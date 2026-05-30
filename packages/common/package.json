@@ -1,0 +1,47 @@
+{
+  "name": "common",
+  "version": "0.0.0",
+  "type": "module",
+  "main": "./index.tsx",
+  "types": "./index.tsx",
+  "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "clean": "rimraf node_modules .turbo tsconfig.tsbuildinfo",
+    "gen:types": "supabase gen types typescript --local >| ./database-types.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@types/dat.gui": "^0.7.12",
+    "@usercentrics/cmp-browser-sdk": "^4.42.0",
+    "api-types": "workspace:*",
+    "config": "workspace:*",
+    "configcat-js": "^9.5.1",
+    "dat.gui": "^0.7.9",
+    "flags": "^4.0.0",
+    "lodash": "catalog:",
+    "next-themes": "catalog:",
+    "posthog-js": "^1.333.0",
+    "react-use": "^17.4.0",
+    "valtio": "catalog:"
+  },
+  "devDependencies": {
+    "@types/lodash": "4.17.5",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "@vitest/ui": "catalog:",
+    "tsconfig": "workspace:*",
+    "type-fest": "5.6.0",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "@supabase/auth-js": "catalog:",
+    "@supabase/supabase-js": "catalog:",
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  }
+}

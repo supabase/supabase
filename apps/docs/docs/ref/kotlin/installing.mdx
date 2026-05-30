@@ -1,0 +1,433 @@
+---
+id: installing
+title: 'Installing & Initialization'
+slug: installing
+custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+---
+
+### Add one or more modules to your project
+
+<RefSubLayout.EducationRow>
+    <RefSubLayout.Details>
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <a href="https://github.com/supabase-community/supabase-kt/releases" style={{ marginRight: '8px' }}>
+                <img src="https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable" alt="latest stable supabase-kt version"/>
+            </a>
+            <a href="https://github.com/supabase-community/supabase-kt/releases">
+                <img src="https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt?label=experimental" alt="latest supabase-kt version"/>
+            </a>
+        </div>
+
+        Add dependency to your build file using the BOM.
+
+        The available modules are:
+        - [**auth-kt**](https://github.com/supabase-community/supabase-kt/tree/master/Auth)
+        - [**realtime-kt**](https://github.com/supabase-community/supabase-kt/tree/master/Realtime)
+        - [**storage-kt**](https://github.com/supabase-community/supabase-kt/tree/master/Storage)
+        - [**functions-kt**](https://github.com/supabase-community/supabase-kt/tree/master/Functions)
+        - [**postgrest-kt**](https://github.com/supabase-community/supabase-kt/tree/master/Postgrest)
+        - Other plugins also available [here](https://github.com/supabase-community/supabase-kt/tree/master/plugins)
+
+        Check out the different READMEs for information about supported Kotlin targets.
+
+        *Note that the minimum Android SDK version is 26. For lower versions, you need to enable [core library desugaring](https://developer.android.com/studio/write/java8-support#library-desugaring).*
+
+    </RefSubLayout.Details>
+    <RefSubLayout.Examples>
+        <Tabs
+            size="small"
+            type="underlined"
+            defaultActiveId="kotlin"
+            queryGroup="build-file"
+        >
+            <TabPanel id="kotlin" label="build.gradle.kts">
+
+                ```kotlin
+                implementation(platform("io.github.jan-tennert.supabase:bom:VERSION"))
+                implementation("io.github.jan-tennert.supabase:postgrest-kt")
+                implementation("io.github.jan-tennert.supabase:auth-kt")
+                implementation("io.github.jan-tennert.supabase:realtime-kt")
+                ```
+
+            </TabPanel>
+            <TabPanel id="groovy" label="build.gradle">
+
+                ```groovy
+                implementation platform("io.github.jan-tennert.supabase:bom:VERSION")
+                implementation 'io.github.jan-tennert.supabase:postgrest-kt'
+                implementation 'io.github.jan-tennert.supabase:auth-kt'
+                implementation 'io.github.jan-tennert.supabase:realtime-kt'
+                ```
+
+            </TabPanel>
+            <TabPanel id="xml" label="pom.xml">
+
+                ```xml
+                <dependency>
+                    <groupId>io.github.jan-tennert.supabase</groupId>
+                    <artifactId>bom</artifactId>
+                    <version>VERSION</version>
+                    <type>pom</type>
+                    <scope>import</scope>
+                </dependency>
+                <dependency>
+                    <groupId>io.github.jan-tennert.supabase</groupId>
+                    <artifactId>postgrest-kt</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>io.github.jan-tennert.supabase</groupId>
+                    <artifactId>auth-kt</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>io.github.jan-tennert.supabase</groupId>
+                    <artifactId>realtime-kt</artifactId>
+                </dependency>
+                ```
+
+            </TabPanel>
+        </Tabs>
+    </RefSubLayout.Examples>
+
+</RefSubLayout.EducationRow>
+
+### Add Ktor Client Engine to each of your Kotlin targets (required)
+
+<RefSubLayout.EducationRow>
+    <RefSubLayout.Details>
+
+        You can find a list of engines [here](https://ktor.io/docs/http-client-engines.html)
+        - Note that not all Ktor engines support WebSockets. So if you plan to use the Realtime module, make sure to use an engine that supports WebSockets. Check out the [engine limitations](https://ktor.io/docs/client-engines.html#limitations) for more information.
+        - If using `supabase-kt` 3.0.0 and above, you need to use Ktor version 3.0.0-rc-1 or later.
+
+    </RefSubLayout.Details>
+    <RefSubLayout.Examples>
+        <Tabs
+            size="small"
+            type="underlined"
+            defaultActiveId="kotlin"
+            queryGroup="build-file"
+        >
+            <TabPanel id="kotlin" label="build.gradle.kts">
+
+                ```kotlin
+                implementation("io.ktor:ktor-client-[engine]:KTOR_VERSION")
+                ```
+
+            </TabPanel>
+            <TabPanel id="groovy" label="build.gradle">
+
+                ```groovy
+                implementation 'io.ktor:ktor-client-[engine]:KTOR_VERSION'
+                ```
+
+            </TabPanel>
+            <TabPanel id="xml" label="pom.xml">
+
+                ```xml
+                <dependency>
+                    <groupId>io.ktor</groupId>
+                    <artifactId>ktor-client-[engine]</artifactId>
+                    <version>KTOR_VERSION</version>
+                </dependency>
+                ```
+
+            </TabPanel>
+        </Tabs>
+    </RefSubLayout.Examples>
+
+    <RefSubLayout.Details>
+
+        Multiplatform example:
+
+    </RefSubLayout.Details>
+    <RefSubLayout.Examples>
+
+        <Tabs
+            size="small"
+            type="underlined"
+            defaultActiveId="kotlin"
+            queryGroup="build-file"
+        >
+            <TabPanel id="kotlin" label="build.gradle.kts">
+
+                ```kotlin
+                commonMain {
+                    dependencies {
+                        //Supabase modules
+                    }
+                }
+                jvmMain {
+                    dependencies {
+                        implementation("io.ktor:ktor-client-cio:KTOR_VERSION")
+                    }
+                }
+                androidMain {
+                    dependsOn(jvmMain.get())
+                }
+                jsMain {
+                    dependencies {
+                        implementation("io.ktor:ktor-client-js:KTOR_VERSION")
+                    }
+                }
+                iosMain {
+                    dependencies {
+                        implementation("io.ktor:ktor-client-darwin:KTOR_VERSION")
+                    }
+                }
+                ```
+
+            </TabPanel>
+        </Tabs>
+
+    </RefSubLayout.Examples>
+
+</RefSubLayout.EducationRow>
+
+### Serialization
+
+supabase-kt provides several different ways to encode and decode your custom objects.
+By default, [KotlinX Serialization](https://github.com/Kotlin/kotlinx.serialization) is used.
+
+<RefSubLayout.EducationRow>
+    <RefSubLayout.Details>
+
+        Use [KotlinX Serialization](https://github.com/Kotlin/kotlinx.serialization).
+
+    </RefSubLayout.Details>
+    <RefSubLayout.Examples>
+
+        <Tabs
+            size="small"
+            type="underlined"
+            defaultActiveId="kotlin"
+            queryGroup="build-file"
+        >
+            <TabPanel id="kotlin" label="build.gradle.kts">
+
+                ```kotlin
+                plugins {
+                    kotlin("plugin.serialization") version "KOTLIN_VERSION"
+                }
+                ```
+
+            </TabPanel>
+            <TabPanel id="groovy" label="build.gradle">
+
+                ```groovy
+                plugins {
+                    id 'org.jetbrains.kotlin.plugin.serialization' version 'KOTLIN_VERSION'
+                }
+                ```
+
+            </TabPanel>
+            <TabPanel id="xml" label="pom.xml">
+
+                ```xml
+                <build>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.jetbrains.kotlin</groupId>
+                            <artifactId>kotlin-maven-plugin</artifactId>
+                            <version>${kotlin.version}</version>
+                            <executions>
+                                <execution>
+                                    <id>compile</id>
+                                    <phase>compile</phase>
+                                    <goals>
+                                        <goal>compile</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                            <configuration>
+                                <compilerPlugins>
+                                    <plugin>kotlinx-serialization</plugin>
+                                </compilerPlugins>
+                            </configuration>
+                            <dependencies>
+                                <dependency>
+                                    <groupId>org.jetbrains.kotlin</groupId>
+                                    <artifactId>kotlin-maven-serialization</artifactId>
+                                    <version>${kotlin.version}</version>
+                                </dependency>
+                            </dependencies>
+                        </plugin>
+                    </plugins>
+                </build>
+                ```
+
+            </TabPanel>
+        </Tabs>
+        ```kotlin
+        val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
+            //Already the default serializer, but you can provide a custom Json instance (optional):
+            defaultSerializer = KotlinXSerializer(Json {
+                //apply your custom config
+            })
+        }
+        ```
+    </RefSubLayout.Examples>
+
+</RefSubLayout.EducationRow>
+<RefSubLayout.EducationRow>
+    <RefSubLayout.Details>
+
+        Use [Moshi](https://github.com/square/moshi).
+
+    </RefSubLayout.Details>
+    <RefSubLayout.Examples>
+
+        <Tabs
+            size="small"
+            type="underlined"
+            defaultActiveId="kotlin"
+            queryGroup="build-file"
+        >
+            <TabPanel id="kotlin" label="build.gradle.kts">
+
+                ```kotlin
+                implementation("io.github.jan-tennert.supabase:serializer-moshi:VERSION")
+                ```
+
+            </TabPanel>
+            <TabPanel id="groovy" label="build.gradle">
+
+                ```groovy
+                implementation 'io.github.jan-tennert.supabase:serializer-moshi:VERSION'
+                ```
+
+            </TabPanel>
+            <TabPanel id="xml" label="pom.xml">
+
+                ```xml
+                <dependency>
+                    <groupId>io.github.jan-tennert.supabase</groupId>
+                    <artifactId>serializer-moshi</artifactId>
+                    <version>VERSION</version>
+                </dependency>
+                ```
+
+            </TabPanel>
+        </Tabs>
+        ```kotlin
+        val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
+            defaultSerializer = MoshiSerializer()
+        }
+        ```
+
+    </RefSubLayout.Examples>
+
+</RefSubLayout.EducationRow>
+<RefSubLayout.EducationRow>
+    <RefSubLayout.Details>
+
+        Use [Jackson](https://github.com/FasterXML/jackson-module-kotlin).
+
+    </RefSubLayout.Details>
+    <RefSubLayout.Examples>
+
+        <Tabs
+            size="small"
+            type="underlined"
+            defaultActiveId="kotlin"
+            queryGroup="build-file"
+        >
+            <TabPanel id="kotlin" label="build.gradle.kts">
+
+                ```kotlin
+                implementation("io.github.jan-tennert.supabase:serializer-jackson:VERSION")
+                ```
+
+            </TabPanel>
+            <TabPanel id="groovy" label="build.gradle">
+
+                ```groovy
+                implementation 'io.github.jan-tennert.supabase:serializer-jackson:VERSION'
+                ```
+
+            </TabPanel>
+            <TabPanel id="xml" label="pom.xml">
+
+                ```xml
+                <dependency>
+                    <groupId>io.github.jan-tennert.supabase</groupId>
+                    <artifactId>serializer-jackson</artifactId>
+                    <version>VERSION</version>
+                </dependency>
+                ```
+
+            </TabPanel>
+        </Tabs>
+        ```kotlin
+        val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
+            defaultSerializer = JacksonSerializer()
+        }
+        ```
+
+    </RefSubLayout.Examples>
+
+</RefSubLayout.EducationRow>
+<RefSubLayout.EducationRow>
+    <RefSubLayout.Details>
+
+        Use custom serializer.
+
+    </RefSubLayout.Details>
+    <RefSubLayout.Examples>
+
+        ```kotlin
+        class CustomSerializer: SupabaseSerializer {
+
+            override fun <T : Any> encode(type: KType, value: T): String {
+                //encode value to string
+            }
+
+            override fun <T : Any> decode(type: KType, value: String): T {
+                //decode value
+            }
+
+        }
+        ```
+
+        ```kotlin
+        val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
+            defaultSerializer = CustomSerializer()
+        }
+        ```
+
+    </RefSubLayout.Examples>
+
+</RefSubLayout.EducationRow>
+
+### Enable Data API access
+
+<RefSubLayout.EducationRow>
+    <RefSubLayout.Details>
+
+        supabase-kt uses the Data API to query and mutate your Postgres data. You first need to grant Data API roles permissions to access your tables and functions.
+
+        In [Data API integrations settings](/dashboard/project/_/integrations/data_api/settings), expose the specific tables and functions you want to access. To automatically grant access for new tables and functions in `public`, enable **Default privileges for new entities**.
+
+        Alternatively, use SQL to grant the required permissions:
+
+    </RefSubLayout.Details>
+
+    <RefSubLayout.Examples>
+
+        ```sql
+        -- Before granting access to client roles, make sure RLS is enabled
+        -- and create the policies required for each role's allowed operations.
+        alter table public.your_table enable row level security;
+        -- create policy ... on public.your_table ...;
+
+        -- Grant least-privilege access to tables after RLS and policies are in place
+        grant select on public.your_table to anon;
+        grant select, insert, update, delete on public.your_table to authenticated;
+        grant all on public.your_table to service_role;
+
+        -- Grant execute on functions after verifying any table access they rely on
+        grant execute on function public.your_function to authenticated, service_role;
+        ```
+
+    </RefSubLayout.Examples>
+
+</RefSubLayout.EducationRow>

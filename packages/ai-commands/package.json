@@ -1,0 +1,41 @@
+{
+  "name": "ai-commands",
+  "version": "0.0.0",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "license": "MIT",
+  "sideEffects": false,
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "clean": "rimraf node_modules",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@serafin/schema-builder": "^0.18.5",
+    "@supabase/supabase-js": "catalog:",
+    "ai": "5.0.52",
+    "common-tags": "^1.8.2",
+    "config": "workspace:*",
+    "js-tiktoken": "^1.0.10",
+    "jsonrepair": "^3.5.0",
+    "openai": "^4.75.1",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@ai-sdk/openai": "^2.0.0",
+    "@types/common-tags": "^1.8.4",
+    "@types/mdast": "^4.0.0",
+    "@types/node": "catalog:",
+    "api-types": "workspace:*",
+    "chalk": "^5.3.0",
+    "dotenv": "^16.3.1",
+    "libpg-query": "15.2.0",
+    "mdast-util-from-markdown": "^2.0.0",
+    "sql-formatter": "^15.0.0",
+    "tsconfig": "workspace:*",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

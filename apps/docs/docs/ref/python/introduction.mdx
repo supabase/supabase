@@ -1,0 +1,1 @@
+This reference documents every object and method available in Supabase's Python library, [supabase-py](https://github.com/supabase/supabase-py). You can use supabase-py to interact with your Postgres database, listen to database changes, invoke Deno Edge Functions, build login and user management functionality, and manage large files.

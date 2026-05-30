@@ -1,0 +1,181 @@
+import { debounce } from 'lodash'
+import { Check, Code, Loader } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Button,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  ScrollArea,
+} from 'ui'
+
+import { useEntityTypesQuery } from '@/data/entity-types/entity-types-infinite-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+
+interface TableSelectorProps {
+  className?: string
+  size?: 'tiny' | 'small'
+  showError?: boolean
+  selectedSchemaName: string
+  selectedTableName: string
+  onSelectTable: (name: string, id: number | undefined) => void
+}
+
+const TableSelector = ({
+  className,
+  size = 'tiny',
+  showError = true,
+  selectedSchemaName,
+  selectedTableName,
+  onSelectTable,
+}: TableSelectorProps) => {
+  const [open, setOpen] = useState(false)
+  const [initiallyLoaded, setInitiallyLoaded] = useState(false)
+  const { data: project } = useSelectedProjectQuery()
+  const [searchInput, setSearchInput] = useState('')
+
+  const {
+    data,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+    error,
+    refetch,
+  } = useEntityTypesQuery({
+    projectRef: project?.ref,
+    search: searchInput,
+    connectionString: project?.connectionString,
+    schemas: [selectedSchemaName],
+  })
+  useEffect(() => {
+    if (!initiallyLoaded && isSuccess) {
+      setInitiallyLoaded(true)
+    }
+  }, [initiallyLoaded, isSuccess])
+
+  useEffect(() => {
+    if (!open && searchInput !== '') {
+      setSearchInput('')
+    }
+  }, [open, searchInput])
+
+  const searchTables = debounce(setSearchInput)
+
+  const entities = (data?.pages[0].data.entities ? [...data?.pages[0].data.entities] : []).sort(
+    (a, b) => (a.name > b.name ? 0 : -1)
+  )
+
+  return (
+    <div className={className}>
+      <Popover open={open} onOpenChange={setOpen} modal={false}>
+        <PopoverTrigger asChild>
+          <Button
+            size={size}
+            type="outline"
+            disabled={isLoading}
+            className={`w-full [&>span]:w-full ${size === 'small' ? 'py-1.5' : ''}`}
+            icon={isLoading ? <Loader className="animate-spin" size={12} /> : null}
+            iconRight={
+              <Code className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
+            }
+          >
+            {initiallyLoaded ? (
+              <div className="w-full flex space-x-3">
+                <p className="text-xs text-light">table</p>
+                <p className="text-xs">
+                  {selectedTableName === '*' ? 'All tables' : selectedTableName}
+                </p>
+              </div>
+            ) : (
+              <p className="flex text-xs text-light">Loading tables...</p>
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="p-0 w-64" side="bottom" align="start">
+          <Command>
+            <CommandInput placeholder="Find table..." onValueChange={(str) => searchTables(str)} />
+            <CommandList>
+              {isLoading && (
+                <div className="flex items-center justify-center space-x-2 px-3 py-2">
+                  <Loader className="animate-spin" size={12} />
+                  <p className="flex text-xs text-light">Loading tables...</p>
+                </div>
+              )}
+
+              {showError && isError && (
+                <Alert variant="warning" className="px-3! py-3! border-0! rounded-none">
+                  <AlertTitle className="text-xs text-amber-900">Failed to load tables</AlertTitle>
+                  <AlertDescription className="text-xs mb-2">
+                    Error: {(error as any)?.message}
+                  </AlertDescription>
+                  <Button type="default" size="tiny" onClick={() => refetch()}>
+                    Reload tables
+                  </Button>
+                </Alert>
+              )}
+
+              {isSuccess && (
+                <>
+                  <CommandGroup forceMount>
+                    <ScrollArea className={(entities || []).length > 7 ? 'h-[210px]' : ''}>
+                      {entities.length === 0 && <CommandEmpty>No tables found</CommandEmpty>}
+                      {!searchInput && (
+                        <CommandItem
+                          key="all-tables"
+                          className="cursor-pointer flex items-center justify-between space-x-2 w-full"
+                          onSelect={() => {
+                            onSelectTable('*', undefined)
+                            setOpen(false)
+                          }}
+                          onClick={() => {
+                            onSelectTable('*', undefined)
+                            setOpen(false)
+                          }}
+                        >
+                          <span>All tables</span>
+                          {selectedSchemaName === '*' && (
+                            <Check className="text-brand" strokeWidth={2} />
+                          )}
+                        </CommandItem>
+                      )}
+                      {entities?.map((table) => (
+                        <CommandItem
+                          key={table.id}
+                          className="cursor-pointer flex items-center justify-between space-x-2 w-full"
+                          onSelect={() => {
+                            onSelectTable(table.name, table.id)
+                            setOpen(false)
+                          }}
+                          onClick={() => {
+                            onSelectTable(table.name, table.id)
+                            setOpen(false)
+                          }}
+                        >
+                          <span>{table.name}</span>
+                          {selectedSchemaName === table.name && (
+                            <Check className="text-brand" strokeWidth={2} />
+                          )}
+                        </CommandItem>
+                      ))}
+                    </ScrollArea>
+                  </CommandGroup>
+                </>
+              )}
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+    </div>
+  )
+}
+
+export default TableSelector

@@ -1,0 +1,161 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
+import dayjs from 'dayjs'
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import {
+  Button,
+  cn,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
+import { useUserUpdateMutation } from '@/data/auth/user-update-mutation'
+import { User } from '@/data/auth/users-infinite-query'
+
+interface BanUserModalProps {
+  visible: boolean
+  user: User
+  onClose: () => void
+}
+
+export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
+  const { ref: projectRef } = useParams()
+
+  const { mutate: updateUser, isPending: isBanningUser } = useUserUpdateMutation({
+    onSuccess: (_, vars) => {
+      const bannedUntil = dayjs()
+        .add(Number(vars.banDuration), 'hours')
+        .format('DD MMM YYYY HH:mm (ZZ)')
+      toast.success(`User banned successfully until ${bannedUntil}`)
+      onClose()
+    },
+  })
+
+  const FormSchema = z.object({
+    value: z.string().min(1, { message: 'Please provide a duration' }),
+    unit: z.enum(['hours', 'days']),
+  })
+  type FormType = z.infer<typeof FormSchema>
+  const defaultValues: FormType = { value: '24', unit: 'hours' }
+  const form = useForm<FormType>({
+    mode: 'onBlur',
+    reValidateMode: 'onChange',
+    resolver: zodResolver(FormSchema),
+    defaultValues,
+  })
+
+  const { value, unit } = form.watch()
+  const bannedUntil = dayjs().add(Number(value), unit).format('DD MMM YYYY HH:mm (ZZ)')
+
+  const onSubmit = (data: FormType) => {
+    if (projectRef === undefined) return console.error('Project ref is required')
+    if (user.id === undefined) {
+      return toast.error(`Failed to ban user: User ID not found`)
+    }
+
+    const durationHours = data.unit === 'hours' ? Number(data.value) : Number(data.value) * 24
+
+    updateUser({
+      projectRef,
+      userId: user.id,
+      banDuration: durationHours,
+    })
+  }
+
+  useEffect(() => {
+    if (visible) form.reset(defaultValues)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible])
+
+  return (
+    <Dialog open={visible} onOpenChange={() => onClose()}>
+      <DialogContent size="small">
+        <DialogHeader>
+          <DialogTitle>Confirm to ban user</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <DialogSection className="flex flex-col gap-y-3">
+              <p className="text-sm">
+                This will revoke the user's access to your project and prevent them from logging in
+                for a specified duration.
+              </p>
+              <div className="flex items-start gap-x-2 [&>div:first-child]:grow">
+                <FormField
+                  control={form.control}
+                  name="value"
+                  render={({ field }) => (
+                    <FormItemLayout label="Set a ban duration">
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="unit"
+                  render={({ field }) => (
+                    <FormItemLayout className="[&>div>div]:mt-0 mt-[29px]">
+                      <FormControl>
+                        <Select
+                          {...field}
+                          aria-label="Duration unit"
+                          value={field.value}
+                          onValueChange={(value) =>
+                            form.setValue('unit', value as 'hours' | 'days')
+                          }
+                        >
+                          <SelectTrigger className="capitalize w-24">{field.value}</SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="hours">Hours</SelectItem>
+                            <SelectItem value="days">Days</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
+              </div>
+
+              <div>
+                <p className="text-sm text-foreground-lighter">
+                  This user will not be able to log in until:
+                </p>
+                <p className={cn('text-sm', !value && 'text-foreground-light')}>
+                  {!!value ? bannedUntil : 'Invalid duration set'}
+                </p>
+              </div>
+            </DialogSection>
+            <DialogFooter>
+              <Button type="default" disabled={isBanningUser} onClick={() => onClose()}>
+                Cancel
+              </Button>
+              <Button type="warning" htmlType="submit" loading={isBanningUser}>
+                Confirm ban
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  )
+}

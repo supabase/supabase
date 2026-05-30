@@ -1,0 +1,82 @@
+import { XCircle } from 'lucide-react'
+import { FC, PropsWithChildren, useState } from 'react'
+
+import { Badge } from 'ui'
+
+interface IOptions {
+  name?: string
+}
+
+type IOption = any
+
+type OptionsSubComponents = {
+  Option: IOption
+}
+
+const Options: FC<PropsWithChildren<IOptions>> & OptionsSubComponents = (props) => {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="mt-0">
+      <button
+        className={[
+          'px-5 py-1',
+          'border-t border-l border-r border-default',
+          'text-left text-sm text-foreground-light',
+          'hover:bg-surface-100',
+          'flex items-center gap-2',
+          open ? 'w-full rounded-tl-lg rounded-tr-lg' : 'border-b rounded-full',
+        ].join(' ')}
+        onClick={() => setOpen(!open)}
+      >
+        <div>
+          <div className={[!open ? 'rotate-45' : 'rotate-0'].join(' ')}>
+            <XCircle size={14} />
+          </div>
+        </div>
+        {`${!open ? `Open` : `Close`} ${props.name ?? 'accepted values'}`}
+      </button>
+      <div className={['opacity-0', open ? 'opacity-100 h-auto' : 'invisible h-0'].join(' ')}>
+        {props.children}
+      </div>
+    </div>
+  )
+}
+
+const Option: FC<IOption> = (props) => {
+  return (
+    <div
+      className="
+        px-5 py-3 first:border-t border-b border-l border-r
+        border-default
+        last:rounded-bl-lg last:rounded-br-lg
+        flex flex-col gap-3
+      "
+    >
+      <div className="flex flex-wrap gap-3 items-center">
+        <span className="text-sm text-foreground font-mono font-medium">
+          {props.name ?? 'no-name'}
+        </span>
+        {!props.isEnum && (
+          <>
+            {props.isOptional ? (
+              <Badge variant="default">Optional</Badge>
+            ) : (
+              <Badge variant="warning">Required</Badge>
+            )}
+            <span className="text-foreground-muted text-xs">{props.type ?? 'no type'}</span>
+          </>
+        )}
+      </div>
+
+      {props.description && (
+        <p className="text-sm text-foreground-lighter m-0">{props.description}</p>
+      )}
+
+      {props.children}
+    </div>
+  )
+}
+
+Options.Option = Option
+
+export default Options

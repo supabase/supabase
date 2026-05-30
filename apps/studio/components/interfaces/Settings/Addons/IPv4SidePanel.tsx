@@ -1,0 +1,247 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
+import { cn, RadioGroup, RadioGroupLargeItem, SidePanel } from 'ui'
+import { Admonition } from 'ui-patterns'
+
+import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useProjectAddonRemoveMutation } from '@/data/subscriptions/project-addon-remove-mutation'
+import { useProjectAddonUpdateMutation } from '@/data/subscriptions/project-addon-update-mutation'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import type { AddonVariantId } from '@/data/subscriptions/types'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsAwsCloudProvider } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import { formatCurrency } from '@/lib/helpers'
+import { useAddonsPagePanel } from '@/state/addons-page'
+
+const IPv4SidePanel = () => {
+  const isAws = useIsAwsCloudProvider()
+  const { ref: projectRef } = useParams()
+
+  const [selectedOption, setSelectedOption] = useState<string>('ipv4_none')
+
+  const { can: canUpdateIPv4 } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.subscriptions'
+  )
+
+  const { panel, closePanel } = useAddonsPagePanel()
+  const visible = panel === 'ipv4'
+
+  const { data: addons, isPending: isLoading } = useProjectAddonsQuery({ projectRef })
+  const { mutate: updateAddon, isPending: isUpdating } = useProjectAddonUpdateMutation({
+    onSuccess: () => {
+      toast.success(`Successfully enabled IPv4`)
+      closePanel()
+    },
+    onError: (error) => {
+      toast.error(`Unable to enable IPv4: ${error.message}`)
+    },
+  })
+  const { mutate: removeAddon, isPending: isRemoving } = useProjectAddonRemoveMutation({
+    onSuccess: () => {
+      toast.success(`Successfully disabled IPv4.`)
+      closePanel()
+    },
+    onError: (error) => {
+      toast.error(`Unable to disable IPv4: ${error.message}`)
+    },
+  })
+  const isSubmitting = isUpdating || isRemoving
+
+  const subscriptionIpV4Option = (addons?.selected_addons ?? []).find(
+    (addon) => addon.type === 'ipv4'
+  )
+  const availableOptions =
+    (addons?.available_addons ?? []).find((addon) => addon.type === 'ipv4')?.variants ?? []
+
+  const { hasAccess: hasAccessToIPv4, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('ipv4')
+  const hasChanges = selectedOption !== (subscriptionIpV4Option?.variant.identifier ?? 'ipv4_none')
+  const selectedIPv4 = availableOptions.find((option) => option.identifier === selectedOption)
+
+  const ipv4Options = [
+    {
+      value: 'ipv4_none',
+      id: 'ipv4_none',
+      title: 'No IPv4 address',
+      description: 'Use shared pooler or IPv6 for database connections.',
+      priceContent: (
+        <>
+          <p className="text-foreground text-sm">$0</p>
+          <p className="text-foreground-light translate-y-px text-sm">/ month</p>
+        </>
+      ),
+      priceRowClassName: 'mt-2',
+    },
+    ...availableOptions.map((option) => ({
+      value: option.identifier,
+      id: option.identifier,
+      title: 'Dedicated IPv4 address',
+      description: 'Allow database connections from IPv4 networks.',
+      priceContent: (
+        <>
+          <p className="text-sm" translate="no">
+            {formatCurrency(option.price)}
+          </p>
+          <p className="text-foreground-light translate-y-[0.5px]">/ month / database</p>
+        </>
+      ),
+      priceRowClassName: 'mt-3',
+    })),
+  ]
+
+  useEffect(() => {
+    if (visible) {
+      if (subscriptionIpV4Option !== undefined) {
+        setSelectedOption(subscriptionIpV4Option.variant.identifier)
+      } else {
+        setSelectedOption('ipv4_none')
+      }
+    }
+  }, [visible, isLoading])
+
+  const onConfirm = async () => {
+    if (!projectRef) return console.error('Project ref is required')
+    if (selectedOption === 'ipv4_none' && subscriptionIpV4Option !== undefined) {
+      removeAddon({ projectRef, variant: subscriptionIpV4Option.variant.identifier })
+    } else {
+      updateAddon({ projectRef, type: 'ipv4', variant: selectedOption as AddonVariantId })
+    }
+  }
+
+  return (
+    <SidePanel
+      size="large"
+      visible={visible}
+      onCancel={closePanel}
+      onConfirm={onConfirm}
+      loading={isLoading || isSubmitting || isLoadingEntitlement}
+      disabled={
+        !hasAccessToIPv4 ||
+        isLoadingEntitlement ||
+        isLoading ||
+        !hasChanges ||
+        isSubmitting ||
+        !canUpdateIPv4 ||
+        !isAws
+      }
+      tooltip={
+        !hasAccessToIPv4
+          ? 'Unable to enable IPv4 on a Free Plan'
+          : !canUpdateIPv4
+            ? 'You do not have permission to update IPv4'
+            : undefined
+      }
+      header={
+        <div className="flex w-full items-center justify-between">
+          <h4>Dedicated IPv4 address</h4>
+          <DocsButton href={`${DOCS_URL}/guides/platform/ipv4-address`} />
+        </div>
+      }
+    >
+      <SidePanel.Content>
+        <div className="py-6 space-y-4">
+          <p className="text-sm">
+            Your project’s direct connection endpoint and dedicated pooler are IPv6-only by default.
+            Enable the dedicated IPv4 address add-on to connect from IPv4-only networks.
+          </p>
+
+          <p className="text-sm">
+            The shared pooler endpoint accepts IPv4 connections by default and does not require this
+            add-on.
+          </p>
+
+          {!isAws && (
+            <Admonition
+              type="default"
+              description="Dedicated IPv4 address is only available for AWS projects."
+            />
+          )}
+
+          {isAws && (
+            <div className={cn('mt-8! pb-4', !hasAccessToIPv4 && 'opacity-75')}>
+              <RadioGroup
+                name="ipv4"
+                value={selectedOption}
+                onValueChange={setSelectedOption}
+                className="grid grid-cols-1 md:grid-cols-2 gap-4"
+              >
+                {ipv4Options.map((option) => (
+                  <RadioGroupLargeItem
+                    key={option.id}
+                    value={option.value}
+                    label=""
+                    showIndicator={false}
+                    className={cn(
+                      'w-full gap-0 p-0 shadow-none bg-transparent cursor-pointer text-left',
+                      'border-default hover:border-control hover:bg-transparent'
+                    )}
+                  >
+                    <div className="px-4 py-3">
+                      <p className="text-sm font-medium">{option.title}</p>
+                      <p className="text-foreground-light text-sm mt-1">{option.description}</p>
+                      <div
+                        className={cn(
+                          'flex items-center space-x-1 text-sm',
+                          option.priceRowClassName
+                        )}
+                      >
+                        {option.priceContent}
+                      </div>
+                    </div>
+                  </RadioGroupLargeItem>
+                ))}
+              </RadioGroup>
+              <TaxDisclaimer className="mt-3" />
+            </div>
+          )}
+
+          {hasChanges && (
+            <>
+              <Admonition
+                type="note"
+                title="Potential downtime"
+                description="There might be some downtime when enabling the add-on since some DNS clients might
+                have cached the old DNS entry. Generally, this should be less than a minute."
+              />
+              {selectedOption !== 'ipv4_none' && (
+                <p className="text-sm text-foreground-light">
+                  By default, this is only applied to the primary database for your project. If{' '}
+                  <InlineLink href={`${DOCS_URL}/guides/platform/read-replicas`} target="_blank">
+                    read replicas
+                  </InlineLink>{' '}
+                  are used, each replica also gets its own IPv4 address, with a corresponding{' '}
+                  <span className="text-foreground">{formatCurrency(selectedIPv4?.price)}</span>{' '}
+                  charge.
+                </p>
+              )}
+              <p className="text-sm text-foreground-light">
+                There are no immediate charges. The add-on is billed at the end of your billing
+                cycle based on your usage and prorated to the hour.
+              </p>
+            </>
+          )}
+
+          {!hasAccessToIPv4 && (
+            <UpgradeToPro
+              addon="ipv4"
+              source="ipv4SidePanel"
+              featureProposition="connect from IPv4-only networks"
+              primaryText="Dedicated IPv4 address is a Pro Plan add-on"
+              secondaryText="Enable the add-on to connect to your project from IPv4-only networks."
+            />
+          )}
+        </div>
+      </SidePanel.Content>
+    </SidePanel>
+  )
+}
+
+export default IPv4SidePanel

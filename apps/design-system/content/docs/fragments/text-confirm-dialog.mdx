@@ -1,0 +1,73 @@
+---
+title: Text Confirm Dialog
+description: A modal dialog that adds a deliberate confirmation step for highly destructive actions.
+component: true
+---
+
+Text Confirm Dialog adds a deliberate “speed bump” before a highly destructive action by requiring the user to type an exact confirmation string before the confirm action is enabled. It wraps the Shadcn [Dialog](../components/dialog) component and is intended for actions that must not be triggered accidentally.
+
+Use Text Confirm Dialog for irreversible operations such as deleting buckets, projects, or other critical resources where an explicit signal of user intent is required beyond a button click.
+
+For non-destructive or less critical confirmations, use [Alert Dialog](../components/alert-dialog) or [Confirmation Modal](../fragments/confirmation-modal) instead. See [Modality](../ui-patterns/modality) for guidance on choosing the appropriate dialog pattern.
+
+<ComponentPreview name="text-confirm-dialog-demo" peekCode showDottedGrid wide />
+
+## Usage
+
+```tsx
+'use client'
+
+import { useState } from 'react'
+import { Button } from 'ui'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
+```
+
+```tsx
+export default function TextConfirmDialogDemo() {
+  const [visible, setVisible] = useState(false)
+  const bucketName = 'profile-pictures'
+
+  return (
+    <>
+      <Button type="danger" onClick={() => setVisible(true)}>
+        Show Text Confirm Dialog
+      </Button>
+
+      <TextConfirmModal
+        visible={visible}
+        size="small"
+        variant="destructive"
+        title="Delete bucket"
+        confirmPlaceholder={bucketName}
+        confirmString={bucketName}
+        confirmLabel="Delete bucket"
+        onConfirm={() => setVisible(false)}
+        onCancel={() => setVisible(false)}
+      >
+        {/* Optional body content */}
+      </TextConfirmModal>
+    </>
+  )
+}
+```
+
+## Props
+
+- `confirmString`: The exact string the user must type to enable the confirm action (leading/trailing whitespace is trimmed)
+- `confirmPlaceholder`: Placeholder text shown in the confirmation input
+- `variant`: Visual intent of the dialog (`default`, `destructive`, or `warning`)
+- Other standard modal props inherited from the underlying [Dialog](../components/dialog) component
+
+## Examples
+
+### Cancel button
+
+<ComponentPreview name="text-confirm-dialog-with-cancel-button" />
+
+### Children
+
+<ComponentPreview name="text-confirm-dialog-with-children" />
+
+### Size
+
+<ComponentPreview name="text-confirm-dialog-with-size" />

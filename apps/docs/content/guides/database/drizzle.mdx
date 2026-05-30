@@ -1,0 +1,99 @@
+---
+id: 'drizzle'
+title: 'Drizzle'
+description: 'Drizzle Quickstart'
+breadcrumb: 'ORM Quickstarts'
+hideToc: true
+---
+
+### Connecting with Drizzle
+
+[Drizzle ORM](https://github.com/drizzle-team/drizzle-orm) is a TypeScript ORM for SQL databases designed with maximum type safety in mind. You can use their ORM to connect to your database.
+
+<Admonition type="note">
+
+If you plan on solely using Drizzle instead of the Supabase Data API (PostgREST), you can turn off the latter in the [API Settings](/dashboard/project/_/settings/api).
+
+</Admonition>
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+
+    <StepHikeCompact.Details title="Install">
+
+    Install Drizzle and related dependencies.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ```shell
+     npm i drizzle-orm postgres
+     npm i -D drizzle-kit
+     ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Create your models">
+
+    Create a `schema.ts` file and define your models.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    ```ts schema.ts
+    import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
+
+    export const users = pgTable('users', {
+      id: serial('id').primaryKey(),
+      fullName: text('full_name'),
+      phone: varchar('phone', { length: 256 }),
+    });
+    ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+
+    <StepHikeCompact.Details title="Connect">
+
+    Connect to your database using the Connection Pooler.
+
+    From the project  [**Connect** panel](/dashboard/project/_?showConnect=true), copy the URI from the "Shared Pooler" option and save it as the `DATABASE_URL` environment variable. Remember to replace the password placeholder with your actual database password.
+
+    In local SUPABASE_DB_URL require to be adapted to work with Docker resolver
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    ```ts db.ts
+    import 'dotenv/config'
+
+    import { drizzle } from 'drizzle-orm/postgres-js'
+    import postgres from 'postgres'
+
+    let connectionString = process.env.DATABASE_URL
+    if (host.includes('postgres:postgres@supabase_db_')) {
+      const url = URL.parse(host)!
+      url.hostname = url.hostname.split('_')[1]
+      connectionString = url.href
+    }
+
+    // Disable prefetch as it is not supported for "Transaction" pool mode
+    export const client = postgres(connectionString, { prepare: false })
+    export const db = drizzle(client);
+    ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>

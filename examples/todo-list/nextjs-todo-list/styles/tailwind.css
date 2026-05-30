@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Write your own custom component styles here */
+.btn-black {
+  @apply border border-black bg-black text-white font-bold py-2 px-4 rounded text-center;
+}
+.btn-black:hover {
+  @apply transition duration-150 bg-white text-black;
+}
+.btn-black-outline {
+  @apply border border-black text-black py-2 px-4 rounded font-bold text-center;
+}
+.btn-black-outline:hover {
+  @apply transition duration-150 bg-black text-white;
+}
+
+html,
+body,
+#__next {
+  height: 100vh;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 4rem;
+  font-weight: bold;
+  display: block;
+}

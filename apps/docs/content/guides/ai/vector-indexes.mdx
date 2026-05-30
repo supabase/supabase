@@ -1,0 +1,41 @@
+---
+id: 'ai-vector-indexes'
+title: 'Vector indexes'
+description: 'Understanding vector indexes'
+sidebar_label: 'Vector indexes'
+---
+
+Once your vector table starts to grow, you will likely want to add an index to speed up queries. Without indexes, you'll be performing a sequential scan which can be a resource-intensive operation when you have many records.
+
+## Choosing an index
+
+Today `pgvector` supports two types of indexes:
+
+- [HNSW](/docs/guides/ai/vector-indexes/hnsw-indexes)
+- [IVFFlat](/docs/guides/ai/vector-indexes/ivf-indexes)
+
+In general we recommend using [HNSW](/docs/guides/ai/vector-indexes/hnsw-indexes) because of its [performance](/blog/increase-performance-pgvector-hnsw#hnsw-performance-1536-dimensions) and [robustness against changing data](/docs/guides/ai/vector-indexes/hnsw-indexes#when-should-you-create-hnsw-indexes).
+
+## Distance operators
+
+Indexes can be used to improve performance of nearest neighbor search using various distance measures. `pgvector` includes 3 distance operators:
+
+| Operator | Description            | [**Operator class**](https://www.postgresql.org/docs/current/sql-createopclass.html) |
+| -------- | ---------------------- | ------------------------------------------------------------------------------------ |
+| `<->`    | Euclidean distance     | `vector_l2_ops`                                                                      |
+| `<#>`    | negative inner product | `vector_ip_ops`                                                                      |
+| `<=>`    | cosine distance        | `vector_cosine_ops`                                                                  |
+
+For pgvector versions 0.7.0 and above, it's possible to create indexes on vectors with the following maximum dimensions:
+
+- vector: up to 2,000 dimensions
+- halfvec: up to 4,000 dimensions
+- bit: up to 64,000 dimensions
+
+You can check your current pgvector version by running: `SELECT * FROM pg_extension WHERE extname = 'vector';` or by navigating to the [Extensions](/dashboard/project/_/database/extensions) tab in your Supabase project dashboard.
+
+If you are on an earlier version of pgvector, you should [upgrade your project here](/dashboard/project/_/settings/infrastructure).
+
+## Resources
+
+Read more about indexing on `pgvector`'s [GitHub page](https://github.com/pgvector/pgvector#indexing).

@@ -1,0 +1,283 @@
+import dagre from '@dagrejs/dagre'
+import type { PGSchema, PGTable } from '@supabase/pg-meta'
+import { Edge, Node, Position } from '@xyflow/react'
+import { uniqBy } from 'lodash'
+
+import '@xyflow/react/dist/style.css'
+
+import { LOCAL_STORAGE_KEYS } from 'common'
+
+import { TableNodeData } from './Schemas.constants'
+import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH } from './SchemaTableNode'
+import { tryParseJson } from '@/lib/helpers'
+
+const NODE_SEP = 25
+const RANK_SEP = 50
+
+export async function getGraphDataFromTables(
+  ref?: string,
+  schema?: PGSchema,
+  tables?: PGTable[]
+): Promise<{
+  nodes: Node<TableNodeData>[]
+  edges: Edge[]
+}> {
+  if (!tables?.length) {
+    return { nodes: [], edges: [] }
+  }
+
+  const nodes = tables.map((table) => {
+    const columns = (table.columns || []).map((column) => {
+      return {
+        id: column.id,
+        isPrimary: table.primary_keys.some((pk) => pk.name === column.name),
+        name: column.name,
+        format: column.format,
+        isNullable: column.is_nullable,
+        isUnique: column.is_unique,
+        isUpdateable: column.is_updatable,
+        isIdentity: column.is_identity,
+        description: column.comment ?? '',
+      }
+    })
+
+    const data: TableNodeData = {
+      ref,
+      id: table.id,
+      name: table.name,
+      description: table.comment ?? '',
+      schema: table.schema,
+      isForeign: false,
+      columns,
+    }
+
+    return {
+      data,
+      id: `${table.id}`,
+      type: 'table',
+      position: { x: 0, y: 0 },
+    }
+  })
+
+  const edges: Edge[] = []
+  const currentSchema = tables[0].schema
+  const uniqueRelationships = uniqBy(
+    tables.flatMap((t) => t.relationships),
+    'id'
+  )
+
+  // Precompute name → { tableId, columnsByName } lookup so each relationship
+  // resolves its source/target handles in O(1) instead of scanning every table+column.
+  const tablesByName = new Map<string, { tableId: number; columnsByName: Map<string, string> }>()
+  for (const table of tables) {
+    const columnsByName = new Map<string, string>()
+    for (const column of table.columns || []) {
+      columnsByName.set(column.name, column.id)
+    }
+    tablesByName.set(table.name, { tableId: table.id, columnsByName })
+  }
+
+  const findHandleIds = (tableName: string, columnName: string): [string?, string?] => {
+    const entry = tablesByName.get(tableName)
+    if (!entry) return []
+    const columnId = entry.columnsByName.get(columnName)
+    if (columnId === undefined) return []
+    return [String(entry.tableId), columnId]
+  }
+
+  for (const rel of uniqueRelationships) {
+    // TODO: Support [external->this] relationship?
+    if (rel.source_schema !== currentSchema) {
+      continue
+    }
+
+    // Create additional [this->foreign] node that we can point to on the graph.
+    if (rel.target_table_schema !== currentSchema) {
+      const targetId = `${rel.target_table_schema}.${rel.target_table_name}.${rel.target_column_name}`
+
+      const targetNode = nodes.find((n) => n.id === targetId)
+      if (!targetNode) {
+        const data: TableNodeData = {
+          id: rel.id,
+          ref: ref!,
+          schema: rel.target_table_schema,
+          name: targetId,
+          description: '',
+          isForeign: true,
+          columns: [],
+        }
+
+        nodes.push({
+          id: targetId,
+          type: 'table',
+          data: data,
+          position: { x: 0, y: 0 },
+        })
+      }
+
+      const [source, sourceHandle] = findHandleIds(rel.source_table_name, rel.source_column_name)
+
+      if (source) {
+        edges.push({
+          id: String(rel.id),
+          source,
+          sourceHandle,
+          target: targetId,
+          targetHandle: targetId,
+          deletable: false,
+          data: {
+            sourceName: rel.source_table_name,
+            sourceSchemaName: rel.source_schema,
+            sourceColumnName: rel.source_column_name,
+            targetName: rel.target_table_name,
+            targetSchemaName: rel.target_table_schema,
+            targetColumnName: rel.target_column_name,
+          },
+        })
+      }
+
+      continue
+    }
+
+    const [source, sourceHandle] = findHandleIds(rel.source_table_name, rel.source_column_name)
+    const [target, targetHandle] = findHandleIds(rel.target_table_name, rel.target_column_name)
+
+    // We do not support [external->this] flow currently.
+    if (source && target) {
+      edges.push({
+        id: String(rel.id),
+        source,
+        sourceHandle,
+        target,
+        targetHandle,
+        type: 'default',
+        data: {
+          sourceName: rel.source_table_name,
+          sourceSchemaName: rel.source_schema,
+          sourceColumnName: rel.source_column_name,
+          targetName: rel.target_table_name,
+          targetSchemaName: rel.target_table_schema,
+          targetColumnName: rel.target_column_name,
+        },
+      })
+    }
+  }
+
+  const savedPositionsLocalStorage = localStorage.getItem(
+    LOCAL_STORAGE_KEYS.SCHEMA_VISUALIZER_POSITIONS(ref ?? 'project', schema?.id ?? 0)
+  )
+  const savedPositions = tryParseJson(savedPositionsLocalStorage)
+  return !!savedPositions
+    ? getLayoutedElementsViaLocalStorage(nodes, edges, savedPositions)
+    : getLayoutedElementsViaDagre(nodes, edges)
+}
+
+export const getLayoutedElementsViaDagre = (nodes: Node<TableNodeData>[], edges: Edge[]) => {
+  const dagreGraph = new dagre.graphlib.Graph()
+  dagreGraph.setDefaultEdgeLabel(() => ({}))
+  dagreGraph.setGraph({
+    rankdir: 'LR',
+    align: 'UR',
+    nodesep: NODE_SEP,
+    ranksep: RANK_SEP,
+  })
+
+  nodes.forEach((node) => {
+    dagreGraph.setNode(node.id, {
+      width: TABLE_NODE_WIDTH / 2,
+      height: (TABLE_NODE_ROW_HEIGHT / 2) * (node.data.columns.length + 1), // columns + header
+    })
+  })
+
+  edges.forEach((edge) => {
+    dagreGraph.setEdge(edge.source, edge.target)
+  })
+
+  dagre.layout(dagreGraph)
+
+  nodes.forEach((node) => {
+    const nodeWithPosition = dagreGraph.node(node.id)
+    node.targetPosition = Position.Left
+    node.sourcePosition = Position.Right
+    // We are shifting the dagre node position (anchor=center center) to the top left
+    // so it matches the React Flow node anchor point (top left).
+    node.position = {
+      x: nodeWithPosition.x - nodeWithPosition.width / 2,
+      y: nodeWithPosition.y - nodeWithPosition.height / 2,
+    }
+
+    return node
+  })
+
+  return { nodes, edges }
+}
+
+const getLayoutedElementsViaLocalStorage = (
+  nodes: Node<TableNodeData>[],
+  edges: Edge[],
+  positions: { [key: string]: { x: number; y: number } }
+) => {
+  // [Joshen] Potentially look into auto fitting new nodes?
+  // https://github.com/xyflow/xyflow/issues/1113
+
+  const nodesWithNoSavedPositons = nodes.filter((n) => !(n.id in positions))
+  let newNodeCount = 0
+  let basePosition = {
+    x: 0,
+    y: -(NODE_SEP + TABLE_NODE_ROW_HEIGHT + nodesWithNoSavedPositons.length * 10),
+  }
+
+  nodes.forEach((node) => {
+    const existingPosition = positions?.[node.id]
+
+    node.targetPosition = Position.Left
+    node.sourcePosition = Position.Right
+
+    if (existingPosition) {
+      node.position = existingPosition
+    } else {
+      node.position = {
+        x: basePosition.x + newNodeCount * 10,
+        y: basePosition.y + newNodeCount * 10,
+      }
+      newNodeCount += 1
+    }
+  })
+  return { nodes, edges }
+}
+
+export const getTableDefinitionAsMarkdown = (table: TableNodeData) => {
+  let markdown = `## Table \`${escapeForMarkdown(table.name)}\`\n\n`
+  if (table.description) {
+    markdown += `${table.description}\n\n`
+  }
+  markdown += `### Columns\n\n`
+  markdown += `| Name | Type | Constraints |\n`
+  markdown += `|------|------|-------------|\n`
+
+  return table.columns.reduce((current, column) => {
+    current += `| \`${escapeForMarkdown(column.name)}\` | \`${escapeForMarkdown(column.format)}\` | ${column.isPrimary ? 'Primary' : ''}${column.isNullable ? ' Nullable' : ''}${column.isUnique ? ' Unique' : ''}${column.isIdentity ? ' Identity' : ''} |\n`
+    return current
+  }, markdown)
+}
+
+export const getSchemaAsMarkdown = (schema: string, tables: TableNodeData[]) => {
+  return tables.reduce((current, table) => {
+    if (table.schema === schema) {
+      current += `${getTableDefinitionAsMarkdown(table)}\n`
+    }
+    return current
+  }, '')
+}
+
+const escapeForMarkdown = (str: string) => {
+  return (
+    str
+      // Escape backslashes first so later escapes are not ambiguous
+      .replace(/\\/g, '\\\\')
+      // Escape backticks and pipes for markdown tables
+      .replace(/([|`])/g, '\\$1')
+      // Remove new lines
+      .replace(/\n/g, ' ')
+  )
+}

@@ -1,0 +1,44 @@
+import { useQuery } from '@tanstack/react-query'
+
+import { invoicesKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
+
+export type InvoicesVariables = {
+  slug?: string
+  offset?: number
+  limit?: number
+}
+
+export async function getInvoices(
+  { slug, offset = 0, limit = 10 }: InvoicesVariables,
+  signal?: AbortSignal
+) {
+  if (!slug) throw new Error('Org slug is required')
+
+  const { data, error } = await get(`/platform/organizations/{slug}/billing/invoices`, {
+    params: {
+      path: { slug },
+      query: { offset, limit },
+    },
+    signal,
+  })
+
+  if (error) handleError(error)
+  return data
+}
+
+export type InvoicesData = Awaited<ReturnType<typeof getInvoices>>
+export type InvoicesError = ResponseError
+
+export const useInvoicesQuery = <TData = InvoicesData>(
+  { slug, offset, limit }: InvoicesVariables,
+  { enabled = true, ...options }: UseCustomQueryOptions<InvoicesData, InvoicesError, TData> = {}
+) =>
+  // [Joshen] Switch to useInfiniteQuery
+  useQuery<InvoicesData, InvoicesError, TData>({
+    queryKey: invoicesKeys.list(slug, offset),
+    queryFn: ({ signal }) => getInvoices({ slug, offset, limit }, signal),
+    enabled: enabled && typeof slug !== 'undefined',
+    ...options,
+  })

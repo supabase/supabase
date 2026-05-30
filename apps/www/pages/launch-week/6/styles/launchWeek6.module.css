@@ -1,0 +1,30 @@
+.mask {
+  mask-image: radial-gradient(black, transparent);
+}
+
+.dark_community {
+  background-image: radial-gradient(
+    closest-side at 50% 50%,
+    #132121,
+    #132121db,
+    hsl(var(--background-default))
+  );
+}
+
+.community {
+  background-image: radial-gradient(closest-side at 50% 50%, #d9eeef, #dbeef0, white);
+}
+
+.wrappers > span {
+  left: -200px !important;
+}
+
+.community_wrappers > span {
+  left: -400px !important;
+}
+
+@media (max-width: 768px) {
+  .community_wrappers > span > img {
+    object-fit: contain !important;
+  }
+}

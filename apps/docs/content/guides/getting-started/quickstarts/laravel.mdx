@@ -1,0 +1,145 @@
+---
+title: 'Use Supabase with Laravel'
+subtitle: 'Learn how to create a PHP Laravel project, connect it to your Supabase Postgres database, and configure user authentication.'
+breadcrumb: 'Framework Quickstarts'
+hideToc: true
+---
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Create a Laravel Project">
+
+    Make sure your PHP and Composer versions are up to date, then use `composer create-project` to scaffold a new Laravel project.
+
+    See the [Laravel docs](https://laravel.com/docs/10.x/installation#creating-a-laravel-project) for more details.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ```bash name=Terminal
+     composer create-project laravel/laravel example-app
+     ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details title="Install the Authentication template">
+
+    Install [Laravel Breeze](https://laravel.com/docs/10.x/starter-kits#laravel-breeze), a simple implementation of all of Laravel's [authentication features](https://laravel.com/docs/10.x/authentication).
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    ```bash name=Terminal
+    composer require laravel/breeze --dev
+    php artisan breeze:install
+    ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Set up the Postgres connection details">
+
+    Go to [database.new](https://database.new) and create a new Supabase project. Save your database password securely.
+
+    When your project is up and running, navigate to your project dashboard and click on [Connect](/dashboard/project/_?showConnect=true&method=session).
+
+    Look for the Session Pooler connection string and copy the string. You will need to replace the Password with your saved database password. You can reset your database password in your [Database Settings](/dashboard/project/_/database/settings) if you do not have it.
+
+      <Admonition type="note">
+
+        If you're in an [IPv6 environment](https://github.com/orgs/supabase/discussions/27034) or have the IPv4 Add-On, you can use the direct connection string instead of Supavisor in Session mode.
+
+      </Admonition>
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    ```bash name=.env
+    DB_CONNECTION=pgsql
+    DB_URL=postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:5432/postgres
+    ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Change the default schema">
+
+    By default Laravel uses the `public` schema. We recommend changing this as Supabase exposes the `public` schema as a [data API](/docs/guides/api).
+
+    You can change the schema of your Laravel application by modifying the `search_path` variable `app/config/database.php`.
+
+    The schema you specify in `search_path` has to exist on Supabase. You can create a new schema from the [Table Editor](/dashboard/project/_/editor).
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    ```php name=app/config/database.php
+    'pgsql' => [
+        'driver' => 'pgsql',
+        'url' => env('DB_URL'),
+        'host' => env('DB_HOST', '127.0.0.1'),
+        'port' => env('DB_PORT', '5432'),
+        'database' => env('DB_DATABASE', 'laravel'),
+        'username' => env('DB_USERNAME', 'root'),
+        'password' => env('DB_PASSWORD', ''),
+        'charset' => env('DB_CHARSET', 'utf8'),
+        'prefix' => '',
+        'prefix_indexes' => true,
+        'search_path' => 'laravel',
+        'sslmode' => 'prefer',
+    ],
+    ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Run the database migrations">
+
+    Laravel ships with database migration files that set up the required tables for Laravel Authentication and User Management.
+
+    Note: Laravel does not use Supabase Auth but rather implements its own authentication system!
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    ```bash name=Terminal
+    php artisan migrate
+    ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={6}>
+    <StepHikeCompact.Details title="Start the app">
+
+    Run the development server. Go to http://127.0.0.1:8000 in a browser to see your application. You can also navigate to http://127.0.0.1:8000/register and http://127.0.0.1:8000/login to register and log in users.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash name=Terminal
+      php artisan serve
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>

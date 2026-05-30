@@ -1,0 +1,173 @@
+export const LOCAL_STORAGE_KEYS = {
+  /**
+   * STUDIO
+   */
+  AI_ASSISTANT_STATE: (projectRef: string | undefined) =>
+    `supabase-ai-assistant-state-${projectRef}`,
+  SIDEBAR_BEHAVIOR: 'supabase-sidebar-behavior',
+  PROJECTS_VIEW: 'projects-view',
+  PROJECTS_FILTER: 'projects-filter',
+  PROJECTS_SORT: 'projects-sort',
+  FEEDBACK_WIDGET_CONTENT: 'feedback-widget-content',
+  FEEDBACK_WIDGET_SCREENSHOT: 'feedback-widget-screenshot',
+  INCIDENT_BANNER_DISMISSED_IDS: 'incident-banner-dismissed-ids',
+  DASHBOARD_PREFERENCES: (ref: string) => `dashboard-preferences-${ref}`,
+  UNIFIED_LOGS_DOCK: 'unified-logs-dock',
+
+  UI_TIMEZONE: 'supabase-ui-timezone',
+  UI_PREVIEW_CLS: 'supabase-ui-cls',
+  UI_PREVIEW_INLINE_EDITOR: 'supabase-ui-preview-inline-editor',
+  UI_PREVIEW_UNIFIED_LOGS: 'supabase-ui-preview-unified-logs',
+  UI_PREVIEW_ADVISOR_RULES: 'supabase-ui-advisor-rules',
+  UI_PREVIEW_QUEUE_OPERATIONS: 'supabase-ui-queue-operations',
+  UI_PREVIEW_PG_DELTA_DIFF: 'supabase-ui-pg-delta-diff',
+  UI_PREVIEW_PLATFORM_WEBHOOKS: 'supabase-ui-platform-webhooks',
+  UI_PREVIEW_JIT_DB_ACCESS: 'supabase-ui-jit-db-access',
+  UI_PREVIEW_RLS_TESTER: 'supabase-ui-rls-tester',
+  UI_PREVIEW_MARKETPLACE: 'supabase-ui-marketplace',
+
+  AI_ASSISTANT_MCP_OPT_IN: 'ai-assistant-mcp-opt-in',
+
+  DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
+  STORAGE_PREFERENCE: (ref: string) => `storage-explorer-${ref}`,
+
+  AUTH_USERS_FILTER: (ref: string) => `auth-users-filter-${ref}`,
+  AUTH_USERS_SORT_BY_VALUE: (ref: string) => `auth-users-sort-by-value-${ref}`,
+  AUTH_USERS_COLUMNS_CONFIGURATION: (ref: string) => `supabase-auth-users-columns-${ref}`,
+  AUTH_USERS_IMPROVED_SEARCH_DISMISSED: (ref: string) =>
+    `auth-users-improved-search-dismissed-${ref}`,
+
+  SQL_EDITOR_INTELLISENSE: 'supabase_sql-editor-intellisense-enabled',
+  SQL_EDITOR_SPLIT_SIZE: 'supabase_sql-editor-split-size',
+  // Key to track which schemas are ok to be sent to AI. The project ref is intentionally put at the end for easier search in the browser console.
+  SQL_EDITOR_AI_SCHEMA: (ref: string) => `supabase_sql-editor-ai-schema-enabled-${ref}`,
+  SQL_EDITOR_AI_OPEN: 'supabase_sql-editor-ai-open',
+  SQL_EDITOR_LAST_SELECTED_DB: (ref: string) => `sql-editor-last-selected-db-${ref}`,
+  SQL_EDITOR_SQL_BLOCK_ACKNOWLEDGED: (ref: string) => `sql-editor-sql-block-acknowledged-${ref}`,
+  SQL_EDITOR_SECTION_STATE: (ref: string) => `sql-editor-section-state-${ref}`,
+  SQL_EDITOR_SORT: (ref: string) => `sql-editor-sort-${ref}`,
+
+  LOG_EXPLORER_SPLIT_SIZE: 'supabase_log-explorer-split-size',
+  GRAPHQL_INTROSPECTION_NOTICE_COLLAPSED: (ref: string) =>
+    `graphql-introspection-notice-collapsed-${ref}`,
+  CLS_DIFF_WARNING: 'cls-diff-warning-dismissed',
+  CLS_SELECT_STAR_WARNING: 'cls-select-star-warning-dismissed',
+  QUERY_PERF_SHOW_BOTTOM_SECTION: 'supabase-query-perf-show-bottom-section',
+  LINTER_SHOW_FOOTER: 'supabase-linter-show-footer',
+  // Key to track account deletion requests
+  ACCOUNT_DELETION_REQUEST: 'supabase-account-deletion-request',
+  // Used for storing a user id when sending reports to Sentry. The id is hashed for anonymity.
+  SENTRY_USER_ID: 'supabase-sentry-user-id',
+  // Used for storing the last sign in method used by the user
+  LAST_SIGN_IN_METHOD: 'supabase-last-sign-in-method',
+  // Key to track the last selected schema. The project ref is intentionally put at the end for easier search in the browser console.
+  LAST_SELECTED_SCHEMA: (ref: string) => `last-selected-schema-${ref}`,
+  // Track position of nodes for schema visualizer
+  SCHEMA_VISUALIZER_POSITIONS: (ref: string, schemaId: number) =>
+    `schema-visualizer-positions-${ref}-${schemaId}`,
+  // Used for allowing the main nav panel to expand on hover
+  EXPAND_NAVIGATION_PANEL: 'supabase-expand-navigation-panel',
+  GITHUB_AUTHORIZATION_STATE: 'supabase-github-authorization-state',
+  // Notice banner keys
+  FLY_DEPRECATION_2026_05_31: 'fly-deprecation-2026-05-31-dismissed',
+  API_KEYS_FEEDBACK_DISMISSED: (ref: string) => `supabase-api-keys-feedback-dismissed-${ref}`,
+  TERMS_OF_SERVICE_UPDATE: 'terms-of-service-update-2026-06-06',
+  SUPAVISOR_MAINTENANCE: (ref: string) => `supavisor-maintenance-2026-05-21-${ref}`,
+  REPORT_DATERANGE: 'supabase-report-daterange',
+  PROJECT_PAUSING_STARTED_AT: (ref: string) => `supabase-project-pausing-started-at-${ref}`,
+  PROJECT_RESTORING_STARTED_AT: (ref: string) => `supabase-project-restoring-started-at-${ref}`,
+
+  // api keys view switcher for new and legacy api keys
+  API_KEYS_VIEW: (ref: string) => `supabase-api-keys-view-${ref}`,
+
+  // Connect sheet: remember last-used tab/framework/method etc. across opens
+  CONNECT_SHEET_PREFS: 'supabase-connect-sheet-prefs',
+
+  // Shortcut preferences
+  SHORTCUT_STORAGE_KEY: 'supabase-shortcut-preferences',
+
+  LAST_VISITED_ORGANIZATION: 'last-visited-organization',
+
+  // user impersonation selector previous searches
+  USER_IMPERSONATION_SELECTOR_PREVIOUS_SEARCHES: (ref: string) =>
+    `user-impersonation-selector-previous-searches-${ref}`,
+
+  LAST_OPENED_SIDE_BAR: (ref: string) => `last-opened-sidebar-${ref}`,
+
+  // Index Advisor notice dismissed
+  INDEX_ADVISOR_NOTICE_DISMISSED: (ref: string) => `index-advisor-notice-dismissed-${ref}`,
+
+  // RLS event trigger banner dismissed
+  RLS_EVENT_TRIGGER_BANNER_DISMISSED: (ref: string) => `rls-event-trigger-banner-dismissed-${ref}`,
+
+  PROJECT_SECURITY_DISMISSED_AT: (ref: string) => `project-security-dismissed-at-${ref}`,
+
+  RLS_TESTER_BANNER_DISMISSED: (ref: string) => `rls-tester-banner-dismissed-${ref}`,
+
+  // Observability banner dismissed
+  OBSERVABILITY_BANNER_DISMISSED: (ref: string) => `observability-banner-dismissed-${ref}`,
+  ORGANIZATION_MARKETPLACE_BANNER_DISMISSED: (orgSlug: string, managedBy: string) =>
+    `organization-marketplace-banner-dismissed-${orgSlug}-${managedBy}`,
+  PROJECT_INTEGRATION_BANNER_DISMISSED: (ref: string, integrationSource: string) =>
+    `project-integration-banner-dismissed-${ref}-${integrationSource}`,
+
+  TABLE_EDITOR_QUEUE_OPERATIONS_BANNER_DISMISSED: (ref: string) =>
+    `table-editor-queue-operations-banner-dismissed-${ref}`,
+  FREE_MICRO_UPGRADE_BANNER_DISMISSED: (ref: string) =>
+    `free-micro-upgrade-banner-dismissed-${ref}`,
+  STORAGE_PUBLIC_BUCKET_SELECT_POLICY_WARNING_DISMISSED: (ref: string, bucketId: string) =>
+    `storage-public-bucket-select-policy-warning-dismissed-${ref}-${bucketId}`,
+
+  /**
+   * COMMON
+   */
+  /** @deprecated – we're using usercentrics instead to handle telemetry consent */
+  TELEMETRY_CONSENT: 'supabase-consent-ph',
+
+  /**
+   * DOCS
+   */
+  SAVED_ORG: 'docs.ui.user.selected.org',
+  SAVED_PROJECT: 'docs.ui.user.selected.project',
+  SAVED_BRANCH: 'docs.ui.user.selected.branch',
+
+  HIDE_PROMO_TOAST: 'supabase-hide-promo-toast-lw15-ticket',
+
+  /**
+   * WWW
+   */
+  BLOG_VIEW: 'supabase-blog-view',
+} as const
+
+export type LocalStorageKey = (typeof LOCAL_STORAGE_KEYS)[keyof typeof LOCAL_STORAGE_KEYS]
+
+const LOCAL_STORAGE_KEYS_ALLOWLIST = [
+  'graphiql:theme',
+  'theme',
+  'supabaseDarkMode',
+  'supabase.dashboard.auth.debug',
+  'supabase.dashboard.auth.navigatorLock.disabled',
+  LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE,
+  LOCAL_STORAGE_KEYS.LAST_SIGN_IN_METHOD,
+  LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST,
+  LOCAL_STORAGE_KEYS.BLOG_VIEW,
+  LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
+  LOCAL_STORAGE_KEYS.LINTER_SHOW_FOOTER,
+  LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
+  LOCAL_STORAGE_KEYS.UI_TIMEZONE,
+]
+
+export function clearLocalStorage() {
+  for (const key in localStorage) {
+    if (!LOCAL_STORAGE_KEYS_ALLOWLIST.includes(key)) {
+      localStorage.removeItem(key)
+    }
+  }
+}

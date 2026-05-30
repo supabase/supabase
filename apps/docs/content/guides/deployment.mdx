@@ -1,0 +1,74 @@
+---
+title: Deployment & Branching
+---
+
+Deploying your app makes it live and accessible to users. Most apps have at least two environments: a production environment for users and one or more staging or preview environments for development.
+
+Supabase provides flexible options for both simple and advanced deployment workflows.
+
+## Recommended workflow
+
+The simplest way to deploy your Supabase project is with GitHub (recommended, but not required):
+
+1. Develop locally using the [Supabase CLI](/docs/guides/local-development)
+2. Push changes to your GitHub repository
+3. Deploy automatically to your Supabase project from your `main` branch
+
+This workflow works on all plans and does not require branching.
+
+If you have branching enabled (on the Pro Plan), you can extend this workflow with preview environments for pull requests.
+
+## Environment management
+
+You can maintain separate development, staging, and production environments:
+
+- **Development**: Develop locally using the [Supabase CLI](/docs/guides/local-development)
+- **Staging / Preview (optional)**: Use [branching](/docs/guides/deployment/branching) to create preview environments for pull requests or long-lived staging environments (Pro Plan)
+- **Production**: Deploy changes from your GitHub repository or your own CI/CD pipeline
+
+## Deployment
+
+You can automate deployments using:
+
+- The [Supabase GitHub integration](/dashboard/project/_/settings/integrations) (recommended)
+  - Deploy changes from your `main` branch
+  - Works on all plans
+  - With branching enabled (Pro Plan), can also create preview environments for pull requests
+- The [Supabase CLI](/docs/guides/local-development) in your own continuous deployment pipeline
+- The [Supabase Terraform provider](/docs/guides/deployment/terraform)
+
+## Frequently asked questions
+
+### Is GitHub required?
+
+No. GitHub integration is recommended for the simplest setup, but you can deploy using the [Supabase CLI](/docs/guides/local-development) in your own CI/CD pipeline without connecting a GitHub repository.
+
+### Do you need a paid plan?
+
+No. The GitHub integration and CLI-based deployments work on all plans. Branching (preview environments for pull requests) requires the Pro Plan.
+
+### What gets deployed?
+
+Database migrations in your `supabase/` directory, plus Edge Functions and storage buckets that are declared in `supabase/config.toml`. Other local configuration files (such as API or Auth settings) are ignored by default. See the [local development guide](/docs/guides/local-development) for details on the directory structure.
+
+### Can you use your own CI/CD pipeline?
+
+Yes. You can use the [Supabase CLI](/docs/guides/local-development) or the [Terraform provider](/docs/guides/deployment/terraform) in any CI/CD system (GitHub Actions, GitLab CI, CircleCI, etc.).
+
+### How does collaboration with other developers work?
+
+Use Git branches to work on changes independently and share them with your team. When a change is ready, merge it into `main` to deploy it to production. If you're on the Pro Plan, you can enable [branching](/docs/guides/deployment/branching) to automatically create a preview environment for each pull request, so you can review and test database changes before they go live.
+
+### What is branching?
+
+Branching creates isolated preview environments for each pull request, so you can test database changes before merging. It is an optional feature available on the Pro Plan. See the [branching guide](/docs/guides/deployment/branching) for details.
+
+### What advantage does branching offer?
+
+Branching gives each pull request its own isolated Supabase environment with a full copy of your database schema (without any production data), so you can validate migrations and test your app end-to-end before merging to `main`.
+
+<Admonition type="tip" title="Self-hosting">
+
+Read the [self-hosting guides](/docs/guides/self-hosting) for instructions on hosting your own Supabase stack.
+
+</Admonition>

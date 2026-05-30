@@ -1,0 +1,72 @@
+import { useQuery } from '@tanstack/react-query'
+
+import { documentKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
+
+export type DocType =
+  | 'standard-security-questionnaire'
+  | 'soc2-type-2-report'
+  | 'iso27001-certificate'
+
+export type DocumentVariables = {
+  orgSlug?: string
+  docType?: DocType
+}
+
+export async function getDocument({ orgSlug, docType }: DocumentVariables, signal?: AbortSignal) {
+  if (!orgSlug) throw new Error('orgSlug is required')
+
+  if (docType === 'standard-security-questionnaire') {
+    const { data, error } = await get(
+      `/platform/organizations/{slug}/documents/standard-security-questionnaire`,
+      {
+        params: { path: { slug: orgSlug } },
+        signal,
+      }
+    )
+
+    if (error) handleError(error)
+    return data as { fileUrl: string }
+  }
+
+  if (docType === 'soc2-type-2-report') {
+    const { data, error } = await get(
+      `/platform/organizations/{slug}/documents/soc2-type-2-report`,
+      {
+        params: { path: { slug: orgSlug } },
+        signal,
+      }
+    )
+    if (error) throw error
+
+    return data as { fileUrl: string }
+  }
+
+  if (docType === 'iso27001-certificate') {
+    const { data, error } = await get(
+      `/platform/organizations/{slug}/documents/iso27001-certificate`,
+      {
+        params: { path: { slug: orgSlug } },
+        signal,
+      }
+    )
+    if (error) throw error
+
+    return data as { fileUrl: string }
+  }
+}
+
+export type DocumentData = Awaited<ReturnType<typeof getDocument>>
+export type DocumentError = ResponseError
+
+export const useDocumentQuery = <TData = DocumentData>(
+  { orgSlug, docType }: DocumentVariables,
+  { enabled = true, ...options }: UseCustomQueryOptions<DocumentData, DocumentError, TData> = {}
+) =>
+  useQuery<DocumentData, DocumentError, TData>({
+    queryKey: documentKeys.resource(orgSlug, docType),
+    queryFn: ({ signal }) => getDocument({ orgSlug, docType }, signal),
+    enabled: enabled && typeof orgSlug !== 'undefined' && typeof docType !== 'undefined',
+    ...options,
+  })

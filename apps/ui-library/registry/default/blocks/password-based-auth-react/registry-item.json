@@ -1,0 +1,26 @@
+{
+  "name": "password-based-auth-react",
+  "type": "registry:block",
+  "title": "Password Based Auth flow for React and Supabase",
+  "description": "Password Based Auth flow for React and Supabase",
+  "registryDependencies": ["button", "card", "input", "label"],
+  "files": [
+    {
+      "path": "registry/default/blocks/password-based-auth-react/components/login-form.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-react/components/sign-up-form.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-react/components/forgot-password-form.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-react/components/update-password-form.tsx",
+      "type": "registry:component"
+    }
+  ],
+  "dependencies": ["@supabase/supabase-js@latest"]
+}

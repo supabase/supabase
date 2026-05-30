@@ -1,0 +1,29 @@
+{
+  "name": "@supabase/pg-meta",
+  "version": "0.0.0",
+  "license": "MIT",
+  "author": "Supabase",
+  "main": "./src/index.ts",
+  "repository": "supabase/supabase",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "clean": "rimraf node_modules .turbo tsconfig.tsbuildinfo",
+    "test": "test/run-tests.sh vitest run --coverage",
+    "test:update": "test/run-tests.sh vitest run --update",
+    "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.11.11",
+    "@vitest/coverage-v8": "catalog:",
+    "npm-run-all": "^4.1.5",
+    "pg": "^8.13.1",
+    "postgres-array": "^3.0.2",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

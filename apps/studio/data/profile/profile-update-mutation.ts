@@ -1,0 +1,61 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+
+import { profileKeys } from './keys'
+import { handleError, patch } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
+
+export type ProfileUpdateVariables = {
+  firstName: string
+  lastName: string
+  username: string
+  primaryEmail: string
+}
+
+export async function updateProfile({
+  firstName,
+  lastName,
+  username,
+  primaryEmail,
+}: ProfileUpdateVariables) {
+  const { data, error } = await patch('/platform/profile', {
+    body: {
+      first_name: firstName,
+      last_name: lastName,
+      username: username,
+      primary_email: primaryEmail,
+    },
+  })
+
+  if (error) handleError(error)
+  return data
+}
+
+type ProfileUpdateData = Awaited<ReturnType<typeof updateProfile>>
+
+export const useProfileUpdateMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: Omit<
+  UseCustomMutationOptions<ProfileUpdateData, ResponseError, ProfileUpdateVariables>,
+  'mutationFn'
+> = {}) => {
+  const queryClient = useQueryClient()
+
+  return useMutation<ProfileUpdateData, ResponseError, ProfileUpdateVariables>({
+    mutationFn: (vars) => updateProfile(vars),
+    async onSuccess(data, variables, context) {
+      await queryClient.invalidateQueries({ queryKey: profileKeys.profile() })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create profile: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
+}

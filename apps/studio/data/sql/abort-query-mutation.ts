@@ -1,0 +1,48 @@
+import { getAbortQuerySQL } from '@supabase/pg-meta'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+
+import { sqlKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
+
+export type QueryAbortVariables = {
+  pid: number
+  projectRef?: string
+  connectionString?: string | null
+}
+
+export async function abortQuery({ pid, projectRef, connectionString }: QueryAbortVariables) {
+  const sql = getAbortQuerySQL({ pid })
+  const { result } = await executeSql({ projectRef, connectionString, sql })
+  return result
+}
+
+type QueryAbortData = Awaited<ReturnType<typeof abortQuery>>
+
+export const useQueryAbortMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: Omit<
+  UseCustomMutationOptions<QueryAbortData, ResponseError, QueryAbortVariables>,
+  'mutationFn'
+> = {}) => {
+  const queryClient = useQueryClient()
+  return useMutation<QueryAbortData, ResponseError, QueryAbortVariables>({
+    mutationFn: (vars) => abortQuery(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: sqlKeys.ongoingQueries(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to abort query: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
+}

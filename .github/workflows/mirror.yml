@@ -1,0 +1,45 @@
+name: Mirror Image
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+    secrets:
+      PROD_AWS_ROLE:
+        required: true
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Image tag'
+        required: true
+        type: string
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@5fd3084fc36e372ff1fff382a39b10d03659f355 # v2.2.0
+        with:
+          role-to-assume: ${{ secrets.PROD_AWS_ROLE }}
+          aws-region: us-east-1
+      - uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
+        with:
+          registry: public.ecr.aws
+      - uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: akhilerm/tag-push-action@85bf542f43f5f2060ef76262a67ee3607cb6db37 # v2.1.0
+        with:
+          src: docker.io/supabase/studio:${{ inputs.version }}
+          dst: |
+            public.ecr.aws/supabase/studio:${{ inputs.version }}
+            ghcr.io/supabase/studio:${{ inputs.version }}

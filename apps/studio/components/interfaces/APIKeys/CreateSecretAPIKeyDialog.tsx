@@ -1,0 +1,187 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
+import { Plus, ShieldCheck } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useRef } from 'react'
+import { useForm, type SubmitHandler } from 'react-hook-form'
+import { toast } from 'sonner'
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
+import { Shortcut } from '@/components/ui/Shortcut'
+import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+
+const NAME_SCHEMA = z
+  .string()
+  .min(4, 'Name must be at least 4 characters')
+  .max(64, "Name can't be more than 64 characters long")
+  .regex(/^[a-z0-9_]+$/, 'Name can only contain lowercased letters, digits and underscore')
+  .refine((val: string) => !val.match(/^[0-9].+$/), 'Name must not start with a digit')
+  .refine(
+    (val: string) => val !== 'anon' && val !== 'service_role',
+    'Using "anon" or "service_role" for API key name is not possible'
+  )
+
+const FORM_ID = 'create-secret-api-key'
+const SCHEMA = z.object({
+  name: NAME_SCHEMA,
+  description: z.string().max(256, "Description shouldn't be too long").trim(),
+})
+
+export const CreateSecretAPIKeyDialog = () => {
+  const { ref: projectRef } = useParams()
+  const [visible, setVisible] = useQueryState('new', parseAsString)
+  const formRef = useRef<HTMLFormElement>(null)
+
+  const onOpenChange = (value: boolean) => {
+    if (value) setVisible('secret')
+    else setVisible('')
+  }
+  const openDialog = () => setVisible('secret')
+
+  const defaultValues = { name: '', description: '' }
+  const form = useForm<z.infer<typeof SCHEMA>>({
+    resolver: zodResolver(SCHEMA),
+    defaultValues,
+  })
+
+  const { mutate: createAPIKey, isPending: isCreatingAPIKey } = useAPIKeyCreateMutation()
+
+  const onSubmit: SubmitHandler<z.infer<typeof SCHEMA>> = async (values) => {
+    createAPIKey(
+      {
+        projectRef,
+        type: 'secret',
+        name: values.name,
+        description: values.description,
+      },
+      {
+        onSuccess: (data) => {
+          toast.success(`Your secret API key ${data.prefix}... is ready.`)
+          form.reset(defaultValues)
+          onOpenChange(false)
+        },
+      }
+    )
+  }
+
+  return (
+    <Dialog open={visible === 'secret'} onOpenChange={onOpenChange}>
+      <Shortcut
+        id={SHORTCUT_IDS.API_KEYS_NEW_SECRET}
+        onTrigger={openDialog}
+        side="bottom"
+        tooltipOpen={visible === 'secret' ? false : undefined}
+      >
+        <Button type="default" className="mt-2" icon={<Plus />} onClick={openDialog}>
+          New secret key
+        </Button>
+      </Shortcut>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Create new secret API key</DialogTitle>
+          <DialogDescription className="grid gap-y-2">
+            <p>
+              Secret API keys allow elevated access to your project's data, bypassing Row-Level
+              security.
+            </p>
+          </DialogDescription>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <DialogSection className="flex flex-col gap-4">
+          <Form {...form}>
+            <form
+              ref={formRef}
+              className="flex flex-col gap-4"
+              id={FORM_ID}
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
+              <FormField
+                key="name"
+                name="name"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItemLayout
+                    label="Name"
+                    description="A short, unique name of lowercased letters, digits and underscore"
+                  >
+                    <FormControl>
+                      <Input {...field} placeholder="Example: my_super_secret_key_123" />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+              <FormField
+                key="description"
+                name="description"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItemLayout label="Description" labelOptional="Optional">
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Short notes on how or where this key will be used"
+                      />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            </form>
+          </Form>
+          <Alert variant="warning">
+            <ShieldCheck />
+            <AlertTitle>Securing your API key</AlertTitle>
+            <AlertDescription className="">
+              <ul className="list-disc">
+                <li>Keep this key secret.</li>
+                <li>Do not use on the web, in mobile or desktop apps.</li>
+                <li>Don't post it publicly or commit in source control.</li>
+                <li>
+                  This key provides elevated access to your data, bypassing Row-Level Security.
+                </li>
+                <li>
+                  If it leaks or is revealed, swap it with a new secret API key and then delete it.
+                </li>
+                <li>
+                  If used in a browser, it will always return HTTP 401 Unauthorized. Delete
+                  immediately.
+                </li>
+              </ul>
+            </AlertDescription>
+          </Alert>
+        </DialogSection>
+        <DialogFooter>
+          <Shortcut
+            id={SHORTCUT_IDS.API_KEYS_CREATE_SECRET}
+            onTrigger={() => formRef.current?.requestSubmit()}
+            options={{ enabled: visible === 'secret' && !isCreatingAPIKey }}
+            side="top"
+          >
+            <Button form={FORM_ID} htmlType="submit" loading={isCreatingAPIKey}>
+              Create API key
+            </Button>
+          </Shortcut>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}

@@ -1,0 +1,48 @@
+.code-block {
+  @apply overflow-hidden;
+}
+
+.code-line {
+  @apply block;
+  transition:
+    filter 500ms ease,
+    opacity 500ms ease;
+  transition-delay: 200ms;
+}
+
+.code-block .code-line:first-of-type {
+  @apply flex h-8 items-end;
+}
+
+.code-block .code-line:first-of-type :global(.linenumber) {
+  @apply items-end self-stretch;
+}
+
+.code-block .code-line:first-of-type > :global(*:not(.linenumber)) {
+  @apply pb-1;
+}
+
+.code-block .code-line:last-of-type {
+  @apply flex h-8 items-start;
+}
+
+.code-block .code-line:last-of-type :global(.linenumber) {
+  @apply items-start self-stretch;
+}
+
+.code-block .code-line:last-of-type > :global(*:not(.linenumber)) {
+  @apply pt-1;
+}
+
+.code-block code .linenumber {
+  margin-right: 4px;
+}
+
+.code-block code::after,
+.code-block code::before {
+  content: none !important;
+}
+
+.code-line--flash {
+  @apply animate-flash-code-slow;
+}

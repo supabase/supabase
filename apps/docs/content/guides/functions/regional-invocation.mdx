@@ -1,0 +1,103 @@
+---
+id: 'function-regional-invocation'
+title: 'Regional Invocations'
+description: 'How to execute an Edge Functions in a particular region.'
+subtitle: 'Execute Edge Functions in specific regions for optimal performance.'
+---
+
+Edge Functions automatically execute in the region closest to the user making the request. This reduces network latency and provides faster responses.
+
+However, if your function performs intensive database or storage operations, executing in the same region as your database often provides better performance:
+
+- **Bulk database operations:** Adding or editing many records
+- **File uploads:** Processing large files or multiple uploads
+- **Complex queries:** Operations requiring multiple database round trips
+
+---
+
+## Available regions
+
+The following regions are supported:
+
+**Asia Pacific:**
+
+- `ap-northeast-1` (Tokyo)
+- `ap-northeast-2` (Seoul)
+- `ap-south-1` (Mumbai)
+- `ap-southeast-1` (Singapore)
+- `ap-southeast-2` (Sydney)
+
+**North America:**
+
+- `ca-central-1` (Canada Central)
+- `us-east-1` (N. Virginia)
+- `us-west-1` (N. California)
+- `us-west-2` (Oregon)
+
+**Europe:**
+
+- `eu-central-1` (Frankfurt)
+- `eu-west-1` (Ireland)
+- `eu-west-2` (London)
+- `eu-west-3` (Paris)
+
+**South America:**
+
+- `sa-east-1` (São Paulo)
+
+---
+
+## Usage
+
+You can specify the region programmatically using the Supabase Client library, or using the `x-region` HTTP header.
+
+<$CodeTabs>
+
+```js name=JavaScript
+import { createClient, FunctionRegion } from '@supabase/supabase-js'
+
+const { data, error } = await supabase.functions.invoke('function-name', {
+  ...
+  region: FunctionRegion.UsEast1, // Execute in us-east-1 region
+})
+```
+
+```bash name=cURL
+curl --request POST 'https://<project_ref>.supabase.co/functions/v1/function-name' \
+  --header 'x-region: us-east-1'  # Execute in us-east-1 region
+```
+
+</$CodeTabs>
+
+In case you cannot add the `x-region` header to the request (e.g.: CORS requests, Webhooks), you can use `forceFunctionRegion` query parameter.
+
+<Admonition type="note">
+
+You can verify the execution region by looking at the `x-sb-edge-region` HTTP header in the response. You can also find it as metadata in [Edge Function Logs](/docs/guides/functions/logging).
+
+</Admonition>
+
+---
+
+## Region runtime information
+
+Functions have access to the following environment variables:
+
+SB_REGION: The AWS region function was invoked
+
+This is useful if you have read replicate and want to Postgres connect to a different replicate according of the Region.
+
+---
+
+## Region outages
+
+When you explicitly specify a region via the `x-region` header, requests will NOT be automatically
+re-routed to another region.
+
+During outages, consider temporarily changing to a different region.
+
+<Admonition type="caution">
+
+Test your function's performance with and without regional specification to determine if the benefits outweigh automatic region selection.
+
+</Admonition>

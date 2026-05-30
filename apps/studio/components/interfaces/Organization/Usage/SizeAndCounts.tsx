@@ -1,0 +1,63 @@
+import { dailyUsageToDataPoints } from './Usage.utils'
+import UsageSection from './UsageSection/UsageSection'
+import { DataPoint } from '@/data/analytics/constants'
+import { PricingMetric, type OrgDailyUsageResponse } from '@/data/analytics/org-daily-stats-query'
+import type { OrgSubscription } from '@/data/subscriptions/types'
+
+export interface SizeAndCountsProps {
+  orgSlug: string
+  projectRef?: string | null
+  subscription: OrgSubscription | undefined
+  currentBillingCycleSelected: boolean
+  orgDailyStats: OrgDailyUsageResponse | undefined
+  isLoadingOrgDailyStats: boolean
+  startDate: string | undefined
+  endDate: string | undefined
+}
+
+const SizeAndCounts = ({
+  orgSlug,
+  projectRef,
+  subscription,
+  currentBillingCycleSelected,
+  orgDailyStats,
+  isLoadingOrgDailyStats,
+  startDate,
+  endDate,
+}: SizeAndCountsProps) => {
+  const chartMeta: {
+    [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean }
+  } = {
+    [PricingMetric.STORAGE_SIZE]: {
+      isLoading: isLoadingOrgDailyStats,
+      margin: 14,
+      data: dailyUsageToDataPoints(
+        orgDailyStats,
+        (metric) => metric === PricingMetric.STORAGE_SIZE
+      ),
+    },
+    [PricingMetric.DATABASE_SIZE]: {
+      isLoading: isLoadingOrgDailyStats,
+      margin: 14,
+      data: dailyUsageToDataPoints(
+        orgDailyStats,
+        (metric) => metric === PricingMetric.DATABASE_SIZE
+      ),
+    },
+  }
+
+  return (
+    <UsageSection
+      orgSlug={orgSlug}
+      projectRef={projectRef}
+      categoryKey="sizeCount"
+      chartMeta={chartMeta}
+      subscription={subscription}
+      currentBillingCycleSelected={currentBillingCycleSelected}
+      startDate={startDate}
+      endDate={endDate}
+    />
+  )
+}
+
+export default SizeAndCounts

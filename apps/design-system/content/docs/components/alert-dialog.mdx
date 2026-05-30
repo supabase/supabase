@@ -1,0 +1,144 @@
+---
+title: Alert Dialog
+description: A modal dialog for critical confirmations and acknowledgements that require an explicit user decision.
+component: true
+links:
+  doc: https://www.radix-ui.com/docs/primitives/components/alert-dialog
+  api: https://www.radix-ui.com/docs/primitives/components/alert-dialog#api-reference
+source:
+  shadcn: true
+  radix: true
+---
+
+Alert Dialog interrupts the user’s workflow to communicate critical information or confirm an action that cannot be taken lightly. It presents a short, focused message and requires the user to explicitly confirm or cancel before proceeding.
+
+Use Alert Dialog for actions such as deleting data, performing irreversible changes, or
+acknowledging important warnings where dismissal without a decision would be unsafe. It is the
+preferred starting point for critical confirmations when the decision can be explained in a short,
+focused message.
+
+<ComponentPreview name="alert-dialog-demo" peekCode wide />
+
+## Installation
+
+<Tabs defaultValue="cli">
+
+<TabsList>
+  <TabsTrigger value="cli">CLI</TabsTrigger>
+  <TabsTrigger value="manual">Manual</TabsTrigger>
+</TabsList>
+<TabsContent value="cli">
+
+```bash
+npx shadcn-ui@latest add alert-dialog
+```
+
+</TabsContent>
+
+<TabsContent value="manual">
+
+<Steps>
+
+<Step>Install the following dependencies:</Step>
+
+```bash
+npm install @radix-ui/react-alert-dialog
+```
+
+<Step>Copy and paste the following code into your project.</Step>
+
+<ComponentSource name="alert-dialog" />
+
+<Step>Update the import paths to match your project setup.</Step>
+
+</Steps>
+
+</TabsContent>
+
+</Tabs>
+
+## Usage
+
+```tsx
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogBody,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+```
+
+```tsx
+<AlertDialog>
+  <AlertDialogTrigger>Open</AlertDialogTrigger>
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+      <AlertDialogDescription>
+        This action cannot be undone. This will permanently delete your account and remove your data
+        from our servers.
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel>Cancel</AlertDialogCancel>
+      <AlertDialogAction>Continue</AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+```
+
+## Behavior
+
+Unlike a generic [Dialog](../components/dialog), an Alert Dialog cannot be dismissed by clicking outside the modal. The user must take an explicit action by confirming, cancelling, or pressing Escape.
+
+This enforced decision helps prevent accidental dismissal of critical warnings or destructive actions.
+
+Supabase’s Alert Dialog extends the Radix/Shadcn version with async action handling. When an
+`AlertDialogAction` returns a Promise, the dialog keeps focus trapped, blocks dismissal, and shows
+loading until the Promise resolves. Rejected Promises keep the dialog open so consumers can render
+inline error feedback.
+
+## Guidelines
+
+- **Keep content concise:** AlertDialogDescription renders as a single paragraph and must not contain block-level elements such as lists, multiple paragraphs, or complex layouts.
+- **Use for critical decisions only:** Reserve Alert Dialog for destructive or irreversible actions, or for warnings that require explicit acknowledgement.
+- **Use for dirty-form discard confirmation:** A short discard-confirmation step after a dirty form dismissal attempt (backdrop, Escape, or `Cancel`) is a valid Alert Dialog pattern. In Studio, prefer `DiscardChangesConfirmationDialog` for this flow.
+- **Always provide a cancel action:** Include AlertDialogCancel so users can safely back out, in addition to supporting the Escape key.
+- **Use AlertDialogBody for inline feedback:** If async actions can fail, render inline feedback such as an Admonition inside AlertDialogBody so spacing stays consistent.
+- **Avoid rich content:** If the decision requires detailed explanations, callouts, multiple paragraphs, or form inputs, move to [Confirmation Modal](../fragments/confirmation-modal) or [Dialog](../components/dialog) instead.
+
+See [Modality](../ui-patterns/modality) for guidance on choosing the appropriate dialog pattern.
+
+## Examples
+
+### Async action
+
+When an action returns a Promise, Alert Dialog keeps the dialog open, shows a loading state on the
+action button, and disables dismissal until the Promise resolves.
+
+<ComponentPreview name="alert-dialog-async" peekCode wide />
+
+### Async action error
+
+Catch errors to show inline feedback, then rethrow so Alert Dialog can reset the loading state and
+keep the dialog open.
+
+<ComponentPreview name="alert-dialog-async-error" peekCode wide />
+
+### Close only
+
+<ComponentPreview name="alert-dialog-close-only" />
+
+### Warning
+
+<ComponentPreview name="alert-dialog-warning" />
+
+### Destructive
+
+<ComponentPreview name="alert-dialog-destructive" />

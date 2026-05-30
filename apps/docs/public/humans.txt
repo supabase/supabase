@@ -1,0 +1,303 @@
+TEAM
+
+Supabase is 100% remote.
+
+Aaron Brooks
+Aaron Byrne
+Adam Mohammed
+Adam Mokan
+AJ Matias
+Akash Manimaran
+Alaister Young
+Alan De Los Santos
+Aleksi Immonen
+Alex Hall
+Alex Hsu
+Alexander Korotkov
+Ali Waseem
+Allan S
+Amir Issaei
+Amogh Rao
+Amy Q
+Ana Mogul
+Andrew Valleteau
+Andrey A
+Angelico de los Reyes
+Anna Weihl
+Ant Evans
+Ant Wilson
+Ariuna K
+Arshdeep Singh
+Artur Zakirov
+Artyom Borissov
+Aziz Quadri
+Barco Fourie
+Beng Eu
+Benjamin Coenen
+Bo Lu
+Bobbie Soedirgo
+Brad Gyger
+Brendan Stephens
+Brent Newson
+Brian Cullen
+Brent Schroeter
+Carel de Waal
+Cameron Blackwood
+Cameron Michie
+Cemal Kılıç
+Chandana Anumula
+Charis Lam
+Chase Cresgy
+Chase Granberry
+Chris Caruso
+Chris Chandler
+Chris Chapman (Chappie)
+Chris Copplestone
+Chris Gwilliams
+Chris Martin
+Chris Stockton
+Chris Ward
+Christian Funkhouser
+Claudiu Dragalina-Paraipan
+Clayton Kast
+Colin Goodheart-Smithe
+Colin Murray
+Colum Ferry
+Craig Cannon
+Cuong Do
+Dane Harrigan
+Daniel Mitterdorfer
+Daniel Velázquez Lara
+Danny White
+Dave Wilson
+David A. Ventimiglia
+David Alvarez
+David Birdsong
+David Camacho Cateura
+David Weitzman
+David Whittington
+Davide Pellegatta
+Deepthi Sigireddi
+Deji I
+Dennis Senn
+Dimitrios Liappis
+Div Arora
+Divit D
+Divya Sharma
+Douglas Hunley
+Dustin Keib
+Eduardo Gurgel
+Eleftheria Trivyzaki
+Eliot Whalan
+Emmett Folger
+Eric Kharitonashvili
+Etienne Stalmans
+Eyal Ehrlich
+Fabrizio Cataldo
+Fabrizio Fenoglio
+Fady A
+Fatuma Abdullahi
+Felipe Stival
+Ferhat Elmas
+Firas El Rachidi
+Francesco Sansalvadore
+Gabriel Claudino
+Garrett Crowell
+Gerardo Estaba
+Gildas Garcia
+Giuseppe Mandato
+Greg Kress
+Greg Marzouka
+Greg P
+Greg Richardson
+Gregor Vand
+Guilherme Souza
+Hannah Bowers
+Hardik Maheshwari
+Haritabh Gupta
+Harold Giménez
+Haydn Maley
+Hieu Pham
+Hunter Luckow
+Ignacio Dobronich
+Illia Basalaiev
+Inian P
+Ivan Vasilov
+Jamie Boyd
+Jared Patterson
+Jason Farber
+Jean-Paul Argudo
+Jeff Smick
+Jenny Kibiri
+Jeremias Menichelli
+Jess Fink
+Jess Shears
+Jesse White
+Jim Brodeur
+Jim Chanco Jr
+Joakim Ahrlin
+Joanna Michniewicz
+Joaquim Moreno
+Joel Low
+Joey Freeland
+John Fitzgerald
+Joel Martin
+Johan Bergström
+John Pena
+John Schaeffer
+Jon M
+Jonny Summers-Muir
+Jordan McQueen
+Jordi Enric
+José Luis Ledesma
+Joshen Lim
+Julian Domke
+Julien Goux
+Kai M
+Kalleby Santos
+Kanishk Dudeja
+Kamil Ogórek
+Kang Ming Tay
+Karan S
+Karlo Ison
+Katerina Skroumpelou
+Keith Resar
+Keith Fiske
+Kemal Y
+Kevin Brolly
+Kevin Grüneberg
+Kevin Strong-Holte
+Kostas Botsas
+Krishna Sai Vandavasi
+Lakshan Perera
+Laura C
+Laurence Isla
+Leandro Pereira
+Leigh Anne Applewhite
+Lenny Urbanowski
+Leonardo Santiago
+Liam Cloud Hogan
+Lindsay Moss
+Lukas Bernert
+Łukasz Niemier
+Maksym Ionutsa
+Manuel Mendez
+Manan Gupta
+Marcus Weiner
+Marija Milicevic
+Mark Burggraf
+Matthew Hambright
+Matt Hudson
+Matt Johnston
+Matt Rossman
+Matthias Luft
+Mats Kindahl
+Mert Yerekapan
+Michal Kleczek
+Michelle Jubrey
+Monica Khoury
+Mykhailo Mischa Lieibenson
+Natalie Roberge
+Nick B
+Nick Littman
+Nick Nowlan
+Nicolas Nosenzo
+Nyannyacha
+Oli R
+Pamela Chia
+Patricia Szasz
+Patrick Crane
+Paul Caselton
+Paul Cioanca
+Paul Copplestone
+Paul Ibeabuchi
+Pavel Borisov
+Paweł Gulbinowicz
+Pedro Rodrigues
+Peter Lyn
+Peter Soderberg
+Pierre Ducroquet
+Qiao Han
+Rafael Chacón
+Raminder Singh
+Raúl Barroso
+Riccardo Busetti
+Richard Kasprzak
+Rob Shields
+Rodrigo Esteves
+Rodrigo Mansueli
+Roman Hernandez
+Ronan Lehane
+Rory Wilding
+Ryan Goulet
+Ryan Senior
+Ruan Maia
+Saba Pochkhua
+Sam Meech-Ward
+Sam Rome
+Sam Rose
+Samir Ketema
+Sana Cordeaux
+Sasi Kanumuri
+Sara Read
+Sean Oliver
+Sean Romberg
+Sean Thompson
+Sergio Cioban Filho
+Shaii O
+Shane E
+Shreekar Shetty
+Sreyas Udayavarman
+Stephen Morgan
+Steve Chavez
+Steven Eubank
+Stojan Dimitrovski
+Szymon Mentel
+Sugat Mahanti
+Sugu Sougoumarane
+Supun Sudaraka Kalidasa
+Taha Le Bras
+Tanun Chalermsinsuwan
+Taryn King
+Terry Sutton
+Thomas E
+Tim Frietas
+Tim Palmer
+Timothy Lim
+Tina Ha
+Tom Ashley
+Tom G
+Tomás Pozo
+Tyler Hillery
+Tyler Fontaine
+Tyler Shukert
+TzeYiing L
+Utkarash Singh
+Victor Farazdagi
+Warwick Mitchell
+Wen Bo Xie
+Yorvi Arias
+Yuliya Marinova
+Zach Marinov
+Zsolt Pazmandy
+____________
+
+JOBS
+
+If you are interested in working with us check out the open roles here: https://supabase.com/careers
+
+___________
+
+
+TECHNOLOGIES
+
+Supabase would not be possible without the work of some other amazing open source contributors.
+
+- Postgres - https://www.postgresql.org/
+- PostgREST - https://github.com/PostgREST
+- Kong - https://github.com/kong/
+- Next.js - https://nextjs.org/
+- Tailwind CSS - https://tailwindcss.com/
+- shadcn/ui - https://ui.shadcn.com/
+- Phoenix - https://www.phoenixframework.org/
+- GoTrue - https://github.com/netlify/gotrue

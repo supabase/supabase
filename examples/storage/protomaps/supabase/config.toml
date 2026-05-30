@@ -1,0 +1,26 @@
+# A string used to distinguish different Supabase projects on the same host. Defaults to the
+# working directory name when running `supabase init`.
+project_id = "protomaps"
+
+[api]
+# Disable data API since we are not using the PostgREST client in this example.
+enabled = false
+
+[storage]
+# The maximum file size allowed for all buckets in the project.
+file_size_limit = "50MiB"
+
+[storage.buckets.maps-private]
+public = false
+# file_size_limit = "50MiB"
+# allowed_mime_types = ["application/vnd.pmtiles"]
+# Uncomment to specify a local directory to upload objects to the bucket.
+# objects_path = "./buckets/maps-private"
+
+[functions.maps-private]
+enabled = true
+verify_jwt = false
+# import_map = "./functions/maps-private/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+# entrypoint = "./functions/maps-private/index.ts"

@@ -1,0 +1,57 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { components } from 'api-types'
+import { toast } from 'sonner'
+
+import { integrationKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
+
+type GitHubConnectionCreateVariables = {
+  organizationId: number
+  connection: components['schemas']['CreateGitHubConnectionBody']
+}
+
+export async function createGitHubConnection({ connection }: GitHubConnectionCreateVariables) {
+  const { data, error } = await post('/platform/integrations/github/connections', {
+    body: connection,
+  })
+
+  if (error) handleError(error)
+  return data
+}
+
+export type GitHubConnectionCreateData = Awaited<ReturnType<typeof createGitHubConnection>>
+
+export const useGitHubConnectionCreateMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: Omit<
+  UseCustomMutationOptions<
+    GitHubConnectionCreateData,
+    ResponseError,
+    GitHubConnectionCreateVariables
+  >,
+  'mutationFn'
+> = {}) => {
+  const queryClient = useQueryClient()
+  return useMutation<GitHubConnectionCreateData, ResponseError, GitHubConnectionCreateVariables>({
+    mutationFn: (vars) => createGitHubConnection(vars),
+    async onSuccess(data, variables, context) {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: integrationKeys.githubConnectionsList(variables.organizationId),
+        }),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create GitHub connection: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
+}

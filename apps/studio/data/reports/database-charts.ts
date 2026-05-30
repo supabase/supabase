@@ -1,0 +1,592 @@
+import { COMPUTE_DISK, COMPUTE_MAX_IOPS } from 'shared-data'
+
+import {
+  hasBurstableIO,
+  mapComputeSizeNameToAddonVariantId,
+} from '@/components/interfaces/DiskManagement/DiskManagement.utils'
+import { compactNumberFormatter } from '@/components/ui/Charts/Charts.utils'
+import { ReportAttributes } from '@/components/ui/Charts/ComposedChart.utils'
+import { DiskAttributesData } from '@/data/config/disk-attributes-query'
+import { MaxConnectionsData } from '@/data/database/max-connections-query'
+import { Project } from '@/data/projects/project-detail-query'
+import { DOCS_URL } from '@/lib/constants'
+import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
+
+export const getReportAttributesV2: (
+  entitledFeatures: string[],
+  project: Project,
+  diskConfig?: DiskAttributesData,
+  maxConnections?: MaxConnectionsData,
+  pgBouncerMaxConnections?: number,
+  isSpendCapEnabled?: boolean,
+  showDiskIOBurstBalanceChart?: boolean
+) => ReportAttributes[] = (
+  entitledFeatures,
+  project,
+  diskConfig,
+  maxConnections,
+  pgBouncerMaxConnections,
+  isSpendCapEnabled,
+  showDiskIOBurstBalanceChart
+) => {
+  const computeVariantId = mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
+  const provisionedDiskIops = diskConfig?.attributes?.iops
+  const computeIopsLimit = COMPUTE_MAX_IOPS[computeVariantId]
+  const effectiveMaxIops =
+    typeof provisionedDiskIops === 'number' && typeof computeIopsLimit === 'number'
+      ? Math.min(provisionedDiskIops, computeIopsLimit)
+      : provisionedDiskIops
+  const showBurstBalanceChart =
+    !!showDiskIOBurstBalanceChart && hasBurstableIO(project?.infra_compute_size)
+  const baselineThroughputMBps = COMPUTE_DISK[computeVariantId]?.baselineThroughputMBps
+  const baselineThroughputLabel =
+    typeof baselineThroughputMBps === 'number' ? `${baselineThroughputMBps} MB/s` : 'its baseline'
+
+  return [
+    {
+      id: 'ram-usage',
+      label: 'Memory usage',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-usage`,
+      hide: false,
+      showTooltip: true,
+      showLegend: true,
+      hideChartType: false,
+      defaultChartStyle: 'bar',
+      showMaxValue: false,
+      showGrid: true,
+      syncId: 'database-reports',
+      valuePrecision: 2,
+      YAxisProps: {
+        width: 75,
+        tickFormatter: (value: number) => formatBytesMinMB(value, 2),
+      },
+      attributes: [
+        {
+          attribute: 'ram_usage_used',
+          provider: 'infra-monitoring',
+          label: 'Used',
+          tooltip:
+            'RAM in use by Postgres and the operating system. Sustained high usage may indicate memory pressure',
+        },
+        {
+          attribute: 'ram_usage_cache_and_buffers',
+          provider: 'infra-monitoring',
+          label: 'Cache + Buffers',
+          tooltip:
+            'RAM used by the operating system page cache and PostgreSQL buffers to accelerate disk reads/writes',
+        },
+        {
+          attribute: 'ram_usage_free',
+          provider: 'infra-monitoring',
+          label: 'Free',
+          tooltip:
+            'Unallocated memory available for use. A small portion is always reserved by the operating system',
+        },
+        {
+          attribute: 'ram_usage_total',
+          provider: 'infra-monitoring',
+          label: 'Total RAM',
+          isMaxValue: true,
+          omitFromTotal: true,
+          tooltip: 'Total RAM available on this instance',
+        },
+      ],
+    },
+    {
+      id: 'swap-usage',
+      label: 'Swap usage',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-usage`,
+      hide: true,
+      showTooltip: true,
+      showLegend: false,
+      hideChartType: false,
+      defaultChartStyle: 'bar',
+      showMaxValue: false,
+      showGrid: true,
+      syncId: 'database-reports',
+      valuePrecision: 2,
+      YAxisProps: {
+        width: 75,
+        tickFormatter: (value: number) => formatBytesMinMB(value, 2),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        domain: [0, (dataMax: number) => Math.max(dataMax, 1024 * 1024 * 1024)] as any,
+      },
+      attributes: [
+        {
+          attribute: 'swap_usage',
+          provider: 'infra-monitoring',
+          label: 'Swap',
+          tooltip:
+            'Swap space in use by the operating system. Sustained swap usage indicates memory pressure and may degrade database performance',
+        },
+      ],
+    },
+    {
+      id: 'cpu-usage',
+      label: 'CPU usage',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#cpu-usage`,
+      syncId: 'database-reports',
+      format: '%',
+      valuePrecision: 2,
+      hide: false,
+      showTooltip: true,
+      showLegend: true,
+      showMaxValue: false,
+      showGrid: true,
+      normalizeVisibleStackToPercent: true,
+      YAxisProps: {
+        width: 55,
+        domain: [0, 100] as [number, number],
+        allowDataOverflow: true,
+        tickFormatter: (v: number) => `${Math.round(v)}%`,
+      },
+      hideChartType: false,
+      defaultChartStyle: 'bar',
+      attributes: [
+        {
+          attribute: 'cpu_usage_busy_system',
+          provider: 'infra-monitoring',
+          label: 'System',
+          format: '%',
+          color: { light: '#EDC35E', dark: '#EDD35E' },
+          fill: { light: '#F6D99F', dark: '#5C5230' },
+          tooltip:
+            'CPU time spent on kernel operations (e.g., process scheduling, memory management). High values may indicate system overhead',
+        },
+        {
+          attribute: 'cpu_usage_busy_user',
+          provider: 'infra-monitoring',
+          label: 'User',
+          format: '%',
+          color: { light: '#0063E8', dark: '#65BCD9' },
+          fill: { light: '#80B1F4', dark: '#2A3D45' },
+          tooltip:
+            'CPU time used by database queries and user-space processes. High values may suggest CPU-intensive queries',
+        },
+        {
+          attribute: 'cpu_usage_busy_iowait',
+          provider: 'infra-monitoring',
+          label: 'IOwait',
+          format: '%',
+          color: { light: '#DB3A34', dark: '#FF6B6B' },
+          fill: { light: '#F2A7A3', dark: '#5C2A2A' },
+          tooltip:
+            'CPU time waiting for disk or network I/O. High values may indicate disk bottlenecks',
+        },
+        {
+          attribute: 'cpu_usage_busy_irqs',
+          provider: 'infra-monitoring',
+          label: 'IRQs',
+          format: '%',
+          color: { light: '#DA760B', dark: '#DA760B' },
+          fill: { light: '#FFB885', dark: '#5C3D0A' },
+          tooltip: 'CPU time handling hardware interrupt requests (IRQ)',
+        },
+        {
+          attribute: 'cpu_usage_busy_other',
+          provider: 'infra-monitoring',
+          label: 'Other',
+          format: '%',
+          color: { light: '#B616A6', dark: '#DB8DF9' },
+          fill: { light: '#DB8BD3', dark: '#4A3D5C' },
+          tooltip:
+            'CPU time spent on other tasks (e.g., background processes, software interrupts)',
+        },
+        {
+          attribute: 'cpu_usage_busy_idle',
+          provider: 'infra-monitoring',
+          label: 'Idle',
+          format: '%',
+          omitFromTotal: true,
+          color: { light: '#6EA85F', dark: '#A3FFC2' },
+          fill: { light: '#A6D8AE', dark: '#2A5C3F' },
+          tooltip: 'CPU time spent idle and available for new work',
+        },
+        {
+          attribute: 'cpu_usage_max',
+          provider: 'reference-line',
+          label: 'Max',
+          value: 100,
+          tooltip: 'Max CPU usage',
+          isMaxValue: true,
+        },
+      ],
+    },
+    {
+      id: 'network-throughput',
+      label: 'Network throughput',
+      syncId: 'database-reports',
+      hide: false,
+      showTooltip: true,
+      format: 'bytes-per-second',
+      valuePrecision: 1,
+      showLegend: true,
+      showMaxValue: false,
+      hideChartType: false,
+      showGrid: true,
+      YAxisProps: {
+        width: 70,
+        tickFormatter: (value: number) => `${formatBytes(value, 1)}/s`,
+      },
+      defaultChartStyle: 'stackedAreaLine',
+      attributes: [
+        {
+          attribute: 'network_receive_bytes',
+          provider: 'infra-monitoring',
+          label: 'Network in',
+          tooltip: 'Inbound network throughput (bytes per second)',
+        },
+        {
+          attribute: 'network_transmit_bytes',
+          provider: 'infra-monitoring',
+          label: 'Network out',
+          tooltip: 'Outbound network throughput (bytes per second)',
+        },
+      ],
+    },
+    {
+      id: 'disk-iops',
+      label: 'Disk Input/Output operations per second (IOPS)',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#disk-inputoutput-operations-per-second-iops`,
+      syncId: 'database-reports',
+      hide: false,
+      showTooltip: true,
+      valuePrecision: 0,
+      showLegend: true,
+      hideChartType: false,
+      showGrid: true,
+      showMaxValue: true,
+      YAxisProps: {
+        width: 55,
+        tickFormatter: (value: number) => compactNumberFormatter(value),
+      },
+      defaultChartStyle: 'bar',
+      attributes: [
+        {
+          attribute: 'disk_iops_write',
+          provider: 'infra-monitoring',
+          label: 'Write IOPS',
+          tooltip:
+            'Number of write operations per second. High values indicate frequent data writes, logging, or transaction activity',
+        },
+        {
+          attribute: 'disk_iops_read',
+          provider: 'infra-monitoring',
+          label: 'Read IOPS',
+          tooltip:
+            'Number of read operations per second. High values suggest frequent disk reads due to queries or poor caching',
+        },
+        {
+          attribute: 'disk_iops_max',
+          provider: 'reference-line',
+          label: 'Max IOPS',
+          value: effectiveMaxIops,
+          tooltip:
+            'Effective maximum IOPS for your current compute and disk configuration. Equal to the lower of the compute IOPS limit and the provisioned disk IOPS',
+          isMaxValue: true,
+        },
+      ],
+    },
+    {
+      id: 'disk-throughput',
+      label: 'Disk throughput',
+      docsUrl: `${DOCS_URL}/guides/platform/compute-add-ons#disk-throughput`,
+      syncId: 'database-reports',
+      hide: false,
+      showTooltip: true,
+      format: 'bytes-per-second',
+      valuePrecision: 1,
+      showLegend: true,
+      showMaxValue: true,
+      hideChartType: false,
+      showGrid: true,
+      YAxisProps: {
+        width: 70,
+        tickFormatter: (value: number) => `${formatBytes(value, 1)}/s`,
+      },
+      defaultChartStyle: 'stackedAreaLine',
+      attributes: [
+        {
+          attribute: 'disk_bytes_read',
+          provider: 'infra-monitoring',
+          label: 'Read throughput',
+          tooltip: 'Disk read throughput (bytes per second)',
+        },
+        {
+          attribute: 'disk_bytes_written',
+          provider: 'infra-monitoring',
+          label: 'Write throughput',
+          tooltip: 'Disk write throughput (bytes per second)',
+        },
+        {
+          attribute: 'disk_throughput_max',
+          provider: 'reference-line',
+          label: 'Max throughput',
+          value:
+            diskConfig?.attributes?.type === 'gp3' &&
+            typeof diskConfig.attributes.throughput_mbps === 'number'
+              ? diskConfig.attributes.throughput_mbps * 1024 * 1024
+              : undefined,
+          tooltip: 'Maximum disk throughput for your current compute size',
+          isMaxValue: true,
+        },
+      ],
+    },
+    {
+      id: 'disk-io-burst-balance',
+      label: 'Disk IO Burst Balance',
+      titleTooltip: `The burst credit pool that smaller compute instances draw on to sustain IO above their baseline. When the balance hits 0%, sustained throughput returns to its baseline of ${baselineThroughputLabel} until it refills.`,
+      docsUrl: `${DOCS_URL}/guides/platform/compute-add-ons#disk-throughput-and-iops`,
+      syncId: 'database-reports',
+      hide: !showBurstBalanceChart,
+      format: '%',
+      valuePrecision: 0,
+      showTooltip: true,
+      showLegend: false,
+      showMaxValue: false,
+      showGrid: true,
+      YAxisProps: {
+        width: 55,
+        domain: [0, 100] as [number, number],
+        allowDataOverflow: true,
+        tickFormatter: (v: number) => `${Math.round(v)}%`,
+      },
+      hideChartType: false,
+      defaultChartStyle: 'bar',
+      attributes: [
+        {
+          attribute: 'disk_io_budget',
+          provider: 'infra-monitoring',
+          label: 'Burst credits remaining',
+          format: '%',
+          tooltip: `Percentage of EBS burst credits remaining. Drops only matter while the instance is bursting above its baseline IO. At 0%, sustained throughput returns to its baseline of ${baselineThroughputLabel} until it refills.`,
+        },
+      ],
+    },
+    {
+      // Client Connections metric for free tier
+      id: 'client-connections-basic',
+      label: 'Database Connections',
+      syncId: 'database-reports',
+      valuePrecision: 0,
+      hide: entitledFeatures.includes('database'),
+      showTooltip: false,
+      showLegend: false,
+      showMaxValue: true,
+      hideChartType: false,
+      showGrid: true,
+      YAxisProps: { width: 30 },
+      defaultChartStyle: 'bar',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#database-connections`,
+      attributes: [
+        {
+          attribute: 'pg_stat_database_num_backends',
+          provider: 'infra-monitoring',
+          label: 'Total connections',
+          tooltip: 'Total number of active database connections',
+        },
+        {
+          attribute: 'max_db_connections',
+          provider: 'reference-line',
+          label: 'Max connections',
+          value: maxConnections?.maxConnections,
+          tooltip: 'Max available connections for your current compute size',
+          isMaxValue: true,
+        },
+      ],
+    },
+    {
+      // advanced client connections metric for paid and above
+      id: 'client-connections',
+      label: 'Database Connections',
+      syncId: 'database-reports',
+      valuePrecision: 0,
+      entitlement: 'database',
+      requiredPlan: 'Pro',
+      hide: !entitledFeatures.includes('database'),
+      showTooltip: true,
+      showLegend: true,
+      showMaxValue: true,
+      hideChartType: false,
+      showGrid: true,
+      YAxisProps: { width: 30 },
+      defaultChartStyle: 'bar',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#database-connections`,
+      attributes: [
+        {
+          attribute: 'client_connections_postgres',
+          provider: 'infra-monitoring',
+          label: 'Postgres',
+          tooltip:
+            'Direct connections to the Postgres database from your application and external clients',
+        },
+        {
+          attribute: 'client_connections_authenticator',
+          provider: 'infra-monitoring',
+          label: 'PostgREST',
+          tooltip: 'Connection pool managed by PostgREST',
+        },
+        {
+          attribute: 'client_connections_supabase_admin',
+          provider: 'infra-monitoring',
+          label: 'Reserved',
+          tooltip:
+            'Administrative connections used by various Supabase services for internal operations and maintenance tasks',
+        },
+        {
+          attribute: 'client_connections_supabase_auth_admin',
+          provider: 'infra-monitoring',
+          label: 'Auth',
+          tooltip: 'Connection pool managed by Supabase Auth',
+        },
+        {
+          attribute: 'client_connections_supabase_storage_admin',
+          provider: 'infra-monitoring',
+          label: 'Storage',
+          tooltip: 'Connection pool managed by Supabase Storage',
+        },
+        {
+          attribute: 'client_connections_other',
+          provider: 'infra-monitoring',
+          label: 'Other roles',
+          tooltip: "Miscellaneous database connections that don't fall into other categories.",
+        },
+        {
+          attribute: 'max_db_connections',
+          provider: 'reference-line',
+          label: 'Max connections',
+          value: maxConnections?.maxConnections,
+          tooltip: 'Max available connections for your current compute size',
+          isMaxValue: true,
+        },
+      ],
+    },
+    {
+      id: 'pgbouncer-connections',
+      label: 'Dedicated Pooler Client Connections',
+      syncId: 'database-reports',
+      valuePrecision: 0,
+      entitlement: 'database',
+      requiredPlan: 'Pro',
+      hide: !entitledFeatures.includes('database'),
+      showTooltip: true,
+      showLegend: true,
+      showMaxValue: true,
+      showGrid: true,
+      YAxisProps: { width: 30 },
+      hideChartType: false,
+      defaultChartStyle: 'bar',
+      docsUrl: `${DOCS_URL}/guides/platform/compute-and-disk#limits-and-constraints`,
+      attributes: [
+        {
+          attribute: 'client_connections_pgbouncer',
+          provider: 'infra-monitoring',
+          label: 'pgbouncer',
+          tooltip: 'PgBouncer connections',
+        },
+        {
+          attribute: 'pg_pooler_max_connections',
+          provider: 'reference-line',
+          label: 'Max pooler connections',
+          value: pgBouncerMaxConnections,
+          tooltip: 'Maximum allowed pooler connections for your current compute size',
+          isMaxValue: true,
+        },
+      ],
+    },
+    {
+      id: 'supavisor-connections-active',
+      label: 'Shared Pooler (Supavisor) client connections',
+      syncId: 'database-reports',
+      valuePrecision: 0,
+      entitlement: 'database',
+      requiredPlan: 'Pro',
+      hide: !entitledFeatures.includes('database'),
+      showTooltip: false,
+      showLegend: false,
+      showMaxValue: false,
+      showGrid: true,
+      YAxisProps: { width: 30 },
+      hideChartType: false,
+      defaultChartStyle: 'bar',
+      attributes: [
+        {
+          attribute: 'supavisor_connections_active',
+          provider: 'infra-monitoring',
+          label: 'supavisor',
+          tooltip: 'Supavisor connections',
+        },
+      ],
+    },
+    {
+      id: 'disk-size',
+      label: 'Disk Usage',
+      syncId: 'database-reports',
+      valuePrecision: 2,
+      hide: false,
+      showTooltip: true,
+      showLegend: true,
+      showMaxValue: true,
+      showGrid: true,
+      YAxisProps: {
+        width: 65,
+        tickFormatter: (value: number) => formatBytes(value, 1),
+      },
+      hideChartType: false,
+      defaultChartStyle: 'bar',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#disk-size`,
+      attributes: [
+        {
+          attribute: 'disk_fs_used_system',
+          provider: 'infra-monitoring',
+          format: 'bytes',
+          label: 'System',
+          tooltip: 'Reserved space for the system to ensure your database runs smoothly',
+        },
+        {
+          attribute: 'disk_fs_used_wal',
+          provider: 'infra-monitoring',
+          format: 'bytes',
+          label: 'WAL',
+          tooltip:
+            'Disk usage by the write-ahead log. The usage depends on your WAL settings and the amount of data being written to the database',
+        },
+        {
+          attribute: 'pg_database_size',
+          provider: 'infra-monitoring',
+          format: 'bytes',
+          label: 'Database',
+          tooltip: 'Disk usage by your database (tables, indexes, data, ...)',
+        },
+        {
+          attribute: 'disk_fs_size',
+          provider: 'infra-monitoring',
+          isMaxValue: true,
+          format: 'bytes',
+          label: 'Disk Size',
+          tooltip: 'Disk Size refers to the total space your project occupies on disk',
+        },
+        entitledFeatures.includes('database') &&
+          (isSpendCapEnabled
+            ? {
+                attribute: 'pg_database_size_percent_paid_spendCap',
+                provider: 'reference-line',
+                isReferenceLine: true,
+                strokeDasharray: '4 2',
+                label: 'Spend cap enabled',
+                value: diskConfig?.attributes?.size_gb! * 1024 * 1024 * 1024,
+                className: '[&_line]:stroke-yellow-800! [&_line]:opacity-100!',
+                opacity: 1,
+              }
+            : {
+                attribute: 'pg_database_size_percent_paid',
+                provider: 'reference-line',
+                isReferenceLine: true,
+                label: '90% - Disk resize threshold',
+                className: '[&_line]:stroke-yellow-800!',
+                value: diskConfig?.attributes?.size_gb! * 1024 * 1024 * 1024 * 0.9,
+              }),
+      ],
+    },
+  ]
+}

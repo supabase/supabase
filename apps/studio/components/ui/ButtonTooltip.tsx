@@ -1,0 +1,28 @@
+import { ComponentProps, ComponentPropsWithoutRef, ElementRef, forwardRef, ReactNode } from 'react'
+import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
+export const ButtonTooltip = forwardRef<
+  ElementRef<typeof Button>,
+  ComponentPropsWithoutRef<typeof Button> & {
+    tooltip: {
+      content: ComponentProps<typeof TooltipContent> & {
+        text?: string | ReactNode
+      }
+    }
+  }
+>(({ tooltip, className, ...props }, ref) => {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button ref={ref} {...props} className={cn(className, 'pointer-events-auto')}>
+          {props.children}
+        </Button>
+      </TooltipTrigger>
+      {tooltip.content.text !== undefined && (
+        <TooltipContent {...tooltip.content}>{tooltip.content.text}</TooltipContent>
+      )}
+    </Tooltip>
+  )
+})
+
+ButtonTooltip.displayName = 'ButtonTooltip'

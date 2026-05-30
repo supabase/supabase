@@ -1,0 +1,153 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import { ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { ComponentPropsWithoutRef, ElementRef, forwardRef, useState } from 'react'
+import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
+
+import type { Commands } from './Functions.types'
+import CommandRender from '@/components/interfaces/Functions/CommandRender'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useAccessTokensQuery } from '@/data/access-tokens/access-tokens-query'
+import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { DOCS_URL } from '@/lib/constants'
+
+interface TerminalInstructionsProps extends ComponentPropsWithoutRef<typeof Collapsible> {
+  closable?: boolean
+  removeBorder?: boolean
+}
+
+export const TerminalInstructions = forwardRef<
+  ElementRef<typeof Collapsible>,
+  TerminalInstructionsProps
+>(({ closable = false, removeBorder = false, ...props }, ref) => {
+  const router = useRouter()
+  const { ref: projectRef } = useParams()
+  const [showInstructions, setShowInstructions] = useState(!closable)
+
+  const { data: tokens } = useAccessTokensQuery()
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
+
+  const { data: endpoint } = useProjectApiUrl({ projectRef })
+  const functionsEndpoint = `${endpoint}/functions/v1`
+
+  const { anonKey, publishableKey } = getKeys(apiKeys)
+  const apiKey = publishableKey?.api_key ?? anonKey?.api_key ?? '[YOUR ANON KEY]'
+
+  // get the .co or .net TLD from the restUrl
+  const restUrl = `https://${endpoint}`
+  const restUrlTld = !!endpoint ? new URL(restUrl).hostname.split('.').pop() : 'co'
+
+  const commands: Commands[] = [
+    {
+      command: 'supabase functions new hello-world',
+      description: ' creates a function stub at ./functions/hello-world/index.ts',
+      jsx: () => {
+        return (
+          <>
+            <span className="text-brand-600">supabase</span> functions new hello-world
+          </>
+        )
+      },
+      comment: 'Create a function',
+    },
+    {
+      command: `supabase functions deploy hello-world --project-ref ${projectRef}`,
+      description: 'Deploys function at ./functions/hello-world/index.ts',
+      jsx: () => {
+        return (
+          <>
+            <span className="text-brand-600">supabase</span> functions deploy hello-world
+            --project-ref {projectRef}
+          </>
+        )
+      },
+      comment: 'Deploy your function',
+    },
+    {
+      command: `curl -L -X POST 'https://${projectRef}.supabase.${restUrlTld}/functions/v1/hello-world' -H 'Authorization: Bearer ${apiKey}'${anonKey?.type === 'publishable' ? ` -H 'apikey: ${apiKey}'` : ''} --data '{"name":"Functions"}'`,
+      description: 'Invokes the hello-world function',
+      jsx: () => {
+        return (
+          <>
+            <span className="text-brand-600">curl</span> -L -X POST '{functionsEndpoint}
+            /hello-world' -H 'Authorization: Bearer [YOUR ANON KEY]'
+            {anonKey?.type === 'publishable' ? " -H 'apikey: [YOUR ANON KEY]' " : ''}
+            {`--data '{"name":"Functions"}'`}
+          </>
+        )
+      },
+      comment: 'Invoke your function',
+    },
+  ]
+
+  return (
+    <Collapsible
+      ref={ref}
+      open={showInstructions}
+      className="w-full"
+      onOpenChange={() => setShowInstructions(!showInstructions)}
+      {...props}
+    >
+      <CollapsibleTrigger className="flex w-full justify-between" disabled={!closable}>
+        <div className="flex items-center gap-x-3">
+          <div className="flex items-center justify-center w-8 h-8 p-2 border rounded-sm bg-alternative">
+            <Terminal strokeWidth={2} />
+          </div>
+          <h4>Create your first Edge Function via the CLI</h4>
+        </div>
+        {closable && (
+          <div className="cursor-pointer" onClick={() => setShowInstructions(!showInstructions)}>
+            {showInstructions ? (
+              <Minimize2 size={16} strokeWidth={1.5} />
+            ) : (
+              <Maximize2 size={16} strokeWidth={1.5} />
+            )}
+          </div>
+        )}
+      </CollapsibleTrigger>
+      <CollapsibleContent className="w-full transition-all data-closed:animate-collapsible-up data-open:animate-collapsible-down">
+        <CommandRender commands={commands} className="my-4" />
+        {tokens && tokens.length === 0 ? (
+          <div className="py-4 space-y-3 border-t">
+            <div>
+              <p className="text-sm text-foreground">You may need to create an access token</p>
+              <p className="text-sm text-foreground-light">
+                You can create a secure access token in your account section
+              </p>
+            </div>
+            <Button type="default" onClick={() => router.push('/account/tokens')}>
+              Access tokens
+            </Button>
+          </div>
+        ) : (
+          <div className="py-4 space-y-3 border-t">
+            <div>
+              <h3 className="text-base text-foreground">Need help?</h3>
+              <p className="text-sm text-foreground-light">
+                Read the documentation, or browse some sample code.
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <DocsButton href={`${DOCS_URL}/guides/functions`} />
+              <Button asChild type="default" icon={<ExternalLink />}>
+                <a
+                  target="_blank"
+                  rel="noreferrer"
+                  href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
+                >
+                  Examples
+                </a>
+              </Button>
+            </div>
+          </div>
+        )}
+      </CollapsibleContent>
+    </Collapsible>
+  )
+})
+
+TerminalInstructions.displayName = 'TerminalInstructions'

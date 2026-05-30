@@ -1,0 +1,175 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import { useForm } from 'react-hook-form'
+import {
+  Button,
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
+
+import CopyButton from '@/components/ui/CopyButton'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useCheckCNAMERecordMutation } from '@/data/custom-domains/check-cname-mutation'
+import { useCustomDomainCreateMutation } from '@/data/custom-domains/custom-domains-create-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+
+const schema = z.object({
+  domain: z.string().trim().min(1, 'A value for your custom domain is required'),
+})
+
+export const CustomDomainsConfigureHostname = () => {
+  const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+
+  const { mutate: checkCNAMERecord, isPending: isCheckingRecord } = useCheckCNAMERecordMutation()
+  const { mutate: createCustomDomain, isPending: isCreating } = useCustomDomainCreateMutation()
+  const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
+
+  const endpoint = settings?.app_config?.endpoint
+  const { can: canConfigureCustomDomain } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'projects',
+    {
+      resource: {
+        project_id: project?.id,
+      },
+    }
+  )
+
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      domain: '',
+    },
+    mode: 'onSubmit',
+    reValidateMode: 'onBlur',
+  })
+
+  const onCreateCustomDomain = async (values: z.infer<typeof schema>) => {
+    if (!ref) return console.error('Project ref is required')
+
+    checkCNAMERecord(
+      { domain: values.domain.trim() },
+      {
+        onSuccess: () => {
+          createCustomDomain({ projectRef: ref, customDomain: values.domain.trim() })
+        },
+      }
+    )
+  }
+
+  const domain = form.watch('domain')
+  const trimmedDomain = domain.trim()
+  const isSubmitting = isCheckingRecord || isCreating
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onCreateCustomDomain)}>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 gap-4">
+            <CardTitle>Add a custom domain</CardTitle>
+            <DocsButton href={`${DOCS_URL}/guides/platform/custom-domains`} />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <FormField
+                control={form.control}
+                name="domain"
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="flex-row-reverse"
+                    label="Custom domain"
+                    description="Enter the subdomain you want to use."
+                    className="[&>div]:md:w-1/2"
+                  >
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="subdomain.example.com"
+                        disabled={!canConfigureCustomDomain || isSubmitting}
+                        autoComplete="off"
+                      />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            </div>
+          </CardContent>
+          <CardContent>
+            <h4 className="text-sm mb-1">Configure a CNAME record</h4>
+            <p className="text-sm text-foreground-light">
+              Set up a CNAME record for{' '}
+              {domain ? <code className="text-code-inline">{domain}</code> : 'your custom domain'}{' '}
+              resolving to{' '}
+              {endpoint ? (
+                <span className="inline-flex items-center gap-x-1">
+                  <code className="text-code-inline">{endpoint}</code>
+                  <CopyButton
+                    iconOnly
+                    type="text"
+                    className="h-5 w-5 min-w-0 p-0 [&_svg]:h-3 [&_svg]:w-3"
+                    text={endpoint}
+                  />
+                </span>
+              ) : (
+                "your project's API URL"
+              )}{' '}
+              with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
+              disable the proxy option.
+              <br />
+              {trimmedDomain.includes('.') ? (
+                <>
+                  Some DNS providers expect only the subdomain label{' '}
+                  <code className="text-code-inline">{trimmedDomain.split('.')[0]}</code>, while
+                  others accept the full hostname{' '}
+                  <code className="text-code-inline whitespace-nowrap">{trimmedDomain}</code>.
+                </>
+              ) : (
+                'Some DNS providers expect only the subdomain label, while others accept the full hostname.'
+              )}
+            </p>
+          </CardContent>
+
+          <CardFooter className="justify-end space-x-2">
+            {form.formState.isDirty && (
+              <Button
+                type="default"
+                disabled={isSubmitting}
+                onClick={() => form.reset({ domain: '' })}
+              >
+                Cancel
+              </Button>
+            )}
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={isSubmitting}
+              disabled={!form.formState.isDirty || isSubmitting || !canConfigureCustomDomain}
+            >
+              Add
+            </Button>
+          </CardFooter>
+        </Card>
+
+        {!canConfigureCustomDomain && (
+          <p className="text-xs text-foreground-light">
+            You need additional permissions to update your project's custom domain settings.
+          </p>
+        )}
+      </form>
+    </Form>
+  )
+}

@@ -1,0 +1,60 @@
+import { Registry } from './schema'
+
+export const charts: Registry = [
+  {
+    name: 'chart-bar-interactive',
+    type: 'components:block',
+    registryDependencies: ['card', 'chart'],
+    files: ['block/chart-bar-interactive.tsx'],
+    category: 'Charts',
+    subcategory: 'Bar',
+  },
+  {
+    name: 'chart-composed-demo',
+    type: 'components:block',
+    registryDependencies: ['chart'],
+    files: ['block/chart-composed-demo.tsx'],
+    category: 'Charts',
+    subcategory: 'Composed',
+  },
+  {
+    name: 'chart-composed-basic',
+    type: 'components:block',
+    registryDependencies: ['chart'],
+    files: ['block/chart-composed-basic.tsx'],
+    category: 'Charts',
+    subcategory: 'Composed',
+  },
+  {
+    name: 'chart-composed-states',
+    type: 'components:block',
+    registryDependencies: ['chart'],
+    files: ['block/chart-composed-states.tsx'],
+    category: 'Charts',
+    subcategory: 'Composed',
+  },
+  {
+    name: 'chart-composed-table',
+    type: 'components:block',
+    registryDependencies: ['chart'],
+    files: ['block/chart-composed-table.tsx'],
+    category: 'Charts',
+    subcategory: 'Composed',
+  },
+  {
+    name: 'chart-composed-metrics',
+    type: 'components:block',
+    registryDependencies: ['chart'],
+    files: ['block/chart-composed-metrics.tsx'],
+    category: 'Charts',
+    subcategory: 'Composed',
+  },
+  {
+    name: 'chart-composed-actions',
+    type: 'components:block',
+    registryDependencies: ['chart'],
+    files: ['block/chart-composed-actions.tsx'],
+    category: 'Charts',
+    subcategory: 'Composed',
+  },
+]

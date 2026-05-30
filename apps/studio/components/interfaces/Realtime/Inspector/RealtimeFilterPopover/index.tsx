@@ -1,0 +1,283 @@
+import { useParams } from 'common'
+import { PlusCircle } from 'lucide-react'
+import Link from 'next/link'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import {
+  Badge,
+  Button,
+  cn,
+  IconBroadcast,
+  IconDatabaseChanges,
+  IconPresence,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Switch,
+} from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import { RealtimeConfig } from '../useRealtimeMessages'
+import { FilterSchema } from './FilterSchema'
+import { FilterTable } from './FilterTable'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+
+type ControlledOpenProps =
+  | { open: boolean; onOpenChange: (open: boolean) => void }
+  | { open?: undefined; onOpenChange?: undefined }
+
+type RealtimeFilterPopoverProps = {
+  config: RealtimeConfig
+  onChangeConfig: Dispatch<SetStateAction<RealtimeConfig>>
+} & ControlledOpenProps
+
+export const RealtimeFilterPopover = ({
+  config,
+  onChangeConfig,
+  open: controlledOpen,
+  onOpenChange,
+}: RealtimeFilterPopoverProps) => {
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isControlled = controlledOpen !== undefined
+  const open = isControlled ? controlledOpen : internalOpen
+
+  const setOpen = (v: boolean) => {
+    if (isControlled) {
+      onOpenChange?.(v)
+    } else {
+      setInternalOpen(v)
+    }
+  }
+  const [applyConfigOpen, setApplyConfigOpen] = useState(false)
+  const [tempConfig, setTempConfig] = useState(config)
+
+  const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+  const track = useTrack()
+
+  const { data: publications } = useDatabasePublicationsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const realtimePublication = (publications ?? []).find(
+    (publication) => publication.name === 'supabase_realtime'
+  )
+
+  // Update tempConfig when config changes to ensure consistency
+  useEffect(() => {
+    setTempConfig(config)
+  }, [config])
+
+  const onOpen = (v: boolean) => {
+    // when opening, copy the outside config into the intermediate one
+    if (v === true) {
+      setTempConfig(config)
+    }
+    setOpen(v)
+  }
+
+  // [Joshen] Restricting the schemas to only public as any other schema won’t work out of the box due to missing permissions
+  // Consequently, SchemaSelector here will also be disabled
+  const isFiltered = config.table !== '*'
+  const filterPopoverTrigger = (
+    <PopoverTrigger asChild>
+      <Button
+        icon={<PlusCircle size="16" />}
+        type={isFiltered ? 'primary' : 'dashed'}
+        className={cn('rounded-full px-1 text-xs h-[26px]')}
+        size="small"
+      >
+        {isFiltered ? (
+          <>
+            <span className="mr-1">Filtered by </span>
+            <Badge variant="success">table: {config.table}</Badge>
+          </>
+        ) : (
+          <span className="mr-1">Filter messages</span>
+        )}
+      </Button>
+    </PopoverTrigger>
+  )
+
+  return (
+    <>
+      <Popover open={open} onOpenChange={onOpen}>
+        {!open && config.channelName.length > 0 ? (
+          <ShortcutTooltip shortcutId={SHORTCUT_IDS.INSPECTOR_TOGGLE_FILTERS} side="bottom">
+            {filterPopoverTrigger}
+          </ShortcutTooltip>
+        ) : (
+          filterPopoverTrigger
+        )}
+        <PopoverContent className="p-0 w-[365px]" align="start">
+          <div className="border-b border-overlay text-xs px-4 py-3 text-foreground">
+            Listen to event types
+          </div>
+          <div className="py-3 px-4 border-b border-overlay">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex gap-2.5 items-center">
+                <IconPresence
+                  size="xlarge"
+                  className="bg-foreground rounded-sm text-background-muted"
+                />
+                <label htmlFor="toggle-presence" className="text-sm">
+                  Presence
+                </label>
+              </div>
+              <Switch
+                id="toggle-presence"
+                size="small"
+                checked={tempConfig.enablePresence}
+                onCheckedChange={(checked) =>
+                  setTempConfig((current) => ({ ...current, enablePresence: checked }))
+                }
+              />
+            </div>
+            <p className="text-xs text-foreground-light pt-1">
+              Store and synchronize user state consistently across clients
+            </p>
+          </div>
+          <div className="py-3 px-4 border-b border-overlay">
+            <div className="flex items-center justify-between">
+              <div className="flex gap-2.5 items-center">
+                <IconBroadcast
+                  size="xlarge"
+                  className="bg-foreground rounded-sm text-background-muted"
+                />
+                <label htmlFor="toggle-broadcast" className="text-sm">
+                  Broadcast
+                </label>
+              </div>
+              <Switch
+                id="toggle-broadcast"
+                size="small"
+                checked={tempConfig.enableBroadcast}
+                onCheckedChange={(checked) =>
+                  setTempConfig((current) => ({ ...current, enableBroadcast: checked }))
+                }
+              />
+            </div>
+            <p className="text-xs  text-foreground-light pt-1">
+              Send any data to any client subscribed to the same channel
+            </p>
+          </div>
+          <div className="py-3 px-4 border-b border-overlay">
+            <div className="flex items-center justify-between">
+              <div className="flex gap-2.5 items-center">
+                <IconDatabaseChanges
+                  size="xlarge"
+                  className={cn(
+                    'rounded-sm text-background-muted',
+                    config.enableDbChanges ? 'bg-foreground' : 'bg-foreground-lighter'
+                  )}
+                />
+                <label
+                  htmlFor="toggle-db-changes"
+                  className={cn('text-sm', !config.enableDbChanges && 'text-foreground-lighter')}
+                >
+                  Database changes
+                </label>
+              </div>
+              <Switch
+                id="toggle-db-changes"
+                size="small"
+                checked={tempConfig.enableDbChanges}
+                disabled={!config.enableDbChanges}
+                onCheckedChange={(checked) =>
+                  setTempConfig((current) => ({ ...current, enableDbChanges: checked }))
+                }
+              />
+            </div>
+            <p className="text-xs text-foreground-light pt-1">
+              Listen for Database inserts, updates, deletes and more
+            </p>
+            {!config.enableDbChanges && (
+              <p className="text-xs text-foreground-light mt-2">
+                Enable{' '}
+                <InlineLink
+                  href={`/project/${ref}/database/publications${!!realtimePublication ? `/${realtimePublication.id}` : ''}`}
+                >
+                  realtime publications
+                </InlineLink>{' '}
+                for your tables to listen for database changes
+              </p>
+            )}
+          </div>
+
+          {tempConfig.enableDbChanges && config.enableDbChanges && (
+            <>
+              <div className="border-b border-overlay text-xs px-4 py-3 text-foreground">
+                Filter messages from database changes
+              </div>
+              <div className="flex border-b border-overlay p-4 gap-y-2 flex-col">
+                <FilterSchema
+                  value={tempConfig.schema}
+                  onChange={(v) => setTempConfig({ ...tempConfig, schema: v, table: '*' })}
+                />
+
+                <FilterTable
+                  value={tempConfig.table}
+                  schema={tempConfig.schema}
+                  onChange={(table) => setTempConfig({ ...tempConfig, table })}
+                />
+              </div>
+              <div className="border-b border-overlay p-4 flex flex-col gap-2">
+                <div className="flex flex-row gap-4 items-center">
+                  <p className="w-[60px] flex justify-end text-sm">AND</p>
+                  <Input
+                    className="w-64"
+                    placeholder="body=eq.hey"
+                    value={tempConfig.filter}
+                    onChange={(v) => setTempConfig({ ...tempConfig, filter: v.target.value })}
+                  />
+                </div>
+                <p className="text-xs text-foreground-light pl-[80px]">
+                  Learn more about realtime filtering in{' '}
+                  <Link
+                    className="underline"
+                    target="_blank"
+                    rel="noreferrer"
+                    href={`${DOCS_URL}/guides/realtime/postgres-changes#available-filters`}
+                  >
+                    our docs
+                  </Link>
+                </p>
+              </div>
+            </>
+          )}
+          <div className="px-4 py-2 gap-2 flex justify-end">
+            <Button type="default" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={() => setApplyConfigOpen(true)}>Apply</Button>
+          </div>
+        </PopoverContent>
+      </Popover>
+      <ConfirmationModal
+        title="Previously found messages will be lost"
+        variant="destructive"
+        confirmLabel="Confirm"
+        size="small"
+        visible={applyConfigOpen}
+        onCancel={() => setApplyConfigOpen(false)}
+        onConfirm={() => {
+          track('realtime_inspector_filters_applied')
+          onChangeConfig(tempConfig)
+          setApplyConfigOpen(false)
+          setOpen(false)
+        }}
+      >
+        <p className="text-sm text-foreground-light">
+          The realtime inspector will clear currently collected messages and start listening for new
+          messages matching the updated filters.
+        </p>
+      </ConfirmationModal>
+    </>
+  )
+}

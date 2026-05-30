@@ -1,0 +1,113 @@
+import * as Sentry from '@sentry/nextjs'
+import { useQueryClient } from '@tanstack/react-query'
+import { getAccessToken, useParams } from 'common'
+import { useRouter } from 'next/router'
+import { useEffect, useEffectEvent, useState } from 'react'
+import { toast } from 'sonner'
+import { LogoLoader } from 'ui'
+
+import { SignInMfaForm } from '@/components/interfaces/SignIn/SignInMfaForm'
+import SignInLayout from '@/components/layouts/SignInLayout/SignInLayout'
+import { useAddLoginEvent } from '@/data/misc/audit-login-mutation'
+import useLatest from '@/hooks/misc/useLatest'
+import { auth, buildPathWithParams, getReturnToPath } from '@/lib/gotrue'
+import { useTrack } from '@/lib/telemetry/track'
+import type { NextPageWithLayout } from '@/types'
+
+const SignInMfaPage: NextPageWithLayout = () => {
+  const router = useRouter()
+
+  const queryClient = useQueryClient()
+  const {
+    // current methods for mfa are github and sso
+    method: signInMethod = 'unknown',
+  } = useParams()
+  const signInMethodRef = useLatest(signInMethod)
+
+  const track = useTrack()
+  const onSignInTracked = useEffectEvent(() => {
+    track('sign_in', {
+      category: 'account',
+      method: signInMethodRef.current,
+    })
+  })
+  const { mutate: addLoginEvent } = useAddLoginEvent()
+
+  const [loading, setLoading] = useState(true)
+
+  // This useEffect redirects the user to MFA if they're already halfway signed in
+  useEffect(() => {
+    auth
+      .initialize()
+      .then(async ({ error }) => {
+        if (error) {
+          // OAuth/SSO callback failed — bounce back to /sign-in so the error renders under the
+          // correct heading instead of "Two-factor authentication". The error is held in the
+          // shared auth context and surfaces via useAuthError() on /sign-in.
+          return router.replace({ pathname: '/sign-in', query: router.query })
+        }
+
+        const token = await getAccessToken()
+
+        if (token) {
+          const { data, error } = await auth.mfa.getAuthenticatorAssuranceLevel()
+          if (error) {
+            // if there was a problem signing in via the url, don't redirect
+            toast.error(
+              `Failed to retrieve assurance level: ${error.message}. Please try signing in again`
+            )
+            setLoading(false)
+            return router.push({ pathname: '/sign-in', query: router.query })
+          }
+
+          if (data.currentLevel === data.nextLevel) {
+            onSignInTracked()
+            addLoginEvent({})
+
+            await queryClient.resetQueries()
+            router.push(getReturnToPath())
+            return
+          } else {
+            // Show the MFA form
+            setLoading(false)
+            return
+          }
+        } else {
+          // if the user doesn't have a token, he needs to go back to the sign-in page
+          const redirectTo = buildPathWithParams('/sign-in')
+          router.replace(redirectTo)
+          return
+        }
+      })
+      .catch((error) => {
+        Sentry.captureException(error)
+        console.error('Auth initialization error:', error)
+        toast.error('Failed to initialize authentication. Please try again.')
+        setLoading(false)
+        router.push({ pathname: '/sign-in', query: router.query })
+      })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="flex flex-col flex-1 bg-alternative h-screen items-center justify-center">
+        <LogoLoader />
+      </div>
+    )
+  }
+
+  return (
+    <SignInLayout
+      heading="Two-factor authentication"
+      subheading="Enter the authentication code from your two-factor authentication app"
+      logoLinkToMarketingSite={true}
+    >
+      <div className="flex flex-col gap-5">
+        <SignInMfaForm />
+      </div>
+    </SignInLayout>
+  )
+}
+
+export default SignInMfaPage

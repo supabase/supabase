@@ -1,0 +1,437 @@
+import { Check, ChevronsUpDown, Loader2 } from 'lucide-react'
+import Link from 'next/link'
+import { Fragment, useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
+import {
+  Button,
+  cn,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
+  SidePanel,
+} from 'ui'
+import { Admonition } from 'ui-patterns'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  MultiSelector,
+  MultiSelectorContent,
+  MultiSelectorItem,
+  MultiSelectorList,
+  MultiSelectorTrigger,
+} from 'ui-patterns/multi-select'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { INDEX_TYPES } from './Indexes.constants'
+import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useDatabaseIndexCreateMutation } from '@/data/database-indexes/index-create-mutation'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useTableColumnsQuery } from '@/data/database/table-columns-query'
+import { useEntityTypesQuery } from '@/data/entity-types/entity-types-infinite-query'
+import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+
+interface CreateIndexSidePanelProps {
+  visible: boolean
+  onClose: () => void
+}
+
+export const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) => {
+  const { data: project } = useSelectedProjectQuery()
+  const isOrioleDb = useIsOrioleDb()
+
+  const [selectedSchema, setSelectedSchema] = useState('public')
+  const [selectedEntity, setSelectedEntity] = useState<string | undefined>(undefined)
+  const [selectedColumns, setSelectedColumns] = useState<string[]>([])
+  const [selectedIndexType, setSelectedIndexType] = useState<string>(INDEX_TYPES[0].value)
+  const [schemaDropdownOpen, setSchemaDropdownOpen] = useState(false)
+  const [tableDropdownOpen, setTableDropdownOpen] = useState(false)
+  const [schemaSearchTerm, setSchemaSearchTerm] = useState('')
+  const [searchTerm, setSearchTerm] = useState('')
+
+  const { data: schemas } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const { data: entities, isPending: isLoadingEntities } = useEntityTypesQuery({
+    schemas: [selectedSchema],
+    sort: 'alphabetical',
+    search: searchTerm,
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const {
+    data: tableColumns,
+    isPending: isLoadingTableColumns,
+    isSuccess: isSuccessTableColumns,
+  } = useTableColumnsQuery({
+    schema: selectedSchema,
+    table: selectedEntity,
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const { mutate: createIndex, isPending: isExecuting } = useDatabaseIndexCreateMutation({
+    onSuccess: () => {
+      onClose()
+      toast.success(`Successfully created index`)
+    },
+  })
+
+  const entityTypes = useMemo(
+    () => entities?.pages.flatMap((page) => page.data.entities) || [],
+    [entities?.pages]
+  )
+  function handleSearchChange(value: string) {
+    setSearchTerm(value)
+  }
+
+  function handleSchemaSelect(schema: string) {
+    setSelectedSchema(schema)
+    setSearchTerm('')
+    setSchemaSearchTerm('')
+    setSchemaDropdownOpen(false)
+  }
+
+  const columns = tableColumns?.[0]?.columns ?? []
+  const columnOptions = columns
+    .filter((column): column is NonNullable<typeof column> => column !== null)
+    .map((column) => ({
+      id: column.attname,
+      value: column.attname,
+      name: column.attname,
+      disabled: false,
+    }))
+
+  const generatedSQL = `
+CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexType} (${selectedColumns
+    .map((column) => `"${column}"`)
+    .join(', ')});
+`.trim()
+
+  const onSaveIndex = () => {
+    if (!project) return console.error('Project is required')
+    if (!selectedEntity) return console.error('Entity is required')
+
+    createIndex({
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+      payload: {
+        schema: selectedSchema,
+        entity: selectedEntity,
+        type: selectedIndexType,
+        columns: selectedColumns,
+      },
+    })
+  }
+
+  useEffect(() => {
+    if (visible) {
+      setSelectedSchema('public')
+      setSelectedEntity('')
+      setSelectedColumns([])
+      setSelectedIndexType(INDEX_TYPES[0].value)
+      setSchemaSearchTerm('')
+      setSearchTerm('')
+    }
+  }, [visible])
+
+  useEffect(() => {
+    setSelectedEntity('')
+    setSelectedColumns([])
+    setSelectedIndexType(INDEX_TYPES[0].value)
+    setSearchTerm('')
+  }, [selectedSchema])
+
+  useEffect(() => {
+    setSelectedColumns([])
+    setSelectedIndexType(INDEX_TYPES[0].value)
+  }, [selectedEntity])
+
+  useEffect(() => {
+    if (!schemaDropdownOpen) setSchemaSearchTerm('')
+  }, [schemaDropdownOpen])
+
+  const isSelectEntityDisabled = entityTypes.length === 0 && searchTerm.trim().length === 0
+
+  return (
+    <SidePanel
+      size="large"
+      header="Create new index"
+      visible={visible}
+      onCancel={onClose}
+      onConfirm={() => onSaveIndex()}
+      loading={isExecuting}
+      confirmText="Create index"
+    >
+      <div className="py-6 space-y-6">
+        <SidePanel.Content className="space-y-6">
+          <FormItemLayout label="Select a schema" name="select-schema" isReactForm={false}>
+            <Popover modal={false} open={schemaDropdownOpen} onOpenChange={setSchemaDropdownOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  type="default"
+                  size={'medium'}
+                  className={`w-full [&>span]:w-full text-left`}
+                  iconRight={
+                    <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
+                  }
+                >
+                  {selectedSchema !== undefined && selectedSchema !== ''
+                    ? selectedSchema
+                    : 'Choose a schema'}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="p-0" side="bottom" align="start" sameWidthAsTrigger>
+                <Command>
+                  <CommandInput
+                    placeholder="Find schema..."
+                    value={schemaSearchTerm}
+                    onValueChange={setSchemaSearchTerm}
+                  />
+                  <CommandList
+                    className={cn((schemas ?? []).length > 7 && 'max-h-[210px]! overflow-y-auto')}
+                    onWheel={(event) => event.stopPropagation()}
+                  >
+                    <CommandEmpty>No schemas found</CommandEmpty>
+                    <CommandGroup>
+                      {(schemas ?? []).map((schema) => (
+                        <CommandItem
+                          key={schema.name}
+                          className="cursor-pointer flex items-center justify-between space-x-2 w-full"
+                          onSelect={() => {
+                            handleSchemaSelect(schema.name)
+                          }}
+                          onClick={() => {
+                            handleSchemaSelect(schema.name)
+                          }}
+                        >
+                          <span>{schema.name}</span>
+                          {selectedSchema === schema.name && (
+                            <Check className="text-brand" strokeWidth={2} size={16} />
+                          )}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          </FormItemLayout>
+
+          <FormItemLayout
+            label="Select a table"
+            name="select-table"
+            description={
+              isSelectEntityDisabled &&
+              !isLoadingEntities &&
+              'Create a table in this schema via the Table or SQL editor first'
+            }
+            isReactForm={false}
+          >
+            <Popover modal={false} open={tableDropdownOpen} onOpenChange={setTableDropdownOpen}>
+              <PopoverTrigger asChild disabled={isSelectEntityDisabled || isLoadingEntities}>
+                <Button
+                  type="default"
+                  size="medium"
+                  className={cn(
+                    'w-full [&>span]:w-full text-left',
+                    selectedEntity === '' && 'text-foreground-lighter'
+                  )}
+                  iconRight={
+                    <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
+                  }
+                >
+                  {selectedEntity !== undefined && selectedEntity !== ''
+                    ? selectedEntity
+                    : isSelectEntityDisabled
+                      ? 'No tables available in schema'
+                      : 'Choose a table'}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="p-0" side="bottom" align="start" sameWidthAsTrigger>
+                {/* [Terry] shouldFilter context:
+                https://github.com/pacocoursey/cmdk/issues/267#issuecomment-2252717107 */}
+                <Command shouldFilter={false}>
+                  <CommandInput
+                    placeholder="Find table..."
+                    value={searchTerm}
+                    onValueChange={handleSearchChange}
+                  />
+                  <CommandList
+                    className={cn(entityTypes.length > 7 && 'max-h-[210px]! overflow-y-auto')}
+                    onWheel={(event) => event.stopPropagation()}
+                  >
+                    <CommandEmpty>
+                      {isLoadingEntities ? (
+                        <div className="flex items-center gap-2 text-center justify-center">
+                          <Loader2 size={12} className="animate-spin" />
+                          Loading...
+                        </div>
+                      ) : (
+                        'No tables found'
+                      )}
+                    </CommandEmpty>
+                    <CommandGroup>
+                      {entityTypes.map((entity) => (
+                        <CommandItem
+                          key={entity.name}
+                          className="cursor-pointer flex items-center justify-between space-x-2 w-full"
+                          onSelect={() => {
+                            setSelectedEntity(entity.name)
+                            setTableDropdownOpen(false)
+                          }}
+                          onClick={() => {
+                            setSelectedEntity(entity.name)
+                            setTableDropdownOpen(false)
+                          }}
+                        >
+                          <span>{entity.name}</span>
+                          {selectedEntity === entity.name && (
+                            <Check className="text-brand" strokeWidth={2} size={16} />
+                          )}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          </FormItemLayout>
+
+          {selectedEntity && (
+            <FormItemLayout id="columns" label="Select up to 32 columns" isReactForm={false}>
+              {isLoadingTableColumns && <ShimmeringLoader className="py-4" />}
+              {isSuccessTableColumns && (
+                <MultiSelector values={selectedColumns} onValuesChange={setSelectedColumns}>
+                  <MultiSelectorTrigger
+                    id="columns"
+                    mode="inline-combobox"
+                    label={
+                      selectedColumns.length === 0
+                        ? 'Choose which columns to create an index on'
+                        : 'Search for a column'
+                    }
+                    deletableBadge
+                    badgeLimit="wrap"
+                    showIcon={false}
+                  />
+                  <MultiSelectorContent>
+                    <MultiSelectorList>
+                      {columnOptions.map((option) => (
+                        <MultiSelectorItem
+                          key={option.id}
+                          value={option.value}
+                          disabled={option.disabled}
+                        >
+                          {option.name}
+                        </MultiSelectorItem>
+                      ))}
+                    </MultiSelectorList>
+                  </MultiSelectorContent>
+                </MultiSelector>
+              )}
+            </FormItemLayout>
+          )}
+        </SidePanel.Content>
+
+        {selectedColumns.length > 0 && (
+          <>
+            <SidePanel.Separator />
+            <SidePanel.Content className="space-y-6">
+              <FormItemLayout
+                label="Select an index type"
+                name="selected-index-type"
+                isReactForm={false}
+              >
+                <Select
+                  disabled={isOrioleDb}
+                  value={selectedIndexType}
+                  onValueChange={setSelectedIndexType}
+                  name="selected-index-type"
+                >
+                  <SelectTrigger size={'small'}>
+                    <SelectValue className="font-mono">{selectedIndexType}</SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {INDEX_TYPES.map((index, i) => (
+                      <Fragment key={index.name}>
+                        <SelectItem value={index.value}>
+                          <div className="flex flex-col gap-0.5">
+                            <span>{index.name}</span>
+                            {index.description.split('\n').map((x, idx) => (
+                              <span
+                                className="text-foreground-lighter group-focus:text-foreground-light group-data-checked:text-foreground-light"
+                                key={`${index.value}-description-${idx}`}
+                              >
+                                {x}
+                              </span>
+                            ))}
+                          </div>
+                        </SelectItem>
+                        {i < INDEX_TYPES.length - 1 && <SelectSeparator />}
+                      </Fragment>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormItemLayout>
+              {isOrioleDb && (
+                <Admonition
+                  type="default"
+                  className="mt-2!"
+                  title="OrioleDB currently only supports the B-tree index type"
+                  description="More index types may be supported when OrioleDB is no longer in preview"
+                >
+                  {/* [Joshen Oriole] Hook up proper docs URL */}
+                  <DocsButton className="mt-2" abbrev={false} href={`${DOCS_URL}`} />
+                </Admonition>
+              )}
+            </SidePanel.Content>
+            <SidePanel.Separator />
+            <SidePanel.Content>
+              <div className="flex items-center justify-between">
+                <p className="text-sm">Preview of SQL statement</p>
+                <Button asChild type="default">
+                  <Link
+                    href={
+                      project !== undefined
+                        ? `/project/${project.ref}/sql/new?content=${generatedSQL}`
+                        : '/'
+                    }
+                  >
+                    Open in SQL Editor
+                  </Link>
+                </Button>
+              </div>
+            </SidePanel.Content>
+            <div className="h-[200px] mt-2!">
+              <div className="relative h-full">
+                <CodeEditor
+                  isReadOnly
+                  autofocus={false}
+                  id={`${selectedSchema}-${selectedEntity}-${selectedColumns.join(
+                    ','
+                  )}-${selectedIndexType}`}
+                  language="pgsql"
+                  defaultValue={generatedSQL}
+                />
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </SidePanel>
+  )
+}

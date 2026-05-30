@@ -1,0 +1,832 @@
+import { literal, safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
+import dayjs from 'dayjs'
+
+import type { DatetimeHelper } from '../Settings/Logs/Logs.types'
+import { PresetConfig, Presets, ReportFilterItem } from './Reports.types'
+import {
+  analyticsLiteral,
+  joinSqlFragments,
+  quotedIdent,
+  safeSql as safeLogSql,
+  type SafeLogSqlFragment,
+} from '@/data/logs/safe-analytics-sql'
+import { PlanId } from '@/data/subscriptions/types'
+
+export const LAYOUT_COLUMN_COUNT = 2
+
+export interface ReportsDatetimeHelper extends DatetimeHelper {
+  availableIn: PlanId[]
+}
+
+export enum REPORT_DATERANGE_HELPER_LABELS {
+  LAST_10_MINUTES = 'Last 10 minutes',
+  LAST_30_MINUTES = 'Last 30 minutes',
+  LAST_60_MINUTES = 'Last 60 minutes',
+  LAST_3_HOURS = 'Last 3 hours',
+  LAST_24_HOURS = 'Last 24 hours',
+  LAST_7_DAYS = 'Last 7 days',
+  LAST_14_DAYS = 'Last 14 days',
+  LAST_28_DAYS = 'Last 28 days',
+}
+
+export const REPORTS_DATEPICKER_HELPERS: ReportsDatetimeHelper[] = [
+  {
+    text: REPORT_DATERANGE_HELPER_LABELS.LAST_10_MINUTES,
+    calcFrom: () => dayjs().subtract(10, 'minute').toISOString(),
+    calcTo: () => dayjs().toISOString(),
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
+  },
+  {
+    text: REPORT_DATERANGE_HELPER_LABELS.LAST_30_MINUTES,
+    calcFrom: () => dayjs().subtract(30, 'minute').toISOString(),
+    calcTo: () => dayjs().toISOString(),
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
+  },
+  {
+    text: REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES,
+    calcFrom: () => dayjs().subtract(1, 'hour').toISOString(),
+    calcTo: () => dayjs().toISOString(),
+    default: true,
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
+  },
+  {
+    text: REPORT_DATERANGE_HELPER_LABELS.LAST_3_HOURS,
+    calcFrom: () => dayjs().subtract(3, 'hour').toISOString(),
+    calcTo: () => dayjs().toISOString(),
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
+  },
+  {
+    text: REPORT_DATERANGE_HELPER_LABELS.LAST_24_HOURS,
+    calcFrom: () => dayjs().subtract(1, 'day').toISOString(),
+    calcTo: () => dayjs().toISOString(),
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
+  },
+  {
+    text: REPORT_DATERANGE_HELPER_LABELS.LAST_7_DAYS,
+    calcFrom: () => dayjs().subtract(7, 'day').toISOString(),
+    calcTo: () => dayjs().toISOString(),
+    availableIn: ['pro', 'team', 'enterprise'],
+  },
+  {
+    text: REPORT_DATERANGE_HELPER_LABELS.LAST_14_DAYS,
+    calcFrom: () => dayjs().subtract(14, 'day').toISOString(),
+    calcTo: () => dayjs().toISOString(),
+    availableIn: ['team', 'enterprise'],
+  },
+  {
+    text: REPORT_DATERANGE_HELPER_LABELS.LAST_28_DAYS,
+    calcFrom: () => dayjs().subtract(28, 'day').toISOString(),
+    calcTo: () => dayjs().toISOString(),
+    availableIn: ['team', 'enterprise'],
+  },
+]
+
+export const DEFAULT_QUERY_PARAMS = {
+  iso_timestamp_start: REPORTS_DATEPICKER_HELPERS[0].calcFrom(),
+  iso_timestamp_end: REPORTS_DATEPICKER_HELPERS[0].calcTo(),
+}
+
+function rewriteWhereToAnd(sql: SafeSqlFragment): SafeSqlFragment {
+  return sql.replace(/^WHERE/, 'AND') as SafeSqlFragment
+}
+
+// Filter values must be raw (unquoted) strings or numbers. `analyticsLiteral` handles all
+// quoting and escaping — callers must NOT pre-wrap values in single quotes.
+export function generateRegexpWhereSafe(
+  filters: ReportFilterItem[],
+  prepend = true
+): SafeLogSqlFragment {
+  if (filters.length === 0) return safeLogSql``
+
+  const conditions = filters
+    .map((filter) => {
+      const splitKey = filter.key.split('.')
+      const normalizedKey = [splitKey[splitKey.length - 2], splitKey[splitKey.length - 1]].join('.')
+      const keyToQuote = filter.key.includes('.') ? normalizedKey : filter.key
+
+      let col: SafeLogSqlFragment
+      try {
+        col = quotedIdent(keyToQuote)
+      } catch {
+        return null
+      }
+
+      const valueIsNumber = !isNaN(Number(filter.value))
+      const lit = valueIsNumber
+        ? analyticsLiteral(Number(filter.value))
+        : analyticsLiteral(String(filter.value).toLowerCase())
+
+      switch (filter.compare) {
+        case 'matches':
+          return safeLogSql`REGEXP_CONTAINS(${col}, ${lit})`
+        case 'is':
+          return safeLogSql`${col} = ${lit}`
+        case '!=':
+          return safeLogSql`${col} != ${lit}`
+        case '>=':
+          return safeLogSql`${col} >= ${lit}`
+        case '<=':
+          return safeLogSql`${col} <= ${lit}`
+        case '>':
+          return safeLogSql`${col} > ${lit}`
+        case '<':
+          return safeLogSql`${col} < ${lit}`
+        default:
+          return safeLogSql`${col} = ${lit}`
+      }
+    })
+    .filter((c) => c !== null)
+
+  if (conditions.length === 0) return safeLogSql``
+
+  const joined = joinSqlFragments(conditions, ' AND ')
+  return prepend ? safeLogSql`WHERE ${joined}` : safeLogSql`AND ${joined}`
+}
+
+export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
+  [Presets.API]: {
+    title: 'API',
+    queries: {
+      totalRequests: {
+        queryType: 'logs',
+        safeSql: (filters) => safeLogSql`
+        -- reports-api-total-requests
+        select
+          cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
+          count(t.id) as count
+        FROM edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
+          ${generateRegexpWhereSafe(filters)}
+        GROUP BY
+          timestamp
+        ORDER BY
+          timestamp ASC`,
+      },
+      topRoutes: {
+        queryType: 'logs',
+        safeSql: (filters) => safeLogSql`
+        -- reports-api-top-routes
+        select
+          request.path as path,
+          request.method as method,
+          request.search as search,
+          response.status_code as status_code,
+          count(t.id) as count
+        from edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
+          ${generateRegexpWhereSafe(filters)}
+        group by
+          request.path, request.method, request.search, response.status_code
+        order by
+          count desc
+        limit 10
+        `,
+      },
+      errorCounts: {
+        queryType: 'logs',
+        safeSql: (filters) => safeLogSql`
+        -- reports-api-error-counts
+        select
+          cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
+          count(t.id) as count
+        FROM edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
+        WHERE
+          response.status_code >= 400
+        ${generateRegexpWhereSafe(filters, false)}
+        GROUP BY
+          timestamp
+        ORDER BY
+          timestamp ASC
+        `,
+      },
+      topErrorRoutes: {
+        queryType: 'logs',
+        safeSql: (filters) => safeLogSql`
+        -- reports-api-top-error-routes
+        select
+          request.path as path,
+          request.method as method,
+          request.search as search,
+          response.status_code as status_code,
+          count(t.id) as count
+        from edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
+        where
+          response.status_code >= 400
+        ${generateRegexpWhereSafe(filters, false)}
+        group by
+          request.path, request.method, request.search, response.status_code
+        order by
+          count desc
+        limit 10
+        `,
+      },
+      responseSpeed: {
+        queryType: 'logs',
+        safeSql: (filters) => safeLogSql`
+        -- reports-api-response-speed
+        select
+          cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
+          avg(response.origin_time) as avg
+        FROM
+          edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
+          ${generateRegexpWhereSafe(filters)}
+        GROUP BY
+          timestamp
+        ORDER BY
+          timestamp ASC
+      `,
+      },
+      topSlowRoutes: {
+        queryType: 'logs',
+        safeSql: (filters) => safeLogSql`
+        -- reports-api-top-slow-routes
+        select
+          request.path as path,
+          request.method as method,
+          request.search as search,
+          response.status_code as status_code,
+          count(t.id) as count,
+          avg(response.origin_time) as avg
+        from edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
+        ${generateRegexpWhereSafe(filters)}
+        group by
+          request.path, request.method, request.search, response.status_code
+        order by
+          avg desc
+        limit 10
+        `,
+      },
+      networkTraffic: {
+        queryType: 'logs',
+        safeSql: (filters) => safeLogSql`
+        -- reports-api-network-traffic
+        select
+          cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
+          coalesce(
+            safe_divide(
+              sum(
+                cast(coalesce(headers.content_length, "0") as int64)
+              ),
+              1000000
+            ),
+            0
+          ) as ingress_mb,
+          coalesce(
+            safe_divide(
+              sum(
+                cast(coalesce(resp_headers.content_length, "0") as int64)
+              ),
+              1000000
+            ),
+            0
+          ) as egress_mb,
+        FROM
+          edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
+          cross join unnest(response.headers) as resp_headers
+          ${generateRegexpWhereSafe(filters)}
+        GROUP BY
+          timestamp
+        ORDER BY
+          timestamp ASC
+        `,
+      },
+      requestsByCountry: {
+        queryType: 'logs',
+        safeSql: (filters) => safeLogSql`
+        -- reports-api-requests-by-country
+        select
+          cf.country as country,
+          count(t.id) as count
+        from edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
+          cross join unnest(request.cf) as cf
+        where
+          cf.country is not null
+        ${generateRegexpWhereSafe(filters, false)}
+        group by
+          cf.country
+        `,
+      },
+    },
+  },
+  [Presets.AUTH]: {
+    title: '',
+    queries: {},
+  },
+  [Presets.STORAGE]: {
+    title: 'Storage',
+    queries: {
+      cacheHitRate: {
+        queryType: 'logs',
+        // storage report does not perform any filtering
+        safeSql: (filters) => safeLogSql`
+        -- reports-storage-cache-hit-rate
+SELECT
+  timestamp_trunc(timestamp, hour) as timestamp,
+  countif( h.cf_cache_status in ('HIT', 'STALE', 'REVALIDATED', 'UPDATING') ) as hit_count,
+  countif( h.cf_cache_status in ('MISS', 'NONE/UNKNOWN', 'EXPIRED', 'BYPASS', 'DYNAMIC') ) as miss_count
+from edge_logs f
+  cross join unnest(f.metadata) as m
+  cross join unnest(m.request) as r
+  cross join unnest(m.response) as res
+  cross join unnest(res.headers) as h
+where starts_with(r.path, '/storage/v1/object') and r.method = 'GET'
+  ${generateRegexpWhereSafe(filters, false)}
+group by timestamp
+order by timestamp desc
+`,
+      },
+      topCacheMisses: {
+        queryType: 'logs',
+        // storage report does not perform any filtering
+        safeSql: (filters) => safeLogSql`
+        -- reports-storage-top-cache-misses
+SELECT
+  r.path as path,
+  r.search as search,
+  count(id) as count
+from edge_logs f
+  cross join unnest(f.metadata) as m
+  cross join unnest(m.request) as r
+  cross join unnest(m.response) as res
+  cross join unnest(res.headers) as h
+where starts_with(r.path, '/storage/v1/object')
+  and r.method = 'GET'
+  and h.cf_cache_status in ('MISS', 'NONE/UNKNOWN', 'EXPIRED', 'BYPASS', 'DYNAMIC')
+  ${generateRegexpWhereSafe(filters, false)}
+group by path, search
+order by count desc
+limit 12
+    `,
+      },
+    },
+  },
+  [Presets.QUERY_PERFORMANCE]: {
+    title: 'Query performance',
+    queries: {
+      mostFrequentlyInvoked: {
+        queryType: 'db',
+        safeSql: (
+          _params,
+          where,
+          orderBy,
+          runIndexAdvisor = false,
+          _filterIndexAdvisor = false
+        ) => safeSql`
+        -- reports-query-performance-most-frequently-invoked
+set search_path to public, extensions;
+
+select
+    auth.rolname,
+    statements.query,
+    statements.calls,
+    -- -- Postgres 13, 14, 15
+    statements.total_exec_time + statements.total_plan_time as total_time,
+    statements.min_exec_time + statements.min_plan_time as min_time,
+    statements.max_exec_time + statements.max_plan_time as max_time,
+    statements.mean_exec_time + statements.mean_plan_time as mean_time,
+    -- -- Postgres <= 12
+    -- total_time,
+    -- min_time,
+    -- max_time,
+    -- mean_time,
+    coalesce(statements.rows::numeric / nullif(statements.calls, 0), 0) as avg_rows,
+    statements.rows as rows_read,
+    case
+      when (statements.shared_blks_hit + statements.shared_blks_read) > 0
+      then round(
+        (statements.shared_blks_hit * 100.0) /
+        (statements.shared_blks_hit + statements.shared_blks_read),
+        2
+      )
+      else 0
+    end as cache_hit_rate${
+      runIndexAdvisor
+        ? safeSql`,
+    case
+      when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
+      then (
+        select json_build_object(
+          'has_suggestion', array_length(index_statements, 1) > 0,
+          'startup_cost_before', startup_cost_before,
+          'startup_cost_after', startup_cost_after,
+          'total_cost_before', total_cost_before,
+          'total_cost_after', total_cost_after,
+          'index_statements', index_statements
+        )
+        from index_advisor(statements.query)
+      )
+      else null
+    end as index_advisor_result`
+        : safeSql``
+    }
+  from pg_stat_statements as statements
+    inner join pg_authid as auth on statements.userid = auth.oid
+  -- skip queries that were never actually executed
+  WHERE statements.calls > 0 ${where ? rewriteWhereToAnd(where) : safeSql``}
+  ${orderBy || safeSql`order by statements.calls desc`}
+  limit 20`,
+      },
+      mostTimeConsuming: {
+        queryType: 'db',
+        safeSql: (
+          _,
+          where,
+          orderBy,
+          runIndexAdvisor = false,
+          _filterIndexAdvisor = false
+        ) => safeSql`
+        -- reports-query-performance-most-time-consuming
+set search_path to public, extensions;
+
+-- compute total time once up front so we don't need a window function over all rows
+with grand_total as (
+  select coalesce(nullif(sum(total_exec_time + total_plan_time), 0), 1) as v
+  from pg_stat_statements where calls > 0
+)
+select
+    auth.rolname,
+    statements.query,
+    statements.calls,
+    statements.total_exec_time + statements.total_plan_time as total_time,
+    statements.mean_exec_time + statements.mean_plan_time as mean_time,
+    coalesce(
+      ((statements.total_exec_time + statements.total_plan_time) /
+        (select v from grand_total)) *
+        100,
+      0
+    ) as prop_total_time${
+      runIndexAdvisor
+        ? safeSql`,
+    case
+      when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
+      then (
+        select json_build_object(
+          'has_suggestion', array_length(index_statements, 1) > 0,
+          'startup_cost_before', startup_cost_before,
+          'startup_cost_after', startup_cost_after,
+          'total_cost_before', total_cost_before,
+          'total_cost_after', total_cost_after,
+          'index_statements', index_statements
+        )
+        from index_advisor(statements.query)
+      )
+      else null
+    end as index_advisor_result`
+        : safeSql``
+    }
+  from pg_stat_statements as statements
+    inner join pg_authid as auth on statements.userid = auth.oid
+  -- skip queries that were never actually executed
+  WHERE statements.calls > 0 ${where ? rewriteWhereToAnd(where) : safeSql``}
+  ${orderBy || safeSql`order by total_time desc`}
+  limit 20`,
+      },
+      slowestExecutionTime: {
+        queryType: 'db',
+        safeSql: (
+          _params,
+          where,
+          orderBy,
+          runIndexAdvisor = false,
+          _filterIndexAdvisor = false
+        ) => safeSql`
+        -- reports-query-performance-slowest-execution-time
+set search_path to public, extensions;
+
+select
+    auth.rolname,
+    statements.query,
+    statements.calls,
+    -- -- Postgres 13, 14, 15
+    statements.total_exec_time + statements.total_plan_time as total_time,
+    statements.min_exec_time + statements.min_plan_time as min_time,
+    statements.max_exec_time + statements.max_plan_time as max_time,
+    statements.mean_exec_time + statements.mean_plan_time as mean_time,
+    -- -- Postgres <= 12
+    -- total_time,
+    -- min_time,
+    -- max_time,
+    -- mean_time,
+    coalesce(statements.rows::numeric / nullif(statements.calls, 0), 0) as avg_rows${
+      runIndexAdvisor
+        ? safeSql`,
+    case
+      when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
+      then (
+        select json_build_object(
+          'has_suggestion', array_length(index_statements, 1) > 0,
+          'startup_cost_before', startup_cost_before,
+          'startup_cost_after', startup_cost_after,
+          'total_cost_before', total_cost_before,
+          'total_cost_after', total_cost_after,
+          'index_statements', index_statements
+        )
+        from index_advisor(statements.query)
+      )
+      else null
+    end as index_advisor_result`
+        : safeSql``
+    }
+  from pg_stat_statements as statements
+    inner join pg_authid as auth on statements.userid = auth.oid
+  -- skip queries that were never actually executed
+  WHERE statements.calls > 0 ${where ? rewriteWhereToAnd(where) : safeSql``}
+  ${orderBy || safeSql`order by max_time desc`}
+  limit 20`,
+      },
+      queryHitRate: {
+        queryType: 'db',
+        safeSql: (_params) => safeSql`-- reports-query-performance-cache-and-index-hit-rate
+select
+    'index hit rate' as name,
+    (sum(idx_blks_hit)) / nullif(sum(idx_blks_hit + idx_blks_read),0) as ratio
+  from pg_statio_user_indexes
+  union all
+  select
+    'table hit rate' as name,
+    sum(heap_blks_hit) / nullif(sum(heap_blks_hit) + sum(heap_blks_read),0) as ratio
+  from pg_statio_user_tables;`,
+      },
+      unified: {
+        queryType: 'db',
+        safeSql: (
+          _params,
+          where,
+          orderBy,
+          runIndexAdvisor = false,
+          filterIndexAdvisor = false,
+          page = 1,
+          pageSize = 20
+        ) => {
+          const offset = (page - 1) * pageSize
+          // When filtering by index suggestions we need a larger scan window since we don't
+          // know how many rows will match. Cap at a reasonable upper bound to avoid running
+          // index_advisor() across the entire dataset on any code path where it's active.
+          const INDEX_ADVISOR_SCAN_CAP = 500
+          const baseScanTarget =
+            filterIndexAdvisor && runIndexAdvisor ? offset + pageSize * 10 : offset + pageSize
+          const baseCteLimit = runIndexAdvisor
+            ? Math.min(baseScanTarget, INDEX_ADVISOR_SCAN_CAP)
+            : baseScanTarget
+          const baseQuery = safeSql`
+        -- reports-query-performance-unified
+        set search_path to public, extensions;
+
+        -- compute total time once up front so we don't need a window function over all rows
+        with grand_total as (
+          select coalesce(nullif(sum(total_exec_time + total_plan_time), 0), 1) as v
+          from pg_stat_statements where calls > 0
+        ),
+        base as (
+          select
+            auth.rolname,
+            statements.query,
+            statements.calls,
+            statements.total_exec_time + statements.total_plan_time as total_time,
+            statements.min_exec_time + statements.min_plan_time as min_time,
+            statements.max_exec_time + statements.max_plan_time as max_time,
+            statements.mean_exec_time + statements.mean_plan_time as mean_time,
+            coalesce(statements.rows::numeric / nullif(statements.calls, 0), 0) as avg_rows,
+            statements.rows as rows_read,
+            statements.shared_blks_hit as debug_hit,
+            statements.shared_blks_read as debug_read,
+            case
+              when (statements.shared_blks_hit + statements.shared_blks_read) > 0
+              then (statements.shared_blks_hit::numeric * 100.0) /
+                   (statements.shared_blks_hit + statements.shared_blks_read)
+              else 0
+            end as cache_hit_rate,
+            coalesce(
+              ((statements.total_exec_time + statements.total_plan_time) /
+                (select v from grand_total)) *
+                100,
+              0
+            ) as prop_total_time
+          from pg_stat_statements as statements
+            inner join pg_authid as auth on statements.userid = auth.oid
+          -- skip queries that were never actually executed
+          WHERE statements.calls > 0 ${where ? rewriteWhereToAnd(where) : safeSql``}
+          ${orderBy || safeSql`order by total_time desc`}
+          ${baseCteLimit !== null ? safeSql`limit ${literal(baseCteLimit)}` : safeSql``}
+        ),
+        query_results as (
+          select
+            base.*${
+              runIndexAdvisor
+                ? safeSql`,
+            case
+              when (lower(base.query) like 'select%' or lower(base.query) like 'with pgrst%')
+              then (
+                select json_build_object(
+                  'has_suggestion', array_length(index_statements, 1) > 0,
+                  'startup_cost_before', startup_cost_before,
+                  'startup_cost_after', startup_cost_after,
+                  'total_cost_before', total_cost_before,
+                  'total_cost_after', total_cost_after,
+                  'index_statements', index_statements
+                )
+                from index_advisor(base.query)
+              )
+              else null
+            end as index_advisor_result`
+                : safeSql``
+            }
+          from base
+        )
+        select *
+        from query_results
+        ${filterIndexAdvisor && runIndexAdvisor ? safeSql`where (index_advisor_result->>'has_suggestion')::boolean = true` : safeSql``}
+        ${orderBy || safeSql`order by total_time desc`}
+        limit ${literal(pageSize)} offset ${literal(offset)}`
+
+          return baseQuery
+        },
+      },
+      slowQueriesCount: {
+        queryType: 'db',
+        safeSql: () => safeSql`
+        -- reports-query-performance-slow-queries-count
+        set search_path to public, extensions;
+
+        -- Count of slow queries (> 1 second average)
+        SELECT count(*) as slow_queries_count
+        -- alias needed to reference columns in WHERE
+        FROM pg_stat_statements as statements
+        -- skip never-executed queries; mean_exec_time > 1000ms = avg over 1 second
+        WHERE statements.calls > 0 AND statements.mean_exec_time > 1000;`,
+      },
+      queryMetrics: {
+        queryType: 'db',
+        safeSql: (
+          _params,
+          where,
+          orderBy,
+          _runIndexAdvisor = false,
+          _filterIndexAdvisor = false
+        ) => safeSql`
+        -- reports-query-performance-metrics
+        set search_path to public, extensions;
+
+        SELECT
+          COALESCE(ROUND(AVG(statements.rows::numeric / NULLIF(statements.calls, 0)), 1), 0) as avg_rows_per_call,
+          COUNT(*) FILTER (WHERE statements.total_exec_time + statements.total_plan_time > 1000) as slow_queries,
+          COALESCE(
+            ROUND(
+              SUM(statements.shared_blks_hit) * 100.0 /
+              NULLIF(SUM(statements.shared_blks_hit + statements.shared_blks_read), 0),
+              2
+            ), 0
+          ) || '%' as cache_hit_rate
+        FROM pg_stat_statements as statements
+        -- skip queries that were never actually executed
+        WHERE statements.calls > 0 ${where ? rewriteWhereToAnd(where) : safeSql``}
+        ${orderBy || safeSql``}`,
+      },
+    },
+  },
+  [Presets.DATABASE]: {
+    title: 'database',
+    queries: {
+      largeObjects: {
+        queryType: 'db',
+        safeSql: (_) => safeSql`-- reports-database-large-objects
+SELECT
+        SCHEMA_NAME,
+        relname,
+        table_size
+      FROM
+        (SELECT
+          pg_catalog.pg_namespace.nspname AS SCHEMA_NAME,
+          relname,
+          pg_total_relation_size(pg_catalog.pg_class.oid) AS table_size
+        FROM pg_catalog.pg_class
+        JOIN pg_catalog.pg_namespace ON relnamespace = pg_catalog.pg_namespace.oid
+        ) t
+      WHERE SCHEMA_NAME NOT LIKE 'pg_%'
+      ORDER BY table_size DESC
+      LIMIT 5;`,
+      },
+    },
+  },
+}
+
+// Burst-balance-related metric keys. These only apply to compute sizes that
+// have a burst credit pool for disk IO (below 4XL). On 4XL+ disk IO is
+// sustained at baseline, so these charts should be hidden.
+export const BURSTABLE_IO_METRIC_KEYS = ['disk_io_budget', 'disk_io_consumption']
+
+export const DEPRECATED_REPORTS = [
+  'total_realtime_ingress',
+  'total_rest_options_requests',
+  'total_auth_ingress',
+  'total_auth_get_requests',
+  'total_auth_post_requests',
+  'total_auth_patch_requests',
+  'total_auth_options_requests',
+  'total_storage_options_requests',
+  'total_storage_patch_requests',
+  'total_options_requests',
+  'total_rest_ingress',
+  'total_rest_get_requests',
+  'total_rest_post_requests',
+  'total_rest_patch_requests',
+  'total_rest_delete_requests',
+  'total_storage_get_requests',
+  'total_storage_post_requests',
+  'total_storage_delete_requests',
+  'total_auth_delete_requests',
+  'total_get_requests',
+  'total_patch_requests',
+  'total_post_requests',
+  'total_ingress',
+  'total_delete_requests',
+]
+
+export const EDGE_FUNCTION_REGIONS = [
+  {
+    key: 'ap-northeast-1',
+    label: 'Tokyo',
+  },
+  {
+    key: 'ap-northeast-2',
+    label: 'Seoul',
+  },
+  {
+    key: 'ap-south-1',
+    label: 'Mumbai',
+  },
+  {
+    key: 'ap-southeast-1',
+    label: 'Singapore',
+  },
+  {
+    key: 'ap-southeast-2',
+    label: 'Sydney',
+  },
+  {
+    key: 'ca-central-1',
+    label: 'Canada Central',
+  },
+  {
+    key: 'us-east-1',
+    label: 'N. Virginia',
+  },
+  {
+    key: 'us-west-1',
+    label: 'N. California',
+  },
+  {
+    key: 'us-west-2',
+    label: 'Oregon',
+  },
+  {
+    key: 'eu-central-1',
+    label: 'Frankfurt',
+  },
+  {
+    key: 'eu-west-1',
+    label: 'Ireland',
+  },
+  {
+    key: 'eu-west-2',
+    label: 'London',
+  },
+  {
+    key: 'eu-west-3',
+    label: 'Paris',
+  },
+  {
+    key: 'sa-east-1',
+    label: 'São Paulo',
+  },
+] as const

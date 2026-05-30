@@ -1,0 +1,19 @@
+
+  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>'Postgres | Supabase Blog</title>
+      <link>https://supabase.com/blog</link>
+      <description>Latest Postgres news from Michel Pelletier at Supabase</description>
+      <language>en</language>
+      <lastBuildDate>Fri, 16 Dec 2022 00:00:00 -0700</lastBuildDate>
+      <atom:link href="https://supabase.com/planetpg-michel-rss.xml" rel="self" type="application/rss+xml"/>
+      <item>
+  <guid>https://supabase.com/blog/vault-now-in-beta</guid>
+  <title>Supabase Vault is now in Beta</title>
+  <link>https://supabase.com/blog/vault-now-in-beta</link>
+  <description>A Postgres extension to store encrypted secrets and encrypt data.</description>
+  <pubDate>Fri, 16 Dec 2022 00:00:00 -0700</pubDate>
+</item>
+
+    </channel>
+  </rss>

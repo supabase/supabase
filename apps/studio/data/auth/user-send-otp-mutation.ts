@@ -1,0 +1,49 @@
+import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
+
+import type { User } from './users-infinite-query'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
+
+export type UserSendOTPVariables = {
+  projectRef: string
+  user: User
+}
+
+export async function sendOTP({ projectRef, user }: UserSendOTPVariables) {
+  const { data, error } = await post('/platform/auth/{ref}/otp', {
+    params: { path: { ref: projectRef } },
+    body: { phone: user.phone },
+  })
+
+  if (error) handleError(error)
+
+  return data
+}
+
+type UserSendOTPData = Awaited<ReturnType<typeof sendOTP>>
+
+export const useUserSendOTPMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: Omit<
+  UseCustomMutationOptions<UserSendOTPData, ResponseError, UserSendOTPVariables>,
+  'mutationFn'
+> = {}) => {
+  return useMutation<UserSendOTPData, ResponseError, UserSendOTPVariables>({
+    mutationFn: (vars) => sendOTP(vars),
+    async onSuccess(data, variables, context) {
+      // [Joshen] If we need to invalidate any queries
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to send OTP: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
+}

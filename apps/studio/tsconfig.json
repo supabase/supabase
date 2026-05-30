@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "tsconfig/nextjs.json",
+  "compilerOptions": {
+    "allowJs": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "paths": {
+      "@/*": ["./*"],
+      "@ui/*": ["./../../packages/ui/src/*"] // handle ui package paths
+    },
+    "plugins": [{ "name": "next" }]
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules", "public/deno/*.ts"]
+}

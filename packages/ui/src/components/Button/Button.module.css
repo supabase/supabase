@@ -1,0 +1,35 @@
+/*
+  Button sizes
+*/
+
+.sbui-btn--tiny {
+  @apply px-2.5 py-1.5 text-xs;
+}
+.sbui-btn--small {
+  @apply px-3 py-2 text-sm leading-4;
+}
+.sbui-btn--medium {
+  @apply px-4 py-2 text-sm;
+}
+.sbui-btn--large {
+  @apply px-4 py-2 text-base;
+}
+.sbui-btn--xlarge {
+  @apply px-6 py-3 text-base;
+}
+
+/*
+  Button varients
+*/
+
+.dark .sbui-btn-primary {
+  text-shadow: 0px 0px 4px rgba(38 111 78 / 50%);
+}
+
+.dark .sbui-btn-default {
+  text-shadow: 0px 0px 4px rgba(31 31 31 / 50%);
+}
+
+.dark .sbui-btn-secondary {
+  text-shadow: 0px 0px 4px rgba(42 42 42 / 50%);
+}

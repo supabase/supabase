@@ -1,0 +1,129 @@
+import { useParams } from 'common'
+import { UseFormReturn } from 'react-hook-form'
+import {
+  Button,
+  FormControl,
+  FormField,
+  FormInputGroupInput,
+  InputGroup,
+  InputGroupAddon,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
+import { DiskStorageSchemaType } from '../DiskManagement.schema'
+import {
+  calculateComputeSizeRequiredForIops,
+  calculateIOPSPrice,
+  mapAddOnVariantIdToComputeSize,
+} from '../DiskManagement.utils'
+import { BillingChangeBadge } from '../ui/BillingChangeBadge'
+import { ComputeSizeRecommendationSection } from '../ui/ComputeSizeRecommendationSection'
+import { DiskType, RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3 } from '../ui/DiskManagement.constants'
+import { DiskManagementIOPSReadReplicas } from '../ui/DiskManagementReadReplicas'
+import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
+
+type IOPSFieldProps = {
+  form: UseFormReturn<DiskStorageSchemaType>
+  disableInput: boolean
+}
+
+export function IOPSField({ form, disableInput }: IOPSFieldProps) {
+  const { ref: projectRef } = useParams()
+  const { control, formState, setValue, trigger, getValues, watch } = form
+
+  const watchedStorageType = watch('storageType')
+  const watchedComputeSize = watch('computeSize')
+  const watchedIOPS = watch('provisionedIOPS') ?? 0
+
+  const { isError } = useDiskAttributesQuery({ projectRef })
+
+  const iopsPrice = calculateIOPSPrice({
+    oldStorageType: formState.defaultValues?.storageType as DiskType,
+    oldProvisionedIOPS: formState.defaultValues?.provisionedIOPS || 0,
+    newStorageType: getValues('storageType') as DiskType,
+    newProvisionedIOPS: getValues('provisionedIOPS'),
+  })
+
+  const disableIopsInput =
+    RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3.includes(watchedComputeSize) && watchedStorageType === 'gp3'
+
+  return (
+    <FormField
+      control={control}
+      name="provisionedIOPS"
+      render={({ field }) => {
+        const reccomendedComputeSize = calculateComputeSizeRequiredForIops(watchedIOPS)
+        return (
+          <FormItemLayout
+            layout="horizontal"
+            label="IOPS"
+            id={field.name}
+            description={
+              <span className="flex flex-col gap-y-2">
+                <p>Use higher IOPS for high-throughput apps.</p>
+                <ComputeSizeRecommendationSection
+                  form={form}
+                  actions={
+                    <Button
+                      type="default"
+                      onClick={() => {
+                        setValue('computeSize', reccomendedComputeSize ?? 'ci_nano')
+                        trigger('provisionedIOPS')
+                      }}
+                    >
+                      Update to {mapAddOnVariantIdToComputeSize(reccomendedComputeSize)}
+                    </Button>
+                  }
+                />
+                {!formState.errors.provisionedIOPS && (
+                  <DiskManagementIOPSReadReplicas
+                    isDirty={formState.dirtyFields.provisionedIOPS !== undefined}
+                    oldIOPS={formState.defaultValues?.provisionedIOPS ?? 0}
+                    newIOPS={field.value}
+                    oldStorageType={formState.defaultValues?.storageType as DiskType}
+                    newStorageType={getValues('storageType') as DiskType}
+                  />
+                )}
+              </span>
+            }
+            labelOptional={
+              <>
+                <BillingChangeBadge
+                  show={
+                    (watchedStorageType !== formState.defaultValues?.storageType ||
+                      (watchedStorageType === 'gp3' &&
+                        field.value !== formState.defaultValues?.provisionedIOPS)) &&
+                    !formState.errors.provisionedIOPS &&
+                    !disableIopsInput
+                  }
+                  beforePrice={Number(iopsPrice.oldPrice)}
+                  afterPrice={Number(iopsPrice.newPrice)}
+                  className="mb-2"
+                />
+                <p className="text-foreground-lighter">Input/output operations per second.</p>
+              </>
+            }
+          >
+            <FormControl className="max-w-32">
+              <InputGroup>
+                <FormInputGroupInput
+                  type="number"
+                  {...field}
+                  value={field.value}
+                  disabled={disableInput || disableIopsInput || isError}
+                  onChange={(e) => {
+                    setValue('provisionedIOPS', e.target.valueAsNumber, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
+                  }}
+                />
+                <InputGroupAddon align="inline-end">IOPS</InputGroupAddon>
+              </InputGroup>
+            </FormControl>
+          </FormItemLayout>
+        )
+      }}
+    />
+  )
+}

@@ -1,0 +1,53 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+
+import { integrationKeys } from './keys'
+import { del, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
+
+type DeleteVariables = {
+  connectionId: string | number
+  organizationId: number
+}
+
+export async function deleteConnection({ connectionId }: DeleteVariables, signal?: AbortSignal) {
+  const { data, error } = await del('/platform/integrations/github/connections/{connection_id}', {
+    params: { path: { connection_id: String(connectionId) } },
+    signal,
+  })
+
+  if (error) handleError(error)
+  return data
+}
+
+type DeleteContentData = Awaited<ReturnType<typeof deleteConnection>>
+
+export const useGitHubConnectionDeleteMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: Omit<
+  UseCustomMutationOptions<DeleteContentData, ResponseError, DeleteVariables>,
+  'mutationFn'
+> = {}) => {
+  const queryClient = useQueryClient()
+  return useMutation<DeleteContentData, ResponseError, DeleteVariables>({
+    mutationFn: (args) => deleteConnection(args),
+    async onSuccess(data, variables, context) {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: integrationKeys.githubConnectionsList(variables.organizationId),
+        }),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete GitHub connection: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
+}

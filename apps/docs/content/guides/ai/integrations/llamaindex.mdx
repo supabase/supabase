@@ -1,0 +1,70 @@
+---
+id: 'ai-integration-llamaindex'
+title: 'Learn how to integrate Supabase with LlamaIndex, a data framework for your LLM applications.'
+subtitle: 'Learn how to integrate Supabase with LlamaIndex, a data framework for your LLM applications.'
+breadcrumb: 'AI Integrations'
+---
+
+This guide will walk you through a basic example using the LlamaIndex [`SupabaseVectorStore`](https://github.com/supabase/supabase/blob/master/examples/ai/llamaindex/llamaindex.ipynb).
+
+<$Partial path="database_setup.mdx" />
+
+## Launching a notebook
+
+Launch our [LlamaIndex](https://github.com/supabase/supabase/blob/master/examples/ai/llamaindex/llamaindex.ipynb) notebook in Colab:
+
+<a
+  className="w-64"
+  href="https://colab.research.google.com/github/supabase/supabase/blob/master/examples/ai/llamaindex/llamaindex.ipynb"
+>
+  <img src="/docs/img/ai/colab-badge.svg" />
+</a>
+
+At the top of the notebook, you'll see a button `Copy to Drive`. Click this button to copy the notebook to your Google Drive.
+
+## Fill in your OpenAI credentials
+
+Inside the Notebook, add your `OPENAI_API_KEY` key. Find the cell which contains this code:
+
+```py
+import os
+os.environ['OPENAI_API_KEY'] = "[your_openai_api_key]"
+```
+
+## Connecting to your database
+
+Inside the Notebook, find the cell which specifies the `DB_CONNECTION`. It will contain some code like this:
+
+```python
+DB_CONNECTION = "postgresql://<user>:<password>@<host>:<port>/<db_name>"
+
+# create vector store client
+vx = vecs.create_client(DB_CONNECTION)
+```
+
+Replace the `DB_CONNECTION` with your own connection string. You can find the connection string on your project dashboard by clicking [Connect](/dashboard/project/_?showConnect=true).
+
+<Admonition type='note'>
+
+SQLAlchemy requires the connection string to start with `postgresql://` (instead of `postgres://`). Don't forget to rename this after copying the string from the dashboard.
+
+</Admonition>
+
+<Admonition type='note'>
+
+You must use the "connection pooling" string (domain ending in `*.pooler.supabase.com`) with Google Colab since Colab does not support IPv6.
+
+</Admonition>
+
+## Stepping through the notebook
+
+Now all that's left is to step through the notebook. You can do this by clicking the "execute" button (`ctrl+enter`) at the top left of each code cell. The notebook guides you through the process of creating a collection, adding data to it, and querying it.
+
+You can view the inserted items in the [Table Editor](/dashboard/project/_/editor/), by selecting the `vecs` schema from the schema dropdown.
+
+![Colab documents](/docs/img/ai/google-colab/colab-documents.png)
+
+## Resources
+
+- Visit the LlamaIndex + `SupabaseVectorStore` [docs](https://developers.llamaindex.ai/python/examples/vector_stores/supabasevectorindexdemo/)
+- Visit the official LlamaIndex [repo](https://github.com/jerryjliu/llama_index/)

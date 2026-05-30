@@ -1,0 +1,376 @@
+import Layout from '../layouts/Layout'
+import SectionContainer from '../components/Layouts/SectionContainer'
+
+export const meta = {
+  title: 'Service Level Agreement | Supabase',
+  description: 'Supabase Service Level Agreement',
+}
+
+<SectionContainer>
+
+# Service Level Agreements
+
+## Enterprise Platform Uptime SLA
+
+The following Service Level Agreement, which is incorporated into and forms part of the Subscription Agreement between Supabase, Inc. ("Supabase") and Customer (the "Agreement"), will apply to the Services for Enterprise Customers specified in an Order Form during the applicable Subscription Term.
+
+---
+
+## 1. Definitions
+
+All capitalized terms used but not defined in this SLA have the meaning set forth in the Agreement.
+
+**Availability Metrics:**
+
+Defines the measurements used to calculate service uptime under this SLA.
+
+- **Scheduled Availability:**
+
+  The total time (in minutes) that the applicable service is generally accessible and available to permitted users.
+
+- **Scheduled Downtime/Maintenance Windows:**
+
+  Periods of time that Supabase has communicated in advance, during which the service may be temporarily unavailable due to planned maintenance, upgrades, or other scheduled activities. These windows are not counted as Unscheduled Downtime for SLA purposes.
+
+- **Unscheduled Downtime:**
+
+  The total time (in minutes) that the service is not accessible or available, excluding periods attributable to any causes listed under SLA Exclusions.
+
+- **Actual Availability:**
+
+  The result of subtracting Unscheduled Downtime from Scheduled Availability.
+
+**Release Maturity Levels:** Indicates the stage of release for a given product or feature and whether it is covered by the SLA.
+
+- **GA (General Availability):** The product is fully released and covered by the SLA.
+- **Beta:** The product or feature is in limited release. Beta products are not covered by the SLA.
+- **Alpha:** The product or feature is in early release. Alpha products are not covered by the SLA.
+
+For the current release stage of each Supabase product and feature see [Supabase features](https://supabase.com/features).
+
+**SLA Scope:** The level at which service availability is measured and the impact required to constitute an SLA breach.
+
+- **Global:** The service is deployed from a centralized global infrastructure; SLA is breached if more than 1% of projects worldwide are affected during a downtime event.
+- **Regional:** The service is deployed within individual geographic regions; SLA is breached if more than 1% of projects in a single region are affected.
+- **Project:** The service is deployed on a dedicated, per-project basis; SLA applies individually to each project.
+
+---
+
+## 2. Uptime Commitment
+
+Supabase will provide Actual Availability for at least ninety-nine and nine tenths percent (99.9%) of the total time in each calendar month during the Subscription Term, as measured by Supabase (the "Uptime Commitment"). Each product is individually covered by a 99.9% uptime commitment for customers with an Enterprise tier subscription.
+
+---
+
+## 3. SLA Definition & Exclusions
+
+This Service Level Agreement applies only to the services and products specifically listed as covered, and is subject to the definitions, scopes, and exclusions outlined in this document.
+
+Supabase is not responsible for outages or service interruptions caused by factors outside of its reasonable control. The following categories of events are excluded from this SLA:
+
+- **Third-Party Vendors:**
+
+  Issues attributable to external vendors or cloud providers, including AWS, Cloudflare, GCP, Azure, GitHub, or other similar providers.
+
+- **Integration Partners:**
+
+  Failures or downtime related to third-party integration partners, such as Resend for email delivery, or other external service failures.
+
+- **General Factors Outside Our Control:**
+
+  Events such as force majeure, internet service provider (ISP) outages, or other issues outside Supabase's reasonable control.
+
+- **Customer Actions or Inactions:**
+
+  Resource limitations, misconfigurations, or failures to follow operational guidelines provided in Supabase documentation; delays in recovery due to insufficient I/O capacity; issues caused by customer's equipment or software; or account suspension or termination in accordance with Supabase Terms.
+
+Product-specific exclusions and further detail are provided in the following sections.
+
+---
+
+### Product-Specific
+
+### Postgres
+
+- **SLA Scope:** Project
+- **Dependencies:** None
+
+**Downtime Definition:**
+
+Any period during which the managed Postgres database for a given project is not generally accessible for permitted users to perform read or write operations.
+
+**Exclusions:**
+
+- Use of user-defined, unofficial, or unsupported Postgres extensions.
+- Use of Postgres versions older than the two most recent major releases officially supported by Supabase.
+- Use of outdated database extension versions; customers must be running the most recent version of database extensions for those to be included in SLA coverage.
+- Customer's failure to provision sufficient CPU, memory, or storage resources for expected workloads.
+- Excessively large numbers of tables or objects that significantly impact recovery times.
+- Insufficient I/O capacity for the database workload as provisioned by the customer.
+- Outages caused by customer-initiated schema changes or migrations that impact database integrity or operability.
+- Issues caused by customer's equipment, networks, or software.
+- Downtime related to suspension or termination of account per Supabase Terms.
+
+---
+
+### Auth
+
+- **SLA Scope:** Project
+- **Dependencies:** Postgres
+
+**Downtime Definition:**
+
+Any period during which the Auth service is unavailable for performing authentication or authorization operations for permitted users of a production system.
+
+**Exclusions:**
+
+- Unavailability caused by upstream service outages listed in Dependencies.
+- Inappropriately provisioned compute resources for anticipated auth workloads.
+- Customer-initiated modifications to database objects, roles, or relationships in the `auth` schema.
+- Outages resulting from integration with third-party providers (OAuth, OpenID, email, SMS, CAPTCHA, password strength checking, geolocation, etc.).
+- Outages due to overly permissive rate-limiting configurations set by the customer.
+- Email sending issues when using the default (provisional) configuration [not intended for production use](https://supabase.com/docs/guides/auth/auth-smtp).
+- Issues caused by using retracted or unofficial Supabase libraries, frameworks, or proxies.
+- Issues that would have been resolved by upgrading to a newer minor or patch version of official Supabase libraries or tools.
+
+---
+
+### Data APIs (PostgREST)
+
+- **SLA Scope:** Project
+- **Dependencies:** Postgres, Auth
+
+**Downtime Definition:**
+
+Any period during which the Data APIs (including PostgREST endpoints) are unavailable for permitted users to perform API calls against the database.
+
+**Exclusions:**
+
+- Unavailability caused by upstream service outages listed in Dependencies.
+- Customer misconfiguration of API permissions, security policies, or database schema.
+- Use of unofficial or unsupported client libraries, API versions, or modifications.
+- Failures resulting from customer's network, application, or API client errors.
+- Outages that could have been resolved by upgrading to the latest supported version of Supabase Data API components.
+
+---
+
+### Storage
+
+- **SLA Scope:** Regional
+- **Dependencies:** Postgres, Pooler
+
+**Downtime Definition:**
+
+Any period during which the Storage service is unavailable for permitted users to upload, download, or manage files and buckets in a region.
+
+**Exclusions:**
+
+- Unavailability caused by upstream service outages listed in Dependencies.
+- Customer misconfiguration of storage settings or connection pools (e.g., low `max_clients` or `pool_size`).
+- Use of unofficial or unsupported client libraries or modifications.
+- Customer-initiated schema changes in the storage schema or cross-schema relationships impacting availability.
+- Deletion of objects or buckets by the customer via the Storage API.
+- Outages that could have been resolved by upgrading to the latest supported version of Supabase Storage components.
+
+---
+
+### Pooler (PgBouncer & Supavisor)
+
+- **SLA Scope:** Regional
+- **Dependencies:** Postgres
+
+**Downtime Definition:**
+
+Any period during which the database connection pooling layer is unavailable for permitted users, resulting in inability to connect to Postgres.
+
+**Exclusions:**
+
+- Unavailability caused by upstream service outages listed in Dependencies.
+- Customer's failure to provision sufficient pooler capacity (e.g., `max_clients`, `pool_size`) for actual workload.
+- Custom changes to connection pooling settings outside recommended operational guidelines.
+- Issues arising from customer's network or database client configuration.
+- Failures resolvable by updating to a supported version of official Supabase pooling components.
+
+---
+
+### Management API
+
+- **SLA Scope:** Regional
+- **Dependencies:** None
+
+**Downtime Definition:**
+
+Any period during which the Supabase Management API is unavailable for permitted users to perform management, provisioning, or configuration actions in a region.
+
+**Exclusions:**
+
+- Customer loss or compromise of personal access tokens or confidential information.
+- Use of the Management API in violation of Supabase fair-use policy.
+- Failures that could have been resolved by upgrading to a newer version of official Supabase management tooling.
+
+---
+
+### Branching
+
+- **SLA Scope:** Regional
+- **Dependencies:** Postgres, Management API
+
+**Downtime Definition:**
+
+Any period during which the branching functionality (including creation, deletion, or promotion of branches) is unavailable for permitted users within a given region.
+
+**Exclusions:**
+
+- Unavailability caused by upstream service outages listed under Dependencies.
+- Failures due to unsupported schema or configurations within branches.
+- Customer misuse or unsupported use of branching features, including but not limited to version pinning, manual overrides, or undocumented patterns.
+- Issues resulting from user-initiated migrations that introduce data loss or instability, including those merged into production environments.
+- Failures in applying configuration or updates older than 90 days.
+- Failures in applying configuration or service updates (e.g., Auth settings) to branches with stale or diverged states.
+
+---
+
+### Realtime
+
+- **SLA Scope:** Regional
+- **Dependencies:** Postgres, Auth
+
+**Downtime Definition:**
+
+Any period during which the Realtime service is unavailable for permitted users to send and receive event notifications or subscribe to database changes in a region.
+
+**Exclusions:**
+
+- Unavailability caused by upstream service outages listed in Dependencies.
+- Customer's failure to provision sufficient compute resources for Realtime workloads.
+- The Realtime service does not guarantee delivery of messages (at-least-once, exactly-once, or at-most-once delivery).
+- Issues resulting from the use of unofficial, outdated, or unsupported client libraries or event-handling frameworks.
+
+---
+
+### Functions
+
+- **SLA Scope:** Regional
+- **Dependencies:** None
+
+**Downtime Definition:**
+
+Any period during which Supabase Edge Functions are unavailable to be executed, created, updated, or deleted by permitted users in a region.
+
+**Exclusions:**
+
+- Outages caused by user code errors, infinite loops, or unsupported packages.
+- Failures due to integration with external dependencies or services.
+- Failures resulting from downstream dependencies explicitly invoked by the user within their function logic (e.g., Postgres queries, HTTP requests to PostgREST, Auth, Storage, or third-party services). These are considered outside the scope of the Functions SLA.
+
+---
+
+### Studio
+
+- **SLA Scope:** Global
+- **Dependencies:** Postgres, Management API, Logging, Auth, Realtime, Functions, Storage
+
+**Downtime Definition:**
+
+Any period during which Supabase Studio is unavailable for permitted users to manage projects, view logs, or interact with platform resources globally.
+
+**Exclusions:**
+
+- Unavailability caused by upstream service outages listed in Dependencies.
+- Failures caused by unsupported browser versions or extensions.
+
+---
+
+### Logging
+
+- **SLA Scope:** Global
+- **Dependencies:** None
+
+**Downtime Definition:**
+
+Any period during which the Logging service is unavailable for permitted users to collect, query, or retrieve log data globally.
+
+**Exclusions:**
+
+- Integration failures with external log ingestion partners or third-party tools.
+- Outages resulting from customer misconfiguration of log collection or retention policies.
+
+---
+
+## 4. Service Credits
+
+If the Uptime Commitment is not met during any particular calendar month, Customer is eligible for a service credit ("Service Credit") upon request. The amount will be:
+
+`<Total Monthly Fees for Affected Service> * <Credit Percentage>`
+
+where Credit Percentage is derived from the table below:
+
+| Actual Availability                                | Credit Percentage |
+| -------------------------------------------------- | ----------------- |
+| Less than 99.9% but greater than or equal to 99.0% | 10%               |
+| Less than 99.0% but greater than or equal to 98.0% | 15%               |
+| Less than 98.0% but greater than or equal to 96.0% | 20%               |
+| Less than 96.0%                                    | 30%               |
+
+---
+
+## 5. Credit Requests and Payment
+
+To request a Service Credit, Customer must send an email to Supabase at support@supabase.io within thirty (30) days of the end of the month in which the Uptime Commitment was not met. The request must include:
+
+(a) the affected organization, service(s), region(s), and project(s);
+
+(b) the specific dates and times (in 5-minute intervals) during which the service was unavailable; and
+
+(c) supporting logs or monitoring data showing failed requests or clear unavailability.
+
+Supabase reserves the right to validate any claim using its own internal monitoring systems and may deny claims that are unsupported, inaccurate, or inconsistent with internal metrics.
+
+If Supabase confirms that Customer is eligible for a Service Credit, Supabase will issue a credit to Customer's account within thirty (30) days. Service Credits are not refunds, cannot be exchanged into cash, and may only be applied to future billing charges. Except as set forth in Section 6 below, the Service Credits constitute Customer's sole and exclusive remedy, and Supabase's sole and exclusive liability, for any failure to meet the Uptime Commitment.
+
+Notwithstanding anything to the contrary in this SLA, the total amount of Service Credits issued to Customer under this SLA shall not exceed twenty percent (20%) of the total fees paid by Customer for the affected services under the applicable Order Form during the preceding twelve (12) month period. Any Service Credits calculated in excess of this cap will be forfeited and shall have no cash or credit value.
+
+---
+
+## 7. Support
+
+Supabase provides Support Service Level Agreements for Team and Enterprise customers.
+
+### Urgent
+
+**Critical Issue**
+
+Defect resulting in full or partial system outage or a condition that makes Supabase unusable or unavailable in production for all of Customer's Users.
+
+### High
+
+**Significant Business Disruption**
+
+Issue resulting in a situation meaning major functionality is impacted and significant performance degradation is experienced. Issue impacts significant proportion of user base and / or major Supabase functionality.
+
+### Normal
+
+**Minor Feature or Functional Issue / General Question**
+
+Issue results in a component of Supabase not performing as expected or documented. An inquiry by a Customer representative regarding a general technical issue or general question.
+
+### Low
+
+**Minor Issue / Feature Request**
+
+An Information request about Supabase or feature request.
+
+### Severity and Target Initial Response Times
+
+| Severity Level | Team                                 | Enterprise Standard                   | Priority Plus            |
+| -------------- | ------------------------------------ | ------------------------------------- | ------------------------ |
+| 1. Urgent      | 24 hours<br />24/7 × 365             | 1 hour<br />24/7 × 365                | 1 hour<br />24/7 × 365   |
+| 2. High        | 1 business day<br />Monday - Friday  | 2 business hours<br />Monday - Friday | 2 hours<br />24/7 × 365  |
+| 3. Normal      | 1 business day<br />Monday - Friday  | 1 business day<br />Monday - Friday   | 12 hours<br />24/7 x 365 |
+| 4. Low         | 2 business days<br />Monday - Friday | 2 business days<br />Monday - Friday  | 24 hours<br />24/7 x 365 |
+
+Business hours are 6am to 6pm local time unless stated otherwise.
+
+</SectionContainer>
+
+export default (context) => <Layout meta={meta} children={context.children} context={context} />

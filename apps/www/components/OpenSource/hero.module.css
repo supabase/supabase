@@ -1,0 +1,47 @@
+.hero-container {
+  z-index: -6;
+  transition: perspective 3s ease 0s;
+}
+
+.hero-grid-lines {
+  position: absolute;
+  width: 120vw;
+  height: 120vh;
+  min-height: 800px;
+  margin-left: 0%;
+  transform: translateY(0);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inset: 0;
+  margin: 0 auto;
+  animation: animate-grid 30s linear infinite;
+  will-change: transform;
+}
+
+@media (min-width: 1024px) {
+  .hero-grid-lines {
+    animation-duration: 30s;
+  }
+
+  @keyframes animate-grid {
+    0% {
+      transform: translateY(500px);
+    }
+
+    to {
+      transform: translateY(100px);
+    }
+  }
+}
+
+@keyframes animate-grid {
+  0% {
+    transform: translateY(100px);
+  }
+
+  to {
+    transform: translateY(-300px);
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "name": "refine-user-management",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@refinedev/cli": "^2.16.51",
+    "@refinedev/core": "^5.0.9",
+    "@refinedev/inferencer": "^7.0.0",
+    "@refinedev/kbar": "^2.0.1",
+    "@refinedev/react-hook-form": "^5.0.4",
+    "@refinedev/react-router": "^2.0.3",
+    "@refinedev/supabase": "^6.0.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-hook-form": "^7.71.2",
+    "react-router": "^7.13.1"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.1",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.4",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1"
+  },
+  "scripts": {
+    "dev": "refine dev",
+    "build": "tsc && refine build",
+    "preview": "refine start",
+    "refine": "refine"
+  },
+  "browserslist": {
+    "production": [">0.2%", "not dead", "not op_mini all"],
+    "development": ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"]
+  }
+}

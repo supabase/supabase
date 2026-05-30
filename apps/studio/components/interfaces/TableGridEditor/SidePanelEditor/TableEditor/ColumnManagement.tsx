@@ -1,0 +1,368 @@
+import {
+  closestCenter,
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { isEmpty, noop, partition } from 'lodash'
+import { Edit, ExternalLink, HelpCircle, Key, Trash } from 'lucide-react'
+import { useState } from 'react'
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Button,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  WarningIcon,
+} from 'ui'
+
+import { generateColumnField } from '../ColumnEditor/ColumnEditor.utils'
+import { ForeignKeySelector } from '../ForeignKeySelector/ForeignKeySelector'
+import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
+import { TEXT_TYPES } from '../SidePanelEditor.constants'
+import type { ColumnField, ExtendedPostgresRelationship } from '../SidePanelEditor.types'
+import { Column } from './Column'
+import type { ImportContent, TableField } from './TableEditor.types'
+import InformationBox from '@/components/ui/InformationBox'
+import type { EnumeratedType } from '@/data/enumerated-types/enumerated-types-query'
+import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
+
+interface ColumnManagementProps {
+  table: TableField
+  columns?: ColumnField[]
+  relations: ForeignKey[]
+  enumTypes: EnumeratedType[]
+  importContent?: ImportContent
+  isNewRecord: boolean
+  onColumnsUpdated: (columns: ColumnField[]) => void
+  onSelectImportData: () => void
+  onClearImportContent: () => void
+  onUpdateFkRelations: (relations: ForeignKey[]) => void
+}
+
+export const ColumnManagement = ({
+  table,
+  columns = [],
+  relations,
+  enumTypes = [],
+  importContent,
+  isNewRecord,
+  onColumnsUpdated = noop,
+  onSelectImportData = noop,
+  onClearImportContent = noop,
+  onUpdateFkRelations,
+}: ColumnManagementProps) => {
+  const track = useTrack()
+
+  const [open, setOpen] = useState(false)
+  const [selectedColumn, setSelectedColumn] = useState<ColumnField>()
+  const [selectedFk, setSelectedFk] = useState<ForeignKey>()
+
+  const hasImportContent = !isEmpty(importContent)
+  const [primaryKeyColumns, otherColumns] = partition(
+    columns,
+    (column: ColumnField) => column.isPrimaryKey
+  )
+
+  const checkIfHaveForeignKeys = (column: ColumnField) => {
+    return (
+      relations.find((relation) => relation.columns.find((x) => x.source === column.name)) !==
+      undefined
+    )
+  }
+
+  const onUpdateColumn = (columnToUpdate: ColumnField, changes: Partial<ColumnField>) => {
+    const updatedColumns = columns.map((column: ColumnField) => {
+      if (column.id === columnToUpdate.id) {
+        const isTextBasedColumn = TEXT_TYPES.includes(columnToUpdate.format)
+        if (!isTextBasedColumn && changes.defaultValue === '') {
+          changes.defaultValue = null
+        }
+
+        if ('name' in changes && column.foreignKey !== undefined) {
+          const foreignKey: ExtendedPostgresRelationship = {
+            ...column.foreignKey,
+            source_column_name: changes?.name ?? '',
+          }
+          return { ...column, ...changes, foreignKey }
+        }
+        return { ...column, ...changes }
+      } else {
+        return column
+      }
+    })
+    onColumnsUpdated(updatedColumns)
+  }
+
+  const onAddColumn = () => {
+    const defaultColumn = generateColumnField()
+    const updatedColumns = columns.concat(defaultColumn)
+    onColumnsUpdated(updatedColumns)
+  }
+
+  const onRemoveColumn = (columnToRemove: ColumnField) => {
+    const updatedColumns = columns.filter((column: ColumnField) => column.id !== columnToRemove.id)
+    onColumnsUpdated(updatedColumns)
+  }
+
+  const onSortColumns = (result: DragEndEvent, type: 'pks' | 'others') => {
+    // Dropped outside of the list
+    if (result.over == null) {
+      return
+    }
+
+    if (type === 'pks') {
+      const activeIndex = primaryKeyColumns.findIndex((item) => item.id === result.active.id)
+      const overIndex = primaryKeyColumns.findIndex((item) => item.id === result.over!.id)
+      if (activeIndex === -1 || overIndex === -1) return
+      const updatedPrimaryKeyColumns = arrayMove(primaryKeyColumns, activeIndex, overIndex)
+      const updatedColumns = updatedPrimaryKeyColumns.concat(otherColumns)
+      return onColumnsUpdated(updatedColumns)
+    }
+
+    if (type === 'others') {
+      const activeIndex = otherColumns.findIndex((item) => item.id === result.active.id)
+      const overIndex = otherColumns.findIndex((item) => item.id === result.over!.id)
+      if (activeIndex === -1 || overIndex === -1) return
+      const updatedOtherColumns = arrayMove(otherColumns, activeIndex, overIndex)
+      const updatedColumns = primaryKeyColumns.concat(updatedOtherColumns)
+      return onColumnsUpdated(updatedColumns)
+    }
+  }
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  return (
+    <>
+      <div className="w-full space-y-4 table-editor-columns">
+        <div className="flex items-center justify-between w-full">
+          <h5>Columns</h5>
+          <div className="flex items-center gap-x-2">
+            <Button asChild type="default" icon={<ExternalLink size={12} strokeWidth={2} />}>
+              <a
+                href={`${DOCS_URL}/guides/database/tables#data-types`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                About data types
+              </a>
+            </Button>
+            {isNewRecord && (
+              <>
+                <div className="py-3 border-r" />
+                {hasImportContent ? (
+                  <div className="flex items-center gap-x-2">
+                    <Button type="default" icon={<Edit />} onClick={onSelectImportData}>
+                      Edit content
+                    </Button>
+                    <Button type="danger" icon={<Trash />} onClick={onClearImportContent}>
+                      Remove content
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    type="default"
+                    onClick={() => {
+                      onSelectImportData()
+                      track('import_data_button_clicked', { tableType: 'New Table' })
+                    }}
+                  >
+                    Import data from CSV
+                  </Button>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+
+        {hasImportContent && (
+          <p className="text-sm text-foreground-light my-2">
+            Your table will be created with {importContent?.rowCount?.toLocaleString()} rows and the
+            following {columns.length} columns.
+          </p>
+        )}
+
+        {primaryKeyColumns.length === 0 && (
+          <Alert variant="warning">
+            <WarningIcon />
+            <AlertTitle>Warning: No primary keys selected</AlertTitle>
+            <AlertDescription>
+              Tables should have at least one column as the primary key to identify each row.
+              Without a primary key, you will not be able to update or delete rows from the table.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {primaryKeyColumns.length > 1 && (
+          <InformationBox
+            block
+            icon={<Key size={16} />}
+            title="Composite primary key selected"
+            description="The columns that you've selected will be grouped as a primary key, and will serve as the unique identifier for the rows in your table"
+          />
+        )}
+
+        <div className="space-y-2">
+          {/* Headers */}
+          <div className="flex w-full px-3">
+            {/* Drag handle */}
+            {isNewRecord && <div className="w-[5%]" />}
+            <div className="w-[25%] flex items-center space-x-2">
+              <h5 className="text-xs text-foreground-lighter">Name</h5>
+              <Tooltip>
+                <TooltipTrigger>
+                  <HelpCircle size={15} strokeWidth={1.5} className="text-foreground-lighter" />
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="w-[300px]">
+                  Recommended to use lowercase and use an underscore to separate words e.g.
+                  column_name
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <div className="w-[25%]">
+              <h5 className="text-xs text-foreground-lighter">Type</h5>
+            </div>
+            <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'} flex items-center space-x-2`}>
+              <h5 className="text-xs text-foreground-lighter">Default Value</h5>
+              <Tooltip>
+                <TooltipTrigger>
+                  <HelpCircle size={15} strokeWidth={1.5} className="text-foreground-lighter" />
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="w-[300px]">
+                  Can either be a literal or an expression. When using an expression wrap your
+                  expression in brackets, e.g. (gen_random_uuid())
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <div className="w-[10%]">
+              <h5 className="text-xs text-foreground-lighter">Primary</h5>
+            </div>
+            {/* Empty space */}
+            <div className={`${hasImportContent ? 'w-[10%]' : 'w-0'}`} />
+            {/* More config button */}
+            <div className="w-[5%]" />
+            {/* Delete button */}
+            {!hasImportContent && <div className="w-[5%]" />}
+          </div>
+
+          {primaryKeyColumns.length > 0 && (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={(result) => onSortColumns(result, 'pks')}
+            >
+              <SortableContext items={primaryKeyColumns} strategy={verticalListSortingStrategy}>
+                <div
+                  className={`space-y-2 rounded-md bg-surface-200 px-3 py-2 ${
+                    isNewRecord ? '' : '-mx-3'
+                  }`}
+                >
+                  {primaryKeyColumns.map((column: ColumnField) => (
+                    <Column
+                      key={column.id}
+                      column={column}
+                      relations={relations.filter((relation) => {
+                        return relation.columns.some((x) => x.source === column.name)
+                      })}
+                      enumTypes={enumTypes}
+                      hasForeignKeys={checkIfHaveForeignKeys(column)}
+                      isNewRecord={isNewRecord}
+                      hasImportContent={hasImportContent}
+                      onUpdateColumn={(changes) => onUpdateColumn(column, changes)}
+                      onRemoveColumn={() => onRemoveColumn(column)}
+                      onEditForeignKey={(fk) => {
+                        setOpen(true)
+                        setSelectedColumn(column)
+                        if (fk) setSelectedFk(fk)
+                      }}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+          )}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={(result) => onSortColumns(result, 'others')}
+          >
+            <SortableContext items={otherColumns} strategy={verticalListSortingStrategy}>
+              <div className={`space-y-2 py-2 ${isNewRecord ? 'px-3 ' : ''}`}>
+                {otherColumns.map((column: ColumnField) => (
+                  <Column
+                    key={column.id}
+                    column={column}
+                    relations={relations.filter((relation) => {
+                      return relation.columns.some((x) => x.source === column.name)
+                    })}
+                    enumTypes={enumTypes}
+                    isNewRecord={isNewRecord}
+                    hasForeignKeys={checkIfHaveForeignKeys(column)}
+                    hasImportContent={hasImportContent}
+                    onUpdateColumn={(changes) => onUpdateColumn(column, changes)}
+                    onRemoveColumn={() => onRemoveColumn(column)}
+                    onEditForeignKey={(fk) => {
+                      setOpen(true)
+                      setSelectedColumn(column)
+                      if (fk) setSelectedFk(fk)
+                    }}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        </div>
+
+        {!hasImportContent && (
+          <div className="flex items-center justify-center rounded-sm border border-strong border-dashed py-3">
+            <Button type="default" onClick={() => onAddColumn()}>
+              Add column
+            </Button>
+          </div>
+        )}
+      </div>
+
+      <ForeignKeySelector
+        visible={open}
+        column={selectedColumn}
+        table={{ id: table.id, name: table.name, columns: table.columns }}
+        foreignKey={selectedFk}
+        onClose={() => {
+          setOpen(false)
+          setSelectedFk(undefined)
+          setSelectedColumn(undefined)
+        }}
+        onSaveRelation={(fk) => {
+          const existingRelationIds = relations.map((x) => x.id)
+          if (fk.id !== undefined && existingRelationIds.includes(fk.id)) {
+            onUpdateFkRelations(
+              relations.map((x) => {
+                if (x.id === fk.id) return fk
+                return x
+              })
+            )
+          } else {
+            onUpdateFkRelations(relations.concat([fk]))
+          }
+        }}
+      />
+    </>
+  )
+}

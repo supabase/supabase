@@ -1,0 +1,153 @@
+name: Publish to Image Registry
+
+on:
+  # run this action every Monday at 04:00 UTC (Singapore noon)
+  schedule:
+    - cron: '0 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+jobs:
+  settings:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    outputs:
+      image_version: ${{ steps.meta.outputs.version }}
+    steps:
+      - id: meta
+        uses: docker/metadata-action@818d4b7b91585d195f67373fd9cb0332e31a7175 # v4.6.0
+        with:
+          images: |
+            supabase/studio
+          flavor: |
+            latest=true
+          tags: |
+            type=sha,prefix={{date 'YYYY.MM.DD'}}-sha-,enable=${{ github.event_name == 'schedule' }}
+            type=sha,prefix={{date 'YYYY.MM.DD'}}-sha-,enable=${{ github.event_name == 'workflow_dispatch' }}
+
+  release_x86:
+    needs: settings
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 120
+    env:
+      arch: amd64
+    outputs:
+      image_digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - id: meta
+        uses: docker/metadata-action@818d4b7b91585d195f67373fd9cb0332e31a7175 # v4.6.0
+        with:
+          images: |
+            supabase/studio
+          tags: |
+            type=raw,value=${{ needs.settings.outputs.image_version }}_${{ env.arch }}
+
+      - uses: docker/setup-buildx-action@885d1462b80bc1c1c7f0b00334ad271f09369c55 # v2.10.0
+
+      - name: Login to DockerHub
+        uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - id: build
+        uses: docker/build-push-action@1104d471370f9806843c095c1db02b5a90c5f8b6 # v3.3.1
+        with:
+          push: true
+          context: '{{defaultContext}}'
+          file: apps/studio/Dockerfile
+          target: production
+          platforms: linux/${{ env.arch }}
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  release_arm:
+    needs: settings
+    runs-on: arm-runner
+    timeout-minutes: 120
+    env:
+      arch: arm64
+    outputs:
+      image_digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          persist-credentials: false
+      - id: meta
+        uses: docker/metadata-action@818d4b7b91585d195f67373fd9cb0332e31a7175 # v4.6.0
+        with:
+          images: |
+            supabase/studio
+          tags: |
+            type=raw,value=${{ needs.settings.outputs.image_version }}_${{ env.arch }}
+
+      - uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - uses: docker/setup-buildx-action@885d1462b80bc1c1c7f0b00334ad271f09369c55 # v2.10.0
+        with:
+          driver: docker
+          driver-opts: |
+            image=moby/buildkit:master
+            network=host
+
+      - id: build
+        uses: docker/build-push-action@1104d471370f9806843c095c1db02b5a90c5f8b6 # v3.3.1
+        with:
+          push: true
+          context: .
+          file: apps/studio/Dockerfile
+          target: production
+          platforms: linux/${{ env.arch }}
+          tags: ${{ steps.meta.outputs.tags }}
+          no-cache: true
+
+  merge_manifest:
+    needs:
+      - settings
+      - release_x86
+      - release_arm
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - uses: docker/setup-buildx-action@885d1462b80bc1c1c7f0b00334ad271f09369c55 # v2.10.0
+
+      - uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Merge multi-arch manifests
+        env:
+          IMAGE_VERSION: ${{ needs.settings.outputs.image_version }}
+          x86_DIGEST: ${{ needs.release_x86.outputs.image_digest }}
+          ARM_DIGEST: ${{ needs.release_arm.outputs.image_digest }}
+        run: |
+          docker buildx imagetools create -t supabase/studio:${IMAGE_VERSION} \
+          supabase/studio@${x86_DIGEST} \
+          supabase/studio@${ARM_DIGEST}
+          docker buildx imagetools create -t supabase/studio:latest \
+          supabase/studio@${x86_DIGEST} \
+          supabase/studio@${ARM_DIGEST}
+          echo "Published Registry Images" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Image | Link |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|------|" >> $GITHUB_STEP_SUMMARY
+          echo "| \`supabase/studio:${IMAGE_VERSION}\` | [View on Docker Hub](https://hub.docker.com/r/supabase/studio/tags?name=${IMAGE_VERSION}) |" >> $GITHUB_STEP_SUMMARY
+          echo "| \`supabase/studio:latest\` | [View on Docker Hub](https://hub.docker.com/r/supabase/studio/tags?name=latest) |" >> $GITHUB_STEP_SUMMARY
+
+  publish:
+    needs:
+      - settings
+      - merge_manifest
+    # Call workflow explicitly because events from actions cannot trigger more actions
+    uses: ./.github/workflows/mirror.yml
+    with:
+      version: ${{ needs.settings.outputs.image_version }}
+    secrets:
+      PROD_AWS_ROLE: ${{ secrets.PROD_AWS_ROLE }}

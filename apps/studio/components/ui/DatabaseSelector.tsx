@@ -1,0 +1,246 @@
+import { useParams } from 'common'
+import { noop } from 'lodash'
+import { Check, ChevronDown, Loader2, Plus } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useEffect, useState } from 'react'
+import {
+  Button,
+  ButtonProps,
+  cn,
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  ScrollArea,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
+
+import { Markdown } from '@/components/interfaces/Markdown'
+import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { formatDatabaseID, formatDatabaseRegion } from '@/data/read-replicas/replicas.utils'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+
+interface DatabaseSelectorProps {
+  selectedDatabaseId?: string // To override initial state
+  variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
+  additionalOptions?: { id: string; name: string }[]
+  buttonProps?: ButtonProps
+  onSelectId?: (id: string) => void // Optional callback
+  className?: string
+  align?: 'start' | 'end'
+  isForm?: boolean
+}
+
+export const DatabaseSelector = ({
+  selectedDatabaseId: _selectedDatabaseId,
+  variant = 'regular',
+  additionalOptions = [],
+  onSelectId = noop,
+  buttonProps,
+  align = 'end',
+  className,
+  isForm = false,
+}: DatabaseSelectorProps) => {
+  const router = useRouter()
+  const { ref: projectRef } = useParams()
+  const [open, setOpen] = useState(false)
+  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+
+  const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
+
+  const state = useDatabaseSelectorStateSnapshot()
+  const selectedDatabaseId = _selectedDatabaseId ?? state.selectedDatabaseId
+
+  const { data, isPending: isLoading, isSuccess } = useReadReplicasQuery({ projectRef })
+  const databases = data ?? []
+  const sortedDatabases = databases
+    .sort((a, b) => (a.inserted_at > b.inserted_at ? 1 : 0))
+    .sort((database) => (database.identifier === projectRef ? -1 : 0))
+
+  const selectedDatabase = databases.find((db) => db.identifier === selectedDatabaseId)
+  const selectedDatabaseRegion = formatDatabaseRegion(selectedDatabase?.region ?? '')
+  const formattedDatabaseId = formatDatabaseID(selectedDatabaseId ?? '')
+
+  const selectedAdditionalOption = additionalOptions.find((x) => x.id === selectedDatabaseId)
+
+  const newReplicaURL = `/project/${projectRef}/database/replication?type=Read+Replica`
+
+  useEffect(() => {
+    if (_selectedDatabaseId && !isForm) state.setSelectedDatabaseId(_selectedDatabaseId)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [_selectedDatabaseId])
+
+  return (
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
+      <PopoverTrigger asChild>
+        <div className={cn('flex cursor-pointer', className)}>
+          {!isForm && (
+            <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
+              Source
+            </span>
+          )}
+          <Button
+            type="default"
+            icon={isLoading && <Loader2 className="animate-spin" />}
+            iconRight={<ChevronDown strokeWidth={1.5} size={12} />}
+            {...buttonProps}
+            className={cn(
+              'justify-start',
+              !isForm && 'rounded-l-none',
+              variant === 'connected-on-right' && 'rounded-r-none',
+              variant === 'connected-on-left' && 'rounded-l-none border-l-0',
+              variant === 'connected-on-both' && 'rounded-none border-x-0',
+              buttonProps?.className
+            )}
+          >
+            {selectedAdditionalOption ? (
+              <span>{selectedAdditionalOption.name}</span>
+            ) : (
+              <>
+                <span className="capitalize">
+                  {isLoading || selectedDatabase?.identifier === projectRef
+                    ? 'Primary database'
+                    : 'Read replica'}
+                </span>{' '}
+                {isSuccess && selectedDatabase?.identifier !== projectRef && (
+                  <span>
+                    ({selectedDatabaseRegion} - {formattedDatabaseId})
+                  </span>
+                )}
+              </>
+            )}
+          </Button>
+        </div>
+      </PopoverTrigger>
+      <PopoverContent className="p-0 w-64" side="bottom" align={align}>
+        <Command>
+          <CommandList>
+            {additionalOptions.length > 0 && (
+              <CommandGroup className="border-b">
+                {additionalOptions.map((option) => (
+                  <CommandItem
+                    key={option.id}
+                    value={option.id}
+                    className="cursor-pointer w-full"
+                    onSelect={() => {
+                      if (!isForm) state.setSelectedDatabaseId(option.id)
+                      setOpen(false)
+                      onSelectId(option.id)
+                    }}
+                    onClick={() => {
+                      if (!isForm) state.setSelectedDatabaseId(option.id)
+                      setOpen(false)
+                      onSelectId(option.id)
+                    }}
+                  >
+                    <div className="w-full flex items-center justify-between">
+                      <p>{option.name}</p>
+                      {option.id === selectedDatabaseId && <Check size={14} />}
+                    </div>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            )}
+            <CommandGroup>
+              <ScrollArea className={(databases || []).length > 7 ? 'h-[210px]' : ''}>
+                {sortedDatabases?.map((database) => {
+                  const region = formatDatabaseRegion(database.region)
+                  const id = formatDatabaseID(database.identifier)
+
+                  if (database.status !== 'ACTIVE_HEALTHY') {
+                    const status = [
+                      REPLICA_STATUS.INIT_READ_REPLICA,
+                      REPLICA_STATUS.COMING_UP,
+                    ].includes(database.status)
+                      ? 'coming up'
+                      : 'not healthy'
+
+                    return (
+                      <Tooltip key={database.identifier}>
+                        <TooltipTrigger asChild>
+                          <div className="px-2 py-1.5 w-full flex items-center justify-between">
+                            <p className="text-xs text-foreground-lighter">
+                              Read replica ({region} - {id})
+                            </p>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent side="right" className="w-80">
+                          <Markdown
+                            className="text-xs text-foreground"
+                            content={`Replica unable to accept requests as its ${status}. [View infrastructure settings](/project/${projectRef}/settings/infrastructure) for more information.`}
+                          />
+                        </TooltipContent>
+                      </Tooltip>
+                    )
+                  }
+
+                  return (
+                    <CommandItem
+                      key={database.identifier}
+                      value={database.identifier}
+                      className="cursor-pointer w-full"
+                      onSelect={() => {
+                        if (!isForm) state.setSelectedDatabaseId(database.identifier)
+                        setOpen(false)
+                        onSelectId(database.identifier)
+                      }}
+                      onClick={() => {
+                        if (!isForm) state.setSelectedDatabaseId(database.identifier)
+                        setOpen(false)
+                        onSelectId(database.identifier)
+                      }}
+                    >
+                      <div className="w-full flex items-center justify-between">
+                        <p>
+                          {database.identifier === projectRef
+                            ? 'Primary database'
+                            : `Read replica (${region} - ${id})`}
+                        </p>
+                        {database.identifier === selectedDatabaseId && <Check size={16} />}
+                      </div>
+                    </CommandItem>
+                  )
+                })}
+              </ScrollArea>
+            </CommandGroup>
+            {IS_PLATFORM && infrastructureReadReplicas && (
+              <CommandGroup className="border-t">
+                <CommandItem
+                  className="cursor-pointer w-full"
+                  onSelect={() => {
+                    setOpen(false)
+                    router.push(newReplicaURL)
+                  }}
+                  onClick={() => setOpen(false)}
+                >
+                  <Link
+                    href={newReplicaURL}
+                    onClick={async () => {
+                      setOpen(false)
+                      // [Joshen] This is used in the Connect UI which is available across all pages
+                      setShowConnect(false)
+                    }}
+                    className="w-full flex items-center gap-2"
+                  >
+                    <Plus size={14} strokeWidth={1.5} />
+                    <p>Create a new read replica</p>
+                  </Link>
+                </CommandItem>
+              </CommandGroup>
+            )}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  )
+}

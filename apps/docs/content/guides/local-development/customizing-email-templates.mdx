@@ -1,0 +1,315 @@
+---
+id: 'customizing-email-templates'
+title: 'Customizing email templates'
+subtitle: 'Customize local email templates via the config file.'
+---
+
+You can customize the email templates for local development by [editing the `config.toml` file](/docs/guides/local-development/cli/config#auth-config).
+
+<Admonition type="note">
+
+For configuring a self-hosted Supabase instance, see [Custom Email Templates](/docs/guides/self-hosting/custom-email-templates)
+
+</Admonition>
+
+## Configuring templates
+
+You should provide a relative URL to the `content_path` parameter, pointing to an HTML file which contains the template. For example:
+
+### Authentication email templates
+
+<$CodeTabs>
+
+```toml name=supabase/config.toml
+[auth.email.template.invite]
+subject = "You are invited to Acme Inc"
+content_path = "./supabase/templates/invite.html"
+```
+
+```html name=supabase/templates/invite.html
+<html>
+  <body>
+    <h2>Confirm your email address</h2>
+    <p>Follow the link below to confirm this email address and finish signing up.</p>
+    <p><a href="{{ .ConfirmationURL }}">Confirm email address</a></p>
+  </body>
+</html>
+```
+
+</$CodeTabs>
+
+### Security notification email templates
+
+<$CodeTabs>
+
+```toml name=supabase/config.toml
+[auth.email.notification.password_changed]
+enabled = true
+subject = "Your password was changed"
+content_path = "./templates/password_changed_notification.html"
+```
+
+```html name=templates/password_changed_notification.html
+<html>
+  <body>
+    <p>The password for your account was recently changed.</p>
+    <p>If you didn't make this change, reset your password and contact support immediately.</p>
+  </body>
+</html>
+```
+
+</$CodeTabs>
+
+## Available authentication email templates
+
+There are several authentication-related email templates which can be configured. Each template serves a specific authentication flow:
+
+### `auth.email.template.invite`
+
+**Default subject**: "You've been invited"
+**When sent**: When a user is invited to join your application via email invitation
+**Purpose**: Invite someone to create an account
+**Content**: Contains a link for the invited user to accept the invitation and create their account
+
+### `auth.email.template.confirmation`
+
+**Default subject**: "Confirm your email address"
+**When sent**: When a user signs up and needs to verify their email address
+**Purpose**: Ask users to confirm their email address after signing up
+**Content**: Contains a confirmation link to verify the user's email address
+
+### `auth.email.template.recovery`
+
+**Default subject**: "Reset your password"
+**When sent**: When a user requests a password reset
+**Purpose**: Send a password reset link or code
+**Content**: Contains a link to reset the user's password
+
+### `auth.email.template.magic_link`
+
+**Default subject**: "Your sign-in link"
+**When sent**: When a user requests a magic link or email OTP for passwordless authentication
+**Purpose**: Send a one-time sign-in link or one-time password
+**Content**: Contains a secure link that automatically logs the user in when clicked
+
+### `auth.email.template.email_change`
+
+**Default subject**: "Confirm your new email address"
+**When sent**: When a user requests to change their email address
+**Purpose**: Ask users to verify their new email address after changing it
+**Content**: Contains a confirmation link to verify the new email address
+
+### `auth.email.template.reauthentication`
+
+**Default subject**: "`{{ .Token }} is your verification code`"
+**When sent**: When a user needs to re-authenticate for sensitive operations
+**Purpose**: Ask users to verify their identity before a sensitive operation
+**Content**: Contains a 6-digit OTP code for verification
+
+## Available security notification email templates
+
+There are several security notification email templates which can be configured. These emails are only sent to users if the respective security notifications have been enabled at the project-level:
+
+### `auth.email.notification.password_changed`
+
+**Default subject**: "Your password was changed"
+**When sent**: When a user's password is changed
+**Purpose**: Notify users when their password has changed
+**Content**: Confirms that the password for the account has been changed
+
+### `auth.email.notification.email_changed`
+
+**Default subject**: "Your email address was changed"
+**When sent**: When a user's email address is changed
+**Purpose**: Notify users when their email address has changed
+**Content**: Confirms the change from the old email to the new email address
+
+### `auth.email.notification.phone_changed`
+
+**Default subject**: "Your phone number was changed"
+**When sent**: When a user's phone number is changed
+**Purpose**: Notify users when their phone number has changed
+**Content**: Confirms the change from the old phone number to the new phone number
+
+### `auth.email.notification.mfa_factor_enrolled`
+
+**Default subject**: "A new verification method was added to your account"
+**When sent**: When a new verification method is added to the user's account
+**Purpose**: Notify users when an MFA method has been added to their account
+**Content**: Confirms that a new verification method was added
+
+### `auth.email.notification.mfa_factor_unenrolled`
+
+**Default subject**: "A verification method was removed from your account"
+**When sent**: When a verification method is removed from the user's account
+**Purpose**: Notify users when an MFA method has been removed from their account
+**Content**: Confirms that a verification method was removed
+
+### `auth.email.notification.identity_linked`
+
+**Default subject**: "A sign-in method was linked to your account"
+**When sent**: When a sign-in method is linked to the account
+**Purpose**: Notify users when a sign-in method has been linked to their account
+**Content**: Confirms that a sign-in method was linked
+
+### `auth.email.notification.identity_unlinked`
+
+**Default subject**: "A sign-in method was removed from your account"
+**When sent**: When a sign-in method is removed from the account
+**Purpose**: Notify users when a sign-in method has been removed from their account
+**Content**: Confirms that a sign-in method was removed
+
+## Template variables
+
+The templating system provides the following variables for use:
+
+### `ConfirmationURL`
+
+Contains the confirmation URL. For example, a signup confirmation URL would look like:
+
+```
+https://project-ref.supabase.co/auth/v1/verify?token={{ .TokenHash }}&type=email&redirect_to=https://example.com/path
+```
+
+**Usage**
+
+```html
+<p><a href="{{ .ConfirmationURL }}">Confirm email address</a></p>
+```
+
+### `Token`
+
+Contains a 6-digit One-Time-Password (OTP) that can be used instead of the `ConfirmationURL`.
+
+**Usage**
+
+```html
+<p>Here is your one time password: {{ .Token }}</p>
+```
+
+### `TokenHash`
+
+Contains a hashed version of the `Token`. This is useful for constructing your own email link in the email template.
+
+**Usage**
+
+```html
+<p>Follow the link below to confirm this email address and finish signing up.</p>
+<p>
+  <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email"
+    >Confirm email address</a
+  >
+</p>
+```
+
+### `SiteURL`
+
+Contains your application's Site URL. This can be configured in your project's [authentication settings](/dashboard/project/_/auth/url-configuration).
+
+**Usage**
+
+```html
+<p>Visit <a href="{{ .SiteURL }}">here</a> to log in.</p>
+```
+
+### `RedirectTo`
+
+Contains the redirect URL passed as the `redirectTo` option in the auth method call.
+
+**Usage**
+
+```html
+<a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next={{ .RedirectTo }}">
+  Confirm your email
+</a>
+```
+
+### `Data`
+
+Contains metadata from `auth.users.user_metadata`. Use this to personalize the email message.
+
+**Usage**
+
+```html
+<p>Hello {{ .Data.first_name }}, please confirm your signup.</p>
+```
+
+### `Email`
+
+Contains the user's email address.
+
+**Usage**
+
+```html
+<p>A recovery request was sent to {{ .Email }}.</p>
+```
+
+### `NewEmail`
+
+Contains the new user's email address. This is only available in the `email_change` email template.
+
+**Usage**
+
+```html
+<p>You are requesting to update your email address to {{ .NewEmail }}.</p>
+```
+
+### `OldEmail`
+
+Contains the user's old email address. This is only available in the `email_changed_notification` email template.
+
+**Usage**
+
+```html
+<p>The email address for your account has been changed from {{ .OldEmail }} to {{ .Email }}.</p>
+```
+
+### `Phone`
+
+Contains the user's new phone number. This is only available in the `phone_changed_notification` email template.
+
+**Usage**
+
+```html
+<p>The phone number for your account has been changed from {{ .OldPhone }} to {{ .Phone }}.</p>
+```
+
+### `OldPhone`
+
+Contains the user's old phone number. This is only available in the `phone_changed_notification` email template.
+
+**Usage**
+
+```html
+<p>The phone number for your account has been changed from {{ .OldPhone }} to {{ .Phone }}.</p>
+```
+
+### `Provider`
+
+Contains the provider of the linked or removed sign-in method. This is only available in the `identity_linked_notification` and `identity_unlinked_notification` email templates.
+
+**Usage**
+
+```html
+<p>Your {{ .Provider }} account was linked as a sign-in method.</p>
+```
+
+### `FactorType`
+
+Contains the type of verification method that was added or removed. This is only available in the `mfa_factor_enrolled_notification` and `mfa_factor_unenrolled_notification` email templates.
+
+**Usage**
+
+```html
+<p>Sign-in verification method {{ .FactorType }} was added to your account.</p>
+```
+
+## Deploying email templates
+
+These settings are for local development. To apply the changes locally, stop and restart the Supabase containers:
+
+```sh
+supabase stop && supabase start
+```
+
+For hosted projects managed by Supabase, copy the templates into the [Email Templates](/dashboard/project/_/auth/templates) section of the Dashboard.

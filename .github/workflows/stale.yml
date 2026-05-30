@@ -1,0 +1,23 @@
+name: Automatically label stale issues
+on:
+  schedule:
+    - cron: '30 1 * * *'
+
+permissions:
+  issues: write
+  pull-requests: write
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Label Stale Issues
+        uses: actions/stale@28ca1036281a5e5922ead5184a1bbf96e5fc984e # v9.0.0
+        with:
+          days-before-issue-stale: 30
+          stale-issue-message: 'After 30 days of inactivity, this issue has been marked as stale. Commenting (or other activity) will remove the stale label.'
+          stale-issue-label: stale
+          any-of-labels: contributor
+          exempt-issue-labels: dnc, needs-analysis
+          exempt-all-assignees: true

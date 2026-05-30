@@ -1,0 +1,166 @@
+import { getImpersonationSQL, type SafeSqlFragment } from '@supabase/pg-meta'
+
+import { uuidv4 } from './helpers'
+import type { User } from '@/data/auth/users-infinite-query'
+import { RoleImpersonationState as ValtioRoleImpersonationState } from '@/state/role-impersonation-state'
+
+type PostgrestImpersonationRole =
+  | {
+      type: 'postgrest'
+      role: 'anon'
+    }
+  | {
+      type: 'postgrest'
+      role: 'service_role'
+    }
+  | {
+      type: 'postgrest'
+      role: 'authenticated'
+      userType: 'native'
+      user?: User
+      aal?: 'aal1' | 'aal2'
+    }
+  | {
+      type: 'postgrest'
+      role: 'authenticated'
+      userType: 'external'
+      externalAuth?: {
+        sub: string
+        additionalClaims?: Record<string, any>
+      }
+      aal?: 'aal1' | 'aal2'
+    }
+
+export type PostgrestRole = PostgrestImpersonationRole['role']
+
+type CustomImpersonationRole = {
+  type: 'custom'
+  role: string
+}
+
+export type ImpersonationRole = PostgrestImpersonationRole | CustomImpersonationRole
+
+export function getExp1HourFromNow() {
+  return Math.floor((Date.now() + 60 * 60 * 1000) / 1000)
+}
+
+export function getPostgrestClaims(projectRef: string, role: PostgrestImpersonationRole) {
+  const exp = getExp1HourFromNow()
+  const nowTimestamp = Math.floor(Date.now() / 1000)
+
+  if (role.role === 'authenticated') {
+    // Supabase native auth case
+    if (role.userType === 'native' && role.user) {
+      const user = role.user
+      return {
+        aal: role.aal ?? 'aal1',
+        amr: [{ method: 'password', timestamp: nowTimestamp }],
+        app_metadata: user.raw_app_meta_data,
+        aud: 'authenticated',
+        email: user.email,
+        exp,
+        iat: nowTimestamp,
+        iss: `https://${projectRef}.supabase.co/auth/v1`,
+        phone: user.phone,
+        role: user.role ?? role.role,
+        session_id: uuidv4(),
+        sub: user.id,
+        user_metadata: user.raw_user_meta_data,
+        is_anonymous: user.is_anonymous,
+      }
+    }
+
+    // External auth case
+    if (role.userType === 'external' && role.externalAuth) {
+      return {
+        aal: role.aal ?? 'aal1',
+        aud: 'authenticated',
+        exp,
+        iat: nowTimestamp,
+        role: 'authenticated',
+        session_id: uuidv4(),
+        sub: role.externalAuth.sub,
+        ...role.externalAuth.additionalClaims,
+      }
+    }
+  }
+
+  return {
+    iss: 'supabase',
+    ref: projectRef,
+    role: role.role,
+    iat: nowTimestamp,
+    exp,
+  }
+}
+
+export type RoleImpersonationState = Pick<ValtioRoleImpersonationState, 'role' | 'claims'>
+
+export function wrapWithRoleImpersonation(
+  sql: SafeSqlFragment,
+  state?: RoleImpersonationState
+): SafeSqlFragment {
+  const { role, claims } = state ?? { role: undefined, claims: undefined }
+
+  if (role === undefined) return sql
+
+  const unexpiredClaims =
+    claims !== undefined ? { ...claims, exp: getExp1HourFromNow() } : undefined
+  const impersonationSql = getImpersonationSQL({ role: role, unexpiredClaims, sql })
+  return impersonationSql
+}
+
+function encodeText(data: string) {
+  return new TextEncoder().encode(data)
+}
+
+function encodeBase64Url(data: ArrayBuffer | Uint8Array | string): string {
+  return btoa(
+    String.fromCharCode(...new Uint8Array(typeof data === 'string' ? encodeText(data) : data))
+  )
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '')
+}
+
+function genKey(rawKey: string) {
+  return window.crypto.subtle.importKey(
+    'raw',
+    encodeText(rawKey),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign', 'verify']
+  )
+}
+
+async function createToken(jwtPayload: object, key: string) {
+  const headerAndPayload =
+    encodeBase64Url(encodeText(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))) +
+    '.' +
+    encodeBase64Url(encodeText(JSON.stringify(jwtPayload)))
+
+  const signature = encodeBase64Url(
+    new Uint8Array(
+      await window.crypto.subtle.sign(
+        { name: 'HMAC' },
+        await genKey(key),
+        encodeText(headerAndPayload)
+      )
+    )
+  )
+
+  return `${headerAndPayload}.${signature}`
+}
+
+export function getRoleImpersonationJWT(
+  projectRef: string,
+  jwtSecret: string,
+  role: PostgrestImpersonationRole
+): Promise<string> {
+  const claims = {
+    ...getPostgrestClaims(projectRef, role),
+    exp: getExp1HourFromNow(),
+  }
+
+  return createToken(claims, jwtSecret)
+}

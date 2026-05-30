@@ -1,0 +1,21 @@
+{
+  "name": "eslint-config-supabase",
+  "version": "1.0.0",
+  "main": "next.js",
+  "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "clean": "rimraf node_modules"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.0.0",
+    "@eslint/js": "^9.0.0",
+    "@tanstack/eslint-plugin-query": "^5.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.48.0",
+    "@typescript-eslint/parser": "^8.48.0",
+    "eslint-config-next": "^15.5.0",
+    "eslint-config-prettier": "^10.0.0",
+    "eslint-config-turbo": "^2.5.0",
+    "typescript": "catalog:"
+  }
+}

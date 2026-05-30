@@ -1,0 +1,91 @@
+packages:
+  - apps/*
+  - packages/*
+  - blocks/*
+  - e2e/*
+
+blockExoticSubdeps: true
+
+catalog:
+  '@sentry/nextjs': ^10.26.0
+  '@supabase/auth-js': 2.106.2
+  '@supabase/postgrest-js': 2.106.2
+  '@supabase/realtime-js': 2.106.2
+  '@supabase/ssr': 0.10.2
+  '@supabase/supabase-js': 2.106.2
+  '@types/node': ^22.0.0
+  '@types/react': ^19.2.14
+  '@types/react-dom': ^19.2.3
+  '@vitejs/plugin-react': ^6.0.1
+  '@vitest/coverage-v8': ^4.1.4
+  '@vitest/ui': ^4.1.4
+  lodash: ^4.18.1
+  lodash-es: ^4.18.1
+  next: 16.2.6
+  next-themes: ^0.4.6
+  postcss: ^8.5.10
+  radix-ui: ^1.4.3
+  react: ^19.2.6
+  react-dom: ^19.2.6
+  recharts: ^2.15.4
+  tailwindcss: ^4.2.4
+  tsx: 4.20.3
+  typescript: ~6.0.0
+  valtio: ^1.12.0
+  vite: ^8.0.8
+  vite-tsconfig-paths: ^6.1.1
+  vitest: ^4.1.4
+  zod: 3.25.76
+
+ignoredBuiltDependencies:
+  - '@parcel/watcher'
+  - '@sentry/cli'
+  - contentlayer2
+  - core-js
+  - es5-ext
+  - esbuild
+  - libpg-query
+  - msw
+  - protobufjs
+  - sharp
+
+minimumReleaseAge: 4320
+
+minimumReleaseAgeExclude:
+  - '@ai-sdk/*'
+  - '@supabase/*'
+  - '@supabase-labs/*'
+  # The following are excluded to fix vulnerablities.
+  - mermaid
+  - '@mermaid-js/parser'
+
+onlyBuiltDependencies:
+  - node-pty
+  - supabase
+
+overrides:
+  '@ardatan/relay-compiler>immutable': ^3.8.3
+  '@mapbox/node-pre-gyp>tar': ^7.5.11
+  '@redocly/respect-core>form-data': ^4.0.4
+  '@redocly/respect-core>js-yaml': ^4.1.1
+  '@rollup/plugin-terser>serialize-javascript': ^7.0.5
+  cacache>tar: ^7.5.11
+  dompurify: ^3.3.2
+  esbuild: ^0.25.2
+  express-rate-limit>ip-address: ^10.1.1
+  lodash: 'catalog:'
+  lodash-es: 'catalog:'
+  node-gyp>tar: ^7.5.11
+  nodemailer: ^7.0.11
+  payload>undici: ^7.18.2
+  pgsql-parser>libpg-query: ^15.2.0
+  postcss: 'catalog:'
+  refractor>prismjs: ^1.30.0
+  supabase>tar: ^7.5.11
+  terser-webpack-plugin>serialize-javascript: ^7.0.5
+  tmp: ^0.2.4
+  unhead: ^2.1.13
+  webpack: ^5.104.1
+
+patchedDependencies:
+  react-data-grid: patches/react-data-grid.patch

@@ -1,0 +1,40 @@
+---
+title: Alert
+description: Displays a low-level callout primitive for user attention.
+component: true
+source:
+  radix: true
+  shadcn: true
+---
+
+Alert is the low-level shadcn primitive that forms the foundation for [Admonition](../fragments/admonition). Use Admonition for product callouts unless you need custom composition that the Admonition API does not support.
+
+Examples where Alert may be appropriate include bespoke icons, custom internal layouts, or wrapper components that need direct access to `alertVariants`.
+
+Use [Collapsible Alert](../fragments/collapsible-alert) when a callout also needs expandable detail. Use [Collapsible](./collapsible) only for generic disclosure behaviour that is not itself an alert.
+
+<ComponentPreview name="alert-demo" peekCode wide />
+
+## Usage
+
+```tsx
+import { Alert, AlertDescription, AlertTitle } from 'ui/src/components/shadcn/ui/alert'
+```
+
+```tsx
+<Alert>
+  <Terminal className="h-4 w-4" />
+  <AlertTitle>Heads up!</AlertTitle>
+  <AlertDescription>
+    You can add components and dependencies to your app using the cli.
+  </AlertDescription>
+</Alert>
+```
+
+### Variants
+
+Use `alertVariants` when building shared wrappers around the primitive.
+
+```tsx
+import { alertVariants } from 'ui/src/components/shadcn/ui/alert'
+```

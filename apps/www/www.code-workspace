@@ -1,0 +1,18 @@
+{
+  "folders": [
+    {
+      "name": "www",
+      "path": "./"
+    },
+    {
+      "name": "supabase-functions",
+      "path": "supabase/functions"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "node_modules/": true,
+      "supabase/functions/": true
+    }
+  }
+}

@@ -1,0 +1,177 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "platform-kit-nextjs",
+  "type": "registry:block",
+  "title": "Platform Kit for Nextjs and Supabase",
+  "description": "Platform Kit for Nextjs and Supabase",
+  "registryDependencies": [
+    "alert",
+    "badge",
+    "button",
+    "card",
+    "chart",
+    "command",
+    "dialog",
+    "drawer",
+    "form",
+    "hover-card",
+    "input",
+    "label",
+    "popover",
+    "select",
+    "skeleton",
+    "switch",
+    "table",
+    "toggle",
+    "toggle-group",
+    "tooltip"
+  ],
+  "dependencies": [
+    "@hookform/resolvers",
+    "@monaco-editor/react",
+    "@tanstack/react-query",
+    "@tanstack/react-table",
+    "axios",
+    "cmdk",
+    "common-tags",
+    "openai",
+    "openapi-fetch",
+    "react-hook-form",
+    "react-markdown",
+    "recharts",
+    "sonner"
+  ],
+  "files": [
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/app/api/ai/sql/route.ts",
+      "type": "registry:page",
+      "target": "app/api/ai/sql/route.ts"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/app/api/supabase-proxy/[...path]/route.ts",
+      "type": "registry:page",
+      "target": "app/api/supabase-proxy/[...path]/route.ts"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/components/dynamic-form.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/components/logo-supabase.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/components/results-table.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/components/sql-editor.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/components/supabase-manager/auth.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/components/supabase-manager/database.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/components/supabase-manager/index.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/components/supabase-manager/logs.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/components/supabase-manager/secrets.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/components/supabase-manager/storage.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/components/supabase-manager/suggestions.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/components/supabase-manager/users.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/components/users-growth-chart.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/hooks/use-auth.ts",
+      "type": "registry:hook"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/hooks/use-logs.ts",
+      "type": "registry:hook"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/hooks/use-run-query.ts",
+      "type": "registry:hook"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/hooks/use-secrets.ts",
+      "type": "registry:hook"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/hooks/use-storage.ts",
+      "type": "registry:hook"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/hooks/use-suggestions.ts",
+      "type": "registry:hook"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/hooks/use-tables.ts",
+      "type": "registry:hook"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/hooks/use-user-counts.ts",
+      "type": "registry:hook"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/lib/logs.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/lib/management-api-schema.d.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/lib/management-api.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/lib/pg-meta/sql.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/lib/pg-meta/index.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/lib/pg-meta/types.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/lib/schemas/auth.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/lib/schemas/secrets.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/contexts/SheetNavigationContext.tsx",
+      "type": "registry:component",
+      "target": "contexts/SheetNavigationContext.tsx"
+    }
+  ]
+}

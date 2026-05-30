@@ -1,0 +1,77 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+
+import type { ProjectAuthConfigData } from './auth-config-query'
+import { authKeys } from './keys'
+import type { components } from '@/data/api'
+import { handleError, patch } from '@/data/fetchers'
+import { lintKeys } from '@/data/lint/keys'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
+
+export type AuthConfigUpdateVariables = {
+  projectRef: string
+  config: Partial<components['schemas']['UpdateGoTrueConfigBody']>
+  skipInvalidation?: boolean
+}
+
+export async function updateAuthConfig({ projectRef, config }: AuthConfigUpdateVariables) {
+  const { data, error } = await patch('/platform/auth/{ref}/config', {
+    params: {
+      path: { ref: projectRef },
+    },
+    body: {
+      ...config,
+    },
+  })
+
+  if (error) handleError(error)
+  return data
+}
+
+type AuthConfigUpdateData = Awaited<ReturnType<typeof updateAuthConfig>>
+
+export const useAuthConfigUpdateMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: Omit<
+  UseCustomMutationOptions<AuthConfigUpdateData, ResponseError, AuthConfigUpdateVariables>,
+  'mutationFn'
+> = {}) => {
+  const queryClient = useQueryClient()
+
+  return useMutation<AuthConfigUpdateData, ResponseError, AuthConfigUpdateVariables>({
+    mutationFn: (vars) => updateAuthConfig(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, skipInvalidation = false } = variables
+
+      if (!skipInvalidation) {
+        queryClient.setQueryData<ProjectAuthConfigData>(authKeys.authConfig(projectRef), data)
+        await queryClient.invalidateQueries({
+          queryKey: authKeys.authConfig(projectRef),
+          refetchType: 'none',
+        })
+      }
+
+      await onSuccess?.(data, variables, context)
+
+      queryClient
+        .invalidateQueries({ queryKey: lintKeys.lint(projectRef) })
+        .then(() =>
+          queryClient.refetchQueries({
+            queryKey: lintKeys.lint(projectRef),
+            type: 'active',
+          })
+        )
+        .catch(() => undefined)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update auth configuration: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
+}

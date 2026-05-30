@@ -1,0 +1,106 @@
+[
+  {
+    "id": "introduction",
+    "title": "Introduction",
+    "slug": "introduction",
+    "summary": "Introduction",
+    "type": "markdown"
+  },
+  {
+    "id": "management-api",
+    "type": "category",
+    "title": "Management API",
+    "items": [
+      {
+        "id": "list-endpoints",
+        "slug": "list-endpoints",
+        "title": "List endpoints",
+        "type": "self-hosted-operation"
+      },
+      {
+        "id": "create-endpoint",
+        "slug": "create-endpoint",
+        "title": "Create endpoint",
+        "type": "self-hosted-operation"
+      },
+      {
+        "id": "delete-endpoint",
+        "slug": "delete-endpoint",
+        "title": "Delete endpoint",
+        "type": "self-hosted-operation"
+      },
+      {
+        "id": "fetch-endpoint",
+        "slug": "fetch-endpoint",
+        "title": "Fetch endpoint",
+        "type": "self-hosted-operation"
+      },
+      {
+        "id": "update-endpoint",
+        "slug": "update-endpoint",
+        "title": "Update endpoint",
+        "type": "self-hosted-operation"
+      },
+      {
+        "id": "list-sources",
+        "slug": "list-sources",
+        "title": "List sources",
+        "type": "self-hosted-operation"
+      },
+      {
+        "id": "create-source",
+        "slug": "create-source",
+        "title": "Create source",
+        "type": "self-hosted-operation"
+      },
+      {
+        "id": "delete-source",
+        "slug": "delete-source",
+        "title": "Delete source",
+        "type": "self-hosted-operation"
+      },
+      {
+        "id": "fetch-source",
+        "slug": "fetch-source",
+        "title": "Fetch source",
+        "type": "self-hosted-operation"
+      },
+      {
+        "id": "update-source",
+        "slug": "update-source",
+        "title": "Update source",
+        "type": "self-hosted-operation"
+      },
+      {
+        "id": "list-teams",
+        "slug": "list-teams",
+        "title": "List teams",
+        "type": "self-hosted-operation"
+      },
+      {
+        "id": "create-team",
+        "slug": "create-team",
+        "title": "Create team",
+        "type": "self-hosted-operation"
+      },
+      {
+        "id": "delete-team",
+        "slug": "delete-team",
+        "title": "Delete team",
+        "type": "self-hosted-operation"
+      },
+      {
+        "id": "fetch-team",
+        "slug": "fetch-team",
+        "title": "Fetch team",
+        "type": "self-hosted-operation"
+      },
+      {
+        "id": "update-team",
+        "slug": "update-team",
+        "title": "Update team",
+        "type": "self-hosted-operation"
+      }
+    ]
+  }
+]

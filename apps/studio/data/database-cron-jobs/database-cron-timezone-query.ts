@@ -1,0 +1,38 @@
+import { safeSql } from '@supabase/pg-meta/src/pg-format'
+import { useQuery } from '@tanstack/react-query'
+
+import { databaseCronJobsKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
+
+export type DatabaseCronJobsVariables = {
+  projectRef?: string
+  connectionString?: string | null
+}
+
+export async function getDatabaseCronTimezone({
+  projectRef,
+  connectionString,
+}: DatabaseCronJobsVariables) {
+  if (!projectRef) throw new Error('Project ref is required')
+
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql: safeSql`select setting from pg_settings where name = 'cron.timezone';`,
+  })
+  return result[0].setting
+}
+
+export type DatabaseCronJobError = ResponseError
+
+export const useCronTimezoneQuery = <TData = string>(
+  { projectRef, connectionString }: DatabaseCronJobsVariables,
+  { enabled = true, ...options }: UseCustomQueryOptions<string, DatabaseCronJobError, TData> = {}
+) =>
+  useQuery<string, DatabaseCronJobError, TData>({
+    queryKey: databaseCronJobsKeys.timezone(projectRef),
+    queryFn: () => getDatabaseCronTimezone({ projectRef, connectionString }),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

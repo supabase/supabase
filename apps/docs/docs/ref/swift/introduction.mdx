@@ -1,0 +1,1 @@
+This reference documents every object and method available in Supabase's Swift library, [supabase-swift](https://github.com/supabase/supabase-swift). You can use supabase-swift to interact with your Postgres database, listen to database changes, invoke Deno Edge Functions, build login and user management functionality, and manage large files.

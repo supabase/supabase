@@ -1,0 +1,69 @@
+import { Admonition } from 'ui-patterns'
+
+import { AWSPrivateLinkSection } from './AWSPrivateLink/AWSPrivateLinkSection'
+import { GitHubSection } from './GithubIntegration/GithubSection'
+import { VercelSection } from './VercelIntegration/VercelSection'
+import { SidePanelVercelProjectLinker } from '@/components/interfaces/Organization/IntegrationSettings/SidePanelVercelProjectLinker'
+import { ScaffoldContainer, ScaffoldDivider } from '@/components/layouts/Scaffold'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { BASE_PATH } from '@/lib/constants'
+
+export const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' | 'aws' }) => {
+  return (
+    <img
+      className="border rounded-lg shadow-sm w-full sm:w-48 mt-6 border-body"
+      src={`${BASE_PATH}/img/integrations/covers/${title}-cover.png`}
+      alt={`${title} cover`}
+    />
+  )
+}
+
+export const IntegrationSettings = () => {
+  const { data: project } = useSelectedProjectQuery()
+  const isBranch = project?.parent_project_ref !== undefined
+
+  const showVercelIntegration = useIsFeatureEnabled('integrations:vercel')
+  const showAWSPrivateLinkFeature = useIsFeatureEnabled('integrations:aws_private_link')
+  // PrivateLink is not available in eu-central-2 (Zurich) until Feb 2026
+  const isPrivateLinkUnsupportedRegion = project?.region === 'eu-central-2'
+  const showAWSPrivateLink = showAWSPrivateLinkFeature && !isPrivateLinkUnsupportedRegion
+
+  return (
+    <>
+      {isBranch && (
+        <ScaffoldContainer>
+          <Admonition
+            type="default"
+            className="mt-6"
+            title="You are currently on a preview branch of your project"
+          >
+            To adjust your project's integration settings, you may return to your{' '}
+            <InlineLink href={`/project/${project.parent_project_ref}/settings/integrations`}>
+              main branch
+            </InlineLink>
+            .
+          </Admonition>
+        </ScaffoldContainer>
+      )}
+
+      <GitHubSection />
+
+      {showVercelIntegration && (
+        <>
+          <ScaffoldDivider />
+          <VercelSection isProjectScoped={true} />
+          <SidePanelVercelProjectLinker />
+        </>
+      )}
+
+      {showAWSPrivateLink && (
+        <>
+          <ScaffoldDivider />
+          <AWSPrivateLinkSection />
+        </>
+      )}
+    </>
+  )
+}

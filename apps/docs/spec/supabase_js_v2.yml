@@ -1,0 +1,663 @@
+openref: 0.1
+info:
+  id: reference/supabase-js
+  title: Supabase Javascript Client
+  description: |
+
+    Supabase JavaScript.
+  definition: spec/enrichments/tsdoc_v2/combined.json
+  specUrl: https://github.com/supabase/supabase/edit/master/apps/docs/spec/supabase_js_v2.yml
+  slugPrefix: /
+  libraries:
+    - id: JavaScript
+      version: 0.0.1
+functions:
+  - id: initializing
+    $ref: '@supabase/supabase-js.SupabaseClient.constructor'
+  - id: auth-api
+    title: Overview
+    notes: |
+      - The auth methods can be accessed via the `supabase.auth` namespace.
+      - By default, the supabase client sets `persistSession` to true and attempts to store the session in local storage. When using the supabase client in an environment that doesn't support local storage, you might notice the following warning message being logged:
+
+        > No storage option exists to persist the session, which may result in unexpected behavior when using auth. If you want to set `persistSession` to true, please provide a storage option or you may set `persistSession` to false to disable this warning.
+
+        This warning message can be safely ignored if you're not using auth on the server-side. If you are using auth and you want to set `persistSession` to true, you will need to provide a custom storage implementation that follows [this interface](https://github.com/supabase/supabase-js/blob/master/packages/core/auth-js/src/lib/types.ts#L1053).
+      - Any email links and one-time passwords (OTPs) sent have a default expiry of 24 hours. We have the following [rate limits](/docs/guides/platform/going-into-prod#auth-rate-limits) in place to guard against brute force attacks.
+      - The expiry of an access token can be set in the "JWT expiry limit" field in [your project's auth settings](/dashboard/project/_/auth/providers). A refresh token never expires and can only be used once.
+    examples:
+      - id: create-auth-client
+        name: Create auth client
+        isSpotlight: true
+        code: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          const supabase = createClient(supabase_url, publishable_key)
+          ```
+      - id: create-auth-client-server-side
+        name: Create auth client (server-side)
+        isSpotlight: false
+        code: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          const supabase = createClient(supabase_url, publishable_key, {
+            auth: {
+              autoRefreshToken: false,
+              persistSession: false,
+              detectSessionInUrl: false
+            }
+          })
+          ```
+  - id: sign-up
+    $ref: '@supabase/auth-js.GoTrueClient.signUp'
+  - id: on-auth-state-change
+    $ref: '@supabase/auth-js.GoTrueClient.onAuthStateChange'
+  - id: sign-in-anonymously
+    $ref: '@supabase/auth-js.GoTrueClient.signInAnonymously'
+  - id: sign-in-with-password
+    $ref: '@supabase/auth-js.GoTrueClient.signInWithPassword'
+  - id: sign-in-with-otp
+    $ref: '@supabase/auth-js.GoTrueClient.signInWithOtp'
+  - id: sign-in-with-oauth
+    $ref: '@supabase/auth-js.GoTrueClient.signInWithOAuth'
+  - id: sign-in-with-id-token
+    $ref: '@supabase/auth-js.GoTrueClient.signInWithIdToken'
+  - id: sign-in-with-sso
+    $ref: '@supabase/auth-js.GoTrueClient.signInWithSSO'
+  - id: sign-in-with-web3
+    $ref: '@supabase/auth-js.GoTrueClient.signInWithWeb3'
+  - id: sign-in-with-passkey
+    $ref: '@supabase/auth-js.GoTrueClient.signInWithPasskey'
+  - id: register-passkey
+    $ref: '@supabase/auth-js.GoTrueClient.registerPasskey'
+  - id: get-claims
+    $ref: '@supabase/auth-js.GoTrueClient.getClaims'
+  - id: sign-out
+    $ref: '@supabase/auth-js.GoTrueClient.signOut'
+  - id: verify-otp
+    $ref: '@supabase/auth-js.GoTrueClient.verifyOtp'
+  - id: get-session
+    $ref: '@supabase/auth-js.GoTrueClient.getSession'
+  - id: start-auto-refresh
+    $ref: '@supabase/auth-js.GoTrueClient.startAutoRefresh'
+  - id: stop-auto-refresh
+    $ref: '@supabase/auth-js.GoTrueClient.stopAutoRefresh'
+  - id: get-user
+    $ref: '@supabase/auth-js.GoTrueClient.getUser'
+  - id: update-user
+    $ref: '@supabase/auth-js.GoTrueClient.updateUser'
+  - id: get-user-identities
+    $ref: '@supabase/auth-js.GoTrueClient.getUserIdentities'
+  - id: link-identity
+    $ref: '@supabase/auth-js.GoTrueClient.linkIdentity'
+  - id: unlink-identity
+    $ref: '@supabase/auth-js.GoTrueClient.unlinkIdentity'
+  - id: send-password-reauthentication
+    $ref: '@supabase/auth-js.GoTrueClient.reauthenticate'
+  - id: resend-email-or-phone-otps
+    $ref: '@supabase/auth-js.GoTrueClient.resend'
+  - id: set-session
+    $ref: '@supabase/auth-js.GoTrueClient.setSession'
+  - id: refresh-session
+    $ref: '@supabase/auth-js.GoTrueClient.refreshSession'
+  - id: exchange-code-for-session
+    $ref: '@supabase/auth-js.GoTrueClient.exchangeCodeForSession'
+  - id: auth-js-gotrueclient-initialize
+    $ref: '@supabase/auth-js.GoTrueClient.initialize'
+  - id: auth-mfa-api
+    title: Overview
+    notes: |
+      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace.
+
+      Currently, there is support for time-based one-time password (TOTP) and phone verification code as the 2nd factor. Recovery codes are not supported but users can enroll multiple factors, with an upper limit of 10.
+
+      Having a 2nd factor for recovery frees the user of the burden of having to store their recovery codes somewhere. It also reduces the attack surface since multiple recovery codes are usually generated compared to just having 1 backup factor.
+
+      Learn more about implementing MFA in your application [in the MFA guide](https://supabase.com/docs/guides/auth/auth-mfa#overview).
+  - id: mfa-enroll
+    $ref: '@supabase/auth-js.GoTrueMFAApi.enroll'
+  - id: mfa-challenge
+    $ref: '@supabase/auth-js.GoTrueMFAApi.challenge'
+  - id: mfa-verify
+    $ref: '@supabase/auth-js.GoTrueMFAApi.verify'
+  - id: mfa-challenge-and-verify
+    $ref: '@supabase/auth-js.GoTrueMFAApi.challengeAndVerify'
+  - id: mfa-unenroll
+    $ref: '@supabase/auth-js.GoTrueMFAApi.unenroll'
+  - id: mfa-get-authenticator-assurance-level
+    $ref: '@supabase/auth-js.GoTrueMFAApi.getAuthenticatorAssuranceLevel'
+  - id: passkey-api
+    title: Auth Passkey
+    notes: |
+      This section contains methods for WebAuthn passkey registration, authentication, and management. Methods are invoked behind the `supabase.auth.passkey` namespace.
+
+      Passkey support is an experimental feature. Enable it when creating the client:
+
+      ```ts
+      const supabase = createClient(supabaseUrl, publishableKey, {
+        auth: {
+          experimental: { passkey: true },
+        },
+      })
+      ```
+  - id: passkey-list
+    $ref: '@supabase/auth-js.AuthPasskeyApi.list'
+  - id: passkey-update
+    $ref: '@supabase/auth-js.AuthPasskeyApi.update'
+  - id: passkey-delete
+    $ref: '@supabase/auth-js.AuthPasskeyApi.delete'
+  - id: passkey-start-registration
+    $ref: '@supabase/auth-js.AuthPasskeyApi.startRegistration'
+  - id: passkey-verify-registration
+    $ref: '@supabase/auth-js.AuthPasskeyApi.verifyRegistration'
+  - id: passkey-start-authentication
+    $ref: '@supabase/auth-js.AuthPasskeyApi.startAuthentication'
+  - id: passkey-verify-authentication
+    $ref: '@supabase/auth-js.AuthPasskeyApi.verifyAuthentication'
+  - id: admin-api
+    title: Overview
+    notes: |
+      - Any method under the `supabase.auth.admin` namespace requires a `secret` key.
+      - These methods are considered admin methods and should be called on a trusted server. Never expose your `secret` key in the browser.
+    examples:
+      - id: create-auth-admin-client
+        name: Create server-side auth client
+        isSpotlight: true
+        code: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          const supabase = createClient(supabase_url, secret_key, {
+            auth: {
+              autoRefreshToken: false,
+              persistSession: false
+            }
+          })
+
+          // Access auth admin api
+          const adminAuthClient = supabase.auth.admin
+          ```
+  - id: get-user-by-id
+    $ref: '@supabase/auth-js.GoTrueAdminApi.getUserById'
+  - id: list-users
+    $ref: '@supabase/auth-js.GoTrueAdminApi.listUsers'
+  - id: create-user
+    $ref: '@supabase/auth-js.GoTrueAdminApi.createUser'
+  - id: delete-user
+    $ref: '@supabase/auth-js.GoTrueAdminApi.deleteUser'
+  - id: invite-user-by-email
+    $ref: '@supabase/auth-js.GoTrueAdminApi.inviteUserByEmail'
+  - id: reset-password-for-email
+    $ref: '@supabase/auth-js.GoTrueClient.resetPasswordForEmail'
+  - id: generate-link
+    $ref: '@supabase/auth-js.GoTrueAdminApi.generateLink'
+  - id: update-user-by-id
+    $ref: '@supabase/auth-js.GoTrueAdminApi.updateUserById'
+  - id: auth-js-gotrueadminapi-signout
+    $ref: '@supabase/auth-js.GoTrueAdminApi.signOut'
+  - id: mfa-list-factors-admin
+    $ref: '@supabase/auth-js.GoTrueAdminMFAApi.listFactors'
+  - id: mfa-delete-factor
+    $ref: '@supabase/auth-js.GoTrueAdminMFAApi.deleteFactor'
+  - id: admin-passkey-api
+    title: Passkey Admin API
+    notes: |
+      Contains passkey administration methods. Requires a secret key.
+  - id: admin-list-passkeys
+    $ref: '@supabase/auth-js.GoTrueAdminPasskeyApi.listPasskeys'
+  - id: admin-delete-passkey
+    $ref: '@supabase/auth-js.GoTrueAdminPasskeyApi.deletePasskey'
+  - id: admin-custom-providers-api
+    title: Custom OIDC/OAuth Provider Admin API
+    notes: |
+      - These methods allow you to manage custom OIDC/OAuth providers programmatically.
+      - Requires `secret` key.
+      - Custom providers use the `custom:` prefix when signing in (e.g., `custom:my-oidc-provider`).
+  - id: admin-custom-providers-create
+    $ref: '@supabase/auth-js.GoTrueAdminCustomProvidersApi.createProvider'
+  - id: admin-custom-providers-list
+    $ref: '@supabase/auth-js.GoTrueAdminCustomProvidersApi.listProviders'
+  - id: admin-custom-providers-get
+    $ref: '@supabase/auth-js.GoTrueAdminCustomProvidersApi.getProvider'
+  - id: admin-custom-providers-update
+    $ref: '@supabase/auth-js.GoTrueAdminCustomProvidersApi.updateProvider'
+  - id: admin-custom-providers-delete
+    $ref: '@supabase/auth-js.GoTrueAdminCustomProvidersApi.deleteProvider'
+  - id: select
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.select'
+  - id: insert
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.insert'
+  - id: update
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.update'
+  - id: upsert
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.upsert'
+  - id: delete
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.delete'
+  - id: rpc
+    $ref: '@supabase/postgrest-js.PostgrestClient.rpc'
+  - id: using-filters
+    title: Using Filters
+    description: |
+      Filters allow you to only return rows that match certain conditions.
+
+      Filters can be used on `select()`, `update()`, `upsert()`, and `delete()` queries.
+
+      If a Postgres function returns a table response, you can also apply filters.
+    examples:
+      - id: applying-filters
+        name: Applying Filters
+        description: |
+          Filters must be applied after any of `select()`, `update()`, `upsert()`,
+          `delete()`, and `rpc()` and before
+          [modifiers](/docs/reference/javascript/using-modifiers).
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('instruments')
+            .select('name, section_id')
+            .eq('name', 'violin')    // Correct
+
+          const { data, error } = await supabase
+            .from('instruments')
+            .eq('name', 'violin')    // Incorrect
+            .select('name, section_id')
+          ```
+      - id: chaining-filters
+        name: Chaining
+        description: |
+          Filters can be chained together to produce advanced queries. For example,
+          to query cities with population between 1,000 and 10,000:
+
+          ```ts
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .gte('population', 1000)
+            .lt('population', 10000)
+          ```
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .gte('population', 1000)
+            .lt('population', 10000)
+          ```
+      - id: conditional-chaining
+        name: Conditional Chaining
+        description: |
+          Filters can be built up one step at a time and then executed. For example:
+
+          ```ts
+          const filterByName = null
+          const filterPopLow = 1000
+          const filterPopHigh = 10000
+
+          let query = supabase
+            .from('cities')
+            .select('name, country_id')
+
+          if (filterByName)  { query = query.eq('name', filterByName) }
+          if (filterPopLow)  { query = query.gte('population', filterPopLow) }
+          if (filterPopHigh) { query = query.lt('population', filterPopHigh) }
+
+          const { data, error } = await query
+          ```
+        code: |
+          ```ts
+          const filterByName = null
+          const filterPopLow = 1000
+          const filterPopHigh = 10000
+
+          let query = supabase
+            .from('cities')
+            .select('name, country_id')
+
+          if (filterByName)  { query = query.eq('name', filterByName) }
+          if (filterPopLow)  { query = query.gte('population', filterPopLow) }
+          if (filterPopHigh) { query = query.lt('population', filterPopHigh) }
+
+          const { data, error } = await query
+          ```
+      - id: filter-by-value-within-json-column
+        name: Filter by values within a JSON column
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('users')
+            .select()
+            .eq('address->postcode', 90210)
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text,
+                address jsonb
+              );
+
+            insert into
+              users (id, name, address)
+            values
+              (1, 'Michael', '{ "postcode": 90210 }'),
+              (2, 'Jane', null);
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Michael",
+                "address": {
+                  "postcode": 90210
+                }
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+      - id: filter-referenced-tables
+        name: Filter referenced tables
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('orchestral_sections')
+            .select(`
+              name,
+              instruments!inner (
+                name
+              )
+            `)
+            .eq('instruments.name', 'flute')
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              orchestral_sections (id int8 primary key, name text);
+            create table
+              instruments (
+                id int8 primary key,
+                section_id int8 not null references orchestral_sections,
+                name text
+              );
+
+            insert into
+              orchestral_sections (id, name)
+            values
+              (1, 'strings'),
+              (2, 'woodwinds');
+            insert into
+              instruments (id, section_id, name)
+            values
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
+            ```
+          response: |
+            ```json
+            {
+              "data": [
+                {
+                  "name": "woodwinds",
+                  "characters": [
+                    {
+                      "name": "flute"
+                    }
+                  ]
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+        description: |
+          You can filter on referenced tables in your `select()` query using dot
+          notation.
+  - id: eq
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.eq'
+  - id: neq
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.neq'
+  - id: gt
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.gt'
+  - id: gte
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.gte'
+  - id: lt
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lt'
+  - id: lte
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
+  - id: like
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.like'
+  - id: ilike
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.ilike'
+  - id: is
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.is'
+  - id: in
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.in'
+  - id: contains
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.contains'
+  - id: contained-by
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.containedBy'
+  - id: range-gt
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeGt'
+  - id: range-gte
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeGte'
+  - id: range-lt
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLt'
+  - id: range-lte
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLte'
+  - id: range-adjacent
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeAdjacent'
+  - id: overlaps
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.overlaps'
+  - id: text-search
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.textSearch'
+  - id: match
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.match'
+  - id: not
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.not'
+  - id: or
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.or'
+  - id: filter
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.filter'
+  - id: using-modifiers
+    title: Using Modifiers
+    description: |
+      Filters work on the row level—they allow you to return rows that
+      only match certain conditions without changing the shape of the rows.
+      Modifiers are everything that don't fit that definition—allowing you to
+      change the format of the response (e.g., returning a CSV string).
+
+      Modifiers must be specified after filters. Some modifiers only apply for
+      queries that return rows (e.g., `select()` or `rpc()` on a function that
+      returns a table response).
+  - id: db-modifiers-select
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.select'
+  - id: order
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.order'
+  - id: limit
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.limit'
+  - id: range
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.range'
+  - id: abort-signal
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.abortSignal'
+  - id: single
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.single'
+  - id: maybe-single
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.maybeSingle'
+  - id: csv
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.csv'
+  - id: strip-nulls
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.stripNulls'
+  - id: returns
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.returns'
+  - id: overrideTypes
+    $ref: '@supabase/postgrest-js.PostgrestBuilder.overrideTypes'
+  - id: explain
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.explain'
+  - id: invoke
+    $ref: '@supabase/functions-js.FunctionsClient.invoke'
+  - id: cors-headers
+    $ref: '@supabase/supabase-js.cors.corsHeaders'
+  - id: functions-setauth
+    $ref: '@supabase/functions-js.FunctionsClient.setAuth'
+  - id: subscribe
+    $ref: '@supabase/realtime-js.RealtimeChannel.on'
+  - id: broadcast-message
+    $ref: '@supabase/realtime-js.RealtimeChannel.send'
+  - id: get-channels
+    $ref: '@supabase/supabase-js.SupabaseClient.getChannels'
+  - id: remove-channel
+    $ref: '@supabase/supabase-js.SupabaseClient.removeChannel'
+  - id: remove-all-channels
+    $ref: '@supabase/supabase-js.SupabaseClient.removeAllChannels'
+  - id: realtime-setauth
+    $ref: '@supabase/realtime-js.RealtimeClient.setAuth'
+  - id: file-buckets
+    title: Overview
+    notes: |
+      This section contains methods for working with File Buckets.
+  - id: list-buckets
+    $ref: '@supabase/storage-js.StorageClient.listBuckets'
+  - id: get-bucket
+    $ref: '@supabase/storage-js.StorageClient.getBucket'
+  - id: create-bucket
+    $ref: '@supabase/storage-js.StorageClient.createBucket'
+  - id: empty-bucket
+    $ref: '@supabase/storage-js.StorageClient.emptyBucket'
+  - id: update-bucket
+    $ref: '@supabase/storage-js.StorageClient.updateBucket'
+  - id: delete-bucket
+    $ref: '@supabase/storage-js.StorageClient.deleteBucket'
+  - id: analytics-buckets
+    title: Overview
+    notes: |
+      This section contains methods for working with Analytics Buckets.
+  - id: storageanalytics-from
+    $ref: '@supabase/storage-js.packages/StorageAnalyticsClient.default.constructor'
+  - id: storageanalytics-createbucket
+    $ref: '@supabase/storage-js.packages/StorageAnalyticsClient.default.createBucket'
+  - id: storageanalytics-listbuckets
+    $ref: '@supabase/storage-js.packages/StorageAnalyticsClient.default.listBuckets'
+  - id: storageanalytics-deletebucket
+    $ref: '@supabase/storage-js.packages/StorageAnalyticsClient.default.deleteBucket'
+  - id: from-upload
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.upload'
+  - id: from-update
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.update'
+  - id: from-move
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.move'
+  - id: from-copy
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.copy'
+  - id: from-create-signed-url
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUrl'
+  - id: from-create-signed-urls
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUrls'
+  - id: from-create-signed-upload-url
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUploadUrl'
+  - id: from-upload-to-signed-url
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.uploadToSignedUrl'
+  - id: from-get-public-url
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.getPublicUrl'
+  - id: from-download
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.download'
+  - id: from-remove
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.remove'
+  - id: from-list
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.list'
+  - id: oauth-server-api
+    title: OAuth Server API
+    notes: |
+      The OAuth Server API allows you to build custom OAuth consent screens for your application.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+  - id: auth-js-authoauthserverapi-approveauthorization
+    $ref: '@supabase/auth-js.AuthOAuthServerApi.approveAuthorization'
+  - id: auth-js-authoauthserverapi-denyauthorization
+    $ref: '@supabase/auth-js.AuthOAuthServerApi.denyAuthorization'
+  - id: auth-js-authoauthserverapi-getauthorizationdetails
+    $ref: '@supabase/auth-js.AuthOAuthServerApi.getAuthorizationDetails'
+  - id: auth-js-authoauthserverapi-listgrants
+    $ref: '@supabase/auth-js.AuthOAuthServerApi.listGrants'
+  - id: auth-js-authoauthserverapi-revokegrant
+    $ref: '@supabase/auth-js.AuthOAuthServerApi.revokeGrant'
+  - id: oauth-admin-api
+    title: OAuth Admin API
+    notes: |
+      The OAuth Admin API allows you to manage OAuth clients programmatically.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+      These functions should only be called on a server. Never expose your `secret` key in the browser.
+  - id: auth-js-gotrueadminoauthapi-createclient
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.createClient'
+  - id: auth-js-gotrueadminoauthapi-deleteclient
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.deleteClient'
+  - id: auth-js-gotrueadminoauthapi-getclient
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.getClient'
+  - id: auth-js-gotrueadminoauthapi-listclients
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.listClients'
+  - id: auth-js-gotrueadminoauthapi-regenerateclientsecret
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.regenerateClientSecret'
+  - id: auth-js-gotrueadminoauthapi-updateclient
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.updateClient'
+  - id: auth-js-gotruemfaapi-listfactors
+    $ref: '@supabase/auth-js.GoTrueMFAApi.listFactors'
+  - id: storageclient-from
+    $ref: '@supabase/storage-js.StorageClient.from'
+  - id: create-bucket
+    $ref: '@supabase/storage-js.index.StorageClient.createBucket'
+  - id: delete-bucket
+    $ref: '@supabase/storage-js.index.StorageClient.deleteBucket'
+  - id: empty-bucket
+    $ref: '@supabase/storage-js.index.StorageClient.emptyBucket'
+  - id: get-bucket
+    $ref: '@supabase/storage-js.index.StorageClient.getBucket'
+  - id: list-buckets
+    $ref: '@supabase/storage-js.index.StorageClient.listBuckets'
+  - id: update-bucket
+    $ref: '@supabase/storage-js.index.StorageClient.updateBucket'
+  - id: storagevectors-create-bucket
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.StorageVectorsClient.createBucket'
+  - id: storagevectors-delete-bucket
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.StorageVectorsClient.deleteBucket'
+  - id: storagevectors-get-bucket
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.StorageVectorsClient.getBucket'
+  - id: storagevectors-list-buckets
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.StorageVectorsClient.listBuckets'
+  - id: storagevectors-from
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.StorageVectorsClient.from'
+  - id: vectorbucket-index
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorBucketScope.index'
+  - id: storagefile-exists
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.exists'
+  - id: storagefile-info
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.info'
+  - id: storagefile-list-v2
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.listV2'
+  - id: storagefile-to-base64
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.toBase64'
+  - id: vector-buckets
+    title: Overview
+    notes: |
+      This section contains methods for working with Vector Buckets.
+  - id: vectorbucket-createindex
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorBucketScope.createIndex'
+  - id: vectorbucket-deleteindex
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorBucketScope.deleteIndex'
+  - id: vectorbucket-getindex
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorBucketScope.getIndex'
+  - id: vectorbucket-listindexes
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorBucketScope.listIndexes'
+  - id: vectorindex-deletevectors
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorIndexScope.deleteVectors'
+  - id: vectorindex-getvectors
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorIndexScope.getVectors'
+  - id: vectorindex-listvectors
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorIndexScope.listVectors'
+  - id: vectorindex-putvectors
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorIndexScope.putVectors'
+  - id: vectorindex-queryvectors
+    $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorIndexScope.queryVectors'

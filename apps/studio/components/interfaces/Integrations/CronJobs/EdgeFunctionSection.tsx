@@ -1,0 +1,209 @@
+import { useParams } from 'common/hooks'
+import { Check, ChevronsUpDown } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useId, useMemo, useState } from 'react'
+import { UseFormReturn } from 'react-hook-form'
+import {
+  Button,
+  cn,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  ScrollArea,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SheetSection,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
+import { CreateCronJobForm } from './CreateCronJobSheet/CreateCronJobSheet.constants'
+import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+
+interface HTTPRequestFieldsProps {
+  form: UseFormReturn<CreateCronJobForm>
+}
+
+const buildFunctionUrl = (slug: string, projectRef: string, restUrl?: string) => {
+  const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
+  const functionUrl = `https://${projectRef}.supabase.${restUrlTld}/functions/v1/${slug}`
+  return functionUrl
+}
+
+export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
+  const { ref } = useParams()
+  const { data: selectedProject } = useSelectedProjectQuery()
+  const {
+    data: functions,
+    isSuccess,
+    isPending: isLoading,
+  } = useEdgeFunctionsQuery({ projectRef: ref })
+  const [open, setOpen] = useState(false)
+  const listboxId = useId()
+  const edgeFunctions = useMemo(
+    () =>
+      functions?.map((fn) => ({
+        ...fn,
+        url: buildFunctionUrl(fn.slug, selectedProject?.ref || '', selectedProject?.restUrl),
+      })) ?? [],
+    [functions, selectedProject]
+  )
+
+  // Only set a default value if the field is empty
+  useEffect(() => {
+    if (isSuccess && edgeFunctions.length > 0 && !form.getValues('values.edgeFunctionName')) {
+      const fn = edgeFunctions[0]
+      form.setValue('values.edgeFunctionName', fn.url)
+    }
+  }, [edgeFunctions, form, isSuccess, selectedProject?.ref, selectedProject?.restUrl])
+
+  return (
+    <SheetSection className="flex flex-col gap-6">
+      <FormField
+        control={form.control}
+        name="values.method"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Method</FormLabel>
+            <Select onValueChange={field.onChange} value={field.value}>
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a method for the API call" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                <SelectItem value="GET">GET</SelectItem>
+                <SelectItem value="POST">POST</SelectItem>
+              </SelectContent>
+            </Select>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      {edgeFunctions.length === 0 ? (
+        <div className="space-y-1">
+          <p className="text-sm text-foreground-light">Select which edge function to trigger</p>
+          {isLoading ? (
+            <Button type="default" className="justify-start" block size="small" loading>
+              Loading edge functions...
+            </Button>
+          ) : (
+            <div className="px-4 py-4 border rounded-sm bg-surface-300 border-strong flex items-center justify-between space-x-4">
+              <p className="text-sm">No edge functions created yet</p>
+              <Button asChild>
+                <Link href={`/project/${ref}/functions`}>Create an edge function</Link>
+              </Button>
+            </div>
+          )}
+        </div>
+      ) : edgeFunctions.length > 0 ? (
+        <FormField
+          control={form.control}
+          name="values.edgeFunctionName"
+          render={({ field }) => {
+            const selectedFunction = edgeFunctions.find((fn) => fn.url === field.value)
+
+            return (
+              <FormItem>
+                <FormLabel>Edge Function</FormLabel>
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        type="default"
+                        role="combobox"
+                        aria-expanded={open}
+                        aria-controls={listboxId}
+                        className={cn(
+                          'w-full justify-between',
+                          !field.value && 'text-muted-foreground'
+                        )}
+                        size="small"
+                        iconRight={
+                          <ChevronsUpDown
+                            className="ml-2 h-4 w-4 shrink-0 opacity-50"
+                            strokeWidth={1}
+                          />
+                        }
+                      >
+                        {selectedFunction
+                          ? selectedFunction.name
+                          : 'Select which edge function to trigger'}
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent id={listboxId} className="p-0" sameWidthAsTrigger>
+                    <Command>
+                      <CommandInput placeholder="Search edge functions..." />
+                      <CommandList>
+                        <CommandEmpty>No edge function found.</CommandEmpty>
+                        <CommandGroup>
+                          <ScrollArea className={edgeFunctions.length > 7 ? 'h-[210px]' : ''}>
+                            {edgeFunctions.map((fn) => {
+                              return (
+                                <CommandItem
+                                  value={fn.name}
+                                  key={fn.id}
+                                  onSelect={() => {
+                                    field.onChange(fn.url === field.value ? '' : fn.url)
+                                    setOpen(false)
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      'mr-2 h-4 w-4',
+                                      fn.url === field.value ? 'opacity-100' : 'opacity-0'
+                                    )}
+                                  />
+                                  {fn.name}
+                                </CommandItem>
+                              )
+                            })}
+                          </ScrollArea>
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )
+          }}
+        />
+      ) : null}
+      <FormField
+        control={form.control}
+        name="values.timeoutMs"
+        render={({ field: { ref, ...rest } }) => (
+          <FormItemLayout label="Timeout" layout="vertical" className="gap-1">
+            <InputGroup>
+              <InputGroupInput {...rest} type="number" placeholder="1000" />
+              <InputGroupAddon align="inline-end">
+                <InputGroupText> ms</InputGroupText>
+              </InputGroupAddon>
+            </InputGroup>
+          </FormItemLayout>
+        )}
+      />
+    </SheetSection>
+  )
+}

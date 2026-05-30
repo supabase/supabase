@@ -1,0 +1,137 @@
+---
+title: 'Build a User Management App with React'
+description: 'Learn how to use Supabase in your React App.'
+---
+
+<$Partial path="uiLibCta.mdx" />
+<$Partial path="quickstart_intro.mdx" />
+
+![Supabase User Management example](/docs/img/user-management-demo.png)
+
+<Admonition type="note">
+
+If you get stuck while working through this guide, you can find the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/react-user-management).
+
+</Admonition>
+
+<$Partial path="project_setup.mdx" variables={{ "framework": "react", "tab": "frameworks" }} />
+
+## Building the app
+
+Start building the React app from scratch.
+
+### Initialize a React app
+
+Use [Vite](https://vitejs.dev/guide/) to initialize an app called `supabase-react`:
+
+```bash
+npm create vite@latest supabase-react -- --template react
+cd supabase-react
+```
+
+Install [supabase-js](https://github.com/supabase/supabase-js):
+
+```bash
+npm install @supabase/supabase-js
+```
+
+Save the environment variables in a `.env.local` file, using the Project URL and the key that you copied [earlier](#get-api-details).
+
+<$CodeSample
+path="/user-management/react-user-management/.env.example"
+lines={[[1, -1]]}
+meta="name=.env"
+/>
+
+With the API credentials in place, create a helper file to initialize the Supabase client. The application exposes these variables in the browser, and that's fine as Supabase enables [Row Level Security](/docs/guides/database/postgres/row-level-security) by default on all tables.
+
+Create and edit `src/supabaseClient.js`:
+
+<$CodeSample
+path="/user-management/react-user-management/src/supabaseClient.js"
+lines={[[1, -1]]}
+meta="name=src/supabaseClient.js"
+/>
+
+### App styling (optional)
+
+An optional step is to update the CSS file `src/index.css` to make the app look better.
+You can find the full contents of this file [in the example repository](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/react-user-management/src/index.css).
+
+### Set up a login component
+
+You need a React component to manage logins and sign-ups. It uses [Magic Links](/docs/guides/auth/auth-email-passwordless#with-magic-link), so users can sign in with their email without using passwords.
+
+<Admonition type="tip" title="Did you know?">
+
+You can customize other emails sent out to new users, including the email's looks, content, and query parameters from [the **Authentication > Email**](/dashboard/project/_/auth/templates) section of the Dashboard.
+
+</Admonition>
+
+Create and edit `src/Auth.jsx`:
+
+<$CodeSample
+path="/user-management/react-user-management/src/Auth.jsx"
+lines={[[1, -1]]}
+meta="name=src/Auth.jsx"
+/>
+
+### Account page
+
+After a user signs in, they need a way to edit their profile details and manage their accounts.
+
+Create a new component called `src/Account.jsx` and add the following code:
+
+<$CodeSample
+path="/user-management/react-user-management/src/Account.jsx"
+lines={[[1, 2], [4, 66], [74, -1]]}
+meta="name=src/Account.jsx"
+/>
+
+## Profile photos
+
+Add a way for users to upload a profile photo. Supabase configures every project with [Storage](/docs/guides/storage) for managing large files like photos and videos.
+
+### Create an upload widget
+
+Create `src/Avatar.jsx` and add the following code:
+
+<$CodeSample
+path="/user-management/react-user-management/src/Avatar.jsx"
+lines={[[1, -1]]}
+meta="name=src/Avatar.jsx"
+/>
+
+### Update the Account component
+
+With the Avatar component created, update `src/Account.jsx` to include it:
+
+<$CodeSample
+path="/user-management/react-user-management/src/Account.jsx"
+lines={[[1, -1]]}
+meta="name=src/Account.jsx"
+/>
+
+### Launch!
+
+With all the components in place, change the contents of `src/App.jsx` to include the new components and Auth logic.
+
+<$Partial path="auth_methods.mdx" />
+
+<$CodeSample
+path="/user-management/react-user-management/src/App.jsx"
+lines={[[1, -1]]}
+meta="name=src/App.jsx"
+/>
+
+Once that's done, run this in a terminal window:
+
+```bash
+npm run dev
+```
+
+And then open the browser to [localhost:5173](http://localhost:5173) and you should see the completed app.
+
+![Screenshot of the Supabase React application running in a browser](/docs/img/supabase-react-demo.png)
+
+At this stage you have a fully functional application!

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="33px" height="27px" viewBox="0 0 33 27" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 59.1 (86144) - https://sketch.com -->
+    <title>Group 11</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group-11">
+            <path d="M15,11 C16.2937198,11 18.2096374,14.9024372 20,13.9036848 C21.2224926,13.2217183 21.6630422,8.49965456 24.0929422,5.10132111 C24.9776554,3.86400658 26.9466747,2.49689954 30,1 L30,26 L2,26 L2,23.1656894 C4.4799755,18.943687 6.87078806,16.8326858 9.17243769,16.8326858 C11.3233993,14.8289503 13.3386423,11 15,11 Z" id="Rectangle" fill-opacity="0.5" fill="#888888"></path>
+            <path d="M2,24 C2,21.4601028 6,17.4826711 8.5,16.9826711 C11,16.4826711 13.5,11 15,11 C16.5,11 18.0233384,13.9036848 20,13.9036848 C21.9766616,13.9036848 21.9766616,7.14628013 24.5,4.65301723 C25.5370147,3.62836264 27.370348,2.38886275 30,0.934517551" id="Line-3" stroke="#979797" stroke-linecap="round"></path>
+            <line x1="0.5" y1="26.5" x2="32.5" y2="26.5" id="Line-4" stroke="#979797" stroke-linecap="round"></line>
+            <line x1="10.5" y1="15.5" x2="10.5" y2="26.5" id="Line-5" stroke="#979797" stroke-width="0.3" stroke-linecap="round" stroke-dasharray="1"></line>
+            <line x1="21.5" y1="12.5" x2="21.5" y2="26.5" id="Line-5" stroke="#979797" stroke-width="0.3" stroke-linecap="round" stroke-dasharray="1"></line>
+            <circle id="Oval" stroke="#979797" stroke-width="0.4" fill="#D8D8D8" cx="30" cy="1" r="1"></circle>
+        </g>
+    </g>
+</svg>

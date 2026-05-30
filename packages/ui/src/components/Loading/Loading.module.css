@@ -1,0 +1,20 @@
+.sbui-loading {
+  @apply transition-all relative;
+}
+
+.sbui-loading--active .sbui-loading-content {
+  opacity: 0.4;
+}
+.sbui-loading-content {
+  @apply transition-opacity duration-300;
+}
+
+.sbui-loading-spinner {
+  @apply text-brand-300 animate-spin;
+  margin: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}

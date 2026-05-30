@@ -1,0 +1,6 @@
+- Go to your [Supabase Project Dashboard](/dashboard)
+- In the left sidebar, click the `Authentication` icon (near the top)
+- Click on [`Providers`](/dashboard/project/_/auth/providers) under the Configuration section
+- Click on **{{ .provider }}** from the accordion list to expand and turn **{{ .provider }} Enabled** to ON
+- Enter your **{{ .provider }} Client ID** and **{{ .provider }} Client Secret** saved in the previous step
+- Click `Save`

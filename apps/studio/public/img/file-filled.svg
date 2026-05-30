@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="21px" viewBox="0 0 24 21" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 59.1 (86144) - https://sketch.com -->
+    <title>Slice</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="File" transform="translate(4.000000, 0.000000)">
+            <path d="M2,0 L10,0 L10,0 L17,7 L17,19 C17,20.1045695 16.1045695,21 15,21 L2,21 C0.8954305,21 1.3527075e-16,20.1045695 0,19 L0,2 C-1.3527075e-16,0.8954305 0.8954305,2.02906125e-16 2,0 Z" id="Rectangle" fill="#888888"></path>
+            <path d="M10,0 L17,7 L12,7 C10.8954305,7 10,6.1045695 10,5 L10,0 L10,0 Z" id="Triangle" fill="#727272"></path>
+        </g>
+    </g>
+</svg>

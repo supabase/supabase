@@ -1,0 +1,46 @@
+---
+title: Current User Avatar
+description: Supabase Auth-aware avatar
+---
+
+<ComponentPreview name="current-user-avatar-demo" showCode={false} />
+
+## Installation
+
+<BlockItem name="current-user-avatar-react" description="Renders the avatar of the current user." />
+
+## Folder structure
+
+<RegistryBlock itemName="current-user-avatar-react" />
+
+## Introduction
+
+The `CurrentUserAvatar` component connects to Supabase Auth to fetch the user data and show an avatar. It uses the `user_metadata`
+property which gets populated automatically by Supabase Auth if the user logged in via a provider. If the user doesn't have a profile image, it renders their initials. If the user is logged out, it renders a `?` as a fallback, which you can change.
+
+## Usage
+
+The `CurrentUserAvatar` component is designed to be used anywhere in your app. Add the `<CurrentUserAvatar />` component to your page and it will render the avatar of the current user, with a fallback.
+
+```tsx
+import { CurrentUserAvatar } from '@/components/current-user-avatar'
+
+const CurrentUserAvatarDemo = () => {
+  return (
+    <Header className="flex items-center justify-between">
+      <h1>Lumon Industries</h1>
+      <CurrentUserAvatar />
+    </Header>
+  )
+}
+
+export default CurrentUserAvatarDemo
+```
+
+## Props
+
+This component doesn't accept any props. If you wish to change the fallback, you can do so by changing the `CurrentUserAvatar` component directly.
+
+## Further reading
+
+- [Auth users](https://supabase.com/docs/guides/auth/users)

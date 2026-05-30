@@ -1,0 +1,164 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
+import { useEffect } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Form,
+  FormControl,
+  FormField,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
+
+import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { useDatabaseQueueMessageSendMutation } from '@/data/database-queues/database-queue-messages-send-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+
+interface SendMessageModalProps {
+  visible: boolean
+  onClose: () => void
+}
+
+const FormSchema = z.object({
+  delay: z.coerce.number().int().gte(0).default(5),
+  payload: z.string().refine(
+    (val) => {
+      try {
+        JSON.parse(val)
+        return true
+      } catch {
+        return false
+      }
+    },
+    {
+      message: 'The payload should be a JSON object',
+    }
+  ),
+})
+
+export type SendMessageForm = z.infer<typeof FormSchema>
+
+const FORM_ID = 'QUEUES_SEND_MESSAGE_FORM'
+
+export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) => {
+  const { childId: queueName } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+  const form = useForm<SendMessageForm>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      delay: 1,
+      payload: '{}',
+    },
+  })
+
+  const { isPending, mutate } = useDatabaseQueueMessageSendMutation({
+    onSuccess: () => {
+      toast.success(`Successfully added a message to the queue.`)
+      onClose()
+    },
+  })
+
+  const onSubmit: SubmitHandler<SendMessageForm> = (values) => {
+    mutate({
+      projectRef: project?.ref!,
+      connectionString: project?.connectionString,
+      queueName: queueName!,
+      payload: values.payload,
+      delay: values.delay,
+    })
+  }
+
+  useEffect(() => {
+    if (visible) {
+      form.reset({ delay: 1, payload: '{}' })
+    }
+  }, [visible])
+
+  return (
+    <Dialog open={visible} onOpenChange={onClose}>
+      <DialogContent size="medium">
+        <DialogHeader>
+          <DialogTitle>Add a message to the queue</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <DialogSection className="flex flex-col gap-y-4">
+          <Form {...form}>
+            <form
+              id={FORM_ID}
+              className="grow overflow-auto gap-2 flex flex-col"
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
+              <FormField
+                control={form.control}
+                name="delay"
+                render={({ field: { ref, ...rest } }) => (
+                  <FormItemLayout
+                    label="Delay"
+                    layout="vertical"
+                    className="gap-1"
+                    description="Time in seconds before the message becomes available for reading."
+                  >
+                    <FormControl>
+                      <InputGroup>
+                        <InputGroupInput {...rest} type="number" placeholder="1" />
+                        <InputGroupAddon align="inline-end">
+                          <InputGroupText>sec</InputGroupText>
+                        </InputGroupAddon>
+                      </InputGroup>
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="payload"
+                render={({ field }) => (
+                  <FormItemLayout label="Message payload" layout="vertical" className="gap-1">
+                    <FormControl>
+                      <CodeEditor
+                        id="message-payload"
+                        language="json"
+                        autofocus={false}
+                        className="mb-0! h-32 overflow-hidden rounded-sm border"
+                        onInputChange={(e: string | undefined) => field.onChange(e)}
+                        options={{ wordWrap: 'off', contextmenu: false }}
+                        value={field.value}
+                      />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            </form>
+          </Form>
+        </DialogSection>
+        <DialogFooter>
+          <Button type="default" onClick={onClose} disabled={isPending}>
+            Cancel
+          </Button>
+          <Button
+            type="primary"
+            htmlType="submit"
+            form={FORM_ID}
+            disabled={isPending}
+            loading={isPending}
+          >
+            Add
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
