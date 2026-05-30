@@ -31,7 +31,7 @@ Pratite "izdanja" ovog repozitorija da bi bili obaviješteni o većim ažuriranj
 
 Za cjelovitu dokumentaciju, posjetite [supabase.com/docs](https://supabase.com/docs)
 
-Za informacije kako doprinijeti razvoju, posjetite [Početak rada](./DEVELOPERS.md)
+Za informacije kako doprinijeti razvoju, posjetite [Početak rada](../DEVELOPERS.md)
 
 ## Zajednica & Podrška
 
@@ -49,7 +49,7 @@ Supabase je kombinacija alata otvorenog koda. Izgrađujemo funkcionalnosti Fireb
 Supabase je [hostana platforma](https://supabase.com/dashboard). Možete se registrirati i odmah počet koristiti Supabase bez ikakvih instalacija.
 Također možete ju [samostalno hostati](https://supabase.com/docs/guides/hosting/overview) i [razvijati lokalno](https://supabase.com/docs/guides/local-development).
 
-![Arhitektura](apps/docs/public/img/supabase-architecture.svg)
+![Arhitektura](../apps/docs/public/img/supabase-architecture.svg)
 
 - [Postgres](https://www.postgresql.org/) je objektno-relacijska baza podataka koja je aktivno u razvoju preko 30 godina i na glasu je kao jako pouzdana, robusna i performantna.
 - [Realtime](https://github.com/supabase/realtime) je Elixir server koji vam dopušta da prisluškujete unose, ažuriranja i brisanja u PostgreSQL bazi koristeći websockete. Realtime prati Postgres-ovu funkcionalnost repliciranja i osluškuje promjene u bazi podataka, te iste upakira u JSON, na kraju emitira taj JSON preko websocketa do autoriziranih klijenata.
@@ -204,7 +204,7 @@ Naš pristup za klijentske knjižnice je modularan. Svaka pod-knjižnica je samo
 
 ## Značke
 
-![Made with Supabase](./apps/www/public/badge-made-with-supabase.svg)
+![Made with Supabase](../apps/www/public/badge-made-with-supabase.svg)
 
 ```md
 [![Made with Supabase](https://supabase.com/badge-made-with-supabase.svg)](https://supabase.com)
@@ -221,7 +221,7 @@ Naš pristup za klijentske knjižnice je modularan. Svaka pod-knjižnica je samo
 </a>
 ```
 
-![Made with Supabase (dark)](./apps/www/public/badge-made-with-supabase-dark.svg)
+![Made with Supabase (dark)](../apps/www/public/badge-made-with-supabase-dark.svg)
 
 ```md
 [![Made with Supabase](https://supabase.com/badge-made-with-supabase-dark.svg)](https://supabase.com)
@@ -245,7 +245,7 @@ Naš pristup za klijentske knjižnice je modularan. Svaka pod-knjižnica je samo
 - [Bengalski / বাংলা](/i18n/README.bn.md)
 - [Bugarski / Български](/i18n/README.bg.md)
 - [Katalonski / Català](/i18n/README.ca.md)
-- [Hrvatski](/i18n/README.ca.md)
+- [Hrvatski](/i18n/README.hr.md)
 - [Češki / čeština](/i18n/README.cs.md)
 - [Danski / Dansk](/i18n/README.da.md)
 - [Nizozemski / Nederlands](/i18n/README.nl.md)
