@@ -154,7 +154,7 @@ export const QueueMessagesDataGrid = ({
     <div className="relative h-full">
       <DataGrid
         ref={gridRef}
-        className="h-full"
+        className="h-full border-t-0! border-b-0!"
         rowHeight={44}
         headerRowHeight={36}
         columns={columns}

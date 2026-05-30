@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Dispatch, SetStateAction, useEffect, useRef } from 'react'
+import { Dispatch, SetStateAction, useEffect, useEffectEvent, useRef } from 'react'
 import { toast } from 'sonner'
 
 import { RealtimeConfig } from './useRealtimeMessages'
@@ -8,7 +8,6 @@ import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { getTemporaryAPIKey } from '@/data/api-keys/temp-api-keys-query'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { IS_PLATFORM } from '@/lib/constants'
 import { getRoleImpersonationJWT } from '@/lib/role-impersonation'
 import { useTrack } from '@/lib/telemetry/track'
@@ -40,7 +39,7 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
   const jwtSecret = postgrestConfig?.jwt_secret
 
   const track = useTrack()
-  const onRoleUpdated = useStaticEffectEvent(() => {
+  const onRoleUpdated = useEffectEvent(() => {
     track('realtime_inspector_database_role_updated')
   })
 

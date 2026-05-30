@@ -94,7 +94,7 @@ export function SectionSwitch({ libraryId, version, section }: SectionSwitchProp
   const allAvailableVersions = REFERENCES[libraryId.replaceAll('-', '_')].versions
   const isLatestVersion = allAvailableVersions.length === 0 || version === allAvailableVersions[0]
 
-  const sectionLink = `/docs/reference/${libPath}/${isLatestVersion ? '' : `${version}/`}${section.slug}`
+  const sectionLink = `/docs/reference/${libPath}${isLatestVersion ? '' : `/${version}`}#${section.slug}`
 
   switch (section.type) {
     case 'markdown':
@@ -192,7 +192,7 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
                 return (
                   <li key={index} className="ml-4">
                     <RefInternalLink
-                      href={`/reference/cli/${subcommandDetails.id}`}
+                      href={`/reference/cli#${subcommandDetails.id}`}
                       sectionSlug={subcommandDetails.id}
                     >
                       {subcommandDetails.title}
@@ -206,7 +206,7 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
         {(command.flags ?? []).length > 0 && (
           <>
             <h3 className="mb-3 text-base text-foreground">Flags</h3>
-            <ul>
+            <ul className="not-prose">
               {command.flags.map((flag, index) => (
                 <li key={index} className="border-t last-of-type:border-b py-5 flex flex-col gap-3">
                   <div className="flex flex-wrap items-baseline gap-3">
@@ -355,6 +355,20 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
                   {endpointDetails['x-oauth-scope']}
                 </span>
               </li>
+            </ul>
+          </section>
+        )}
+        {endpointDetails['x-allowed-plans'] && (
+          <section>
+            <h3 className="mb-3 text-base text-foreground">
+              This endpoint is only available on the following plans:
+            </h3>
+            <ul>
+              {endpointDetails['x-allowed-plans'].map((plan) => (
+                <li key={plan} className="list-['-'] ml-2 pl-2">
+                  <span className="font-mono text-sm font-medium text-foreground">{plan}</span>
+                </li>
+              ))}
             </ul>
           </section>
         )}

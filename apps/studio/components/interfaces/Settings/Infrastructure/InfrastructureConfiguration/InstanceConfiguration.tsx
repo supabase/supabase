@@ -12,7 +12,7 @@ import { partition } from 'lodash'
 import { ChevronDown, Globe2, Loader2, Network } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useEffectEvent, useMemo, useState } from 'react'
 
 import '@xyflow/react/dist/style.css'
 
@@ -51,7 +51,6 @@ import {
   useIsOrioleDb,
   useSelectedProjectQuery,
 } from '@/hooks/misc/useSelectedProject'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { timeout } from '@/lib/helpers'
 
 interface InstanceConfigurationUIProps {
@@ -247,14 +246,15 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
   // Second pass: once React Flow has measured the nodes, re-run the layout so
   // dagre uses real heights. Only `nodesInitialized` going true should trigger
   // this — the first-pass effect above handles node/view changes.
-  const runMeasuredLayout = useStaticEffectEvent(() => {
+  const runMeasuredLayout = useEffectEvent(() => {
     if (nodesInitialized && nodes.length > 0 && view === 'flow') {
       setReactFlow({ measured: true })
     }
   })
   useEffect(() => {
     runMeasuredLayout()
-  }, [nodesInitialized, runMeasuredLayout])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [nodesInitialized])
 
   return (
     <div className={cn('nowheel', diagramOnly ? 'h-full' : 'border-y')}>

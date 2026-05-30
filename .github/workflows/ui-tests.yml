@@ -31,6 +31,7 @@ jobs:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         if: steps.filter.outputs.relevant == 'true'
         with:
+          persist-credentials: false
           sparse-checkout: |
             packages
             patches
@@ -72,6 +73,7 @@ jobs:
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
+          persist-credentials: false
           sparse-checkout: |
             packages/ui
             patches

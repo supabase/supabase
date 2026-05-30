@@ -9,7 +9,7 @@ import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 
 export async function ApiReferencePage() {
   return (
-    <ReferenceContentScrollHandler libPath="api" version="latest" isLatestVersion={true}>
+    <ReferenceContentScrollHandler>
       <SidebarSkeleton
         menuId={MenuId.RefApi}
         NavigationMenu={

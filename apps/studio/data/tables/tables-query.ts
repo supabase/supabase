@@ -130,6 +130,7 @@ export type InfiniteTablesVariables = Pick<
   'projectRef' | 'connectionString' | 'schema' | 'includeColumns'
 > & {
   pageSize?: number
+  nameFilter?: string
 }
 
 export async function getTablesPage(
@@ -140,9 +141,11 @@ export async function getTablesPage(
     includeColumns = false,
     limit,
     afterOid,
+    nameFilter,
   }: Pick<TablesVariables, 'projectRef' | 'connectionString' | 'schema' | 'includeColumns'> & {
     limit: number
     afterOid: number
+    nameFilter?: string
   },
   signal?: AbortSignal
 ) {
@@ -150,16 +153,22 @@ export async function getTablesPage(
     throw new Error('projectRef is required')
   }
 
-  const sql = getTablesPaginatedSql({ schema, includeColumns, limit, afterOid })
+  const sql = getTablesPaginatedSql({ schema, includeColumns, limit, afterOid, nameFilter })
 
   const { result } = await executeSql(
     {
       projectRef,
       connectionString,
       sql,
-      queryKey: tableKeys
-        .infiniteList(projectRef, schema, includeColumns, limit)
-        .concat([afterOid]),
+      queryKey: [
+        `project:${projectRef}`,
+        `schema:${schema}`,
+        `infinite_tables`,
+        includeColumns ? 'with_columns' : null,
+        nameFilter ? `search:${nameFilter}` : null,
+        limit ? `page_size:${limit}` : null,
+        afterOid ? `after:${afterOid}` : null,
+      ],
     },
     signal
   )
@@ -168,14 +177,21 @@ export async function getTablesPage(
 }
 
 export const useInfiniteTablesQuery = <TData = InfiniteData<TablesData>>(
-  { projectRef, connectionString, schema, includeColumns, pageSize = 50 }: InfiniteTablesVariables,
+  {
+    projectRef,
+    connectionString,
+    schema,
+    includeColumns,
+    pageSize = 50,
+    nameFilter,
+  }: InfiniteTablesVariables,
   {
     enabled = true,
     ...options
   }: UseCustomInfiniteQueryOptions<TablesData, TablesError, TData, readonly unknown[], number> = {}
 ) => {
   return useInfiniteQuery({
-    queryKey: tableKeys.infiniteList(projectRef, schema, includeColumns, pageSize),
+    queryKey: tableKeys.infiniteList(projectRef, schema, { includeColumns, pageSize, nameFilter }),
     queryFn: ({ signal, pageParam }) =>
       getTablesPage(
         {
@@ -185,6 +201,7 @@ export const useInfiniteTablesQuery = <TData = InfiniteData<TablesData>>(
           includeColumns,
           limit: pageSize,
           afterOid: pageParam,
+          nameFilter,
         },
         signal
       ),

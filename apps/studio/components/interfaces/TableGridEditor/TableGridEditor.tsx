@@ -193,7 +193,7 @@ export const TableGridEditor = ({
           </SupabaseGrid>
 
           <DeleteConfirmationDialogs
-            selectedTable={isTableSelected ? selectedTable : undefined}
+            selectedTable={selectedTable}
             onTableDeleted={onTableDeleted}
           />
         </TableEditorTableStateContextProvider>
