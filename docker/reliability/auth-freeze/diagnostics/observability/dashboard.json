@@ -1,0 +1,148 @@
+{
+  "title": "GoTrue · freezekit",
+  "uid": "freezekit",
+  "schemaVersion": 38,
+  "version": 1,
+  "tags": ["supabase", "auth", "freezekit", "reliability"],
+  "timezone": "browser",
+  "refresh": "30s",
+  "time": { "from": "now-6h", "to": "now" },
+  "templating": {
+    "list": [
+      {
+        "name": "pod",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "query": "label_values(freezekit_state, pod)",
+        "includeAll": true,
+        "multi": true,
+        "refresh": 2
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Detector state",
+      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+      "targets": [
+        { "expr": "max(freezekit_state{pod=~\"$pod\"})", "refId": "A", "datasource": { "type": "prometheus", "uid": "prometheus" } }
+      ],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "NORMAL", "color": "green" } } },
+            { "type": "value", "options": { "1": { "text": "WARNING", "color": "yellow" } } },
+            { "type": "value", "options": { "2": { "text": "DEGRADED", "color": "orange" } } },
+            { "type": "value", "options": { "3": { "text": "FREEZE", "color": "red" } } },
+            { "type": "value", "options": { "4": { "text": "CAPTURED", "color": "purple" } } }
+          ]
+        }
+      }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Signal scores",
+      "gridPos": { "x": 6, "y": 0, "w": 18, "h": 8 },
+      "targets": [
+        { "expr": "freezekit_signal_score{pod=~\"$pod\"}", "refId": "A", "legendFormat": "{{signal}}", "datasource": { "type": "prometheus", "uid": "prometheus" } }
+      ],
+      "fieldConfig": { "defaults": { "min": 0, "max": 1, "unit": "percentunit" } }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Captures (last hour)",
+      "gridPos": { "x": 0, "y": 4, "w": 6, "h": 4 },
+      "targets": [
+        { "expr": "sum(increase(freezekit_freeze_events_total{pod=~\"$pod\"}[1h]))", "refId": "A", "datasource": { "type": "prometheus", "uid": "prometheus" } }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "In-flight requests + oldest age",
+      "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+      "targets": [
+        { "expr": "freezekit_inflight{pod=~\"$pod\"}", "refId": "A", "legendFormat": "inflight ({{pod}})", "datasource": { "type": "prometheus", "uid": "prometheus" } },
+        { "expr": "freezekit_oldest_inflight_seconds{pod=~\"$pod\"}", "refId": "B", "legendFormat": "oldest_s ({{pod}})", "datasource": { "type": "prometheus", "uid": "prometheus" } }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Capture duration (s)",
+      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(freezekit_capture_duration_seconds_bucket{pod=~\"$pod\"}[5m])))",
+          "refId": "A", "legendFormat": "p95",
+          "datasource": { "type": "prometheus", "uid": "prometheus" }
+        },
+        {
+          "expr": "histogram_quantile(0.50, sum by (le) (rate(freezekit_capture_duration_seconds_bucket{pod=~\"$pod\"}[5m])))",
+          "refId": "B", "legendFormat": "p50",
+          "datasource": { "type": "prometheus", "uid": "prometheus" }
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" } }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Sink upload result (rate/min)",
+      "gridPos": { "x": 0, "y": 16, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "sum by (sink, result) (rate(freezekit_sink_uploads_total{pod=~\"$pod\"}[5m]) * 60)",
+          "refId": "A", "legendFormat": "{{sink}} / {{result}}",
+          "datasource": { "type": "prometheus", "uid": "prometheus" }
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Self-stall + dropped artifacts",
+      "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "sum by (pod) (increase(freezekit_self_stall_total{pod=~\"$pod\"}[5m]))",
+          "refId": "A", "legendFormat": "self_stall ({{pod}})",
+          "datasource": { "type": "prometheus", "uid": "prometheus" }
+        },
+        {
+          "expr": "sum by (pod, reason) (increase(freezekit_artifacts_dropped_total{pod=~\"$pod\"}[5m]))",
+          "refId": "B", "legendFormat": "dropped {{reason}} ({{pod}})",
+          "datasource": { "type": "prometheus", "uid": "prometheus" }
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "type": "stat",
+      "title": "Local disk usage",
+      "gridPos": { "x": 0, "y": 24, "w": 6, "h": 4 },
+      "targets": [
+        { "expr": "max(freezekit_local_disk_used_bytes{pod=~\"$pod\"})", "refId": "A", "datasource": { "type": "prometheus", "uid": "prometheus" } }
+      ],
+      "fieldConfig": { "defaults": { "unit": "bytes" } }
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Recovered panics",
+      "gridPos": { "x": 6, "y": 24, "w": 18, "h": 4 },
+      "targets": [
+        {
+          "expr": "sum by (goroutine) (increase(freezekit_panics_recovered_total{pod=~\"$pod\"}[5m]))",
+          "refId": "A", "legendFormat": "{{goroutine}}",
+          "datasource": { "type": "prometheus", "uid": "prometheus" }
+        }
+      ]
+    }
+  ]
+}

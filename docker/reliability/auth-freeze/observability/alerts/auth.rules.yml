@@ -1,0 +1,177 @@
+groups:
+
+  # ===========================================================================
+  # Headline freeze-detection alerts. These page humans.
+  # ===========================================================================
+  - name: gotrue-freeze
+    interval: 30s
+    rules:
+
+      - alert: AuthDeepHealthFailing
+        expr: |
+          (
+            max_over_time(gotrue_probe_all_ok[2m]) == 0
+          )
+          or
+          (
+            # Probe itself stopped reporting — treat as down.
+            absent(gotrue_probe_all_ok)
+          )
+        for: 1m
+        labels:
+          severity: critical
+          team: auth
+          page: "true"
+        annotations:
+          summary: "GoTrue deep healthcheck failing"
+          description: |
+            The layered deep healthcheck has been failing for >1m. This is the
+            exact failure mode where `/health` stays green but DB-backed auth
+            paths are wedged. Restart of the auth pod is likely required.
+            Runbook: https://github.com/supabase/supabase/blob/master/docker/reliability/auth-freeze/README.md#tldr
+
+      - alert: AuthTokenLatencyHighP99
+        expr: |
+          histogram_quantile(
+            0.99,
+            sum by (le) (
+              rate(gotrue_http_request_duration_seconds_bucket{route="/token"}[5m])
+            )
+          ) > 2
+        for: 3m
+        labels:
+          severity: critical
+          team: auth
+          page: "true"
+        annotations:
+          summary: "POST /token p99 latency > 2s"
+          description: |
+            p99 latency of POST /token has exceeded 2s for 3 minutes. This is
+            the precursor signal to a full freeze. Inspect `gotrue_db_pool_in_use`
+            vs `gotrue_db_pool_max` first.
+
+      - alert: AuthZeroSuccessfulLogins
+        expr: |
+          sum(rate(gotrue_http_requests_total{route="/token",status=~"2.."}[5m])) == 0
+          and
+          sum(rate(gotrue_http_requests_total{route="/token"}[5m])) > 0
+        for: 2m
+        labels:
+          severity: critical
+          team: auth
+          page: "true"
+        annotations:
+          summary: "POST /token: requests arriving but ZERO 2xx responses"
+          description: |
+            /token is receiving traffic but every response is non-2xx. Either
+            an auth-wide credential issue or a freeze. Compare with
+            AuthHangingRequest and AuthDBPoolSaturated to disambiguate.
+
+      - alert: AuthHangingRequest
+        expr: gotrue_handler_inflight_oldest_seconds > 30
+        for: 1m
+        labels:
+          severity: critical
+          team: auth
+          page: "true"
+        annotations:
+          summary: "Some auth handler has been running >30s"
+          description: |
+            The oldest in-flight handler has been running for {{ $value | humanizeDuration }}.
+            Inspect the in-flight set via `curl auth:9100/debug/inflight`
+            (added by patch 03).
+
+  # ===========================================================================
+  # Pressure signals — warn-level, do not page.
+  # ===========================================================================
+  - name: gotrue-pressure
+    interval: 30s
+    rules:
+
+      - alert: AuthDBPoolSaturated
+        expr: |
+          (gotrue_db_pool_in_use / gotrue_db_pool_max) > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          team: auth
+        annotations:
+          summary: "GoTrue DB pool >90% utilised for 5m"
+          description: |
+            Sustained pool saturation. Either a slow upstream (DB), an
+            unindexed query, a pg-function hook taking too long, or a
+            traffic spike. Scale horizontally or raise `GOTRUE_DB_MAX_POOL_SIZE`.
+
+      - alert: AuthGoroutineLeak
+        expr: delta(gotrue_goroutines[1h]) > 5000
+        for: 30m
+        labels:
+          severity: warning
+          team: auth
+        annotations:
+          summary: "GoTrue goroutine count grew by >5000 in the last hour"
+          description: |
+            Linear growth in goroutine count is a leak. Pull a profile:
+            `curl http://auth:9100/debug/pprof/goroutine?debug=2 > leak.txt`.
+
+      - alert: AuthDashboardAdminDegraded
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum by (le) (
+              rate(gotrue_http_request_duration_seconds_bucket{route=~"/admin/.*"}[5m])
+            )
+          ) > 5
+        for: 5m
+        labels:
+          severity: warning
+          team: auth
+        annotations:
+          summary: "Dashboard admin endpoints p95 > 5s"
+          description: |
+            /admin/* paths (used by the Studio Users page) are slow. Usually
+            an index regression or a count(*) on a growing users table.
+
+      - alert: AuthPanicsRecoveredSpike
+        expr: rate(gotrue_panic_recovered_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          team: auth
+        annotations:
+          summary: "Panics are being recovered in GoTrue handlers"
+          description: |
+            >0.1 panics/sec are being swallowed by the recoverer middleware.
+            This used to be silent. Inspect logs filtered on
+            `panic_recovered=true`.
+
+  # ===========================================================================
+  # Probe meta-health: detects when our own observability is broken.
+  # ===========================================================================
+  - name: gotrue-probe-meta
+    interval: 30s
+    rules:
+
+      - alert: AuthDeepProbeMissing
+        expr: up{job="auth-deep-probe"} == 0
+        for: 5m
+        labels:
+          severity: warning
+          team: auth
+        annotations:
+          summary: "auth-deep-probe sidecar is down"
+          description: |
+            The deep probe sidecar itself is not being scraped. Real freezes
+            will go undetected by AuthDeepHealthFailing while this is firing.
+
+      - alert: AuthDeepProbeStalled
+        expr: gotrue_probe_last_cycle_age_seconds > 60
+        for: 2m
+        labels:
+          severity: warning
+          team: auth
+        annotations:
+          summary: "auth-deep-probe has not completed a cycle in >60s"
+          description: |
+            The probe is up but its loop hasn't ticked. Check
+            `gotrue_probe_watchdog_trips_total` and restart the sidecar.

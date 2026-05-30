@@ -1,0 +1,334 @@
+# freezekit-enabled Supabase Auth deployment.
+#
+# Extends the deployment in ../../k8s/auth-deployment.yaml with:
+#   - freezekit-sidecar container (scrapes pprof + uploads on freeze)
+#   - shared emptyDir volume for local artifact fallback
+#   - preStop hook that triggers a final dump
+#   - terminationGracePeriodSeconds raised to 90 so preStop can run
+#
+# Apply with:
+#   kubectl apply -f auth-deployment-with-freezekit.yaml
+#
+# Roll back to the parent (non-freezekit) deployment with:
+#   kubectl apply -f ../../k8s/auth-deployment.yaml
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: supabase-auth
+  namespace: supabase
+  labels:
+    app: supabase-auth
+    freezekit/enabled: "true"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: supabase-auth
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: supabase-auth
+        freezekit/enabled: "true"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9100"
+    spec:
+      serviceAccountName: supabase-auth
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      terminationGracePeriodSeconds: 90
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: supabase-auth
+
+      volumes:
+        - name: freezekit-tmp
+          emptyDir:
+            sizeLimit: 512Mi
+        - name: prestop
+          configMap:
+            name: supabase-auth-prestop
+            defaultMode: 0o755
+
+      containers:
+        # ───────────────────────────────────────────────────────────
+        # GoTrue (Supabase Auth)
+        # ───────────────────────────────────────────────────────────
+        - name: gotrue
+          image: supabase/gotrue:v2.186.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 9999
+            - name: metrics
+              containerPort: 9100
+            - name: pprof
+              containerPort: 6060
+
+          env:
+            # ─── freezekit feature flags (wave-by-wave) ────────────
+            - name: FREEZEKIT_DISABLED
+              value: "false"
+            - name: FREEZEKIT_DETECTOR_ENABLED
+              value: "true"        # Wave 4: detector + auto capture
+            - name: FREEZEKIT_SINK
+              value: "multi"        # Wave 3+
+            - name: FREEZEKIT_SAMPLE_INTERVAL
+              value: "5s"
+            - name: FREEZEKIT_MAX_CAPTURES_PER_HOUR
+              value: "6"
+            - name: FREEZEKIT_MIN_INTERVAL
+              value: "5m"
+            - name: FREEZEKIT_BLOCK_PROFILE_RATE_NS
+              value: "10000"
+            - name: FREEZEKIT_MUTEX_PROFILE_FRACTION
+              value: "100"
+            - name: FREEZEKIT_HEAP_SKIP_RSS_MB
+              value: "1638"   # 80% of 2Gi limit below
+
+            # ─── Pod identity for the manifest ─────────────────────
+            - name: POD_NAME
+              valueFrom: { fieldRef: { fieldPath: metadata.name } }
+            - name: POD_NAMESPACE
+              valueFrom: { fieldRef: { fieldPath: metadata.namespace } }
+            - name: NODE_NAME
+              valueFrom: { fieldRef: { fieldPath: spec.nodeName } }
+            - name: SERVICE_NAME
+              value: "gotrue"
+            - name: SERVICE_VERSION
+              value: "v2.186.0"
+            - name: REGION
+              valueFrom:
+                fieldRef:
+                  fieldPath: "metadata.labels['topology.kubernetes.io/region']"
+            - name: CLUSTER
+              value: "supabase-prod"
+
+          resources:
+            requests: { cpu: 200m, memory: 512Mi, ephemeral-storage: 64Mi }
+            limits:   { cpu: "2",  memory: 2Gi,   ephemeral-storage: 512Mi }
+
+          startupProbe:
+            httpGet: { path: /healthz/deep, port: http }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 30
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet: { path: /health, port: http }
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 6
+          readinessProbe:
+            httpGet: { path: /healthz/deep, port: http }
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/usr/local/bin/freezekit-prestop"]
+
+          volumeMounts:
+            - { name: freezekit-tmp, mountPath: /var/freezekit }
+            - { name: prestop,       mountPath: /usr/local/bin/freezekit-prestop, subPath: preStop.sh }
+
+        # ───────────────────────────────────────────────────────────
+        # freezekit-sidecar
+        # ───────────────────────────────────────────────────────────
+        - name: freezekit-sidecar
+          image: ghcr.io/supabase/freezekit-sidecar:v0.1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: fk
+              containerPort: 9101
+
+          env:
+            - name: TARGET_URL
+              value: "http://localhost:9999"
+            - name: METRICS_URL
+              value: "http://localhost:9100/metrics"
+            - name: LOCAL_DIR
+              value: "/var/freezekit"
+            - name: SIGNER_URL
+              valueFrom:
+                secretKeyRef: { name: freezekit-signer, key: url, optional: true }
+            - name: SIGNER_AUTH
+              valueFrom:
+                secretKeyRef: { name: freezekit-signer, key: auth, optional: true }
+            - name: SAMPLE_INTERVAL
+              value: "5s"
+            - name: OLDEST_THRESHOLD
+              value: "45s"
+            - name: MAX_PER_HOUR
+              value: "6"
+            - name: MIN_INTERVAL
+              value: "5m"
+            - name: INCLUDE_HEAP
+              value: "true"
+
+          resources:
+            requests: { cpu: 50m,  memory: 64Mi, ephemeral-storage: 128Mi }
+            limits:   { cpu: 200m, memory: 256Mi, ephemeral-storage: 384Mi }
+
+          livenessProbe:
+            httpGet: { path: /metrics, port: fk }
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet: { path: /probe, port: fk }
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+
+          volumeMounts:
+            - { name: freezekit-tmp, mountPath: /var/freezekit }
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: supabase-auth-prestop
+  namespace: supabase
+data:
+  preStop.sh: |
+    #!/bin/sh
+    # freezekit pre-stop hook.
+    #
+    # Runs ONCE on SIGTERM. Asks the freezekit endpoint (either the
+    # embedded one in the auth process, or the sidecar) to capture a
+    # final dump. Then sleeps long enough for the Service controller
+    # to remove this pod from endpoints before we exit.
+    #
+    # Exit code is ignored by kubelet.
+
+    set -u
+
+    # First try the embedded endpoint (requires patch 02). If that
+    # 404s or fails, fall back to the sidecar.
+    EMBEDDED_URL="http://localhost:9999/debug/freezekit/capture?reason=preStop"
+    SIDECAR_URL="http://localhost:9101/capture?reason=preStop"
+
+    echo "freezekit preStop: triggering final capture" >&2
+    if ! curl -fsS -X POST -m 30 -H "apikey: ${SERVICE_ROLE_KEY:-x}" "$EMBEDDED_URL" >/dev/null 2>&1; then
+      echo "freezekit preStop: embedded unavailable, trying sidecar" >&2
+      curl -fsS -X POST -m 30 "$SIDECAR_URL" >/dev/null 2>&1 || true
+    fi
+
+    # Give the Service controller a beat. Tunable via PRESTOP_DRAIN env.
+    DRAIN="${PRESTOP_DRAIN:-15}"
+    echo "freezekit preStop: sleeping ${DRAIN}s to drain connections" >&2
+    sleep "$DRAIN"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: supabase-auth
+  namespace: supabase
+spec:
+  selector:
+    app: supabase-auth
+  ports:
+    - { name: http,    port: 9999, targetPort: http }
+    - { name: metrics, port: 9100, targetPort: metrics }
+    - { name: fk,      port: 9101, targetPort: fk }
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: supabase-auth
+  namespace: supabase
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: supabase-auth
+
+---
+# ServiceMonitor for both the auth metrics AND the freezekit sidecar.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: supabase-auth-freezekit
+  namespace: supabase
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: supabase-auth
+  endpoints:
+    - port: metrics
+      interval: 15s
+      scrapeTimeout: 10s
+    - port: fk
+      interval: 15s
+      scrapeTimeout: 10s
+
+---
+# Minimal RBAC. freezekit doesn't need the k8s API; this SA exists
+# only so we can attach IRSA / Workload Identity for cloud uploads
+# if the operator chooses that pattern (instead of the signer).
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: supabase-auth
+  namespace: supabase
+
+---
+# Optional NetworkPolicy: lock the sidecar's egress to only the
+# signer URL and DNS. Adapt to your environment.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: supabase-auth-freezekit-egress
+  namespace: supabase
+spec:
+  podSelector:
+    matchLabels:
+      app: supabase-auth
+  policyTypes: ["Egress"]
+  egress:
+    - to:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              app: supabase-auth
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - { protocol: UDP, port: 53 }
+        - { protocol: TCP, port: 53 }
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except: ["169.254.169.254/32"]  # block instance metadata
+      ports:
+        - { protocol: TCP, port: 443 }

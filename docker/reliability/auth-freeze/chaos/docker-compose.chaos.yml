@@ -1,0 +1,74 @@
+# docker-compose.chaos.yml
+#
+# Optional override that adds on-demand chaos services:
+#
+#   pg-block   psql-bearing image that runs ../chaos/pg-block.sh
+#   k6         Grafana k6 image that runs ../chaos/k6-token-flood.js
+#
+# Both are `profile: chaos` so they DO NOT start with `docker compose up`.
+# Trigger them explicitly:
+#
+#   docker compose -f docker-compose.yml \
+#                  -f reliability/auth-freeze/compose/docker-compose.deep-health.yml \
+#                  -f reliability/auth-freeze/compose/docker-compose.observability.yml \
+#                  -f reliability/auth-freeze/chaos/docker-compose.chaos.yml \
+#                  --profile chaos run --rm pg-block sleep 90 10
+#
+#   docker compose ... --profile chaos run --rm k6 run /chaos/k6-token-flood.js
+
+name: supabase
+
+services:
+
+  pg-block:
+    image: postgres:17-alpine
+    profiles: ["chaos"]
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PG_BLOCK_USER: supabase_auth_admin
+    entrypoint: ["/bin/bash", "/chaos/pg-block.sh"]
+    volumes:
+      - ../chaos:/chaos:ro,z
+
+  k6:
+    image: grafana/k6:0.54.0
+    profiles: ["chaos"]
+    depends_on:
+      auth:
+        condition: service_started
+    environment:
+      BASE_URL: http://kong:8000
+      ANON_KEY: ${ANON_KEY}
+      TEST_EMAIL: ${CHAOS_TEST_EMAIL:-probe@reliability.example.test}
+      TEST_PASSWORD: ${CHAOS_TEST_PASSWORD:-ProbePass1!}
+      HEALTH_URL: http://auth:9999/health
+      DEEP_URL: http://auth-deep-probe:9101/probe
+      VUS: ${CHAOS_VUS:-200}
+      DURATION: ${CHAOS_DURATION:-60s}
+    entrypoint: ["k6", "run"]
+    command: ["/chaos/k6-token-flood.js"]
+    volumes:
+      - ../chaos:/chaos:ro,z
+
+  curl-loop:
+    image: curlimages/curl:8.10.1
+    profiles: ["chaos"]
+    depends_on:
+      auth:
+        condition: service_started
+    environment:
+      BASE_URL: http://kong:8000
+      ANON_KEY: ${ANON_KEY}
+      TEST_EMAIL: ${CHAOS_TEST_EMAIL:-probe@reliability.example.test}
+      TEST_PASSWORD: ${CHAOS_TEST_PASSWORD:-ProbePass1!}
+      DEEP_URL: http://auth-deep-probe:9101/probe
+    entrypoint: ["/bin/sh", "/chaos/curl-loop.sh"]
+    command: ["60", "50"]
+    volumes:
+      - ../chaos:/chaos:ro,z

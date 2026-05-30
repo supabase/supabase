@@ -1,0 +1,138 @@
+# Prometheus alert rules for freezekit. Drop into your Alertmanager
+# rule directory (or merge into the parent dir's auth.rules.yml).
+groups:
+  - name: freezekit.rules
+    interval: 30s
+    rules:
+
+      # ─────────────────────────────────────────────────────────────
+      # CRITICAL — page immediately
+      # ─────────────────────────────────────────────────────────────
+
+      - alert: FreezekitFreezeDetected
+        expr: |
+          freezekit_state >= 3
+        for: 30s
+        labels:
+          severity: critical
+          team: auth
+          runbook: https://runbooks.supabase.com/auth-freeze
+        annotations:
+          summary: "GoTrue freeze detected on {{ $labels.pod }}"
+          description: |
+            freezekit on pod {{ $labels.pod }} (namespace {{ $labels.namespace }})
+            has been in FREEZE_DETECTED or CAPTURE_COMPLETE state for ≥30s.
+            Look up the freeze event in S3:
+              s3://supabase-diagnostics/auth/{{ $labels.region }}/{{ $labels.pod }}/
+            and run `go tool pprof goroutine.pb.gz`.
+
+      - alert: FreezekitCaptureFailingRepeatedly
+        expr: |
+          increase(freezekit_captures_completed_total{result="failed"}[1h]) >= 3
+        for: 5m
+        labels:
+          severity: warning
+          team: auth
+        annotations:
+          summary: "freezekit captures failing on {{ $labels.pod }}"
+          description: |
+            ≥3 freezekit captures have failed in the last hour. Check the
+            sink (cloud upload) and the freezekit logs. Forensic data
+            from recent freezes may have been lost.
+
+      # ─────────────────────────────────────────────────────────────
+      # WARNING — investigate
+      # ─────────────────────────────────────────────────────────────
+
+      - alert: FreezekitUploadFailureRateHigh
+        expr: |
+          (
+            sum(rate(freezekit_sink_uploads_total{result="failed"}[15m])) by (pod, sink)
+            /
+            sum(rate(freezekit_sink_uploads_total[15m])) by (pod, sink)
+          ) > 0.5
+        for: 10m
+        labels:
+          severity: warning
+          team: auth
+        annotations:
+          summary: "freezekit sink {{ $labels.sink }} >50% upload failure"
+          description: |
+            {{ $value | humanizePercentage }} of freezekit upload attempts
+            to sink {{ $labels.sink }} on pod {{ $labels.pod }} are failing.
+            Check signer service health and bucket permissions. Local
+            artifacts (if configured) remain available until LRU eviction.
+
+      - alert: FreezekitSelfStall
+        expr: |
+          increase(freezekit_self_stall_total[1h]) > 0
+        for: 0m
+        labels:
+          severity: warning
+          team: auth
+        annotations:
+          summary: "freezekit self-watchdog tripped on {{ $labels.pod }}"
+          description: |
+            freezekit's own detector loop stalled for longer than its
+            SelfStallThreshold and freezekit has disabled itself. The
+            pod is no longer collecting freeze diagnostics. Investigate
+            log for the disable reason; consider rolling the pod.
+
+      - alert: FreezekitDisabledUnexpectedly
+        expr: |
+          absent(freezekit_state{pod=~"supabase-auth-.*"})
+        for: 5m
+        labels:
+          severity: warning
+          team: auth
+        annotations:
+          summary: "freezekit metrics missing for ≥5m"
+          description: |
+            No freezekit_state samples are arriving from any
+            supabase-auth pod. Either freezekit is disabled
+            (FREEZEKIT_DISABLED=true), the metrics endpoint is
+            unreachable, or every auth pod is down.
+
+      - alert: FreezekitLocalDiskUsageHigh
+        expr: |
+          freezekit_local_disk_used_bytes / (256 * 1024 * 1024) > 0.8
+        for: 10m
+        labels:
+          severity: warning
+          team: auth
+        annotations:
+          summary: "freezekit local sink >80% of 256 MiB budget"
+          description: |
+            On pod {{ $labels.pod }} the LocalSink is using
+            {{ $value | humanizePercentage }} of its budget. LRU eviction
+            is removing older captures; investigate why captures are
+            firing this frequently (likely a sustained incident, or
+            a leaked signal threshold).
+
+      - alert: FreezekitArtifactsDropped
+        expr: |
+          increase(freezekit_artifacts_dropped_total{reason="channel_full"}[1h]) > 5
+        for: 5m
+        labels:
+          severity: warning
+          team: auth
+        annotations:
+          summary: "freezekit dropping artifacts: upload channel full"
+          description: |
+            freezekit on {{ $labels.pod }} is dropping artifacts because
+            the upload workers cannot keep up. Increase UPLOAD_WORKERS
+            or investigate sink latency. Captures are succeeding but
+            individual profiles inside them are being lost.
+
+      - alert: FreezekitOldestInflightApproaching
+        expr: |
+          freezekit_oldest_inflight_seconds > 20
+        for: 30s
+        labels:
+          severity: info
+          team: auth
+        annotations:
+          summary: "Auth oldest in-flight request > 20s on {{ $labels.pod }}"
+          description: |
+            Precursor alert: a freeze trigger may fire soon. Investigate
+            slow downstream dependencies (DB, SMS provider, OAuth IDP).

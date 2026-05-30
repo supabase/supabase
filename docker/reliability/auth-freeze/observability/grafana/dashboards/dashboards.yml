@@ -1,0 +1,13 @@
+apiVersion: 1
+
+providers:
+  - name: gotrue-reliability
+    orgId: 1
+    folder: Auth Reliability
+    type: file
+    disableDeletion: true
+    updateIntervalSeconds: 30
+    allowUiUpdates: false
+    options:
+      path: /etc/grafana/provisioning/dashboards
+      foldersFromFilesStructure: false

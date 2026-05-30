@@ -1,0 +1,69 @@
+# Prometheus scrape config tuned for the auth-freeze reliability stack.
+#
+# Sane defaults for self-hosted Supabase. The scrape interval (15s) is
+# deliberately fast enough to observe sub-minute freezes; tune
+# `--storage.tsdb.retention.time` in the compose file if disk space is a
+# concern.
+
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+  external_labels:
+    stack: supabase-self-hosted
+    role: auth-reliability
+
+rule_files:
+  - /etc/prometheus/alerts/*.yml
+
+scrape_configs:
+
+  - job_name: prometheus
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # ---------------------------------------------------------------------------
+  # GoTrue auth service. Requires patch 03 (Prometheus exporter on :9100).
+  # Will silently get 0 targets-up until the patched image is rolled out.
+  # ---------------------------------------------------------------------------
+  - job_name: gotrue-auth
+    metrics_path: /metrics
+    scheme: http
+    static_configs:
+      - targets: ['auth:9100']
+        labels:
+          service: gotrue
+          tier: auth
+    # Keep failed scrapes visible — don't filter them out.
+    honor_labels: true
+
+  # ---------------------------------------------------------------------------
+  # auth-deep-probe sidecar (this repo's reference impl). Always running
+  # under the deep-health compose override.
+  # ---------------------------------------------------------------------------
+  - job_name: auth-deep-probe
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['auth-deep-probe:9101']
+        labels:
+          service: gotrue
+          tier: probe
+
+  # ---------------------------------------------------------------------------
+  # Optional: cAdvisor for per-container CPU/mem/restarts. Add to the
+  # compose override if you want this; not enabled by default to keep the
+  # observability footprint small.
+  # ---------------------------------------------------------------------------
+  - job_name: cadvisor
+    static_configs:
+      - targets: ['cadvisor:8080']
+    relabel_configs:
+      - source_labels: [__address__]
+        action: keep
+        regex: cadvisor:.*
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []        # add 'alertmanager:9093' once configured
+      timeout: 10s

@@ -1,0 +1,295 @@
+# Production-grade Kubernetes manifests for supabase/gotrue, implementing
+# the three-tier probe model described in
+# ../README.md#phase-3--healthcheck-redesign
+#
+# Highlights:
+#
+#   - livenessProbe   GET /health        cheap, restart-safe
+#   - readinessProbe  GET /probe         deep, traffic-shedding
+#   - startupProbe    GET /probe         very long failureThreshold for
+#                                        migration + warmup
+#   - Sidecar         gotrue-deep-probe  the actual deep probe binary
+#                     from ../probes/deep-probe/
+#   - PodDisruptionBudget                ensure at least one pod survives
+#                                        node drains during incidents
+#   - ServiceMonitor                     auto-discovery for kube-prometheus
+#
+# All resource requests/limits are starting points; tune to your fleet.
+#
+# Apply with:
+#   kubectl apply -f auth-deployment.yaml
+#
+# Requires:
+#   - A Secret named `supabase-auth-env` carrying GOTRUE_* env vars
+#     (including SERVICE_ROLE_KEY for the deep probe).
+#   - A Secret named `supabase-auth-deep-probe` carrying:
+#       SERVICE_ROLE_KEY: <base64 jwt>
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: supabase-auth
+  labels:
+    app.kubernetes.io/name: supabase-auth
+    app.kubernetes.io/component: auth
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: supabase-auth
+  ports:
+    - name: gotrue
+      port: 9999
+      targetPort: gotrue
+    - name: metrics
+      port: 9100
+      targetPort: metrics
+    - name: probe
+      port: 9101
+      targetPort: probe
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: supabase-auth
+  labels:
+    app.kubernetes.io/name: supabase-auth
+    app.kubernetes.io/component: auth
+spec:
+  replicas: 3
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: supabase-auth
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: supabase-auth
+        app.kubernetes.io/component: auth
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9100"
+        prometheus.io/path: "/metrics"
+    spec:
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      # Spread across zones; tolerate eviction during incidents.
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: supabase-auth
+      containers:
+
+        # ---------------------------------------------------------------------
+        # Main GoTrue container.
+        # ---------------------------------------------------------------------
+        - name: gotrue
+          image: supabase/gotrue:v2.186.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: gotrue
+              containerPort: 9999
+              protocol: TCP
+            - name: metrics
+              containerPort: 9100
+              protocol: TCP
+          envFrom:
+            - secretRef:
+                name: supabase-auth-env
+          env:
+            # Patches 01-04 (see ../gotrue-patches/). Safe defaults.
+            - name: GOTRUE_REQUEST_DEADLINE_ENABLED
+              value: "true"
+            - name: GOTRUE_REQUEST_DEADLINE_SECONDS
+              value: "15"
+            - name: GOTRUE_DEEP_HEALTH_ENABLED
+              value: "true"
+            - name: GOTRUE_METRICS_ENABLED
+              value: "true"
+            - name: GOTRUE_METRICS_PORT
+              value: "9100"
+            - name: GOTRUE_WATCHDOG_ENABLED
+              value: "true"
+            - name: GOTRUE_WATCHDOG_ACTION
+              value: "log"          # start in 'log' mode; flip to 'exit' after bake
+            - name: GOTRUE_WATCHDOG_INFLIGHT_AGE_SECS
+              value: "60"
+            - name: GOTRUE_DB_SAFETY_NETS_ENABLED
+              value: "true"
+            - name: GOTRUE_DB_STATEMENT_TIMEOUT_MS
+              value: "30000"
+            - name: GOTRUE_DB_LOCK_TIMEOUT_MS
+              value: "5000"
+            - name: GOTRUE_DB_IDLE_IN_TXN_TIMEOUT_MS
+              value: "60000"
+
+          # =====================================================================
+          # KEY DESIGN: liveness is cheap, readiness is deep. See
+          # ../README.md#31-the-two-tier-model
+          # =====================================================================
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: gotrue
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 6        # tolerate 60s of total non-response
+            successThreshold: 1
+
+          readinessProbe:
+            httpGet:
+              path: /healthz/deep      # added by patch 02
+              port: gotrue
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3        # remove from Service after 15s of failure
+            successThreshold: 1
+
+          startupProbe:
+            httpGet:
+              path: /healthz/deep
+              port: gotrue
+            initialDelaySeconds: 0
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 60       # 5 min budget for migrations
+            successThreshold: 1
+
+          # Drain in-flight requests before SIGTERM. preStop sleeps so the
+          # endpoint removal from kube-proxy propagates before the process
+          # starts refusing connections.
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /bin/sh
+                  - -c
+                  - sleep 10
+
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: "2"
+              memory: 1Gi
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+
+        # ---------------------------------------------------------------------
+        # Sidecar deep probe — same patterns the main service should use.
+        # Even if the main service is on an old GoTrue image without patch
+        # 02, this sidecar still exposes a *honest* readiness signal.
+        # ---------------------------------------------------------------------
+        - name: deep-probe
+          image: ghcr.io/supabase/auth-deep-probe:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: probe
+              containerPort: 9101
+              protocol: TCP
+          env:
+            - name: GOTRUE_URL
+              value: http://localhost:9999
+            - name: GOTRUE_PROBE_ADMIN_JWT
+              valueFrom:
+                secretKeyRef:
+                  name: supabase-auth-deep-probe
+                  key: SERVICE_ROLE_KEY
+            - name: PROBE_LISTEN_ADDR
+              value: ":9101"
+            - name: PROBE_INTERVAL
+              value: "10s"
+            - name: PROBE_TIMEOUT
+              value: "3s"
+            - name: PROBE_WATCHDOG_STALL
+              value: "30s"
+            - name: PROBE_WATCHDOG_EXIT
+              value: "true"
+            - name: PROBE_LOG_LEVEL
+              value: "INFO"
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: probe
+            periodSeconds: 10
+            failureThreshold: 6
+          readinessProbe:
+            httpGet:
+              path: /probe
+              port: probe
+            periodSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests: { cpu: 25m, memory: 32Mi }
+            limits:   { cpu: 200m, memory: 128Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities: { drop: ["ALL"] }
+
+      volumes:
+        - name: tmp
+          emptyDir:
+            sizeLimit: 64Mi
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: supabase-auth
+spec:
+  minAvailable: 1                # never let a drain take everyone out at once
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: supabase-auth
+
+---
+# Optional: pick up by kube-prometheus-stack. Remove if not using the
+# Prometheus Operator.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: supabase-auth
+  labels:
+    release: kube-prometheus-stack       # match your operator's selector
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: supabase-auth
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 15s
+      scrapeTimeout: 10s
+    - port: probe
+      path: /metrics
+      interval: 15s
+      scrapeTimeout: 10s

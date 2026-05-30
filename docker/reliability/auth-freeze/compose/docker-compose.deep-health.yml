@@ -1,0 +1,76 @@
+# docker-compose.deep-health.yml
+#
+# Opt-in override that:
+#   1. Adds the gotrue-deep-probe sidecar (`auth-deep-probe`).
+#   2. Mounts the layered shell healthcheck into the auth container.
+#   3. Replaces the auth container's HEALTHCHECK with the layered script,
+#      using SERVICE_ROLE_KEY for the admin layer so a saturated DB pool
+#      actually trips the probe.
+#
+# IMPORTANT
+#   The deep healthcheck WILL flap if Postgres goes down. By design.
+#   That is correct behaviour for readiness but DANGEROUS for liveness if
+#   you're running Docker with a `restart-on-unhealthy` orchestrator. The
+#   default `restart: unless-stopped` in the upstream compose file does
+#   NOT restart on unhealthy, so the override is safe with the bundled
+#   stack. For Kubernetes, use the manifests under ../k8s/ which bind
+#   liveness to /health and readiness to the deep probe.
+#
+# Usage
+#   docker compose -f docker-compose.yml \
+#                  -f reliability/auth-freeze/compose/docker-compose.deep-health.yml \
+#                  up -d
+
+name: supabase
+
+services:
+
+  auth:
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - /probes/gotrue-deep-healthcheck.sh
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    environment:
+      # Re-exported so the script inside the container can find them.
+      GOTRUE_URL: http://localhost:9999
+      GOTRUE_PROBE_TIMEOUT: "3"
+      GOTRUE_PROBE_ADMIN_JWT: ${SERVICE_ROLE_KEY}
+    volumes:
+      - ../probes/gotrue-deep-healthcheck.sh:/probes/gotrue-deep-healthcheck.sh:ro,z
+
+  auth-deep-probe:
+    container_name: supabase-auth-deep-probe
+    build:
+      context: ../probes/deep-probe
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      auth:
+        condition: service_started
+    environment:
+      GOTRUE_URL: http://auth:9999
+      GOTRUE_PROBE_ADMIN_JWT: ${SERVICE_ROLE_KEY}
+      PROBE_LISTEN_ADDR: ":9101"
+      PROBE_INTERVAL: 10s
+      PROBE_TIMEOUT: 3s
+      PROBE_WATCHDOG_STALL: 30s
+      # Set to "true" only if you have an external supervisor that will
+      # restart this container; otherwise the watchdog will just log.
+      PROBE_WATCHDOG_EXIT: "false"
+      PROBE_LOG_LEVEL: INFO
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "wget -q -O- http://localhost:9101/healthz | grep -q ok"
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    # Expose the probe's port locally so operators can `curl localhost:9101/probe`
+    # without execing into the container.
+    ports:
+      - "127.0.0.1:9101:9101"

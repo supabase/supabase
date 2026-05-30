@@ -1,0 +1,82 @@
+# docker-compose.observability.yml
+#
+# Minimal Prometheus + Grafana stack for the auth-freeze reliability work.
+# Provisions:
+#   - Prometheus scraping:
+#       * auth (when GOTRUE_METRICS_ENABLED=true, port 9100)
+#       * auth-deep-probe (port 9101)
+#       * cAdvisor (optional)
+#       * itself
+#   - Alert rules from observability/alerts/auth.rules.yml
+#   - Grafana with the dashboard auto-provisioned (no login required for
+#     localhost development; PLEASE change the admin password before any
+#     non-loopback exposure).
+#
+# Usage
+#   docker compose -f docker-compose.yml \
+#                  -f reliability/auth-freeze/compose/docker-compose.deep-health.yml \
+#                  -f reliability/auth-freeze/compose/docker-compose.observability.yml \
+#                  up -d
+#
+# Then open: http://localhost:3001  (Grafana)
+#            http://localhost:9090  (Prometheus)
+
+name: supabase
+
+services:
+
+  prometheus:
+    container_name: supabase-prometheus
+    image: prom/prometheus:v2.55.1
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=72h
+      - --web.enable-lifecycle
+      - --web.listen-address=:9090
+    volumes:
+      - ../observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro,z
+      - ../observability/alerts:/etc/prometheus/alerts:ro,z
+      - prometheus-data:/prometheus
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - --quiet
+        - --tries=1
+        - --spider
+        - http://localhost:9090/-/healthy
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    ports:
+      - "127.0.0.1:9090:9090"
+
+  grafana:
+    container_name: supabase-grafana
+    image: grafana/grafana-oss:11.3.1
+    restart: unless-stopped
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    environment:
+      # Loopback-only by default. Override for shared development.
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_INSTALL_PLUGINS: ""
+      # Keep file-based provisioning only; disable plugins for security.
+      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: ""
+    volumes:
+      - ../observability/grafana/datasources:/etc/grafana/provisioning/datasources:ro,z
+      - ../observability/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro,z
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "127.0.0.1:3001:3000"
+
+volumes:
+  prometheus-data:
+  grafana-data:
