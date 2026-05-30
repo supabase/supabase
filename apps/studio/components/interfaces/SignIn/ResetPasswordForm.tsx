@@ -45,9 +45,7 @@ export const ResetPasswordForm = () => {
   const { type } = useParams()
   const user = useUser()
 
-  const hasPassword =
-    user?.app_metadata?.provider === 'email' ||
-    user?.user_metadata?.has_password === true
+  const hasPassword = user?.user_metadata?.has_password === true
 
   const requireCurrentPassword = type === 'change' && hasPassword
 

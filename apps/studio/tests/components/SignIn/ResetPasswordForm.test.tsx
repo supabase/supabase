@@ -44,7 +44,7 @@ describe('ResetPasswordForm Component', () => {
     mockUseParams.mockReturnValue({ type: 'change' })
     mockUseUser.mockReturnValue({
       app_metadata: { provider: 'email' },
-      user_metadata: {},
+      user_metadata: { has_password: true },
     })
 
     const { container } = render(<ResetPasswordForm />)
