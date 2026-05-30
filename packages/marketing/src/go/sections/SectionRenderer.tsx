@@ -5,6 +5,7 @@ import CodeBlockSection from './CodeBlockSection'
 import FaqSection from './FaqSection'
 import FeatureGridSection from './FeatureGridSection'
 import FormSection from './FormSection'
+import HubSpotMeetingSection from './HubSpotMeetingSection'
 import MetricsSection from './MetricsSection'
 import QuoteSection from './QuoteSection'
 import SingleColumnSection from './SingleColumnSection'
@@ -20,10 +21,12 @@ export type CustomSectionRenderers = {
 
 interface SectionRendererProps {
   section: GoSection
+  /** Page slug — threaded through so form sections can build a server-resolvable formRef. */
+  slug: string
   customRenderers?: CustomSectionRenderers
 }
 
-export default function SectionRenderer({ section, customRenderers }: SectionRendererProps) {
+export default function SectionRenderer({ section, slug, customRenderers }: SectionRendererProps) {
   // Check for a custom renderer first
   const CustomRenderer = customRenderers?.[section.type] as
     | React.ComponentType<{ section: typeof section }>
@@ -44,9 +47,13 @@ export default function SectionRenderer({ section, customRenderers }: SectionRen
       case 'three-column':
         content = <ThreeColumnSection section={section} />
         break
-      case 'form':
-        content = <FormSection section={section} />
+      case 'form': {
+        // Drop CRM config before the section crosses into the client bundle —
+        // the server action re-resolves it from the registry by formRef.
+        const { crm: _crm, ...clientSection } = section
+        content = <FormSection section={clientSection} slug={slug} />
         break
+      }
       case 'feature-grid':
         content = <FeatureGridSection section={section} />
         break
@@ -67,6 +74,9 @@ export default function SectionRenderer({ section, customRenderers }: SectionRen
         break
       case 'quote':
         content = <QuoteSection section={section} />
+        break
+      case 'hubspot-meeting':
+        content = <HubSpotMeetingSection section={section} />
         break
       default: {
         const _exhaustive: never = section

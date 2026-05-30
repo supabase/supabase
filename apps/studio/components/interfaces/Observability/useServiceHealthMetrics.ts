@@ -1,12 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
-import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
-import useTimeseriesUnixToIso from 'hooks/analytics/useTimeseriesUnixToIso'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import { useMemo } from 'react'
 
 import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
-import { LogsTableName } from '../Settings/Logs/Logs.constants'
-import { genChartQuery } from '../Settings/Logs/Logs.utils'
 import {
   calculateAggregatedMetrics,
   calculateDateRange,
@@ -14,8 +11,24 @@ import {
   transformToBarChartData,
   type RawChartData,
 } from './useServiceHealthMetrics.utils'
+import { analyticsKeys } from '@/data/analytics/keys'
+import {
+  getServiceHealth,
+  type ServiceHealthGranularity,
+  type ServiceHealthResultRow,
+} from '@/data/analytics/service-health-query'
+import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
 
-export type ServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime' | 'postgrest'
+dayjs.extend(utc)
+
+export type ServiceKey =
+  | 'db'
+  | 'functions'
+  | 'auth'
+  | 'storage'
+  | 'realtime'
+  | 'data_api'
+  | 'postgrest'
 
 export type ServiceHealthData = {
   total: number
@@ -30,112 +43,92 @@ export type ServiceHealthData = {
   refresh: () => void
 }
 
-type ServiceConfig = {
-  table: LogsTableName
-  enabled: boolean
+const INTERVAL_TO_GRANULARITY: Record<'1hr' | '1day' | '7day', ServiceHealthGranularity> = {
+  '1hr': 'minute',
+  '1day': 'hour',
+  '7day': 'day',
 }
 
-const SERVICE_CONFIG: Record<ServiceKey, ServiceConfig> = {
-  db: { table: LogsTableName.POSTGRES, enabled: true },
-  auth: { table: LogsTableName.AUTH, enabled: true },
-  functions: { table: LogsTableName.FN_EDGE, enabled: true },
-  storage: { table: LogsTableName.STORAGE, enabled: true },
-  realtime: { table: LogsTableName.REALTIME, enabled: true },
-  postgrest: { table: LogsTableName.POSTGREST, enabled: true },
+/** Maps our service keys to the field names returned by the service-health endpoint */
+const SERVICE_RESPONSE_KEY: Record<
+  ServiceKey,
+  Exclude<keyof ServiceHealthResultRow, 'timestamp'>
+> = {
+  db: 'postgres_logs',
+  auth: 'auth_logs',
+  functions: 'function_edge_logs',
+  storage: 'storage_logs',
+  realtime: 'realtime_logs',
+  data_api: 'edge_logs',
+  postgrest: 'postgrest_logs',
 }
 
-type ChartQueryResult = {
-  timestamp: string | number
-  ok_count: number
-  warning_count: number
-  error_count: number
-}
-
-/**
- * Fetches service health metrics using the same logic as the logs pages
- */
-const fetchServiceHealthMetrics = async (
-  projectRef: string,
-  table: LogsTableName,
-  startDate: string,
-  endDate: string,
-  signal?: AbortSignal
-): Promise<ChartQueryResult[]> => {
-  const sql = genChartQuery(
-    table,
-    {
-      iso_timestamp_start: startDate,
-      iso_timestamp_end: endDate,
-    },
-    {}
-  )
-
-  const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-    params: {
-      path: { ref: projectRef },
-      query: {
-        sql,
-        iso_timestamp_start: startDate,
-        iso_timestamp_end: endDate,
-      },
-    },
-    signal,
+/** Extracts a single service's timeseries rows from the shared service-health response */
+export function extractServiceRows(rows: ServiceHealthResultRow[], serviceKey: ServiceKey) {
+  const responseKey = SERVICE_RESPONSE_KEY[serviceKey]
+  return rows.map((row) => {
+    const svc = row[responseKey]
+    return {
+      timestamp: row.timestamp,
+      ok_count: svc?.ok ?? 0,
+      warning_count: svc?.warning ?? 0,
+      error_count: svc?.error ?? 0,
+    }
   })
-
-  if (error ?? data?.error) {
-    throw error ?? data?.error
-  }
-
-  return (data?.result ?? []) as ChartQueryResult[]
 }
 
 /**
- * Hook to fetch health metrics for a single service
+ * Hook to fetch and process health metrics for a single service.
+ * All service hooks share one deduplicated network request via the same query key.
  */
 const useServiceHealthQuery = ({
   projectRef,
   serviceKey,
   startDate,
   endDate,
+  granularity,
   enabled,
 }: {
   projectRef: string
   serviceKey: ServiceKey
   startDate: string
   endDate: string
+  granularity: ServiceHealthGranularity
   enabled: boolean
 }) => {
-  const config = SERVICE_CONFIG[serviceKey]
-  const table = config.table
-
   const queryResult = useQuery({
-    queryKey: ['service-health-metrics', projectRef, serviceKey, startDate, endDate, table],
+    queryKey: analyticsKeys.serviceHealth(projectRef, { startDate, endDate, granularity }),
     queryFn: ({ signal }) =>
-      fetchServiceHealthMetrics(projectRef, table, startDate, endDate, signal),
-    enabled: enabled && config.enabled && Boolean(projectRef),
-    staleTime: 1000 * 60, // 1 minute
+      getServiceHealth({ projectRef, startDate, endDate, granularity }, signal),
+    enabled: enabled && Boolean(projectRef),
+    staleTime: 1000 * 60,
   })
 
-  // Convert unix microseconds to ISO timestamps
-  const normalizedData = useTimeseriesUnixToIso(queryResult.data ?? [], 'timestamp')
+  const rawRows = useMemo(
+    () => extractServiceRows(queryResult.data?.result ?? [], serviceKey),
+    [queryResult.data, serviceKey]
+  )
+
+  // Snap start/end to the granularity boundary so fillTimeseries iterates
+  // in sync with the API's bucketed timestamps (e.g. midnight for 'day').
+  const fillStart = dayjs.utc(startDate).startOf(granularity).toISOString()
+  const fillEnd = dayjs.utc(endDate).startOf(granularity).toISOString()
 
   // Fill gaps in timeseries
   const { data: filledData } = useFillTimeseriesSorted({
-    data: normalizedData,
+    data: rawRows,
     timestampKey: 'timestamp',
-    valueKey: 'ok_count',
+    valueKey: ['ok_count', 'warning_count', 'error_count'],
     defaultValue: 0,
-    startDate,
-    endDate,
+    startDate: fillStart,
+    endDate: fillEnd,
   })
 
-  // Transform to LogsBarChartDatum format
   const eventChartData: LogsBarChartDatum[] = useMemo(
     () => transformToBarChartData(filledData as RawChartData[]),
     [filledData]
   )
 
-  // Calculate metrics
   const metrics = useMemo(() => calculateHealthMetrics(eventChartData), [eventChartData])
 
   return {
@@ -148,71 +141,35 @@ const useServiceHealthQuery = ({
 }
 
 /**
- * Hook to fetch observability overview data for all services using logs page queries
+ * Hook to fetch observability overview data for all services using the service-health endpoint.
+ * One network request is made; results are fanned out to each service by field name.
  */
 export const useServiceHealthMetrics = (
   projectRef: string,
   interval: '1hr' | '1day' | '7day',
   refreshKey: number
 ) => {
-  // Calculate date range based on interval
-  // refreshKey is intentionally included to force recalculation when user refreshes
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const { startDate, endDate } = useMemo(() => calculateDateRange(interval), [interval, refreshKey])
 
+  const granularity = INTERVAL_TO_GRANULARITY[interval]
   const enabled = Boolean(projectRef)
 
-  // Fetch metrics for each service
-  const db = useServiceHealthQuery({ projectRef, serviceKey: 'db', startDate, endDate, enabled })
-  const auth = useServiceHealthQuery({
-    projectRef,
-    serviceKey: 'auth',
-    startDate,
-    endDate,
-    enabled,
-  })
-  const functions = useServiceHealthQuery({
-    projectRef,
-    serviceKey: 'functions',
-    startDate,
-    endDate,
-    enabled,
-  })
-  const storage = useServiceHealthQuery({
-    projectRef,
-    serviceKey: 'storage',
-    startDate,
-    endDate,
-    enabled,
-  })
-  const realtime = useServiceHealthQuery({
-    projectRef,
-    serviceKey: 'realtime',
-    startDate,
-    endDate,
-    enabled,
-  })
-  const postgrest = useServiceHealthQuery({
-    projectRef,
-    serviceKey: 'postgrest',
-    startDate,
-    endDate,
-    enabled,
-  })
+  const sharedParams = { projectRef, startDate, endDate, granularity, enabled }
+
+  const db = useServiceHealthQuery({ ...sharedParams, serviceKey: 'db' })
+  const auth = useServiceHealthQuery({ ...sharedParams, serviceKey: 'auth' })
+  const functions = useServiceHealthQuery({ ...sharedParams, serviceKey: 'functions' })
+  const storage = useServiceHealthQuery({ ...sharedParams, serviceKey: 'storage' })
+  const realtime = useServiceHealthQuery({ ...sharedParams, serviceKey: 'realtime' })
+  const data_api = useServiceHealthQuery({ ...sharedParams, serviceKey: 'data_api' })
+  const postgrest = useServiceHealthQuery({ ...sharedParams, serviceKey: 'postgrest' })
 
   const services: Record<ServiceKey, ServiceHealthData> = useMemo(
-    () => ({
-      db,
-      auth,
-      functions,
-      storage,
-      realtime,
-      postgrest,
-    }),
-    [db, auth, functions, storage, realtime, postgrest]
+    () => ({ db, auth, functions, storage, realtime, data_api, postgrest }),
+    [db, auth, functions, storage, realtime, data_api, postgrest]
   )
 
-  // Calculate aggregated metrics
   const aggregated = useMemo(() => calculateAggregatedMetrics(Object.values(services)), [services])
 
   const isLoading = Object.values(services).some((s) => s.isLoading)

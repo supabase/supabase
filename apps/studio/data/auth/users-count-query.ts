@@ -1,11 +1,11 @@
 import type { OptimizedSearchColumns } from '@supabase/pg-meta'
 import { getUsersCountSQL } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
-import { executeSql, type ExecuteSqlError } from 'data/sql/execute-sql-query'
-import { UseCustomQueryOptions } from 'types'
 
 import { authKeys } from './keys'
 import { type Filter } from './users-infinite-query'
+import { executeSql, type ExecuteSqlError } from '@/data/sql/execute-sql-query'
+import { UseCustomQueryOptions } from '@/types'
 
 type UsersCountVariables = {
   projectRef?: string

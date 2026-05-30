@@ -1,17 +1,16 @@
 import { useParams } from 'common'
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import Error from 'components/ui/Error'
-import { ProductMenu } from 'components/ui/ProductMenu'
-import { useOpenAPISpecQuery } from 'data/open-api/api-spec-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { withAuth } from 'hooks/misc/withAuth'
-import { PROJECT_STATUS } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { ReactElement } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
 import { generateDocsMenu, getActivePage } from './DocsLayout.utils'
+import Error from '@/components/ui/Error'
+import { ProductMenu } from '@/components/ui/ProductMenu'
+import { useOpenAPISpecQuery } from '@/data/open-api/api-spec-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { withAuth } from '@/hooks/misc/withAuth'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 function DocsLayout({ title, children }: { title: string; children: ReactElement }) {
   const router = useRouter()
@@ -25,8 +24,7 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
     error,
   } = useOpenAPISpecQuery({ projectRef: ref }, { enabled: !isPaused })
 
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
-  const hideMenu = isNewAPIDocsEnabled && router.pathname.endsWith('/graphiql')
+  const hideMenu = router.pathname.endsWith('/graphiql')
 
   const { projectAuthAll: authEnabled } = useIsFeatureEnabled(['project_auth:all'])
 

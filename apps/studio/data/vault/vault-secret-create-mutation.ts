@@ -1,10 +1,10 @@
 import { getCreateVaultSecretSQL } from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { executeSql } from 'data/sql/execute-sql-query'
 import { toast } from 'sonner'
-import type { ResponseError, UseCustomMutationOptions, VaultSecret } from 'types'
 
 import { vaultSecretsKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { ResponseError, UseCustomMutationOptions, VaultSecret } from '@/types'
 
 export type VaultSecretCreateVariables = {
   projectRef: string

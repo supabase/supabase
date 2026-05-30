@@ -1,16 +1,16 @@
 import { format } from 'date-fns'
 import { Clock } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { cn } from 'ui'
 
+import type { TimeSplitInputProps, TimeType } from './DatePicker.types'
 import {
   isUnixMicro,
   unixMicroToIsoTimestamp,
-} from 'components/interfaces/Settings/Logs/Logs.utils'
-import { cn } from 'ui'
-import type { TimeSplitInputProps, TimeType } from './DatePicker.types'
+} from '@/components/interfaces/Settings/Logs/Logs.utils'
 
 const inputStyle = cn(
-  'w-6 p-0 text-center text-xs text-foreground outline-none cursor-text',
+  'w-6 p-0 text-center text-xs text-foreground outline-hidden cursor-text',
   'ring-0 focus:ring-0 ring-none border-none bg-transparent'
 )
 
@@ -230,7 +230,7 @@ export const TimeSplitInput = ({
     <div
       className={`
         flex h-7 items-center justify-center
-        gap-0 rounded border border-strong bg-surface-100 text-xs text-foreground-light
+        gap-0 rounded-sm border border-strong bg-surface-100 text-xs text-foreground-light
         ${focus && ' border-stronger outline outline-2 outline-border'}
         hover:border-stronger transition-colors
     `}

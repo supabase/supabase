@@ -1,10 +1,4 @@
-import { BranchDropdown } from 'components/layouts/AppLayout/BranchDropdown'
-import { OrganizationDropdown } from 'components/layouts/AppLayout/OrganizationDropdown'
-import { ProjectDropdown } from 'components/layouts/AppLayout/ProjectDropdown'
-import type { Branch } from 'data/branches/branches-query'
-import type { ProjectDetail } from 'data/projects/project-detail-query'
 import { Box, Boxes, GitBranch } from 'lucide-react'
-import type { Organization } from 'types'
 import {
   cn,
   SheetHeader,
@@ -16,6 +10,12 @@ import {
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 
 import { ProjectBranchSelectorSheetTabTrigger } from './ProjectBranchSelectorSheetTabTrigger'
+import { BranchDropdown } from '@/components/layouts/AppLayout/BranchDropdown'
+import { OrganizationDropdown } from '@/components/layouts/AppLayout/OrganizationDropdown'
+import { ProjectDropdown } from '@/components/layouts/AppLayout/ProjectDropdown'
+import type { Branch } from '@/data/branches/branches-query'
+import type { ProjectDetail } from '@/data/projects/project-detail-query'
+import type { Organization } from '@/types'
 
 const EMBEDDED_CLASSNAME =
   'bg-transparent border-0 shadow-none min-h-0 flex-1 flex flex-col overflow-hidden rounded-none'

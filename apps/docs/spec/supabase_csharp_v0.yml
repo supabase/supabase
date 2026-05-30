@@ -667,17 +667,17 @@ functions:
           ```
 
   - id: rpc
-    title: 'Stored Procedures: Rpc()'
+    title: 'Database Functions: Rpc()'
     description: |
-      You can call stored procedures as a "Remote Procedure Call".
+      You can call functions as a "Remote Procedure Call".
 
       That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
       It's especially useful when the logic rarely changes - like password resets and updates.
     examples:
-      - id: call-a-stored-procedure
-        name: Call a stored procedure
+      - id: call-a-database-function
+        name: Call a database function
         isSpotlight: true
-        description: This is an example invoking a stored procedure.
+        description: This is an example invoking a database function.
         code: |
           ```c#
           await supabase.Rpc("hello_world", null);

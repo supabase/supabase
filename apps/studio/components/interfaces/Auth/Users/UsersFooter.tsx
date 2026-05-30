@@ -1,15 +1,15 @@
 import { THRESHOLD_COUNT, type OptimizedSearchColumns } from '@supabase/pg-meta'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { formatEstimatedCount } from 'components/grid/components/footer/pagination/Pagination.utils'
-import { useUsersCountQuery } from 'data/auth/users-count-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { HelpCircle, Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import type { Filter, SpecificFilterColumn } from './Users.constants'
+import { formatEstimatedCount } from '@/components/grid/components/footer/pagination/Pagination.utils'
+import { useUsersCountQuery } from '@/data/auth/users-count-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface UsersFooterProps {
   filter: Filter

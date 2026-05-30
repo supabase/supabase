@@ -1,7 +1,7 @@
 ---
 id: 'pgroonga'
 title: 'PGroonga: Multilingual Full Text Search'
-description: 'Full Text Search for multiple languages in PostgreSQL'
+description: 'Full Text Search for multiple languages in Postgres'
 tocVideo: 'Mmmv9g_MiBA'
 ---
 
@@ -65,9 +65,9 @@ To test the full text index, we'll add some data.
 ```sql
 insert into memos(content)
 values
-  ('PostgreSQL is a relational database management system.'),
+  ('Postgres is a relational database management system.'),
   ('Groonga is a fast full text search engine that supports all languages.'),
-  ('PGroonga is a PostgreSQL extension that uses Groonga as index.'),
+  ('PGroonga is a Postgres extension that uses Groonga as index.'),
   ('There is groonga command.');
 ```
 
@@ -117,7 +117,7 @@ And the result:
 id | content  
 ----+------------------------------------------------------------------------
 2 | Groonga is a fast full text search engine that supports all languages.
-3 | PGroonga is a PostgreSQL extension that uses Groonga as index.
+3 | PGroonga is a Postgres extension that uses Groonga as index.
 4 | There is groonga command.
 (3 rows)
 ```
@@ -136,7 +136,7 @@ And the result:
 ```markdown
 id | content  
 ----+----------------------------------------------------------------
-3 | PGroonga is a PostgreSQL extension that uses Groonga as index.
+3 | PGroonga is a Postgres extension that uses Groonga as index.
 (1 row)
 ```
 
@@ -154,8 +154,8 @@ And the result:
 ```markdown
 id | content  
 ----+----------------------------------------------------------------
-1 | PostgreSQL is a relational database management system.
-3 | PGroonga is a PostgreSQL extension that uses Groonga as index.
+1 | Postgres is a relational database management system.
+3 | PGroonga is a Postgres extension that uses Groonga as index.
 (2 rows)
 ```
 
@@ -173,7 +173,7 @@ And the result:
 ```markdown
 id | content  
 ----+--------------------------------------------------------
-1 | PostgreSQL is a relational database management system.
+1 | Postgres is a relational database management system.
 (1 row)
 ```
 

@@ -1,9 +1,9 @@
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
-
 import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
+
 import { contentKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
 export type SnippetFolderResponse = components['schemas']['GetUserContentFolderResponse']['data']
 export type SnippetFolder =

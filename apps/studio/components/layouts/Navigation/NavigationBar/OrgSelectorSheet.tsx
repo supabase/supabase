@@ -1,6 +1,4 @@
-import { OrganizationDropdown } from 'components/layouts/AppLayout/OrganizationDropdown'
 import { Boxes } from 'lucide-react'
-import type { Organization } from 'types'
 import {
   SheetHeader,
   SheetTitle,
@@ -10,6 +8,9 @@ import {
   TabsTrigger_Shadcn_,
 } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
+
+import { OrganizationDropdown } from '@/components/layouts/AppLayout/OrganizationDropdown'
+import type { Organization } from '@/types'
 
 const embeddedClassName =
   'bg-transparent border-0 shadow-none min-h-0 flex-1 flex flex-col overflow-hidden rounded-none'

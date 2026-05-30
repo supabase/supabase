@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
 import { AnimatePresence, motion, useAnimation } from 'framer-motion'
+import { useEffect, useState, type ReactNode } from 'react'
 import { cn } from 'ui'
 
 interface TabProps {
-  label: string | JSX.Element
+  label: ReactNode
   isActive: boolean
   onClick: VoidFunction
 }
@@ -11,7 +11,7 @@ interface TabProps {
 const Tab = ({ isActive, label, onClick }: TabProps) => (
   <button
     onClick={onClick}
-    className={`text-left text-lg flex flex-col group gap-1 transition-opacity flex-[1] ${
+    className={`text-left text-lg flex flex-col group gap-1 transition-opacity flex-1 ${
       isActive ? 'opacity-100' : 'opacity-50'
     }`}
     aria-selected={isActive}
@@ -22,9 +22,9 @@ const Tab = ({ isActive, label, onClick }: TabProps) => (
 )
 
 interface Tab {
-  label: string | JSX.Element
+  label: ReactNode
   paragraph?: string
-  panel: JSX.Element
+  panel: ReactNode
 }
 
 interface Props {
@@ -100,7 +100,7 @@ const EnterpriseFormQuotes = ({
         </motion.div>
       </AnimatePresence>
       {/* progress bar */}
-      <div className="relative w-full h-[1px] bg-border-strong opacity-80 group-hover:opacity-100 rounded-full overflow-hidden">
+      <div className="relative w-full h-px bg-border-strong opacity-80 group-hover:opacity-100 rounded-full overflow-hidden">
         <motion.div
           className={cn(
             'absolute motion-reduce:hidden inset-0 w-full right-full bg-brand h-full transition-all',

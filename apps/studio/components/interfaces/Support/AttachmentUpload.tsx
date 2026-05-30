@@ -1,11 +1,7 @@
 // End of third-party imports
 
-import { useGenerateAttachmentURLsMutation } from 'data/support/generate-attachment-urls-mutation'
-import { uuidv4 } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
 import { compact } from 'lodash'
-import { File, FileCode, Plus, X } from 'lucide-react'
-import { InlineLink } from 'components/ui/InlineLink'
+import { FileCode, Plus, X } from 'lucide-react'
 import {
   useCallback,
   useEffect,
@@ -19,6 +15,10 @@ import { toast } from 'sonner'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { createSupportStorageClient } from './support-storage-client'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useGenerateAttachmentURLsMutation } from '@/data/support/generate-attachment-urls-mutation'
+import { uuidv4 } from '@/lib/helpers'
+import { useProfile } from '@/lib/profile'
 
 const MAX_ATTACHMENTS = 5
 
@@ -112,9 +112,14 @@ export function useAttachmentUpload() {
 
     if (uploadedFiles.length === 0) return
 
-    const filenames = await uploadAttachments({ userId: profile.gotrue_id, files: uploadedFiles })
-    const urls = await generateAttachmentURLs({ bucket: 'support-attachments', filenames })
-    return urls
+    try {
+      const filenames = await uploadAttachments({ userId: profile.gotrue_id, files: uploadedFiles })
+      const urls = await generateAttachmentURLs({ bucket: 'support-attachments', filenames })
+      return urls
+    } catch {
+      // Ignore attachments upload errors, images are additional context and support can ask for more if needed
+      return
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile, uploadedFiles])
 
@@ -133,7 +138,7 @@ export function useAttachmentUpload() {
 }
 
 interface AttachmentUploadDisplayProps {
-  uploadButtonRef: RefObject<HTMLInputElement>
+  uploadButtonRef: RefObject<HTMLInputElement | null>
   isFull: boolean
   uploadedDataUrls: string[]
   addFile: () => void
@@ -188,7 +193,7 @@ export function AttachmentUploadDisplay({
             return (
               <div
                 key={url}
-                className="border relative h-14 w-14 rounded flex items-center justify-center"
+                className="border relative h-14 w-14 rounded-sm flex items-center justify-center"
               >
                 <Tooltip>
                   <TooltipTrigger className="cursor-default" onClick={(e) => e.preventDefault()}>
@@ -220,7 +225,7 @@ export function AttachmentUploadDisplay({
               <div
                 key={url}
                 style={{ backgroundImage: `url("${url}")` }}
-                className="relative h-14 w-14 rounded bg-cover bg-center bg-no-repeat"
+                className="relative h-14 w-14 rounded-sm bg-cover bg-center bg-no-repeat"
               >
                 <button
                   type="button"
@@ -242,7 +247,7 @@ export function AttachmentUploadDisplay({
             type="button"
             className={cn(
               'border border-stronger opacity-50 transition hover:opacity-100',
-              'group flex h-14 w-14 cursor-pointer items-center justify-center rounded'
+              'group flex h-14 w-14 cursor-pointer items-center justify-center rounded-sm'
             )}
             onClick={addFile}
           >

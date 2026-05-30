@@ -1,13 +1,12 @@
+import { AddRowOperationItem } from './AddRowOperationItem'
+import { DeleteRowOperationItem } from './DeleteRowOperationItem'
+import { OperationItem } from './OperationItem'
 import {
   isAddRowOperation,
   isDeleteRowOperation,
   isEditCellContentOperation,
   QueuedOperation,
-} from 'state/table-editor-operation-queue.types'
-
-import { AddRowOperationItem } from './AddRowOperationItem'
-import { DeleteRowOperationItem } from './DeleteRowOperationItem'
-import { OperationItem } from './OperationItem'
+} from '@/state/table-editor-operation-queue.types'
 
 interface OperationListProps {
   operations: readonly QueuedOperation[]

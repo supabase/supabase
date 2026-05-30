@@ -1,8 +1,8 @@
 import { enrichLintsQuery, getLintsSQL } from '@supabase/pg-meta'
 import { paths } from 'api-types'
-import { DOCS_URL } from 'lib/constants'
 
 import { executeQuery } from './query'
+import { DOCS_URL } from '@/lib/constants'
 
 interface GetLintsOptions {
   headers?: HeadersInit

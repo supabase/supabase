@@ -1,15 +1,16 @@
+import { type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
 import { useQuery } from '@tanstack/react-query'
 
-import { DEFAULT_QUERY_PARAMS } from 'components/interfaces/Reports/Reports.constants'
+import { DEFAULT_QUERY_PARAMS } from '@/components/interfaces/Reports/Reports.constants'
 import {
   BaseReportParams,
   MetaQueryResponse,
-  ReportQuery,
-} from 'components/interfaces/Reports/Reports.types'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+  ReportQueryDb,
+} from '@/components/interfaces/Reports/Reports.types'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 export interface DbQueryHook<T = any> {
   isLoading: boolean
@@ -31,7 +32,7 @@ const useDbQuery = ({
   where,
   orderBy,
 }: {
-  sql: ReportQuery['sql'] | string
+  sql: ReportQueryDb['safeSql'] | SafeSqlFragment
   params?: BaseReportParams
   where?: string
   orderBy?: string

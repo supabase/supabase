@@ -1,9 +1,9 @@
 import { replicationLagSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
-import { UseCustomQueryOptions } from 'types'
 
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { replicaKeys } from './keys'
+import { executeSql, ExecuteSqlError } from '@/data/sql/execute-sql-query'
+import { UseCustomQueryOptions } from '@/types'
 
 export type ReplicationLagVariables = {
   id: string

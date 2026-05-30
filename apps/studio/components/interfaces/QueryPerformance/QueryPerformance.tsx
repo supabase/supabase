@@ -1,10 +1,10 @@
 import { useParams } from 'common'
 import { useEffect } from 'react'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
 import { PresetHookResult } from '../Reports/Reports.utils'
 import { QueryPerformanceInfiniteHook } from './useQueryPerformanceQuery'
 import { WithStatements } from './WithStatements/WithStatements'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 interface QueryPerformanceProps {
   queryHitRate: PresetHookResult

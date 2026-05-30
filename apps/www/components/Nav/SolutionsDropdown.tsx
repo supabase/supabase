@@ -50,7 +50,7 @@ const LinksGroup = ({ links, label }: { links: LinkProps[]; label: string }) => 
           <li key={link.text}>
             <Link
               href={link.url!}
-              className="flex group items-center gap-2 text-foreground-light text-sm hover:text-foreground focus-visible:text-foreground focus-visible:ring-2 focus-visible:outline-none focus-visible:rounded focus-visible:ring-foreground-lighter"
+              className="flex group items-center gap-2 text-foreground-light text-sm hover:text-foreground focus-visible:text-foreground focus-visible:ring-2 focus-visible:outline-hidden focus-visible:rounded-sm focus-visible:ring-foreground-lighter"
             >
               {Icon && <Icon size={16} strokeWidth={1.3} />}
               <span>{link.text}</span>

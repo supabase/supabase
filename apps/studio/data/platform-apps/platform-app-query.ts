@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
-
 import type { components } from 'api-types'
-import { constructHeaders, fetchHandler, handleError } from 'data/fetchers'
-import { API_URL } from 'lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { platformAppKeys } from './keys'
+import { constructHeaders, fetchHandler, handleError } from '@/data/fetchers'
+import { API_URL } from '@/lib/constants'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type PlatformAppVariables = {
   slug?: string

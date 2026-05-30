@@ -1,26 +1,25 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { useCallback, useEffect, useReducer } from 'react'
+import { useCallback, useEffect, useEffectEvent, useReducer } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Card } from 'ui'
 
-import { DataApiEnableSwitchForm } from './DataApiEnableSwitchForm'
-import { DataApiEnableSwitchError, DataApiEnableSwitchLoading } from './DataApiEnableSwitchStates'
 import { dataApiFormSchema, type DataApiFormValues } from './DataApiEnableSwitch.types'
 import {
   enableCheckReducer,
   getDefaultSchemas,
   queryUnsafeEntitiesInApi,
 } from './DataApiEnableSwitch.utils'
+import { DataApiEnableSwitchForm } from './DataApiEnableSwitchForm'
+import { DataApiEnableSwitchError, DataApiEnableSwitchLoading } from './DataApiEnableSwitchStates'
 import { UnsafeEntitiesConfirmModal } from './UnsafeEntitiesConfirmModal'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-postgrest-config-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 
 export const DataApiEnableSwitch = () => {
   const { ref: projectRef } = useParams()
@@ -55,14 +54,15 @@ export const DataApiEnableSwitch = () => {
     },
   })
 
-  const syncForm = useStaticEffectEvent(() => {
+  const syncForm = useEffectEvent(() => {
     if (!isEnabledCheckPending) {
       form.reset({ enableDataApi: isEnabled })
     }
   })
   useEffect(() => {
     syncForm()
-  }, [syncForm, isEnabled])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [isEnabled])
 
   const doUpdate = useCallback(
     (enableDataApi: boolean) => {

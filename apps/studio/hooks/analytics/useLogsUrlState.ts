@@ -1,6 +1,6 @@
 import { createParser, useQueryState } from 'nuqs'
 
-import { Filters } from 'components/interfaces/Settings/Logs/Logs.types'
+import { Filters } from '@/components/interfaces/Settings/Logs/Logs.types'
 
 interface LogsUrlState {
   search: string

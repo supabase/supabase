@@ -1,8 +1,8 @@
-import { StorageMenuV2 } from 'components/interfaces/Storage/StorageMenuV2'
-import { withAuth } from 'hooks/misc/withAuth'
 import { ReactNode } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
+import { StorageMenuV2 } from '@/components/interfaces/Storage/StorageMenuV2'
+import { withAuth } from '@/hooks/misc/withAuth'
 
 export interface StorageLayoutProps {
   title: string

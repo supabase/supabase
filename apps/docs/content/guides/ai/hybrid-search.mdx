@@ -168,7 +168,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2'
 import OpenAI from 'npm:openai'
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+const supabaseSecretKey = Deno.env.get('SUPABASE_SECRET_KEY')!
 const openaiApiKey = Deno.env.get('OPENAI_API_KEY')!
 
 Deno.serve(async (req) => {

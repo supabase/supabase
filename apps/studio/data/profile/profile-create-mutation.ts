@@ -1,12 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { components } from 'api-types'
 import { toast } from 'sonner'
 
-import { components } from 'api-types'
-import { handleError, post } from 'data/fetchers'
-import { organizationKeys } from 'data/organizations/keys'
-import { permissionKeys } from 'data/permissions/keys'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { profileKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import { organizationKeys } from '@/data/organizations/keys'
+import { permissionKeys } from '@/data/permissions/keys'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type ProfileResponse = components['schemas']['ProfileResponse']
 

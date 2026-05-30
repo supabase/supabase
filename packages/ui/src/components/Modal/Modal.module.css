@@ -102,19 +102,19 @@
 }
 
 .sbui-modal-icon-container {
-  @apply mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full sm:mx-0 sm:h-10 sm:w-10;
+  @apply mx-auto shrink-0 flex items-center justify-center h-12 w-12 rounded-full sm:mx-0 sm:h-10 sm:w-10;
 }
 
 .sbui-modal-icon-container--danger {
-  @apply text-red-600 bg-red-600 bg-opacity-20;
+  @apply text-red-600 bg-red-600/20;
 }
 
 .sbui-modal-icon-container--warning {
-  @apply text-yellow-500 bg-yellow-500 bg-opacity-20;
+  @apply text-yellow-500 bg-yellow-500/20;
 }
 
 .sbui-modal-icon-container--success {
-  @apply text-brand-300 bg-brand-300 bg-opacity-20;
+  @apply text-brand-300 bg-brand-300/20;
 }
 
 .sbui-modal-close-container {

@@ -16,10 +16,10 @@ const constraintTokenClassName = cn(
 export const ConstraintToken = ({ icon, label, variant = 'default' }: ConstraintTokenProps) => {
   const tokenToneClassName =
     variant === 'primary'
-      ? 'bg-brand bg-opacity-10 text-brand-600 border-brand-500'
+      ? 'bg-brand/10 text-brand-600 border-brand-500'
       : variant === 'default'
         ? 'bg-surface-75 text-foreground-light border-strong'
-        : 'bg-surface-75 bg-opacity-50 text-foreground-light border-strong'
+        : 'bg-surface-75/50 text-foreground-light border-strong'
 
   return (
     <div className="inline-flex items-center whitespace-nowrap">

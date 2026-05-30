@@ -1,12 +1,4 @@
 import { useParams } from 'common'
-import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import { generateSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
-import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -19,9 +11,18 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Input_Shadcn_,
-  Label_Shadcn_,
+  Input,
+  Label,
 } from 'ui'
+
+import { subscriptionHasHipaaAddon } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
+import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
+import { useSqlTitleGenerateMutation } from '@/data/ai/sql-title-mutation'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface SaveSnippetDialogProps {
   open: boolean
@@ -71,8 +72,8 @@ export const SaveSnippetDialog = ({ open, sql, onOpenChange, onSave }: SaveSnipp
         <DialogSectionSeparator />
         <DialogSection className="flex flex-col gap-y-4 py-5">
           <div className="flex flex-col gap-y-2">
-            <Label_Shadcn_ htmlFor="snippet-name">Name</Label_Shadcn_>
-            <Input_Shadcn_
+            <Label htmlFor="snippet-name">Name</Label>
+            <Input
               id="snippet-name"
               autoFocus
               value={name}

@@ -1,29 +1,22 @@
-import { Loader, Search } from 'lucide-react'
-import { NextSeo } from 'next-seo'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import { Input } from 'ui'
-import { useDebounce } from 'use-debounce'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import BecomeAPartner from '~/components/Partners/BecomeAPartner'
 import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
-import supabase from '~/lib/supabaseMisc'
-import type { Partner } from '~/types/partners'
+import { listPartners, searchPartners } from '~/lib/marketplaceDb'
+import { type Category, type Partner } from '~/types/partners'
+import { Loader, Search } from 'lucide-react'
+import { NextSeo } from 'next-seo'
+import { useRouter } from 'next/router'
+import { useEffect, useRef, useState } from 'react'
+import { InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
+import { useDebounce } from 'use-debounce'
+
 import TileGrid from '../../../components/Partners/TileGrid'
 
-export async function getStaticProps() {
-  const { data: partners } = await supabase
-    .from('partners')
-    .select('*')
-    .eq('approved', true)
-    .eq('type', 'technology')
-    .order('category')
-    .order('title')
-
+export async function getStaticProps(): Promise<{ props: Props; revalidate: number }> {
   return {
     props: {
-      partners,
+      partners: await listPartners(),
     },
     // TODO: consider using Next.js' On-demand Revalidation with Supabase Database Webhooks instead
     revalidate: 1800, // 30 minutes
@@ -35,10 +28,20 @@ interface Props {
 }
 
 function IntegrationPartnersPage(props: Props) {
-  const initialPartners = props.partners ?? []
+  const initialPartners = props.partners
   const [partners, setPartners] = useState(initialPartners)
 
-  const allCategories = Array.from(new Set(initialPartners?.map((p) => p.category)))
+  const categoryMap: { [slug: string]: Category } = {}
+  initialPartners.forEach((p) =>
+    p.categories.forEach((c) => {
+      if (!(c.slug in categoryMap)) {
+        categoryMap[c.slug] = c
+      }
+    })
+  )
+  const allCategories = Object.keys(categoryMap)
+    .toSorted()
+    .map((slug) => categoryMap[slug])
 
   const router = useRouter()
 
@@ -48,44 +51,35 @@ function IntegrationPartnersPage(props: Props) {
   const [search, setSearch] = useState('')
   const [debouncedSearchTerm] = useDebounce(search, 300)
   const [isSearching, setIsSearching] = useState(false)
+  const searchIdRef = useRef(0)
 
   useEffect(() => {
-    const searchPartners = async () => {
-      setIsSearching(true)
-
-      let query = supabase
-        .from('partners')
-        .select('*')
-        .eq('approved', true)
-        .order('category')
-        .order('title')
-
-      if (search.trim()) {
-        query = query.textSearch('tsv', `${search.trim()}`, {
-          type: 'websearch',
-          config: 'english',
-        })
-      }
-
-      const { data: partners } = await query
-
-      return partners
-    }
-
-    if (search.trim() === '') {
+    if (debouncedSearchTerm.trim() === '') {
       setIsSearching(false)
       setPartners(initialPartners)
       return
     }
 
-    searchPartners().then((partners) => {
-      if (partners) {
-        setPartners(partners)
-      }
+    setIsSearching(true)
+    const currentSearchId = ++searchIdRef.current
 
-      setIsSearching(false)
-    })
-  }, [debouncedSearchTerm, router])
+    searchPartners(debouncedSearchTerm)
+      .then((results) => {
+        if (currentSearchId === searchIdRef.current) {
+          setPartners(results ?? [])
+        }
+      })
+      .catch(() => {
+        if (currentSearchId === searchIdRef.current) {
+          setPartners([])
+        }
+      })
+      .finally(() => {
+        if (currentSearchId === searchIdRef.current) {
+          setIsSearching(false)
+        }
+      })
+  }, [debouncedSearchTerm, initialPartners])
 
   return (
     <>
@@ -115,32 +109,36 @@ function IntegrationPartnersPage(props: Props) {
               {/* Horizontal link menu */}
               <div className="space-y-6">
                 {/* Search Bar */}
-
-                <Input
-                  size="small"
-                  icon={<Search />}
-                  placeholder="Search..."
-                  type="text"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  actions={
-                    isSearching && (
+                <InputGroup className="w-full">
+                  <InputGroupInput
+                    size="small"
+                    autoComplete="off"
+                    type="search"
+                    placeholder="Search..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                  <InputGroupAddon>
+                    <Search />
+                  </InputGroupAddon>
+                  {isSearching && (
+                    <InputGroupAddon align="inline-end">
                       <span className="mr-1 animate-spin text-white">
                         <Loader />
                       </span>
-                    )
-                  }
-                />
+                    </InputGroupAddon>
+                  )}
+                </InputGroup>
                 <div className="hidden lg:block">
                   <div className="text-foreground-lighter mb-2 text-sm">Categories</div>
                   <div className="space-y-1">
                     {allCategories.map((category) => (
                       <button
-                        key={category}
-                        onClick={() => router.push(`#${category.toLowerCase()}`)}
-                        className="text-foreground-light block text-base"
+                        key={category.slug}
+                        onClick={() => router.push(`#${category.slug}`)}
+                        className="text-foreground-light block text-base cursor-pointer"
                       >
-                        {category}
+                        {category.name}
                       </button>
                     ))}
                   </div>

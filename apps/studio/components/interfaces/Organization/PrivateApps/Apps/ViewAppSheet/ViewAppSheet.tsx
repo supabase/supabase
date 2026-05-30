@@ -1,5 +1,3 @@
-import { usePlatformAppDeleteMutation } from 'data/platform-apps/platform-app-delete-mutation'
-import { usePlatformAppQuery } from 'data/platform-apps/platform-app-query'
 import { X } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -11,6 +9,8 @@ import { DeleteAppModal } from '../DeleteAppModal'
 import { ViewAppSheetDangerZone } from './ViewAppSheetDangerZone'
 import { ViewAppSheetInfo } from './ViewAppSheetInfo'
 import { ViewAppSheetPermissions } from './ViewAppSheetPermissions'
+import { usePlatformAppDeleteMutation } from '@/data/platform-apps/platform-app-delete-mutation'
+import { usePlatformAppQuery } from '@/data/platform-apps/platform-app-query'
 
 interface ViewAppSheetProps {
   app: PrivateApp | null
@@ -62,7 +62,7 @@ export function ViewAppSheet({ app, visible, onClose, onDeleted }: ViewAppSheetP
         <SheetContent
           showClose={false}
           size="default"
-          className="!min-w-[600px] flex flex-col h-full gap-0"
+          className="min-w-[600px]! flex flex-col h-full gap-0"
         >
           <SheetHeader
             className={cn('flex flex-row justify-between gap-x-4 items-center border-b')}

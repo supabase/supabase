@@ -1,14 +1,15 @@
+import { describe, expect, test } from 'vitest'
+
 import {
   calculateMaxCost,
   calculateSummary,
   parseExplainOutput,
   parseNodeDetails,
-} from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.parser'
+} from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.parser'
 import type {
   ExplainNode,
   QueryPlanRow,
-} from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
-import { describe, expect, test } from 'vitest'
+} from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
 
 // Helper to create QueryPlanRow array from strings
 const toQueryPlanRows = (lines: string[]): QueryPlanRow[] =>

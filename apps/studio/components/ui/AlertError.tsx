@@ -1,9 +1,10 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { useTrack } from 'lib/telemetry/track'
 import { PropsWithChildren, useEffect, useRef } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { useTrack } from '@/lib/telemetry/track'
 
 export interface AlertErrorProps {
   projectRef?: string
@@ -16,6 +17,7 @@ export interface AlertErrorProps {
   showInstructions?: boolean
   showErrorPrefix?: boolean
   additionalActions?: React.ReactNode
+  hideContactSupport?: boolean
 }
 
 export const ContactSupportButton = ({
@@ -56,6 +58,7 @@ export const AlertError = ({
   showErrorPrefix = true,
   children,
   additionalActions,
+  hideContactSupport = false,
 }: PropsWithChildren<AlertErrorProps>) => {
   const track = useTrack()
   const hasTrackedRef = useRef(false)
@@ -94,7 +97,9 @@ export const AlertError = ({
         </>
       }
       actions={
-        additionalActions ? (
+        hideContactSupport ? (
+          (additionalActions ?? null)
+        ) : additionalActions ? (
           <>
             {additionalActions}
             <ContactSupportButton projectRef={projectRef} subject={subject} error={error} />

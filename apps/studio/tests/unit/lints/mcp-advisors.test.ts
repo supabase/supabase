@@ -1,14 +1,17 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { DEFAULT_EXPOSED_SCHEMAS } from 'lib/api/self-hosted/constants'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { DEFAULT_EXPOSED_SCHEMAS } from '@/lib/api/self-hosted/constants'
+import { getDebuggingOperations } from '@/lib/api/self-hosted/mcp'
+
+const mockGetLints = vi.fn()
 
 // Mock getLints to capture what arguments the MCP operations pass
-const mockGetLints = vi.fn()
-vi.mock('lib/api/self-hosted/lints', () => ({
+vi.mock('@/lib/api/self-hosted/lints', () => ({
   getLints: (...args: unknown[]) => mockGetLints(...args),
 }))
 
 // Mock getProjectSettings to avoid assertSelfHosted() check
-vi.mock('lib/api/self-hosted/settings', () => ({
+vi.mock('@/lib/api/self-hosted/settings', () => ({
   getProjectSettings: () => ({
     app_config: {
       db_schema: 'public',
@@ -18,9 +21,6 @@ vi.mock('lib/api/self-hosted/settings', () => ({
     service_api_keys: [{ api_key: 'test', name: 'anon key', tags: 'anon' }],
   }),
 }))
-
-// Must import after mock setup
-import { getDebuggingOperations } from 'lib/api/self-hosted/mcp'
 
 describe('MCP advisor operations pass exposedSchemas to getLints', () => {
   const headers = { Authorization: 'Bearer test' }

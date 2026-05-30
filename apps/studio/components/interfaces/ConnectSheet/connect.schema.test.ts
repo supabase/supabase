@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
 import { resolveSteps } from './connect.resolver'
-import { connectSchema, INSTALL_COMMANDS } from './connect.schema'
+import { connectSchema, EXTRA_PACKAGES, INSTALL_COMMANDS } from './connect.schema'
 import type { ConnectState } from './Connect.types'
 
 // ============================================================================
@@ -94,7 +94,9 @@ describe('connect.schema:fields', () => {
     const field = connectSchema.fields.connectionMethod
     expect(field.type).toBe('radio-list')
     expect(field.options).toEqual({ source: 'connectionMethods' })
-    expect(field.defaultValue).toBe('direct')
+    // defaultValue is intentionally unset — useConnectState.setMode picks the
+    // per-deployment-mode default (platform/CLI: 'direct'; self-hosted: 'session')
+    expect(field.defaultValue).toBeUndefined()
   })
 
   test('useSharedPooler field should depend on transaction connection method', () => {
@@ -150,6 +152,20 @@ describe('connect.schema:INSTALL_COMMANDS', () => {
   })
 })
 
+describe('connect.schema:EXTRA_PACKAGES', () => {
+  test('should have @supabase/ssr as extra package for nextjs app router with supabasejs', () => {
+    expect(EXTRA_PACKAGES.supabasejs?.['nextjs/app']).toContain('@supabase/ssr')
+  })
+
+  test('should not have extra packages for nextjs pages router', () => {
+    expect(EXTRA_PACKAGES.supabasejs?.['nextjs/pages']).toBeUndefined()
+  })
+
+  test('should have @supabase/ssr as extra package for remix with supabasejs', () => {
+    expect(EXTRA_PACKAGES.supabasejs?.remix).toContain('@supabase/ssr')
+  })
+})
+
 // ============================================================================
 // Steps Resolution Integration Tests
 // ============================================================================
@@ -163,6 +179,48 @@ describe('connect.schema:steps resolution', () => {
       expect(steps.length).toBeGreaterThan(0)
       expect(steps.find((s) => s.id === 'install')).toBeDefined()
       expect(steps.find((s) => s.id === 'install-skills')).toBeDefined()
+    })
+
+    test('should use "Install packages" title for nextjs app router', () => {
+      const state: ConnectState = {
+        mode: 'framework',
+        framework: 'nextjs',
+        frameworkVariant: 'app',
+        frameworkUi: false,
+      }
+      const steps = resolveSteps(connectSchema, state)
+      const installStep = steps.find((s) => s.id === 'install')
+
+      expect(installStep?.title).toBe('Install packages')
+    })
+
+    test('should use "Install package" title for nextjs pages router', () => {
+      const state: ConnectState = {
+        mode: 'framework',
+        framework: 'nextjs',
+        frameworkVariant: 'pages',
+        frameworkUi: false,
+      }
+      const steps = resolveSteps(connectSchema, state)
+      const installStep = steps.find((s) => s.id === 'install')
+
+      expect(installStep?.title).toBe('Install package')
+    })
+
+    test('should use "Install packages" title for remix install step', () => {
+      const state: ConnectState = { mode: 'framework', framework: 'remix' }
+      const steps = resolveSteps(connectSchema, state)
+      const installStep = steps.find((s) => s.id === 'install')
+
+      expect(installStep?.title).toBe('Install packages')
+    })
+
+    test('should use "Install package" title for frameworks without extra packages', () => {
+      const state: ConnectState = { mode: 'framework', framework: 'vuejs' }
+      const steps = resolveSteps(connectSchema, state)
+      const installStep = steps.find((s) => s.id === 'install')
+
+      expect(installStep?.title).toBe('Install package')
     })
 
     test('should resolve shadcn steps for nextjs with frameworkUi true', () => {
@@ -272,7 +330,6 @@ describe('connect.schema:steps resolution', () => {
       const steps = resolveSteps(connectSchema, state)
 
       expect(steps.find((s) => s.id === 'codex-add-server')).toBeDefined()
-      expect(steps.find((s) => s.id === 'codex-enable-remote')).toBeDefined()
       expect(steps.find((s) => s.id === 'codex-authenticate')).toBeDefined()
       expect(steps.find((s) => s.id === 'codex-verify')).toBeDefined()
     })
@@ -388,9 +445,6 @@ describe('connect.schema:step content paths', () => {
 
     expect(steps.find((s) => s.id === 'codex-add-server')?.content).toBe(
       'steps/mcp/codex/add-server'
-    )
-    expect(steps.find((s) => s.id === 'codex-enable-remote')?.content).toBe(
-      'steps/mcp/codex/enable-remote'
     )
     expect(steps.find((s) => s.id === 'codex-authenticate')?.content).toBe(
       'steps/mcp/codex/authenticate'

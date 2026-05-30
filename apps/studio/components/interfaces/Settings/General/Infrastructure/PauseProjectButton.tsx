@@ -1,18 +1,27 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useSetProjectStatus } from 'data/projects/project-detail-query'
-import { useProjectPauseMutation } from 'data/projects/project-pause-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useIsProjectActive, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
-import { Pause } from 'lucide-react'
+import { CirclePause } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from 'ui'
 
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useSetProjectStatus } from '@/data/projects/project-detail-query'
+import { useProjectPauseMutation } from '@/data/projects/project-pause-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useIsProjectActive, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 const PauseProjectButton = () => {
   const router = useRouter()
@@ -21,6 +30,7 @@ const PauseProjectButton = () => {
   const { setProjectStatus } = useSetProjectStatus()
 
   const isProjectActive = useIsProjectActive()
+  const isProjectUnhealthy = project?.status === PROJECT_STATUS.ACTIVE_UNHEALTHY
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const projectRef = project?.ref ?? ''
@@ -60,49 +70,53 @@ const PauseProjectButton = () => {
     !canPauseProject ||
     !isProjectActive
 
+  function getTooltipText() {
+    if (isPaused) return 'Your project is already paused'
+    if (!canPauseProject) return 'You need additional permissions to pause this project'
+    if (isProjectUnhealthy)
+      return 'Your project is unhealthy — restart it instead to restore normal operation'
+    if (!isProjectActive) return 'Unable to pause project as project is not active'
+    if (isBranch) return 'Branch projects cannot be paused'
+    if (!projectPausingAllowedInOrg && !isFreePlan)
+      return 'Projects on a paid plan will always be running'
+    return undefined
+  }
+
   return (
     <>
       <ButtonTooltip
         type="default"
-        icon={<Pause />}
+        icon={<CirclePause />}
         onClick={() => setIsModalOpen(true)}
         loading={isPausing}
         disabled={buttonDisabled}
         tooltip={{
           content: {
             side: 'bottom',
-            text: isPaused
-              ? 'Your project is already paused'
-              : !canPauseProject
-                ? 'You need additional permissions to pause this project'
-                : !isProjectActive
-                  ? 'Unable to pause project as project is not active'
-                  : isBranch
-                    ? 'Branch projects cannot be paused'
-                    : !projectPausingAllowedInOrg && !isFreePlan
-                      ? 'Projects on a paid plan will always be running'
-                      : undefined,
+            text: getTooltipText(),
           },
         }}
       >
         Pause project
       </ButtonTooltip>
 
-      <ConfirmationModal
-        variant={'destructive'}
-        visible={isModalOpen}
-        loading={isPausing}
-        title="Pause this project?"
-        confirmLabel="Pause project"
-        confirmLabelLoading="Pausing project"
-        onCancel={() => setIsModalOpen(false)}
-        onConfirm={requestPauseProject}
-      >
-        <p className="text-foreground-light text-sm">
-          Are you sure you want to pause this project? It will not be accessible until you unpause
-          it.
-        </p>
-      </ConfirmationModal>
+      <AlertDialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Pause project?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This project will be unavailable while paused. Paused projects can be resumed for 90
+              days. After that, backups remain available to download.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPausing}>Cancel</AlertDialogCancel>
+            <AlertDialogAction disabled={isPausing} onClick={requestPauseProject} variant="danger">
+              {isPausing ? 'Pausing project...' : 'Pause project'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }

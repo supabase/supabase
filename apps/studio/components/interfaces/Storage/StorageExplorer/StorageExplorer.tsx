@@ -1,12 +1,7 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import type { Bucket } from 'data/storage/buckets-query'
-import { useLatest } from 'hooks/misc/useLatest'
-import { IS_PLATFORM } from 'lib/constants'
 import { compact, get, isEmpty, uniqBy } from 'lodash'
-import { useEffect, useRef, useState } from 'react'
-import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
 
 import { useSelectedBucket } from '../FilesBuckets/useSelectedBucket'
 import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
@@ -17,14 +12,18 @@ import { FileExplorerHeader } from './FileExplorerHeader'
 import { FileExplorerHeaderSelection } from './FileExplorerHeaderSelection'
 import { MoveItemsModal } from './MoveItemsModal'
 import { PreviewPane } from './PreviewPane'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
+import { useStorageExplorerShortcuts } from './useStorageExplorerShortcuts'
+import { useStoragePreference } from './useStoragePreference'
+import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
+import type { Bucket } from '@/data/storage/buckets-query'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export const StorageExplorer = () => {
   const { ref, bucketId } = useParams()
   const storageExplorerRef = useRef(null)
   const {
     projectRef,
-    view,
     columns,
     selectedItems,
     openedFolders,
@@ -41,7 +40,9 @@ export const StorageExplorer = () => {
     clearSelectedItems,
     setSelectedFilePreview,
     setSelectedItemsToMove,
+    setIsSearching,
   } = useStorageExplorerStateSnapshot()
+  const { view } = useStoragePreference(projectRef)
 
   useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { data: bucket, isLoading: isBucketQueryLoading } = useSelectedBucket()
@@ -55,7 +56,14 @@ export const StorageExplorer = () => {
   const [itemSearchString, setItemSearchString] = useState('')
   const debouncedSearchString = useDebounce(itemSearchString, 500)
 
-  const fetchContents = useStaticEffectEvent(async (bucket: Bucket) => {
+  const handleClearSearch = useCallback(() => {
+    setIsSearching(false)
+    setItemSearchString('')
+  }, [setIsSearching])
+
+  useStorageExplorerShortcuts({ onClearSearch: handleClearSearch })
+
+  const fetchContents = useEffectEvent(async (bucket: Bucket) => {
     if (view === STORAGE_VIEWS.LIST) {
       const currentFolderIdx = openedFolders.length - 1
       const currentFolder = openedFolders[currentFolderIdx]
@@ -93,7 +101,8 @@ export const StorageExplorer = () => {
 
   useEffect(() => {
     if (bucket && projectRef) fetchContents(bucket)
-  }, [bucket, projectRef, debouncedSearchString, selectedBucket.id, fetchContents])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [bucket, projectRef, debouncedSearchString, selectedBucket.id])
 
   /** Checkbox selection methods */
   /** [Joshen] We'll only support checkbox selection for files ONLY */
@@ -145,10 +154,7 @@ export const StorageExplorer = () => {
   }
 
   return (
-    <div
-      ref={storageExplorerRef}
-      className="bg-studio border rounded-md border-overlay flex h-full w-full flex-col"
-    >
+    <div ref={storageExplorerRef} className="bg-studio flex h-full w-full flex-col">
       {selectedItems.length === 0 ? (
         <FileExplorerHeader
           itemSearchString={itemSearchString}

@@ -3,14 +3,7 @@
 import { X } from 'lucide-react'
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
-import {
-  Button,
-  cn,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  ScrollArea,
-} from 'ui'
+import { Button, cn, Popover, PopoverContent, PopoverTrigger, ScrollArea } from 'ui'
 
 interface FilterPopoverProps {
   allProductAreas: string[]
@@ -57,9 +50,9 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
   }
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-      <PopoverTrigger_Shadcn_ asChild>{trigger}</PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>{trigger}</PopoverTrigger>
+      <PopoverContent
         className="w-[calc(100vw-2rem)] sm:w-[500px] md:w-[600px] p-0"
         align="end"
         sideOffset={8}
@@ -141,7 +134,7 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
             </div>
           </ScrollArea>
         </div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

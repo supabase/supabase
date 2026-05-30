@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { del, handleError } from 'data/fetchers'
 import { toast } from 'sonner'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 import { jitDbAccessKeys } from './keys'
+import { del, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type JitDbAccessRevokeVariables = {
   projectRef: string
@@ -44,7 +44,7 @@ export const useJitDbAccessRevokeMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to revoke JIT database access: ${data.message}`)
+        toast.error(`Failed to revoke temporary access: ${data.message}`)
       } else {
         onError(data, variables, context)
       }

@@ -1,8 +1,8 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
 import { type DynamicToolUIPart, type ReasoningUIPart, type TextUIPart, type ToolUIPart } from 'ai'
 import { BrainIcon, CheckIcon, Loader2 } from 'lucide-react'
-
 import { cn } from 'ui'
+
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
 import { EdgeFunctionRenderer } from './EdgeFunctionRenderer'
 import { Tool } from './elements/Tool'
@@ -13,9 +13,15 @@ import {
   parseExecuteSqlChartResult,
 } from './Message.utils'
 import { MessageMarkdown } from './MessageMarkdown'
+import { parseSupportRequestMessage, SupportRequestMessage } from './SupportRequestMessage'
 
 function MessagePartText({ textPart }: { textPart: TextUIPart }) {
   const { id, isLoading, readOnly, isUserMessage, state } = useMessageInfoContext()
+  const supportRequest = isUserMessage ? parseSupportRequestMessage(textPart.text) : null
+
+  if (supportRequest) {
+    return <SupportRequestMessage request={supportRequest} />
+  }
 
   return (
     <MessageMarkdown
@@ -23,7 +29,7 @@ function MessagePartText({ textPart }: { textPart: TextUIPart }) {
       isLoading={isLoading}
       readOnly={readOnly}
       className={cn(
-        'max-w-none space-y-4 prose prose-sm prose-li:mt-1 [&>div]:my-4 prose-h1:text-xl prose-h1:mt-6 prose-h2:text-lg prose-h2:font-medium prose-h3:no-underline prose-h3:text-base prose-h3:mb-4 prose-strong:font-medium prose-strong:text-foreground prose-ol:space-y-3 prose-ul:space-y-3 prose-li:my-0 break-words [&>p:not(:last-child)]:!mb-2 [&>*>p:first-child]:!mt-0 [&>*>p:last-child]:!mb-0 [&>*>*>p:first-child]:!mt-0 [&>*>*>p:last-child]:!mb-0 [&>ol>li]:!pl-4',
+        'max-w-none space-y-4 prose prose-sm prose-li:mt-1 [&>div]:my-4 prose-h1:text-xl prose-h1:mt-6 prose-h2:text-lg prose-h2:font-medium prose-h3:no-underline prose-h3:text-base prose-h3:mb-4 prose-strong:font-medium prose-strong:text-foreground prose-ol:space-y-3 prose-ul:space-y-3 prose-li:my-0 wrap-break-word [&>p:not(:last-child)]:mb-2! [&>*>p:first-child]:mt-0! [&>*>p:last-child]:mb-0! [&>*>*>p:first-child]:mt-0! [&>*>*>p:last-child]:mb-0! [&>ol>li]:pl-4!',
         isUserMessage && 'text-foreground [&>p]:font-medium',
         state === 'editing' && 'animate-pulse'
       )}
@@ -90,11 +96,11 @@ function MessagePartReasoning({ reasoningPart }: { reasoningPart: ReasoningUIPar
   )
 }
 
-function ToolDisplayExecuteSqlLoading() {
+function ToolDisplayExecuteSqlLoading({ label = 'Writing SQL...' }: { label?: string }) {
   return (
     <div className="my-4 rounded-lg border bg-surface-75 heading-meta h-9 px-3 text-foreground-light flex items-center gap-2">
       <Loader2 className="w-4 h-4 animate-spin" />
-      Writing SQL...
+      {label}
     </div>
   )
 }
@@ -111,7 +117,7 @@ function MessagePartExecuteSql({
   isLastPart?: boolean
 }) {
   const { id, isLastMessage } = useMessageInfoContext()
-  const { addToolResult } = useMessageActionsContext()
+  const { addToolApprovalResponse } = useMessageActionsContext()
 
   const { toolCallId, state, input, output } = toolPart
 
@@ -126,7 +132,14 @@ function MessagePartExecuteSql({
   const { data: chart, success } = parseExecuteSqlChartResult(input)
   if (!success) return null
 
-  if (state === 'input-available' || state === 'output-available') {
+  if (
+    state === 'input-available' ||
+    state === 'approval-requested' ||
+    state === 'approval-responded' ||
+    state === 'output-denied' ||
+    state === 'output-available'
+  ) {
+    const approvalId = state === 'approval-requested' ? toolPart.approval?.id : undefined
     return (
       <div className="w-auto overflow-x-hidden my-4 space-y-2">
         <DisplayBlockRenderer
@@ -142,24 +155,19 @@ function MessagePartExecuteSql({
           }}
           initialResults={output}
           toolState={state}
+          toolApprovalRespondedApproved={toolPart.approval?.approved}
           isLastPart={isLastPart}
           isLastMessage={isLastMessage}
-          onResults={(args: { messageId: string; results: unknown }) => {
-            const results = args.results as any[]
-
-            addToolResult?.({
-              tool: 'execute_sql',
-              toolCallId: String(toolCallId),
-              output: results,
-            })
-          }}
-          onError={({ errorText }) => {
-            addToolResult?.({
-              tool: 'execute_sql',
-              toolCallId: String(toolCallId),
-              output: `Error: ${errorText}`,
-            })
-          }}
+          onApprove={
+            approvalId
+              ? () => addToolApprovalResponse?.({ id: approvalId, approved: true })
+              : undefined
+          }
+          onDeny={
+            approvalId
+              ? () => addToolApprovalResponse?.({ id: approvalId, approved: false })
+              : undefined
+          }
         />
       </div>
     )
@@ -168,11 +176,17 @@ function MessagePartExecuteSql({
   return null
 }
 
-const TOOL_DEPLOY_EDGE_FUNCTION_STATES_WITH_INPUT = new Set(['input-available', 'output-available'])
+const TOOL_DEPLOY_EDGE_FUNCTION_STATES_WITH_INPUT = new Set([
+  'input-available',
+  'approval-requested',
+  'approval-responded',
+  'output-denied',
+  'output-available',
+])
 
 function MessagePartDeployEdgeFunction({ toolPart }: { toolPart: ToolUIPart }) {
-  const { toolCallId, state, input, output } = toolPart
-  const { addToolResult } = useMessageActionsContext()
+  const { state, input, output } = toolPart
+  const { addToolApprovalResponse } = useMessageActionsContext()
 
   if (state === 'input-streaming') {
     return (
@@ -196,20 +210,24 @@ function MessagePartDeployEdgeFunction({ toolPart }: { toolPart: ToolUIPart }) {
   const isInitiallyDeployed =
     state === 'output-available' && parsedOutput.success && parsedOutput.data.success === true
 
+  const approvalId = state === 'approval-requested' ? toolPart.approval?.id : undefined
+
   return (
     <EdgeFunctionRenderer
       label={parsedInput.data.label}
       code={parsedInput.data.code}
       functionName={parsedInput.data.functionName}
-      showConfirmFooter={!output}
+      showConfirmFooter={state === 'approval-requested'}
+      isDeploying={state === 'approval-responded' && toolPart.approval?.approved !== false}
       initialIsDeployed={isInitiallyDeployed}
-      onDeployed={(result) => {
-        addToolResult?.({
-          tool: 'deploy_edge_function',
-          toolCallId: String(toolCallId),
-          output: result,
-        })
-      }}
+      onApprove={
+        approvalId ? () => addToolApprovalResponse?.({ id: approvalId, approved: true }) : undefined
+      }
+      onDeny={
+        approvalId
+          ? () => addToolApprovalResponse?.({ id: approvalId, approved: false })
+          : undefined
+      }
     />
   )
 }
@@ -236,7 +254,8 @@ export function MessagePartSwitcher({
     }
     case 'tool-list_policies':
     case 'tool-search_docs':
-    case 'tool-get_active_incidents': {
+    case 'tool-get_active_incidents':
+    case 'tool-load_knowledge': {
       return <MessagePart.Tool toolPart={part} />
     }
     case 'reasoning':

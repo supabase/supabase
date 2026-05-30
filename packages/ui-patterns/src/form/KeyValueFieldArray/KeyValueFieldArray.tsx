@@ -17,11 +17,11 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormMessage_Shadcn_,
-  Input_Shadcn_,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+  Input,
 } from 'ui'
 
 export type KeyValueFieldArrayAction<TItem> = {
@@ -50,7 +50,7 @@ export interface KeyValueFieldArrayProps<
   addLabel: string
   addActions?: KeyValueFieldArrayAction<TItem>[]
   disabled?: boolean
-  inputSize?: React.ComponentProps<typeof Input_Shadcn_>['size']
+  inputSize?: React.ComponentProps<typeof Input>['size']
   className?: string
   rowsClassName?: string
   rowClassName?: string
@@ -77,6 +77,12 @@ const appendRows = <
   append(Array.isArray(rows) && rows.length === 1 ? rows[0] : rows)
 }
 
+/**
+ * Rendering-only field array for text/text pairs.
+ *
+ * Consumers own validation in their resolver schema and can rely on the nested
+ * `FormMessage` instances here to display per-cell errors.
+ */
 export const KeyValueFieldArray = <
   TFieldValues extends FieldValues,
   TFieldArrayName extends FieldArrayPath<TFieldValues>,
@@ -120,41 +126,41 @@ export const KeyValueFieldArray = <
       <div className={rowsClassName}>
         {typedFields.map((field, index) => (
           <div key={field.fieldId} className={cn('flex items-start space-x-2', rowClassName)}>
-            <FormField_Shadcn_
+            <FormField
               control={control}
               name={toFieldPath<TFieldValues>(`${name}.${index}.${keyFieldName}`)}
               render={({ field }) => (
-                <FormItem_Shadcn_ className="flex-1">
-                  <FormControl_Shadcn_>
-                    <Input_Shadcn_
+                <FormItem className="flex-1">
+                  <FormControl>
+                    <Input
                       {...field}
                       size={inputSize}
                       className={cn('w-full', keyInputClassName)}
                       placeholder={keyPlaceholder}
                       disabled={disabled}
                     />
-                  </FormControl_Shadcn_>
-                  <FormMessage_Shadcn_ />
-                </FormItem_Shadcn_>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
 
-            <FormField_Shadcn_
+            <FormField
               control={control}
               name={toFieldPath<TFieldValues>(`${name}.${index}.${valueFieldName}`)}
               render={({ field }) => (
-                <FormItem_Shadcn_ className="flex-1">
-                  <FormControl_Shadcn_>
-                    <Input_Shadcn_
+                <FormItem className="flex-1">
+                  <FormControl>
+                    <Input
                       {...field}
                       size={inputSize}
                       className={cn('w-full', valueInputClassName)}
                       placeholder={valuePlaceholder}
                       disabled={disabled}
                     />
-                  </FormControl_Shadcn_>
-                  <FormMessage_Shadcn_ />
-                </FormItem_Shadcn_>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
 

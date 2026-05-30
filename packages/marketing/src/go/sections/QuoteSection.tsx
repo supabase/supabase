@@ -2,7 +2,7 @@ import type { GoQuoteSection } from '../schemas'
 
 export default function QuoteSection({ section }: { section: GoQuoteSection }) {
   return (
-    <div className="max-w-[80rem] mx-auto px-8">
+    <div className="max-w-7xl mx-auto px-8">
       <figure className="max-w-3xl mx-auto text-center">
         <blockquote>
           <p className="text-foreground text-xl sm:text-2xl font-medium leading-relaxed">

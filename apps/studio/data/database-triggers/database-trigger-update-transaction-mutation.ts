@@ -1,12 +1,15 @@
-import { getDatabaseTriggerUpdateSQL } from '@supabase/pg-meta'
-import { PGTrigger, PGTriggerCreate } from '@supabase/pg-meta/src/pg-meta-triggers'
-import { PostgresTrigger } from '@supabase/postgres-meta'
+import {
+  getDatabaseTriggerUpdateSQL,
+  type PGTrigger,
+  type PGTriggerCreate,
+  type SafeSqlFragment,
+} from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { executeSql } from 'data/sql/execute-sql-query'
 import { toast } from 'sonner'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 import { databaseTriggerKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 // [Joshen] Writing this query within FE as the PATCH endpoint from pg-meta only supports updating
 // trigger name and enabled mode. So we'll delete and create the trigger, within a single transaction
@@ -15,8 +18,9 @@ import { databaseTriggerKeys } from './keys'
 export type DatabaseTriggerUpdateVariables = {
   projectRef: string
   connectionString?: string | null
-  originalTrigger: PostgresTrigger
-  updatedTrigger: PGTriggerCreate & Pick<PGTrigger, 'enabled_mode'>
+  originalTrigger: PGTrigger
+  updatedTrigger: Omit<PGTriggerCreate, 'events'> &
+    Pick<PGTrigger, 'enabled_mode'> & { events: Array<SafeSqlFragment> }
 }
 
 export async function updateDatabaseTrigger({

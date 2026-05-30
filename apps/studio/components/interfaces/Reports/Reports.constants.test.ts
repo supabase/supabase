@@ -1,10 +1,11 @@
-import { describe, it, expect } from 'vitest'
-import { generateRegexpWhere } from './Reports.constants'
+import { describe, expect, it } from 'vitest'
+
+import { generateRegexpWhereSafe } from './Reports.constants'
 import type { ReportFilterItem } from './Reports.types'
 
-describe('generateRegexpWhere', () => {
-  it('should return empty string when no filters provided', () => {
-    const result = generateRegexpWhere([])
+describe('generateRegexpWhereSafe', () => {
+  it('should return empty fragment when no filters provided', () => {
+    const result = generateRegexpWhereSafe([])
     expect(result).toBe('')
   })
 
@@ -16,8 +17,8 @@ describe('generateRegexpWhere', () => {
         compare: 'is',
       },
     ]
-    const result = generateRegexpWhere(filters, true)
-    expect(result).toBe("WHERE request.path = '/api/users'")
+    const result = generateRegexpWhereSafe(filters, true)
+    expect(result).toBe("WHERE `request`.`path` = '/api/users'")
   })
 
   it('should generate AND clause for single filter with prepend=false', () => {
@@ -28,8 +29,8 @@ describe('generateRegexpWhere', () => {
         compare: 'is',
       },
     ]
-    const result = generateRegexpWhere(filters, false)
-    expect(result).toBe("AND request.path = '/api/users'")
+    const result = generateRegexpWhereSafe(filters, false)
+    expect(result).toBe("AND `request`.`path` = '/api/users'")
   })
 
   it('should handle different comparison operators', () => {
@@ -45,49 +46,10 @@ describe('generateRegexpWhere', () => {
         compare: 'is',
       },
     ]
-    const result = generateRegexpWhere(filters, true)
+    const result = generateRegexpWhereSafe(filters, true)
     expect(result).toBe(
-      "WHERE REGEXP_CONTAINS(request.path, '/api/*') AND response.status_code = 404"
+      "WHERE REGEXP_CONTAINS(`request`.`path`, '/api/*') AND `response`.`status_code` = 404"
     )
-  })
-
-  it('should handle values with quotes', () => {
-    const filters: ReportFilterItem[] = [
-      {
-        key: 'request.path',
-        value: '"/api/users"',
-        compare: 'is',
-      },
-    ]
-
-    const result = generateRegexpWhere(filters, true)
-    expect(result).toBe(`WHERE request.path = "/api/users"`)
-  })
-
-  it('should handle values without quotes', () => {
-    const filters: ReportFilterItem[] = [
-      {
-        key: 'request.path',
-        value: '/api/users',
-        compare: 'is',
-      },
-    ]
-
-    const result = generateRegexpWhere(filters, true)
-    expect(result).toBe("WHERE request.path = '/api/users'")
-  })
-
-  it('should handle values with quotes and lowercase', () => {
-    const filters: ReportFilterItem[] = [
-      {
-        key: 'request.path',
-        value: '"/Api/Users"',
-        compare: 'is',
-      },
-    ]
-
-    const result = generateRegexpWhere(filters, true)
-    expect(result).toBe(`WHERE request.path = "/api/users"`)
   })
 
   it('should handle numbers', () => {
@@ -98,8 +60,62 @@ describe('generateRegexpWhere', () => {
         compare: 'is',
       },
     ]
+    const result = generateRegexpWhereSafe(filters, true)
+    expect(result).toBe('WHERE `request`.`status_code` = 200')
+  })
 
-    const result = generateRegexpWhere(filters, true)
-    expect(result).toBe(`WHERE request.status_code = 200`)
+  it('should escape single quotes in string values', () => {
+    const filters: ReportFilterItem[] = [
+      {
+        key: 'request.path',
+        value: "/it's/here",
+        compare: 'is',
+      },
+    ]
+    const result = generateRegexpWhereSafe(filters, true)
+    expect(result).toBe("WHERE `request`.`path` = '/it''s/here'")
+  })
+
+  it('should drop filters with injection-attempt keys (OR injection)', () => {
+    const filters: ReportFilterItem[] = [
+      {
+        key: 'level OR id IS NOT NULL',
+        value: 'info',
+        compare: 'is',
+      },
+    ]
+    // Key contains spaces — quotedIdent rejects it, predicate is dropped entirely
+    const result = generateRegexpWhereSafe(filters, true)
+    expect(result).toBe('')
+  })
+
+  it('should drop filters with injection-attempt keys (semicolon injection)', () => {
+    const filters: ReportFilterItem[] = [
+      {
+        key: 'request.method); DROP TABLE edge_logs; --',
+        value: 'GET',
+        compare: 'is',
+      },
+    ]
+    // Key fails ident validation — predicate dropped entirely, no SQL emitted
+    const result = generateRegexpWhereSafe(filters, true)
+    expect(result).toBe('')
+  })
+
+  it('should drop invalid keys but keep valid ones', () => {
+    const filters: ReportFilterItem[] = [
+      {
+        key: 'bad key!',
+        value: 'anything',
+        compare: 'is',
+      },
+      {
+        key: 'request.method',
+        value: 'GET',
+        compare: 'is',
+      },
+    ]
+    const result = generateRegexpWhereSafe(filters, true)
+    expect(result).toBe("WHERE `request`.`method` = 'get'")
   })
 })

@@ -1,18 +1,21 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { HTMLProps, ReactNode, useCallback, useState } from 'react'
 import { Sheet, SheetContent } from 'ui'
-import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 
 import { CreateWrapperSheet } from './CreateWrapperSheet'
 import { WRAPPERS } from './Wrappers.constants'
 import { wrapperMetaComparator } from './Wrappers.utils'
 import { WrapperTable } from './WrapperTable'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useFDWsQuery } from '@/data/fdw/fdws-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const WrappersTab = () => {
   const { id } = useParams()
@@ -23,6 +26,11 @@ export const WrappersTab = () => {
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'wrappers'
   )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, () => setCreateWrapperShown(true), {
+    label: 'Add new wrapper',
+    enabled: canCreateWrapper,
+  })
 
   const { data } = useFDWsQuery({
     projectRef: project?.ref,
@@ -48,7 +56,7 @@ export const WrappersTab = () => {
 
   const Container = useCallback(
     ({ ...props }: { children: ReactNode } & HTMLProps<HTMLDivElement>) => (
-      <div className="w-full mx-10 py-10 ">
+      <div className="w-full p-10">
         {props.children}
         <Sheet open={!!createWrapperShown} onOpenChange={handleOpenChange}>
           <SheetContent size="lg" tabIndex={undefined}>
@@ -101,6 +109,23 @@ export const WrappersTab = () => {
 
   return (
     <Container>
+      <div className="max-w-5xl flex items-center gap-x-2 justify-end mb-4">
+        <DocsButton href={wrapperMeta.docsUrl} />
+        <ButtonTooltip
+          type="primary"
+          onClick={() => setCreateWrapperShown(true)}
+          disabled={!canCreateWrapper}
+          tooltip={{
+            content: {
+              text: !canCreateWrapper
+                ? 'You need additional permissions to create a foreign data wrapper'
+                : undefined,
+            },
+          }}
+        >
+          Add new wrapper
+        </ButtonTooltip>
+      </div>
       <WrapperTable />
       <DiscardChangesConfirmationDialog {...modalProps} />
     </Container>

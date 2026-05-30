@@ -1,17 +1,7 @@
-import { useState } from 'react'
 import { Plus } from 'lucide-react'
+import { useState } from 'react'
 import { Button } from 'ui'
-import { AppsList } from 'components/interfaces/Organization/PrivateApps/Apps/AppsList/AppsList'
-import { CreateAppSheet } from 'components/interfaces/Organization/PrivateApps/Apps/CreateAppSheet/CreateAppSheet'
-import {
-  PrivateAppsProvider,
-  usePrivateApps,
-} from 'components/interfaces/Organization/PrivateApps/PrivateAppsContext'
 import { PageContainer } from 'ui-patterns/PageContainer'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import OrganizationSettingsLayout from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'
-import type { NextPageWithLayout } from 'types'
 import {
   PageHeader,
   PageHeaderDescription,
@@ -28,6 +18,19 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+
+import { AppsList } from '@/components/interfaces/Organization/PrivateApps/Apps/AppsList/AppsList'
+import { CreateAppSheet } from '@/components/interfaces/Organization/PrivateApps/Apps/CreateAppSheet/CreateAppSheet'
+import {
+  PrivateAppsProvider,
+  usePrivateApps,
+} from '@/components/interfaces/Organization/PrivateApps/PrivateAppsContext'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import OrganizationLayout from '@/components/layouts/OrganizationLayout'
+import { OrganizationSettingsLayout } from '@/components/layouts/ProjectLayout/OrganizationSettingsLayout'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import type { NextPageWithLayout } from '@/types'
 
 function PrivateAppsContent() {
   const { apps, isLoading } = usePrivateApps()
@@ -57,18 +60,28 @@ function PrivateAppsContent() {
             </PageSectionSummary>
             {!isLoading && apps.length > 0 && (
               <PageSectionAside>
-                <Button
-                  type="primary"
-                  icon={<Plus size={14} />}
-                  onClick={() => setShowCreate(true)}
+                <Shortcut
+                  id={SHORTCUT_IDS.ORG_PRIVATE_APPS_CREATE}
+                  onTrigger={() => setShowCreate(true)}
+                  side="bottom"
+                  tooltipOpen={showCreate ? false : undefined}
                 >
-                  Create app
-                </Button>
+                  <Button
+                    type="primary"
+                    icon={<Plus size={14} />}
+                    onClick={() => setShowCreate(true)}
+                  >
+                    Create app
+                  </Button>
+                </Shortcut>
               </PageSectionAside>
             )}
           </PageSectionMeta>
           <PageSectionContent>
-            <AppsList onCreateApp={() => setShowCreate(true)} />
+            <AppsList
+              onCreateApp={() => setShowCreate(true)}
+              createShortcutId={SHORTCUT_IDS.ORG_PRIVATE_APPS_CREATE}
+            />
           </PageSectionContent>
         </PageSection>
       </PageContainer>

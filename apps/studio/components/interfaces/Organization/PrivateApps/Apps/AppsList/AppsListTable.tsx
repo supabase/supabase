@@ -18,6 +18,7 @@ import {
   TableRow,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+
 import type { PrivateApp } from '../../PrivateAppsContext'
 import type { AppsSort } from '../Apps.types'
 
@@ -94,7 +95,7 @@ export function AppsListTable({
                       )}
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
-                        className="!text-destructive gap-x-2"
+                        className="text-destructive! gap-x-2"
                         onClick={() => onDeleteApp(app)}
                       >
                         <Trash size={14} />

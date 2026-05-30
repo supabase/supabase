@@ -1,14 +1,14 @@
+import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
-import { useParams } from 'common'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
-import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
-import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
-import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
-import { useTabsStateSnapshot } from 'state/tabs'
-import type { NextPageWithLayout } from 'types'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { EditorBaseLayout } from '@/components/layouts/editors/EditorBaseLayout'
+import SQLEditorLayout from '@/components/layouts/SQLEditorLayout/SQLEditorLayout'
+import { SQLEditorMenu } from '@/components/layouts/SQLEditorLayout/SQLEditorMenu'
+import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
+import { useTabsStateSnapshot } from '@/state/tabs'
+import type { NextPageWithLayout } from '@/types'
 
 const SQLEditorIndexPage: NextPageWithLayout = () => {
   const router = useRouter()

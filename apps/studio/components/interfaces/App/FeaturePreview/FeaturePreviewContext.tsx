@@ -1,5 +1,4 @@
 import { FeatureFlagContext, LOCAL_STORAGE_KEYS, useFlag } from 'common'
-import { EMPTY_OBJ } from 'lib/void'
 import { noop } from 'lodash'
 import { useQueryState } from 'nuqs'
 import {
@@ -7,13 +6,14 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useEffectEvent,
   useMemo,
   useState,
   type PropsWithChildren,
 } from 'react'
 
 import { useFeaturePreviews } from './useFeaturePreviews'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
+import { EMPTY_OBJ } from '@/lib/void'
 
 type FeaturePreviewContextType = {
   flags: { [key: string]: boolean }
@@ -27,7 +27,7 @@ const FeaturePreviewContext = createContext<FeaturePreviewContextType>({
 
 export const useFeaturePreviewContext = () => useContext(FeaturePreviewContext)
 
-export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}>) => {
+export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) => {
   const { hasLoaded } = useContext(FeatureFlagContext)
   const featurePreviews = useFeaturePreviews()
 
@@ -35,14 +35,18 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
     featurePreviews.reduce((a, b) => ({ ...a, [b.key]: false }), {})
   )
 
-  const initializeFlags = useStaticEffectEvent(() => {
+  const initializeFlags = useEffectEvent(() => {
     setFlags(
       featurePreviews.reduce((a, b) => {
         const defaultOptIn = b.isDefaultOptIn
-        const localStorageValue = localStorage.getItem(b.key)
-        return {
-          ...a,
-          [b.key]: !localStorageValue ? defaultOptIn : localStorageValue === 'true',
+        try {
+          const localStorageValue = window.localStorage.getItem(b.key)
+          return {
+            ...a,
+            [b.key]: !localStorageValue ? defaultOptIn : localStorageValue === 'true',
+          }
+        } catch {
+          return { ...a, [b.key]: defaultOptIn }
         }
       }, {})
     )
@@ -52,13 +56,18 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
     if (typeof window !== 'undefined') {
       initializeFlags()
     }
-  }, [hasLoaded, initializeFlags])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [hasLoaded])
 
   const value = {
     flags,
     onUpdateFlag: (key: string, value: boolean) => {
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(key, value.toString())
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          window.localStorage.setItem(key, value ? 'true' : 'false')
+        }
+      } catch {
+        // Silently fail in restricted storage modes (e.g. Safari private browsing)
       }
       const updatedFlags = { ...flags, [key]: value }
       setFlags(updatedFlags)
@@ -70,11 +79,6 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
 
 // Helpers
 
-export const useIsAPIDocsSidePanelEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL]
-}
-
 export const useIsColumnLevelPrivilegesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]
@@ -82,19 +86,16 @@ export const useIsColumnLevelPrivilegesEnabled = () => {
 
 export const useUnifiedLogsPreview = () => {
   const { flags, onUpdateFlag } = useFeaturePreviewContext()
+  const { hasLoaded: flagsHaveLoaded } = useContext(FeatureFlagContext)
   const unifiedLogsEnabled = useFlag('unifiedLogs')
 
+  const isLoading = !flagsHaveLoaded
   const isEnabled = unifiedLogsEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
 
-  return { isEnabled, enable, disable }
-}
-
-export const useIsBranching2Enabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0]
+  return { isEnabled, isEligible: unifiedLogsEnabled, isLoading, enable, disable }
 }
 
 export const useIsPgDeltaDiffEnabled = () => {
@@ -106,11 +107,6 @@ export const useIsPgDeltaDiffEnabled = () => {
 export const useIsAdvisorRulesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
-}
-
-export const useIsQueueOperationsEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS]
 }
 
 export const useIsPlatformWebhooksEnabled = () => {
@@ -125,16 +121,15 @@ export const useIsJitDbAccessEnabled = () => {
   return jitDbAccessEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]
 }
 
-export const useIsTableFilterBarEnabled = () => {
+export const useIsRLSTesterEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER]
 }
 
-export const useIsFloatingMobileToolbarEnabled = () => {
+export const useIsMarketplaceEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  const showFloatingMobileToolbar = useFlag('enableFloatingMobileToolbar')
-
-  return showFloatingMobileToolbar && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_FLOATING_MOBILE_TOOLBAR]
+  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+  return isMarketplaceEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]
 }
 
 export const useFeaturePreviewModal = () => {

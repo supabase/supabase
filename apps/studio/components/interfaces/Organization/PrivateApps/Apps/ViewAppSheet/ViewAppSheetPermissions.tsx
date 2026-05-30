@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+
 import type { Permission } from '../Apps.constants'
 
 interface ViewAppSheetPermissionsProps {

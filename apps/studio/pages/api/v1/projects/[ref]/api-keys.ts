@@ -1,7 +1,7 @@
+import { components } from 'api-types'
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import { components } from 'api-types'
-import apiWrapper from 'lib/api/apiWrapper'
+import apiWrapper from '@/lib/api/apiWrapper'
 
 type ProjectAppConfig = components['schemas']['ProjectSettingsResponse']['app_config'] & {
   protocol?: string
@@ -24,7 +24,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
+const handleGetAll = async (_req: NextApiRequest, res: NextApiResponse) => {
   const response = [
     {
       name: 'anon',
@@ -44,6 +44,32 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
       prefix: '',
       description: 'Legacy service_role API key',
     },
+    ...(process.env.SUPABASE_PUBLISHABLE_KEY
+      ? [
+          {
+            name: 'publishable',
+            api_key: process.env.SUPABASE_PUBLISHABLE_KEY,
+            id: 'publishable',
+            type: 'publishable',
+            hash: '',
+            prefix: '',
+            description: 'Publishable API key (anon role)',
+          },
+        ]
+      : []),
+    ...(process.env.SUPABASE_SECRET_KEY
+      ? [
+          {
+            name: 'secret',
+            api_key: process.env.SUPABASE_SECRET_KEY,
+            id: 'secret',
+            type: 'secret',
+            hash: '',
+            prefix: '',
+            description: 'Secret API key (service_role)',
+          },
+        ]
+      : []),
   ]
 
   return res.status(200).json(response)

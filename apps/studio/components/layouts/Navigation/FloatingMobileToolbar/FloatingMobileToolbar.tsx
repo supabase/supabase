@@ -1,10 +1,4 @@
 import { useParams, useViewport } from 'common'
-import { AdvisorButton } from 'components/layouts/AppLayout/AdvisorButton'
-import { AssistantButton } from 'components/layouts/AppLayout/AssistantButton'
-import { InlineEditorButton } from 'components/layouts/AppLayout/InlineEditorButton'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { HelpButton } from 'components/ui/HelpPanel/HelpButton'
 import { AnimatePresence } from 'framer-motion'
 import { Menu, Search, X } from 'lucide-react'
 import { useRef } from 'react'
@@ -15,6 +9,12 @@ import { useFloatingToolbarDrag } from './useFloatingToolbarDrag'
 import { useFloatingToolbarNavSize } from './useFloatingToolbarNavSize'
 import { useFloatingToolbarSheet } from './useFloatingToolbarSheet'
 import { useFloatingToolbarSidebarClick } from './useFloatingToolbarSidebarClick'
+import { AdvisorButton } from '@/components/layouts/AppLayout/AdvisorButton'
+import { AssistantButton } from '@/components/layouts/AppLayout/AssistantButton'
+import { InlineEditorButton } from '@/components/layouts/AppLayout/InlineEditorButton'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { HelpButton } from '@/components/ui/HelpPanel/HelpButton'
 
 export const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boolean }) => {
   const navRef = useRef<HTMLElement | null>(null)
@@ -103,8 +103,8 @@ export const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boo
               title="Menu dropdown button"
               type={sheet.isMenuOpen ? 'secondary' : 'default'}
               className={cn(
-                'flex lg:hidden mr-1 rounded-md min-w-[30px] w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30',
-                !sheet.isMenuOpen && '!bg-surface-300'
+                'flex lg:hidden mr-1 rounded-md min-w-[30px] w-[30px] h-[30px] data-open:bg-overlay-hover/30',
+                !sheet.isMenuOpen && 'bg-surface-300!'
               )}
               icon={<Menu />}
               onClick={sheet.handleMenuClick}
@@ -118,9 +118,9 @@ export const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boo
           type="text"
           className={cn(
             'flex flex-row items-center justify-center rounded-full',
-            'bg-overlay/50 backdrop-blur-md my-auto !p-1 gap-2',
+            'bg-overlay/50 backdrop-blur-md my-auto p-1! gap-2',
             'border border-strong shadow-[0px_3px_6px_-2px_rgba(0,0,0,0.07),0px_10px_30px_0px_rgba(0,0,0,0.10)]',
-            '!w-10 !h-10 !min-w-10 !min-h-10',
+            'w-10! h-10! min-w-10! min-h-10!',
             'rounded-full',
             !sheet.isSheetOpen && 'hidden'
           )}

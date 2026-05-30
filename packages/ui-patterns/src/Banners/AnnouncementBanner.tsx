@@ -1,5 +1,4 @@
-import { Announcement } from 'ui/src/layout/banners'
-
+import { Announcement } from './Announcement'
 import announcementJSON from './data.json'
 import LW15Banner from './LW15Banner'
 

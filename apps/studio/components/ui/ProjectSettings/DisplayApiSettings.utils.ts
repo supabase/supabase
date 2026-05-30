@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { useRef } from 'react'
 
-import useLogsQuery from 'hooks/analytics/useLogsQuery'
+import useLogsQuery from '@/hooks/analytics/useLogsQuery'
 
 export function useLastUsedAPIKeysLogQuery({
   projectRef,
