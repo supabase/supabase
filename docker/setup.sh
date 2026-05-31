@@ -3,7 +3,7 @@
 # Bootstrap a self-hosted Supabase project on Linux (Debian/Ubuntu or RHEL/CentOS/Fedora).
 #
 # What it does:
-#   1. Installs prerequisites: git, curl, openssl, jq, ca-certificates
+#   1. Installs prerequisites: git, openssl, jq, ca-certificates
 #   2. Installs Docker Engine + Compose plugin (if missing)
 #   3. Optionally installs the AWS CLI v2 (--with-aws)
 #   4. Sparse-clones the repo to extract the contents of ./docker
@@ -119,13 +119,13 @@ pkg_install() {
 }
 
 install_base_packages() {
-    log "Installing base packages: git, curl, openssl, jq, ca-certificates"
+    log "Installing base packages: git, openssl, jq, ca-certificates"
     pkg_update
     if [ "$OS_FAMILY" = "debian" ]; then
-        pkg_install git curl openssl jq ca-certificates \
+        pkg_install git openssl jq ca-certificates \
             apt-transport-https gnupg lsb-release
     else
-        pkg_install git curl openssl jq ca-certificates dnf-plugins-core
+        pkg_install git openssl jq ca-certificates dnf-plugins-core
     fi
 }
 
@@ -151,14 +151,25 @@ install_docker() {
         $SUDO apt-get update -y
         pkg_install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
     else
-        repo_distro="centos"
-        case "$OS_ID" in
-            fedora) repo_distro="fedora" ;;
-            rhel)   repo_distro="rhel" ;;
-        esac
-        $SUDO dnf config-manager --add-repo "https://download.docker.com/linux/${repo_distro}/docker-ce.repo" 2>/dev/null \
-            || $SUDO dnf-3 config-manager --add-repo "https://download.docker.com/linux/${repo_distro}/docker-ce.repo"
-        pkg_install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+        # Amazon Linux
+        if [ "$OS_ID" = "amzn" ]; then
+            # Install Docker from the repo
+            pkg_install docker
+            # Install Docker Compose
+            $SUDO mkdir -p /usr/local/lib/docker/cli-plugins && \
+            $SUDO curl -fsSL "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-$(uname -m)" \
+                       -o /usr/local/lib/docker/cli-plugins/docker-compose && \
+            $SUDO chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+        else
+            repo_distro="centos"
+            case "$OS_ID" in
+                fedora) repo_distro="fedora" ;;
+                rhel)   repo_distro="rhel" ;;
+            esac
+            $SUDO dnf config-manager --add-repo "https://download.docker.com/linux/${repo_distro}/docker-ce.repo" 2>/dev/null \
+                || $SUDO dnf-3 config-manager --add-repo "https://download.docker.com/linux/${repo_distro}/docker-ce.repo"
+            pkg_install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+        fi
     fi
 
     log "Enabling and starting docker service"
@@ -321,10 +332,10 @@ echo "Setup complete. Project ready at: $(pwd)"
 echo ""
 echo "Next steps:"
 echo "  cd $(pwd)"
-echo "  sh ./run.sh config"
-echo "  sh ./run.sh secrets"
-echo "  sh ./run.sh start"
+echo "  sh run.sh config"
+echo "  sh run.sh secrets"
+echo "  sh run.sh start"
 echo ""
 echo "To enable docker-compose overrides (pg17, envoy, caddy, nginx, rustfs, s3, logs):"
-echo "  sh ./run.sh config add pg17"
+echo "  sh run.sh config add pg17"
 echo ""

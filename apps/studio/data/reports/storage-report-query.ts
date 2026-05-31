@@ -80,7 +80,7 @@ export const useStorageReport = () => {
   const formattedFilters: ReportFilterItem[] = [
     ...filters,
     ...(identifier !== undefined
-      ? [{ key: 'identifier', value: `'${identifier}'`, compare: 'is' } as ReportFilterItem]
+      ? [{ key: 'identifier', value: identifier, compare: 'is' } as ReportFilterItem]
       : []),
   ]
 

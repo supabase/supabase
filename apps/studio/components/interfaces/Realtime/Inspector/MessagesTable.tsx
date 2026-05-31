@@ -191,7 +191,7 @@ const MessagesTable = ({
             )}
 
             <DataGrid
-              className="data-grid--simple-logs h-full border-b-0"
+              className="data-grid--simple-logs h-full border-t-0! border-b-0!"
               rowHeight={40}
               headerRowHeight={0}
               columns={ColumnRenderer}

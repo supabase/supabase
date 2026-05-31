@@ -70,6 +70,38 @@ export const dataset: AssistantEvalCase[] = [
   {
     input: {
       prompt:
+        "I'm adding a place to store logos, product screenshots, and campaign images for our public marketing website. Visitors should be able to load those images directly on the site. How should I set that up in Supabase Storage?",
+    },
+    expected: {
+      requiredKnowledge: ['storage'],
+      correctAnswer:
+        'Assistant recommends using a public Storage bucket for public website assets, such as marketing-assets. Public reads should be served through the bucket public setting, so the Assistant must not suggest adding broad storage.objects SELECT/RLS policies for public reads. Only discuss write policies if client-side uploads or updates are needed.',
+    },
+    metadata: {
+      category: ['rls_policies'],
+      description:
+        'Verifies the assistant infers a public bucket for public website assets without adding a broad Storage SELECT policy.',
+    },
+  },
+  {
+    input: {
+      prompt:
+        "I'm adding profile pictures to my app. People should be able to see each other's avatars, but each user should only be able to upload or replace their own picture. How should I set that up in Supabase Storage?",
+    },
+    expected: {
+      requiredKnowledge: ['storage'],
+      correctAnswer:
+        "Assistant recommends a public avatars bucket so profile pictures can be used directly in image URLs. Public reads should not use storage.objects SELECT policies, especially broad policies like using (bucket_id = 'avatars'), because public buckets are already readable and SELECT policies can allow listing. Upload and update policies are allowed for the public bucket, but they must be scoped to authenticated users and constrained to the user's own avatar path or owner.",
+    },
+    metadata: {
+      category: ['rls_policies'],
+      description:
+        'Verifies the assistant uses a public bucket for avatars with scoped mutation policies and no broad read policy.',
+    },
+  },
+  {
+    input: {
+      prompt:
         'Show me customer name, order date, order, and user from the order history table in MySchema where order is not null',
       mockTables: {
         MySchema: [
@@ -140,6 +172,38 @@ export const dataset: AssistantEvalCase[] = [
       requiredKnowledge: ['rls'],
     },
     metadata: { category: ['rls_policies'] },
+  },
+  {
+    input: {
+      prompt:
+        'Create RLS policies for my profiles table. Users should be able to see approved profiles and manage their own profile.',
+      mockTables: {
+        public: [
+          {
+            name: 'profiles',
+            rls_enabled: true,
+            columns: [
+              { name: 'id', data_type: 'uuid' },
+              { name: 'user_id', data_type: 'uuid' },
+              { name: 'display_name', data_type: 'text' },
+              { name: 'bio', data_type: 'text' },
+              { name: 'is_approved', data_type: 'boolean' },
+            ],
+          },
+        ],
+      },
+    },
+    expected: {
+      requiredTools: ['list_tables', 'list_policies', 'execute_sql'],
+      requiredKnowledge: ['rls'],
+      correctAnswer:
+        'The assistant must not create a broad public SELECT policy like USING (is_approved = true) for profiles, because that exposes all approved user profiles. It should either ask whether approved profiles are intentionally public, or make the read policy more restrictive by combining approval with an authenticated viewer, ownership, relationship, team, or other access-control condition. Users may manage only their own profile with policies scoped by auth.uid() and user_id.',
+    },
+    metadata: {
+      category: ['rls_policies'],
+      description:
+        'Verifies the assistant avoids overly permissive RLS policies that expose all approved user profiles.',
+    },
   },
   {
     input: {
