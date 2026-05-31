@@ -45,6 +45,9 @@ This Docker Compose configuration includes the following services:
 - **[versions.md](./versions.md)** - Complete history of Docker image versions for rollback reference
 - **[Ask DeepWiki / Supabase](https://deepwiki.com/supabase/supabase/3-self-hosted-deployment)** - DeepWiki-generated description of self-hosted configuration
 - **[CONFIG.md](./CONFIG.md)** - Configuration reference for all environment variables
+- **[JWT_VERIFIER_ARCHITECTURE.md](./JWT_VERIFIER_ARCHITECTURE.md)** - `VerifyJWT v1` contract every service that validates user JWTs must implement
+- **[JWT_HOSTED_VS_SELF_HOSTED.md](./JWT_HOSTED_VS_SELF_HOSTED.md)** - Why ES256 failures manifest in both hosted and self-hosted, and the reproducibility matrix
+- **[UPSTREAM_PR_DRAFTS.md](./UPSTREAM_PR_DRAFTS.md)** - PR descriptions for upstream service repos implementing the verifier contract
 
 ## Updates
 

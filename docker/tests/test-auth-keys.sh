@@ -35,6 +35,8 @@ ANON_KEY=$(grep '^ANON_KEY=' .env | cut -d= -f2-)
 SERVICE_ROLE_KEY=$(grep '^SERVICE_ROLE_KEY=' .env | cut -d= -f2-)
 SUPABASE_PUBLISHABLE_KEY=$(grep '^SUPABASE_PUBLISHABLE_KEY=' .env | cut -d= -f2-)
 SUPABASE_SECRET_KEY=$(grep '^SUPABASE_SECRET_KEY=' .env | cut -d= -f2-)
+JWT_KEYS_VAL=$(grep '^JWT_KEYS=' .env | cut -d= -f2-)
+JWT_JWKS_VAL=$(grep '^JWT_JWKS=' .env | cut -d= -f2-)
 
 pass=0
 fail=0
@@ -61,6 +63,29 @@ http_status() {
 
 echo ""
 echo "=== Testing against $BASE_URL ==="
+echo ""
+
+echo "--- Asymmetric JWT configuration ---"
+if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
+    check "JWT_KEYS configured for Auth signing" "true" \
+        "$([ -n "$JWT_KEYS_VAL" ] && echo true || echo false)"
+    check "JWT_JWKS configured for token verifiers" "true" \
+        "$([ -n "$JWT_JWKS_VAL" ] && echo true || echo false)"
+
+    jwt_jwks_has_ec=$(printf '%s' "$JWT_JWKS_VAL" | jq -r 'if .keys and any(.keys[]; .kty == "EC" and .alg == "ES256") then "true" else "false" end' 2>/dev/null)
+    check "JWT_JWKS includes ES256 public key" "true" "$jwt_jwks_has_ec"
+
+    if [ -f docker-compose.yml ]; then
+        compose_has_auth_keys=$(grep -q '^[[:space:]]*GOTRUE_JWT_KEYS:' docker-compose.yml && echo true || echo false)
+        compose_has_realtime_jwks=$(grep -q '^[[:space:]]*API_JWT_JWKS:' docker-compose.yml && echo true || echo false)
+        compose_has_storage_jwks=$(grep -q '^[[:space:]]*JWT_JWKS:' docker-compose.yml && echo true || echo false)
+        check "docker-compose passes signing keys to Auth" "true" "$compose_has_auth_keys"
+        check "docker-compose passes JWKS to Realtime" "true" "$compose_has_realtime_jwks"
+        check "docker-compose passes JWKS to Storage" "true" "$compose_has_storage_jwks"
+    fi
+else
+    echo "  SKIP: Opaque keys not configured"
+fi
 echo ""
 
 # ---------------------------------------------
@@ -259,6 +284,11 @@ if [ -n "$access_token" ]; then
         echo "  INFO: User session JWT signed with: $jwt_alg"
         if [ "$jwt_alg" = "ES256" ]; then
             check "JWT uses ES256 (asymmetric)" "ES256" "$jwt_alg"
+
+            jwt_kid=$(echo "$access_token" | cut -d. -f1 | \
+                jq -Rr '@base64d | fromjson | .kid // empty' 2>/dev/null)
+            jwks_has_session_kid=$(printf '%s' "$JWT_JWKS_VAL" | jq -r --arg kid "$jwt_kid" 'if .keys and any(.keys[]; .kid == $kid) then "true" else "false" end' 2>/dev/null)
+            check "Session JWT kid exists in JWT_JWKS" "true" "$jwks_has_session_kid"
         else
             check "JWT uses HS256 (legacy)" "HS256" "$jwt_alg"
         fi
@@ -333,6 +363,10 @@ if [ -n "$hs256_token" ]; then
         "$(http_status "$BASE_URL/rest/v1/" \
             -H "apikey: $ANON_KEY" \
             -H "Authorization: Bearer $hs256_token")"
+    check "HS256 token with Storage (backward compat)" "200" \
+        "$(http_status "$BASE_URL/storage/v1/bucket" \
+            -H "apikey: $ANON_KEY" \
+            -H "Authorization: Bearer $hs256_token")"
 else
     echo "  SKIP: Could not mint HS256 token (node required)"
 fi
@@ -344,7 +378,6 @@ fi
 echo ""
 echo "--- JWT_KEYS format ---"
 
-JWT_KEYS_VAL=$(grep '^JWT_KEYS=' .env | cut -d= -f2-)
 if [ -n "$JWT_KEYS_VAL" ]; then
     # Auth expects a JSON array, not a JWKS object
     jwt_keys_is_array=$(echo "$JWT_KEYS_VAL" | jq -r 'if type == "array" then "true" else "false" end' 2>/dev/null)

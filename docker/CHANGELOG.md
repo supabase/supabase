@@ -19,6 +19,22 @@ See per-service updates below for details.
 - [Upgrading from PG 15 to 17 (breaking change)](https://github.com/orgs/supabase/discussions/46080)
 - [Switching Studio from `supabase_admin` to `postgres` (breaking change)](https://github.com/orgs/supabase/discussions/46081)
 
+### Configuration
+- Pass `JWT_JWKS` to Auth, Realtime, and Storage by default so asymmetric JWT signing keys are propagated consistently across all token verifiers.
+
+### Tests
+- Added asymmetric JWT configuration checks to the self-hosted auth key smoke test (`tests/test-auth-keys.sh`).
+- Added `tests/test-jwt-e2e.sh` — full ES256 lifecycle: user create, sign-in, PostgREST `auth.uid()` probe (via a temporary `public.jwt_probe()` RPC), Storage RLS upload to `<uid>/test.txt`, Realtime WebSocket upgrade, and explicit negative tests proving that tampered or unknown-`kid` JWTs are rejected with 4xx rather than silently downgraded to the `anon` role.
+- Added `tests/test-jwt-rotation.sh` — mints ES256 tokens client-side from each key in `JWT_KEYS` and verifies every active service accepts them; mints a token with a synthetic foreign `kid` and verifies every service rejects it.
+
+### Utils
+- Added `utils/diagnose-jwt.sh` — read-only operator diagnostic that prints (a) `.env` asymmetric-key state, (b) per-container JWT env wiring via `docker exec`, (c) live `/auth/v1/.well-known/jwks.json` content vs. `JWT_JWKS`, and (d) a live ES256 token probe across PostgREST, Storage, and Realtime. Supports `--json` for CI capture and produces a non-zero exit code on detected inconsistency.
+
+### Documentation
+- Added `JWT_VERIFIER_ARCHITECTURE.md` — the `VerifyJWT v1` contract (algorithm, fail-closed behavior, JWKS cache lifecycle, observability, configuration surface, per-service implementation map, security analysis, rollout plan).
+- Added `JWT_HOSTED_VS_SELF_HOSTED.md` — the four planes that must agree for ES256 to work end-to-end, why the failure manifests on both hosted and self-hosted, and the reproducibility matrix.
+- Added `UPSTREAM_PR_DRAFTS.md` — ready-to-paste PR descriptions for `supabase/storage-api`, `supabase/realtime`, `supabase/auth`, and `supabase/edge-runtime` implementing the contract.
+
 ---
 
 ## [2026-04-27]
