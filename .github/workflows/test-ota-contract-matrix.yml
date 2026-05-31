@@ -77,7 +77,7 @@ jobs:
       - name: Setup ota
         uses: ota-run/setup@4ec459ee7956050be33e5c30f7e070f1f155c023 # v1
         with:
-          ota-version: 1.6.15
+          ota-version: 1.6.18
 
       - name: Verify ota install [bash]
         if: matrix.run_shell == 'bash'
@@ -406,7 +406,7 @@ jobs:
       - name: Setup ota
         uses: ota-run/setup@4ec459ee7956050be33e5c30f7e070f1f155c023 # v1
         with:
-          ota-version: 1.6.15
+          ota-version: 1.6.18
 
       - name: Verify ota install
         shell: bash
@@ -590,7 +590,7 @@ jobs:
       - name: Setup ota
         uses: ota-run/setup@4ec459ee7956050be33e5c30f7e070f1f155c023 # v1
         with:
-          ota-version: 1.6.15
+          ota-version: 1.6.18
 
       - name: Verify ota install
         shell: bash
