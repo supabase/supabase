@@ -65,14 +65,13 @@ import { useProfile } from '@/lib/profile'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const ROLE_DESCRIPTIONS: Record<string, string> = {
-  Owner:
-    'Full access, including deleting the organization, transferring or deleting projects, managing billing, and assigning owners.',
+  Owner: 'Full access, including deleting the organization and transferring or deleting projects.',
   Administrator:
-    'Manage members, billing, and project settings, including creating, pausing, and deleting projects. Cannot update organization settings, transfer projects outside the organization, or add owners.',
+    'Manage members, billing, and project settings, including deleting projects. Cannot manage organization settings or owners.',
   Developer:
-    'Read organization resources and manage or delete project content such as database data, authentication users, storage files, and Edge Functions. Cannot change project settings or delete projects.',
+    'Manage project content, including deleting data, users, files, and Edge Functions. Cannot change settings or delete projects.',
   'Read-only':
-    'View organization and project resources without modifying or deleting them. SQL Editor access is limited to SELECT queries.',
+    'View resources without modifying or deleting them. SQL Editor access is limited to SELECT queries.',
 }
 
 export const InviteMemberButton = () => {

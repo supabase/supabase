@@ -145,22 +145,22 @@ describe('InviteMemberButton', () => {
     )
     expect(
       screen.getByText(
-        'Full access, including deleting the organization, transferring or deleting projects, managing billing, and assigning owners.'
+        'Full access, including deleting the organization and transferring or deleting projects.'
       )
     ).toBeInTheDocument()
     expect(
       screen.getByText(
-        'Manage members, billing, and project settings, including creating, pausing, and deleting projects. Cannot update organization settings, transfer projects outside the organization, or add owners.'
+        'Manage members, billing, and project settings, including deleting projects. Cannot manage organization settings or owners.'
       )
     ).toBeInTheDocument()
     expect(
       screen.getByText(
-        'Read organization resources and manage or delete project content such as database data, authentication users, storage files, and Edge Functions. Cannot change project settings or delete projects.'
+        'Manage project content, including deleting data, users, files, and Edge Functions. Cannot change settings or delete projects.'
       )
     ).toBeInTheDocument()
     expect(
       screen.getByText(
-        'View organization and project resources without modifying or deleting them. SQL Editor access is limited to SELECT queries.'
+        'View resources without modifying or deleting them. SQL Editor access is limited to SELECT queries.'
       )
     ).toBeInTheDocument()
   })
