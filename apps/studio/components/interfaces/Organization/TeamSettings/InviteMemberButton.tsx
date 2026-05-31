@@ -7,24 +7,27 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogSection,
-  DialogSectionSeparator,
-  DialogTitle,
-  DialogTrigger,
   ExpandingTextArea,
   Form,
   FormControl,
   FormField,
+  FormItem,
+  RadioGroupStacked,
+  RadioGroupStackedItem,
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetSection,
+  SheetTitle,
+  SheetTrigger,
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -60,6 +63,17 @@ import { DOCS_URL } from '@/lib/constants'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { useProfile } from '@/lib/profile'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+
+const ROLE_DESCRIPTIONS: Record<string, string> = {
+  Owner:
+    'Full access, including deleting the organization, transferring or deleting projects, managing billing, and assigning owners.',
+  Administrator:
+    'Manage members, billing, and project settings, including creating, pausing, and deleting projects. Cannot update organization settings, transfer projects outside the organization, or add owners.',
+  Developer:
+    'Read organization resources and manage or delete project content such as database data, authentication users, storage files, and Edge Functions. Cannot change project settings or delete projects.',
+  'Read-only':
+    'View organization and project resources without modifying or deleting them. SQL Editor access is limited to SELECT queries.',
+}
 
 export const InviteMemberButton = () => {
   const { slug } = useParams()
@@ -209,7 +223,7 @@ export const InviteMemberButton = () => {
     }
 
     if (succeeded.length > 0) {
-      closeInviteDialog()
+      closeInviteSheet()
     }
   }
 
@@ -228,7 +242,7 @@ export const InviteMemberButton = () => {
 
   const hasUnsavedChanges = form.formState.isDirty
 
-  const closeInviteDialog = () => {
+  const closeInviteSheet = () => {
     setProjectDropdownOpen(false)
     setIsOpen(false)
     form.reset(defaultValues)
@@ -240,12 +254,12 @@ export const InviteMemberButton = () => {
     modalProps: discardChangesModalProps,
   } = useConfirmOnClose({
     checkIsDirty: () => hasUnsavedChanges,
-    onClose: closeInviteDialog,
+    onClose: closeInviteSheet,
   })
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
+    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
+      <SheetTrigger asChild>
         <Shortcut
           id={SHORTCUT_IDS.ORG_TEAM_INVITE}
           onTrigger={() => {
@@ -274,12 +288,14 @@ export const InviteMemberButton = () => {
             Invite members
           </ButtonTooltip>
         </Shortcut>
-      </DialogTrigger>
-      <DialogContent size="medium">
-        <DialogHeader>
-          <DialogTitle>Invite team members</DialogTitle>
-        </DialogHeader>
-        <DialogSectionSeparator />
+      </SheetTrigger>
+      <SheetContent className="flex flex-col gap-0">
+        <SheetHeader>
+          <SheetTitle>Invite team members</SheetTitle>
+          <SheetDescription>
+            Send invitations and choose the access each new team member receives.
+          </SheetDescription>
+        </SheetHeader>
         <Admonition
           type="note"
           showIcon={false}
@@ -300,58 +316,67 @@ export const InviteMemberButton = () => {
             </>
           }
         />
-        <Form {...form}>
-          <form
-            id="organization-invitation"
-            className="flex flex-col gap-y-4"
-            onSubmit={form.handleSubmit(onInviteMember)}
-          >
-            <DialogSection className="flex flex-col gap-y-4 pb-2">
+        <SheetSection className="grow overflow-auto">
+          <Form {...form}>
+            <form
+              id="organization-invitation"
+              className="flex flex-col gap-y-4"
+              onSubmit={form.handleSubmit(onInviteMember)}
+            >
               <FormField
                 name="role"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItemLayout label="Role">
-                    <FormControl>
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger className="text-sm capitalize">
-                          {orgScopedRoles.find((role) => role.id === Number(field.value))?.name ??
-                            'Unknown'}
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            {orgScopedRoles.map((role) => {
-                              const canAssignRole = rolesAddable.includes(role.id)
-                              const isOwnerRole = role.name === 'Owner'
-                              const disabledForStripe = isStripeProjectsOrg && isOwnerRole
-                              const disabled = !canAssignRole || disabledForStripe
-                              const disabledReason = disabledForStripe
-                                ? 'Cannot be assigned in Stripe Projects organizations'
-                                : !canAssignRole
-                                  ? 'Additional permissions required to assign role'
-                                  : undefined
+                  <FormItemLayout
+                    layout="horizontal"
+                    label="Role"
+                    description={
+                      <>
+                        Learn more about{' '}
+                        <a
+                          href="https://supabase.com/docs/guides/platform/access-control"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-link"
+                        >
+                          roles and permissions
+                        </a>
+                      </>
+                    }
+                  >
+                    <FormControl className="col-span-6">
+                      <RadioGroupStacked value={field.value} onValueChange={field.onChange}>
+                        {orgScopedRoles.map((role) => {
+                          const canAssignRole = rolesAddable.includes(role.id)
+                          const isOwnerRole = role.name === 'Owner'
+                          const disabledForStripe = isStripeProjectsOrg && isOwnerRole
+                          const disabled = !canAssignRole || disabledForStripe
+                          const disabledReason = disabledForStripe
+                            ? 'Cannot be assigned in Stripe Projects organizations'
+                            : !canAssignRole
+                              ? 'Additional permissions required to assign role'
+                              : undefined
 
-                              return (
-                                <SelectItem
-                                  key={role.id}
+                          return (
+                            <FormItem asChild key={role.id}>
+                              <FormControl>
+                                <RadioGroupStackedItem
                                   value={role.id.toString()}
-                                  className="text-sm"
                                   disabled={disabled}
-                                >
-                                  <div className="flex flex-col gap-0.5">
-                                    <span>{role.name}</span>
-                                    {disabledReason && (
-                                      <span className="text-xs text-foreground-lighter">
-                                        {disabledReason}
-                                      </span>
-                                    )}
-                                  </div>
-                                </SelectItem>
-                              )
-                            })}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
+                                  label={role.name}
+                                  description={[
+                                    ROLE_DESCRIPTIONS[role.name] ??
+                                      'Permissions are based on the configured organization role.',
+                                    disabledReason,
+                                  ]
+                                    .filter(Boolean)
+                                    .join(' ')}
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )
+                        })}
+                      </RadioGroupStacked>
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -362,10 +387,11 @@ export const InviteMemberButton = () => {
                   control={form.control}
                   render={({ field }) => (
                     <FormItemLayout
+                      layout="horizontal"
                       label="Invitation type"
                       description="Choose how the invitee should authenticate"
                     >
-                      <FormControl>
+                      <FormControl className="col-span-6">
                         <Select value={field.value} onValueChange={field.onChange}>
                           <SelectTrigger>
                             <SelectValue placeholder="Automatic (based on your account)" />
@@ -390,8 +416,12 @@ export const InviteMemberButton = () => {
                   name="applyToOrg"
                   control={form.control}
                   render={({ field }) => (
-                    <FormItemLayout layout="flex" label="Grant this role on all projects">
-                      <FormControl>
+                    <FormItemLayout
+                      layout="horizontal"
+                      label="Grant this role on all projects"
+                      description="Apply this role to all current and future projects in the organization"
+                    >
+                      <FormControl className="col-span-6">
                         <Switch checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
                     </FormItemLayout>
@@ -404,10 +434,11 @@ export const InviteMemberButton = () => {
                   control={form.control}
                   render={({ field }) => (
                     <FormItemLayout
+                      layout="horizontal"
                       label="Select a project"
                       description="Project access can be adjusted after the user joins"
                     >
-                      <FormControl>
+                      <FormControl className="col-span-6">
                         <OrganizationProjectSelector
                           fetchOnMount
                           sameWidthAsTrigger
@@ -428,8 +459,8 @@ export const InviteMemberButton = () => {
                 name="email"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItemLayout label="Email addresses">
-                    <FormControl>
+                  <FormItemLayout layout="horizontal" label="Email addresses">
+                    <FormControl className="col-span-6">
                       <ExpandingTextArea
                         autoFocus
                         {...field}
@@ -446,29 +477,34 @@ export const InviteMemberButton = () => {
                   </FormItemLayout>
                 )}
               />
-            </DialogSection>
-            <DialogFooter className="justify-between!">
-              <Button type="default" onClick={confirmOnClose}>
-                Cancel
-              </Button>
-              <Shortcut
-                id={SHORTCUT_IDS.ORG_TEAM_INVITE_SUBMIT}
-                onTrigger={() => form.handleSubmit(onInviteMember)()}
-                options={{ enabled: isOpen && !isInviting }}
-                side="top"
-              >
-                <Button type="primary" htmlType="submit" loading={isInviting}>
-                  {emailCount >= 2 ? 'Send invitations' : 'Send invitation'}
-                </Button>
-              </Shortcut>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
+            </form>
+          </Form>
+        </SheetSection>
+        <SheetFooter>
+          <Button type="default" onClick={confirmOnClose}>
+            Cancel
+          </Button>
+          <Shortcut
+            id={SHORTCUT_IDS.ORG_TEAM_INVITE_SUBMIT}
+            onTrigger={() => form.handleSubmit(onInviteMember)()}
+            options={{ enabled: isOpen && !isInviting }}
+            side="top"
+          >
+            <Button
+              type="primary"
+              form="organization-invitation"
+              htmlType="submit"
+              loading={isInviting}
+            >
+              {emailCount >= 2 ? 'Send invitations' : 'Send invitation'}
+            </Button>
+          </Shortcut>
+        </SheetFooter>
+      </SheetContent>
       <DiscardChangesConfirmationDialog
         {...discardChangesModalProps}
         description="Are you sure you want to discard your changes? Your invitation will not be sent."
       />
-    </Dialog>
+    </Sheet>
   )
 }
