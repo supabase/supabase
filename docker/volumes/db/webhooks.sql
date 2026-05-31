@@ -122,6 +122,12 @@ BEGIN;
   ALTER table "supabase_functions".hooks OWNER TO supabase_functions_admin;
   ALTER function "supabase_functions".http_request() OWNER TO supabase_functions_admin;
   GRANT supabase_functions_admin TO postgres;
+  -- http_request() runs as supabase_functions_admin (SECURITY DEFINER) and builds the
+  -- webhook payload from NEW/OLD. Serializing rows whose columns use a type defined in
+  -- the extensions schema (e.g. PostGIS geometry) invokes that type's I/O functions, which
+  -- requires USAGE on the schema. Without this grant the trigger fails with
+  -- "permission denied for schema extensions".
+  GRANT USAGE ON SCHEMA extensions TO supabase_functions_admin;
   -- Remove unused supabase_pg_net_admin role
   DO
   $$
