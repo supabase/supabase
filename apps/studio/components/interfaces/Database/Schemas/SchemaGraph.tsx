@@ -8,6 +8,7 @@ import {
   MiniMap,
   Node,
   OnSelectionChangeParams,
+  Panel,
   ReactFlow,
   useReactFlow,
 } from '@xyflow/react'
@@ -41,6 +42,7 @@ import { Admonition } from 'ui-patterns/admonition'
 
 import { SidePanelEditor } from '../../TableGridEditor/SidePanelEditor/SidePanelEditor'
 import { DefaultEdge } from './DefaultEdge'
+import { FindTableSelector } from './FindTableSelector'
 import { SchemaGraphContextProvider, SchemaGraphContextType } from './SchemaGraphContext'
 import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { EdgeData, TableNodeData } from './Schemas.constants'
@@ -56,7 +58,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import SchemaSelector from '@/components/ui/SchemaSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useSchemasQuery } from '@/data/database/schemas-query'
-import { useTablesQuery } from '@/data/tables/tables-query'
+import { useInfiniteTablesQuery } from '@/data/tables/tables-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
@@ -117,18 +119,23 @@ export const SchemaGraph = () => {
   })
 
   const {
-    data: tables = [],
+    data: tablesData,
     error: errorTables,
     isSuccess: isSuccessTables,
     isPending: isLoadingTables,
     isError: isErrorTables,
-  } = useTablesQuery({
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useInfiniteTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema: selectedSchema,
     includeColumns: true,
+    pageSize: 100,
   })
-  const hasNoTables = isSuccessSchemas && tables.length === 0
+  const tables = useMemo(() => tablesData?.pages.flat() ?? [], [tablesData])
+  const hasNoTables = isSuccessTables && isSuccessSchemas && tables.length === 0 && !hasNextPage
 
   const schema = (schemas ?? []).find((s) => s.name === selectedSchema)
   const [, setStoredPositions] = useLocalStorage(
@@ -227,7 +234,13 @@ export const SchemaGraph = () => {
   }
 
   const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
+  const [findTableOpen, setFindTableOpen] = useState(false)
   const [autoLayoutDialogOpen, setAutoLayoutDialogOpen] = useState(false)
+
+  const handleSelectSchema = (name: string) => {
+    setFindTableOpen(false)
+    setSelectedSchema(name)
+  }
 
   const shortcutsEnabled = isSuccessSchemas && !hasNoTables
 
@@ -241,8 +254,13 @@ export const SchemaGraph = () => {
   useShortcut(SHORTCUT_IDS.SCHEMA_VISUALIZER_DOWNLOAD_SVG, () => downloadImage('svg'), {
     enabled: shortcutsEnabled,
   })
+  useShortcut(SHORTCUT_IDS.SCHEMA_VISUALIZER_FIND_TABLE, () => setFindTableOpen(true), {
+    enabled: shortcutsEnabled,
+  })
 
   const isFirstLoad = useRef(true)
+  const fitViewOnNextLayout = useRef(false)
+  const pendingFocusTableIdRef = useRef<string | null>(null)
   useEffect(() => {
     if (isSuccessTables && isSuccessSchemas && tables.length > 0) {
       const schema = schemas.find((s) => s.name === selectedSchema) as PGSchema
@@ -250,13 +268,48 @@ export const SchemaGraph = () => {
         reactFlowInstance.setNodes(nodes)
         reactFlowInstance.setEdges(edges)
         // Prevent resetting a view after first load to avoid layout changes after editing a column
-        if (isFirstLoad.current) {
+        if (isFirstLoad.current || fitViewOnNextLayout.current) {
           isFirstLoad.current = false
+          fitViewOnNextLayout.current = false
           setTimeout(() => reactFlowInstance.fitView({})) // it needs to happen during next event tick
+        }
+        const pendingId = pendingFocusTableIdRef.current
+        if (pendingId !== null && nodes.some((n) => n.id === pendingId)) {
+          pendingFocusTableIdRef.current = null
+          setTimeout(() =>
+            reactFlowInstance.fitView({
+              nodes: [{ id: pendingId }],
+              duration: 300,
+              maxZoom: 1.5,
+            })
+          )
         }
       })
     }
   }, [isSuccessTables, isSuccessSchemas, tables, reactFlowInstance, ref, schemas, selectedSchema])
+
+  const handleFindTableSelect = async (table: SafePostgresTable) => {
+    const targetId = String(table.id)
+    if (reactFlowInstance.getNode(targetId)) {
+      reactFlowInstance.fitView({
+        nodes: [{ id: targetId }],
+        duration: 300,
+        maxZoom: 1.5,
+      })
+      return
+    }
+    // Selected table isn't loaded yet — queue the fitView and pull pages until
+    // it shows up. The build-effect above will consume the pending id once the
+    // node is mounted.
+    pendingFocusTableIdRef.current = targetId
+    let result = await fetchNextPage()
+    while (
+      result.hasNextPage &&
+      !result.data?.pages.some((page) => page.some((t) => t.id === table.id))
+    ) {
+      result = await fetchNextPage()
+    }
+  }
 
   const schemaGraphContext = useMemo<SchemaGraphContextType>(
     () => ({
@@ -294,23 +347,43 @@ export const SchemaGraph = () => {
 
         {isSuccessSchemas && (
           <>
-            <Shortcut
-              id={SHORTCUT_IDS.SCHEMA_VISUALIZER_FOCUS_SCHEMA}
-              onTrigger={() => setSchemaSelectorOpen(true)}
-              options={{ enabled: isSuccessSchemas }}
-              side="bottom"
-              tooltipOpen={schemaSelectorOpen ? false : undefined}
-            >
-              <SchemaSelector
-                className="w-[180px]"
-                size="tiny"
-                showError={false}
-                selectedSchemaName={selectedSchema}
-                onSelectSchema={setSelectedSchema}
-                open={schemaSelectorOpen}
-                onOpenChange={setSchemaSelectorOpen}
-              />
-            </Shortcut>
+            <div className="flex items-center gap-x-2">
+              <Shortcut
+                id={SHORTCUT_IDS.SCHEMA_VISUALIZER_FOCUS_SCHEMA}
+                onTrigger={() => setSchemaSelectorOpen(true)}
+                options={{ enabled: isSuccessSchemas }}
+                side="bottom"
+                tooltipOpen={schemaSelectorOpen ? false : undefined}
+              >
+                <SchemaSelector
+                  className="w-[180px]"
+                  size="tiny"
+                  showError={false}
+                  selectedSchemaName={selectedSchema}
+                  onSelectSchema={handleSelectSchema}
+                  open={schemaSelectorOpen}
+                  onOpenChange={setSchemaSelectorOpen}
+                />
+              </Shortcut>
+              {!hasNoTables && (
+                <Shortcut
+                  id={SHORTCUT_IDS.SCHEMA_VISUALIZER_FIND_TABLE}
+                  onTrigger={() => setFindTableOpen(true)}
+                  options={{ enabled: shortcutsEnabled }}
+                  side="bottom"
+                  tooltipOpen={findTableOpen ? false : undefined}
+                >
+                  <FindTableSelector
+                    projectRef={project?.ref}
+                    connectionString={project?.connectionString}
+                    schema={selectedSchema}
+                    open={findTableOpen}
+                    onOpenChange={setFindTableOpen}
+                    onSelect={handleFindTableSelect}
+                  />
+                </Shortcut>
+              )}
+            </div>
             {!hasNoTables && (
               <div className="flex items-center gap-x-2">
                 <div className="flex items-center gap-0">
@@ -483,6 +556,21 @@ export const SchemaGraph = () => {
                     className="border rounded-md shadow-xs"
                   />
                   <SchemaGraphLegend />
+                  {hasNextPage && (
+                    <Panel position="bottom-center" className="mb-11!">
+                      <Button
+                        type="default"
+                        size="tiny"
+                        loading={isFetchingNextPage}
+                        onClick={() => {
+                          fitViewOnNextLayout.current = true
+                          fetchNextPage()
+                        }}
+                      >
+                        Load more tables
+                      </Button>
+                    </Panel>
+                  )}
                 </ReactFlow>
               </div>
             </SchemaGraphContextProvider>

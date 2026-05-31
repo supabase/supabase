@@ -207,7 +207,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         applicationName="Supabase Studio"
                         route={isNonProdEnv ? '/favicon/staging' : '/favicon'}
                       />
-                      <TooltipProvider delayDuration={0}>
+                      <TooltipProvider>
                         <RouteValidationWrapper>
                           <ThemeProvider>
                             <DevToolbarProvider apiUrl={API_URL}>
