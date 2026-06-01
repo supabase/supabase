@@ -90,10 +90,10 @@ export const pricingTooltips: PricingTooltips = {
     main: 'Only events processed and sent to destinations are counted. Egress required to export logs count towards usage.\nEgress through Log Drains is rolled up into the unified egress and benefits from the unified egress quota.',
   },
   'security.logsIngest': {
-    main: 'Total volume of log data ingested across all services (Postgres, API gateway, Auth, Storage, Realtime, Edge Functions). Billing is based on the sum of ingested data in GB throughout your billing period.',
+    main: 'Total volume of log data ingested across all services (Postgres, API gateway, Auth, Storage, Realtime, Edge Functions). Billing is based on the sum of ingested data in GB throughout your billing period.\nFree Plan is capped at 5 GB per month — no overage charges apply.',
   },
   'security.logsQuery': {
-    main: 'Total volume of log data scanned when reading logs via Studio, Management API, or CLI. Billing is based on the sum of scanned data in GB throughout your billing period.',
+    main: 'Total volume of log data scanned when reading logs via Studio, Management API, or CLI. Billing is based on the sum of scanned data in GB throughout your billing period.\nFree Plan is capped at 1,000 GB per month — no overage charges apply.',
   },
   'security.hipaa': {
     main: 'Available as a paid add-on on Team Plan and above.',
