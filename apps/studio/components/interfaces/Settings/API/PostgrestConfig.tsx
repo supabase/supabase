@@ -58,7 +58,11 @@ const formSchema = z.object({
   // Fields for updatePostgrestConfig
   dbSchema: z.array(z.string()),
   dbExtraSearchPath: z.array(z.string()),
-  maxRows: z.coerce.number().max(1000000, "Can't be more than 1,000,000"),
+  maxRows: z
+    .union([z.literal(''), z.coerce.number().int().min(1)])
+    .refine((value) => value !== '', 'Max rows is required')
+    .transform((value) => Number(value))
+    .max(1000000, "Can't be more than 1,000,000"),
   dbPool: z.coerce
     .number()
     .min(0, 'Must be more than 0')
