@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Trash } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useEffectEvent, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
@@ -25,7 +25,6 @@ import { useOrgSSOConfigQuery } from '@/data/sso/sso-config-query'
 import { useSSOConfigUpdateMutation } from '@/data/sso/sso-config-update-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { DOCS_URL } from '@/lib/constants'
 
 const FormSchema = z
@@ -187,7 +186,7 @@ export const SSOConfig = () => {
     deleteSSOConfig({ slug: organization.slug })
   }
 
-  const syncFormFromConfig = useStaticEffectEvent(() => {
+  const syncFormFromConfig = useEffectEvent(() => {
     if (!organization?.slug) return
 
     // Only reset form if it's not dirty (user hasn't made changes)
@@ -214,10 +213,11 @@ export const SSOConfig = () => {
 
   useEffect(() => {
     syncFormFromConfig()
-  }, [ssoConfig, organization?.slug, syncFormFromConfig])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [ssoConfig, organization?.slug])
 
   // Automatically add an empty domain field when SP-initiated is enabled
-  const ensureDomainField = useStaticEffectEvent(() => {
+  const ensureDomainField = useEffectEvent(() => {
     const currentDomains = form.getValues('domains')
     if (enableSpInitiated && (!currentDomains || currentDomains.length === 0)) {
       form.setValue('domains', [{ value: '' }], { shouldValidate: false })
@@ -226,7 +226,8 @@ export const SSOConfig = () => {
 
   useEffect(() => {
     ensureDomainField()
-  }, [enableSpInitiated, ensureDomainField])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [enableSpInitiated])
 
   return (
     <ScaffoldContainer size="small" className="px-6 xl:px-10">

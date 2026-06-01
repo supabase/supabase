@@ -350,8 +350,8 @@ ChartContent.displayName = 'ChartContent'
 interface ChartEmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string
   icon?: React.ReactNode
-  title: string
-  description: string
+  title?: string
+  description?: string
 }
 
 const ChartEmptyState = React.forwardRef<HTMLDivElement, ChartEmptyStateProps>(
@@ -370,8 +370,8 @@ const ChartEmptyState = React.forwardRef<HTMLDivElement, ChartEmptyStateProps>(
             {icon}
           </div>
         )}
-        <h3 className="text-sm font-medium text-foreground-light">{title}</h3>
-        <p className="text-sm text-foreground-lighter">{description}</p>
+        {title && <h3 className="text-sm font-medium text-foreground-light">{title}</h3>}
+        {description && <p className="text-sm text-foreground-lighter">{description}</p>}
       </div>
     )
   }

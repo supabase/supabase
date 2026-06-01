@@ -23,10 +23,9 @@ import { FilterTable } from './FilterTable'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 type ControlledOpenProps =
@@ -60,8 +59,7 @@ export const RealtimeFilterPopover = ({
 
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const { data: publications } = useDatabasePublicationsQuery({
     projectRef: project?.ref,
@@ -269,10 +267,7 @@ export const RealtimeFilterPopover = ({
         visible={applyConfigOpen}
         onCancel={() => setApplyConfigOpen(false)}
         onConfirm={() => {
-          sendEvent({
-            action: 'realtime_inspector_filters_applied',
-            groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-          })
+          track('realtime_inspector_filters_applied')
           onChangeConfig(tempConfig)
           setApplyConfigOpen(false)
           setOpen(false)

@@ -21,6 +21,7 @@ export interface ComboBoxOption {
   id: string
   value: string
   displayName: string
+  disabled?: boolean
 }
 
 export function ComboBox<Opt extends ComboBoxOption>({
@@ -131,6 +132,7 @@ export function ComboBox<Opt extends ComboBoxOption>({
                     {options.map((option) => (
                       <CommandItem
                         key={option.id}
+                        disabled={option.disabled}
                         value={option.value}
                         onSelect={(selectedValue: string) => {
                           setOpen(false)

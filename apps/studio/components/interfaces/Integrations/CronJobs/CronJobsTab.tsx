@@ -14,12 +14,11 @@ import { useCronJobsData } from './CronJobsTab.useCronJobsData'
 import { DeleteCronJob } from './DeleteCronJob'
 import { CreateCronJobSheet } from '@/components/interfaces/Integrations/CronJobs/CreateCronJobSheet/CreateCronJobSheet'
 import { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useInfiniteScroll } from '@/hooks/misc/useInfiniteScroll'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { cleanPointerEventsNoneOnBody } from '@/lib/helpers'
 import { createNavigationHandler } from '@/lib/navigation'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -29,7 +28,7 @@ export const CronjobsTab = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
 
   const [searchQuery, setSearchQuery] = useQueryState('search', parseAsString.withDefault(''))
 
@@ -60,27 +59,19 @@ export const CronjobsTab = () => {
 
   const [, setCronJobForDeletion] = useQueryState('delete', parseAsString)
 
-  const { mutate: sendEvent } = useSendEventMutation()
-
   const columns = useMemo(
     () =>
       formatCronJobColumns({
         onSelectEdit: (job: CronJob) => {
-          sendEvent({
-            action: 'cron_job_update_clicked',
-            groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-          })
+          track('cron_job_update_clicked')
           setCronJobForEditing(job.jobid.toString())
         },
         onSelectDelete: (job: CronJob) => {
-          sendEvent({
-            action: 'cron_job_delete_clicked',
-            groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-          })
+          track('cron_job_delete_clicked')
           setCronJobForDeletion(job.jobid.toString())
         },
       }),
-    [org?.slug, ref, sendEvent, setCronJobForEditing, setCronJobForDeletion]
+    [track, setCronJobForEditing, setCronJobForDeletion]
   )
 
   const handleScroll = useInfiniteScroll({
@@ -91,10 +82,7 @@ export const CronjobsTab = () => {
   })
 
   const onOpenCreateJobSheet = () => {
-    sendEvent({
-      action: 'cron_job_create_clicked',
-      groups: { project: project?.ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-    })
+    track('cron_job_create_clicked')
     setCreateCronJobSheetShown(true)
   }
 
@@ -118,10 +106,7 @@ export const CronjobsTab = () => {
       jobname || `Job #${jobid}`
     )}`
 
-    sendEvent({
-      action: 'cron_job_history_clicked',
-      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-    })
+    track('cron_job_history_clicked')
 
     createNavigationHandler(url, router)(event)
   }

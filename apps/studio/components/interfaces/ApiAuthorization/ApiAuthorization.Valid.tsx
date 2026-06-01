@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useEffectEvent, useMemo, useState, type ReactNode } from 'react'
 import { useForm, type UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
 
@@ -16,7 +16,6 @@ import { useApiAuthorizationApproveMutation } from '@/data/api-authorization/api
 import { useApiAuthorizationDeclineMutation } from '@/data/api-authorization/api-authorization-decline-mutation'
 import { useApiAuthorizationQuery } from '@/data/api-authorization/api-authorization-query'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import type { Organization } from '@/types'
 
 function getMatchingOrganization(
@@ -90,7 +89,7 @@ function usePrefillFormOnOrganizationsSuccess(
   organizationsState: ReturnType<typeof useOrganizationsState>,
   organization_slug: string | undefined
 ) {
-  const prefillForm = useStaticEffectEvent(() => {
+  const prefillForm = useEffectEvent(() => {
     if (organizationsState._tag === 'success') {
       preselectOrganizationSlug({
         form,
@@ -103,7 +102,8 @@ function usePrefillFormOnOrganizationsSuccess(
     if (organizationsState._tag === 'success') {
       prefillForm()
     }
-  }, [organizationsState._tag, prefillForm])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [organizationsState._tag])
 }
 
 export interface ApiAuthorizationValidScreenProps {

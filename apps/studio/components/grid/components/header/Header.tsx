@@ -235,6 +235,7 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
         table: snap.table,
         projectRef: project.ref,
         connectionString: project.connectionString ?? null,
+        roleImpersonationState: roleImpersonationState as RoleImpersonationState,
       })
       if (hydrated.status !== 'ok') {
         throw new Error('Failed to fetch full values for truncated cells')
