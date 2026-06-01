@@ -30,6 +30,26 @@ export function ApiSectionClient({ examples }: { examples: ApiExample[] }) {
   const { ref: inViewRef, inView } = useInView({ threshold: 0.3 })
   const active = examples[activeIdx]
 
+  // Auto-size the code panel to the active snippet. We measure an always-mounted,
+  // invisible copy of the current code so the target height is known immediately on
+  // switch (and doesn't collapse during the cross-fade), then animate `height` to it.
+  const measureRef = useRef<HTMLDivElement>(null)
+  const [height, setHeight] = useState<number>()
+  const hasMeasured = useRef(false)
+
+  useEffect(() => {
+    const el = measureRef.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setHeight(el.offsetHeight))
+    ro.observe(el)
+    setHeight(el.offsetHeight)
+    return () => ro.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (height != null) hasMeasured.current = true
+  }, [height])
+
   const clearTimer = useCallback(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current)
@@ -115,7 +135,23 @@ export function ApiSectionClient({ examples }: { examples: ApiExample[] }) {
           </div>
 
           {/* Right: code block */}
-          <div className="relative min-h-[440px] overflow-auto border border-border rounded-md">
+          <motion.div
+            initial={false}
+            animate={height != null ? { height } : undefined}
+            transition={
+              hasMeasured.current ? { duration: 0.35, ease: [0.22, 1, 0.36, 1] } : { duration: 0 }
+            }
+            className="relative self-end overflow-hidden border border-border rounded-md"
+          >
+            {/* Invisible measuring copy: drives the animated container height */}
+            <div
+              ref={measureRef}
+              aria-hidden
+              className="pointer-events-none invisible absolute inset-x-0 top-0 overflow-x-auto pb-12 [&_pre]:!bg-transparent [&_pre]:m-0 [&_pre]:p-6"
+              style={{ fontSize: '0.8125rem', fontWeight: 500, lineHeight: 1.7 }}
+              dangerouslySetInnerHTML={{ __html: active.languages[activeLang]?.darkHtml ?? '' }}
+            />
+
             {/* Language switcher */}
             <div className="absolute top-3 right-4 z-10 flex items-center">
               <div className="relative flex items-center gap-1 text-foreground-muted text-xs">
@@ -140,6 +176,7 @@ export function ApiSectionClient({ examples }: { examples: ApiExample[] }) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1, transition: { duration: 0.15, delay: 0.05 } }}
                 exit={{ opacity: 0, transition: { duration: 0.05 } }}
+                className="overflow-x-auto pb-12"
               >
                 <div
                   dangerouslySetInnerHTML={{ __html: active.languages[activeLang]?.darkHtml ?? '' }}
@@ -177,7 +214,7 @@ export function ApiSectionClient({ examples }: { examples: ApiExample[] }) {
                 />
               </svg>
             </Link>
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>

@@ -1,31 +1,9 @@
 'use client'
 
 import { AnimatePresence, motion } from 'framer-motion'
-import {
-  Blocks,
-  KeyRound,
-  Link2,
-  ListChecks,
-  Rocket,
-  Server,
-  ShieldCheck,
-  Users,
-  type LucideIcon,
-} from 'lucide-react'
 import Link from 'next/link'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { cn } from 'ui'
-
-const EXAMPLE_ICONS: Record<string, LucideIcon> = {
-  ListChecks,
-  Users,
-  Rocket,
-  KeyRound,
-  Link2,
-  ShieldCheck,
-  Blocks,
-  Server,
-}
 
 type Framework = {
   name: string
@@ -38,12 +16,9 @@ type Framework = {
 
 export function FrameworksSectionClient({ frameworks }: { frameworks: Framework[] }) {
   const [activeIdx, setActiveIdx] = useState(0)
-  const prevIdx = useRef(0)
-  const direction = activeIdx > prevIdx.current ? -1 : 1
   const active = frameworks[activeIdx]
 
   const handleTabChange = (index: number) => {
-    prevIdx.current = activeIdx
     setActiveIdx(index)
   }
 
@@ -51,7 +26,7 @@ export function FrameworksSectionClient({ frameworks }: { frameworks: Framework[
     <div className="border-b border-border py-24">
       <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-0">
-          {/* Left: title + example cards */}
+          {/* Left: title */}
           <div className="flex flex-col justify-between py-4 gap-6 md:gap-10">
             <h3 className="text-2xl md:text-4xl text-foreground-lighter">
               Use Supabase with{' '}
@@ -69,48 +44,6 @@ export function FrameworksSectionClient({ frameworks }: { frameworks: Framework[
                 </AnimatePresence>
               </span>
             </h3>
-
-            {active.examples.length > 0 && (
-              <AnimatePresence mode="wait" initial={false} custom={direction}>
-                <motion.div
-                  key={active.name}
-                  custom={direction}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  variants={{
-                    enter: (d: number) => ({ opacity: 0, x: -28 * d, filter: 'blur(2px)' }),
-                    center: {
-                      opacity: 1,
-                      x: 0,
-                      filter: 'blur(0px)',
-                      transition: { duration: 0.2, delay: 0.05 },
-                    },
-                    exit: (d: number) => ({
-                      opacity: 0,
-                      x: 28 * d,
-                      filter: 'blur(2px)',
-                      transition: { duration: 0.1 },
-                    }),
-                  }}
-                  className="flex flex-col gap-1 md:max-w-sm"
-                >
-                  {active.examples.map((example) => {
-                    const Icon = EXAMPLE_ICONS[example.icon]
-                    return (
-                      <Link
-                        key={example.url}
-                        href={example.url}
-                        className="flex items-center gap-3 py-2 text-2xl font-medium text-foreground-light"
-                      >
-                        {Icon && <Icon size={22} strokeWidth={1.5} />}
-                        {example.title}
-                      </Link>
-                    )
-                  })}
-                </motion.div>
-              </AnimatePresence>
-            )}
           </div>
 
           {/* Right: icon tabs + code */}
