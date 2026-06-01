@@ -3203,20 +3203,6 @@ module.exports = [
     destination: '/dashboard/redeem?code=:code',
     permanent: false,
   },
-  // Reference pages use hash anchors for sections; redirect the legacy
-  // path-style /docs/reference/<lib>/introduction (and versioned variants)
-  // back to the base reference URL. Order matters: introduction first so it
-  // strips to a bare URL, then the section rules add a hash anchor.
-  {
-    permanent: true,
-    source: '/docs/reference/:lib/:version(v\\d+)/:section',
-    destination: '/docs/reference/:lib/:version#:section',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/:lib/:section((?!v\\d+$)[^/]+)',
-    destination: '/docs/reference/:lib#:section',
-  },
   // Legacy product .txt URLs → new .md routes
   { permanent: true, source: '/llms/homepage.txt', destination: '/homepage.md' },
   { permanent: true, source: '/llms/auth.txt', destination: '/auth.md' },
