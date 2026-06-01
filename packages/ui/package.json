@@ -43,8 +43,10 @@
     "vaul": "^1.1.2"
   },
   "devDependencies": {
+    "@hookform/resolvers": "^3.1.1",
     "@testing-library/jest-dom": "^6.6.0",
     "@testing-library/react": "^16.0.0",
+    "@testing-library/user-event": "^14.0.0",
     "@types/lodash": "4.17.5",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
