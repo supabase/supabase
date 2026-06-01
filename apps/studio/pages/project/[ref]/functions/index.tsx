@@ -129,7 +129,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
               <>
                 {hasFunctions ? (
                   <div className="space-y-4">
-                    {isSelfHosted && functions.length === 1 && <SelfHostedManualFunctionCard />}
+                    {isSelfHosted && <SelfHostedManualFunctionCard />}
                     <div className="flex items-center gap-2">
                       <div className="flex items-center gap-2">
                         <div className="relative">

@@ -39,11 +39,15 @@ export const FunctionsEmptyState = () => {
     return EDGE_FUNCTION_TEMPLATES.filter((template) => template.value !== 'stripe-webhook')
   }, [showStripeExample])
 
+  const emptyStateTitle = IS_PLATFORM
+    ? 'Deploy your first edge function'
+    : 'Add your first edge function'
+
   return (
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Deploy your first edge function</CardTitle>
+          <CardTitle>{emptyStateTitle}</CardTitle>
         </CardHeader>
         <CardContent className="p-0 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] divide-y md:divide-y-0 md:divide-x divide-default items-stretch">
           {/* Editor Option */}
