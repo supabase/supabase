@@ -493,7 +493,12 @@ export const TableList = ({
                             {!isSchemaLocked && (
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button type="default" className="px-1" icon={<MoreVertical />} />
+                                  <Button
+                                    type="default"
+                                    className="px-1"
+                                    icon={<MoreVertical />}
+                                    aria-label={`Table ${x.name} actions`}
+                                  />
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent side="bottom" align="end" className="w-40">
                                   <DropdownMenuItem
