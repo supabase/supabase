@@ -1,16 +1,51 @@
 # Reference content pipeline
 
-A new process has been set to break away from big files dependencies for reference documentation updates.
-
-The new setup allows developer to drop files, plus add content via partials and tweak output through configuration.
-
-_For now, it supports only [typedoc](https://typedoc.org/) output, though teams can build their own adapters to match the expected output as a pre-step._
-
 This directory feeds the **new** reference-docs pipeline driven by
 [`scripts/build-reference-content.ts`](../../scripts/build-reference-content.ts).
-The legacy pipeline (`spec/supabase_*_v*.yml` + `spec/common-client-libs-sections.json`
+The setup lets you drop TypeDoc dumps, layer hand-authored content via
+partials, and tweak ordering through `config.json`. Currently it only consumes
+[TypeDoc](https://typedoc.org/) JSON output, but other formats can be adapted
+to the same shape as a pre-step.
 
-The YAML-driven `features/docs/Reference.generated.script.ts`) still exists for SDKs that haven't migrated yet — see "Routing to the new pipeline" below for how a lib opts in.
+The legacy pipeline (the `spec/supabase_*_v*.yml` files plus
+`spec/common-client-libs-sections.json` driven by
+`features/docs/Reference.generated.script.ts`) still exists for SDKs that
+haven't migrated yet — see "Routing to the new pipeline" below for how a lib
+opts in.
+
+## Pipeline at a glance
+
+```
+Upstream supabase-js packages publish TypeDoc JSON at
+   https://supabase.github.io/<pkg>/v2/spec.json
+                │
+                │  (1)  cd apps/docs/spec && make download.tsdoc.v2
+                ▼
+   spec/reference/<lib>/<ver>/                              ← gitignored *.json
+     ├── *.json            ← downloaded TypeDoc dumps         (committed: config.json
+     ├── config.json       ← hand-authored                                 + partials/)
+     └── partials/         ← hand-authored
+                │
+                │  (2)  pnpm codegen:references:new
+                │       (= ensure dumps + build-reference-content.ts)
+                ▼
+   content/reference/<lib>/<ver>/                            ← gitignored (all 5 files)
+     ├── bySlug.json
+     ├── flat.json
+     ├── sections.json
+     ├── functions.json
+     └── typeSpec.json
+                │
+                │  (3)  Next.js render
+                ▼
+   /docs/reference/<lib>/<ver>/<slug>
+```
+
+Both `spec/reference/<lib>/<ver>/*.json` (the source dumps) and the entire
+`content/reference/` tree (the build output) are gitignored — only
+hand-authored files inside `spec/reference/<lib>/<ver>/` (`config.json` and
+`partials/`) are committed. Everything regenerates on `pnpm dev` / `pnpm build`
+via `predev` / `prebuild`, so a clean checkout just works.
 
 ## Directory layout
 
@@ -18,9 +53,9 @@ The YAML-driven `features/docs/Reference.generated.script.ts`) still exists for 
 spec/reference/
 └── <library>/                  e.g. javascript
     └── <version>/              e.g. v2
-        ├── *.json              TypeDoc spec files (the source of truth for declarations)
-        ├── config.json         Optional. Filters and ordering — see below
-        └── partials/           Optional. Per-section content
+        ├── *.json              TypeDoc spec files                       (GITIGNORED — downloaded)
+        ├── config.json         Optional. Filters and ordering — see below   (committed)
+        └── partials/           Optional. Per-section content                (committed)
             ├── *.mdx | *.md    Markdown partials (with frontmatter)
             └── *.json          Rich function-type partials (description, examples, …)
 ```
@@ -29,13 +64,34 @@ Library and version names come straight from the folder names. Anything you drop
 under `spec/reference/<lib>/<ver>/` is picked up automatically by the build
 script — there is no separate manifest to update inside this directory.
 
-The output will be sent to the `content/reference/<lib>/<ver>/` directory.
+The output will be sent to the `content/reference/<lib>/<ver>/` directory
+(also gitignored — see "Outputs" below).
 
 ## Source: TypeDoc JSON specs
 
 Each top-level `.json` file (except `config.json`) is a TypeDoc dump of one
-package. The build walks every declaration and harvests anything tagged with
-`@category` (and optionally `@subcategory`):
+package. These files are **gitignored** — they're downloaded build artifacts,
+not source. Only hand-authored files (`config.json` and `partials/`) are
+tracked. To refresh the dumps locally:
+
+```bash
+cd apps/docs/spec && make download.tsdoc.v2
+```
+
+`pnpm dev` / `pnpm build` runs `codegen:references:ensure` automatically as
+part of `predev` / `prebuild`. That script checks for
+`spec/reference/javascript/v2/supabase.json` and, if missing, invokes
+`make download.tsdoc.v2`. So a clean checkout just works — the dumps land on
+first build and are reused on subsequent runs. To force a refresh after
+supabase-js ships a release, run the make target by hand (or delete one of
+the `.json` files and let the next build re-fetch).
+
+CI runs the same path: `.github/workflows/docs-tests.yml` calls
+`make download.tsdoc.v2` before tests, and `docs-js-libs-update.yml` opens a
+PR with regenerated snapshots when supabase-js publishes a new version.
+
+The build walks every declaration in those dumps and harvests anything tagged
+with `@category` (and optionally `@subcategory`):
 
 ```jsonc
 // spec/reference/javascript/v2/gotrue.json (excerpt)
@@ -211,7 +267,8 @@ the same per-version output directory — the page renderer's routed loader
 (`getRefMarkdownForLib`) reads those bodies directly, no manual copy needed.
 
 The whole `apps/docs/content/reference/` tree is gitignored — outputs are
-regenerated by `prebuild` (`pnpm codegen:references`).
+regenerated by `prebuild` (`pnpm codegen:references:new`, which also runs as
+part of `predev`).
 
 ## Routing to the new pipeline
 
@@ -241,8 +298,21 @@ The same set drives every runtime read that depends on the new layout:
   (`getRefMarkdownForLib`) picks between
   `docs/ref/<libPath>/[<version>/]<id>.mdx` and
   `content/reference/<libPath>/<version>/<id>.mdx`.
+- The legacy section-generation script
+  [`Reference.generated.script.ts`](../../features/docs/Reference.generated.script.ts)
+  filters out libs in the set, so no `supabase_<lib>_v<ver>.yml` is read for
+  them. Migrated libs therefore drop their `specFile` field from
+  [`content/navigation.references.ts`](../../content/navigation.references.ts)
+  (see the JS v2 entry for an example).
+- Search/embeddings ingest in
+  [`scripts/search/sources/index.ts`](../../scripts/search/sources/index.ts):
+  `fetchJsLibReferenceSource()` calls `loadClientLibReferenceFromNewPipeline()`
+  which reads `content/reference/javascript/v2/{sections,functions,typeSpec}.json`
+  directly. Other libs still go through `ClientLibReferenceLoader` against
+  their YAML. To migrate another lib, swap the same way once it's in
+  `SUPPORTS_NEW_REFERENCE_PROCESS`.
 
-No other call sites need to change.
+No other call sites in the render path need to change.
 
 > ⚠️ Don't move the constant. `Reference.utils.ts` transitively pulls in
 > `next/navigation`, which crashes `tsx --conditions=react-server` (used by
@@ -252,9 +322,12 @@ No other call sites need to change.
 
 ## Adding a new lib/version (checklist)
 
-1. **Drop TypeDoc output files** under `spec/reference/<lib>/<ver>/`. One JSON per
-   package is fine — the walker handles multiple files. Make sure every
-   public method has an `@category` tag.
+1. **Wire up the TypeDoc download** in [`spec/Makefile`](../Makefile). Copy the
+   `download.tsdoc.v2` target, adapt the URLs and output paths to
+   `spec/reference/<lib>/<ver>/`. Make sure every public method in the upstream
+   source has an `@category` tag. One JSON per package is fine — the walker
+   handles multiple files. The dumps themselves are gitignored; only
+   `config.json` and `partials/` get tracked.
 2. **(Optional) add `config.json`** with `excludeCategories`,
    `excludeDefinitions`, `categoryOrder`, `partialsOrder`.
 3. **(Optional) add `partials/`** with intro markdown and per-section rich
@@ -264,10 +337,12 @@ No other call sites need to change.
    `SUPPORTS_NEW_REFERENCE_PROCESS` so the runtime reads the new outputs.
 5. **Run the build**:
    ```bash
-   cd apps/docs && pnpm tsx scripts/build-reference-content.ts
+   cd apps/docs && pnpm codegen:references:new
    ```
-   Inspect the five files under `content/reference/<lib>/<ver>/`. The log line
-   prints declaration / function / subcategory / category counts.
+   This auto-downloads missing dumps via `codegen:references:ensure` and then
+   runs `build-reference-content.ts`. Inspect the five files under
+   `content/reference/<lib>/<ver>/`. The log line prints declaration /
+   function / subcategory / category counts.
 6. **Verify the rendered page** at `/docs/reference/<lib>/<ver>` in dev. If
    subcategory bodies are empty, check that the partial filename matches the
    subcategory title slug exactly (`title.toLowerCase().replace(/\s+/g, '-')`).

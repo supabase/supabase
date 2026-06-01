@@ -16,6 +16,16 @@ import { dirname, extname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import matter from 'gray-matter'
 
+import {
+  buildMap,
+  KIND_VARIABLE,
+  normalizeComment,
+  parseSignature,
+  parseType,
+  type MethodTypes,
+  type VariableTypes,
+} from '../features/docs/Reference.typeSpec'
+
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const DOCS_DIR = join(__dirname, '..')
 const SPEC_DIR = join(DOCS_DIR, 'spec/reference')
@@ -70,21 +80,14 @@ interface FunctionsEntry {
   [key: string]: unknown
 }
 
-interface TypeSpecMethod {
-  ref: string
-  params: Array<{ name: string; type: unknown; isOptional?: boolean }>
-  returnType?: unknown
-}
-
-interface TypeSpecVariable {
-  ref: string
-  type?: unknown
-  isConst?: boolean
-}
-
+/**
+ * Per-lib typeSpec.json shape. Keys are normalised `$ref`s; values mirror the
+ * legacy `MethodTypes` / `VariableTypes` so the renderer in
+ * `Reference.sections.tsx` can consume the new file without changes.
+ */
 interface TypeSpec {
-  methods: Record<string, TypeSpecMethod>
-  variables: Record<string, TypeSpecVariable>
+  methods: Record<string, MethodTypes>
+  variables: Record<string, VariableTypes>
 }
 
 interface BySlugFunction {
@@ -240,10 +243,16 @@ function normalizeRefPath(path: string): string {
  *     `@subcategory`) plus a constructed `$ref` of the form
  *     `<package>.<module…>.<class…>.<name>` (normalized to strip `.index.`).
  *   - `typeSpec`: separate `methods` and `variables` maps keyed by the same
- *     `$ref`. Methods get their first signature's parameters and return type;
- *     variables (kind 32) get their type and `isConst` flag. Not filtered by
- *     category or `excludeDefinitions`, so partials that link to "hidden"
- *     methods (e.g. a constructor) can still resolve.
+ *     `$ref`. Methods carry every signature (first → primary, rest →
+ *     `altSignatures`) with params, return type, and normalised comment
+ *     (shortText, text, tags, examples). Variables (kind 32) carry their
+ *     parsed type and `isConst` flag. Type-tree normalisation and comment
+ *     extraction are delegated to the shared helpers in
+ *     `~/features/docs/Reference.typeSpec` so the renderer can consume the
+ *     output without any shape translation.
+ *
+ *   Not filtered by category or `excludeDefinitions`, so partials that link
+ *   to "hidden" methods (e.g. a constructor) can still resolve.
  *
  * Context is threaded down through container nodes:
  *   - kind 1 (project) sets the package name and resets the path.
@@ -260,6 +269,7 @@ const PATH_CONTAINER_KINDS = new Set([2, 4, 128, 256])
 function collectFunctions(
   node: Declaration,
   out: { functions: FunctionEntry[]; typeSpec: TypeSpec },
+  idMap: Map<number, any>,
   ctx: { pkg: string | null; path: string[] } = { pkg: null, path: [] }
 ): void {
   let nextCtx = ctx
@@ -272,20 +282,37 @@ function collectFunctions(
   if (ctx.pkg && node.name) {
     const ref = normalizeRefPath([ctx.pkg, ...ctx.path, node.name].join('.'))
     if (node.signatures?.length) {
-      const sig = node.signatures[0]
-      out.typeSpec.methods[ref] = {
-        ref,
-        params: (sig.parameters ?? []).map((p) => {
-          const entry: TypeSpecMethod['params'][number] = { name: p.name, type: p.type }
-          if (p.flags?.isOptional) entry.isOptional = true
-          return entry
-        }),
-        returnType: sig.type,
+      const firstSig = node.signatures[0]
+      const { params, ret, comment: sigComment } = parseSignature(firstSig, idMap)
+
+      // Some overloaded methods carry shared JSDoc (e.g. @remarks, @example)
+      // on the declaration node rather than any individual signature. Merge
+      // node-level tags as a base so they aren't lost when the first
+      // signature only has a summary.
+      let comment = sigComment
+      if (node.comment) {
+        const nodeComment = normalizeComment(node.comment as any)
+        if (nodeComment) {
+          comment = { ...nodeComment, ...sigComment }
+        }
       }
-    } else if (node.kind === 32 && node.type) {
-      const entry: TypeSpecVariable = { ref, type: node.type }
-      if (node.flags?.isConst) entry.isConst = true
-      out.typeSpec.variables[ref] = entry
+
+      const methodEntry: MethodTypes = { name: ref, params, ret, comment }
+      if (node.signatures.length > 1) {
+        methodEntry.altSignatures = node.signatures.slice(1).map((sig) => {
+          const { params: altParams, ret: altRet } = parseSignature(sig, idMap)
+          return { params: altParams, ret: altRet }
+        }) as MethodTypes['altSignatures']
+      }
+      out.typeSpec.methods[ref] = methodEntry
+    } else if (node.kind === KIND_VARIABLE && node.type) {
+      const variableEntry: VariableTypes = {
+        name: ref,
+        type: parseType(node.type, idMap),
+        comment: node.comment ? normalizeComment(node.comment as any) : undefined,
+        isConst: node.flags?.isConst ?? false,
+      }
+      out.typeSpec.variables[ref] = variableEntry
     }
   }
 
@@ -300,7 +327,7 @@ function collectFunctions(
 
   if (node.children) {
     for (const child of node.children) {
-      collectFunctions(child, out, nextCtx)
+      collectFunctions(child, out, idMap, nextCtx)
     }
   }
 }
@@ -524,14 +551,15 @@ async function writeNewMarkdownPartials(library: string, partials: PartialEntry[
 }
 
 /**
- * Processes one `[library]/[version]` directory: reads spec files, partials,
- * and config, then writes all five output files (`bySlug.json`, `flat.json`,
- * `sections.json`, `functions.json`, `typeSpec.json`) in parallel. `flat.json`
- * is `Object.values(bySlug)`, `sections.json` is the nested tree, `functions.json`
- * maps each slug/partial to its `$ref`, and `typeSpec.json` holds the raw
- * parameter and return-type signatures keyed by ref.
+ * In-memory computation for a single `[library]/[version]`: reads spec files,
+ * partials, and config, walks every TypeDoc declaration, and returns the five
+ * derived artifacts (`bySlug`, `flat`, `sections`, `functionsList`,
+ * `typeSpec`) plus the partial list needed for downstream `.mdx` seeding.
+ *
+ * Exported so tests can snapshot the output shape without going through the
+ * filesystem.
  */
-async function processVersion(library: string, version: string): Promise<void> {
+export async function collectReferenceContent(library: string, version: string) {
   const versionDir = join(SPEC_DIR, library, version)
   const files = (await readdir(versionDir)).filter(
     (f) => f.endsWith('.json') && f !== 'config.json'
@@ -547,11 +575,26 @@ async function processVersion(library: string, version: string): Promise<void> {
   for (const file of files) {
     const raw = await readFile(join(versionDir, file), 'utf-8')
     const spec = JSON.parse(raw) as Declaration
-    collectFunctions(spec, collected)
+    // Build a numeric id → node map per package file so `parseType`'s reference
+    // resolution can walk dereferenced types and aliased declarations.
+    const idMap = new Map<number, any>()
+    buildMap(spec, idMap)
+    collectFunctions(spec, collected, idMap)
   }
 
   const { bySlug, sections, functionsList } = buildBySlug(collected.functions, partials, config)
   const flat = Object.values(bySlug)
+  return { bySlug, flat, sections, functionsList, typeSpec: collected.typeSpec, partials }
+}
+
+/**
+ * Processes one `[library]/[version]` directory: reads spec files, partials,
+ * and config, then writes all five output files (`bySlug.json`, `flat.json`,
+ * `sections.json`, `functions.json`, `typeSpec.json`) in parallel.
+ */
+async function processVersion(library: string, version: string): Promise<void> {
+  const { bySlug, flat, sections, functionsList, typeSpec, partials } =
+    await collectReferenceContent(library, version)
 
   const counts = { markdown: 0, function: 0, subcategory: 0, category: 0 }
   for (const v of flat) {
@@ -568,7 +611,7 @@ async function processVersion(library: string, version: string): Promise<void> {
     writeFile(join(outputDir, 'flat.json'), JSON.stringify(flat)),
     writeFile(join(outputDir, 'sections.json'), JSON.stringify(sections)),
     writeFile(join(outputDir, 'functions.json'), JSON.stringify(functionsList)),
-    writeFile(join(outputDir, 'typeSpec.json'), JSON.stringify(collected.typeSpec)),
+    writeFile(join(outputDir, 'typeSpec.json'), JSON.stringify(typeSpec)),
   ])
 
   // The page renderer's `MarkdownSection` loads body text by id from
@@ -577,10 +620,10 @@ async function processVersion(library: string, version: string): Promise<void> {
   // hand-maintained legacy partials like introduction.mdx).
   await writeNewMarkdownPartials(library, partials)
 
-  const typeSpecMethods = Object.keys(collected.typeSpec.methods).length
-  const typeSpecVariables = Object.keys(collected.typeSpec.variables).length
+  const typeSpecMethods = Object.keys(typeSpec.methods).length
+  const typeSpecVariables = Object.keys(typeSpec.variables).length
   console.log(
-    `[${library}/${version}] wrote 5 files — ${collected.functions.length} declarations scanned, ${counts.markdown} partials, ${counts.function} function slugs, ${counts.subcategory} subcategories, ${counts.category} categories, ${functionsList.length} functions.json entries, ${typeSpecMethods} typeSpec methods, ${typeSpecVariables} typeSpec variables`
+    `[${library}/${version}] wrote 5 files — ${counts.markdown} partials, ${counts.function} function slugs, ${counts.subcategory} subcategories, ${counts.category} categories, ${functionsList.length} functions.json entries, ${typeSpecMethods} typeSpec methods, ${typeSpecVariables} typeSpec variables`
   )
 }
 
@@ -597,7 +640,11 @@ async function main(): Promise<void> {
   }
 }
 
-main().catch((err) => {
-  console.error(err)
-  process.exit(1)
-})
+// Only run `main()` when invoked as a script (via `tsx`). Importing this
+// module from a test should not trigger the side-effecting walk.
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((err) => {
+    console.error(err)
+    process.exit(1)
+  })
+}
