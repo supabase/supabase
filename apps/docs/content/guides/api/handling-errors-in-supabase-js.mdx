@@ -1,20 +1,25 @@
 ---
 id: handling-errors-in-supabase-js
 title: 'Handling errors with `supabase-js`'
-subtitle: 'Log the full error object so actionable fields like `hint` and `code` are never hidden.'
+subtitle: 'Read `error.hint` first — Postgres often tells you the exact fix. Log the full error so you actually see it.'
 ---
 
-Every `supabase-js` call returns a `{ data, error }` pair instead of throwing. When `error` is non-null, log the **full error object** — never just `error.message` — so that `code`, `details`, and `hint` are all visible.
+Every `supabase-js` call returns a `{ data, error }` pair instead of throwing. When something fails, the single most useful field on `error` is usually **`hint`** — Postgres returns the _fix_, not just a description of the problem. Logging only `error.message` hides it.
 
-<Admonition type="tip" title="The actionable part is often in `error.hint`">
+## `error.hint` tells you the fix
 
-The database returns the next step you should take in `error.hint`, not in `error.message`. For example, a `42501` permission-denied error arrives with a `hint` like `"Grant the required privileges to the current role with: GRANT SELECT ON public.users TO anon;"`. Logging only `error.message` hides it.
+Consider a `42501` permission-denied error on a table where default `GRANT`s have been revoked from `anon`:
 
-</Admonition>
+```
+message: "permission denied for table users"
+hint:    "Grant the required privileges to the current role with: GRANT SELECT ON public.users TO anon;"
+```
+
+The `message` tells you something went wrong. The `hint` tells you the literal SQL statement to run in the dashboard SQL editor to fix it. Same pattern shows up across many Postgres errors — missing column? `hint` suggests the column name you probably meant. Type mismatch? `hint` shows the expected type. Whenever Postgres knows the fix, it puts it in `hint`.
+
+This is why the rule of thumb is: **log the full `error` object, not just `error.message`.**
 
 ## The recommended pattern
-
-Use `console.error(error)` so every field is included in your logs:
 
 ```ts
 const { data, error } = await supabase.from('users').select()
@@ -24,7 +29,7 @@ if (error) {
 }
 ```
 
-A permission-denied response on a table where default `GRANT`s have been revoked from `anon` looks like this:
+The full response body that PostgREST returns for the permission-denied case above:
 
 ```json
 {
@@ -39,16 +44,18 @@ A permission-denied response on a table where default `GRANT`s have been revoked
 }
 ```
 
-## The `PostgrestError` shape
+`postgrest-js` passes the body through verbatim, so `error.hint` is the exact string Postgres produced. Treat it as the answer the database is giving you, not as a suggestion to file away.
 
-Database calls (`select`, `insert`, `update`, `upsert`, `delete`, `rpc`) return a `PostgrestError` with four fields:
+## The `PostgrestError` fields, by usefulness
 
-| Field     | Description                                                                         |
-| --------- | ----------------------------------------------------------------------------------- |
-| `message` | Human-readable summary from Postgres or PostgREST.                                |
-| `code`    | Error code from PostgREST (e.g. `PGRST301`) or Postgres (e.g. `42501`).           |
-| `details` | Extra context about what went wrong.                                                |
-| `hint`    | Actionable guidance from the database when available — often the most useful field. |
+Database calls (`select`, `insert`, `update`, `upsert`, `delete`, `rpc`) return a `PostgrestError` with four fields. Read them in roughly this order:
+
+| Field     | Read it when                                                                                                       |
+| --------- | ------------------------------------------------------------------------------------------------------------------ |
+| `hint`    | Always check first. When Postgres includes one, it's the actionable fix (a `GRANT` to run, a column name, a type). |
+| `code`    | When branching in code. Codes are stable across versions; `message` text isn't.                                    |
+| `details` | When `hint` and `message` aren't enough. Often contains the offending value, key, or row.                          |
+| `message` | As the human summary. Useful in UI strings, less useful for debugging.                                             |
 
 A full list of PostgREST error codes is in the [Error Codes reference](/guides/api/rest/postgrest-error-codes).
 
