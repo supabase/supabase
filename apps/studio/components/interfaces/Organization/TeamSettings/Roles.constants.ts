@@ -1,9 +1,9 @@
 export const ROLE_DESCRIPTIONS: Record<string, string> = {
-  Owner:
-    'Full access to the organization and all projects, including billing, organization settings, and managing members.',
+  Owner: 'Full access, including deleting the organization and transferring or deleting projects.',
   Administrator:
-    'Full access to projects and members, including pausing and deleting projects. Cannot change organization settings or add owners.',
+    'Manage members, billing, and project settings, including deleting projects. Cannot manage organization settings or owners.',
   Developer:
-    'Read and write project data, but cannot change project settings, manage members, or delete projects.',
-  'Read-only': 'Read-only access to the organization and all projects. Cannot make any changes.',
+    'Manage project content, including deleting data, users, files, and Edge Functions. Cannot change settings or delete projects.',
+  'Read-only':
+    'View resources without modifying or deleting them. SQL Editor access is limited to SELECT queries.',
 }

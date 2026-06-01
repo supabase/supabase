@@ -76,7 +76,6 @@ const buildMember = (overrides: Partial<Member>): Member => ({
   ...overrides,
 })
 
-
 const buildPermission = (resource: string): AccessControlPermission => ({
   actions: ['write:Create', 'write:Delete'],
   condition: null,
@@ -194,10 +193,10 @@ describe('InviteMemberButton (network)', () => {
     expect(screen.getByText('Read-only')).toBeInTheDocument()
 
     // The key safety message from the ticket: Administrator can delete projects
-    expect(screen.getByText(/including pausing and deleting projects/i)).toBeInTheDocument()
+    expect(screen.getByText(/including deleting projects/i)).toBeInTheDocument()
 
     // Roles documentation is one click away (the ticket's other complaint)
-    const docsLink = screen.getByRole('link', { name: /learn more about roles/i })
+    const docsLink = screen.getByRole('link', { name: /roles and permissions/i })
     expect(docsLink).toHaveAttribute(
       'href',
       expect.stringContaining('/guides/platform/access-control')
