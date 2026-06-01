@@ -79,8 +79,6 @@ export const MarketplaceDetail = () => {
     return <InstallIntegrationSheet integration={integration} />
   }
 
-  console.log('integration', integration)
-
   // For overview route, get the integration-specific overview component if available
   const OverviewComponent = activeRoute === 'overview' ? Component : null
   const CustomPageComponent = activeRoute !== 'overview' && isKnownRoute ? Component : null

@@ -111,17 +111,13 @@ export const useAvailableIntegrations = () => {
             images,
             content,
             // TODO: use real API value once `uninstall_steps` column exists in marketplace DB
-            uninstall_steps: apiUninstallSteps,
+            uninstall_steps,
             partner_name: authorName,
             listing_logo: listingLogo,
           } = integration
 
           const status = undefined
           const author = { name: authorName ?? '', websiteUrl: '' }
-          // Only surface uninstall steps in the marketplace UI; fall back to mock until DB column ships
-          const uninstall_steps = isMarketplaceEnabled
-            ? (apiUninstallSteps ?? MOCK_UNINSTALL_STEPS)
-            : undefined
 
           return {
             id: slug ?? '',
@@ -146,43 +142,16 @@ export const useAvailableIntegrations = () => {
             author,
             requiredExtensions: [],
             icon: renderMarketplaceLogo(listingLogo),
-            navigation: [
-              {
-                route: 'overview',
-                label: 'Overview',
-              },
-              ...(uninstall_steps
-                ? [
-                    {
-                      route: 'how-to-uninstall',
-                      label: 'Uninstall',
-                      layout: 'constrained' as const,
-                    },
-                  ]
-                : []),
-            ],
+            navigation: [{ route: 'overview', label: 'Overview' }],
             navigate: ({ pageId = 'overview' }) => {
-              switch (pageId) {
-                case 'overview':
-                  return dynamic(
-                    () =>
-                      import('@/components/interfaces/Integrations/Integration/MarketplaceIntegrationOverviewTab').then(
-                        (mod) => mod.MarketplaceIntegrationOverviewTab
-                      ),
-                    {
-                      loading: Loading,
-                    }
-                  )
-                case 'how-to-uninstall':
-                  return dynamic(
-                    () =>
-                      import('@/components/interfaces/Integrations/Marketplace/UninstallTab').then(
-                        (mod) => mod.UninstallTab
-                      ),
-                    {
-                      loading: Loading,
-                    }
-                  )
+              if (pageId === 'overview') {
+                return dynamic(
+                  () =>
+                    import('@/components/interfaces/Integrations/Integration/MarketplaceIntegrationOverviewTab').then(
+                      (mod) => mod.MarketplaceIntegrationOverviewTab
+                    ),
+                  { loading: Loading }
+                )
               }
               return null
             },
@@ -258,8 +227,49 @@ export const useAvailableIntegrations = () => {
     )
   }, [marketplaceIntegrations, allIntegrations])
 
+  // Inject the Uninstall tab into every integration when the marketplace UI is enabled.
+  // Uses the real `uninstall_steps` value from the API when available, otherwise falls back to mock.
+  // TODO: remove MOCK_UNINSTALL_STEPS fallback once the DB column ships.
+  const dataWithUninstall = useMemo(
+    () =>
+      dataWithMarketplace.map((integration) => {
+        if (!isMarketplaceEnabled) return integration
+
+        const originalNavigate = integration.navigate
+        return {
+          ...integration,
+          uninstall_steps: integration.uninstall_steps ?? MOCK_UNINSTALL_STEPS,
+          navigation: integration.navigation
+            ? [
+                ...integration.navigation,
+                {
+                  route: 'how-to-uninstall',
+                  label: 'Uninstall',
+                  layout: 'constrained' as const,
+                },
+              ]
+            : integration.navigation,
+          navigate: (
+            props: Parameters<typeof originalNavigate>[0]
+          ): ReturnType<typeof originalNavigate> => {
+            if (props.pageId === 'how-to-uninstall') {
+              return dynamic(
+                () =>
+                  import('@/components/interfaces/Integrations/Marketplace/UninstallTab').then(
+                    (mod) => mod.UninstallTab
+                  ),
+                { loading: Loading }
+              )
+            }
+            return originalNavigate(props)
+          },
+        }
+      }),
+    [dataWithMarketplace, isMarketplaceEnabled]
+  )
+
   return {
-    data: dataWithMarketplace,
+    data: dataWithUninstall,
     error,
     isPending,
     isSuccess,
