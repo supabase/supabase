@@ -2919,7 +2919,7 @@ export interface ComputeBadgeUpgradeClickedEvent {
   properties: {
     computeSize: string
     planId: string
-    upgradeType: 'pro_upgrade' | 'free_micro_upgrade' | 'compute_upgrade'
+    upgradeType: 'free_micro_upgrade' | 'compute_upgrade'
   }
   groups: TelemetryGroups
 }
