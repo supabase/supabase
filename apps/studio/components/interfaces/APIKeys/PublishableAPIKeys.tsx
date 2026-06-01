@@ -121,7 +121,7 @@ export const PublishableAPIKeys = () => {
             <TableBody>
               {hasApiKeys && publishableApiKeys.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={3} className="p-0">
+                  <TableCell colSpan={IS_PLATFORM ? 3 : 2} className="p-0">
                     <Admonition showIcon={false} type="default" className="border-0 rounded-none">
                       <p className="text-foreground-light">No publishable keys created yet</p>
                     </Admonition>
@@ -143,7 +143,7 @@ export const PublishableAPIKeys = () => {
 
             <TableFooter className="border-t">
               <TableRow className="border-b-0">
-                <TableCell colSpan={3} className="py-2">
+                <TableCell colSpan={IS_PLATFORM ? 3 : 2} className="py-2">
                   <p className="text-xs text-foreground-lighter font-normal">
                     Publishable keys can be safely shared publicly
                   </p>
