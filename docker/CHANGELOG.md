@@ -24,7 +24,7 @@ See per-service updates below for details. Only the most important changes relev
 ⚠️ **Note:** This update includes **important changes**. Please check the details below.
 
 ### Configuration
-- ⚠️ Logs and analytics are now [optional](https://github.com/orgs/supabase/discussions/46084) and were removed from the default `docker-compose.yml`. A new `docker-compose.logs.yml` override has been added. Check the main [configuration guide](https://supabase.com/docs/guides/self-hosting/docker) and the changes to Studio below for more information - PR [#45327](https://github.com/supabase/supabase/pull/45327) (via [@luizfelmach](https://github.com/luizfelmach/))
+- ⚠️ Logs and analytics are now [optional](https://github.com/orgs/supabase/discussions/46084) and were removed from the default `docker-compose.yml`. A new `docker-compose.logs.yml` override has been added. Check the main [configuration guide](https://supabase.com/docs/guides/self-hosting/docker#enabling-analytics) and the changes to Studio below for more information - PR [#45327](https://github.com/supabase/supabase/pull/45327) (via [@luizfelmach](https://github.com/luizfelmach/))
 
 ### Documentation
 - Added a new [reference list](https://github.com/supabase/supabase/blob/master/docker/CONFIG.md) of all configuration environment variables - PR [#46124](https://github.com/supabase/supabase/pull/46124)
@@ -78,7 +78,7 @@ See per-service updates below for details. Only the most important changes relev
 ## [2026-04-27]
 
 ### Configuration
-- ⚠️ Added `docker-compose.envoy.yml` and `volumes/api/envoy` - PR [#43838](https://github.com/supabase/supabase/pull/43838). See also the API gateway updates below
+- ⚠️ Added `docker-compose.envoy.yml` and `volumes/api/envoy`. See also the API gateway updates below - PR [#43838](https://github.com/supabase/supabase/pull/43838)
 - ⚠️ Changed Studio healthcheck and some other configuration for better compatibility with Podman (requires `docker-compose.yml` update) - PR [#44754](https://github.com/supabase/supabase/pull/44754)
 - ⚠️ Changed Studio configuration to bind to all IPv4 interfaces only (requires `docker-compose.yml` update) - PR [#44772](https://github.com/supabase/supabase/pull/44772)
 
@@ -88,7 +88,7 @@ See per-service updates below for details. Only the most important changes relev
 - Updated the main [setup guide](https://supabase.com/docs/guides/self-hosting/docker) and the how-tos to reflect the state of the self-hosted Supabase configuration - PR [#45011](https://github.com/supabase/supabase/pull/45011)
 
 ### Utils
-- ⚠️ Added `utils/reassign-owner.sh` to update database objects - PR [#42975](https://github.com/supabase/supabase/pull/42975). Read more in the "[Remove superuser access](https://supabase.com/docs/guides/self-hosting/remove-superuser-access)" how-to guide
+- ⚠️ Added `utils/reassign-owner.sh` to update database objects. Read more in the "[Remove superuser access](https://supabase.com/docs/guides/self-hosting/remove-superuser-access)" how-to guide - PR [#42975](https://github.com/supabase/supabase/pull/42975)
 - ⚠️ Changed `utils/add-new-auth-keys.sh` to also update `docker-compose.yml` - PR [#45056](https://github.com/supabase/supabase/pull/45056)
 
 ### API gateway
@@ -96,8 +96,7 @@ See per-service updates below for details. Only the most important changes relev
 
 ### Studio
 - Updated to `2026.04.27-sha-5f60601`
-- ⚠️ Added 4 new lints to the Security Advisor - PR [#45253](https://github.com/supabase/supabase/pull/45253), PR [#45260](https://github.com/supabase/supabase/pull/45260). Read more about lint rules 0026 - 0029 in the [Performance and Security Advisors](https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0026_pg_graphql_anon_table_exposed) section of the Supabase documentation
-
+- ⚠️ Added 4 new lints to the Security Advisor. Read more about lint rules 0026 - 0029 in the [Performance and Security Advisors](https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0026_pg_graphql_anon_table_exposed) section of the Supabase documentation - PR [#45253](https://github.com/supabase/supabase/pull/45253), PR [#45260](https://github.com/supabase/supabase/pull/45260)
 ---
 
 ## [2026-04-08]
@@ -106,7 +105,7 @@ See per-service updates below for details. Only the most important changes relev
 - Added new how-to guides for configuring [custom email templates](https://supabase.com/docs/guides/self-hosting/custom-email-templates), setting up [SAML SSO](https://supabase.com/docs/guides/self-hosting/self-hosted-saml-sso), and [using Postgres 17](https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17) - PR [#42832](https://github.com/supabase/supabase/pull/42832), PR [#43386](https://github.com/supabase/supabase/pull/43386), PR [#44147](https://github.com/supabase/supabase/pull/44147)
 
 ### Utils
-- ⚠️ Added `utils/upgrade-pg17.sh` - PR [#44147](https://github.com/supabase/supabase/pull/44147). Read more in the "[Upgrade to Postgres 17](https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17)" how-to guide
+- ⚠️ Added `utils/upgrade-pg17.sh`. Read more in the "[Upgrade to Postgres 17](https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17)" how-to guide - PR [#44147](https://github.com/supabase/supabase/pull/44147)
 
 ### API gateway
 - ⚠️ Added configuration for SAML SSO (requires `.env`, `docker-compose.yml` and `volumes/api/kong.yml` update) - PR [#43385](https://github.com/supabase/supabase/pull/43385) (via [@luizfelmach](https://github.com/luizfelmach/))
@@ -142,7 +141,7 @@ See per-service updates below for details. Only the most important changes relev
 
 ### Configuration
 - ⚠️ Added scripts and templates to support the new API key format (`sb_` API keys) and the new asymmetric authentication - PR [#43554](https://github.com/supabase/supabase/pull/43554); see the [how-to guide](https://supabase.com/docs/guides/self-hosting/self-hosted-auth-keys) for detailed instructions
-- Added optional proxy configuration for Caddy and nginx - PR [#43291](https://github.com/supabase/supabase/pull/43291); read the [how-to guide](https://supabase.com/docs/guides/self-hosting/self-hosted-proxy-https) to learn more
+- Added optional proxy configuration for Caddy and nginx. Read the [how-to guide](https://supabase.com/docs/guides/self-hosting/self-hosted-proxy-https) to learn more - PR [#43291](https://github.com/supabase/supabase/pull/43291)
 
 ### Documentation
 - Added several new how-to guides to the self-hosted Supabase [documentation](https://supabase.com/docs/guides/self-hosting) - PR [#42745](https://github.com/supabase/supabase/pull/42745), PR [#42953](https://github.com/supabase/supabase/pull/42953), PR [#43177](https://github.com/supabase/supabase/pull/43177), PR [#43286](https://github.com/supabase/supabase/pull/43286), PR [#43293](https://github.com/supabase/supabase/pull/43293)
