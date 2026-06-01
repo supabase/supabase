@@ -36,19 +36,20 @@ export const CancellationFlow = (props: CancellationFlowProps) => {
     setFlowState(props.visible ? 'show-downgrade-modal' : 'closed')
   }, [props.visible])
 
-  const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
+  const { data: membersExceededLimit, isLoading: projectLimitQueryLoading } =
+    useFreeProjectLimitCheckQuery({ slug }, { enabled: flowState !== 'closed' })
+
+  const { data: orgProjectsData, isLoading: orgProjectsQueryLoading } = useOrgProjectsInfiniteQuery(
     { slug },
     { enabled: flowState !== 'closed' }
   )
 
-  const { data: orgProjectsData } = useOrgProjectsInfiniteQuery(
-    { slug },
-    { enabled: flowState !== 'closed' }
-  )
-
-  const { data: subscription } = useOrgSubscriptionQuery({
+  const { data: subscription, isLoading: orgSubscriptionQueryLoading } = useOrgSubscriptionQuery({
     orgSlug: slug,
   })
+
+  const isLoading =
+    projectLimitQueryLoading || orgProjectsQueryLoading || orgSubscriptionQueryLoading
 
   const orgProjects =
     useMemo(
@@ -84,6 +85,7 @@ export const CancellationFlow = (props: CancellationFlowProps) => {
         visible={flowState === 'show-downgrade-modal'}
         subscription={subscription}
         onClose={onCancelFlow}
+        confirmDisabled={isLoading}
         onConfirm={onConfirmDowngrade}
         projects={orgProjects}
       />
@@ -135,8 +137,8 @@ export const InitiateCancellationFlowButton = (props: InitiateCancellationFlowBu
   const [visible, setVisible] = useState(false)
 
   const tooltipText = [
-    [isAwsManaged, 'You cannot change the plan for an organization managed by AWS Marketplace'],
-    [!isDowngradeablePlan, 'Reach out to us via support to update your plan'],
+    [isAwsManaged, 'You cannot change the plan for an organization managed by AWS Marketplace.'],
+    [!isDowngradeablePlan, 'Reach out to us via support to update your plan.'],
     [!canUpdateSubscription, "You need additional permissions to change your organization's plan."],
   ].find(([cond]) => cond)?.[1]
 
