@@ -35,9 +35,9 @@ function renderFeaturedThumb(blog: PostTypes, author: any[]) {
       <Link
         href={`${blog.path}`}
         prefetch={false}
-        className="relative w-full aspect-[16/10] lg:col-span-6 overflow-hidden block group"
+        className="relative w-full aspect-[1.91/1] lg:col-span-6 overflow-hidden block group"
       >
-        <div className="relative w-full h-full min-h-[200px] shadow-lg border border-foreground/10 rounded-lg overflow-hidden">
+        <div className="relative w-full h-full shadow-lg border border-foreground/10 rounded-lg overflow-hidden">
           <Image
             src={imageUrl}
             fill
