@@ -194,9 +194,3 @@ const SelfHostedManualFunctionContent = () => (
     <DocsButton href={`${DOCS_URL}/guides/self-hosting/self-hosted-functions`} />
   </div>
 )
-
-export const SelfHostedManualFunctionCard = () => (
-  <Card>
-    <SelfHostedManualFunctionContent />
-  </Card>
-)
