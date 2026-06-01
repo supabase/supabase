@@ -1,0 +1,134 @@
+---
+id: handling-errors-in-supabase-js
+title: 'Handling errors with `supabase-js`'
+subtitle: 'Log the full error object so actionable fields like `hint` and `code` are never hidden.'
+---
+
+Every `supabase-js` call returns a `{ data, error }` pair instead of throwing. When `error` is non-null, log the **full error object** — never just `error.message` — so that `code`, `details`, and `hint` are all visible.
+
+<Admonition type="tip" title="The actionable part is often in `error.hint`">
+
+The database returns the next step you should take in `error.hint`, not in `error.message`. For example, a `42501` permission-denied error arrives with a `hint` like `"Grant the required privileges to the current role with: GRANT SELECT ON public.users TO anon;"`. Logging only `error.message` hides it.
+
+</Admonition>
+
+## The recommended pattern
+
+Use `console.error(error)` so every field is included in your logs:
+
+```ts
+const { data, error } = await supabase.from('users').select()
+if (error) {
+  console.error(error)
+  return
+}
+```
+
+A permission-denied response on a table where default `GRANT`s have been revoked from `anon` looks like this:
+
+```json
+{
+  "error": {
+    "code": "42501",
+    "message": "permission denied for table users",
+    "details": null,
+    "hint": "Grant the required privileges to the current role with: GRANT SELECT ON public.users TO anon;"
+  },
+  "status": 401,
+  "statusText": "Unauthorized"
+}
+```
+
+## The `PostgrestError` shape
+
+Database calls (`select`, `insert`, `update`, `upsert`, `delete`, `rpc`) return a `PostgrestError` with four fields:
+
+| Field     | Description                                                                         |
+| --------- | ----------------------------------------------------------------------------------- |
+| `message` | Human-readable summary from Postgres or PostgREST.                                |
+| `code`    | Error code from PostgREST (e.g. `PGRST301`) or Postgres (e.g. `42501`).           |
+| `details` | Extra context about what went wrong.                                                |
+| `hint`    | Actionable guidance from the database when available — often the most useful field. |
+
+A full list of PostgREST error codes is in the [Error Codes reference](/guides/api/rest/postgrest-error-codes).
+
+## Branch on `error.code`, not `error.message`
+
+`error.code` is more reliable than `error.message` for programmatic branching: messages change between Postgres and PostgREST versions, but codes are stable.
+
+```ts
+const { data, error } = await supabase.from('users').select()
+if (error) {
+  console.error(error)
+  if (error.code === '42501') {
+    // Permission denied. error.hint usually contains the GRANT to run.
+  }
+  return
+}
+```
+
+## Errors from Auth, Storage, and Edge Functions
+
+The same rule applies across the SDK — log the whole error object — but the shape differs by client.
+
+### Auth
+
+`AuthError` exposes `error.code` (e.g. `'invalid_credentials'`, `'email_not_confirmed'`) and `error.status`. Branch on `code`; log the whole thing.
+
+```ts
+const { data, error } = await supabase.auth.signInWithPassword({
+  email: 'example@email.com',
+  password: 'example-password',
+})
+if (error) {
+  console.error(error)
+  return
+}
+```
+
+### Storage
+
+`StorageError` exposes `error.statusCode` (HTTP status as a string) and a structured `error` name (e.g. `'Duplicate'`, `'NotFound'`).
+
+```ts
+const { data, error } = await supabase.storage
+  .from('avatars')
+  .upload('public/avatar1.png', avatarFile)
+if (error) {
+  console.error(error)
+  return
+}
+```
+
+### Edge Functions
+
+Functions errors arrive as one of three subclasses. Narrow with `instanceof`; for `FunctionsHttpError`, parse the body to get the function's own error payload.
+
+```ts
+import { FunctionsHttpError, FunctionsRelayError, FunctionsFetchError } from '@supabase/supabase-js'
+
+const { data, error } = await supabase.functions.invoke('hello')
+if (error instanceof FunctionsHttpError) {
+  console.error('Function error', await error.context.json())
+} else if (error) {
+  console.error(error)
+}
+```
+
+### Realtime
+
+The `subscribe()` callback receives a `status` and, on failure, an `err` argument. Log the whole `err` — its `cause` often holds the underlying reason.
+
+```ts
+supabase.channel('room1').subscribe((status, err) => {
+  if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+    console.error(status, err)
+  }
+})
+```
+
+## Related
+
+- [PostgREST Error Codes](/guides/api/rest/postgrest-error-codes)
+- [Automatic retries with `supabase-js`](/guides/api/automatic-retries-in-supabase-js)
+- [Securing your API](/guides/api/securing-your-api)
