@@ -94,8 +94,8 @@ export function RLSSectionClient({ examples }: { examples: RLSExample[] }) {
             <span className="text-foreground">without the middleware</span>
           </h3>
           <p className="text-foreground-lighter text-sm lg:text-base">
-            Build authorization rules with Postgres&apos; Row Level Security — control who can
-            create, edit, and delete specific rows in your database. No additional servers required.
+            Build authorization rules with Postgres Row Level Security — control who can create,
+            edit, and delete specific rows in your database. No additional servers required.
           </p>
         </div>
       </div>
