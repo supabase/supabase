@@ -29,7 +29,7 @@ import {
 import { EdgeFunctionsListItem } from '@/components/interfaces/Functions/EdgeFunctionsListItem'
 import {
   FunctionsEmptyState,
-  FunctionsInstructionsLocal,
+  SelfHostedManualFunctionCard,
 } from '@/components/interfaces/Functions/FunctionsEmptyState'
 import { TerminalInstructionsDialog } from '@/components/interfaces/Functions/TerminalInstructionsDialog'
 import { useFunctionsListShortcuts } from '@/components/interfaces/Functions/useFunctionsListShortcuts'
@@ -39,6 +39,7 @@ import AlertError from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useIsProjectActive } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
@@ -50,6 +51,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
   const showLastHourStats = useFlag('edgeFunctionsRequestMetrics')
   const isProjectActive = useIsProjectActive()
+  const { isSelfHosted } = useDeploymentMode()
 
   const searchInputRef = useRef<HTMLInputElement>(null)
 
@@ -127,6 +129,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
               <>
                 {hasFunctions ? (
                   <div className="space-y-4">
+                    {isSelfHosted && functions.length === 1 && <SelfHostedManualFunctionCard />}
                     <div className="flex items-center gap-2">
                       <div className="flex items-center gap-2">
                         <div className="relative">
@@ -226,7 +229,6 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                 )}
               </>
             )}
-            {!IS_PLATFORM && <FunctionsInstructionsLocal />}
           </div>
         </PageSectionContent>
       </PageSection>
