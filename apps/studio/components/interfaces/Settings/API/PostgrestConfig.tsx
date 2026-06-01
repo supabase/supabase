@@ -58,8 +58,8 @@ const formSchema = z.object({
   // Fields for updatePostgrestConfig
   dbSchema: z.array(z.string()),
   dbExtraSearchPath: z.array(z.string()),
-  maxRows: z.number().max(1000000, "Can't be more than 1,000,000"),
-  dbPool: z
+  maxRows: z.coerce.number().max(1000000, "Can't be more than 1,000,000"),
+  dbPool: z.coerce
     .number()
     .min(0, 'Must be more than 0')
     .max(1000, "Can't be more than 1000")
@@ -511,7 +511,6 @@ export const PostgrestConfig = () => {
                                   disabled={!canUpdatePostgrestConfig}
                                   {...field}
                                   type="number"
-                                  onChange={(e) => field.onChange(Number(e.target.value))}
                                 />
                                 <InputGroupAddon align="inline-end">
                                   <InputGroupText>rows</InputGroupText>

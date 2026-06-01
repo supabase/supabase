@@ -219,7 +219,6 @@ const AddRestrictionModal = ({
                           max={
                             type === 'IPv4' ? IPV4_MAX_CIDR_BLOCK_SIZE : IPV6_MAX_CIDR_BLOCK_SIZE
                           }
-                          onChange={(e) => field.onChange(Number(e.target.value))}
                           placeholder={
                             type === 'IPv4'
                               ? IPV4_MAX_CIDR_BLOCK_SIZE.toString()

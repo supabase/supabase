@@ -199,12 +199,7 @@ const DiskSizeConfigurationModal = ({
                           >
                             <FormControl>
                               <InputGroup>
-                                <FormInputGroupInput
-                                  {...field}
-                                  id="new-disk-size"
-                                  type="number"
-                                  onChange={(e) => field.onChange(Number(e.target.value))}
-                                />
+                                <FormInputGroupInput {...field} id="new-disk-size" type="number" />
                                 <InputGroupAddon align="inline-end">
                                   <InputGroupText>GB</InputGroupText>
                                 </InputGroupAddon>
