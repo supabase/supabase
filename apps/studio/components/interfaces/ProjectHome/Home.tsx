@@ -1,6 +1,6 @@
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { IS_PLATFORM, useFlag, useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { useEffect, useRef } from 'react'
 import { cn } from 'ui'
@@ -17,7 +17,7 @@ import { ProjectNeedsSecuring } from '@/components/layouts/ProjectNeedsSecuring/
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from '@/lib/constants'
+import { IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 
@@ -81,6 +81,7 @@ export const ProjectHome = () => {
 
   const renderOrder = mergeSectionOrder(sectionOrder).filter((id) => {
     if (id === 'connect') return showConnectSection
+    if (id === 'usage' || id === 'custom-report') return IS_PLATFORM
     return true
   })
 
