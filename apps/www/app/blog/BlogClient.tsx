@@ -11,6 +11,8 @@ import Link from 'next/link'
 import { Suspense, useCallback, useState } from 'react'
 import type PostTypes from 'types/post'
 
+import blogAuthors from '@/lib/authors.json'
+
 function SecondarySpotlight({ post }: { post: PostTypes }) {
   const resolveImagePath = (img: string | undefined): string | null => {
     if (!img) return null
@@ -20,6 +22,11 @@ function SecondarySpotlight({ post }: { post: PostTypes }) {
     resolveImagePath(post.imgThumb) ||
     resolveImagePath(post.imgSocial) ||
     '/images/blog/blog-placeholder.png'
+
+  const authorNames = (post.author?.split(',') ?? [])
+    .map((id) => blogAuthors.find((a: any) => a.author_id === id.trim())?.author)
+    .filter(Boolean)
+    .join(', ')
 
   return (
     <Link href={post.path} prefetch={false} className="group flex gap-4 items-start">
@@ -40,6 +47,7 @@ function SecondarySpotlight({ post }: { post: PostTypes }) {
         {post.formattedDate && (
           <p className="text-foreground-lighter text-xs">{post.formattedDate}</p>
         )}
+        {authorNames && <p className="text-foreground-light text-xs">{authorNames}</p>}
       </div>
     </Link>
   )
@@ -193,6 +201,11 @@ export default function BlogClient({ initialBlogs, totalPosts }: BlogClientProps
   const featuredPost = initialBlogs[0]
   const secondaryPosts = initialBlogs.slice(1, 3)
 
+  // The featured post (index 0) is rendered as the hero above, so drop it from
+  // the list to avoid showing it twice — pagination compensates via the API
+  // offset (+1). Filtered results are a separate query with no hero, so show all.
+  const visibleBlogs = filteredPosts !== null ? blogs : blogs.slice(1)
+
   return (
     <div>
       <h1 className="sr-only">Supabase blog</h1>
@@ -246,16 +259,16 @@ export default function BlogClient({ initialBlogs, totalPosts }: BlogClientProps
               ))}
             </div>
           )
-        ) : blogs?.length ? (
+        ) : visibleBlogs?.length ? (
           isList ? (
             <div>
-              {blogs.map((blog: PostTypes, idx: number) => (
+              {visibleBlogs.map((blog: PostTypes, idx: number) => (
                 <BlogListItem post={blog} key={`list-${idx}-${blog.slug}`} />
               ))}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              {blogs.map((blog: PostTypes, idx: number) => (
+              {visibleBlogs.map((blog: PostTypes, idx: number) => (
                 <BlogGridItem post={blog} key={`grid-${idx}-${blog.slug}`} />
               ))}
             </div>
