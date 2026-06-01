@@ -69,7 +69,6 @@ export const LOCAL_STORAGE_KEYS = {
   EXPAND_NAVIGATION_PANEL: 'supabase-expand-navigation-panel',
   GITHUB_AUTHORIZATION_STATE: 'supabase-github-authorization-state',
   // Notice banner keys
-  FLY_DEPRECATION_2026_05_31: 'fly-deprecation-2026-05-31-dismissed',
   API_KEYS_FEEDBACK_DISMISSED: (ref: string) => `supabase-api-keys-feedback-dismissed-${ref}`,
   TERMS_OF_SERVICE_UPDATE: 'terms-of-service-update-2026-06-06',
   SUPAVISOR_MAINTENANCE: (ref: string) => `supavisor-maintenance-2026-05-21-${ref}`,
