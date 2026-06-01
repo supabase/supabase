@@ -124,6 +124,22 @@ const pageMap = [
     remoteFile: 'bigquery.md',
   },
   {
+    slug: 'cal',
+    meta: {
+      title: 'Cal.com',
+      dashboardIntegrationPath: 'cal_wrapper',
+    },
+    remoteFile: 'cal.md',
+  },
+  {
+    slug: 'calendly',
+    meta: {
+      title: 'Calendly',
+      dashboardIntegrationPath: 'calendly_wrapper',
+    },
+    remoteFile: 'calendly.md',
+  },
+  {
     slug: 'clerk',
     meta: {
       title: 'Clerk',
@@ -140,6 +156,14 @@ const pageMap = [
     remoteFile: 'clickhouse.md',
   },
   {
+    slug: 'cloudflare-d1',
+    meta: {
+      title: 'Cloudflare D1',
+      dashboardIntegrationPath: 'cfd1_wrapper',
+    },
+    remoteFile: 'cfd1.md',
+  },
+  {
     slug: 'cognito',
     meta: {
       title: 'AWS Cognito',
@@ -151,8 +175,17 @@ const pageMap = [
     slug: 'duckdb',
     meta: {
       title: 'DuckDB',
+      dashboardIntegrationPath: undefined,
     },
     remoteFile: 'duckdb.md',
+  },
+  {
+    slug: 'dynamodb',
+    meta: {
+      title: 'AWS DynamoDB',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'dynamodb.md',
   },
   {
     slug: 'firebase',
@@ -163,12 +196,36 @@ const pageMap = [
     remoteFile: 'firebase.md',
   },
   {
+    slug: 'gravatar',
+    meta: {
+      title: 'Gravatar',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'gravatar.md',
+  },
+  {
+    slug: 'hubspot',
+    meta: {
+      title: 'HubSpot',
+      dashboardIntegrationPath: 'hubspot_wrapper',
+    },
+    remoteFile: 'hubspot.md',
+  },
+  {
     slug: 'iceberg',
     meta: {
       title: 'Iceberg',
       dashboardIntegrationPath: 'iceberg_wrapper',
     },
     remoteFile: 'iceberg.md',
+  },
+  {
+    slug: 'infura',
+    meta: {
+      title: 'Infura',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'infura.md',
   },
   {
     slug: 'logflare',
@@ -187,12 +244,36 @@ const pageMap = [
     remoteFile: 'mssql.md',
   },
   {
+    slug: 'mysql',
+    meta: {
+      title: 'MySQL',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'mysql.md',
+  },
+  {
     slug: 'notion',
     meta: {
       title: 'Notion',
       dashboardIntegrationPath: 'notion_wrapper',
     },
     remoteFile: 'notion.md',
+  },
+  {
+    slug: 'openapi',
+    meta: {
+      title: 'OpenAPI',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'openapi.md',
+  },
+  {
+    slug: 'orb',
+    meta: {
+      title: 'Orb',
+      dashboardIntegrationPath: 'orb_wrapper',
+    },
+    remoteFile: 'orb.md',
   },
   {
     slug: 'paddle',
@@ -225,6 +306,22 @@ const pageMap = [
       dashboardIntegrationPath: 's3_vectors_wrapper',
     },
     remoteFile: 's3vectors.md',
+  },
+  {
+    slug: 'shopify',
+    meta: {
+      title: 'Shopify',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'shopify.md',
+  },
+  {
+    slug: 'slack',
+    meta: {
+      title: 'Slack',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'slack.md',
   },
   {
     slug: 'snowflake',
