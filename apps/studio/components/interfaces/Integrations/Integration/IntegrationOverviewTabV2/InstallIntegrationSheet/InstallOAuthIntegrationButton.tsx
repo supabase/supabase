@@ -24,7 +24,7 @@ export function InstallOAuthIntegrationButton({ integration }: InstallOAuthInteg
     !!integration.edgeFunctionSecretName
 
   const requiresPartnerIntegrationsCheck =
-    integration.installIdentificationMethod === 'callback_status'
+    integration.installIdentificationMethod === 'integration_status'
 
   const { data: apiKeys, isLoading: isApiKeysLoading } = useAPIKeysQuery(
     { projectRef, reveal: false },
@@ -74,7 +74,7 @@ export function InstallOAuthIntegrationButton({ integration }: InstallOAuthInteg
       return edgeFunctionSecrets.some((secret) => secret.name === secretName)
     }
 
-    if (integration.installIdentificationMethod === 'callback_status') {
+    if (integration.installIdentificationMethod === 'integration_status') {
       if (isPartnerIntegrationsLoading || !partnerIntegrations) return false
       return partnerIntegrations.some(
         (i) => i.listing_slug === integration.id && i.status === 'ready'

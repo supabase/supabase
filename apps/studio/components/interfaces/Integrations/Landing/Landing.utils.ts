@@ -31,7 +31,7 @@ export const isOAuthInstalled = ({
   secrets: ProjectSecret[]
   partnerIntegrations: IntegrationStatus[]
 }) => {
-  if (integration.installIdentificationMethod === 'callback_status') {
+  if (integration.installIdentificationMethod === 'integration_status') {
     return partnerIntegrations.some(
       (i) => i.listing_slug === integration.id && i.status === 'ready'
     )

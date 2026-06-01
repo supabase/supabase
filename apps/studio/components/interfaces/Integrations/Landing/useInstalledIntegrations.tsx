@@ -49,7 +49,7 @@ export const useInstalledIntegrations = () => {
     return allIntegrations.some(
       (integration) =>
         integration.type === 'oauth' &&
-        integration.installIdentificationMethod === 'callback_status'
+        integration.installIdentificationMethod === 'integration_status'
     )
   }, [allIntegrations])
 
