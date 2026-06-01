@@ -75,11 +75,11 @@ export const Anchor = ({
 )
 
 export const UnorderedList = ({ className, ...props }: HTMLAttributes<HTMLUListElement>) => (
-  <ul className={cn('my-6 ml-6 list-disc text-foreground', className)} {...props} />
+  <ul className={cn('my-6 ml-6 text-foreground', className)} {...props} />
 )
 
 export const OrderedList = ({ className, ...props }: HTMLAttributes<HTMLOListElement>) => (
-  <ol className={cn('my-6 ml-6 list-decimal text-foreground', className)} {...props} />
+  <ol className={cn('my-6 ml-6 text-foreground', className)} {...props} />
 )
 
 export const ListItem = ({ className, ...props }: HTMLAttributes<HTMLLIElement>) => (
