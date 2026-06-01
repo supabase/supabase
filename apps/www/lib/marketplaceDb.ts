@@ -17,6 +17,7 @@ function toPartner(listing: Listing): Partner {
     featured,
     slug,
     title,
+    built_by,
     partner_name,
     description,
     content,
@@ -34,7 +35,7 @@ function toPartner(listing: Listing): Partner {
     type: 'technology',
     slug,
     title,
-    partnerName: partner_name,
+    partnerName: built_by ?? partner_name,
     description,
     content,
     websiteUrl: website_url,
@@ -50,7 +51,7 @@ async function getMarketplaceListings(): Promise<Partner[]> {
   const { data } = await marketplaceClient
     .from('listings')
     .select('*')
-    .is('publish_marketplace', true)
+    .not('published_in_catalog_at', 'is', null)
 
   return data?.map(toPartner) ?? []
 }
@@ -78,7 +79,7 @@ async function getMarketplaceListingSlugs(): Promise<string[]> {
   const { data } = await marketplaceClient
     .from('listings')
     .select('slug')
-    .is('publish_marketplace', true)
+    .not('published_in_catalog_at', 'is', null)
 
   return data?.map((row) => row.slug) ?? []
 }
@@ -102,7 +103,10 @@ export async function listPartnerSlugs(): Promise<string[]> {
 
 async function searchMarketplaceListings(search: string): Promise<Partner[] | null> {
   const searchTerm = search.trim()
-  let query = marketplaceClient.from('listings').select('*').is('publish_marketplace', true)
+  let query = marketplaceClient
+    .from('listings')
+    .select('*')
+    .not('published_in_catalog_at', 'is', null)
 
   if (searchTerm) {
     const searchPattern = `%${searchTerm}%`
@@ -157,7 +161,7 @@ async function getMarketplaceListing(slug: string): Promise<Partner | null> {
     .from('listings')
     .select('*')
     .eq('slug', slug)
-    .is('publish_marketplace', true)
+    .not('published_in_catalog_at', 'is', null)
     .single()
 
   return data ? toPartner(data) : null

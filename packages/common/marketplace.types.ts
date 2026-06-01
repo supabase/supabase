@@ -30,6 +30,7 @@ export type Database = {
       listings: {
         Row: {
           aud: string | null
+          built_by: string | null
           categories: Json | null
           content: string | null
           description: string | null
@@ -47,18 +48,29 @@ export type Database = {
           listing_logo: string | null
           listing_tsv: unknown
           marketplace_url: string | null
+          partner_id: string | null
           partner_logo: string | null
           partner_name: string | null
           partner_slug: string | null
           publish_dashboard: boolean | null
           publish_marketplace: boolean | null
+          published_in_catalog_at: string | null
+          published_in_marketplace_at: string | null
           secret_key_prefix: string | null
           slug: string | null
           title: string | null
           website_url: string | null
           youtube_id: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: 'listings_partner_id_fkey'
+            columns: ['partner_id']
+            isOneToOne: false
+            referencedRelation: 'partners'
+            referencedColumns: ['id']
+          },
+        ]
       }
       partners: {
         Row: {
@@ -93,6 +105,20 @@ export type Database = {
           slug?: string | null
           type?: 'technology' | 'expert' | null
           website?: string | null
+        }
+        Relationships: []
+      }
+      project_integration_status: {
+        Row: {
+          created_at: string | null
+          integration_id: string | null
+          listing_slug: string | null
+          partner_links: Json | null
+          project_ref: string | null
+          status: 'installing' | 'ready' | 'error' | null
+          updated_at: string | null
+          user_alert: Json | null
+          version: string | null
         }
         Relationships: []
       }
