@@ -781,6 +781,14 @@ export const updateTable = async ({
       schema: table.schema,
       payload,
     })
+    await queryClient.invalidateQueries({
+      queryKey: tableKeys.infiniteListPrefix(projectRef, table.schema),
+    })
+    if (payload.schema && payload.schema !== table.schema) {
+      await queryClient.invalidateQueries({
+        queryKey: tableKeys.infiniteListPrefix(projectRef, payload.schema),
+      })
+    }
   }
 
   if (payload.rls_enabled === true) {

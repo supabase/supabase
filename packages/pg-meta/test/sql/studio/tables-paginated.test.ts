@@ -287,6 +287,48 @@ withTestDatabase('includeColumns: true returns columns per row', async ({ execut
   expect(empty.columns).toEqual([])
 })
 
+withTestDatabase(
+  'nameFilter restricts results to tables whose name matches (case-insensitive)',
+  async ({ executeQuery }) => {
+    await executeQuery(`
+      create table public.users_archive_2024 (id bigint primary key);
+      create table public.users_archive_2025 (id bigint primary key);
+    `)
+
+    const sql = getTablesPaginatedSql({
+      schema: 'public',
+      limit: 100,
+      afterOid: 0,
+      nameFilter: 'USERS_ARCHIVE',
+    })
+    const rows = await executeQuery<Row[]>(sql)
+    const names = rows.map((r) => r.name).sort()
+    expect(names).toEqual(['users_archive_2024', 'users_archive_2025'])
+  }
+)
+
+withTestDatabase(
+  'nameFilter escapes LIKE wildcards so they match literally',
+  async ({ executeQuery }) => {
+    await executeQuery(`
+      create table public."weird_name" (id bigint primary key);
+      create table public."weird%name" (id bigint primary key);
+    `)
+
+    const sql = getTablesPaginatedSql({
+      schema: 'public',
+      limit: 100,
+      afterOid: 0,
+      nameFilter: 'weird%',
+    })
+    const rows = await executeQuery<Row[]>(sql)
+    const names = rows.map((r) => r.name)
+    // Only the table with a literal `%` in its name should match.
+    expect(names).toContain('weird%name')
+    expect(names).not.toContain('weird_name')
+  }
+)
+
 withTestDatabase('afterOid skips tables with smaller oids', async ({ executeQuery }) => {
   const fullSql = getTablesPaginatedSql({ schema: 'public', limit: 1000, afterOid: 0 })
   const all = await executeQuery<Row[]>(fullSql)
