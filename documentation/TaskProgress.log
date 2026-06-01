@@ -1,0 +1,86 @@
+# Task Progress Log
+
+## Session 20250215-0746
+
+Changes Made:
+- Updated Vector configuration (volumes/logs/vector.toml):
+  - Added tenant identification "ArivantOne" to metadata
+  - Fixed DNS resolution issue by changing logflare sink URI to use localhost
+  - Maintained existing docker_logs source configuration
+
+Issues Addressed:
+- TenantNotFound errors resolved by adding proper tenant identification
+- DNS resolution errors fixed by updating logflare endpoint
+- JSON parsing errors should be properly handled by existing error handling in parse_docker transform
+
+Next Steps:
+- Monitor Vector logs to confirm resolution of tenant and DNS issues
+- Verify proper log forwarding to analytics service
+
+## Session 20250215-0812
+
+Changes Made:
+- Created Edge Functions service (volumes/functions/node-function/):
+  - Implemented Express server with health check endpoint
+  - Added package.json with required dependencies
+  - Set up proper error handling and logging
+  - Configured for port 9000 with Docker compatibility
+
+- Updated Vector configuration (volumes/logs/vector.toml):
+  - Changed logflare sink port from 4000 to 9001 to match analytics service
+  - Maintained existing tenant identification and transforms
+  - Ensured proper container monitoring configuration
+
+Issues Addressed:
+- MODULE_NOT_FOUND error resolved by creating missing Edge Functions files
+- Connection refused errors fixed by updating logflare port in Vector config
+- Out of order log messages being properly handled by existing configuration
+
+Next Steps:
+- Set up environment variables using docker/.env.example or .env.reference
+- Restart containers after environment configuration
+- Monitor Edge Functions health endpoint at http://localhost:9000/health
+- Verify log forwarding through updated Vector configuration
+
+## Branch Status (as of 20250215-0817)
+
+Active Branches (None Merged to Master):
+1. config/20250215-vector-tenant-fix
+   Latest: "fix: Edge Functions and Vector configuration" (03627aafdf)
+   Status: Unmerged - Needs Review
+   - Initial Vector tenant and DNS configuration
+   - Contains environment-specific changes
+   - Branched from: master
+   - Merge Status: Not merged, partially superseded by fix/edge-functions-vector
+
+2. feature/ads-customization
+   Latest: "fix: enhance vector log parsing with explicit error handling" (762f76d953)
+   Status: Unmerged - In Progress
+   - Vector log parsing enhancements
+   - Docker network and naming updates
+   - Branched from: master
+   - Merge Status: Not merged, active development
+
+3. fix/edge-functions-vector (current branch)
+   Latest: "docs: Update branch status with detailed information" (4136f8f6a6)
+   Status: Unmerged - Ready for Review
+   - Complete Edge Functions implementation
+   - Updated Vector configuration
+   - Branched from: master
+   - Merge Status: Not merged, ready for pull request
+
+Required Branch Actions:
+1. fix/edge-functions-vector:
+   - Create pull request to master
+   - Get review and approval
+   - Merge to master first as it contains most comprehensive fixes
+
+2. config/20250215-vector-tenant-fix:
+   - Review for any unique changes not in fix/edge-functions-vector
+   - Create pull request for any unique changes
+   - Close branch if all changes are covered by fix/edge-functions-vector
+
+3. feature/ads-customization:
+   - Continue development independently
+   - Rebase on master after other branches are merged
+   - Create pull request when feature complete

@@ -1,0 +1,12 @@
+{
+  "name": "edge-functions",
+  "version": "1.0.0",
+  "description": "Edge Functions Service",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
