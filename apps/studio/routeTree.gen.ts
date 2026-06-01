@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as RedeemRouteImport } from './routes/redeem'
 import { Route as MaintenanceRouteImport } from './routes/maintenance'
 import { Route as LogoutRouteImport } from './routes/logout'
@@ -301,6 +302,11 @@ import { Route as ApiPlatformStorageRefBucketsIdObjectsMoveRouteImport } from '.
 import { Route as ApiPlatformStorageRefBucketsIdObjectsListRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/objects/list'
 import { Route as ApiPlatformStorageRefBucketsIdObjectsDownloadRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/objects/download'
 
+const VerifyEmailRoute = VerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RedeemRoute = RedeemRouteImport.update({
   id: '/redeem',
   path: '/redeem',
@@ -1935,6 +1941,7 @@ export interface FileRoutesByFullPath {
   '/logout': typeof LogoutRoute
   '/maintenance': typeof MaintenanceRoute
   '/redeem': typeof RedeemRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/account': typeof AppAccountRouteWithChildren
   '/org': typeof AppOrgRouteWithChildren
   '/organizations': typeof AppOrganizationsRoute
@@ -2226,6 +2233,7 @@ export interface FileRoutesByTo {
   '/logout': typeof LogoutRoute
   '/maintenance': typeof MaintenanceRoute
   '/redeem': typeof RedeemRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/account': typeof AppAccountRouteWithChildren
   '/organizations': typeof AppOrganizationsRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
@@ -2508,6 +2516,7 @@ export interface FileRoutesById {
   '/logout': typeof LogoutRoute
   '/maintenance': typeof MaintenanceRoute
   '/redeem': typeof RedeemRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/_app/account': typeof AppAccountRouteWithChildren
   '/_app/org': typeof AppOrgRouteWithChildren
   '/_app/organizations': typeof AppOrganizationsRoute
@@ -2801,6 +2810,7 @@ export interface FileRouteTypes {
     | '/logout'
     | '/maintenance'
     | '/redeem'
+    | '/verify-email'
     | '/account'
     | '/org'
     | '/organizations'
@@ -3092,6 +3102,7 @@ export interface FileRouteTypes {
     | '/logout'
     | '/maintenance'
     | '/redeem'
+    | '/verify-email'
     | '/account'
     | '/organizations'
     | '/forgot-password'
@@ -3373,6 +3384,7 @@ export interface FileRouteTypes {
     | '/logout'
     | '/maintenance'
     | '/redeem'
+    | '/verify-email'
     | '/_app/account'
     | '/_app/org'
     | '/_app/organizations'
@@ -3667,6 +3679,7 @@ export interface RootRouteChildren {
   LogoutRoute: typeof LogoutRoute
   MaintenanceRoute: typeof MaintenanceRoute
   RedeemRoute: typeof RedeemRoute
+  VerifyEmailRoute: typeof VerifyEmailRoute
   ApiCheckCnameRoute: typeof ApiCheckCnameRoute
   ApiCliReleaseVersionRoute: typeof ApiCliReleaseVersionRoute
   ApiEnabledFeaturesOverridesRoute: typeof ApiEnabledFeaturesOverridesRoute
@@ -3768,6 +3781,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/verify-email': {
+      id: '/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof VerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/redeem': {
       id: '/redeem'
       path: '/redeem'
@@ -6475,6 +6495,7 @@ const rootRouteChildren: RootRouteChildren = {
   LogoutRoute: LogoutRoute,
   MaintenanceRoute: MaintenanceRoute,
   RedeemRoute: RedeemRoute,
+  VerifyEmailRoute: VerifyEmailRoute,
   ApiCheckCnameRoute: ApiCheckCnameRoute,
   ApiCliReleaseVersionRoute: ApiCliReleaseVersionRoute,
   ApiEnabledFeaturesOverridesRoute: ApiEnabledFeaturesOverridesRoute,
