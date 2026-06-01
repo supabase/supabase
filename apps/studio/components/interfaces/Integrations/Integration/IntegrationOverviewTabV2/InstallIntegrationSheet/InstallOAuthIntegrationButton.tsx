@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import Link from 'next/link'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
@@ -7,6 +8,7 @@ import type { IntegrationDefinition } from '@/components/interfaces/Integrations
 import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useInstallOAuthIntegrationMutation } from '@/data/marketplace/install-oauth-integration-mutation'
 import { useSecretsQuery } from '@/data/secrets/secrets-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface InstallOAuthIntegrationButtonProps {
   integration: IntegrationDefinition
@@ -14,6 +16,7 @@ interface InstallOAuthIntegrationButtonProps {
 
 export function InstallOAuthIntegrationButton({ integration }: InstallOAuthIntegrationButtonProps) {
   const { ref: projectRef } = useParams()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const requiresApiKeysCheck =
     integration.installIdentificationMethod === 'secret_key_prefix' && !!integration.secretKeyPrefix
@@ -79,8 +82,8 @@ export function InstallOAuthIntegrationButton({ integration }: InstallOAuthInteg
   return (
     <>
       {isIntegrationInstalled ? (
-        <Button disabled type="outline" className="shrink-0">
-          Installed
+        <Button disabled={isLoading} className="shrink-0" asChild>
+          <Link href={`/org/${organization?.slug}/apps`}>Manage integartion</Link>
         </Button>
       ) : (
         <Button
