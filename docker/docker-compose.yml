@@ -2,7 +2,7 @@
 #   Start:              docker compose up -d
 #   Stop:               docker compose down
 #   Dev mode:           docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up -d
-#   Reset everything:  ./reset.sh
+#   Reset everything:   sh reset.sh
 #
 # TODO:
 #   - Podman does not support nested variable interpolation (${A:-${B}})
