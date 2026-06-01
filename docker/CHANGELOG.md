@@ -33,12 +33,12 @@ See per-service updates below for details. Only the most important changes relev
 
 ### Utils
 - Added `setup.sh` and `run.sh` to support quick start and easier management of the compose configuration - PR [#45603](https://github.com/supabase/supabase/pull/45603)
-- Updated `add-new-auth-keys.sh` and `rotate-new-api-key.sh` to remove the dependency on OpenSSL and Node.js - PR [#45941](https://github.com/supabase/supabase/pull/45941)
-- Updated `test-container-logs.sh` to skip checks for `kong`, `analytics` and `vector` when the services are not running - PR [#46099](https://github.com/supabase/supabase/pull/46099)
+- Updated `utils/add-new-auth-keys.sh` and `utils/rotate-new-api-key.sh` to remove the dependency on OpenSSL and Node.js - PR [#45941](https://github.com/supabase/supabase/pull/45941)
+- Updated `tests/test-container-logs.sh` to skip checks for `kong`, `analytics` and `vector` when the services are not running - PR [#46099](https://github.com/supabase/supabase/pull/46099)
 
 ### API gateway
-- Updated Envoy version to `1.38.0` (see `docker-compose.envoy.yml`)
-- Updated Envoy configuration to address a discrepancy in API key checking - PR [#46023](https://github.com/supabase/supabase/pull/46023)
+- Updated Envoy version to `1.38.0` (see `docker-compose.envoy.yml`) - PR [#46023](https://github.com/supabase/supabase/pull/46023)
+- Updated Envoy configuration to address a discrepancy in API key checking (requires `volumes/api/envoy` update) - PR [#46023](https://github.com/supabase/supabase/pull/46023)
 
 ### Studio
 - Updated to `2026.06.01-sha-a4334a2`
@@ -88,8 +88,8 @@ See per-service updates below for details. Only the most important changes relev
 - Updated the main [setup guide](https://supabase.com/docs/guides/self-hosting/docker) and the how-tos to reflect the state of the self-hosted Supabase configuration - PR [#45011](https://github.com/supabase/supabase/pull/45011)
 
 ### Utils
-- ⚠️ Added `reassign-owner.sh` to update database objects - PR [#42975](https://github.com/supabase/supabase/pull/42975). Read more in the "[Remove superuser access](https://supabase.com/docs/guides/self-hosting/remove-superuser-access)" how-to guide
-- ⚠️ Changed `add-new-auth-keys.sh` to also update `docker-compose.yml` - PR [#45056](https://github.com/supabase/supabase/pull/45056)
+- ⚠️ Added `utils/reassign-owner.sh` to update database objects - PR [#42975](https://github.com/supabase/supabase/pull/42975). Read more in the "[Remove superuser access](https://supabase.com/docs/guides/self-hosting/remove-superuser-access)" how-to guide
+- ⚠️ Changed `utils/add-new-auth-keys.sh` to also update `docker-compose.yml` - PR [#45056](https://github.com/supabase/supabase/pull/45056)
 
 ### API gateway
 - ⚠️ Added Envoy as the new optional API gateway (requires `docker-compose.envoy.yml`, `volumes/api/envoy`, and `volumes/logs/vector.yml` update) - PR [#43838](https://github.com/supabase/supabase/pull/43838) (via [@luizfelmach](https://github.com/luizfelmach/))
@@ -106,7 +106,7 @@ See per-service updates below for details. Only the most important changes relev
 - Added new how-to guides for configuring [custom email templates](https://supabase.com/docs/guides/self-hosting/custom-email-templates), setting up [SAML SSO](https://supabase.com/docs/guides/self-hosting/self-hosted-saml-sso), and [using Postgres 17](https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17) - PR [#42832](https://github.com/supabase/supabase/pull/42832), PR [#43386](https://github.com/supabase/supabase/pull/43386), PR [#44147](https://github.com/supabase/supabase/pull/44147)
 
 ### Utils
-- ⚠️ Added `upgrade-pg17.sh` - PR [#44147](https://github.com/supabase/supabase/pull/44147). Read more in the "[Upgrade to Postgres 17](https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17)" how-to guide
+- ⚠️ Added `utils/upgrade-pg17.sh` - PR [#44147](https://github.com/supabase/supabase/pull/44147). Read more in the "[Upgrade to Postgres 17](https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17)" how-to guide
 
 ### API gateway
 - ⚠️ Added configuration for SAML SSO (requires `.env`, `docker-compose.yml` and `volumes/api/kong.yml` update) - PR [#43385](https://github.com/supabase/supabase/pull/43385) (via [@luizfelmach](https://github.com/luizfelmach/))
@@ -131,7 +131,7 @@ See per-service updates below for details. Only the most important changes relev
 
 ### Postgres
 - ⚠️ Added `docker-compose.pg17.yml` override - PR [#44147](https://github.com/supabase/supabase/pull/44147)
-- ⚠️ Added `upgrade-pg17.sh` - PR [#44147](https://github.com/supabase/supabase/pull/44147)
+- ⚠️ Added `utils/upgrade-pg17.sh` - PR [#44147](https://github.com/supabase/supabase/pull/44147)
 - ⚠️ Added [documentation](https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17) explaining the upgrade to Postgres 17
 
 ---
@@ -148,8 +148,8 @@ See per-service updates below for details. Only the most important changes relev
 - Added several new how-to guides to the self-hosted Supabase [documentation](https://supabase.com/docs/guides/self-hosting) - PR [#42745](https://github.com/supabase/supabase/pull/42745), PR [#42953](https://github.com/supabase/supabase/pull/42953), PR [#43177](https://github.com/supabase/supabase/pull/43177), PR [#43286](https://github.com/supabase/supabase/pull/43286), PR [#43293](https://github.com/supabase/supabase/pull/43293)
 
 ### Utils and tests
-- Added `add-new-auth-keys.sh` and `rotate-new-api-keys.sh` - PR [#43554](https://github.com/supabase/supabase/pull/43554)
-- Added `./tests` with 100+ test cases - PR [#43573](https://github.com/supabase/supabase/pull/43573)
+- Added `utils/add-new-auth-keys.sh` and `utils/rotate-new-api-keys.sh` - PR [#43554](https://github.com/supabase/supabase/pull/43554)
+- Added `tests/` with 100+ test cases - PR [#43573](https://github.com/supabase/supabase/pull/43573)
 
 ### Studio
 - Updated to `2026.03.16-sha-5528817`
@@ -292,8 +292,8 @@ See per-service updates below for details. Only the most important changes relev
 - Updated self-hosting installation and configuration guide - PR [#40901](https://github.com/supabase/supabase/pull/40901), PR [#41438](https://github.com/supabase/supabase/pull/41438)
 
 ### Utils
-- Added `generate-keys.sh` - PR [#41363](https://github.com/supabase/supabase/pull/41363)
-- Added `db-passwd.sh` - PR [#41432](https://github.com/supabase/supabase/pull/41432)
+- Added `utils/generate-keys.sh` - PR [#41363](https://github.com/supabase/supabase/pull/41363)
+- Added `utils/db-passwd.sh` - PR [#41432](https://github.com/supabase/supabase/pull/41432)
 - Changed `reset.sh` to POSIX and added more checks - PR [#41361](https://github.com/supabase/supabase/pull/41361)
 
 ### Studio
