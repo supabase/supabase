@@ -73,7 +73,11 @@ export const ProjectHome = () => {
     setSectionOrder(mergeSectionOrder)
   }, [setSectionOrder])
 
-  const showConnectSection = !isMatureProject && !!project
+  // On self-hosted the project's `inserted_at` is hard-coded to a past date
+  // (so it always looks "mature"), and the home page is otherwise sparse —
+  // always surface the Get Connected pane there. Platform keeps the
+  // maturity gate so long-running projects don't see it forever.
+  const showConnectSection = !!project && (!IS_PLATFORM || !isMatureProject)
 
   const renderOrder = mergeSectionOrder(sectionOrder).filter((id) => {
     if (id === 'connect') return showConnectSection
@@ -128,7 +132,7 @@ export const ProjectHome = () => {
                         </div>
                       )
                     }
-                    if (id === 'custom-report') {
+                    if (IS_PLATFORM && id === 'custom-report') {
                       return (
                         <div
                           key={id}
