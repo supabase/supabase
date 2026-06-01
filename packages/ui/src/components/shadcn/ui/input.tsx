@@ -32,44 +32,37 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     { className, type, size = 'small', onChange, onBlur, onFocus, value: valueProp, ...props },
     ref
   ) => {
-    const onChangeEventHandler = React.useEffectEvent(onChange ?? noop)
-    const onBlurEventHandler = React.useEffectEvent(onBlur ?? noop)
-    const onFocusEventHandler = React.useEffectEvent(onFocus ?? noop)
     // Handle the value locally to avoid issues with numbers
     const [value, setValue] = React.useState(valueProp ?? '')
 
-    const handleChange = React.useEffectEvent(
-      (event: React.ChangeEvent<HTMLInputElement, HTMLInputElement>) => {
-        const target = event.target
-        // Always show users the value they entered even though (in the case of numbers), it's not valid yet.
-        // This avoids issues when users deletes the current value or when they enter numbers like 0.123
-        setValue(target.value)
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement, HTMLInputElement>) => {
+      const target = event.target
+      // Always show users the value they entered even though (in the case of numbers), it's not valid yet.
+      // This avoids issues when users deletes the current value or when they enter numbers like 0.123
+      setValue(target.value)
 
-        if (type !== 'number') {
-          return onChangeEventHandler(event)
-        }
-
-        const isNumber = target.valueAsNumber != null && !isNaN(target.valueAsNumber)
-
-        if (isNumber) {
-          onChangeEventHandler(event)
-        }
+      if (type !== 'number') {
+        onChange && onChange(event)
+        return
       }
-    )
+
+      const isNumber = target.valueAsNumber != null && !isNaN(target.valueAsNumber)
+
+      if (isNumber) {
+        onChange && onChange(event)
+      }
+    }
 
     const hasFocus = React.useRef(false)
-    const handleFocus = React.useEffectEvent(
-      (event: React.FocusEvent<HTMLInputElement, Element>) => {
-        hasFocus.current = true
-        onFocusEventHandler(event)
-      }
-    )
-    const handleBlur = React.useEffectEvent(
-      (event: React.FocusEvent<HTMLInputElement, Element>) => {
-        hasFocus.current = false
-        onBlurEventHandler(event)
-      }
-    )
+    const handleFocus = (event: React.FocusEvent<HTMLInputElement, Element>) => {
+      hasFocus.current = true
+      onFocus && onFocus(event)
+    }
+
+    const handleBlur = (event: React.FocusEvent<HTMLInputElement, Element>) => {
+      hasFocus.current = false
+      onBlur && onBlur(event)
+    }
 
     // Update the input text when the value changed and users aren't currently editing it
     React.useEffect(() => {
