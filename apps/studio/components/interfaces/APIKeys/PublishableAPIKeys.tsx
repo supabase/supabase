@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
@@ -54,6 +54,9 @@ export const PublishableAPIKeys = () => {
     [apiKeysData]
   )
 
+  const showSelfHostedEmptyState =
+    !IS_PLATFORM && publishableApiKeys.length === 0 && !isLoadingApiKeys && !isLoadingPermissions
+
   const [deleteId, setDeleteId] = useQueryState('deletePublishableKey', parseAsString)
   const apiKeyToDelete = publishableApiKeys?.find((key) => key.id === deleteId)
 
@@ -86,7 +89,7 @@ export const PublishableAPIKeys = () => {
       <FormHeader
         title="Publishable key"
         description="This key is safe to use in a browser if you have enabled Row Level Security (RLS) for your tables and configured policies."
-        actions={<CreatePublishableAPIKeyDialog />}
+        actions={IS_PLATFORM ? <CreatePublishableAPIKeyDialog /> : null}
       />
 
       {!canReadAPIKeys && !isLoadingPermissions ? (
@@ -95,6 +98,15 @@ export const PublishableAPIKeys = () => {
         <GenericSkeletonLoader />
       ) : isErrorApiKeys ? (
         <AlertError error={error} subject="Failed to load API keys" />
+      ) : showSelfHostedEmptyState ? (
+        <Card>
+          <div className="rounded-b-md! overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
+            <p className="text-sm text-foreground">No publishable API keys found</p>
+            <p className="text-sm text-foreground-light">
+              This may be a configuration issue. Ensure your API keys are available to Studio.
+            </p>
+          </div>
+        </Card>
       ) : (
         <Card className="bg-surface-100">
           <Table>
@@ -102,7 +114,7 @@ export const PublishableAPIKeys = () => {
               <TableRow className="bg-200">
                 <TableHead>Name</TableHead>
                 <TableHead>API Key</TableHead>
-                <TableHead />
+                {IS_PLATFORM && <TableHead />}
               </TableRow>
             </TableHeader>
 
