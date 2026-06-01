@@ -63,40 +63,85 @@ function convertStepHike(content: string): string {
 }
 
 /**
- * For getting-started.mdx: replaces `{[ ...objects ].map(...)}` resource-card
- * grids with a markdown bullet list of `[title](href), description`. Without
- * this, the rendered output leaves raw JS code in the markdown since stripping
- * JSX components doesn't touch JS expressions wrapped in `{...}`.
+ * Extracts a `title` prop value from a JSX opening-tag's attribute text.
+ * Supports `title="..."`, `title='...'`, and `title={<jsx>...</jsx>}` forms.
+ * For JSX titles, strips inline tags and collapses whitespace so the text
+ * content remains.
  */
-function convertResourceLists(content: string): string {
-  return content.replace(/\{\s*\[\s*\{[\s\S]*?\},?\s*\][\s\S]*?\}\)\}/g, (block) => {
-    const arrMatch = block.match(/\[([\s\S]+?)\]\s*\.(?:filter|map)\b/)
-    if (!arrMatch) return block
+function extractTitleAttr(attrs: string): string | null {
+  const strMatch = attrs.match(/\btitle=(?:"([^"]+)"|'([^']+)')/)
+  if (strMatch) return strMatch[1] ?? strMatch[2]
 
-    // Collect top-level { ... } object literals from the array body.
-    const arr = arrMatch[1]
-    const objs: string[] = []
-    let depth = 0
-    let start = -1
-    for (let i = 0; i < arr.length; i++) {
-      if (arr[i] === '{') {
-        if (depth === 0) start = i
-        depth++
-      } else if (arr[i] === '}' && --depth === 0 && start !== -1) {
-        objs.push(arr.slice(start, i + 1))
-        start = -1
-      }
+  const exprIdx = attrs.indexOf('title={')
+  if (exprIdx === -1) return null
+
+  let i = exprIdx + 'title={'.length
+  const inner: string[] = []
+  let depth = 1
+  while (i < attrs.length && depth > 0) {
+    const ch = attrs[i]
+    if (ch === '{') depth++
+    else if (ch === '}') {
+      depth--
+      if (depth === 0) break
     }
+    inner.push(ch)
+    i++
+  }
+  return inner
+    .join('')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
 
-    return objs
-      .map((o) => {
-        const title = o.match(/title:\s*['"`]([^'"`]+)['"`]/)?.[1]
-        const href = o.match(/href:\s*['"`]([^'"`]+)['"`]/)?.[1]
-        const desc = o.match(/description:\s*[`'"]([^`'"]+)[`'"]/)?.[1]
-        return title && href ? `- [${title}](${href})${desc ? `. ${desc}` : ''}` : ''
-      })
-      .filter(Boolean)
-      .join('\n')
+/**
+ * Converts `<Link href="..."><GlassPanel|IconPanel title="...">desc</...></Link>`
+ * blocks into markdown bullet lines: `- [title](href). description`. Without
+ * this, the rendered output keeps prop syntax (className, passHref, etc.) since
+ * stripping JSX tags discards inner text from props but leaves panel children
+ * floating without context. Applied to all guides so resource-card grids render
+ * consistently in the markdown view.
+ */
+function convertLinkPanels(content: string): string {
+  return content.replace(/<Link\b([\s\S]*?)>([\s\S]*?)<\/Link>/g, (full, linkAttrs, body) => {
+    const hrefMatch = linkAttrs.match(/\bhref="([^"]+)"/)
+    if (!hrefMatch) return full
+    const href = hrefMatch[1]
+
+    const panelOpen = body.match(/<(GlassPanel|IconPanel)\b/)
+    if (!panelOpen) return full
+    const panelName = panelOpen[1]
+    const panelStart = panelOpen.index ?? 0
+
+    // Walk past the opening tag, respecting JSX expression braces so attribute
+    // values like `title={<span>...</span>}` don't terminate parsing early.
+    let i = panelStart + panelOpen[0].length
+    let depth = 0
+    while (i < body.length) {
+      const ch = body[i]
+      if (ch === '{') depth++
+      else if (ch === '}') depth--
+      else if (ch === '>' && depth === 0) break
+      i++
+    }
+    if (i >= body.length) return full
+
+    const panelAttrs = body.slice(panelStart + panelOpen[0].length, i)
+    const closingTag = `</${panelName}>`
+    const closeIdx = body.indexOf(closingTag, i)
+    if (closeIdx === -1) return full
+
+    const title = extractTitleAttr(panelAttrs)
+    if (!title) return full
+
+    const description = body
+      .slice(i + 1, closeIdx)
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+
+    return `- [${title}](${href})${description ? `. ${description}` : ''}`
   })
 }
 
@@ -165,11 +210,8 @@ async function generate() {
 
         const withPartials = await inlinePartials(rawContent)
         const withSteps = convertStepHike(withPartials)
-        const withLists =
-          filePath === 'content/guides/getting-started.mdx'
-            ? convertResourceLists(withSteps)
-            : withSteps
-        const processed = stripJsxTags(withLists)
+        const withLinks = convertLinkPanels(withSteps)
+        const processed = stripJsxTags(withLinks)
 
         const header = [
           data.title ? `# ${data.title}` : '',

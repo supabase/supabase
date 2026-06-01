@@ -2919,39 +2919,9 @@ export interface ComputeBadgeUpgradeClickedEvent {
   properties: {
     computeSize: string
     planId: string
-    upgradeType: 'pro_upgrade' | 'free_micro_upgrade' | 'compute_upgrade'
+    upgradeType: 'free_micro_upgrade' | 'compute_upgrade'
   }
   groups: TelemetryGroups
-}
-
-/**
- * Fly.io deprecation banner rendered for a user with at least one Fly.io project or branch.
- *
- * @group Events
- * @source studio
- */
-export interface FlyDeprecationBannerExposedEvent {
-  action: 'fly_deprecation_banner_exposed'
-  groups: TelemetryGroups
-  properties: {
-    primaryCount: number
-    branchCount: number
-  }
-}
-
-/**
- * User dismissed the Fly.io deprecation banner.
- *
- * @group Events
- * @source studio
- */
-export interface FlyDeprecationBannerDismissedEvent {
-  action: 'fly_deprecation_banner_dismissed'
-  groups: TelemetryGroups
-  properties: {
-    primaryCount: number
-    branchCount: number
-  }
 }
 
 /**
@@ -3461,8 +3431,6 @@ export type TelemetryEvent =
   | OrgMenuBackClickedEvent
   | OrgMenuItemClickedEvent
   | ComputeBadgeUpgradeClickedEvent
-  | FlyDeprecationBannerExposedEvent
-  | FlyDeprecationBannerDismissedEvent
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
   | AccessTokenCreatedEvent
