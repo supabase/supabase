@@ -30,6 +30,7 @@ export type Database = MergeDeep<
             website_url: string
             documentation_url: string
             listing_logo: string
+            uninstall_steps: string | null
           }
         }
       }
