@@ -49,9 +49,7 @@ export const useIntegrationDetail = () => {
     if (!integration?.navigation) return []
     return isInstalled
       ? integration.navigation
-      : integration.navigation.filter(
-          (nav) => nav.route === 'overview' || nav.route === 'how-to-uninstall'
-        )
+      : integration.navigation.filter((nav) => nav.route === 'overview')
   }, [integration, isInstalled])
 
   const activeRoute = pageId ?? 'overview'
