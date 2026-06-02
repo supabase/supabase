@@ -1467,6 +1467,21 @@ export interface AiAssistantInSupportFormClickedEvent {
 }
 
 /**
+ * User clicked the Assistant follow-up card after submitting a support ticket.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/support/new
+ */
+export interface SupportAssistantFollowUpCardClickedEvent {
+  action: 'support_assistant_follow_up_card_clicked'
+  properties: {
+    ticketCategory: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
  * User rated an AI assistant message with thumbs up or thumbs down.
  *
  * @group Events
@@ -2435,7 +2450,6 @@ export interface LogDrainSaveButtonClickedEvent {
       | 'clickhouse'
       | 'webhook'
       | 'datadog'
-      | 'elastic'
       | 'loki'
       | 'sentry'
       | 's3'
@@ -2466,7 +2480,6 @@ export interface LogDrainRemovedEvent {
       | 'clickhouse'
       | 'webhook'
       | 'datadog'
-      | 'elastic'
       | 'loki'
       | 'sentry'
       | 's3'
@@ -2904,39 +2917,9 @@ export interface ComputeBadgeUpgradeClickedEvent {
   properties: {
     computeSize: string
     planId: string
-    upgradeType: 'pro_upgrade' | 'free_micro_upgrade' | 'compute_upgrade'
+    upgradeType: 'free_micro_upgrade' | 'compute_upgrade'
   }
   groups: TelemetryGroups
-}
-
-/**
- * Fly.io deprecation banner rendered for a user with at least one Fly.io project or branch.
- *
- * @group Events
- * @source studio
- */
-export interface FlyDeprecationBannerExposedEvent {
-  action: 'fly_deprecation_banner_exposed'
-  groups: TelemetryGroups
-  properties: {
-    primaryCount: number
-    branchCount: number
-  }
-}
-
-/**
- * User dismissed the Fly.io deprecation banner.
- *
- * @group Events
- * @source studio
- */
-export interface FlyDeprecationBannerDismissedEvent {
-  action: 'fly_deprecation_banner_dismissed'
-  groups: TelemetryGroups
-  properties: {
-    primaryCount: number
-    branchCount: number
-  }
 }
 
 /**
@@ -3378,6 +3361,7 @@ export type TelemetryEvent =
   | SupabaseUiCommandCopyButtonClickedEvent
   | SupportTicketSubmittedEvent
   | AiAssistantInSupportFormClickedEvent
+  | SupportAssistantFollowUpCardClickedEvent
   | OrganizationMfaEnforcementUpdatedEvent
   | ForeignDataWrapperCreatedEvent
   | StorageBucketCreatedEvent
@@ -3445,8 +3429,6 @@ export type TelemetryEvent =
   | OrgMenuBackClickedEvent
   | OrgMenuItemClickedEvent
   | ComputeBadgeUpgradeClickedEvent
-  | FlyDeprecationBannerExposedEvent
-  | FlyDeprecationBannerDismissedEvent
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
   | AccessTokenCreatedEvent

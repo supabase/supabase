@@ -48,6 +48,7 @@ import { useLegacyJWTSigningKeyCreateMutation } from '@/data/jwt-signing-keys/le
 import { useLegacyJWTSigningKeyQuery } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 type DialogType = 'legacy' | 'create' | 'rotate' | 'key-details' | 'revoke' | 'delete'
 
@@ -206,6 +207,7 @@ export const JWTSecretKeysTable = () => {
                 loading={isPendingMutation}
                 type="primary"
                 icon={<Timer className="size-4" />}
+                shortcutId={SHORTCUT_IDS.JWT_KEYS_CREATE_STANDBY}
               />
             )}
           </>
