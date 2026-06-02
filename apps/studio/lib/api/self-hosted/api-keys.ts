@@ -81,9 +81,15 @@ export function getNonPlatformApiKeys(): NonPlatformApiKey[] {
       id: 'secret',
       type: 'secret',
       hash: '',
-      // The prefix is always exposed; only the remainder of the key is masked
-      // until revealed (matches the platform management API).
-      prefix: secretKey.slice(0, SECRET_KEY_VISIBLE_PREFIX_LENGTH),
+      // The prefix is exposed while the rest of the key stays masked until
+      // revealed (matches the platform management API). Only expose it when the
+      // key is genuinely longer than the prefix — otherwise the "prefix" would
+      // be the whole secret, so we mask entirely to avoid leaking a short or
+      // misconfigured key in the unrevealed response.
+      prefix:
+        secretKey.length > SECRET_KEY_VISIBLE_PREFIX_LENGTH
+          ? secretKey.slice(0, SECRET_KEY_VISIBLE_PREFIX_LENGTH)
+          : '',
       description: 'Secret API key (service_role)',
     })
   }

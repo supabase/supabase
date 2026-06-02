@@ -1,12 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from '@/lib/api/apiWrapper'
-import {
-  getNonPlatformApiKeyById,
-  parseRevealQuery,
-} from '@/lib/api/self-hosted/api-keys'
+import { getNonPlatformApiKeyById, parseRevealQuery } from '@/lib/api/self-hosted/api-keys'
 
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+const apiKeyByIdRoute = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+
+export default apiKeyByIdRoute
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
