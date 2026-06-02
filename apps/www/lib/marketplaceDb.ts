@@ -34,7 +34,7 @@ function toPartner(listing: Listing): Partner {
     type: 'technology',
     slug,
     title,
-    partnerName: built_by,
+    builtBy: built_by,
     description,
     content,
     websiteUrl: website_url,
