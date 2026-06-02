@@ -1,14 +1,12 @@
 'use client'
 
-import { isBrowser, LOCAL_STORAGE_KEYS } from 'common'
+import { type BlogView } from 'app/blog/blog-view'
 import BlogFilters from 'components/Blog/BlogFilters'
 import BlogGridItem from 'components/Blog/BlogGridItem'
 import BlogListItem from 'components/Blog/BlogListItem'
 import { useInfiniteScrollWithFetch } from 'hooks/useInfiniteScroll'
 import { Suspense, useCallback, useState } from 'react'
 import type PostTypes from 'types/post'
-
-export type BlogView = 'list' | 'grid'
 
 const POSTS_PER_PAGE = 25
 const SKELETON_COUNT = 6
@@ -57,12 +55,11 @@ function BlogGridItemSkeleton() {
 interface BlogClientProps {
   initialBlogs: any[]
   totalPosts: number
+  initialView: BlogView
 }
 
-export default function BlogClient({ initialBlogs, totalPosts }: BlogClientProps) {
-  const { BLOG_VIEW } = LOCAL_STORAGE_KEYS
-  const localView = isBrowser ? (localStorage?.getItem(BLOG_VIEW) as BlogView) : undefined
-  const [view, setView] = useState<BlogView>(localView ?? 'list')
+export default function BlogClient({ initialBlogs, totalPosts, initialView }: BlogClientProps) {
+  const [view, setView] = useState<BlogView>(initialView)
   const [isFiltering, setIsFiltering] = useState(false)
   const [filterParams, setFilterParams] = useState<{ category?: string; search?: string }>({})
   const [filteredPosts, setFilteredPosts] = useState<any[] | null>(null)

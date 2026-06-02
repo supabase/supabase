@@ -1,10 +1,11 @@
 'use client'
 
-import type { BlogView } from 'app/blog/BlogClient'
-import { LOCAL_STORAGE_KEYS, useBreakpoint } from 'common'
+import { type BlogView } from 'app/blog/blog-view'
+import { useBreakpoint } from 'common'
+import BlogViewToggle from 'components/Blog/BlogViewToggle'
 import { motion } from 'framer-motion'
 import { startCase } from 'lib/helpers'
-import { AlignJustify, ChevronDown, X as CloseIcon, Grid, Search } from 'lucide-react'
+import { ChevronDown, X as CloseIcon, Search } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
@@ -25,11 +26,15 @@ interface Props {
   view: BlogView
   setView: (view: any) => void
   /**
-   * When provided (blog index), typing in the search box filters the current
-   * list client-side. When omitted (e.g. category pages), the search affordance
-   * is hidden — those pages are statically generated per filter.
+   * Blog index search: keeps the query in the URL (`?q=`) and filters the full
+   * post set client-side via the index's fetch logic.
    */
   onFilterChange?: (category?: string, search?: string) => void
+  /**
+   * Category-page search: filters the in-memory posts for the current category.
+   * No URL sync / fetch. Mutually exclusive with `onFilterChange`.
+   */
+  onSearch?: (term: string) => void
 }
 
 // Hard-coded so they can be curated/reordered. Each (except "all") maps to a
@@ -51,9 +56,8 @@ const categoryHref = (category: string) =>
 const categoryLabel = (category: string) =>
   category === 'all' ? 'All' : startCase(category.replaceAll('-', ' '))
 
-function BlogFilters({ view, setView, onFilterChange }: Props) {
-  const { BLOG_VIEW } = LOCAL_STORAGE_KEYS
-  const showSearch = Boolean(onFilterChange)
+function BlogFilters({ view, setView, onFilterChange, onSearch }: Props) {
+  const showSearch = Boolean(onFilterChange) || Boolean(onSearch)
   const [searchTerm, setSearchTerm] = useState<string>('')
   const [showSearchInput, setShowSearchInput] = useState<boolean>(false)
 
@@ -83,9 +87,9 @@ function BlogFilters({ view, setView, onFilterChange }: Props) {
 
   // Reflect ?q= deep links into the search state on mount (index only)
   useEffect(() => {
-    if (showSearch && q) {
+    if (onFilterChange && q) {
       setSearchTerm(q)
-      onFilterChange?.(undefined, q)
+      onFilterChange(undefined, q)
     }
   }, []) // Only run on mount
 
@@ -93,17 +97,18 @@ function BlogFilters({ view, setView, onFilterChange }: Props) {
     (text: string) => {
       setSearchTerm(text)
 
-      // Update URL
-      if (text.length > 0) {
-        router?.replace(`/blog?q=${encodeURIComponent(text)}`, { scroll: false })
+      if (onFilterChange) {
+        // Index: keep the query in the URL and filter the full list (debounced).
+        router?.replace(text.length > 0 ? `/blog?q=${encodeURIComponent(text)}` : '/blog', {
+          scroll: false,
+        })
+        debouncedFilterChange(text)
       } else {
-        router?.replace('/blog', { scroll: false })
+        // Category: filter the in-memory posts; no URL change.
+        onSearch?.(text)
       }
-
-      // Trigger filter change (debounced)
-      debouncedFilterChange(text)
     },
-    [router, debouncedFilterChange]
+    [router, debouncedFilterChange, onFilterChange, onSearch]
   )
 
   useEffect(() => {
@@ -222,36 +227,7 @@ function BlogFilters({ view, setView, onFilterChange }: Props) {
       )}
 
       {/* View toggle */}
-      <div className="flex items-center border border-border rounded-md p-0.5 gap-0.5 bg-surface-100">
-        {(['list', 'grid'] as BlogView[]).map((v) => (
-          <button
-            key={v}
-            onClick={() => {
-              setView(v)
-              localStorage.setItem(BLOG_VIEW, v)
-            }}
-            className={cn(
-              'relative flex items-center justify-center w-7 h-7 rounded-sm transition-colors',
-              view === v ? 'text-foreground' : 'text-foreground-light hover:text-foreground'
-            )}
-          >
-            {view === v && (
-              <motion.span
-                layoutId="blog-view-bg"
-                className="absolute inset-0 rounded-sm bg-surface-300 border border-border"
-                transition={{ type: 'spring', duration: 0.3, bounce: 0.15 }}
-              />
-            )}
-            <span className="relative z-10">
-              {v === 'list' ? (
-                <AlignJustify className="w-3.5 h-3.5" />
-              ) : (
-                <Grid className="w-3.5 h-3.5" />
-              )}
-            </span>
-          </button>
-        ))}
-      </div>
+      <BlogViewToggle view={view} setView={setView} />
     </div>
   )
 }

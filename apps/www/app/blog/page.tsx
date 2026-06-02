@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
+import { cookies } from 'next/headers'
 
+import { BLOG_VIEW_COOKIE, isBlogView, type BlogView } from './blog-view'
 import BlogClient from './BlogClient'
 import { breadcrumbs } from '@/lib/breadcrumbs'
 import { breadcrumbListSchema, serializeJsonLd } from '@/lib/json-ld'
 import { getSortedPosts } from '@/lib/posts'
-
-export const revalidate = 30
 
 export const metadata: Metadata = {
   title: 'Supabase Blog: the Postgres development platform',
@@ -34,6 +34,12 @@ export default async function BlogPage() {
   // route's layout.tsx.
   const initialPosts = allPosts.slice(0, INITIAL_POSTS_LIMIT)
 
+  // Render the list/grid view from a cookie so it matches the user's choice on
+  // first paint (avoids the localStorage hydration flicker).
+  const cookieStore = await cookies()
+  const cookieView = cookieStore.get(BLOG_VIEW_COOKIE)?.value
+  const initialView: BlogView = isBlogView(cookieView) ? cookieView : 'list'
+
   return (
     <>
       <script
@@ -42,7 +48,11 @@ export default async function BlogPage() {
           __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.blogIndex)),
         }}
       />
-      <BlogClient initialBlogs={initialPosts} totalPosts={allPosts.length} />
+      <BlogClient
+        initialBlogs={initialPosts}
+        totalPosts={allPosts.length}
+        initialView={initialView}
+      />
     </>
   )
 }
