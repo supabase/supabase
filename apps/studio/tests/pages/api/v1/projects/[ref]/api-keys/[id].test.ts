@@ -88,6 +88,24 @@ describe('/api/v1/projects/[ref]/api-keys/[id]', () => {
       })
     })
 
+    it('masks the secret key by default when no reveal query param is set', async () => {
+      vi.stubEnv('SUPABASE_SECRET_KEY', 'sb_secret_abcdefghijklmnop')
+
+      const { req, res } = createMocks({
+        method: 'GET',
+        query: { ref: 'default', id: 'secret' },
+      })
+      await handler(req, res)
+
+      expect(res._getStatusCode()).toBe(200)
+      expect(JSON.parse(res._getData())).toMatchObject({
+        id: 'secret',
+        type: 'secret',
+        api_key: 'sb_secret_abcde',
+        prefix: 'sb_secret_abcde',
+      })
+    })
+
     it('returns the full secret key when reveal is true', async () => {
       vi.stubEnv('SUPABASE_SECRET_KEY', 'sb_secret_abcdefghijklmnop')
 
