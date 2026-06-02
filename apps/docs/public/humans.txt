@@ -58,6 +58,7 @@ Chris Martin
 Chris Stockton
 Chris Ward
 Christian Funkhouser
+Claudiu Dragalina-Paraipan
 Clayton Kast
 Colin Goodheart-Smithe
 Colin Murray
@@ -82,6 +83,7 @@ Dennis Senn
 Dimitrios Liappis
 Div Arora
 Divit D
+Divya Sharma
 Douglas Hunley
 Dustin Keib
 Eduardo Gurgel
@@ -177,6 +179,7 @@ Leonardo Santiago
 Liam Cloud Hogan
 Lindsay Moss
 Lukas Bernert
+Lukas Klingsbo
 Łukasz Niemier
 Maksym Ionutsa
 Manuel Mendez
@@ -216,6 +219,7 @@ Peter Lyn
 Peter Soderberg
 Pierre Ducroquet
 Qiao Han
+Quintin Willison
 Rafael Chacón
 Raminder Singh
 Raúl Barroso
@@ -242,6 +246,7 @@ Sean Oliver
 Sean Romberg
 Sean Thompson
 Sergio Cioban Filho
+Shaii O
 Shane E
 Shreekar Shetty
 Sreyas Udayavarman

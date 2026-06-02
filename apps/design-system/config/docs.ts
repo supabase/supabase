@@ -86,13 +86,18 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          href: '/docs/ui-patterns/modality',
-          title: 'Modality',
+          title: 'Markdown',
+          href: '/docs/ui-patterns/markdown',
           items: [],
         },
         {
-          href: '/docs/ui-patterns/navigation',
+          title: 'Modality',
+          href: '/docs/ui-patterns/modality',
+          items: [],
+        },
+        {
           title: 'Navigation',
+          href: '/docs/ui-patterns/navigation',
           items: [],
         },
         {
@@ -123,6 +128,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Collapsible Card Section',
+          href: '/docs/fragments/collapsible-card-section',
+          items: [],
+        },
+        {
           title: 'Assistant Chat',
           href: '/docs/fragments/assistant-chat',
           items: [],
@@ -130,11 +140,6 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Empty State Presentational',
           href: '/docs/fragments/empty-state-presentational',
-          items: [],
-        },
-        {
-          title: 'Modal',
-          href: '/docs/fragments/modal',
           items: [],
         },
         {

@@ -17,12 +17,15 @@ import { CreateReportModal } from '@/components/interfaces/Reports/CreateReportM
 import { UpdateCustomReportModal } from '@/components/interfaces/Reports/UpdateModal'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { ProductMenu } from '@/components/ui/ProductMenu'
+import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
 import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
 import { Content, ContentBase, useContentQuery } from '@/data/content/content-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useProfile } from '@/lib/profile'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { Dashboards } from '@/types'
 
 const ObservabilityMenu = () => {
@@ -133,8 +136,17 @@ const ObservabilityMenu = () => {
     isPlatform: IS_PLATFORM,
   })
 
+  useShortcut(
+    SHORTCUT_IDS.OBSERVABILITY_NEW_REPORT,
+    () => {
+      setShowNewReportModal(true)
+    },
+    { enabled: IS_PLATFORM && canCreateCustomReport }
+  )
+
   return (
     <div>
+      <ProductMenuShortcuts menu={menuItems} />
       {isLoading ? (
         <div className="px-5 my-4 space-y-2">
           <ShimmeringLoader />

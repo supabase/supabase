@@ -1,4 +1,4 @@
-import { SurveyChart, buildWhereClause } from '../SurveyChart'
+import { buildWhereClause, SurveyChart } from '../SurveyChart'
 
 function generateSalesToolsSQL(activeFilters: Record<string, string>) {
   const whereClause = buildWhereClause(activeFilters)
@@ -20,7 +20,7 @@ function generateSalesToolsSQL(activeFilters: Record<string, string>) {
       END AS tool_clean
     FROM (
       SELECT id, unnest(sales_tools) AS tool
-      FROM responses_2025
+      FROM responses_2026
       ${whereClause}
     ) sub
   )

@@ -8,6 +8,7 @@ import { LinterDataGrid } from '@/components/interfaces/Linter/LinterDataGrid'
 import LinterFilters from '@/components/interfaces/Linter/LinterFilters'
 import { LinterPageFooter } from '@/components/interfaces/Linter/LinterPageFooter'
 import LintPageTabs from '@/components/interfaces/Linter/LintPageTabs'
+import { useAdvisorPageShortcuts } from '@/components/interfaces/Linter/useAdvisorPageShortcuts'
 import AdvisorsLayout from '@/components/layouts/AdvisorsLayout/AdvisorsLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { FormHeader } from '@/components/ui/Forms/FormHeader'
@@ -59,6 +60,13 @@ const ProjectLints: NextPageWithLayout = () => {
   const selectedLint: Lint | null = useMemo(() => {
     return activeLints.find((lint) => lint.cache_key === id) ?? null
   }, [id, activeLints])
+
+  useAdvisorPageShortcuts({
+    setCurrentTab,
+    refetch,
+    hasSelectedLint: selectedLint !== null,
+    isRefreshDisabled: isLoading || isRefetching,
+  })
 
   return (
     <div className="h-full flex flex-col">

@@ -6,8 +6,8 @@ import { Button } from 'ui'
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useInstallOAuthIntegrationMutation } from '@/data/marketplace/install-oauth-integration-mutation'
+import { usePartnerIntegrationsQuery } from '@/data/partners/integration-status-query'
 import { useSecretsQuery } from '@/data/secrets/secrets-query'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface InstallOAuthIntegrationButtonProps {
   integration: IntegrationDefinition
@@ -15,7 +15,6 @@ interface InstallOAuthIntegrationButtonProps {
 
 export function InstallOAuthIntegrationButton({ integration }: InstallOAuthIntegrationButtonProps) {
   const { ref: projectRef } = useParams()
-  const { data: selectedOrg } = useSelectedOrganizationQuery()
 
   const requiresApiKeysCheck =
     integration.installIdentificationMethod === 'secret_key_prefix' && !!integration.secretKeyPrefix
@@ -23,6 +22,9 @@ export function InstallOAuthIntegrationButton({ integration }: InstallOAuthInteg
   const requiresEdgeFunctionSecretsCheck =
     integration.installIdentificationMethod === 'edge_function_secret_name' &&
     !!integration.edgeFunctionSecretName
+
+  const requiresPartnerIntegrationsCheck =
+    integration.installIdentificationMethod === 'integration_status'
 
   const { data: apiKeys, isLoading: isApiKeysLoading } = useAPIKeysQuery(
     { projectRef, reveal: false },
@@ -33,6 +35,9 @@ export function InstallOAuthIntegrationButton({ integration }: InstallOAuthInteg
     { projectRef },
     { enabled: requiresEdgeFunctionSecretsCheck }
   )
+
+  const { data: partnerIntegrations, isPending: isPartnerIntegrationsLoading } =
+    usePartnerIntegrationsQuery({ projectRef }, { enabled: requiresPartnerIntegrationsCheck })
 
   const { mutate: installOAuthIntegration, isPending: isInstalling } =
     useInstallOAuthIntegrationMutation({
@@ -51,7 +56,8 @@ export function InstallOAuthIntegrationButton({ integration }: InstallOAuthInteg
 
   const isLoading =
     (requiresApiKeysCheck && isApiKeysLoading) ||
-    (requiresEdgeFunctionSecretsCheck && isEdgeFunctionSecretsLoading)
+    (requiresEdgeFunctionSecretsCheck && isEdgeFunctionSecretsLoading) ||
+    (requiresPartnerIntegrationsCheck && isPartnerIntegrationsLoading)
 
   const isIntegrationInstalled = useMemo(() => {
     if (!integration) return false
@@ -68,27 +74,29 @@ export function InstallOAuthIntegrationButton({ integration }: InstallOAuthInteg
       return edgeFunctionSecrets.some((secret) => secret.name === secretName)
     }
 
+    if (integration.installIdentificationMethod === 'integration_status') {
+      if (isPartnerIntegrationsLoading || !partnerIntegrations) return false
+      return partnerIntegrations.some(
+        (i) => i.listing_slug === integration.id && i.status === 'ready'
+      )
+    }
+
     return false
-  }, [apiKeys, edgeFunctionSecrets, integration, isApiKeysLoading, isEdgeFunctionSecretsLoading])
+  }, [
+    apiKeys,
+    edgeFunctionSecrets,
+    partnerIntegrations,
+    integration,
+    isApiKeysLoading,
+    isEdgeFunctionSecretsLoading,
+    isPartnerIntegrationsLoading,
+  ])
 
   const handleInstallClick = async () => {
     if (!integration || !projectRef) return
+    if (!integration.id) return toast.error('Listing ID is required')
 
-    if (integration.installUrlType === 'post') {
-      if (!integration.id) return toast.error('Listing ID is required')
-      installOAuthIntegration({ projectRef, listingSlug: integration.id })
-    } else {
-      let redirectUrl = '/'
-
-      if (integration.installUrl) {
-        const url = new URL(integration.installUrl)
-        url.searchParams.append('organization_slug', selectedOrg?.slug ?? '')
-        url.searchParams.append('project_id', projectRef)
-        redirectUrl = url.href
-      }
-
-      window.open(redirectUrl, '_blank', 'noreferrer')
-    }
+    installOAuthIntegration({ projectRef, listingSlug: integration.id })
   }
 
   return (

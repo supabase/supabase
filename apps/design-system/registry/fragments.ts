@@ -2,6 +2,12 @@ import { Registry } from '@/registry/schema'
 
 export const fragments: Registry = [
   {
+    name: 'CollapsibleCardSection',
+    type: 'components:fragment',
+    files: ['/CollapsibleCardSection.tsx'],
+    optionalPath: '',
+  },
+  {
     name: 'ConfirmationModal',
     type: 'components:fragment',
     files: ['/Dialogs/ConfirmationModal.tsx'],
