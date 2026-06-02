@@ -121,6 +121,18 @@ interface VersionConfig {
   excludeDefinitions?: string[]
   categoryOrder?: string[]
   partialsOrder?: string[]
+  /**
+   * Customizes the navigation slug used as a prefix for a category or
+   * subcategory (matched on the literal `@category` / `@subcategory` text).
+   *   - `string` → use that value as the prefix (e.g. `"Edge Functions": "functions"`
+   *     turns `edge-functions-invoke` into `functions-invoke`).
+   *   - `false`  → drop the prefix entirely for child function slugs (e.g.
+   *     `"Using modifiers": false` turns `using-modifiers-explain` into
+   *     `explain`). The category/subcategory header itself still needs a slug,
+   *     so its entry slug falls back to the slugified title.
+   *   - missing  → default to the slugified title.
+   */
+  navigationPrefixes?: Record<string, string | false>
 }
 
 interface PartialEntry {
@@ -144,6 +156,31 @@ interface PartialEntry {
 /** Lowercases a string and collapses internal whitespace to hyphens for use as a URL slug. */
 function slugifyTag(value: string): string {
   return value.toLowerCase().trim().replace(/\s+/g, '-')
+}
+
+type NavigationPrefixes = Record<string, string | false> | undefined
+
+/**
+ * The slug used for a category or subcategory **entry** (the header that
+ * appears in the navigation). `navigationPrefixes[title] = string` overrides
+ * the default; `false` and `undefined` both fall back to the slugified title
+ * because the entry still needs a stable, navigable slug.
+ */
+function entrySlug(title: string, navigationPrefixes: NavigationPrefixes): string {
+  const override = navigationPrefixes?.[title]
+  return typeof override === 'string' ? override : slugifyTag(title)
+}
+
+/**
+ * The prefix segment used in front of a function's name. `false` means "no
+ * prefix" — the function slug becomes just its lowercased name. `string`
+ * overrides the default; `undefined` falls back to the slugified title.
+ */
+function functionPrefix(title: string, navigationPrefixes: NavigationPrefixes): string | null {
+  const override = navigationPrefixes?.[title]
+  if (override === false) return null
+  if (typeof override === 'string') return override
+  return slugifyTag(title)
 }
 
 /**
@@ -184,19 +221,24 @@ const subcategoryEntry = (slug: string, title: string, product: string): BySlugF
 })
 
 /**
- * Builds a function bySlug entry. `id` equals `slug`, and the slug includes
- * the subcategory (if any) so same-named methods on different classes don't
- * collide — e.g. `createBucket` exists on StorageClient (subcategory
- * "File Buckets"), StorageAnalyticsClient (subcategory "Analytics Buckets"),
- * and StorageVectorsClient (subcategory "Vector Buckets"). Without the
- * subcategory segment they'd all dedupe to one entry, emptying the Analytics
- * and Vector subcategories. The renderer in `Reference.sections.tsx`
- * resolves functions via `fns.find(f => f.id === section.id)`, so id and
- * slug must match.
+ * Builds a function bySlug entry. The slug is `${prefix}-${name}` where
+ * `prefix` comes from the function's nearest container — its `@subcategory`
+ * if present, otherwise its `@category`. `navigationPrefixes` in `config.json`
+ * can rename that prefix or drop it entirely (false). `id` always equals
+ * `slug` so the renderer's `fns.find(f => f.id === section.id)` resolves.
+ *
+ * `product` keeps the literal slugified category (independent of any
+ * navigation prefix) because the renderer uses it for feature filtering
+ * (e.g. hiding `auth` sections when the SDK Auth flag is disabled).
  */
-const functionEntry = (fn: FunctionEntry, product: string): BySlugFunction => {
-  const sub = fn.subcategory ? `${slugifyTag(fn.subcategory)}-` : ''
-  const slug = `${product}-${sub}${fn.name.toLowerCase()}`
+const functionEntry = (
+  fn: FunctionEntry,
+  product: string,
+  navigationPrefixes: NavigationPrefixes
+): BySlugFunction => {
+  const prefix = functionPrefix(fn.subcategory ?? fn.category, navigationPrefixes)
+  const nameLower = fn.name.toLowerCase()
+  const slug = prefix === null ? nameLower : `${prefix}-${nameLower}`
   return { id: slug, title: fn.name, slug, product, type: 'function' }
 }
 
@@ -469,7 +511,7 @@ function buildBySlug(
   const orderedCategories = reorder(Array.from(groups.keys()), config.categoryOrder, (c) => c)
 
   const writeFunction = (fn: FunctionEntry, product: string, items: SectionEntry[]) => {
-    const entry = functionEntry(fn, product)
+    const entry = functionEntry(fn, product, config.navigationPrefixes)
     // Spec files can re-declare same-named methods on different classes; the
     // slug collides, so only emit each unique slug once (first wins).
     if (entry.slug in bySlug) return
@@ -489,11 +531,15 @@ function buildBySlug(
 
   for (const category of orderedCategories) {
     const group = groups.get(category)!
+    // `product` keeps the literal slugified category for feature filtering and
+    // for partial-filename matching, even when navigationPrefixes renames the
+    // category's navigation slug.
     const product = slugifyTag(category)
+    const categorySlug = entrySlug(category, config.navigationPrefixes)
 
     const cat = categoryEntry(group.title)
     const catItems: SectionEntry[] = []
-    bySlug[product] = cat
+    bySlug[categorySlug] = cat
     sections.push({ ...cat, items: catItems })
 
     const categoryPartial = partialsByCategory.get(product)
@@ -506,7 +552,7 @@ function buildBySlug(
     )
     for (const [subcategory, fns] of sortedSubs) {
       const subKey = slugifyTag(subcategory)
-      const subSlug = `${product}-${subKey}`
+      const subSlug = entrySlug(subcategory, config.navigationPrefixes)
       const sub = subcategoryEntry(subSlug, subcategory, product)
       const subItems: SectionEntry[] = []
       bySlug[subSlug] = sub

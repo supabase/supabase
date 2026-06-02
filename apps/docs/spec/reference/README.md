@@ -201,10 +201,11 @@ Routing semantics differ from markdown partials:
 
 - **Matches a category/subcategory** → **enriches** that section's header.
   No separate sub-section is emitted. The entry is keyed in `functions.json`
-  under the matched section's id (e.g. `auth-auth-admin`,
-  `database-using-filters`), so the renderer's
-  `fns.find(f => f.id === section.id)` resolves to the partial body and the
-  subcategory header renders with the description/examples in place.
+  under the matched section's slug (e.g. `auth-admin`, `using-filters` —
+  whichever slug the header resolves to, after `navigationPrefixes`), so the
+  renderer's `fns.find(f => f.id === section.id)` resolves to the partial
+  body and the subcategory header renders with the description/examples in
+  place.
 - **Top-level (no match)** → emitted as its own `type: 'function'` section.
 
 This is why `auth-admin.json` (matching the `auth-admin` subcategory slug)
@@ -236,8 +237,43 @@ alphabetical-within-section.
   // Order top-level partials. Anything not listed here falls back to
   // alphabetical order at the end.
   "partialsOrder": ["introduction", "installing", "typescript-support"],
+
+  // Customize the navigation slug used as a prefix for a category or
+  // subcategory. Keys are the literal @category / @subcategory text
+  // (case-sensitive). Values:
+  //   string  → use this in place of the default slugified title.
+  //             e.g. "Edge Functions": "functions" turns the function slug
+  //             "edge-functions-invoke" into "functions-invoke".
+  //   false   → drop the prefix entirely from child function slugs.
+  //             e.g. "Using modifiers": false turns "using-modifiers-explain"
+  //             into "explain". The category/subcategory header itself still
+  //             needs a navigable slug, so its entry slug falls back to the
+  //             slugified title ("using-modifiers").
+  //   absent  → use the slugified title (default behavior).
+  "navigationPrefixes": {
+    "Database": false,
+    "Using filters": false,
+    "Using modifiers": false,
+    "Edge Functions": "functions",
+  },
 }
 ```
+
+### Slug shape
+
+A function's slug is `${prefix}-${name}` where `prefix` is its nearest container
+— its `@subcategory` if it has one, otherwise its `@category`. For example a
+PostgREST `eq` method tagged `@category Database @subcategory Using filters`:
+
+- without config: `using-filters-eq`
+- with `"Using filters": false`: `eq`
+- with `"Using filters": "filters"`: `filters-eq`
+
+The category and subcategory header entries (the rows that show up in
+navigation) get the resolved prefix too — `"Edge Functions": "functions"`
+makes the Edge Functions category render at `/functions`, not `/edge-functions`.
+`false` falls back to the title slug for the header (a header needs a stable,
+navigable slug).
 
 Within each category, the script always:
 
