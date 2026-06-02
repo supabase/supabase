@@ -1,5 +1,6 @@
 import { BookOpen, Check, ChevronsUpDown, Copy, ExternalLink, List, X } from 'lucide-react'
 import Link from 'next/link'
+import { Popover as PopoverPrimitive } from 'radix-ui'
 import { useState } from 'react'
 import { logConstants } from 'shared-data'
 import {
@@ -13,7 +14,6 @@ import {
   CommandList,
   copyToClipboard,
   Popover,
-  PopoverContent,
   PopoverTrigger,
   SidePanel,
   Tooltip,
@@ -114,7 +114,12 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
                   {selectedSchema?.name ?? 'Select source...'}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="p-0" sameWidthAsTrigger>
+              <PopoverPrimitive.Content
+                align="center"
+                sideOffset={4}
+                style={{ width: 'var(--radix-popover-trigger-width)' }}
+                className="z-50 rounded-md border border-overlay bg-overlay p-0 text-popover-foreground shadow-md outline-hidden animate-in data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
+              >
                 <Command>
                   <CommandInput placeholder="Search source..." />
                   <CommandList>
@@ -141,7 +146,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
                     </CommandGroup>
                   </CommandList>
                 </Command>
-              </PopoverContent>
+              </PopoverPrimitive.Content>
             </Popover>
             <Table
               head={[
