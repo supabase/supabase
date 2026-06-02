@@ -34,6 +34,7 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { useFDWImportForeignSchemaMutation } from '@/data/fdw/fdw-import-foreign-schema-mutation'
 import { useVectorBucketIndexCreateMutation } from '@/data/storage/vector-bucket-index-create-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -104,6 +105,7 @@ interface CreateVectorTableSheetProps {
 
 export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetProps) => {
   const { data: project } = useSelectedProjectQuery()
+  const { isCli } = useDeploymentMode()
 
   const [visible, setVisible] = useQueryState(
     'newTable',
@@ -117,7 +119,8 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
     ?.split('supabase_target_schema=')[1]
 
   // [Joshen] Can remove this once this restriction is removed
-  const showIndexCreationNotice = isStagingLocal && !!project && project?.region !== 'us-east-1'
+  const showIndexCreationNotice =
+    isStagingLocal && !isCli && !!project && project?.region !== 'us-east-1'
 
   const defaultValues = {
     name: '',
