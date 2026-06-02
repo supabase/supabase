@@ -358,58 +358,54 @@ LIMIT ${lit(MAX_FACETS_QUANTITY)}
 }
 
 /**
- * Bundled count query — UNION ALL of (dimension, value, count) rows so the
- * frontend can render facet counts and total in one round trip.
+ * Bundled count query — single-scan `arrayJoin` "explode".
+ *
+ * Replaces the previous 13× UNION ALL with one pass over `logs`: `arrayJoin`
+ * fans each row out into one row per dimension, and `multiIf` picks that
+ * dimension's value (or '' to drop it via HAVING). Emits the same
+ * (dimension, value, count) shape the UNION ALL version did, so the consumer
+ * in `unified-logs-count-query.ts` is unchanged.
+ *
+ * Shape is dictated by what the Logflare OTEL endpoint tolerates (empirically
+ * verified): no CTEs (a `WITH` collides with the endpoint's own `WITH`), no
+ * GROUPING SETS, no window functions / `LIMIT BY`, no tuples / array indexing,
+ * no outer aggregation over a `FROM logs` subquery. A flat single-level
+ * arrayJoin + top-level GROUP BY is the only construct that yields a single
+ * multi-dimensional pass.
+ *
+ * Tradeoffs vs. the UNION ALL version (both inherent to a single scan):
+ *   - One shared WHERE means we cannot exclude each facet's own filter from
+ *     its own counts. Counts are conjunctive — an active filter on a dimension
+ *     also narrows that dimension's buckets.
+ *   - Per-dimension top-N can't be enforced (no `LIMIT BY` / window fns), so we
+ *     bound the whole payload with a global ORDER BY + LIMIT instead. The
+ *     `total` row is exempt so the total badge is never dropped.
  */
 export const getLogsCountQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
-  // When no predicates remain, fall back to `1` so we emit a valid
-  // tautology rather than a bare `WHERE`.
-  const baseFiltersFor = (excludeField?: string): SafeLogSqlFragment => {
-    const predicates = buildBaseWhere(search, excludeField)
-    return predicates.length > 0 ? joinSqlFragments(predicates, ' AND ') : safeSql`1`
-  }
+  const predicates = buildBaseWhere(search)
 
-  // The "total" badge should reflect the user's *current* filter set,
-  // including any active log_type filter. Pass no excludeField so the
-  // log_type predicate is included.
-  const totalSql = safeSql`
-SELECT 'total' AS dimension, 'all' AS value, count() AS count
+  const MAX_ROWS = 200
+
+  return safeSql`
+SELECT
+  arrayJoin(['total','log_type','level','method','status','pathname']) AS dimension,
+  multiIf(
+    dimension = 'total', 'all',
+    dimension = 'log_type', (${LOG_TYPE_EXPR}),
+    dimension = 'level', (${LEVEL_EXPR}),
+    dimension = 'method', ${ATTR.method},
+    dimension = 'status', (${STATUS_EXPR}),
+    dimension = 'pathname', ${ATTR.path},
+    ''
+  ) AS value,
+  count() AS count
 FROM logs
-WHERE ${baseFiltersFor()}
+${whereClause(predicates)}
+GROUP BY dimension, value
+HAVING value != ''
+ORDER BY dimension = 'total' DESC, count DESC
+LIMIT ${lit(MAX_ROWS)}
 `
-
-  const logTypeBranches = joinSqlFragments(
-    Object.entries(LOG_TYPE_PREDICATE).map(
-      ([logType, predicate]) =>
-        safeSql`
-SELECT 'log_type' AS dimension, ${lit(logType)} AS value, countIf(${predicate}) AS count
-FROM logs
-WHERE ${baseFiltersFor('log_type')}
-`
-    ),
-    ' UNION ALL '
-  )
-
-  const levelBranches = joinSqlFragments(
-    (['success', 'warning', 'error'] as const).map(
-      (lvl) =>
-        safeSql`
-SELECT 'level' AS dimension, ${lit(lvl)} AS value, countIf((${LEVEL_EXPR}) = ${lit(lvl)}) AS count
-FROM logs
-WHERE ${baseFiltersFor('level')}
-`
-    ),
-    ' UNION ALL '
-  )
-
-  const facetBranches = joinSqlFragments(
-    (['method', 'status', 'pathname'] as const).map(
-      (facet) => safeSql`(${getFacetCountQuery({ search, facet })})`
-    ),
-    ' UNION ALL '
-  )
-
-  return joinSqlFragments([totalSql, logTypeBranches, levelBranches, facetBranches], ' UNION ALL ')
 }
 
 /**
