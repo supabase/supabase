@@ -317,25 +317,26 @@ export default function IntegrationsContent({
 
             {/* Marketplace callout — shown when the Marketplace filter is active */}
             {oneClickOnly && (
-              <div className="rounded-xl border bg-surface-100 p-5 flex flex-col gap-1.5">
+              <div className="rounded-xl border bg-surface-100 p-5 flex flex-col items-start gap-1.5">
                 <div className="flex items-center gap-2">
                   <Store size={16} className="shrink-0" />
                   <h2 className="text-foreground text-base">Supabase Integrations Marketplace</h2>
                 </div>
                 <p className="text-foreground-lighter text-sm">
-                  The Marketplace is where you can find, install and manage integrations directly in
-                  the{' '}
-                  <a
-                    href="https://supabase.com/dashboard/project/_/integrations"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-foreground-light hover:underline inline-flex items-center gap-0.5"
-                  >
-                    Supabase dashboard
-                    <ArrowUpRight size={13} className="shrink-0" />
-                  </a>
-                  .
+                  The Marketplace is where you can explore, install and manage integrations directly
+                  from your project.
                 </p>
+                <Button
+                  asChild
+                  size="tiny"
+                  type="default"
+                  iconRight={<ArrowUpRight />}
+                  className="shrink-0 mt-2"
+                >
+                  <Link href="https://supabase.com/dashboard/project/_/integrations">
+                    Explore Marketplace
+                  </Link>
+                </Button>
               </div>
             )}
 
