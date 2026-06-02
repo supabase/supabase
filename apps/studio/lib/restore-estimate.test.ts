@@ -18,7 +18,7 @@ describe('restore-estimate', () => {
   })
 
   it('scales the long-running threshold for larger restores', () => {
-    expect(getRestoreLongRunningThresholdMinutes(200)).toBe(15)
+    expect(getRestoreLongRunningThresholdMinutes(200)).toBe(20)
     expect(getRestoreLongRunningThresholdMinutes(500)).toBe(31)
     expect(getRestoreLongRunningThresholdMinutes(1_000)).toBe(56)
   })
