@@ -59,10 +59,12 @@ const formSchema = z.object({
   dbSchema: z.array(z.string()),
   dbExtraSearchPath: z.array(z.string()),
   maxRows: z
-    .union([z.literal(''), z.coerce.number().int().min(1)])
+    .union([
+      z.literal(''),
+      z.coerce.number().int().min(1).max(1000000, "Can't be more than 1,000,000"),
+    ])
     .refine((value) => value !== '', 'Max rows is required')
-    .transform((value) => Number(value))
-    .max(1000000, "Can't be more than 1,000,000"),
+    .transform((value) => Number(value)),
   dbPool: z.coerce
     .number()
     .min(0, 'Must be more than 0')
