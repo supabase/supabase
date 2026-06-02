@@ -77,14 +77,14 @@ const Subscription = () => {
               {isError && <AlertError subject="Failed to retrieve subscription" error={error} />}
 
               {isSuccess && (
-                <div className="space-y-6">
-                  <div>
-                    <p className="text-2xl text-brand">{currentPlan?.name ?? 'Unknown'} Plan</p>
-                  </div>
+                <div className="space-y-6 w-full">
+                  <div className="flex justify-between items-center">
+                    <p className="text-2xl text-brand leading-none">
+                      {currentPlan?.name ?? 'Unknown'} Plan
+                    </p>
 
-                  <div>
-                    {canChangeTier ? (
-                      <div className="flex justify-between">
+                    {canChangeTier && (
+                      <div className="flex fllex-shrink space-x-2">
                         <Button
                           type="default"
                           className="pointer-events-auto"
@@ -98,35 +98,41 @@ const Subscription = () => {
                           </InitiateCancellationFlowButton>
                         )}
                       </div>
-                    ) : projectUpdateDisabled ? (
-                      <Admonition
-                        type="default"
-                        layout="horizontal"
-                        title={`Unable to update plan from ${planName}`}
-                        description="We have temporarily disabled project and subscription changes - our
-                          engineers are working on a fix."
-                      />
-                    ) : (
-                      <Admonition
-                        type="default"
-                        layout="horizontal"
-                        title={`Unable to update plan from ${planName}`}
-                        description="Please contact us if you'd like to change your plan."
-                        actions={
-                          <Button asChild key="contact-support" type="default">
-                            <SupportLink
-                              queryParams={{
-                                category: SupportCategories.SALES_ENQUIRY,
-                                subject: `Change plan away from ${planName}`,
-                              }}
-                            >
-                              Contact support
-                            </SupportLink>
-                          </Button>
-                        }
-                      />
                     )}
                   </div>
+
+                  {!canChangeTier && (
+                    <div>
+                      {projectUpdateDisabled ? (
+                        <Admonition
+                          type="default"
+                          layout="horizontal"
+                          title={`Unable to update plan from ${planName}`}
+                          description="We have temporarily disabled project and subscription changes - our
+                          engineers are working on a fix."
+                        />
+                      ) : (
+                        <Admonition
+                          type="default"
+                          layout="horizontal"
+                          title={`Unable to update plan from ${planName}`}
+                          description="Please contact us if you'd like to change your plan."
+                          actions={
+                            <Button asChild key="contact-support" type="default">
+                              <SupportLink
+                                queryParams={{
+                                  category: SupportCategories.SALES_ENQUIRY,
+                                  subject: `Change plan away from ${planName}`,
+                                }}
+                              >
+                                Contact support
+                              </SupportLink>
+                            </Button>
+                          }
+                        />
+                      )}
+                    </div>
+                  )}
 
                   {!subscription?.usage_billing_enabled && (
                     <Admonition
