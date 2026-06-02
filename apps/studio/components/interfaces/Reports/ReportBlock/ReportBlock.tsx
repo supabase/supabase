@@ -1,4 +1,4 @@
-import { acceptUntrustedSql } from '@supabase/pg-meta'
+import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { X } from 'lucide-react'
@@ -10,6 +10,11 @@ import { ChartBlock } from './ChartBlock'
 import { DeprecatedChartBlock } from './DeprecatedChartBlock'
 import { UnavailableChartBlock } from './UnavailableChartBlock'
 import { hasBurstableIO } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
+import {
+  getBlockSql,
+  isEmbeddedSqlBlock,
+  isLegacySnippetBlock,
+} from '@/components/interfaces/Notebook/notebookBlock.utils'
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DEFAULT_CHART_CONFIG, QueryBlock } from '@/components/ui/QueryBlock/QueryBlock'
@@ -55,7 +60,9 @@ export const ReportBlock = ({
 
   const [isWriteQuery, setIsWriteQuery] = useState(false)
 
-  const isSnippet = item.attribute.startsWith('snippet_')
+  const isEmbeddedSql = isEmbeddedSqlBlock(item)
+  const isLegacySnippet = isLegacySnippetBlock(item)
+  const isSnippet = isLegacySnippet
   const isUnavailableBurstChart =
     BURSTABLE_IO_METRIC_KEYS.includes(item.attribute) &&
     !hasBurstableIO(project?.infra_compute_size)
@@ -78,7 +85,11 @@ export const ReportBlock = ({
     }
   )
 
-  const sql = isSnippet ? (data?.content as SqlSnippets.Content)?.unchecked_sql : undefined
+  const sql = isEmbeddedSql
+    ? getBlockSql(item)
+    : isSnippet
+      ? (data?.content as SqlSnippets.Content)?.unchecked_sql
+      : undefined
   const chartConfig = { ...DEFAULT_CHART_CONFIG, ...(item.chartConfig ?? {}) }
   const isDeprecatedChart = DEPRECATED_REPORTS.includes(item.attribute)
   const snippetMissing = contentError?.message.includes('Content not found')
@@ -115,10 +126,10 @@ export const ReportBlock = ({
         // acceptUntrustedSql is usually not allowed in an auto-run position,
         // but in this case we are explicitly allowing it because adding a block
         // to a report is an explicit user action.
-        sql: acceptUntrustedSql(sql),
+        sql: acceptUntrustedSql(untrustedSql(sql)),
       })
     },
-    enabled: !isLoadingContent && contentError == null,
+    enabled: isEmbeddedSql ? !!sql : !isLoadingContent && contentError == null,
     refetchOnWindowFocus: false,
   })
 
@@ -146,7 +157,7 @@ export const ReportBlock = ({
 
   return (
     <>
-      {isSnippet ? (
+      {isSnippet || isEmbeddedSql ? (
         <QueryBlock
           blockWriteQueries
           id={item.id}
@@ -217,7 +228,7 @@ export const ReportBlock = ({
           endDate={endDate}
           interval={interval}
           attribute={item.attribute}
-          provider={item.provider}
+          provider={item.provider ?? 'daily-stats'}
           defaultChartStyle={item.chart_type}
           defaultLogScale={chartConfig?.logScale ?? false}
           maxHeight={176}

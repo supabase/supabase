@@ -13,6 +13,7 @@ import type { DatabaseEventTrigger } from '@/data/database-event-triggers/databa
 import { generateUuid } from '@/lib/api/snippets.browser'
 import { removeCommentsFromSql } from '@/lib/helpers'
 import { sqlEventParser } from '@/lib/sql-event-parser'
+import type { QueryExecutionSource } from '@/state/query-execution-source'
 import type { SnippetWithContent } from '@/state/sql-editor-v2'
 
 export type CreateTableWithoutRLS = {
@@ -54,34 +55,44 @@ export const createSqlSnippetSkeletonV2 = ({
   project_id,
   folder_id,
   idOverride,
+  visibility,
+  favorite,
+  querySource = 'database',
 }: {
   name: string
   sql: string
   owner_id: number
   project_id: number
-  folder_id?: string
+  folder_id?: string | null
+  visibility?: SnippetWithContent['visibility']
+  favorite?: boolean
+  querySource?: QueryExecutionSource
   /**
    * Optionally, provide a specific snippetId to use for the snippet. This is used to ensure the snippet is created
    * with a known id, such as to prevent flicker in the SQL editor when adding new unsaved snippets.
    */
   idOverride?: string
 }): SnippetWithContent => {
-  const id = idOverride ?? generateUuid([folder_id, `${name}.sql`])
+  const id = idOverride ?? generateUuid([folder_id ?? undefined, `${name}.sql`])
+  const resolvedVisibility = visibility ?? NEW_SQL_SNIPPET_SKELETON.visibility
 
   return {
     ...NEW_SQL_SNIPPET_SKELETON,
     id,
+    type: querySource === 'logs' ? 'log_sql' : 'sql',
     owner_id,
     project_id,
     name,
-    folder_id,
-    favorite: false,
+    folder_id: resolvedVisibility === 'project' ? null : folder_id,
+    visibility: resolvedVisibility,
+    favorite: favorite ?? false,
     inserted_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     content: {
       ...NEW_SQL_SNIPPET_SKELETON.content,
       content_id: id ?? '',
       unchecked_sql: untrustedSql(sql ?? ''),
+      query_source: querySource,
     } as any,
     isNotSavedInDatabaseYet: true,
   }

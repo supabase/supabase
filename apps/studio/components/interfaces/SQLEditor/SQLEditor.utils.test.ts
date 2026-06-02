@@ -7,6 +7,7 @@ import {
   checkAlterDatabaseConnection,
   checkDestructiveQuery,
   checkIfAppendLimitRequired,
+  createSqlSnippetSkeletonV2,
   filterTablesCoveredByEnsureRLSTrigger,
   getCreateTablesMissingRLS,
   hasActiveEnsureRLSTrigger,
@@ -26,6 +27,22 @@ const buildTrigger = (overrides: Partial<DatabaseEventTrigger> = {}): DatabaseEv
   owner: 'postgres',
   function_definition: null,
   ...overrides,
+})
+
+describe('SQLEditor.utils.ts:createSqlSnippetSkeletonV2', () => {
+  it('preserves a logs source while a new snippet is still local', () => {
+    const snippet = createSqlSnippetSkeletonV2({
+      idOverride: 'query-1',
+      name: 'Logs query',
+      sql: 'select 1',
+      owner_id: 1,
+      project_id: 1,
+      querySource: 'logs',
+    })
+
+    expect(snippet.type).toBe('log_sql')
+    expect(snippet.content?.query_source).toBe('logs')
+  })
 })
 
 describe('SQLEditor.utils.ts:checkIfAppendLimitRequired', () => {

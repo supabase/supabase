@@ -680,8 +680,7 @@ hello world`)
     await page.waitForTimeout(2000) // wait for sql snippets cache to invalidate.
 
     // create a folder
-    await page.getByTestId('sql-editor-new-query-button').click()
-    await page.getByRole('menuitem', { name: 'Create a new folder' }).click()
+    await page.getByTestId('sql-editor-private-new-folder-button').click()
     await page.getByRole('tree', { name: 'private-snippets' }).getByRole('textbox').click()
     await page
       .getByRole('tree', { name: 'private-snippets' })

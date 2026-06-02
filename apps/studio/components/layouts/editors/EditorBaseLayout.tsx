@@ -7,7 +7,7 @@ import { ProjectLayoutWithAuth } from '../ProjectLayout'
 import { CollapseButton } from '../Tabs/CollapseButton'
 import { EditorTabs } from '../Tabs/Tabs'
 import { useEditorType } from './EditorsLayout.hooks'
-import { useTabsStateSnapshot } from '@/state/tabs'
+import { isSqlEditorTab, useTabsStateSnapshot } from '@/state/tabs'
 
 export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayoutWithAuth> {
   children: ReactNode
@@ -30,7 +30,9 @@ export const EditorBaseLayout = ({
   const tabs = useTabsStateSnapshot()
 
   const hasNoOpenTabs =
-    editor === 'table' ? tabs.openTabs.filter((x) => !x.startsWith('sql')).length === 0 : false
+    editor === 'table'
+      ? tabs.openTabs.filter((x) => !isSqlEditorTab(x, tabs.tabsMap)).length === 0
+      : false
   const hideTabs =
     pathname === `/project/${ref}/editor` || pathname === `/project/${ref}/sql` || hasNoOpenTabs
 
@@ -42,7 +44,7 @@ export const EditorBaseLayout = ({
     activeEditorTab === undefined
       ? undefined
       : editor === 'sql'
-        ? activeEditorTab.type === 'sql'
+        ? activeEditorTab.type === 'sql' || activeEditorTab.type === 'notebook'
           ? activeEditorTabLabel
           : undefined
         : editor === 'table'

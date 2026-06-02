@@ -3,7 +3,20 @@
 // it explicit that this value must never be executed without user confirmation.
 import { untrustedSql } from '@supabase/pg-meta'
 
+import {
+  remapNotebookContentFromApi,
+  unmapNotebookContentForApi,
+} from '@/components/interfaces/Notebook/notebookBlock.utils'
+import type { Dashboards } from '@/types'
+
 export function remapSqlContentField<T extends { type: string }>(item: T): T {
+  if (item.type === 'report' && 'content' in item) {
+    return {
+      ...item,
+      content: remapNotebookContentFromApi(item.content as Dashboards.Content),
+    } as T
+  }
+
   if (item.type !== 'sql') return item
   if (!('content' in item)) return item
   const content = item.content as Record<string, unknown>
@@ -18,6 +31,13 @@ export function remapSqlContentFields<T extends { type: string }>(items: Array<T
 
 // Reverse remap: `unchecked_sql` → `sql` before sending to the API.
 export function unmapSqlContentField<T extends { type: string }>(item: T): T {
+  if (item.type === 'report' && 'content' in item) {
+    return {
+      ...item,
+      content: unmapNotebookContentForApi(item.content as Dashboards.Content),
+    } as T
+  }
+
   if (item.type !== 'sql') return item
   if (!('content' in item)) return item
   const content = item.content as Record<string, unknown>

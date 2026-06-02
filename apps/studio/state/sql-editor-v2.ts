@@ -7,12 +7,18 @@ import { devtools, proxyMap } from 'valtio/utils'
 
 import type { QueryPlanRow } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
 import { DiffType } from '@/components/interfaces/SQLEditor/SQLEditor.types'
+import {
+  buildSnippetUpsertContent,
+  getSnippetContentType,
+  getSnippetSqlFromContent,
+} from '@/components/interfaces/SQLEditor/sqlSnippet.utils'
 import { upsertContent, UpsertContentPayload } from '@/data/content/content-upsert-mutation'
 import { contentKeys } from '@/data/content/keys'
 import { createSQLSnippetFolder } from '@/data/content/sql-folder-create-mutation'
 import { updateSQLSnippetFolder } from '@/data/content/sql-folder-update-mutation'
 import { Snippet, SnippetFolder } from '@/data/content/sql-folders-query'
 import { getQueryClient } from '@/data/query-client'
+import { isNotebookBlockId, persistNotebookBlock } from '@/state/notebook-block-registry'
 import type { SqlSnippets } from '@/types'
 
 type StateSnippetFolder = {
@@ -77,6 +83,16 @@ export const sqlEditorState = proxy({
       error?: { message: string; formattedError?: string }
     }
   },
+
+  /**
+   * Logs analytics query results
+   */
+  logsResults: {} as {
+    [snippetId: string]: {
+      rows: any[]
+      error?: any
+    }
+  },
   /**
    * Synchronous saving of folders and snippets (debounce behavior). Key is the snippet id, value is shouldInvalidate
    */
@@ -124,6 +140,7 @@ export const sqlEditorState = proxy({
     sqlEditorState.snippets[snippet.id] = { projectRef, splitSizes: [50, 50], snippet }
     sqlEditorState.results[snippet.id] = []
     sqlEditorState.explainResults[snippet.id] = { rows: [] }
+    sqlEditorState.logsResults[snippet.id] = { rows: [] }
     sqlEditorState.savingStates[snippet.id] = 'IDLE'
   },
 
@@ -144,7 +161,17 @@ export const sqlEditorState = proxy({
         ...sqlEditorState.snippets[id].snippet,
         ...snippet,
       }
-      if (!skipSave) sqlEditorState.needsSaving.set(id, true)
+      if (!skipSave) {
+        if (isNotebookBlockId(id)) {
+          const sqlValue = getSnippetSqlFromContent(sqlEditorState.snippets[id]?.snippet.content)
+          persistNotebookBlock(id, {
+            sql: sqlValue,
+            label: snippet.name,
+          })
+        } else {
+          sqlEditorState.needsSaving.set(id, true)
+        }
+      }
     }
   },
 
@@ -179,7 +206,18 @@ export const sqlEditorState = proxy({
   }) => {
     let snippet = sqlEditorState.snippets[id]?.snippet
     if (snippet?.content) {
-      snippet.content.unchecked_sql = untrustedSql(sql)
+      const content = snippet.content as unknown as Record<string, unknown>
+      if ('unchecked_sql' in content) {
+        content.unchecked_sql = untrustedSql(sql)
+      } else if ('sql' in content) {
+        content.sql = sql
+      }
+
+      if (isNotebookBlockId(id)) {
+        persistNotebookBlock(id, { sql })
+        return
+      }
+
       sqlEditorState.needsSaving.set(id, shouldInvalidate)
     }
   },
@@ -295,7 +333,16 @@ export const sqlEditorState = proxy({
    */
   setLimit: (value: number) => (sqlEditorState.limit = value),
 
-  addNeedsSaving: (id: string) => sqlEditorState.needsSaving.set(id, true),
+  addNeedsSaving: (id: string) => {
+    if (isNotebookBlockId(id)) {
+      const snippet = sqlEditorState.snippets[id]?.snippet
+      if (snippet?.content) {
+        persistNotebookBlock(id, { sql: getSnippetSqlFromContent(snippet.content) })
+      }
+      return
+    }
+    sqlEditorState.needsSaving.set(id, true)
+  },
 
   addFavorite: (id: string) => {
     const storeSnippet = sqlEditorState.snippets[id]
@@ -349,9 +396,22 @@ export const sqlEditorState = proxy({
     sqlEditorState.explainResults[id] = { rows: [] }
   },
 
+  addLogsResult: (id: string, results: any[]) => {
+    sqlEditorState.logsResults[id] = { rows: ref(results) }
+  },
+
+  addLogsResultError: (id: string, error: any) => {
+    sqlEditorState.logsResults[id] = { rows: ref([]), error }
+  },
+
+  resetLogsResults: (id: string) => {
+    sqlEditorState.logsResults[id] = { rows: [] }
+  },
+
   resetResults: (id: string) => {
     sqlEditorState.resetResult(id)
     sqlEditorState.resetExplainResult(id)
+    sqlEditorState.resetLogsResults(id)
   },
 })
 
@@ -480,6 +540,11 @@ if (typeof window !== 'undefined') {
       const folder = state.folders[id]
 
       if (snippet) {
+        if (isNotebookBlockId(id)) {
+          sqlEditorState.needsSaving.delete(id)
+          return
+        }
+
         const {
           name,
           description,
@@ -494,12 +559,15 @@ if (typeof window !== 'undefined') {
         if (visibility === 'project' && !!folder_id) {
           toast.error('Shared snippet cannot be within a folder')
         } else {
+          const snippetType = getSnippetContentType(snippet.snippet)
+          const saveContent = buildSnippetUpsertContent(id, snippetType, content)
+
           debouncedUpdateSnippet(
             id,
             snippet.projectRef,
             {
               id,
-              type: 'sql',
+              type: snippetType,
               name: name ?? 'Untitled',
               description: description ?? '',
               visibility: visibility ?? 'user',
@@ -507,10 +575,7 @@ if (typeof window !== 'undefined') {
               owner_id: owner_id,
               folder_id: folder_id ?? undefined,
               favorite: favorite ?? false,
-              content: {
-                ...content!,
-                content_id: id,
-              },
+              content: saveContent,
             },
             shouldInvalidate
           )

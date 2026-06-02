@@ -68,7 +68,7 @@ const ReportWidget = (props: ReportWidgetProps) => {
 
                     const pathname = isDbQueryType
                       ? `/project/${projectRef}/sql/new`
-                      : `/project/${projectRef}/logs/explorer`
+                      : `/project/${projectRef}/sql/new?source=logs&skip=true`
 
                     const query: Record<string, string | undefined> = {}
 

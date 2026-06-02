@@ -1,7 +1,13 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createTabsState } from './tabs'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+
+const createRouter = () =>
+  ({
+    query: { ref: 'default' },
+    push: vi.fn(),
+  }) as any
 
 describe('tabs recent items', () => {
   beforeEach(() => {
@@ -58,5 +64,69 @@ describe('tabs recent items', () => {
     expect(store.tabsMap['r-1'].label).toBe('routines')
     expect(store.recentItems[0].label).toBe('routines')
     expect(store.recentItems[0].metadata?.name).toBe('routines')
+  })
+})
+
+describe('tabs removal', () => {
+  beforeEach(() => {
+    localStorage.clear()
+  })
+
+  it('activates the next visible tab when the first tab is removed', () => {
+    const store = createTabsState('default')
+
+    store.addTab({ id: 'sql-a', type: 'sql', metadata: { sqlId: 'a' }, isPreview: false })
+    store.addTab({ id: 'sql-b', type: 'sql', metadata: { sqlId: 'b' }, isPreview: false })
+    store.addTab({ id: 'sql-c', type: 'sql', metadata: { sqlId: 'c' }, isPreview: false })
+    store.makeTabActive('sql-a')
+
+    store.removeTab('sql-a')
+
+    expect(store.activeTab).toBe('sql-b')
+  })
+
+  it('does not share mutable default tabs between store instances', () => {
+    const firstStore = createTabsState('first')
+    const secondStore = createTabsState('second')
+
+    firstStore.addTab({
+      id: 'sql-a',
+      type: 'sql',
+      metadata: { sqlId: 'a' },
+      isPreview: false,
+    })
+
+    expect(secondStore.openTabs).toEqual([])
+    expect(secondStore.tabsMap).toEqual({})
+  })
+
+  it('clears the preview marker when a preview tab is removed', () => {
+    const store = createTabsState('default')
+
+    store.addTab({ id: 'sql-preview', type: 'sql', metadata: { sqlId: 'preview' } })
+    store.removeTab('sql-preview')
+
+    expect(store.previewTabId).toBeUndefined()
+  })
+
+  it('navigates to the neighbor from the visible tab order when closing an active tab', () => {
+    const store = createTabsState('default')
+    const router = createRouter()
+
+    store.addTab({ id: 'sql-a', type: 'sql', metadata: { sqlId: 'a' }, isPreview: false })
+    store.addTab({ id: 'sql-b', type: 'sql', metadata: { sqlId: 'b' }, isPreview: false })
+    store.addTab({ id: 'sql-c', type: 'sql', metadata: { sqlId: 'c' }, isPreview: false })
+    store.reorderTabs(2, 0)
+    store.makeTabActive('sql-b')
+
+    store.handleTabClose({
+      id: 'sql-b',
+      router,
+      editor: 'sql',
+      onClearDashboardHistory: vi.fn(),
+    })
+
+    expect(store.activeTab).toBe('sql-a')
+    expect(router.push).toHaveBeenCalledWith('/project/default/sql/a?schema=public')
   })
 })

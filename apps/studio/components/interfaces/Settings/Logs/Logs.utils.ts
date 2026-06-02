@@ -437,81 +437,80 @@ export const ensureNoTimestampConflict = (
 /**
  * Adds SQL code hints to logs explorer code editor
  */
-export const useEditorHints = () => {
+export const useEditorHints = (enabled = true) => {
   const monaco = useMonaco()
 
   useEffect(() => {
-    if (monaco) {
-      const competionProvider = {
-        triggerCharacters: ['`', ' ', '.'],
-        provideCompletionItems: function (model: any, position: any, context: any) {
-          let iterator = new BackwardIterator(model, position.column - 2, position.lineNumber - 1)
-          if (iterator.isNextDQuote()) return { suggestions: [] }
-          let suggestions: { label: string; kind: any; insertText: string }[] = []
+    if (!enabled || !monaco) return
+    const competionProvider = {
+      triggerCharacters: ['`', ' ', '.'],
+      provideCompletionItems: function (model: any, position: any, context: any) {
+        let iterator = new BackwardIterator(model, position.column - 2, position.lineNumber - 1)
+        if (iterator.isNextDQuote()) return { suggestions: [] }
+        let suggestions: { label: string; kind: any; insertText: string }[] = []
 
-          let schemasInUse = logConstants.schemas.filter((schema) =>
-            iterator._text.includes(schema.reference)
-          )
-          if (schemasInUse.length === 0) {
-            schemasInUse = logConstants.schemas
-          }
+        let schemasInUse = logConstants.schemas.filter((schema) =>
+          iterator._text.includes(schema.reference)
+        )
+        if (schemasInUse.length === 0) {
+          schemasInUse = logConstants.schemas
+        }
 
-          if (iterator.isNextPeriod()) {
-            // should be nested key reference, suggest all tail endings of available fields
-            const fields = schemasInUse.flatMap((schema) => schema.fields)
-            const trailingKeys = fields.flatMap((field) => {
-              const [_head, ...rest] = field.path.split('.')
-              return rest
-            })
+        if (iterator.isNextPeriod()) {
+          // should be nested key reference, suggest all tail endings of available fields
+          const fields = schemasInUse.flatMap((schema) => schema.fields)
+          const trailingKeys = fields.flatMap((field) => {
+            const [_head, ...rest] = field.path.split('.')
+            return rest
+          })
 
-            const trailingToAdd = trailingKeys.map((key) => ({
-              label: key,
-              kind: monaco.languages.CompletionItemKind.Property,
-              insertText: key,
-            }))
-            suggestions = suggestions.concat(trailingToAdd)
-          }
+          const trailingToAdd = trailingKeys.map((key) => ({
+            label: key,
+            kind: monaco.languages.CompletionItemKind.Property,
+            insertText: key,
+          }))
+          suggestions = suggestions.concat(trailingToAdd)
+        }
 
-          if (context.triggerCharacter === '`' || context.triggerCharacter === ' ') {
-            // should be reference or start of key
-            const referencesToAdd = logConstants.schemas.map((schema) => ({
-              label: schema.reference,
-              kind: monaco.languages.CompletionItemKind.Class,
-              insertText: schema.reference,
-            }))
+        if (context.triggerCharacter === '`' || context.triggerCharacter === ' ') {
+          // should be reference or start of key
+          const referencesToAdd = logConstants.schemas.map((schema) => ({
+            label: schema.reference,
+            kind: monaco.languages.CompletionItemKind.Class,
+            insertText: schema.reference,
+          }))
 
-            const fields = schemasInUse.flatMap((schema) => schema.fields)
-            const leadingKeys = fields.flatMap((field) => {
-              const splitPath = field.path.split('.')
+          const fields = schemasInUse.flatMap((schema) => schema.fields)
+          const leadingKeys = fields.flatMap((field) => {
+            const splitPath = field.path.split('.')
 
-              return splitPath.slice(0, -1)
-            })
+            return splitPath.slice(0, -1)
+          })
 
-            const leadingToAdd = leadingKeys.map((key) => ({
-              label: key,
-              kind: monaco.languages.CompletionItemKind.Property,
-              insertText: key,
-            }))
-            suggestions = suggestions.concat(leadingToAdd)
-            suggestions = suggestions.concat(referencesToAdd)
-          }
-          return {
-            suggestions: uniqBy(suggestions, 'label'),
-          }
-        },
-      } as any
+          const leadingToAdd = leadingKeys.map((key) => ({
+            label: key,
+            kind: monaco.languages.CompletionItemKind.Property,
+            insertText: key,
+          }))
+          suggestions = suggestions.concat(leadingToAdd)
+          suggestions = suggestions.concat(referencesToAdd)
+        }
+        return {
+          suggestions: uniqBy(suggestions, 'label'),
+        }
+      },
+    } as any
 
-      // register completion item provider for pgsql
-      const completeProvider = monaco.languages.registerCompletionItemProvider(
-        'pgsql',
-        competionProvider
-      )
+    // register completion item provider for pgsql
+    const completeProvider = monaco.languages.registerCompletionItemProvider(
+      'pgsql',
+      competionProvider
+    )
 
-      return () => {
-        completeProvider.dispose()
-      }
+    return () => {
+      completeProvider.dispose()
     }
-  }, [monaco])
+  }, [enabled, monaco])
 }
 
 /**

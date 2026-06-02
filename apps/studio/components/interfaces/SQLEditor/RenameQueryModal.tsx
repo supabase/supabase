@@ -24,6 +24,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
+import { getSnippetSqlFromContent } from './sqlSnippet.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
 import { useSqlTitleGenerateMutation } from '@/data/ai/sql-title-mutation'
@@ -95,11 +96,11 @@ export const RenameQueryModal = ({
 
   const generateTitle = async () => {
     if ('content' in snippet && isSQLSnippet) {
-      getGeneratedValues({ sql: snippet.content.unchecked_sql })
+      getGeneratedValues({ sql: getSnippetSqlFromContent(snippet.content) })
     } else {
       try {
         const { content } = await getContentById({ projectRef: ref, id: snippet.id })
-        if ('unchecked_sql' in content) getGeneratedValues({ sql: content.unchecked_sql })
+        getGeneratedValues({ sql: getSnippetSqlFromContent(content) })
       } catch (error) {
         toast.error('Unable to generate title based on query contents')
       }

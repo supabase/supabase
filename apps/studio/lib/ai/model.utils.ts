@@ -2,16 +2,18 @@ export type ProviderName = 'bedrock' | 'openai'
 
 export type BedrockModel = 'anthropic.claude-3-7-sonnet-20250219-v1:0' | 'openai.gpt-oss-120b-1:0'
 
-export type OpenAIModelId = 'gpt-5.4-nano' | 'gpt-5.3-codex'
+export type OpenAIModelId = 'gpt-5.4-nano' | 'gpt-5.4-mini' | 'gpt-5.3-codex'
 
 // Source: https://developers.openai.com/api/docs/guides/reasoning + per-model pages
 export type ReasoningEffort = 'none' | 'minimal' | 'low' | 'medium' | 'high' | 'xhigh'
 
 // Per-model reasoning effort compatibility.
 // Sources: https://developers.openai.com/api/docs/models/gpt-5.4-nano
+//          https://developers.openai.com/api/docs/models/gpt-5.4-mini
 //          https://developers.openai.com/api/docs/models/gpt-5.3-codex
 type ModelReasoningSupport = {
   'gpt-5.4-nano': 'none' | 'low' | 'medium' | 'high' | 'xhigh'
+  'gpt-5.4-mini': 'none' | 'low' | 'medium' | 'high' | 'xhigh'
   'gpt-5.3-codex': 'low' | 'medium' | 'high' | 'xhigh'
 }
 
@@ -49,6 +51,12 @@ export type OpenAIModelEntry = ReturnType<typeof openaiModelEntry>
 export const DEFAULT_COMPLETION_MODEL = openaiModelEntry({
   id: 'gpt-5.4-nano',
   reasoningEffort: 'none',
+})
+
+/** Structured notebook generation: multi-block SQL, tools, and schema-aware queries. */
+export const NOTEBOOK_GENERATE_MODEL = openaiModelEntry({
+  id: 'gpt-5.4-mini',
+  reasoningEffort: 'low',
 })
 
 // Single source of truth for all Assistant chat model variants and their reasoning levels.
@@ -149,6 +157,7 @@ export const PROVIDERS: ProviderRegistry = {
   openai: {
     models: {
       'gpt-5.3-codex': { default: false },
+      'gpt-5.4-mini': { default: false },
       'gpt-5.4-nano': { default: true },
     },
     providerOptions: {

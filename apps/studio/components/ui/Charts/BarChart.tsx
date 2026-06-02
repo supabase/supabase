@@ -10,6 +10,7 @@ import {
   YAxis,
 } from 'recharts'
 import type { CategoricalChartState } from 'recharts/types/chart/types'
+import { cn } from 'ui'
 
 import { ChartHeader } from './ChartHeader'
 import type { CommonChartProps, Datum } from './Charts.types'
@@ -111,13 +112,16 @@ function BarChart<D extends Datum = Datum>({
   const resolvedHighlightedValue =
     focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : highlightedValue
 
+  const isFillSize = size === 'fill'
+
   if (data.length === 0) {
     return (
       <NoDataPlaceholder
         message={emptyStateMessage}
         description="It may take up to 24 hours for data to refresh"
-        size={size}
-        className={className}
+        size={isFillSize ? 'fill' : size}
+        isFullHeight={isFillSize}
+        className={cn(isFillSize && 'h-full min-h-0 w-full flex-1', className)}
         attribute={title}
         format={format}
       />
@@ -125,24 +129,26 @@ function BarChart<D extends Datum = Datum>({
   }
 
   return (
-    <div className={['flex flex-col gap-y-3', className].join(' ')}>
-      <ChartHeader
-        title={title}
-        format={format}
-        customDateFormat={customDateFormat}
-        highlightedValue={resolvedHighlightedValue}
-        highlightedLabel={resolvedHighlightedLabel}
-        minimalHeader={minimalHeader}
-        syncId={syncId}
-        data={data}
-        xAxisKey={xAxisKey}
-        yAxisKey={yAxisKey}
-        xAxisIsDate={xAxisIsDate}
-        displayDateInUtc={displayDateInUtc}
-        valuePrecision={valuePrecision}
-        attributes={[]}
-      />
-      <Container>
+    <div className={cn('flex flex-col gap-y-3', isFillSize && 'h-full min-h-0', className)}>
+      <div className={isFillSize ? 'shrink-0' : undefined}>
+        <ChartHeader
+          title={title}
+          format={format}
+          customDateFormat={customDateFormat}
+          highlightedValue={resolvedHighlightedValue}
+          highlightedLabel={resolvedHighlightedLabel}
+          minimalHeader={minimalHeader}
+          syncId={syncId}
+          data={data}
+          xAxisKey={xAxisKey}
+          yAxisKey={yAxisKey}
+          xAxisIsDate={xAxisIsDate}
+          displayDateInUtc={displayDateInUtc}
+          valuePrecision={valuePrecision}
+          attributes={[]}
+        />
+      </div>
+      <Container className={isFillSize ? 'min-h-0 flex-1' : undefined}>
         <RechartBarChart
           data={transformedData}
           className="overflow-visible"

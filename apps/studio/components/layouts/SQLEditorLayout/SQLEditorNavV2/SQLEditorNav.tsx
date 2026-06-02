@@ -15,30 +15,40 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { DeleteSnippetsModal } from './DeleteSnippetsModal'
+import { NotebookSection } from './NotebookSection'
 import { ReferenceSnippetsSection } from './ReferenceSnippetsSection'
 import { ShareSnippetModal } from './ShareSnippetModal'
 import { SQLEditorLoadingSnippets } from './SQLEditorLoadingSnippets'
 import { DEFAULT_SECTION_STATE, type SectionState } from './SQLEditorNav.constants'
 import { formatFolderResponseForTreeView, getLastItemIds, ROOT_NODE } from './SQLEditorNav.utils'
+import { SQLEditorSectionActions } from './SQLEditorSectionActions'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
 import { UnshareSnippetModal } from './UnshareSnippetModal'
+import { useSqlEditorCreateActions } from './useSqlEditorCreateActions'
 import { DownloadSnippetModal } from '@/components/interfaces/SQLEditor/DownloadSnippetModal'
 import { MoveQueryModal } from '@/components/interfaces/SQLEditor/MoveQueryModal'
 import { RenameQueryModal } from '@/components/interfaces/SQLEditor/RenameQueryModal'
 import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
+import { mergeSnippetsWithLogSql } from '@/components/interfaces/SQLEditor/sqlSnippet.utils'
 import { EmptyPrivateQueriesPanel } from '@/components/layouts/SQLEditorLayout/PrivateSqlSnippetEmpty'
 import { EditorMenuListSkeleton } from '@/components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import { useSqlEditorTabsCleanup } from '@/components/layouts/Tabs/Tabs.utils'
 import { useContentCountQuery } from '@/data/content/content-count-query'
 import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
+import { useContentQuery } from '@/data/content/content-query'
 import { useSQLSnippetFoldersDeleteMutation } from '@/data/content/sql-folders-delete-mutation'
 import { Snippet, SnippetFolder, useSQLSnippetFoldersQuery } from '@/data/content/sql-folders-query'
 import { useSqlSnippetsQuery, type SqlSnippet } from '@/data/content/sql-snippets-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
-import { useSnippetFolders, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import {
+  type SnippetWithContent,
+  useSnippetFolders,
+  useSqlEditorV2StateSnapshot,
+} from '@/state/sql-editor-v2'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 interface SQLEditorNavProps {
@@ -53,16 +63,50 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   const { data: project } = useSelectedProjectQuery()
   const tabs = useTabsStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const addSnippet = snapV2.addSnippet
 
   const [sectionVisibility, setSectionVisibility] = useLocalStorage<SectionState>(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_SECTION_STATE(projectRef ?? ''),
     DEFAULT_SECTION_STATE
   )
+  const mergedSectionVisibility = useMemo(
+    () => ({ ...DEFAULT_SECTION_STATE, ...sectionVisibility }),
+    [sectionVisibility]
+  )
   const {
     shared: showSharedSnippets,
     favorite: showFavoriteSnippets,
     private: showPrivateSnippets,
-  } = sectionVisibility
+    reports: showReports,
+  } = mergedSectionVisibility
+  const { reportsAll } = useIsFeatureEnabled(['reports:all'])
+  const showNotebookSection = IS_PLATFORM && reportsAll
+  const { canCreateSQLSnippet, createNewFolder, createNewSnippet } = useSqlEditorCreateActions()
+
+  const { data: notebooksData } = useContentQuery(
+    {
+      projectRef,
+      type: 'report',
+    },
+    { enabled: showNotebookSection }
+  )
+
+  const notebooksInView = useMemo(
+    () =>
+      (notebooksData?.content ?? [])
+        .filter((report) => {
+          const notebookContent = report.content as { meta?: { role?: string } } | undefined
+          return notebookContent?.meta?.role !== 'home' && report.name !== 'Home'
+        })
+        .map((report) => ({ id: report.id, name: report.name })),
+    [notebooksData?.content]
+  )
+
+  const { data: logSqlSnippetsData } = useContentQuery(
+    { projectRef, type: 'log_sql', limit: 100 },
+    { enabled: IS_PLATFORM && (showPrivateSnippets || showSharedSnippets || showFavoriteSnippets) }
+  )
+  const logSqlSnippets = useMemo(() => logSqlSnippetsData?.content ?? [], [logSqlSnippetsData])
 
   const [showMoveModal, setShowMoveModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -136,16 +180,18 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     return snippetInfo
   }, [privateSnippetsPages?.pages, subResults, isLoading, isPlaceholderData, isFetching, snippet])
 
-  const privateSnippets = useMemo(
-    () =>
-      filteredSnippets.snippets
-        ?.filter((snippet) => snippet.visibility === 'user')
-        .sort((a, b) => {
-          if (sort === 'name') return a.name.localeCompare(b.name)
-          else return new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
-        }) ?? [],
-    [filteredSnippets.snippets, sort]
-  )
+  const privateSnippets = useMemo(() => {
+    const userSnippets =
+      filteredSnippets.snippets?.filter((snippet) => snippet.visibility === 'user') ?? []
+
+    return mergeSnippetsWithLogSql(
+      userSnippets,
+      logSqlSnippets.filter((snippet) => snippet.visibility === 'user')
+    ).sort((a, b) => {
+      if (sort === 'name') return a.name.localeCompare(b.name)
+      else return new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
+    })
+  }, [filteredSnippets.snippets, logSqlSnippets, sort])
   const folders = useSnippetFolders(projectRef!)
 
   const { data: snippetCountData, error: snippetCountError } = useContentCountQuery({
@@ -212,15 +258,20 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
       snippets.push(snippet as SqlSnippet)
     }
 
+    const withLogSqlFavorites = mergeSnippetsWithLogSql(
+      snippets,
+      logSqlSnippets.filter((item) => item.favorite)
+    )
+
     return (
-      snippets
+      withLogSqlFavorites
         .map((snippet) => ({ ...snippet, folder_id: undefined }))
         .sort((a, b) => {
           if (sort === 'name') return a.name.localeCompare(b.name)
           else return new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
         }) ?? []
     )
-  }, [favoriteSqlSnippetsData?.pages, snippet, sort])
+  }, [favoriteSqlSnippetsData?.pages, snippet, sort, logSqlSnippets])
 
   const numFavoriteSnippets = snippetCountData?.favorites ?? 0
 
@@ -257,7 +308,10 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   )
 
   const sharedSnippets = useMemo(() => {
-    let snippets = sharedSqlSnippetsData?.pages.flatMap((page) => page.contents ?? []) ?? []
+    let snippets = mergeSnippetsWithLogSql(
+      sharedSqlSnippetsData?.pages.flatMap((page) => page.contents ?? []) ?? [],
+      logSqlSnippets.filter((snippet) => snippet.visibility === 'project')
+    )
 
     if (snippet && snippet.visibility === 'project' && !snippets.find((x) => x.id === snippet.id)) {
       snippets.push(snippet as SqlSnippet)
@@ -269,7 +323,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
         else return new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
       }) ?? []
     )
-  }, [sharedSqlSnippetsData?.pages, snippet, sort])
+  }, [sharedSqlSnippetsData?.pages, snippet, sort, logSqlSnippets])
 
   const numProjectSnippets = snippetCountData?.shared ?? 0
 
@@ -290,8 +344,9 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     () => [
       ...(privateSnippetsPages?.pages.flatMap((x) => x.contents) ?? []),
       ...(sharedSqlSnippetsData?.pages.flatMap((x) => x.contents) ?? []),
+      ...logSqlSnippets,
     ],
-    [privateSnippetsPages, sharedSqlSnippetsData]
+    [privateSnippetsPages, sharedSqlSnippetsData, logSqlSnippets]
   )
 
   // ==========================
@@ -403,9 +458,9 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   useEffect(() => {
     if (snippet !== undefined && isSuccess) {
       if (snippet.visibility === 'project') {
-        setSectionVisibility({ ...sectionVisibility, shared: true })
+        setSectionVisibility({ ...mergedSectionVisibility, shared: true })
       } else if (snippet.visibility === 'user') {
-        setSectionVisibility({ ...sectionVisibility, private: true })
+        setSectionVisibility({ ...mergedSectionVisibility, private: true })
       }
       if (snippet.folder_id && !expandedFolderIds.includes(snippet.folder_id)) {
         setExpandedFolderIds([...expandedFolderIds, snippet.folder_id])
@@ -449,12 +504,23 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     })
   }, [projectRef, sharedSqlSnippetsData?.pages])
 
+  useEffect(() => {
+    if (projectRef === undefined) return
+
+    logSqlSnippets.forEach((snippet) => {
+      addSnippet({ projectRef, snippet: snippet as unknown as SnippetWithContent })
+    })
+  }, [addSnippet, projectRef, logSqlSnippets])
+
   const sqlEditorTabsCleanup = useSqlEditorTabsCleanup()
   useEffect(() => {
     if (isSuccess) {
-      sqlEditorTabsCleanup({ snippets: allSnippetsInView as any })
+      sqlEditorTabsCleanup({
+        snippets: allSnippetsInView as any,
+        notebooks: notebooksInView,
+      })
     }
-  }, [allSnippetsInView, isSuccess, sqlEditorTabsCleanup])
+  }, [allSnippetsInView, isSuccess, notebooksInView, sqlEditorTabsCleanup])
 
   return (
     <>
@@ -466,14 +532,22 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
             open={showSharedSnippets}
             onOpenChange={(value) => {
               setSectionVisibility({
-                ...(sectionVisibility ?? DEFAULT_SECTION_STATE),
+                ...mergedSectionVisibility,
                 shared: value,
               })
             }}
           >
-            <InnerSideMenuCollapsibleTrigger
-              title={`Shared ${numProjectSnippets > 0 ? ` (${numProjectSnippets})` : ''}`}
-            />
+            <div className="flex items-center w-full">
+              <InnerSideMenuCollapsibleTrigger
+                className="flex-1 min-w-0"
+                title={`Shared ${numProjectSnippets > 0 ? ` (${numProjectSnippets})` : ''}`}
+              />
+              <SQLEditorSectionActions
+                onNewSnippet={() => void createNewSnippet('shared')}
+                canCreateSnippet={canCreateSQLSnippet}
+                newSnippetTestId="sql-editor-shared-new-snippet-button"
+              />
+            </div>
             <InnerSideMenuCollapsibleContent className="group-data-open:pt-2">
               {isLoadingSharedSqlSnippets ? (
                 <SQLEditorLoadingSnippets />
@@ -542,14 +616,22 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
             open={showFavoriteSnippets}
             onOpenChange={(value) => {
               setSectionVisibility({
-                ...(sectionVisibility ?? DEFAULT_SECTION_STATE),
+                ...mergedSectionVisibility,
                 favorite: value,
               })
             }}
           >
-            <InnerSideMenuCollapsibleTrigger
-              title={`Favorites ${numFavoriteSnippets > 0 ? ` (${numFavoriteSnippets})` : ''}`}
-            />
+            <div className="flex items-center w-full">
+              <InnerSideMenuCollapsibleTrigger
+                className="flex-1 min-w-0"
+                title={`Favorites ${numFavoriteSnippets > 0 ? ` (${numFavoriteSnippets})` : ''}`}
+              />
+              <SQLEditorSectionActions
+                onNewSnippet={() => void createNewSnippet('favorite')}
+                canCreateSnippet={canCreateSQLSnippet}
+                newSnippetTestId="sql-editor-favorites-new-snippet-button"
+              />
+            </div>
             <InnerSideMenuCollapsibleContent className="group-data-open:pt-2">
               {isLoadingFavoriteSqlSnippets ? (
                 <SQLEditorLoadingSnippets />
@@ -624,14 +706,24 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
       <InnerSideMenuCollapsible
         open={showPrivateSnippets}
         onOpenChange={(value) => {
-          setSectionVisibility({ ...(sectionVisibility ?? DEFAULT_SECTION_STATE), private: value })
+          setSectionVisibility({ ...mergedSectionVisibility, private: value })
         }}
         className="px-0"
       >
-        <InnerSideMenuCollapsibleTrigger
-          title={`PRIVATE
+        <div className="flex items-center w-full">
+          <InnerSideMenuCollapsibleTrigger
+            className="flex-1 min-w-0"
+            title={`PRIVATE
             ${numPrivateSnippets > 0 ? ` (${numPrivateSnippets})` : ''}`}
-        />
+          />
+          <SQLEditorSectionActions
+            onNewSnippet={() => void createNewSnippet('private')}
+            onNewFolder={createNewFolder}
+            canCreateSnippet={canCreateSQLSnippet}
+            newSnippetTestId="sql-editor-new-query-button"
+            newFolderTestId="sql-editor-private-new-folder-button"
+          />
+        </div>
         <InnerSideMenuCollapsibleContent className="group-data-open:pt-2">
           {isLoading ? (
             <EditorMenuListSkeleton />
@@ -748,6 +840,19 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
         </InnerSideMenuCollapsibleContent>
       </InnerSideMenuCollapsible>
 
+      {showNotebookSection && (
+        <>
+          <InnerSideMenuSeparator />
+
+          <NotebookSection
+            open={showReports}
+            onOpenChange={(value) => {
+              setSectionVisibility({ ...mergedSectionVisibility, reports: value })
+            }}
+          />
+        </>
+      )}
+
       <InnerSideMenuSeparator />
 
       <ReferenceSnippetsSection />
@@ -779,13 +884,13 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
       <ShareSnippetModal
         snippet={selectedSnippetToShare}
         onClose={() => setSelectedSnippetToShare(undefined)}
-        onSuccess={() => setSectionVisibility({ ...sectionVisibility, shared: true })}
+        onSuccess={() => setSectionVisibility({ ...mergedSectionVisibility, shared: true })}
       />
 
       <UnshareSnippetModal
         snippet={selectedSnippetToUnshare}
         onClose={() => setSelectedSnippetToUnshare(undefined)}
-        onSuccess={() => setSectionVisibility({ ...sectionVisibility, private: true })}
+        onSuccess={() => setSectionVisibility({ ...mergedSectionVisibility, private: true })}
       />
 
       <DeleteSnippetsModal

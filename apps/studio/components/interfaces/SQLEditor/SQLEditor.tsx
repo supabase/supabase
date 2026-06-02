@@ -56,13 +56,18 @@ import {
   isUpdateWithoutWhere,
   suffixWithLimit,
 } from './SQLEditor.utils'
-import { useAddDefinitions } from './useAddDefinitions'
+import { useSqlEditorCompletion } from './useSqlEditorCompletion'
 import { UtilityPanel } from './UtilityPanel/UtilityPanel'
 import {
   isExplainQuery,
   isExplainSql,
   splitSqlStatements,
 } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
+import {
+  checkForILIKEClause,
+  checkForWithClause,
+} from '@/components/interfaces/Settings/Logs/Logs.utils'
+import { buildLogQueryParams } from '@/components/interfaces/Settings/Logs/logsDateRange'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import ResizableAIWidget from '@/components/ui/AIEditor/ResizableAIWidget'
 import { GridFooter } from '@/components/ui/GridFooter'
@@ -70,6 +75,7 @@ import { useSqlTitleGenerateMutation } from '@/data/ai/sql-title-mutation'
 import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
 import { constructHeaders, isValidConnString } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'
+import { useExecuteLogsSqlMutation } from '@/data/logs/execute-logs-sql-mutation'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { isError } from '@/data/utils/error-check'
@@ -85,6 +91,8 @@ import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import { useNotebookEditorContext } from '@/state/notebook-editor-context'
+import { useQueryExecutionSourceSnapshot } from '@/state/query-execution-source'
 import {
   isRoleImpersonationEnabled,
   useGetImpersonatedRoleState,
@@ -106,6 +114,7 @@ export const SQLEditor = () => {
   const os = detectOS()
   const router = useRouter()
   const { ref, id: urlId } = useParams()
+  const notebookEditorContext = useNotebookEditorContext()
 
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
@@ -118,6 +127,7 @@ export const SQLEditor = () => {
   const snapV2 = useSqlEditorV2StateSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
+  const queryExecutionSourceState = useQueryExecutionSourceSnapshot()
   const { isHipaaProjectDisallowed } = useOrgAiOptInLevel()
   const showPrettyExplain = useFlag('ShowPrettyExplain')
 
@@ -189,16 +199,17 @@ export const SQLEditor = () => {
   }, [urlId])
 
   // the id is stable across renders - it depends either on the url or on the memoized generated id
-  const id = !urlId || urlId === 'new' ? generatedId : urlId
+  const effectiveUrlId = notebookEditorContext?.blockId ?? urlId
+  const id = !effectiveUrlId || effectiveUrlId === 'new' ? generatedId : effectiveUrlId
 
   const limit = snapV2.limit
   const results = snapV2.results[id]?.[0]
   const snippetIsLoading = !(
     id in snapV2.snippets && snapV2.snippets[id].snippet.content !== undefined
   )
-  const isLoading = urlId === 'new' ? false : snippetIsLoading
+  const isLoading = effectiveUrlId === 'new' ? false : snippetIsLoading
 
-  useAddDefinitions(id, monacoRef.current)
+  useSqlEditorCompletion(id, monacoRef.current)
 
   const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery(
     {
@@ -217,7 +228,6 @@ export const SQLEditor = () => {
 
   /* React query mutations */
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
-  const track = useTrack()
   const { mutate: execute, isPending: isExecuting } = useExecuteSqlMutation({
     onSuccess(data, vars) {
       if (id) {
@@ -291,6 +301,29 @@ export const SQLEditor = () => {
     },
   })
 
+  const track = useTrack()
+
+  const { mutate: executeLogs, isPending: isLogsExecuting } = useExecuteLogsSqlMutation({
+    onSuccess(data) {
+      if (id) {
+        const rows = data?.result ?? []
+        if (data?.error) {
+          snapV2.addLogsResultError(id, data.error)
+        } else {
+          snapV2.addLogsResult(id, rows)
+        }
+        setActiveUtilityTab('results')
+      }
+      refocusEditorAfterRunIfNeeded()
+    },
+    onError(error) {
+      if (id) {
+        snapV2.addLogsResultError(id, error)
+      }
+      refocusEditorAfterRunIfNeeded()
+    },
+  })
+
   const setAiTitle = useCallback(
     async (id: string, sql: string) => {
       try {
@@ -351,7 +384,7 @@ export const SQLEditor = () => {
       const state = getSqlEditorV2StateSnapshot()
       const snippet = state.snippets[id]
 
-      if (editorRef.current === null || isExecuting || project === undefined) {
+      if (editorRef.current === null || isExecuting || isLogsExecuting || project === undefined) {
         clearPendingRunRefocus()
         return
       }
@@ -365,6 +398,44 @@ export const SQLEditor = () => {
           snippet.snippet.content?.unchecked_sql)
         : selectedValue || editorRef.current?.getValue()
       const sql = sqlOverride ?? editorSql
+
+      const executionSource = queryExecutionSourceState.executionSource
+
+      if (executionSource === 'logs') {
+        if (!sql || sql.trim().length === 0) {
+          clearPendingRunRefocus()
+          return toast.error('Please enter a query to run')
+        }
+
+        const usesWith = checkForWithClause(sql)
+        const usesILIKE = checkForILIKEClause(sql)
+        if (IS_PLATFORM) {
+          if (usesWith) {
+            clearPendingRunRefocus()
+            return toast.error('The parser does not yet support WITH and subquery statements.')
+          }
+          if (usesILIKE) {
+            clearPendingRunRefocus()
+            return toast.error('BigQuery does not support ILIKE. Use REGEXP_CONTAINS instead.')
+          }
+        }
+
+        const resolvedParams = buildLogQueryParams(
+          queryExecutionSourceState.logsDatePickerValue,
+          sql
+        )
+
+        executeLogs({
+          projectRef: project.ref,
+          sql: resolvedParams.sql,
+          iso_timestamp_start: resolvedParams.from,
+          iso_timestamp_end: resolvedParams.to,
+          useOtel: queryExecutionSourceState.useOtelEndpoint,
+        })
+
+        track('log_explorer_query_run_button_clicked', { is_saved_query: urlId !== 'new' })
+        return
+      }
 
       const hasDestructiveOperations = checkDestructiveQuery(sql)
       const hasUpdateWithoutWhere = isUpdateWithoutWhere(sql)
@@ -439,6 +510,7 @@ export const SQLEditor = () => {
       isDiffOpen,
       id,
       isExecuting,
+      isLogsExecuting,
       project,
       isHipaaProjectDisallowed,
       execute,
@@ -1013,7 +1085,7 @@ export const SQLEditor = () => {
             ) : (
               <UtilityPanel
                 id={id}
-                isExecuting={isExecuting}
+                isExecuting={isExecuting || isLogsExecuting}
                 isExplainExecuting={isExplainExecuting}
                 isDisabled={isDiffOpen}
                 hasSelection={hasSelection}

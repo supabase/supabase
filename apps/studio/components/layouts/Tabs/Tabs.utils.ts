@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef } from 'react'
 
 import { Entity } from '@/data/entity-types/entity-types-infinite-query'
 import useLatest from '@/hooks/misc/useLatest'
-import { createTabId, editorEntityTypes, useTabsStateSnapshot } from '@/state/tabs'
+import { createTabId, editorEntityTypes, isSqlEditorTab, useTabsStateSnapshot } from '@/state/tabs'
 
 export function useTableEditorTabsCleanUp() {
   const tabs = useTabsStateSnapshot()
@@ -39,7 +39,10 @@ export function useTableEditorTabsCleanUp() {
 
     const tableEditorTabsToBeCleaned = [
       ...tabsFilteredToSchemas.filter(
-        (id) => !id.startsWith('sql') && !id.startsWith('schema') && !entitiesById.includes(id)
+        (id) =>
+          !isSqlEditorTab(id, tabMapRef.current) &&
+          !id.startsWith('schema') &&
+          !entitiesById.includes(id)
       ),
     ]
 
@@ -65,46 +68,36 @@ export function useSqlEditorTabsCleanup() {
   const tabMapRef = useLatest(tabs.tabsMap)
   const openTabsRef = useLatest(tabs.openTabs)
 
-  return useCallback(({ snippets }: { snippets: { id: string; type: string; name: string }[] }) => {
-    // these are tabs that are static content
-    // these canot be removed from localstorage based on this query request
-    const IGNORED_TAB_IDS = ['sql-templates', 'sql-quickstarts']
+  return useCallback(
+    ({
+      snippets,
+      notebooks = [],
+    }: {
+      snippets: { id: string; type: string; name: string }[]
+      notebooks?: { id: string; name: string }[]
+    }) => {
+      // These lists are paginated and some sections are fetched only when expanded.
+      // They can refresh labels, but absence is not proof that content was deleted.
+      const openSqlEditorTabs = openTabsRef.current
+        .map((id) => tabMapRef.current[id])
+        .filter((tab) => !!tab && isSqlEditorTab(tab))
 
-    // Identify all SQL snippets / content by their tab ids
-    const currentContentIds = [
-      ...snippets
-        .filter((content) => content.type === 'sql')
-        .map((content) => createTabId('sql', { id: content.id })),
-      // append ignored tab IDs
-      ...IGNORED_TAB_IDS,
-    ]
+      openSqlEditorTabs.forEach((tab) => {
+        if (tab.type === 'sql') {
+          const snippet = snippets?.find((x) => tab.metadata?.sqlId === x.id)
+          if (!!snippet && snippet.name !== tab.label)
+            tabs.updateTab(tab.id, { label: snippet.name })
+        }
 
-    // Remove any snippet tabs that might no longer be existing (removed outside of the dashboard session)
-    const snippetTabsToBeCleaned = openTabsRef.current.filter(
-      (id: string) => id.startsWith('sql') && !currentContentIds.includes(id)
-    )
-    tabs.removeTabs(snippetTabsToBeCleaned)
-
-    // Remove any recent items that might no longer be existing (removed outside of the dashboard session)
-    const recentItems = tabs.getRecentItemsByType('sql')
-    tabs.removeRecentItems(
-      recentItems
-        ? recentItems.filter((item) => !currentContentIds.includes(item.id)).map((item) => item.id)
-        : []
-    )
-
-    // [Joshen] Validate for opened tabs, if their label matches the snippet's name - update label if not
-    // As the snippets name could've been updated outside of the SQL Editor session
-    // e.g for a shared snippet, the owner could've updated the name of the snippet
-    const openSqlTabs = openTabsRef.current
-      .map((id) => tabMapRef.current[id])
-      .filter((tab) => !!tab && editorEntityTypes['sql']?.includes(tab.type))
-
-    openSqlTabs.forEach((tab) => {
-      const snippet = snippets?.find((x) => tab.metadata?.sqlId === x.id)
-      if (!!snippet && snippet.name !== tab.label) tabs.updateTab(tab.id, { label: snippet.name })
-    })
-  }, [])
+        if (tab.type === 'notebook') {
+          const notebook = notebooks?.find((x) => tab.metadata?.notebookId === x.id)
+          if (!!notebook && notebook.name !== tab.label)
+            tabs.updateTab(tab.id, { label: notebook.name })
+        }
+      })
+    },
+    []
+  )
 }
 
 interface UseTabsScrollOptions {

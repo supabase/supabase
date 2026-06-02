@@ -11,7 +11,7 @@ export interface CommonChartProps<D> extends Pick<
   title?: string
   className?: string
   valuePrecision?: number
-  size?: 'tiny' | 'small' | 'normal' | 'large'
+  size?: 'tiny' | 'small' | 'normal' | 'large' | 'fill'
 }
 
 export interface StackedChartProps<D> extends CommonChartProps<D> {

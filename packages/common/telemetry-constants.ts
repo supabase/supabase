@@ -783,7 +783,7 @@ export interface AssistantEditInSqlEditorClickedEvent {
  * @page /dashboard/project/{ref}/reports/{id}
  */
 export interface CustomReportAddSQLBlockClickedEvent {
-  action: 'custom_report_add_sql_block_clicked'
+  action: 'notebook_add_sql_block_clicked'
   groups: TelemetryGroups
 }
 
@@ -795,7 +795,7 @@ export interface CustomReportAddSQLBlockClickedEvent {
  * @page /dashboard/project/{ref}/reports/{id}
  */
 export interface CustomReportAssistantSQLBlockAddedEvent {
-  action: 'custom_report_assistant_sql_block_added'
+  action: 'notebook_assistant_sql_block_added'
   groups: TelemetryGroups
 }
 
@@ -1875,7 +1875,7 @@ export interface HomeProjectUsageChartClickedEvent {
  * @page /project/{ref}
  */
 export interface HomeCustomReportBlockAddedEvent {
-  action: 'home_custom_report_block_added'
+  action: 'home_notebook_block_added'
   properties: {
     /**
      * ID of the snippet/block added
@@ -1897,7 +1897,7 @@ export interface HomeCustomReportBlockAddedEvent {
  * @page /project/{ref}
  */
 export interface HomeCustomReportBlockRemovedEvent {
-  action: 'home_custom_report_block_removed'
+  action: 'home_notebook_block_removed'
   properties: {
     /**
      * ID of the block removed

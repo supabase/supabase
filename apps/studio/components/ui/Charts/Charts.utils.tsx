@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 import { useMemo, type FC, type ReactElement } from 'react'
 import { ResponsiveContainer } from 'recharts'
+import { cn } from 'ui'
 
 import { DateTimeFormats } from './Charts.constants'
 import type { CommonChartProps, StackedChartProps } from './Charts.types'
@@ -231,21 +232,31 @@ export const useChartSize = (
     large: 280,
   }
 ) => {
-  const minHeight = sizeMap[size]
-  const Container: FC<{ children: ReactElement; className?: string }> = useMemo(
-    () =>
-      ({ className, children }) => (
-        <ResponsiveContainer
-          className={className}
-          height={minHeight}
-          minHeight={minHeight}
-          width="100%"
-        >
-          {children}
-        </ResponsiveContainer>
-      ),
-    [size]
-  )
+  const minHeight = size === 'fill' ? 0 : sizeMap[size ?? 'normal']
+
+  const Container: FC<{ children: ReactElement; className?: string }> = useMemo(() => {
+    if (size === 'fill') {
+      return ({ className, children }) => (
+        <div className={cn('min-h-0 w-full flex-1', className)}>
+          <ResponsiveContainer width="100%" height="100%">
+            {children}
+          </ResponsiveContainer>
+        </div>
+      )
+    }
+
+    return ({ className, children }) => (
+      <ResponsiveContainer
+        className={className}
+        height={minHeight}
+        minHeight={minHeight}
+        width="100%"
+      >
+        {children}
+      </ResponsiveContainer>
+    )
+  }, [minHeight, size])
+
   return {
     Container,
     minHeight,

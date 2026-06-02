@@ -27,10 +27,14 @@ const NoDataPlaceholder = ({
   titleTooltip,
   hideTotalPlaceholder = false,
 }: NoDataPlaceholderProps) => {
-  const { minHeight } = useChartSize(size)
+  const isFillSize = size === 'fill'
+  const fillsContainer = isFullHeight || isFillSize
+  const { minHeight } = useChartSize(isFillSize ? 'normal' : size)
 
   return (
-    <div className={cn(isFullHeight && 'h-full')}>
+    <div
+      className={cn('flex w-full flex-col', fillsContainer && 'h-full min-h-0 flex-1', className)}
+    >
       {attribute !== undefined && (
         <ChartHeader
           title={attribute}
@@ -41,12 +45,10 @@ const NoDataPlaceholder = ({
       )}
       <div
         className={cn(
-          'border-control flex grow w-full flex-col items-center justify-center space-y-2 border border-dashed text-center',
-          isFullHeight && 'h-full',
-          className
+          'border-control flex w-full flex-col items-center justify-center space-y-2 border border-dashed text-center',
+          fillsContainer ? 'min-h-0 flex-1' : 'grow'
         )}
-        // extra 20 px for the x ticks
-        style={{ minHeight: minHeight + 20 }}
+        style={isFillSize ? undefined : { minHeight: minHeight + 20 }}
       >
         <BarChart2 size={20} className="text-border-stronger" />
         <div className="px-1">

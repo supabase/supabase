@@ -1,6 +1,7 @@
 import { PropsWithChildren } from 'react'
 
 import { DatabaseSelectorStateContextProvider } from '@/state/database-selector'
+import { QueryExecutionSourceStateContextProvider } from '@/state/query-execution-source'
 import { RoleImpersonationStateContextProvider } from '@/state/role-impersonation-state'
 import { TableEditorStateContextProvider } from '@/state/table-editor'
 import { TabsStateContextProvider } from '@/state/tabs'
@@ -17,9 +18,13 @@ export const ProjectContextProvider = ({
     <TableEditorStateContextProvider key={`table-editor-state-${projectRef}`}>
       <TabsStateContextProvider key={`tabs-state-${projectRef}`}>
         <DatabaseSelectorStateContextProvider key={`database-selector-state-${projectRef}`}>
-          <RoleImpersonationStateContextProvider key={`role-impersonation-state-${projectRef}`}>
-            {children}
-          </RoleImpersonationStateContextProvider>
+          <QueryExecutionSourceStateContextProvider
+            key={`query-execution-source-state-${projectRef}`}
+          >
+            <RoleImpersonationStateContextProvider key={`role-impersonation-state-${projectRef}`}>
+              {children}
+            </RoleImpersonationStateContextProvider>
+          </QueryExecutionSourceStateContextProvider>
         </DatabaseSelectorStateContextProvider>
       </TabsStateContextProvider>
     </TableEditorStateContextProvider>

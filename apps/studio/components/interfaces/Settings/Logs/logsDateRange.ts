@@ -18,6 +18,20 @@ const findHelper = (value: DatePickerValue, helpers: DatetimeHelper[]) => {
   return helpers.find((helper) => helper.text === value.text)
 }
 
+export const getLogDatePickerValueForHelper = (
+  text?: string,
+  helpers: DatetimeHelper[] = EXPLORER_DATEPICKER_HELPERS
+): DatePickerValue => {
+  const helper = helpers.find((candidate) => candidate.text === text) ?? getDefaultHelper(helpers)
+
+  return {
+    from: helper.calcFrom(),
+    to: helper.calcTo(),
+    isHelper: true,
+    text: helper.text,
+  }
+}
+
 const ensureEnd = (candidate: string | undefined, now: dayjs.Dayjs) => {
   if (candidate && candidate.length > 0) return candidate
   return now.toISOString()

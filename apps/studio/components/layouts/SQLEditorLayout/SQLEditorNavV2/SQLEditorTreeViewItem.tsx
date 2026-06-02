@@ -4,6 +4,7 @@ import { IS_PLATFORM } from 'common'
 import { useParams } from 'common/hooks/useParams'
 import {
   Copy,
+  Database,
   Download,
   Edit,
   ExternalLink,
@@ -11,6 +12,7 @@ import {
   Lock,
   Move,
   Plus,
+  ScrollText,
   Share,
   Trash,
 } from 'lucide-react'
@@ -29,6 +31,7 @@ import {
 } from 'ui'
 
 import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
+import { isLogsSnippet } from '@/components/interfaces/SQLEditor/sqlSnippet.utils'
 import { getContentById } from '@/data/content/content-id-query'
 import { useSQLSnippetFolderContentsQuery } from '@/data/content/sql-folder-contents-query'
 import { Snippet } from '@/data/content/sql-folders-query'
@@ -104,6 +107,9 @@ export const SQLEditorTreeViewItem = ({
   const isOwner = profile?.id === element?.metadata.owner_id
   const isSharedSnippet = element.metadata.visibility === 'project'
   const isFavorite = element.metadata.favorite
+  const snippetId = String(element.id)
+  const snippetFromStore = snapV2.snippets[snippetId]?.snippet
+  const isLogsQuery = isLogsSnippet(snippetFromStore ?? element.metadata)
 
   const isEditing = status === 'editing'
   const isSaving = status === 'saving'
@@ -255,6 +261,13 @@ export const SQLEditorTreeViewItem = ({
             name={element.name}
             nameForTitle={props.nameForTitle}
             description={element.metadata?.description || undefined}
+            icon={
+              isLogsQuery ? (
+                <ScrollText size={15} strokeWidth={1.5} className="shrink-0" />
+              ) : (
+                <Database size={15} strokeWidth={1.5} className="shrink-0" />
+              )
+            }
             xPadding={16}
           />
         </ContextMenuTrigger>

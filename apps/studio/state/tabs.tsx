@@ -9,10 +9,22 @@ import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 
 export const editorEntityTypes = {
   table: ['r', 'v', 'm', 'f', 'p'],
-  sql: ['sql'],
+  sql: ['sql', 'notebook'],
 }
 
-export type TabType = ENTITY_TYPE | 'sql'
+export type TabType = ENTITY_TYPE | 'sql' | 'notebook'
+
+export const SQL_EDITOR_TAB_TYPES: TabType[] = ['sql', 'notebook']
+
+export function isSqlEditorTab(tabOrId: Tab | string, tabsMap?: Record<string, Tab>) {
+  if (typeof tabOrId === 'string') {
+    const tab = tabsMap?.[tabOrId]
+    if (tab) return SQL_EDITOR_TAB_TYPES.includes(tab.type)
+    return tabOrId.startsWith('sql-') || tabOrId.startsWith('notebook-')
+  }
+
+  return SQL_EDITOR_TAB_TYPES.includes(tabOrId.type)
+}
 
 type CreateTabIdParams = {
   r: { id: number }
@@ -21,6 +33,7 @@ type CreateTabIdParams = {
   f: { id: number }
   p: { id: number }
   sql: { id: string }
+  notebook: { id: string }
   schema: { schema: string }
   view: never
   function: never
@@ -36,6 +49,7 @@ export interface Tab {
     name?: string
     tableId?: number
     sqlId?: string
+    notebookId?: string
     scrollTop?: number
   }
   isPreview?: boolean
@@ -55,6 +69,7 @@ export interface RecentItem {
     name?: string
     tableId?: number
     sqlId?: string
+    notebookId?: string
   }
 }
 
@@ -73,27 +88,27 @@ function getSavedRecentItems(ref: string): RecentItem[] {
   }
 }
 
-const DEFAULT_TABS_STATE = {
+const createDefaultTabsState = () => ({
   activeTab: null as string | null,
   openTabs: [] as string[],
   tabsMap: {} as Record<string, Tab>,
   previewTabId: undefined as string | undefined,
   recentItems: [],
-}
+})
 const TABS_STORAGE_KEY = 'supabase_studio_tabs'
 const getTabsStorageKey = (ref: string) => `${TABS_STORAGE_KEY}_${ref}`
 
 function getSavedTabs(ref: string) {
-  if (typeof window === 'undefined' || !ref) return DEFAULT_TABS_STATE
+  if (typeof window === 'undefined' || !ref) return createDefaultTabsState()
 
   const stored = localStorage.getItem(getTabsStorageKey(ref))
 
-  if (!stored) return DEFAULT_TABS_STATE
+  if (!stored) return createDefaultTabsState()
 
   try {
-    const parsed = JSON.parse(
-      stored ?? JSON.stringify(DEFAULT_TABS_STATE)
-    ) as typeof DEFAULT_TABS_STATE
+    const parsed = JSON.parse(stored ?? JSON.stringify(createDefaultTabsState())) as ReturnType<
+      typeof createDefaultTabsState
+    >
 
     if (
       !parsed.openTabs ||
@@ -101,12 +116,12 @@ function getSavedTabs(ref: string) {
       !parsed.tabsMap ||
       typeof parsed.tabsMap !== 'object'
     ) {
-      return DEFAULT_TABS_STATE
+      return createDefaultTabsState()
     }
 
     return parsed
   } catch (error) {
-    return DEFAULT_TABS_STATE
+    return createDefaultTabsState()
   }
 }
 
@@ -248,9 +263,13 @@ export function createTabsState(projectRef: string) {
       store.openTabs = store.openTabs.filter((tabId) => tabId !== id)
       delete store.tabsMap[id]
 
+      if (store.previewTabId === id) {
+        store.previewTabId = undefined
+      }
+
       // Update active tab if the removed tab was active
       if (id === store.activeTab) {
-        store.activeTab = store.openTabs[idx - 1] || store.openTabs[idx + 1] || null
+        store.activeTab = store.openTabs[idx - 1] || store.openTabs[idx] || null
       }
     },
 
@@ -303,9 +322,13 @@ export function createTabsState(projectRef: string) {
       if (!tab.isPreview) store.addRecentItem(tab)
 
       switch (tab.type) {
-        case 'sql':
+        case 'sql': {
           const schema = (router.query.schema as string) || 'public'
           router.push(`/project/${router.query.ref}/sql/${tab.metadata?.sqlId}?schema=${schema}`)
+          break
+        }
+        case 'notebook':
+          router.push(`/project/${router.query.ref}/sql/notebooks/${tab.metadata?.notebookId}`)
           break
         case 'r':
         case 'v':
@@ -337,13 +360,13 @@ export function createTabsState(projectRef: string) {
     }) => {
       const tabBeingClosed = store.tabsMap[id]
 
-      const editorTabIds = (
-        editor
-          ? Object.values(store.tabsMap).filter((tab) =>
-              editorEntityTypes[editor]?.includes(tab.type)
-            )
-          : []
-      ).map((tab) => tab.id)
+      const editorTabIds = store.openTabs.filter((tabId) => {
+        const tab = store.tabsMap[tabId]
+        if (!editor || !tab) return false
+        return editor === 'sql'
+          ? isSqlEditorTab(tab)
+          : editorEntityTypes[editor]?.includes(tab.type)
+      })
       const tabIndexBeingClosed = editorTabIds.indexOf(id)
       const isLastTabBeingClosed = tabIndexBeingClosed === editorTabIds.length - 1
       const nextTabId =
@@ -377,6 +400,7 @@ export function createTabsState(projectRef: string) {
           // If no tabs of same type, go to the home of the current section
           switch (tabBeingClosed?.type) {
             case 'sql':
+            case 'notebook':
               router.push(`/project/${router.query.ref}/sql`)
               break
             case 'r':
@@ -405,8 +429,8 @@ export function createTabsState(projectRef: string) {
     }) => {
       const tabsToClose =
         editor === 'table'
-          ? store.openTabs.filter((x) => !x.startsWith('sql'))
-          : store.openTabs.filter((x) => x.startsWith('sql'))
+          ? store.openTabs.filter((x) => !isSqlEditorTab(x, store.tabsMap))
+          : store.openTabs.filter((x) => isSqlEditorTab(x, store.tabsMap))
       store.removeTabs(tabsToClose)
       onClearDashboardHistory()
       router.push(`/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}`)
@@ -492,6 +516,8 @@ export function createTabId<T extends TabType>(type: T, params: CreateTabIdParam
       return `p-${(params as CreateTabIdParams['p']).id}`
     case 'sql':
       return `sql-${(params as CreateTabIdParams['sql']).id}`
+    case 'notebook':
+      return `notebook-${(params as CreateTabIdParams['notebook']).id}`
     default:
       return ''
   }

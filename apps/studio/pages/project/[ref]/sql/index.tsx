@@ -7,7 +7,7 @@ import { EditorBaseLayout } from '@/components/layouts/editors/EditorBaseLayout'
 import SQLEditorLayout from '@/components/layouts/SQLEditorLayout/SQLEditorLayout'
 import { SQLEditorMenu } from '@/components/layouts/SQLEditorLayout/SQLEditorMenu'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
-import { useTabsStateSnapshot } from '@/state/tabs'
+import { isSqlEditorTab, useTabsStateSnapshot } from '@/state/tabs'
 import type { NextPageWithLayout } from '@/types'
 
 const SQLEditorIndexPage: NextPageWithLayout = () => {
@@ -21,13 +21,15 @@ const SQLEditorIndexPage: NextPageWithLayout = () => {
     if (isHistoryLoaded) {
       // Handle redirect to last opened snippet tab, or last snippet tab
       const lastOpenedTab = history.sql
-      const lastTabId = store.openTabs.find((id) => store.tabsMap[id]?.type === 'sql')
+      const lastTabId = store.openTabs.find((id) => isSqlEditorTab(id, store.tabsMap))
       if (lastOpenedTab !== undefined) {
         router.replace(`/project/${projectRef}/sql/${history.sql}`)
       } else if (lastTabId) {
         const lastTab = store.tabsMap[lastTabId]
-        if (lastTab) {
-          router.replace(`/project/${projectRef}/sql/${lastTab.id.replace('sql-', '')}`)
+        if (lastTab?.type === 'notebook' && lastTab.metadata?.notebookId) {
+          router.replace(`/project/${projectRef}/sql/notebooks/${lastTab.metadata.notebookId}`)
+        } else if (lastTab?.metadata?.sqlId) {
+          router.replace(`/project/${projectRef}/sql/${lastTab.metadata.sqlId}`)
         }
       } else {
         router.replace(`/project/${projectRef}/sql/new`)
@@ -41,7 +43,7 @@ const SQLEditorIndexPage: NextPageWithLayout = () => {
 
 SQLEditorIndexPage.getLayout = (page) => (
   <DefaultLayout>
-    <EditorBaseLayout productMenu={<SQLEditorMenu />} product="SQL Editor">
+    <EditorBaseLayout productMenu={<SQLEditorMenu />} product="Explorer">
       <SQLEditorLayout>{page}</SQLEditorLayout>
     </EditorBaseLayout>
   </DefaultLayout>

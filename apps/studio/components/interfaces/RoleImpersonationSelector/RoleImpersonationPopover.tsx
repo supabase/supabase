@@ -5,6 +5,10 @@ import { Button, cn, Popover, PopoverContent, PopoverTrigger } from 'ui'
 
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
 import type { User } from '@/data/auth/users-infinite-query'
+import {
+  useQueryExecutionSourceSnapshot,
+  type QueryExecutionSource,
+} from '@/state/query-execution-source'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 export interface RoleImpersonationPopoverProps {
@@ -13,6 +17,8 @@ export interface RoleImpersonationPopoverProps {
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
   align?: 'center' | 'start' | 'end'
   disallowAuthenticatedOption?: boolean
+  hideWhenLogsSource?: boolean
+  executionSource?: QueryExecutionSource
 }
 
 export const RoleImpersonationPopover = ({
@@ -21,12 +27,19 @@ export const RoleImpersonationPopover = ({
   variant = 'regular',
   align = 'end',
   disallowAuthenticatedOption = false,
+  hideWhenLogsSource = false,
+  executionSource,
 }: RoleImpersonationPopoverProps) => {
   const state = useRoleImpersonationStateSnapshot()
+  const querySourceState = useQueryExecutionSourceSnapshot()
 
   const [isOpen, setIsOpen] = useState(false)
 
   const currentRole = state.role?.role ?? serviceRoleLabel ?? 'postgres'
+
+  if (hideWhenLogsSource && (executionSource ?? querySourceState.executionSource) === 'logs') {
+    return null
+  }
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>

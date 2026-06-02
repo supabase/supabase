@@ -3,6 +3,7 @@ export type SectionState = {
   favorite: boolean
   private: boolean
   community: boolean
+  reports: boolean
 }
 
 export const DEFAULT_SECTION_STATE: SectionState = {
@@ -10,4 +11,5 @@ export const DEFAULT_SECTION_STATE: SectionState = {
   favorite: false,
   private: true,
   community: true,
+  reports: true,
 }

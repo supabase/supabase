@@ -17,7 +17,7 @@ const inactiveProject = { status: 'INACTIVE' } as Project
 const keys = (routes: { key: string }[]) => routes.map((r) => r.key)
 
 describe('generateToolRoutes', () => {
-  it('always returns Table Editor and SQL Editor', () => {
+  it('always returns Table Editor and Explorer', () => {
     const routes = generateToolRoutes(REF, activeProject)
     expect(keys(routes)).toEqual(['editor', 'sql'])
   })

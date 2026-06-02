@@ -58,7 +58,7 @@ export const generateToolRoutes = (ref?: string, project?: Project): Route[] => 
     },
     {
       key: 'sql',
-      label: 'SQL Editor',
+      label: 'Explorer',
       disabled: !isProjectActive,
       icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),

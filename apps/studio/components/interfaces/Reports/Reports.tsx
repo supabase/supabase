@@ -341,7 +341,7 @@ const Reports = () => {
         },
       }
     )
-    track('custom_report_assistant_sql_block_added')
+    track('notebook_assistant_sql_block_added')
   }
 
   useEffect(() => {

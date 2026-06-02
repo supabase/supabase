@@ -1,10 +1,10 @@
-import { Eye, GitBranch, Table2 } from 'lucide-react'
+import { Eye, FileBarChart, GitBranch, Table2 } from 'lucide-react'
 import { cn, SQL_ICON } from 'ui'
 
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 
 interface EntityTypeIconProps {
-  type: 'sql' | 'schema' | 'new' | 'r' | 'v' | 'm' | 'f' | 'p'
+  type: 'sql' | 'notebook' | 'schema' | 'new' | 'r' | 'v' | 'm' | 'f' | 'p'
   size?: number
   strokeWidth?: number
   isActive?: boolean
@@ -16,6 +16,20 @@ export const EntityTypeIcon = ({
   strokeWidth = 1.5,
   isActive,
 }: EntityTypeIconProps) => {
+  if (type === 'notebook') {
+    return (
+      <FileBarChart
+        size={size}
+        strokeWidth={strokeWidth}
+        className={cn(
+          'text-foreground-muted group-hover:text-foreground-lighter group-aria-selected:text-foreground',
+          isActive && 'text-foreground-light',
+          'transition-colors shrink-0'
+        )}
+      />
+    )
+  }
+
   if (type === 'sql') {
     return (
       <SQL_ICON

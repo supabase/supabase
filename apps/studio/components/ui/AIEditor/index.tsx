@@ -37,6 +37,14 @@ interface AIEditorProps {
   closeShortcutEnabled?: boolean
   openAIAssistantShortcutEnabled?: boolean
   executeQuery?: () => void
+  /** When set, CMD+SHIFT+K delegates to the parent (e.g. full SQL editor assistant flow). */
+  onGenerateWithAI?: (value: {
+    selection: string
+    beforeSelection: string
+    afterSelection: string
+    startLineNumber: number
+    endLineNumber: number
+  }) => void
   onMount?: (editor: monacoEditor.IStandaloneCodeEditor, monaco: Monaco) => void
 }
 
@@ -60,6 +68,7 @@ export const AIEditor = ({
   closeShortcutEnabled = true,
   openAIAssistantShortcutEnabled = true,
   executeQuery,
+  onGenerateWithAI,
   onMount,
 }: AIEditorProps) => {
   const { toggleSidebar } = useSidebarManagerSnapshot()
@@ -267,6 +276,10 @@ export const AIEditor = ({
       run: () => {
         const selectionParts = getEditorSelectionParts(editor)
         if (!selectionParts) return
+        if (onGenerateWithAI) {
+          onGenerateWithAI(selectionParts)
+          return
+        }
         setPromptState({ isOpen: true, ...selectionParts })
       },
     })
@@ -447,7 +460,7 @@ export const AIEditor = ({
             />
           )}
           <AnimatePresence>
-            {!promptState.isOpen && !currentValue && aiEndpoint && (
+            {!promptState.isOpen && !currentValue && aiEndpoint && !onGenerateWithAI && (
               <motion.p
                 initial={{ y: 5, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}

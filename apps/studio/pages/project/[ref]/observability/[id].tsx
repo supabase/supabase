@@ -1,21 +1,22 @@
-import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
-import Reports from '@/components/interfaces/Reports/Reports'
+import { useParams } from 'common'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+
 import DefaultLayout from '@/components/layouts/DefaultLayout'
-import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
 import type { NextPageWithLayout } from '@/types'
 
-const PageLayout: NextPageWithLayout = () => (
-  <div className="mx-auto flex flex-col gap-4 w-full grow">
-    <ReportPadding>
-      <Reports />
-    </ReportPadding>
-  </div>
-)
+const ObservabilityReportRedirectPage: NextPageWithLayout = () => {
+  const router = useRouter()
+  const { ref, id } = useParams()
 
-PageLayout.getLayout = (page) => (
-  <DefaultLayout>
-    <ObservabilityLayout title="Report">{page}</ObservabilityLayout>
-  </DefaultLayout>
-)
+  useEffect(() => {
+    if (!ref || !id || !router.isReady) return
+    router.replace(`/project/${ref}/sql/notebooks/${id}`)
+  }, [ref, id, router])
 
-export default PageLayout
+  return null
+}
+
+ObservabilityReportRedirectPage.getLayout = (page) => <DefaultLayout>{page}</DefaultLayout>
+
+export default ObservabilityReportRedirectPage

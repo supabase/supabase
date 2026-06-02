@@ -18,8 +18,8 @@ export function useLogsGotoCommands(options?: CommandOptions) {
       ? [
           {
             id: 'nav-logs-explorer',
-            name: 'Logs Explorer',
-            route: `/project/${ref}/logs/explorer`,
+            name: 'SQL Editor (Logs)',
+            route: `/project/${ref}/sql/new?source=logs&skip=true`,
             defaultHidden: true,
           },
           ...(logsCollections

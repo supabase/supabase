@@ -741,6 +741,109 @@ export const SQL_COMPLETION_INSTRUCTIONS = `
 Do not quote identifiers unless they actually require it (uppercase letters, reserved words, or special characters). Plain lowercase identifiers should not be quoted.
 `
 
+/** BigQuery Logs Explorer SQL for notebooks and assistants (logs.all / query_source "logs"). */
+export const LOGS_EXPLORER_SQL_INSTRUCTIONS = `
+# Supabase Logs Explorer SQL (query_source: "logs")
+
+Logs blocks run on **BigQuery** via the logs.all analytics endpoint — not on Postgres. Use standard BigQuery SQL.
+
+## Log source tables
+
+Pick **one** primary table per query:
+
+- \`edge_logs\` — API gateway / edge network (REST, GraphQL, etc.)
+- \`postgres_logs\` — Postgres statements and database activity
+- \`auth_logs\` — Auth (GoTrue) server logs
+- \`storage_logs\` — Storage API
+- \`realtime_logs\` — Realtime server
+- \`function_logs\` — Edge Function \`console\` output during execution
+- \`function_edge_logs\` — Edge Function network invocations
+
+## Timestamp (CRITICAL — avoid ambiguous or invalid \`timestamp\`)
+
+Each log row has a top-level \`timestamp\` column (\`TIMESTAMP\`). Nested metadata can also expose fields named \`timestamp\`. After \`CROSS JOIN UNNEST\`, bare \`timestamp\` in \`SELECT\`, \`WHERE\`, \`GROUP BY\`, or \`ORDER BY\` causes **"Column name timestamp is ambiguous"**.
+
+**Always:**
+
+1. Alias the log table: \`FROM edge_logs AS el\` (or \`postgres_logs AS pl\`, etc.).
+2. Qualify every timestamp reference: \`el.timestamp\` — never unqualified \`timestamp\` when the query has unnests or joins.
+3. For display, use a distinct output alias: \`datetime(el.timestamp) AS log_time\` (or \`CAST(el.timestamp AS DATETIME) AS log_time\`).
+4. Always filter on the qualified source column: \`WHERE el.timestamp > ...\`.
+
+For raw event queries that return individual log rows, sort on the qualified source column: \`ORDER BY el.timestamp DESC\`.
+
+For aggregate queries, do **not** sort on the raw source timestamp unless it is grouped. BigQuery rejects queries such as \`GROUP BY severity ORDER BY pl.timestamp\` because \`pl.timestamp\` is neither grouped nor aggregated. Sort by a grouped output alias or an aggregate alias instead:
+
+- Time series: create a bucket alias such as \`log_time\`, then use \`GROUP BY log_time ORDER BY log_time\`.
+- Ranked aggregates: use an aggregate alias such as \`event_count\`, then use \`ORDER BY event_count DESC\`.
+- Before returning any query with \`GROUP BY\`, verify that each \`ORDER BY\` expression is grouped, aggregated, or an output alias for a grouped or aggregated expression.
+
+\`datetime()\` / \`CAST(... AS DATETIME)\` renders chart-friendly timestamp values.
+
+Raw event example:
+
+\`\`\`sql
+SELECT
+  datetime(el.timestamp) AS log_time,
+  r.method,
+  resp.status_code
+FROM edge_logs AS el
+CROSS JOIN UNNEST(el.metadata) AS m
+CROSS JOIN UNNEST(m.request) AS r
+CROSS JOIN UNNEST(m.response) AS resp
+WHERE el.timestamp > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 24 HOUR)
+ORDER BY el.timestamp DESC
+LIMIT 1000
+\`\`\`
+
+Aggregate time-series example:
+
+\`\`\`sql
+SELECT
+  datetime(TIMESTAMP_TRUNC(pl.timestamp, HOUR)) AS log_time,
+  COUNT(*) AS event_count
+FROM postgres_logs AS pl
+WHERE pl.timestamp > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 24 HOUR)
+GROUP BY log_time
+ORDER BY log_time DESC
+LIMIT 1000
+\`\`\`
+
+## Unnesting \`metadata\`
+
+\`metadata\` is an **array** of objects. Use \`CROSS JOIN UNNEST(el.metadata) AS m\` (or \`LEFT JOIN UNNEST(...) ON TRUE\`) and add one unnest per nested array level (\`m.request\`, \`m.response\`, \`r.headers\`, etc.).
+
+- Do **not** invent top-level log-table fields. Common top-level fields include \`id\`, \`timestamp\`, \`event_message\`, and \`metadata\`; product-specific fields are usually nested inside \`metadata\`.
+- Prefer **specific nested fields** (\`r.method\`, \`h.x_real_ip\`) over selecting whole \`metadata\` objects.
+- Give each unnest alias a unique name (\`m\`, \`r\`, \`resp\`, \`h\`) — do not reuse \`timestamp\` as an alias.
+
+Common \`edge_logs\` paths (after unnesting): \`m.request[].method\`, \`m.request[].path\`, \`m.response[].status_code\`, \`m.request[].headers[].cf_ipcountry\`.
+
+Common \`postgres_logs\` paths require two unnests: \`pl.metadata[]\` as \`m\`, then \`m.parsed[]\` as \`p\`. Postgres severity is \`p.error_severity\`, **not** \`pl.severity\` or \`pl.error_severity\`.
+
+Postgres severity aggregate example:
+
+\`\`\`sql
+SELECT
+  p.error_severity AS severity,
+  COUNT(*) AS event_count
+FROM postgres_logs AS pl
+CROSS JOIN UNNEST(pl.metadata) AS m
+CROSS JOIN UNNEST(m.parsed) AS p
+WHERE pl.timestamp > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 24 HOUR)
+GROUP BY severity
+ORDER BY event_count DESC
+LIMIT 1000
+\`\`\`
+
+## Query hygiene
+
+- **Always** filter on the qualified source timestamp (for example, \`el.timestamp\` or \`pl.timestamp\`) to limit scan size; avoid querying full retention without a time window.
+- **Always** include \`LIMIT\` (max **1000** rows per Logs Explorer run).
+- String literals in BigQuery use **double quotes**: \`r.method = "GET"\`.
+- Set \`query_source\` to \`"logs"\` only for the log tables above; use \`"database"\` for application Postgres tables.
+`
+
 export const LIMITATIONS_PROMPT = `
 # Limitations
 - You are to only answer Supabase, database, or edge function related questions. All other questions should be declined with a polite message.

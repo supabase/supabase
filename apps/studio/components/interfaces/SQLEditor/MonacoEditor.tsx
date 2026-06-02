@@ -1,20 +1,23 @@
-import Editor, { Monaco, OnMount } from '@monaco-editor/react'
+import type { Monaco, OnMount } from '@monaco-editor/react'
 import { useDebounce } from '@uidotdev/usehooks'
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { MutableRefObject, useEffect, useRef, useState } from 'react'
-import { cn } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
 import { createSqlSnippetSkeletonV2 } from './SQLEditor.utils'
+import { getSnippetSqlFromContent } from './sqlSnippet.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { getEditorSelectionParts } from '@/components/ui/AIEditor/utils'
+import { AIEditor } from '@/components/ui/AIEditor'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { BASE_PATH } from '@/lib/constants'
 import { useProfile } from '@/lib/profile'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useQueryExecutionSourceSnapshot } from '@/state/query-execution-source'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
@@ -49,7 +52,7 @@ const MonacoEditor = ({
   editorRef,
   monacoRef,
   autoFocus = true,
-  placeholder = '',
+  placeholder: _placeholder = '',
   className,
   executeQuery,
   executeExplainQuery,
@@ -62,11 +65,13 @@ const MonacoEditor = ({
   const { profile } = useProfile()
   const { ref, content } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
 
   const snapV2 = useSqlEditorV2StateSnapshot()
   const tabsSnap = useTabsStateSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
-  const { openSidebar, toggleSidebar } = useSidebarManagerSnapshot()
+  const querySourceState = useQueryExecutionSourceSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const [intellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
@@ -135,17 +140,6 @@ const MonacoEditor = ({
     )
 
     editor.addAction({
-      id: 'run-query',
-      label: 'Run Query',
-      keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.Enter],
-      contextMenuGroupId: 'operation',
-      contextMenuOrder: 0,
-      run: () => {
-        executeQueryRef.current()
-      },
-    })
-
-    editor.addAction({
       id: 'run-explain-query',
       label: 'Run EXPLAIN ANALYZE',
       keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Enter],
@@ -196,29 +190,6 @@ const MonacoEditor = ({
       },
     })
 
-    editor.addAction({
-      id: 'toggle-ai-assistant',
-      label: 'Toggle AI Assistant',
-      keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyI],
-      run: () => {
-        if (aiHotkeyEnabledRef.current) {
-          toggleSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-        }
-      },
-    })
-
-    if (onPrompt) {
-      editor.addAction({
-        id: 'generate-sql',
-        label: 'Generate SQL',
-        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyK],
-        run: () => {
-          const selectionParts = getEditorSelectionParts(editor)
-          if (selectionParts) onPrompt(selectionParts)
-        },
-      })
-    }
-
     // Monaco claims Cmd+K as a chord prefix, which swallows the global command
     // menu shortcut while the editor is focused. Intercept it here and open the
     // command menu directly so it works the same inside and outside the editor.
@@ -253,6 +224,7 @@ const MonacoEditor = ({
           sql: value,
           owner_id: profile?.id,
           project_id: project?.id,
+          querySource: querySourceState.executionSource,
         })
         snapV2.addSnippet({ projectRef: ref, snippet })
         router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
@@ -260,6 +232,11 @@ const MonacoEditor = ({
       setValue(value)
     }
   }
+
+  useEffect(() => {
+    const sql = getSnippetSqlFromContent(snippet?.snippet.content)
+    if (sql) setValue(sql)
+  }, [id, snippet?.snippet.content])
 
   useEffect(() => {
     if (debouncedValue.length > 0 && snippet) {
@@ -285,29 +262,31 @@ const MonacoEditor = ({
           description="This snippet has been shared to the project and is only editable by the owner who created this snippet. You may duplicate this snippet into a personal copy by right clicking on the snippet and selecting “Duplicate query”."
         />
       )}
-      <Editor
-        className={cn(className, 'monaco-editor')}
-        theme={'supabase'}
-        onMount={handleEditorOnMount}
+      <AIEditor
+        className={className}
+        language="pgsql"
+        autoFocus={autoFocus}
+        readOnly={disableEdit}
+        value={value || getSnippetSqlFromContent(snippet?.snippet.content)}
         onChange={handleEditorChange}
-        defaultLanguage="pgsql"
-        defaultValue={snippet?.snippet.content?.unchecked_sql}
-        path={id}
+        onMount={handleEditorOnMount}
+        executeQuery={executeQuery}
+        onGenerateWithAI={onPrompt}
+        aiEndpoint={onPrompt || !IS_PLATFORM ? undefined : `${BASE_PATH}/api/ai/code/complete`}
+        aiMetadata={{
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          orgSlug: org?.slug,
+          language: 'sql',
+        }}
+        openAIAssistantShortcutEnabled={isAIAssistantHotkeyEnabled}
         options={{
           tabSize: 2,
           fontSize: 13,
-          placeholder,
           lineDecorationsWidth: 0,
-          readOnly: disableEdit,
           minimap: { enabled: false },
           wordWrap: 'on',
           padding: { top: 4 },
-          // [Joshen] Commenting the following out as it causes the autocomplete suggestion popover
-          // to be positioned wrongly somehow. I'm not sure if this affects anything though, but leaving
-          // comment just in case anyone might be wondering. Relevant issues:
-          // - https://github.com/microsoft/monaco-editor/issues/2229
-          // - https://github.com/microsoft/monaco-editor/issues/2503
-          // fixedOverflowWidgets: true,
           suggest: {
             showMethods: intellisenseEnabled,
             showFunctions: intellisenseEnabled,

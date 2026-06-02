@@ -5,11 +5,14 @@ import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn
 import { ChartConfig } from './ChartConfig'
 import { UtilityActions } from './UtilityActions'
 import { UtilityTabExplain } from './UtilityTabExplain'
+import { UtilityTabLogsResults } from './UtilityTabLogsResults'
 import { UtilityTabResults } from './UtilityTabResults'
 import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 import { Snippet } from '@/data/content/sql-folders-query'
 import { useTrack } from '@/lib/telemetry/track'
+import { useNotebookEditorContext } from '@/state/notebook-editor-context'
+import { useQueryExecutionSourceSnapshot } from '@/state/query-execution-source'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 export type UtilityPanelProps = {
@@ -55,17 +58,13 @@ export const UtilityPanel = ({
   const { ref } = useParams()
   const track = useTrack()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const querySourceState = useQueryExecutionSourceSnapshot()
+  const notebookEditorContext = useNotebookEditorContext()
+  const executionSource = notebookEditorContext?.querySource ?? querySourceState.executionSource
+  const isLogsSource = executionSource === 'logs'
 
   const snippet = snapV2.snippets[id]?.snippet
-  const result = snapV2.results[id]?.[0]
-
-  const handleTabChange = (tab: string) => {
-    // When switching to the explain tab, trigger the explain query
-    if (tab === 'explain') {
-      executeExplainQuery()
-    }
-    onActiveTabChange?.(tab)
-  }
+  const result = isLogsSource ? snapV2.logsResults[id] : snapV2.results[id]?.[0]
 
   const { mutate: upsertContent } = useContentUpsertMutation({
     invalidateQueriesOnSuccess: false,
@@ -93,6 +92,10 @@ export const UtilityPanel = ({
   })
 
   function getChartConfig() {
+    if (notebookEditorContext) {
+      return notebookEditorContext.chartConfig
+    }
+
     if (!snippet || snippet.type !== 'sql') {
       return DEFAULT_CHART_CONFIG
     }
@@ -106,7 +109,27 @@ export const UtilityPanel = ({
 
   const chartConfig = getChartConfig()
 
+  const handleTabChange = (tab: string) => {
+    if (tab === 'explain' && !isLogsSource) {
+      executeExplainQuery()
+    }
+
+    if (notebookEditorContext && (tab === 'chart' || tab === 'results')) {
+      notebookEditorContext.onChartConfigChange({
+        ...chartConfig,
+        view: tab === 'chart' ? 'chart' : 'table',
+      })
+    }
+
+    onActiveTabChange?.(tab)
+  }
+
   function onConfigChange(config: ChartConfig) {
+    if (notebookEditorContext) {
+      notebookEditorContext.onChartConfigChange(config)
+      return
+    }
+
     if (!ref || !snippet?.id) return
 
     upsertContent({
@@ -136,14 +159,16 @@ export const UtilityPanel = ({
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
             <span className="translate-y-px">Results</span>
           </TabsTrigger_Shadcn_>
-          <TabsTrigger_Shadcn_ className="py-3 text-xs" value="explain">
-            <span className="translate-y-px">Explain</span>
-          </TabsTrigger_Shadcn_>
+          {!isLogsSource && (
+            <TabsTrigger_Shadcn_ className="py-3 text-xs" value="explain">
+              <span className="translate-y-px">Explain</span>
+            </TabsTrigger_Shadcn_>
+          )}
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="chart">
             <span className="translate-y-px">Chart</span>
           </TabsTrigger_Shadcn_>
 
-          {result?.rows && (
+          {result?.rows && !isLogsSource && (
             <DownloadResultsButton
               type="text"
               results={result.rows as any[]}
@@ -167,22 +192,33 @@ export const UtilityPanel = ({
       </TabsList_Shadcn_>
 
       <TabsContent_Shadcn_ asChild value="results" className="mt-0 grow">
-        <UtilityTabResults
-          id={id}
-          isExecuting={isExecuting}
-          isDisabled={isDisabled}
-          onDebug={onDebug}
-          buildDebugPrompt={buildDebugPrompt}
-          isDebugging={isDebugging}
+        {isLogsSource ? (
+          <UtilityTabLogsResults id={id} isExecuting={isExecuting} onRun={executeQuery} />
+        ) : (
+          <UtilityTabResults
+            id={id}
+            isExecuting={isExecuting}
+            isDisabled={isDisabled}
+            onDebug={onDebug}
+            buildDebugPrompt={buildDebugPrompt}
+            isDebugging={isDebugging}
+          />
+        )}
+      </TabsContent_Shadcn_>
+
+      {!isLogsSource && (
+        <TabsContent_Shadcn_ asChild value="explain" className="mt-0 grow">
+          <UtilityTabExplain id={id} isExecuting={isExplainExecuting} />
+        </TabsContent_Shadcn_>
+      )}
+
+      <TabsContent_Shadcn_ value="chart" className="mt-0 flex min-h-0 flex-1 flex-col">
+        <ChartConfig
+          key={`${id}-chart`}
+          results={result}
+          config={chartConfig}
+          onConfigChange={onConfigChange}
         />
-      </TabsContent_Shadcn_>
-
-      <TabsContent_Shadcn_ asChild value="explain" className="mt-0 grow">
-        <UtilityTabExplain id={id} isExecuting={isExplainExecuting} />
-      </TabsContent_Shadcn_>
-
-      <TabsContent_Shadcn_ asChild value="chart" className="mt-0 grow">
-        <ChartConfig results={result} config={chartConfig} onConfigChange={onConfigChange} />
       </TabsContent_Shadcn_>
     </Tabs_Shadcn_>
   )

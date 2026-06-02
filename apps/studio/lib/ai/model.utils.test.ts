@@ -11,6 +11,7 @@ import {
   isAdvanceOnlyModelId,
   isAssistantBaseModelId,
   isKnownAssistantModelId,
+  NOTEBOOK_GENERATE_MODEL,
   openaiModelEntry,
   PROVIDERS,
 } from './model.utils'
@@ -49,6 +50,7 @@ describe('model.utils', () => {
       expect(PROVIDERS.openai.models).toBeDefined()
       expect(Object.keys(PROVIDERS.openai.models)).toContain('gpt-5.3-codex')
       expect(Object.keys(PROVIDERS.openai.models)).toContain('gpt-5.4-nano')
+      expect(Object.keys(PROVIDERS.openai.models)).toContain('gpt-5.4-mini')
     })
 
     it('should have exactly one default model per provider', () => {
@@ -145,6 +147,12 @@ describe('model.utils', () => {
       expect(DEFAULT_COMPLETION_MODEL.reasoningEffort).toBe('none')
     })
 
+    it('NOTEBOOK_GENERATE_MODEL is gpt-5.4-mini with low reasoning effort', () => {
+      expect(NOTEBOOK_GENERATE_MODEL.id).toBe('gpt-5.4-mini')
+      expect(NOTEBOOK_GENERATE_MODEL.reasoningEffort).toBe('low')
+      expect(Object.keys(PROVIDERS.openai.models)).toContain(NOTEBOOK_GENERATE_MODEL.id)
+    })
+
     it('openaiModelEntry enforces valid reasoning effort at compile time', () => {
       // Valid: supported effort level
       const withEffort = openaiModelEntry({
@@ -156,6 +164,12 @@ describe('model.utils', () => {
       // Valid: no effort
       const withoutEffort = openaiModelEntry({ id: 'gpt-5.4-nano' })
       expect(withoutEffort.reasoningEffort).toBeUndefined()
+
+      const miniWithEffort = openaiModelEntry({
+        id: 'gpt-5.4-mini',
+        reasoningEffort: 'low',
+      })
+      expect(miniWithEffort.reasoningEffort).toBe('low')
     })
   })
 })

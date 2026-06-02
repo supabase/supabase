@@ -123,30 +123,33 @@ export const ChartConfig = ({
 
   if (!resultKeys.length) {
     return (
-      <div className="p-2">
+      <div className="flex h-full min-h-0 w-full flex-1 flex-col p-4">
         <NoDataPlaceholder
-          size="normal"
+          size="fill"
+          isFullHeight
           description="Execute a query and configure the chart options."
         />
       </div>
     )
   }
 
+  const showBarChart = config.type === 'bar' || config.type === 'line'
+
   return (
-    <ResizablePanelGroup orientation="horizontal" className="grow h-full">
-      <ResizablePanel className="p-4 h-full" defaultSize="75">
+    <ResizablePanelGroup orientation="horizontal" className="h-full min-h-0 flex-1">
+      <ResizablePanel className="flex h-full min-h-0 w-full flex-col p-4" defaultSize="75">
         {!hasConfig ? (
-          <ResizablePanel className="p-4 h-full" defaultSize="75">
-            <NoDataPlaceholder
-              size="normal"
-              title="Configure your chart"
-              description="Select your X and Y axis in the chart options panel"
-            />
-          </ResizablePanel>
-        ) : config.type === 'bar' ? (
+          <NoDataPlaceholder
+            size="fill"
+            isFullHeight
+            title="Configure your chart"
+            description="Select your X and Y axis in the chart options panel"
+          />
+        ) : showBarChart ? (
           <BarChart
             showLegend
-            size="normal"
+            size="fill"
+            className="min-h-0 flex-1"
             xAxisIsDate={xKeyDateFormat === 'date'}
             data={resultToRender}
             xAxisKey={config.xKey}

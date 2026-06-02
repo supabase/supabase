@@ -54,19 +54,21 @@ export function RecentItems() {
                 >
                   <Link
                     href={
-                      item.type === 'sql'
-                        ? `/project/${ref}/sql/${item.metadata?.sqlId}`
-                        : item.type === 'r' ||
-                            item.type === 'v' ||
-                            item.type === 'm' ||
-                            item.type === 'f' ||
-                            item.type === 'p'
-                          ? buildTableEditorUrl({
-                              projectRef: ref,
-                              tableId: item.metadata?.tableId!,
-                              schema: item.metadata?.schema,
-                            })
-                          : `/project/${ref}/explorer/${item.type}/${item.metadata?.schema}/${item.metadata?.name}`
+                      item.type === 'notebook'
+                        ? `/project/${ref}/sql/notebooks/${item.metadata?.notebookId}`
+                        : item.type === 'sql'
+                          ? `/project/${ref}/sql/${item.metadata?.sqlId}`
+                          : item.type === 'r' ||
+                              item.type === 'v' ||
+                              item.type === 'm' ||
+                              item.type === 'f' ||
+                              item.type === 'p'
+                            ? buildTableEditorUrl({
+                                projectRef: ref,
+                                tableId: item.metadata?.tableId!,
+                                schema: item.metadata?.schema,
+                              })
+                            : `/project/${ref}/explorer/${item.type}/${item.metadata?.schema}/${item.metadata?.name}`
                     }
                     className="flex items-center gap-4 rounded-lg bg-surface-100 py-2 transition-colors hover:bg-surface-200"
                   >

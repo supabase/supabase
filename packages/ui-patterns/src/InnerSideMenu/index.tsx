@@ -50,15 +50,15 @@ const InnerSideMenuCollapsible = forwardRef<
 
 const InnerSideMenuCollapsibleTrigger = forwardRef<
   ElementRef<typeof CollapsibleTrigger>,
-  React.ComponentPropsWithoutRef<typeof CollapsibleTrigger>
->(({ ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof CollapsibleTrigger> & { title?: React.ReactNode }
+>(({ title, className, ...props }, ref) => {
   return (
     <CollapsibleTrigger
       ref={ref}
       {...props}
       className={cn(
         'w-full flex gap-1 items-center group px-3 text-sm font-normal font-mono uppercase text-lighter tracking-wide',
-        props.className
+        className
       )}
     >
       <ChevronRight
@@ -66,7 +66,7 @@ const InnerSideMenuCollapsibleTrigger = forwardRef<
         size={16}
         strokeWidth={1.5}
       />
-      <span className="group-hover:not-disabled:text-foreground">{props.title}</span>
+      {title ? <span className="group-hover:not-disabled:text-foreground">{title}</span> : null}
     </CollapsibleTrigger>
   )
 })

@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import dayjs from 'dayjs'
 import { beforeAll, describe, expect, test, vi } from 'vitest'
 
-import { LogsExplorerPage } from '@/pages/project/[ref]/logs/explorer/index'
+import LogsExplorerRedirectPage from '@/pages/project/[ref]/logs/explorer/index'
 import { clickDropdown } from '@/tests/helpers'
 import { customRender as render } from '@/tests/lib/custom-render'
 import { routerMock } from '@/tests/lib/route-mock'
@@ -27,7 +27,7 @@ beforeAll(() => {
 })
 
 test.skip('can display log data', async () => {
-  const { container } = render(<LogsExplorerPage dehydratedState={{}} />)
+  const { container } = render(<LogsExplorerRedirectPage />)
   let editor = container.querySelector('.monaco-editor')
   await waitFor(() => {
     editor = container.querySelector('.monaco-editor')
@@ -51,7 +51,7 @@ test.skip('can display log data', async () => {
 test('q= query param will populate the query input', async () => {
   router.query = { ...router.query, type: 'api', q: 'some_query' }
 
-  render(<LogsExplorerPage dehydratedState={{}} />)
+  render(<LogsExplorerRedirectPage />)
 })
 
 test('ite= and its= query param will populate the datepicker', async () => {
@@ -65,11 +65,11 @@ test('ite= and its= query param will populate the datepicker', async () => {
     ite: end.toISOString(),
   }
 
-  render(<LogsExplorerPage dehydratedState={{}} />)
+  render(<LogsExplorerRedirectPage />)
 })
 
 test.skip('custom sql querying', async () => {
-  const { container } = render(<LogsExplorerPage dehydratedState={{}} />)
+  const { container } = render(<LogsExplorerRedirectPage />)
 
   let editor = container.querySelector('.monaco-editor')
   if (!editor) {
@@ -97,7 +97,7 @@ test.skip('custom sql querying', async () => {
 })
 
 test.skip('bug: can edit query after selecting a log', async () => {
-  const { container } = render(<LogsExplorerPage dehydratedState={{}} />)
+  const { container } = render(<LogsExplorerRedirectPage />)
   // run default query
   await userEvent.click(await screen.findByText('Run'))
   const rowValue = await screen.findByText(/12345/) // row value
@@ -130,12 +130,12 @@ test.skip('query warnings', async () => {
     ite: dayjs().toISOString(),
   }
 
-  render(<LogsExplorerPage dehydratedState={{}} />)
+  render(<LogsExplorerRedirectPage />)
   await screen.findByText('1 warning')
 })
 
 test('field reference', async () => {
-  render(<LogsExplorerPage dehydratedState={{}} />)
+  render(<LogsExplorerRedirectPage />)
   await userEvent.click(await screen.findByText('Field Reference'))
   await screen.findByText('metadata.request.cf.asOrganization')
 })
@@ -149,11 +149,11 @@ describe.each(['free', 'pro', 'team', 'enterprise'])('upgrade modal for %s', (ke
       ite: dayjs().toISOString(),
     }
 
-    render(<LogsExplorerPage dehydratedState={{}} />)
+    render(<LogsExplorerRedirectPage />)
     await screen.findByText(/Log retention/) // assert modal title is present
   })
   test.skip('based on datepicker helpers', async () => {
-    render(<LogsExplorerPage dehydratedState={{}} />)
+    render(<LogsExplorerRedirectPage />)
     clickDropdown(screen.getByText('Last hour'))
     await waitFor(async () => {
       const option = await screen.findByText('Last 3 days')

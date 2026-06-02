@@ -1,5 +1,6 @@
 import type { UntrustedSqlFragment } from '@supabase/pg-meta'
 
+import type { DatePickerValue } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 
 export interface UserContent<
@@ -43,6 +44,9 @@ export namespace SqlSnippets {
     // we can add some versioning to this schema in case we need to change the format.
     schema_version: string
 
+    /** Which execution source this snippet was saved for (database vs logs analytics). */
+    query_source?: 'database' | 'logs'
+
     chart?: {
       type: 'bar' | 'line'
       cumulative: boolean
@@ -68,6 +72,11 @@ export namespace Dashboards {
    * Time periods are considered as historical dates and can be provided as
    * an interval ("1w" = 1 week ago) or an exact date.
    */
+  export interface ContentMeta {
+    /** Identifies the project home notebook among user notebooks */
+    role?: 'home'
+  }
+
   export interface Content {
     schema_version: 1 // we can add some versioning to this schema in case we need to change the format.
     period_start: {
@@ -80,12 +89,24 @@ export namespace Dashboards {
     }
     interval: '1m' | '5m' | '1h' | '1d' | '1w' | '1M' | '1y' // this is the data interval
     layout: Chart[]
+    meta?: ContentMeta
+  }
+
+  /** SQL embedded on a notebook block (stored inside report content JSON) */
+  export interface BlockSql {
+    unchecked_sql?: UntrustedSqlFragment
+    /** API may return `sql` before client remap */
+    sql?: string
+    query_source?: 'database' | 'logs'
+    logs_date_picker_value?: DatePickerValue
+    schema_version?: string
   }
 
   /**
    * Predefined charts
    */
   export type ChartType =
+    | 'sql_block'
     | 'total_get_requests'
     | 'total_auth_patch_requests'
     | 'total_auth_requests'
@@ -106,10 +127,12 @@ export namespace Dashboards {
     w: number
     h: number
     label: string
-    attribute: ChartType
-    provider: 'daily-stats' | 'infra-monitoring'
+    attribute: ChartType | (string & {})
+    provider?: 'daily-stats' | 'infra-monitoring'
     chart_type: 'bar' | 'line'
     chartConfig?: Partial<ChartConfig>
+    /** Embedded query for notebook SQL blocks */
+    sql?: BlockSql
   }
 }
 

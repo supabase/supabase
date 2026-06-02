@@ -1,20 +1,8 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { FilePlus, FolderPlus, Plus, X } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import {
   InnerSideBarFilters,
   InnerSideBarFilterSearchInput,
@@ -24,19 +12,11 @@ import {
 
 import { SearchList } from './SQLEditorNavV2/SearchList'
 import { SQLEditorNav } from './SQLEditorNavV2/SQLEditorNav'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useProfile } from '@/lib/profile'
 import { getAppStateSnapshot } from '@/state/app-state'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 export const SQLEditorMenu = () => {
-  const router = useRouter()
   const { ref } = useParams()
-  const { profile } = useProfile()
-  const { data: project } = useSelectedProjectQuery()
-  const snapV2 = useSqlEditorV2StateSnapshot()
 
   const [search, setSearch] = useState('')
   const [showSearch, setShowSearch] = useState(false)
@@ -48,38 +28,6 @@ export const SQLEditorMenu = () => {
   const appState = getAppStateSnapshot()
   const debouncedSearch = useDebounce(search, 500)
 
-  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'user_content',
-    {
-      resource: { type: 'sql', owner_id: profile?.id },
-      subject: { id: profile?.id },
-    }
-  )
-
-  const createNewFolder = () => {
-    if (!ref) return console.error('Project ref is required')
-    setSearch('')
-    setShowSearch(false)
-    snapV2.addNewFolder({ projectRef: ref })
-  }
-
-  const handleNewQuery = async () => {
-    if (!ref) return console.error('Project ref is required')
-    if (!project) return console.error('Project is required')
-    if (!profile) return console.error('Profile is required')
-    if (!canCreateSQLSnippet) {
-      return toast('Your queries will not be saved as you do not have sufficient permissions')
-    }
-    try {
-      router.push(`/project/${ref}/sql/new?skip=true`)
-      setSearch('')
-      setShowSearch(false)
-    } catch (error: any) {
-      toast.error(`Failed to create new query: ${error.message}`)
-    }
-  }
-
   useEffect(() => {
     setShowSearch(debouncedSearch.length > 0)
   }, [debouncedSearch])
@@ -87,7 +35,7 @@ export const SQLEditorMenu = () => {
   return (
     <div className="h-full flex flex-col justify-between">
       <div className="flex flex-col gap-y-4 grow">
-        <div className="mt-4 mx-4 flex items-center justify-between gap-x-2">
+        <div className="mt-4 mx-4">
           <InnerSideBarFilters className="w-full p-0 gap-0">
             <InnerSideBarFilterSearchInput
               name="search-queries"
@@ -134,26 +82,6 @@ export const SQLEditorMenu = () => {
               )}
             </InnerSideBarFilterSearchInput>
           </InnerSideBarFilters>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                data-testid="sql-editor-new-query-button"
-                type="default"
-                icon={<Plus className="text-foreground" />}
-                className="w-[26px]"
-              />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" side="bottom" className="w-48">
-              <DropdownMenuItem className="gap-x-2" onClick={() => handleNewQuery()}>
-                <FilePlus size={14} />
-                Create a new snippet
-              </DropdownMenuItem>
-              <DropdownMenuItem className="gap-x-2" onClick={() => createNewFolder()}>
-                <FolderPlus size={14} />
-                Create a new folder
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
 
         {showSearch ? <SearchList search={debouncedSearch} /> : <SQLEditorNav sort={sort} />}

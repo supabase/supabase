@@ -28,10 +28,10 @@ import { SortableTab } from './SortableTab'
 import { TabPreview } from './TabPreview'
 import { useTabsScroll } from './Tabs.utils'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
-import { editorEntityTypes, useTabsStateSnapshot, type Tab } from '@/state/tabs'
+import { editorEntityTypes, isSqlEditorTab, useTabsStateSnapshot, type Tab } from '@/state/tabs'
 
 export const EditorTabs = () => {
-  const { ref, id } = useParams()
+  const { ref } = useParams()
   const router = useRouter()
   const { setLastVisitedSnippet, setLastVisitedTable } = useDashboardHistory()
 
@@ -84,8 +84,8 @@ export const EditorTabs = () => {
     if (editor) {
       const tabsToClose =
         editor === 'table'
-          ? tabs.openTabs.filter((x) => !x.startsWith('sql'))
-          : tabs.openTabs.filter((x) => x.startsWith('sql'))
+          ? tabs.openTabs.filter((x) => !isSqlEditorTab(x, tabs.tabsMap))
+          : tabs.openTabs.filter((x) => isSqlEditorTab(x, tabs.tabsMap))
 
       tabs.removeTabs(tabsToClose)
       onClearDashboardHistory()
@@ -97,15 +97,14 @@ export const EditorTabs = () => {
     if (editor) {
       const tabsToClose =
         editor === 'table'
-          ? tabs.openTabs.filter((x) => !x.startsWith('sql') && x !== tabId)
-          : tabs.openTabs.filter((x) => x.startsWith('sql') && x !== tabId)
+          ? tabs.openTabs.filter((x) => !isSqlEditorTab(x, tabs.tabsMap) && x !== tabId)
+          : tabs.openTabs.filter((x) => isSqlEditorTab(x, tabs.tabsMap) && x !== tabId)
 
       tabs.removeTabs(tabsToClose)
       onClearDashboardHistory()
 
-      const entityId = editor === 'table' ? tabId.split('-')[1] : tabId.split('sql-')[1]
-      if (id !== entityId) {
-        router.push(`/project/${ref}/${editor === 'table' ? 'editor' : 'sql'}/${entityId}`)
+      if (tabs.activeTab !== tabId) {
+        tabs.handleTabNavigation(tabId, router)
       }
     }
   }
@@ -114,8 +113,8 @@ export const EditorTabs = () => {
     if (editor) {
       const openedTabs =
         editor === 'table'
-          ? tabs.openTabs.filter((x) => !x.startsWith('sql'))
-          : tabs.openTabs.filter((x) => x.startsWith('sql'))
+          ? tabs.openTabs.filter((x) => !isSqlEditorTab(x, tabs.tabsMap))
+          : tabs.openTabs.filter((x) => isSqlEditorTab(x, tabs.tabsMap))
       const tabIdx = openedTabs.indexOf(tabId)
       const activeTabIdx = openedTabs.indexOf(tabs.activeTab!)
       const tabsToClose = openedTabs.slice(tabIdx + 1)
@@ -123,8 +122,7 @@ export const EditorTabs = () => {
 
       const isActiveTabClosed = tabIdx < activeTabIdx
       if (isActiveTabClosed) {
-        const id = editor === 'table' ? tabId.split('-')[1] : tabId.split('sql-')[1]
-        router.push(`/project/${ref}/${editor === 'table' ? 'editor' : 'sql'}/${id}`)
+        tabs.handleTabNavigation(tabId, router)
       }
     }
   }

@@ -99,7 +99,10 @@ export const DisplayBlockRenderer = ({
   const [rows, setRows] = useState<any[] | undefined>(
     Array.isArray(initialResults) ? initialResults : undefined
   )
-  const isReportsPage = router.pathname.endsWith('/reports/[id]')
+  const isReportsPage =
+    router.pathname.endsWith('/reports/[id]') ||
+    router.pathname.endsWith('/observability/[id]') ||
+    router.pathname.includes('/sql/reports/')
   const isHomePage = router.pathname === '/project/[ref]'
   const isDraggableToReports = canCreateSQLSnippet && (isReportsPage || isHomePage)
   const label = initialArgs.label || 'SQL Results'

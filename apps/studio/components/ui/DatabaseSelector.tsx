@@ -39,6 +39,7 @@ interface DatabaseSelectorProps {
   className?: string
   align?: 'start' | 'end'
   isForm?: boolean
+  hideSourceLabel?: boolean
 }
 
 export const DatabaseSelector = ({
@@ -50,6 +51,7 @@ export const DatabaseSelector = ({
   align = 'end',
   className,
   isForm = false,
+  hideSourceLabel = false,
 }: DatabaseSelectorProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
@@ -84,7 +86,7 @@ export const DatabaseSelector = ({
     <Popover open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger asChild>
         <div className={cn('flex cursor-pointer', className)}>
-          {!isForm && (
+          {!isForm && !hideSourceLabel && (
             <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
               Source
             </span>
@@ -96,7 +98,8 @@ export const DatabaseSelector = ({
             {...buttonProps}
             className={cn(
               'justify-start',
-              !isForm && 'rounded-l-none',
+              !isForm && !hideSourceLabel && 'rounded-l-none',
+              !isForm && hideSourceLabel && variant === 'regular' && 'rounded-l-lg',
               variant === 'connected-on-right' && 'rounded-r-none',
               variant === 'connected-on-left' && 'rounded-l-none border-l-0',
               variant === 'connected-on-both' && 'rounded-none border-x-0',

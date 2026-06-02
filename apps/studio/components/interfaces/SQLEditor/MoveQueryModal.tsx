@@ -37,8 +37,16 @@ import {
 } from 'ui'
 import * as z from 'zod'
 
+import {
+  buildSnippetUpsertContent,
+  getSnippetContentType,
+  getSnippetSqlFromContent,
+} from '@/components/interfaces/SQLEditor/sqlSnippet.utils'
 import { getContentById } from '@/data/content/content-id-query'
-import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
+import {
+  UpsertContentPayload,
+  useContentUpsertMutation,
+} from '@/data/content/content-upsert-mutation'
 import { useSQLSnippetFolderCreateMutation } from '@/data/content/sql-folder-create-mutation'
 import { Snippet } from '@/data/content/sql-folders-query'
 import {
@@ -137,52 +145,60 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
 
       await Promise.all(
         snippets.map(async (snippet) => {
-          let snippetContent = (snippet as SnippetWithContent)?.content
+          const snippetType = getSnippetContentType(snippet)
+
+          let snippetContent: unknown = (snippet as SnippetWithContent)?.content
           if (snippetContent === undefined) {
-            const { content } = await getContentById({ projectRef: ref, id: snippet.id })
-            if ('unchecked_sql' in content) {
-              snippetContent = content
-            }
+            const loaded = await getContentById({ projectRef: ref, id: snippet.id })
+            snippetContent = loaded.content
           }
 
-          if (snippetContent === undefined) {
+          if (!getSnippetSqlFromContent(snippetContent)) {
             return toast.error('Failed to save snippet: Unable to retrieve snippet contents')
-          } else {
-            const movedSnippet = await moveSnippetAsync({
-              projectRef: ref,
-              payload: {
-                id: snippet.id,
-                type: 'sql',
-                name: snippet.name,
-                description: snippet.description,
-                visibility: snippet.visibility,
-                project_id: snippet.project_id,
-                owner_id: snippet.owner_id,
+          }
+
+          const movedSnippet = await moveSnippetAsync({
+            projectRef: ref,
+            payload: {
+              id: snippet.id,
+              type: snippetType,
+              name: snippet.name,
+              description: snippet.description,
+              visibility: snippet.visibility,
+              project_id: snippet.project_id,
+              owner_id: snippet.owner_id,
+              folder_id: selectedId === 'root' ? null : folderId,
+              content: buildSnippetUpsertContent(
+                snippet.id,
+                snippetType,
+                snippetContent
+              ) as UpsertContentPayload['content'],
+            },
+          })
+          if (IS_PLATFORM) {
+            snapV2.updateSnippet({
+              id: snippet.id,
+              snippet: {
+                ...snippet,
+                type: snippetType,
                 folder_id: selectedId === 'root' ? null : folderId,
-                content: snippetContent as any,
               },
+              skipSave: true,
             })
-            if (IS_PLATFORM) {
-              snapV2.updateSnippet({
-                id: snippet.id,
-                snippet: { ...snippet, folder_id: selectedId === 'root' ? null : folderId },
-                skipSave: true,
-              })
-            } else if (movedSnippet) {
-              // On selfhosted, we need to update the state with the moved snippet because the snippet depends on the
-              // folder_id the moved snippet has a different id than the original snippet.
+          } else if (movedSnippet) {
+            // On selfhosted, we need to update the state with the moved snippet because the snippet depends on the
+            // folder_id the moved snippet has a different id than the original snippet.
 
-              // remove the old snippet from the state without saving to API
-              snapV2.removeSnippet(snippet.id, true)
+            // remove the old snippet from the state without saving to API
+            snapV2.removeSnippet(snippet.id, true)
 
-              snapV2.addSnippet({ projectRef: ref, snippet: movedSnippet })
+            snapV2.addSnippet({ projectRef: ref, snippet: movedSnippet })
 
-              // remove the tab for the old snippet if the snippet was open. Moving can also happen when the tab is not open.
-              const tabId = createTabId('sql', { id: snippet.id })
-              if (tabsSnap.hasTab(tabId)) {
-                tabsSnap.removeTab(tabId)
-                await router.push(`/project/${ref}/sql/${movedSnippet.id}`)
-              }
+            // remove the tab for the old snippet if the snippet was open. Moving can also happen when the tab is not open.
+            const tabId = createTabId('sql', { id: snippet.id })
+            if (tabsSnap.hasTab(tabId)) {
+              tabsSnap.removeTab(tabId)
+              await router.push(`/project/${ref}/sql/${movedSnippet.id}`)
             }
           }
         })

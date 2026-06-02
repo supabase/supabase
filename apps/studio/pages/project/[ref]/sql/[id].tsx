@@ -8,6 +8,7 @@ import { Admonition } from 'ui-patterns'
 
 import { SQLEditor } from '@/components/interfaces/SQLEditor/SQLEditor'
 import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
+import { getSnippetQuerySource } from '@/components/interfaces/SQLEditor/sqlSnippet.utils'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import { EditorBaseLayout } from '@/components/layouts/editors/EditorBaseLayout'
 import { useEditorType } from '@/components/layouts/editors/EditorsLayout.hooks'
@@ -17,6 +18,7 @@ import { useContentIdQuery } from '@/data/content/content-id-query'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
+import { useQueryExecutionSourceSnapshot } from '@/state/query-execution-source'
 import { SnippetWithContent, useSnippets, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 import type { NextPageWithLayout } from '@/types'
@@ -30,6 +32,7 @@ const SqlEditor: NextPageWithLayout = () => {
   const editor = useEditorType()
   const tabs = useTabsStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const querySourceState = useQueryExecutionSourceSnapshot()
   const { history, setLastVisitedSnippet } = useDashboardHistory()
 
   const allSnippets = useSnippets(ref!)
@@ -74,6 +77,15 @@ const SqlEditor: NextPageWithLayout = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref, data, project])
+
+  useEffect(() => {
+    if (router.query.source === 'logs') {
+      querySourceState.setExecutionSource('logs')
+    } else if (data) {
+      querySourceState.setExecutionSource(getSnippetQuerySource(data))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.query.source, data])
 
   // Load the last visited snippet when landing on /new
   useEffect(() => {
@@ -153,7 +165,7 @@ const SqlEditor: NextPageWithLayout = () => {
 
 SqlEditor.getLayout = (page) => (
   <DefaultLayout>
-    <EditorBaseLayout productMenu={<SQLEditorMenu />} product="SQL Editor">
+    <EditorBaseLayout productMenu={<SQLEditorMenu />} product="Explorer">
       <SQLEditorLayout>{page}</SQLEditorLayout>
     </EditorBaseLayout>
   </DefaultLayout>

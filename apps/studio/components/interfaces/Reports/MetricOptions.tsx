@@ -157,7 +157,7 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
                             },
                             isAddingChart: true,
                           })
-                          track('custom_report_add_sql_block_clicked')
+                          track('notebook_add_sql_block_clicked')
                         }
                       }}
                     >

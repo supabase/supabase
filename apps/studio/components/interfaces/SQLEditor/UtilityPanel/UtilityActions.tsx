@@ -19,9 +19,11 @@ import {
 import { SqlRunButton } from './RunButton'
 import SavingIndicator from './SavingIndicator'
 import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
-import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
+import { QuerySourceSelector } from '@/components/ui/QuerySourceSelector'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from '@/lib/constants'
+import { useNotebookEditorContext } from '@/state/notebook-editor-context'
+import type { QueryExecutionSource } from '@/state/query-execution-source'
 import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
@@ -45,6 +47,7 @@ export const UtilityActions = ({
 }: UtilityActionsProps) => {
   const { ref } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const notebookEditorContext = useNotebookEditorContext()
 
   const [isAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
   const [intellisenseEnabled, setIntellisenseEnabled] = useLocalStorageQuery(
@@ -78,6 +81,14 @@ export const UtilityActions = ({
     snapV2.resetResults(id)
     setLastSelectedDb(databaseId)
   }
+
+  const onSourceChange = (source: QueryExecutionSource) => {
+    snapV2.resetResults(id)
+    snapV2.resetLogsResults(id)
+    notebookEditorContext?.persistBlock({ querySource: source })
+  }
+
+  const executionSource = notebookEditorContext?.querySource
 
   return (
     <div className="inline-flex items-center justify-end gap-x-2">
@@ -196,16 +207,23 @@ export const UtilityActions = ({
       <div className="flex items-center justify-between gap-x-2">
         <div className="flex items-center">
           {IS_PLATFORM && (
-            <DatabaseSelector
+            <QuerySourceSelector
               selectedDatabaseId={lastSelectedDb.length === 0 ? undefined : lastSelectedDb}
-              variant="connected-on-right"
-              onSelectId={onSelectDatabase}
+              selectedSource={executionSource}
+              selectedLogsDatePickerValue={notebookEditorContext?.logsDatePickerValue}
+              onSelectDatabase={onSelectDatabase}
+              onSourceChange={onSourceChange}
+              onLogsDatePickerValueChange={(value) =>
+                notebookEditorContext?.persistBlock({ logsDatePickerValue: value })
+              }
             />
           )}
           <RoleImpersonationPopover
             serviceRoleLabel="postgres"
             header="Run SQL query as a role"
             variant={IS_PLATFORM ? 'connected-on-both' : 'connected-on-right'}
+            hideWhenLogsSource
+            executionSource={executionSource}
           />
           <SqlRunButton
             hasSelection={hasSelection}
