@@ -5,7 +5,7 @@ import 'swiper/css'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Image } from 'ui-patterns/Image'
 
-export const FilesViewer = ({ files }: { files: string[] }) => {
+export const FilesViewer = ({ files }: { files: { src: string; alt: string }[] }) => {
   return (
     <Swiper
       className="w-full"
@@ -19,10 +19,10 @@ export const FilesViewer = ({ files }: { files: string[] }) => {
       }}
     >
       {files.map((file, i) => (
-        <SwiperSlide key={`${file}-${i}`}>
+        <SwiperSlide key={`${file.src}-${i}`}>
           <Image
-            src={file}
-            alt=""
+            src={file.src}
+            alt={file.alt}
             zoomable
             width={400}
             height={225}

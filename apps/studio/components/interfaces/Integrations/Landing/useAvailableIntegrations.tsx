@@ -97,7 +97,10 @@ export const useAvailableIntegrations = () => {
             source: 'Partner' as const,
             categories: categories.map((x) => x.slug),
             content,
-            files: images?.map((image) => fullImageUrl(image)),
+            files: images?.map((image, i) => ({
+              src: fullImageUrl(image),
+              alt: `${title} image ${i + 1}`,
+            })),
             description,
             docsUrl,
             siteUrl,
@@ -186,7 +189,10 @@ export const useAvailableIntegrations = () => {
         docsUrl,
         siteUrl,
         author: authorName ? { name: authorName, websiteUrl: '' } : undefined,
-        files: images?.map((image) => fullImageUrl(image)),
+        files: images?.map((image, i) => ({
+          src: fullImageUrl(image),
+          alt: `${title} screenshot ${i + 1}`,
+        })),
         icon: listingLogo ? renderMarketplaceLogo(listingLogo) : undefined,
       }
 
