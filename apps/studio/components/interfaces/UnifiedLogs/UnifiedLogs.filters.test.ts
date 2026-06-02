@@ -7,12 +7,17 @@ describe('columnFiltersToLogsFilters', () => {
     // The shared DataTable checkbox writes a plain array via setFilterValue.
     // It must still round-trip into the `filter` URL param, otherwise clicking
     // a sidebar facet never re-runs the query (the reported regression).
-    const filters = columnFiltersToLogsFilters([{ id: 'log_type', value: ['postgres', 'postgrest'] }])
+    const filters = columnFiltersToLogsFilters([
+      { id: 'log_type', value: ['postgres', 'postgrest'] },
+    ])
     expect(filters).toEqual([
       { column: 'log_type', operator: '=', value: 'postgres' },
       { column: 'log_type', operator: '=', value: 'postgrest' },
     ])
-    expect(logsFiltersToUrlParams(filters)).toEqual(['log_type:eq:postgres', 'log_type:eq:postgrest'])
+    expect(logsFiltersToUrlParams(filters)).toEqual([
+      'log_type:eq:postgres',
+      'log_type:eq:postgrest',
+    ])
   })
 
   it('preserves the operator from a wrapped value (top filter bar)', () => {
