@@ -2,7 +2,7 @@ import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 import { useTheme } from 'next-themes'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogHeader, DialogSectionSeparator, DialogTitle } from 'ui'
 
@@ -33,6 +33,13 @@ const AddNewPaymentMethodModal = ({
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
+  const isMounted = useRef(true)
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false
+    }
+  }, [])
 
   const { mutate: setupIntent } = useOrganizationPaymentMethodSetupIntent({
     onSuccess: (intent) => {
@@ -71,6 +78,9 @@ const AddNewPaymentMethodModal = ({
         }
 
         await initSetupIntent(token ?? undefined)
+
+        if (!isMounted.current) return
+
         resetCaptcha()
       }
     }
