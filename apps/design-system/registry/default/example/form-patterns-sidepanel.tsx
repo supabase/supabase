@@ -59,8 +59,8 @@ const formSchema = z
         z.literal(''),
         z.coerce
           .number()
-          .gte(1000, 'Max connections should be at least 1')
-          .lte(10000, 'Max connections should not exceed 1000'),
+          .gte(1000, 'Max connections should be at least 1000')
+          .lte(10000, 'Max connections should not exceed 10000'),
       ])
       .refine((value) => value !== '', 'Max connections is required'),
     enableFeature: z.boolean(),
