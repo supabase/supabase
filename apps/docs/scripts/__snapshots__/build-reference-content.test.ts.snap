@@ -248,6 +248,13 @@ exports[`build-reference-content — javascript/v2 > matches snapshot 1`] = `
       "title": "verifyRegistration",
       "type": "function",
     },
+    "auth-dispose": {
+      "id": "auth-dispose",
+      "product": "auth",
+      "slug": "auth-dispose",
+      "title": "dispose",
+      "type": "function",
+    },
     "auth-exchangecodeforsession": {
       "id": "auth-exchangecodeforsession",
       "product": "auth",
@@ -2025,6 +2032,13 @@ exports[`build-reference-content — javascript/v2 > matches snapshot 1`] = `
       "type": "function",
     },
     {
+      "id": "auth-dispose",
+      "product": "auth",
+      "slug": "auth-dispose",
+      "title": "dispose",
+      "type": "function",
+    },
+    {
       "id": "auth-exchangecodeforsession",
       "product": "auth",
       "slug": "auth-exchangecodeforsession",
@@ -3633,6 +3647,10 @@ const supabase = createClient(supabase_url, publishable_key, {
       "title": "Overview",
     },
     {
+      "$ref": "@supabase/auth-js.GoTrueClient.dispose",
+      "id": "auth-dispose",
+    },
+    {
       "$ref": "@supabase/auth-js.GoTrueClient.exchangeCodeForSession",
       "id": "auth-exchangecodeforsession",
     },
@@ -4735,6 +4753,13 @@ Passkey support is an experimental feature. Enable it when creating the client:"
           "id": "auth",
           "slug": "auth",
           "title": "Overview",
+          "type": "function",
+        },
+        {
+          "id": "auth-dispose",
+          "product": "auth",
+          "slug": "auth-dispose",
+          "title": "dispose",
           "type": "function",
         },
         {
@@ -9193,6 +9218,87 @@ challenge. Used as the second step of a two-step registration flow.",
             },
             "name": "Promise",
             "type": "promise",
+          },
+        },
+      },
+      "@supabase/auth-js.AuthRefreshDiscardedError.constructor": {
+        "comment": undefined,
+        "name": "@supabase/auth-js.AuthRefreshDiscardedError.constructor",
+        "params": [
+          {
+            "name": "message",
+            "type": {
+              "name": "string",
+              "type": "intrinsic",
+            },
+          },
+        ],
+        "ret": {
+          "type": {
+            "name": "AuthRefreshDiscardedError",
+            "type": "nameOnly",
+          },
+        },
+      },
+      "@supabase/auth-js.AuthRefreshDiscardedError.toJSON": {
+        "comment": undefined,
+        "name": "@supabase/auth-js.AuthRefreshDiscardedError.toJSON",
+        "params": [],
+        "ret": {
+          "type": {
+            "name": Symbol(anonymous),
+            "properties": [
+              {
+                "name": "code",
+                "type": {
+                  "name": Symbol(anonymous),
+                  "subTypes": [
+                    {
+                      "name": "undefined",
+                      "type": "intrinsic",
+                    },
+                    undefined,
+                    {
+                      "name": "ErrorCode",
+                      "type": "nameOnly",
+                    },
+                  ],
+                  "type": "union",
+                },
+              },
+              {
+                "name": "message",
+                "type": {
+                  "name": "string",
+                  "type": "intrinsic",
+                },
+              },
+              {
+                "name": "name",
+                "type": {
+                  "name": "string",
+                  "type": "intrinsic",
+                },
+              },
+              {
+                "name": "status",
+                "type": {
+                  "name": Symbol(anonymous),
+                  "subTypes": [
+                    {
+                      "name": "undefined",
+                      "type": "intrinsic",
+                    },
+                    {
+                      "name": "number",
+                      "type": "intrinsic",
+                    },
+                  ],
+                  "type": "union",
+                },
+              },
+            ],
+            "type": "object",
           },
         },
       },
@@ -19479,16 +19585,13 @@ disabled throws a descriptive error at call time.",
                 },
                 {
                   "comment": {
-                    "shortText": "Provide your own locking mechanism based on the environment. By default,
-\`navigatorLock\` (Web Locks API) is used in browser environments when
-\`persistSession\` is true. Falls back to an in-process lock for non-browser
-environments (e.g. React Native).",
-                    "tags": [
-                      {
-                        "tag": "experimental",
-                        "text": "",
-                      },
-                    ],
+                    "shortText": "Provide your own locking mechanism based on the environment. By default
+the client coordinates refreshes itself (single-flight via
+\`refreshingDeferred\` + commit guard) and relies on the GoTrue server to
+resolve cross-tab refresh races. Passing a custom lock opts into a
+legacy path that wraps every auth operation in your supplied lock — this
+path is preserved for backwards compatibility (typically React Native
+\`processLock\` or Node multi-process setups).",
                   },
                   "isOptional": true,
                   "name": "lock",
@@ -19557,35 +19660,9 @@ environments (e.g. React Native).",
                 },
                 {
                   "comment": {
-                    "examples": [
-                      {
-                        "code": "\`\`\`ts
-const client = createClient(url, key, {
-  auth: {
-    lockAcquireTimeout: 5000, // 5 seconds, then steal orphaned lock
-  },
-})
-\`\`\`",
-                        "data": undefined,
-                        "description": undefined,
-                        "id": "example-1",
-                        "name": "Example 1",
-                        "response": undefined,
-                      },
-                    ],
-                    "shortText": "The maximum time in milliseconds to wait for acquiring a cross-tab synchronization lock.
-
-When multiple browser tabs or windows use the auth client simultaneously, they coordinate
-via the Web Locks API to prevent race conditions during session refresh and other operations.
-This timeout controls how long to wait before attempting lock recovery.
-
-- **Positive value**: Wait up to this many milliseconds. If the lock is still held, attempt
-  automatic recovery by stealing it (the previous holder is evicted, its callback continues
-  to completion without exclusive access). This recovers from orphaned locks caused by
-  React Strict Mode double-mount, storage API hangs, or aborted operations.
-- **Zero (0)**: Fail immediately if the lock is unavailable; throws \`LockAcquireTimeoutError\`
-  (check \`error.isAcquireTimeout === true\`).
-- **Negative value**: Wait indefinitely — can cause permanent deadlocks if the lock is orphaned.",
+                    "shortText": "The maximum time in milliseconds to wait for acquiring the custom lock
+supplied via the \`lock\` option. Only consulted when a custom \`lock\` is
+passed — the default lockless path doesn't use this timeout.",
                   },
                   "isOptional": true,
                   "name": "lockAcquireTimeout",
@@ -19679,6 +19756,55 @@ When this option is set and cookie storage is used, \`getSession()\` and other f
           "type": {
             "name": "GoTrueClient",
             "type": "nameOnly",
+          },
+        },
+      },
+      "@supabase/auth-js.GoTrueClient.dispose": {
+        "comment": {
+          "examples": [
+            {
+              "code": "\`\`\`ts
+useEffect(() => {
+  const client = createClient(...)
+  return () => { client.auth.dispose() }
+}, [])
+\`\`\`",
+              "data": undefined,
+              "description": undefined,
+              "id": "cleanup-on-react-unmount",
+              "name": "Cleanup on React unmount",
+              "response": undefined,
+            },
+          ],
+          "shortText": "Tears down the client's background work: stops the auto-refresh interval,
+removes the \`visibilitychange\` listener, closes the cross-tab
+\`BroadcastChannel\`, and clears registered \`onAuthStateChange\` subscribers.
+
+Call this from cleanup hooks when the client is being replaced before
+its JS realm is destroyed. React Strict Mode and HMR are the common
+cases. Any in-flight \`fetch\` calls continue to completion and may still
+write to storage; dispose doesn't abort them or erase storage.
+
+Lifecycle caveat: because in-flight refreshes are not aborted, a
+disposed instance can still persist a rotated session to storage after
+\`dispose()\` returns. A subsequent \`createClient\` against the same
+\`storageKey\` will pick up that session on its next read. If you need
+strict isolation between client lifecycles, await any pending auth
+operation before calling \`dispose()\` (or change the \`storageKey\` for
+the replacement client).
+
+Safe to call repeatedly.",
+        },
+        "name": "@supabase/auth-js.GoTrueClient.dispose",
+        "params": [],
+        "ret": {
+          "type": {
+            "awaited": {
+              "name": "void",
+              "type": "intrinsic",
+            },
+            "name": "Promise",
+            "type": "promise",
           },
         },
       },
@@ -21762,7 +21888,7 @@ will be emitted if this is detected. Use #getUser() instead.",
 - If the session's access token is expired or is about to expire, this method will use the refresh token to refresh the session.
 - When using in a browser, or you've called \`startAutoRefresh()\` in your environment (React Native, etc.) this function always returns a valid access token without refreshing the session itself, as this is done in the background. This function returns very fast.
 - **IMPORTANT SECURITY NOTICE:** If using an insecure storage medium, such as cookies or request headers, the user object returned by this function **must not be trusted**. Always verify the JWT using \`getClaims()\` or your own JWT verification library to securely establish the user's identity and access. You can also use \`getUser()\` to fetch the user object directly from the Auth server for this purpose.
-- When using in a browser, this function is synchronized across all tabs using the [LockManager](https://developer.mozilla.org/en-US/docs/Web/API/LockManager) API. In other environments make sure you've defined a proper \`lock\` property, if necessary, to make sure there are no race conditions while the session is being refreshed.",
+- Cross-tab refresh races are handled by the GoTrue server (the rotated token from the first tab is returned to subsequent tabs via the parent-of-active mechanism), so no client-side serialization is needed.",
         },
         "name": "@supabase/auth-js.GoTrueClient.getSession",
         "params": [],
@@ -26794,18 +26920,8 @@ Safe to use without an async function as callback.",
           "text": "- Subscribes to important events occurring on the user's session.
 - Use on the frontend/client. It is less useful on the server.
 - Events are emitted across tabs to keep your application's UI up-to-date. Some events can fire very frequently, based on the number of tabs open. Use a quick and efficient callback function, and defer or debounce as many operations as you can to be performed outside of the callback.
-- **Important:** A callback can be an \`async\` function and it runs synchronously during the processing of the changes causing the event. You can easily create a dead-lock by using \`await\` on a call to another method of the Supabase library.
-  - Avoid using \`async\` functions as callbacks.
-  - Limit the number of \`await\` calls in \`async\` callbacks.
-  - Do not use other Supabase functions in the callback function. If you must, dispatch the functions once the callback has finished executing. Use this as a quick way to achieve this:
-    \`\`\`js
-    supabase.auth.onAuthStateChange((event, session) => {
-      setTimeout(async () => {
-        // await on other Supabase function here
-        // this runs right after the callback has finished
-      }, 0)
-    })
-    \`\`\`
+- Callbacks can be \`async\` and can safely call other Supabase auth methods (\`getUser\`, \`setSession\`, etc.) from inside the callback.
+- Keep callbacks quick. Events are awaited in order, so a slow callback delays subsequent events to subscribers in this tab.
 - Emitted events:
   - \`INITIAL_SESSION\`
     - Emitted right after the Supabase client is constructed and the initial session from storage is loaded.
@@ -26871,6 +26987,7 @@ Safe to use without an async function as callback.",
       "@supabase/auth-js.isAuthError": [Object],
       "@supabase/auth-js.isAuthImplicitGrantRedirectError": [Object],
       "@supabase/auth-js.isAuthPKCECodeVerifierMissingError": [Object],
+      "@supabase/auth-js.isAuthRefreshDiscardedError": [Object],
       "@supabase/auth-js.isAuthRetryableFetchError": [Object],
       "@supabase/auth-js.isAuthSessionMissingError": [Object],
       "@supabase/auth-js.isAuthWeakPasswordError": [Object],
@@ -27135,6 +27252,8 @@ Safe to use without an async function as callback.",
       "@supabase/supabase-js.AuthPasskeyApi.update": [Object],
       "@supabase/supabase-js.AuthPasskeyApi.verifyAuthentication": [Object],
       "@supabase/supabase-js.AuthPasskeyApi.verifyRegistration": [Object],
+      "@supabase/supabase-js.AuthRefreshDiscardedError.constructor": [Object],
+      "@supabase/supabase-js.AuthRefreshDiscardedError.toJSON": [Object],
       "@supabase/supabase-js.AuthRetryableFetchError.constructor": [Object],
       "@supabase/supabase-js.AuthRetryableFetchError.toJSON": [Object],
       "@supabase/supabase-js.AuthSessionMissingError.constructor": [Object],
@@ -27182,6 +27301,7 @@ Safe to use without an async function as callback.",
       "@supabase/supabase-js.GoTrueClient._signOut": [Object],
       "@supabase/supabase-js.GoTrueClient._updateUser": [Object],
       "@supabase/supabase-js.GoTrueClient.constructor": [Object],
+      "@supabase/supabase-js.GoTrueClient.dispose": [Object],
       "@supabase/supabase-js.GoTrueClient.exchangeCodeForSession": [Object],
       "@supabase/supabase-js.GoTrueClient.getClaims": [Object],
       "@supabase/supabase-js.GoTrueClient.getSession": [Object],
@@ -27359,6 +27479,7 @@ Safe to use without an async function as callback.",
       "@supabase/supabase-js.isAuthError": [Object],
       "@supabase/supabase-js.isAuthImplicitGrantRedirectError": [Object],
       "@supabase/supabase-js.isAuthPKCECodeVerifierMissingError": [Object],
+      "@supabase/supabase-js.isAuthRefreshDiscardedError": [Object],
       "@supabase/supabase-js.isAuthRetryableFetchError": [Object],
       "@supabase/supabase-js.isAuthSessionMissingError": [Object],
       "@supabase/supabase-js.isAuthWeakPasswordError": [Object],
