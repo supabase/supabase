@@ -150,6 +150,20 @@ export default function IntegrationsContent({
   // Uses wrapping <label> elements (no id/htmlFor) to avoid duplicate HTML IDs in the DOM.
   const filtersPanel = (
     <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3 border-b border-muted pb-4">
+        <label className="flex cursor-pointer items-center justify-between gap-3 text-foreground-light transition-colors hover:text-foreground">
+          <span className="flex flex-1 items-center gap-2 text-sm text-left">
+            <Store size={13} className="shrink-0 text-foreground-lighter" />
+            Marketplace
+          </span>
+          <Checkbox
+            checked={oneClickOnly}
+            onCheckedChange={(checked) => setFilters({ marketplace: !!checked })}
+            className="[&_input]:m-0"
+          />
+        </label>
+      </div>
+
       <div className="flex flex-col gap-2.5">
         <h2 className="text-xs font-mono uppercase text-foreground-lighter">Categories</h2>
         {allCategories.map((category) => {
@@ -171,31 +185,6 @@ export default function IntegrationsContent({
             </label>
           )
         })}
-      </div>
-
-      <div className="flex flex-col gap-3 border-t border-muted pt-4">
-        <label className="flex cursor-pointer items-center justify-between gap-3 text-foreground-light transition-colors hover:text-foreground">
-          <span className="flex flex-1 items-center gap-2 text-sm text-left">
-            <BadgeCheck size={13} className="shrink-0 text-foreground-lighter" />
-            Official Partners
-          </span>
-          <Checkbox
-            checked={partnerOnly}
-            onCheckedChange={(checked) => setFilters({ partner: !!checked })}
-            className="[&_input]:m-0"
-          />
-        </label>
-        <label className="flex cursor-pointer items-center justify-between gap-3 text-foreground-light transition-colors hover:text-foreground">
-          <span className="flex flex-1 items-center gap-2 text-sm text-left">
-            <Store size={13} className="shrink-0 text-foreground-lighter" />
-            Available in Marketplace
-          </span>
-          <Checkbox
-            checked={oneClickOnly}
-            onCheckedChange={(checked) => setFilters({ marketplace: !!checked })}
-            className="[&_input]:m-0"
-          />
-        </label>
       </div>
 
       {HAS_ACTIVE_FILTERS && (
@@ -323,6 +312,30 @@ export default function IntegrationsContent({
                     </Link>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Marketplace callout — shown when the Marketplace filter is active */}
+            {oneClickOnly && (
+              <div className="rounded-xl border bg-surface-100 p-5 flex flex-col gap-1.5">
+                <div className="flex items-center gap-2">
+                  <Store size={16} className="shrink-0" />
+                  <h2 className="text-foreground text-base">Supabase Integrations Marketplace</h2>
+                </div>
+                <p className="text-foreground-lighter text-sm">
+                  The Marketplace is where you can find, install and manage integrations directly in
+                  the{' '}
+                  <a
+                    href="https://supabase.com/dashboard/project/_/integrations"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-foreground-light hover:underline inline-flex items-center gap-0.5"
+                  >
+                    Supabase dashboard
+                    <ArrowUpRight size={13} className="shrink-0" />
+                  </a>
+                  .
+                </p>
               </div>
             )}
 
