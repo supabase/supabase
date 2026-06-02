@@ -82,13 +82,24 @@ export const groupLogsFiltersByColumn = (
 }
 
 export const columnFiltersToLogsFilters = (
-  columnFilters: { id: string; value: unknown }[]
+  columnFilters: { id: string; value: unknown }[],
+  filterableNames?: Set<string>
 ): LogsFilter[] => {
   const filters: LogsFilter[] = []
   for (const { id, value } of columnFilters) {
-    if (!isLogsFilterColumnValue(value)) continue
-    for (const v of value.values) {
-      filters.push({ column: id, operator: value.operator, value: String(v) })
+    // Skip columns that don't serialize into the `filter` param (e.g. the
+    // `date` timerange brush, which round-trips through its own URL key).
+    if (filterableNames && !filterableNames.has(id)) continue
+    if (value === null || value === undefined) continue
+    // The top filter bar writes a wrapped { operator, values }, while the shared
+    // sidebar checkbox writes a bare string[] (TanStack convention). Normalize
+    // the bare array to the default `=` operator so sidebar clicks serialize and
+    // re-run the query the same way the filter bar does.
+    const { operator, values } = isLogsFilterColumnValue(value)
+      ? value
+      : { operator: '=' as LogsFilterOperator, values: Array.isArray(value) ? value : [value] }
+    for (const v of values) {
+      filters.push({ column: id, operator, value: String(v) })
     }
   }
   return filters

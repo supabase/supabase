@@ -299,7 +299,12 @@ export const UnifiedLogs = () => {
   // column filters keep their dedicated per-column URL keys so things like the timeline brush still
   // round-trip — they have their own range semantics and aren't covered by eq/neq/like.
   const applyFilterSearch = () => {
-    const filterEntries = logsFiltersToUrlParams(columnFiltersToLogsFilters(columnFilters))
+    const filterableNames = new Set(
+      filterFields.filter((field) => field.type !== 'timerange').map((field) => field.value)
+    )
+    const filterEntries = logsFiltersToUrlParams(
+      columnFiltersToLogsFilters(columnFilters, filterableNames)
+    )
     const update: Record<string, unknown> = {
       filter: filterEntries.length > 0 ? filterEntries : null,
     }
