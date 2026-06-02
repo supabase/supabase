@@ -71,7 +71,7 @@ export const LOCAL_STORAGE_KEYS = {
   // Notice banner keys
   API_KEYS_FEEDBACK_DISMISSED: (ref: string) => `supabase-api-keys-feedback-dismissed-${ref}`,
   TERMS_OF_SERVICE_UPDATE: 'terms-of-service-update-2026-06-06',
-  SUPAVISOR_MAINTENANCE: (ref: string) => `supavisor-maintenance-2026-05-21-${ref}`,
+  SUPAVISOR_MAINTENANCE: (ref: string) => `supavisor-maintenance-2026-06-09-${ref}`,
   REPORT_DATERANGE: 'supabase-report-daterange',
   PROJECT_PAUSING_STARTED_AT: (ref: string) => `supabase-project-pausing-started-at-${ref}`,
   PROJECT_RESTORING_STARTED_AT: (ref: string) => `supabase-project-restoring-started-at-${ref}`,
