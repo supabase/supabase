@@ -1,13 +1,15 @@
+import { safeSql } from '@supabase/pg-meta'
 import { Query } from '@supabase/pg-meta/src/query'
 import { useQuery } from '@tanstack/react-query'
-import { UseCustomQueryOptions } from 'types'
-import { executeSql } from '../sql/execute-sql-query'
+
 import { vaultSecretsKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import { UseCustomQueryOptions } from '@/types'
 
 const vaultSecretDecryptedValueQuery = (id: string) => {
   const sql = new Query()
     .from('decrypted_secrets', 'vault')
-    .select('decrypted_secret')
+    .select(safeSql`decrypted_secret`)
     .match({ id })
     .toSql()
 
@@ -17,7 +19,7 @@ const vaultSecretDecryptedValueQuery = (id: string) => {
 const vaultSecretDecryptedValuesQuery = (ids: string[]) => {
   const sql = new Query()
     .from('decrypted_secrets', 'vault')
-    .select('id,decrypted_secret')
+    .select(safeSql`id,decrypted_secret`)
     .filter('id', 'in', ids)
     .toSql()
 
@@ -27,13 +29,15 @@ const vaultSecretDecryptedValuesQuery = (ids: string[]) => {
 export type VaultSecretsDecryptedValueVariables = {
   projectRef?: string
   connectionString?: string | null
-  id: string
+  id?: string
 }
 
 export const getDecryptedValue = async (
   { projectRef, connectionString, id }: VaultSecretsDecryptedValueVariables,
   signal?: AbortSignal
 ) => {
+  if (!id) throw new Error('ID is required')
+
   const sql = vaultSecretDecryptedValueQuery(id)
   const { result } = await executeSql(
     {
@@ -84,8 +88,14 @@ export const getDecryptedValues = async (
   signal?: AbortSignal
 ) => {
   const sql = vaultSecretDecryptedValuesQuery(ids)
-  const { result } = await executeSql({ projectRef, connectionString, sql }, signal)
-  return result.reduce((a: any, b: any) => {
-    return { ...a, [b.id]: b.decrypted_secret }
-  }, {})
+  const { result } = await executeSql<{ id: string; decrypted_secret: string }[]>(
+    { projectRef, connectionString, sql },
+    signal
+  )
+  return result.reduce(
+    (a, b) => {
+      return { ...a, [b.id]: b.decrypted_secret }
+    },
+    {} as Record<string, string>
+  )
 }

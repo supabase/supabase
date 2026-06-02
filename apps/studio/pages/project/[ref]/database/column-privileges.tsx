@@ -3,44 +3,45 @@ import { AlertCircle, XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
+import { Alert, AlertDescription, AlertTitle, Button } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
   useFeaturePreviewModal,
   useIsColumnLevelPrivilegesEnabled,
-} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+} from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   getDefaultColumnCheckedStates,
   getDefaultTableCheckedStates,
   useApplyPrivilegeOperations,
   usePrivilegesState,
-} from 'components/interfaces/Database/Privileges/Privileges.utils'
-import PrivilegesHead from 'components/interfaces/Database/Privileges/PrivilegesHead'
-import PrivilegesTable from 'components/interfaces/Database/Privileges/PrivilegesTable'
-import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
-import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { PgRole, useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
-import { useColumnPrivilegesQuery } from 'data/privileges/column-privileges-query'
-import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
-import { DOCS_URL } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+} from '@/components/interfaces/Database/Privileges/Privileges.utils'
+import PrivilegesHead from '@/components/interfaces/Database/Privileges/PrivilegesHead'
+import PrivilegesTable from '@/components/interfaces/Database/Privileges/PrivilegesTable'
+import { ProtectedSchemaWarning } from '@/components/interfaces/Database/ProtectedSchemaWarning'
+import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import AlertError from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
+import { PgRole, useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
+import { useColumnPrivilegesQuery } from '@/data/privileges/column-privileges-query'
+import { useTablePrivilegesQuery } from '@/data/privileges/table-privileges-query'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { DOCS_URL } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
 
 const EDITABLE_ROLES = ['authenticated', 'anon', 'service_role']
 
 const PrivilegesPage: NextPageWithLayout = () => {
   const { ref, table: paramTable } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { openFeaturePreviewModal } = useFeaturePreviewModal()
+  const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
   const isEnabled = useIsColumnLevelPrivilegesEnabled()
 
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
@@ -224,10 +225,15 @@ const PrivilegesPage: NextPageWithLayout = () => {
         <div className="col-span-12 flex flex-col pb-4 gap-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="mb-1 text-xl">Column-level privileges</h3>
-              <div className="text-sm text-lighter">
-                <p>Grant or revoke privileges on a column based on user role.</p>
+              <div className="flex items-center gap-x-4 mb-1">
+                <h3 className="text-xl">Column-level privileges</h3>
+                {isEnabled && (
+                  <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS} />
+                )}
               </div>
+              <p className="text-sm text-lighter">
+                Grant or revoke privileges on a column based on user role.
+              </p>
             </div>
             <DocsButton href={`${DOCS_URL}/guides/auth/column-level-security`} />
           </div>
@@ -235,37 +241,35 @@ const PrivilegesPage: NextPageWithLayout = () => {
           {isEnabled ? (
             <>
               {!diffWarningDismissed && (
-                <Alert_Shadcn_ variant="warning">
+                <Alert variant="warning">
                   <AlertCircle strokeWidth={2} />
-                  <AlertTitle_Shadcn_>
+                  <AlertTitle>
                     Changes to column privileges will not be reflected in migrations when running{' '}
                     <code className="text-code-inline">supabase db diff</code>.
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
+                  </AlertTitle>
+                  <AlertDescription>
                     Column privileges are not supported in the current version of the Supabase CLI.
                     <br />
                     You will need to manually apply these changes to your database.
-                  </AlertDescription_Shadcn_>
+                  </AlertDescription>
                   <Button
                     type="outline"
                     aria-label="Dismiss"
-                    className="absolute top-2 right-2 p-1 !pl-1"
+                    className="absolute top-2 right-2 p-1 pl-1!"
                     onClick={() => {
                       setDiffWarningDismissed(true)
                     }}
                   >
                     <XIcon width={14} height={14} />
                   </Button>
-                </Alert_Shadcn_>
+                </Alert>
               )}
 
               {!selectStarWarningDismissed && (
-                <Alert_Shadcn_ variant="warning">
+                <Alert variant="warning">
                   <AlertCircle strokeWidth={2} />
-                  <AlertTitle_Shadcn_>
-                    Changing column privileges can break existing queries.
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
+                  <AlertTitle>Changing column privileges can break existing queries.</AlertTitle>
+                  <AlertDescription>
                     If you remove a column privilege for a role, that role will lose all access to
                     that column.
                     <br />
@@ -275,18 +279,18 @@ const PrivilegesPage: NextPageWithLayout = () => {
                     <code className="text-code-inline">insert</code>,{' '}
                     <code className="text-code-inline">update</code>, and{' '}
                     <code className="text-code-inline">delete</code>) will fail.
-                  </AlertDescription_Shadcn_>
+                  </AlertDescription>
                   <Button
                     type="outline"
                     aria-label="Dismiss"
-                    className="absolute top-2 right-2 p-1 !pl-1"
+                    className="absolute top-2 right-2 p-1 pl-1!"
                     onClick={() => {
                       setSelectStarWarningDismissed(true)
                     }}
                   >
                     <XIcon width={14} height={14} />
                   </Button>
-                </Alert_Shadcn_>
+                </Alert>
               )}
 
               <PrivilegesHead
@@ -324,7 +328,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                   />
                 </div>
               ) : (tables ?? []).length === 0 ? (
-                <div className="flex-grow flex flex-col items-center justify-center w-[600px] mx-auto">
+                <div className="grow flex flex-col items-center justify-center w-[600px] mx-auto">
                   <p className="text-center">There are no tables in the {selectedSchema} schema</p>
                   <p className="text-sm text-foreground-light text-center">
                     Once a table is available in the schema, you may manage it's column-level
@@ -343,19 +347,17 @@ const PrivilegesPage: NextPageWithLayout = () => {
               )}
             </>
           ) : (
-            <Alert_Shadcn_>
-              <AlertTitle_Shadcn_>
-                Column-level privileges is a dashboard feature preview
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+            <Alert>
+              <AlertTitle>Column-level privileges is a dashboard feature preview</AlertTitle>
+              <AlertDescription>
                 You may access this feature by enabling it under dashboard feature previews.
-              </AlertDescription_Shadcn_>
+              </AlertDescription>
               <div className="mt-4">
-                <Button type="default" onClick={openFeaturePreviewModal}>
+                <Button type="default" onClick={() => toggleFeaturePreviewModal(true)}>
                   View feature previews
                 </Button>
               </div>
-            </Alert_Shadcn_>
+            </Alert>
           )}
         </div>
       </ScaffoldSection>

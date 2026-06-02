@@ -3,6 +3,7 @@ import type { ExplainNode, QueryPlanRow } from './ExplainVisualizer.types'
 export interface ExplainSummary {
   totalTime: number
   totalCost: number
+  maxCost: number
   hasSeqScan: boolean
   seqScanTables: string[]
   hasIndexScan: boolean
@@ -217,14 +218,28 @@ function addNodeToTree(
 }
 
 // Calculate max cost for scaling the visualization bars
-function getNodeMax(node: ExplainNode): number {
+function getNodeMaxCost(node: ExplainNode): number {
   const nodeCost = node.cost?.end || node.actualTime?.end || 0
-  const childrenMax = node.children.reduce((max, child) => Math.max(max, getNodeMax(child)), 0)
+  const childrenMax = node.children.reduce((max, child) => Math.max(max, getNodeMaxCost(child)), 0)
   return Math.max(nodeCost, childrenMax)
 }
 
 export function calculateMaxCost(tree: ExplainNode[]): number {
-  return tree.reduce((max, node) => Math.max(max, getNodeMax(node)), 0)
+  return tree.reduce((max, node) => Math.max(max, getNodeMaxCost(node)), 0)
+}
+
+// Calculate max duration across all nodes for scaling the visualization bars
+function getNodeMaxDuration(node: ExplainNode): number {
+  const nodeDuration = node.actualTime ? node.actualTime.end - node.actualTime.start : 0
+  const childrenMax = node.children.reduce(
+    (max, child) => Math.max(max, getNodeMaxDuration(child)),
+    0
+  )
+  return Math.max(nodeDuration, childrenMax)
+}
+
+export function calculateMaxDuration(tree: ExplainNode[]): number {
+  return tree.reduce((max, node) => Math.max(max, getNodeMaxDuration(node)), 0)
 }
 
 // Calculate summary stats
@@ -232,6 +247,7 @@ export function calculateSummary(tree: ExplainNode[]): ExplainSummary {
   const stats: ExplainSummary = {
     totalTime: 0,
     totalCost: 0,
+    maxCost: 0,
     hasSeqScan: false,
     seqScanTables: [],
     hasIndexScan: false,
@@ -242,7 +258,7 @@ export function calculateSummary(tree: ExplainNode[]): ExplainSummary {
       stats.totalTime = Math.max(stats.totalTime, node.actualTime.end)
     }
     if (node.cost) {
-      stats.totalCost = Math.max(stats.totalCost, node.cost.end)
+      stats.maxCost = Math.max(stats.maxCost, node.cost.end)
     }
     const op = node.operation.toLowerCase()
     if (op.includes('seq scan')) {
@@ -256,6 +272,8 @@ export function calculateSummary(tree: ExplainNode[]): ExplainSummary {
     node.children.forEach(traverse)
   }
   tree.forEach(traverse)
+
+  stats.totalCost = tree[0]?.cost?.end ?? 0
   return stats
 }
 
@@ -265,4 +283,26 @@ export function createNodeTree(rows: readonly QueryPlanRow[]): ExplainNode[] {
   // Parse additional details from each node
   tree.forEach(parseNodeDetails)
   return tree
+}
+
+export function parseDetailLines(details: string): { label: string; value: string }[] {
+  if (!details) return []
+
+  const lines = details.split('\n').filter(Boolean)
+  const result: { label: string; value: string }[] = []
+
+  for (const line of lines) {
+    const colonIndex = line.indexOf(':')
+    if (colonIndex > 0) {
+      result.push({
+        label: line.substring(0, colonIndex + 1),
+        value: line.substring(colonIndex + 1).trim(),
+      })
+    } else if (line.trim()) {
+      // Lines without colons (like table names)
+      result.push({ label: '', value: line.trim() })
+    }
+  }
+
+  return result
 }

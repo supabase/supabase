@@ -1,7 +1,8 @@
-import { IS_PLATFORM } from 'lib/constants'
-import { snakeCase } from 'lodash'
 import type { IncomingHttpHeaders } from 'node:http'
+import { snakeCase } from 'lodash'
 import z from 'zod'
+
+import { IS_PLATFORM } from '@/lib/constants'
 
 /**
  * Construct headers for api request.
@@ -118,4 +119,14 @@ export function commaSeparatedStringIntoArray(value: string): string[] {
     .split(',')
     .map((v) => v.trim())
     .filter(Boolean)
+}
+
+export class InternalServerError extends Error {
+  constructor(
+    message: string,
+    public details?: Record<string, unknown>
+  ) {
+    super(message)
+    this.name = 'InternalServerError'
+  }
 }

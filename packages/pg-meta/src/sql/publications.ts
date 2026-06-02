@@ -1,4 +1,6 @@
-export const PUBLICATIONS_SQL = /* SQL */ `
+import { safeSql } from '../pg-format'
+
+export const PUBLICATIONS_SQL = /* SQL */ safeSql`
 SELECT
   p.oid :: int8 AS id,
   p.pubname AS name,

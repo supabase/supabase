@@ -64,7 +64,7 @@ export async function CodeBlock({
         'group',
         'relative',
         'not-prose',
-        'w-full overflow-hidden',
+        'w-full overflow-x-auto',
         'border border-default rounded-lg',
         'bg-200',
         'text-sm',

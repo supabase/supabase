@@ -1,6 +1,6 @@
-import { Timer } from 'lucide-react'
 import { CubeIcon } from '@heroicons/react/outline'
-import { Image } from 'ui'
+import { Timer } from 'lucide-react'
+
 import type {
   CTASection,
   FeaturesSection,

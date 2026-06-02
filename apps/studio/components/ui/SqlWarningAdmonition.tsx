@@ -33,7 +33,7 @@ export const SqlWarningAdmonition = ({
       className={`mb-0 rounded-none border-0 shrink-0 bg-background-100 ${className}`}
     >
       {!!message && (
-        <p className="text-xs !mb-1">
+        <p className="text-xs mb-1!">
           {`${
             warningType === 'hasWriteOperation'
               ? 'This query contains write operations.'

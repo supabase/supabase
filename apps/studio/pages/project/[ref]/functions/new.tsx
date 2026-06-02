@@ -1,50 +1,52 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
+import { isEqual } from 'lodash'
 import { AlertCircle, Book, Check } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useId, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { useParams } from 'common'
-import { EdgeFunctionFile } from 'components/interfaces/EdgeFunctions/EdgeFunction.types'
-import { EDGE_FUNCTION_TEMPLATES } from 'components/interfaces/Functions/Functions.templates'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { FileExplorerAndEditor } from 'components/ui/FileExplorerAndEditor'
-import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH } from 'lib/constants'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  Input_Shadcn_,
-  Label_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  Input,
+  Label,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import * as z from 'zod'
+
+import { EDGE_FUNCTION_TEMPLATES } from '@/components/interfaces/Functions/Functions.templates'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import EdgeFunctionsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
+import { FileExplorerAndEditor } from '@/components/ui/FileExplorerAndEditor'
+import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
+import { useEdgeFunctionDeployMutation } from '@/data/edge-functions/edge-functions-deploy-mutation'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { BASE_PATH } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 // Array of adjectives and nouns for random function name generation
 const ADJECTIVES = [
@@ -75,7 +77,7 @@ const NOUNS = [
 // Function name validation regex - only allows alphanumeric characters, hyphens, and underscores
 const FUNCTION_NAME_REGEX = /^[A-Za-z0-9_-]+$/
 
-// Define form schema with yup
+// Define form schema with zod
 const FormSchema = z.object({
   functionName: z
     .string()
@@ -99,25 +101,29 @@ const sanitizeFunctionName = (name: string): string => {
 // Type for the form values
 type FormValues = z.infer<typeof FormSchema>
 
+const INITIAL_FILES: FileData[] = [
+  {
+    id: 1,
+    name: 'index.ts',
+    content: EDGE_FUNCTION_TEMPLATES[0].content,
+    state: 'new',
+  },
+]
+
 const NewFunctionPage = () => {
   const router = useRouter()
   const { ref, template } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const snap = useAiAssistantStateSnapshot()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
   const { openSidebar } = useSidebarManagerSnapshot()
 
-  const [files, setFiles] = useState<EdgeFunctionFile[]>([
-    {
-      id: 1,
-      name: 'index.ts',
-      selected: true,
-      content: EDGE_FUNCTION_TEMPLATES[0].content,
-    },
-  ])
+  const [files, setFiles] = useState<FileData[]>(INITIAL_FILES)
+  const [selectedFileId, setSelectedFileId] = useState<number>(INITIAL_FILES[0].id)
   const [open, setOpen] = useState(false)
+  const templatesListboxId = useId()
   const [isPreviewingTemplate, setIsPreviewingTemplate] = useState(false)
   const [savedCode, setSavedCode] = useState<string>('')
 
@@ -136,14 +142,22 @@ const NewFunctionPage = () => {
     },
   })
 
-  const { mutate: deployFunction, isPending: isDeploying } = useEdgeFunctionDeployMutation({
+  const {
+    mutate: deployFunction,
+    isPending: isDeploying,
+    isSuccess: hasDeployed,
+  } = useEdgeFunctionDeployMutation({
     // [Joshen] To investigate: For some reason, the invalidation for list of edge functions isn't triggering
     onSuccess: () => {
       toast.success('Successfully deployed edge function')
       const functionName = form.getValues('functionName')
-      if (ref && functionName) {
-        router.push(`/project/${ref}/functions/${functionName}/details`)
-      }
+      // Allow the mutation state (isSuccess) to propagate before navigating
+      // to prevent unnecessary dialog about unsaved changes
+      setTimeout(() => {
+        if (ref && functionName) {
+          router.push(`/project/${ref}/functions/${functionName}/details`)
+        }
+      }, 150)
     },
   })
 
@@ -157,19 +171,16 @@ const NewFunctionPage = () => {
       files: files.map(({ name, content }) => ({ name, content })),
     })
 
-    sendEvent({
-      action: 'edge_function_deploy_button_clicked',
-      properties: { origin: 'functions_editor' },
-      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-    })
+    track('edge_function_deploy_button_clicked', { origin: 'functions_editor' })
   }
 
   const handleChat = () => {
-    const selectedFile = files.find((f) => f.selected) ?? files[0]
+    const selectedFile = files.find((f) => f.id === selectedFileId)
+
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     snap.newChat({
       name: 'Explain edge function',
-      sqlSnippets: [selectedFile.content],
+      sqlSnippets: [selectedFile?.content ?? ''],
       initialInput: 'Help me understand and improve this edge function...',
       suggestions: {
         title:
@@ -194,42 +205,40 @@ const NewFunctionPage = () => {
         ],
       },
     })
-    sendEvent({
-      action: 'edge_function_ai_assistant_button_clicked',
-      properties: { origin: 'functions_editor_chat' },
-      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-    })
+    track('edge_function_ai_assistant_button_clicked', { origin: 'functions_editor_chat' })
   }
 
   const onSelectTemplate = (templateValue: string) => {
     const template = EDGE_FUNCTION_TEMPLATES.find((t) => t.value === templateValue)
     if (template) {
       setFiles((prev) =>
-        prev.map((file) => (file.selected ? { ...file, content: template.content } : file))
+        prev.map((file) =>
+          file.id === selectedFileId ? { ...file, content: template.content } : file
+        )
       )
       setOpen(false)
-      sendEvent({
-        action: 'edge_function_template_clicked',
-        properties: { templateName: template.name, origin: 'editor_page' },
-        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      track('edge_function_template_clicked', {
+        templateName: template.name,
+        origin: 'editor_page',
       })
     }
+    setIsPreviewingTemplate(false)
   }
 
   const handleTemplateMouseEnter = (content: string) => {
     if (!isPreviewingTemplate) {
-      const selectedFile = files.find((f) => f.selected) ?? files[0]
+      const selectedFile = files.find((f) => f.id === selectedFileId) ?? files[0]
       setSavedCode(selectedFile.content)
     }
     setIsPreviewingTemplate(true)
-    setFiles((prev) => prev.map((file) => (file.selected ? { ...file, content } : file)))
+    setFiles((prev) => prev.map((f) => (f.id === selectedFileId ? { ...f, content } : f)))
   }
 
   const handleTemplateMouseLeave = () => {
     if (isPreviewingTemplate) {
       setIsPreviewingTemplate(false)
       setFiles((prev) =>
-        prev.map((file) => (file.selected ? { ...file, content: savedCode } : file))
+        prev.map((f) => (f.id === selectedFileId ? { ...f, content: savedCode } : f))
       )
     }
   }
@@ -252,18 +261,21 @@ const NewFunctionPage = () => {
       const templateMeta = EDGE_FUNCTION_TEMPLATES.find((x) => x.value === template)
       if (templateMeta) {
         form.reset({ functionName: template })
+        setSelectedFileId(1)
         setFiles([
           {
             id: 1,
             name: 'index.ts',
-            selected: true,
             content: templateMeta.content,
+            state: 'new',
           },
         ])
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [template])
+
+  const hasUnsavedChanges = useMemo(() => !isEqual(INITIAL_FILES, files), [files])
 
   return (
     <PageLayout
@@ -278,26 +290,27 @@ const NewFunctionPage = () => {
       ]}
       primaryActions={
         <>
-          <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-            <PopoverTrigger_Shadcn_ asChild>
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
               <Button
                 size="tiny"
                 type="default"
                 role="combobox"
                 aria-expanded={open}
+                aria-controls={templatesListboxId}
                 icon={<Book size={14} />}
               >
                 Templates
               </Button>
-            </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ portal className="w-[300px] p-0" align="end">
-              <Command_Shadcn_>
-                <CommandInput_Shadcn_ placeholder="Search templates..." />
-                <CommandList_Shadcn_>
-                  <CommandEmpty_Shadcn_>No templates found.</CommandEmpty_Shadcn_>
-                  <CommandGroup_Shadcn_>
+            </PopoverTrigger>
+            <PopoverContent id={templatesListboxId} className="w-[300px] p-0" align="end">
+              <Command>
+                <CommandInput placeholder="Search templates..." />
+                <CommandList>
+                  <CommandEmpty>No templates found.</CommandEmpty>
+                  <CommandGroup>
                     {templates.map((template) => (
-                      <CommandItem_Shadcn_
+                      <CommandItem
                         key={template.value}
                         value={template.value}
                         onSelect={onSelectTemplate}
@@ -310,7 +323,7 @@ const NewFunctionPage = () => {
                             <Check
                               className={cn(
                                 'mr-2 h-4 w-4',
-                                files.some((f) => f.selected && f.content === template.content)
+                                files.some((f) => f.content === template.content)
                                   ? 'opacity-100'
                                   : 'opacity-0'
                               )}
@@ -321,13 +334,13 @@ const NewFunctionPage = () => {
                             {template.description}
                           </span>
                         </div>
-                      </CommandItem_Shadcn_>
+                      </CommandItem>
                     ))}
-                  </CommandGroup_Shadcn_>
-                </CommandList_Shadcn_>
-              </Command_Shadcn_>
-            </PopoverContent_Shadcn_>
-          </Popover_Shadcn_>
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
           <Button
             size="tiny"
             type="default"
@@ -348,23 +361,25 @@ const NewFunctionPage = () => {
           connectionString: project?.connectionString,
           orgSlug: org?.slug,
         }}
+        selectedFileId={selectedFileId}
+        setSelectedFileId={setSelectedFileId}
       />
 
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 gap-3"
         >
           <div className="flex items-center gap-3">
-            <Label_Shadcn_ htmlFor="functionName">Function name</Label_Shadcn_>
-            <FormField_Shadcn_
+            <Label htmlFor="functionName">Function name</Label>
+            <FormField
               control={form.control}
               name="functionName"
               render={({ field }) => (
-                <FormItem_Shadcn_ className="flex flex-col gap-0 m-0">
+                <FormItem className="flex flex-col gap-0 m-0">
                   <div className="flex items-center">
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
+                    <FormControl>
+                      <Input
                         id="functionName"
                         type="text"
                         size={'large'}
@@ -372,7 +387,7 @@ const NewFunctionPage = () => {
                         className="w-[250px]"
                         {...field}
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                     {form.formState.errors.functionName && (
                       <Tooltip>
                         <TooltipTrigger>
@@ -384,7 +399,7 @@ const NewFunctionPage = () => {
                       </Tooltip>
                     )}
                   </div>
-                </FormItem_Shadcn_>
+                </FormItem>
               )}
             />
           </div>
@@ -397,7 +412,8 @@ const NewFunctionPage = () => {
             Deploy function
           </Button>
         </form>
-      </Form_Shadcn_>
+      </Form>
+      <PreventNavigationOnUnsavedChanges hasChanges={hasUnsavedChanges && !hasDeployed} />
     </PageLayout>
   )
 }
@@ -405,7 +421,7 @@ const NewFunctionPage = () => {
 NewFunctionPage.getLayout = (page: React.ReactNode) => {
   return (
     <DefaultLayout>
-      <EdgeFunctionsLayout>{page}</EdgeFunctionsLayout>
+      <EdgeFunctionsLayout title="New">{page}</EdgeFunctionsLayout>
     </DefaultLayout>
   )
 }

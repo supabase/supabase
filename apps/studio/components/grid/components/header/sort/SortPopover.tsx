@@ -1,16 +1,15 @@
 import { useMemo } from 'react'
 
-import { formatSortURLParams } from 'components/grid/SupabaseGrid.utils'
-import { useTableSort } from 'components/grid/hooks/useTableSort'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { SortPopoverPrimitive } from './SortPopoverPrimitive'
+import { useTableSort } from '@/components/grid/hooks/useTableSort'
+import { formatSortURLParams } from '@/components/grid/SupabaseGrid.utils'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export interface SortPopoverProps {
-  portal?: boolean
   tableQueriesEnabled?: boolean
 }
 
-export const SortPopover = ({ portal = true, tableQueriesEnabled }: SortPopoverProps) => {
+export const SortPopover = ({ tableQueriesEnabled }: SortPopoverProps) => {
   const { urlSorts, onApplySorts } = useTableSort()
 
   const snap = useTableEditorTableStateSnapshot()
@@ -23,7 +22,6 @@ export const SortPopover = ({ portal = true, tableQueriesEnabled }: SortPopoverP
 
   return (
     <SortPopoverPrimitive
-      portal={portal}
       sorts={sorts}
       onApplySorts={onApplySorts}
       tableQueriesEnabled={tableQueriesEnabled}

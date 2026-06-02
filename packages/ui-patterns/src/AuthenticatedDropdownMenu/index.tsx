@@ -1,13 +1,15 @@
 'use client'
 
-import { Fragment } from 'react'
+import type { User } from '@supabase/supabase-js'
+import type { LucideIcon } from 'icons/src/createSupabaseIcon'
+import { UserIcon } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useTheme } from 'next-themes'
-import { UserIcon } from 'lucide-react'
+import { Fragment } from 'react'
 import {
-  cn,
   buttonVariants,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -19,9 +21,6 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { themes } from 'ui/src/components/ThemeProvider/themes'
-
-import type { User } from '@supabase/supabase-js'
-import type { LucideIcon } from 'icons/src/createSupabaseIcon'
 import type { Theme } from 'ui/src/components/ThemeProvider/themes'
 
 interface Props {
@@ -86,7 +85,7 @@ export const AuthenticatedDropdownMenu = ({ user, menu, site }: Props) => {
                   return (
                     <div
                       key={`${site}-auth-dropdown-${sectionItem.label}-${sectionIdx}-${itemIdx}`}
-                      className="flex cursor-text items-center text-foreground rounded-sm px-2 py-1.5 text-xs outline-none space-x-2"
+                      className="flex cursor-text items-center text-foreground rounded-xs px-2 py-1.5 text-xs outline-hidden space-x-2"
                       {...sectionItem.otherProps}
                     >
                       <DropdownItemContent {...sectionItem} />

@@ -1,0 +1,375 @@
+import dayjs from 'dayjs'
+import Link from 'next/link'
+import { useMemo, type ReactNode } from 'react'
+import type { UseFormReturn } from 'react-hook-form'
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Button,
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  WarningIcon,
+} from 'ui'
+import { ShimmeringLoader } from 'ui-patterns'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
+
+import type { ApprovalState, IApprovalFormSchema } from './ApiAuthorization.Schema'
+import { AuthorizeRequesterDetails } from '@/components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
+import type { ApiAuthorizationResponse } from '@/data/api-authorization/api-authorization-query'
+import { BASE_PATH } from '@/lib/constants'
+import type { Organization, ResponseError } from '@/types'
+
+type OrganizationsState_Loading = {
+  _tag: 'loading'
+}
+
+type OrganizationsState_Error = {
+  _tag: 'error'
+  error: ResponseError | null
+}
+
+type OrganizationsState_Empty = {
+  _tag: 'empty'
+}
+
+type OrganizationsState_NotMember = {
+  _tag: 'not_member'
+}
+
+type OrganizationsState_Success = {
+  _tag: 'success'
+  organizations: Array<Organization>
+}
+
+type OrganizationsState =
+  | OrganizationsState_Loading
+  | OrganizationsState_Error
+  | OrganizationsState_Empty
+  | OrganizationsState_NotMember
+  | OrganizationsState_Success
+
+export interface ApiAuthorizationMainViewProps {
+  approvalState: ApprovalState
+  form: UseFormReturn<IApprovalFormSchema>
+  requester: ApiAuthorizationResponse
+  organizations: OrganizationsState
+  requestedOrganizationSlug: string | undefined
+  onApprove: () => void
+  onDecline: () => void
+}
+
+export function ApiAuthorizationMainView({
+  approvalState,
+  form,
+  requester,
+  organizations,
+  requestedOrganizationSlug,
+  onApprove,
+  onDecline,
+}: ApiAuthorizationMainViewProps): ReactNode {
+  const isMcpClient = requester.registration_type === 'dynamic'
+  const isExpired = dayjs().isAfter(dayjs(requester.expires_at))
+
+  return (
+    <FormShell title={`Authorize API access for ${requester.name}`}>
+      {isMcpClient && <McpNotice />}
+      <AuthorizeRequesterDetails
+        icon={requester.icon}
+        name={requester.name}
+        domain={requester.domain}
+        scopes={requester.scopes}
+      />
+      {isExpired && <ExpiredNotice />}
+      {organizations._tag === 'loading' && <OrganizationsLoader />}
+      {organizations._tag === 'error' && <OrganizationsErrorNotice error={organizations.error} />}
+      {organizations._tag === 'empty' && <OrganizationsEmptyState />}
+      {organizations._tag === 'not_member' && <NotMemberOfOrganizationNotice />}
+      {organizations._tag === 'success' && (
+        <OrganizationSelector
+          form={form}
+          disabled={isExpired || !!requestedOrganizationSlug}
+          requester={requester}
+          organizations={organizations.organizations}
+          requestedOrganizationSlug={requestedOrganizationSlug}
+        />
+      )}
+      <FormFooter
+        disabled={isExpired || organizations._tag !== 'success'}
+        approvalState={approvalState}
+        requester={requester}
+        organizations={organizations}
+        onApprove={onApprove}
+        onDecline={onDecline}
+      />
+    </FormShell>
+  )
+}
+
+interface FormShellProps {
+  title: string
+  children: ReactNode
+}
+
+function FormShell({ title, children }: FormShellProps): ReactNode {
+  return (
+    <Card>
+      <CardHeader>{title}</CardHeader>
+      <CardContent className="space-y-8">{children}</CardContent>
+    </Card>
+  )
+}
+
+function McpNotice(): ReactNode {
+  return (
+    <Alert variant="warning">
+      <WarningIcon />
+      <AlertTitle>MCP Client Connection</AlertTitle>
+      <AlertDescription>
+        This is an MCP (Model Context Protocol) client designed to connect with AI applications.
+        Please ensure you trust this application before granting access to your organization's data.
+      </AlertDescription>
+    </Alert>
+  )
+}
+
+function ExpiredNotice(): ReactNode {
+  return (
+    <Alert variant="warning">
+      <WarningIcon />
+      <AlertTitle>This authorization request is expired</AlertTitle>
+      <AlertDescription>
+        Please retry your authorization request from the requesting app
+      </AlertDescription>
+    </Alert>
+  )
+}
+
+function OrganizationsLoader(): ReactNode {
+  return (
+    <div className="py-4 space-y-2">
+      <ShimmeringLoader />
+      <ShimmeringLoader className="w-3/4" />
+    </div>
+  )
+}
+
+interface OrganizationsErrorNoticeProps {
+  error: ResponseError | null
+}
+
+function OrganizationsErrorNotice({ error }: OrganizationsErrorNoticeProps): ReactNode {
+  return (
+    <Alert variant="warning">
+      <WarningIcon />
+      <AlertTitle>There was an error loading your organizations</AlertTitle>
+      <AlertDescription>
+        Please try again. If the problem persists, contact support.
+        {error && <p className="mt-2">Error: {error.message}</p>}
+      </AlertDescription>
+    </Alert>
+  )
+}
+
+function OrganizationsEmptyState(): ReactNode {
+  return (
+    <Alert variant="warning">
+      <WarningIcon />
+      <AlertTitle>Organization is needed for installing an integration</AlertTitle>
+      <AlertDescription>
+        Your account isn't associated with any organizations. To use this integration, it must be
+        installed within an organization. You'll be redirected to create an organization first.
+      </AlertDescription>
+    </Alert>
+  )
+}
+
+function NotMemberOfOrganizationNotice(): ReactNode {
+  return (
+    <Alert variant="warning">
+      <WarningIcon />
+      <AlertTitle>Organization is needed for installing an integration</AlertTitle>
+      <AlertDescription>
+        Your account is not a member of the pre-selected organization. To use this integration, it
+        must be installed within an organization your account is associated with.
+      </AlertDescription>
+    </Alert>
+  )
+}
+
+interface OrganizationSelectorProps {
+  form: UseFormReturn<IApprovalFormSchema>
+  requester: ApiAuthorizationResponse
+  requestedOrganizationSlug: string | undefined
+  organizations: Array<Organization>
+  disabled?: boolean
+}
+
+function OrganizationSelector({
+  form,
+  requester,
+  requestedOrganizationSlug,
+  organizations,
+  disabled = false,
+}: OrganizationSelectorProps): ReactNode {
+  return (
+    <Form {...form}>
+      <FormField
+        control={form.control}
+        name="selectedOrgSlug"
+        render={({ field }) => (
+          <FormItem>
+            <FormLayout
+              label="Organization to grant API access to"
+              description={
+                requestedOrganizationSlug
+                  ? `This organization has been pre-selected by ${requester.name}.`
+                  : undefined
+              }
+              isReactForm
+            >
+              <FormControl>
+                <Select
+                  value={field.value || undefined}
+                  disabled={disabled}
+                  onValueChange={field.onChange}
+                >
+                  <SelectTrigger size="small">
+                    <SelectValue placeholder="Select an organization" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {organizations.map((organization) => (
+                      <SelectItem
+                        key={organization.slug}
+                        value={organization.slug}
+                        className="text-xs"
+                      >
+                        {organization.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormControl>
+            </FormLayout>
+          </FormItem>
+        )}
+      />
+    </Form>
+  )
+}
+
+interface FormFooterProps {
+  disabled?: boolean
+  approvalState: ApprovalState
+  requester: ApiAuthorizationResponse
+  organizations: OrganizationsState
+  onDecline: () => void
+  onApprove: () => void
+}
+
+function FormFooter({
+  disabled = false,
+  approvalState,
+  requester,
+  organizations,
+  onDecline,
+  onApprove,
+}: FormFooterProps): ReactNode {
+  const showApprovalButton = organizations._tag === 'success' || organizations._tag === 'not_member'
+
+  return (
+    <CardFooter className="justify-end space-x-2">
+      <Button
+        type="default"
+        loading={approvalState === 'declining'}
+        disabled={disabled || approvalState !== 'indeterminate'}
+        onClick={onDecline}
+      >
+        Decline
+      </Button>
+      {organizations._tag === 'loading' && (
+        <LoadingApprovalButton>Authorize {requester.name}</LoadingApprovalButton>
+      )}
+      {organizations._tag === 'empty' && <CreateOrganizationLink />}
+      {showApprovalButton && (
+        <ApprovalButton
+          disabled={disabled || approvalState !== 'indeterminate'}
+          approvalState={approvalState}
+          requester={requester}
+          onApprove={onApprove}
+        />
+      )}
+    </CardFooter>
+  )
+}
+
+interface LoadingApprovalButtonProps {
+  children: ReactNode
+}
+
+function LoadingApprovalButton({ children }: LoadingApprovalButtonProps): ReactNode {
+  return <Button loading={true}>{children}</Button>
+}
+
+function createReturnToSearchParam(): string | null {
+  if (typeof window === 'undefined') {
+    return null
+  }
+
+  const basePath = BASE_PATH
+
+  let pathname = basePath ? location.pathname.replace(basePath, '') : location.pathname
+  if (location.search) {
+    pathname += location.search
+  }
+
+  return pathname
+}
+
+function CreateOrganizationLink(): ReactNode {
+  const searchParamString = useMemo(function createSearchParams() {
+    const searchParams = new URLSearchParams()
+    const returnTo = createReturnToSearchParam()
+    if (returnTo) {
+      searchParams.set('returnTo', returnTo)
+    }
+    return searchParams.toString()
+  }, [])
+
+  return (
+    <Button asChild>
+      <Link href={`/new?${searchParamString}`}>Create an organization</Link>
+    </Button>
+  )
+}
+
+interface ApprovalButtonProps {
+  disabled?: boolean
+  approvalState: ApprovalState
+  requester: ApiAuthorizationResponse
+  onApprove: () => void
+}
+
+function ApprovalButton({
+  disabled,
+  approvalState,
+  requester,
+  onApprove,
+}: ApprovalButtonProps): ReactNode {
+  return (
+    <Button loading={approvalState === 'approving'} disabled={disabled} onClick={onApprove}>
+      Authorize {requester.name}
+    </Button>
+  )
+}

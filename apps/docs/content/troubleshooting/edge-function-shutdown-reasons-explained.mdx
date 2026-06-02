@@ -2,6 +2,7 @@
 title = "Edge Function shutdown reasons explained"
 topics = [ "functions" ]
 keywords = [ "shutdown", "termination", "event loop", "wall clock", "cpu time", "memory", "early drop" ]
+database_id = "109b964f-c28c-4554-b059-cd8b165c63f8"
 
 [[errors]]
 http_status_code = 546
@@ -50,7 +51,7 @@ These events are surfaced through logs and observability tools, allowing you to 
 
 ### CPUTime
 
-**What it means:** The worker consumed more CPU time than allowed. CPU time measures actual processing cycles used by your code, excluding time spent waiting for I/O or sleeping. Currently limited to 200 milliseconds.
+**What it means:** The worker consumed more CPU time than allowed. CPU time measures actual processing cycles used by your code, excluding time spent waiting for I/O or sleeping. Currently limited to 2000 milliseconds.
 
 **When it happens:** Your function is performing too much computation. This includes complex calculations, data processing, encryption, or other CPU-intensive operations.
 

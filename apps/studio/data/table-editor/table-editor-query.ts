@@ -1,10 +1,10 @@
-import { QueryClient, useQuery } from '@tanstack/react-query'
+import { getTableEditorSql } from '@supabase/pg-meta'
+import { QueryClient, queryOptions, useQuery } from '@tanstack/react-query'
 
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { tableEditorKeys } from './keys'
-import { getTableEditorSql } from './table-editor-query-sql'
 import { Entity } from './table-editor-types'
-import { UseCustomQueryOptions } from 'types'
+import { executeSql, ExecuteSqlError } from '@/data/sql/execute-sql-query'
+import { UseCustomQueryOptions } from '@/types'
 
 type TableEditorArgs = {
   id?: number
@@ -23,7 +23,7 @@ export async function getTableEditor(
     throw new Error('id is required')
   }
 
-  const sql = getTableEditorSql(id)
+  const sql = getTableEditorSql({ id })
   const { result } = await executeSql(
     {
       projectRef,
@@ -48,8 +48,7 @@ export const useTableEditorQuery = <TData = TableEditorData>(
   }: UseCustomQueryOptions<TableEditorData, TableEditorError, TData> = {}
 ) =>
   useQuery<TableEditorData, TableEditorError, TData>({
-    queryKey: tableEditorKeys.tableEditor(projectRef, id),
-    queryFn: ({ signal }) => getTableEditor({ projectRef, connectionString, id }, signal),
+    ...tableEditorQueryOptions({ projectRef, connectionString, id }),
     enabled:
       enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined' && !isNaN(id),
     refetchOnWindowFocus: false,
@@ -62,16 +61,16 @@ export function prefetchTableEditor(
   client: QueryClient,
   { projectRef, connectionString, id }: TableEditorVariables
 ) {
-  return client.fetchQuery({
+  return client.fetchQuery(tableEditorQueryOptions({ projectRef, connectionString, id }))
+}
+
+export const tableEditorQueryOptions = <TData = TableEditorData>({
+  projectRef,
+  connectionString,
+  id,
+}: TableEditorVariables) => {
+  return queryOptions<TableEditorData, TableEditorError, TData>({
     queryKey: tableEditorKeys.tableEditor(projectRef, id),
-    queryFn: ({ signal }) =>
-      getTableEditor(
-        {
-          projectRef,
-          connectionString,
-          id,
-        },
-        signal
-      ),
+    queryFn: ({ signal }) => getTableEditor({ projectRef, connectionString, id }, signal),
   })
 }

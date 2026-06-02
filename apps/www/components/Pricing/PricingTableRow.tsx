@@ -38,8 +38,8 @@ export const pricingTooltips: PricingTooltips = {
   'database.egress': {
     main: 'Billing is based on the total sum of all outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor, Log Drains) in GB throughout your billing period. Excludes cache hits.',
   },
-  'database.cachedEgress': {
-    main: 'Billing is based on the total sum of any outgoing traffic (includes Database, Storage, API, Edge Functions) in GB throughout your billing period that is served from our CDN cache.',
+  'storage.cachedEgress': {
+    main: 'Billing is based on the total sum of outgoing Storage traffic in GB throughout your billing period that is served from our CDN cache.',
   },
   'auth.totalUsers': {
     main: 'The maximum number of users your project can have',
@@ -91,6 +91,18 @@ export const pricingTooltips: PricingTooltips = {
   },
   'security.hipaa': {
     main: 'Available as a paid add-on on Team Plan and above.',
+  },
+  'security.privateLink': {
+    main: (
+      <span className="prose text-xs">
+        AWS PrivateLink enables private connectivity between your AWS VPC and Supabase, keeping
+        traffic within the AWS network. Read more in our{' '}
+        <Link href="/docs/guides/platform/privatelink" target="_blank">
+          docs
+        </Link>
+        .
+      </span>
+    ),
   },
 
   'security.accessRoles': {

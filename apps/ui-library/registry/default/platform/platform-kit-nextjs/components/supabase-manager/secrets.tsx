@@ -1,5 +1,12 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
+import { AlertTriangle, Key, Minus, PlusIcon } from 'lucide-react'
+import { useFieldArray, useForm } from 'react-hook-form'
+import { z } from 'zod'
+
+import { secretsSchema } from '../../lib/schemas/secrets'
+import { Alert, AlertDescription, AlertTitle } from '@/registry/default/components/ui/alert'
 import { Button } from '@/registry/default/components/ui/button'
 import {
   Form,
@@ -16,12 +23,6 @@ import {
   useDeleteSecrets,
   useGetSecrets,
 } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-secrets'
-import { secretsSchema } from '../../lib/schemas/secrets'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertTriangle, Minus, PlusIcon, Key } from 'lucide-react'
-import { useFieldArray, useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { Alert, AlertDescription, AlertTitle } from '@/registry/default/components/ui/alert'
 
 export function SecretsManager({ projectRef }: { projectRef: string }) {
   const { data: secrets, isLoading, error } = useGetSecrets(projectRef)

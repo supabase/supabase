@@ -12,31 +12,31 @@
   "files": [
     {
       "path": "registry/default/clients/nuxtjs/lib/supabase/client.ts",
-      "content": "import { createBrowserClient } from '@supabase/ssr'\n\nexport function createClient() {\n  return createBrowserClient(\n    process.env.NUXT_PUBLIC_SUPABASE_URL!,\n    process.env.NUXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!\n  )\n}\n",
+      "content": "import { createBrowserClient } from '@supabase/ssr'\n\nexport function createClient() {\n  return createBrowserClient(\n    process.env.NUXT_PUBLIC_SUPABASE_URL!,\n    process.env.NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!\n  )\n}\n",
       "type": "registry:lib"
     },
     {
       "path": "registry/default/clients/nuxtjs/server/middleware/is-authenticated.ts",
-      "content": "import { defineNuxtRouteMiddleware, navigateTo, useRequestEvent } from 'nuxt/app'\nimport { createSupabaseServerClient } from '../supabase/client'\n\nexport default defineNuxtRouteMiddleware(async (to) => {\n  const event = useRequestEvent()\n\n  // create Supabase SSR client directly here\n  const supabase = createSupabaseServerClient(event);\n\n  // check current user\n  const { data: { user } } = await supabase.auth.getUser()\n\n  if (!user && to.path !== '/login') {\n    return navigateTo('/login')\n  }\n})\n",
+      "content": "import { defineNuxtRouteMiddleware, navigateTo, useRequestEvent } from 'nuxt/app'\n\nimport { createSupabaseServerClient } from '../supabase/client'\n\nexport default defineNuxtRouteMiddleware(async (to) => {\n  const event = useRequestEvent()\n\n  // create Supabase SSR client directly here\n  const supabase = createSupabaseServerClient(event)\n\n  // check current user\n  const {\n    data: { user },\n  } = await supabase.auth.getUser()\n\n  if (!user && to.path !== '/login') {\n    return navigateTo('/login')\n  }\n})\n",
       "type": "registry:file",
       "target": "server/middleware/is-authenticated.ts"
     },
     {
       "path": "registry/default/clients/nuxtjs/server/api/profile.get.ts",
-      "content": "import { createError, defineEventHandler } from 'h3';\nimport { createSupabaseServerClient } from '../supabase/client';\n\nexport default defineEventHandler(async (event) => {\n  // Create Supabase SSR client\n  const supabase = createSupabaseServerClient(event)\n\n  // Example: get user session\n  const {\n    data: { user },\n  } = await supabase.auth.getUser();\n\n  if (!user) {\n    return { error: 'Not authenticated' };\n  }\n\n  // Fetch profile row\n  const { data, error } = await supabase\n    .from('profiles')\n    .select('*')\n    .eq('id', user.id)\n    .single();\n\n  if (error) {\n    throw createError({ statusCode: 500, statusMessage: error.message });\n  }\n\n  return { profile: data };\n});\n",
+      "content": "import { createError, defineEventHandler } from 'h3'\n\nimport { createSupabaseServerClient } from '../supabase/client'\n\nexport default defineEventHandler(async (event) => {\n  // Create Supabase SSR client\n  const supabase = createSupabaseServerClient(event)\n\n  // Example: get user session\n  const {\n    data: { user },\n  } = await supabase.auth.getUser()\n\n  if (!user) {\n    return { error: 'Not authenticated' }\n  }\n\n  // Fetch profile row\n  const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single()\n\n  if (error) {\n    throw createError({ statusCode: 500, statusMessage: error.message })\n  }\n\n  return { profile: data }\n})\n",
       "type": "registry:file",
       "target": "server/api/profile.get.ts"
     },
     {
       "path": "registry/default/clients/nuxtjs/server/supabase/client.ts",
-      "content": "import { createServerClient } from '@supabase/ssr'\nimport { getCookie, setCookie, deleteCookie, H3Event, EventHandlerRequest } from 'h3'\n\nexport const createSupabaseServerClient = (event: H3Event<EventHandlerRequest> | undefined) => {\n  return createServerClient(\n    process.env.NUXT_PUBLIC_SUPABASE_URL!,\n    process.env.NUXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,\n    {\n      cookies: {\n        get: (key) => getCookie(event!, key),\n        set: (key, value, options) => setCookie(event!, key, value, options),\n        remove: (key, options) => deleteCookie(event!, key, options),\n      },\n    }\n  )\n}",
+      "content": "import { createServerClient } from '@supabase/ssr'\nimport { deleteCookie, EventHandlerRequest, getCookie, H3Event, setCookie } from 'h3'\n\nexport const createSupabaseServerClient = (event: H3Event<EventHandlerRequest> | undefined) => {\n  return createServerClient(\n    process.env.NUXT_PUBLIC_SUPABASE_URL!,\n    process.env.NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,\n    {\n      cookies: {\n        get: (key) => getCookie(event!, key),\n        set: (key, value, options) => setCookie(event!, key, value, options),\n        remove: (key, options) => deleteCookie(event!, key, options),\n      },\n    }\n  )\n}\n",
       "type": "registry:file",
       "target": "server/supabase/client.ts"
     }
   ],
   "envVars": {
     "NUXT_PUBLIC_SUPABASE_URL": "",
-    "NUXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+    "NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": ""
   },
-  "docs": "You'll need to set the following environment variables in your project: `NUXT_PUBLIC_SUPABASE_URL` and `NUXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`."
+  "docs": "You'll need to set the following environment variables in your project: `NUXT_PUBLIC_SUPABASE_URL` and `NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`."
 }

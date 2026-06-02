@@ -1,19 +1,19 @@
 'use client'
 
-import { useState, ReactNode } from 'react'
+import dayjs from 'dayjs'
+import { useTheme } from 'next-themes'
+import { ReactNode, useState } from 'react'
 import {
   Bar,
+  CartesianGrid,
   Cell,
   BarChart as RechartBarChart,
+  ReferenceArea,
   XAxis,
   YAxis,
-  ReferenceArea,
-  CartesianGrid,
 } from 'recharts'
 import type { CategoricalChartState } from 'recharts/types/chart/types'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
-import dayjs from 'dayjs'
-import { useTheme } from 'next-themes'
 
 const CHART_COLORS = {
   TICK: 'hsl(var(--background-overlay-hover))',
@@ -54,8 +54,6 @@ export interface ChartBarProps {
   color?: string
   hoverColor?: string
   chartHighlight?: ChartHighlight
-  updateDateRange?: (from: string, to: string) => void
-  highlightActions?: ChartHighlightAction[]
   syncId?: string
   showHighlightArea?: boolean
   cursor?: string
@@ -80,8 +78,6 @@ export const ChartBar = ({
   color = CHART_COLORS.BRAND,
   hoverColor = CHART_COLORS.BRAND_HOVER,
   chartHighlight,
-  updateDateRange,
-  highlightActions,
   syncId,
   showHighlightArea = true,
   cursor,
@@ -114,8 +110,8 @@ export const ChartBar = ({
   const yAxisConfig = {
     tick: showYAxis,
     hide: !showYAxis,
-    tickMargin: showYAxis ? YAxisProps?.tickMargin ?? 4 : 0,
-    width: showYAxis ? YAxisProps?.width ?? undefined : 0,
+    tickMargin: showYAxis ? (YAxisProps?.tickMargin ?? 4) : 0,
+    width: showYAxis ? (YAxisProps?.width ?? undefined) : 0,
     axisLine: { stroke: CHART_COLORS.AXIS },
     tickLine: { stroke: CHART_COLORS.AXIS },
     ...YAxisProps,
@@ -133,7 +129,7 @@ export const ChartBar = ({
       data-testid="chart-bar"
       className={cn('flex flex-col gap-y-3 w-full', isFullHeight ? 'h-full' : 'h-24', className)}
     >
-      <ChartContainer className="!w-full h-full" config={chartConfig}>
+      <ChartContainer className="w-full! h-full" config={chartConfig}>
         <RechartBarChart
           data={data}
           syncId={syncId}

@@ -1,15 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { AlertCircle, ChevronDown, Globe, Lock } from 'lucide-react'
 import { useState } from 'react'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DocsButton } from 'components/ui/DocsButton'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import {
   Badge,
   Button,
@@ -25,10 +17,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import AddRestrictionModal from './AddRestrictionModal'
-import AllowAllModal from './AllowAllModal'
-import DisallowAllModal from './DisallowAllModal'
-import RemoveRestrictionModal from './RemoveRestrictionModal'
 import {
   PageSection,
   PageSectionAside,
@@ -37,6 +25,18 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import AddRestrictionModal from './AddRestrictionModal'
+import AllowAllModal from './AllowAllModal'
+import DisallowAllModal from './DisallowAllModal'
+import RemoveRestrictionModal from './RemoveRestrictionModal'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useNetworkRestrictionsQuery } from '@/data/network-restrictions/network-restrictions-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 interface AccessButtonProps {
   disabled: boolean
@@ -114,7 +114,7 @@ export const NetworkRestrictions = () => {
       <PageSection id="network-restrictions">
         <PageSectionMeta>
           <PageSectionSummary>
-            <PageSectionTitle>Network Restrictions</PageSectionTitle>
+            <PageSectionTitle>Network restrictions</PageSectionTitle>
           </PageSectionSummary>
           <PageSectionAside className="flex items-center gap-x-2">
             <DocsButton href={`${DOCS_URL}/guides/platform/network-restrictions`} />
@@ -206,8 +206,8 @@ export const NetworkRestrictions = () => {
               {isUninitialized || isAllowedAll ? (
                 <CardContent className="flex items-center justify-between">
                   <div className="flex items-start space-x-4">
-                    <div className="space-y-1">
-                      <p className="text-foreground-light text-sm">
+                    <div className="space-y-0.5">
+                      <p className="text-foreground text-sm">
                         Your database can be accessed by all IP addresses
                       </p>
                       <p className="text-foreground-light text-sm">

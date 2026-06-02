@@ -161,7 +161,7 @@ async function writeTypes() {
   await writeFile(
     join(GENERATED_DIRECTORY, 'typeSpec.json'),
     JSON.stringify(types, (key, value) => {
-      if (key === 'methods') {
+      if (key === 'methods' || key === 'variables') {
         return Object.fromEntries(value.entries())
       } else {
         return value

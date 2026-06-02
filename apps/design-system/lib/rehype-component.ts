@@ -1,27 +1,13 @@
 import fs from 'fs'
 import path from 'path'
-import { UnistNode, UnistTree } from 'types/unist'
+// import { Column, IColumnProps } from './sample-component'
+import React from 'react'
 import { u } from 'unist-builder'
 import { visit } from 'unist-util-visit'
 
 import { Index } from '../__registry__'
 import { styles } from '../registry/styles'
-
-// import { Column, IColumnProps } from './sample-component'
-import React from 'react' // ComponentType
-
-function inspectComponentProps<T>(component: React.ComponentType<T>): void {
-  // Assert the component's props type
-  const defaultProps = (component as React.ComponentType<any>).defaultProps || {}
-
-  // console.log('Component props:')
-  // console.log('----------------')
-
-  for (const propName in defaultProps) {
-    const propType = typeof defaultProps[propName]
-    console.log(`${propName}: ${propType}`)
-  }
-}
+import { UnistNode, UnistTree } from '@/types/unist'
 
 export function rehypeComponent() {
   return async (tree: UnistTree) => {

@@ -109,91 +109,90 @@ export async function GET(req: Request) {
     const TICKET_BOTTOM_TEXT_FONT_SIZE = 20
 
     const generatedTicketImage = new ImageResponse(
-      (
-        <>
+      <>
+        <div
+          style={{
+            width: '1200px',
+            height: '628px',
+            position: 'relative',
+            fontFamily: 'Circular',
+            overflow: 'hidden',
+            color: STYLING_CONFIG.TICKET_BACKGROUND,
+            backgroundColor: '#000',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+          }}
+        >
+          {/* Background */}
+          <img
+            width="1204"
+            height="634"
+            style={{
+              position: 'relative',
+              width: '1204px',
+              height: '634px',
+              top: '-2px',
+              left: '-2px',
+              bottom: '-2px',
+              right: '-2px',
+              backgroundSize: 'cover',
+              opacity: 0.25,
+            }}
+            src={STYLING_CONFIG.IMG}
+          />
+
+          {/* LINEAR GRADIENT */}
           <div
             style={{
-              width: '1200px',
-              height: '628px',
-              position: 'relative',
-              fontFamily: 'Circular',
-              overflow: 'hidden',
-              color: STYLING_CONFIG.TICKET_BACKGROUND,
-              backgroundColor: '#000',
+              position: 'absolute',
+              width: '100%',
+              height: '100%',
+              left: '0px',
+              top: '0px',
+              bottom: '0px',
+              right: '0px',
+              background: 'linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0))',
+              zIndex: 1,
+            }}
+          />
+
+          {/* LEFT */}
+          <div
+            style={{
+              position: 'absolute',
+              width: `${OG_WIDTH - OG_PADDING_X * 2 - TICKET_WIDTH}px`,
+              height: '100%',
+              top: '0px',
+              left: '0px',
+              padding: `${OG_PADDING_Y}px 0 ${OG_PADDING_Y}px ${OG_PADDING_X}px`,
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
+              color: '#fff',
             }}
           >
-            {/* Background */}
-            <img
-              width="1204"
-              height="634"
+            <div
               style={{
                 position: 'relative',
-                width: '1204px',
-                height: '634px',
-                top: '-2px',
-                left: '-2px',
-                bottom: '-2px',
-                right: '-2px',
-                backgroundSize: 'cover',
-                opacity: 0.25,
-              }}
-              src={STYLING_CONFIG.IMG}
-            />
-
-            {/* LINEAR GRADIENT */}
-            <div
-              style={{
-                position: 'absolute',
                 width: '100%',
-                height: '100%',
-                left: '0px',
-                top: '0px',
-                bottom: '0px',
-                right: '0px',
-                background: 'linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0))',
-                zIndex: 1,
-              }}
-            />
-
-            {/* LEFT */}
-            <div
-              style={{
-                position: 'absolute',
-                width: `${OG_WIDTH - OG_PADDING_X * 2 - TICKET_WIDTH}px`,
-                height: '100%',
+                height: '40px',
                 top: '0px',
                 left: '0px',
-                padding: `${OG_PADDING_Y}px 0 ${OG_PADDING_Y}px ${OG_PADDING_X}px`,
                 display: 'flex',
-                flexDirection: 'column',
                 justifyContent: 'space-between',
-                color: '#fff',
               }}
             >
-              <div
+              <p
                 style={{
-                  position: 'relative',
-                  width: '100%',
-                  height: '40px',
-                  top: '0px',
-                  left: '0px',
-                  display: 'flex',
-                  justifyContent: 'space-between',
+                  fontSize: `28px`,
+                  lineHeight: '110%',
+                  margin: '0',
                 }}
               >
-                <p
-                  style={{
-                    fontSize: `28px`,
-                    lineHeight: '110%',
-                    margin: '0',
-                  }}
-                >
-                  Launch Week 15
-                </p>
-                {/* <img
+                Launch Week 15
+              </p>
+              {/* <img
                   src={LW15_LEFT}
                   width="100%"
                   height="100%"
@@ -215,220 +214,220 @@ export async function GET(req: Request) {
                     backgroundSize: 'contain',
                   }}
                 /> */}
-              </div>
-              <div
-                style={{
-                  position: 'relative',
-                  width: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '30px',
-                }}
-              >
-                <p
-                  style={{
-                    fontSize: `${DATE_FONT_SIZE}px`,
-                    lineHeight: '110%',
-                    margin: '0',
-                  }}
-                >
-                  July 14—18
-                </p>
-                <img
-                  src={SUPABASE_LOGO_IMG}
-                  width="100%"
-                  height="40px"
-                  style={{
-                    position: 'relative',
-                    backgroundSize: 'contain',
-                    height: `${SUPABASE_LOGO_HEIGHT}px`,
-                    width: `${SUPABASE_LOGO_RATIO * SUPABASE_LOGO_HEIGHT}px`,
-                    marginBottom: '20px',
-                  }}
-                />
-              </div>
             </div>
-
-            {/* TICKET */}
             <div
               style={{
-                position: 'absolute',
-                width: `${TICKET_WIDTH}px`,
-                height: `${TICKET_HEIGHT}px`,
-                top: `${OG_PADDING_Y - 40}px`,
-                right: `${OG_PADDING_X}px`,
-                backgroundColor: STYLING_CONFIG.TICKET_BACKGROUND,
-                color: STYLING_CONFIG.TICKET_FOREGROUND,
-                borderRadius: '12px',
+                position: 'relative',
+                width: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                border: '1px solid #ffffff40',
-                overflow: 'hidden',
-                boxShadow: '0 0 60px 0 rgba(0, 0, 0, 0.5)',
+                gap: '30px',
+              }}
+            >
+              <p
+                style={{
+                  fontSize: `${DATE_FONT_SIZE}px`,
+                  lineHeight: '110%',
+                  margin: '0',
+                }}
+              >
+                July 14—18
+              </p>
+              <img
+                src={SUPABASE_LOGO_IMG}
+                width="100%"
+                height="40px"
+                style={{
+                  position: 'relative',
+                  backgroundSize: 'contain',
+                  height: `${SUPABASE_LOGO_HEIGHT}px`,
+                  width: `${SUPABASE_LOGO_RATIO * SUPABASE_LOGO_HEIGHT}px`,
+                  marginBottom: '20px',
+                }}
+              />
+            </div>
+          </div>
+
+          {/* TICKET */}
+          <div
+            style={{
+              position: 'absolute',
+              width: `${TICKET_WIDTH}px`,
+              height: `${TICKET_HEIGHT}px`,
+              top: `${OG_PADDING_Y - 40}px`,
+              right: `${OG_PADDING_X}px`,
+              backgroundColor: STYLING_CONFIG.TICKET_BACKGROUND,
+              color: STYLING_CONFIG.TICKET_FOREGROUND,
+              borderRadius: '12px',
+              display: 'flex',
+              flexDirection: 'column',
+              border: '1px solid #ffffff40',
+              overflow: 'hidden',
+              boxShadow: '0 0 60px 0 rgba(0, 0, 0, 0.5)',
+            }}
+          >
+            <div
+              style={{
+                position: 'relative',
+                width: '100%',
+                height: '50%',
+                display: 'flex',
               }}
             >
               <div
                 style={{
-                  position: 'relative',
-                  width: '100%',
-                  height: '50%',
                   display: 'flex',
+                  justifyContent: 'center',
+                  position: 'absolute',
+                  width: '100%',
+                  height: '100%',
+                  backgroundSize: 'cover',
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  right: 0,
                 }}
               >
-                <div
+                <img
+                  width="600"
+                  height="600"
+                  src={STYLING_CONFIG.IMG}
                   style={{
-                    display: 'flex',
-                    justifyContent: 'center',
                     position: 'absolute',
                     width: '100%',
                     height: '100%',
                     backgroundSize: 'cover',
                     left: 0,
-                    top: 0,
-                    bottom: 0,
+                    mixBlendMode: 'screen',
+                    opacity: 0.7,
+                  }}
+                />
+                <div
+                  style={{
+                    display: 'flex',
+                    position: 'absolute',
+                    background: STYLING_CONFIG.TICKET_BACKGROUND,
+                    width: '100%',
+                    height: '100%',
                     right: 0,
+                    bottom: 0,
+                    top: 0,
+                    left: 0,
+                    mixBlendMode: 'color',
+                    opacity: 0.2,
+                  }}
+                />
+                <span
+                  className="absolute top-5 mx-auto inset-x-0 h-[15px] w-[50px] rounded-lg shadow-inner"
+                  style={{
+                    position: 'absolute',
+                    top: '30px',
+                    margin: '0 auto',
+                    width: '70px',
+                    height: '20px',
+                    backgroundColor: '#000',
+                    border: '1px solid #ffffff40',
+                    borderRadius: '10px',
+                  }}
+                />
+                <div
+                  style={{
+                    position: 'relative',
+                    width: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    zIndex: 2,
+                    padding: '0px 18px',
+                    gap: '10px',
                   }}
                 >
-                  <img
-                    width="600"
-                    height="600"
-                    src={STYLING_CONFIG.IMG}
-                    style={{
-                      position: 'absolute',
-                      width: '100%',
-                      height: '100%',
-                      backgroundSize: 'cover',
-                      left: 0,
-                      mixBlendMode: 'screen',
-                      opacity: 0.7,
-                    }}
-                  />
-                  <div
-                    style={{
-                      display: 'flex',
-                      position: 'absolute',
-                      background: STYLING_CONFIG.TICKET_BACKGROUND,
-                      width: '100%',
-                      height: '100%',
-                      right: 0,
-                      bottom: 0,
-                      top: 0,
-                      left: 0,
-                      mixBlendMode: 'color',
-                      opacity: 0.2,
-                    }}
-                  />
-                  <span
-                    className="absolute top-5 mx-auto inset-x-0 h-[15px] w-[50px] rounded-lg shadow-inner"
-                    style={{
-                      position: 'absolute',
-                      top: '30px',
-                      margin: '0 auto',
-                      width: '70px',
-                      height: '20px',
-                      backgroundColor: '#000',
-                      border: '1px solid #ffffff40',
-                      borderRadius: '10px',
-                    }}
-                  />
                   <div
                     style={{
                       position: 'relative',
                       width: '100%',
                       display: 'flex',
-                      flexDirection: 'column',
-                      zIndex: 2,
-                      padding: '0px 18px',
-                      gap: '10px',
+                      justifyContent: 'space-between',
+                      margin: '0',
+                      padding: '0',
                     }}
                   >
-                    <div
+                    <p
                       style={{
-                        position: 'relative',
-                        width: '100%',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        margin: '0',
+                        fontSize: `${LW15_TEXT_LOGO_FONT_SIZE}px`,
                         padding: '0',
+                        margin: '0',
                       }}
                     >
-                      <p
-                        style={{
-                          fontSize: `${LW15_TEXT_LOGO_FONT_SIZE}px`,
-                          padding: '0',
-                          margin: '0',
-                        }}
-                      >
-                        LW
-                      </p>
-                      <p
-                        style={{
-                          fontSize: `${LW15_TEXT_LOGO_FONT_SIZE}px`,
-                          padding: '0',
-                          margin: '0',
-                        }}
-                      >
-                        15
-                      </p>
-                    </div>
+                      LW
+                    </p>
+                    <p
+                      style={{
+                        fontSize: `${LW15_TEXT_LOGO_FONT_SIZE}px`,
+                        padding: '0',
+                        margin: '0',
+                      }}
+                    >
+                      15
+                    </p>
                   </div>
                 </div>
               </div>
-              <div
+            </div>
+            <div
+              style={{
+                position: 'relative',
+                width: '100%',
+                height: '50%',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-start',
+                padding: '10px 20px',
+                gap: '0px',
+              }}
+            >
+              <p
                 style={{
+                  display: 'flex',
                   position: 'relative',
                   width: '100%',
-                  height: '50%',
+                  backgroundSize: 'cover',
+                  fontSize: `${USERNAME_FONT_SIZE}px`,
+                  lineHeight: '110%',
+                }}
+              >
+                @{username}
+              </p>
+              <div
+                style={{
                   display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'flex-start',
-                  padding: '10px 20px',
-                  gap: '0px',
+                  position: 'relative',
+                  width: '100%',
+                  marginTop: '10px',
                 }}
               >
                 <p
                   style={{
-                    display: 'flex',
-                    position: 'relative',
-                    width: '100%',
-                    backgroundSize: 'cover',
-                    fontSize: `${USERNAME_FONT_SIZE}px`,
+                    fontSize: `${TICKET_BOTTOM_TEXT_FONT_SIZE}px`,
                     lineHeight: '110%',
+                    width: '35%',
+                    padding: '0',
+                    margin: '0',
                   }}
                 >
-                  @{username}
+                  Company
                 </p>
-                <div
+                <p
                   style={{
-                    display: 'flex',
-                    position: 'relative',
-                    width: '100%',
-                    marginTop: '10px',
+                    fontSize: `${TICKET_BOTTOM_TEXT_FONT_SIZE}px`,
+                    lineHeight: '110%',
+                    padding: '0',
+                    margin: '0',
                   }}
                 >
-                  <p
-                    style={{
-                      fontSize: `${TICKET_BOTTOM_TEXT_FONT_SIZE}px`,
-                      lineHeight: '110%',
-                      width: '35%',
-                      padding: '0',
-                      margin: '0',
-                    }}
-                  >
-                    Company
-                  </p>
-                  <p
-                    style={{
-                      fontSize: `${TICKET_BOTTOM_TEXT_FONT_SIZE}px`,
-                      lineHeight: '110%',
-                      padding: '0',
-                      margin: '0',
-                    }}
-                  >
-                    {metadata.company ?? '—'}
-                  </p>
-                </div>
-                {/* <div
+                  {metadata.company ?? '—'}
+                </p>
+              </div>
+              {/* <div
                   style={{
                     display: 'flex',
                     position: 'relative',
@@ -458,11 +457,10 @@ export async function GET(req: Request) {
                     {metadata.location ?? '—'}
                   </p>
                 </div> */}
-              </div>
             </div>
           </div>
-        </>
-      ),
+        </div>
+      </>,
       {
         width: OG_WIDTH,
         height: OG_HEIGHT,

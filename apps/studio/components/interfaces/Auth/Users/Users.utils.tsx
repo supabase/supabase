@@ -1,22 +1,23 @@
 import dayjs from 'dayjs'
+import { SqlEditor, TableEditor } from 'icons'
 import { Copy, Trash, UserIcon } from 'lucide-react'
 import { Column, useRowSelection } from 'react-data-grid'
-
-import { User } from 'data/auth/users-infinite-query'
-import { BASE_PATH } from 'lib/constants'
 import {
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
-  ContextMenu_Shadcn_,
-  ContextMenuContent_Shadcn_,
-  ContextMenuItem_Shadcn_,
-  ContextMenuSeparator_Shadcn_,
-  ContextMenuTrigger_Shadcn_,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
   copyToClipboard,
 } from 'ui'
+
 import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import { ColumnConfiguration, UsersTableColumn } from './Users.constants'
 import { HeaderCell } from './UsersGridComponents'
+import { User } from '@/data/auth/users-infinite-query'
+import { BASE_PATH } from '@/lib/constants'
 
 const GITHUB_AVATAR_URL = 'https://avatars.githubusercontent.com'
 const SUPPORTED_CSP_AVATAR_URLS = [GITHUB_AVATAR_URL, 'https://lh3.googleusercontent.com']
@@ -82,6 +83,7 @@ const providers = {
     { notion: 'notion-icon' },
     { twitch: 'twitch-icon' },
     { twitter: 'twitter-icon' },
+    { x: 'x-icon-light' },
     { slack_oidc: 'slack-icon' },
     { slack: 'slack-icon' },
     { spotify: 'spotify-icon' },
@@ -149,6 +151,7 @@ export function getDisplayName(user: User, fallback = '-'): string {
     last_name,
     firstName,
     first_name,
+    name,
   } = user.raw_user_meta_data ?? {}
 
   const {
@@ -193,7 +196,8 @@ export function getDisplayName(user: User, fallback = '-'): string {
 
   return (
     toPrettyJsonString(
-      displayName ||
+      name ||
+        displayName ||
         display_name ||
         ccDisplayName ||
         cc_display_name ||
@@ -257,6 +261,7 @@ export const formatUserColumns = ({
   visibleColumns = [],
   setSortByValue,
   onSelectDeleteUser,
+  onSelectImpersonateUser,
 }: {
   specificFilterColumn: string
   columns: UsersTableColumn[]
@@ -265,6 +270,7 @@ export const formatUserColumns = ({
   visibleColumns?: string[]
   setSortByValue: (val: string) => void
   onSelectDeleteUser: (user: User) => void
+  onSelectImpersonateUser: (user: User, destination: 'sql' | 'table-editor') => Promise<void>
 }) => {
   const columnOrder = config.map((c) => c.id) ?? columns.map((c) => c.id)
 
@@ -278,7 +284,7 @@ export const formatUserColumns = ({
       draggable: true,
       width: savedConfig?.width ?? col.width,
       minWidth: col.minWidth ?? 120,
-      headerCellClass: 'z-50 outline-none !shadow-none',
+      headerCellClass: 'z-50 outline-hidden shadow-none!',
       renderHeaderCell: () => {
         // [Joshen] I'm on the fence to support "Select all" for users, as the results are infinitely paginated
         // "Select all" wouldn't be an accurate representation if not all the pages have been fetched, but if decide
@@ -296,7 +302,7 @@ export const formatUserColumns = ({
       renderCell: ({ row }) => {
         // This is actually a valid React component, so we can use hooks here
         // eslint-disable-next-line react-hooks/rules-of-hooks
-        const [isRowSelected, onRowSelectionChange] = useRowSelection()
+        const { isRowSelected, onRowSelectionChange } = useRowSelection()
 
         const value = row?.[col.id]
         const user = users?.find((u) => u.id === row.id)
@@ -320,13 +326,12 @@ export const formatUserColumns = ({
         if (col.id === 'img') {
           return (
             <div className="flex items-center justify-center gap-x-2">
-              <Checkbox_Shadcn_
+              <Checkbox
                 checked={isRowSelected}
                 onClick={(e) => {
                   e.stopPropagation()
                   onRowSelectionChange({
                     row,
-                    type: 'ROW',
                     checked: !isRowSelected,
                     isShiftClick: e.shiftKey,
                   })
@@ -346,8 +351,8 @@ export const formatUserColumns = ({
         }
 
         return (
-          <ContextMenu_Shadcn_>
-            <ContextMenuTrigger_Shadcn_ asChild>
+          <ContextMenu>
+            <ContextMenuTrigger asChild>
               <div
                 className={cn(
                   'w-full flex items-center text-xs',
@@ -360,6 +365,7 @@ export const formatUserColumns = ({
                     const provider = row.providers[idx]
                     return (
                       <div
+                        key={`${user?.id}-${provider}-wrapper`}
                         className="min-w-6 min-h-6 rounded-full border flex items-center justify-center bg-surface-75"
                         style={{
                           marginLeft: idx === 0 ? 0 : `-8px`,
@@ -371,7 +377,9 @@ export const formatUserColumns = ({
                           width={16}
                           src={icon}
                           alt={`${provider} auth icon`}
-                          className={cn(provider === 'github' && 'dark:invert')}
+                          className={cn(
+                            (provider === 'github' || provider === 'x') && 'dark:invert'
+                          )}
                         />
                       </div>
                     )
@@ -384,9 +392,9 @@ export const formatUserColumns = ({
                   </p>
                 )}
               </div>
-            </ContextMenuTrigger_Shadcn_>
-            <ContextMenuContent_Shadcn_ onClick={(e) => e.stopPropagation()}>
-              <ContextMenuItem_Shadcn_
+            </ContextMenuTrigger>
+            <ContextMenuContent onClick={(e) => e.stopPropagation()}>
+              <ContextMenuItem
                 className="gap-x-2"
                 onFocusCapture={(e) => e.stopPropagation()}
                 onSelect={() => {
@@ -396,9 +404,35 @@ export const formatUserColumns = ({
               >
                 <Copy size={12} />
                 <span>Copy {col.id === 'id' ? col.name : col.name.toLowerCase()}</span>
-              </ContextMenuItem_Shadcn_>
-              <ContextMenuSeparator_Shadcn_ />
-              <ContextMenuItem_Shadcn_
+              </ContextMenuItem>
+
+              <ContextMenuSeparator />
+
+              <ContextMenuItem
+                className="gap-x-2"
+                onFocusCapture={(e) => e.stopPropagation()}
+                onSelect={() => {
+                  if (user) onSelectImpersonateUser(user, 'table-editor')
+                }}
+              >
+                <TableEditor size={12} />
+                <span>View data as user</span>
+              </ContextMenuItem>
+
+              <ContextMenuItem
+                className="gap-x-2"
+                onFocusCapture={(e) => e.stopPropagation()}
+                onSelect={() => {
+                  if (user) onSelectImpersonateUser(user, 'sql')
+                }}
+              >
+                <SqlEditor size={12} />
+                <span>Run SQL as user</span>
+              </ContextMenuItem>
+
+              <ContextMenuSeparator />
+
+              <ContextMenuItem
                 className="gap-x-2"
                 onFocusCapture={(e) => e.stopPropagation()}
                 onSelect={() => {
@@ -407,9 +441,9 @@ export const formatUserColumns = ({
               >
                 <Trash size={12} />
                 <span>Delete user</span>
-              </ContextMenuItem_Shadcn_>
-            </ContextMenuContent_Shadcn_>
-          </ContextMenu_Shadcn_>
+              </ContextMenuItem>
+            </ContextMenuContent>
+          </ContextMenu>
         )
       },
     }

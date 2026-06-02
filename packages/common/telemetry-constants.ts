@@ -3,8 +3,10 @@
  *
  * Note that events are not emitted for users that have opted out of telemetry.
  *
- * Original definitions located at:
- * https://github.com/supabase/supabase/blob/master/packages/common/telemetry-constants.ts
+ * ## Naming conventions
+ * Event names and actions should use standardized past-tense verbs for data quality and consistency.
+ * Only use verbs already established in this file or in https://github.com/supabase/platform/blob/develop/shared/src/telemetry.ts
+ * Adding new verbs requires @growth-eng review to prevent data pollution.
  *
  * @module telemetry-frontend
  */
@@ -18,7 +20,11 @@ export const TABLE_EVENT_ACTIONS = {
   TableCreated: 'table_created',
   TableDataAdded: 'table_data_added',
   TableRLSEnabled: 'table_rls_enabled',
-} as const
+} as const satisfies {
+  TableCreated: TableCreatedEvent['action']
+  TableDataAdded: TableDataAddedEvent['action']
+  TableRLSEnabled: TableRLSEnabledEvent['action']
+}
 
 export type TableEventAction = (typeof TABLE_EVENT_ACTIONS)[keyof typeof TABLE_EVENT_ACTIONS]
 
@@ -165,14 +171,18 @@ export interface CronJobUpdatedEvent {
 }
 
 /**
- * Cron job deleted.
+ * Cron job removed. Previously: cron_job_deleted
  *
  * @group Events
  * @source studio
  * @page /dashboard/project/{ref}/integrations/cron/jobs
  */
-export interface CronJobDeletedEvent {
-  action: 'cron_job_deleted'
+export interface CronJobRemovedEvent {
+  action: 'cron_job_removed'
+  properties: {
+    /** Cron job classification, parsed from the job's command at deletion time. */
+    type: 'sql_function' | 'sql_snippet' | 'edge_function' | 'http_request'
+  }
   groups: TelemetryGroups
 }
 
@@ -263,21 +273,142 @@ export interface FeaturePreviewDisabledEvent {
 }
 
 /**
- * Existing project creation form was submitted and the project was created.
+ * The user picked a timezone in the dashboard timezone picker (in the user
+ * avatar dropdown). Setting an explicit IANA value or returning to the auto
+ * detected default both fire this event.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface TimezonePickerClickedEvent {
+  action: 'timezone_picker_clicked'
+  properties: {
+    /** IANA name resolved before the change. */
+    previousTimezone: string
+    /** IANA name resolved after the change. */
+    nextTimezone: string
+    /** True when the user opted back into the browser-detected default. */
+    isAutoDetected: boolean
+    /** Where the picker was rendered. */
+    source: 'user_dropdown' | 'account_preferences'
+  }
+  groups: TelemetryGroups
+}
+/**
+ * Top-of-funnel event for the dataApiRevokeOnCreateDefault rollout. Fires once per
+ * mount after the flag resolves so cohort attribution is clean — pair with
+ * project_creation_simple_version_submitted to measure the flag's impact on
+ * project creation completion rate.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug} and /integrations/vercel/{slug}/deploy-button/new-project
+ */
+export interface ProjectCreationDefaultPrivilegesExposedEvent {
+  action: 'project_creation_default_privileges_exposed'
+  properties: {
+    /** Where the checkbox was shown. */
+    surface: 'main' | 'vercel'
+    /**
+     * Current state of the "Automatically expose new tables" checkbox
+     * (`dataApiDefaultPrivileges` form field) at exposure time. This is the
+     * field the experiment actually controls.
+     * true = default privileges granted (legacy behaviour)
+     * false = revoke SQL runs on create (new behaviour, treatment default)
+     */
+    dataApiDefaultPrivileges: boolean
+    /**
+     * Raw value of the dataApiRevokeOnCreateDefault PostHog flag at exposure time.
+     * Accepts boolean (current rollout shape) or string (post-multivariate-migration
+     * variant name, e.g. 'test' / 'control'). See GROWTH-877 for the migration plan.
+     * true | 'test' = revoke cohort (checkbox defaulted to unchecked)
+     * false = outside the rollout (checkbox defaulted to checked)
+     * 'control' = in-experiment control arm (checkbox defaulted to checked)
+     */
+    dataApiRevokeOnCreateDefaultEnabled: boolean | string
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Project creation form was submitted and the project was created. Fires from both
+ * the main project creation wizard and the Vercel deploy-button flow — disambiguate
+ * by the `surface` property.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug} and /integrations/vercel/{slug}/deploy-button/new-project
+ */
+export interface ProjectCreationSimpleVersionSubmittedEvent {
+  action: 'project_creation_simple_version_submitted'
+  properties: {
+    /**
+     * Which surface produced the submission. Omitted on events emitted before this
+     * property was introduced; treat absent as 'main' for backfill.
+     */
+    surface?: 'main' | 'vercel'
+    /**
+     * The instance size selected in the project creation form.
+     */
+    instanceSize?: string
+    /**
+     * Whether the automatic RLS event trigger option was enabled
+     */
+    enableRlsEventTrigger?: boolean
+    /**
+     * Experiment variant: 'control' (checkbox not shown) or 'test' (checkbox shown)
+     */
+    rlsOptionVariant?: 'control' | 'test'
+    /**
+     * Whether Data API is enabled.
+     * true = "Data API + Connection String" (default)
+     * false = "Only Connection String"
+     */
+    dataApiEnabled?: boolean
+    /**
+     * Data API schema configuration. Only relevant when dataApiEnabled is true.
+     * true = "Use dedicated API schema for Data API"
+     * false = "Use public schema for Data API" (default)
+     */
+    useApiSchema?: boolean
+    /**
+     * Postgres engine type selection.
+     * true = "Postgres with OrioleDB" (alpha)
+     * false = "Postgres" (default)
+     */
+    useOrioleDb?: boolean
+    /**
+     * Raw checkbox state for "Automatically expose new tables and functions" at submission.
+     * true = default privileges are granted on new entities (current behaviour)
+     * false = revoke SQL ran; user must manually grant access per entity
+     */
+    dataApiDefaultPrivilegesGranted?: boolean
+    /**
+     * Raw value of the dataApiRevokeOnCreateDefault PostHog flag at submission time.
+     * Controls only the default checkbox state of "Automatically expose new tables and functions"
+     * at project creation. Tracking it lets us correlate flag cohort with user choice.
+     * Accepts boolean (current rollout shape) or string (post-multivariate-migration
+     * variant name, e.g. 'test' / 'control'). See GROWTH-877 for the migration plan.
+     * true | 'test' = user is in the treatment arm (checkbox defaulted to unchecked)
+     * false = user is outside the rollout (checkbox defaulted to checked)
+     * 'control' = in-experiment control arm (checkbox defaulted to checked)
+     * omitted = PostHog flags had not loaded at the time of project creation
+     */
+    dataApiRevokeOnCreateDefaultEnabled?: boolean | string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked to connect GitHub during project creation.
  *
  * @group Events
  * @source studio
  * @page new/{slug}
  */
-export interface ProjectCreationSimpleVersionSubmittedEvent {
-  action: 'project_creation_simple_version_submitted'
-  /**
-   * the instance size selected in the project creation form
-   */
-  properties: {
-    instanceSize?: string
-  }
-  groups: TelemetryGroups
+export interface ProjectCreationGithubConnectClickedEvent {
+  action: 'project_creation_github_connect_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
 }
 
 /**
@@ -299,69 +430,26 @@ export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
 }
 
 /**
- * On the InitialStep.tsx screen, where user can chose to prompt, start blank or migrate, at least 5 characters were typed
- * in the prompt textarea indicating an intention to use the prompt.
+ * User toggled Data API access on a table via the switch in the table editor side panel.
+ * Only fires for new tables — editing existing tables links out to the settings page instead.
  *
  * @group Events
  * @source studio
- * @page new/v2/{slug}
+ * @page /dashboard/project/{ref}/editor
  */
-export interface ProjectCreationInitialStepPromptIntendedEvent {
-  action: 'project_creation_initial_step_prompt_intended'
-  /**
-   * Is this a new prompt (e.g. when following the start blank route where no prompt has been filled in the InitialStep). In other
-   * words, was this not just an edit. In this case, it should always be true.
-   */
-  properties: {
-    isNewPrompt: boolean
-  }
-}
-
-/**
- * First step of project creation was submitted, where the user writes a prompt or select to start blank or to migrate.
- *
- * @group Events
- * @source studio
- * @page new/v2/{slug}
- */
-export interface ProjectCreationInitialStepSubmittedEvent {
-  action: 'project_creation_initial_step_submitted'
+export interface TableApiAccessToggleClickedEvent {
+  action: 'table_api_access_toggle_clicked'
   properties: {
     /**
-     * Records what the user selected in the first step of project creation.
+     * The resulting state of the toggle after the click.
      */
-    onboardingPath: 'use_prompt' | 'start_blank' | 'migrate'
-  }
-}
-
-/**
- * After the InitialStep screen, at least 5 characters were typed in the prompt textarea indicating an intention to use the prompt.
- *
- * @group Events
- * @source studio
- * @page new/v2/{slug}
- */
-export interface ProjectCreationSecondStepPromptIntendedEvent {
-  action: 'project_creation_second_step_prompt_intended'
-  properties: {
+    newState: 'enabled' | 'disabled'
     /**
-     * Is this a new prompt (e.g. when following the start blank route where no prompt has been filled in the InitialStep). In other
-     * words, was this not just an edit.
+     * The schema containing the table being created.
      */
-    isNewPrompt: boolean
+    schemaName: string
   }
-}
-
-/**
- * Second and final step of project creation was submitted. More precisely, right after the user clicks on "Create Project". To check,
- * if the project creation was successful, please refer to project_created event.
- *
- * @group Events
- * @source studio
- * @page new/v2/{slug}
- */
-export interface ProjectCreationSecondStepSubmittedEvent {
-  action: 'project_creation_second_step_submitted'
+  groups: TelemetryGroups
 }
 
 /**
@@ -583,6 +671,18 @@ export interface SqlEditorResultCopyJsonClickedEvent {
 }
 
 /**
+ * User clicked the "Result copy CSV" button in the SQL editor
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql
+ */
+export interface SqlEditorResultCopyCsvClickedEvent {
+  action: 'sql_editor_result_copy_csv_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User submitted a prompt to the assistant sidebar.
  *
  * @group Events
@@ -590,6 +690,10 @@ export interface SqlEditorResultCopyJsonClickedEvent {
  */
 export interface AssistantPromptSubmittedEvent {
   action: 'assistant_prompt_submitted'
+  properties: {
+    /** UUID of the chat session in which the prompt was submitted */
+    chatId?: string
+  }
   groups: TelemetryGroups
 }
 
@@ -601,6 +705,10 @@ export interface AssistantPromptSubmittedEvent {
  */
 export interface AssistantDebugSubmittedEvent {
   action: 'assistant_debug_submitted'
+  properties: {
+    /** UUID of the chat session in which the debug request was submitted */
+    chatId?: string
+  }
   groups: TelemetryGroups
 }
 
@@ -617,7 +725,13 @@ export interface AssistantSuggestionRunQueryClickedEvent {
      * The type of suggestion that was run by the user. Mutate or Select query types only.
      */
     queryType: string
-    category?: string
+    /**
+     * For mutation queries only: the DDL subtype detected from the SQL.
+     * 'functions' for CREATE FUNCTION / CREATE OR REPLACE FUNCTION,
+     * 'rls-policies' for CREATE POLICY / ALTER POLICY,
+     * 'unknown' for any other mutation. Omitted for non-mutation queries.
+     */
+    mutationType?: 'functions' | 'rls-policies' | 'unknown'
   }
   groups: TelemetryGroups
 }
@@ -668,7 +782,7 @@ export interface AssistantEditInSqlEditorClickedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/reports/{id}
  */
-export interface CustomReportAddSQLBlockClicked {
+export interface CustomReportAddSQLBlockClickedEvent {
   action: 'custom_report_add_sql_block_clicked'
   groups: TelemetryGroups
 }
@@ -698,6 +812,29 @@ export interface DocsFeedbackClickedEvent {
      * 'yes' means clicking on the tick button, 'no' means clicking on the cross button.
      */
     response: 'yes' | 'no'
+  }
+}
+
+/**
+ * User clicked 'Copy as Markdown' option on a page.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface CopyAsMarkdownEvent {
+  action: 'copy_as_markdown_clicked'
+}
+
+/**
+ * User clicked "Ask..." to open a new window to consult an agent about the current page.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface AskAIEvent {
+  action: 'ask_ai_clicked'
+  properties: {
+    agent: 'chatgpt' | 'claude'
   }
 }
 
@@ -758,6 +895,7 @@ export interface WwwPricingPlanCtaClickedEvent {
     section: 'main' | 'comparison_table'
     tableMode?: 'mobile' | 'desktop'
   }
+  groups?: Partial<TelemetryGroups>
 }
 
 /**
@@ -768,7 +906,7 @@ export interface WwwPricingPlanCtaClickedEvent {
  * @page /events/*
  */
 export interface EventPageCtaClickedEvent {
-  action: 'www_pricing_plan_cta_clicked'
+  action: 'www_event_page_cta_clicked'
   properties: {
     /**
      * The title of the event clicked.
@@ -901,23 +1039,6 @@ export interface RequestDemoButtonClickedEvent {
 }
 
 /**
- * User clicked the "Register" button in the State of Startups 2025 newsletter form.
- *
- * @group Events
- * @source www
- */
-export interface RegisterStateOfStartups2025NewsletterClicked {
-  action: 'register_for_state_of_startups_newsletter_clicked'
-  properties: {
-    /**
-     * The source of the button click, e.g. homepage hero, cta banner, product page header.
-     * If it states it came from the request demo form, it can come from different pages so refer to path name to determine.
-     */
-    buttonLocation: string
-  }
-}
-
-/**
  * User clicked the sign-in button in various locations described in properties.
  *
  * @group Events
@@ -994,13 +1115,13 @@ export interface ImportDataButtonClickedEvent {
 }
 
 /**
- * User dropped a file into the import data dropzone on an empty table.
+ * User added a file to the import data dropzone on an empty table.
  *
  * @group Events
  * @source studio
  * @page /dashboard/project/{ref}/editor
  */
-export interface ImportDataFileDroppedEvent {
+export interface ImportDataFileAddedEvent {
   action: 'import_data_dropzone_file_added'
   groups: TelemetryGroups
 }
@@ -1107,26 +1228,17 @@ export interface MetricsAPIBannerDismissButtonClickedEvent {
 }
 
 /**
- * Index Advisor banner enable button clicked event.
+ * User clicked the enable button for Index Advisor, either from the banner or the confirmation dialog.
  *
  * @group Events
  * @source studio
  * @page /observability/query-performance
  */
-export interface IndexAdvisorBannerEnableButtonClickedEvent {
-  action: 'index_advisor_banner_enable_button_clicked'
-  groups: TelemetryGroups
-}
-
-/**
- * Index Advisor dialog enable button clicked event.
- *
- * @group Events
- * @source studio
- * @page /observability/query-performance
- */
-export interface IndexAdvisorDialogEnableButtonClickedEvent {
-  action: 'index_advisor_dialog_enable_button_clicked'
+export interface IndexAdvisorEnableButtonClickedEvent {
+  action: 'index_advisor_enable_button_clicked'
+  properties: {
+    origin: 'banner' | 'dialog'
+  }
   groups: TelemetryGroups
 }
 
@@ -1355,6 +1467,21 @@ export interface AiAssistantInSupportFormClickedEvent {
 }
 
 /**
+ * User clicked the Assistant follow-up card after submitting a support ticket.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/support/new
+ */
+export interface SupportAssistantFollowUpCardClickedEvent {
+  action: 'support_assistant_follow_up_card_clicked'
+  properties: {
+    ticketCategory: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
  * User rated an AI assistant message with thumbs up or thumbs down.
  *
  * @group Events
@@ -1379,6 +1506,10 @@ export interface AssistantMessageRatingSubmittedEvent {
       | 'debugging'
       | 'general_help'
       | 'other'
+    /** Optional reason provided by the user when rating negatively */
+    reason?: string
+    /** UUID of the chat session in which the message was rated */
+    chatId?: string
   }
   groups: TelemetryGroups
 }
@@ -1407,7 +1538,7 @@ export interface SupabaseUiCommandCopyButtonClickedEvent {
  * @source studio
  * @page /dashboard/org/{slug}/security
  */
-export interface OrganizationMfaEnforcementUpdated {
+export interface OrganizationMfaEnforcementUpdatedEvent {
   action: 'organization_mfa_enforcement_updated'
   properties: {
     mfaEnforced: boolean
@@ -1539,14 +1670,14 @@ export interface BranchMergeSubmittedEvent {
 }
 
 /**
- * Triggered when a branch merge is successful.
+ * Triggered when a branch merge completes successfully. Previously: branch_merge_succeeded
  *
  * @group Events
  * @source studio
  * @page /dashboard/project/{ref}/merge
  */
-export interface BranchMergeSucceededEvent {
-  action: 'branch_merge_succeeded'
+export interface BranchMergeCompletedEvent {
+  action: 'branch_merge_completed'
   properties: {
     /**
      * The type of branch being merged, e.g. preview, persistent
@@ -1611,6 +1742,46 @@ export interface BranchReviewWithAssistantClickedEvent {
 }
 
 /**
+ * Triggered when a user selects a branch from the branch selector dropdown.
+ *
+ * @group Events
+ * @source studio
+ * @page branch selector (header / sheet / popover)
+ */
+export interface BranchSelectorBranchClickedEvent {
+  action: 'branch_selector_branch_clicked'
+  properties: {
+    branchId: string
+    branchName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user clicks "Create branch" in the branch selector dropdown.
+ *
+ * @group Events
+ * @source studio
+ * @page branch selector (header / sheet / popover)
+ */
+export interface BranchSelectorCreateClickedEvent {
+  action: 'branch_selector_create_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user clicks "Manage branches" in the branch selector dropdown.
+ *
+ * @group Events
+ * @source studio
+ * @page branch selector (header / sheet / popover)
+ */
+export interface BranchSelectorManageClickedEvent {
+  action: 'branch_selector_manage_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked on a DPA PDF link to open it.
  *
  * @group Events
@@ -1624,62 +1795,6 @@ export interface DpaPdfOpenedEvent {
      */
     source: 'www' | 'studio'
   }
-}
-
-/**
- * User selected a workflow in the Getting Started section of HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeGettingStartedWorkflowClickedEvent {
-  action: 'home_getting_started_workflow_clicked'
-  properties: {
-    /**
-     * The workflow selected by the user
-     */
-    workflow: 'code' | 'no_code'
-    /**
-     * Whether this is switching from another workflow
-     */
-    is_switch: boolean
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * User clicked on a step in the Getting Started section of HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeGettingStartedStepClickedEvent {
-  action: 'home_getting_started_step_clicked'
-  properties: {
-    /**
-     * The workflow type (code or no-code)
-     */
-    workflow: 'code' | 'no_code'
-    /**
-     * The step number (1-based index)
-     */
-    step_number: number
-    /**
-     * The title of the step
-     */
-    step_title: string
-    /**
-     * The action type of the button clicked
-     */
-    action_type: 'primary' | 'ai_assist' | 'external_link'
-    /**
-     * Whether the step was already completed
-     */
-    was_completed: boolean
-  }
-  groups: TelemetryGroups
 }
 
 /**
@@ -1705,32 +1820,6 @@ export interface HomeActivityStatClickedEvent {
 }
 
 /**
- * User was exposed to the realtime experiment (shown or not shown the Enable Realtime button).
- *
- * @group Events
- * @source studio
- * @page /dashboard/project/{ref}/editor
- */
-export interface RealtimeExperimentExposedEvent {
-  action: 'realtime_experiment_exposed'
-  properties: {
-    /**
-     * The experiment variant shown to the user
-     */
-    variant: 'control' | 'hide-button' | 'triggers'
-    /**
-     * Whether the table already has realtime enabled
-     */
-    table_has_realtime_enabled: boolean
-    /**
-     * Days since project creation (to segment by new user cohorts)
-     */
-    days_since_project_creation: number
-  }
-  groups: TelemetryGroups
-}
-
-/**
  * User clicked on a service title in Project Usage section of HomeV2.
  *
  * @group Events
@@ -1749,9 +1838,9 @@ export interface HomeProjectUsageServiceClickedEvent {
      */
     total_requests: number
     /**
-     * Number of errors for this service
+     * Number of errors for this service (optional, only sent when error data is available)
      */
-    error_count: number
+    error_count?: number
   }
   groups: TelemetryGroups
 }
@@ -1819,27 +1908,51 @@ export interface HomeCustomReportBlockRemovedEvent {
 }
 
 /**
- * User dismissed the Getting Started section in HomeV2.
+ * Connect section was shown to the user on the project homepage.
  *
  * @group Events
  * @source studio
  * @page /project/{ref}
  */
-export interface HomeGettingStartedClosedEvent {
-  action: 'home_getting_started_closed'
+export interface HomeConnectSectionExposedEvent {
+  action: 'home_connect_section_exposed'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked a connect action tile in the Connect section on the project homepage.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeConnectActionClickedEvent {
+  action: 'home_connect_action_clicked'
   properties: {
     /**
-     * The current workflow when dismissed
+     * The connect action/tile that was clicked
      */
-    workflow: 'code' | 'no_code'
+    mode: 'framework' | 'direct' | 'orm' | 'mcp' | 'api_keys'
+  }
+  groups: TelemetryGroups
+}
+
+export type ConnectSheetSource = 'header_button' | 'connect_section' | 'keyboard_shortcut'
+
+/**
+ * User opened the ConnectSheet panel.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface ConnectSheetOpenedEvent {
+  action: 'connect_sheet_opened'
+  properties: {
     /**
-     * Number of steps completed when dismissed
+     * Where the sheet was opened from
      */
-    steps_completed: number
-    /**
-     * Total number of steps in the workflow
-     */
-    total_steps: number
+    source: ConnectSheetSource
   }
   groups: TelemetryGroups
 }
@@ -1879,6 +1992,7 @@ export interface HomeSectionRowsMovedEvent {
  */
 export interface DpaRequestButtonClickedEvent {
   action: 'dpa_request_button_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
 }
 
 /**
@@ -1894,7 +2008,7 @@ export interface DocumentViewButtonClickedEvent {
     /**
      * The name of the document being viewed, e.g. TIA, SOC2, Standard Security Questionnaire
      */
-    documentName: 'TIA' | 'SOC2' | 'Standard Security Questionnaire'
+    documentName: 'TIA' | 'SOC2' | 'ISO27001' | 'Standard Security Questionnaire'
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -2026,68 +2140,6 @@ export interface RLSGeneratedPolicyRemovedEvent {
  */
 export interface RLSGeneratedPoliciesCreatedEvent {
   action: 'rls_generated_policies_created'
-  groups: TelemetryGroups
-}
-
-/**
- * Conversion event for the generate policies experiment.
- * Fires when a user in the experiment creates a new table via table editor.
- * This is separate from TableCreatedEvent to keep experiment tracking isolated.
- *
- * @group Events
- * @source studio
- * @page /dashboard/project/{ref}/editor
- */
-export interface TableCreateGeneratePoliciesExperimentConvertedEvent {
-  action: 'table_create_generate_policies_experiment_converted'
-  properties: {
-    /**
-     * Experiment identifier for tracking
-     */
-    experiment_id: 'tableCreateGeneratePolicies'
-    /**
-     * Experiment variant: 'control' (feature disabled) or 'treatment' (feature enabled)
-     */
-    variant: 'control' | 'treatment'
-    /**
-     * Whether RLS was enabled on the table
-     */
-    has_rls_enabled: boolean
-    /**
-     * Whether the table was created with any RLS policies (manual or generated)
-     */
-    has_rls_policies: boolean
-    /**
-     * Whether AI-generated policies were used (only possible in treatment)
-     */
-    has_generated_policies: boolean
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * User was exposed to the generate policies experiment (shown or not shown the Generate Policies button).
- *
- * @group Events
- * @source studio
- * @page /dashboard/project/{ref}/editor
- */
-export interface TableCreateGeneratePoliciesExperimentExposedEvent {
-  action: 'table_create_generate_policies_experiment_exposed'
-  properties: {
-    /**
-     * Experiment identifier for tracking
-     */
-    experiment_id: 'tableCreateGeneratePolicies'
-    /**
-     * Experiment variant: 'control' (feature disabled) or 'treatment' (feature enabled)
-     */
-    variant: 'control' | 'treatment'
-    /**
-     * Days since project creation (to segment by new user cohorts)
-     */
-    days_since_project_creation: number
-  }
   groups: TelemetryGroups
 }
 
@@ -2244,7 +2296,33 @@ export interface CommandMenuCommandClickedEvent {
     command_value?: string
     command_type: 'action' | 'route'
     /**
+     * The search query that was active when the command was clicked
+     */
+    search_query?: string
+    /**
+     * The path or URL the clicked item leads to (only present for route commands)
+     */
+    result_path?: string
+    /**
      * In which app the command input was typed
+     */
+    app: 'studio' | 'docs' | 'www'
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User closed the command menu.
+ *
+ * @group Events
+ * @source studio, docs, www
+ * @page any
+ */
+export interface CommandMenuClosedEvent {
+  action: 'command_menu_closed'
+  properties: {
+    /**
+     * In which app the command menu was closed
      */
     app: 'studio' | 'docs' | 'www'
   }
@@ -2264,160 +2342,55 @@ export interface SidebarOpenedEvent {
     /**
      * The sidebar panel that was opened, e.g. ai-assistant, editor-panel, advisor-panel
      */
-    sidebar: 'ai-assistant' | 'editor-panel' | 'advisor-panel'
+    sidebar: 'ai-assistant' | 'editor-panel' | 'advisor-panel' | 'help-panel'
   }
   groups: TelemetryGroups
 }
 
 /**
- * User was exposed to the table quickstart experiment.
+ * User opened an org menu submenu in the mobile navigation sheet.
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/editor (NewTab)
+ * @page Organization pages (mobile)
  */
-export interface TableQuickstartOpenedEvent {
-  action: 'table_quickstart_opened'
+export interface OrgSubmenuOpenedEvent {
+  action: 'org_submenu_opened'
   properties: {
-    /**
-     * Which variation the user was shown: ai, templates, assistant, or control
-     */
-    variant: 'ai' | 'templates' | 'assistant' | 'control'
-  }
-  groups: TelemetryGroups
-}
-/**
- * User submitted a prompt in the AI quickstart variation.
- *
- * @group Events
- * @source studio
- * @page /dashboard/project/{ref}/editor (QuickstartAIWidget)
- */
-export interface TableQuickstartAIPromptSubmittedEvent {
-  action: 'table_quickstart_ai_prompt_submitted'
-  properties: {
-    /**
-     * Length of the AI prompt
-     */
-    promptLength: number
-    /**
-     * Whether this was triggered by a quick idea button
-     */
-    wasQuickIdea: boolean
+    /** The key of the submenu item that was opened */
+    itemKey: string
+    /** The display label of the submenu item */
+    itemLabel: string
   }
   groups: TelemetryGroups
 }
 
 /**
- * AI table generation completed (success or failure).
+ * User clicked the back button in the mobile org menu to return to the top-level menu.
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/editor (QuickstartAIWidget)
+ * @page Organization pages (mobile)
  */
-export interface TableQuickstartAIGenerationCompletedEvent {
-  action: 'table_quickstart_ai_generation_completed'
-  properties: {
-    /**
-     * Whether generation succeeded
-     */
-    success: boolean
-    /**
-     * Number of tables generated (0 if failed)
-     */
-    tablesGenerated: number
-    /**
-     * Length of the prompt used
-     */
-    promptLength: number
-    /**
-     * Error message if failed
-     */
-    errorMessage?: string
-  }
+export interface OrgMenuBackClickedEvent {
+  action: 'org_menu_back_clicked'
   groups: TelemetryGroups
 }
 
 /**
- * User clicked a quick idea button in the AI variation.
+ * User clicked a menu item in the mobile org navigation sheet.
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/editor (QuickstartAIWidget)
+ * @page Organization pages (mobile)
  */
-export interface TableQuickstartQuickIdeaClickedEvent {
-  action: 'table_quickstart_quick_idea_clicked'
+export interface OrgMenuItemClickedEvent {
+  action: 'org_menu_item_clicked'
   properties: {
-    /**
-     * Text of the quick idea clicked
-     */
-    ideaText: string
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * User selected a category in the templates variation.
- *
- * @group Events
- * @source studio
- * @page /dashboard/project/{ref}/editor (QuickstartTemplatesWidget)
- */
-export interface TableQuickstartCategoryClickedEvent {
-  action: 'table_quickstart_category_clicked'
-  properties: {
-    /**
-     * Name of the category clicked
-     */
-    categoryName: string
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * User selected a table template from either AI-generated suggestions or pre-made templates.
- *
- * @group Events
- * @source studio
- * @page /dashboard/project/{ref}/editor (QuickstartAIWidget, QuickstartTemplatesWidget)
- */
-export interface TableQuickstartTemplateClickedEvent {
-  action: 'table_quickstart_template_clicked'
-  properties: {
-    /**
-     * Name of the table clicked
-     */
-    tableName: string
-    /**
-     * Number of columns in the template
-     */
-    columnCount: number
-    /**
-     * Source of the template clicked
-     */
-    source: 'ai' | 'templates'
-    /**
-     * Category the template belongs to (only present for templates source)
-     */
-    categoryName?: string
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * User clicked the assistant button in the assistant variation.
- *
- * @group Events
- * @source studio
- * @page /dashboard/project/{ref}/editor (NewTab)
- */
-export interface TableQuickstartAssistantOpenedEvent {
-  action: 'table_quickstart_assistant_opened'
-  properties: {
-    /**
-     * Whether the assistant chat was successfully created
-     */
-    chatCreated: boolean
+    /** The key identifying the menu item */
+    itemKey: string
+    /** The navigation href of the menu item */
+    itemHref: string
   }
   groups: TelemetryGroups
 }
@@ -2441,6 +2414,24 @@ export interface InlineEditorSettingClickedEvent {
 }
 
 /**
+ * User toggled the queue table operations setting in account preferences.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/account/preferences
+ */
+export interface QueueOperationsSettingClickedEvent {
+  action: 'queue_operations_setting_clicked'
+  properties: {
+    /**
+     * Whether the queue operations was enabled or disabled
+     */
+    enabled: boolean
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
  * User clicked the save destination button in add log drains sheet.
  *
  * @group Events
@@ -2453,25 +2444,49 @@ export interface LogDrainSaveButtonClickedEvent {
     /**
      * Type of the destination saved
      */
-    destination: 'webhook' | 'datadog' | 'loki' | 'sentry'
+    destination:
+      | 'postgres'
+      | 'bigquery'
+      | 'clickhouse'
+      | 'webhook'
+      | 'datadog'
+      | 'loki'
+      | 'sentry'
+      | 's3'
+      | 'axiom'
+      | 'last9'
+      | 'otlp'
+      | 'syslog'
   }
   groups: TelemetryGroups
 }
 
 /**
- * User confirmed addition of log drain destination.
+ * User confirmed removal of a log drain destination in the delete-confirm modal.
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/settings/log-drains (LogDrains)
+ * @page /dashboard/project/{ref}/settings/log-drains
  */
-export interface LogDrainConfirmButtonSubmittedEvent {
-  action: 'log_drain_confirm_button_submitted'
+export interface LogDrainRemovedEvent {
+  action: 'log_drain_removed'
   properties: {
     /**
-     * Type of the destination confirmed
+     * Type of the destination removed
      */
-    destination: 'webhook' | 'datadog' | 'loki' | 'sentry'
+    destination:
+      | 'postgres'
+      | 'bigquery'
+      | 'clickhouse'
+      | 'webhook'
+      | 'datadog'
+      | 'loki'
+      | 'sentry'
+      | 's3'
+      | 'axiom'
+      | 'last9'
+      | 'otlp'
+      | 'syslog'
   }
   groups: TelemetryGroups
 }
@@ -2480,7 +2495,7 @@ type AdvisorCategory = 'PERFORMANCE' | 'SECURITY'
 type AdvisorLevel = 'ERROR' | 'WARN' | 'INFO'
 
 /**
- * User opened an advisor detail page to view a specific advisor (lint or notification).
+ * User opened an advisor detail page to view a specific advisor (lint, notification, or signal).
  * This tracks when users engage with advisor recommendations.
  *
  * @group Events
@@ -2497,7 +2512,7 @@ export interface AdvisorDetailOpenedEvent {
     /**
      * Source of the advisor
      */
-    advisorSource: 'lint' | 'notification'
+    advisorSource: 'lint' | 'notification' | 'signal'
     /**
      * Category of the advisor (SECURITY or PERFORMANCE)
      */
@@ -2550,6 +2565,106 @@ export interface AdvisorAssistantButtonClickedEvent {
 }
 
 /**
+ * User clicked on "Explain with AI" button in Query Performance detail panel
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/observability/query-performance
+ */
+export interface QueryPerformanceAIExplanationButtonClickedEvent {
+  action: 'query_performance_explain_with_ai_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * Source/location where AI assistant actions originate from.
+ */
+export type AiAssistantSource =
+  | 'explain_visualizer'
+  | 'query_performance'
+  | 'sql_debug'
+  | 'lint_detail'
+  | 'advisor_section'
+  | 'advisor_widget'
+  | 'branch_review'
+  | 'log_explorer'
+  | 'error_code'
+  | 'advisor_signal_detail'
+  | 'rls_tester'
+
+/**
+ * User copied an AI prompt to clipboard instead of using the built-in assistant.
+ * This allows users to paste the prompt into external AI tools (Cursor, Claude, etc.)
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AiPromptCopiedEvent {
+  action: 'ai_prompt_copied'
+  properties: {
+    /**
+     * Source/location where the prompt was copied from
+     */
+    source: AiAssistantSource
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the main AI assistant button in the dropdown.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AiAssistantDropdownButtonClickedEvent {
+  action: 'ai_assistant_dropdown_button_clicked'
+  properties: {
+    /**
+     * Source/location where the button was clicked
+     */
+    source: AiAssistantSource
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked an external AI tool link (ChatGPT or Claude) in the dropdown.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AiExternalToolClickedEvent {
+  action: 'ai_external_tool_clicked'
+  properties: {
+    /**
+     * Source/location where the link was clicked
+     */
+    source: AiAssistantSource
+    /**
+     * Which external AI tool was selected
+     */
+    tool: 'chatgpt' | 'claude'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked a CTA in the project security gate.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ProjectSecurityCtaClickedEvent {
+  action: 'project_security_cta_clicked'
+  properties: {
+    type: 'ask_assistant' | 'copy_prompt' | 'skip_to_home' | 'view_policies'
+    schema?: string
+    tableName?: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User opened the request upgrade modal (for users without billing permissions).
  *
  * @group Events
@@ -2561,7 +2676,7 @@ export interface RequestUpgradeModalOpenedEvent {
     /** Target plan being requested */
     requestedPlan: 'Pro' | 'Team' | 'Enterprise'
     /** Addon being requested, if applicable */
-    addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
+    addon?: 'pitr' | 'customDomain' | 'ipv4' | 'spendCap' | 'computeSize'
     /** Current organization plan */
     currentPlan?: string
     /** Feature context driving the upgrade request */
@@ -2582,11 +2697,571 @@ export interface RequestUpgradeSubmittedEvent {
     /** Target plan being requested */
     requestedPlan: 'Pro' | 'Team' | 'Enterprise'
     /** Addon being requested, if applicable */
-    addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
+    addon?: 'pitr' | 'customDomain' | 'ipv4' | 'spendCap' | 'computeSize'
     /** Current organization plan */
     currentPlan?: string
   }
   groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Triggered when a Studio error UI element is displayed (mounted).
+ * This includes error Admonitions, Toast notifications, and ErrorDisplay components.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface DashboardErrorCreatedEvent {
+  action: 'dashboard_error_created'
+  properties: {
+    /**
+     * Source of the error
+     */
+    source?: 'admonition' | 'toast' | 'error_display'
+    /**
+     * Type of error matched (for error_display source)
+     */
+    errorType?: string
+    /**
+     * Whether troubleshooting steps are available (for error_display source)
+     */
+    hasTroubleshooting?: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when the inline error troubleshooter is shown to the user.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface InlineErrorTroubleshooterExposedEvent {
+  action: 'inline_error_troubleshooter_exposed'
+  properties: {
+    /** ID of the matched error mapping */
+    errorType: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user opens or closes a troubleshooting accordion step.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface InlineErrorTroubleshooterStepClickedEvent {
+  action: 'inline_error_troubleshooter_step_clicked'
+  properties: {
+    /** ID of the matched error mapping */
+    errorType: string
+    /** Step number that was clicked (1, 2, 3, ...) — null when a step is collapsed */
+    step: number | null
+    /** Title of the step that was clicked */
+    stepTitle?: string
+    /** Whether the step was opened (true) or closed (false) */
+    expanded: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user clicks an action within the inline error troubleshooter.
+ * Covers all CTAs including the contact support link.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface InlineErrorTroubleshooterActionClickedEvent {
+  action: 'inline_error_troubleshooter_action_clicked'
+  properties: {
+    /** ID of the matched error mapping */
+    errorType: string
+    /** Which CTA was clicked */
+    ctaType: 'restart_db' | 'troubleshooting_guide' | 'ask_ai' | 'contact_support'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User successfully completed installing an integration via the integrations marketplace in the dashboard.
+ * Note: This excludes Wrappers and Postgres Extensions. Previously: integration_installed
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationInstallCompletedEvent {
+  action: 'integration_install_completed'
+  properties: {
+    /**
+     * The name of the integration installed
+     */
+    integrationName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User submitted an integration install via the integrations marketplace. Previously: integration_install_started
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationInstallSubmittedEvent {
+  action: 'integration_install_submitted'
+  properties: {
+    /** The name of the integration being installed */
+    integrationName: string
+    /** The integration method (will be 'template' for frontend-driven integrations.) */
+    method: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User submitted an integration uninstall via the integrations marketplace. Previously: integration_uninstall_started
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationUninstallSubmittedEvent {
+  action: 'integration_uninstall_submitted'
+  properties: {
+    /**
+     * The name of the integration being uninstalled
+     */
+    integrationName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Installation failed for an integration.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationInstallFailedEvent {
+  action: 'integration_install_failed'
+  properties: {
+    /**
+     * The name of the integration whose installation failed
+     */
+    integrationName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User successfully completed uninstalling an integration via the integrations marketplace in the dashboard.
+ * Note: This excludes Wrappers and Postgres Extensions. Previously: integration_uninstalled
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/{integration_slug}
+ */
+export interface IntegrationUninstallCompletedEvent {
+  action: 'integration_uninstall_completed'
+  properties: {
+    /**
+     * The name of the integration installed
+     */
+    integrationName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the enable Create rls_ensure trigger button in the RLS Event Trigger banner.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/auth/policies
+ */
+export interface RlsEventTriggerBannerCreateButtonClickedEvent {
+  action: 'rls_event_trigger_banner_create_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the Run button in the log explorer.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/logs/explorer
+ */
+export interface LogExplorerQueryRunButtonClickedEvent {
+  action: 'log_explorer_query_run_button_clicked'
+  properties: {
+    /**
+     * Whether the user is editing a saved query
+     */
+    is_saved_query: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked an upgrade CTA inside the compute badge hover card.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ComputeBadgeUpgradeClickedEvent {
+  action: 'compute_badge_upgrade_clicked'
+  properties: {
+    computeSize: string
+    planId: string
+    upgradeType: 'free_micro_upgrade' | 'compute_upgrade'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User dismissed the free Micro upgrade banner.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface FreeMicroUpgradeBannerDismissedEvent {
+  action: 'free_micro_upgrade_banner_dismissed'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the CTA on the free Micro upgrade banner.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface FreeMicroUpgradeBannerCtaClickedEvent {
+  action: 'free_micro_upgrade_banner_cta_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the Navigate action in the storage explorer header.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/storage/files/buckets/{bucketId}
+ */
+export interface StorageExplorerNavigateClickedEvent {
+  action: 'storage_explorer_navigate_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User submitted a folder path from the storage explorer Navigate action.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/storage/files/buckets/{bucketId}
+ */
+export interface StorageExplorerNavigateSubmittedEvent {
+  action: 'storage_explorer_navigate_submitted'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the Remove policy button on the public bucket SELECT policy warning.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/storage/files/buckets/{bucketId}
+ */
+export interface StoragePublicBucketSelectPolicyRemovedEvent {
+  action: 'storage_public_bucket_select_policy_removed'
+  properties: {
+    /** The ID of the bucket whose SELECT policy was removed */
+    bucketId: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User dismissed the public bucket SELECT policy warning banner.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/storage/files/buckets/{bucketId}
+ */
+export interface StoragePublicBucketSelectPolicyWarningDismissButtonClickedEvent {
+  action: 'storage_public_bucket_select_policy_warning_dismiss_button_clicked'
+  properties: {
+    /** The ID of the bucket whose warning was dismissed */
+    bucketId: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when an access token is successfully created.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens
+ */
+export interface AccessTokenCreatedEvent {
+  action: 'access_token_created'
+  properties: {
+    tokenType: 'classic' | 'scoped'
+    expiryPreset: string
+    resourceAccess?: 'all-orgs' | 'selected-orgs' | 'selected-projects'
+    permissionCount?: number
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Triggered when an access token is successfully deleted.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens
+ */
+export interface AccessTokenRemovedEvent {
+  action: 'access_token_removed'
+  properties: {
+    tokenType: 'classic' | 'scoped'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the primary CTA on a resource exhaustion warning banner.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ResourceExhaustionBannerUpgradeClickedEvent {
+  action: 'resource_exhaustion_banner_upgrade_clicked'
+  groups: TelemetryGroups
+  properties: {
+    warningTypes: string[]
+    destination: string
+  }
+}
+
+/**
+ * User clicked "Ask AI Assistant" on a resource exhaustion warning banner.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ResourceExhaustionBannerAiAssistantClickedEvent {
+  action: 'resource_exhaustion_banner_ai_assistant_clicked'
+  groups: TelemetryGroups
+  properties: {
+    warningTypes: string[]
+  }
+}
+
+/**
+ * User clicked a row in the Unified Logs interface.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface UnifiedLogsRowClickedEvent {
+  action: 'unified_logs_row_clicked'
+  properties: {
+    /**
+     * Service that produced the log row. Mirrors `LOG_TYPES` in UnifiedLogs.constants.tsx.
+     * Server values are validated against this set by zod (UnifiedLogs.schema.ts) before
+     * reaching the table; anything else is rejected upstream so the union here is exhaustive.
+     */
+    logType: 'postgres' | 'postgrest' | 'auth' | 'storage' | 'edge function'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the Supabase logo in the top-left corner of the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderHomeLogoClickedEvent {
+  action: 'header_home_logo_clicked'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked the mobile back-to-dashboard chevron in the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderBackToDashboardClickedEvent {
+  action: 'header_back_to_dashboard_clicked'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked the "Exceeding usage limits" badge in the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderExceedingUsageBadgeClickedEvent {
+  action: 'header_exceeding_usage_badge_clicked'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User opened the organization dropdown in the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderOrganizationDropdownOpenedEvent {
+  action: 'header_organization_dropdown_opened'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User opened the project dropdown in the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderProjectDropdownOpenedEvent {
+  action: 'header_project_dropdown_opened'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User opened the branch dropdown in the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderBranchDropdownOpenedEvent {
+  action: 'header_branch_dropdown_opened'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked the merge-request trigger button in the page header.
+ * Fires on click; the existing branch_create_merge_request_button_clicked
+ * fires only on successful merge-request creation.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderMergeRequestButtonClickedEvent {
+  action: 'header_merge_request_button_clicked'
+  properties: {
+    /** Whether a review has already been requested for this branch. */
+    hasReviewRequested: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the "Connect" button in the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderConnectButtonClickedEvent {
+  action: 'header_connect_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User opened the feedback dropdown in the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderFeedbackDropdownOpenedEvent {
+  action: 'header_feedback_dropdown_opened'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked the Advisor Center toggle button in the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderAdvisorButtonClickedEvent {
+  action: 'header_advisor_button_clicked'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked the Inline SQL Editor toggle button in the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderInlineEditorButtonClickedEvent {
+  action: 'header_inline_editor_button_clicked'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked the AI Assistant toggle button in the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderAssistantButtonClickedEvent {
+  action: 'header_assistant_button_clicked'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User opened the user/account dropdown in the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderUserDropdownOpenedEvent {
+  action: 'header_user_dropdown_opened'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User opened the local-development settings dropdown in the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderLocalDropdownOpenedEvent {
+  action: 'header_local_dropdown_opened'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User opened the local CLI version popover in the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderLocalVersionPopoverOpenedEvent {
+  action: 'header_local_version_popover_opened'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User ran a query in the RLS tester feature preview.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface RLSTesterRunQueryClickedEvent {
+  action: 'rls_tester_run_query_clicked'
+  properties: { type: 'raw' | 'inferred' }
+  groups: Partial<TelemetryGroups>
 }
 
 /**
@@ -2601,19 +3276,19 @@ export type TelemetryEvent =
   | ApiDocsCodeCopyButtonClickedEvent
   | CronJobCreatedEvent
   | CronJobUpdatedEvent
-  | CronJobDeletedEvent
+  | CronJobRemovedEvent
   | CronJobCreateClickedEvent
   | CronJobUpdateClickedEvent
   | CronJobDeleteClickedEvent
   | CronJobHistoryClickedEvent
   | FeaturePreviewEnabledEvent
   | FeaturePreviewDisabledEvent
+  | TimezonePickerClickedEvent
+  | ProjectCreationDefaultPrivilegesExposedEvent
+  | ProjectCreationGithubConnectClickedEvent
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
-  | ProjectCreationInitialStepPromptIntendedEvent
-  | ProjectCreationInitialStepSubmittedEvent
-  | ProjectCreationSecondStepPromptIntendedEvent
-  | ProjectCreationSecondStepSubmittedEvent
+  | TableApiAccessToggleClickedEvent
   | RealtimeInspectorListenChannelClickedEvent
   | RealtimeInspectorBroadcastSentEvent
   | RealtimeInspectorMessageClickedEvent
@@ -2628,6 +3303,7 @@ export type TelemetryEvent =
   | SqlEditorResultDownloadCsvClickedEvent
   | SqlEditorResultCopyMarkdownClickedEvent
   | SqlEditorResultCopyJsonClickedEvent
+  | SqlEditorResultCopyCsvClickedEvent
   | AssistantPromptSubmittedEvent
   | AssistantDebugSubmittedEvent
   | AssistantSuggestionRunQueryClickedEvent
@@ -2635,6 +3311,8 @@ export type TelemetryEvent =
   | AssistantEditInSqlEditorClickedEvent
   | AssistantMessageRatingSubmittedEvent
   | DocsFeedbackClickedEvent
+  | CopyAsMarkdownEvent
+  | AskAIEvent
   | HomepageFrameworkQuickstartClickedEvent
   | HomepageProductCardClickedEvent
   | WwwPricingPlanCtaClickedEvent
@@ -2643,29 +3321,32 @@ export type TelemetryEvent =
   | HomepageDiscordButtonClickedEvent
   | HomepageCustomerStoryCardClickedEvent
   | HomepageProjectTemplateCardClickedEvent
-  | CustomReportAddSQLBlockClicked
+  | CustomReportAddSQLBlockClickedEvent
   | CustomReportAssistantSQLBlockAddedEvent
   | OpenSourceRepoCardClickedEvent
   | StartProjectButtonClickedEvent
   | SeeDocumentationButtonClickedEvent
   | RequestDemoButtonClickedEvent
-  | RegisterStateOfStartups2025NewsletterClicked
   | SignInButtonClickedEvent
   | HelpButtonClickedEvent
   | ExampleProjectCardClickedEvent
   | ImportDataButtonClickedEvent
-  | ImportDataFileDroppedEvent
+  | ImportDataFileAddedEvent
   | ImportDataAddedEvent
   | SendFeedbackButtonClickedEvent
   | SqlEditorQueryRunButtonClickedEvent
+  | LogExplorerQueryRunButtonClickedEvent
+  | StorageExplorerNavigateClickedEvent
+  | StorageExplorerNavigateSubmittedEvent
+  | StoragePublicBucketSelectPolicyRemovedEvent
+  | StoragePublicBucketSelectPolicyWarningDismissButtonClickedEvent
   | StudioPricingPlanCtaClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
   | MetricsAPIBannerCtaButtonClickedEvent
   | MetricsAPIBannerDismissButtonClickedEvent
-  | IndexAdvisorBannerEnableButtonClickedEvent
+  | IndexAdvisorEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
-  | IndexAdvisorDialogEnableButtonClickedEvent
   | IndexAdvisorTabClickedEvent
   | IndexAdvisorCreateIndexesButtonClickedEvent
   | EdgeFunctionDeployButtonClickedEvent
@@ -2680,7 +3361,8 @@ export type TelemetryEvent =
   | SupabaseUiCommandCopyButtonClickedEvent
   | SupportTicketSubmittedEvent
   | AiAssistantInSupportFormClickedEvent
-  | OrganizationMfaEnforcementUpdated
+  | SupportAssistantFollowUpCardClickedEvent
+  | OrganizationMfaEnforcementUpdatedEvent
   | ForeignDataWrapperCreatedEvent
   | StorageBucketCreatedEvent
   | BranchCreateButtonClickedEvent
@@ -2688,17 +3370,19 @@ export type TelemetryEvent =
   | BranchCreateMergeRequestButtonClickedEvent
   | BranchCloseMergeRequestButtonClickedEvent
   | BranchMergeSubmittedEvent
-  | BranchMergeSucceededEvent
+  | BranchMergeCompletedEvent
   | BranchMergeFailedEvent
   | BranchUpdatedEvent
   | BranchReviewWithAssistantClickedEvent
+  | BranchSelectorBranchClickedEvent
+  | BranchSelectorCreateClickedEvent
+  | BranchSelectorManageClickedEvent
   | DpaPdfOpenedEvent
-  | HomeGettingStartedWorkflowClickedEvent
-  | HomeGettingStartedStepClickedEvent
-  | HomeGettingStartedClosedEvent
+  | HomeConnectSectionExposedEvent
+  | HomeConnectActionClickedEvent
+  | ConnectSheetOpenedEvent
   | HomeSectionRowsMovedEvent
   | HomeActivityStatClickedEvent
-  | RealtimeExperimentExposedEvent
   | HomeProjectUsageServiceClickedEvent
   | HomeProjectUsageChartClickedEvent
   | HomeCustomReportBlockAddedEvent
@@ -2712,24 +3396,59 @@ export type TelemetryEvent =
   | RLSGeneratePoliciesClickedEvent
   | RLSGeneratedPolicyRemovedEvent
   | RLSGeneratedPoliciesCreatedEvent
-  | TableCreateGeneratePoliciesExperimentExposedEvent
-  | TableCreateGeneratePoliciesExperimentConvertedEvent
-  | TableQuickstartOpenedEvent
-  | TableQuickstartAIPromptSubmittedEvent
-  | TableQuickstartAIGenerationCompletedEvent
-  | TableQuickstartQuickIdeaClickedEvent
-  | TableQuickstartCategoryClickedEvent
-  | TableQuickstartTemplateClickedEvent
-  | TableQuickstartAssistantOpenedEvent
   | AuthUsersSearchSubmittedEvent
   | CommandMenuOpenedEvent
+  | CommandMenuClosedEvent
   | CommandMenuSearchSubmittedEvent
   | CommandMenuCommandClickedEvent
   | InlineEditorSettingClickedEvent
+  | QueueOperationsSettingClickedEvent
   | SidebarOpenedEvent
   | LogDrainSaveButtonClickedEvent
-  | LogDrainConfirmButtonSubmittedEvent
+  | LogDrainRemovedEvent
   | AdvisorDetailOpenedEvent
   | AdvisorAssistantButtonClickedEvent
+  | QueryPerformanceAIExplanationButtonClickedEvent
+  | AiPromptCopiedEvent
+  | AiAssistantDropdownButtonClickedEvent
+  | AiExternalToolClickedEvent
+  | ProjectSecurityCtaClickedEvent
   | RequestUpgradeModalOpenedEvent
   | RequestUpgradeSubmittedEvent
+  | DashboardErrorCreatedEvent
+  | InlineErrorTroubleshooterExposedEvent
+  | InlineErrorTroubleshooterStepClickedEvent
+  | InlineErrorTroubleshooterActionClickedEvent
+  | IntegrationInstallCompletedEvent
+  | IntegrationInstallSubmittedEvent
+  | IntegrationUninstallSubmittedEvent
+  | IntegrationInstallFailedEvent
+  | IntegrationUninstallCompletedEvent
+  | RlsEventTriggerBannerCreateButtonClickedEvent
+  | OrgSubmenuOpenedEvent
+  | OrgMenuBackClickedEvent
+  | OrgMenuItemClickedEvent
+  | ComputeBadgeUpgradeClickedEvent
+  | FreeMicroUpgradeBannerDismissedEvent
+  | FreeMicroUpgradeBannerCtaClickedEvent
+  | AccessTokenCreatedEvent
+  | AccessTokenRemovedEvent
+  | ResourceExhaustionBannerUpgradeClickedEvent
+  | ResourceExhaustionBannerAiAssistantClickedEvent
+  | UnifiedLogsRowClickedEvent
+  | HeaderHomeLogoClickedEvent
+  | HeaderBackToDashboardClickedEvent
+  | HeaderExceedingUsageBadgeClickedEvent
+  | HeaderOrganizationDropdownOpenedEvent
+  | HeaderProjectDropdownOpenedEvent
+  | HeaderBranchDropdownOpenedEvent
+  | HeaderMergeRequestButtonClickedEvent
+  | HeaderConnectButtonClickedEvent
+  | HeaderFeedbackDropdownOpenedEvent
+  | HeaderAdvisorButtonClickedEvent
+  | HeaderInlineEditorButtonClickedEvent
+  | HeaderAssistantButtonClickedEvent
+  | HeaderUserDropdownOpenedEvent
+  | HeaderLocalDropdownOpenedEvent
+  | HeaderLocalVersionPopoverOpenedEvent
+  | RLSTesterRunQueryClickedEvent

@@ -13,6 +13,7 @@ export type UseCustomQueryOptions<
   TQueryKey extends QueryKey = QueryKey,
 > = Omit<UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>, 'queryKey'>
 
+// @deprecated Just use UseMutationOptions directly
 export type UseCustomMutationOptions<
   TData = unknown,
   TError = unknown,

@@ -240,7 +240,11 @@ export function runRatchet(argv: string[], runEslint = dangerouslyRunEsLint): nu
   // Offloaded to user. Must document that they should not pass untrusted input
   // via --eslint or --eslint-args.
   const { results, stderr } = runEslint(args.eslint, args.eslintArgs)
-  const currentSnapshots = collectRuleSnapshots(results, args.rules)
+
+  // Filter out test files.
+  const filteredResults = results.filter((result) => !result.filePath?.includes('.test.'))
+
+  const currentSnapshots = collectRuleSnapshots(filteredResults, args.rules)
   const currentCounts: Record<string, number> = {}
   for (const rule of args.rules) {
     currentCounts[rule] = currentSnapshots[rule]?.total ?? 0

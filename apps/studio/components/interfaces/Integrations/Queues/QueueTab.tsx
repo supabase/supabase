@@ -1,36 +1,29 @@
+import { useParams } from 'common'
 import { Lock, Paintbrush, PlusCircle, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { DeleteQueue } from 'components/interfaces/Integrations/Queues/SingleQueue/DeleteQueue'
-import { PurgeQueue } from 'components/interfaces/Integrations/Queues/SingleQueue/PurgeQueue'
-import { QUEUE_MESSAGE_TYPE } from 'components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
-import { QueueMessagesDataGrid } from 'components/interfaces/Integrations/Queues/SingleQueue/QueueDataGrid'
-import { QueueFilters } from 'components/interfaces/Integrations/Queues/SingleQueue/QueueFilters'
-import { QueueSettings } from 'components/interfaces/Integrations/Queues/SingleQueue/QueueSettings'
-import { SendMessageModal } from 'components/interfaces/Integrations/Queues/SingleQueue/SendMessageModal'
-import { Markdown } from 'components/interfaces/Markdown'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { useQueueMessagesInfiniteQuery } from 'data/database-queues/database-queue-messages-infinite-query'
-import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
-import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import {
-  Button,
-  cn,
-  LoadingLine,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Separator,
-} from 'ui'
+import { Button, cn, LoadingLine, Popover, PopoverContent, PopoverTrigger, Separator } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { pgmqQueueTable } from './Queues.utils'
+import { DeleteQueue } from '@/components/interfaces/Integrations/Queues/SingleQueue/DeleteQueue'
+import { PurgeQueue } from '@/components/interfaces/Integrations/Queues/SingleQueue/PurgeQueue'
+import { QUEUE_MESSAGE_TYPE } from '@/components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
+import { QueueMessagesDataGrid } from '@/components/interfaces/Integrations/Queues/SingleQueue/QueueDataGrid'
+import { QueueFilters } from '@/components/interfaces/Integrations/Queues/SingleQueue/QueueFilters'
+import { QueueSettings } from '@/components/interfaces/Integrations/Queues/SingleQueue/QueueSettings'
+import { SendMessageModal } from '@/components/interfaces/Integrations/Queues/SingleQueue/SendMessageModal'
+import { Markdown } from '@/components/interfaces/Markdown'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
+import { useQueueMessagesInfiniteQuery } from '@/data/database-queues/database-queue-messages-infinite-query'
+import { useQueuesExposePostgrestStatusQuery } from '@/data/database-queues/database-queues-expose-postgrest-status-query'
+import { useTableUpdateMutation } from '@/data/tables/table-update-mutation'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const QueueTab = () => {
   const { childId: queueName, ref } = useParams()
@@ -51,7 +44,8 @@ export const QueueTab = () => {
     connectionString: project?.connectionString,
     schema: 'pgmq',
   })
-  const queueTable = tables?.find((x) => x.name === `q_${queueName}`)
+  const queueRelname = queueName ? pgmqQueueTable(queueName) : undefined
+  const queueTable = tables?.find((x) => x.name === queueRelname)
   const isRlsEnabled = queueTable?.rls_enabled ?? false
 
   const { data: policies } = useDatabasePoliciesQuery({
@@ -59,7 +53,7 @@ export const QueueTab = () => {
     connectionString: project?.connectionString,
     schema: 'pgmq',
   })
-  const queuePolicies = (policies ?? []).filter((policy) => policy.table === `q_${queueName}`)
+  const queuePolicies = (policies ?? []).filter((policy) => policy.table === queueRelname)
 
   const { data: isExposed } = useQueuesExposePostgrestStatusQuery({
     projectRef: project?.ref,
@@ -121,6 +115,7 @@ export const QueueTab = () => {
             onClick={() => setPurgeQueueModalShown(true)}
             icon={<Paintbrush />}
             title="Purge messages"
+            aria-label="Purge messages"
             tooltip={{ content: { side: 'bottom', text: 'Purge messages' } }}
           />
 
@@ -130,6 +125,7 @@ export const QueueTab = () => {
             onClick={() => setDeleteQueueModalShown(true)}
             icon={<Trash2 />}
             title="Delete queue"
+            aria-label="Delete queue"
             tooltip={{ content: { side: 'bottom', text: 'Delete queue' } }}
           />
 
@@ -188,17 +184,17 @@ export const QueueTab = () => {
               )}
             </>
           ) : (
-            <Popover_Shadcn_
+            <Popover
               modal={false}
               open={openRlsPopover}
               onOpenChange={() => setOpenRlsPopover(!openRlsPopover)}
             >
-              <PopoverTrigger_Shadcn_ asChild>
+              <PopoverTrigger asChild>
                 <Button type={isExposed ? 'warning' : 'default'} icon={<Lock strokeWidth={1.5} />}>
                   RLS disabled
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="w-80 text-sm" align="end">
+              </PopoverTrigger>
+              <PopoverContent className="w-80 text-sm" align="end">
                 <h3 className="text-xs flex items-center gap-x-2">
                   <Lock size={14} /> Row Level Security (RLS)
                 </h3>
@@ -221,7 +217,7 @@ export const QueueTab = () => {
                   ) : (
                     <>
                       <Markdown
-                        className="[&>p]:!leading-normal text-xs [&>p]:!m-0 flex flex-col gap-y-2"
+                        className="[&>p]:leading-normal! text-xs [&>p]:m-0! flex flex-col gap-y-2"
                         content={`
 RLS for queues is only relevant if exposure through PostgREST has been enabled, in which you can restrict and control who can manage this queue using Row Level Security.
 
@@ -237,8 +233,8 @@ You may opt to manage your queues via any Supabase client libraries or PostgREST
                     </>
                   )}
                 </div>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
           )}
 
           <Button type="primary" onClick={() => setSendMessageModalShown(true)}>

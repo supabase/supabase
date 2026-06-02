@@ -1,19 +1,39 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import {
+  Button,
+  Card,
+  CardContent,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  DialogTrigger,
+} from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
-import { useParams } from 'common'
-import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
-import { useDatabasePasswordResetMutation } from 'data/database/database-password-reset-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
-import { passwordStrength } from 'lib/password-strength'
-import { generateStrongPassword } from 'lib/project'
-import { Button, Card, CardContent, Input, Modal } from 'ui'
-import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { PasswordStrengthBar } from '@/components/ui/PasswordStrengthBar'
+import { useDatabasePasswordResetMutation } from '@/data/database/database-password-reset-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsProjectActive, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from '@/lib/constants'
+import { passwordStrength, PasswordStrengthScore } from '@/lib/password-strength'
+import { generateStrongPassword } from '@/lib/project'
 
 const ResetDbPassword = ({ disabled = false }) => {
   const { ref } = useParams()
@@ -35,7 +55,7 @@ const ResetDbPassword = ({ disabled = false }) => {
   const [password, setPassword] = useState<string>('')
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState<string>('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState<string>('')
-  const [passwordStrengthScore, setPasswordStrengthScore] = useState<number>(0)
+  const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
 
   const { mutate: resetDatabasePassword, isPending: isUpdatingPassword } =
     useDatabasePasswordResetMutation({
@@ -86,81 +106,96 @@ const ResetDbPassword = ({ disabled = false }) => {
 
   return (
     <>
-      <Card id="database-password">
-        <CardContent>
-          <FormLayout
-            layout="flex-row-reverse"
-            label="Database password"
-            description="You can use this password to connect directly to your Postgres database."
-          >
-            <div className="flex items-end justify-end">
-              <ButtonTooltip
-                type="default"
-                disabled={!canResetDbPassword || !isProjectActive || disabled}
-                onClick={() => setShowResetDbPass(true)}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: !canResetDbPassword
-                      ? 'You need additional permissions to reset the database password'
-                      : !isProjectActive
-                        ? 'Unable to reset database password as project is not active'
-                        : undefined,
-                  },
-                }}
-              >
-                Reset database password
-              </ButtonTooltip>
-            </div>
-          </FormLayout>
-        </CardContent>
-      </Card>
-      <Modal
-        hideFooter
-        header={<h5 className="text-foreground">Reset database password</h5>}
-        confirmText="Reset password"
-        size="medium"
-        visible={showResetDbPass}
-        loading={isUpdatingPassword}
-        onCancel={() => setShowResetDbPass(false)}
-      >
-        <Modal.Content className="w-full space-y-8">
-          <Input
-            type="password"
-            value={password}
-            copy={password.length > 0}
-            onChange={onDbPassChange}
-            error={passwordStrengthWarning}
-            // @ts-ignore
-            descriptionText={
-              <PasswordStrengthBar
-                passwordStrengthScore={passwordStrengthScore}
-                passwordStrengthMessage={passwordStrengthMessage}
-                password={password}
-                generateStrongPassword={generatePassword}
-              />
-            }
-          />
-        </Modal.Content>
-        <Modal.Separator />
-        <Modal.Content className="flex items-center justify-end space-x-2">
-          <Button
-            type="default"
-            disabled={isUpdatingPassword}
-            onClick={() => setShowResetDbPass(false)}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="primary"
-            loading={isUpdatingPassword}
-            disabled={isUpdatingPassword}
-            onClick={() => confirmResetDbPass()}
-          >
-            Reset password
-          </Button>
-        </Modal.Content>
-      </Modal>
+      <PageSection id="database-password">
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Database password</PageSectionTitle>
+
+            <PageSectionDescription>Used for direct Postgres connections</PageSectionDescription>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <Card>
+            <CardContent className="flex flex-row items-center gap-x-2 justify-between">
+              <div className="space-y-0.5">
+                <h3 className="text-sm text-foreground">Reset database password</h3>
+                <p className="text-sm text-foreground-light text-balance">
+                  The database password isn’t viewable after creation. Resetting it will break any
+                  existing connections.
+                </p>
+              </div>
+              <Dialog open={showResetDbPass} onOpenChange={(open) => setShowResetDbPass(open)}>
+                <DialogTrigger asChild>
+                  <ButtonTooltip
+                    type="default"
+                    disabled={!canResetDbPassword || !isProjectActive || disabled}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: !canResetDbPassword
+                          ? 'You need additional permissions to reset the database password'
+                          : !isProjectActive
+                            ? 'Unable to reset database password as project is not active'
+                            : undefined,
+                      },
+                    }}
+                  >
+                    Reset password
+                  </ButtonTooltip>
+                </DialogTrigger>
+                <DialogContent size="medium">
+                  <DialogHeader>
+                    <DialogTitle>Reset database password</DialogTitle>
+                  </DialogHeader>
+                  <DialogSectionSeparator />
+                  <DialogSection className="w-full space-y-8">
+                    <FormItemLayout
+                      layout="vertical"
+                      isReactForm={false}
+                      error={passwordStrengthWarning}
+                      description={
+                        <PasswordStrengthBar
+                          passwordStrengthScore={passwordStrengthScore as PasswordStrengthScore}
+                          passwordStrengthMessage={passwordStrengthMessage}
+                          password={password}
+                          generateStrongPassword={generatePassword}
+                        />
+                      }
+                    >
+                      <Input
+                        copy={password.length > 0}
+                        aria-invalid={!!passwordStrengthWarning}
+                        type="password"
+                        placeholder="Type in a strong password"
+                        value={password}
+                        autoComplete="off"
+                        onChange={onDbPassChange}
+                      />
+                    </FormItemLayout>
+                  </DialogSection>
+                  <DialogFooter>
+                    <Button
+                      type="default"
+                      disabled={isUpdatingPassword}
+                      onClick={() => setShowResetDbPass(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="primary"
+                      loading={isUpdatingPassword}
+                      disabled={isUpdatingPassword}
+                      onClick={() => confirmResetDbPass()}
+                    >
+                      Reset password
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </CardContent>
+          </Card>
+        </PageSectionContent>
+      </PageSection>
     </>
   )
 }

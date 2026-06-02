@@ -1,7 +1,5 @@
 import { ChevronDown } from 'lucide-react'
 import Image from 'next/image'
-
-import { useFlag } from 'common'
 import {
   Button,
   cn,
@@ -12,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
+
 import {
   getIntegrationTypeIcon,
   getIntegrationTypeLabel,
@@ -22,6 +21,8 @@ interface AddIntegrationDropdownProps {
   buttonText?: string
   align?: 'end' | 'center'
   type?: 'primary' | 'default'
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
   onSelectIntegrationType: (type: INTEGRATION_TYPES) => void
 }
 
@@ -50,12 +51,12 @@ const ProviderDropdownItem = ({
 export const AddIntegrationDropdown = ({
   type = 'primary',
   align = 'end',
+  open,
+  onOpenChange,
   onSelectIntegrationType,
 }: AddIntegrationDropdownProps) => {
-  const isWorkOSEnabled = useFlag('isWorkOSTPAEnabled')
-
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
         <Button type={type} iconRight={<ChevronDown />}>
           Add provider
@@ -64,12 +65,9 @@ export const AddIntegrationDropdown = ({
       <DropdownMenuContent align={align} className="w-56">
         <DropdownMenuLabel>Select provider</DropdownMenuLabel>
         <DropdownMenuSeparator />
-
         <ProviderDropdownItem type="firebase" onSelectIntegrationType={onSelectIntegrationType} />
         <ProviderDropdownItem type="clerk" onSelectIntegrationType={onSelectIntegrationType} />
-        {isWorkOSEnabled && (
-          <ProviderDropdownItem type="workos" onSelectIntegrationType={onSelectIntegrationType} />
-        )}
+        <ProviderDropdownItem type="workos" onSelectIntegrationType={onSelectIntegrationType} />
         <ProviderDropdownItem type="auth0" onSelectIntegrationType={onSelectIntegrationType} />
         <ProviderDropdownItem type="awsCognito" onSelectIntegrationType={onSelectIntegrationType} />
       </DropdownMenuContent>

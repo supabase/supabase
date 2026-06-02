@@ -12,13 +12,17 @@ Currently, Supabase Auth supports 2 strategies to link an identity to a user:
 1. [Automatic Linking](#automatic-linking)
 2. [Manual Linking](#manual-linking-beta)
 
+<Admonition type="note" title="No identity linking for SSO accounts">
+
+Users that signed up with [SAML SSO](/docs/guides/auth/sso/auth-sso-saml) will not be considered as targets for identity linking (automatic or manual) for security reasons.
+
+</Admonition>
+
 ### Automatic linking
 
 Supabase Auth automatically links identities with the same email address to a single user. This helps to improve the user experience when multiple OAuth login options are presented since the user does not need to remember which OAuth account they used to sign up with. When a new user signs in with OAuth, Supabase Auth will attempt to look for an existing user that uses the same email address. If a match is found, the new identity is linked to the user.
 
 In order for automatic linking to correctly identify the user for linking, Supabase Auth needs to ensure that all user emails are unique. It would also be an insecure practice to automatically link an identity to a user with an unverified email address since that could lead to pre-account takeover attacks. To prevent this from happening, when a new identity can be linked to an existing user, Supabase Auth will remove any other unconfirmed identities linked to an existing user.
-
-Users that signed up with [SAML SSO](/docs/guides/auth/sso/auth-sso-saml) will not be considered as targets for automatic linking.
 
 ### Manual linking (beta)
 
@@ -35,7 +39,8 @@ Supabase Auth allows a user to initiate identity linking with a different email 
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('<your-supabase-url>', '<your-supabase-anon-key>')
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 const { data, error } = await supabase.auth.linkIdentity({ provider: 'google' })
@@ -162,7 +167,8 @@ You can use [`getUserIdentities()`](/docs/reference/javascript/auth-getuserident
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('<your-supabase-url>', '<your-supabase-anon-key>')
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 // retrieve all identities linked to a user

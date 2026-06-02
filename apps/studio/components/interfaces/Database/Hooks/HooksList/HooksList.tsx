@@ -1,37 +1,32 @@
-import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, map as lodashMap, uniqBy } from 'lodash'
 import { Search } from 'lucide-react'
-import { useState } from 'react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useRef, useState } from 'react'
+import { InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DocsButton } from 'components/ui/DocsButton'
-import { NoSearchResults } from 'components/ui/NoSearchResults'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useDatabaseHooksQuery } from 'data/database-triggers/database-triggers-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
-import { noop } from 'lib/void'
-import { Input } from 'ui'
 import { HooksListEmpty } from './HooksListEmpty'
 import { SchemaTable } from './SchemaTable'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
-export interface HooksListProps {
-  createHook: () => void
-  editHook: (hook: PostgresTrigger) => void
-  deleteHook: (hook: PostgresTrigger) => void
-}
-
-export const HooksList = ({
-  createHook = noop,
-  editHook = noop,
-  deleteHook = noop,
-}: HooksListProps) => {
+export const HooksList = () => {
   const { data: project } = useSelectedProjectQuery()
+
+  const [, setShowCreateHookForm] = useQueryState('new', parseAsBoolean.withDefault(false))
+
   const {
-    data: hooks,
+    data: hooks = [],
     isPending: isLoading,
     isSuccess,
     isError,
@@ -42,7 +37,7 @@ export const HooksList = ({
   })
   const [filterString, setFilterString] = useState<string>('')
 
-  const filteredHooks = (hooks || []).filter((x: any) =>
+  const filteredHooks = hooks.filter((x) =>
     includes(x.name.toLowerCase(), filterString.toLowerCase())
   )
   const filteredHookSchemas = lodashMap(uniqBy(filteredHooks, 'schema'), 'schema')
@@ -52,21 +47,42 @@ export const HooksList = ({
     'triggers'
   )
 
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search webhooks' }
+  )
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => setFilterString(''))
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, () => setShowCreateHookForm(true), {
+    label: 'Create webhook',
+    enabled: isPermissionsLoaded && canCreateWebhooks,
+  })
+
   return (
     <div className="w-full space-y-4">
       <div className="flex items-center justify-between">
-        <Input
-          placeholder="Search for a webhook"
-          size="tiny"
-          icon={<Search />}
-          value={filterString}
-          className="w-52"
-          onChange={(e) => setFilterString(e.target.value)}
-        />
+        <InputGroup className="w-52">
+          <InputGroupInput
+            ref={searchInputRef}
+            size="tiny"
+            placeholder="Search for a webhook"
+            value={filterString}
+            onChange={(e) => setFilterString(e.target.value)}
+            onKeyDown={onSearchInputEscape(filterString, setFilterString)}
+          />
+          <InputGroupAddon>
+            <Search />
+          </InputGroupAddon>
+        </InputGroup>
         <div className="flex items-center gap-x-2">
           <DocsButton href={`${DOCS_URL}/guides/database/webhooks`} />
           <ButtonTooltip
-            onClick={() => createHook()}
+            onClick={() => setShowCreateHookForm(true)}
             disabled={!isPermissionsLoaded || !canCreateWebhooks}
             tooltip={{
               content: {
@@ -102,14 +118,8 @@ export const HooksList = ({
                 onResetFilter={() => setFilterString('')}
               />
             )}
-            {filteredHookSchemas.map((schema: any) => (
-              <SchemaTable
-                key={schema}
-                filterString={filterString}
-                schema={schema}
-                editHook={editHook}
-                deleteHook={deleteHook}
-              />
+            {filteredHookSchemas.map((schema) => (
+              <SchemaTable key={schema} filterString={filterString} schema={schema} />
             ))}
           </>
         ))}

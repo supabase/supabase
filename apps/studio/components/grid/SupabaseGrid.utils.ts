@@ -1,19 +1,27 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { compact } from 'lodash'
-import { useEffect, useMemo } from 'react'
-import { CalculatedColumn, CellKeyboardEvent } from 'react-data-grid'
-
-import type { Filter, SavedState } from 'components/grid/types'
-import { Entity, isTableLike } from 'data/table-editor/table-editor-types'
 import { useSearchParams } from 'next/navigation'
-import { parseAsBoolean, parseAsNativeArrayOf, parseAsString, useQueryStates } from 'nuqs'
+import { parseAsNativeArrayOf, parseAsString, useQueryStates } from 'nuqs'
+import { useEffect, useMemo } from 'react'
+import {
+  CalculatedColumn,
+  CellKeyboardEvent,
+  CellKeyDownArgs,
+  RowsChangeData,
+} from 'react-data-grid'
+import { toast } from 'sonner'
 import { copyToClipboard } from 'ui'
+
 import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
 import { STORAGE_KEY_PREFIX } from './constants'
-import type { Sort, SupaColumn, SupaTable } from './types'
+import type { Sort, SupaColumn, SupaRow, SupaTable } from './types'
 import { formatClipboardValue } from './utils/common'
-
-export const LOAD_TAB_FROM_CACHE_PARAM = 'loadFromCache'
+import { isBoolColumn } from './utils/types'
+import type { Filter, SavedState } from '@/components/grid/types'
+import { Entity, isTableLike } from '@/data/table-editor/table-editor-types'
+import { BASE_PATH } from '@/lib/constants'
+import { eventMatchesAnyShortcut } from '@/state/shortcuts/matchEvent'
+import { tableEditorRegistry } from '@/state/shortcuts/registry/table-editor'
 
 export function formatSortURLParams(tableName: string, sort?: string[]): Sort[] {
   if (Array.isArray(sort)) {
@@ -29,7 +37,7 @@ export function formatSortURLParams(tableName: string, sort?: string[]): Sort[] 
   return []
 }
 
-export function sortsToUrlParams(sorts: Sort[]) {
+export function sortsToUrlParams(sorts: { column: string; ascending?: boolean }[]) {
   return sorts.map((sort) => `${sort.column}:${sort.ascending ? 'asc' : 'desc'}`)
 }
 
@@ -54,7 +62,9 @@ export function formatFilterURLParams(filter?: string[]): Filter[] {
   ) as Filter[]
 }
 
-export function filtersToUrlParams(filters: Filter[]) {
+export function filtersToUrlParams(
+  filters: { column: string | Array<string>; operator: string; value: string }[]
+) {
   return filters.map((filter) => {
     const selectedOperator = FilterOperatorOptions.find(
       (option) => option.value === filter.operator
@@ -134,50 +144,75 @@ export function getStorageKey(prefix: string, ref: string) {
 
 export function loadTableEditorStateFromLocalStorage(
   projectRef: string,
-  tableName: string,
-  schema?: string | null
+  tableId: number
 ): SavedState | undefined {
   const storageKey = getStorageKey(STORAGE_KEY_PREFIX, projectRef)
   // Prefer sessionStorage (scoped to current tab) over localStorage
   const jsonStr = sessionStorage.getItem(storageKey) ?? localStorage.getItem(storageKey)
   if (!jsonStr) return
   const json = JSON.parse(jsonStr)
-  const tableKey = !schema || schema == 'public' ? tableName : `${schema}.${tableName}`
-  return json[tableKey]
+  return json[tableId]
+}
+
+/**
+ * Builds a table editor URL with the given project reference, table ID. It will load the saved state from local storage
+ * and add the sort and filter parameters to the URL.
+ */
+export function buildTableEditorUrl({
+  projectRef = 'default',
+  tableId,
+  schema,
+}: {
+  projectRef?: string
+  tableId: number
+  schema?: string
+}) {
+  const url = new URL(`${BASE_PATH}/project/${projectRef}/editor/${tableId}`, location.origin)
+
+  // If the schema is provided, add it to the URL so that the left sidebar is opened to the correct schema
+  if (schema) {
+    url.searchParams.set('schema', schema)
+  }
+
+  const savedState = loadTableEditorStateFromLocalStorage(projectRef, tableId)
+  if (savedState?.sorts && savedState.sorts.length > 0) {
+    savedState.sorts?.forEach((sort) => url.searchParams.append('sort', sort))
+  }
+  if (savedState?.filters && savedState.filters.length > 0) {
+    savedState.filters?.forEach((filter) => url.searchParams.append('filter', filter))
+  }
+  return url.toString()
 }
 
 export function saveTableEditorStateToLocalStorage({
   projectRef,
-  tableName,
-  schema,
+  tableId,
   gridColumns,
   sorts,
   filters,
 }: {
   projectRef: string
-  tableName: string
-  schema?: string | null
+  tableId: number
   gridColumns?: CalculatedColumn<any, any>[]
   sorts?: string[]
   filters?: string[]
 }) {
   const storageKey = getStorageKey(STORAGE_KEY_PREFIX, projectRef)
   const savedStr = sessionStorage.getItem(storageKey) ?? localStorage.getItem(storageKey)
-  const tableKey = !schema || schema == 'public' ? tableName : `${schema}.${tableName}`
 
   const config = {
     ...(gridColumns !== undefined && { gridColumns }),
-    ...(sorts !== undefined && { sorts }),
-    ...(filters !== undefined && { filters }),
+    ...(sorts !== undefined && { sorts: sorts.filter((sort) => sort !== '') }),
+    ...(filters !== undefined && { filters: filters.filter((filter) => filter !== '') }),
   }
 
   let savedJson
   if (savedStr) {
     savedJson = JSON.parse(savedStr)
-    const previousConfig = savedJson[tableKey]
-    savedJson = { ...savedJson, [tableKey]: { ...previousConfig, ...config } }
+    const previousConfig = savedJson[tableId]
+    savedJson = { ...savedJson, [tableId]: { ...previousConfig, ...config } }
   } else {
-    savedJson = { [tableKey]: config }
+    savedJson = { [tableId]: config }
   }
   // Save to both localStorage and sessionStorage so it's consistent to current tab
   localStorage.setItem(storageKey, JSON.stringify(savedJson))
@@ -193,8 +228,7 @@ function getLatestParams() {
   const queryParams = new URLSearchParams(window.location.search)
   const sort = queryParams.getAll('sort')
   const filter = queryParams.getAll('filter')
-  const loadFromCache = !!queryParams.get(LOAD_TAB_FROM_CACHE_PARAM)
-  return { sort, filter, loadFromCache }
+  return { sort, filter }
 }
 
 export function useSyncTableEditorStateFromLocalStorageWithUrl({
@@ -205,11 +239,10 @@ export function useSyncTableEditorStateFromLocalStorageWithUrl({
   table: Entity | undefined
 }) {
   // Warning: nuxt url state often fails to update to changes to URL
-  const [, updateUrlParams] = useQueryStates(
+  useQueryStates(
     {
       sort: parseAsNativeArrayOf(parseAsString),
       filter: parseAsNativeArrayOf(parseAsString),
-      [LOAD_TAB_FROM_CACHE_PARAM]: parseAsBoolean.withDefault(false),
     },
     {
       history: 'replace',
@@ -218,10 +251,9 @@ export function useSyncTableEditorStateFromLocalStorageWithUrl({
   // Use nextjs useSearchParams to get the latest URL params
   const searchParams = useSearchParams()
   const urlParams = useMemo(() => {
-    const sort = searchParams.getAll('sort')
-    const filter = searchParams.getAll('filter')
-    const loadFromCache = !!searchParams.get(LOAD_TAB_FROM_CACHE_PARAM)
-    return { sort, filter, loadFromCache }
+    const sort = searchParams?.getAll('sort') ?? []
+    const filter = searchParams?.getAll('filter') ?? []
+    return { sort, filter }
   }, [searchParams])
 
   useEffect(() => {
@@ -232,40 +264,80 @@ export function useSyncTableEditorStateFromLocalStorageWithUrl({
     // `urlParams` from `useQueryStates` can be stale so always get the latest from the URL
     const latestUrlParams = getLatestParams()
 
-    if (latestUrlParams.loadFromCache) {
-      const savedState = loadTableEditorStateFromLocalStorage(projectRef, table.name, table.schema)
-      updateUrlParams(
-        {
-          sort: savedState?.sorts ?? [],
-          filter: savedState?.filters ?? [],
-          loadFromCache: false,
-        },
-        { clearOnDefault: true }
-      )
-    } else {
-      saveTableEditorStateToLocalStorage({
-        projectRef,
-        tableName: table.name,
-        schema: table.schema,
-        sorts: latestUrlParams.sort,
-        filters: latestUrlParams.filter,
-      })
-    }
+    saveTableEditorStateToLocalStorage({
+      projectRef,
+      tableId: table.id,
+      sorts: latestUrlParams.sort,
+      filters: latestUrlParams.filter,
+    })
   }, [urlParams, table, projectRef])
 }
 
-export const handleCopyCell = (
-  {
-    mode,
-    column,
-    row,
-  }: { mode: 'SELECT' | 'EDIT'; column: CalculatedColumn<any, unknown>; row: any },
-  event: CellKeyboardEvent
-) => {
-  if (mode === 'SELECT' && event.code === 'KeyC' && (event.metaKey || event.ctrlKey)) {
-    const colKey = column.key
-    const cellValue = row[colKey] ?? ''
-    const value = formatClipboardValue(cellValue)
-    copyToClipboard(value)
+export const handleCellKeyDown = <TRow extends SupaRow = SupaRow>(
+  args: CellKeyDownArgs<TRow, unknown>,
+  event: CellKeyboardEvent,
+  context?: {
+    rows: TRow[]
+    columns: SupaColumn[]
+    onRowsChange: (rows: TRow[], data: RowsChangeData<TRow, unknown>) => void
   }
+) => {
+  const { mode, column, row, rowIdx } = args
+  if (mode !== 'SELECT') return
+  const key = event.key.toLowerCase()
+
+  if (key === 'c' && (event.metaKey || event.ctrlKey)) {
+    if (window.getSelection()?.isCollapsed === false) return
+
+    const value = formatClipboardValue(row[column.key] ?? '')
+    event.preventDefault()
+    event.preventGridDefault()
+    void copyToClipboard(value, () => {
+      toast.success('Copied cell value to clipboard')
+    })
+    return
+  }
+
+  // Let registered shortcuts win over rdg's "type a key to enter edit mode" default,
+  // unless a printable key enters edit mode.
+  if (eventMatchesAnyShortcut(event.nativeEvent, tableEditorRegistry)) {
+    if (
+      event.key.length === 1 &&
+      event.key !== ' ' &&
+      !event.altKey &&
+      !event.ctrlKey &&
+      !event.metaKey &&
+      !event.shiftKey &&
+      column.renderEditCell != null
+    ) {
+      event.stopPropagation()
+    } else {
+      event.preventGridDefault()
+      return
+    }
+  }
+
+  // Toggle boolean cells with T/F when no modifier keys are pressed.
+  if (context === undefined) return
+
+  if (event.altKey || event.ctrlKey || event.metaKey || (key !== 't' && key !== 'f')) return
+
+  const supaColumn = context.columns.find((c) => c.name === column.key)
+  if (
+    supaColumn === undefined ||
+    !isBoolColumn(supaColumn.dataType) ||
+    column.renderEditCell == null
+  ) {
+    return
+  }
+
+  event.preventDefault()
+  event.preventGridDefault()
+
+  const nextValue = key === 't'
+  if (row[column.key] === nextValue) return
+
+  const updatedRows = [...context.rows]
+  updatedRows[rowIdx] = { ...row, [column.key]: nextValue }
+  context.onRowsChange(updatedRows, { indexes: [rowIdx], column })
 }
