@@ -30,7 +30,7 @@ const SUPAVISOR_UPDATE_REGIONS = {
   'us-east-1': {
     start: Date.UTC(2026, 5, 3, 13, 0, 0),
     end: Date.UTC(2026, 5, 3, 15, 0, 0),
-    url: 'https://status.supabase.com/incidents/7zgmgh2p343n',
+    url: 'https://status.supabase.com/incidents/y8rp6dwjyplw',
   },
 }
 
