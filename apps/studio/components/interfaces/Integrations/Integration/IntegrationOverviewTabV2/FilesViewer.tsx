@@ -1,19 +1,35 @@
+'use client'
+
+import 'swiper/css'
+
+import { Swiper, SwiperSlide } from 'swiper/react'
 import { Image } from 'ui-patterns/Image'
 
 export const FilesViewer = ({ files }: { files: string[] }) => {
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-      {files.map((file) => (
-        <Image
-          key={file}
-          src={file}
-          alt=""
-          zoomable
-          width={400}
-          height={225}
-          className="rounded-md border object-cover w-full"
-        />
+    <Swiper
+      className="w-full"
+      spaceBetween={12}
+      slidesPerView={1.4}
+      threshold={2}
+      watchOverflow
+      breakpoints={{
+        640: { slidesPerView: 1.4 },
+        1024: { slidesPerView: 3.2 },
+      }}
+    >
+      {files.map((file, i) => (
+        <SwiperSlide key={`${file}-${i}`}>
+          <Image
+            src={file}
+            alt=""
+            zoomable
+            width={400}
+            height={225}
+            className="rounded-md border object-cover w-full"
+          />
+        </SwiperSlide>
       ))}
-    </div>
+    </Swiper>
   )
 }
