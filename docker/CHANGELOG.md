@@ -55,10 +55,10 @@ See per-service updates below for details. Only the most important changes relev
 - Updated to `v14.12` - [Changelog](https://github.com/PostgREST/postgrest/blob/main/CHANGELOG.md) | [Release](https://github.com/PostgREST/postgrest/releases/tag/v14.12)
 
 ### Realtime
-- Updated to `v2.102.0` - [Release](https://github.com/supabase/realtime/releases/tag/v2.102.0)
+- Updated to `v2.102.3` - [Release](https://github.com/supabase/realtime/releases/tag/v2.102.3)
 
 ### Storage
-- Updated to `v1.60.2` - [Release](https://github.com/supabase/storage/releases/tag/v1.60.2)
+- Updated to `v1.60.4` - [Release](https://github.com/supabase/storage/releases/tag/v1.60.4)
 
 ### Postgres Meta
 - Updated to `v0.96.6` - [Release](https://github.com/supabase/postgres-meta/releases/tag/v0.96.6)
@@ -71,7 +71,7 @@ See per-service updates below for details. Only the most important changes relev
 - Added `POSTGRES_HOST` to Supavisor service configuration (requires `docker-compose.yml` and `volumes/pooler/pooler.exs` update) - PR [#41273](https://github.com/supabase/supabase/pull/41273)
 
 ### Analytics (Logflare)
-- Updated to `1.42.0` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.42.0)
+- Updated to `1.43.1` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.43.1)
 
 ---
 
@@ -140,7 +140,7 @@ See per-service updates below for details. Only the most important changes relev
 ⚠️ **Note:** This update includes **important changes**. Please check the details below. The following configuration files have been added/updated: `utils/add-new-auth-keys.sh`, `utils/rotate-new-api-keys.sh`, `docker-compose.yml`, `.env.example`, `docker-compose.s3.yml`, `docker-compose.rustfs.yml`, `volumes/api/kong.yml`, `volumes/api/kong-entrypoint.sh`, `docker-compose.caddy.yml`, `docker-compose.nginx.yml`, `volumes/functions/main/index.ts`, and `volumes/proxy`.
 
 ### Configuration
-- ⚠️ Added scripts and templates to support the new API key format (`sb_` API keys) and the new asymmetric authentication - PR [#43554](https://github.com/supabase/supabase/pull/43554); see the [how-to guide](https://supabase.com/docs/guides/self-hosting/self-hosted-auth-keys) for detailed instructions
+- ⚠️ Added scripts and templates to support the new API key format (`sb_` API keys) and the new asymmetric authentication. Check the [how-to guide](https://supabase.com/docs/guides/self-hosting/self-hosted-auth-keys) for detailed instructions - PR [#43554](https://github.com/supabase/supabase/pull/43554)
 - Added optional proxy configuration for Caddy and nginx. Read the [how-to guide](https://supabase.com/docs/guides/self-hosting/self-hosted-proxy-https) to learn more - PR [#43291](https://github.com/supabase/supabase/pull/43291)
 
 ### Documentation
