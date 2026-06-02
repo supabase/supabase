@@ -704,6 +704,9 @@ function getErrorCondition(table: LogsTableName): SafeLogSqlFragment {
       return safeSql`metadata.level IN ('error', 'fatal')`
     case 'pg_cron_logs':
       return safeSql`parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')`
+    case 'multigres_logs':
+      // multigres logs store the structured payload as a JSON string in event_message
+      return safeSql`JSON_VALUE(event_message, '$.level') IN ('ERROR', 'FATAL', 'PANIC')`
     default:
       return safeSql`false`
   }
@@ -721,6 +724,9 @@ function getWarningCondition(table: LogsTableName): SafeLogSqlFragment {
       return safeSql`response.status_code >= 400 AND response.status_code < 500`
     case 'function_logs':
       return safeSql`metadata.level IN ('warning')`
+    case 'multigres_logs':
+      // multigres logs store the structured payload as a JSON string in event_message
+      return safeSql`JSON_VALUE(event_message, '$.level') IN ('WARN', 'WARNING')`
     default:
       return safeSql`false`
   }
