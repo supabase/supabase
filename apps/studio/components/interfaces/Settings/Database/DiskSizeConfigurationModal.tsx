@@ -98,11 +98,19 @@ const DiskSizeConfigurationModal = ({
   const diskSizeValidationSchema = useMemo(
     () =>
       z.object({
-        'new-disk-size': z.coerce
-          .number({ required_error: 'Please enter a GB amount you want to resize the disk up to.' })
-          .min(Number(currentDiskSize ?? 0), `Must be at least ${currentDiskSize} GB`)
-          // to do, update with max_disk_volume_size_gb
-          .max(Number(maxDiskSize), `Must not be more than ${maxDiskSize} GB`),
+        'new-disk-size': z
+          .union([
+            z.literal(''),
+            z.coerce
+              .number()
+              .min(Number(currentDiskSize ?? 0), `Must be at least ${currentDiskSize} GB`)
+              // to do, update with max_disk_volume_size_gb
+              .max(Number(maxDiskSize), `Must not be more than ${maxDiskSize} GB`),
+          ])
+          .refine(
+            (value) => value !== '',
+            'Please enter a GB amount you want to resize the disk up to'
+          ),
       }),
     [currentDiskSize]
   )
@@ -199,12 +207,7 @@ const DiskSizeConfigurationModal = ({
                           >
                             <FormControl>
                               <InputGroup>
-                                <FormInputGroupInput
-                                  {...field}
-                                  id="new-disk-size"
-                                  type="number"
-                                  onChange={(e) => field.onChange(Number(e.target.value))}
-                                />
+                                <FormInputGroupInput {...field} id="new-disk-size" type="number" />
                                 <InputGroupAddon align="inline-end">
                                   <InputGroupText>GB</InputGroupText>
                                 </InputGroupAddon>

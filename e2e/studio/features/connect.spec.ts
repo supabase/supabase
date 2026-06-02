@@ -43,7 +43,7 @@ test.describe('Connect', async () => {
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible({ timeout: 30000 })
 
     // Click the Connect button in the header
-    await page.getByRole('button', { name: 'Connect' }).click()
+    await page.getByRole('button', { name: 'Connect', exact: true }).click()
 
     // Verify the ConnectSheet opens
     await expect(page.getByRole('heading', { name: 'Connect to your project' })).toBeVisible({
@@ -58,9 +58,7 @@ test.describe('Connect', async () => {
 test.describe('Connect Sheet deep linking', async () => {
   test('pre-selects framework and variant from URL params', async ({ page, ref }) => {
     await page.goto(
-      toUrl(
-        `/project/${ref}?showConnect=true&connectTab=framework&framework=nextjs&using=pages`
-      )
+      toUrl(`/project/${ref}?showConnect=true&connectTab=framework&framework=nextjs&using=pages`)
     )
 
     await expect(
@@ -125,9 +123,7 @@ test.describe('Connect Sheet deep linking', async () => {
   })
 
   test('pre-selects direct connection method from URL params', async ({ page, ref }) => {
-    await page.goto(
-      toUrl(`/project/${ref}?showConnect=true&connectTab=direct&method=transaction`)
-    )
+    await page.goto(toUrl(`/project/${ref}?showConnect=true&connectTab=direct&method=transaction`))
 
     await expect(
       page.getByRole('heading', { name: 'Connect to your project' }),
@@ -142,9 +138,7 @@ test.describe('Connect Sheet deep linking', async () => {
 
   test('closing the sheet clears all deep-link params from URL', async ({ page, ref }) => {
     await page.goto(
-      toUrl(
-        `/project/${ref}?showConnect=true&connectTab=framework&framework=nextjs&using=pages`
-      )
+      toUrl(`/project/${ref}?showConnect=true&connectTab=framework&framework=nextjs&using=pages`)
     )
 
     await expect(
@@ -165,9 +159,7 @@ test.describe('Connect Sheet deep linking', async () => {
   })
 
   test('changing mode clears previous mode params from URL', async ({ page, ref }) => {
-    await page.goto(
-      toUrl(`/project/${ref}?showConnect=true&connectTab=framework&framework=nextjs`)
-    )
+    await page.goto(toUrl(`/project/${ref}?showConnect=true&connectTab=framework&framework=nextjs`))
 
     await expect(
       page.getByRole('heading', { name: 'Connect to your project' }),

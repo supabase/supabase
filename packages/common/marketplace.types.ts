@@ -41,12 +41,15 @@ export type Database = {
           installation_identification_method:
             | 'secret_key_prefix'
             | 'edge_function_secret_name'
+            | 'integration_status'
+            | 'oauth_authorization'
             | null
           installation_url: string | null
           installation_url_type: 'get' | 'post' | null
           listing_logo: string | null
           listing_tsv: unknown
           marketplace_url: string | null
+          oauth_client_id: string | null
           partner_logo: string | null
           partner_name: string | null
           partner_slug: string | null
@@ -93,6 +96,20 @@ export type Database = {
           slug?: string | null
           type?: 'technology' | 'expert' | null
           website?: string | null
+        }
+        Relationships: []
+      }
+      project_integration_status: {
+        Row: {
+          created_at: string | null
+          integration_id: string | null
+          listing_slug: string | null
+          partner_links: Json | null
+          project_ref: string | null
+          status: 'installing' | 'ready' | 'error' | null
+          updated_at: string | null
+          user_alert: Json | null
+          version: string | null
         }
         Relationships: []
       }
