@@ -116,7 +116,8 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
               ) : (
                 <Admonition type="warning" title="Failed to retrieve edge functions">
                   <p className="prose [&>code]:text-xs text-sm">
-                    Local functions can be found at <code>supabase/functions</code> folder.
+                    Edge functions could not be read from disk. The functions directory may be
+                    missing, not mounted into Studio, or unreadable.
                   </p>
                 </Admonition>
               ))}
