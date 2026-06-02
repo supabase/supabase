@@ -38,7 +38,7 @@ import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
 import { LogsWarning, LogTemplate } from './Logs.types'
 import Table from '@/components/to-be-cleaned/Table'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
+import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
 import { DOCS_URL } from '@/lib/constants'
 
 export interface LogsQueryPanelProps {
@@ -100,9 +100,9 @@ const LogsQueryPanel = ({
 
   const [open, setOpen] = useState(false)
 
-  const isHighAvailability = useIsHighAvailability()
+  const showMultigresLogs = useShowMultigresLogs()
   const schemas = logConstants.schemas.filter(
-    (schema) => schema.reference !== 'multigres_logs' || isHighAvailability
+    (schema) => schema.reference !== 'multigres_logs' || showMultigresLogs
   )
 
   const [selectedSchema, setSelectedSchema] = useState(schemas[0])
