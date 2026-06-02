@@ -78,7 +78,6 @@ describe('ApiKeyPill', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Reveal API key' }))
 
-    // The pill renders the masked prefix + the revealed tail (revealedKey.slice(15)).
     expect(await screen.findByText(FULL.slice(15))).toBeInTheDocument()
   })
 
@@ -89,7 +88,6 @@ describe('ApiKeyPill', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Copy API key' }))
 
     await waitFor(() => expect(mockCopyToClipboard).toHaveBeenCalledTimes(1))
-    // CopyButton hands copyToClipboard a Promise<string> (onCopy reveals via MSW).
     await expect(Promise.resolve(mockCopyToClipboard.mock.calls[0][0])).resolves.toBe(FULL)
   })
 })

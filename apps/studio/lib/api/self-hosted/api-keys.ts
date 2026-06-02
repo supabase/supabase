@@ -1,14 +1,5 @@
 /**
- * Synthesizes API key responses for non-platform Studio (local CLI and
- * self-hosted Docker). Both deployment modes inject the same env vars
- * (`SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_KEY`, and optionally
- * `SUPABASE_PUBLISHABLE_KEY` / `SUPABASE_SECRET_KEY`); there is no
- * CLI-vs-Docker branching here.
- *
- * Consumed by the `/api/v1/projects/[ref]/api-keys` mock routes, which
- * stand in for the platform management API on single-tenant Studio builds.
- *
- * _Only call this from server-side non-platform code._
+ * Both CLI and self-hosted inject the same env vars.
  */
 import { assertSelfHosted } from './util'
 
@@ -24,10 +15,7 @@ export type NonPlatformApiKey = {
 
 /**
  * Length of the identifying prefix shown for a secret key before it is
- * revealed. Mirrors the platform management API and the `ApiKeyPill` UI, both
- * of which expose `sb_secret_` (10 chars) + 5 identifying chars = 15 (see
- * `ApiKeyPill`'s `api_key.slice(0, 15)` and the `sb_secret_8I4Se•••` mock in
- * `ApiKeysIllustrations`).
+ * revealed. Mirrors the platform management API and the `ApiKeyPill` UI.
  */
 const SECRET_KEY_VISIBLE_PREFIX_LENGTH = 15
 
@@ -81,11 +69,7 @@ export function getNonPlatformApiKeys(): NonPlatformApiKey[] {
       id: 'secret',
       type: 'secret',
       hash: '',
-      // The prefix is exposed while the rest of the key stays masked until
-      // revealed (matches the platform management API). Only expose it when the
-      // key is genuinely longer than the prefix — otherwise the "prefix" would
-      // be the whole secret, so we mask entirely to avoid leaking a short or
-      // misconfigured key in the unrevealed response.
+      // Only expose the prefix when the key is genuinely longer than the prefix.
       prefix:
         secretKey.length > SECRET_KEY_VISIBLE_PREFIX_LENGTH
           ? secretKey.slice(0, SECRET_KEY_VISIBLE_PREFIX_LENGTH)
@@ -100,7 +84,6 @@ export function getNonPlatformApiKeys(): NonPlatformApiKey[] {
 export function applyRevealToApiKey(key: NonPlatformApiKey, reveal: boolean): NonPlatformApiKey {
   if (key.type !== 'secret' || reveal) return key
 
-  // Masked: expose only the identifying prefix, never the full secret.
   return { ...key, api_key: key.prefix }
 }
 
