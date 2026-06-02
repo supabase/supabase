@@ -51,7 +51,7 @@ describe('api/self-hosted/settings', () => {
       expect(settings.db_port).toBe(5432)
       expect(settings.db_user).toBe('postgres')
       expect(settings.ref).toBe('default')
-      expect(settings.region).toBe('ap-southeast-1')
+      expect(settings.region).toBe('local')
       expect(settings.status).toBe('ACTIVE_HEALTHY')
       expect(settings.ssl_enforced).toBe(false)
     })

@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query'
 import { parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import { useMemo, useRef } from 'react'
 import { Button, Card, ShadowScrollArea, Table, TableBody, TableHeader } from 'ui'
@@ -33,7 +32,7 @@ import { useInstalledIntegrations } from '@/components/interfaces/Integrations/L
 import { useIntegrationFilteringAndSort } from '@/components/interfaces/Integrations/Landing/useIntegrationFilteringAndSort'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { marketplaceCategoriesQueryOptions } from '@/data/marketplace/integration-categories-query'
+import { useMarketplaceCategoriesQuery } from '@/data/marketplace/integration-categories-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { DOCS_URL } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -89,7 +88,7 @@ export const MarketplaceIndex = () => {
   const isLoading = isLoadingAvailable || isLoadingInstalled
   const isSuccess = isSuccessAvailable && isSuccessInstalled
 
-  const { data: marketplaceCategories = [] } = useQuery(marketplaceCategoriesQueryOptions())
+  const { data: marketplaceCategories = [] } = useMarketplaceCategoriesQuery()
 
   const categoryOptions = useMemo(() => {
     // Start with marketplace DB categories

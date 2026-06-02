@@ -439,6 +439,9 @@ export const SidePanelEditor = ({
         queryClient.invalidateQueries({
           queryKey: tableKeys.list(project?.ref, selectedTable?.schema, includeColumns),
         }),
+        queryClient.invalidateQueries({
+          queryKey: tableKeys.infiniteListPrefix(project?.ref, selectedTable?.schema),
+        }),
       ])
 
       // We need to invalidate tableRowsAndCount after tableEditor

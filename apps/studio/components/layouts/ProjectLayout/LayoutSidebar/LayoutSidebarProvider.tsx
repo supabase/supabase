@@ -2,14 +2,13 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, type PropsWithChildren } from 'react'
+import { useEffect, useEffectEvent, type PropsWithChildren } from 'react'
 
 import { getSupportLinkQueryParams } from '@/components/ui/HelpPanel/HelpPanel.utils'
 import useLatest from '@/hooks/misc/useLatest'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -84,7 +83,7 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
     sidebarManagerState.toggleSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
   )
 
-  const onSidebarChanged = useStaticEffectEvent(
+  const onSidebarChanged = useEffectEvent(
     (sidebarId: (typeof SIDEBAR_KEYS)[keyof typeof SIDEBAR_KEYS]) => {
       track('sidebar_opened', { sidebar: sidebarId })
     }

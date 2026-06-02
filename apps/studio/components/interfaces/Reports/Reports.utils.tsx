@@ -54,7 +54,7 @@ export function getLogsSql(query: ReportQuery, filters: ReportFilterItem[]): Saf
   if (query.queryType !== 'logs') {
     throw new Error(`Expected logs query, got ${query.queryType}`)
   }
-  return query.sql(filters)
+  return query.safeSql(filters)
 }
 
 /**

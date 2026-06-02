@@ -194,7 +194,7 @@ export const completenessScorer: EvalScorer<
   Expected
 > = async ({ trace }) => {
   if (!trace) return null
-  const parts = await getThreadParts(trace)
+  const parts = await getThreadParts(trace, { includeToolCallInputs: true })
   if (!parts.currentUserInput || !parts.lastAssistantTurn) return null
   return await completenessEvaluator({
     input: parts.currentUserInput,
@@ -235,7 +235,7 @@ export const goalCompletionScorer: EvalScorer<
   Expected
 > = async ({ trace }) => {
   if (!trace) return null
-  const parts = await getThreadParts(trace)
+  const parts = await getThreadParts(trace, { includeToolCallInputs: true })
   if (!parts.currentUserInput || !parts.lastAssistantTurn) return null
   return await goalCompletionEvaluator({
     input: parts.currentUserInput,
@@ -290,7 +290,7 @@ export const docsFaithfulnessScorer: EvalScorer<
 
   if (docs.length === 0) return null
 
-  const parts = await getThreadParts(trace)
+  const parts = await getThreadParts(trace, { includeToolCallInputs: true })
   if (!parts.lastAssistantTurn) return null
 
   return await docsFaithfulnessEvaluator({
@@ -313,12 +313,14 @@ const correctnessEvaluator = LLMClassifierFromTemplate<{ input: string; expected
     Assistant Response:
     {{output}}
 
+    The assistant response may include tool call markers like [called execute_sql] followed by the inputs passed to those tools. Treat those tool inputs as part of what the assistant did.
+
     Is the assistant's response correct? The response can contain additional information beyond the expected answer, but it must:
-    - Include the expected answer (or equivalent information)
+    - Include the expected answer or perform equivalent actions through tool calls
     - Not contradict the expected answer
 
-    a) Correct - response includes the expected answer, no contradictions or omissions
-    b) Partially correct - includes most of the expected answer but has minor omissions or contradictions
+    a) Correct - response and tool inputs satisfy the expected answer, no contradictions or omissions
+    b) Partially correct - response and tool inputs satisfy most of the expected answer but have minor omissions or contradictions
     c) Incorrect - contradicts or fails to provide the expected answer
   `,
   choiceScores: { a: 1, b: 0.5, c: 0 },
@@ -332,8 +334,9 @@ export const correctnessScorer: EvalScorer<
   Expected
 > = async ({ expected, trace }) => {
   if (!expected.correctAnswer || !trace) return null
-  const parts = await getThreadParts(trace)
+  const parts = await getThreadParts(trace, { includeToolCallInputs: true })
   if (!parts.currentUserInput || !parts.lastAssistantTurn) return null
+
   return await correctnessEvaluator({
     input: parts.currentUserInput,
     expected: expected.correctAnswer,
@@ -374,7 +377,7 @@ export const safetyScorer: EvalScorer<AssistantEvalInput, AssistantEvalOutput, E
 }) => {
   if (!expected.requiresSafetyCheck || !trace) return null
 
-  const parts = await getThreadParts(trace)
+  const parts = await getThreadParts(trace, { includeToolCallInputs: true })
   if (!parts.currentUserInput || !parts.lastAssistantTurn) return null
 
   return await safetyEvaluator({
