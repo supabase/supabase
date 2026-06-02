@@ -711,7 +711,7 @@
           }
         },
         "responses": {
-          "201": {
+          "200": {
             "description": "",
             "content": {
               "application/json": {
@@ -2824,6 +2824,9 @@
               }
             }
           },
+          "400": {
+            "description": "This feature requires the Pro, Team, or Enterprise organization plan."
+          },
           "401": { "description": "Unauthorized" },
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" },
@@ -2832,7 +2835,11 @@
         "security": [{ "bearer": [] }, { "fga_permissions": ["vanity_subdomain_read"] }],
         "summary": "[Beta] Gets current vanity subdomain config",
         "tags": ["Domains"],
-        "x-badges": [{ "name": "OAuth scope: domains:read", "position": "after" }],
+        "x-allowed-plans": ["Pro", "Team", "Enterprise"],
+        "x-badges": [
+          { "name": "OAuth scope: domains:read", "position": "after" },
+          { "name": "Only available on Pro, Team, Enterprise", "position": "before" }
+        ],
         "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:read"
       },
@@ -2901,6 +2908,9 @@
               }
             }
           },
+          "400": {
+            "description": "This feature requires the Pro, Team, or Enterprise organization plan."
+          },
           "401": { "description": "Unauthorized" },
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" },
@@ -2909,7 +2919,11 @@
         "security": [{ "bearer": [] }, { "fga_permissions": ["vanity_subdomain_write"] }],
         "summary": "[Beta] Checks vanity subdomain availability",
         "tags": ["Domains"],
-        "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
+        "x-allowed-plans": ["Pro", "Team", "Enterprise"],
+        "x-badges": [
+          { "name": "OAuth scope: domains:write", "position": "after" },
+          { "name": "Only available on Pro, Team, Enterprise", "position": "before" }
+        ],
         "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
       }
@@ -2947,6 +2961,9 @@
               }
             }
           },
+          "400": {
+            "description": "This feature requires the Pro, Team, or Enterprise organization plan."
+          },
           "401": { "description": "Unauthorized" },
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" },
@@ -2955,7 +2972,11 @@
         "security": [{ "bearer": [] }, { "fga_permissions": ["vanity_subdomain_write"] }],
         "summary": "[Beta] Activates a vanity subdomain for a project.",
         "tags": ["Domains"],
-        "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
+        "x-allowed-plans": ["Pro", "Team", "Enterprise"],
+        "x-badges": [
+          { "name": "OAuth scope: domains:write", "position": "after" },
+          { "name": "Only available on Pro, Team, Enterprise", "position": "before" }
+        ],
         "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
       }
@@ -3203,6 +3224,9 @@
         "responses": {
           "201": { "description": "" },
           "401": { "description": "Unauthorized" },
+          "402": {
+            "description": "This feature requires the Pro, Team, or Enterprise organization plan."
+          },
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to set up read replica" }
@@ -3210,6 +3234,8 @@
         "security": [{ "bearer": [] }, { "fga_permissions": ["infra_read_replicas_write"] }],
         "summary": "[Beta] Set up a read replica",
         "tags": ["Database"],
+        "x-allowed-plans": ["Pro", "Team", "Enterprise"],
+        "x-badges": [{ "name": "Only available on Pro, Team, Enterprise", "position": "before" }],
         "x-endpoint-owners": ["management-api", "infra"]
       }
     },
@@ -6931,7 +6957,7 @@
             }
           },
           "401": { "description": "Unauthorized" },
-          "402": { "description": "Feature requires a higher plan" },
+          "402": { "description": "This feature requires the Enterprise organization plan." },
           "403": { "description": "Forbidden action" },
           "404": { "description": "Project or backup schedule not found" },
           "429": { "description": "Rate limit exceeded" },
@@ -6940,7 +6966,11 @@
         "security": [{ "bearer": [] }, { "fga_permissions": ["backups_read"] }],
         "summary": "Gets the backup schedule for a project",
         "tags": ["Database"],
-        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-allowed-plans": ["Enterprise"],
+        "x-badges": [
+          { "name": "OAuth scope: database:read", "position": "after" },
+          { "name": "Only available on Enterprise", "position": "before" }
+        ],
         "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:read"
       },
@@ -6981,7 +7011,7 @@
           },
           "400": { "description": "Invalid schedule_for format" },
           "401": { "description": "Unauthorized" },
-          "402": { "description": "Feature requires a higher plan" },
+          "402": { "description": "This feature requires the Enterprise organization plan." },
           "403": { "description": "Forbidden action" },
           "404": { "description": "Project or backup schedule not found" },
           "429": { "description": "Rate limit exceeded" },
@@ -6990,7 +7020,11 @@
         "security": [{ "bearer": [] }, { "fga_permissions": ["backups_write"] }],
         "summary": "Updates the backup schedule time for a project",
         "tags": ["Database"],
-        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-allowed-plans": ["Enterprise"],
+        "x-badges": [
+          { "name": "OAuth scope: database:write", "position": "after" },
+          { "name": "Only available on Enterprise", "position": "before" }
+        ],
         "x-endpoint-owners": ["infra"],
         "x-oauth-scope": "database:write"
       }
