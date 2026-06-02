@@ -522,7 +522,7 @@ const urlTransform: UrlTransformFunction = (url) => {
 }
 
 const generateStaticParams = async () => {
-  if (!IS_DEV) {
+  if (IS_DEV) {
     return []
   }
 
