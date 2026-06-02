@@ -1,6 +1,6 @@
 # Docker Image Versions
 
-## 2026-06-01
+## 2026-06-03
 - supabase/studio:2026.06.01-sha-a4334a2 (prev supabase/studio:2026.04.27-sha-5f60601)
 - supabase/gotrue:v2.189.0 (prev supabase/gotrue:v2.186.0)
 - postgrest/postgrest:v14.12 (prev postgrest/postgrest:v14.8)

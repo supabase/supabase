@@ -19,7 +19,7 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
-## [2026-06-01]
+## [2026-06-03]
 
 ⚠️ **Note:** This update includes **important changes**. Please check the details below.
 
