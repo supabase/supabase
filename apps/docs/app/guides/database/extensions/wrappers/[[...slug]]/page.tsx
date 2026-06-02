@@ -15,7 +15,7 @@ import { linkTransform, type UrlTransformFunction } from '~/lib/mdx/plugins/rehy
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
-import { getGitHubFileContents, octokit } from '~/lib/octokit'
+import { getGitHubFileContents } from '~/lib/octokit'
 import type { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 import { isFeatureEnabled } from 'common'
 import matter from 'gray-matter'
@@ -29,73 +29,9 @@ import { Admonition } from 'ui-patterns'
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
 const repo = 'wrappers'
+const branch = 'main'
 const docsDir = 'docs/catalog'
 const externalSite = 'https://supabase.github.io/wrappers'
-
-type TagQueryResponse = {
-  repository: {
-    refs: {
-      nodes:
-        | {
-            name: string
-          }[]
-        | null
-      pageInfo: {
-        hasNextPage: boolean
-        endCursor: string | null
-      }
-    }
-  }
-}
-
-const tagQuery = `
-    query TagQuery($owner: String!, $name: String!, $after: String) {
-      repository(owner: $owner, name: $name) {
-        refs(
-          refPrefix: "refs/tags/",
-          orderBy: {
-            field: TAG_COMMIT_DATE,
-            direction: DESC
-          },
-          first: 5,
-          after: $after
-        ) {
-          nodes {
-            name
-          }
-          pageInfo {
-            hasNextPage
-            endCursor
-          }
-        }
-      }
-    }
-  `
-
-async function getLatestRelease(after: string | null = null) {
-  try {
-    const {
-      repository: {
-        refs: {
-          nodes,
-          pageInfo: { hasNextPage, endCursor },
-        },
-      },
-    } = await octokit().graphql<TagQueryResponse>(tagQuery, {
-      owner: org,
-      name: repo,
-      after,
-    })
-
-    return (
-      nodes?.find((node) => node?.name?.match(/^docs_v\d+\.\d+\.\d+/))?.name ??
-      (hasNextPage && endCursor ? await getLatestRelease(endCursor) : null)
-    )
-  } catch (error) {
-    console.error(`Error fetching release tags for wrappers federated pages: ${error}`)
-    return null
-  }
-}
 
 // Each external docs page is mapped to a local page
 const pageMap = [
@@ -442,21 +378,16 @@ const getContent = async (params: Params) => {
     let remoteFile: string
     ;({ remoteFile, meta } = federatedPage)
 
-    const tag = await getLatestRelease()
-    if (!tag) {
-      throw new Error('No latest release found for federated wrappers pages')
-    }
-
-    editLink = `${org}/${repo}/blob/${tag}/${docsDir}/${remoteFile}`
+    editLink = `${org}/${repo}/blob/${branch}/${docsDir}/${remoteFile}`
 
     let rawContent = await getGitHubFileContents({
       org,
       repo,
       path: `${docsDir}/${remoteFile}`,
-      branch: tag,
+      branch,
     })
 
-    assetsBaseUrl = `https://raw.githubusercontent.com/${org}/${repo}/${tag}/docs/assets/`
+    assetsBaseUrl = `https://raw.githubusercontent.com/${org}/${repo}/${branch}/docs/assets/`
 
     const { content: contentWithoutFrontmatter } = matter(rawContent)
     content = removeRedundantH1(contentWithoutFrontmatter)
