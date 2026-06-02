@@ -289,6 +289,19 @@ export const formCrmConfigSchema = z
     message: 'At least one CRM provider (hubspot, customerio, or notion) must be configured',
   })
 
+/**
+ * Form `id` doubles as the lookup key the server uses to resolve the trusted
+ * CRM config at submit time. The client only posts `{ slug, formId }`; the
+ * server pulls `crm` from the in-process page registry. Keep this restricted
+ * to a plain identifier — it is round-tripped through the action payload.
+ *
+ * Enforcement happens post-parse in `validateGoPage` rather than via a Zod
+ * `.superRefine` so `formSectionSchema` stays a plain `ZodObject` and remains
+ * usable as a member of the section `discriminatedUnion`.
+ */
+export const FORM_ID_PATTERN = /^[a-z0-9][a-z0-9_-]*$/i
+export const FORM_ID_MAX_LENGTH = 120
+
 export const formSectionSchema = z.object({
   ...sectionBase,
   type: z.literal('form'),
@@ -462,6 +475,49 @@ export const goPageSchema = z.discriminatedUnion('template', [
   thankYouPageSchema,
   legalPageSchema,
 ])
+
+/**
+ * Post-parse checks that can't be expressed in the Zod schema without breaking
+ * the section `discriminatedUnion`. Returns an array of human-readable errors
+ * (empty if the page is valid). Intended to be called by the page-registry
+ * loader alongside `goPageSchema.safeParse`.
+ *
+ * Currently checks:
+ * - Every form section that configures `crm` has a stable `id` (used as the
+ *   server-side lookup key — see `submitFormAction`).
+ * - Form ids match `FORM_ID_PATTERN` so they're safe to round-trip through
+ *   the action payload.
+ * - Form ids are unique within a page so resolution is deterministic.
+ */
+export function validateGoPageInvariants(page: z.infer<typeof goPageSchema>): string[] {
+  const errors: string[] = []
+  const sections = 'sections' in page ? (page.sections ?? []) : []
+  const formIds = new Set<string>()
+
+  sections.forEach((section, index) => {
+    if (section.type !== 'form') return
+
+    if (section.crm && !section.id) {
+      errors.push(
+        `sections[${index}]: form sections that configure \`crm\` must declare an \`id\` — the server uses it to look up the trusted CRM config.`
+      )
+    }
+
+    if (section.id) {
+      if (section.id.length > FORM_ID_MAX_LENGTH || !FORM_ID_PATTERN.test(section.id)) {
+        errors.push(
+          `sections[${index}].id: "${section.id}" is not a valid form id (must be ≤${FORM_ID_MAX_LENGTH} chars, alphanumeric/underscore/dash, starting with alphanumeric).`
+        )
+      }
+      if (formIds.has(section.id)) {
+        errors.push(`sections[${index}].id: duplicate form id "${section.id}" on this page.`)
+      }
+      formIds.add(section.id)
+    }
+  })
+
+  return errors
+}
 
 // ----- Inferred types -----
 

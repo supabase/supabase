@@ -5,6 +5,8 @@ import { releaseFileOnceCleanup, withFileOnceSetup } from '../utils/once-per-fil
 import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 
+type CronJobRow = { jobid: number; schedule: string }
+
 /**
  * Helper to navigate to the cron overview page
  */
@@ -38,6 +40,32 @@ const deleteJobViaAPI = async (page: Page, ref: string, jobName: string) => {
     failOnStatusCode: true,
     data: {
       query: `select cron.unschedule('${jobName}');`,
+    },
+  })
+}
+
+// Creates a cron job with an empty name (as can happen when a job is scheduled directly via SQL)
+// and returns its generated jobid. Such jobs can only be referenced by id, not name.
+const createUnnamedJobViaAPI = async (
+  page: Page,
+  ref: string,
+  command: string
+): Promise<number> => {
+  const response = await page.request.post(toUrl(`/api/platform/pg-meta/${ref}/query`), {
+    failOnStatusCode: true,
+    data: {
+      query: `select cron.schedule('', '*/30 * * * *', $$${command}$$) as jobid;`,
+    },
+  })
+  const rows = (await response.json()) as Array<{ jobid: number }>
+  return rows[0].jobid
+}
+
+const unscheduleJobByIdViaAPI = async (page: Page, ref: string, jobId: number) => {
+  await page.request.post(toUrl(`/api/platform/pg-meta/${ref}/query`), {
+    failOnStatusCode: true,
+    data: {
+      query: `select cron.unschedule(${jobId});`,
     },
   })
 }
@@ -167,6 +195,54 @@ test.describe('Cron Jobs', () => {
         await expect(page.getByText(/Successfully updated cron job/)).toBeVisible({
           timeout: 10000,
         })
+      })
+
+      // Regression test for FE-3489: editing a cron job that has no name used to create a brand
+      // new job (via cron.schedule) instead of updating the existing one. The edit now goes
+      // through cron.alter_job by jobid, so the original job is updated in place.
+      test('editing an unnamed cron job updates it in place instead of creating a new job', async ({
+        page,
+        ref,
+      }) => {
+        // Unique command so we can reliably find this job (it has no name to search by)
+        const command = `select 'pw_unnamed_edit_job';`
+        let jobId: number | undefined
+
+        await using _ = await withSetupCleanup(
+          async () => {
+            jobId = await createUnnamedJobViaAPI(page, ref, command)
+          },
+          async () => {
+            if (jobId !== undefined) await unscheduleJobByIdViaAPI(page, ref, jobId)
+          }
+        )
+
+        // Unnamed jobs can't be edited from the list context menu, so edit from the detail page
+        await page.goto(toUrl(`/project/${ref}/integrations/cron/jobs/${jobId}`))
+        await page.getByRole('button', { name: 'Edit', exact: true }).click()
+
+        // The sheet falls back to a generic title when the job has no name
+        await expect(
+          page.getByRole('heading', { name: 'Edit cron job' }),
+          'Edit sheet should open for the unnamed job'
+        ).toBeVisible({ timeout: 30000 })
+
+        // Change the schedule and save
+        await page.getByRole('button', { name: 'Every 5 minutes' }).click()
+        await page.getByRole('button', { name: 'Save cron job' }).click()
+
+        await expect(page.getByText(/Successfully updated cron job/)).toBeVisible({
+          timeout: 10000,
+        })
+
+        // The original job should be updated in place: exactly one job with this command, and its
+        // schedule should reflect the edit. Before the fix a second job would have been created.
+        const jobs = await query<CronJobRow>(
+          `select jobid, schedule from cron.job where command = $$${command}$$;`
+        )
+        expect(jobs, 'Editing should not create a duplicate job').toHaveLength(1)
+        expect(jobs[0].jobid, 'The existing job should be the one updated').toBe(jobId)
+        expect(jobs[0].schedule, 'The schedule should have been updated').toBe('*/5 * * * *')
       })
 
       test('can delete a cron job', async ({ page, ref }) => {
@@ -324,8 +400,10 @@ test.describe('Cron Jobs', () => {
       // The test job should still be visible in the grid (minimal mode shows jobs without last run)
       await expect(page.getByRole('row', { name: new RegExp(testJobName) })).toBeVisible()
 
-      // The "Learn more" button should be visible
-      await expect(page.getByRole('button', { name: 'Learn more' })).toBeVisible()
+      // An alert about high query costs should be visible and contain a "Learn more" button
+      await expect(
+        page.getByRole('alert').getByRole('button', { name: 'Learn more' })
+      ).toBeVisible()
 
       // Remove the route mock for subsequent tests
       await page.unroute('**/pg-meta/*/query**')
@@ -365,8 +443,8 @@ test.describe('Cron Jobs', () => {
         timeout: 15000,
       })
 
-      // Click the "Learn more" button to open the dialog
-      await page.getByRole('button', { name: 'Learn more' }).click()
+      // Click the "Learn more" button in the alert to open the dialog
+      await page.getByRole('alert').getByRole('button', { name: 'Learn more' }).click()
 
       // The dialog should open with the explanation
       await expect(
@@ -428,7 +506,7 @@ test.describe('Cron Jobs', () => {
       ).toBeVisible({
         timeout: 15000,
       })
-      await page.getByRole('button', { name: 'Learn more' }).click()
+      await page.getByRole('alert').getByRole('button', { name: 'Learn more' }).click()
 
       // Wait for dialog to open
       await expect(

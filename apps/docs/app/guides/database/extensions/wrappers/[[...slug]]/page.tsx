@@ -15,7 +15,7 @@ import { linkTransform, type UrlTransformFunction } from '~/lib/mdx/plugins/rehy
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
-import { getGitHubFileContents, octokit } from '~/lib/octokit'
+import { getGitHubFileContents } from '~/lib/octokit'
 import type { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 import { isFeatureEnabled } from 'common'
 import matter from 'gray-matter'
@@ -29,73 +29,9 @@ import { Admonition } from 'ui-patterns'
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
 const repo = 'wrappers'
+const branch = 'main'
 const docsDir = 'docs/catalog'
 const externalSite = 'https://supabase.github.io/wrappers'
-
-type TagQueryResponse = {
-  repository: {
-    refs: {
-      nodes:
-        | {
-            name: string
-          }[]
-        | null
-      pageInfo: {
-        hasNextPage: boolean
-        endCursor: string | null
-      }
-    }
-  }
-}
-
-const tagQuery = `
-    query TagQuery($owner: String!, $name: String!, $after: String) {
-      repository(owner: $owner, name: $name) {
-        refs(
-          refPrefix: "refs/tags/",
-          orderBy: {
-            field: TAG_COMMIT_DATE,
-            direction: DESC
-          },
-          first: 5,
-          after: $after
-        ) {
-          nodes {
-            name
-          }
-          pageInfo {
-            hasNextPage
-            endCursor
-          }
-        }
-      }
-    }
-  `
-
-async function getLatestRelease(after: string | null = null) {
-  try {
-    const {
-      repository: {
-        refs: {
-          nodes,
-          pageInfo: { hasNextPage, endCursor },
-        },
-      },
-    } = await octokit().graphql<TagQueryResponse>(tagQuery, {
-      owner: org,
-      name: repo,
-      after,
-    })
-
-    return (
-      nodes?.find((node) => node?.name?.match(/^docs_v\d+\.\d+\.\d+/))?.name ??
-      (hasNextPage && endCursor ? await getLatestRelease(endCursor) : null)
-    )
-  } catch (error) {
-    console.error(`Error fetching release tags for wrappers federated pages: ${error}`)
-    return null
-  }
-}
 
 // Each external docs page is mapped to a local page
 const pageMap = [
@@ -124,6 +60,22 @@ const pageMap = [
     remoteFile: 'bigquery.md',
   },
   {
+    slug: 'cal',
+    meta: {
+      title: 'Cal.com',
+      dashboardIntegrationPath: 'cal_wrapper',
+    },
+    remoteFile: 'cal.md',
+  },
+  {
+    slug: 'calendly',
+    meta: {
+      title: 'Calendly',
+      dashboardIntegrationPath: 'calendly_wrapper',
+    },
+    remoteFile: 'calendly.md',
+  },
+  {
     slug: 'clerk',
     meta: {
       title: 'Clerk',
@@ -140,6 +92,14 @@ const pageMap = [
     remoteFile: 'clickhouse.md',
   },
   {
+    slug: 'cloudflare-d1',
+    meta: {
+      title: 'Cloudflare D1',
+      dashboardIntegrationPath: 'cfd1_wrapper',
+    },
+    remoteFile: 'cfd1.md',
+  },
+  {
     slug: 'cognito',
     meta: {
       title: 'AWS Cognito',
@@ -151,8 +111,17 @@ const pageMap = [
     slug: 'duckdb',
     meta: {
       title: 'DuckDB',
+      dashboardIntegrationPath: undefined,
     },
     remoteFile: 'duckdb.md',
+  },
+  {
+    slug: 'dynamodb',
+    meta: {
+      title: 'AWS DynamoDB',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'dynamodb.md',
   },
   {
     slug: 'firebase',
@@ -163,12 +132,36 @@ const pageMap = [
     remoteFile: 'firebase.md',
   },
   {
+    slug: 'gravatar',
+    meta: {
+      title: 'Gravatar',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'gravatar.md',
+  },
+  {
+    slug: 'hubspot',
+    meta: {
+      title: 'HubSpot',
+      dashboardIntegrationPath: 'hubspot_wrapper',
+    },
+    remoteFile: 'hubspot.md',
+  },
+  {
     slug: 'iceberg',
     meta: {
       title: 'Iceberg',
       dashboardIntegrationPath: 'iceberg_wrapper',
     },
     remoteFile: 'iceberg.md',
+  },
+  {
+    slug: 'infura',
+    meta: {
+      title: 'Infura',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'infura.md',
   },
   {
     slug: 'logflare',
@@ -187,12 +180,36 @@ const pageMap = [
     remoteFile: 'mssql.md',
   },
   {
+    slug: 'mysql',
+    meta: {
+      title: 'MySQL',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'mysql.md',
+  },
+  {
     slug: 'notion',
     meta: {
       title: 'Notion',
       dashboardIntegrationPath: 'notion_wrapper',
     },
     remoteFile: 'notion.md',
+  },
+  {
+    slug: 'openapi',
+    meta: {
+      title: 'OpenAPI',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'openapi.md',
+  },
+  {
+    slug: 'orb',
+    meta: {
+      title: 'Orb',
+      dashboardIntegrationPath: 'orb_wrapper',
+    },
+    remoteFile: 'orb.md',
   },
   {
     slug: 'paddle',
@@ -225,6 +242,22 @@ const pageMap = [
       dashboardIntegrationPath: 's3_vectors_wrapper',
     },
     remoteFile: 's3vectors.md',
+  },
+  {
+    slug: 'shopify',
+    meta: {
+      title: 'Shopify',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'shopify.md',
+  },
+  {
+    slug: 'slack',
+    meta: {
+      title: 'Slack',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'slack.md',
   },
   {
     slug: 'snowflake',
@@ -345,21 +378,16 @@ const getContent = async (params: Params) => {
     let remoteFile: string
     ;({ remoteFile, meta } = federatedPage)
 
-    const tag = await getLatestRelease()
-    if (!tag) {
-      throw new Error('No latest release found for federated wrappers pages')
-    }
-
-    editLink = `${org}/${repo}/blob/${tag}/${docsDir}/${remoteFile}`
+    editLink = `${org}/${repo}/blob/${branch}/${docsDir}/${remoteFile}`
 
     let rawContent = await getGitHubFileContents({
       org,
       repo,
       path: `${docsDir}/${remoteFile}`,
-      branch: tag,
+      branch,
     })
 
-    assetsBaseUrl = `https://raw.githubusercontent.com/${org}/${repo}/${tag}/docs/assets/`
+    assetsBaseUrl = `https://raw.githubusercontent.com/${org}/${repo}/${branch}/docs/assets/`
 
     const { content: contentWithoutFrontmatter } = matter(rawContent)
     content = removeRedundantH1(contentWithoutFrontmatter)
@@ -425,7 +453,7 @@ const urlTransform: UrlTransformFunction = (url) => {
 }
 
 const generateStaticParams = async () => {
-  if (!IS_DEV) {
+  if (IS_DEV) {
     return []
   }
 

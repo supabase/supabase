@@ -3230,16 +3230,6 @@ module.exports = [
     destination: '/dashboard/redeem?code=:code',
     permanent: false,
   },
-  {
-    permanent: true,
-    source: '/docs/llms.txt',
-    destination: '/llms.txt',
-  },
-  {
-    permanent: true,
-    source: '/docs/llms-full.txt',
-    destination: '/llms-full.txt',
-  },
   // Legacy product .txt URLs → new .md routes
   { permanent: true, source: '/llms/homepage.txt', destination: '/homepage.md' },
   { permanent: true, source: '/llms/auth.txt', destination: '/auth.md' },

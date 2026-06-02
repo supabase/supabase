@@ -133,7 +133,7 @@ Actions you can take:
 | Action                                                                      | Description                                    |
 | --------------------------------------------------------------------------- | ---------------------------------------------- |
 | [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size) | Increase available memory resources            |
-| [Optimize queries](/docs/content/guides/database/query-optimization)        | Reduce memory consumption of expensive queries |
+| [Optimize queries](/docs/guides/database/query-optimization)                | Reduce memory consumption of expensive queries |
 | [Tune Postgres configuration](https://pgtune.leopard.in.ua)                 | Improve memory management settings             |
 | Implement application caching                                               | Add query result caching to reduce memory load |
 
@@ -169,12 +169,12 @@ How it helps debug issues:
 
 Actions you can take:
 
-| Action                                                                             | Description                                     |
-| ---------------------------------------------------------------------------------- | ----------------------------------------------- |
-| [Optimize CPU-intensive queries](/docs/content/guides/database/query-optimization) | Target queries causing high User CPU usage      |
-| Address IO bottlenecks                                                             | Resolve disk/network issues when IOWait is high |
-| [Upgrade compute size](/docs/guides/platform/compute-and-disk)                     | Increase available CPU capacity                 |
-| [Implement proper indexing](/docs/guides/database/postgres/indexes)                | Use query optimization techniques               |
+| Action                                                                     | Description                                     |
+| -------------------------------------------------------------------------- | ----------------------------------------------- |
+| [Optimize CPU-intensive queries](/docs/guides/database/query-optimization) | Target queries causing high User CPU usage      |
+| Address IO bottlenecks                                                     | Resolve disk/network issues when IOWait is high |
+| [Upgrade compute size](/docs/guides/platform/compute-and-disk)             | Increase available CPU capacity                 |
+| [Implement proper indexing](/docs/guides/database/postgres/indexes)        | Use query optimization techniques               |
 
 ### Disk input/output operations per second (IOPS)
 
@@ -227,7 +227,7 @@ Actions you can take:
 
 | Action                                                                               | Description                                                   |
 | ------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
-| [Optimize disk-intensive queries](/docs/content/guides/database/query-optimization)  | Reduce queries that perform excessive reads/writes            |
+| [Optimize disk-intensive queries](/docs/guides/database/query-optimization)          | Reduce queries that perform excessive reads/writes            |
 | Tune caching and batching                                                            | Minimize repeated disk access and improve throughput headroom |
 | [Upgrade compute size](/docs/guides/platform/compute-and-disk)                       | Increase throughput limits for sustained workloads            |
 | Review database design                                                               | Optimize schema and query patterns for efficiency             |
