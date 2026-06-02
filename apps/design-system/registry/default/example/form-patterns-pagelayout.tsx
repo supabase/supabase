@@ -327,7 +327,7 @@ export default function FormPatternsPageLayout() {
                             <button
                               type="button"
                               onClick={() => uploadButtonRef.current?.click()}
-                              className="flex items-center justify-center h-10 w-10 shrink-0 text-foreground-lighter hover:text-foreground-light overflow-hidden rounded-full bg-cover border hover:border-strong"
+                              className="flex items-center justify-center h-10 w-10 shrink-0 text-foreground-lighter hover:text-foreground-light overflow-hidden rounded-full bg-cover border hover:border-strong focus-visible:outline-brand-600"
                               style={{
                                 backgroundImage: logoUrl ? `url("${logoUrl}")` : 'none',
                               }}
@@ -675,7 +675,7 @@ export default function FormPatternsPageLayout() {
                             <PopoverTrigger asChild>
                               <Button
                                 type="outline"
-                                className="bg-control w-full justify-start text-left font-normal px-3 py-4"
+                                className="bg-control focus:ring-background-control focus:border-control focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-background-control focus-visible:ring-offset-2 focus-visible:ring-offset-foreground-muted disabled:cursor-not-allowed disabled:text-foreground-muted w-full justify-start text-left font-normal px-3 py-4"
                                 icon={<CalendarIcon className="h-4 w-4" />}
                               >
                                 {field.value ? format(field.value, 'PPP') : 'Pick a date'}

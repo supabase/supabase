@@ -13,8 +13,6 @@ const buttonVariants = cva(
   `relative
   flex items-center justify-center
   cursor-pointer
-  inline-flex
-  items-center
   space-x-2
   text-center
   font-regular
@@ -24,6 +22,7 @@ const buttonVariants = cva(
   outline-hidden
   transition-all
   outline-0
+  focus-visible:outline-solid
   focus-visible:outline-4
   focus-visible:outline-offset-1
   border
