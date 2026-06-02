@@ -46,6 +46,7 @@ See per-service updates below for details. Only the most important changes relev
 - ⚠️ Added `SUPABASE_PUBLISHABLE_KEY` and `SUPABASE_SECRET_KEY` to Studio service configuration (requires `docker-compose.yml` update) - PR [#46173](https://github.com/supabase/supabase/pull/46173)
 - ⚠️ Added `start_period` to Studio healthcheck for more reliable cold-boot on slower hosts (requires `docker-compose.yml` update) - PR [#45327](https://github.com/supabase/supabase/pull/45327)
 - Fixed incorrect connection strings in the connect sheet for self-hosted environments - PR [#46217](https://github.com/supabase/supabase/pull/46217)
+- Updated project home and functions page, and added a minimal project settings implementation - PR [#46544](https://github.com/supabase/supabase/pull/46544), PR [#46550](https://github.com/supabase/supabase/pull/46550), PR [#46554](https://github.com/supabase/supabase/pull/46554)
 
 ### Auth
 - Updated to `v2.189.0` - [Changelog](https://github.com/supabase/auth/blob/master/CHANGELOG.md) | [Release](https://github.com/supabase/auth/releases/tag/v2.189.0)
@@ -72,6 +73,7 @@ See per-service updates below for details. Only the most important changes relev
 
 ### Analytics (Logflare)
 - Updated to `1.43.1` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.43.1)
+- ⚠️ Changed default `docker-compose.yml` to no longer include logs & analytics. Read more in Supabase's [changelog](https://github.com/orgs/supabase/discussions/46084) - PR [#45327](https://github.com/supabase/supabase/pull/45327)
 
 ---
 
