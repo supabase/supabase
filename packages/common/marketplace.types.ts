@@ -42,12 +42,15 @@ export type Database = {
           installation_identification_method:
             | 'secret_key_prefix'
             | 'edge_function_secret_name'
+            | 'integration_status'
+            | 'oauth_authorization'
             | null
           installation_url: string | null
           installation_url_type: 'get' | 'post' | null
           listing_logo: string | null
           listing_tsv: unknown
           marketplace_url: string | null
+          oauth_client_id: string | null
           partner_id: string | null
           partner_logo: string | null
           partner_name: string | null
