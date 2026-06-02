@@ -2,8 +2,9 @@ import type { UpdateCustomProviderParams } from '@supabase/auth-js'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { customProviderAdminRequest } from './custom-provider-admin-request'
 import { oAuthCustomProvidersKeys } from './keys'
+import { handleError } from '@/data/fetchers'
+import { createProjectSupabaseClient } from '@/lib/project-supabase-client'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type OAuthCustomProviderUpdateVariables = UpdateCustomProviderParams & {
@@ -22,13 +23,14 @@ export async function updateOAuthCustomProvider({
   if (!clientEndpoint) throw new Error('Client endpoint is required')
   if (!identifier) throw new Error('Provider identifier is required')
 
-  return customProviderAdminRequest({
-    method: 'PUT',
-    projectRef,
-    clientEndpoint,
+  const supabaseClient = await createProjectSupabaseClient(projectRef, clientEndpoint)
+  const { data, error } = await supabaseClient.auth.admin.customProviders.updateProvider(
     identifier,
-    body: params,
-  })
+    params
+  )
+
+  if (error) handleError(error)
+  return data!
 }
 
 type OAuthCustomProviderUpdateData = Awaited<ReturnType<typeof updateOAuthCustomProvider>>

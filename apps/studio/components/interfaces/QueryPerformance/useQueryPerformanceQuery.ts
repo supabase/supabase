@@ -138,7 +138,7 @@ export const useQueryPerformanceInfiniteQuery = (
   const { data: databases } = useReadReplicasQuery({ projectRef: project?.ref })
   const connectionString = (databases || []).find(
     (db) => db.identifier === state.selectedDatabaseId
-  )?.connectionString
+  )?.connection_string_read_only // default to read_only connection string
 
   // Clamp pageSize the same way generateQueryPerformanceSql does so getNextPageParam
   // and the queryKey are always consistent with the SQL actually executed.
