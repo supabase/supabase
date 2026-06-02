@@ -9,14 +9,17 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns'
 
 interface MarketplaceDetailTopBarProps {
-  title: string
+  isLoading?: boolean
+  title?: string
   actions?: ReactNode
   isInstalled?: boolean
 }
 
 export const MarketplaceDetailTopBar = ({
+  isLoading,
   title,
   isInstalled,
   actions,
@@ -34,13 +37,17 @@ export const MarketplaceDetailTopBar = ({
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem className="min-w-0">
-            <BreadcrumbPage className="block min-w-0 truncate">{title}</BreadcrumbPage>
+            <BreadcrumbPage className="block min-w-0 truncate">
+              {isLoading ? <ShimmeringLoader className="w-24" /> : title}
+            </BreadcrumbPage>
             {isInstalled && <Badge variant="success">Installed</Badge>}
           </BreadcrumbItem>
         </BreadcrumbList>
       </div>
 
-      <div className="flex shrink-0 items-center gap-2">{actions}</div>
+      <div className="flex shrink-0 items-center gap-2">
+        {isLoading ? <ShimmeringLoader className="w-24" /> : actions}
+      </div>
     </div>
   )
 }

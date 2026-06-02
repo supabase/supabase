@@ -38,9 +38,9 @@ export const MarketplaceDetail = () => {
   if (isAvailableLoading || isInstalledLoading) {
     return (
       <>
-        <MarketplaceDetailTopBar title="" />
-        <div className={cn(centeredContentClass, 'border-b bg-surface-75 pt-10')}>
-          <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 pb-6">
+        <MarketplaceDetailTopBar isLoading />
+        <div className={cn(centeredContentClass, 'max-w-none border-b bg-surface-75 pt-10')}>
+          <div className="mx-auto flex w-full flex-col gap-3 pb-6">
             <ShimmeringLoader className="h-9 w-64" />
             <ShimmeringLoader className="h-4 w-96" />
           </div>
