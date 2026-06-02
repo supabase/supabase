@@ -18,7 +18,7 @@ services:
 
   analytics:
     container_name: supabase-analytics
-    image: supabase/logflare:1.42.0
+    image: supabase/logflare:1.43.1
     restart: unless-stopped
     #ports:
     #  - 4000:4000
