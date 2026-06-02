@@ -165,7 +165,7 @@ services:
 
       # JSON array of signing JWKs (EC private + legacy symmetric)
       # For Podman, use: GOTRUE_JWT_KEYS: ${JWT_KEYS}
-      #GOTRUE_JWT_KEYS: ${JWT_KEYS:-[]}
+      GOTRUE_JWT_KEYS: ${JWT_KEYS:-[]}
 
       GOTRUE_JWT_ISSUER: ${API_EXTERNAL_URL}/auth/v1
 
@@ -322,7 +322,7 @@ services:
 
       # JWKS for token verification (EC public + legacy symmetric).
       # For Podman, use: API_JWT_JWKS: ${JWT_JWKS}
-      #API_JWT_JWKS: ${JWT_JWKS:-{"keys":[]}}
+      API_JWT_JWKS: ${JWT_JWKS:-{"keys":[]}}
 
       SECRET_KEY_BASE: ${SECRET_KEY_BASE}
       METRICS_JWT_SECRET: ${JWT_SECRET}
@@ -371,7 +371,7 @@ services:
 
       # JWKS for token verification (EC public + legacy symmetric).
       # For Podman, use: JWT_JWKS: ${JWT_JWKS}
-      #JWT_JWKS: ${JWT_JWKS:-{"keys":[]}}
+      JWT_JWKS: ${JWT_JWKS:-{"keys":[]}}
 
       DATABASE_URL: postgres://supabase_storage_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       STORAGE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}

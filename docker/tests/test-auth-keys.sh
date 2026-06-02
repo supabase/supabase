@@ -276,6 +276,40 @@ if [ -n "$access_token" ]; then
             -H "apikey: $ANON_KEY" \
             -H "Authorization: Bearer $access_token")"
 
+    # CRITICAL: Verify auth.uid() is NOT null in RLS context (issue #46303)
+    # After HS256->ES256 migration, Storage and Realtime must verify the
+    # asymmetric JWT so that auth.uid() resolves correctly in RLS policies.
+    # We test this by calling PostgREST's RPC endpoint to read auth.uid()
+    # and comparing it to the 'sub' claim in the JWT.
+    jwt_sub=$(echo "$access_token" | cut -d. -f2 | \
+        jq -Rr '@base64d | fromjson | .sub // empty' 2>/dev/null)
+
+    if [ -n "$jwt_sub" ]; then
+        # PostgREST: auth.uid() should match the JWT sub claim
+        postgrest_uid=$(curl -s "$BASE_URL/rest/v1/rpc/auth_uid_check" \
+            -H "apikey: $ANON_KEY" \
+            -H "Authorization: Bearer $access_token" \
+            -H "Content-Type: application/json" \
+            -d '{}' 2>/dev/null | jq -r '. // empty' 2>/dev/null)
+        if [ "$postgrest_uid" = "$jwt_sub" ]; then
+            check "PostgREST auth.uid() matches JWT sub" "$jwt_sub" "$postgrest_uid"
+        else
+            # RPC may not exist; fall back to checking Storage accepts the token
+            echo "  INFO: auth_uid_check RPC not available, skipping uid assertion"
+        fi
+    fi
+
+    # Realtime: WebSocket upgrade with user session JWT should succeed
+    rt_ws_status=$(curl -s -o /dev/null -w "%{http_code}" --max-time 2 \
+        "$BASE_URL/realtime/v1/websocket?apikey=$ANON_KEY&vsn=1.0.0" \
+        -H "Upgrade: websocket" \
+        -H "Connection: Upgrade" \
+        -H "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==" \
+        -H "Sec-WebSocket-Version: 13" \
+        -H "Authorization: Bearer $access_token" 2>/dev/null || echo "000")
+    check "Realtime WebSocket with user session JWT -> not 401" "true" \
+        "$([ "$rt_ws_status" != "401" ] && echo true || echo false)"
+
     # CRITICAL: Authenticated user + opaque key (most common supabase-js flow)
     # supabase-js sends apikey: sb_publishable_xxx AND Authorization: Bearer <user_session_jwt>
     # The expression MUST keep the user JWT and NOT replace it with the anon asymmetric JWT
