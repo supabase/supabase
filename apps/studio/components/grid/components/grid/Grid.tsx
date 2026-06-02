@@ -111,19 +111,19 @@ export const Grid = memo(
       const canImportData = !isSchemaLocked && isTable && hasPermissionToImportData
       const track = useTrack()
 
-      const { isDraggedOver, onDragOver, onFileDrop } = useCsvFileDrop({
+      const { isValidFile, isDraggedOver, onDragOver, onFileDrop } = useCsvFileDrop({
         enabled: isTableEmpty && canImportData,
         onFileDropped: (file) => tableEditorSnap.onImportData(valtioRef(file)),
         onTelemetryEvent: (eventName) => track(eventName),
       })
 
       const emptyStateMessage = isDraggedOver
-        ? isValidFileDraggedOver
+        ? isValidFile
           ? 'Drop your CSV file here'
           : 'Only CSV files are accepted'
         : 'This table is empty'
 
-      const messageClassName = isDraggedOver && !isValidFileDraggedOver ? 'text-destructive' : ''
+      const messageClassName = isDraggedOver && !isValidFile ? 'text-destructive' : ''
 
       const { data } = useForeignKeyConstraintsQuery({
         projectRef: project?.ref,
