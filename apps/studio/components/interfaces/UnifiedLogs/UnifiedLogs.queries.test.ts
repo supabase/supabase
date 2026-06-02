@@ -128,9 +128,7 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       const sql = getLogsCountQuery(baseSearch)
       // One multi-dimensional pass, not a stack of UNION ALL branches.
       expect(sql).not.toContain('UNION ALL')
-      expect(sql).toContain(
-        `arrayJoin(['total','log_type','level','method','status','pathname'])`
-      )
+      expect(sql).toContain(`arrayJoin(['total','log_type','level','method','status','pathname'])`)
       // multiIf picks each dimension's value off the exploded dimension alias.
       expect(sql).toContain('multiIf(')
       expect(sql).toContain(`dimension = 'total', 'all'`)
