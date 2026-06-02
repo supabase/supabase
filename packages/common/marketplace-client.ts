@@ -22,8 +22,8 @@ export type Database = MergeDeep<
             // These all come from non-nullable columns but all view columns are inferred as nullable.
             // See https://github.com/orgs/supabase/discussions/14151
             featured: boolean
-            built_by: string
             partner_name: string
+            built_by: string | null
             slug: string
             title: string
             description: string

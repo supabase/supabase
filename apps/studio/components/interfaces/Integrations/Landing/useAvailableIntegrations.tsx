@@ -81,10 +81,12 @@ export const useAvailableIntegrations = () => {
             edge_function_secret_name: edgeFunctionSecretName,
             images,
             content,
-            built_by: authorName,
+            partner_name,
+            built_by,
             listing_logo: listingLogo,
           } = integration
 
+          const authorName = built_by ?? partner_name
           const status = undefined
           const author = { name: authorName ?? '', websiteUrl: '' }
 
@@ -175,10 +177,12 @@ export const useAvailableIntegrations = () => {
         documentation_url: docsUrl,
         website_url: siteUrl,
         images,
-        built_by: authorName,
+        partner_name,
+        built_by,
         listing_logo: listingLogo,
       } = marketplaceWrapper
 
+      const authorName = built_by ?? partner_name
       const overrides = {
         name: title,
         description,
