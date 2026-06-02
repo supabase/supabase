@@ -2,14 +2,25 @@ import type { ReactNode } from 'react'
 
 import { useIsFeatureEnabled } from './useIsFeatureEnabled'
 import { RESTRICTION_MESSAGES } from '@/components/interfaces/Organization/restriction.constants'
+import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import { useOverdueInvoicesQuery } from '@/data/invoices/invoices-overdue-query'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useOrgUsageQuery } from '@/data/usage/org-usage-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 export type WarningBannerProps = {
   variant: 'danger' | 'warning' | 'note'
   title: string
   description: ReactNode
+}
+
+/**
+ * Logs metrics that are subject to fair-use quotas, mapped to the labels used on
+ * the org usage page. Keep these in sync with the logs entries in Usage.constants.
+ */
+const LOGS_QUOTA_METRIC_LABELS: Partial<Record<PricingMetric, string>> = {
+  [PricingMetric.LOG_INGESTION]: 'Log Ingestion',
+  [PricingMetric.LOG_QUERYING]: 'Log Query',
 }
 
 /**
@@ -27,6 +38,7 @@ export function useOrganizationRestrictions() {
 
   const { data: overdueInvoices } = useOverdueInvoicesQuery()
   const { data: organizations } = useOrganizationsQuery()
+  const { data: usage, isSuccess: isSuccessOrgUsage } = useOrgUsageQuery({ orgSlug: org?.slug })
 
   const warnings: WarningBannerProps[] = []
 
@@ -88,6 +100,35 @@ export function useOrganizationRestrictions() {
       title: RESTRICTION_MESSAGES.RESTRICTED.title,
       description: RESTRICTION_MESSAGES.RESTRICTED.description(org.slug),
     })
+  }
+
+  // Logs fair-use quota banner. Suppressed while the org is under a billing
+  // restriction status (those banners cover the same exceeded-quota situation)
+  // and until usage has loaded, to avoid flashing stale cross-org data. Uses
+  // the same exceeded-quota predicate as the in-page Restriction component, so
+  // it auto-resolves once usage drops back under the quota.
+  if (!org?.restriction_status && isSuccessOrgUsage) {
+    const exceededLogsMetricLabels = (usage?.usages ?? [])
+      .filter(
+        (metric) =>
+          (metric.metric === PricingMetric.LOG_INGESTION ||
+            metric.metric === PricingMetric.LOG_QUERYING) &&
+          !metric.unlimited &&
+          metric.capped &&
+          metric.usage > (metric.pricing_free_units ?? 0)
+      )
+      .map((metric) => LOGS_QUOTA_METRIC_LABELS[metric.metric as PricingMetric] ?? metric.metric)
+
+    if (exceededLogsMetricLabels.length > 0) {
+      warnings.push({
+        variant: 'warning',
+        title: RESTRICTION_MESSAGES.LOGS_QUOTA_EXCEEDED.title,
+        description: RESTRICTION_MESSAGES.LOGS_QUOTA_EXCEEDED.description(
+          org?.slug ?? 'default',
+          exceededLogsMetricLabels
+        ),
+      })
+    }
   }
 
   return { warnings, org }

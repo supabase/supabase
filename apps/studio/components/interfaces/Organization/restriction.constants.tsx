@@ -54,4 +54,13 @@ export const RESTRICTION_MESSAGES = {
       </>
     ),
   },
+  LOGS_QUOTA_EXCEEDED: {
+    title: 'Logs quota exceeded',
+    description: (slug: string, metricLabels: string[]): ReactNode => (
+      <>
+        Your organization has exceeded its {metricLabels.join(' and ')} quota.{' '}
+        <InlineLink href={`/org/${slug}/usage`}>Review usage</InlineLink>
+      </>
+    ),
+  },
 }
