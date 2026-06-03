@@ -1,17 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Code, MoreVertical, Play, Plus, Trash } from 'lucide-react'
+import { Play, Plus, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import {
-  Button,
-  cn,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from 'ui'
+import { Button, cn, DropdownMenuItem } from 'ui'
 import { Admonition } from 'ui-patterns'
 
 import {
@@ -27,6 +20,7 @@ import { useNotebookLazyMigration } from '@/components/interfaces/Notebook/useNo
 import { useNotebookPersist } from '@/components/interfaces/Notebook/useNotebookPersist'
 import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
+import { SqlEditorShowSqlToggle } from '@/components/interfaces/SQLEditor/SqlEditorShowSqlToggle'
 import { SqlQueryBlockEditor } from '@/components/interfaces/SQLEditor/SqlQueryBlockEditor'
 import type { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -45,54 +39,6 @@ import {
 import { NotebookEditorProvider } from '@/state/notebook-editor-context'
 import { SnippetWithContent, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 import type { Dashboards } from '@/types'
-
-interface NotebookBlockHeaderProps {
-  title: string
-  showSql: boolean
-  onToggleSql: () => void
-  canUpdate: boolean
-  onDelete: () => void
-}
-
-const NotebookBlockHeader = ({
-  title,
-  showSql,
-  onToggleSql,
-  canUpdate,
-  onDelete,
-}: NotebookBlockHeaderProps) => (
-  <div className="flex items-center justify-between gap-2 border-b px-4 py-2">
-    <p className="min-w-0 flex-1 truncate text-sm font-medium">{title}</p>
-    <div className="flex shrink-0 items-center gap-0.5">
-      <ButtonTooltip
-        type="text"
-        className="px-1.5 opacity-70 hover:opacity-100"
-        icon={<Code size={14} strokeWidth={1.5} />}
-        onClick={onToggleSql}
-        tooltip={{
-          content: { side: 'bottom', text: showSql ? 'Hide SQL' : 'Show SQL' },
-        }}
-      />
-      {canUpdate && (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              type="text"
-              className="px-1.5 opacity-70 hover:opacity-100"
-              icon={<MoreVertical size={14} />}
-            />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40 *:gap-x-2">
-            <DropdownMenuItem onClick={onDelete}>
-              <Trash size={14} />
-              <span>Delete block</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
-    </div>
-  </div>
-)
 
 interface NotebookBlockProps {
   notebookId: string
@@ -173,19 +119,29 @@ const NotebookBlock = ({
     block.label || snapV2.snippets[block.id]?.snippet.name || generateSnippetTitle()
   const isEditorReady = block.id in snapV2.snippets && !!snapV2.snippets[block.id].snippet.content
 
+  const blockLeadingActions = (
+    <SqlEditorShowSqlToggle
+      isSqlEditorVisible={showSql}
+      onToggle={() => setShowSql((current) => !current)}
+    />
+  )
+
+  const blockMenuItems = canUpdateReport ? (
+    <DropdownMenuItem className="gap-x-2" onClick={() => onRemoveBlock(block.id)}>
+      <Trash size={14} />
+      <span>Delete block</span>
+    </DropdownMenuItem>
+  ) : undefined
+
   return (
     <div id={`notebook-block-${block.id}`} className="rounded-lg border bg-surface-100">
-      <NotebookBlockHeader
-        title={blockTitle}
-        showSql={showSql}
-        onToggleSql={() => setShowSql((current) => !current)}
-        canUpdate={canUpdateReport}
-        onDelete={() => onRemoveBlock(block.id)}
-      />
       <NotebookEditorProvider value={editorContextValue}>
         <SqlQueryBlockEditor
           id={block.id}
           snippetName={blockTitle}
+          title={blockTitle}
+          leadingActions={blockLeadingActions}
+          actions={blockMenuItems}
           variant="block"
           isSqlEditorVisible={showSql}
           autoFocus={false}
@@ -349,12 +305,12 @@ export const NotebookView = ({
   return (
     <div className={cn('flex flex-col', variant === 'full' ? 'h-full overflow-y-auto' : 'gap-4')}>
       {showHeader && (
-        <div className="px-6 py-4 border-b shrink-0">
-          <div className="flex items-start justify-between gap-4">
+        <div className="px-6 pt-4 shrink-0">
+          <div className="flex items-center justify-between gap-4">
             <div className="min-w-0 flex-1">
               <h1 className="text-lg font-medium">{report.name}</h1>
               {notebookDescription ? (
-                <p className="mt-1 text-sm text-foreground-light">{notebookDescription}</p>
+                <p className="text-sm text-foreground-light">{notebookDescription}</p>
               ) : null}
             </div>
             <div className="flex shrink-0 items-center gap-2">

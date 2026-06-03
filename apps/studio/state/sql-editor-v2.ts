@@ -199,10 +199,12 @@ export const sqlEditorState = proxy({
     id,
     sql,
     shouldInvalidate = false,
+    skipSave = false,
   }: {
     id: string
     sql: string
     shouldInvalidate?: boolean
+    skipSave?: boolean
   }) => {
     let snippet = sqlEditorState.snippets[id]?.snippet
     if (snippet?.content) {
@@ -218,7 +220,9 @@ export const sqlEditorState = proxy({
         return
       }
 
-      sqlEditorState.needsSaving.set(id, shouldInvalidate)
+      if (!skipSave) {
+        sqlEditorState.needsSaving.set(id, shouldInvalidate)
+      }
     }
   },
 

@@ -58,9 +58,27 @@ import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 interface AIAssistantProps {
   initialMessages?: MessageType[] | undefined
   className?: string
+  conversationClassName?: string
+  conversationContentClassName?: string
+  composerClassName?: string
+  showHeader?: boolean
+  showCloseButton?: boolean
+  onChatSelected?: (chatId: string) => void
+  onChatCreated?: (chatId: string) => void
+  onChatDeleted?: (deletedChatId: string, nextChatId?: string) => void
 }
 
-export const AIAssistant = ({ className }: AIAssistantProps) => {
+export const AIAssistant = ({
+  className,
+  conversationClassName,
+  conversationContentClassName,
+  composerClassName,
+  showHeader = true,
+  showCloseButton,
+  onChatSelected,
+  onChatCreated,
+  onChatDeleted,
+}: AIAssistantProps) => {
   const router = useRouter()
   const { id: entityId } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -314,6 +332,12 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const hasMessages = chatMessages.length > 0
 
+  const handleNewChat = useCallback(() => {
+    const chatId = snap.newChat()
+    onChatCreated?.(chatId)
+    return chatId
+  }, [onChatCreated, snap])
+
   const sendMessageToAssistant = (finalContent: string) => {
     if (editingMessageId) {
       // Handling when the user is in edit mode
@@ -401,19 +425,27 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         },
       ]}
     >
-      <div className={cn('flex flex-col h-full w-full md:h-full max-h-dvh', className)}>
-        <AIAssistantHeader
-          isChatLoading={isChatLoading}
-          onNewChat={snap.newChat}
-          onCloseAssistant={() => closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)}
-          showMetadataWarning={showMetadataWarning}
-          updatedOptInSinceMCP={updatedOptInSinceMCP}
-          isHipaaProjectDisallowed={isHipaaProjectDisallowed}
-          aiOptInLevel={aiOptInLevel}
-        />
+      <div className={cn('flex flex-col h-full min-h-0 w-full md:h-full max-h-dvh', className)}>
+        {showHeader && (
+          <AIAssistantHeader
+            isChatLoading={isChatLoading}
+            onNewChat={handleNewChat}
+            onCloseAssistant={() => closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)}
+            showMetadataWarning={showMetadataWarning}
+            updatedOptInSinceMCP={updatedOptInSinceMCP}
+            isHipaaProjectDisallowed={isHipaaProjectDisallowed}
+            aiOptInLevel={aiOptInLevel}
+            showCloseButton={showCloseButton}
+            onChatSelected={onChatSelected}
+            onChatCreated={onChatCreated}
+            onChatDeleted={onChatDeleted}
+          />
+        )}
         {hasMessages ? (
-          <Conversation className={cn('flex-1')}>
-            <ConversationContent className="w-full px-7 py-8 mb-10">
+          <Conversation className={cn('flex-1 min-h-0', conversationClassName)}>
+            <ConversationContent
+              className={cn('w-full px-7 py-8 mb-10', conversationContentClassName)}
+            >
               {renderedMessages}
               {error && (
                 <>
@@ -434,7 +466,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                           <Button
                             type="default"
                             size="tiny"
-                            onClick={() => snap.newChat()}
+                            onClick={handleNewChat}
                             className="text-xs"
                           >
                             New chat
@@ -534,7 +566,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           )}
         </AnimatePresence>
 
-        <div className="px-3 pb-3 z-20 relative">
+        <div className={cn('px-3 pb-3 z-20 relative shrink-0', composerClassName)}>
           {disablePrompts && (
             <Admonition
               showIcon={false}

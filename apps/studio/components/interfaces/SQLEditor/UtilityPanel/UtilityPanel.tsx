@@ -1,12 +1,12 @@
 import { useParams } from 'common'
+import { BarChart2, Settings2, Table } from 'lucide-react'
 import { toast } from 'sonner'
-import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import { Popover, PopoverContent, PopoverTrigger, ToggleGroup, ToggleGroupItem } from 'ui'
 
-import { ChartConfig } from './ChartConfig'
-import { UtilityActions } from './UtilityActions'
-import { UtilityTabExplain } from './UtilityTabExplain'
+import { ChartConfig, ChartSettings } from './ChartConfig'
 import { UtilityTabLogsResults } from './UtilityTabLogsResults'
 import { UtilityTabResults } from './UtilityTabResults'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 import { Snippet } from '@/data/content/sql-folders-query'
@@ -18,13 +18,9 @@ import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 export type UtilityPanelProps = {
   id: string
   isExecuting?: boolean
-  isExplainExecuting?: boolean
   isDebugging?: boolean
   isDisabled?: boolean
-  hasSelection: boolean
-  prettifyQuery: () => void
   executeQuery: () => void
-  executeExplainQuery: () => void
   onDebug: () => void
   buildDebugPrompt: () => string
   activeTab?: string
@@ -43,13 +39,9 @@ const DEFAULT_CHART_CONFIG: ChartConfig = {
 export const UtilityPanel = ({
   id,
   isExecuting,
-  isExplainExecuting,
   isDebugging,
   isDisabled,
-  hasSelection,
-  prettifyQuery,
   executeQuery,
-  executeExplainQuery,
   onDebug,
   buildDebugPrompt,
   activeTab = 'results',
@@ -108,20 +100,19 @@ export const UtilityPanel = ({
   }
 
   const chartConfig = getChartConfig()
+  const activeView = activeTab === 'chart' ? 'chart' : 'results'
 
-  const handleTabChange = (tab: string) => {
-    if (tab === 'explain' && !isLogsSource) {
-      executeExplainQuery()
-    }
+  const handleViewChange = (view: string) => {
+    if (view !== 'results' && view !== 'chart') return
 
-    if (notebookEditorContext && (tab === 'chart' || tab === 'results')) {
+    if (notebookEditorContext) {
       notebookEditorContext.onChartConfigChange({
         ...chartConfig,
-        view: tab === 'chart' ? 'chart' : 'table',
+        view: view === 'chart' ? 'chart' : 'table',
       })
     }
 
-    onActiveTabChange?.(tab)
+    onActiveTabChange?.(view)
   }
 
   function onConfigChange(config: ChartConfig) {
@@ -149,50 +140,76 @@ export const UtilityPanel = ({
   }
 
   return (
-    <Tabs_Shadcn_
-      value={activeTab}
-      onValueChange={handleTabChange}
-      className="w-full h-full flex flex-col"
-    >
-      <TabsList_Shadcn_ className="flex justify-between gap-2 px-4 overflow-x-auto min-h-[42px]">
-        <div className="flex items-center gap-4">
-          <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
-            <span className="translate-y-px">Results</span>
-          </TabsTrigger_Shadcn_>
-          {!isLogsSource && (
-            <TabsTrigger_Shadcn_ className="py-3 text-xs" value="explain">
-              <span className="translate-y-px">Explain</span>
-            </TabsTrigger_Shadcn_>
-          )}
-          <TabsTrigger_Shadcn_ className="py-3 text-xs" value="chart">
-            <span className="translate-y-px">Chart</span>
-          </TabsTrigger_Shadcn_>
+    <div className="flex h-full w-full flex-col">
+      <div className="flex min-h-[42px] shrink-0 items-center justify-between gap-2 border-b px-4">
+        <ToggleGroup
+          type="single"
+          value={activeView}
+          onValueChange={handleViewChange}
+          className="justify-start"
+        >
+          <ToggleGroupItem
+            value="results"
+            aria-label="Show table"
+            className="h-7 gap-1.5 px-2 text-xs"
+          >
+            <Table size={14} strokeWidth={1.5} />
+            <span>Table</span>
+          </ToggleGroupItem>
+          <ToggleGroupItem
+            value="chart"
+            aria-label="Show chart"
+            className="h-7 gap-1.5 px-2 text-xs"
+          >
+            <BarChart2 size={14} strokeWidth={1.5} />
+            <span>Chart</span>
+          </ToggleGroupItem>
+        </ToggleGroup>
 
+        <div className="flex shrink-0 items-center gap-1">
           {result?.rows && !isLogsSource && (
             <DownloadResultsButton
               type="text"
               results={result.rows as any[]}
-              fileName={`Supabase Snippet ${snippet.name}`}
+              fileName={`Supabase Snippet ${snippet?.name ?? 'Untitled query'}`}
               onDownloadAsCSV={() => track('sql_editor_result_download_csv_clicked')}
               onCopyAsMarkdown={() => track('sql_editor_result_copy_markdown_clicked')}
               onCopyAsJSON={() => track('sql_editor_result_copy_json_clicked')}
               onCopyAsCSV={() => track('sql_editor_result_copy_csv_clicked')}
             />
           )}
+
+          {activeView === 'chart' && (
+            <Popover modal={false}>
+              <PopoverTrigger asChild>
+                <ButtonTooltip
+                  type="text"
+                  className="px-1.5"
+                  icon={<Settings2 size={14} strokeWidth={1.5} />}
+                  tooltip={{ content: { side: 'bottom', text: 'Chart settings' } }}
+                />
+              </PopoverTrigger>
+              <PopoverContent side="bottom" align="end" className="w-[280px] p-3">
+                <ChartSettings
+                  results={result}
+                  config={chartConfig}
+                  onConfigChange={onConfigChange}
+                />
+              </PopoverContent>
+            </Popover>
+          )}
         </div>
+      </div>
 
-        <UtilityActions
-          id={id}
-          isExecuting={isExecuting}
-          isDisabled={isDisabled}
-          hasSelection={hasSelection}
-          prettifyQuery={prettifyQuery}
-          executeQuery={executeQuery}
-        />
-      </TabsList_Shadcn_>
-
-      <TabsContent_Shadcn_ asChild value="results" className="mt-0 grow">
-        {isLogsSource ? (
+      <div className="min-h-0 flex-1">
+        {activeView === 'chart' ? (
+          <ChartConfig
+            key={`${id}-chart`}
+            results={result}
+            config={chartConfig}
+            isLoading={isExecuting}
+          />
+        ) : isLogsSource ? (
           <UtilityTabLogsResults id={id} isExecuting={isExecuting} onRun={executeQuery} />
         ) : (
           <UtilityTabResults
@@ -204,22 +221,7 @@ export const UtilityPanel = ({
             isDebugging={isDebugging}
           />
         )}
-      </TabsContent_Shadcn_>
-
-      {!isLogsSource && (
-        <TabsContent_Shadcn_ asChild value="explain" className="mt-0 grow">
-          <UtilityTabExplain id={id} isExecuting={isExplainExecuting} />
-        </TabsContent_Shadcn_>
-      )}
-
-      <TabsContent_Shadcn_ value="chart" className="mt-0 flex min-h-0 flex-1 flex-col">
-        <ChartConfig
-          key={`${id}-chart`}
-          results={result}
-          config={chartConfig}
-          onConfigChange={onConfigChange}
-        />
-      </TabsContent_Shadcn_>
-    </Tabs_Shadcn_>
+      </div>
+    </div>
   )
 }

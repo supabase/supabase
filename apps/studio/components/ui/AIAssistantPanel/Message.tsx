@@ -12,6 +12,7 @@ import { MessageDisplay } from './Message.Display'
 function AssistantMessage({ message }: { message: VercelMessage }) {
   const { id, variant, state, isLastMessage, readOnly, rating, isLoading } = useMessageInfoContext()
   const { onCancelEdit, onRate } = useMessageActionsContext()
+  const hasQueryBlock = message.parts?.some((part) => part.type === 'tool-execute_sql') ?? false
 
   const handleRate = (newRating: 'positive' | 'negative', reason?: string) => {
     onRate?.(id, newRating, reason)
@@ -20,12 +21,14 @@ function AssistantMessage({ message }: { message: VercelMessage }) {
   return (
     <MessageDisplay.Container
       className={cn(
+        'assistant-message-container assistant-message-container-assistant',
+        hasQueryBlock ? 'assistant-message-container-query' : 'assistant-message-container-standard',
         variant === 'warning' && 'bg-warning-200',
         state === 'predecessor-editing' && 'opacity-50 transition-opacity cursor-pointer'
       )}
       onClick={state === 'predecessor-editing' ? onCancelEdit : undefined}
     >
-      <MessageDisplay.MainArea>
+      <MessageDisplay.MainArea className="assistant-message-main-area">
         <MessageDisplay.Content message={message} />
       </MessageDisplay.MainArea>
       {!readOnly && isLastMessage && onRate && !isLoading && (
@@ -55,13 +58,13 @@ function UserMessage({ message }: { message: VercelMessage }) {
     <>
       <MessageDisplay.Container
         className={cn(
-          'mt-6 text-foreground',
+          'assistant-message-container assistant-message-container-user assistant-message-container-standard mt-6 text-foreground',
           variant === 'warning' && 'bg-warning-200',
           state === 'predecessor-editing' && 'opacity-50 transition-opacity cursor-pointer'
         )}
         onClick={state === 'predecessor-editing' ? onCancelEdit : undefined}
       >
-        <MessageDisplay.MainArea>
+        <MessageDisplay.MainArea className="assistant-message-main-area">
           <MessageDisplay.ProfileImage />
           <MessageDisplay.Content message={message} />
         </MessageDisplay.MainArea>

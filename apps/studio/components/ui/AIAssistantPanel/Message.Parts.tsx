@@ -248,32 +248,66 @@ export function MessagePartSwitcher({
   part: NonNullable<VercelMessage['parts']>[number]
   isLastPart?: boolean
 }) {
-  switch (part.type) {
-    case 'dynamic-tool': {
-      return <MessagePart.Dynamic toolPart={part} />
-    }
-    case 'tool-list_policies':
-    case 'tool-search_docs':
-    case 'tool-get_active_incidents':
-    case 'tool-load_knowledge': {
-      return <MessagePart.Tool toolPart={part} />
-    }
-    case 'reasoning':
-      return <MessagePart.Reasoning reasoningPart={part} />
-    case 'text':
-      return <MessagePart.Text textPart={part} />
+  const renderPart = () => {
+    switch (part.type) {
+      case 'dynamic-tool': {
+        return <MessagePart.Dynamic toolPart={part} />
+      }
+      case 'tool-list_policies':
+      case 'tool-search_docs':
+      case 'tool-get_active_incidents':
+      case 'tool-load_knowledge': {
+        return <MessagePart.Tool toolPart={part} />
+      }
+      case 'reasoning':
+        return <MessagePart.Reasoning reasoningPart={part} />
+      case 'text':
+        return <MessagePart.Text textPart={part} />
 
-    case 'tool-execute_sql': {
-      return <MessagePart.ExecuteSql toolPart={part} isLastPart={isLastPart} />
-    }
-    case 'tool-deploy_edge_function': {
-      return <MessagePart.DeployEdgeFunction toolPart={part} />
-    }
+      case 'tool-execute_sql': {
+        return <MessagePart.ExecuteSql toolPart={part} isLastPart={isLastPart} />
+      }
+      case 'tool-deploy_edge_function': {
+        return <MessagePart.DeployEdgeFunction toolPart={part} />
+      }
 
-    case 'source-url':
-    case 'source-document':
-    case 'file':
-    default:
-      return null
+      case 'source-url':
+      case 'source-document':
+      case 'file':
+      default:
+        return null
+    }
   }
+
+  const renderedPart = renderPart()
+  if (!renderedPart) return null
+
+  const isQueryBlock = part.type === 'tool-execute_sql'
+  const isToolStatus =
+    part.type === 'dynamic-tool' ||
+    part.type === 'tool-list_policies' ||
+    part.type === 'tool-search_docs' ||
+    part.type === 'tool-get_active_incidents' ||
+    part.type === 'tool-load_knowledge' ||
+    part.type === 'reasoning'
+
+  return (
+    <div
+      className={cn(
+        'assistant-message-part w-full',
+        isQueryBlock ? 'assistant-message-part-query' : 'assistant-message-part-standard',
+        isToolStatus &&
+          cn(
+            'assistant-message-part-tool',
+            '[&_.tool-item]:mt-0! [&_.tool-item]:mb-0!',
+            '[&:not(.assistant-message-part-tool+.assistant-message-part-tool)]:mt-4',
+            '[&:not(:has(+.assistant-message-part-tool))]:mb-4',
+            '[&:has(+.assistant-message-part-tool)_.tool-item]:border-b',
+            '[&:has(+.assistant-message-part-tool)_.tool-item]:border-b-muted'
+          )
+      )}
+    >
+      {renderedPart}
+    </div>
+  )
 }

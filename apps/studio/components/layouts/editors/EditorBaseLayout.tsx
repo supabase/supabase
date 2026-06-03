@@ -4,6 +4,7 @@ import { ComponentProps, ReactNode } from 'react'
 import { cn } from 'ui'
 
 import { ProjectLayoutWithAuth } from '../ProjectLayout'
+import { SQL_EDITOR_CHROME_HEADER_CLASSNAME } from '../SQLEditorLayout/SQLEditorNavV2/SQLEditorNav.constants'
 import { CollapseButton } from '../Tabs/CollapseButton'
 import { EditorTabs } from '../Tabs/Tabs'
 import { useEditorType } from './EditorsLayout.hooks'
@@ -44,11 +45,11 @@ export const EditorBaseLayout = ({
     activeEditorTab === undefined
       ? undefined
       : editor === 'sql'
-        ? activeEditorTab.type === 'sql' || activeEditorTab.type === 'notebook'
+        ? isSqlEditorTab(activeEditorTab)
           ? activeEditorTabLabel
           : undefined
         : editor === 'table'
-          ? activeEditorTab.type !== 'sql'
+          ? !isSqlEditorTab(activeEditorTab)
             ? activeEditorTabLabel
             : undefined
           : undefined
@@ -67,16 +68,20 @@ export const EditorBaseLayout = ({
       productMenuClassName={productMenuClassName}
       productMenu={productMenu}
     >
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full min-h-0">
         <div
           className={cn(
-            'h-10 md:min-h-(--header-height) flex items-center',
-            !hideTabs ? 'bg-surface-200 dark:bg-alternative' : 'bg-surface-100'
+            'flex items-center',
+            editor === 'sql'
+              ? SQL_EDITOR_CHROME_HEADER_CLASSNAME
+              : hideTabs
+                ? 'h-10 bg-surface-100 md:min-h-(--header-height)'
+                : 'h-10 bg-surface-200 md:min-h-(--header-height) dark:bg-alternative'
           )}
         >
           {hideTabs ? <CollapseButton hideTabs={hideTabs} /> : <EditorTabs />}
         </div>
-        <div className="h-full">{children}</div>
+        <div className="h-full min-h-0">{children}</div>
       </div>
     </ProjectLayoutWithAuth>
   )

@@ -1,8 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { FileBarChart, Trash } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { cn, ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from 'ui'
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from 'ui'
 
+import { SqlEditorNavItem } from './SqlEditorNavItem'
 import { Content } from '@/data/content/content-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useProfile } from '@/lib/profile'
@@ -12,7 +13,6 @@ interface NotebookNavItemProps {
   report: Content
   projectRef: string
   isActive: boolean
-  isOpened: boolean
   isPreview: boolean
   onSelectDelete: () => void
 }
@@ -21,7 +21,6 @@ export const NotebookNavItem = ({
   report,
   projectRef,
   isActive,
-  isOpened,
   isPreview,
   onSelectDelete,
 }: NotebookNavItemProps) => {
@@ -44,8 +43,11 @@ export const NotebookNavItem = ({
   )
 
   const notebookButton = (
-    <button
-      type="button"
+    <SqlEditorNavItem
+      icon={<FileBarChart size={14} className="shrink-0" />}
+      label={report.name}
+      isActive={isActive}
+      isPreview={isPreview}
       onClick={() => {
         router.push(`/project/${projectRef}/sql/notebooks/${report.id}`)
       }}
@@ -53,17 +55,7 @@ export const NotebookNavItem = ({
         event.preventDefault()
         tabs.makeTabPermanent(tabId)
       }}
-      className={cn(
-        'flex items-center gap-x-2 px-2 py-1.5 rounded-md text-sm transition truncate w-full text-left',
-        isActive || (isOpened && !isPreview)
-          ? 'bg-surface-200 text-foreground'
-          : 'text-foreground-light hover:bg-surface-100 hover:text-foreground',
-        isPreview && 'italic font-light'
-      )}
-    >
-      <FileBarChart size={14} className="shrink-0" />
-      <span className="truncate">{report.name}</span>
-    </button>
+    />
   )
 
   if (!canUpdateNotebook) {

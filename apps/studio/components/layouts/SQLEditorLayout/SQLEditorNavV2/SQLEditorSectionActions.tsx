@@ -24,7 +24,7 @@ export function SQLEditorSectionActions({
   if (!onNewSnippet && !onNewFolder) return null
 
   return (
-    <div className="flex items-center shrink-0 pr-3">
+    <div className="flex shrink-0 items-center pr-1">
       {onNewSnippet ? (
         <ButtonTooltip
           type="text"

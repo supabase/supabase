@@ -36,7 +36,6 @@ import {
   generateSnippetTitle,
   ROWS_PER_PAGE_OPTIONS,
   sqlAiDisclaimerComment,
-  untitledSnippetTitle,
 } from './SQLEditor.constants'
 import {
   DiffType,
@@ -56,7 +55,12 @@ import {
   isUpdateWithoutWhere,
   suffixWithLimit,
 } from './SQLEditor.utils'
+import { SqlEditorPanelHeader } from './SqlEditorPanelHeader'
+import { SqlEditorShowSqlToggle } from './SqlEditorShowSqlToggle'
+import { getSnippetSqlFromContent } from './sqlSnippet.utils'
+import { useSaveSqlSnippet } from './useSaveSqlSnippet'
 import { useSqlEditorCompletion } from './useSqlEditorCompletion'
+import { UtilityActions } from './UtilityPanel/UtilityActions'
 import { UtilityPanel } from './UtilityPanel/UtilityPanel'
 import {
   isExplainQuery,
@@ -79,7 +83,6 @@ import { useExecuteLogsSqlMutation } from '@/data/logs/execute-logs-sql-mutation
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { isError } from '@/data/utils/error-check'
-import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { generateUuid } from '@/lib/api/snippets.browser'
@@ -128,7 +131,6 @@ export const SQLEditor = () => {
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
   const queryExecutionSourceState = useQueryExecutionSourceSnapshot()
-  const { isHipaaProjectDisallowed } = useOrgAiOptInLevel()
   const showPrettyExplain = useFlag('ShowPrettyExplain')
 
   const {
@@ -157,6 +159,7 @@ export const SQLEditor = () => {
 
   const [showWidget, setShowWidget] = useState(false)
   const [activeUtilityTab, setActiveUtilityTab] = useState<string>('results')
+  const [isSqlEditorVisible, setIsSqlEditorVisible] = useState(true)
 
   const refocusEditor = useCallback(() => {
     requestAnimationFrame(() => {
@@ -208,6 +211,10 @@ export const SQLEditor = () => {
     id in snapV2.snippets && snapV2.snippets[id].snippet.content !== undefined
   )
   const isLoading = effectiveUrlId === 'new' ? false : snippetIsLoading
+  const snippetDisplayTitle =
+    effectiveUrlId === 'new'
+      ? generatedNewSnippetName
+      : (snapV2.snippets[id]?.snippet.name ?? generatedNewSnippetName)
 
   useSqlEditorCompletion(id, monacoRef.current)
 
@@ -235,10 +242,6 @@ export const SQLEditor = () => {
 
         if (showPrettyExplain && isExplainQuery(data.result)) {
           snapV2.addExplainResult(id, data.result)
-          setActiveUtilityTab('explain')
-        } else if (activeUtilityTab === 'explain') {
-          // If on Explain tab but ran a non-EXPLAIN query, switch to Results tab
-          setActiveUtilityTab('results')
         }
       }
 
@@ -290,13 +293,11 @@ export const SQLEditor = () => {
     onSuccess(data) {
       if (id) {
         snapV2.addExplainResult(id, data.result)
-        setActiveUtilityTab('explain')
       }
     },
     onError(error) {
       if (id) {
         snapV2.addExplainResultError(id, error)
-        setActiveUtilityTab('explain')
       }
     },
   })
@@ -324,21 +325,6 @@ export const SQLEditor = () => {
     },
   })
 
-  const setAiTitle = useCallback(
-    async (id: string, sql: string) => {
-      try {
-        const { title: name } = await generateSqlTitle({ sql })
-        snapV2.updateSnippet({ id, snippet: { name } })
-        snapV2.addNeedsSaving(id)
-        const tabId = createTabId('sql', { id })
-        tabs.updateTab(tabId, { label: name })
-      } catch (error) {
-        // [Joshen] No error handler required as this happens in the background and not necessary to ping the user
-      }
-    },
-    [generateSqlTitle, snapV2]
-  )
-
   const prettifyQuery = useCallback(async () => {
     if (isDiffOpen) return
 
@@ -364,12 +350,38 @@ export const SQLEditor = () => {
             range: editorModel.getFullModelRange(),
           },
         ])
-        snapV2.setSql({ id, sql: formattedSql })
+        snapV2.setSql({ id, sql: formattedSql, skipSave: true })
       }
     }
   }, [id, isDiffOpen, project, snapV2])
 
   useShortcut(SHORTCUT_IDS.SQL_EDITOR_FORMAT, prettifyQuery, {
+    registerInCommandMenu: true,
+  })
+
+  const getEditorSql = useCallback(() => {
+    const state = getSqlEditorV2StateSnapshot()
+    const snippet = state.snippets[id]
+    const editor = editorRef.current
+    const snippetSql = getSnippetSqlFromContent(snippet?.snippet.content)
+    const selection = editor?.getSelection()
+    const selectedValue = selection ? editor?.getModel()?.getValueInRange(selection) : undefined
+
+    if (snippet) {
+      return (selectedValue || editor?.getValue()) ?? snippetSql
+    }
+
+    return selectedValue || editor?.getValue() || snippetSql
+  }, [id])
+
+  const { saveQuery, isSaving, canSave } = useSaveSqlSnippet({
+    id,
+    snippetName: snippetDisplayTitle,
+    getEditorSql,
+    isOnNewRoute: urlId === 'new',
+  })
+
+  useShortcut(SHORTCUT_IDS.SQL_EDITOR_SAVE, () => void saveQuery(), {
     registerInCommandMenu: true,
   })
 
@@ -383,21 +395,15 @@ export const SQLEditor = () => {
       // use the latest state
       const state = getSqlEditorV2StateSnapshot()
       const snippet = state.snippets[id]
+      const snippetSql = getSnippetSqlFromContent(snippet?.snippet.content)
+      const editor = editorRef.current
 
-      if (editorRef.current === null || isExecuting || isLogsExecuting || project === undefined) {
+      if ((!editor && !snippetSql) || isExecuting || isLogsExecuting || project === undefined) {
         clearPendingRunRefocus()
         return
       }
 
-      const editor = editorRef.current
-      const selection = editor.getSelection()
-      const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
-
-      const editorSql = snippet
-        ? ((selectedValue || editorRef.current?.getValue()) ??
-          snippet.snippet.content?.unchecked_sql)
-        : selectedValue || editorRef.current?.getValue()
-      const sql = sqlOverride ?? editorSql
+      const sql = String(sqlOverride ?? getEditorSql() ?? '')
 
       const executionSource = queryExecutionSourceState.executionSource
 
@@ -462,15 +468,6 @@ export const SQLEditor = () => {
         return
       }
 
-      if (
-        !isHipaaProjectDisallowed &&
-        snippet?.snippet.name.startsWith(untitledSnippetTitle) &&
-        IS_PLATFORM
-      ) {
-        // Intentionally don't await title gen (lazy)
-        setAiTitle(id, sql)
-      }
-
       if (lineHighlights.length > 0) {
         editor?.deltaDecorations(lineHighlights, [])
         setLineHighlights([])
@@ -512,10 +509,9 @@ export const SQLEditor = () => {
       isExecuting,
       isLogsExecuting,
       project,
-      isHipaaProjectDisallowed,
       execute,
       getImpersonatedRoleState,
-      setAiTitle,
+      getEditorSql,
       databaseSelectorState.selectedDatabaseId,
       databases,
       eventTriggers,
@@ -525,8 +521,10 @@ export const SQLEditor = () => {
   )
 
   const executeQueryFromButton = useCallback(() => {
-    shouldRefocusAfterRunRef.current = true
-    refocusEditor()
+    if (editorRef.current) {
+      shouldRefocusAfterRunRef.current = true
+      refocusEditor()
+    }
     void executeQuery()
   }, [executeQuery, refocusEditor])
 
@@ -536,16 +534,11 @@ export const SQLEditor = () => {
     // use the latest state
     const state = getSqlEditorV2StateSnapshot()
     const snippet = state.snippets[id]
+    const editor = editorRef.current
+    const snippetSql = getSnippetSqlFromContent(snippet?.snippet.content)
 
-    if (editorRef.current !== null && !isExplainExecuting && project !== undefined) {
-      const editor = editorRef.current
-      const selection = editor.getSelection()
-      const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
-
-      const sql = snippet
-        ? ((selectedValue || editorRef.current?.getValue()) ??
-          snippet.snippet.content?.unchecked_sql)
-        : selectedValue || editorRef.current?.getValue()
+    if ((editor || snippetSql) && !isExplainExecuting && project !== undefined) {
+      const sql = getEditorSql() ?? ''
 
       // Check for multiple statements - EXPLAIN only works on a single statement
       const statements = splitSqlStatements(sql)
@@ -554,7 +547,6 @@ export const SQLEditor = () => {
           message:
             'EXPLAIN only works on a single SQL statement. Please select just one query to analyze.',
         })
-        setActiveUtilityTab('explain')
         return
       }
 
@@ -925,6 +917,74 @@ export const SQLEditor = () => {
     }
   }, [isDiffOpen, isDiffEditorMounted])
 
+  const utilityPanel = isLoading ? (
+    <div className="flex h-full w-full items-center justify-center">
+      <Loader2 className="animate-spin text-brand" />
+    </div>
+  ) : (
+    <UtilityPanel
+      id={id}
+      isExecuting={isExecuting || isLogsExecuting}
+      isDisabled={isDiffOpen}
+      executeQuery={executeQueryFromButton}
+      onDebug={onDebug}
+      buildDebugPrompt={buildDebugPrompt}
+      activeTab={activeUtilityTab}
+      onActiveTabChange={setActiveUtilityTab}
+    />
+  )
+
+  const resultsFooter =
+    results?.rows !== undefined && !isExecuting ? (
+      <GridFooter className="flex items-center justify-between gap-2">
+        <Tooltip>
+          <TooltipTrigger>
+            <p className="text-xs">
+              <span className="text-foreground">
+                {results.rows.length} row{results.rows.length > 1 ? 's' : ''}
+              </span>
+              <span className="text-foreground-lighter ml-1">
+                {results.autoLimit !== undefined && ` (Limited to only ${results.autoLimit} rows)`}
+              </span>
+            </p>
+          </TooltipTrigger>
+          <TooltipContent className="max-w-xs">
+            <p className="flex flex-col gap-y-1">
+              <span>
+                Results are automatically limited to preserve browser performance, in particular if
+                your query returns an exceptionally large number of rows.
+              </span>
+              <span className="text-foreground-light">
+                You may change or remove this limit from the dropdown on the right
+              </span>
+            </p>
+          </TooltipContent>
+        </Tooltip>
+        {results.autoLimit !== undefined && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button type="default" iconRight={<ChevronUp size={14} />}>
+                Limit results to:{' '}
+                {ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === snapV2.limit)?.label}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-40" align="end">
+              <DropdownMenuRadioGroup
+                value={snapV2.limit.toString()}
+                onValueChange={(val) => snapV2.setLimit(Number(val))}
+              >
+                {ROWS_PER_PAGE_OPTIONS.map((option) => (
+                  <DropdownMenuRadioItem key={option.label} value={option.value.toString()}>
+                    {option.label}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+      </GridFooter>
+    ) : null
+
   return (
     <>
       <RunQueryWarningModal
@@ -958,202 +1018,164 @@ export const SQLEditor = () => {
         }}
       />
 
-      <div className="flex h-full">
-        <ResizablePanelGroup
-          className="relative"
-          orientation="vertical"
-          autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
-        >
-          <ResizablePanel defaultSize="50" maxSize="70">
-            <div className="grow overflow-y-auto border-b h-full">
-              {isLoading ? (
-                <div className="flex h-full w-full items-center justify-center">
-                  <Loader2 className="animate-spin text-brand" />
-                </div>
-              ) : (
-                <>
-                  {isDiffOpen && (
-                    <div className="w-full h-full">
-                      <DiffEditor
-                        language="pgsql"
-                        original={defaultSqlDiff.original}
-                        modified={defaultSqlDiff.modified}
-                        onMount={(editor) => {
-                          diffEditorRef.current = editor
-                          setIsDiffEditorMounted(true)
-                        }}
-                      />
-                      {showWidget && (
-                        <ResizableAIWidget
-                          editor={diffEditorRef.current!}
-                          id="ask-ai-diff"
-                          value={promptInput}
-                          onChange={setPromptInput}
-                          onSubmit={(prompt: string) => {
-                            handlePrompt(prompt, {
-                              beforeSelection: promptState.beforeSelection,
-                              selection: promptState.selection || defaultSqlDiff.modified,
-                              afterSelection: promptState.afterSelection,
-                            })
-                          }}
-                          onAccept={acceptAiHandler}
-                          onReject={discardAiHandler}
-                          onCancel={resetPrompt}
-                          isDiffVisible={true}
-                          isLoading={isCompletionLoading}
-                          startLineNumber={Math.max(0, promptState.startLineNumber)}
-                          endLineNumber={promptState.endLineNumber}
-                        />
-                      )}
+      <div className="flex h-full flex-col">
+        <SqlEditorPanelHeader
+          title={snippetDisplayTitle}
+          leadingActions={
+            <SqlEditorShowSqlToggle
+              isSqlEditorVisible={isSqlEditorVisible}
+              onToggle={() => setIsSqlEditorVisible((current) => !current)}
+            />
+          }
+          runActions={
+            <UtilityActions
+              id={id}
+              isExecuting={isExecuting || isLogsExecuting}
+              isDisabled={isDiffOpen}
+              hasSelection={hasSelection}
+              isSaving={isSaving}
+              isSaveDisabled={!canSave}
+              prettifyQuery={prettifyQuery}
+              executeQuery={executeQueryFromButton}
+              saveQuery={() => void saveQuery()}
+            />
+          }
+        />
+
+        {isSqlEditorVisible ? (
+          <ResizablePanelGroup
+            className="relative min-h-0 flex-grow"
+            orientation="vertical"
+            autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
+          >
+            <ResizablePanel defaultSize="50" maxSize="70">
+              <div className="flex h-full min-h-0 flex-col">
+                <div className="min-h-0 flex-1 overflow-y-auto border-b">
+                  {isLoading ? (
+                    <div className="flex h-full w-full items-center justify-center">
+                      <Loader2 className="animate-spin text-brand" />
                     </div>
+                  ) : (
+                    <>
+                      {isDiffOpen && (
+                        <div className="w-full h-full">
+                          <DiffEditor
+                            language="pgsql"
+                            original={defaultSqlDiff.original}
+                            modified={defaultSqlDiff.modified}
+                            onMount={(editor) => {
+                              diffEditorRef.current = editor
+                              setIsDiffEditorMounted(true)
+                            }}
+                          />
+                          {showWidget && (
+                            <ResizableAIWidget
+                              editor={diffEditorRef.current!}
+                              id="ask-ai-diff"
+                              value={promptInput}
+                              onChange={setPromptInput}
+                              onSubmit={(prompt: string) => {
+                                handlePrompt(prompt, {
+                                  beforeSelection: promptState.beforeSelection,
+                                  selection: promptState.selection || defaultSqlDiff.modified,
+                                  afterSelection: promptState.afterSelection,
+                                })
+                              }}
+                              onAccept={acceptAiHandler}
+                              onReject={discardAiHandler}
+                              onCancel={resetPrompt}
+                              isDiffVisible={true}
+                              isLoading={isCompletionLoading}
+                              startLineNumber={Math.max(0, promptState.startLineNumber)}
+                              endLineNumber={promptState.endLineNumber}
+                            />
+                          )}
+                        </div>
+                      )}
+                      <div key={id} className="w-full h-full relative">
+                        <MonacoEditor
+                          autoFocus
+                          placeholder={
+                            !promptState.isOpen && !editorRef.current?.getValue()
+                              ? 'Hit ' +
+                                (os === 'macos' ? 'CMD+SHIFT+K' : `CTRL+SHIFT+K`) +
+                                ' to generate query or just start typing'
+                              : ''
+                          }
+                          id={id}
+                          snippetName={
+                            urlId === 'new'
+                              ? generatedNewSnippetName
+                              : (snapV2.snippets[id]?.snippet.name ?? generatedNewSnippetName)
+                          }
+                          className={cn(isDiffOpen && 'hidden')}
+                          editorRef={editorRef}
+                          monacoRef={monacoRef}
+                          executeQuery={executeQuery}
+                          executeExplainQuery={executeExplainQuery}
+                          prettifyQuery={prettifyQuery}
+                          onSaveQuery={() => void saveQuery()}
+                          onHasSelection={setHasSelection}
+                          onMount={onMount}
+                          onPrompt={({
+                            selection,
+                            beforeSelection,
+                            afterSelection,
+                            startLineNumber,
+                            endLineNumber,
+                          }) => {
+                            setPromptState((prev) => ({
+                              ...prev,
+                              isOpen: true,
+                              selection,
+                              beforeSelection,
+                              afterSelection,
+                              startLineNumber,
+                              endLineNumber,
+                            }))
+                          }}
+                        />
+                        {editorRef.current && promptState.isOpen && !isDiffOpen && (
+                          <ResizableAIWidget
+                            editor={editorRef.current}
+                            id="ask-ai"
+                            value={promptInput}
+                            onChange={setPromptInput}
+                            onSubmit={(prompt: string) => {
+                              handlePrompt(prompt, {
+                                beforeSelection: promptState.beforeSelection,
+                                selection: promptState.selection,
+                                afterSelection: promptState.afterSelection,
+                              })
+                            }}
+                            onCancel={resetPrompt}
+                            isDiffVisible={false}
+                            isLoading={isCompletionLoading}
+                            startLineNumber={Math.max(0, promptState.startLineNumber)}
+                            endLineNumber={promptState.endLineNumber}
+                          />
+                        )}
+                      </div>
+                    </>
                   )}
-                  <div key={id} className="w-full h-full relative">
-                    <MonacoEditor
-                      autoFocus
-                      placeholder={
-                        !promptState.isOpen && !editorRef.current?.getValue()
-                          ? 'Hit ' +
-                            (os === 'macos' ? 'CMD+SHIFT+K' : `CTRL+SHIFT+K`) +
-                            ' to generate query or just start typing'
-                          : ''
-                      }
-                      id={id}
-                      snippetName={
-                        urlId === 'new'
-                          ? generatedNewSnippetName
-                          : (snapV2.snippets[id]?.snippet.name ?? generatedNewSnippetName)
-                      }
-                      className={cn(isDiffOpen && 'hidden')}
-                      editorRef={editorRef}
-                      monacoRef={monacoRef}
-                      executeQuery={executeQuery}
-                      executeExplainQuery={executeExplainQuery}
-                      prettifyQuery={prettifyQuery}
-                      onHasSelection={setHasSelection}
-                      onMount={onMount}
-                      onPrompt={({
-                        selection,
-                        beforeSelection,
-                        afterSelection,
-                        startLineNumber,
-                        endLineNumber,
-                      }) => {
-                        setPromptState((prev) => ({
-                          ...prev,
-                          isOpen: true,
-                          selection,
-                          beforeSelection,
-                          afterSelection,
-                          startLineNumber,
-                          endLineNumber,
-                        }))
-                      }}
-                    />
-                    {editorRef.current && promptState.isOpen && !isDiffOpen && (
-                      <ResizableAIWidget
-                        editor={editorRef.current}
-                        id="ask-ai"
-                        value={promptInput}
-                        onChange={setPromptInput}
-                        onSubmit={(prompt: string) => {
-                          handlePrompt(prompt, {
-                            beforeSelection: promptState.beforeSelection,
-                            selection: promptState.selection,
-                            afterSelection: promptState.afterSelection,
-                          })
-                        }}
-                        onCancel={resetPrompt}
-                        isDiffVisible={false}
-                        isLoading={isCompletionLoading}
-                        startLineNumber={Math.max(0, promptState.startLineNumber)}
-                        endLineNumber={promptState.endLineNumber}
-                      />
-                    )}
-                  </div>
-                </>
-              )}
-            </div>
-          </ResizablePanel>
-
-          <ResizableHandle withHandle />
-
-          <ResizablePanel defaultSize="50" maxSize="70">
-            {isLoading ? (
-              <div className="flex h-full w-full items-center justify-center">
-                <Loader2 className="animate-spin text-brand" />
+                </div>
               </div>
-            ) : (
-              <UtilityPanel
-                id={id}
-                isExecuting={isExecuting || isLogsExecuting}
-                isExplainExecuting={isExplainExecuting}
-                isDisabled={isDiffOpen}
-                hasSelection={hasSelection}
-                prettifyQuery={prettifyQuery}
-                executeQuery={executeQueryFromButton}
-                executeExplainQuery={executeExplainQuery}
-                onDebug={onDebug}
-                buildDebugPrompt={buildDebugPrompt}
-                activeTab={activeUtilityTab}
-                onActiveTabChange={setActiveUtilityTab}
-              />
-            )}
-          </ResizablePanel>
+            </ResizablePanel>
 
-          <div className="h-9">
-            {results?.rows !== undefined && !isExecuting && (
-              <GridFooter className="flex items-center justify-between gap-2">
-                <Tooltip>
-                  <TooltipTrigger>
-                    <p className="text-xs">
-                      <span className="text-foreground">
-                        {results.rows.length} row{results.rows.length > 1 ? 's' : ''}
-                      </span>
-                      <span className="text-foreground-lighter ml-1">
-                        {results.autoLimit !== undefined &&
-                          ` (Limited to only ${results.autoLimit} rows)`}
-                      </span>
-                    </p>
-                  </TooltipTrigger>
-                  <TooltipContent className="max-w-xs">
-                    <p className="flex flex-col gap-y-1">
-                      <span>
-                        Results are automatically limited to preserve browser performance, in
-                        particular if your query returns an exceptionally large number of rows.
-                      </span>
+            <ResizableHandle withHandle />
 
-                      <span className="text-foreground-light">
-                        You may change or remove this limit from the dropdown on the right
-                      </span>
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-                {results.autoLimit !== undefined && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button type="default" iconRight={<ChevronUp size={14} />}>
-                        Limit results to:{' '}
-                        {ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === snapV2.limit)?.label}
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-40" align="end">
-                      <DropdownMenuRadioGroup
-                        value={snapV2.limit.toString()}
-                        onValueChange={(val) => snapV2.setLimit(Number(val))}
-                      >
-                        {ROWS_PER_PAGE_OPTIONS.map((option) => (
-                          <DropdownMenuRadioItem key={option.label} value={option.value.toString()}>
-                            {option.label}
-                          </DropdownMenuRadioItem>
-                        ))}
-                      </DropdownMenuRadioGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
-              </GridFooter>
-            )}
-          </div>
-        </ResizablePanelGroup>
+            <ResizablePanel defaultSize="50" maxSize="70">
+              {utilityPanel}
+            </ResizablePanel>
+
+            <div className="h-9">{resultsFooter}</div>
+          </ResizablePanelGroup>
+        ) : (
+          <>
+            <div className="min-h-0 flex-grow">{utilityPanel}</div>
+            <div className="h-9">{resultsFooter}</div>
+          </>
+        )}
       </div>
     </>
   )

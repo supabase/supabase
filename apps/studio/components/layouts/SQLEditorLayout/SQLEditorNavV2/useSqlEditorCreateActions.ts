@@ -1,14 +1,18 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useCallback } from 'react'
 import { toast } from 'sonner'
 
 import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from '@/lib/constants'
 import { useProfile } from '@/lib/profile'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 export type SqlEditorSnippetCreateTarget = 'private' | 'shared' | 'favorite'
@@ -19,6 +23,10 @@ export function useSqlEditorCreateActions() {
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const assistant = useAiAssistantStateSnapshot()
+  const [, setShowNewReportModal] = useQueryState('newReport', parseAsBoolean.withDefault(false))
+  const { reportsAll } = useIsFeatureEnabled(['reports:all'])
+  const canCreateNotebook = IS_PLATFORM && reportsAll
 
   const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
@@ -69,9 +77,22 @@ export function useSqlEditorCreateActions() {
     [canCreateSQLSnippet, profile, project, projectRef, router, snapV2]
   )
 
+  const createNewChat = useCallback(() => {
+    if (!projectRef) return console.error('Project ref is required')
+    const newChatId = assistant.newChat()
+    void router.push(`/project/${projectRef}/sql/chats/${newChatId}`)
+  }, [assistant, projectRef, router])
+
+  const createNewNotebook = useCallback(() => {
+    void setShowNewReportModal(true)
+  }, [setShowNewReportModal])
+
   return {
+    canCreateNotebook,
     canCreateSQLSnippet,
+    createNewChat,
     createNewFolder,
+    createNewNotebook,
     createNewSnippet,
   }
 }

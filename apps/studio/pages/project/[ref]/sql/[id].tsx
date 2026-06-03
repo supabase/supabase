@@ -70,6 +70,7 @@ const SqlEditor: NextPageWithLayout = () => {
       // [Joshen] Check if snippet belongs to the current project
       if (!IS_PLATFORM || data.project_id === project.id) {
         snapV2.setSnippet(ref, data as unknown as SnippetWithContent)
+        setLastVisitedSnippet(data.id)
       } else {
         setLastVisitedSnippet(undefined)
         router.replace(`/project/${ref}/sql/new`)
@@ -77,6 +78,20 @@ const SqlEditor: NextPageWithLayout = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref, data, project])
+
+  useEffect(() => {
+    if (!router.isReady || !ref || id === 'new') return
+
+    if (snippetMissing && !snippetMissingImmediatelyAfterCreating) {
+      setLastVisitedSnippet(undefined)
+      const tabId = createTabId('sql', { id })
+      if (tabs.openTabs.includes(tabId)) {
+        tabs.removeTab(tabId)
+      }
+      router.replace(`/project/${ref}/sql/new?skip=true`)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.isReady, ref, id, snippetMissing, snippetMissingImmediatelyAfterCreating])
 
   useEffect(() => {
     if (router.query.source === 'logs') {
@@ -120,7 +135,11 @@ const SqlEditor: NextPageWithLayout = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.isReady, id])
 
-  if ((snippetMissing || invalidId) && !snippetMissingImmediatelyAfterCreating) {
+  if (snippetMissing && !snippetMissingImmediatelyAfterCreating) {
+    return null
+  }
+
+  if (invalidId) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="w-[400px]">
@@ -165,7 +184,7 @@ const SqlEditor: NextPageWithLayout = () => {
 
 SqlEditor.getLayout = (page) => (
   <DefaultLayout>
-    <EditorBaseLayout productMenu={<SQLEditorMenu />} product="Explorer">
+    <EditorBaseLayout productMenu={<SQLEditorMenu />}>
       <SQLEditorLayout>{page}</SQLEditorLayout>
     </EditorBaseLayout>
   </DefaultLayout>

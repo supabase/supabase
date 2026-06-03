@@ -56,6 +56,8 @@ export function RecentItems() {
                     href={
                       item.type === 'notebook'
                         ? `/project/${ref}/sql/notebooks/${item.metadata?.notebookId}`
+                        : item.type === 'chat'
+                          ? `/project/${ref}/sql/chats/${item.metadata?.chatId}`
                         : item.type === 'sql'
                           ? `/project/${ref}/sql/${item.metadata?.sqlId}`
                           : item.type === 'r' ||

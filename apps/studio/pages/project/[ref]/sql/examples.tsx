@@ -35,7 +35,7 @@ const SqlExamples: NextPageWithLayout = () => {
 
 SqlExamples.getLayout = (page) => (
   <DefaultLayout>
-    <EditorBaseLayout productMenu={<SQLEditorMenu />} product="Explorer">
+    <EditorBaseLayout productMenu={<SQLEditorMenu />}>
       <SQLEditorLayout>{page}</SQLEditorLayout>
     </EditorBaseLayout>
   </DefaultLayout>

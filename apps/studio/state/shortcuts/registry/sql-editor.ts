@@ -6,6 +6,7 @@ export const SQL_EDITOR_SHORTCUT_IDS = {
   SQL_EDITOR_FORMAT: 'sql-editor.format',
   SQL_EDITOR_EXPLAIN: 'sql-editor.explain',
   SQL_EDITOR_NEW_SNIPPET: 'sql-editor.new-snippet',
+  SQL_EDITOR_SAVE: 'sql-editor.save',
 }
 
 export type SqlEditorShortcutId =
@@ -40,6 +41,12 @@ export const sqlEditorRegistry: RegistryDefinations<SqlEditorShortcutId> = {
     id: SQL_EDITOR_SHORTCUT_IDS.SQL_EDITOR_NEW_SNIPPET,
     label: 'New SQL snippet',
     sequence: ['Shift+N'],
+    showInSettings: false,
+  },
+  [SQL_EDITOR_SHORTCUT_IDS.SQL_EDITOR_SAVE]: {
+    id: SQL_EDITOR_SHORTCUT_IDS.SQL_EDITOR_SAVE,
+    label: 'Save SQL snippet',
+    sequence: ['Mod+S'],
     showInSettings: false,
   },
 }

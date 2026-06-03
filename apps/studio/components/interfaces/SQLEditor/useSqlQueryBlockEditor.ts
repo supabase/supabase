@@ -6,7 +6,7 @@ import { IS_PLATFORM, useParams } from 'common'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import { sqlAiDisclaimerComment, untitledSnippetTitle } from './SQLEditor.constants'
+import { sqlAiDisclaimerComment } from './SQLEditor.constants'
 import type { IStandaloneCodeEditor, PotentialIssues } from './SQLEditor.types'
 import {
   checkAlterDatabaseConnection,
@@ -19,8 +19,8 @@ import {
   suffixWithLimit,
 } from './SQLEditor.utils'
 import { getSnippetSqlFromContent } from './sqlSnippet.utils'
+import { useSaveSqlSnippet } from './useSaveSqlSnippet'
 import {
-  isExplainQuery,
   isExplainSql,
   splitSqlStatements,
 } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
@@ -31,14 +31,12 @@ import {
 } from '@/components/interfaces/Settings/Logs/Logs.utils'
 import { buildLogQueryParams } from '@/components/interfaces/Settings/Logs/logsDateRange'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useSqlTitleGenerateMutation } from '@/data/ai/sql-title-mutation'
 import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
 import { isValidConnString } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'
 import { useExecuteLogsSqlMutation } from '@/data/logs/execute-logs-sql-mutation'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
-import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatSql } from '@/lib/formatSql'
 import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
@@ -57,12 +55,14 @@ import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from '@/stat
 
 export interface UseSqlQueryBlockEditorOptions {
   id: string
+  snippetName: string
   editorRef: React.MutableRefObject<IStandaloneCodeEditor | null>
   monacoRef: React.MutableRefObject<Monaco | null>
 }
 
 export function useSqlQueryBlockEditor({
   id,
+  snippetName,
   editorRef,
   monacoRef,
 }: UseSqlQueryBlockEditorOptions) {
@@ -74,10 +74,8 @@ export function useSqlQueryBlockEditor({
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
   const queryExecutionSourceState = useQueryExecutionSourceSnapshot()
-  const { isHipaaProjectDisallowed } = useOrgAiOptInLevel()
   const { openSidebar } = useSidebarManagerSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
-  const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
   const notebookEditorContext = useNotebookEditorContext()
 
   const [hasSelection, setHasSelection] = useState(false)
@@ -136,9 +134,7 @@ export function useSqlQueryBlockEditor({
     onSuccess(data, vars) {
       if (id) {
         snapV2.addResult(id, data.result, vars.autoLimit)
-        if (activeUtilityTab === 'explain' && !isExplainQuery(data.result)) {
-          setActiveUtilityTab('results')
-        } else if (
+        if (
           notebookEditorContext &&
           getNotebookBlockUtilityTab(notebookEditorContext.chartConfig) === 'chart'
         ) {
@@ -185,13 +181,11 @@ export function useSqlQueryBlockEditor({
     onSuccess(data) {
       if (id) {
         snapV2.addExplainResult(id, data.result)
-        setActiveUtilityTab('explain')
       }
     },
     onError(error) {
       if (id) {
         snapV2.addExplainResultError(id, error)
-        setActiveUtilityTab('explain')
       }
     },
   })
@@ -217,19 +211,6 @@ export function useSqlQueryBlockEditor({
     },
   })
 
-  const setAiTitle = useCallback(
-    async (snippetId: string, sql: string) => {
-      try {
-        const { title: name } = await generateSqlTitle({ sql })
-        snapV2.updateSnippet({ id: snippetId, snippet: { name } })
-        snapV2.addNeedsSaving(snippetId)
-      } catch {
-        // background title generation — no user feedback needed
-      }
-    },
-    [generateSqlTitle, snapV2]
-  )
-
   const prettifyQuery = useCallback(async () => {
     const state = getSqlEditorV2StateSnapshot()
     const snippet = state.snippets[id]
@@ -249,7 +230,7 @@ export function useSqlQueryBlockEditor({
         editorRef.current.executeEdits('apply-prettify-edit', [
           { text: formattedSql, range: editorModel.getFullModelRange() },
         ])
-        snapV2.setSql({ id, sql: formattedSql })
+        snapV2.setSql({ id, sql: formattedSql, skipSave: true })
       }
     }
   }, [id, project, snapV2, editorRef])
@@ -268,6 +249,12 @@ export function useSqlQueryBlockEditor({
 
     return selectedValue || editor?.getValue() || snippetSql
   }, [id, editorRef])
+
+  const { saveQuery, isSaving, canSave } = useSaveSqlSnippet({
+    id,
+    snippetName,
+    getEditorSql,
+  })
 
   const executeQuery = useCallback(
     async (force: boolean = false, sqlOverride?: SafeSqlFragment) => {
@@ -346,14 +333,6 @@ export function useSqlQueryBlockEditor({
         return
       }
 
-      if (
-        !isHipaaProjectDisallowed &&
-        snippet?.snippet.name.startsWith(untitledSnippetTitle) &&
-        IS_PLATFORM
-      ) {
-        setAiTitle(id, sql)
-      }
-
       if (lineHighlights.length > 0 && editor) {
         editor.deltaDecorations(lineHighlights, [])
         setLineHighlights([])
@@ -393,11 +372,9 @@ export function useSqlQueryBlockEditor({
       isExecuting,
       isLogsExecuting,
       project,
-      isHipaaProjectDisallowed,
       executeAsync,
       executeLogsAsync,
       getImpersonatedRoleState,
-      setAiTitle,
       databaseSelectorState.selectedDatabaseId,
       databases,
       eventTriggers,
@@ -448,7 +425,6 @@ export function useSqlQueryBlockEditor({
           message:
             'EXPLAIN only works on a single SQL statement. Please select just one query to analyze.',
         })
-        setActiveUtilityTab('explain')
         return
       }
 
@@ -533,6 +509,9 @@ export function useSqlQueryBlockEditor({
     executeQuery,
     executeQueryFromButton,
     executeExplainQuery,
+    saveQuery,
+    isSaving,
+    canSave,
     buildDebugPrompt,
     onDebug,
     limit,

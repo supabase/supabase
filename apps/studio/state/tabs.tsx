@@ -9,18 +9,22 @@ import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 
 export const editorEntityTypes = {
   table: ['r', 'v', 'm', 'f', 'p'],
-  sql: ['sql', 'notebook'],
+  sql: ['sql', 'notebook', 'chat'],
 }
 
-export type TabType = ENTITY_TYPE | 'sql' | 'notebook'
+export type TabType = ENTITY_TYPE | 'sql' | 'notebook' | 'chat'
 
-export const SQL_EDITOR_TAB_TYPES: TabType[] = ['sql', 'notebook']
+export const SQL_EDITOR_TAB_TYPES: TabType[] = ['sql', 'notebook', 'chat']
 
 export function isSqlEditorTab(tabOrId: Tab | string, tabsMap?: Record<string, Tab>) {
   if (typeof tabOrId === 'string') {
     const tab = tabsMap?.[tabOrId]
     if (tab) return SQL_EDITOR_TAB_TYPES.includes(tab.type)
-    return tabOrId.startsWith('sql-') || tabOrId.startsWith('notebook-')
+    return (
+      tabOrId.startsWith('sql-') ||
+      tabOrId.startsWith('notebook-') ||
+      tabOrId.startsWith('chat-')
+    )
   }
 
   return SQL_EDITOR_TAB_TYPES.includes(tabOrId.type)
@@ -34,6 +38,7 @@ type CreateTabIdParams = {
   p: { id: number }
   sql: { id: string }
   notebook: { id: string }
+  chat: { id: string }
   schema: { schema: string }
   view: never
   function: never
@@ -50,6 +55,7 @@ export interface Tab {
     tableId?: number
     sqlId?: string
     notebookId?: string
+    chatId?: string
     scrollTop?: number
   }
   isPreview?: boolean
@@ -70,6 +76,7 @@ export interface RecentItem {
     tableId?: number
     sqlId?: string
     notebookId?: string
+    chatId?: string
   }
 }
 
@@ -330,6 +337,9 @@ export function createTabsState(projectRef: string) {
         case 'notebook':
           router.push(`/project/${router.query.ref}/sql/notebooks/${tab.metadata?.notebookId}`)
           break
+        case 'chat':
+          router.push(`/project/${router.query.ref}/sql/chats/${tab.metadata?.chatId}`)
+          break
         case 'r':
         case 'v':
         case 'm':
@@ -401,6 +411,7 @@ export function createTabsState(projectRef: string) {
           switch (tabBeingClosed?.type) {
             case 'sql':
             case 'notebook':
+            case 'chat':
               router.push(`/project/${router.query.ref}/sql`)
               break
             case 'r':
@@ -518,6 +529,8 @@ export function createTabId<T extends TabType>(type: T, params: CreateTabIdParam
       return `sql-${(params as CreateTabIdParams['sql']).id}`
     case 'notebook':
       return `notebook-${(params as CreateTabIdParams['notebook']).id}`
+    case 'chat':
+      return `chat-${(params as CreateTabIdParams['chat']).id}`
     default:
       return ''
   }

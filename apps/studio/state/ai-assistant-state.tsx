@@ -40,6 +40,7 @@ export type AiAssistantContext = {
 }
 
 type AiAssistantData = {
+  isInitialized: boolean
   initialInput: string
   sqlSnippets?: SqlSnippet[]
   suggestions?: SuggestionsType
@@ -59,6 +60,7 @@ type StoredAiAssistantState = {
 }
 
 const INITIAL_AI_ASSISTANT: AiAssistantData = {
+  isInitialized: false,
   initialInput: '',
   sqlSnippets: undefined,
   suggestions: undefined,
@@ -322,6 +324,9 @@ export const createAiAssistantState = (): AiAssistantState => {
 
     resetAiAssistantPanel: () => {
       Object.assign(state, INITIAL_AI_ASSISTANT)
+      state.chatInstances = {}
+      state.pendingSpanIds = {}
+      state.messageSpanIds = {}
     },
 
     setModel: (model: AssistantModel) => {
@@ -391,10 +396,18 @@ export const createAiAssistantState = (): AiAssistantState => {
     deleteChat: (id: string) => {
       const { [id]: _, ...remainingChats } = state.chats
       state.chats = remainingChats
+      delete state.chatInstances[id]
 
       if (id === state.activeChatId) {
         const remainingChatIds = Object.keys(remainingChats)
-        state.activeChatId = remainingChatIds.length > 0 ? remainingChatIds[0] : undefined
+        state.activeChatId =
+          remainingChatIds.length > 0
+            ? remainingChatIds.sort(
+                (a, b) =>
+                  (state.chats[b].updatedAt?.getTime() || 0) -
+                  (state.chats[a].updatedAt?.getTime() || 0)
+              )[0]
+            : undefined
 
         if (state.activeChatId) {
           const chat = state.chats[state.activeChatId]
@@ -405,6 +418,8 @@ export const createAiAssistantState = (): AiAssistantState => {
           }
         }
       }
+
+      return state.activeChatId
     },
 
     renameChat: (id: string, name: string) => {
@@ -546,7 +561,7 @@ export type AiAssistantState = AiAssistantData & {
     >
   ) => string
   selectChat: (id: string) => void
-  deleteChat: (id: string) => void
+  deleteChat: (id: string) => string | undefined
   renameChat: (id: string, name: string) => void
   clearMessages: () => void
   deleteMessagesAfter: (id: string, options?: { includeSelf?: boolean }) => void
@@ -570,10 +585,9 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
     let isMounted = true
 
     async function loadAndInitializeState() {
+      state.resetAiAssistantPanel()
+
       if (!project?.ref || typeof window === 'undefined') {
-        if (project?.ref === undefined) {
-          state.resetAiAssistantPanel()
-        }
         return // Don't load if no projectRef or not in browser
       }
 
@@ -596,6 +610,7 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
 
       // 4. Ensure an active chat exists and handle URL overrides
       ensureActiveChatOrInitialize(state)
+      state.isInitialized = true
     }
 
     loadAndInitializeState()
@@ -613,6 +628,8 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
 
       const unsubscribe = subscribe(state, () => {
         const snap = snapshot(state)
+        if (!snap.isInitialized) return
+
         // Prepare state for IndexedDB
         const stateToSave: StoredAiAssistantState = {
           projectRef: project?.ref,

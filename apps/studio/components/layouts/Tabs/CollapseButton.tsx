@@ -4,7 +4,15 @@ import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { useAppStateSnapshot } from '@/state/app-state'
 
-export function CollapseButton({ hideTabs }: { hideTabs: boolean }) {
+export function CollapseButton({
+  hideTabs,
+  hideBottomBorder = false,
+  heightClassName,
+}: {
+  hideTabs: boolean
+  hideBottomBorder?: boolean
+  heightClassName?: string
+}) {
   const { showSidebar, setShowSidebar, mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
   const isMobile = useBreakpoint('md')
 
@@ -21,8 +29,9 @@ export function CollapseButton({ hideTabs }: { hideTabs: boolean }) {
       <TooltipTrigger asChild>
         <button
           className={cn(
-            'hidden md:flex items-center justify-center w-10 h-(--header-height) hover:bg-surface-100 shrink-0',
-            !hideTabs && 'border-b border-b-default'
+            'hidden md:flex shrink-0 items-center justify-center w-10 hover:bg-surface-100',
+            heightClassName ?? 'h-(--header-height)',
+            !hideTabs && !hideBottomBorder && 'border-b border-b-default'
           )}
           onClick={handleToggle}
         >

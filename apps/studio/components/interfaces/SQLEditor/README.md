@@ -45,13 +45,14 @@ Quick run-through of the different building blocks that make up the SQL Editor, 
 ### Writing a snippet
 
 - On `/editor/sql/new`:
-  - The first character input will [update the Valtio store](https://github.com/supabase/supabase/blob/master/apps/studio/components/interfaces/SQLEditor/MonacoEditor.tsx#L192) with a snippet skeleton via `snapV2.addSnippet` and user will be redirected to `/editor/sql/[id]`, using the `id` from the skeleton
-  - Note that `snapV2.addSnippet` only handles adding snippets to the store and does not queue the snippet for saving
-  - Subsequent character inputs will follow below as per `/editor/sql/[id]`
+  - Typing updates the editor locally only — no snippet is added to the Valtio store or sidebar until Save
+  - Clicking **Save** creates the snippet skeleton, persists it, and navigates to `/editor/sql/[id]`
 
 - On `/editor/sql/[id]`:
-  - [`snapV2.setSql`](https://github.com/supabase/supabase/blob/master/apps/studio/components/interfaces/SQLEditor/MonacoEditor.tsx#L207) will be called based on the debounced value of the code editor, in which we'll then queue the snippet for [saving](https://github.com/supabase/supabase/blob/master/apps/studio/state/sql-editor-v2.ts#L477) via `upsertSnippet`.
-  - Note that we do invalidate some React Queries (snippet count, snippets, and folders) after saving via [`upsertSnippet`](https://github.com/supabase/supabase/blob/master/apps/studio/state/sql-editor-v2.ts#L412), but the invalidation is only [triggered](https://github.com/supabase/supabase/blob/master/apps/studio/components/interfaces/SQLEditor/MonacoEditor.tsx#L209) if it's a new snippet that's not saved in the DB yet
+  - Edits are kept in the Monaco editor locally and are **not** auto-saved
+  - Clicking **Save** (or pressing Cmd+S) calls [`saveSqlSnippet`](https://github.com/supabase/supabase/blob/master/apps/studio/components/interfaces/SQLEditor/saveSqlSnippet.utils.ts), which syncs the editor content to the Valtio store and queues the snippet for [saving](https://github.com/supabase/supabase/blob/master/apps/studio/state/sql-editor-v2.ts#L477) via `upsertSnippet`
+  - If the snippet name is still "Untitled query", saving also triggers a non-blocking request to rename the snippet via AI
+  - Note that we do invalidate some React Queries (snippet count, snippets, and folders) after saving via [`upsertSnippet`](https://github.com/supabase/supabase/blob/master/apps/studio/state/sql-editor-v2.ts#L412), but the invalidation is only triggered if it's a new snippet that's not saved in the DB yet
 
 ### Running a snippet
 
@@ -60,7 +61,7 @@ Quick run-through of the different building blocks that make up the SQL Editor, 
   - [Check for update statements without where clause](https://github.com/supabase/supabase/blob/master/apps/studio/components/interfaces/SQLEditor/SQLEditor.tsx#L300): Will open a confirmation modal before running the query
   - [Append a preset limit to the query if it's a select](https://github.com/supabase/supabase/blob/master/apps/studio/components/interfaces/SQLEditor/SQLEditor.tsx#L333): To prevent accidentally running an expensive query on the database. Users can explicitly opt out of this to set "No limit"
 
-- If the snippet's name is "Untitled query", we'll also trigger a non-blocking request to [rename the snippet via AI](https://github.com/supabase/supabase/blob/master/apps/studio/components/interfaces/SQLEditor/SQLEditor.tsx#L317). Snippet name will be updated whenever the request completes.
+- Running a query does **not** save or rename the snippet
 
 ### Renaming, Moving, Deleting, Sharing snippets
 

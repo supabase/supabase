@@ -21,13 +21,18 @@ const SQLEditorIndexPage: NextPageWithLayout = () => {
     if (isHistoryLoaded) {
       // Handle redirect to last opened snippet tab, or last snippet tab
       const lastOpenedTab = history.sql
+      const activeTab = store.activeTab ? store.tabsMap[store.activeTab] : undefined
       const lastTabId = store.openTabs.find((id) => isSqlEditorTab(id, store.tabsMap))
-      if (lastOpenedTab !== undefined) {
+      if (activeTab?.type === 'chat' && activeTab.metadata?.chatId) {
+        router.replace(`/project/${projectRef}/sql/chats/${activeTab.metadata.chatId}`)
+      } else if (lastOpenedTab !== undefined) {
         router.replace(`/project/${projectRef}/sql/${history.sql}`)
       } else if (lastTabId) {
         const lastTab = store.tabsMap[lastTabId]
         if (lastTab?.type === 'notebook' && lastTab.metadata?.notebookId) {
           router.replace(`/project/${projectRef}/sql/notebooks/${lastTab.metadata.notebookId}`)
+        } else if (lastTab?.type === 'chat' && lastTab.metadata?.chatId) {
+          router.replace(`/project/${projectRef}/sql/chats/${lastTab.metadata.chatId}`)
         } else if (lastTab?.metadata?.sqlId) {
           router.replace(`/project/${projectRef}/sql/${lastTab.metadata.sqlId}`)
         }
@@ -43,7 +48,7 @@ const SQLEditorIndexPage: NextPageWithLayout = () => {
 
 SQLEditorIndexPage.getLayout = (page) => (
   <DefaultLayout>
-    <EditorBaseLayout productMenu={<SQLEditorMenu />} product="Explorer">
+    <EditorBaseLayout productMenu={<SQLEditorMenu />}>
       <SQLEditorLayout>{page}</SQLEditorLayout>
     </EditorBaseLayout>
   </DefaultLayout>

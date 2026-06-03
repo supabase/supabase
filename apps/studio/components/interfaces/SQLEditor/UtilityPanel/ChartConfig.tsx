@@ -1,307 +1,283 @@
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import dayjs from 'dayjs'
-import { ArrowUpDown, X } from 'lucide-react'
-import Link from 'next/link'
+import { ArrowUpDown, BarChart2 } from 'lucide-react'
 import { useMemo } from 'react'
+import type { ChartConfig as RechartsChartConfig } from 'ui'
+import { Checkbox, Label, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger } from 'ui'
 import {
-  Badge,
-  Button,
-  Checkbox,
-  Label,
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
-import { Admonition } from 'ui-patterns'
+  Chart,
+  ChartBar,
+  ChartCard,
+  ChartContent,
+  ChartEmptyState,
+  ChartLine,
+  ChartLoadingState,
+} from 'ui-patterns/Chart'
 
+import { SqlEditorAwaitingResultsEmptyState } from './SqlEditorAwaitingResultsEmptyState'
+import {
+  getCumulativeSqlChartRows,
+  getSqlEditorDateTimeFormat,
+  getSqlEditorResultKeys,
+  getSqlEditorXKeyFormat,
+  getSqlEditorYAxisKeys,
+  shouldShowSqlChartXLabel,
+  sqlRowsToChartTicks,
+  type SqlChartTick,
+  type SqlEditorChartConfig,
+} from './sqlEditorChart.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import BarChart from '@/components/ui/Charts/BarChart'
-import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
-type Results = { rows: readonly any[] }
+export type { SqlEditorChartConfig as ChartConfig }
 
-export type ChartConfig = {
-  view?: 'table' | 'chart'
-  type: 'bar' | 'line'
-  cumulative: boolean
-  xKey: string
-  yKey: string
-  showLabels?: boolean
-  showGrid?: boolean
-  logScale?: boolean
-}
-
-const getCumulativeResults = (results: Results, config: ChartConfig) => {
-  if (!results?.rows?.length) {
-    return []
-  }
-
-  const cumulativeResults = results.rows.reduce((acc, row) => {
-    const prev = acc[acc.length - 1] || {}
-    const next = {
-      ...row,
-      [config.yKey]: (prev[config.yKey] || 0) + row[config.yKey],
-    }
-    return [...acc, next]
-  }, [])
-  return cumulativeResults
-}
-const VALID_RESULT_KEY_TYPES = ['number', 'string', 'date']
+type Results = { rows: readonly Record<string, unknown>[] }
 
 type ChartConfigProps = {
-  results: Results
-  config: ChartConfig
-  onConfigChange: (config: ChartConfig) => void
+  results?: Results
+  config: SqlEditorChartConfig
+  isLoading?: boolean
+}
+
+type ChartSettingsProps = ChartConfigProps & {
+  onConfigChange: (config: SqlEditorChartConfig) => void
 }
 
 export const ChartConfig = ({
   results = { rows: [] },
   config,
-  onConfigChange,
+  isLoading = false,
 }: ChartConfigProps) => {
-  const { ref } = useParams()
+  const resultKeys = useMemo(() => getSqlEditorResultKeys(results), [results])
 
-  const [acknowledged, setAcknowledged] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.SQL_EDITOR_SQL_BLOCK_ACKNOWLEDGED(ref as string),
-    false
+  const hasConfig = Boolean(config.xKey && config.yKey)
+
+  const rowsToPlot = useMemo(() => {
+    const baseRows = config.cumulative ? getCumulativeSqlChartRows(results, config) : results.rows
+    if (!hasConfig || !baseRows.length) return []
+
+    const xKeyFormat = getSqlEditorXKeyFormat(baseRows[0]?.[config.xKey])
+    return sqlRowsToChartTicks(baseRows, config.xKey, config.yKey, xKeyFormat)
+  }, [config, hasConfig, results])
+
+  const xKeyFormat = useMemo(() => {
+    if (!hasConfig || !rowsToPlot.length) return 'string' as const
+    return getSqlEditorXKeyFormat(results.rows[0]?.[config.xKey])
+  }, [config.xKey, hasConfig, results.rows, rowsToPlot.length])
+
+  const rechartsConfig = useMemo<RechartsChartConfig>(
+    () => ({
+      [config.yKey]: {
+        label: config.yKey,
+        color: 'hsl(var(--brand-default))',
+      },
+    }),
+    [config.yKey]
   )
 
-  // If a result key is not valid, it will be filtered out
-  const resultKeys = useMemo(() => {
-    return Object.keys(results.rows[0] || {}).filter((key) => {
-      const type = typeof results.rows[0][key]
-      return VALID_RESULT_KEY_TYPES.includes(type)
-    })
-  }, [results])
+  const dateTimeFormat = getSqlEditorDateTimeFormat(xKeyFormat)
+  const showXLabelInTooltip = shouldShowSqlChartXLabel(xKeyFormat)
 
-  // Only allow Y-axis keys that are numbers
-  const yAxisKeys = useMemo(() => {
-    if (!results.rows[0]) return []
-    return Object.keys(results.rows[0]).filter((key) => {
-      const value = results.rows[0][key]
-      return typeof value === 'number' || !isNaN(Number(value))
-    })
-  }, [results])
-
-  const hasConfig = config.xKey && config.yKey
-
-  const canFlip = useMemo(() => {
-    if (!hasConfig) return false
-    const xKeyType = typeof results.rows[0]?.[config.xKey]
-    const yKeyType = typeof results.rows[0]?.[config.yKey]
-    return xKeyType === 'number' && yKeyType === 'number'
-  }, [hasConfig, results.rows, config.xKey, config.yKey])
-
-  // Compute cumulative results only if necessary
-  const cumulativeResults = useMemo(() => getCumulativeResults(results, config), [results, config])
-
-  const resultToRender = config.cumulative ? cumulativeResults : results.rows
-
-  const getDateFormat = (key: any) => {
-    const value = resultToRender?.[0]?.[key] || ''
-    if (typeof value === 'number') return 'number'
-    if (dayjs(value).isValid()) return 'date'
-    return 'string'
-  }
-
-  const xKeyDateFormat = getDateFormat(config.xKey)
-
-  const onFlip = () => {
-    const newY = config.xKey
-    const newX = config.yKey
-    onConfigChange({ ...config, xKey: newX, yKey: newY })
+  const yAxisProps = {
+    tickFormatter: (value: number) => value.toLocaleString(),
+    width: config.showLabels ? 72 : 0,
   }
 
   if (!resultKeys.length) {
     return (
-      <div className="flex h-full min-h-0 w-full flex-1 flex-col p-4">
-        <NoDataPlaceholder
-          size="fill"
-          isFullHeight
-          description="Execute a query and configure the chart options."
-        />
-      </div>
+      <Chart isLoading={isLoading} className="h-full min-h-0">
+        <ChartCard asChild>
+          <ChartContent
+            className="flex h-full min-h-0 flex-1 flex-col"
+            isEmpty
+            emptyState={<SqlEditorAwaitingResultsEmptyState />}
+            loadingState={<ChartLoadingState />}
+          />
+        </ChartCard>
+      </Chart>
     )
   }
 
-  const showBarChart = config.type === 'bar' || config.type === 'line'
+  return (
+    <Chart isLoading={isLoading} className="h-full min-h-0">
+      <ChartCard asChild>
+        <ChartContent
+          className="flex h-full min-h-0 flex-1 flex-col"
+          isEmpty={!hasConfig || rowsToPlot.length === 0}
+          emptyState={
+            !hasConfig ? (
+              <ChartEmptyState
+                icon={<BarChart2 size={16} />}
+                title="Configure your chart"
+                description="Select your X and Y axis in chart settings."
+              />
+            ) : (
+              <ChartEmptyState
+                icon={<BarChart2 size={16} />}
+                title="No data to show"
+                description="The query returned no rows to chart."
+              />
+            )
+          }
+          loadingState={<ChartLoadingState />}
+        >
+          <div className="min-h-[160px] flex-1">
+            {config.type === 'line' ? (
+              <ChartLine
+                data={rowsToPlot}
+                dataKey={config.yKey}
+                config={rechartsConfig}
+                showGrid={config.showGrid}
+                showYAxis={config.showLabels}
+                isFullHeight
+                DateTimeFormat={dateTimeFormat}
+                YAxisProps={yAxisProps}
+                tooltipDetails={
+                  showXLabelInTooltip
+                    ? (datum: SqlChartTick) => (
+                        <span className="text-foreground-lighter text-xs">{datum._xLabel}</span>
+                      )
+                    : undefined
+                }
+              />
+            ) : (
+              <ChartBar
+                data={rowsToPlot}
+                dataKey={config.yKey}
+                config={rechartsConfig}
+                showGrid={config.showGrid}
+                showYAxis={config.showLabels}
+                isFullHeight
+                DateTimeFormat={dateTimeFormat}
+                YAxisProps={yAxisProps}
+              />
+            )}
+          </div>
+        </ChartContent>
+      </ChartCard>
+    </Chart>
+  )
+}
+
+export const ChartSettings = ({
+  results = { rows: [] },
+  config,
+  onConfigChange,
+}: ChartSettingsProps) => {
+  const resultKeys = useMemo(() => getSqlEditorResultKeys(results), [results])
+  const yAxisKeys = useMemo(() => getSqlEditorYAxisKeys(results), [results])
+
+  const canFlip = useMemo(() => {
+    if (!config.xKey || !config.yKey) return false
+    const xKeyType = typeof results.rows[0]?.[config.xKey]
+    const yKeyType = typeof results.rows[0]?.[config.yKey]
+    return xKeyType === 'number' && yKeyType === 'number'
+  }, [results.rows, config.xKey, config.yKey])
+
+  const onFlip = () => {
+    onConfigChange({ ...config, xKey: config.yKey, yKey: config.xKey })
+  }
+
+  if (!resultKeys.length) {
+    return <p className="text-sm text-foreground-light">Execute a query to configure a chart.</p>
+  }
 
   return (
-    <ResizablePanelGroup orientation="horizontal" className="h-full min-h-0 flex-1">
-      <ResizablePanel className="flex h-full min-h-0 w-full flex-col p-4" defaultSize="75">
-        {!hasConfig ? (
-          <NoDataPlaceholder
-            size="fill"
-            isFullHeight
-            title="Configure your chart"
-            description="Select your X and Y axis in the chart options panel"
-          />
-        ) : showBarChart ? (
-          <BarChart
-            showLegend
-            size="fill"
-            className="min-h-0 flex-1"
-            xAxisIsDate={xKeyDateFormat === 'date'}
-            data={resultToRender}
-            xAxisKey={config.xKey}
-            yAxisKey={config.yKey}
-            showGrid={config.showGrid}
-            XAxisProps={{
-              angle: 0,
-              interval: 'preserveStart',
-              hide: !config.showLabels,
-              tickFormatter: (idx: string) => {
-                const value = resultToRender[+idx][config.xKey]
-                if (xKeyDateFormat === 'date') {
-                  return dayjs(value).format('MMM D YYYY HH:mm')
-                }
-                return value
+    <form className="grid gap-3">
+      <div className="flex min-h-7 items-center justify-between gap-2">
+        <h2 className="text-sm text-foreground-lighter">Chart options</h2>
+        {config.xKey && config.yKey && (
+          <ButtonTooltip
+            type="text"
+            size="tiny"
+            onClick={onFlip}
+            disabled={!canFlip}
+            icon={<ArrowUpDown size="15" className="text-foreground-lighter" />}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                className: 'w-64 text-center',
+                text: canFlip
+                  ? 'Swap X and Y axis'
+                  : 'Unable to swap X and Y axis - both axes need to numerical values',
               },
             }}
-            YAxisProps={{
-              tickFormatter: (value: number) => value.toLocaleString(),
-              hide: !config.showLabels,
-              domain: [0, 'dataMax'],
-            }}
-          />
-        ) : null}
-      </ResizablePanel>
-      <ResizableHandle withHandle />
-      <ResizablePanel
-        defaultSize="25"
-        minSize="15"
-        className="px-3 py-3 space-y-4 overflow-y-auto!"
-      >
-        <div className="flex justify-between items-center h-5">
-          <h2 className="text-sm text-foreground-lighter">Chart options</h2>
-          {config.xKey && config.yKey && (
-            <ButtonTooltip
-              type="text"
-              size="tiny"
-              onClick={onFlip}
-              disabled={!canFlip}
-              icon={<ArrowUpDown size="15" className="text-foreground-lighter" />}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  className: 'w-64 text-center',
-                  text: canFlip
-                    ? 'Swap X and Y axis'
-                    : 'Unable to swap X and Y axis - both axes need to numerical values',
-                },
-              }}
-            >
-              Flip
-            </ButtonTooltip>
-          )}
-        </div>
-
-        {!acknowledged && (
-          <Admonition showIcon={false} type="tip" className="p-2 relative group">
-            <Tooltip>
-              <TooltipTrigger
-                onClick={() => setAcknowledged(true)}
-                className="absolute top-3 right-3 opacity-30 group-hover:opacity-100 transition-opacity"
-              >
-                <X size={14} className="text-foreground-light" />
-              </TooltipTrigger>
-              <TooltipContent side="bottom">Dismiss</TooltipContent>
-            </Tooltip>
-            <div className="flex items-center gap-x-2">
-              <Badge variant="success">New</Badge>
-              <p className="text-xs">Add this chart to custom reports</p>
-            </div>
-            <p className="text-xs text-foreground-light mt-1!">
-              SQL snippets can now be added and saved to your custom reports. Try it out now!
-            </p>
-            <Button asChild size="tiny" type="default" className="mt-1">
-              <Link href={`/project/${ref}/reports`}>Head to Reports</Link>
-            </Button>
-          </Admonition>
+          >
+            Flip
+          </ButtonTooltip>
         )}
+      </div>
 
-        <div>
-          <Label className="text-xs text-foreground-light">X Axis</Label>
-          <Select
-            value={config.xKey}
-            onValueChange={(value) => {
-              onConfigChange({ ...config, xKey: value })
-            }}
-          >
-            <SelectTrigger>{config.xKey || 'Select X Axis'}</SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                {resultKeys.map((key) => (
-                  <SelectItem value={key} key={key}>
-                    {key}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
+      <div>
+        <Label className="text-xs text-foreground-light">X Axis</Label>
+        <Select
+          value={config.xKey}
+          onValueChange={(value) => {
+            onConfigChange({ ...config, xKey: value })
+          }}
+        >
+          <SelectTrigger className="text-left">{config.xKey || 'Select X Axis'}</SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              {resultKeys.map((key) => (
+                <SelectItem value={key} key={key}>
+                  {key}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
 
-        <div>
-          <Label className="text-xs text-foreground-light">Y Axis</Label>
-          <Select
-            value={config.yKey}
-            onValueChange={(value) => {
-              onConfigChange({ ...config, yKey: value })
-            }}
-          >
-            <SelectTrigger>{config.yKey || 'Select Y Axis'}</SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                {yAxisKeys.map((key) => (
-                  <SelectItem value={key} key={key}>
-                    {key}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="*:flex *:gap-2 *:items-center grid gap-2 *:text-foreground-light *:p-1.5 *:pl-0">
-          <Label className="" htmlFor="cumulative">
-            <Checkbox
-              id="cumulative"
-              name="cumulative"
-              checked={config.cumulative}
-              onClick={() => onConfigChange({ ...config, cumulative: !config.cumulative })}
-            />
-            Cumulative
-          </Label>
+      <div>
+        <Label className="text-xs text-foreground-light">Y Axis</Label>
+        <Select
+          value={config.yKey}
+          onValueChange={(value) => {
+            onConfigChange({ ...config, yKey: value })
+          }}
+        >
+          <SelectTrigger className="text-left">{config.yKey || 'Select Y Axis'}</SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              {yAxisKeys.map((key) => (
+                <SelectItem value={key} key={key}>
+                  {key}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
 
-          <Label htmlFor="showLabels">
-            <Checkbox
-              id="showLabels"
-              name="showLabels"
-              checked={config.showLabels}
-              onClick={() => onConfigChange({ ...config, showLabels: !config.showLabels })}
-            />
-            Show labels
-          </Label>
+      <div className="*:flex *:items-center *:gap-2 grid gap-2 *:p-1.5 *:pl-0 *:text-foreground-light">
+        <Label htmlFor="cumulative">
+          <Checkbox
+            id="cumulative"
+            name="cumulative"
+            checked={config.cumulative}
+            onClick={() => onConfigChange({ ...config, cumulative: !config.cumulative })}
+          />
+          Cumulative
+        </Label>
 
-          <Label htmlFor="showGrid">
-            <Checkbox
-              id="showGrid"
-              name="showGrid"
-              checked={config.showGrid}
-              onClick={() => onConfigChange({ ...config, showGrid: !config.showGrid })}
-            />
-            Show grid
-          </Label>
-        </div>
-      </ResizablePanel>
-    </ResizablePanelGroup>
+        <Label htmlFor="showLabels">
+          <Checkbox
+            id="showLabels"
+            name="showLabels"
+            checked={config.showLabels}
+            onClick={() => onConfigChange({ ...config, showLabels: !config.showLabels })}
+          />
+          Show labels
+        </Label>
+
+        <Label htmlFor="showGrid">
+          <Checkbox
+            id="showGrid"
+            name="showGrid"
+            checked={config.showGrid}
+            onClick={() => onConfigChange({ ...config, showGrid: !config.showGrid })}
+          />
+          Show grid
+        </Label>
+      </div>
+    </form>
   )
 }

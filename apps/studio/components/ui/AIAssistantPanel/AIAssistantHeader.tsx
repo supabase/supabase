@@ -24,6 +24,10 @@ interface AIAssistantHeaderProps {
   updatedOptInSinceMCP: boolean
   isHipaaProjectDisallowed: boolean
   aiOptInLevel: 'disabled' | 'schema' | 'full' | string | undefined
+  showCloseButton?: boolean
+  onChatSelected?: (chatId: string) => void
+  onChatCreated?: (chatId: string) => void
+  onChatDeleted?: (deletedChatId: string, nextChatId?: string) => void
 }
 
 export const AIAssistantHeader = ({
@@ -34,6 +38,10 @@ export const AIAssistantHeader = ({
   updatedOptInSinceMCP,
   isHipaaProjectDisallowed,
   aiOptInLevel,
+  showCloseButton = true,
+  onChatSelected,
+  onChatCreated,
+  onChatDeleted,
 }: AIAssistantHeaderProps) => {
   const snap = useAiAssistantStateSnapshot()
   const [isOptInModalOpen, setIsOptInModalOpen] = useState(false)
@@ -57,7 +65,11 @@ export const AIAssistantHeader = ({
               <path d="M16 3.549L7.12 20.600" />
             </svg>
           </span>
-          <AIAssistantChatSelector />
+          <AIAssistantChatSelector
+            onChatSelected={onChatSelected}
+            onChatCreated={onChatCreated}
+            onChatDeleted={onChatDeleted}
+          />
         </div>
         <div className="flex items-center gap-x-4">
           <div className="flex items-center">
@@ -100,13 +112,15 @@ export const AIAssistantHeader = ({
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <ButtonTooltip
-              type="text"
-              className="w-7 h-7"
-              onClick={onCloseAssistant}
-              icon={<X strokeWidth={1.5} />}
-              tooltip={{ content: { side: 'bottom', text: 'Close assistant' } }}
-            />
+            {showCloseButton && (
+              <ButtonTooltip
+                type="text"
+                className="w-7 h-7"
+                onClick={onCloseAssistant}
+                icon={<X strokeWidth={1.5} />}
+                tooltip={{ content: { side: 'bottom', text: 'Close assistant' } }}
+              />
+            )}
           </div>
         </div>
       </div>

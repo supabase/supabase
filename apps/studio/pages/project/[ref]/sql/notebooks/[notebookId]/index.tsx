@@ -80,7 +80,7 @@ const NotebookPage: NextPageWithLayout = () => {
 
 NotebookPage.getLayout = (page) => (
   <DefaultLayout>
-    <EditorBaseLayout productMenu={<SQLEditorMenu />} product="Explorer">
+    <EditorBaseLayout productMenu={<SQLEditorMenu />}>
       <SQLEditorLayout>{page}</SQLEditorLayout>
     </EditorBaseLayout>
   </DefaultLayout>

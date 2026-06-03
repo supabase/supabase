@@ -21,9 +21,15 @@ import { ButtonTooltip } from '../ButtonTooltip'
 export function MessageActions({
   children,
   alwaysShow = false,
-}: PropsWithChildren<{ alwaysShow?: boolean }>) {
+  className,
+}: PropsWithChildren<{ alwaysShow?: boolean; className?: string }>) {
   return (
-    <div className="flex items-center gap-4 mt-2 mb-1">
+    <div
+      className={cn(
+        'assistant-message-actions flex w-full items-center gap-4 mt-2 mb-1',
+        className
+      )}
+    >
       <span className="h-0.5 w-5 bg-muted" />
       <div className={cn('group-hover:opacity-100 transition-opacity', !alwaysShow && 'opacity-0')}>
         {children}

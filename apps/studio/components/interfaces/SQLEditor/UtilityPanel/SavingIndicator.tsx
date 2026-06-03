@@ -37,47 +37,51 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
 
   const retry = () => snapV2.addNeedsSaving(id)
 
+  const isSaving = savingState === 'UPDATING'
+  const isSaveFailed = savingState === 'UPDATING_FAILED'
+  const hasIndicator = showSavedText || isSaving || isSaveFailed
+
+  if (!hasIndicator) return null
+
   return (
-    <>
-      <div className="mx-2 flex items-center gap-2">
-        {isSnippetOwner && savingState === 'UPDATING_FAILED' && (
-          <Button
-            type="text"
-            size="tiny"
-            icon={<RefreshCcw className="text-gray-1100" strokeWidth={2} />}
-            onClick={retry}
-          >
-            Retry
-          </Button>
-        )}
-        {showSavedText ? (
+    <div className="flex items-center gap-2">
+      {isSnippetOwner && isSaveFailed && (
+        <Button
+          type="text"
+          size="tiny"
+          icon={<RefreshCcw className="text-gray-1100" strokeWidth={2} />}
+          onClick={retry}
+        >
+          Retry
+        </Button>
+      )}
+      {showSavedText ? (
+        <Tooltip>
+          <TooltipTrigger>
+            <Check className="text-brand" size={14} strokeWidth={3} />
+          </TooltipTrigger>
+          <TooltipContent side="bottom">All changes saved</TooltipContent>
+        </Tooltip>
+      ) : isSaving ? (
+        <Tooltip>
+          <TooltipTrigger>
+            <Loader2 className="animate-spin" size={14} strokeWidth={2} />
+          </TooltipTrigger>
+          <TooltipContent>Saving changes...</TooltipContent>
+        </Tooltip>
+      ) : isSaveFailed ? (
+        isSnippetOwner ? (
           <Tooltip>
             <TooltipTrigger>
-              <Check className="text-brand" size={14} strokeWidth={3} />
+              <AlertCircle className="text-red-900" size={14} strokeWidth={2} />
             </TooltipTrigger>
-            <TooltipContent side="bottom">All changes saved</TooltipContent>
+            <TooltipContent>Failed to save changes</TooltipContent>
           </Tooltip>
-        ) : savingState === 'UPDATING' ? (
-          <Tooltip>
-            <TooltipTrigger>
-              <Loader2 className="animate-spin" size={14} strokeWidth={2} />
-            </TooltipTrigger>
-            <TooltipContent>Saving changes...</TooltipContent>
-          </Tooltip>
-        ) : savingState === 'UPDATING_FAILED' ? (
-          isSnippetOwner ? (
-            <Tooltip>
-              <TooltipTrigger>
-                <AlertCircle className="text-red-900" size={14} strokeWidth={2} />
-              </TooltipTrigger>
-              <TooltipContent>Failed to save changes</TooltipContent>
-            </Tooltip>
-          ) : (
-            <ReadOnlyBadge id={id} />
-          )
-        ) : null}
-      </div>
-    </>
+        ) : (
+          <ReadOnlyBadge id={id} />
+        )
+      ) : null}
+    </div>
   )
 }
 

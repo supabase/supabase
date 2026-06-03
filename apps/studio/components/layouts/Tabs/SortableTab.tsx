@@ -2,10 +2,11 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
-import { useMemo } from 'react'
-import { cn, TabsTrigger_Shadcn_ } from 'ui'
+import { useMemo, type MouseEvent } from 'react'
+import { cn, TabsTrigger_Shadcn_, ToggleGroupItem } from 'ui'
 
 import { useEditorType } from '../editors/EditorsLayout.hooks'
+import { SQL_EDITOR_SIDEBAR_SEARCH_ROW_HEIGHT_CLASSNAME } from '../SQLEditorLayout/SQLEditorNavV2/SQLEditorNav.constants'
 import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useTabsStateSnapshot, type Tab } from '@/state/tabs'
@@ -23,11 +24,13 @@ export const SortableTab = ({
   index,
   openTabs,
   onClose,
+  variant = 'default',
 }: {
   tab: Tab
   index: number
   openTabs: Tab[]
   onClose: (id: string) => void
+  variant?: 'default' | 'toggle-group'
 }) => {
   const editor = useEditorType()
   const tabs = useTabsStateSnapshot()
@@ -49,8 +52,73 @@ export const SortableTab = ({
     return openTabs.some((t) => editor === 'table' && t.metadata?.schema !== currentSchema)
   }, [openTabs, currentSchema, editor])
 
-  // Create a motion version of TabsTrigger while preserving all functionality
-  // const MotionTabsTrigger = motion(TabsTrigger_Shadcn_)
+  const isToggleGroupTab = variant === 'toggle-group'
+
+  const tabLabel = (
+    <>
+      <span className={cn(isToggleGroupTab && 'shrink-0')}>
+        <EntityTypeIcon type={tab.type} />
+      </span>
+      <div
+        className={cn(
+          'flex min-w-0 items-center gap-0',
+          isToggleGroupTab && 'flex-1 overflow-hidden'
+        )}
+      >
+        <AnimatePresence mode="popLayout" initial>
+          {shouldShowSchema && (
+            <motion.span
+              initial={{ opacity: 0, width: 0 }}
+              animate={{ opacity: 1, width: 'auto' }}
+              exit={{ opacity: 0, width: 0 }}
+              transition={{ duration: 0.15 }}
+              className={cn(
+                'shrink-0 text-foreground-muted',
+                isToggleGroupTab
+                  ? 'group-data-[state=on]:text-foreground-lighter'
+                  : 'group-data-[state=active]:text-foreground-lighter'
+              )}
+            >
+              {tab?.metadata?.schema}.
+            </motion.span>
+          )}
+        </AnimatePresence>
+        <span className={cn(isToggleGroupTab && 'truncate')}>{tab.label || 'Untitled'}</span>
+      </div>
+      <span
+        role="button"
+        onClick={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+        }}
+        className={cn(
+          'ml-1 cursor-pointer rounded-xs p-0.5 opacity-0 group-hover:opacity-100 hover:bg-200',
+          isToggleGroupTab && 'shrink-0'
+        )}
+        onMouseDown={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+        }}
+        onPointerDown={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          onClose(tab.id)
+        }}
+      >
+        <X size={12} className="text-foreground-light" />
+      </span>
+    </>
+  )
+
+  const tabInteractionProps = {
+    onAuxClick: (e: MouseEvent) => {
+      if (e.button === 1) {
+        e.preventDefault()
+        onClose(tab.id)
+      }
+    },
+    onDoubleClick: () => tabs.makeTabPermanent(tab.id),
+  }
 
   return (
     <motion.div
@@ -60,69 +128,48 @@ export const SortableTab = ({
       layoutId={tab.id}
       transition={{ duration: 0.045 }}
       animate={{ opacity: isDragging ? 0 : 1 }}
-      className={cn('flex items-center h-(--header-height) first-of-type:border-l')}
+      className={cn(
+        'flex items-center',
+        isToggleGroupTab
+          ? 'min-w-0 max-w-[240px] shrink'
+          : 'h-(--header-height) shrink-0 first-of-type:border-l'
+      )}
     >
-      <TabsTrigger_Shadcn_
-        value={tab.id}
-        onAuxClick={(e) => {
-          // Middle click closes tab
-          if (e.button === 1) {
-            e.preventDefault()
-            onClose(tab.id)
-          }
-        }}
-        onDoubleClick={() => tabs.makeTabPermanent(tab.id)}
-        className={cn(
-          'flex items-center gap-2 pl-3 pr-2.5 text-xs',
-          'bg-dash-sidebar/50 dark:bg-surface-100/50',
-          'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
-          'border-b border-default',
-          'data-[state=active]:border-b-background-dash-sidebar dark:data-[state=active]:border-b-background-surface-100',
-          'relative group h-full',
-          'hover:bg-surface-300 dark:hover:bg-surface-100',
-          tab.isPreview && 'italic font-light' // Optional: style preview tabs differently
-        )}
-        {...listeners}
-      >
-        <EntityTypeIcon type={tab.type} />
-        <div className="flex items-center gap-0">
-          <AnimatePresence mode="popLayout" initial>
-            {shouldShowSchema && (
-              <motion.span
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: 'auto' }}
-                exit={{ opacity: 0, width: 0 }}
-                transition={{ duration: 0.15 }}
-                className="text-foreground-muted group-data-[state=active]:text-foreground-lighter"
-              >
-                {tab?.metadata?.schema}.
-              </motion.span>
-            )}
-          </AnimatePresence>
-          <span>{tab.label || 'Untitled'}</span>
-        </div>
-        <span
-          role="button"
-          onClick={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-          }}
-          className="p-0.5 ml-1 opacity-0 group-hover:opacity-100 hover:bg-200 rounded-xs cursor-pointer"
-          onMouseDown={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-          }}
-          onPointerDown={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-            onClose(tab.id)
-          }}
+      {variant === 'toggle-group' ? (
+        <ToggleGroupItem
+          value={tab.id}
+          aria-label={tab.label || 'Untitled'}
+          className={cn(
+            'group relative flex w-auto min-w-0 max-w-full items-center gap-1.5 overflow-hidden px-2 text-xs',
+            SQL_EDITOR_SIDEBAR_SEARCH_ROW_HEIGHT_CLASSNAME,
+            tab.isPreview && 'italic font-light'
+          )}
+          {...tabInteractionProps}
+          {...listeners}
         >
-          <X size={12} className="text-foreground-light" />
-        </span>
-        <div className="absolute w-full top-0 left-0 right-0 h-px bg-foreground opacity-0 group-data-[state=active]:opacity-100" />
-      </TabsTrigger_Shadcn_>
-      {index < openTabs.length && (
+          {tabLabel}
+        </ToggleGroupItem>
+      ) : (
+        <TabsTrigger_Shadcn_
+          value={tab.id}
+          className={cn(
+            'flex items-center gap-2 pl-3 pr-2.5 text-xs',
+            'bg-dash-sidebar/50 dark:bg-surface-100/50',
+            'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
+            'border-b border-default',
+            'data-[state=active]:border-b-background-dash-sidebar dark:data-[state=active]:border-b-background-surface-100',
+            'relative group h-full',
+            'hover:bg-surface-300 dark:hover:bg-surface-100',
+            tab.isPreview && 'italic font-light'
+          )}
+          {...tabInteractionProps}
+          {...listeners}
+        >
+          {tabLabel}
+          <div className="absolute w-full top-0 left-0 right-0 h-px bg-foreground opacity-0 group-data-[state=active]:opacity-100" />
+        </TabsTrigger_Shadcn_>
+      )}
+      {variant === 'default' && index < openTabs.length && (
         <div role="separator" className="h-full w-px bg-border" key={`separator-${tab.id}`} />
       )}
     </motion.div>

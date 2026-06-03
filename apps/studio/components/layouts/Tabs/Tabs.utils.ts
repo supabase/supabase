@@ -72,9 +72,11 @@ export function useSqlEditorTabsCleanup() {
     ({
       snippets,
       notebooks = [],
+      chats = [],
     }: {
       snippets: { id: string; type: string; name: string }[]
       notebooks?: { id: string; name: string }[]
+      chats?: { id: string; name: string }[]
     }) => {
       // These lists are paginated and some sections are fetched only when expanded.
       // They can refresh labels, but absence is not proof that content was deleted.
@@ -94,6 +96,11 @@ export function useSqlEditorTabsCleanup() {
           if (!!notebook && notebook.name !== tab.label)
             tabs.updateTab(tab.id, { label: notebook.name })
         }
+
+        if (tab.type === 'chat') {
+          const chat = chats?.find((x) => tab.metadata?.chatId === x.id)
+          if (!!chat && chat.name !== tab.label) tabs.updateTab(tab.id, { label: chat.name })
+        }
       })
     },
     []
@@ -103,20 +110,22 @@ export function useSqlEditorTabsCleanup() {
 interface UseTabsScrollOptions {
   activeTab: string | null | undefined
   tabCount: number
+  enabled?: boolean
 }
 
-export function useTabsScroll({ activeTab, tabCount }: UseTabsScrollOptions) {
+export function useTabsScroll({ activeTab, tabCount, enabled = true }: UseTabsScrollOptions) {
   const tabsListRef = useRef<HTMLDivElement>(null)
   const prevTabCountRef = useRef<number>(tabCount)
   const isInitialMount = useRef(true)
 
   useEffect(() => {
-    if (tabsListRef.current) {
-      tabsListRef.current.scrollLeft = tabsListRef.current.scrollWidth
-    }
-  }, [])
+    if (!enabled || !tabsListRef.current) return
+    tabsListRef.current.scrollLeft = tabsListRef.current.scrollWidth
+  }, [enabled])
 
   useEffect(() => {
+    if (!enabled) return
+
     if (isInitialMount.current) {
       isInitialMount.current = false
       return
@@ -143,7 +152,7 @@ export function useTabsScroll({ activeTab, tabCount }: UseTabsScrollOptions) {
     }
 
     prevTabCountRef.current = tabCount
-  }, [activeTab, tabCount])
+  }, [activeTab, enabled, tabCount])
 
   return { tabsListRef }
 }

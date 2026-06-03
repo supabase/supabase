@@ -5,6 +5,7 @@ export interface SnippetEditorShellProps {
   editorPanel: ReactNode
   utilityPanel: ReactNode
   footer?: ReactNode
+  header?: ReactNode
   defaultSplitSize?: number
   /** When true, only the utility panel is shown (e.g. notebook blocks with SQL collapsed) */
   hideEditorPanel?: boolean
@@ -14,12 +15,14 @@ export const SnippetEditorShell = ({
   editorPanel,
   utilityPanel,
   footer,
+  header,
   defaultSplitSize = 50,
   hideEditorPanel = false,
 }: SnippetEditorShellProps) => {
   if (hideEditorPanel) {
     return (
       <div className="flex h-full flex-col">
+        {header}
         <div className="min-h-0 flex-grow">{utilityPanel}</div>
         {footer}
       </div>
@@ -28,7 +31,8 @@ export const SnippetEditorShell = ({
 
   return (
     <div className="flex flex-col h-full">
-      <ResizablePanelGroup orientation="vertical" className="flex-grow h-full">
+      {header}
+      <ResizablePanelGroup orientation="vertical" className="flex-grow h-full min-h-0">
         <ResizablePanel defaultSize={defaultSplitSize} minSize={30}>
           {editorPanel}
         </ResizablePanel>

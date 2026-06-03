@@ -2,6 +2,7 @@ import type { Monaco } from '@monaco-editor/react'
 import { acceptUntrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { ChevronUp, Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
+import type { ReactNode } from 'react'
 import { useRef } from 'react'
 import {
   Button,
@@ -21,8 +22,10 @@ import { SnippetEditorShell } from './SnippetEditorShell'
 import { ROWS_PER_PAGE_OPTIONS } from './SQLEditor.constants'
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
 import { appendEnableRLSStatements } from './SQLEditor.utils'
+import { SqlEditorPanelHeader } from './SqlEditorPanelHeader'
 import { useSqlEditorCompletion } from './useSqlEditorCompletion'
 import { useSqlQueryBlockEditor } from './useSqlQueryBlockEditor'
+import { UtilityActions } from './UtilityPanel/UtilityActions'
 import { UtilityPanel } from './UtilityPanel/UtilityPanel'
 import { GridFooter } from '@/components/ui/GridFooter'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
@@ -32,22 +35,35 @@ const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
 export interface SqlQueryBlockEditorProps {
   id: string
   snippetName: string
+  /** Shown in the panel header on the left; defaults to snippetName */
+  title?: ReactNode
+  /** Rendered left of run controls (e.g. show/hide SQL) */
+  leadingActions?: ReactNode
+  /** Items appended to the more menu (e.g. delete block in notebooks) */
+  actions?: ReactNode
   /** When true, uses a fixed height suitable for stacking in notebook pages */
   variant?: 'full' | 'block'
   /** When false, only the utility panel (results) is shown */
   isSqlEditorVisible?: boolean
   autoFocus?: boolean
   isLoading?: boolean
+  isDisabled?: boolean
+  isExecutingOverride?: boolean
   className?: string
 }
 
 export const SqlQueryBlockEditor = ({
   id,
   snippetName,
+  title,
+  leadingActions,
+  actions,
   variant = 'full',
   isSqlEditorVisible = true,
   autoFocus = true,
   isLoading = false,
+  isDisabled = false,
+  isExecutingOverride = false,
   className,
 }: SqlQueryBlockEditorProps) => {
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
@@ -65,20 +81,53 @@ export const SqlQueryBlockEditor = ({
     setActiveUtilityTab,
     results,
     isExecuting,
-    isExplainExecuting,
     isLogsExecuting,
     prettifyQuery,
     executeQueryFromButton,
     executeExplainQuery,
+    saveQuery,
+    isSaving,
+    canSave,
     buildDebugPrompt,
     onDebug,
     executeQuery,
     limit,
-  } = useSqlQueryBlockEditor({ id, editorRef, monacoRef })
+  } = useSqlQueryBlockEditor({ id, snippetName, editorRef, monacoRef })
 
   const containerClassName = cn(
     variant === 'full' ? 'h-full' : isSqlEditorVisible ? 'h-[480px]' : 'h-[280px]',
     className
+  )
+
+  const executeQueryFromControls = () => {
+    if (isDisabled) return
+    executeQueryFromButton()
+  }
+
+  const executeExplainQueryFromControls = () => {
+    if (isDisabled) return
+    void executeExplainQuery()
+  }
+
+  const panelHeader = (
+    <SqlEditorPanelHeader
+      title={title ?? snippetName}
+      leadingActions={leadingActions}
+      runActions={
+        <UtilityActions
+          id={id}
+          isExecuting={isExecuting || isLogsExecuting || isExecutingOverride}
+          isDisabled={isDisabled}
+          hasSelection={hasSelection}
+          isSaving={isSaving}
+          isSaveDisabled={!canSave}
+          prettifyQuery={prettifyQuery}
+          executeQuery={executeQueryFromControls}
+          saveQuery={() => void saveQuery()}
+          menuItems={actions}
+        />
+      }
+    />
   )
 
   return (
@@ -108,7 +157,8 @@ export const SqlQueryBlockEditor = ({
 
       <div className={containerClassName}>
         <SnippetEditorShell
-          hideEditorPanel={variant === 'block' && !isSqlEditorVisible}
+          header={panelHeader}
+          hideEditorPanel={!isSqlEditorVisible}
           editorPanel={
             isLoading ? (
               <div className="flex h-full w-full items-center justify-center">
@@ -122,9 +172,10 @@ export const SqlQueryBlockEditor = ({
                   snippetName={snippetName}
                   editorRef={editorRef}
                   monacoRef={monacoRef}
-                  executeQuery={executeQueryFromButton}
-                  executeExplainQuery={executeExplainQuery}
+                  executeQuery={executeQueryFromControls}
+                  executeExplainQuery={executeExplainQueryFromControls}
                   prettifyQuery={prettifyQuery}
+                  onSaveQuery={() => void saveQuery()}
                   onHasSelection={setHasSelection}
                 />
               </div>
@@ -138,12 +189,9 @@ export const SqlQueryBlockEditor = ({
             ) : (
               <UtilityPanel
                 id={id}
-                isExecuting={isExecuting || isLogsExecuting}
-                isExplainExecuting={isExplainExecuting}
-                hasSelection={hasSelection}
-                prettifyQuery={prettifyQuery}
-                executeQuery={executeQueryFromButton}
-                executeExplainQuery={executeExplainQuery}
+                isExecuting={isExecuting || isLogsExecuting || isExecutingOverride}
+                isDisabled={isDisabled}
+                executeQuery={executeQueryFromControls}
                 onDebug={onDebug}
                 buildDebugPrompt={buildDebugPrompt}
                 activeTab={activeUtilityTab}

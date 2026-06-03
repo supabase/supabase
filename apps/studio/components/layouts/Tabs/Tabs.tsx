@@ -20,9 +20,12 @@ import {
   Tabs_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
+  ToggleGroup,
+  ToggleGroupItem,
 } from 'ui'
 
 import { useEditorType } from '../editors/EditorsLayout.hooks'
+import { SQL_EDITOR_SIDEBAR_SEARCH_ROW_HEIGHT_CLASSNAME } from '../SQLEditorLayout/SQLEditorNavV2/SQLEditorNav.constants'
 import { CollapseButton } from './CollapseButton'
 import { SortableTab } from './SortableTab'
 import { TabPreview } from './TabPreview'
@@ -131,118 +134,178 @@ export const EditorTabs = () => {
     tabs.handleTabNavigation(id, router)
   }
 
-  const { tabsListRef } = useTabsScroll({ activeTab: tabs.activeTab, tabCount: editorTabs.length })
+  const { tabsListRef } = useTabsScroll({
+    activeTab: tabs.activeTab,
+    tabCount: editorTabs.length,
+    enabled: editor !== 'sql',
+  })
+  const activeTabValue = hasNewTab ? 'new' : (tabs.activeTab ?? undefined)
+  const isSqlEditor = editor === 'sql'
+
+  const sortableTabs = (
+    <SortableContext
+      items={editorTabs.map((tab) => tab.id)}
+      strategy={horizontalListSortingStrategy}
+    >
+      {editorTabs.map((tab, index) => (
+        <ContextMenu key={tab.id}>
+          <ContextMenuTrigger asChild={isSqlEditor}>
+            <SortableTab
+              key={tab.id}
+              tab={tab}
+              index={index}
+              openTabs={openTabs}
+              variant={isSqlEditor ? 'toggle-group' : 'default'}
+              onClose={() => handleClose(tab.id)}
+            />
+          </ContextMenuTrigger>
+          <ContextMenuContent>
+            <ContextMenuItem onClick={() => handleClose(tab.id)}>Close</ContextMenuItem>
+            <ContextMenuItem onClick={() => handleCloseOthers(tab.id)}>
+              Close Others
+            </ContextMenuItem>
+            <ContextMenuItem onClick={() => handleCloseRight(tab.id)}>
+              Close to the Right
+            </ContextMenuItem>
+            <ContextMenuItem onClick={handleCloseAll}>Close All</ContextMenuItem>
+          </ContextMenuContent>
+        </ContextMenu>
+      ))}
+    </SortableContext>
+  )
+
+  const newTabCloseButton = (
+    <span
+      role="button"
+      onClick={(e) => {
+        e.preventDefault()
+        e.stopPropagation()
+      }}
+      className="ml-1 opacity-0 group-hover:opacity-100 hover:bg-200 rounded-xs cursor-pointer"
+      onMouseDown={(e) => {
+        e.preventDefault()
+        e.stopPropagation()
+      }}
+      onPointerDown={(e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        handleClose('new')
+      }}
+    >
+      <X size={12} className="text-foreground-light" />
+    </span>
+  )
+
+  const addTabButton = (
+    <AnimatePresence initial={false}>
+      {!hasNewTab && (
+        <motion.button
+          className={cn(
+            'flex shrink-0 items-center justify-center rounded-md hover:bg-surface-300',
+            isSqlEditor
+              ? cn(SQL_EDITOR_SIDEBAR_SEARCH_ROW_HEIGHT_CLASSNAME, 'aspect-square shrink-0')
+              : 'w-10 min-h-(--header-height) hover:bg-surface-100 border-b'
+          )}
+          onClick={() =>
+            router.push(
+              `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new?skip=true`
+            )
+          }
+          initial={{ opacity: 0, scale: 0.8, x: -10 }}
+          animate={{ opacity: 1, scale: 1, x: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <Plus
+            size={16}
+            strokeWidth={1.5}
+            className="text-foreground-lighter hover:text-foreground-light"
+          />
+        </motion.button>
+      )}
+    </AnimatePresence>
+  )
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      <Tabs_Shadcn_
-        className="w-full flex"
-        value={hasNewTab ? 'new' : (tabs.activeTab ?? undefined)}
-        onValueChange={handleTabChange}
-      >
-        <CollapseButton hideTabs={false} />
-        <TabsList_Shadcn_
-          ref={tabsListRef}
-          className={cn(
-            'rounded-b-none gap-0 min-h-(--header-height) flex items-center w-full z-1',
-            'bg-surface-200 dark:bg-alternative border-none text-clip overflow-x-auto'
-          )}
-        >
-          <SortableContext
-            items={editorTabs.map((tab) => tab.id)}
-            strategy={horizontalListSortingStrategy}
-          >
-            {editorTabs.map((tab, index) => (
-              <ContextMenu key={tab.id}>
-                <ContextMenuTrigger>
-                  <SortableTab
-                    key={tab.id}
-                    tab={tab}
-                    index={index}
-                    openTabs={openTabs}
-                    onClose={() => handleClose(tab.id)}
-                  />
-                </ContextMenuTrigger>
-                <ContextMenuContent>
-                  <ContextMenuItem onClick={() => handleClose(tab.id)}>Close</ContextMenuItem>
-                  <ContextMenuItem onClick={() => handleCloseOthers(tab.id)}>
-                    Close Others
-                  </ContextMenuItem>
-                  <ContextMenuItem onClick={() => handleCloseRight(tab.id)}>
-                    Close to the Right
-                  </ContextMenuItem>
-                  <ContextMenuItem onClick={handleCloseAll}>Close All</ContextMenuItem>
-                </ContextMenuContent>
-              </ContextMenu>
-            ))}
-          </SortableContext>
-
-          {/* Non-draggable new tab */}
-          {hasNewTab && (
-            <TabsTrigger_Shadcn_
-              value="new"
-              className={cn(
-                'flex items-center gap-2 px-3 text-xs',
-                'bg-dash-sidebar/50 dark:bg-surface-100/50',
-                'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
-                'relative group h-full border-t-2 border-b-0!',
-                'hover:bg-surface-300 dark:hover:bg-surface-100'
-              )}
+      {isSqlEditor ? (
+        <div className="flex w-full min-w-0 flex-1 items-center gap-2">
+          <CollapseButton
+            hideTabs={false}
+            hideBottomBorder
+            heightClassName={SQL_EDITOR_SIDEBAR_SEARCH_ROW_HEIGHT_CLASSNAME}
+          />
+          <div className="z-1 flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
+            <ToggleGroup
+              type="single"
+              value={activeTabValue}
+              onValueChange={(value) => {
+                if (value) handleTabChange(value)
+              }}
+              className="flex w-max min-w-0 max-w-full flex-nowrap justify-start overflow-hidden"
             >
-              <Plus size={16} strokeWidth={1.5} className={'text-foreground-lighter'} />
-              <div className="flex items-center gap-0">
-                <span>New</span>
-              </div>
-              <span
-                role="button"
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                }}
-                className="ml-1 opacity-0 group-hover:opacity-100 hover:bg-200 rounded-xs cursor-pointer"
-                onMouseDown={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                }}
-                onPointerDown={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  handleClose('new')
-                }}
-              >
-                <X size={12} className="text-foreground-light" />
-              </span>{' '}
-              <div className="absolute w-full -bottom-px left-0 right-0 h-px bg-dash-sidebar dark:bg-surface-100 opacity-0 group-data-[state=active]:opacity-100" />
-            </TabsTrigger_Shadcn_>
-          )}
-
-          <AnimatePresence initial={false}>
-            {!hasNewTab && (
-              <motion.button
-                className="flex items-center justify-center w-10 min-h-(--header-height) hover:bg-surface-100 shrink-0 border-b"
-                onClick={() =>
-                  router.push(
-                    `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new?skip=true`
-                  )
-                }
-                initial={{ opacity: 0, scale: 0.8, x: -10 }}
-                animate={{ opacity: 1, scale: 1, x: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Plus
-                  size={16}
-                  strokeWidth={1.5}
-                  className="text-foreground-lighter hover:text-foreground-light"
-                />
-              </motion.button>
+              {sortableTabs}
+              {hasNewTab && (
+                <ToggleGroupItem
+                  value="new"
+                  aria-label="New tab"
+                  className={cn(
+                    'group flex shrink-0 items-center gap-1.5 px-2 text-xs',
+                    SQL_EDITOR_SIDEBAR_SEARCH_ROW_HEIGHT_CLASSNAME
+                  )}
+                >
+                  <Plus size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                  <span>New</span>
+                  {newTabCloseButton}
+                </ToggleGroupItem>
+              )}
+            </ToggleGroup>
+            {addTabButton}
+          </div>
+        </div>
+      ) : (
+        <Tabs_Shadcn_
+          className="w-full flex"
+          value={activeTabValue}
+          onValueChange={handleTabChange}
+        >
+          <CollapseButton hideTabs={false} />
+          <TabsList_Shadcn_
+            ref={tabsListRef}
+            className={cn(
+              'rounded-b-none gap-0 min-h-(--header-height) flex items-center w-full z-1',
+              'bg-surface-200 dark:bg-alternative border-none text-clip overflow-x-auto'
             )}
-          </AnimatePresence>
-          <div className="grow h-full border-b pr-6" />
-        </TabsList_Shadcn_>
-      </Tabs_Shadcn_>
+          >
+            {sortableTabs}
+            {hasNewTab && (
+              <TabsTrigger_Shadcn_
+                value="new"
+                className={cn(
+                  'flex items-center gap-2 px-3 text-xs',
+                  'bg-dash-sidebar/50 dark:bg-surface-100/50',
+                  'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
+                  'relative group h-full border-t-2 border-b-0!',
+                  'hover:bg-surface-300 dark:hover:bg-surface-100'
+                )}
+              >
+                <Plus size={16} strokeWidth={1.5} className={'text-foreground-lighter'} />
+                <div className="flex items-center gap-0">
+                  <span>New</span>
+                </div>
+                {newTabCloseButton}
+                <div className="absolute w-full -bottom-px left-0 right-0 h-px bg-dash-sidebar dark:bg-surface-100 opacity-0 group-data-[state=active]:opacity-100" />
+              </TabsTrigger_Shadcn_>
+            )}
+            {addTabButton}
+            <div className="grow h-full border-b pr-6" />
+          </TabsList_Shadcn_>
+        </Tabs_Shadcn_>
+      )}
 
       <DragOverlay dropAnimation={null}>
-        {tabs.activeTab ? <TabPreview tab={tabs.activeTab} /> : null}
+        {tabs.activeTab ? (
+          <TabPreview tab={tabs.activeTab} variant={isSqlEditor ? 'toggle-group' : 'default'} />
+        ) : null}
       </DragOverlay>
     </DndContext>
   )

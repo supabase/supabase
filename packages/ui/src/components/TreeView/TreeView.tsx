@@ -81,6 +81,8 @@ const TreeViewItem = forwardRef<
     onDoubleClick?: (e: React.MouseEvent) => void
     /** Actions to render on the right end of the item */
     actions?: ReactNode
+    /** Show expand chevron on branch rows (folder rows) */
+    showBranchChevron?: boolean
   }
 >(
   (
@@ -90,6 +92,7 @@ const TreeViewItem = forwardRef<
       isExpanded = false,
       isOpened = false,
       isBranch = false,
+      showBranchChevron = true,
       isSelected = false,
       isPreview = false,
       isLoading = false,
@@ -227,7 +230,7 @@ const TreeViewItem = forwardRef<
             <>
               {isLoading ? (
                 <Loader2 className={cn('text-foreground-muted animate-spin')} size={14} />
-              ) : (
+              ) : showBranchChevron ? (
                 <ChevronRight
                   className={cn(
                     'text-foreground-muted',
@@ -239,7 +242,7 @@ const TreeViewItem = forwardRef<
                   size={CHEVRON_ICON_SIZE}
                   strokeWidth={1.5}
                 />
-              )}
+              ) : null}
               <TreeViewFolderIcon
                 className={cn(
                   'transition-colors',
@@ -266,7 +269,7 @@ const TreeViewItem = forwardRef<
               />
             )
           )}
-          <span className={cn(isEditing && 'hidden', 'truncate text-sm')}>{name}</span>
+          <span className={cn(isEditing && 'hidden', 'truncate text-inherit')}>{name}</span>
         </div>
 
         {!isEditing && actions}

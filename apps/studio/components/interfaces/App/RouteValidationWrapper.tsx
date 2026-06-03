@@ -10,6 +10,7 @@ import useLatest from '@/hooks/misc/useLatest'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
+import { getSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 // Ideally these could all be within a _middleware when we use Next 12
 export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
@@ -95,7 +96,10 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   useEffect(() => {
     if (ref !== undefined && id !== undefined) {
       if (router.pathname.endsWith('/sql/[id]') && id !== 'new') {
-        setLastVisitedSnippet(id)
+        const snippet = getSqlEditorV2StateSnapshot().snippets[id]?.snippet
+        if (!snippet?.isNotSavedInDatabaseYet) {
+          setLastVisitedSnippet(id)
+        }
       } else if (router.pathname.endsWith('/editor/[id]')) {
         setLastVisitedTable(id)
       }

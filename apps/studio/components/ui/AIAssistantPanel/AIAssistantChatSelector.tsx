@@ -21,9 +21,17 @@ import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 
 interface AIAssistantChatSelectorProps {
   disabled?: boolean
+  onChatSelected?: (chatId: string) => void
+  onChatCreated?: (chatId: string) => void
+  onChatDeleted?: (deletedChatId: string, nextChatId?: string) => void
 }
 
-export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSelectorProps) => {
+export const AIAssistantChatSelector = ({
+  disabled = false,
+  onChatSelected,
+  onChatCreated,
+  onChatDeleted,
+}: AIAssistantChatSelectorProps) => {
   const snap = useAiAssistantStateSnapshot()
   const currentChat = snap.activeChat?.name
 
@@ -35,6 +43,7 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
 
   const handleSelectChat = (id: string) => {
     snap.selectChat(id)
+    onChatSelected?.(id)
     setChatSelectorOpen(false)
   }
 
@@ -42,7 +51,14 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
     if (e) {
       e.stopPropagation()
     }
-    snap.deleteChat(id)
+    const nextChatId = snap.deleteChat(id)
+    onChatDeleted?.(id, nextChatId)
+  }
+
+  const handleCreateChat = () => {
+    const chatId = snap.newChat()
+    onChatCreated?.(chatId)
+    setChatSelectorOpen(false)
   }
 
   const handleStartEditChat = (id: string, name: string, e?: React.MouseEvent) => {
@@ -193,14 +209,7 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
             <CommandGroup>
               <CommandItem
                 className="cursor-pointer w-full gap-x-2"
-                onSelect={() => {
-                  snap.newChat()
-                  setChatSelectorOpen(false)
-                }}
-                onClick={() => {
-                  snap.newChat()
-                  setChatSelectorOpen(false)
-                }}
+                onSelect={handleCreateChat}
                 disabled={disabled}
               >
                 <Plus size={14} strokeWidth={1.5} />

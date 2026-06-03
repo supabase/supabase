@@ -1,23 +1,24 @@
-import { acceptUntrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
+import { type UntrustedSqlFragment } from '@supabase/pg-meta'
 import type { ToolUIPart } from 'ai'
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
-import { useRef, useState, type DragEvent, type PropsWithChildren } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { DEFAULT_CHART_CONFIG, QueryBlock } from '../QueryBlock/QueryBlock'
-import { identifyQueryType } from './AIAssistant.utils'
 import { ConfirmFooter } from './ConfirmFooter'
+import { getLogDatePickerValueForHelper } from '@/components/interfaces/Settings/Logs/logsDateRange'
+import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
+import { SqlEditorShowSqlToggle } from '@/components/interfaces/SQLEditor/SqlEditorShowSqlToggle'
+import { SqlQueryBlockEditor } from '@/components/interfaces/SQLEditor/SqlQueryBlockEditor'
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
-import { entityTypeKeys } from '@/data/entity-types/keys'
-import { lintKeys } from '@/data/lint/keys'
-import { usePrimaryDatabase } from '@/data/read-replicas/replicas-query'
-import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
-import { useChangedSync } from '@/hooks/misc/useChanged'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { DEFAULT_CHART_CONFIG } from '@/components/ui/QueryBlock/QueryBlock'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
-import { useTrack } from '@/lib/telemetry/track'
+import {
+  registerNotebookBlock,
+  unregisterNotebookBlock,
+  type NotebookBlockPersistPatch,
+} from '@/state/notebook-block-registry'
+import { NotebookEditorProvider } from '@/state/notebook-editor-context'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 interface DisplayBlockRendererProps {
   messageId: string
@@ -53,7 +54,6 @@ export const DisplayBlockRenderer = ({
   toolCallId,
   initialArgs,
   initialResults,
-  onError,
   onApprove,
   onDeny,
   toolState,
@@ -62,164 +62,107 @@ export const DisplayBlockRenderer = ({
   isLastMessage = false,
   showConfirmFooter = true,
   onChartConfigChange,
-  onQueryRun,
-}: PropsWithChildren<DisplayBlockRendererProps>) => {
-  const queryClient = useQueryClient()
-
-  const savedInitialArgs = useRef(initialArgs)
-  const savedInitialResults = useRef(initialResults)
-  const savedInitialConfig = useRef<ChartConfig>({
-    ...DEFAULT_CHART_CONFIG,
-    view: initialArgs.view === 'chart' ? 'chart' : 'table',
-    xKey: initialArgs.xAxis ?? '',
-    yKey: initialArgs.yAxis ?? '',
-  })
-
-  const router = useRouter()
+}: DisplayBlockRendererProps) => {
   const { ref } = useParams()
   const { profile } = useProfile()
+  const { data: project } = useSelectedProjectQuery()
+  const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const track = useTrack()
-  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'user_content',
-    {
-      resource: { type: 'sql', owner_id: profile?.id },
-      subject: { id: profile?.id },
-    }
+  const blockId = useMemo(
+    () => `assistant-sql-${messageId}-${toolCallId}`.replace(/[^a-zA-Z0-9_-]/g, '-'),
+    [messageId, toolCallId]
   )
 
-  const [chartConfig, setChartConfig] = useState<ChartConfig>(() => ({
-    ...DEFAULT_CHART_CONFIG,
-    view: initialArgs.view === 'chart' ? 'chart' : 'table',
-    xKey: initialArgs.xAxis ?? '',
-    yKey: initialArgs.yAxis ?? '',
-  }))
-
-  const [rows, setRows] = useState<any[] | undefined>(
-    Array.isArray(initialResults) ? initialResults : undefined
-  )
-  const isReportsPage =
-    router.pathname.endsWith('/reports/[id]') ||
-    router.pathname.endsWith('/observability/[id]') ||
-    router.pathname.includes('/sql/reports/')
-  const isHomePage = router.pathname === '/project/[ref]'
-  const isDraggableToReports = canCreateSQLSnippet && (isReportsPage || isHomePage)
   const label = initialArgs.label || 'SQL Results'
-  const [isWriteQuery, setIsWriteQuery] = useState<boolean>(initialArgs.isWriteQuery || false)
-  const sqlQuery = initialArgs.sql
+  const sqlQuery = String(initialArgs.sql ?? '')
+  const initialChartConfig = useMemo<ChartConfig>(
+    () => ({
+      ...DEFAULT_CHART_CONFIG,
+      view: initialArgs.view === 'chart' ? 'chart' : 'table',
+      xKey: initialArgs.xAxis ?? '',
+      yKey: initialArgs.yAxis ?? '',
+    }),
+    [initialArgs.view, initialArgs.xAxis, initialArgs.yAxis]
+  )
 
-  const { database: primaryDatabase } = usePrimaryDatabase({ projectRef: ref })
+  const [chartConfig, setChartConfig] = useState<ChartConfig>(() => initialChartConfig)
+  const [isSqlEditorVisible, setIsSqlEditorVisible] = useState(false)
+  const [querySource, setQuerySource] = useState<'database' | 'logs'>('database')
+  const [logsDatePickerValue, setLogsDatePickerValue] = useState(() =>
+    getLogDatePickerValueForHelper()
+  )
 
-  const readOnlyConnectionString = primaryDatabase?.connection_string_read_only
-  const postgresConnectionString = primaryDatabase?.connectionString
+  const handlePersistBlock = useCallback((patch: NotebookBlockPersistPatch) => {
+    if (patch.querySource) setQuerySource(patch.querySource)
+    if (patch.logsDatePickerValue) setLogsDatePickerValue(patch.logsDatePickerValue)
+  }, [])
 
-  const {
-    mutate: executeSql,
-    error: executeSqlError,
-    isPending: executeSqlLoading,
-  } = useExecuteSqlMutation({
-    onError: () => {
-      // Suppress toast because error message is displayed inline
+  useEffect(() => {
+    registerNotebookBlock(blockId, { persistBlock: handlePersistBlock })
+
+    return () => {
+      unregisterNotebookBlock(blockId)
+      snapV2.removeSnippet(blockId, true)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blockId, handlePersistBlock])
+
+  useEffect(() => {
+    setChartConfig(initialChartConfig)
+    onChartConfigChange?.(initialChartConfig)
+    setQuerySource('database')
+    setLogsDatePickerValue(getLogDatePickerValueForHelper())
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blockId, initialChartConfig])
+
+  useEffect(() => {
+    const snippet = createSqlSnippetSkeletonV2({
+      idOverride: blockId,
+      name: label,
+      sql: sqlQuery,
+      owner_id: profile?.id ?? -1,
+      project_id: project?.id ?? 0,
+    })
+
+    snapV2.setSnippet((ref as string | undefined) ?? '', snippet)
+    snapV2.setSql({ id: blockId, sql: sqlQuery })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blockId, label, profile?.id, project?.id, ref, sqlQuery])
+
+  useEffect(() => {
+    const rows = getRowsFromToolOutput(initialResults)
+    if (rows) snapV2.addResult(blockId, rows)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blockId, initialResults])
+
+  const handleChartConfigChange = useCallback(
+    (config: ChartConfig) => {
+      setChartConfig(config)
+      onChartConfigChange?.(config)
     },
-  })
+    [onChartConfigChange]
+  )
 
-  const toolCallIdChanged = useChangedSync(toolCallId)
-  if (toolCallIdChanged) {
-    setChartConfig(savedInitialConfig.current)
-    onChartConfigChange?.(savedInitialConfig.current)
-    setIsWriteQuery(savedInitialArgs.current.isWriteQuery || false)
-    setRows(Array.isArray(savedInitialResults.current) ? savedInitialResults.current : undefined)
-  }
-
-  const initialResultsChanged = useChangedSync(initialResults)
-  if (initialResultsChanged) {
-    const normalized = Array.isArray(initialResults) ? initialResults : undefined
-    if (!normalized || normalized === rows) return
-    setRows(normalized)
-  }
-
-  const handleRunQuery = (queryType: 'select' | 'mutation') => {
-    if (!sqlQuery) return
-
-    onQueryRun?.(queryType)
-
-    track('assistant_suggestion_run_query_clicked', {
-      queryType,
-      ...(queryType === 'mutation'
-        ? { mutationType: identifyQueryType(sqlQuery) ?? 'unknown' }
-        : {}),
-    })
-  }
-
-  const runQuery = (queryType: 'select' | 'mutation') => {
-    if (!ref || !sqlQuery) return
-
-    const connectionString =
-      queryType === 'mutation'
-        ? postgresConnectionString
-        : (readOnlyConnectionString ?? postgresConnectionString)
-
-    if (!connectionString) {
-      const fallbackMessage = 'Unable to find a database connection to execute this query.'
-      onError?.({ messageId, errorText: fallbackMessage })
-      return
-    }
-
-    if (queryType === 'mutation') {
-      setIsWriteQuery(true)
-    }
-    executeSql(
-      { projectRef: ref, connectionString, sql: acceptUntrustedSql(sqlQuery) },
-      {
-        onSuccess: (data) => {
-          setRows(Array.isArray(data.result) ? data.result : undefined)
-          setIsWriteQuery(queryType === 'mutation' || initialArgs.isWriteQuery || false)
-          if (queryType === 'mutation') {
-            queryClient.invalidateQueries({ queryKey: lintKeys.lint(ref) })
-            queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(ref) })
-          }
-        },
-        onError: (error) => {
-          const lowerMessage = error.message.toLowerCase()
-          const isReadOnlyError =
-            lowerMessage.includes('read-only transaction') ||
-            lowerMessage.includes('permission denied') ||
-            lowerMessage.includes('must be owner')
-
-          if (queryType === 'select' && isReadOnlyError) {
-            setIsWriteQuery(true)
-          }
-
-          onError?.({ messageId, errorText: error.message })
-        },
-      }
-    )
-  }
-
-  const handleExecute = (queryType: 'select' | 'mutation') => {
-    handleRunQuery(queryType)
-    runQuery(queryType)
-  }
-
-  const handleUpdateChartConfig = ({
-    chartConfig: updatedValues,
-  }: {
-    chartConfig: Partial<ChartConfig>
-  }) => {
-    setChartConfig((prev) => {
-      const next = { ...prev, ...updatedValues }
-      onChartConfigChange?.(next)
-      return next
-    })
-  }
-
-  const handleDragStart = (e: DragEvent<Element>) => {
-    e.dataTransfer.setData(
-      'application/json',
-      JSON.stringify({ label, sql: sqlQuery, config: chartConfig })
-    )
-  }
+  const editorContextValue = useMemo(
+    () => ({
+      notebookId: messageId,
+      blockId,
+      chartConfig,
+      onChartConfigChange: handleChartConfigChange,
+      persistBlock: handlePersistBlock,
+      querySource,
+      logsDatePickerValue,
+    }),
+    [
+      messageId,
+      blockId,
+      chartConfig,
+      handleChartConfigChange,
+      handlePersistBlock,
+      querySource,
+      logsDatePickerValue,
+    ]
+  )
 
   const isApprovalRequested = toolState === 'approval-requested'
   const isApprovalResponded = toolState === 'approval-responded'
@@ -230,34 +173,36 @@ export const DisplayBlockRenderer = ({
     isLastPart &&
     isLastMessage &&
     (isApprovalResponded || (!!onApprove && !!onDeny))
-  const isRunningApprovedTool = (isApprovalResponded && !isApprovalDenied) || executeSqlLoading
+  const isRunningApprovedTool = isApprovalResponded && !isApprovalDenied
 
   return (
-    <div className="display-block w-auto overflow-x-hidden">
-      <div className="relative z-10">
-        <QueryBlock
-          label={label}
-          isWriteQuery={isWriteQuery}
-          sql={sqlQuery}
-          results={rows}
-          errorText={executeSqlError?.message}
-          chartConfig={chartConfig}
-          onExecute={handleExecute}
-          onUpdateChartConfig={handleUpdateChartConfig}
-          draggable={isDraggableToReports}
-          onDragStart={handleDragStart}
-          disabled={shouldShowConfirmFooter}
-          isExecuting={isRunningApprovedTool}
+    <div className="display-block w-auto overflow-x-hidden rounded-lg border bg-surface-100">
+      <NotebookEditorProvider value={editorContextValue}>
+        <SqlQueryBlockEditor
+          id={blockId}
+          snippetName={label}
+          title={label}
+          leadingActions={
+            <SqlEditorShowSqlToggle
+              isSqlEditorVisible={isSqlEditorVisible}
+              onToggle={() => setIsSqlEditorVisible((current) => !current)}
+            />
+          }
+          variant="block"
+          isSqlEditorVisible={isSqlEditorVisible}
+          autoFocus={false}
+          isDisabled={shouldShowConfirmFooter}
+          isExecutingOverride={isRunningApprovedTool}
         />
-      </div>
+      </NotebookEditorProvider>
       {shouldShowConfirmFooter && (
-        <div className="mx-4">
+        <div className="border-t px-4 py-3">
           <ConfirmFooter
             message="Assistant wants to run this query"
             cancelLabel="Skip"
             confirmLabel="Run Query"
             confirmLabelLoading="Running..."
-            isLoading={isApprovalResponded || executeSqlLoading}
+            isLoading={isApprovalResponded}
             onCancel={isApprovalRequested ? onDeny : undefined}
             onConfirm={isApprovalRequested ? onApprove : undefined}
           />
@@ -265,4 +210,26 @@ export const DisplayBlockRenderer = ({
       )}
     </div>
   )
+}
+
+type QueryResultRow = Record<string, unknown>
+
+function isQueryResultRows(value: unknown): value is QueryResultRow[] {
+  return Array.isArray(value)
+}
+
+function getRowsFromToolOutput(output: unknown): QueryResultRow[] | undefined {
+  if (isQueryResultRows(output)) return output
+
+  if (!output || typeof output !== 'object') return undefined
+
+  if ('result' in output && isQueryResultRows(output.result)) {
+    return output.result
+  }
+
+  if ('rows' in output && isQueryResultRows(output.rows)) {
+    return output.rows
+  }
+
+  return undefined
 }

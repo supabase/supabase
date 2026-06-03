@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { createTabsState } from './tabs'
+import { createTabId, createTabsState, isSqlEditorTab } from './tabs'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 
 const createRouter = () =>
@@ -128,5 +128,62 @@ describe('tabs removal', () => {
 
     expect(store.activeTab).toBe('sql-a')
     expect(router.push).toHaveBeenCalledWith('/project/default/sql/a?schema=public')
+  })
+
+  it('treats chat tabs as SQL editor tabs', () => {
+    const store = createTabsState('default')
+    const chatTabId = createTabId('chat', { id: 'chat-a' })
+
+    store.addTab({
+      id: chatTabId,
+      type: 'chat',
+      metadata: { chatId: 'chat-a' },
+      isPreview: false,
+    })
+
+    expect(chatTabId).toBe('chat-chat-a')
+    expect(isSqlEditorTab(chatTabId, store.tabsMap)).toBe(true)
+    expect(isSqlEditorTab('chat-chat-a')).toBe(true)
+  })
+
+  it('navigates to chat routes for chat tabs', () => {
+    const store = createTabsState('default')
+    const router = createRouter()
+
+    store.addTab({
+      id: 'chat-a',
+      type: 'chat',
+      metadata: { chatId: 'a' },
+      isPreview: false,
+    })
+
+    store.handleTabNavigation('chat-a', router)
+
+    expect(router.push).toHaveBeenCalledWith('/project/default/sql/chats/a')
+  })
+
+  it('navigates to the neighboring SQL Explorer tab when closing an active chat tab', () => {
+    const store = createTabsState('default')
+    const router = createRouter()
+
+    store.addTab({ id: 'sql-a', type: 'sql', metadata: { sqlId: 'a' }, isPreview: false })
+    store.addTab({
+      id: 'chat-b',
+      type: 'chat',
+      metadata: { chatId: 'b' },
+      isPreview: false,
+    })
+    store.addTab({ id: 'sql-c', type: 'sql', metadata: { sqlId: 'c' }, isPreview: false })
+    store.makeTabActive('chat-b')
+
+    store.handleTabClose({
+      id: 'chat-b',
+      router,
+      editor: 'sql',
+      onClearDashboardHistory: vi.fn(),
+    })
+
+    expect(store.activeTab).toBe('sql-c')
+    expect(router.push).toHaveBeenCalledWith('/project/default/sql/c?schema=public')
   })
 })

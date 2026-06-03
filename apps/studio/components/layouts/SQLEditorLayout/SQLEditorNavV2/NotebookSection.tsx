@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { cn } from 'ui'
 import {
   InnerSideBarEmptyPanel,
   InnerSideMenuCollapsible,
@@ -12,6 +13,11 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { NotebookNavItem } from './NotebookNavItem'
+import {
+  SQL_EDITOR_NAV_LIST_GAP_CLASSNAME,
+  SQL_EDITOR_NAV_SECTION_TRIGGER_CLASSNAME,
+  SQL_EDITOR_NAV_TOP_LEVEL_SECTION_CLASSNAME,
+} from './SQLEditorNav.constants'
 import { SQLEditorSectionActions } from './SQLEditorSectionActions'
 import { CreateReportModal } from '@/components/interfaces/Reports/CreateReportModal'
 import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
@@ -82,16 +88,23 @@ export const NotebookSection = ({ open, onOpenChange }: NotebookSectionProps) =>
 
   return (
     <>
-      <InnerSideMenuCollapsible open={open} onOpenChange={onOpenChange} className="px-0">
+      <InnerSideMenuCollapsible
+        open={open}
+        onOpenChange={onOpenChange}
+        className={SQL_EDITOR_NAV_TOP_LEVEL_SECTION_CLASSNAME}
+      >
         <div className="flex items-center w-full">
-          <InnerSideMenuCollapsibleTrigger className="flex-1 min-w-0" title="Notebooks" />
+          <InnerSideMenuCollapsibleTrigger
+            className={SQL_EDITOR_NAV_SECTION_TRIGGER_CLASSNAME}
+            title="Notebooks"
+          />
           <SQLEditorSectionActions
             onNewSnippet={() => setShowNewReportModal(true)}
             newSnippetTestId="sql-editor-notebooks-new-button"
             newSnippetTooltip="New notebook"
           />
         </div>
-        <InnerSideMenuCollapsibleContent className="group-data-open:pt-2">
+        <InnerSideMenuCollapsibleContent className="group-data-open:pt-1">
           {isLoading ? (
             <div className="px-4 py-2 text-xs text-foreground-light">Loading...</div>
           ) : reports.length === 0 ? (
@@ -101,12 +114,9 @@ export const NotebookSection = ({ open, onOpenChange }: NotebookSectionProps) =>
               description="Create a notebook to organize SQL blocks with chart and table views."
             />
           ) : (
-            <div className="flex flex-col gap-0.5 px-2">
+            <div className={cn('flex flex-col px-2', SQL_EDITOR_NAV_LIST_GAP_CLASSNAME)}>
               {reports.map((report) => {
                 const tabId = createTabId('notebook', { id: report.id })
-                const isOpened = Object.values(tabs.tabsMap).some(
-                  (tab) => tab.metadata?.notebookId === report.id
-                )
                 const isPreview = tabs.previewTabId === tabId
                 const isActive = !isPreview && notebookId === report.id
 
@@ -116,7 +126,6 @@ export const NotebookSection = ({ open, onOpenChange }: NotebookSectionProps) =>
                     report={report}
                     projectRef={projectRef!}
                     isActive={isActive}
-                    isOpened={isOpened}
                     isPreview={isPreview}
                     onSelectDelete={() => {
                       setSelectedNotebookToDelete(report)
