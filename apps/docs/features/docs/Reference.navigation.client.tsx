@@ -6,6 +6,7 @@ import { BASE_PATH } from '~/lib/constants'
 import { debounce } from 'lodash-es'
 import { ChevronUp } from 'lucide-react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { Collapsible } from 'radix-ui'
 import type { HTMLAttributes, MouseEvent, PropsWithChildren } from 'react'
 import {
@@ -36,7 +37,6 @@ function subscribeToPathname(callback: () => void) {
 
   if (patchCount === 0) {
     window.addEventListener('popstate', notifyPathnameListeners)
-    window.addEventListener('hashchange', notifyPathnameListeners)
 
     originalPushState = history.pushState.bind(history)
     history.pushState = (...args) => {
@@ -58,7 +58,6 @@ function subscribeToPathname(callback: () => void) {
 
     if (patchCount === 0) {
       window.removeEventListener('popstate', notifyPathnameListeners)
-      window.removeEventListener('hashchange', notifyPathnameListeners)
       history.pushState = originalPushState!
       history.replaceState = originalReplaceState!
       originalPushState = null
@@ -67,29 +66,40 @@ function subscribeToPathname(callback: () => void) {
   }
 }
 
-function getLocation() {
+function getPathname() {
   if (typeof window === 'undefined') return ''
   const pathname = window.location.pathname
-  const strippedPathname = pathname.startsWith(BASE_PATH)
-    ? pathname.slice(BASE_PATH.length)
-    : pathname
-  return `${strippedPathname}${window.location.hash}`
+  return pathname.startsWith(BASE_PATH) ? pathname.slice(BASE_PATH.length) : pathname
 }
 
-function getServerLocation() {
+function getServerPathname() {
   return ''
 }
 
-function useCurrentLocation() {
-  return useSyncExternalStore(subscribeToPathname, getLocation, getServerLocation)
+function useCurrentPathname() {
+  return useSyncExternalStore(subscribeToPathname, getPathname, getServerPathname)
 }
 
-export function ReferenceContentScrollHandler({ children }: PropsWithChildren) {
+export function ReferenceContentScrollHandler({
+  libPath,
+  version,
+  isLatestVersion,
+  children,
+}: PropsWithChildren<{
+  libPath: string
+  version: string
+  isLatestVersion: boolean
+}>) {
   const [initiallyScrolled, setInitiallyScrolled] = useState(false)
+
+  const pathname = usePathname()
 
   useEffect(() => {
     if (!initiallyScrolled) {
-      const initialSelectedSection = window.location.hash.replace(/^#/, '')
+      const initialSelectedSection = pathname.replace(
+        `/reference/${libPath}/${isLatestVersion ? '' : `${version}/`}`,
+        ''
+      )
       if (initialSelectedSection) {
         const section = document.getElementById(initialSelectedSection)
         if (section) {
@@ -100,7 +110,7 @@ export function ReferenceContentScrollHandler({ children }: PropsWithChildren) {
 
       setInitiallyScrolled(true)
     }
-  }, [initiallyScrolled])
+  }, [pathname, libPath, version, isLatestVersion, initiallyScrolled])
 
   return (
     <ReferenceContentInitiallyScrolledContext.Provider value={initiallyScrolled}>
@@ -167,7 +177,7 @@ export function ReferenceNavigationScrollHandler({
 }
 
 function deriveHref(basePath: string, section: AbbrevApiReferenceSection) {
-  return 'slug' in section ? `${basePath}#${section.slug}` : ''
+  return 'slug' in section ? `${basePath}/${section.slug}` : ''
 }
 
 function getLinkStyles(isActive: boolean, className?: string) {
@@ -237,10 +247,10 @@ export function RefLink({
 }) {
   const ref = useRef<HTMLAnchorElement>(null)
 
-  const location = useCurrentLocation()
+  const pathname = useCurrentPathname()
   const href = deriveHref(basePath, section)
   const isActive =
-    location === href || (location === basePath && href.replace(basePath, '') === '#introduction')
+    pathname === href || (pathname === basePath && href.replace(basePath, '') === '/introduction')
 
   useEffect(() => {
     if (ref.current) {
@@ -283,15 +293,15 @@ export function RefLink({
 function useCompoundRefLinkActive(basePath: string, section: AbbrevApiReferenceSection) {
   const [open, _setOpen] = useState(false)
 
-  const location = useCurrentLocation()
+  const pathname = useCurrentPathname()
   const parentHref = deriveHref(basePath, section)
-  const isParentActive = location === parentHref
+  const isParentActive = pathname === parentHref
 
   const childHrefs = useMemo(
     () => new Set((section.items || []).map((item) => deriveHref(basePath, item))),
     [basePath, section]
   )
-  const isChildActive = childHrefs.has(location)
+  const isChildActive = childHrefs.has(pathname)
 
   const isActive = isParentActive || isChildActive
 
@@ -343,7 +353,6 @@ function CompoundRefLink({
         className={cn('border-l border-control pl-3 ml-1 data-open:mt-2 grid gap-2.5')}
       >
         <ul className="space-y-2">
-          <RefLink basePath={basePath} section={section} skipChildren />
           {(section.items || []).map((item, idx) => {
             return (
               <li key={`${section.id}-${idx}`}>
