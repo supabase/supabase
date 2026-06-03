@@ -2336,11 +2336,6 @@ module.exports = [
     destination: '/partners/catalog',
   },
   {
-    permanent: false,
-    source: '/marketplace',
-    destination: '/partners/catalog',
-  },
-  {
     permanent: true,
     source: '/partners/integrations/:slug*',
     destination: '/partners/catalog/:slug*',

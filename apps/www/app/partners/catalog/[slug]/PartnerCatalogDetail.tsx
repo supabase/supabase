@@ -1,6 +1,12 @@
 'use client'
 
+import 'swiper/css'
+
 import { CH } from '@code-hike/mdx/components'
+import DefaultLayout from '~/components/Layouts/Default'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import { type ListingDetail, type Partner } from '~/types/partners'
+import { useBreakpoint } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronLeft, ExternalLink } from 'lucide-react'
 import type { SerializeResult as MDXRemoteSerializeResult } from 'next-mdx-remote-client'
@@ -9,13 +15,6 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useQueryState } from 'nuqs'
 import { useState, type Dispatch, type SetStateAction } from 'react'
-
-import 'swiper/css'
-
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import { type ListingDetail, type Partner } from '~/types/partners'
-import { useBreakpoint } from 'common'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Button, cn } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'

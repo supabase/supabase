@@ -16,8 +16,12 @@ import {
 import type { z } from 'zod'
 
 import { submitFormAction } from '../go/actions/submitForm'
+import { formFieldSchema, type GoFormCrmConfig } from '../go/schemas'
 import { evaluateShowWhen } from '../go/showWhen'
-import { formFieldSchema } from '../go/schemas'
+
+/** CRM fan-out config used by components that define their CRM inline (e.g. PartnerIntakeForm).
+ *  Once a form's `formRef` is registered on the server, prefer that pattern for security. */
+export type MarketingFormCrmConfig = GoFormCrmConfig
 
 /** Input-shape field type — fields with Zod defaults (`half`, `required`) are optional here. */
 export type MarketingFormField = z.input<typeof formFieldSchema>
@@ -58,6 +62,13 @@ export interface MarketingFormProps {
   card?: boolean
   /** Extra class names applied to the outer wrapper. */
   className?: string
+  /** Pre-populate specific fields by name. Values are applied on first render only. */
+  initialValues?: Record<string, string>
+  /**
+   * Inline CRM config. Accepted for type compatibility; actual fan-out requires
+   * a registered `formRef`. Wire up `formRef` once the form GUIDs are confirmed.
+   */
+  crm?: MarketingFormCrmConfig
 }
 
 type SubmitState = 'idle' | 'loading' | 'success' | 'error'
@@ -213,9 +224,10 @@ export default function MarketingForm({
   formRef,
   card = true,
   className,
+  initialValues,
 }: MarketingFormProps) {
   const [values, setValues] = useState<Record<string, string>>(() =>
-    Object.fromEntries(fields.map((f) => [f.name, '']))
+    Object.fromEntries(fields.map((f) => [f.name, initialValues?.[f.name] ?? '']))
   )
   const [submitState, setSubmitState] = useState<SubmitState>('idle')
   const [errorMessages, setErrorMessages] = useState<string[]>([])

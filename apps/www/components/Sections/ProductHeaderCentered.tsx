@@ -77,7 +77,7 @@ const ProductHeaderCentered = (props: Types) => (
             </div>
           ) : null}
         </div>
-        <div className={cn(styles['appear-from-bottom'])}>
+        <div className={cn('flex flex-col items-center', styles['appear-from-bottom'])}>
           <h1 className="h1 text-3xl md:text-4xl text-balance" key={`h1`}>
             {props.h1}
           </h1>

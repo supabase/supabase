@@ -1,4 +1,11 @@
-import { MarketingForm, type MarketingFormCrmConfig, type MarketingFormField } from 'marketing'
+'use client'
+
+import {
+  MarketingForm,
+  type MarketingFormCrmConfig,
+  type MarketingFormField,
+} from 'marketing/forms'
+import { parseAsString, useQueryState } from 'nuqs'
 
 /**
  * `partner_type` controls which conditional sections render. Values are kept
@@ -271,6 +278,8 @@ interface PartnerIntakeFormProps {
 }
 
 export default function PartnerIntakeForm({ className }: PartnerIntakeFormProps) {
+  const [partnerType] = useQueryState('partner_type', parseAsString.withDefault(''))
+
   return (
     <MarketingForm
       className={className}
@@ -278,6 +287,7 @@ export default function PartnerIntakeForm({ className }: PartnerIntakeFormProps)
       submitLabel="Submit application"
       crm={partnerIntakeCrm}
       successMessage={successMessage}
+      initialValues={partnerType ? { partner_type: partnerType } : undefined}
     />
   )
 }

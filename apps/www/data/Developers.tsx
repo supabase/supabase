@@ -1,4 +1,4 @@
-import { Calendar, Pencil, ScrollText } from 'lucide-react'
+import { Calendar, Pencil, ScrollText, Store } from 'lucide-react'
 import {
   IconBriefcase2,
   IconDocumentation,
@@ -23,6 +23,12 @@ export const data = {
           description: 'How to contribute to Supabase.',
           url: '/contribute',
           icon: () => <Pencil className="w-4 h-4" />,
+        },
+        {
+          text: 'Marketplace',
+          description: 'Explore native and third-party integrations directly from your project.',
+          url: '/marketplace',
+          icon: () => <Store className="w-4 h-4" />,
         },
         {
           text: 'Supabase UI',
