@@ -1,21 +1,21 @@
 import '../utils/dotenv.js'
 
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { parseArgs } from 'node:util'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { OpenAI } from 'openai'
 import { v4 as uuidv4 } from 'uuid'
 
 import type { Section } from '../helpers.mdx.js'
 import {
+  computePageResults,
+  createBatches,
+  logFailedSections,
+  mapEmbeddingsToSections,
+  updatePageInsertionCounts,
   type PageInfo,
   type PageSectionForEmbedding,
   type PageSectionWithEmbedding,
   type ProcessingResult,
-  createBatches,
-  mapEmbeddingsToSections,
-  updatePageInsertionCounts,
-  computePageResults,
-  logFailedSections,
 } from './embeddings/utils.js'
 import { fetchAllSources } from './sources/index.js'
 
@@ -132,6 +132,24 @@ async function prepareSections(
 ): Promise<PreparedSections> {
   const embeddingSources = await fetchAllSources(fullIndex)
   console.log(`Discovered ${embeddingSources.length} sources`)
+
+  // Diagnostic: identify any sources that share a path. Two sources for the
+  // same path collapse onto the same page row (page.path is UNIQUE) and both
+  // push sections, producing "inserted N/1" mismatches in the failure log.
+  // This warning names the offending loader so we can fix the root cause.
+  const seenPaths = new Map<string, { source: string; type: string }>()
+  for (const s of embeddingSources) {
+    const existing = seenPaths.get(s.path)
+    if (existing) {
+      console.warn(
+        `Duplicate source path: ${s.path} ` +
+          `(first from source="${existing.source}" type="${existing.type}", ` +
+          `also from source="${s.source}" type="${s.type}")`
+      )
+      continue
+    }
+    seenPaths.set(s.path, { source: s.source, type: s.type })
+  }
 
   const allSectionsToProcess: PageSectionForEmbedding[] = []
   const pageInfoMap = new Map<number, PageInfo>()
