@@ -1,4 +1,12 @@
-import { routes, type VercelConfig } from '@vercel/config/v1'
+import { routes, type Redirect, type VercelConfig } from '@vercel/config/v1'
+
+import {
+  getMaintenanceRedirects,
+  PLATFORM_REDIRECTS,
+  SELF_HOSTED_REDIRECTS,
+  SHARED_REDIRECTS,
+  type StudioRedirect,
+} from './redirects.shared'
 
 // STUDIO_FRAMEWORK gates the TanStack Start deploy. When the env var is
 // unset (the default — used by the Next.js prod deploy) this file returns
@@ -52,6 +60,38 @@ function routesFor(prefix: string) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Redirects — entries live in `redirects.shared.ts`, consumed by both
+// `next.config.ts` and this file. Next auto-prepends `basePath` to its
+// redirects; Vercel doesn't, so we apply it here.
+// ---------------------------------------------------------------------------
+
+function applyBasePath(r: StudioRedirect): Redirect {
+  if (!basePath) return r
+  const prefix = (path: string) =>
+    path.startsWith('/') ? (path === '/' ? basePath : `${basePath}${path}`) : path
+  return { ...r, source: prefix(r.source), destination: prefix(r.destination) }
+}
+
+function buildRedirects(): Redirect[] {
+  const isPlatform = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
+  const maintenance = process.env.MAINTENANCE_MODE === 'true'
+  const conditional = isPlatform ? PLATFORM_REDIRECTS : SELF_HOSTED_REDIRECTS
+
+  // Bare-domain bounce to the basePath when one is configured. Source
+  // stays literally `/` (NOT prefixed) so the entry-point redirect fires.
+  const basePathBounce: Redirect[] = basePath
+    ? [{ source: '/', destination: basePath, permanent: false }]
+    : []
+
+  return [
+    ...conditional.map(applyBasePath),
+    ...SHARED_REDIRECTS.map(applyBasePath),
+    ...basePathBounce,
+    ...getMaintenanceRedirects(maintenance).map(applyBasePath),
+  ]
+}
+
 function buildTanstackConfig(): VercelConfig {
   // When a base path is configured, emit both the prefixed and root rule
   // sets (prefixed first so it wins for explicit /dashboard/* hits, root as
@@ -62,6 +102,7 @@ function buildTanstackConfig(): VercelConfig {
     framework: null,
     outputDirectory: 'dist/client',
     cleanUrls: true,
+    redirects: buildRedirects(),
     rewrites: ruleSets.flatMap((r) => r.rewrites),
     headers: ruleSets.flatMap((r) => r.headers),
     // `api/server.js` imports the TanStack SSR bundle via a computed
