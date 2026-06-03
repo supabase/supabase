@@ -233,12 +233,25 @@ function assertNoChunkCycles(): Plugin {
   }
 }
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ command, mode }) => {
+  // Match Next's "always production-NODE_ENV during build" behaviour.
+  // `pnpm run e2e:setup:selfhosted` invokes the build with a shell
+  // `NODE_ENV=test` so Next can pick up `.env.test` for env loading;
+  // Next overrides NODE_ENV back to 'production' internally before
+  // emitting code, so the bundle never sees 'test'. Vite respects the
+  // user's NODE_ENV by default and would bake `process.env.NODE_ENV ===
+  // 'test'` into the client bundle, which trips vitest-only code paths
+  // (notably `API_URL` in `lib/constants/index.ts` pointing the browser
+  // at the vitest MSW host on port 3000, breaking every API fetch in
+  // e2e). Override here so `--mode test` still loads `.env.test` (via
+  // Vite's mode-based env resolution) while the bundle stays at
+  // `NODE_ENV='production'`, mirroring Next.
+  if (command === 'build') {
+    process.env.NODE_ENV = 'production'
+  }
+
   // Inline NEXT_PUBLIC_* env vars at build time so `process.env.NEXT_PUBLIC_*`
-  // works in the browser bundle (mirrors Next.js behaviour). For e2e the
-  // build is invoked with `--mode test` (no shell `NODE_ENV=test`, which
-  // would force the React plugin onto the dev JSX runtime), so `.env.test`
-  // overrides whatever a developer has in `.env.local`.
+  // works in the browser bundle (mirrors Next.js behaviour).
   const env = loadEnv(mode, rootDir, '')
   const publicEnvDefines = Object.fromEntries(
     Object.entries(env)
