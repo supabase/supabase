@@ -101,6 +101,7 @@ export const EdgeFunctionDetails = () => {
 
   const { anonKey, publishableKey } = getKeys(apiKeys)
   const apiKey = publishableKey?.api_key ?? anonKey?.api_key ?? '[YOUR ANON KEY]'
+  const apiKeyLabel = publishableKey?.api_key ? 'publishable key' : 'anon key'
 
   const { managementCommands } = generateCLICommands({
     selectedFunction,
@@ -263,7 +264,7 @@ export const EdgeFunctionDetails = () => {
                       className="ml-auto -translate-y-2 translate-x-3"
                       onClick={() => setShowKey(!showKey)}
                     >
-                      {showKey ? 'Hide' : 'Show'} anon key
+                      {showKey ? 'Hide' : 'Show'} {apiKeyLabel}
                     </Button>
                   )}
                 </TabsList>

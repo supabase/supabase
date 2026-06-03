@@ -17,13 +17,19 @@ export const INVOCATION_TABS: InvocationTab[] = [
     label: 'cURL',
     language: 'bash',
     code: ({ showKey, functionUrl, apiKey }) => {
-      const obfuscatedName = apiKey.includes('publishable')
-        ? 'SUPABASE_PUBLISHABLE_KEY'
-        : 'SUPABASE_ANON_KEY'
+      const isPublishableKey = apiKey.includes('publishable')
+      const obfuscatedName = isPublishableKey ? 'SUPABASE_PUBLISHABLE_KEY' : 'SUPABASE_ANON_KEY'
       const keyValue = showKey ? apiKey : obfuscatedName
 
+      // Publishable and secret keys aren't JWTs, so they must be sent on the `apikey`
+      // header. Passing them on `Authorization: Bearer` makes the platform reject the
+      // request with `Invalid JWT`. Legacy `anon` keys are JWTs and use `Authorization`.
+      const authHeader = isPublishableKey
+        ? `-H 'apikey: ${keyValue}'`
+        : `-H 'Authorization: Bearer ${keyValue}'`
+
       return `curl -L -X POST '${functionUrl}' \\
-  -H 'Authorization: Bearer ${keyValue}' \\${apiKey.includes('publishable') ? `\n  -H 'apikey: ${keyValue}' \\` : ''}
+  ${authHeader} \\
   -H 'Content-Type: application/json' \\
   --data '{"name":"Functions"}'`
     },
