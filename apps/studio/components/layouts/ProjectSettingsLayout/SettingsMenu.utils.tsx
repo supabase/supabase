@@ -16,8 +16,11 @@ export const useGenerateSettingsMenu = () => {
 
   const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
 
-  const { projectSettingsLegacyJwtKeys: legacyJwtKeysEnabled, billingAll: billingEnabled } =
-    useIsFeatureEnabled(['project_settings:legacy_jwt_keys', 'billing:all'])
+  const {
+    projectSettingsLegacyJwtKeys: legacyJwtKeysEnabled,
+    billingAll: billingEnabled,
+    logsAll: showLogDrains,
+  } = useIsFeatureEnabled(['project_settings:legacy_jwt_keys', 'billing:all', 'logs:all'])
 
   const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
@@ -46,13 +49,17 @@ export const useGenerateSettingsMenu = () => {
               : `/project/${ref}/settings/jwt/signing-keys`,
             items: [],
           },
-          {
-            name: `Log Drains`,
-            key: `log-drains`,
-            url: `/project/${ref}/settings/log-drains`,
-            items: [],
-            shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_LOG_DRAINS,
-          },
+          ...(showLogDrains
+            ? [
+                {
+                  name: `Log Drains`,
+                  key: `log-drains`,
+                  url: `/project/${ref}/settings/log-drains`,
+                  items: [],
+                  shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_LOG_DRAINS,
+                },
+              ]
+            : []),
         ],
       },
       {
@@ -146,14 +153,18 @@ export const useGenerateSettingsMenu = () => {
           shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_JWT_KEYS,
         },
 
-        {
-          name: `Log Drains`,
-          key: `log-drains`,
-          url: `/project/${ref}/settings/log-drains`,
-          items: [],
-          disabled: !isProjectActive,
-          shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_LOG_DRAINS,
-        },
+        ...(showLogDrains
+          ? [
+              {
+                name: `Log Drains`,
+                key: `log-drains`,
+                url: `/project/${ref}/settings/log-drains`,
+                items: [],
+                disabled: !isProjectActive,
+                shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_LOG_DRAINS,
+              },
+            ]
+          : []),
         {
           name: 'Add-ons',
           key: 'addons',
