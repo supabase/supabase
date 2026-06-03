@@ -24,7 +24,8 @@ jobs:
 
     permissions:
       contents: write
-
+      packages: write
+      id-token: write
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
