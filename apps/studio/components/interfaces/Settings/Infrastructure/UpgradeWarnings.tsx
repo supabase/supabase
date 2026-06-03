@@ -46,6 +46,10 @@ const getValidationErrorTitle = (error: ProjectUpgradeEligibilityValidationError
       return `${error.schema_name}.${error.obj_name}`
     case 'active_replication_slot':
       return error.slot_name
+    case 'project_hibernating':
+      return 'Project is hibernating'
+    case 'x86_architecture':
+      return 'Project is running on x86 architecture'
   }
 }
 
@@ -67,6 +71,10 @@ const getValidationErrorDescription = (error: ProjectUpgradeEligibilityValidatio
       return `Move the ${error.obj_type} to your own schema`
     case 'active_replication_slot':
       return 'Drop the active replication slot'
+    case 'project_hibernating':
+      return 'The project is currently hibernating and will wake on next supported request'
+    case 'x86_architecture':
+      return 'The project is running on x86 architecture and cannot be upgraded'
   }
 }
 

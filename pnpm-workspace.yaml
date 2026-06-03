@@ -8,11 +8,11 @@ blockExoticSubdeps: true
 
 catalog:
   '@sentry/nextjs': ^10.26.0
-  '@supabase/auth-js': 2.106.2
-  '@supabase/postgrest-js': 2.106.2
-  '@supabase/realtime-js': 2.106.2
+  '@supabase/auth-js': 2.107.0
+  '@supabase/postgrest-js': 2.107.0
+  '@supabase/realtime-js': 2.107.0
   '@supabase/ssr': 0.10.2
-  '@supabase/supabase-js': 2.106.2
+  '@supabase/supabase-js': 2.107.0
   '@tanstack/react-router': ^1.169.2
   '@tanstack/react-start': ^1.167.65
   '@tanstack/react-table': ^8.21.3

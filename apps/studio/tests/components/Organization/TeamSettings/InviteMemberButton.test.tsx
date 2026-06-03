@@ -53,7 +53,12 @@ vi.mock('@/data/organizations/organization-members-query', () => ({
 }))
 
 const mockRoles = {
-  org_scoped_roles: [{ id: 1, name: 'Developer', description: null }],
+  org_scoped_roles: [
+    { id: 4, name: 'Owner', description: null },
+    { id: 3, name: 'Administrator', description: null },
+    { id: 1, name: 'Developer', description: null },
+    { id: 2, name: 'Read-only', description: null },
+  ],
 }
 vi.mock('@/data/organization-members/organization-roles-query', () => ({
   useOrganizationRolesV2Query: () => ({ data: mockRoles, isSuccess: true }),
@@ -72,7 +77,10 @@ vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
 }))
 
 vi.mock('@/components/interfaces/Organization/TeamSettings/TeamSettings.utils', () => ({
-  useGetRolesManagementPermissions: () => ({ rolesAddable: [1], rolesRemovable: [1] }),
+  useGetRolesManagementPermissions: () => ({
+    rolesAddable: [1, 2, 3, 4],
+    rolesRemovable: [1, 2, 3, 4],
+  }),
 }))
 
 const mockInvite = vi.fn().mockResolvedValue({ succeeded: [], failed: [] })
@@ -124,6 +132,37 @@ describe('InviteMemberButton', () => {
     await openDialog()
     expect(screen.getByRole('dialog')).toBeInTheDocument()
     expect(screen.getByText('Invite team members')).toBeInTheDocument()
+  })
+
+  it('renders a stacked radio option with permission guidance for each role', async () => {
+    customRender(<InviteMemberButton />)
+    await openDialog()
+
+    expect(screen.getAllByRole('radio')).toHaveLength(4)
+    expect(screen.getByRole('link', { name: 'roles and permissions' })).toHaveAttribute(
+      'href',
+      'https://supabase.com/docs/guides/platform/access-control'
+    )
+    expect(
+      screen.getByText(
+        'Full access, including deleting the organization and transferring or deleting projects.'
+      )
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'Manage members, billing, and project settings, including deleting projects. Cannot manage organization settings or owners.'
+      )
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'Manage project content, including deleting data, users, files, and Edge Functions. Cannot change settings or delete projects.'
+      )
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'View resources without modifying or deleting them. SQL Editor access is limited to SELECT queries.'
+      )
+    ).toBeInTheDocument()
   })
 
   it('calls the mutation with a single email in an array', async () => {

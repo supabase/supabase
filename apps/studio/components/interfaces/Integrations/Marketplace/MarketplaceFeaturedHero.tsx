@@ -142,17 +142,10 @@ export const MarketplaceFeaturedHero = ({
             </div>
 
             <div className="mt-1 flex items-center gap-4">
-              <Button
-                asChild
-                type="text"
-                className="p-0 pointer-events-none"
-                iconRight={<ArrowRight size={12} />}
-                size="tiny"
-              >
-                <Link href={`/project/${project?.ref}/integrations/${active.id}/overview`}>
-                  {isActiveInstalled ? 'Manage integration' : 'View integration'}
-                </Link>
-              </Button>
+              <span className="inline-flex items-center gap-1.5 text-xs text-foreground">
+                {isActiveInstalled ? 'Manage integration' : 'View integration'}
+                <ArrowRight size={12} />
+              </span>
             </div>
           </div>
         </Link>

@@ -27,10 +27,7 @@ import {
   EdgeFunctionsSortOrder,
 } from '@/components/interfaces/EdgeFunctions/EdgeFunctionsSortDropdown'
 import { EdgeFunctionsListItem } from '@/components/interfaces/Functions/EdgeFunctionsListItem'
-import {
-  FunctionsEmptyState,
-  FunctionsInstructionsLocal,
-} from '@/components/interfaces/Functions/FunctionsEmptyState'
+import { FunctionsEmptyState } from '@/components/interfaces/Functions/FunctionsEmptyState'
 import { TerminalInstructionsDialog } from '@/components/interfaces/Functions/TerminalInstructionsDialog'
 import { useFunctionsListShortcuts } from '@/components/interfaces/Functions/useFunctionsListShortcuts'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
@@ -119,7 +116,8 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
               ) : (
                 <Admonition type="warning" title="Failed to retrieve edge functions">
                   <p className="prose [&>code]:text-xs text-sm">
-                    Local functions can be found at <code>supabase/functions</code> folder.
+                    Edge functions could not be read from disk. The functions directory may be
+                    missing, not mounted into Studio, or unreadable.
                   </p>
                 </Admonition>
               ))}
@@ -226,7 +224,6 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                 )}
               </>
             )}
-            {!IS_PLATFORM && <FunctionsInstructionsLocal />}
           </div>
         </PageSectionContent>
       </PageSection>
