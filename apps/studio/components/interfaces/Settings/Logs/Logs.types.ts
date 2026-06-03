@@ -96,6 +96,7 @@ export type QueryType =
   | 'pg_cron'
   | 'pgbouncer'
   | 'etl'
+  | 'multigres'
 
 export type Mode = 'simple' | 'custom'
 

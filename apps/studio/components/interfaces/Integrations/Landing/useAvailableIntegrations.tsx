@@ -81,7 +81,7 @@ export const useAvailableIntegrations = () => {
             edge_function_secret_name: edgeFunctionSecretName,
             images,
             content,
-            partner_name: authorName,
+            built_by: authorName,
             listing_logo: listingLogo,
           } = integration
 
@@ -178,7 +178,7 @@ export const useAvailableIntegrations = () => {
         documentation_url: docsUrl,
         website_url: siteUrl,
         images,
-        partner_name: authorName,
+        built_by: authorName,
         listing_logo: listingLogo,
       } = marketplaceWrapper
 

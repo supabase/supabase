@@ -353,7 +353,6 @@ function CompoundRefLink({
         className={cn('border-l border-control pl-3 ml-1 data-open:mt-2 grid gap-2.5')}
       >
         <ul className="space-y-2">
-          <RefLink basePath={basePath} section={section} skipChildren />
           {(section.items || []).map((item, idx) => {
             return (
               <li key={`${section.id}-${idx}`}>
