@@ -185,6 +185,7 @@ export const SeverityFormatter = ({
       )
       break
 
+    case 'WARN':
     case 'WARNING':
       return (
         <Layout className="gap-1">
