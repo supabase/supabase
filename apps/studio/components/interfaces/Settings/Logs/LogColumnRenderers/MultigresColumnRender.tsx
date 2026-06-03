@@ -40,7 +40,7 @@ const columns: Column<LogData>[] = [
 
       return (
         <RowLayout>
-          <TimestampInfo utcTimestamp={props.row.timestamp!} />
+          {props.row.timestamp && <TimestampInfo utcTimestamp={props.row.timestamp} />}
           {level && <SeverityFormatter value={level} />}
           <TextFormatter className="w-full" value={msg ?? props.row.event_message} />
         </RowLayout>

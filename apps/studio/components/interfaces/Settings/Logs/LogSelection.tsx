@@ -70,7 +70,7 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
 
         return <DefaultPreviewSelectionRenderer log={apiLog} />
 
-      case 'multigres':
+      case 'multigres': {
         const parsedMultigresMessage = (() => {
           if (typeof log.event_message !== 'string') return null
           try {
@@ -80,8 +80,11 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
             return null
           }
         })()
-        const multigresLog = parsedMultigresMessage ? { ...log, ...parsedMultigresMessage } : log
+        // Spread the log last so its canonical fields (id, timestamp, event_message)
+        // always win over any same-named keys inside the parsed event_message.
+        const multigresLog = parsedMultigresMessage ? { ...parsedMultigresMessage, ...log } : log
         return <DefaultPreviewSelectionRenderer log={multigresLog} />
+      }
 
       case 'database':
         const hint = log?.metadata?.[0]?.parsed?.[0]?.hint
