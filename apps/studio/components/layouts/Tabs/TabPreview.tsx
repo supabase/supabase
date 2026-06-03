@@ -27,7 +27,7 @@ export const TabPreview = ({
         'relative flex items-center text-xs shadow-lg',
         variant === 'toggle-group'
           ? cn(
-              'max-w-[240px] gap-1.5 overflow-hidden rounded-md bg-surface-300 px-2',
+              'max-w-fit gap-1.5 overflow-hidden rounded-md bg-surface-300 px-2',
               SQL_EDITOR_SIDEBAR_SEARCH_ROW_HEIGHT_CLASSNAME
             )
           : 'h-10 gap-2 rounded-xs bg-dash-sidebar px-3 dark:bg-surface-100'

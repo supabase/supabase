@@ -23,8 +23,13 @@ export type SaveSqlSnippetParams = {
   }) => void
   addNeedsSaving: (id: string) => void
   generateSqlTitle: (args: { sql: string }) => Promise<{ title: string }>
-  updateSnippet: (args: { id: string; snippet: { name: string } }) => void
+  updateSnippet: (args: {
+    id: string
+    snippet: { name?: string; isDraftTab?: boolean }
+    skipSave?: boolean
+  }) => void
   onTabLabelUpdate?: (name: string) => void
+  onDraftSaved?: () => void
   onNavigateToSnippet?: () => void
 }
 
@@ -44,6 +49,7 @@ export async function saveSqlSnippet({
   generateSqlTitle,
   updateSnippet,
   onTabLabelUpdate,
+  onDraftSaved,
   onNavigateToSnippet,
 }: SaveSqlSnippetParams): Promise<{ saved: boolean; reason?: 'empty' }> {
   const trimmedSql = sql.trim()
@@ -68,6 +74,13 @@ export async function saveSqlSnippet({
   }
 
   const shouldInvalidate = currentSnippet.isNotSavedInDatabaseYet
+
+  if (currentSnippet.isDraftTab) {
+    updateSnippet({ id, snippet: { isDraftTab: false }, skipSave: true })
+    currentSnippet = { ...currentSnippet, isDraftTab: false }
+    onDraftSaved?.()
+  }
+
   setSql({ id, sql: trimmedSql, shouldInvalidate })
   addNeedsSaving(id)
 

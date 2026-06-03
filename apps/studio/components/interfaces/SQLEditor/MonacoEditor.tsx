@@ -214,8 +214,11 @@ const MonacoEditor = ({
 
   function handleEditorChange(value: string | undefined) {
     tabsSnap.makeActiveTabPermanent()
-    if (id && value) {
+    if (id && value !== undefined) {
       setValue(value)
+      if (snippet) {
+        snapV2.setSql({ id, sql: value, skipSave: true })
+      }
     }
   }
 

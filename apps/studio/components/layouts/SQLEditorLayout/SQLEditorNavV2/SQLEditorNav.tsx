@@ -2,7 +2,7 @@ import { keepPreviousData } from '@tanstack/react-query'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { Heart } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
   InnerSideBarEmptyPanel,
@@ -29,6 +29,10 @@ import { SqlEditorNavFolder } from './SqlEditorNavFolder'
 import { SQLEditorSectionActions } from './SQLEditorSectionActions'
 import { UnshareSnippetModal } from './UnshareSnippetModal'
 import { useSqlEditorCreateActions } from './useSqlEditorCreateActions'
+import {
+  getOpenDraftSqlTabIds,
+  shouldHideDraftSqlTabFromNav,
+} from '@/components/interfaces/SQLEditor/createDraftSqlTab'
 import { DownloadSnippetModal } from '@/components/interfaces/SQLEditor/DownloadSnippetModal'
 import { MoveQueryModal } from '@/components/interfaces/SQLEditor/MoveQueryModal'
 import { RenameQueryModal } from '@/components/interfaces/SQLEditor/RenameQueryModal'
@@ -142,6 +146,17 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
 
   const snippet = snapV2.snippets[id as string]?.snippet
 
+  const openDraftSqlTabIds = useMemo(
+    () => getOpenDraftSqlTabIds(tabs.openTabs, tabs.tabsMap),
+    [tabs.openTabs, tabs.tabsMap]
+  )
+
+  const isHiddenDraftSqlTab = useCallback(
+    (snippetId: string, snippetToCheck?: SnippetWithContent) =>
+      shouldHideDraftSqlTabFromNav(snippetId, openDraftSqlTabIds, snippetToCheck),
+    [openDraftSqlTabIds]
+  )
+
   // ==========================
   // Private snippets & folders
   // ==========================
@@ -195,7 +210,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     if (
       snippet &&
       snippet.visibility === 'user' &&
-      !snippet.isNotSavedInDatabaseYet &&
+      !isHiddenDraftSqlTab(snippet.id, snippet) &&
       !snippetInfo.snippetIds.has(snippet.id)
     ) {
       snippetInfo.snippetIds.add(snippet.id)
@@ -203,11 +218,21 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     }
 
     return snippetInfo
-  }, [privateSnippetsPages?.pages, subResults, isLoading, isPlaceholderData, isFetching, snippet])
+  }, [
+    privateSnippetsPages?.pages,
+    subResults,
+    isLoading,
+    isPlaceholderData,
+    isFetching,
+    snippet,
+    isHiddenDraftSqlTab,
+  ])
 
   const privateSnippets = useMemo(() => {
     const userSnippets =
-      filteredSnippets.snippets?.filter((snippet) => snippet.visibility === 'user') ?? []
+      filteredSnippets.snippets?.filter(
+        (snippet) => snippet.visibility === 'user' && !isHiddenDraftSqlTab(snippet.id)
+      ) ?? []
 
     return mergeSnippetsWithLogSql(
       userSnippets,
@@ -216,7 +241,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
       if (sort === 'name') return a.name.localeCompare(b.name)
       else return new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
     })
-  }, [filteredSnippets.snippets, logSqlSnippets, sort])
+  }, [filteredSnippets.snippets, logSqlSnippets, sort, isHiddenDraftSqlTab])
   const folders = useSnippetFolders(projectRef!)
 
   const { data: snippetCountData, error: snippetCountError } = useContentCountQuery({
@@ -264,7 +289,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     if (
       snippet &&
       snippet.favorite &&
-      !snippet.isNotSavedInDatabaseYet &&
+      !isHiddenDraftSqlTab(snippet.id, snippet) &&
       !snippets.find((x) => x.id === snippet.id)
     ) {
       snippets.push(snippet as SqlSnippet)
@@ -277,13 +302,14 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
 
     return (
       withLogSqlFavorites
+        .filter((snippet) => !isHiddenDraftSqlTab(snippet.id))
         .map((snippet) => ({ ...snippet, folder_id: undefined }))
         .sort((a, b) => {
           if (sort === 'name') return a.name.localeCompare(b.name)
           else return new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
         }) ?? []
     )
-  }, [favoriteSqlSnippetsData?.pages, snippet, sort, logSqlSnippets])
+  }, [favoriteSqlSnippetsData?.pages, snippet, sort, logSqlSnippets, isHiddenDraftSqlTab])
 
   const numFavoriteSnippets = snippetCountData?.favorites ?? 0
 
@@ -315,19 +341,21 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     if (
       snippet &&
       snippet.visibility === 'project' &&
-      !snippet.isNotSavedInDatabaseYet &&
+      !isHiddenDraftSqlTab(snippet.id, snippet) &&
       !snippets.find((x) => x.id === snippet.id)
     ) {
       snippets.push(snippet as SqlSnippet)
     }
 
     return (
-      snippets.sort((a, b) => {
-        if (sort === 'name') return a.name.localeCompare(b.name)
-        else return new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
-      }) ?? []
+      snippets
+        .filter((snippet) => !isHiddenDraftSqlTab(snippet.id))
+        .sort((a, b) => {
+          if (sort === 'name') return a.name.localeCompare(b.name)
+          else return new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
+        }) ?? []
     )
-  }, [sharedSqlSnippetsData?.pages, snippet, sort, logSqlSnippets])
+  }, [sharedSqlSnippetsData?.pages, snippet, sort, logSqlSnippets, isHiddenDraftSqlTab])
 
   const numProjectSnippets = snippetCountData?.shared ?? 0
   const numTotalSnippets =

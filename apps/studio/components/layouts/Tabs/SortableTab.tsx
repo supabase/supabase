@@ -131,7 +131,7 @@ export const SortableTab = ({
       className={cn(
         'flex items-center',
         isToggleGroupTab
-          ? 'min-w-0 max-w-[240px] shrink'
+          ? 'min-w-0 flex-1 max-w-fit overflow-hidden'
           : 'h-(--header-height) shrink-0 first-of-type:border-l'
       )}
     >
@@ -140,7 +140,7 @@ export const SortableTab = ({
           value={tab.id}
           aria-label={tab.label || 'Untitled'}
           className={cn(
-            'group relative flex w-auto min-w-0 max-w-full items-center gap-1.5 overflow-hidden px-2 text-xs',
+            'group relative flex w-full min-w-0 flex-1 max-w-fit items-center gap-1.5 overflow-hidden px-2 text-xs',
             SQL_EDITOR_SIDEBAR_SEARCH_ROW_HEIGHT_CLASSNAME,
             tab.isPreview && 'italic font-light'
           )}

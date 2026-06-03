@@ -9,7 +9,7 @@ import {
 import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable'
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Plus, X } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
 import {
   cn,
@@ -30,7 +30,10 @@ import { CollapseButton } from './CollapseButton'
 import { SortableTab } from './SortableTab'
 import { TabPreview } from './TabPreview'
 import { useTabsScroll } from './Tabs.utils'
+import { clearPersistedDraftSqlTab } from '@/components/interfaces/SQLEditor/createDraftSqlTab'
+import { useCreateDraftSqlTab } from '@/components/interfaces/SQLEditor/useCreateDraftSqlTab'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 import { editorEntityTypes, isSqlEditorTab, useTabsStateSnapshot, type Tab } from '@/state/tabs'
 
 export const EditorTabs = () => {
@@ -40,6 +43,8 @@ export const EditorTabs = () => {
 
   const editor = useEditorType()
   const tabs = useTabsStateSnapshot()
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const { createDraftTab } = useCreateDraftSqlTab()
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -51,8 +56,6 @@ export const EditorTabs = () => {
   const openTabs = tabs.openTabs
     .map((id) => tabs.tabsMap[id])
     .filter((tab) => tab !== undefined) as Tab[]
-
-  const hasNewTab = router.asPath.includes('/new')
 
   // Filter by editor type - only show SQL tabs for SQL editor and table tabs for table editor
   const editorTabs = !!editor
@@ -79,8 +82,25 @@ export const EditorTabs = () => {
     }
   }
 
+  const cleanupDraftTabState = (tabId: string) => {
+    const tab = tabs.tabsMap[tabId]
+    const draftSqlId = tab?.metadata?.isDraft ? tab.metadata?.sqlId : undefined
+    if (draftSqlId && ref) {
+      snapV2.removeSnippet(draftSqlId, true)
+      clearPersistedDraftSqlTab(ref, draftSqlId)
+    }
+  }
+
   const handleClose = (tabId: string) => {
-    tabs.handleTabClose({ id: tabId, router, editor, onClearDashboardHistory })
+    tabs.handleTabClose({
+      id: tabId,
+      router,
+      editor,
+      onClearDashboardHistory,
+      onClose: () => {
+        cleanupDraftTabState(tabId)
+      },
+    })
   }
 
   const handleCloseAll = () => {
@@ -90,6 +110,7 @@ export const EditorTabs = () => {
           ? tabs.openTabs.filter((x) => !isSqlEditorTab(x, tabs.tabsMap))
           : tabs.openTabs.filter((x) => isSqlEditorTab(x, tabs.tabsMap))
 
+      tabsToClose.forEach(cleanupDraftTabState)
       tabs.removeTabs(tabsToClose)
       onClearDashboardHistory()
       router.push(`/project/${ref}/${editor === 'table' ? 'editor' : 'sql'}`)
@@ -103,6 +124,7 @@ export const EditorTabs = () => {
           ? tabs.openTabs.filter((x) => !isSqlEditorTab(x, tabs.tabsMap) && x !== tabId)
           : tabs.openTabs.filter((x) => isSqlEditorTab(x, tabs.tabsMap) && x !== tabId)
 
+      tabsToClose.forEach(cleanupDraftTabState)
       tabs.removeTabs(tabsToClose)
       onClearDashboardHistory()
 
@@ -121,6 +143,7 @@ export const EditorTabs = () => {
       const tabIdx = openedTabs.indexOf(tabId)
       const activeTabIdx = openedTabs.indexOf(tabs.activeTab!)
       const tabsToClose = openedTabs.slice(tabIdx + 1)
+      tabsToClose.forEach(cleanupDraftTabState)
       tabs.removeTabs(tabsToClose)
 
       const isActiveTabClosed = tabIdx < activeTabIdx
@@ -139,7 +162,7 @@ export const EditorTabs = () => {
     tabCount: editorTabs.length,
     enabled: editor !== 'sql',
   })
-  const activeTabValue = hasNewTab ? 'new' : (tabs.activeTab ?? undefined)
+  const activeTabValue = tabs.activeTab ?? undefined
   const isSqlEditor = editor === 'sql'
 
   const sortableTabs = (
@@ -174,54 +197,32 @@ export const EditorTabs = () => {
     </SortableContext>
   )
 
-  const newTabCloseButton = (
-    <span
-      role="button"
-      onClick={(e) => {
-        e.preventDefault()
-        e.stopPropagation()
-      }}
-      className="ml-1 opacity-0 group-hover:opacity-100 hover:bg-200 rounded-xs cursor-pointer"
-      onMouseDown={(e) => {
-        e.preventDefault()
-        e.stopPropagation()
-      }}
-      onPointerDown={(e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        handleClose('new')
-      }}
-    >
-      <X size={12} className="text-foreground-light" />
-    </span>
-  )
-
   const addTabButton = (
     <AnimatePresence initial={false}>
-      {!hasNewTab && (
-        <motion.button
-          className={cn(
-            'flex shrink-0 items-center justify-center rounded-md hover:bg-surface-300',
-            isSqlEditor
-              ? cn(SQL_EDITOR_SIDEBAR_SEARCH_ROW_HEIGHT_CLASSNAME, 'aspect-square shrink-0')
-              : 'w-10 min-h-(--header-height) hover:bg-surface-100 border-b'
-          )}
-          onClick={() =>
-            router.push(
-              `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new?skip=true`
-            )
+      <motion.button
+        className={cn(
+          'flex shrink-0 items-center justify-center rounded-md hover:bg-surface-300',
+          isSqlEditor
+            ? cn(SQL_EDITOR_SIDEBAR_SEARCH_ROW_HEIGHT_CLASSNAME, 'aspect-square shrink-0')
+            : 'w-10 min-h-(--header-height) hover:bg-surface-100 border-b'
+        )}
+        onClick={() => {
+          if (editor === 'sql') {
+            createDraftTab()
+          } else {
+            void router.push(`/project/${router.query.ref}/editor/new?skip=true`)
           }
-          initial={{ opacity: 0, scale: 0.8, x: -10 }}
-          animate={{ opacity: 1, scale: 1, x: 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          <Plus
-            size={16}
-            strokeWidth={1.5}
-            className="text-foreground-lighter hover:text-foreground-light"
-          />
-        </motion.button>
-      )}
+        }}
+        initial={{ opacity: 0, scale: 0.8, x: -10 }}
+        animate={{ opacity: 1, scale: 1, x: 0 }}
+        transition={{ duration: 0.2 }}
+      >
+        <Plus
+          size={16}
+          strokeWidth={1.5}
+          className="text-foreground-lighter hover:text-foreground-light"
+        />
+      </motion.button>
     </AnimatePresence>
   )
 
@@ -241,23 +242,9 @@ export const EditorTabs = () => {
               onValueChange={(value) => {
                 if (value) handleTabChange(value)
               }}
-              className="flex w-max min-w-0 max-w-full flex-nowrap justify-start overflow-hidden"
+              className="flex min-w-0 flex-1 flex-nowrap justify-start overflow-hidden"
             >
               {sortableTabs}
-              {hasNewTab && (
-                <ToggleGroupItem
-                  value="new"
-                  aria-label="New tab"
-                  className={cn(
-                    'group flex shrink-0 items-center gap-1.5 px-2 text-xs',
-                    SQL_EDITOR_SIDEBAR_SEARCH_ROW_HEIGHT_CLASSNAME
-                  )}
-                >
-                  <Plus size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                  <span>New</span>
-                  {newTabCloseButton}
-                </ToggleGroupItem>
-              )}
             </ToggleGroup>
             {addTabButton}
           </div>
@@ -277,25 +264,6 @@ export const EditorTabs = () => {
             )}
           >
             {sortableTabs}
-            {hasNewTab && (
-              <TabsTrigger_Shadcn_
-                value="new"
-                className={cn(
-                  'flex items-center gap-2 px-3 text-xs',
-                  'bg-dash-sidebar/50 dark:bg-surface-100/50',
-                  'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
-                  'relative group h-full border-t-2 border-b-0!',
-                  'hover:bg-surface-300 dark:hover:bg-surface-100'
-                )}
-              >
-                <Plus size={16} strokeWidth={1.5} className={'text-foreground-lighter'} />
-                <div className="flex items-center gap-0">
-                  <span>New</span>
-                </div>
-                {newTabCloseButton}
-                <div className="absolute w-full -bottom-px left-0 right-0 h-px bg-dash-sidebar dark:bg-surface-100 opacity-0 group-data-[state=active]:opacity-100" />
-              </TabsTrigger_Shadcn_>
-            )}
             {addTabButton}
             <div className="grow h-full border-b pr-6" />
           </TabsList_Shadcn_>

@@ -1,6 +1,7 @@
 import { ReactNode } from 'react'
 
 import { OngoingQueriesPanel } from '@/components/interfaces/SQLEditor/OngoingQueriesPanel'
+import { useRestorePersistedDraftSqlTabs } from '@/components/interfaces/SQLEditor/useRestorePersistedDraftSqlTabs'
 import { withAuth } from '@/hooks/misc/withAuth'
 
 export interface SQLEditorLayoutProps {
@@ -8,6 +9,8 @@ export interface SQLEditorLayoutProps {
 }
 
 const SQLEditorLayout = ({ children }: SQLEditorLayoutProps) => {
+  useRestorePersistedDraftSqlTabs()
+
   return (
     <>
       {children}

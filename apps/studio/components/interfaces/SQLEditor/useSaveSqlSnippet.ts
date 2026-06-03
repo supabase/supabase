@@ -1,9 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { useCallback } from 'react'
 import { toast } from 'sonner'
 
+import { clearPersistedDraftSqlTab } from './createDraftSqlTab'
 import { saveSqlSnippet } from './saveSqlSnippet.utils'
 import { useSqlTitleGenerateMutation } from '@/data/ai/sql-title-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -18,16 +18,9 @@ export type UseSaveSqlSnippetOptions = {
   id: string
   snippetName: string
   getEditorSql: () => string | undefined
-  isOnNewRoute?: boolean
 }
 
-export function useSaveSqlSnippet({
-  id,
-  snippetName,
-  getEditorSql,
-  isOnNewRoute = false,
-}: UseSaveSqlSnippetOptions) {
-  const router = useRouter()
+export function useSaveSqlSnippet({ id, snippetName, getEditorSql }: UseSaveSqlSnippetOptions) {
   const { ref: projectRef } = useParams()
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
@@ -52,9 +45,8 @@ export function useSaveSqlSnippet({
     if (!profile) return console.error('Profile is required')
 
     const state = getSqlEditorV2StateSnapshot()
-    const snippet = state.snippets[id]
-    const isReadOnly =
-      snippet?.snippet.visibility === 'project' && snippet?.snippet.owner_id !== profile.id
+    const snippet = state.snippets[id]?.snippet
+    const isReadOnly = snippet?.visibility === 'project' && snippet?.owner_id !== profile.id
 
     if (isReadOnly) return
 
@@ -82,11 +74,13 @@ export function useSaveSqlSnippet({
         const tabId = createTabId('sql', { id })
         tabs.updateTab(tabId, { label: name })
       },
-      onNavigateToSnippet: isOnNewRoute
-        ? () => {
-            void router.push(`/project/${projectRef}/sql/${id}`, undefined, { shallow: true })
-          }
-        : undefined,
+      onDraftSaved: () => {
+        const tabId = createTabId('sql', { id })
+        tabs.updateTab(tabId, { metadata: { isDraft: false } })
+        if (projectRef) {
+          clearPersistedDraftSqlTab(projectRef, id)
+        }
+      },
     })
 
     if (result.reason === 'empty') {
@@ -98,12 +92,10 @@ export function useSaveSqlSnippet({
     getEditorSql,
     id,
     isHipaaProjectDisallowed,
-    isOnNewRoute,
     profile,
     project,
     projectRef,
     querySourceState.executionSource,
-    router,
     snippetName,
     snapV2.addNeedsSaving,
     snapV2.addSnippet,

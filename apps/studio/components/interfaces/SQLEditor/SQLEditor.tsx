@@ -58,6 +58,7 @@ import {
 import { SqlEditorPanelHeader } from './SqlEditorPanelHeader'
 import { SqlEditorShowSqlToggle } from './SqlEditorShowSqlToggle'
 import { getSnippetSqlFromContent } from './sqlSnippet.utils'
+import { useCreateDraftSqlTab } from './useCreateDraftSqlTab'
 import { useSaveSqlSnippet } from './useSaveSqlSnippet'
 import { useSqlEditorCompletion } from './useSqlEditorCompletion'
 import { UtilityActions } from './UtilityPanel/UtilityActions'
@@ -85,7 +86,6 @@ import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { isError } from '@/data/utils/error-check'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { generateUuid } from '@/lib/api/snippets.browser'
 import { BASE_PATH } from '@/lib/constants'
 import { formatSql } from '@/lib/formatSql'
 import { detectOS } from '@/lib/helpers'
@@ -171,13 +171,11 @@ export const SQLEditor = () => {
     registerInCommandMenu: true,
   })
 
+  const { createDraftTab } = useCreateDraftSqlTab()
+
   const openNewSnippet = useCallback(() => {
-    if (!ref) return
-    // skip=true bypasses the "load last visited snippet" redirect on /sql/new.
-    // Without it, the effect in pages/project/[ref]/sql/[id].tsx bounces back
-    // to the previous snippet.
-    router.push(`/project/${ref}/sql/new?skip=true`)
-  }, [ref, router])
+    createDraftTab()
+  }, [createDraftTab])
 
   useShortcut(SHORTCUT_IDS.SQL_EDITOR_NEW_SNIPPET, openNewSnippet, {
     registerInCommandMenu: true,
@@ -194,27 +192,22 @@ export const SQLEditor = () => {
     refocusEditor()
   }, [refocusEditor])
 
-  // generate a new snippet title and an id to be used for new snippets. The dependency on urlId is to avoid a bug which
-  // shows up when clicking on the SQL Editor while being in the SQL editor on a random snippet.
-  const [generatedNewSnippetName, generatedId] = useMemo(() => {
-    const name = generateSnippetTitle()
-    return [name, generateUuid([`${name}.sql`])]
-  }, [urlId])
-
-  // the id is stable across renders - it depends either on the url or on the memoized generated id
   const effectiveUrlId = notebookEditorContext?.blockId ?? urlId
-  const id = !effectiveUrlId || effectiveUrlId === 'new' ? generatedId : effectiveUrlId
+  const id = effectiveUrlId === 'new' ? '' : (effectiveUrlId ?? '')
+
+  if (!id) {
+    return null
+  }
 
   const limit = snapV2.limit
-  const results = snapV2.results[id]?.[0]
+  const results = id ? snapV2.results[id]?.[0] : undefined
   const snippetIsLoading = !(
-    id in snapV2.snippets && snapV2.snippets[id].snippet.content !== undefined
+    id &&
+    id in snapV2.snippets &&
+    snapV2.snippets[id].snippet.content !== undefined
   )
-  const isLoading = effectiveUrlId === 'new' ? false : snippetIsLoading
-  const snippetDisplayTitle =
-    effectiveUrlId === 'new'
-      ? generatedNewSnippetName
-      : (snapV2.snippets[id]?.snippet.name ?? generatedNewSnippetName)
+  const isLoading = !id || snippetIsLoading
+  const snippetDisplayTitle = snapV2.snippets[id]?.snippet.name ?? generateSnippetTitle()
 
   useSqlEditorCompletion(id, monacoRef.current)
 
@@ -378,7 +371,6 @@ export const SQLEditor = () => {
     id,
     snippetName: snippetDisplayTitle,
     getEditorSql,
-    isOnNewRoute: urlId === 'new',
   })
 
   useShortcut(SHORTCUT_IDS.SQL_EDITOR_SAVE, () => void saveQuery(), {
@@ -1103,11 +1095,7 @@ export const SQLEditor = () => {
                               : ''
                           }
                           id={id}
-                          snippetName={
-                            urlId === 'new'
-                              ? generatedNewSnippetName
-                              : (snapV2.snippets[id]?.snippet.name ?? generatedNewSnippetName)
-                          }
+                          snippetName={snippetDisplayTitle}
                           className={cn(isDiffOpen && 'hidden')}
                           editorRef={editorRef}
                           monacoRef={monacoRef}

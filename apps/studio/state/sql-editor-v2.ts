@@ -6,10 +6,12 @@ import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 import { devtools, proxyMap } from 'valtio/utils'
 
 import type { QueryPlanRow } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
+import { persistDraftSqlTab } from '@/components/interfaces/SQLEditor/draftSqlTabStorage.utils'
 import { DiffType } from '@/components/interfaces/SQLEditor/SQLEditor.types'
 import {
   buildSnippetUpsertContent,
   getSnippetContentType,
+  getSnippetQuerySource,
   getSnippetSqlFromContent,
 } from '@/components/interfaces/SQLEditor/sqlSnippet.utils'
 import { upsertContent, UpsertContentPayload } from '@/data/content/content-upsert-mutation'
@@ -33,10 +35,16 @@ type StateSnippet = {
   snippet: SnippetWithContent
 }
 
+function isDraftSqlTabId(id: string) {
+  return sqlEditorState.snippets[id]?.snippet?.isDraftTab === true
+}
+
 // [Joshen] API codegen is somehow missing the content property
 export interface SnippetWithContent extends Snippet {
   content?: SqlSnippets.Content
   isNotSavedInDatabaseYet?: boolean
+  /** Ephemeral SQL editor tab — not shown in the sidebar until saved */
+  isDraftTab?: boolean
 }
 
 const NEW_FOLDER_ID = 'new-folder'
@@ -168,7 +176,7 @@ export const sqlEditorState = proxy({
             sql: sqlValue,
             label: snippet.name,
           })
-        } else {
+        } else if (!isDraftSqlTabId(id)) {
           sqlEditorState.needsSaving.set(id, true)
         }
       }
@@ -217,6 +225,18 @@ export const sqlEditorState = proxy({
 
       if (isNotebookBlockId(id)) {
         persistNotebookBlock(id, { sql })
+        return
+      }
+
+      if (isDraftSqlTabId(id)) {
+        const stateSnippet = sqlEditorState.snippets[id]
+        if (stateSnippet) {
+          persistDraftSqlTab(stateSnippet.projectRef, id, {
+            sql,
+            name: snippet.name,
+            querySource: getSnippetQuerySource(snippet),
+          })
+        }
         return
       }
 
@@ -345,6 +365,7 @@ export const sqlEditorState = proxy({
       }
       return
     }
+    if (isDraftSqlTabId(id)) return
     sqlEditorState.needsSaving.set(id, true)
   },
 
@@ -545,6 +566,11 @@ if (typeof window !== 'undefined') {
 
       if (snippet) {
         if (isNotebookBlockId(id)) {
+          sqlEditorState.needsSaving.delete(id)
+          return
+        }
+
+        if (isDraftSqlTabId(id)) {
           sqlEditorState.needsSaving.delete(id)
           return
         }

@@ -21,9 +21,7 @@ export function isSqlEditorTab(tabOrId: Tab | string, tabsMap?: Record<string, T
     const tab = tabsMap?.[tabOrId]
     if (tab) return SQL_EDITOR_TAB_TYPES.includes(tab.type)
     return (
-      tabOrId.startsWith('sql-') ||
-      tabOrId.startsWith('notebook-') ||
-      tabOrId.startsWith('chat-')
+      tabOrId.startsWith('sql-') || tabOrId.startsWith('notebook-') || tabOrId.startsWith('chat-')
     )
   }
 
@@ -57,6 +55,7 @@ export interface Tab {
     notebookId?: string
     chatId?: string
     scrollTop?: number
+    isDraft?: boolean
   }
   isPreview?: boolean
   createdAt?: Date
@@ -244,7 +243,14 @@ export function createTabsState(projectRef: string) {
       store.previewTabId = tab.id
       store.activeTab = tab.id
     },
-    updateTab: (id: string, updates: { label?: string; scrollTop?: number }) => {
+    updateTab: (
+      id: string,
+      updates: {
+        label?: string
+        scrollTop?: number
+        metadata?: Partial<NonNullable<Tab['metadata']>>
+      }
+    ) => {
       if (!!store.tabsMap[id]) {
         if ('label' in updates) {
           store.tabsMap[id].label = updates.label
@@ -259,6 +265,12 @@ export function createTabsState(projectRef: string) {
         }
         if ('scrollTop' in updates && store.tabsMap[id].metadata) {
           store.tabsMap[id].metadata.scrollTop = updates.scrollTop
+        }
+        if (updates.metadata && store.tabsMap[id].metadata) {
+          store.tabsMap[id].metadata = {
+            ...store.tabsMap[id].metadata,
+            ...updates.metadata,
+          }
         }
       }
     },

@@ -2,10 +2,15 @@ import { usePrevious } from '@uidotdev/usehooks'
 import { useParams } from 'common/hooks/useParams'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 
+import {
+  createDraftSqlTab,
+  isDraftSqlSnippet,
+  restoreDraftSqlTab,
+} from '@/components/interfaces/SQLEditor/createDraftSqlTab'
 import { SQLEditor } from '@/components/interfaces/SQLEditor/SQLEditor'
 import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
 import { getSnippetQuerySource } from '@/components/interfaces/SQLEditor/sqlSnippet.utils'
@@ -18,6 +23,7 @@ import { useContentIdQuery } from '@/data/content/content-id-query'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
+import { useProfile } from '@/lib/profile'
 import { useQueryExecutionSourceSnapshot } from '@/state/query-execution-source'
 import { SnippetWithContent, useSnippets, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
@@ -25,26 +31,32 @@ import type { NextPageWithLayout } from '@/types'
 
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
-  const { id, ref, content, skip } = useParams()
+  const { id, ref, content, source } = useParams()
   const previousRoute = usePrevious(id)
   const { data: project } = useSelectedProjectQuery()
+  const { profile } = useProfile()
+  const creatingDraftRef = useRef(false)
 
   const editor = useEditorType()
   const tabs = useTabsStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const querySourceState = useQueryExecutionSourceSnapshot()
-  const { history, setLastVisitedSnippet } = useDashboardHistory()
+  const { setLastVisitedSnippet } = useDashboardHistory()
 
   const allSnippets = useSnippets(ref!)
   const snippet = allSnippets.find((x) => x.id === id)
+  const tabId = id ? tabs.openTabs.find((x) => x.endsWith(id)) : undefined
+  const tab = tabId ? tabs.tabsMap[tabId] : undefined
+  const isDraftTab = isDraftSqlSnippet(snippet) || tab?.metadata?.isDraft === true
 
-  const tabId = !!id ? tabs.openTabs.find((x) => x.endsWith(id)) : undefined
-
-  // [Joshen] May need to investigate separately, but occasionally addSnippet doesnt exist in
-  // the snapV2 valtio store for some reason hence why the added typeof check here
   const canFetchContentBasedOnId = Boolean(
-    id !== 'new' && typeof snapV2.addSnippet === 'function' && !snippet?.isNotSavedInDatabaseYet
+    id &&
+    id !== 'new' &&
+    typeof snapV2.addSnippet === 'function' &&
+    !isDraftTab &&
+    !snippet?.isNotSavedInDatabaseYet
   )
+
   const { data, error, isError } = useContentIdQuery(
     { projectRef: ref, id },
     {
@@ -57,41 +69,71 @@ const SqlEditor: NextPageWithLayout = () => {
     isError && error.code === 404 && error.message.includes('Content not found')
   const invalidId = isError && error.code === 400 && error.message.includes('Invalid uuid')
 
-  // [Joshen] Atm we suspect that replication lag is causing this to happen whereby a newly created snippet
-  // shows the "Unable to find snippet" error which blocks the whole UI
-  // Am opting to silently swallow this error, since the saves are still going through and we're scoping this behaviour
-  // behaviour down to a very specific use case too with all these conditionals
-  // More details: https://github.com/supabase/supabase/pull/39389
   const snippetMissingImmediatelyAfterCreating =
     !!snippet && snippetMissing && previousRoute === 'new' && 'isNotSavedInDatabaseYet' in snippet
 
   useEffect(() => {
+    if (
+      id !== 'new' ||
+      !router.isReady ||
+      !ref ||
+      !project ||
+      !profile ||
+      creatingDraftRef.current
+    ) {
+      return
+    }
+
+    creatingDraftRef.current = true
+
+    const initialSql = typeof content === 'string' ? content : ''
+    const querySource = source === 'logs' ? ('logs' as const) : ('database' as const)
+
+    const draftId = createDraftSqlTab({
+      projectRef: ref,
+      projectId: project.id,
+      ownerId: profile.id,
+      snapV2,
+      tabs,
+      initialSql,
+      querySource,
+      skipNavigation: true,
+    })
+
+    if (source === 'logs') {
+      querySourceState.setExecutionSource('logs')
+    }
+
+    void router.replace(`/project/${ref}/sql/${draftId}`)
+  }, [content, id, profile, project, querySourceState, ref, router, snapV2, source, tabs])
+
+  useEffect(() => {
+    if (!router.isReady || !id || id === 'new' || !ref || !project || !profile) return
+    if (!tab?.metadata?.isDraft || snippet) return
+
+    restoreDraftSqlTab({
+      draftId: id,
+      projectRef: ref,
+      projectId: project.id,
+      ownerId: profile.id,
+      snapV2,
+      name: tab.metadata?.name ?? generateSnippetTitle(),
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.isReady, id, ref, project, profile, tab?.metadata?.isDraft, snippet])
+
+  useEffect(() => {
     if (ref && data && project) {
-      // [Joshen] Check if snippet belongs to the current project
       if (!IS_PLATFORM || data.project_id === project.id) {
         snapV2.setSnippet(ref, data as unknown as SnippetWithContent)
         setLastVisitedSnippet(data.id)
       } else {
         setLastVisitedSnippet(undefined)
-        router.replace(`/project/${ref}/sql/new`)
+        void router.replace(`/project/${ref}/sql/new?skip=true`)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref, data, project])
-
-  useEffect(() => {
-    if (!router.isReady || !ref || id === 'new') return
-
-    if (snippetMissing && !snippetMissingImmediatelyAfterCreating) {
-      setLastVisitedSnippet(undefined)
-      const tabId = createTabId('sql', { id })
-      if (tabs.openTabs.includes(tabId)) {
-        tabs.removeTab(tabId)
-      }
-      router.replace(`/project/${ref}/sql/new?skip=true`)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.isReady, ref, id, snippetMissing, snippetMissingImmediatelyAfterCreating])
 
   useEffect(() => {
     if (router.query.source === 'logs') {
@@ -102,40 +144,44 @@ const SqlEditor: NextPageWithLayout = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.query.source, data])
 
-  // Load the last visited snippet when landing on /new
-  useEffect(() => {
-    if (
-      id === 'new' &&
-      skip !== 'true' && // [Joshen] Skip flag implies to skip loading the last visited snippet
-      history.sql !== undefined &&
-      content === undefined
-    ) {
-      const snippet = allSnippets.find((snippet) => snippet.id === history.sql)
-      if (snippet !== undefined) router.replace(`/project/${ref}/sql/${history.sql}`)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, allSnippets, content])
-
-  // Watch for route changes
   useEffect(() => {
     if (!router.isReady || !id || id === 'new') return
 
-    const tabId = createTabId('sql', { id })
-    const snippet = allSnippets.find((x) => x.id === id)
+    const nextTabId = createTabId('sql', { id })
+    const routeSnippet = allSnippets.find((x) => x.id === id)
 
     tabs.addTab({
-      id: tabId,
+      id: nextTabId,
       type: 'sql',
-      label: snippet?.name || generateSnippetTitle(),
+      label: routeSnippet?.name || tab?.metadata?.name || generateSnippetTitle(),
       metadata: {
         sqlId: id,
-        name: snippet?.name,
+        name: routeSnippet?.name ?? tab?.metadata?.name,
+        isDraft: isDraftTab,
       },
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.isReady, id])
 
-  if (snippetMissing && !snippetMissingImmediatelyAfterCreating) {
+  useEffect(() => {
+    if (!router.isReady || !ref || !id || id === 'new') return
+
+    if (snippetMissing && !snippetMissingImmediatelyAfterCreating && !isDraftTab) {
+      setLastVisitedSnippet(undefined)
+      const staleTabId = createTabId('sql', { id })
+      if (tabs.openTabs.includes(staleTabId)) {
+        tabs.removeTab(staleTabId)
+      }
+      void router.replace(`/project/${ref}/sql/new?skip=true`)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.isReady, ref, id, snippetMissing, snippetMissingImmediatelyAfterCreating, isDraftTab])
+
+  if (id === 'new') {
+    return null
+  }
+
+  if (snippetMissing && !snippetMissingImmediatelyAfterCreating && !isDraftTab) {
     return null
   }
 

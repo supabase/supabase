@@ -37,7 +37,7 @@ const SQLEditorIndexPage: NextPageWithLayout = () => {
           router.replace(`/project/${projectRef}/sql/${lastTab.metadata.sqlId}`)
         }
       } else {
-        router.replace(`/project/${projectRef}/sql/new`)
+        router.replace(`/project/${projectRef}/sql/new?skip=true`)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -97,7 +97,7 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
     if (ref !== undefined && id !== undefined) {
       if (router.pathname.endsWith('/sql/[id]') && id !== 'new') {
         const snippet = getSqlEditorV2StateSnapshot().snippets[id]?.snippet
-        if (!snippet?.isNotSavedInDatabaseYet) {
+        if (!snippet?.isDraftTab && !snippet?.isNotSavedInDatabaseYet) {
           setLastVisitedSnippet(id)
         }
       } else if (router.pathname.endsWith('/editor/[id]')) {

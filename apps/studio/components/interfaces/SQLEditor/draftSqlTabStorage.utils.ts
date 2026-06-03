@@ -1,0 +1,94 @@
+import { LOCAL_STORAGE_KEYS } from 'common'
+
+import type { QueryExecutionSource } from '@/state/query-execution-source'
+
+export type PersistedDraftSqlTab = {
+  sql: string
+  name: string
+  querySource: QueryExecutionSource
+  updatedAt: number
+}
+
+export type DraftSqlTabStorage = Record<string, PersistedDraftSqlTab>
+
+export function getDraftSqlTabStorageKey(projectRef: string) {
+  return LOCAL_STORAGE_KEYS.SQL_EDITOR_DRAFT_TABS(projectRef)
+}
+
+export function readDraftSqlTabStorage(projectRef: string): DraftSqlTabStorage {
+  if (typeof window === 'undefined' || !projectRef) return {}
+
+  try {
+    const raw = localStorage.getItem(getDraftSqlTabStorageKey(projectRef))
+    if (!raw) return {}
+
+    const parsed = JSON.parse(raw) as unknown
+    if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+      return {}
+    }
+
+    return parsed as DraftSqlTabStorage
+  } catch {
+    return {}
+  }
+}
+
+export function readPersistedDraftSqlTab(
+  projectRef: string,
+  draftId: string
+): PersistedDraftSqlTab | undefined {
+  return readDraftSqlTabStorage(projectRef)[draftId]
+}
+
+export function persistDraftSqlTab(
+  projectRef: string,
+  draftId: string,
+  patch: {
+    sql?: string
+    name: string
+    querySource?: QueryExecutionSource
+  }
+) {
+  if (typeof window === 'undefined' || !projectRef) return
+
+  const storage = readDraftSqlTabStorage(projectRef)
+  const existing = storage[draftId]
+
+  storage[draftId] = {
+    sql: patch.sql ?? existing?.sql ?? '',
+    name: patch.name,
+    querySource: patch.querySource ?? existing?.querySource ?? 'database',
+    updatedAt: Date.now(),
+  }
+
+  localStorage.setItem(getDraftSqlTabStorageKey(projectRef), JSON.stringify(storage))
+}
+
+export function removePersistedDraftSqlTab(projectRef: string, draftId: string) {
+  if (typeof window === 'undefined' || !projectRef) return
+
+  const storage = readDraftSqlTabStorage(projectRef)
+  if (!(draftId in storage)) return
+
+  delete storage[draftId]
+  localStorage.setItem(getDraftSqlTabStorageKey(projectRef), JSON.stringify(storage))
+}
+
+export function prunePersistedDraftSqlTabs(projectRef: string, openDraftIds: string[]) {
+  if (typeof window === 'undefined' || !projectRef) return
+
+  const storage = readDraftSqlTabStorage(projectRef)
+  const openDraftIdSet = new Set(openDraftIds)
+  let hasChanges = false
+
+  for (const draftId of Object.keys(storage)) {
+    if (!openDraftIdSet.has(draftId)) {
+      delete storage[draftId]
+      hasChanges = true
+    }
+  }
+
+  if (hasChanges) {
+    localStorage.setItem(getDraftSqlTabStorageKey(projectRef), JSON.stringify(storage))
+  }
+}

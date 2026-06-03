@@ -6,6 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger, ToggleGroup, ToggleGroupItem }
 import { ChartConfig, ChartSettings } from './ChartConfig'
 import { UtilityTabLogsResults } from './UtilityTabLogsResults'
 import { UtilityTabResults } from './UtilityTabResults'
+import { isDraftSqlSnippet } from '@/components/interfaces/SQLEditor/createDraftSqlTab'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
@@ -76,7 +77,11 @@ export const UtilityPanel = ({
         },
       }
 
-      snapV2.updateSnippet({ id, snippet: newSnippet as unknown as Snippet })
+      snapV2.updateSnippet({
+        id,
+        snippet: newSnippet as unknown as Snippet,
+        skipSave: isDraftSqlSnippet(snippet),
+      })
     },
     onError: async (_err, _newContent, _context) => {
       toast.error(`Failed to update chart. Please try again.`)
@@ -122,6 +127,19 @@ export const UtilityPanel = ({
     }
 
     if (!ref || !snippet?.id) return
+    if (isDraftSqlSnippet(snippet)) {
+      snapV2.updateSnippet({
+        id,
+        snippet: {
+          content: {
+            ...snippet.content,
+            chart: config,
+          },
+        } as unknown as Snippet,
+        skipSave: true,
+      })
+      return
+    }
 
     upsertContent({
       projectRef: ref,

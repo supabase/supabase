@@ -5,6 +5,7 @@ import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useCallback } from 'react'
 import { toast } from 'sonner'
 
+import { createDraftSqlTab } from '@/components/interfaces/SQLEditor/createDraftSqlTab'
 import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -14,6 +15,7 @@ import { IS_PLATFORM } from '@/lib/constants'
 import { useProfile } from '@/lib/profile'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useTabsStateSnapshot } from '@/state/tabs'
 
 export type SqlEditorSnippetCreateTarget = 'private' | 'shared' | 'favorite'
 
@@ -23,6 +25,7 @@ export function useSqlEditorCreateActions() {
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const tabs = useTabsStateSnapshot()
   const assistant = useAiAssistantStateSnapshot()
   const [, setShowNewReportModal] = useQueryState('newReport', parseAsBoolean.withDefault(false))
   const { reportsAll } = useIsFeatureEnabled(['reports:all'])
@@ -53,7 +56,14 @@ export function useSqlEditorCreateActions() {
 
       try {
         if (target === 'private') {
-          await router.push(`/project/${projectRef}/sql/new?skip=true`)
+          createDraftSqlTab({
+            projectRef,
+            projectId: project.id,
+            ownerId: profile.id,
+            snapV2,
+            tabs,
+            router,
+          })
           return
         }
 
@@ -74,7 +84,7 @@ export function useSqlEditorCreateActions() {
         toast.error(`Failed to create new query: ${error.message}`)
       }
     },
-    [canCreateSQLSnippet, profile, project, projectRef, router, snapV2]
+    [canCreateSQLSnippet, profile, project, projectRef, router, snapV2, tabs]
   )
 
   const createNewChat = useCallback(() => {

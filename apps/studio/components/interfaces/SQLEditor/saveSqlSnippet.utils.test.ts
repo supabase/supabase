@@ -99,6 +99,31 @@ describe('saveSqlSnippet', () => {
     expect(onTabLabelUpdate).toHaveBeenCalledWith('Active users')
   })
 
+  it('clears draft tab flag when saving a draft snippet', async () => {
+    const updateSnippet = vi.fn()
+    const onDraftSaved = vi.fn()
+
+    await saveSqlSnippet({
+      ...baseParams,
+      updateSnippet,
+      onDraftSaved,
+      snippet: {
+        id: 'snippet-id',
+        name: untitledSnippetTitle,
+        visibility: 'user',
+        isNotSavedInDatabaseYet: true,
+        isDraftTab: true,
+      } as any,
+    })
+
+    expect(updateSnippet).toHaveBeenCalledWith({
+      id: 'snippet-id',
+      snippet: { isDraftTab: false },
+      skipSave: true,
+    })
+    expect(onDraftSaved).toHaveBeenCalled()
+  })
+
   it('skips AI rename when snippet already has a custom name', async () => {
     const generateSqlTitle = vi.fn()
 
