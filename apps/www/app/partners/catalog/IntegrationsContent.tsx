@@ -9,7 +9,6 @@ import { getCategoryIcon } from 'common/marketplace-categories'
 import {
   ArrowRight,
   ArrowUpRight,
-  BadgeCheck,
   Filter,
   LayoutGrid,
   List,
@@ -213,8 +212,8 @@ export default function IntegrationsContent({
                 {metaDescription}
               </p>
             </div>
-            <Button asChild size="small" className="shrink-0">
-              <Link href="/partners#become-a-partner">Become a partner</Link>
+            <Button asChild size="tiny" className="shrink-0">
+              <Link href="/partners#become-a-partner">Apply to become a partner</Link>
             </Button>
           </div>
         </div>
@@ -473,9 +472,9 @@ export default function IntegrationsContent({
           id="become-a-partner"
           className="mx-auto max-w-2xl flex flex-col items-center gap-6 py-32 px-6 text-center"
         >
-          <h2 className="h2 text-balance">Interested in adding your product to the catalog?</h2>
+          <h2 className="h2 text-balance">Interested in partnering with Supabase?</h2>
           <Button asChild size="medium" iconRight={<ArrowRight />}>
-            <Link href="/partners#become-a-partner">Become a partner</Link>
+            <Link href="/partners#become-a-partner">Apply to become a partner</Link>
           </Button>
         </div>
       </div>
