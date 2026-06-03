@@ -1,12 +1,12 @@
 ---
 id: 'migrating-to-new-api-keys'
-title: 'Migrate to publishable and secret API keys'
-description: 'Move from legacy JWT-based anon and service_role keys to publishable and secret keys with zero downtime.'
+title: 'Migrating to publishable and secret API keys'
+description: 'Move from legacy JWT-based anon and service_role keys to publishable and secret keys.'
 ---
 
 Supabase has changed the way API keys work. The legacy `anon` and `service_role` keys are based on your project's JWT secret, which makes them hard to rotate without downtime. The new publishable (`sb_publishable_...`) and secret (`sb_secret_...`) keys can be created, named, and revoked independently, so you can rotate a single key without touching the rest of your app.
 
-This guide walks through migrating an existing project. Both key types work at the same time, so you can swap clients one at a time and deactivate the legacy keys only once nothing depends on them.
+This guide covers migrating an **existing project.** Both key types work simultaneously, so you can swap clients one at a time and deactivate the legacy keys only after nothing depends on them.
 
 <Admonition type="note">
 
@@ -23,15 +23,15 @@ The migration maps onto your existing keys:
 | `anon`         | Publishable key | Browsers, mobile and desktop apps, CLIs, public source |
 | `service_role` | Secret key      | Servers, Edge Functions, workers, other backend code   |
 
-For a full explanation of each key type, see [Understanding API keys](/docs/guides/getting-started/api-keys).
+For a full explanation of each key type, read [the Understanding API keys guide](/docs/guides/getting-started/api-keys).
 
 ## Step 1: Create the new API keys
 
 Open the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard and select the **Publishable and secret API keys** tab.
 
-Older projects don't have these keys yet. If you see a **Create new API keys** button, your project is still on legacy keys only. Creating the new keys is safe: it adds a publishable key and a secret key alongside your existing `anon` and `service_role` keys. Nothing breaks, and your legacy keys keep working.
+Older projects don't have these keys yet. If you see a **Create new API keys** button, your project is still on legacy keys only. Creating the new keys is safe. It adds a publishable key and a secret key alongside your existing `anon` and `service_role` keys. Your legacy keys keep working.
 
-The new keys are created under the name `default`. You can add more keys with different names later, for example one secret key per backend component so you can rotate them independently. For an initial migration, the `default` publishable and secret keys are all you need.
+The new keys are created under the name `default`. You can add more keys with different names later, for example, one secret key per backend component, so you can rotate them independently. For an initial migration, the `default` publishable and secret keys are all you need.
 
 ## Step 2: Swap the publishable key in client code
 
@@ -46,7 +46,7 @@ const supabase = createClient(
 )
 ```
 
-The publishable key carries the same low privileges as the `anon` key, so your [Row Level Security](/docs/guides/database/postgres/row-level-security) policies behave the same. User authentication through Supabase Auth is unchanged: the user still signs in and gets their own JWT.
+The publishable key carries the same low privileges as the `anon` key, so your [Row Level Security](/docs/guides/database/postgres/row-level-security) policies behave the same. User authentication through Supabase Auth is unchanged. The user still signs in and gets their own JWT.
 
 ## Step 3: Swap the secret key in backend code
 
@@ -118,7 +118,7 @@ You have two options: a minimal change that swaps which variable you read, or a 
 
 ### Option 1: Read the new keys from the environment
 
-For most functions, the only change is how you read the key. The legacy variables held a plain string. The new ones hold a JSON object keyed by name, so you parse them and read the key by name. The key you created in [Step 1](#step-1-create-the-new-api-keys) is named `default`.
+For most functions, the only change is how you read the key. The legacy variables held a plain string. The new ones hold a JSON object keyed by name, so you parse them and read the key by name. The key you created in [step 1](#step-1-create-the-new-api-keys) is named `default`.
 
 ```ts
 // before
@@ -128,9 +128,9 @@ const secretKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 const secretKey = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)['default']
 ```
 
-The publishable keys work the same way through `SUPABASE_PUBLISHABLE_KEYS`. See [Managing Secrets](/docs/guides/functions/secrets) for more on environment variables in Edge Functions.
+The publishable keys work the same way through `SUPABASE_PUBLISHABLE_KEYS`. Read [the Managing Secrets guide](/docs/guides/functions/secrets) for more on environment variables in Edge Functions.
 
-If you created more than one secret key in [Step 1](#step-1-create-the-new-api-keys), every key lives in the same `SUPABASE_SECRET_KEYS` object, each under its own name. Read a non-default key the same way:
+If you created more than one secret key in [step 1](#step-1-create-the-new-api-keys), every key lives in the same `SUPABASE_SECRET_KEYS` object, each under its own name. Read a non-default key the same way:
 
 ```ts
 const secretKeys = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
@@ -210,7 +210,7 @@ Don't forget callers that are easy to miss:
 
 ## Step 6: Deactivate the legacy keys
 
-Once you've confirmed nothing uses the legacy keys, deactivate them in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section. You can re-activate them if you find a client you missed, so this step is reversible.
+Once you've confirmed nothing uses the legacy keys, deactivate them in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard. You can re-activate them if you find a client you missed, so this step is reversible.
 
 ## Known limitations
 
