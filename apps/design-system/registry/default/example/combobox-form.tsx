@@ -6,12 +6,12 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   Form,
   FormControl,
   FormDescription,
@@ -94,13 +94,13 @@ export default function ComboboxForm() {
                   </FormControl>
                 </PopoverTrigger>
                 <PopoverContent className="w-[200px] p-0">
-                  <Command_Shadcn_>
-                    <CommandInput_Shadcn_ placeholder="Search language..." />
-                    <CommandList_Shadcn_>
-                      <CommandEmpty_Shadcn_>No language found.</CommandEmpty_Shadcn_>
-                      <CommandGroup_Shadcn_>
+                  <Command>
+                    <CommandInput placeholder="Search language..." />
+                    <CommandList>
+                      <CommandEmpty>No language found.</CommandEmpty>
+                      <CommandGroup>
                         {languages.map((language) => (
-                          <CommandItem_Shadcn_
+                          <CommandItem
                             value={language.label}
                             key={language.value}
                             onSelect={() => {
@@ -114,11 +114,11 @@ export default function ComboboxForm() {
                               )}
                             />
                             {language.label}
-                          </CommandItem_Shadcn_>
+                          </CommandItem>
                         ))}
-                      </CommandGroup_Shadcn_>
-                    </CommandList_Shadcn_>
-                  </Command_Shadcn_>
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
                 </PopoverContent>
               </Popover>
               <FormDescription>

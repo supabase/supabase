@@ -7,19 +7,18 @@ import {
   Button,
   Checkbox,
   cn,
-  Command_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
   Input,
   Popover,
   PopoverContent,
   PopoverTrigger,
-  Switch,
   Tooltip,
   TooltipContent,
-  TooltipTrigger,
+  TooltipTrigger, 
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -133,8 +132,9 @@ export const Column = ({
           <GripVertical size={16} strokeWidth={1.5} />
         </button>
       </div>
-      <div className="w-[25%]">
+      <div className="w-[30%]">
         <div className="flex w-[95%] items-center justify-between">
+        <div className="h-4 w-px bg-border" />
           <Input
             aria-label="Column name"
             size="small"
@@ -148,143 +148,147 @@ export const Column = ({
             )}
             onChange={(event) => onUpdateColumn({ name: event.target.value })}
           />
-          <div className="flex items-center gap-x-1">
-            {relations.filter((r) => !r.toRemove).length === 0 ? (
-              <Button
-                type="dashed"
-                className="rounded-l-none h-[30px] py-0 px-2"
-                onClick={() => onEditForeignKey()}
-              >
-                <Link size={12} />
-              </Button>
-            ) : (
-              <Popover open={open} onOpenChange={setOpen} modal={false}>
-                <PopoverTrigger asChild>
-                  <Button type="default" className="rounded-l-none h-[30px] py-0 px-2">
-                    <Link size={12} />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent
-                  className={cn('p-0', hasChangesInRelations ? 'w-96' : 'w-72')}
-                  side="bottom"
-                  align="center"
-                >
-                  <div className="text-xs px-2 pt-2">
-                    Involved in {relations.length} foreign key{relations.length > 1 ? 's' : ''}
-                  </div>
-                  <Command_Shadcn_>
-                    <CommandList_Shadcn_>
-                      <CommandGroup_Shadcn_>
-                        {relations.map((relation, idx) => {
-                          const key = String(relation?.id ?? `${column.id}-relation-${idx}`)
-                          const status = getRelationStatus(relation)
-                          if (status === 'REMOVE') return null
+          
+          {relations.filter((r) => !r.toRemove).length === 0 ? (
+            <div className="flex items-center gap-x-1">
+            <Button
+              type="dashed"
+              className="rounded-l-none h-[30px] py-0 px-2"
+              onClick={() => onEditForeignKey()}
+            >
+              <Link size={12} />
+            </Button>
 
-                          return (
-                            <CommandItem_Shadcn_
-                              key={key}
-                              value={key}
-                              className="cursor-pointer w-full"
-                              onSelect={() => onEditForeignKey(relation)}
-                              onClick={() => onEditForeignKey(relation)}
-                            >
-                              {status === undefined ? (
-                                <div className="w-full flex items-center justify-between truncate">
-                                  {relation.name}
-                                </div>
-                              ) : (
-                                <div className="flex items-center gap-x-2 truncate">
-                                  <Badge variant={status === 'ADD' ? 'success' : 'warning'}>
-                                    {status}
-                                  </Badge>
-                                  <p className="truncate">
-                                    {relation.name || (
-                                      <>
-                                        To{' '}
-                                        {relation.columns
-                                          .filter((c) => c.source === column.name)
-                                          .map((c) => {
-                                            return (
-                                              <code key={`${c.source}-${c.target}`}>
-                                                {relation.schema}.{relation.table}.{c.target}
-                                              </code>
-                                            )
-                                          })}
-                                        {relation.columns.length > 1 && (
-                                          <>
-                                            and {relation.columns.length - 1} other column
-                                            {relation.columns.length > 2 ? 's' : ''}
-                                          </>
-                                        )}
-                                      </>
-                                    )}
-                                  </p>
-                                </div>
-                              )}
-                            </CommandItem_Shadcn_>
-                          )
-                        })}
-                      </CommandGroup_Shadcn_>
-                      <CommandSeparator_Shadcn_ />
-                      <CommandGroup_Shadcn_>
-                        <CommandItem_Shadcn_
-                          className="cursor-pointer w-full gap-x-2"
-                          onSelect={() => onEditForeignKey()}
-                          onClick={() => onEditForeignKey()}
-                        >
-                          <Plus size={14} strokeWidth={1.5} />
-                          <p>Add foreign key relation</p>
-                        </CommandItem_Shadcn_>
-                      </CommandGroup_Shadcn_>
-                    </CommandList_Shadcn_>
-                  </Command_Shadcn_>
-                </PopoverContent>
-              </Popover>
-            )}
             <div className="h-4 w-px bg-border" />
             <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={() => {
-                    const SENSITIVE_DATA_MARKER = '[SENSITIVE]'
-                    const isSensitive = !column.isSensitiveData
-                    let updatedComment = column.comment || ''
-
-                    if (isSensitive && !updatedComment.includes(SENSITIVE_DATA_MARKER)) {
-                      updatedComment = updatedComment
-                        ? `${updatedComment} ${SENSITIVE_DATA_MARKER}`
-                        : SENSITIVE_DATA_MARKER
-                    } else if (!isSensitive) {
-                      updatedComment = updatedComment.replace(SENSITIVE_DATA_MARKER, '').trim()
-                    }
-
-                    onUpdateColumn({ isSensitiveData: isSensitive, comment: updatedComment })
-                  }}
-                  className={cn(
-                    'transition cursor-pointer p-1 hover:bg-surface-100 rounded',
-                    column.isSensitiveData
-                      ? 'opacity-100 text-foreground'
-                      : 'opacity-50 hover:opacity-100 text-foreground-light'
-                  )}
-                  type="button"
-                  aria-label={
-                    column.isSensitiveData ? 'Marked as sensitive' : 'Not marked as sensitive'
+            <TooltipTrigger asChild>
+              <button
+                onClick={() => {
+                  const SENSITIVE_DATA_MARKER = '[SENSITIVE]'
+                  const isSensitive = !column.isSensitiveData
+                  let updatedComment = column.comment || ''
+          
+                  if (isSensitive && !updatedComment.includes(SENSITIVE_DATA_MARKER)) {
+                    updatedComment = updatedComment
+                      ? `${updatedComment} ${SENSITIVE_DATA_MARKER}`
+                      : SENSITIVE_DATA_MARKER
+                  } else if (!isSensitive) {
+                    updatedComment = updatedComment.replace(SENSITIVE_DATA_MARKER, '').trim()
                   }
-                >
-                  {column.isSensitiveData ? (
-                    <EyeOff size={14} strokeWidth={1.5} />
-                  ) : (
-                    <Eye size={14} strokeWidth={1.5} />
-                  )}
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                {column.isSensitiveData
-                  ? 'Data is masked in grid display. Actual data unchanged in database.'
-                  : 'Mark as sensitive to mask in grid display'}
-              </TooltipContent>
-            </Tooltip>
+          
+                  onUpdateColumn({ isSensitiveData: isSensitive, comment: updatedComment })
+                }}
+                className={cn(
+                  'transition cursor-pointer p-1 hover:bg-surface-100 rounded',
+                  column.isSensitiveData
+                    ? 'opacity-100 text-foreground'
+                    : 'opacity-50 hover:opacity-100 text-foreground-light'
+                )}
+                type="button"
+                aria-label={
+                  column.isSensitiveData
+                    ? 'Marked as sensitive'
+                    : 'Not marked as sensitive'
+                }
+              >
+                {column.isSensitiveData ? (
+                  <EyeOff size={14} strokeWidth={1.5} />
+                ) : (
+                  <Eye size={14} strokeWidth={1.5} />
+                )}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              {column.isSensitiveData
+                ? 'Data is masked in grid display. Actual data unchanged in database.'
+                : 'Mark as sensitive to mask in grid display'}
+            </TooltipContent>
+          </Tooltip>
           </div>
+          ) : (
+            <Popover open={open} onOpenChange={setOpen} modal={false}>
+              <PopoverTrigger asChild>
+                <Button type="default" className="rounded-l-none h-[30px] py-0 px-2">
+                  <Link size={12} />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                className={cn('p-0', hasChangesInRelations ? 'w-96' : 'w-72')}
+                side="bottom"
+                align="center"
+              >
+                <div className="text-xs px-2 pt-2">
+                  Involved in {relations.length} foreign key{relations.length > 1 ? 's' : ''}
+                </div>
+                <Command>
+                  <CommandList>
+                    <CommandGroup>
+                      {relations.map((relation, idx) => {
+                        const key = String(relation?.id ?? `${column.id}-relation-${idx}`)
+                        const status = getRelationStatus(relation)
+                        if (status === 'REMOVE') return null
+
+                        return (
+                          <CommandItem
+                            key={key}
+                            value={key}
+                            className="cursor-pointer w-full"
+                            onSelect={() => onEditForeignKey(relation)}
+                            onClick={() => onEditForeignKey(relation)}
+                          >
+                            {status === undefined ? (
+                              <div className="w-full flex items-center justify-between truncate">
+                                {relation.name}
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-x-2 truncate">
+                                <Badge variant={status === 'ADD' ? 'success' : 'warning'}>
+                                  {status}
+                                </Badge>
+                                <p className="truncate">
+                                  {relation.name || (
+                                    <>
+                                      To{' '}
+                                      {relation.columns
+                                        .filter((c) => c.source === column.name)
+                                        .map((c) => {
+                                          return (
+                                            <code key={`${c.source}-${c.target}`}>
+                                              {relation.schema}.{relation.table}.{c.target}
+                                            </code>
+                                          )
+                                        })}
+                                      {relation.columns.length > 1 && (
+                                        <>
+                                          and {relation.columns.length - 1} other column
+                                          {relation.columns.length > 2 ? 's' : ''}
+                                        </>
+                                      )}
+                                    </>
+                                  )}
+                                </p>
+                              </div>
+                            )}
+                          </CommandItem>
+                        )
+                      })}
+                    </CommandGroup>
+                    <CommandSeparator />
+                    <CommandGroup>
+                      <CommandItem
+                        className="cursor-pointer w-full gap-x-2"
+                        onSelect={() => onEditForeignKey()}
+                        onClick={() => onEditForeignKey()}
+                      >
+                        <Plus size={14} strokeWidth={1.5} />
+                        <p>Add foreign key relation</p>
+                      </CommandItem>
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          )}
         </div>
       </div>
       <div className="w-[25%]">

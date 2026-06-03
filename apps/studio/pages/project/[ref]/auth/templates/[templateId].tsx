@@ -36,7 +36,12 @@ import {
 import * as z from 'zod'
 
 import { TEMPLATES_SCHEMAS } from '@/components/interfaces/Auth/EmailTemplates/AuthTemplatesValidation'
-import { slugifyTitle } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
+import { CustomEmailTemplateRestrictionAdmonition } from '@/components/interfaces/Auth/EmailTemplates/CustomEmailTemplateRestrictionAdmonition'
+import {
+  isCustomEmailTemplateEditingRestricted,
+  isCustomEmailTemplateRestrictionStatusKnown,
+  slugifyTitle,
+} from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
 import { TemplateEditor } from '@/components/interfaces/Auth/EmailTemplates/TemplateEditor'
 import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
@@ -45,6 +50,8 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
@@ -68,6 +75,21 @@ const RedirectToTemplates = () => {
   )
 
   const { data: authConfig, isPending: isLoadingConfig } = useAuthConfigQuery({ projectRef })
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { data: selectedProject } = useSelectedProjectQuery()
+  const isTemplateRestrictionStatusKnown = isCustomEmailTemplateRestrictionStatusKnown({
+    authConfig,
+    organization: selectedOrganization,
+    projectInsertedAt: selectedProject?.inserted_at,
+  })
+  const isTemplateEditBlocked =
+    isTemplateRestrictionStatusKnown &&
+    isCustomEmailTemplateEditingRestricted({
+      authConfig,
+      organization: selectedOrganization,
+      projectInsertedAt: selectedProject?.inserted_at,
+    })
+  const isTemplateEditorReadOnly = !isTemplateRestrictionStatusKnown || isTemplateEditBlocked
 
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation({
     onError: (error) => {
@@ -264,8 +286,13 @@ const RedirectToTemplates = () => {
                 </PageSectionMeta>
               )}
               <PageSectionContent>
+                {isTemplateEditBlocked && (
+                  <div className="mb-4">
+                    <CustomEmailTemplateRestrictionAdmonition />
+                  </div>
+                )}
                 <Card>
-                  <TemplateEditor template={template} />
+                  <TemplateEditor template={template} isReadOnly={isTemplateEditorReadOnly} />
                 </Card>
               </PageSectionContent>
             </PageSection>

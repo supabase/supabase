@@ -1,4 +1,4 @@
-import { SurveyChart, buildWhereClause } from '../SurveyChart'
+import { buildWhereClause, SurveyChart } from '../SurveyChart'
 
 function generateAIModelsSQL(activeFilters: Record<string, string>) {
   const whereClause = buildWhereClause(activeFilters)
@@ -23,7 +23,7 @@ function generateAIModelsSQL(activeFilters: Record<string, string>) {
       END AS technology_clean
     FROM (
       SELECT id, unnest(ai_models_used) AS technology
-      FROM responses_2025
+      FROM responses_2026
       ${whereClause}
     ) sub
   )

@@ -1,17 +1,8 @@
 import { ExternalLink } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
-import Link from 'next/link'
 import { useState } from 'react'
-import {
-  cn,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-  InfoIcon,
-} from 'ui'
+import { cn, HoverCard, HoverCardContent, HoverCardTrigger, InfoIcon } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getErrorCodeInfo } from './ErrorCodeTooltip.utils'
@@ -117,25 +108,19 @@ export const ErrorCodeTooltip = ({ errorCode, service, children }: ErrorCodeTool
               </div>
             )}
             <AiAssistantDropdown
+              showExternalAI
               label="Fix with AI"
               buildPrompt={buildPrompt}
               onOpenAssistant={handleOpenAssistant}
               telemetrySource="error_code"
               copyLabel="Copy Markdown"
-              showExternalAI
-              extraDropdownItems={
-                docsUrl ? (
-                  <>
-                    <DropdownMenuItem asChild className="gap-2">
-                      <Link href={docsUrl} target="_blank" rel="noreferrer">
-                        <ExternalLink size={14} />
-                        Go to Docs
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                  </>
-                ) : undefined
-              }
+              additionalDropdownItems={[
+                {
+                  label: 'Go to Docs',
+                  icon: <ExternalLink size={14} />,
+                  href: docsUrl,
+                },
+              ]}
             />
           </div>
         </div>

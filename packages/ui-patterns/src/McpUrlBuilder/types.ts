@@ -166,10 +166,20 @@ export interface AntigravityMcpConfig {
   }
 }
 
+export interface CopilotMcpConfig extends McpClientBaseConfig {
+  mcpServers: {
+    supabase: {
+      type: 'http'
+      url: string
+    }
+  }
+}
+
 // Union of all possible config types
 export type McpClientConfig =
   | AntigravityMcpConfig
   | ClaudeCodeMcpConfig
+  | CopilotMcpConfig
   | ClaudeDesktopMcpConfig
   | CodexMcpConfig
   | CursorMcpConfig

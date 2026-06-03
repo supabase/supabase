@@ -47,7 +47,6 @@ import { FeaturePreviewContextProvider } from '@/components/interfaces/App/Featu
 import { FeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProvider'
 import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
-import { UpdateBillingAddressModal } from '@/components/interfaces/App/UpdateBillingAddressModal'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
@@ -62,6 +61,7 @@ import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/const
 import { TimezoneProvider, useTimezone } from '@/lib/datetime'
 import { ProfileProvider } from '@/lib/profile'
 import { Telemetry } from '@/lib/telemetry'
+import { ToastErrorTracker } from '@/lib/toast-errors'
 import { Toaster } from '@/lib/toaster'
 import { AiAssistantStateContextProvider } from '@/state/ai-assistant-state'
 import type { AppPropsWithLayout } from '@/types'
@@ -208,7 +208,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         applicationName="Supabase Studio"
                         route={isNonProdEnv ? '/favicon/staging' : '/favicon'}
                       />
-                      <TooltipProvider delayDuration={0}>
+                      <TooltipProvider>
                         <RouteValidationWrapper>
                           <ThemeProvider>
                             <DevToolbarProvider apiUrl={API_URL}>
@@ -222,7 +222,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                                       <GlobalShortcuts />
                                       <StudioCommandMenu />
                                       <FeaturePreviewModal />
-                                      <UpdateBillingAddressModal />
                                     </FeaturePreviewContextProvider>
                                   </BannerStackProvider>
                                   <Toaster />
@@ -236,6 +235,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         </RouteValidationWrapper>
                       </TooltipProvider>
                       <Telemetry />
+                      <ToastErrorTracker />
                       {!isTestEnv && (
                         <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
                       )}

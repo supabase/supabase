@@ -5,13 +5,13 @@ import {
   Badge,
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -74,8 +74,8 @@ export const PublicationsComboBox = ({
         </Button>
       </PopoverTrigger>
       <PopoverContent sameWidthAsTrigger className="p-0" align="start">
-        <Command_Shadcn_>
-          <CommandInput_Shadcn_
+        <Command>
+          <CommandInput
             placeholder="Find publication..."
             className="text-xs"
             value={searchTerm}
@@ -86,8 +86,8 @@ export const PublicationsComboBox = ({
               Publications with no tables are hidden
             </p>
           </div>
-          <CommandList_Shadcn_>
-            <CommandEmpty_Shadcn_>
+          <CommandList>
+            <CommandEmpty>
               {isLoadingPublications ? (
                 <div className="flex items-center gap-2 text-center justify-center">
                   <Loader2 size={12} className="animate-spin" />
@@ -96,9 +96,9 @@ export const PublicationsComboBox = ({
               ) : (
                 'No publications found'
               )}
-            </CommandEmpty_Shadcn_>
+            </CommandEmpty>
 
-            <CommandGroup_Shadcn_>
+            <CommandGroup>
               {publications.length === 0 && (
                 <p className="text-foreground-lighter text-xs py-3 px-2">
                   No publications available
@@ -106,7 +106,7 @@ export const PublicationsComboBox = ({
               )}
               <ScrollArea className={publications.length > 7 ? 'h-[210px]' : ''}>
                 {publications.map((pub) => (
-                  <CommandItem_Shadcn_
+                  <CommandItem
                     key={pub.name}
                     className="cursor-pointer flex items-center justify-between space-x-2 w-full"
                     onSelect={() => {
@@ -128,25 +128,25 @@ export const PublicationsComboBox = ({
                         <Check className="text-brand" strokeWidth={2} size={13} />
                       )}
                     </div>
-                  </CommandItem_Shadcn_>
+                  </CommandItem>
                 ))}
               </ScrollArea>
-            </CommandGroup_Shadcn_>
+            </CommandGroup>
 
-            <CommandSeparator_Shadcn_ />
+            <CommandSeparator />
 
-            <CommandGroup_Shadcn_>
-              <CommandItem_Shadcn_
+            <CommandGroup>
+              <CommandItem
                 className="cursor-pointer w-full"
                 onSelect={onNewPublicationClick}
                 onClick={onNewPublicationClick}
               >
                 <Plus size={14} strokeWidth={1.5} className="mr-2" />
                 <p>New publication</p>
-              </CommandItem_Shadcn_>
-            </CommandGroup_Shadcn_>
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
+              </CommandItem>
+            </CommandGroup>
+          </CommandList>
+        </Command>
       </PopoverContent>
     </Popover>
   )

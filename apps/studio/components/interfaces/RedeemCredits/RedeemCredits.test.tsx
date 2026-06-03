@@ -1,15 +1,18 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { platformComponents as components } from 'api-types'
 import { FeatureFlagContext } from 'common'
 import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { RedeemCreditsScreen } from './RedeemCredits'
 import type { ProfileContextType } from '@/lib/profile'
-import { createMockOrganization } from '@/tests/helpers'
+import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { routerMock } from '@/tests/lib/route-mock'
+
+type OrganizationResponse = components['schemas']['OrganizationResponse']
 
 const { creditRedemptionProps } = vi.hoisted(() => ({
   creditRedemptionProps: vi.fn(),
@@ -52,7 +55,7 @@ const DEFAULT_PROFILE_CONTEXT: ProfileContextType = {
   isSuccess: true,
 }
 
-const ORGANIZATION = createMockOrganization({
+const ORGANIZATION = createMockOrganizationResponse({
   id: 1,
   name: 'Acme Production',
   slug: 'acme-production',
@@ -82,7 +85,7 @@ describe('RedeemCreditsScreen', () => {
     addAPIMock({
       method: 'get',
       path: '/platform/organizations',
-      response: () => HttpResponse.json([ORGANIZATION]),
+      response: () => HttpResponse.json<OrganizationResponse[]>([ORGANIZATION]),
     })
 
     renderScreen()
@@ -106,7 +109,7 @@ describe('RedeemCreditsScreen', () => {
     addAPIMock({
       method: 'get',
       path: '/platform/organizations',
-      response: () => HttpResponse.json([ORGANIZATION]),
+      response: () => HttpResponse.json<OrganizationResponse[]>([ORGANIZATION]),
     })
 
     renderScreen()
@@ -128,7 +131,7 @@ describe('RedeemCreditsScreen', () => {
     addAPIMock({
       method: 'get',
       path: '/platform/organizations',
-      response: () => HttpResponse.json([ORGANIZATION]),
+      response: () => HttpResponse.json<OrganizationResponse[]>([ORGANIZATION]),
     })
 
     renderScreen()

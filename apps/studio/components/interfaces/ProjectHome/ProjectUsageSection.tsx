@@ -11,11 +11,11 @@ import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
 import { ChartIntervalDropdown } from '@/components/ui/Logs/ChartIntervalDropdown'
 import { CHART_INTERVALS } from '@/components/ui/Logs/logs.utils'
 import { UsageApiCounts, useProjectLogStatsQuery } from '@/data/analytics/project-log-stats-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 
 type LogsBarChartDatum = {
   timestamp: string
@@ -47,7 +47,7 @@ export const ProjectUsageSection = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { projectAuthAll: authEnabled, projectStorageAll: storageEnabled } = useIsFeatureEnabled([
     'project_auth:all',
     'project_storage:all',
@@ -183,19 +183,10 @@ export const ProjectUsageSection = () => {
 
       router.push(`/project/${projectRef}${logRoute}?${queryParams.toString()}`)
 
-      if (projectRef && organization?.slug) {
-        sendEvent({
-          action: 'home_project_usage_chart_clicked',
-          properties: {
-            service_type: serviceKey,
-            bar_timestamp: datum.timestamp,
-          },
-          groups: {
-            project: projectRef,
-            organization: organization.slug,
-          },
-        })
-      }
+      track('home_project_usage_chart_clicked', {
+        service_type: serviceKey,
+        bar_timestamp: datum.timestamp,
+      })
     }
 
   const enabledServices = services.filter((s) => s.enabled)
@@ -227,19 +218,10 @@ export const ProjectUsageSection = () => {
                       <Link
                         href={s.href}
                         onClick={() => {
-                          if (projectRef && organization?.slug) {
-                            sendEvent({
-                              action: 'home_project_usage_service_clicked',
-                              properties: {
-                                service_type: s.key,
-                                total_requests: s.total || 0,
-                              },
-                              groups: {
-                                project: projectRef,
-                                organization: organization.slug,
-                              },
-                            })
-                          }
+                          track('home_project_usage_service_clicked', {
+                            service_type: s.key,
+                            total_requests: s.total || 0,
+                          })
                         }}
                       >
                         {s.title}

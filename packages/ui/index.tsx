@@ -14,7 +14,6 @@ export * from './src/components/NavMenu'
 
 // OVERLAYS
 
-export * from './src/components/Modal'
 export * from './src/components/SidePanel'
 
 // HTML
@@ -23,7 +22,6 @@ export { Heading } from './src/components/CustomHTMLElements'
 
 // UTILITIES
 
-export * from './src/components/Space'
 export * from './src/components/Loading'
 export * from './src/components/LogoLoader'
 export * from './src/components/AnimatedCounter'
@@ -63,17 +61,7 @@ export * from './src/components/shadcn/ui/toggle-group'
 export * from './src/components/shadcn/ui/toggle'
 export * from './src/components/shadcn/ui/card'
 
-export {
-  Command as Command_Shadcn_,
-  CommandDialog as CommandDialog,
-  CommandInput as CommandInput_Shadcn_,
-  CommandList as CommandList_Shadcn_,
-  CommandEmpty as CommandEmpty_Shadcn_,
-  CommandGroup as CommandGroup_Shadcn_,
-  CommandItem as CommandItem_Shadcn_,
-  CommandShortcut as CommandShortcut_Shadcn_,
-  CommandSeparator as CommandSeparator_Shadcn_,
-} from './src/components/shadcn/ui/command'
+export * from './src/components/shadcn/ui/command'
 
 export * from './src/components/shadcn/ui/context-menu'
 

@@ -1,12 +1,13 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useFlag } from 'common'
 
+import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
 import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
 import { UNIFIED_LOGS_QUERY_OPTIONS, UnifiedLogsVariables } from './unified-logs-infinite-query'
+import { parseLogsFilterUrlParams } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
 import { getLogsChartQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getLogsChartQuery as getLogsChartQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
-import { handleError, post } from '@/data/fetchers'
 import { ExecuteSqlError } from '@/data/sql/execute-sql-query'
 import { UseCustomQueryOptions } from '@/types'
 
@@ -42,17 +43,16 @@ export async function getUnifiedLogsChart(
   // Get SQL query from utility function (with dynamic bucketing)
   const sql = pickLogsQueryBuilder(useOtel, getLogsChartQuery, getLogsChartQueryBq)(search)
 
-  let headers = new Headers(headersInit)
-
   const endpoint = logsAllEndpointUrl(useOtel)
-  const { data, error } = await post(endpoint, {
-    params: { path: { ref: projectRef } },
-    body: { sql, iso_timestamp_start: dateStart, iso_timestamp_end: dateEnd },
+  const data = await executeAnalyticsSql({
+    projectRef,
+    endpoint,
+    sql,
+    iso_timestamp_start: dateStart,
+    iso_timestamp_end: dateEnd,
     signal,
-    headers,
+    headers: headersInit,
   })
-
-  if (error) handleError(error)
 
   const chartData: Array<{
     timestamp: number
@@ -89,13 +89,21 @@ export async function getUnifiedLogsChart(
         error: Number(row.error) || 0,
       }
 
-      // Filter levels if needed
-      const levelFilter = search.level
-      if (levelFilter && levelFilter.length > 0) {
-        // Reset levels not in the filter
-        if (!levelFilter.includes('success')) dataPoint.success = 0
-        if (!levelFilter.includes('warning')) dataPoint.warning = 0
-        if (!levelFilter.includes('error')) dataPoint.error = 0
+      // Zero out levels excluded by the active filter set.
+      // `=` filters narrow to an allow-list; `<>` filters carve out a deny-list.
+      const levelFilters = parseLogsFilterUrlParams(search.filter).filter(
+        (f) => f.column === 'level'
+      )
+      if (levelFilters.length > 0) {
+        const included = levelFilters.filter((f) => f.operator === '=').map((f) => f.value)
+        const excluded = new Set(
+          levelFilters.filter((f) => f.operator === '<>').map((f) => f.value)
+        )
+        const isActive = (lvl: 'success' | 'warning' | 'error') =>
+          (included.length === 0 || included.includes(lvl)) && !excluded.has(lvl)
+        if (!isActive('success')) dataPoint.success = 0
+        if (!isActive('warning')) dataPoint.warning = 0
+        if (!isActive('error')) dataPoint.error = 0
       }
 
       dataByTimestamp.set(milliseconds, dataPoint)

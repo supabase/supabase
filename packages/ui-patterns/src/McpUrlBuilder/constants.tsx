@@ -6,6 +6,7 @@ import type {
   AntigravityMcpConfig,
   ClaudeCodeMcpConfig,
   CodexMcpConfig,
+  CopilotMcpConfig,
   FactoryMcpConfig,
   GeminiMcpConfig,
   GooseMcpConfig,
@@ -194,17 +195,7 @@ export const MCP_CLIENTS: McpClient[] = [
     },
     alternateInstructions: (_config, onCopy) => (
       <div className="space-y-2">
-        <p className="text-xs text-foreground-light">
-          After adding the server, enable remote MCP client support by adding this to your{' '}
-          <code>~/.codex/config.toml</code>:
-        </p>
-        <CodeBlock
-          value={`[features]\nrmcp_client = true`}
-          focusable={false}
-          className="block"
-          onCopyCallback={() => onCopy('config')}
-        />
-        <p className="text-xs text-foreground-light">Then authenticate:</p>
+        <p className="text-xs text-foreground-light">Authenticate with the MCP server:</p>
         <CodeBlock
           value="codex mcp login supabase"
           language="bash"
@@ -308,6 +299,60 @@ export const MCP_CLIENTS: McpClient[] = [
         </div>
       )
     },
+  },
+  {
+    key: 'copilot-cli',
+    label: 'GitHub Copilot',
+    icon: 'copilot',
+    hasDistinctDarkIcon: true,
+    configFile: '~/.copilot/mcp-config.json',
+    externalDocsUrl:
+      'https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-mcp-servers',
+    transformConfig: (config): CopilotMcpConfig => {
+      return {
+        mcpServers: {
+          supabase: {
+            type: 'http',
+            url: config.mcpServers.supabase.url,
+          },
+        },
+      }
+    },
+    primaryInstructions: (_config, onCopy) => {
+      const config = _config as CopilotMcpConfig
+      const command = `copilot mcp add --transport http supabase "${config.mcpServers.supabase.url}"`
+      return (
+        <div className="space-y-2">
+          <p className="text-xs text-foreground-light">
+            Add the MCP server to your GitHub Copilot config using the command line:
+          </p>
+          <CodeBlock
+            value={command}
+            language="bash"
+            focusable={false}
+            className="block"
+            onCopyCallback={() => onCopy('command')}
+          />
+        </div>
+      )
+    },
+    alternateInstructions: (_config, onCopy) => (
+      <div className="space-y-2">
+        <p className="text-xs text-foreground-light">
+          After configuring the MCP server, authenticate by running:
+        </p>
+        <CodeBlock
+          value="copilot -i /mcp"
+          language="bash"
+          focusable={false}
+          className="block"
+          onCopyCallback={() => onCopy('command')}
+        />
+        <p className="text-xs text-foreground-light">
+          Follow the on-screen instructions to complete the authentication flow.
+        </p>
+      </div>
+    ),
   },
   {
     key: 'antigravity',
@@ -576,7 +621,7 @@ export const MCP_CLIENTS: McpClient[] = [
 export const MCP_CLIENT_GROUPS = [
   {
     heading: 'AI Agent CLI',
-    keys: ['claude-code', 'codex', 'gemini-cli', 'opencode', 'factory'],
+    keys: ['claude-code', 'codex', 'gemini-cli', 'copilot-cli', 'opencode', 'factory'],
   },
   {
     heading: 'Web Clients',
