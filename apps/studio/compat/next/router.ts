@@ -83,6 +83,18 @@ function resolveUrl(url: string | UrlObject): string {
 // untouched so TanStack hands them to the browser as external.
 const NEXT_PUBLIC_BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
+// Strip a leading basePath segment from a path-shape URL (no origin).
+// Mirrors what Next's pages-router does for `asPath`. Used by both
+// `useRouter().asPath` and the push/replace path-normalisation pipeline.
+function stripBasePath(pathish: string): string {
+  if (!NEXT_PUBLIC_BASE_PATH) return pathish
+  if (pathish === NEXT_PUBLIC_BASE_PATH) return '/'
+  if (pathish.startsWith(`${NEXT_PUBLIC_BASE_PATH}/`)) {
+    return pathish.slice(NEXT_PUBLIC_BASE_PATH.length)
+  }
+  return pathish
+}
+
 function toRelativeSameOrigin(url: string): string {
   let pathname: string
   let search = ''
@@ -115,13 +127,7 @@ function toRelativeSameOrigin(url: string): string {
       hash = rest
     }
   }
-  if (
-    NEXT_PUBLIC_BASE_PATH &&
-    (pathname === NEXT_PUBLIC_BASE_PATH || pathname.startsWith(`${NEXT_PUBLIC_BASE_PATH}/`))
-  ) {
-    pathname = pathname.slice(NEXT_PUBLIC_BASE_PATH.length) || '/'
-  }
-  return `${pathname}${search}${hash}`
+  return `${stripBasePath(pathname)}${search}${hash}`
 }
 
 // Next's pages-router passes a TransitionOptions bag as the 3rd arg to
@@ -178,13 +184,15 @@ export function useRouter() {
       // downstream `.split('/')` calls crash.
       route: pathPattern,
       query: { ...params, ...search },
-      // Next's pages-router `asPath` is path + query + hash (with basePath),
-      // *without* the origin. Use TanStack's `location.href` which is
-      // already path+search+hash, basepath-included, no origin. Avoid
-      // hand-concatenating from `location.search` — that's the parsed
-      // search object, not a string; `${location.search}` throws
-      // "Cannot convert object to primitive value" during SSR prerender.
-      asPath: location.href,
+      // Next's pages-router `asPath` is path + query + hash *without* the
+      // origin and *without* the configured `basePath`
+      // (https://nextjs.org/docs/pages/api-reference/functions/use-router).
+      // Studio code relies on the no-basePath shape — e.g.
+      // OrganizationSettingsLayout compares `currentPath === '/org/<slug>/
+      // general'` for the side-nav active state, with section hrefs that
+      // never include `/dashboard`. Returning a basepath-prefixed value
+      // breaks every such strict-equality check.
+      asPath: stripBasePath(location.href),
       // Mirror Next's pages-router contract for `basePath`:
       //   - no basePath configured → '' (empty string)
       //   - configured            → '/dashboard' (leading slash, no trailing)
