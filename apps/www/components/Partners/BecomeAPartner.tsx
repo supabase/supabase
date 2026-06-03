@@ -1,3 +1,5 @@
+import { Suspense } from 'react'
+
 import PartnerIntakeForm from './PartnerIntakeForm'
 
 export default function BecomeAPartner() {
@@ -10,11 +12,13 @@ export default function BecomeAPartner() {
         <div className="flex flex-col items-center gap-4 text-center text-balance">
           <h2 className="text-3xl md:text-4xl tracking-tight">Become a Supabase Partner</h2>
           <p className="text-foreground-light text-lg max-w-xl">
-            Tell us about your company and the program you’re interested in. Our team reviews every
-            application and will reach out if there’s a good fit.
+            Tell us about your company and the program you&apos;re interested in. Our team reviews
+            every application and will reach out if there&apos;s a good fit.
           </p>
         </div>
-        <PartnerIntakeForm />
+        <Suspense>
+          <PartnerIntakeForm />
+        </Suspense>
       </div>
     </div>
   )
