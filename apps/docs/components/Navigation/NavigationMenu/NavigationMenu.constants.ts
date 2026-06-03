@@ -1571,6 +1571,10 @@ export const api: NavMenuConstant = {
         { name: 'Generating TypeScript Types', url: '/guides/api/rest/generating-types' },
         { name: 'Generating Python Types', url: '/guides/api/rest/generating-python-types' },
         { name: 'Error Codes', url: '/guides/api/rest/postgrest-error-codes' },
+        {
+          name: 'Handling Errors in supabase-js',
+          url: '/guides/api/handling-errors-in-supabase-js',
+        },
       ],
     },
     {
