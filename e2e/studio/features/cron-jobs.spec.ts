@@ -400,8 +400,10 @@ test.describe('Cron Jobs', () => {
       // The test job should still be visible in the grid (minimal mode shows jobs without last run)
       await expect(page.getByRole('row', { name: new RegExp(testJobName) })).toBeVisible()
 
-      // The "Learn more" button should be visible
-      await expect(page.getByRole('button', { name: 'Learn more' })).toBeVisible()
+      // An alert about high query costs should be visible and contain a "Learn more" button
+      await expect(
+        page.getByRole('alert').getByRole('button', { name: 'Learn more' })
+      ).toBeVisible()
 
       // Remove the route mock for subsequent tests
       await page.unroute('**/pg-meta/*/query**')
@@ -441,8 +443,8 @@ test.describe('Cron Jobs', () => {
         timeout: 15000,
       })
 
-      // Click the "Learn more" button to open the dialog
-      await page.getByRole('button', { name: 'Learn more' }).click()
+      // Click the "Learn more" button in the alert to open the dialog
+      await page.getByRole('alert').getByRole('button', { name: 'Learn more' }).click()
 
       // The dialog should open with the explanation
       await expect(
@@ -504,7 +506,7 @@ test.describe('Cron Jobs', () => {
       ).toBeVisible({
         timeout: 15000,
       })
-      await page.getByRole('button', { name: 'Learn more' }).click()
+      await page.getByRole('alert').getByRole('button', { name: 'Learn more' }).click()
 
       // Wait for dialog to open
       await expect(
