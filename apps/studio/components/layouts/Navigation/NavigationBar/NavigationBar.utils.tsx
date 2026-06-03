@@ -1,5 +1,5 @@
 import { Auth, Database, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
-import { Blocks, Lightbulb, List, Settings, Telescope } from 'lucide-react'
+import { Blocks, Globe, Lightbulb, List, Settings, Telescope } from 'lucide-react'
 
 import { ICON_SIZE, ICON_STROKE_WIDTH } from '@/components/interfaces/Sidebar'
 import type { Route } from '@/components/ui/ui.types'
@@ -28,6 +28,8 @@ interface OtherFeatures {
   unifiedLogs?: boolean
   showReports?: boolean
   showLogs?: boolean
+  /** Self-hosted web hosting ("Sites"). Off on platform/CLI. */
+  sites?: boolean
 }
 
 function getRouteContext(ref?: string, project?: Project): RouteContext {
@@ -159,6 +161,7 @@ export const generateOtherRoutes = (
   const unifiedLogsEnabled = features?.unifiedLogs ?? false
   const reportsEnabled = features?.showReports ?? true
   const logsEnabled = features?.showLogs ?? true
+  const sitesEnabled = features?.sites ?? false
   return [
     {
       key: 'advisors',
@@ -203,6 +206,18 @@ export const generateOtherRoutes = (
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/integrations`),
       shortcutId: SHORTCUT_IDS.NAV_INTEGRATIONS,
     },
+    // Self-hosted only: managed static/SPA web hosting.
+    ...(sitesEnabled
+      ? [
+          {
+            key: 'sites',
+            label: 'Sites',
+            disabled: !isProjectActive,
+            icon: <Globe size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sites`),
+          },
+        ]
+      : []),
   ]
 }
 

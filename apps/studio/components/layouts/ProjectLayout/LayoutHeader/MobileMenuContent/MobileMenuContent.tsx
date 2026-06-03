@@ -21,6 +21,7 @@ import {
   generateToolRoutes,
 } from '@/components/layouts/Navigation/NavigationBar/NavigationBar.utils'
 import type { Route } from '@/components/ui/ui.types'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { getPathnameWithoutQuery, getPathSegment } from '@/lib/pathname.utils'
@@ -65,6 +66,7 @@ export function MobileMenuContent({
   const authOverviewPageEnabled = useFlag('authOverviewPage')
   const showReports = useIsFeatureEnabled('reports:all')
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
+  const { isSelfHosted } = useDeploymentMode()
 
   const toolRoutes = useMemo(() => generateToolRoutes(ref, project), [ref, project])
   const productRoutes = useMemo(
@@ -91,8 +93,9 @@ export function MobileMenuContent({
       generateOtherRoutes(ref, project, {
         unifiedLogs: isUnifiedLogsEnabled,
         showReports,
+        sites: isSelfHosted,
       }),
-    [ref, project, isUnifiedLogsEnabled, showReports]
+    [ref, project, isUnifiedLogsEnabled, showReports, isSelfHosted]
   )
   const settingsRoutes = useMemo(() => generateSettingsRoutes(ref), [ref])
 

@@ -255,7 +255,7 @@ EdgeFunctionsPage.getLayout = (page: React.ReactElement) => {
                     Examples
                   </a>
                 </Button>
-                {IS_PLATFORM && <DeployEdgeFunctionButton />}
+                <DeployEdgeFunctionButton />
               </PageHeaderAside>
             </PageHeaderMeta>
           </PageHeader>

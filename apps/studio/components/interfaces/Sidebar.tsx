@@ -37,6 +37,7 @@ import {
   generateToolRoutes,
 } from '@/components/layouts/Navigation/NavigationBar/NavigationBar.utils'
 import { ProjectIndexPageLink } from '@/data/prefetchers/project.$ref'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useHideSidebar } from '@/hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLints } from '@/hooks/misc/useLints'
@@ -239,6 +240,7 @@ const ProjectLinks = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { securityLints, errorLints } = useLints()
+  const { isSelfHosted } = useDeploymentMode()
   const showReports = useIsFeatureEnabled('reports:all')
   const showLogs = useIsFeatureEnabled('logs:all')
 
@@ -272,6 +274,7 @@ const ProjectLinks = () => {
     unifiedLogs: isUnifiedLogsEnabled,
     showReports,
     showLogs,
+    sites: isSelfHosted,
   })
   const settingsRoutes = generateSettingsRoutes(ref)
 

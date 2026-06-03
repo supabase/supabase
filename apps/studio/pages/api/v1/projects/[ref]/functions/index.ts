@@ -3,7 +3,7 @@ import { type NextApiRequest, type NextApiResponse } from 'next'
 
 import apiWrapper from '@/lib/api/apiWrapper'
 import { getFunctionsArtifactStore } from '@/lib/api/self-hosted/functions'
-import { uuidv4 } from '@/lib/helpers'
+import { getStableFunctionId } from '@/lib/api/self-hosted/functions/fileSystemStore'
 
 export default function handlerWithErrorCatching(req: NextApiRequest, res: NextApiResponse) {
   return apiWrapper(req, res, handler, { withAuth: true })
@@ -32,7 +32,7 @@ const handleGetAll = async (_req: NextApiRequest, res: NextApiResponse) => {
   const functions = functionsArtifacts.map(
     (func) =>
       ({
-        id: uuidv4(),
+        id: getStableFunctionId(func.slug),
         slug: func.slug,
         version: 1,
         name: func.slug,

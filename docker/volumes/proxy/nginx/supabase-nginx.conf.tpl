@@ -3,6 +3,11 @@ upstream kong_upstream {
     keepalive 2;
 }
 
+# Per-site server blocks for hosted static/SPA front-ends, written by the
+# hosting agent. Each file is a complete `server { ... }` for one domain.
+# A glob matching no files is not an error, so this is safe when empty.
+include /etc/nginx/sites/*.conf;
+
 server {
     listen 443 ssl;
     listen [::]:443 ssl;

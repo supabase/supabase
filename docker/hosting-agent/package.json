@@ -1,0 +1,10 @@
+{
+  "name": "supabase-hosting-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Privileged sidecar that manages nginx site configs and reloads for Supabase self-hosted web hosting.",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

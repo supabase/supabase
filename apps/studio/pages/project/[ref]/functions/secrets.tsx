@@ -22,6 +22,34 @@ import type { NextPageWithLayout } from '@/types'
 const SecretsPage: NextPageWithLayout = () => {
   const { isCli, isSelfHosted } = useDeploymentMode()
 
+  if (isSelfHosted) {
+    return (
+      <PageContainer size="large">
+        <PageSection>
+          <PageSectionContent className="space-y-4 md:space-y-8">
+            <Admonition
+              type="default"
+              title="Secrets are written to volumes/functions/.env"
+              description={
+                <p>
+                  Point the <code className="text-code-inline">functions</code> service at this file
+                  via <code className="text-code-inline">env_file</code> and restart it to apply
+                  changes — unlike function code, environment variables are not hot-reloaded.
+                </p>
+              }
+              actions={
+                <DocsButton
+                  href={`${DOCS_URL}/guides/self-hosting/self-hosted-functions#custom-environment-variables`}
+                />
+              }
+            />
+            <EdgeFunctionSecrets />
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+    )
+  }
+
   if (!IS_PLATFORM) {
     return (
       <PageContainer size="large">
@@ -42,18 +70,6 @@ const SecretsPage: NextPageWithLayout = () => {
                 actions={<DocsButton href={`${DOCS_URL}/guides/functions/secrets#using-the-cli`} />}
               />
             )}
-            {isSelfHosted && (
-              <Admonition
-                type="default"
-                title="Self-hosted Supabase"
-                description={<p>Set custom secrets via environment variables.</p>}
-                actions={
-                  <DocsButton
-                    href={`${DOCS_URL}/guides/self-hosting/self-hosted-functions#custom-environment-variables`}
-                  />
-                }
-              />
-            )}
             <section className="space-y-4">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
                 <div className="space-y-1">
@@ -62,13 +78,7 @@ const SecretsPage: NextPageWithLayout = () => {
                     Reserved secrets available in every project
                   </p>
                 </div>
-                <DocsButton
-                  href={
-                    isSelfHosted
-                      ? `${DOCS_URL}/guides/self-hosting/self-hosted-functions#calling-supabase-services-from-functions`
-                      : `${DOCS_URL}/guides/functions/secrets#default-secrets`
-                  }
-                />
+                <DocsButton href={`${DOCS_URL}/guides/functions/secrets#default-secrets`} />
               </div>
               <DefaultEdgeFunctionSecrets
                 secrets={DEFAULT_EDGE_FUNCTION_SECRETS.filter((secret) => !secret.isRuntime)}

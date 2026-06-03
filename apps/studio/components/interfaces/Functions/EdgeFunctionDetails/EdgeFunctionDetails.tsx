@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IS_PLATFORM, useParams } from 'common'
+import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -48,6 +48,7 @@ import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from '@/data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from '@/data/edge-functions/edge-functions-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 const FormSchema = z.object({
@@ -76,7 +77,14 @@ export const EdgeFunctionDetails = () => {
     '*'
   )
 
-  const canUpdateEdgeFunction = IS_PLATFORM && canUpdateEdgeFunctionPermission
+  const { isPlatform, isSelfHosted } = useDeploymentMode()
+  const canManageFunctions = isPlatform || isSelfHosted
+
+  // Renaming / verify_jwt go through the platform PATCH endpoint, which has no
+  // self-hosted equivalent, so the configuration form stays platform-only.
+  const canUpdateEdgeFunction = isPlatform && canUpdateEdgeFunctionPermission
+  // Deleting just removes the function folder from disk, which self-hosted supports.
+  const canDeleteEdgeFunction = canManageFunctions && canUpdateEdgeFunctionPermission
 
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
@@ -170,7 +178,7 @@ export const EdgeFunctionDetails = () => {
                     )}
                   />
                 </CardContent>
-                {IS_PLATFORM && (
+                {isPlatform && (
                   <>
                     <CardContent>
                       <FormField
@@ -307,38 +315,41 @@ export const EdgeFunctionDetails = () => {
         </PageSectionContent>
       </PageSection>
 
-      {IS_PLATFORM && (
-        <>
-          <PageSection>
-            <PageSectionMeta>
-              <PageSectionSummary>
-                <PageSectionTitle>Develop locally</PageSectionTitle>
-              </PageSectionSummary>
-            </PageSectionMeta>
-            <PageSectionContent>
-              <div className="rounded-sm border bg-surface-100 px-6 py-4 drop-shadow-xs">
-                <div className="space-y-6">
-                  <CommandRender
-                    commands={[
-                      {
-                        command: `supabase functions download ${selectedFunction?.slug}`,
-                        description: 'Download the function to your local machine',
-                        jsx: () => (
-                          <>
-                            <span className="text-brand">supabase</span> functions download{' '}
-                            {selectedFunction?.slug}
-                          </>
-                        ),
-                        comment: '1. Download the function',
-                      },
-                    ]}
-                  />
-                  <CommandRender commands={[managementCommands[0]]} />
-                  <CommandRender commands={[managementCommands[1]]} />
-                </div>
+      {isPlatform && (
+        <PageSection>
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>Develop locally</PageSectionTitle>
+            </PageSectionSummary>
+          </PageSectionMeta>
+          <PageSectionContent>
+            <div className="rounded-sm border bg-surface-100 px-6 py-4 drop-shadow-xs">
+              <div className="space-y-6">
+                <CommandRender
+                  commands={[
+                    {
+                      command: `supabase functions download ${selectedFunction?.slug}`,
+                      description: 'Download the function to your local machine',
+                      jsx: () => (
+                        <>
+                          <span className="text-brand">supabase</span> functions download{' '}
+                          {selectedFunction?.slug}
+                        </>
+                      ),
+                      comment: '1. Download the function',
+                    },
+                  ]}
+                />
+                <CommandRender commands={[managementCommands[0]]} />
+                <CommandRender commands={[managementCommands[1]]} />
               </div>
-            </PageSectionContent>
-          </PageSection>
+            </div>
+          </PageSectionContent>
+        </PageSection>
+      )}
+
+      {canManageFunctions && (
+        <>
           <PageSection>
             <PageSectionMeta>
               <PageSectionSummary>
@@ -355,7 +366,7 @@ export const EdgeFunctionDetails = () => {
                 <AlertDescription className="mt-3">
                   <Button
                     type="danger"
-                    disabled={!canUpdateEdgeFunction}
+                    disabled={!canDeleteEdgeFunction}
                     loading={selectedFunction?.id === undefined}
                     onClick={() => setShowDeleteModal(true)}
                   >

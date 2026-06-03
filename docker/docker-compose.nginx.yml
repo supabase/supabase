@@ -18,6 +18,16 @@ services:
     environment:
       KONG_PORT_MAPS: "443:8000,443:8443"
 
+  # Studio gains access to the web hosting root (docroots + sites registry) and
+  # the hosting agent, so the "Sites" product can manage static/SPA hosting.
+  studio:
+    environment:
+      WEB_HOSTING_ROOT: /var/www
+      HOSTING_AGENT_URL: http://hosting-agent:9000
+      HOSTING_AGENT_TOKEN: ${HOSTING_AGENT_TOKEN}
+    volumes:
+      - ./volumes/www:/var/www
+
   nginx:
     container_name: supabase-nginx
     image: jonasal/nginx-certbot:6.2.0-nginx1.31.0
@@ -46,7 +56,60 @@ services:
         /scripts/start_nginx_certbot.sh
     volumes:
       - ./volumes/proxy/nginx/supabase-nginx.conf.tpl:/etc/nginx/supabase-nginx.conf.tpl:ro
+      # Per-site server blocks written by the hosting agent (included by the template).
+      - ./volumes/proxy/nginx/sites:/etc/nginx/sites
+      # Static/SPA docroots served by nginx (read-only is enough to serve).
+      - ./volumes/www:/var/www:ro
       - nginx_letsencrypt:/etc/letsencrypt
+
+  # Privileged sidecar that owns nginx site config + reloads. Studio calls it
+  # over the internal network with a bearer token — Studio itself never touches
+  # the Docker socket. This is the single component with elevated host access.
+  hosting-agent:
+    container_name: supabase-hosting-agent
+    build:
+      context: ./hosting-agent
+    restart: unless-stopped
+    environment:
+      HOSTING_AGENT_TOKEN: ${HOSTING_AGENT_TOKEN}
+      NGINX_CONTAINER_NAME: supabase-nginx
+      NGINX_SITES_DIR: /etc/nginx/sites
+      KONG_UPSTREAM: kong_upstream
+    volumes:
+      - ./volumes/proxy/nginx/sites:/etc/nginx/sites
+      # Needed to send a reload (SIGHUP) signal to the nginx container.
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  # Secure file access to the docroots (recommended). One chrooted user per site.
+  # Credentials are managed from Studio in a later phase; users.conf is the source.
+  sftp:
+    container_name: supabase-sftp
+    image: atmoz/sftp:alpine
+    restart: unless-stopped
+    ports:
+      - "${SFTP_PORT:-2222}:22"
+    volumes:
+      - ./volumes/www:/home
+      - ./volumes/sftp/users.conf:/etc/sftp/users.conf:ro
+      - ./volumes/sftp/ssh:/etc/ssh/keys:ro
+
+  # Optional FTP-over-TLS (explicit FTPS) for classic FTP clients. Disabled by
+  # default behind a profile — enable with `--profile ftps`. Requires a TLS cert
+  # and a reachable passive port range; see docker/hosting-agent/README.md.
+  ftps:
+    container_name: supabase-ftps
+    image: garethflowers/ftp-server:latest
+    restart: unless-stopped
+    profiles:
+      - ftps
+    environment:
+      FTP_USER: ${FTPS_USER:-supabase}
+      FTP_PASS: ${FTPS_PASS:-}
+    ports:
+      - "${FTPS_PORT:-21}:21"
+      - "40000-40009:40000-40009"
+    volumes:
+      - ./volumes/www:/home/user
 
 volumes:
   nginx_letsencrypt:

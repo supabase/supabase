@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IS_PLATFORM, useParams } from 'common'
+import { useParams } from 'common'
 import { isEqual } from 'lodash'
 import { AlertCircle, CornerDownLeft, Loader2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
@@ -19,6 +19,7 @@ import { useEdgeFunctionBodyQuery } from '@/data/edge-functions/edge-function-bo
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeployMutation } from '@/data/edge-functions/edge-functions-deploy-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH } from '@/lib/constants'
@@ -31,6 +32,10 @@ const CodePage = () => {
 
   const track = useTrack()
   const [showDeployWarning, setShowDeployWarning] = useState(false)
+
+  const { isPlatform, isSelfHosted } = useDeploymentMode()
+  // Both platform and self-hosted support deploying updated code from the editor.
+  const canManageFunctions = isPlatform || isSelfHosted
 
   const { can: canDeployFunction } = useAsyncCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
 
@@ -205,7 +210,7 @@ const CodePage = () => {
               orgSlug: org?.slug,
             }}
           />
-          {IS_PLATFORM && (
+          {canManageFunctions && (
             <div className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 shrink-0">
               <ButtonTooltip
                 loading={isDeploying}

@@ -12,6 +12,7 @@ import {
 
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useIsProjectActive } from '@/hooks/misc/useSelectedProject'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -26,6 +27,11 @@ export const DeployEdgeFunctionButton = () => {
   const [, setCreateMethod] = useQueryState('create', parseAsString)
 
   const isProjectActive = useIsProjectActive()
+  const { isPlatform, isSelfHosted } = useDeploymentMode()
+
+  // Both platform and self-hosted can deploy from the dashboard. CLI deployments
+  // are managed locally through the Supabase CLI, so the in-browser flow is hidden.
+  if (!isPlatform && !isSelfHosted) return null
 
   return (
     <DropdownMenu>

@@ -14,7 +14,7 @@ import { ResourceItem } from '@/components/ui/Resource/ResourceItem'
 import { ResourceList } from '@/components/ui/Resource/ResourceList'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
+import { DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
@@ -22,7 +22,9 @@ import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 export const FunctionsEmptyState = () => {
   const { ref } = useParams()
   const router = useRouter()
-  const { isCli, isSelfHosted } = useDeploymentMode()
+  const { isPlatform, isCli, isSelfHosted } = useDeploymentMode()
+  // Platform and self-hosted can author/deploy functions from the dashboard.
+  const canManageFunctions = isPlatform || isSelfHosted
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
 
@@ -39,7 +41,7 @@ export const FunctionsEmptyState = () => {
     return EDGE_FUNCTION_TEMPLATES.filter((template) => template.value !== 'stripe-webhook')
   }, [showStripeExample])
 
-  const emptyStateTitle = IS_PLATFORM
+  const emptyStateTitle = canManageFunctions
     ? 'Deploy your first edge function'
     : 'Add your first edge function'
 
@@ -51,80 +53,79 @@ export const FunctionsEmptyState = () => {
         </CardHeader>
         <CardContent className="p-0 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] divide-y md:divide-y-0 md:divide-x divide-default items-stretch">
           {/* Editor Option */}
-          {IS_PLATFORM && (
-            <>
-              <div className="p-8">
-                <div className="flex items-center gap-2">
-                  <Code strokeWidth={1.5} size={20} />
-                  <h4 className="text-base text-foreground">Via Editor</h4>
-                </div>
-                <p className="text-sm text-foreground-light mb-4 mt-1">
-                  Create and edit functions directly in the browser. Download to local at any time.
-                </p>
-                <Button
-                  type="default"
-                  onClick={() => {
-                    router.push(`/project/${ref}/functions/new`)
-                    track('edge_function_via_editor_button_clicked', {
-                      origin: 'no_functions_block',
-                    })
-                  }}
-                >
-                  Open Editor
-                </Button>
+          {canManageFunctions && (
+            <div className="p-8">
+              <div className="flex items-center gap-2">
+                <Code strokeWidth={1.5} size={20} />
+                <h4 className="text-base text-foreground">Via Editor</h4>
               </div>
+              <p className="text-sm text-foreground-light mb-4 mt-1">
+                Create and edit functions directly in the browser. Download to local at any time.
+              </p>
+              <Button
+                type="default"
+                onClick={() => {
+                  router.push(`/project/${ref}/functions/new`)
+                  track('edge_function_via_editor_button_clicked', {
+                    origin: 'no_functions_block',
+                  })
+                }}
+              >
+                Open Editor
+              </Button>
+            </div>
+          )}
 
-              {/* AI Assistant Option */}
-              <div className="p-8">
-                <div className="flex items-center gap-2">
-                  <AiIconAnimation size={20} />
-                  <h4 className="text-base text-foreground">AI Assistant</h4>
-                </div>
-                <p className="text-sm text-foreground-light mb-4 mt-1">
-                  Let our AI assistant help you create functions. Perfect for kickstarting a
-                  function.
-                </p>
-                <Button
-                  type="default"
-                  onClick={() => {
-                    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-                    aiSnap.newChat({
-                      name: 'Create new edge function',
-                      initialInput: 'Create a new edge function that ...',
-                      suggestions: {
-                        title:
-                          'I can help you create a new edge function. Here are a few example prompts to get you started:',
-                        prompts: [
-                          {
-                            label: 'Stripe Payments',
-                            description:
-                              'Create a new edge function that processes payments with Stripe',
-                          },
-                          {
-                            label: 'Email with Resend',
-                            description: 'Create a new edge function that sends emails with Resend',
-                          },
-                          {
-                            label: 'PDF Generator',
-                            description:
-                              'Create a new edge function that generates PDFs from HTML templates',
-                          },
-                        ],
-                      },
-                    })
-                    track('edge_function_ai_assistant_button_clicked', {
-                      origin: 'no_functions_block',
-                    })
-                  }}
-                >
-                  Open Assistant
-                </Button>
+          {/* AI Assistant Option */}
+          {isPlatform && (
+            <div className="p-8">
+              <div className="flex items-center gap-2">
+                <AiIconAnimation size={20} />
+                <h4 className="text-base text-foreground">AI Assistant</h4>
               </div>
-            </>
+              <p className="text-sm text-foreground-light mb-4 mt-1">
+                Let our AI assistant help you create functions. Perfect for kickstarting a function.
+              </p>
+              <Button
+                type="default"
+                onClick={() => {
+                  openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+                  aiSnap.newChat({
+                    name: 'Create new edge function',
+                    initialInput: 'Create a new edge function that ...',
+                    suggestions: {
+                      title:
+                        'I can help you create a new edge function. Here are a few example prompts to get you started:',
+                      prompts: [
+                        {
+                          label: 'Stripe Payments',
+                          description:
+                            'Create a new edge function that processes payments with Stripe',
+                        },
+                        {
+                          label: 'Email with Resend',
+                          description: 'Create a new edge function that sends emails with Resend',
+                        },
+                        {
+                          label: 'PDF Generator',
+                          description:
+                            'Create a new edge function that generates PDFs from HTML templates',
+                        },
+                      ],
+                    },
+                  })
+                  track('edge_function_ai_assistant_button_clicked', {
+                    origin: 'no_functions_block',
+                  })
+                }}
+              >
+                Open Assistant
+              </Button>
+            </div>
           )}
 
           {/* CLI Option */}
-          {(IS_PLATFORM || isCli) && (
+          {(isPlatform || isCli) && (
             <div className="p-8">
               <div className="flex items-center gap-2">
                 <Terminal strokeWidth={1.5} size={20} />
@@ -150,7 +151,7 @@ export const FunctionsEmptyState = () => {
           {isSelfHosted && <SelfHostedManualFunctionContent />}
         </CardContent>
       </Card>
-      {IS_PLATFORM && (
+      {canManageFunctions && (
         <>
           <ScaffoldSectionTitle className="text-xl mb-4 mt-12">
             Start with a template
@@ -187,9 +188,10 @@ const SelfHostedManualFunctionContent = () => (
       <h4 className="text-base text-foreground">Self-Hosted</h4>
     </div>
     <p className="text-sm text-foreground-light mb-4 mt-1">
-      Place each function at{' '}
-      <code className="text-code-inline">volumes/functions/&lt;function-name&gt;/index.ts</code> and
-      restart the <code className="text-code-inline">functions</code> service to pick up changes.
+      Prefer the filesystem? Place each function at{' '}
+      <code className="text-code-inline">volumes/functions/&lt;function-name&gt;/index.ts</code>. The{' '}
+      <code className="text-code-inline">functions</code> service picks up changes on the next
+      invocation.
     </p>
     <DocsButton href={`${DOCS_URL}/guides/self-hosting/self-hosted-functions`} />
   </div>
