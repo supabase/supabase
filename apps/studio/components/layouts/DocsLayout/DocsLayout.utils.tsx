@@ -48,6 +48,7 @@ export const generateDocsMenu = (
     },
     {
       title: 'Tables and Views',
+      key: 'tables',
       items: [
         {
           name: 'Introduction',
@@ -67,6 +68,7 @@ export const generateDocsMenu = (
     },
     {
       title: 'Functions',
+      key: 'functions',
       items: [
         {
           name: 'Introduction',

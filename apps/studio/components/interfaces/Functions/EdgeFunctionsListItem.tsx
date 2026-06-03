@@ -32,7 +32,7 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
   const functionUrl = `${endpoint}/functions/v1/${item.slug}`
 
   const handleNavigation = createNavigationHandler(
-    `/project/${ref}/functions/${item.slug}${IS_PLATFORM ? '' : `/details`}`,
+    `/project/${ref}/functions/${item.slug}${IS_PLATFORM ? '' : `/code`}`,
     router
   )
 
