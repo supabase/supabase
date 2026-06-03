@@ -21,8 +21,16 @@ import { getRouterEventsProxy } from './_router-events'
 // string for index pages instead of `undefined`, and the home icon
 // stops highlighting. The root path stays `/` either way.
 function toNextPathPattern(routeId: string) {
-  const withBracketParams = routeId.replace(/\$([a-zA-Z0-9_]+)/g, '[$1]')
-  if (withBracketParams === '/') return withBracketParams
+  // Strip TanStack's layout-route segments — they're prefixed with `_`
+  // (`_app`, `_auth`, etc.) and don't appear in the URL or in Next's
+  // `router.pathname`. Without this, downstream code that derives a path
+  // segment from `pathname.split('/')[N]` indexes into the wrong slot —
+  // e.g. Sidebar uses index 3 to pick the active route, expecting
+  // `/org/[slug]/general` but receiving `/_app/org/[slug]/general` and
+  // ending up with `[slug]` instead of `general`.
+  const withoutLayoutSegments = routeId.replace(/\/_[a-zA-Z0-9_]+(?=\/|$)/g, '')
+  const withBracketParams = withoutLayoutSegments.replace(/\$([a-zA-Z0-9_]+)/g, '[$1]')
+  if (withBracketParams === '' || withBracketParams === '/') return '/'
   return withBracketParams.replace(/\/$/, '')
 }
 
