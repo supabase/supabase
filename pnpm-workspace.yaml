@@ -86,6 +86,7 @@ overrides:
   tmp: ^0.2.7
   unhead: ^2.1.13
   webpack: ^5.104.1
+  qs: ^6.15.2
 
 patchedDependencies:
   react-data-grid: patches/react-data-grid.patch
