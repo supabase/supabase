@@ -105,7 +105,7 @@ overrides:
   refractor>prismjs: ^1.30.0
   supabase>tar: ^7.5.11
   terser-webpack-plugin>serialize-javascript: ^7.0.5
-  tmp: ^0.2.4
+  tmp: ^0.2.7
   unhead: ^2.1.13
   webpack: ^5.104.1
 
@@ -16490,8 +16490,8 @@ packages:
     resolution: {integrity: sha512-5bdPHSwbKTeHmXrgecID4Ljff8rQjv7g8zKQPkCozRo2HWWni+p310FSn5ImI+9kWw9kK4lzOB5q/a6iv0IJsw==}
     hasBin: true
 
-  tmp@0.2.5:
-    resolution: {integrity: sha512-voyz6MApa1rQGUxT3E+BK7/ROe8itEx7vD8/HEvt4xwXucvQ5G5oeEiHkmHZJuBO21RpOf+YYm9MOivj709jow==}
+  tmp@0.2.7:
+    resolution: {integrity: sha512-e0votIpp4Uo2AJYSzVHV6xCcawuiez3DzqDAbrTc3YxBkplN6e+dM13ZeIcZnDg/QpSuU2zfZ3rzwY8ukEnaXw==}
     engines: {node: '>=14.14'}
 
   to-gatsby-remark-plugin@0.1.0:
@@ -27899,7 +27899,7 @@ snapshots:
     dependencies:
       chardet: 0.7.0
       iconv-lite: 0.4.24
-      tmp: 0.2.5
+      tmp: 0.2.7
 
   extsprintf@1.4.1: {}
 
@@ -34689,7 +34689,7 @@ snapshots:
     dependencies:
       tldts-core: 7.0.16
 
-  tmp@0.2.5: {}
+  tmp@0.2.7: {}
 
   to-gatsby-remark-plugin@0.1.0:
     dependencies:

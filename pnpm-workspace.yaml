@@ -83,7 +83,7 @@ overrides:
   refractor>prismjs: ^1.30.0
   supabase>tar: ^7.5.11
   terser-webpack-plugin>serialize-javascript: ^7.0.5
-  tmp: ^0.2.4
+  tmp: ^0.2.7
   unhead: ^2.1.13
   webpack: ^5.104.1
 
