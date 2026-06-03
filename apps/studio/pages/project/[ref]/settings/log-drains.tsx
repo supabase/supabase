@@ -35,6 +35,7 @@ import { useUpdateLogDrainMutation } from '@/data/log-drains/update-log-drain-mu
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import type { NextPageWithLayout } from '@/types'
 
@@ -44,6 +45,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
     'logflare'
   )
 
+  const track = useTrack()
   const [open, setOpen] = useState(false)
   const { ref } = useParams() as { ref: string }
   const [selectedLogDrain, setSelectedLogDrain] = useState<Partial<LogDrainData> | null>(null)
@@ -128,6 +130,10 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             type: selectedLogDrain?.type ? selectedLogDrain.type : 'webhook',
           }}
           isLoading={isLoading}
+          existingDrainNames={(logDrains ?? []).map((drain) => drain.name)}
+          onSaveClick={(type) => {
+            track('log_drain_save_button_clicked', { destination: type })
+          }}
           onSubmit={({ name, description, type, ...values }) => {
             const logDrainValues = {
               name,

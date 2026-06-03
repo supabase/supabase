@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IS_PLATFORM, useFlag, useParams } from 'common'
+import { IS_PLATFORM, useFlag } from 'common'
 import Link from 'next/link'
 import { ReactNode, useEffect, useMemo, useRef } from 'react'
 import { useForm } from 'react-hook-form'
@@ -53,9 +53,8 @@ import {
 } from './LogDrains.utils'
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { Shortcut } from '@/components/ui/Shortcut'
-import { LogDrainData, useLogDrainsQuery } from '@/data/log-drains/log-drains-query'
+import { LogDrainData } from '@/data/log-drains/log-drains-query'
 import { DOCS_URL } from '@/lib/constants'
-import { useTrack } from '@/lib/telemetry/track'
 import { httpEndpointUrlSchema } from '@/lib/validation/http-url'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
@@ -263,7 +262,9 @@ type LogDrainDestinationSubmitValues = z.infer<typeof submitSchema>
 
 const HEADER_ENABLED_TYPES = ['webhook', 'loki', 'otlp'] as const
 
-function toSubmitValues(values: LogDrainDestinationFormValues): LogDrainDestinationSubmitValues {
+export function toSubmitValues(
+  values: LogDrainDestinationFormValues
+): LogDrainDestinationSubmitValues {
   if (!HEADER_ENABLED_TYPES.includes(values.type as (typeof HEADER_ENABLED_TYPES)[number])) {
     return submitSchema.parse(values)
   }
@@ -321,6 +322,8 @@ export function LogDrainDestinationSheetForm({
   onSubmit,
   isLoading,
   mode,
+  existingDrainNames = [],
+  onSaveClick,
 }: {
   open: boolean
   onOpenChange: (v: boolean) => void
@@ -328,6 +331,10 @@ export function LogDrainDestinationSheetForm({
   isLoading?: boolean
   onSubmit: (values: LogDrainDestinationSubmitValues) => void
   mode: 'create' | 'update'
+  /** Names of existing drains in the current scope, used for the duplicate-name check. */
+  existingDrainNames?: string[]
+  /** Called when the save button is clicked, so the caller can attach scope-aware telemetry. */
+  onSaveClick?: (type: LogDrainType) => void
 }) {
   // NOTE(kamil): This used to be `any` for a long long time, but after moving to Zod,
   // it produces a correct union type of all possible configs. Unfortunately, this type was not designed correctly
@@ -349,12 +356,6 @@ export function LogDrainDestinationSheetForm({
   const last9Enabled = useFlag('Last9LogDrain')
   const syslogEnabled = useFlag('syslogLogDrain')
 
-  const { ref } = useParams()
-  const { data: logDrains } = useLogDrainsQuery({
-    ref,
-  })
-
-  const track = useTrack()
   const formRef = useRef<HTMLFormElement>(null)
 
   const formValues = useMemo(() => {
@@ -435,17 +436,14 @@ export function LogDrainDestinationSheetForm({
 
                 // Temp check to make sure the name is unique
                 const logDrainName = form.getValues('name')
-                const logDrainExists =
-                  !!logDrains?.length && logDrains?.find((drain) => drain.name === logDrainName)
+                const logDrainExists = existingDrainNames.includes(logDrainName)
                 if (logDrainExists && mode === 'create') {
                   toast.error('Log drain name already exists')
                   return
                 }
 
                 form.handleSubmit((values) => onSubmit(toSubmitValues(values)))(e)
-                track('log_drain_save_button_clicked', {
-                  destination: form.getValues('type'),
-                })
+                onSaveClick?.(form.getValues('type'))
               }}
             >
               <div className="space-y-8 px-content">
