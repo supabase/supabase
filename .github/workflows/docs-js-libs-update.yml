@@ -52,11 +52,9 @@ jobs:
           echo "Version: ${VERSION}"
           make
 
-      - name: Generate new typespec snapshot
+      - name: Refresh reference-content snapshot
         working-directory: apps/docs
-        run: |
-          echo "Generating new typespec snapshot for review..."
-          npx vitest run --update --dir features/docs
+        run: npx vitest run --update scripts/build-reference-content.test.ts
 
       - name: Generate token
         id: app-token
