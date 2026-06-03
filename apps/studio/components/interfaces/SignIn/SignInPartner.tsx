@@ -39,7 +39,8 @@ export const SignInPartner = () => {
     return () => { 
       isMounted = false
     }
-  }, [router]) 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) 
 
   return (
     <div className="relative mx-auto w-full flex flex-col items-center justify-center gap-y-6">
