@@ -76,7 +76,7 @@ export function ApiKeyPill({
       return key ?? ''
     } catch {
       toast.error('Failed to copy secret API key')
-      return apiKey.api_key
+      return ''
     }
   }
 
@@ -112,6 +112,7 @@ export function ApiKeyPill({
           <TooltipTrigger asChild>
             <Button
               type="outline"
+              aria-label={show ? 'Hide API key' : 'Reveal API key'}
               className="rounded-full px-2 pointer-events-auto"
               loading={show && isLoading}
               icon={show ? <EyeOff strokeWidth={2} /> : <Eye strokeWidth={2} />}
@@ -135,6 +136,7 @@ export function ApiKeyPill({
         <TooltipTrigger asChild>
           <CopyButton
             type="default"
+            aria-label="Copy API key"
             asyncText={onCopy}
             iconOnly
             className="rounded-full px-2 pointer-events-auto"

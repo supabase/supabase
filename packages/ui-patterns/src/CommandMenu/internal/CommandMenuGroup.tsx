@@ -1,14 +1,14 @@
 'use client'
 
 import { forwardRef } from 'react'
-import { cn, CommandGroup_Shadcn_ } from 'ui'
+import { cn, CommandGroup } from 'ui'
 
 const CommandMenuGroup = forwardRef<
-  React.ElementRef<typeof CommandGroup_Shadcn_>,
-  React.ComponentPropsWithoutRef<typeof CommandGroup_Shadcn_>
+  React.ElementRef<typeof CommandGroup>,
+  React.ComponentPropsWithoutRef<typeof CommandGroup>
 >(({ className, ...props }, ref) => {
   return (
-    <CommandGroup_Shadcn_
+    <CommandGroup
       ref={ref}
       className={cn(
         'overflow-hidden py-3 px-2 text-foreground-lighter/60 **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:pb-1.5 **:[[cmdk-group-heading]]:text-sm **:[[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-lighter/60',

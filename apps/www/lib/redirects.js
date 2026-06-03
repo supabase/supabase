@@ -2435,6 +2435,16 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/partners/integrations/refine_dev',
+    destination: '/partners/integrations/refine',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations/supabase_wrapper_stripe',
+    destination: '/partners/integrations/stripe-wrapper',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/integrations/sequin',
     destination: '/partners/integrations/sequin',
   },
@@ -3197,16 +3207,6 @@ module.exports = [
     ],
     destination: '/dashboard/redeem?code=:code',
     permanent: false,
-  },
-  {
-    permanent: true,
-    source: '/docs/llms.txt',
-    destination: '/llms.txt',
-  },
-  {
-    permanent: true,
-    source: '/docs/llms-full.txt',
-    destination: '/llms-full.txt',
   },
   // Legacy product .txt URLs → new .md routes
   { permanent: true, source: '/llms/homepage.txt', destination: '/homepage.md' },

@@ -84,7 +84,6 @@ type DucklakeApiConfig = {
   s3_url_style?: 'path' | 'vhost'
   s3_use_ssl?: boolean
   metadata_schema?: string
-  expire_snapshots_older_than?: string
 }
 
 export const DestinationForm = ({
@@ -237,7 +236,6 @@ export const DestinationForm = ({
       ducklakeS3UrlStyle: ducklakeConfig?.s3_url_style ?? 'path',
       ducklakeS3UseSsl: ducklakeConfig?.s3_use_ssl ?? true,
       ducklakeMetadataSchema: ducklakeConfig?.metadata_schema ?? 'ducklake',
-      ducklakeExpireSnapshotsOlderThan: ducklakeConfig?.expire_snapshots_older_than ?? '',
     }
   }, [destinationData, pipelineData, catalogToken, projectSettings])
 

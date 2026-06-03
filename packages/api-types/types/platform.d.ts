@@ -687,6 +687,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/integrations/partners/{ref}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Lists installed marketplace integrations for the given project. */
+    get: operations['PartnerIntegrationsController_listIntegrations']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/integrations/partners/{ref}/{listing_slug}': {
     parameters: {
       query?: never
@@ -694,7 +711,8 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    get?: never
+    /** Gets the installation status of the given marketplace integration for the given project. */
+    get: operations['PartnerIntegrationsController_getIntegration']
     put?: never
     /** Creates a partner integration and returns the redirect URL */
     post: operations['PartnerIntegrationsController_createIntegration']
@@ -949,6 +967,60 @@ export interface paths {
     head?: never
     /** Updates organization */
     patch: operations['OrganizationSlugController_updateOrganization']
+    trace?: never
+  }
+  '/platform/organizations/{slug}/analytics/audit-log-drains': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Lists all audit log drains for an organization */
+    get: operations['AuditLogDrainController_listAuditLogDrains']
+    put?: never
+    /** Create an audit log drain */
+    post: operations['AuditLogDrainController_createAuditLogDrain']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/{slug}/analytics/audit-log-drains/{token}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Update an audit log drain */
+    put: operations['AuditLogDrainController_updateAuditLogDrain']
+    post?: never
+    /** Delete an audit log drain */
+    delete: operations['AuditLogDrainController_deleteAuditLogDrain']
+    options?: never
+    head?: never
+    /** Patch an audit log drain */
+    patch: operations['AuditLogDrainController_patchAuditLogDrain']
+    trace?: never
+  }
+  '/platform/organizations/{slug}/analytics/audit-log-drains/{token}/test': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Test an audit log drain connection */
+    post: operations['AuditLogDrainController_testAuditLogDrain']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
     trace?: never
   }
   '/platform/organizations/{slug}/apps': {
@@ -2505,6 +2577,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/projects/{ref}/analytics/endpoints/service-health': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets project's service health based on log levels */
+    get: operations['UsageApiController_getProjectServiceHealth']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/projects/{ref}/analytics/endpoints/usage.api-counts': {
     parameters: {
       query?: never
@@ -2574,6 +2663,23 @@ export interface paths {
     head?: never
     /** Patch a log drain */
     patch: operations['LogDrainController_patchLogDrain']
+    trace?: never
+  }
+  '/platform/projects/{ref}/analytics/log-drains/{token}/test': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Test a log drain connection */
+    post: operations['LogDrainController_testLogDrain']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
     trace?: never
   }
   '/platform/projects/{ref}/api-keys/temporary': {
@@ -2871,7 +2977,7 @@ export interface paths {
     /** Creates project's content folder */
     post: operations['ContentFoldersController_createFolder']
     /** Deletes project's content folders */
-    delete: operations['ContentFoldersController_DeleteFolder']
+    delete: operations['ContentFoldersController_deleteFolder']
     options?: never
     head?: never
     patch?: never
@@ -4465,6 +4571,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/support/verify-email': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Verify a support conversation email
+     * @description Called by the Supabase dashboard when a user clicks their email verification link. Validates the token, checks org/project ownership, updates the Front conversation custom fields, and removes unverified tags.
+     */
+    post: operations['VerifyEmailController_verifyEmail']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/telemetry/event': {
     parameters: {
       query?: never
@@ -4827,6 +4953,10 @@ export interface components {
         title: string
       }[]
     }
+    BackendConnectionTest: {
+      'connected?': boolean
+      reason: string
+    }
     BackupsResponse: {
       backups: {
         id: number
@@ -4919,6 +5049,7 @@ export interface components {
           | 'ALREADY_MANAGED_BY_PARTNER'
           | 'ALREADY_MANAGED_BY_PARTNER_AWS'
           | 'OVERDUE_INVOICES'
+          | 'IN_ARREARS_BILLING_MODE'
         )[]
         slug: string
       }[]
@@ -4996,11 +5127,6 @@ export interface components {
             region?: string
           }
         | {
-            password?: string | null
-            url?: string
-            username?: string | null
-          }
-        | {
             headers?: {
               [key: string]: string
             }
@@ -5036,7 +5162,6 @@ export interface components {
         | 'clickhouse'
         | 'webhook'
         | 'datadog'
-        | 'elastic'
         | 'loki'
         | 'sentry'
         | 's3'
@@ -5462,13 +5587,13 @@ export interface components {
       custom_supabase_internal_requests?: {
         ami: {
           /**
-           * @description Exact AWS instance type to provision (e.g. `t3.nano`, `t4g.nano`). When omitted the default for `desired_instance_size` is used. Only for internal use; rejected for user-facing requests in production.
+           * @description Exact AWS instance type to provision (e.g. `t3.nano`, `t4g.nano`). Hard pin — no ODCR fallback. Only for internal use; rejected for user-facing requests in production.
            * @enum {string}
            */
           instance_type?:
             | 't4g.nano'
-            | 't3.nano'
             | 't3a.nano'
+            | 't3.nano'
             | 't4g.micro'
             | 't4g.small'
             | 't4g.medium'
@@ -5488,6 +5613,11 @@ export interface components {
             | 'c8g.48xlarge'
             | 'r8g.48xlarge'
             | 'x8g.48xlarge'
+          /**
+           * @description Preferred architecture for WPP projects. Soft hint — the worker selects the cheapest region-available type for this arch and may cross to the other arch if no ODCR capacity is available. Cannot be set together with instance_type. Only for internal use.
+           * @enum {string}
+           */
+          preferred_arch?: 'x86_64' | 'arm64'
           search_tags?: {
             [key: string]: string
           }
@@ -5684,11 +5814,6 @@ export interface components {
                */
               data_path: string
               /**
-               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-               * @example 7 days
-               */
-              expire_snapshots_older_than?: string
-              /**
                * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                * @default ducklake
                * @example ducklake
@@ -5821,11 +5946,6 @@ export interface components {
                * @example s3://<bucket-name>/
                */
               data_path: string
-              /**
-               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-               * @example 7 days
-               */
-              expire_snapshots_older_than?: string
               /**
                * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                * @default ducklake
@@ -7357,21 +7477,6 @@ export interface components {
       MAILER_SUBJECTS_PHONE_CHANGED_NOTIFICATION: string
       MAILER_SUBJECTS_REAUTHENTICATION: string
       MAILER_SUBJECTS_RECOVERY: string
-      MAILER_SUBJECTS_CUSTOM_CONTENTS: {
-        MAILER_SUBJECTS_CONFIRMATION: boolean
-        MAILER_SUBJECTS_EMAIL_CHANGE: boolean
-        MAILER_SUBJECTS_EMAIL_CHANGED_NOTIFICATION: boolean
-        MAILER_SUBJECTS_IDENTITY_LINKED_NOTIFICATION: boolean
-        MAILER_SUBJECTS_IDENTITY_UNLINKED_NOTIFICATION: boolean
-        MAILER_SUBJECTS_INVITE: boolean
-        MAILER_SUBJECTS_MAGIC_LINK: boolean
-        MAILER_SUBJECTS_MFA_FACTOR_ENROLLED_NOTIFICATION: boolean
-        MAILER_SUBJECTS_MFA_FACTOR_UNENROLLED_NOTIFICATION: boolean
-        MAILER_SUBJECTS_PASSWORD_CHANGED_NOTIFICATION: boolean
-        MAILER_SUBJECTS_PHONE_CHANGED_NOTIFICATION: boolean
-        MAILER_SUBJECTS_REAUTHENTICATION: boolean
-        MAILER_SUBJECTS_RECOVERY: boolean
-      }
       MAILER_TEMPLATES_CONFIRMATION_CONTENT: string
       MAILER_TEMPLATES_CUSTOM_CONTENTS: {
         MAILER_TEMPLATES_CONFIRMATION_CONTENT: boolean
@@ -7560,11 +7665,6 @@ export interface components {
             region?: string
           }
         | {
-            password?: string | null
-            url?: string
-            username?: string | null
-          }
-        | {
             headers?: {
               [key: string]: string
             }
@@ -7607,7 +7707,6 @@ export interface components {
         | 'clickhouse'
         | 'webhook'
         | 'datadog'
-        | 'elastic'
         | 'loki'
         | 'sentry'
         | 's3'
@@ -7662,6 +7761,7 @@ export interface components {
             | 'ipv4'
             | 'pitr.available_variants'
             | 'log_drains'
+            | 'audit_log_drains'
             | 'branching_limit'
             | 'branching_persistent'
             | 'auth.mfa_phone'
@@ -7679,6 +7779,7 @@ export interface components {
             | 'auth.custom_oauth.max_providers'
             | 'backup.retention_days'
             | 'backup.restore_to_new_project'
+            | 'backup.schedule'
             | 'function.max_count'
             | 'function.size_limit_mb'
             | 'realtime.max_concurrent_users'
@@ -8337,22 +8438,42 @@ export interface components {
       organization_id: number
       overdue_invoice_count: number
     }
+    PartnerIntegrationListResponse: {
+      integrations: {
+        listing_slug: string
+        partner_links?: {
+          dashboard?: string
+          manage?: string
+        }
+        /** @enum {string} */
+        status: 'installing' | 'ready' | 'error'
+        user_alert?: {
+          message: string
+        }
+        version?: string
+      }[]
+    }
     PartnerIntegrationsResponse: {
-      /**
-       * Format: date-time
-       * @description When the integration link expires (1 hour from creation). The user must begin the flow before this time.
-       */
-      expiresAt: string
-      /**
-       * Format: uuid
-       * @description Unique identifier for the integration record
-       */
-      integrationId: string
       /**
        * Format: uri
        * @description URL to redirect the user's browser to
        */
       redirectUrl: string
+    }
+    PartnerIntegrationStatusResponse: {
+      install_state?: {
+        partner_links?: {
+          dashboard?: string
+          manage?: string
+        }
+        /** @enum {string} */
+        status: 'installing' | 'ready' | 'error'
+        user_alert?: {
+          message: string
+        }
+        version?: string
+      }
+      installed: boolean
     }
     PauseStatusResponse: {
       can_restore: boolean
@@ -9130,6 +9251,18 @@ export interface components {
     ProjectSensitivityResponse: {
       is_sensitive: boolean
     }
+    ProjectServiceHealthResponse: {
+      /** @enum {string} */
+      granularity?: 'day' | 'hour' | 'minute'
+      /** @example 2025-03-01T23:59:59Z */
+      iso_timestamp_end: string
+      /** @example 2025-03-01T00:00:00Z */
+      iso_timestamp_start: string
+      /** @example s:edge_logs */
+      lql?: string
+      /** @example select timestamp, edge_logs from service_health */
+      sql?: string
+    }
     ProjectSettingsResponse: {
       app_config?: {
         db_schema: string
@@ -9362,11 +9495,6 @@ export interface components {
                */
               data_path: string
               /**
-               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-               * @example 7 days
-               */
-              expire_snapshots_older_than?: string
-              /**
                * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                * @default ducklake
                * @example ducklake
@@ -9511,11 +9639,6 @@ export interface components {
                  * @example s3://<bucket-name>/
                  */
                 data_path: string
-                /**
-                 * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-                 * @example 7 days
-                 */
-                expire_snapshots_older_than?: string
                 /**
                  * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                  * @default ducklake
@@ -10674,11 +10797,6 @@ export interface components {
             region?: string
           }
         | {
-            password?: string | null
-            url?: string
-            username?: string | null
-          }
-        | {
             headers?: {
               [key: string]: string
             }
@@ -10714,7 +10832,6 @@ export interface components {
         | 'clickhouse'
         | 'webhook'
         | 'datadog'
-        | 'elastic'
         | 'loki'
         | 'sentry'
         | 's3'
@@ -11359,11 +11476,6 @@ export interface components {
                */
               data_path: string
               /**
-               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-               * @example 7 days
-               */
-              expire_snapshots_older_than?: string
-              /**
                * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                * @default ducklake
                * @example ducklake
@@ -11496,11 +11608,6 @@ export interface components {
                * @example s3://<bucket-name>/
                */
               data_path: string
-              /**
-               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-               * @example 7 days
-               */
-              expire_snapshots_older_than?: string
               /**
                * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                * @default ducklake
@@ -12046,11 +12153,6 @@ export interface components {
                */
               data_path: string
               /**
-               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-               * @example 7 days
-               */
-              expire_snapshots_older_than?: string
-              /**
                * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                * @default ducklake
                * @example ducklake
@@ -12142,6 +12244,13 @@ export interface components {
     }
     VercelRedirectResponse: {
       url: string
+    }
+    VerifyEmailBody: {
+      token: string
+    }
+    VerifyEmailResponse: {
+      /** @enum {string} */
+      result: 'success'
     }
     WorkflowRunResponse: {
       branch_id: string
@@ -14080,6 +14189,108 @@ export interface operations {
       }
     }
   }
+  PartnerIntegrationsController_listIntegrations: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PartnerIntegrationListResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Project not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  PartnerIntegrationsController_getIntegration: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The slug of the listing in the marketplace database */
+        listing_slug: string
+        /** @description Supabase project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PartnerIntegrationStatusResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Project not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   PartnerIntegrationsController_createIntegration: {
     parameters: {
       query?: never
@@ -14787,6 +14998,324 @@ export interface operations {
         content?: never
       }
       /** @description Failed to update organization */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  AuditLogDrainController_listAuditLogDrains: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['LFBackend'][]
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to fetch audit log drains */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  AuditLogDrainController_createAuditLogDrain: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateBackendParamsOpenapi']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['LFBackend']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to create an audit log drain */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  AuditLogDrainController_updateAuditLogDrain: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+        /** @description Audit log drain identifier */
+        token: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateBackendParamsOpenapi']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['LFBackend']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update audit log drain */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  AuditLogDrainController_deleteAuditLogDrain: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+        /** @description Audit log drain identifier */
+        token: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to delete an audit log drain */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  AuditLogDrainController_patchAuditLogDrain: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+        /** @description Audit log drain identifier */
+        token: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateBackendParamsOpenapi']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['LFBackend']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to patch audit log drain */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  AuditLogDrainController_testAuditLogDrain: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+        /** @description Audit log drain identifier */
+        token: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BackendConnectionTest']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to test audit log drain */
       500: {
         headers: {
           [name: string]: unknown
@@ -16531,7 +17060,10 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
       cookie?: never
     }
     requestBody: {
@@ -19347,6 +19879,7 @@ export interface operations {
           | 'ipv4'
           | 'pitr.available_variants'
           | 'log_drains'
+          | 'audit_log_drains'
           | 'branching_limit'
           | 'branching_persistent'
           | 'auth.mfa_phone'
@@ -19364,6 +19897,7 @@ export interface operations {
           | 'auth.custom_oauth.max_providers'
           | 'backup.retention_days'
           | 'backup.restore_to_new_project'
+          | 'backup.schedule'
           | 'function.max_count'
           | 'function.size_limit_mb'
           | 'realtime.max_concurrent_users'
@@ -20473,6 +21007,62 @@ export interface operations {
       }
     }
   }
+  UsageApiController_getProjectServiceHealth: {
+    parameters: {
+      query: {
+        granularity?: 'day' | 'hour' | 'minute'
+        iso_timestamp_end: string
+        iso_timestamp_start: string
+        lql?: string
+        sql?: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ProjectServiceHealthResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get project's service health */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   UsageApiController_getApiCounts: {
     parameters: {
       query?: {
@@ -20833,6 +21423,58 @@ export interface operations {
         content?: never
       }
       /** @description Failed to patch log drain */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  LogDrainController_testLogDrain: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Log drains identifier */
+        token: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BackendConnectionTest']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to test log drain */
       500: {
         headers: {
           [name: string]: unknown
@@ -22150,7 +22792,7 @@ export interface operations {
       }
     }
   }
-  ContentFoldersController_DeleteFolder: {
+  ContentFoldersController_deleteFolder: {
     parameters: {
       query: {
         ids: string
@@ -28069,6 +28711,30 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+    }
+  }
+  VerifyEmailController_verifyEmail: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['VerifyEmailBody']
+      }
+    }
+    responses: {
+      /** @description Verification successful */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['VerifyEmailResponse']
+        }
       }
     }
   }

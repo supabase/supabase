@@ -5,14 +5,7 @@ import { User } from 'lucide-react'
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import {
-  AiIconAnimation,
-  Button,
-  cn,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-} from 'ui'
+import { AiIconAnimation, Button, cn, CommandGroup, CommandItem, CommandList } from 'ui'
 import { markdownComponents } from 'ui-patterns/Markdown'
 import { StatusIcon } from 'ui/src/components/StatusIcon'
 
@@ -195,7 +188,7 @@ function AiMessages({ messages }: { messages: Array<Message> }) {
       error. This display doesn't actually need the Command Menu, but it's
       needed for the empty state to work with the input, so this is a somewhat
       hacktastic way of making it not error. */}
-      <CommandList_Shadcn_ />
+      <CommandList />
       <div
         className={cn(
           'grow min-h-0 overflow-auto p-4',
@@ -289,8 +282,8 @@ function EmptyState({ handleSubmit }: { handleSubmit: (message: string) => void 
   const query = useQuery()
 
   return (
-    <CommandList_Shadcn_ className="max-h-[unset]">
-      <CommandGroup_Shadcn_
+    <CommandList className="max-h-[unset]">
+      <CommandGroup
         heading="Examples"
         className={cn(
           'text-border-strong',
@@ -301,7 +294,7 @@ function EmptyState({ handleSubmit }: { handleSubmit: (message: string) => void 
         {questions.map((question) => {
           const key = question.replace(/\s+/g, '_')
           return (
-            <CommandItem_Shadcn_
+            <CommandItem
               className={generateCommandClassNames(false)}
               onSelect={() => {
                 if (!query) {
@@ -312,11 +305,11 @@ function EmptyState({ handleSubmit }: { handleSubmit: (message: string) => void 
             >
               <AiIconAnimation />
               {question}
-            </CommandItem_Shadcn_>
+            </CommandItem>
           )
         })}
-      </CommandGroup_Shadcn_>
-    </CommandList_Shadcn_>
+      </CommandGroup>
+    </CommandList>
   )
 }
 

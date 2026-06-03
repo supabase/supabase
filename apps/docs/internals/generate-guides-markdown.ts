@@ -2,7 +2,6 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { globby } from 'globby'
 import matter from 'gray-matter'
-import { create as createTar } from 'tar'
 
 const PARTIALS_DIR = path.join(process.cwd(), 'content', '_partials')
 
@@ -60,6 +59,89 @@ function convertStepHike(content: string): string {
       stepNum++
     }
     return items.join('\n\n')
+  })
+}
+
+/**
+ * Extracts a `title` prop value from a JSX opening-tag's attribute text.
+ * Supports `title="..."`, `title='...'`, and `title={<jsx>...</jsx>}` forms.
+ * For JSX titles, strips inline tags and collapses whitespace so the text
+ * content remains.
+ */
+function extractTitleAttr(attrs: string): string | null {
+  const strMatch = attrs.match(/\btitle=(?:"([^"]+)"|'([^']+)')/)
+  if (strMatch) return strMatch[1] ?? strMatch[2]
+
+  const exprIdx = attrs.indexOf('title={')
+  if (exprIdx === -1) return null
+
+  let i = exprIdx + 'title={'.length
+  const inner: string[] = []
+  let depth = 1
+  while (i < attrs.length && depth > 0) {
+    const ch = attrs[i]
+    if (ch === '{') depth++
+    else if (ch === '}') {
+      depth--
+      if (depth === 0) break
+    }
+    inner.push(ch)
+    i++
+  }
+  return inner
+    .join('')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+/**
+ * Converts `<Link href="..."><GlassPanel|IconPanel title="...">desc</...></Link>`
+ * blocks into markdown bullet lines: `- [title](href). description`. Without
+ * this, the rendered output keeps prop syntax (className, passHref, etc.) since
+ * stripping JSX tags discards inner text from props but leaves panel children
+ * floating without context. Applied to all guides so resource-card grids render
+ * consistently in the markdown view.
+ */
+function convertLinkPanels(content: string): string {
+  return content.replace(/<Link\b([\s\S]*?)>([\s\S]*?)<\/Link>/g, (full, linkAttrs, body) => {
+    const hrefMatch = linkAttrs.match(/\bhref="([^"]+)"/)
+    if (!hrefMatch) return full
+    const href = hrefMatch[1]
+
+    const panelOpen = body.match(/<(GlassPanel|IconPanel)\b/)
+    if (!panelOpen) return full
+    const panelName = panelOpen[1]
+    const panelStart = panelOpen.index ?? 0
+
+    // Walk past the opening tag, respecting JSX expression braces so attribute
+    // values like `title={<span>...</span>}` don't terminate parsing early.
+    let i = panelStart + panelOpen[0].length
+    let depth = 0
+    while (i < body.length) {
+      const ch = body[i]
+      if (ch === '{') depth++
+      else if (ch === '}') depth--
+      else if (ch === '>' && depth === 0) break
+      i++
+    }
+    if (i >= body.length) return full
+
+    const panelAttrs = body.slice(panelStart + panelOpen[0].length, i)
+    const closingTag = `</${panelName}>`
+    const closeIdx = body.indexOf(closingTag, i)
+    if (closeIdx === -1) return full
+
+    const title = extractTitleAttr(panelAttrs)
+    if (!title) return full
+
+    const description = body
+      .slice(i + 1, closeIdx)
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+
+    return `- [${title}](${href})${description ? `. ${description}` : ''}`
   })
 }
 
@@ -128,7 +210,8 @@ async function generate() {
 
         const withPartials = await inlinePartials(rawContent)
         const withSteps = convertStepHike(withPartials)
-        const processed = stripJsxTags(withSteps)
+        const withLinks = convertLinkPanels(withSteps)
+        const processed = stripJsxTags(withLinks)
 
         const header = [
           data.title ? `# ${data.title}` : '',
@@ -161,16 +244,6 @@ async function generate() {
 
   const summary = warnings ? ` (${warnings} with warnings)` : ''
   console.log(`Generated ${files.length} markdown files under public/docs/guides/${summary}`)
-
-  // Create a tar.gz archive of the generated docs, served at /docs/docs.tar.gz.
-  // Sorted entries, portable headers, and a fixed mtime keep the output deterministic.
-  const archivePath = 'public/docs.tar.gz'
-  const entries = (await globby(['**'], { cwd: 'public/docs' })).sort()
-  await createTar(
-    { gzip: true, file: archivePath, cwd: 'public/docs', portable: true, mtime: new Date() },
-    entries
-  )
-  console.log(`Created archive at ${archivePath}`)
 }
 
 generate()

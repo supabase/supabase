@@ -93,7 +93,6 @@ async function updateDestinationPipeline(
       s3UrlStyle,
       s3UseSsl,
       metadataSchema,
-      expireSnapshotsOlderThan,
     } = destinationConfig.ducklake
     destination_config = {
       ducklake: {
@@ -107,7 +106,6 @@ async function updateDestinationPipeline(
         s3_url_style: s3UrlStyle,
         s3_use_ssl: s3UseSsl,
         metadata_schema: metadataSchema,
-        expire_snapshots_older_than: expireSnapshotsOlderThan,
       },
     } as unknown as components['schemas']['UpdateReplicationDestinationPipelineBody']['destination_config']
   } else {
