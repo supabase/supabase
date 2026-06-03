@@ -14,7 +14,6 @@ export * from './src/components/NavMenu'
 
 // OVERLAYS
 
-export * from './src/components/Modal'
 export * from './src/components/SidePanel'
 
 // HTML
