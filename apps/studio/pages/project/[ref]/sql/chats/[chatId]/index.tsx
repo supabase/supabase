@@ -120,9 +120,9 @@ const SqlEditorChatPage: NextPageWithLayout = () => {
   return (
     <AIAssistant
       className="bg-studio h-full min-h-0"
+      contentClassName="flex flex-1 min-h-0 flex-col px-4 md:px-8"
       conversationClassName="min-h-0"
       conversationContentClassName={`
-        px-4 md:px-8
         [&_.assistant-message-container-standard]:mx-auto
         [&_.assistant-message-container-standard]:max-w-3xl
         [&_.assistant-message-container-query]:mx-auto
@@ -134,6 +134,7 @@ const SqlEditorChatPage: NextPageWithLayout = () => {
         [&_.assistant-message-part-query]:mx-auto
         [&_.assistant-message-part-query]:max-w-6xl
       `}
+      onboardingClassName="mx-auto w-full max-w-3xl px-0"
       composerClassName="mx-auto w-full max-w-3xl"
       showHeader={false}
       showCloseButton={false}

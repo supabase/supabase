@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { motion } from 'framer-motion'
 import { BarChart, FileText, Shield } from 'lucide-react'
-import { Button, Skeleton } from 'ui'
+import { Button, cn, Skeleton } from 'ui'
 
 import { codeSnippetPrompts, defaultPrompts } from './AIAssistant.prompts'
 import type { SqlSnippet } from './AIAssistant.types'
@@ -10,6 +10,7 @@ import { createLintSummaryPrompt } from '@/components/interfaces/Linter/Linter.u
 import { useProjectLintsQuery, type Lint } from '@/data/lint/lint-query'
 
 interface AIOnboardingProps {
+  className?: string
   sqlSnippets?: SqlSnippet[]
   suggestions?: {
     title?: string
@@ -20,6 +21,7 @@ interface AIOnboardingProps {
 }
 
 export const AIOnboarding = ({
+  className,
   sqlSnippets,
   suggestions,
   onValueChange,
@@ -50,7 +52,9 @@ export const AIOnboarding = ({
 
   return (
     <div className="flex-1 overflow-y-auto">
-      <div className="w-full flex-1 max-h-full min-h-full px-4 flex flex-col gap-0">
+      <div
+        className={cn('w-full flex-1 max-h-full min-h-full px-4 flex flex-col gap-0', className)}
+      >
         <div className="mt-auto w-full space-y-6 py-8 ">
           <h2 className="heading-section text-foreground mx-4">How can I assist you?</h2>
           {suggestions?.prompts?.length ? (

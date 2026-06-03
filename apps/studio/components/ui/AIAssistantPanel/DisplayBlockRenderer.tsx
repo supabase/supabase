@@ -2,6 +2,7 @@ import { type UntrustedSqlFragment } from '@supabase/pg-meta'
 import type { ToolUIPart } from 'ai'
 import { useParams } from 'common'
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { cn } from 'ui'
 
 import { ConfirmFooter } from './ConfirmFooter'
 import { getLogDatePickerValueForHelper } from '@/components/interfaces/Settings/Logs/logsDateRange'
@@ -176,28 +177,36 @@ export const DisplayBlockRenderer = ({
   const isRunningApprovedTool = isApprovalResponded && !isApprovalDenied
 
   return (
-    <div className="display-block w-auto overflow-x-hidden rounded-lg border bg-surface-100">
-      <NotebookEditorProvider value={editorContextValue}>
-        <SqlQueryBlockEditor
-          id={blockId}
-          snippetName={label}
-          title={label}
-          leadingActions={
-            <SqlEditorShowSqlToggle
-              isSqlEditorVisible={isSqlEditorVisible}
-              onToggle={() => setIsSqlEditorVisible((current) => !current)}
-            />
-          }
-          variant="block"
-          isSqlEditorVisible={isSqlEditorVisible}
-          autoFocus={false}
-          isDisabled={shouldShowConfirmFooter}
-          isExecutingOverride={isRunningApprovedTool}
-        />
-      </NotebookEditorProvider>
+    <div className="display-block w-auto">
+      <div
+        className={cn(
+          'overflow-x-hidden border bg-surface-100',
+          shouldShowConfirmFooter ? 'rounded-t-lg' : 'rounded-lg'
+        )}
+      >
+        <NotebookEditorProvider value={editorContextValue}>
+          <SqlQueryBlockEditor
+            id={blockId}
+            snippetName={label}
+            title={label}
+            leadingActions={
+              <SqlEditorShowSqlToggle
+                isSqlEditorVisible={isSqlEditorVisible}
+                onToggle={() => setIsSqlEditorVisible((current) => !current)}
+              />
+            }
+            variant="block"
+            isSqlEditorVisible={isSqlEditorVisible}
+            autoFocus={false}
+            isDisabled={shouldShowConfirmFooter}
+            isExecutingOverride={isRunningApprovedTool}
+          />
+        </NotebookEditorProvider>
+      </div>
       {shouldShowConfirmFooter && (
-        <div className="border-t px-4 py-3">
+        <div className="relative z-10 -mt-px mx-3">
           <ConfirmFooter
+            placement="overhang"
             message="Assistant wants to run this query"
             cancelLabel="Skip"
             confirmLabel="Run Query"

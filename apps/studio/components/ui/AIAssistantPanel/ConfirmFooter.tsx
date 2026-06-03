@@ -7,6 +7,8 @@ interface ConfirmFooterProps {
   confirmLabel?: string
   confirmLabelLoading?: string
   isLoading?: boolean
+  /** Attached inside a card (default) or overhanging below the card bottom edge. */
+  placement?: 'attached' | 'overhang'
   onCancel?: () => void | Promise<void>
   onConfirm?: () => void | Promise<void>
 }
@@ -17,6 +19,7 @@ export const ConfirmFooter = ({
   confirmLabel = 'Confirm',
   confirmLabelLoading = 'Working...',
   isLoading = false,
+  placement = 'attached',
   onCancel,
   onConfirm,
 }: PropsWithChildren<ConfirmFooterProps>) => {
@@ -24,8 +27,10 @@ export const ConfirmFooter = ({
     <div
       className={cn(
         'flex items-center justify-between py-2 pr-2 pl-4 text-xs text-foreground',
-        'relative border border-t-0 overflow-hidden rounded-b-lg bg-border shadow-inset gap-3',
-        'bg-linear-to-r from-background-surface-75 to-background-surface-200'
+        'relative border overflow-hidden gap-3',
+        'bg-linear-to-r from-background-surface-75 to-background-surface-200',
+        placement === 'attached' && 'border-t-0 rounded-b-lg bg-border shadow-inset',
+        placement === 'overhang' && 'rounded-lg shadow-sm'
       )}
     >
       <div className="flex-1 relative z-10">{message}</div>
