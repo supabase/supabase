@@ -41,7 +41,7 @@ See per-service updates below for details. Only the most important changes relev
 - Updated Envoy configuration to address a discrepancy in API key checking (requires `volumes/api/envoy` update) - PR [#46023](https://github.com/supabase/supabase/pull/46023)
 
 ### Studio
-- Updated to `2026.06.01-sha-a4334a2`
+- Updated to `2026.06.03-sha-0bca601`
 - ⚠️ Added `ENABLED_FEATURES_LOGS_ALL` to Studio service configuration (requires `docker-compose.yml` update) - PR [#45327](https://github.com/supabase/supabase/pull/45327)
 - ⚠️ Added `SUPABASE_PUBLISHABLE_KEY` and `SUPABASE_SECRET_KEY` to Studio service configuration (requires `docker-compose.yml` update) - PR [#46173](https://github.com/supabase/supabase/pull/46173)
 - ⚠️ Added `start_period` to Studio healthcheck for more reliable cold-boot on slower hosts (requires `docker-compose.yml` update) - PR [#45327](https://github.com/supabase/supabase/pull/45327)
