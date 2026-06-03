@@ -334,3 +334,91 @@ export function getMaintenanceRedirects(maintenanceMode: boolean): StudioRedirec
     ? [{ source: '/((?!maintenance|img).*)', destination: '/maintenance', permanent: false }]
     : [{ source: '/maintenance', destination: '/', permanent: false }]
 }
+
+// ---------------------------------------------------------------------------
+// Runtime matcher — used by TanStack's `__root` beforeLoad so self-hosted
+// (and any request Vercel's edge didn't already intercept) still gets the
+// same redirect behaviour as the Next.js / Vercel deploys.
+//
+// The patterns above are written in Next/Vercel-flavoured syntax: `:name`
+// for a single segment, `:name*` for a trailing catch-all, literals
+// otherwise. That's all the redirect rules use, so a hand-rolled matcher
+// is simpler (and dependency-free) than pulling in path-to-regexp here.
+// ---------------------------------------------------------------------------
+
+type RedirectMatch = { destination: string; permanent: boolean }
+
+function matchPattern(pattern: string, pathname: string): Record<string, string> | null {
+  const patternParts = pattern.split('/')
+  const pathParts = pathname.split('/')
+  const params: Record<string, string> = {}
+
+  for (let i = 0; i < patternParts.length; i++) {
+    const p = patternParts[i]
+    if (p?.startsWith(':') && p.endsWith('*')) {
+      params[p.slice(1, -1)] = pathParts.slice(i).join('/')
+      return params
+    }
+    if (p?.startsWith(':')) {
+      const v = pathParts[i]
+      if (!v) return null
+      params[p.slice(1)] = decodeURIComponent(v)
+      continue
+    }
+    if (p !== pathParts[i]) return null
+  }
+  return patternParts.length === pathParts.length ? params : null
+}
+
+function substituteDestination(dest: string, params: Record<string, string>): string {
+  return dest.replace(/:(\w+)\*?/g, (_, name) => params[name] ?? '')
+}
+
+function hasQueryMatches(
+  has: StudioRedirect['has'],
+  search: URLSearchParams | Record<string, string | string[] | undefined>
+): boolean {
+  if (!has?.length) return true
+  const get = (k: string) =>
+    search instanceof URLSearchParams
+      ? search.get(k)
+      : Array.isArray(search[k])
+        ? (search[k] as string[])[0]
+        : (search[k] as string | undefined)
+  return has.every((h) => h.type === 'query' && get(h.key) === h.value)
+}
+
+export function matchRedirect(input: {
+  pathname: string
+  search: URLSearchParams | Record<string, string | string[] | undefined>
+  isPlatform: boolean
+  maintenanceMode?: boolean
+}): RedirectMatch | null {
+  const { pathname, search, isPlatform, maintenanceMode = false } = input
+
+  // Maintenance mode handled inline — the maintenance-on rule uses a
+  // negative-lookahead regex source that the segment matcher above can't
+  // parse. Cheap to special-case here.
+  if (maintenanceMode) {
+    if (!pathname.startsWith('/maintenance') && !pathname.startsWith('/img')) {
+      return { destination: '/maintenance', permanent: false }
+    }
+  } else if (pathname === '/maintenance') {
+    return { destination: '/', permanent: false }
+  }
+
+  const ordered = [
+    ...(isPlatform ? PLATFORM_REDIRECTS : SELF_HOSTED_REDIRECTS),
+    ...SHARED_REDIRECTS,
+  ]
+  for (const rule of ordered) {
+    const params = matchPattern(rule.source, pathname)
+    if (!params) continue
+    if (!hasQueryMatches(rule.has, search)) continue
+    return {
+      destination: substituteDestination(rule.destination, params),
+      permanent: rule.permanent,
+    }
+  }
+  return null
+}

@@ -26,7 +26,13 @@ import * as Sentry from '@sentry/react'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import type { QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
-import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
+import {
+  createRootRouteWithContext,
+  HeadContent,
+  Outlet,
+  redirect,
+  Scripts,
+} from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import {
   FeatureFlagProvider,
@@ -73,6 +79,7 @@ import { Telemetry } from '@/lib/telemetry'
 import { Toaster } from '@/lib/toaster'
 import Error404 from '@/pages/404'
 import Error500 from '@/pages/500'
+import { matchRedirect } from '@/redirects.shared'
 import { AiAssistantStateContextProvider } from '@/state/ai-assistant-state'
 
 dayjs.extend(customParseFormat)
@@ -274,6 +281,19 @@ function ErrorBoundaryRoute({ error }: { error: Error }) {
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   head: buildRootHead,
+  // Mirrors the redirect rules in `next.config.ts` / `vercel.ts`. Vercel's
+  // edge layer already handles these for the platform deploy; this is the
+  // self-hosted (Node-server) fallback and the client-side safety net.
+  beforeLoad: ({ location }) => {
+    const match = matchRedirect({
+      pathname: location.pathname,
+      search: location.search as Record<string, string | string[] | undefined>,
+      isPlatform: IS_PLATFORM,
+    })
+    if (!match) return
+    const href = BASE_PATH ? `${BASE_PATH}${match.destination}` : match.destination
+    throw redirect({ href, statusCode: match.permanent ? 308 : 307 })
+  },
   component: RootComponent,
   shellComponent: RootDocument,
   notFoundComponent: NotFound,
