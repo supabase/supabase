@@ -84,7 +84,7 @@ const Subscription = () => {
                     </p>
 
                     {canChangeTier && (
-                      <div className="flex fllex-shrink space-x-2">
+                      <div className="flex space-x-2">
                         <Button
                           type="default"
                           className="pointer-events-auto"
