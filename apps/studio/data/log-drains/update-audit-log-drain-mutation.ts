@@ -21,7 +21,6 @@ export async function updateAuditLogDrain(payload: AuditLogDrainUpdateVariables)
   }
 
   const { data, error } = await put(
-    // @ts-ignore: org audit log drain paths are not in the generated API types yet
     '/platform/organizations/{slug}/analytics/audit-log-drains/{token}',
     {
       params: { path: { slug: payload.slug, token: payload.token } },

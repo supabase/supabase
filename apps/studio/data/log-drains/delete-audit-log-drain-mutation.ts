@@ -12,7 +12,6 @@ export type AuditLogDrainDeleteVariables = {
 
 export async function deleteAuditLogDrain({ slug, token }: AuditLogDrainDeleteVariables) {
   const { data, error } = await del(
-    // @ts-ignore: org audit log drain paths are not in the generated API types yet
     '/platform/organizations/{slug}/analytics/audit-log-drains/{token}',
     {
       params: { path: { slug, token } },

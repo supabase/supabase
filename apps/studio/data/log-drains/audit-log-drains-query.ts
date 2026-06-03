@@ -15,7 +15,6 @@ export async function getAuditLogDrains({ slug }: AuditLogDrainsVariables, signa
     throw new Error('slug is required')
   }
 
-  // @ts-ignore: org audit log drain paths are not in the generated API types yet
   const { data, error } = await get('/platform/organizations/{slug}/analytics/audit-log-drains', {
     params: { path: { slug } },
     signal,

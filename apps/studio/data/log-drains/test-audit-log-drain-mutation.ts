@@ -11,7 +11,6 @@ export type AuditLogDrainTestVariables = {
 
 export async function testAuditLogDrain({ slug, token }: AuditLogDrainTestVariables) {
   const { data, error } = await post(
-    // @ts-ignore: org audit log drain paths are not in the generated API types yet
     '/platform/organizations/{slug}/analytics/audit-log-drains/{token}/test',
     {
       params: { path: { slug, token } },
