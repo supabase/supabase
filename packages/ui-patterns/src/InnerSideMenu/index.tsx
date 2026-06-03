@@ -66,7 +66,7 @@ const InnerSideMenuCollapsibleTrigger = forwardRef<
         size={16}
         strokeWidth={1.5}
       />
-      {title ? <span className="group-hover:not-disabled:text-foreground">{title}</span> : null}
+      {title ? <span className="group-hover:not-disabled:text-foreground text-foreground-lighter">{title}</span> : null}
     </CollapsibleTrigger>
   )
 })
