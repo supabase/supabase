@@ -69,23 +69,59 @@ function resolveUrl(url: string | UrlObject): string {
 
 // Studio code occasionally constructs `router.push` targets via
 // `new URL().toString()` (e.g. `buildTableEditorUrl`), producing fully
-// qualified `http://localhost:8082/project/.../editor/123?...` strings.
-// Next's router tolerated those by treating same-origin absolute URLs as
-// relative paths. TanStack Router doesn't — it appends them to the current
-// path, yielding garbage like `/project/.../schemas/http:/localhost:...`.
-// Strip the origin when it matches the current page so navigation lands
-// where the caller intended. Cross-origin URLs pass through untouched so
-// TanStack can hand them to the browser as external navigations.
+// qualified `http://localhost:8082/dashboard/project/.../editor/123?...`
+// strings — origin + basePath + path. Next's router tolerated both by
+// treating same-origin absolute URLs as relative paths AND understanding
+// basePath was already in the input.
+//
+// TanStack Router needs `to` to be basepath-relative — given
+// `basepath: '/dashboard'` and `to: '/foo'`, it produces `/dashboard/foo`.
+// So we strip the origin AND the basePath when present; otherwise
+// `router.push('/dashboard/...')` would double-prefix to
+// `/dashboard/dashboard/...`. Mirrors the equivalent logic in the
+// next/link shim's `splitInternalUrl`. Cross-origin URLs pass through
+// untouched so TanStack hands them to the browser as external.
+const NEXT_PUBLIC_BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+
 function toRelativeSameOrigin(url: string): string {
-  if (!url.startsWith('http://') && !url.startsWith('https://')) return url
-  if (typeof window === 'undefined' || !window.location) return url
-  try {
-    const parsed = new URL(url)
-    if (parsed.origin !== window.location.origin) return url
-    return `${parsed.pathname}${parsed.search}${parsed.hash}`
-  } catch {
-    return url
+  let pathname: string
+  let search = ''
+  let hash = ''
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    if (typeof window === 'undefined' || !window.location) return url
+    try {
+      const parsed = new URL(url)
+      if (parsed.origin !== window.location.origin) return url
+      pathname = parsed.pathname
+      search = parsed.search
+      hash = parsed.hash
+    } catch {
+      return url
+    }
+  } else {
+    // Relative input — split on the first `?` / `#` so we can strip a
+    // basePath segment from the pathname only.
+    const queryIdx = url.indexOf('?')
+    const hashIdx = url.indexOf('#')
+    const splitIdx =
+      [queryIdx, hashIdx].filter((i) => i >= 0).sort((a, b) => a - b)[0] ?? url.length
+    pathname = url.slice(0, splitIdx)
+    const rest = url.slice(splitIdx)
+    const qEnd = rest.indexOf('#')
+    if (rest.startsWith('?')) {
+      search = qEnd >= 0 ? rest.slice(0, qEnd) : rest
+      hash = qEnd >= 0 ? rest.slice(qEnd) : ''
+    } else if (rest.startsWith('#')) {
+      hash = rest
+    }
   }
+  if (
+    NEXT_PUBLIC_BASE_PATH &&
+    (pathname === NEXT_PUBLIC_BASE_PATH || pathname.startsWith(`${NEXT_PUBLIC_BASE_PATH}/`))
+  ) {
+    pathname = pathname.slice(NEXT_PUBLIC_BASE_PATH.length) || '/'
+  }
+  return `${pathname}${search}${hash}`
 }
 
 // Next's pages-router passes a TransitionOptions bag as the 3rd arg to
