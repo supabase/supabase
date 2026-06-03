@@ -8,7 +8,7 @@ export const revalidate = 1800
 
 const META_TITLE = 'Supabase Integrations Marketplace'
 const META_DESCRIPTION =
-  'Discover, install, and manage native and third-party integrations directly from your Supabase project — observability, security, secrets, email, and more.'
+  'Explore, install, and manage native and third-party integrations directly from your Supabase project — observability, security, secrets, email, and more.'
 
 export const metadata: Metadata = {
   title: META_TITLE,
