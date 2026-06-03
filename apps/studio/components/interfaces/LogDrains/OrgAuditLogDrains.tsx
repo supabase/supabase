@@ -17,7 +17,6 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { LogDrainDestinationSheetForm } from './LogDrainDestinationSheetForm'
 import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 import { LogDrainsList } from './LogDrainsList'
-import { DocsButton } from '@/components/ui/DocsButton'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useAuditLogDrainsQuery } from '@/data/log-drains/audit-log-drains-query'
@@ -31,7 +30,6 @@ import { useTestAuditLogDrainMutation } from '@/data/log-drains/test-audit-log-d
 import { useUpdateAuditLogDrainMutation } from '@/data/log-drains/update-audit-log-drain-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
@@ -163,9 +161,8 @@ export function OrgAuditLogDrains() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <DocsButton href={`${DOCS_URL}/guides/telemetry/log-drains`} />
-        {!!logDrains?.length && (
+      {!!logDrains?.length && (
+        <div className="flex items-center justify-end">
           <div className="flex items-center">
             <Shortcut
               id={SHORTCUT_IDS.LOG_DRAINS_ADD_DESTINATION}
@@ -212,8 +209,8 @@ export function OrgAuditLogDrains() {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       <LogDrainDestinationSheetForm
         mode={mode}
