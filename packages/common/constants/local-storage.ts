@@ -1,3 +1,5 @@
+import { safeLocalStorage } from '../safe-storage'
+
 export const LOCAL_STORAGE_KEYS = {
   /**
    * STUDIO
@@ -164,9 +166,9 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
 ]
 
 export function clearLocalStorage() {
-  for (const key in localStorage) {
+  for (const key of safeLocalStorage.keys()) {
     if (!LOCAL_STORAGE_KEYS_ALLOWLIST.includes(key)) {
-      localStorage.removeItem(key)
+      safeLocalStorage.removeItem(key)
     }
   }
 }
