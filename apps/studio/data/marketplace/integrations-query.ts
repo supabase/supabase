@@ -9,7 +9,10 @@ export type MarketplaceIntegration = Listing
 
 export async function getMarketplaceIntegrations(signal?: AbortSignal) {
   const marketplaceClient = createMarketplaceClient()
-  let query = marketplaceClient.from('listings').select('*').is('publish_dashboard', true)
+  let query = marketplaceClient
+    .from('listings')
+    .select('*')
+    .not('published_in_marketplace_at', 'is', null)
   if (signal) query = query.abortSignal(signal)
   const { data, error } = await query
 

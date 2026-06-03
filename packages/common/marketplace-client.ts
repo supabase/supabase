@@ -23,6 +23,7 @@ export type Database = MergeDeep<
             // See https://github.com/orgs/supabase/discussions/14151
             featured: boolean
             partner_name: string
+            built_by: string
             slug: string
             title: string
             description: string
