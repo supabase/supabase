@@ -1,7 +1,7 @@
 import { useState } from 'react'
 // Import Swiper React components
 import { Swiper, SwiperClass, SwiperSlide } from 'swiper/react'
-import { Button, cn, Tabs } from 'ui'
+import { Button, cn } from 'ui'
 
 import CodeBlock from '../CodeBlock/CodeBlock'
 // Import Swiper styles
