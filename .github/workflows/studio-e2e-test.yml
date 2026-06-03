@@ -97,7 +97,7 @@ jobs:
         if: failure()
         run: |
           docker ps -a
-          sudo ss -tlnp | grep 54322
+          sudo ss -tlnp | grep 54322 || echo "54322 not listening"
           docker logs $(docker ps -aq) 2>&1 || true
 
       - name: Build studio
