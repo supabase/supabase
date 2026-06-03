@@ -11,7 +11,7 @@ const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
 
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL')!,
-  Deno.env.get(SUPABASE_SECRET_KEYS['default'])!
+  SUPABASE_SECRET_KEYS['default']!
 )
 
 Sentry.init({

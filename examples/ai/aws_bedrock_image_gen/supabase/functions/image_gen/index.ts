@@ -58,7 +58,7 @@ Deno.serve(async (req) => {
       // Supabase API URL - env var exported by default.
       Deno.env.get('SUPABASE_URL')!,
       // Supabase API SECRET KEY - env var exported by default.
-      Deno.env.get(SUPABASE_SECRET_KEYS['default'])!
+      SUPABASE_SECRET_KEYS['default']!
     )
 
     const { data: upload, error: uploadError } = await supabaseClient.storage
