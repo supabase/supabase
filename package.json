@@ -75,5 +75,8 @@
     "database",
     "auth"
   ],
-  "packageManager": "pnpm@10.24.0"
+  "packageManager": "pnpm@10.24.0",
+  "dependencies": {
+    "js-cookie": "3.0.7"
+  }
 }
