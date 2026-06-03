@@ -13,17 +13,9 @@ import {
   Code,
   CodeBlockPre,
   DefaultPre,
-  H1,
-  H2,
-  H3,
-  H4,
-  H5,
-  H6,
   Hr,
   Img,
   InlineCode,
-  ListItem,
-  OrderedList,
   Paragraph,
   Quote,
   SimplePre,
@@ -31,7 +23,6 @@ import {
   Td,
   Th,
   Tr,
-  UnorderedList,
 } from './components'
 
 const defaultComponents: Components = {
@@ -45,9 +36,6 @@ const defaultComponents: Components = {
   a: Anchor,
   code: Code,
   img: Img,
-  ul: UnorderedList,
-  ol: OrderedList,
-  li: ListItem,
   blockquote: Blockquote,
   hr: Hr,
   pre: DefaultPre,
@@ -83,7 +71,7 @@ export function Markdown({
   }
 
   return (
-    <div className={cn('text-sm', className)}>
+    <div className={cn('prose max-w-none', className)}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm, ...(remarkPlugins ?? [])]}
         components={mergedComponents}

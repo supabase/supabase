@@ -9,50 +9,8 @@ const DynamicCodeBlock = dynamic(() =>
   import('../CodeBlock').then((m) => ({ default: m.CodeBlock }))
 )
 
-export const H1 = ({ className, ...props }: HTMLAttributes<HTMLHeadingElement>) => (
-  <h1 className={cn('font-heading mt-2 scroll-m-20 text-4xl font-bold', className)} {...props} />
-)
-
-export const H2 = ({ className, ...props }: HTMLAttributes<HTMLHeadingElement>) => (
-  <h2
-    className={cn(
-      'font-heading mt-12 scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight first:mt-0',
-      className
-    )}
-    {...props}
-  />
-)
-
-export const H3 = ({ className, ...props }: HTMLAttributes<HTMLHeadingElement>) => (
-  <h3
-    className={cn('font-heading mt-8 scroll-m-20 text-xl font-semibold tracking-tight', className)}
-    {...props}
-  />
-)
-
-export const H4 = ({ className, ...props }: HTMLAttributes<HTMLHeadingElement>) => (
-  <h4
-    className={cn('font-heading mt-8 scroll-m-20 text-lg font-semibold tracking-tight', className)}
-    {...props}
-  />
-)
-
-export const H5 = ({ className, ...props }: HTMLAttributes<HTMLHeadingElement>) => (
-  <h5
-    className={cn('mt-8 scroll-m-20 text-lg font-semibold tracking-tight', className)}
-    {...props}
-  />
-)
-
-export const H6 = ({ className, ...props }: HTMLAttributes<HTMLHeadingElement>) => (
-  <h6
-    className={cn('mt-8 scroll-m-20 text-base font-semibold tracking-tight', className)}
-    {...props}
-  />
-)
-
 export const Paragraph = ({ className, ...props }: HTMLAttributes<HTMLParagraphElement>) => (
-  <p className={cn('leading-7 [&:not(:first-child)]:mt-6 text-foreground', className)} {...props} />
+  <p className={cn('leading-7 not-first:mt-6 text-foreground', className)} {...props} />
 )
 
 export const InlineCode = ({ className, ...props }: HTMLAttributes<HTMLElement>) => (
@@ -72,18 +30,6 @@ export const Anchor = ({
     )}
     {...props}
   />
-)
-
-export const UnorderedList = ({ className, ...props }: HTMLAttributes<HTMLUListElement>) => (
-  <ul className={cn('my-6 ml-6 text-foreground', className)} {...props} />
-)
-
-export const OrderedList = ({ className, ...props }: HTMLAttributes<HTMLOListElement>) => (
-  <ol className={cn('my-6 ml-6 text-foreground', className)} {...props} />
-)
-
-export const ListItem = ({ className, ...props }: HTMLAttributes<HTMLLIElement>) => (
-  <li className={cn('mt-2', className)} {...props} />
 )
 
 export const Blockquote = ({ className, ...props }: HTMLAttributes<HTMLElement>) => (
