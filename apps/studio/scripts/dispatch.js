@@ -13,7 +13,7 @@
 // Resolves to `pnpm run <target>:<framework>` where framework is `tanstack`
 // when STUDIO_FRAMEWORK=tanstack (set in shell env or .env.local),
 // otherwise `next`.
-import { spawnSync } from 'node:child_process'
+import { spawn } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 
 const target = process.argv[2]
@@ -45,9 +45,29 @@ const studioFramework = process.env.STUDIO_FRAMEWORK ?? readEnvLocalKey('STUDIO_
 const framework = studioFramework === 'tanstack' ? 'tanstack' : 'next'
 const script = `${target}:${framework}`
 
-const result = spawnSync('pnpm', ['run', script], {
+// Use async `spawn` rather than `spawnSync` — long-running dev servers
+// (vite dev / next dev) wedge under `spawnSync` because Node holds the
+// event loop and stdin doesn't flow through cleanly. The dev server says
+// "ready" then exits ~1s later. `spawn` + manual forwarding keeps the
+// child interactive and lets the parent exit cleanly when the child does.
+const child = spawn('pnpm', ['run', script], {
   stdio: 'inherit',
   env: process.env,
 })
 
-process.exit(result.status ?? 1)
+const forwardSignal = (signal) => {
+  if (!child.killed) child.kill(signal)
+}
+for (const signal of ['SIGINT', 'SIGTERM', 'SIGHUP', 'SIGQUIT']) {
+  process.on(signal, () => forwardSignal(signal))
+}
+
+child.on('exit', (code, signal) => {
+  if (signal) process.kill(process.pid, signal)
+  else process.exit(code ?? 1)
+})
+
+child.on('error', (err) => {
+  console.error('dispatch.js: failed to spawn child:', err)
+  process.exit(1)
+})
