@@ -29,7 +29,7 @@ export const MarketplaceDetailBreadrumbs = ({
 
   return (
     <PageBreadcrumbs
-      slotClassName="sticky top-0 z-20"
+      slotClassName="sticky top-0 z-20 bg-dash-sidebar"
       className="max-h-(--header-height)! flex justify-between items-center w-full md:px-2 xl:px-6"
       actions={
         <PageBreadcrumbsActions>
