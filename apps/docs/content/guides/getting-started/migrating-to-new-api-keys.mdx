@@ -130,6 +130,15 @@ const secretKey = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)['default']
 
 The publishable keys work the same way through `SUPABASE_PUBLISHABLE_KEYS`. See [Managing Secrets](/docs/guides/functions/secrets) for more on environment variables in Edge Functions.
 
+If you created more than one secret key in [Step 1](#step-1-create-the-new-api-keys), every key lives in the same `SUPABASE_SECRET_KEYS` object, each under its own name. Read a non-default key the same way:
+
+```ts
+const secretKeys = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
+
+const defaultKey = secretKeys['default']
+const billingKey = secretKeys['billing'] // the secret key you named "billing"
+```
+
 Send publishable and secret keys on the `apikey` header only. If you also pass the key on the `Authorization: Bearer` header, which many Supabase clients do by default, the platform tries to parse it as a JWT and rejects the request with `Invalid JWT`. The platform's built-in `verify_jwt` check only understands the legacy JWT-based keys, so set `verify_jwt = false` for these functions and authorize the request in your own code, or let the `@supabase/server` SDK do it for you ([Option 2](#option-2-adopt-the-supabaseserver-sdk)).
 
 ```toml
@@ -168,6 +177,8 @@ Deno.serve(
   })
 )
 ```
+
+To accept a specific named key instead of `default`, add its name after the mode with a colon. For example, `auth: 'secret:billing'` validates the request against the secret key you named `billing`, and `auth: 'publishable:web'` against a publishable key named `web`.
 
 `withSupabase` returns a standard request handler, so you can also export it as a `fetch` handler instead of passing it to `Deno.serve`:
 
