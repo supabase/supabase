@@ -1,12 +1,12 @@
 ---
 id: handling-errors-in-supabase-js
-title: 'Handling errors with `supabase-js`'
+title: 'Handling errors in `supabase-js`'
 subtitle: 'Read `error.hint` first — Postgres often tells you the exact fix. Log the full error so you actually see it.'
 ---
 
-Every `supabase-js` call returns a `{ data, error }` pair instead of throwing. When something fails, the single most useful field on `error` is usually **`hint`** — Postgres returns the _fix_, not just a description of the problem. Logging only `error.message` hides it.
+Every `supabase-js` call returns a `{ data, error }` pair instead of throwing. When something fails, the single most useful field on `error` is usually `hint` — Postgres returns the _fix_, not just a description of the problem. Logging only `error.message` hides it.
 
-## `error.hint` tells you the fix
+## Usage of `message` and `hint` properties
 
 Consider a `42501` permission-denied error on a table where default `GRANT`s have been revoked from `anon`:
 
@@ -15,11 +15,15 @@ message: "permission denied for table users"
 hint:    "Grant the required privileges to the current role with: GRANT SELECT ON public.users TO anon;"
 ```
 
-The `message` tells you something went wrong. The `hint` tells you the literal SQL statement to run in the dashboard SQL editor to fix it. Same pattern shows up across many Postgres errors — missing column? `hint` suggests the column name you probably meant. Type mismatch? `hint` shows the expected type. Whenever Postgres knows the fix, it puts it in `hint`.
+The `message` exposes the error reason, and `hint` gives you the literal SQL statement to run in the dashboard SQL editor to fix it.
 
-This is why the rule of thumb is: **log the full `error` object, not just `error.message`.**
+The same pattern shows up across many Postgres errors — missing column? `hint` suggests the column name you probably meant. Type mismatch? `hint` shows the expected type. Whenever Postgres knows the fix, it puts it in `hint`.
+
+<Admonition type="tip">Log the full `error` object, not just `error.message`.</Admonition>
 
 ## The recommended pattern
+
+Destructure `{ data, error }`, check `error`, log the whole object, and return early.
 
 ```ts
 const { data, error } = await supabase.from('users').select()
@@ -29,7 +33,7 @@ if (error) {
 }
 ```
 
-The full response body that PostgREST returns for the permission-denied case above:
+In the case of a permission-denied error, the response body will look like this:
 
 ```json
 {
@@ -112,7 +116,7 @@ if (error) {
 Functions errors arrive as one of three subclasses. Narrow with `instanceof`; for `FunctionsHttpError`, parse the body to get the function's own error payload.
 
 ```ts
-import { FunctionsHttpError, FunctionsRelayError, FunctionsFetchError } from '@supabase/supabase-js'
+import { FunctionsFetchError, FunctionsHttpError, FunctionsRelayError } from '@supabase/supabase-js'
 
 const { data, error } = await supabase.functions.invoke('hello')
 if (error instanceof FunctionsHttpError) {
