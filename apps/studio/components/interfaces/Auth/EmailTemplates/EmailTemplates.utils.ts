@@ -1,12 +1,12 @@
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
-dayjs.extend(utc)
-
 import { isSmtpEnabled } from '../SmtpForm/SmtpForm.utils'
 import { type AuthTemplateType, type KebabCase } from './EmailTemplates.types'
 import type { components } from '@/data/api'
 import type { Organization } from '@/types'
+
+dayjs.extend(utc)
 
 type AuthConfig = components['schemas']['GoTrueConfigResponse']
 
