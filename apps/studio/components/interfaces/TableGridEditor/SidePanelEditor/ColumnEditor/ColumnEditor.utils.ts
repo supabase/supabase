@@ -35,7 +35,7 @@ const isSensitiveDataInComment = (comment: string | null | undefined): boolean =
 const encodeCommentWithSensitivityFlag = (
   comment: string | null | undefined,
   isSensitive: boolean
-): string | null | undefined => {
+): string | null => {
   let cleanComment = comment?.replace(SENSITIVE_DATA_MARKER, '').trim() ?? ''
   if (isSensitive && cleanComment) {
     return `${SENSITIVE_DATA_MARKER} ${cleanComment}`
@@ -46,7 +46,7 @@ const encodeCommentWithSensitivityFlag = (
 }
 
 const decodeCommentWithoutSensitivityFlag = (comment: string | null | undefined): string | null => {
-  if (!comment) return comment
+  if (!comment) return null
   return comment.replace(SENSITIVE_DATA_MARKER, '').trim() || null
 }
 

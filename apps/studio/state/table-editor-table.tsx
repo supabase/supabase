@@ -55,11 +55,7 @@ export const createTableEditorTableState = ({
     savedState
   )
 
-  // Initialize sensitive data columns from both column metadata and localStorage
-  // defaultSensitiveColumns: columns marked [SENSITIVE] in DB schema (source of truth)
-  const defaultSensitiveColumns = new Set(
-    table.columns.filter((col) => isSensitiveDataColumn(col.comment)).map((col) => col.name)
-  )
+  
   // userToggledColumns: columns user has explicitly toggled OFF (persisted)
   const userToggledColumns = new Set<string>((savedState as any)?.sensitiveDataColumns ?? [])
 

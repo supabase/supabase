@@ -193,8 +193,7 @@ export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
             </>
           )}
         </DropdownMenuItem>
-        {(snap.sensitiveDataColumns.has(columnKey) ||
-          snap.userToggledSensitiveColumns.has(columnKey)) && (
+        {snap.sensitiveDataColumns.has(columnKey) && (
           <DropdownMenuItem
             className="space-x-2"
             disabled={snap.temporarilyRevealedColumns.has(columnKey)}
