@@ -1,7 +1,11 @@
 import dayjs from 'dayjs'
+import { ChevronDown } from 'lucide-react'
 import type { Control } from 'react-hook-form'
 import {
   Checkbox,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   Select,
   SelectContent,
   SelectItem,
@@ -167,124 +171,135 @@ export function JitDbAccessRoleGrantFields({
             </FormItemLayout>
 
             {showAdvancedOptions && (
-              <>
-                <FormItemLayout
-                  isReactForm={false}
-                  label="Expires in"
-                  description={
-                    grant.hasExpiry && grant.expiry ? (
-                      <p className="text-xs text-foreground-lighter">
-                        Expires at{' '}
-                        <TimestampInfo
-                          utcTimestamp={grant.expiry}
-                          className="text-foreground-lighter"
-                          labelFormat="DD MMM, HH:mm"
-                        />
-                      </p>
-                    ) : grant.expiryMode === 'never' ? (
-                      <div className="mt-3 mx-0.5 flex w-full items-center gap-x-2">
-                        <WarningIcon />
-                        <span className="text-left text-xs text-foreground-lighter">
-                          No expiry means ongoing database access until manually revoked.
-                        </span>
-                      </div>
-                    ) : undefined
-                  }
-                >
-                  <div className="flex gap-2">
-                    <div className="flex-1">
-                      <Select
-                        value={grant.expiryMode}
-                        onValueChange={(value) => {
-                          const nextMode = value as JitRoleGrantDraft['expiryMode']
+              <Collapsible className="border-t border-muted pt-3">
+                <CollapsibleTrigger className="group flex w-full items-center justify-between gap-x-2 py-1 text-sm text-foreground">
+                  <span>Advanced options</span>
+                  <ChevronDown
+                    size={14}
+                    className="text-foreground-lighter transition-transform group-data-[state=open]:rotate-180"
+                  />
+                </CollapsibleTrigger>
+                <CollapsibleContent className="space-y-4 pt-3">
+                  <FormItemLayout
+                    isReactForm={false}
+                    label="Expires in"
+                    description={
+                      grant.hasExpiry && grant.expiry ? (
+                        <p className="text-xs text-foreground-lighter">
+                          Expires at{' '}
+                          <TimestampInfo
+                            utcTimestamp={grant.expiry}
+                            className="text-foreground-lighter"
+                            labelFormat="DD MMM, HH:mm"
+                          />
+                        </p>
+                      ) : grant.expiryMode === 'never' ? (
+                        <div className="mt-3 mx-0.5 flex w-full items-center gap-x-2">
+                          <WarningIcon />
+                          <span className="text-left text-xs text-foreground-lighter">
+                            No expiry means ongoing database access until manually revoked.
+                          </span>
+                        </div>
+                      ) : undefined
+                    }
+                  >
+                    <div className="flex gap-2">
+                      <div className="flex-1">
+                        <Select
+                          value={grant.expiryMode}
+                          onValueChange={(value) => {
+                            const nextMode = value as JitRoleGrantDraft['expiryMode']
 
-                          if (nextMode === 'never') {
-                            return onChange({
-                              ...grant,
-                              expiryMode: nextMode,
-                              hasExpiry: false,
-                              expiry: '',
-                            })
-                          }
+                            if (nextMode === 'never') {
+                              return onChange({
+                                ...grant,
+                                expiryMode: nextMode,
+                                hasExpiry: false,
+                                expiry: '',
+                              })
+                            }
 
-                          if (nextMode === 'custom') {
-                            return onChange({
+                            if (nextMode === 'custom') {
+                              return onChange({
+                                ...grant,
+                                expiryMode: nextMode,
+                                hasExpiry: true,
+                                expiry: grant.expiry || getRelativeDatetimeByMode('1h'),
+                              })
+                            }
+
+                            onChange({
                               ...grant,
                               expiryMode: nextMode,
                               hasExpiry: true,
-                              expiry: grant.expiry || getRelativeDatetimeByMode('1h'),
+                              expiry: getRelativeDatetimeByMode(nextMode),
                             })
-                          }
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Expires in" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {EXPIRY_MODE_OPTIONS.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-                          onChange({
-                            ...grant,
-                            expiryMode: nextMode,
-                            hasExpiry: true,
-                            expiry: getRelativeDatetimeByMode(nextMode),
-                          })
-                        }}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Expires in" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {EXPIRY_MODE_OPTIONS.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      {grant.expiryMode === 'custom' && (
+                        <DatePicker
+                          selectsRange={false}
+                          triggerButtonSize="small"
+                          contentSide="top"
+                          to={grant.expiry || undefined}
+                          minDate={new Date()}
+                          maxDate={dayjs().add(MAX_CUSTOM_EXPIRY_YEARS, 'year').toDate()}
+                          onChange={(value) => {
+                            const selectedDate = value.to || value.from || ''
+                            onChange({
+                              ...grant,
+                              hasExpiry: true,
+                              expiry: selectedDate,
+                            })
+                          }}
+                          triggerButtonClassName="min-w-[120px]"
+                        >
+                          {grant.expiry
+                            ? dayjs(grant.expiry).format('DD MMM, HH:mm')
+                            : 'Select date'}
+                        </DatePicker>
+                      )}
                     </div>
+                  </FormItemLayout>
 
-                    {grant.expiryMode === 'custom' && (
-                      <DatePicker
-                        selectsRange={false}
-                        triggerButtonSize="small"
-                        contentSide="top"
-                        to={grant.expiry || undefined}
-                        minDate={new Date()}
-                        maxDate={dayjs().add(MAX_CUSTOM_EXPIRY_YEARS, 'year').toDate()}
-                        onChange={(value) => {
-                          const selectedDate = value.to || value.from || ''
-                          onChange({
-                            ...grant,
-                            hasExpiry: true,
-                            expiry: selectedDate,
-                          })
-                        }}
-                        triggerButtonClassName="min-w-[120px]"
-                      >
-                        {grant.expiry ? dayjs(grant.expiry).format('DD MMM, HH:mm') : 'Select date'}
-                      </DatePicker>
-                    )}
-                  </div>
-                </FormItemLayout>
-
-                <FormItemLayout
-                  isReactForm={false}
-                  label={
-                    <p className="text-sm text-foreground">
-                      Restricted IP addresses{' '}
-                      <span className="font-normal text-foreground-lighter">(optional)</span>
-                    </p>
-                  }
-                >
-                  <SingleValueFieldArray
-                    control={control}
-                    name={`grants.${grantIndex}.ipRanges` as const}
-                    valueFieldName="value"
-                    createEmptyRow={createEmptyIpRange}
-                    placeholder="192.168.0.0/24"
-                    addLabel="Add IP restriction"
-                    removeLabel="Remove IP restriction"
-                    minimumRows={1}
-                    inputAutoComplete="off"
-                    rowsClassName="space-y-2"
-                    addButtonClassName="w-min"
-                  />
-                </FormItemLayout>
-              </>
+                  <FormItemLayout
+                    isReactForm={false}
+                    label={
+                      <p className="text-sm text-foreground">
+                        Restricted IP addresses{' '}
+                        <span className="font-normal text-foreground-lighter">(optional)</span>
+                      </p>
+                    }
+                  >
+                    <SingleValueFieldArray
+                      control={control}
+                      name={`grants.${grantIndex}.ipRanges` as const}
+                      valueFieldName="value"
+                      createEmptyRow={createEmptyIpRange}
+                      placeholder="192.168.0.0/24"
+                      addLabel="Add IP restriction"
+                      removeLabel="Remove IP restriction"
+                      minimumRows={1}
+                      inputAutoComplete="off"
+                      rowsClassName="space-y-2"
+                      addButtonClassName="w-min"
+                    />
+                  </FormItemLayout>
+                </CollapsibleContent>
+              </Collapsible>
             )}
           </div>
         </div>
