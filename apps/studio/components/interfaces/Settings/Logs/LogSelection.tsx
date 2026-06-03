@@ -12,8 +12,8 @@ import {
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import type { LogData, QueryType } from './Logs.types'
-import { apiKey, role as extractRole, jwtAPIKey } from './Logs.utils'
+import type { LogData, PreviewLogData, QueryType } from './Logs.types'
+import { apiKey, role as extractRole, jwtAPIKey, parseMultigresEventMessage } from './Logs.utils'
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
@@ -71,18 +71,12 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
         return <DefaultPreviewSelectionRenderer log={apiLog} />
 
       case 'multigres': {
-        const parsedMultigresMessage = (() => {
-          if (typeof log.event_message !== 'string') return null
-          try {
-            const parsed = JSON.parse(log.event_message)
-            return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : null
-          } catch {
-            return null
-          }
-        })()
+        const parsedMultigresMessage = parseMultigresEventMessage(log.event_message)
         // Spread the log last so its canonical fields (id, timestamp, event_message)
         // always win over any same-named keys inside the parsed event_message.
-        const multigresLog = parsedMultigresMessage ? { ...parsedMultigresMessage, ...log } : log
+        const multigresLog = (
+          parsedMultigresMessage ? { ...parsedMultigresMessage, ...log } : log
+        ) as PreviewLogData
         return <DefaultPreviewSelectionRenderer log={multigresLog} />
       }
 

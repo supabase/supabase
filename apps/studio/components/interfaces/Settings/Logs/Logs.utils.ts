@@ -310,10 +310,26 @@ export const LOG_TABLE_SQL: Record<LogsTableName, SafeLogSqlFragment> = {
  * SQL query to retrieve only one log
  */
 export const genSingleLogQuery = (table: LogsTableName, id: string): SafeLogSqlFragment => {
-  if (table === LogsTableName.MULTIGRES) {
-    return safeSql`select id, timestamp, event_message from ${LOG_TABLE_SQL[table]} where id = ${analyticsLiteral(id)} limit 1`
+  // multigres logs have no metadata column
+  const metadataColumn = table === LogsTableName.MULTIGRES ? safeSql`` : safeSql`, metadata`
+  return safeSql`select id, timestamp, event_message${metadataColumn} from ${LOG_TABLE_SQL[table]} where id = ${analyticsLiteral(id)} limit 1`
+}
+
+/**
+ * Multigres logs store their structured payload as a JSON string in
+ * `event_message`. Parse it into a plain object, returning `null` when the
+ * value is missing, not valid JSON, or not a plain object (e.g. an array).
+ */
+export const parseMultigresEventMessage = (
+  eventMessage: unknown
+): Record<string, unknown> | null => {
+  if (typeof eventMessage !== 'string') return null
+  try {
+    const parsed = JSON.parse(eventMessage)
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : null
+  } catch {
+    return null
   }
-  return safeSql`select id, timestamp, event_message, metadata from ${LOG_TABLE_SQL[table]} where id = ${analyticsLiteral(id)} limit 1`
 }
 
 /**
@@ -705,7 +721,6 @@ function getErrorCondition(table: LogsTableName): SafeLogSqlFragment {
     case 'pg_cron_logs':
       return safeSql`parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')`
     case 'multigres_logs':
-      // multigres logs store the structured payload as a JSON string in event_message
       return safeSql`JSON_VALUE(event_message, '$.level') IN ('ERROR', 'FATAL', 'PANIC')`
     default:
       return safeSql`false`
@@ -725,7 +740,6 @@ function getWarningCondition(table: LogsTableName): SafeLogSqlFragment {
     case 'function_logs':
       return safeSql`metadata.level IN ('warning')`
     case 'multigres_logs':
-      // multigres logs store the structured payload as a JSON string in event_message
       return safeSql`JSON_VALUE(event_message, '$.level') IN ('WARN', 'WARNING')`
     default:
       return safeSql`false`
