@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { useMemo, useState, type PropsWithChildren } from 'react'
 
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
-import { ConfirmFooter } from './ConfirmFooter'
+import { useAssistantToolApprovalOptional } from './AssistantToolApprovalContext'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useTrack } from '@/lib/telemetry/track'
@@ -15,7 +15,7 @@ interface EdgeFunctionRendererProps {
   onDeny?: () => void
   isDeploying?: boolean
   initialIsDeployed?: boolean
-  showConfirmFooter?: boolean
+  isAwaitingUserApproval?: boolean
 }
 
 export const EdgeFunctionRenderer = ({
@@ -23,14 +23,14 @@ export const EdgeFunctionRenderer = ({
   code,
   functionName,
   onApprove,
-  onDeny,
   isDeploying = false,
   initialIsDeployed,
-  showConfirmFooter = true,
+  isAwaitingUserApproval = false,
 }: PropsWithChildren<EdgeFunctionRendererProps>) => {
   const { ref } = useParams()
   const track = useTrack()
-  const [showReplaceWarning, setShowReplaceWarning] = useState(false)
+  const [localShowReplaceWarning, setLocalShowReplaceWarning] = useState(false)
+  const approvalContext = useAssistantToolApprovalOptional()
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref }, { enabled: !!ref })
   const { data: existingFunction } = useEdgeFunctionQuery(
@@ -63,6 +63,14 @@ export const EdgeFunctionRenderer = ({
     return `supabase functions download ${functionName}`
   }, [functionName])
 
+  const showReplaceWarning = isAwaitingUserApproval
+    ? (approvalContext?.edgeFunctionReplaceWarning ?? false)
+    : localShowReplaceWarning
+
+  const setShowReplaceWarning = isAwaitingUserApproval
+    ? (value: boolean) => approvalContext?.setEdgeFunctionReplaceWarning(value)
+    : setLocalShowReplaceWarning
+
   const approveDeploy = () => {
     if (!code || isDeploying || !ref || !functionName) return
 
@@ -88,30 +96,18 @@ export const EdgeFunctionRenderer = ({
         label={label}
         code={code}
         functionName={functionName}
-        disabled={showConfirmFooter}
+        disabled={isAwaitingUserApproval}
         isDeploying={isDeploying}
         isDeployed={initialIsDeployed}
         functionUrl={functionUrl}
         deploymentDetailsUrl={deploymentDetailsUrl}
         downloadCommand={downloadCommand}
-        hideDeployButton={showConfirmFooter || initialIsDeployed}
+        hideDeployButton={isAwaitingUserApproval || initialIsDeployed}
         showReplaceWarning={showReplaceWarning}
         onCancelReplace={() => setShowReplaceWarning(false)}
         onConfirmReplace={approveDeploy}
+        onDeploy={handleDeploy}
       />
-      {showConfirmFooter && (
-        <div className="mx-4">
-          <ConfirmFooter
-            message="Assistant wants to deploy this Edge Function"
-            cancelLabel="Skip"
-            confirmLabel="Deploy"
-            confirmLabelLoading="Deploying..."
-            isLoading={isDeploying}
-            onCancel={() => onDeny?.()}
-            onConfirm={handleDeploy}
-          />
-        </div>
-      )}
     </div>
   )
 }

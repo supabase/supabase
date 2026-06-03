@@ -2,6 +2,7 @@ import { isToolUIPart, type UIMessage } from 'ai'
 import { toast } from 'sonner'
 
 import { SAFE_FUNCTIONS } from './AiAssistant.constants'
+import { deployEdgeFunctionInputSchema } from './Message.utils'
 import { authKeys } from '@/data/auth/keys'
 import { databaseExtensionsKeys } from '@/data/database-extensions/keys'
 import { databaseIndexesKeys } from '@/data/database-indexes/keys'
@@ -77,11 +78,60 @@ export const isReadOnlySelect = (query: string): boolean => {
 }
 
 export const hasPendingToolApproval = (messages: Pick<UIMessage, 'role' | 'parts'>[]) => {
-  return messages.some((message) => {
-    if (message.role !== 'assistant') return false
+  return getActiveToolApproval(messages)?.status === 'pending'
+}
 
-    return message.parts?.some((part) => isToolUIPart(part) && part.state === 'approval-requested')
-  })
+export type ActiveToolApproval =
+  | {
+      kind: 'execute_sql'
+      approvalId: string
+      status: 'pending' | 'running'
+    }
+  | {
+      kind: 'deploy_edge_function'
+      approvalId: string
+      functionName: string
+      status: 'pending' | 'running'
+    }
+
+export const getActiveToolApproval = (
+  messages: Pick<UIMessage, 'role' | 'parts'>[]
+): ActiveToolApproval | null => {
+  const lastMessage = messages.at(-1)
+  if (!lastMessage || lastMessage.role !== 'assistant') return null
+
+  const lastPart = lastMessage.parts?.at(-1)
+  if (!lastPart || !isToolUIPart(lastPart)) return null
+
+  const approvalId = lastPart.approval?.id
+  if (!approvalId) return null
+
+  const status =
+    lastPart.state === 'approval-requested'
+      ? 'pending'
+      : lastPart.state === 'approval-responded' && lastPart.approval?.approved !== false
+        ? 'running'
+        : null
+
+  if (!status) return null
+
+  if (lastPart.type === 'tool-execute_sql') {
+    return { kind: 'execute_sql', approvalId, status }
+  }
+
+  if (lastPart.type === 'tool-deploy_edge_function') {
+    const parsedInput = deployEdgeFunctionInputSchema.safeParse(lastPart.input)
+    if (!parsedInput.success) return null
+
+    return {
+      kind: 'deploy_edge_function',
+      approvalId,
+      functionName: parsedInput.data.functionName,
+      status,
+    }
+  }
+
+  return null
 }
 
 export const resolvePendingToolApprovalsAsDenied = (messages: UIMessage[]): UIMessage[] => {

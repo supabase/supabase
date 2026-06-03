@@ -45,6 +45,8 @@ export interface SqlQueryBlockEditorProps {
   variant?: 'full' | 'block'
   /** When false, only the utility panel (results) is shown */
   isSqlEditorVisible?: boolean
+  /** When true, only the SQL editor is shown */
+  hideUtilityPanel?: boolean
   autoFocus?: boolean
   isLoading?: boolean
   isDisabled?: boolean
@@ -60,6 +62,7 @@ export const SqlQueryBlockEditor = ({
   actions,
   variant = 'full',
   isSqlEditorVisible = true,
+  hideUtilityPanel = false,
   autoFocus = true,
   isLoading = false,
   isDisabled = false,
@@ -95,7 +98,11 @@ export const SqlQueryBlockEditor = ({
   } = useSqlQueryBlockEditor({ id, snippetName, editorRef, monacoRef })
 
   const containerClassName = cn(
-    variant === 'full' ? 'h-full' : isSqlEditorVisible ? 'h-[480px]' : 'h-[280px]',
+    variant === 'full'
+      ? 'h-full'
+      : hideUtilityPanel || isSqlEditorVisible
+        ? 'h-[480px]'
+        : 'h-[280px]',
     className
   )
 
@@ -159,6 +166,7 @@ export const SqlQueryBlockEditor = ({
         <SnippetEditorShell
           header={panelHeader}
           hideEditorPanel={!isSqlEditorVisible}
+          hideUtilityPanel={hideUtilityPanel}
           editorPanel={
             isLoading ? (
               <div className="flex h-full w-full items-center justify-center">

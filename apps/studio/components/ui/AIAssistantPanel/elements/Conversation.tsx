@@ -4,18 +4,36 @@ import { useCallback } from 'react'
 import { Button, cn } from 'ui'
 import { StickToBottom, useStickToBottomContext } from 'use-stick-to-bottom'
 
-type ConversationProps = ComponentProps<typeof StickToBottom>
+type ConversationProps = ComponentProps<typeof StickToBottom> & {
+  bottomFadeClassName?: string
+}
 type ConversationContentProps = ComponentProps<typeof StickToBottom.Content>
 type ConversationScrollButtonProps = ComponentProps<typeof Button>
 
-export const Conversation = ({ className, ...props }: ConversationProps) => (
-  <StickToBottom
-    className={cn('relative flex-1 overflow-y-auto', className)}
-    initial="smooth"
-    resize="smooth"
-    role="log"
-    {...props}
-  />
+export const Conversation = ({
+  className,
+  bottomFadeClassName,
+  children,
+  ...props
+}: ConversationProps) => (
+  <div className={cn('relative flex min-h-0 flex-1 flex-col', className)}>
+    <StickToBottom
+      className="flex min-h-0 flex-1 flex-col"
+      initial="smooth"
+      resize="smooth"
+      role="log"
+      {...props}
+    >
+      {children}
+    </StickToBottom>
+    <div
+      aria-hidden
+      className={cn(
+        'pointer-events-none absolute inset-x-0 bottom-0 z-10 h-16 bg-linear-to-t from-background to-transparent',
+        bottomFadeClassName
+      )}
+    />
+  </div>
 )
 
 export const ConversationContent = ({ className, ...props }: ConversationContentProps) => (
@@ -35,7 +53,10 @@ export const ConversationScrollButton = ({
   return (
     !isAtBottom && (
       <Button
-        className={cn('absolute bottom-4 left-[50%] translate-x-[-50%] rounded-full', className)}
+        className={cn(
+          'absolute bottom-4 left-[50%] z-20 translate-x-[-50%] rounded-full',
+          className
+        )}
         onClick={handleScrollToBottom}
         size="tiny"
         type="default"

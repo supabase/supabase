@@ -2,6 +2,7 @@ import type { UIMessage } from 'ai'
 import { describe, expect, test } from 'vitest'
 
 import {
+  getActiveToolApproval,
   hasPendingToolApproval,
   isReadOnlySelect,
   resolvePendingToolApprovalsAsDenied,
@@ -85,6 +86,46 @@ describe('AIAssistant.utils.ts:isReadOnlySelect', () => {
     const sql2 = `create schema joshen; select count(select * from countries);`
     const result2 = isReadOnlySelect(sql2)
     expect(result2).toBe(false)
+  })
+})
+
+describe('AIAssistant.utils.ts:getActiveToolApproval', () => {
+  test('Should return pending SQL approval from the last assistant message part', () => {
+    const messages = createMessageWithPart(pendingSqlApprovalPart)
+
+    expect(getActiveToolApproval(messages)).toEqual({
+      kind: 'execute_sql',
+      approvalId: 'approval-1',
+      status: 'pending',
+    })
+  })
+
+  test('Should return running SQL approval after the user approves', () => {
+    const messages = createMessageWithPart({
+      type: 'tool-execute_sql',
+      toolCallId: 'call-1',
+      state: 'approval-responded',
+      input: { sql: 'select 1', label: 'Test query' },
+      approval: { id: 'approval-1', approved: true },
+    })
+
+    expect(getActiveToolApproval(messages)).toEqual({
+      kind: 'execute_sql',
+      approvalId: 'approval-1',
+      status: 'running',
+    })
+  })
+
+  test('Should ignore approvals that are not on the last message part', () => {
+    const messages = [
+      {
+        id: 'assistant-msg-1',
+        role: 'assistant',
+        parts: [pendingSqlApprovalPart, { type: 'text', text: 'Done' }],
+      },
+    ] as UIMessage[]
+
+    expect(getActiveToolApproval(messages)).toBeNull()
   })
 })
 

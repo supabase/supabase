@@ -117,7 +117,6 @@ function MessagePartExecuteSql({
   isLastPart?: boolean
 }) {
   const { id, isLastMessage } = useMessageInfoContext()
-  const { addToolApprovalResponse } = useMessageActionsContext()
 
   const { toolCallId, state, input, output } = toolPart
 
@@ -139,9 +138,11 @@ function MessagePartExecuteSql({
     state === 'output-denied' ||
     state === 'output-available'
   ) {
-    const approvalId = state === 'approval-requested' ? toolPart.approval?.id : undefined
+    const isAwaitingUserApproval =
+      state === 'approval-requested' && isLastPart === true && isLastMessage === true
+
     return (
-      <div className="w-auto overflow-x-hidden my-4 space-y-2">
+      <div className="w-auto overflow-x-hidden my-4">
         <DisplayBlockRenderer
           messageId={id}
           toolCallId={toolCallId}
@@ -156,18 +157,7 @@ function MessagePartExecuteSql({
           initialResults={output}
           toolState={state}
           toolApprovalRespondedApproved={toolPart.approval?.approved}
-          isLastPart={isLastPart}
-          isLastMessage={isLastMessage}
-          onApprove={
-            approvalId
-              ? () => addToolApprovalResponse?.({ id: approvalId, approved: true })
-              : undefined
-          }
-          onDeny={
-            approvalId
-              ? () => addToolApprovalResponse?.({ id: approvalId, approved: false })
-              : undefined
-          }
+          hideUtilityPanel={isAwaitingUserApproval}
         />
       </div>
     )
@@ -184,8 +174,15 @@ const TOOL_DEPLOY_EDGE_FUNCTION_STATES_WITH_INPUT = new Set([
   'output-available',
 ])
 
-function MessagePartDeployEdgeFunction({ toolPart }: { toolPart: ToolUIPart }) {
+function MessagePartDeployEdgeFunction({
+  toolPart,
+  isLastPart,
+}: {
+  toolPart: ToolUIPart
+  isLastPart?: boolean
+}) {
   const { state, input, output } = toolPart
+  const { isLastMessage } = useMessageInfoContext()
   const { addToolApprovalResponse } = useMessageActionsContext()
 
   if (state === 'input-streaming') {
@@ -211,22 +208,19 @@ function MessagePartDeployEdgeFunction({ toolPart }: { toolPart: ToolUIPart }) {
     state === 'output-available' && parsedOutput.success && parsedOutput.data.success === true
 
   const approvalId = state === 'approval-requested' ? toolPart.approval?.id : undefined
+  const isAwaitingUserApproval =
+    state === 'approval-requested' && isLastPart === true && isLastMessage === true
 
   return (
     <EdgeFunctionRenderer
       label={parsedInput.data.label}
       code={parsedInput.data.code}
       functionName={parsedInput.data.functionName}
-      showConfirmFooter={state === 'approval-requested'}
+      isAwaitingUserApproval={isAwaitingUserApproval}
       isDeploying={state === 'approval-responded' && toolPart.approval?.approved !== false}
       initialIsDeployed={isInitiallyDeployed}
       onApprove={
         approvalId ? () => addToolApprovalResponse?.({ id: approvalId, approved: true }) : undefined
-      }
-      onDeny={
-        approvalId
-          ? () => addToolApprovalResponse?.({ id: approvalId, approved: false })
-          : undefined
       }
     />
   )
@@ -268,7 +262,7 @@ export function MessagePartSwitcher({
         return <MessagePart.ExecuteSql toolPart={part} isLastPart={isLastPart} />
       }
       case 'tool-deploy_edge_function': {
-        return <MessagePart.DeployEdgeFunction toolPart={part} />
+        return <MessagePart.DeployEdgeFunction toolPart={part} isLastPart={isLastPart} />
       }
 
       case 'source-url':

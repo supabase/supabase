@@ -49,12 +49,15 @@ vi.mock('../EdgeFunctionBlock/EdgeFunctionBlock', () => ({
     showReplaceWarning,
     onCancelReplace,
     onConfirmReplace,
+    onDeploy,
   }: {
     showReplaceWarning?: boolean
     onCancelReplace?: () => void
     onConfirmReplace?: () => void
+    onDeploy?: () => void
   }) => (
     <div>
+      {onDeploy && <button onClick={onDeploy}>Deploy</button>}
       {showReplaceWarning && (
         <div>
           <p>An edge function with this name already exists.</p>
@@ -64,16 +67,6 @@ vi.mock('../EdgeFunctionBlock/EdgeFunctionBlock', () => ({
       )}
     </div>
   ),
-}))
-
-vi.mock('./ConfirmFooter', () => ({
-  ConfirmFooter: ({
-    confirmLabel,
-    onConfirm,
-  }: {
-    confirmLabel?: string
-    onConfirm?: () => void
-  }) => <button onClick={onConfirm}>{confirmLabel ?? 'Confirm'}</button>,
 }))
 
 describe('EdgeFunctionRenderer', () => {
@@ -129,7 +122,6 @@ describe('EdgeFunctionRenderer', () => {
     )
 
     await user.click(screen.getByRole('button', { name: 'Deploy' }))
-
     expect(onApprove).toHaveBeenCalledTimes(1)
     expect(mockTrack).toHaveBeenCalledTimes(1)
   })

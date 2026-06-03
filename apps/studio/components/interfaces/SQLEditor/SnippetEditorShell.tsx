@@ -9,6 +9,8 @@ export interface SnippetEditorShellProps {
   defaultSplitSize?: number
   /** When true, only the utility panel is shown (e.g. notebook blocks with SQL collapsed) */
   hideEditorPanel?: boolean
+  /** When true, only the SQL editor is shown (e.g. assistant blocks awaiting query approval) */
+  hideUtilityPanel?: boolean
 }
 
 export const SnippetEditorShell = ({
@@ -18,12 +20,23 @@ export const SnippetEditorShell = ({
   header,
   defaultSplitSize = 50,
   hideEditorPanel = false,
+  hideUtilityPanel = false,
 }: SnippetEditorShellProps) => {
   if (hideEditorPanel) {
     return (
       <div className="flex h-full flex-col">
         {header}
         <div className="min-h-0 flex-grow">{utilityPanel}</div>
+        {footer}
+      </div>
+    )
+  }
+
+  if (hideUtilityPanel) {
+    return (
+      <div className="flex h-full flex-col">
+        {header}
+        <div className="min-h-0 flex-grow">{editorPanel}</div>
         {footer}
       </div>
     )

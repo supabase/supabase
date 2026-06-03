@@ -122,6 +122,7 @@ const SqlEditorChatPage: NextPageWithLayout = () => {
       className="bg-studio h-full min-h-0"
       contentClassName="flex flex-1 min-h-0 flex-col px-4 md:px-8"
       conversationClassName="min-h-0"
+      conversationBottomFadeClassName="from-studio"
       conversationContentClassName={`
         [&_.assistant-message-container-standard]:mx-auto
         [&_.assistant-message-container-standard]:max-w-3xl

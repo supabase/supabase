@@ -2,9 +2,7 @@ import { type UntrustedSqlFragment } from '@supabase/pg-meta'
 import type { ToolUIPart } from 'ai'
 import { useParams } from 'common'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { cn } from 'ui'
 
-import { ConfirmFooter } from './ConfirmFooter'
 import { getLogDatePickerValueForHelper } from '@/components/interfaces/Settings/Logs/logsDateRange'
 import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
 import { SqlEditorShowSqlToggle } from '@/components/interfaces/SQLEditor/SqlEditorShowSqlToggle'
@@ -35,16 +33,11 @@ interface DisplayBlockRendererProps {
   initialResults?: unknown
   /** Called when locally running SQL fails before or during client-side execution. */
   onError?: (args: { messageId: string; errorText: string }) => void
-  /** Responds affirmatively to an AI SDK tool approval request; does not run SQL directly. */
-  onApprove?: () => void
-  /** Responds negatively to an AI SDK tool approval request; does not run SQL directly. */
-  onDeny?: () => void
   /** AI SDK tool state used to show approval UI for pending tool calls. */
   toolState?: ToolUIPart['state']
   toolApprovalRespondedApproved?: boolean
-  isLastPart?: boolean
-  isLastMessage?: boolean
-  showConfirmFooter?: boolean
+  /** Hide the results panel while awaiting approval in the composer bar. */
+  hideUtilityPanel?: boolean
   onChartConfigChange?: (chartConfig: ChartConfig) => void
   /** Called when the user clicks the query block play button to run SQL locally. */
   onQueryRun?: (queryType: 'select' | 'mutation') => void
@@ -55,13 +48,9 @@ export const DisplayBlockRenderer = ({
   toolCallId,
   initialArgs,
   initialResults,
-  onApprove,
-  onDeny,
   toolState,
   toolApprovalRespondedApproved,
-  isLastPart = false,
-  isLastMessage = false,
-  showConfirmFooter = true,
+  hideUtilityPanel = false,
   onChartConfigChange,
 }: DisplayBlockRendererProps) => {
   const { ref } = useParams()
@@ -87,7 +76,7 @@ export const DisplayBlockRenderer = ({
   )
 
   const [chartConfig, setChartConfig] = useState<ChartConfig>(() => initialChartConfig)
-  const [isSqlEditorVisible, setIsSqlEditorVisible] = useState(false)
+  const [isSqlEditorVisible, setIsSqlEditorVisible] = useState(hideUtilityPanel)
   const [querySource, setQuerySource] = useState<'database' | 'logs'>('database')
   const [logsDatePickerValue, setLogsDatePickerValue] = useState(() =>
     getLogDatePickerValueForHelper()
@@ -131,10 +120,18 @@ export const DisplayBlockRenderer = ({
   }, [blockId, label, profile?.id, project?.id, ref, sqlQuery])
 
   useEffect(() => {
+    if (hideUtilityPanel) return
+
     const rows = getRowsFromToolOutput(initialResults)
     if (rows) snapV2.addResult(blockId, rows)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [blockId, initialResults])
+  }, [blockId, hideUtilityPanel, initialResults])
+
+  useEffect(() => {
+    if (hideUtilityPanel) {
+      setIsSqlEditorVisible(true)
+    }
+  }, [hideUtilityPanel])
 
   const handleChartConfigChange = useCallback(
     (config: ChartConfig) => {
@@ -165,58 +162,32 @@ export const DisplayBlockRenderer = ({
     ]
   )
 
-  const isApprovalRequested = toolState === 'approval-requested'
   const isApprovalResponded = toolState === 'approval-responded'
   const isApprovalDenied = isApprovalResponded && toolApprovalRespondedApproved === false
-  const shouldShowConfirmFooter =
-    showConfirmFooter &&
-    (isApprovalRequested || (isApprovalResponded && !isApprovalDenied)) &&
-    isLastPart &&
-    isLastMessage &&
-    (isApprovalResponded || (!!onApprove && !!onDeny))
   const isRunningApprovedTool = isApprovalResponded && !isApprovalDenied
+  const isSqlVisible = hideUtilityPanel || isSqlEditorVisible
 
   return (
-    <div className="display-block w-auto">
-      <div
-        className={cn(
-          'overflow-x-hidden border bg-surface-100',
-          shouldShowConfirmFooter ? 'rounded-t-lg' : 'rounded-lg'
-        )}
-      >
-        <NotebookEditorProvider value={editorContextValue}>
-          <SqlQueryBlockEditor
-            id={blockId}
-            snippetName={label}
-            title={label}
-            leadingActions={
-              <SqlEditorShowSqlToggle
-                isSqlEditorVisible={isSqlEditorVisible}
-                onToggle={() => setIsSqlEditorVisible((current) => !current)}
-              />
-            }
-            variant="block"
-            isSqlEditorVisible={isSqlEditorVisible}
-            autoFocus={false}
-            isDisabled={shouldShowConfirmFooter}
-            isExecutingOverride={isRunningApprovedTool}
-          />
-        </NotebookEditorProvider>
-      </div>
-      {shouldShowConfirmFooter && (
-        <div className="relative z-10 -mt-px mx-3">
-          <ConfirmFooter
-            placement="overhang"
-            message="Assistant wants to run this query"
-            cancelLabel="Skip"
-            confirmLabel="Run Query"
-            confirmLabelLoading="Running..."
-            isLoading={isApprovalResponded}
-            onCancel={isApprovalRequested ? onDeny : undefined}
-            onConfirm={isApprovalRequested ? onApprove : undefined}
-          />
-        </div>
-      )}
+    <div className="display-block w-auto overflow-x-hidden rounded-lg border bg-surface-100">
+      <NotebookEditorProvider value={editorContextValue}>
+        <SqlQueryBlockEditor
+          id={blockId}
+          snippetName={label}
+          title={label}
+          leadingActions={
+            <SqlEditorShowSqlToggle
+              isSqlEditorVisible={isSqlVisible}
+              onToggle={() => setIsSqlEditorVisible((current) => !current)}
+            />
+          }
+          variant="block"
+          isSqlEditorVisible={isSqlVisible}
+          hideUtilityPanel={hideUtilityPanel}
+          autoFocus={false}
+          isDisabled={hideUtilityPanel}
+          isExecutingOverride={isRunningApprovedTool}
+        />
+      </NotebookEditorProvider>
     </div>
   )
 }
