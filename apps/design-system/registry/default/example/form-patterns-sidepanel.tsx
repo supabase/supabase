@@ -176,7 +176,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Password Input */}
               <SheetSection>
@@ -197,7 +197,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Copyable Input */}
               <SheetSection>
@@ -225,7 +225,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Number Input */}
               <SheetSection>
@@ -246,7 +246,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Input with Units */}
               <SheetSection>
@@ -272,7 +272,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Textarea */}
               <SheetSection>
@@ -298,7 +298,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Icon Upload */}
               <SheetSection>
@@ -366,7 +366,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* File Upload */}
               <SheetSection>
@@ -459,7 +459,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Switch */}
               <SheetSection>
@@ -555,7 +555,7 @@ export default function FormPatternsSidePanel() {
                 </FormItemLayout>
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Select */}
               <SheetSection>
@@ -585,7 +585,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Multi-Select */}
               <SheetSection>
@@ -611,7 +611,7 @@ export default function FormPatternsSidePanel() {
                             badgeLimit="wrap"
                             showIcon={false}
                             deletableBadge
-                            className="w-full min-w-lg!"
+                            className="w-full"
                           />
                           <MultiSelectorContent>
                             <MultiSelectorList>
@@ -627,7 +627,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Radio Group */}
               <SheetSection>
@@ -659,7 +659,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Date Picker */}
               <SheetSection>
@@ -698,7 +698,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Field Array */}
               <SheetSection>
@@ -727,7 +727,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Key/Value Field Array */}
               <SheetSection>
@@ -758,7 +758,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Action Field */}
               <SheetSection>
