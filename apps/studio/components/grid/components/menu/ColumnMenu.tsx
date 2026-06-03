@@ -204,20 +204,23 @@ export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
             </>
           )}
         </DropdownMenuItem>
-        <DropdownMenuItem className="space-x-2" onClick={onToggleSensitiveData}>
-          {snap.sensitiveDataColumns.has(columnKey) &&
-          !snap.temporarilyRevealedColumns.has(columnKey) ? (
-            <>
-              <Eye size={14} strokeWidth={1.5} />
-              <span>Show data</span>
-            </>
-          ) : (
-            <>
-              <EyeOff size={14} strokeWidth={1.5} />
-              <span>Hide sensitive data</span>
-            </>
-          )}
-        </DropdownMenuItem>
+        {(snap.sensitiveDataColumns.has(columnKey) ||
+          snap.temporarilyRevealedColumns.has(columnKey)) && (
+          <DropdownMenuItem className="space-x-2" onClick={onToggleSensitiveData}>
+            {snap.sensitiveDataColumns.has(columnKey) &&
+            !snap.temporarilyRevealedColumns.has(columnKey) ? (
+              <>
+                <Eye size={14} strokeWidth={1.5} />
+                <span>Show data</span>
+              </>
+            ) : (
+              <>
+                <EyeOff size={14} strokeWidth={1.5} />
+                <span>Hide sensitive data</span>
+              </>
+            )}
+          </DropdownMenuItem>
+        )}
         {snap.editable && (
           <>
             <DropdownMenuSeparator />
