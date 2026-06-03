@@ -29,7 +29,8 @@ export const MarketplaceDetailBreadrumbs = ({
 
   return (
     <PageBreadcrumbs
-      className="sticky max-h-(--header-height)! top-0 z-20 flex justify-between items-center w-full md:px-2 xl:px-6"
+      slotClassName="sticky top-0 z-20"
+      className="max-h-(--header-height)! flex justify-between items-center w-full md:px-2 xl:px-6"
       actions={
         <PageBreadcrumbsActions>
           {isLoading ? <ShimmeringLoader className="w-24" /> : actions}
