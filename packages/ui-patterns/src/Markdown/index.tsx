@@ -7,22 +7,15 @@ import { cn } from 'ui'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
 
 import {
-  Anchor,
   Avatar,
   Blockquote,
   Code,
   CodeBlockPre,
   DefaultPre,
-  Hr,
   Img,
   InlineCode,
-  Paragraph,
   Quote,
   SimplePre,
-  Table,
-  Td,
-  Th,
-  Tr,
 } from './components'
 
 const defaultComponents: Components = {
@@ -32,17 +25,10 @@ const defaultComponents: Components = {
   h4: (props) => <Heading tag="h4" {...props} />,
   h5: (props) => <Heading tag="h5" {...props} />,
   h6: (props) => <Heading tag="h6" {...props} />,
-  p: Paragraph,
-  a: Anchor,
   code: Code,
   img: Img,
   blockquote: Blockquote,
-  hr: Hr,
   pre: DefaultPre,
-  table: Table,
-  tr: Tr,
-  th: Th,
-  td: Td,
 }
 
 interface MarkdownProps extends Omit<Options, 'children' | 'node' | 'components'> {
@@ -89,21 +75,4 @@ export const markdownComponents = {
   img: Img,
 }
 
-export {
-  Anchor,
-  Avatar,
-  Blockquote,
-  Code,
-  CodeBlockPre,
-  DefaultPre,
-  Hr,
-  Img,
-  InlineCode,
-  Paragraph,
-  Quote,
-  SimplePre,
-  Table,
-  Td,
-  Th,
-  Tr,
-}
+export { Avatar, Blockquote, Code, CodeBlockPre, DefaultPre, Img, InlineCode, Quote, SimplePre }
