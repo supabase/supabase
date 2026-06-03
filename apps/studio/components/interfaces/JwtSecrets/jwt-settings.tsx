@@ -5,7 +5,7 @@ import {
   JwtSecretUpdateProgress,
   JwtSecretUpdateStatus,
 } from '@supabase/shared-types/out/events'
-import { useFlag, useParams } from 'common'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
 import {
   AlertCircle,
   ChevronDown,
@@ -119,7 +119,7 @@ export const JWTSettings = () => {
     'custom_config_gotrue'
   )
 
-  const { data } = useJwtSecretUpdatingStatusQuery({ projectRef })
+  const { data } = useJwtSecretUpdatingStatusQuery({ projectRef }, { enabled: IS_PLATFORM })
   const { data: config, isError } = useProjectPostgrestConfigQuery({ projectRef })
   const { mutateAsync: updateJwt, isPending: isSubmittingJwtSecretUpdateRequest } =
     useJwtSecretUpdateMutation()
@@ -127,14 +127,17 @@ export const JWTSettings = () => {
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: legacyKey, isPending } = useLegacyJWTSigningKeyQuery(
     { projectRef },
-    { enabled: canReadAPIKeys, retry: false }
+    { enabled: IS_PLATFORM && canReadAPIKeys, retry: false }
   )
   const { data: legacyAPIKeysStatus } = useLegacyAPIKeysStatusQuery(
     { projectRef },
-    { enabled: canReadAPIKeys }
+    { enabled: IS_PLATFORM && canReadAPIKeys }
   )
 
-  const { data: authConfig, isPending: isLoadingAuthConfig } = useAuthConfigQuery({ projectRef })
+  const { data: authConfig, isPending: isLoadingAuthConfig } = useAuthConfigQuery(
+    { projectRef },
+    { enabled: IS_PLATFORM }
+  )
   const { mutate: updateAuthConfig, isPending: isUpdatingAuthConfig } =
     useAuthConfigUpdateMutation()
 
@@ -206,6 +209,26 @@ export const JWTSettings = () => {
       toast.error(`Failed to update JWT secret: ${error.message}`)
     }
   }
+
+  if (!IS_PLATFORM) {
+    return (
+      <Panel>
+        <Panel.Content className="border-t border-panel-border-interior-light in-data-[theme*=dark]:border-panel-border-interior-dark">
+          <Form {...form}>
+            <FormItemLayout
+              layout="flex-row-reverse"
+              id="JWT_SECRET"
+              label="JWT secret"
+              description="Used to verify legacy user session JWTs issued by Supabase Auth."
+            >
+              <Input id="JWT_SECRET" copy reveal readOnly value={config?.jwt_secret || ''} />
+            </FormItemLayout>
+          </Form>
+        </Panel.Content>
+      </Panel>
+    )
+  }
+
   return (
     <>
       <Panel
