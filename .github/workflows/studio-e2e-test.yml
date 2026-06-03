@@ -87,7 +87,7 @@ jobs:
       - name: Pre-start diagnostics
         run: |
           docker ps -a
-          sudo ss -tlnp | grep 5432 || echo "5432 free"
+          sudo ss -tlnp | grep 54322 || echo "54322 free"
 
       - name: Start supabase
         if: steps.filter.outputs.studio == 'true'
@@ -97,7 +97,7 @@ jobs:
         if: failure()
         run: |
           docker ps -a
-          sudo ss -tlnp | grep 5432
+          sudo ss -tlnp | grep 54322
           docker logs $(docker ps -aq) 2>&1 || true
 
       - name: Build studio
