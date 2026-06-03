@@ -1,4 +1,5 @@
 import { IS_PLATFORM, useFlag, useParams } from 'common'
+import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
   PageHeaderDescription,
@@ -34,7 +35,9 @@ const OrgAuditLogDrainsPage: NextPageWithLayout = () => {
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>
-      <OrgAuditLogDrains />
+      <PageContainer size="default">
+        <OrgAuditLogDrains />
+      </PageContainer>
     </>
   )
 }
