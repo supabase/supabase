@@ -206,7 +206,7 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
         {(command.flags ?? []).length > 0 && (
           <>
             <h3 className="mb-3 text-base text-foreground">Flags</h3>
-            <ul>
+            <ul className="not-prose">
               {command.flags.map((flag, index) => (
                 <li key={index} className="border-t last-of-type:border-b py-5 flex flex-col gap-3">
                   <div className="flex flex-wrap items-baseline gap-3">
@@ -472,7 +472,7 @@ async function FunctionSection({
 
   let types: MethodTypes | VariableTypes | undefined
   if (useTypeSpec && '$ref' in fn) {
-    types = await getTypeSpec(fn['$ref'] as string)
+    types = await getTypeSpec(sdkId, version, fn['$ref'] as string)
   }
 
   const fullDescription = [
