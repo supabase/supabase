@@ -14,7 +14,7 @@ services:
 
   studio:
     container_name: supabase-studio
-    image: supabase/studio:2026.04.27-sha-5f60601
+    image: supabase/studio:2026.06.03-sha-0bca601
     restart: unless-stopped
     healthcheck:
       test:
@@ -25,11 +25,9 @@ services:
       timeout: 10s
       interval: 5s
       retries: 3
-    depends_on:
-      analytics:
-        condition: service_healthy
+      start_period: 20s
     environment:
-      #  Listen on all IPv4 interfaces
+      # Listen on all IPv4 interfaces
       HOSTNAME: "0.0.0.0"
 
       STUDIO_PG_META_URL: http://meta:8080
@@ -58,22 +56,14 @@ services:
       SUPABASE_PUBLISHABLE_KEY: ${SUPABASE_PUBLISHABLE_KEY}
       SUPABASE_SECRET_KEY: ${SUPABASE_SECRET_KEY}
 
-      # LOGFLARE_API_KEY is deprecated
-      LOGFLARE_API_KEY: ${LOGFLARE_PUBLIC_ACCESS_TOKEN}
-      LOGFLARE_PUBLIC_ACCESS_TOKEN: ${LOGFLARE_PUBLIC_ACCESS_TOKEN}
-      LOGFLARE_PRIVATE_ACCESS_TOKEN: ${LOGFLARE_PRIVATE_ACCESS_TOKEN}
+      # See: docker-compose.logs.yml
+      ENABLED_FEATURES_LOGS_ALL: "false"
 
-      LOGFLARE_URL: http://analytics:4000
-      NEXT_PUBLIC_ENABLE_LOGS: "true"
-      # Comment to use Big Query backend for analytics
-      NEXT_ANALYTICS_BACKEND_PROVIDER: postgres
-      # Uncomment to use Big Query backend for analytics
-      # NEXT_ANALYTICS_BACKEND_PROVIDER: bigquery
       SNIPPETS_MANAGEMENT_FOLDER: /app/snippets
       EDGE_FUNCTIONS_MANAGEMENT_FOLDER: /app/edge-functions
     volumes:
-      - ./volumes/snippets:/app/snippets:Z
-      - ./volumes/functions:/app/edge-functions:Z
+      - ./volumes/snippets:/app/snippets:z
+      - ./volumes/functions:/app/edge-functions:ro,z
 
   kong:
     container_name: supabase-kong
@@ -95,7 +85,6 @@ services:
       - ${KONG_HTTP_PORT}:8000/tcp
       - ${KONG_HTTPS_PORT}:8443/tcp
     volumes:
-      # https://github.com/supabase/supabase/issues/12661
       - ./volumes/api/kong.yml:/home/kong/temp.yml:ro,z
       - ./volumes/api/kong-entrypoint.sh:/home/kong/kong-entrypoint.sh:ro,z
       #- ./volumes/api/server.crt:/home/kong/server.crt:ro
@@ -124,7 +113,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.186.0
+    image: supabase/gotrue:v2.189.0
     restart: unless-stopped
     healthcheck:
       test:
@@ -262,7 +251,7 @@ services:
 
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:v14.8
+    image: postgrest/postgrest:v14.12
     restart: unless-stopped
     depends_on:
       db:
@@ -291,7 +280,7 @@ services:
   realtime:
     # This container name looks inconsistent but is correct because realtime constructs tenant id by parsing the subdomain
     container_name: realtime-dev.supabase-realtime
-    image: supabase/realtime:v2.76.5
+    image: supabase/realtime:v2.102.3
     restart: unless-stopped
     depends_on:
       db:
@@ -337,7 +326,7 @@ services:
   # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v1.48.26
+    image: supabase/storage-api:v1.60.4
     restart: unless-stopped
     depends_on:
       db:
@@ -423,7 +412,7 @@ services:
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.96.3
+    image: supabase/postgres-meta:v0.96.6
     restart: unless-stopped
     depends_on:
       db:
@@ -440,10 +429,10 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.71.2
+    image: supabase/edge-runtime:v1.74.0
     restart: unless-stopped
     volumes:
-      - ./volumes/functions:/home/deno/functions:Z
+      - ./volumes/functions:/home/deno/functions:z
       - deno-cache:/root/.cache/deno
     depends_on:
       kong:
@@ -468,52 +457,6 @@ services:
         "--main-service",
         "/home/deno/functions/main"
       ]
-
-  analytics:
-    container_name: supabase-analytics
-    image: supabase/logflare:1.36.1
-    restart: unless-stopped
-    # ports:
-    #   - 4000:4000
-    # Uncomment to use Big Query backend for analytics
-    # volumes:
-    #   - type: bind
-    #     source: ${PWD}/gcloud.json
-    #     target: /opt/app/rel/logflare/bin/gcloud.json
-    #     read_only: true
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "curl -sSfL -o /dev/null http://localhost:4000/health"
-        ]
-      timeout: 5s
-      interval: 5s
-      retries: 10
-    depends_on:
-      db:
-        # Disable this if you are using an external Postgres database
-        condition: service_healthy
-    environment:
-      LOGFLARE_NODE_HOST: 127.0.0.1
-      DB_USERNAME: supabase_admin
-      DB_DATABASE: _supabase
-      DB_HOSTNAME: ${POSTGRES_HOST}
-      DB_PORT: ${POSTGRES_PORT}
-      DB_PASSWORD: ${POSTGRES_PASSWORD}
-      DB_SCHEMA: _analytics
-      LOGFLARE_PUBLIC_ACCESS_TOKEN: ${LOGFLARE_PUBLIC_ACCESS_TOKEN}
-      LOGFLARE_PRIVATE_ACCESS_TOKEN: ${LOGFLARE_PRIVATE_ACCESS_TOKEN}
-      LOGFLARE_SINGLE_TENANT: "true"
-      LOGFLARE_SUPABASE_MODE: "true"
-
-      # Comment variables to use Big Query backend for analytics
-      POSTGRES_BACKEND_URL: postgresql://supabase_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/_supabase
-      POSTGRES_BACKEND_SCHEMA: _analytics
-      LOGFLARE_FEATURE_FLAG_OVERRIDE: multibackend=true
-      # Uncomment to use Big Query backend for analytics
-      # GOOGLE_PROJECT_ID: ${GOOGLE_PROJECT_ID}
-      # GOOGLE_PROJECT_NUMBER: ${GOOGLE_PROJECT_NUMBER}
 
   # Comment out everything below this point if you are using an external Postgres database
   db:
@@ -570,43 +513,10 @@ services:
         "log_min_messages=fatal" # prevents Realtime polling queries from appearing in logs
       ]
 
-  vector:
-    container_name: supabase-vector
-    image: timberio/vector:0.53.0-alpine
-    restart: unless-stopped
-    volumes:
-      - ./volumes/logs/vector.yml:/etc/vector/vector.yml:ro,z
-      - ${DOCKER_SOCKET_LOCATION}:/var/run/docker.sock:ro,z
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "wget",
-          "--no-verbose",
-          "--tries=1",
-          "--spider",
-          "http://vector:9001/health"
-        ]
-      timeout: 5s
-      interval: 5s
-      retries: 3
-    depends_on:
-      analytics:
-        condition: service_healthy
-    environment:
-      LOGFLARE_PUBLIC_ACCESS_TOKEN: ${LOGFLARE_PUBLIC_ACCESS_TOKEN}
-    command:
-      [
-        "--config",
-        "/etc/vector/vector.yml"
-      ]
-    security_opt:
-      - "label=disable"
-
   # Update the DATABASE_URL if you are using an external Postgres database
   supavisor:
     container_name: supabase-pooler
-    image: supabase/supavisor:2.7.4
+    image: supabase/supavisor:2.9.5
     restart: unless-stopped
     ports:
       - ${POSTGRES_PORT}:5432
