@@ -23,7 +23,7 @@ The same pattern shows up across many Postgres errors — missing column? `hint`
 
 ## The recommended pattern
 
-Destructure `{ data, error }`, check `error`, log the whole object, and return early.
+Read `{ data, error }` from the response, check `error`, log the whole object, and return early.
 
 ```ts
 const { data, error } = await supabase.from('users').select()
