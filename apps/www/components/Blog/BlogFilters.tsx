@@ -2,6 +2,7 @@
 
 import type { BlogView } from 'app/blog/BlogClient'
 import { LOCAL_STORAGE_KEYS, useBreakpoint } from 'common'
+import { motion } from 'framer-motion'
 import { startCase } from 'lib/helpers'
 import { AlignJustify, ChevronDown, X as CloseIcon, Grid, Search } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -45,7 +46,6 @@ function BlogFilters({ onFilterChange, view, setView }: Props) {
   const q = searchParams?.get('q')
   const activeCategory = searchParams?.get('category')
   const isMobile = useBreakpoint(1023)
-  const is2XL = useBreakpoint(1535)
 
   // Use hard-coded categories here as they:
   // - serve as a reference
@@ -142,15 +142,6 @@ function BlogFilters({ onFilterChange, view, setView }: Props) {
     [handleSearchByText]
   )
 
-  const handleViewSelection = () => {
-    setView((prevView: 'list' | 'grid') => {
-      const newValue = prevView === 'list' ? 'grid' : 'list'
-      localStorage.setItem(BLOG_VIEW, newValue)
-
-      return newValue
-    })
-  }
-
   return (
     <div className="flex flex-row items-center justify-between gap-2">
       {!showSearchInput && (
@@ -186,24 +177,31 @@ function BlogFilters({ onFilterChange, view, setView }: Props) {
           </DropdownMenu>
         </div>
       )}
-      <div className="hidden lg:flex flex-wrap items-center grow gap-2">
-        {allCategories.map((category: string) => (
-          <Button
-            key={category}
-            type={
-              category === 'all' && !searchTerm && !activeCategory
-                ? 'default'
-                : category === activeCategory
-                  ? 'default'
-                  : 'outline'
-            }
-            onClick={() => handleSetCategory(category)}
-            size={is2XL ? 'tiny' : 'small'}
-            className="rounded-full"
-          >
-            {category === 'all' ? 'All' : startCase(category.replaceAll('-', ' '))}
-          </Button>
-        ))}
+      <div className="hidden lg:flex flex-wrap items-center flex-grow gap-1">
+        {allCategories.map((cat: string) => {
+          const isActive = (cat === 'all' && !searchTerm && category === 'all') || cat === category
+          return (
+            <button
+              key={cat}
+              onClick={() => handleSetCategory(cat)}
+              className={cn(
+                'relative px-3 py-1.5 text-sm rounded-full transition-colors',
+                isActive ? 'text-foreground' : 'text-foreground-lighter hover:text-foreground-light'
+              )}
+            >
+              {isActive && (
+                <motion.span
+                  layoutId="blog-cat-bg"
+                  className="absolute inset-0 rounded-full bg-surface-300 border border-border"
+                  transition={{ type: 'spring', duration: 0.35, bounce: 0.15 }}
+                />
+              )}
+              <span className="relative z-10">
+                {cat === 'all' ? 'All' : startCase(cat.replaceAll('-', ' '))}
+              </span>
+            </button>
+          )
+        })}
       </div>
 
       {!showSearchInput && (
@@ -249,18 +247,36 @@ function BlogFilters({ onFilterChange, view, setView }: Props) {
           </InputGroup>
         </div>
       )}
-      <Button
-        type="default"
-        title={isList ? 'Grid View' : 'List View'}
-        onClick={handleViewSelection}
-        className="h-full p-2 text-foreground-light"
-      >
-        {isList ? (
-          <Grid className="w-4 h-4 stroke-1.5" />
-        ) : (
-          <AlignJustify className="w-4 h-4 stroke-1.5" />
-        )}
-      </Button>
+      <div className="flex items-center border border-border rounded-full p-0.5 gap-0.5 bg-surface-100">
+        {(['list', 'grid'] as BlogView[]).map((v) => (
+          <button
+            key={v}
+            onClick={() => {
+              setView(v)
+              localStorage.setItem(BLOG_VIEW, v)
+            }}
+            className={cn(
+              'relative flex items-center justify-center w-7 h-7 rounded-full transition-colors',
+              view === v ? 'text-foreground' : 'text-foreground-light hover:text-foreground'
+            )}
+          >
+            {view === v && (
+              <motion.span
+                layoutId="blog-view-bg"
+                className="absolute inset-0 rounded-full bg-surface-300 border border-border"
+                transition={{ type: 'spring', duration: 0.3, bounce: 0.15 }}
+              />
+            )}
+            <span className="relative z-10">
+              {v === 'list' ? (
+                <AlignJustify className="w-3.5 h-3.5" />
+              ) : (
+                <Grid className="w-3.5 h-3.5" />
+              )}
+            </span>
+          </button>
+        ))}
+      </div>
     </div>
   )
 }

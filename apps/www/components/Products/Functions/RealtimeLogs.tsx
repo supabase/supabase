@@ -35,13 +35,23 @@ const RealtimeLogs: FC<Props> = ({ isActive, isInView, className }) => {
     const t = new Date()
     t.setSeconds(t.getSeconds() - (offset ?? 0))
 
+    const rand = Math.random()
+    const status = rand > 0.92 ? 500 : rand > 0.85 ? 404 : rand > 0.8 ? 301 : rand > 0.75 ? 201 : 200
+
     return {
-      status: Math.random() > 0.995 ? 500 : 200,
+      status,
       method: Math.random() > 0.5 ? 'GET' : 'POST',
       id: crypto.randomUUID(),
       timestamp: t,
     }
   }
+
+  useEffect(() => {
+    if (isPlaying) {
+      const newLog = createLog()
+      setActiveLogs((prev) => [newLog, ...prev])
+    }
+  }, [isPlaying])
 
   useInterval(
     () => {
@@ -49,7 +59,7 @@ const RealtimeLogs: FC<Props> = ({ isActive, isInView, className }) => {
       if (skip) return
 
       const newLog = createLog()
-      setActiveLogs([newLog, ...activeLogs])
+      setActiveLogs((prev) => [newLog, ...prev])
     },
     isPlaying ? INTERVAL : null
   )
@@ -61,8 +71,19 @@ const RealtimeLogs: FC<Props> = ({ isActive, isInView, className }) => {
   if (!mounted) return null
 
   return (
-    <div className={cn('absolute inset-0 bottom-8 overflow-hidden', className)}>
-      <div className="visual-overlay absolute z-20 pointer-events-none inset-0 top-auto h-32 bg-[linear-gradient(to_top,hsl(var(--background-surface-75))_0%,transparent_100%)]" />
+    <div className={cn('absolute inset-0 overflow-hidden', className)}>
+      <div
+        className={cn(
+          'visual-overlay absolute z-20 pointer-events-none inset-0 bottom-auto h-32 bg-[linear-gradient(to_bottom,hsl(var(--background-surface-75))_0%,transparent_100%)] transition-opacity duration-300',
+          isPlaying ? 'opacity-100' : 'opacity-0'
+        )}
+      />
+      <div
+        className={cn(
+          'visual-overlay absolute z-20 pointer-events-none inset-0 top-auto h-32 bg-[linear-gradient(to_top,hsl(var(--background-surface-75))_0%,transparent_100%)] transition-opacity duration-300',
+          isPlaying ? 'opacity-100' : 'opacity-0'
+        )}
+      />
       <motion.ul
         layout
         transition={{
@@ -70,7 +91,7 @@ const RealtimeLogs: FC<Props> = ({ isActive, isInView, className }) => {
           duration: 0.1,
           staggerChildren: 0.2,
         }}
-        className="relative z-10 w-full h-auto flex flex-col px-4 overflow-y-auto"
+        className="relative z-10 w-full h-auto flex flex-col overflow-y-auto"
       >
         <AnimatePresence>
           {activeLogs.map((log, i) => (
@@ -83,13 +104,16 @@ const RealtimeLogs: FC<Props> = ({ isActive, isInView, className }) => {
                 y: 0,
                 transition: { delay: 0.2 + i * 0.03, duration: 0.15 },
               }}
-              className="py-2 md:px-4 pointer-events-auto border-b hover:bg-selection/20 first:border-t w-full font-mono text-xs flex gap-4 items-center"
+              className="h-9 px-4 md:px-6 pointer-events-auto border-b hover:bg-selection/20 w-full font-mono text-xs flex gap-4 items-center"
             >
               <span className="shrink-0">{dayjs(log.timestamp).format('D MMM HH:mm:ss')}</span>
-              <span className="">
-                <Badge variant={log.status === 200 ? 'default' : 'warning'}>{log.status}</Badge>
+              <span className="shrink-0">
+                <Badge
+                  variant={log.status >= 500 ? 'destructive' : log.status >= 400 ? 'warning' : log.status >= 300 ? 'default' : 'default'}
+                  className={log.status >= 300 && log.status < 400 ? 'bg-blue-200/10 text-blue-900 border-blue-500' : undefined}
+                >{log.status}</Badge>
               </span>
-              <span className="w-10 truncate">{log.method}</span>
+              <span className="w-12 shrink-0">{log.method}</span>
               <span className="truncate">{log.id}</span>
             </motion.li>
           ))}

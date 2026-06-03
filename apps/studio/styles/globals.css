@@ -166,6 +166,14 @@
   ::file-selector-button {
     border-color: hsl(var(--border-default, currentColor));
   }
+
+  h1,
+  h2 {
+    font-weight: 500;
+  }
+  body {
+    letter-spacing: -0.01em;
+  }
 }
 
 html,

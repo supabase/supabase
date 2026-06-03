@@ -8,27 +8,29 @@ const ScrollProgress = () => {
   const pathname = usePathname()
 
   const isBlogPost = pathname?.includes('/blog/')
-  if (!isBlogPost) return null
-
-  const handleScroll = () => {
-    if (typeof document === 'undefined') return null
-    const article = document?.querySelector('article')
-    if (!article) return null
-    const { top, height } = (article as any)?.getBoundingClientRect()
-    let scrollDistance = -top
-    let progressPercentage =
-      (scrollDistance / (height - document.documentElement.clientHeight)) * 100
-    setProgressPercentage(progressPercentage)
-  }
 
   useEffect(() => {
+    if (!isBlogPost) return
+
+    const handleScroll = () => {
+      const article = document?.querySelector('article')
+      if (!article) return
+      const { top, height } = article.getBoundingClientRect()
+      const scrollDistance = -top
+      const progress =
+        (scrollDistance / (height - document.documentElement.clientHeight)) * 100
+      setProgressPercentage(progress)
+    }
+
     window.addEventListener('scroll', handleScroll)
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [])
+  }, [isBlogPost])
 
-  let isActive = progressPercentage <= 100
+  if (!isBlogPost) return null
+
+  const isActive = progressPercentage <= 100
 
   return (
     <div className="h-[2px] w-full flex justify-start relative">
