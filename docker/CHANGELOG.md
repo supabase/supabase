@@ -25,6 +25,7 @@ See per-service updates below for details. Only the most important changes relev
 
 ### Configuration
 - ⚠️ Logs and analytics are now [optional](https://github.com/orgs/supabase/discussions/46084) and were removed from the default `docker-compose.yml`. A new `docker-compose.logs.yml` override has been added. Check the main [configuration guide](https://supabase.com/docs/guides/self-hosting/docker#enabling-analytics) and the changes to Studio below for more information - PR [#45327](https://github.com/supabase/supabase/pull/45327) (via [@luizfelmach](https://github.com/luizfelmach/))
+- ⚠️ Added `COMPOSE_FILE` to `.env.example` for configuring compose overrides (also used by `run.sh`) - PR [#45603](https://github.com/supabase/supabase/pull/45603)
 
 ### Documentation
 - Added a new [reference list](https://github.com/supabase/supabase/blob/master/docker/CONFIG.md) of all configuration environment variables - PR [#46124](https://github.com/supabase/supabase/pull/46124)
