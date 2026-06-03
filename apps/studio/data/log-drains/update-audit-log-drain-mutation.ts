@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { AuditLogDrainConfig } from './create-audit-log-drain-mutation'
 import { logDrainsKeys } from './keys'
 import { LogDrainType } from '@/components/interfaces/LogDrains/LogDrains.constants'
 import { handleError, put } from '@/data/fetchers'
@@ -12,7 +13,7 @@ export type AuditLogDrainUpdateVariables = {
   name: string
   description?: string
   type: LogDrainType
-  config: Record<string, never>
+  config: AuditLogDrainConfig
 }
 
 export async function updateAuditLogDrain(payload: AuditLogDrainUpdateVariables) {
@@ -28,7 +29,7 @@ export async function updateAuditLogDrain(payload: AuditLogDrainUpdateVariables)
         name: payload.name,
         description: payload.description,
         type: payload.type,
-        config: payload.config as any,
+        config: payload.config,
       },
     }
   )

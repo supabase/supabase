@@ -3,14 +3,17 @@ import { toast } from 'sonner'
 
 import { logDrainsKeys } from './keys'
 import { LogDrainType } from '@/components/interfaces/LogDrains/LogDrains.constants'
+import type { components } from '@/data/api'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
+
+export type AuditLogDrainConfig = components['schemas']['CreateBackendParamsOpenapi']['config']
 
 export type AuditLogDrainCreateVariables = {
   slug: string
   name: string
   description: string
-  config: Record<string, never>
+  config: AuditLogDrainConfig
   type: LogDrainType
 }
 
@@ -21,7 +24,7 @@ export async function createAuditLogDrain(payload: AuditLogDrainCreateVariables)
       name: payload.name,
       description: payload.description,
       type: payload.type,
-      config: payload.config as any,
+      config: payload.config,
     },
   })
 

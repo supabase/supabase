@@ -22,6 +22,7 @@ import { Shortcut } from '@/components/ui/Shortcut'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useAuditLogDrainsQuery } from '@/data/log-drains/audit-log-drains-query'
 import {
+  AuditLogDrainConfig,
   AuditLogDrainCreateVariables,
   useCreateAuditLogDrainMutation,
 } from '@/data/log-drains/create-audit-log-drain-mutation'
@@ -217,7 +218,7 @@ export function OrgAuditLogDrains() {
             name,
             description: description || '',
             type,
-            config: values as any,
+            config: values as AuditLogDrainConfig,
             id: selectedLogDrain?.id,
             slug,
             token: selectedLogDrain?.token,
