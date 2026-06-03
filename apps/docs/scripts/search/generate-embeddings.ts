@@ -133,24 +133,6 @@ async function prepareSections(
   const embeddingSources = await fetchAllSources(fullIndex)
   console.log(`Discovered ${embeddingSources.length} sources`)
 
-  // Diagnostic: identify any sources that share a path. Two sources for the
-  // same path collapse onto the same page row (page.path is UNIQUE) and both
-  // push sections, producing "inserted N/1" mismatches in the failure log.
-  // This warning names the offending loader so we can fix the root cause.
-  const seenPaths = new Map<string, { source: string; type: string }>()
-  for (const s of embeddingSources) {
-    const existing = seenPaths.get(s.path)
-    if (existing) {
-      console.warn(
-        `Duplicate source path: ${s.path} ` +
-          `(first from source="${existing.source}" type="${existing.type}", ` +
-          `also from source="${s.source}" type="${s.type}")`
-      )
-      continue
-    }
-    seenPaths.set(s.path, { source: s.source, type: s.type })
-  }
-
   const allSectionsToProcess: PageSectionForEmbedding[] = []
   const pageInfoMap = new Map<number, PageInfo>()
 

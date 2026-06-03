@@ -558,8 +558,18 @@ function buildBySlug(
       bySlug[subSlug] = sub
       catItems.push({ ...sub, items: subItems })
 
+      // Enrich the subcategory header's functions.json entry. Do NOT call
+      // writePartial — that would also push a child entry into subItems with
+      // the same slug as the subcategory header itself, producing a
+      // duplicate-slug node that the search-embeddings loader emits twice.
       const subcategoryPartial = partialsBySubcategory.get(subKey)
-      if (subcategoryPartial) writePartial(subcategoryPartial, subItems)
+      if (subcategoryPartial) {
+        if (subcategoryPartial.kind === 'function') {
+          functionsList.push({ id: subSlug, ...subcategoryPartial.body })
+        } else if (subcategoryPartial.ref) {
+          functionsList.push({ id: subSlug, $ref: subcategoryPartial.ref })
+        }
+      }
 
       for (const fn of [...fns].sort(byName)) writeFunction(fn, product, subItems)
     }

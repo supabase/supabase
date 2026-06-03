@@ -5,6 +5,8 @@ exports[`build-reference-content — javascript/v2 > matches snapshot 1`] = `
   "bySlug": {
     "analytics-buckets": {
       "id": "analytics-buckets",
+      "isFunc": false,
+      "product": "storage",
       "slug": "analytics-buckets",
       "title": "Analytics Buckets",
       "type": "function",
@@ -45,8 +47,10 @@ exports[`build-reference-content — javascript/v2 > matches snapshot 1`] = `
     },
     "auth-admin": {
       "id": "auth-admin",
+      "isFunc": false,
+      "product": "auth",
       "slug": "auth-admin",
-      "title": "Overview",
+      "title": "Auth Admin",
       "type": "function",
     },
     "auth-admin-createprovider": {
@@ -212,6 +216,8 @@ exports[`build-reference-content — javascript/v2 > matches snapshot 1`] = `
     },
     "auth-mfa": {
       "id": "auth-mfa",
+      "isFunc": false,
+      "product": "auth",
       "slug": "auth-mfa",
       "title": "Auth MFA",
       "type": "function",
@@ -274,6 +280,8 @@ exports[`build-reference-content — javascript/v2 > matches snapshot 1`] = `
     },
     "auth-passkey": {
       "id": "auth-passkey",
+      "isFunc": false,
+      "product": "auth",
       "slug": "auth-passkey",
       "title": "Auth Passkey",
       "type": "function",
@@ -522,6 +530,8 @@ exports[`build-reference-content — javascript/v2 > matches snapshot 1`] = `
     },
     "file-buckets": {
       "id": "file-buckets",
+      "isFunc": false,
+      "product": "storage",
       "slug": "file-buckets",
       "title": "File Buckets",
       "type": "function",
@@ -809,6 +819,8 @@ exports[`build-reference-content — javascript/v2 > matches snapshot 1`] = `
     },
     "oauth-admin": {
       "id": "oauth-admin",
+      "isFunc": false,
+      "product": "auth",
       "slug": "oauth-admin",
       "title": "OAuth Admin",
       "type": "function",
@@ -857,6 +869,8 @@ exports[`build-reference-content — javascript/v2 > matches snapshot 1`] = `
     },
     "oauth-server": {
       "id": "oauth-server",
+      "isFunc": false,
+      "product": "auth",
       "slug": "oauth-server",
       "title": "OAuth Server",
       "type": "function",
@@ -912,8 +926,10 @@ exports[`build-reference-content — javascript/v2 > matches snapshot 1`] = `
     },
     "passkey-admin": {
       "id": "passkey-admin",
+      "isFunc": false,
+      "product": "auth",
       "slug": "passkey-admin",
-      "title": "Passkey admin",
+      "title": "Passkey Admin",
       "type": "function",
     },
     "passkey-admin-deletepasskey": {
@@ -1107,8 +1123,10 @@ exports[`build-reference-content — javascript/v2 > matches snapshot 1`] = `
     },
     "using-filters": {
       "id": "using-filters",
+      "isFunc": false,
+      "product": "database",
       "slug": "using-filters",
-      "title": "Using Filters",
+      "title": "Using filters",
       "type": "function",
     },
     "using-filters-containedby": {
@@ -1302,6 +1320,8 @@ exports[`build-reference-content — javascript/v2 > matches snapshot 1`] = `
     },
     "using-modifiers": {
       "id": "using-modifiers",
+      "isFunc": false,
+      "product": "database",
       "slug": "using-modifiers",
       "title": "Using modifiers",
       "type": "function",
@@ -1392,6 +1412,8 @@ exports[`build-reference-content — javascript/v2 > matches snapshot 1`] = `
     },
     "vector-buckets": {
       "id": "vector-buckets",
+      "isFunc": false,
+      "product": "storage",
       "slug": "vector-buckets",
       "title": "Vector Buckets",
       "type": "function",
@@ -1638,8 +1660,10 @@ exports[`build-reference-content — javascript/v2 > matches snapshot 1`] = `
     },
     {
       "id": "using-filters",
+      "isFunc": false,
+      "product": "database",
       "slug": "using-filters",
-      "title": "Using Filters",
+      "title": "Using filters",
       "type": "function",
     },
     {
@@ -1833,6 +1857,8 @@ exports[`build-reference-content — javascript/v2 > matches snapshot 1`] = `
     },
     {
       "id": "using-modifiers",
+      "isFunc": false,
+      "product": "database",
       "slug": "using-modifiers",
       "title": "Using modifiers",
       "type": "function",
@@ -2139,8 +2165,10 @@ exports[`build-reference-content — javascript/v2 > matches snapshot 1`] = `
     },
     {
       "id": "auth-admin",
+      "isFunc": false,
+      "product": "auth",
       "slug": "auth-admin",
-      "title": "Overview",
+      "title": "Auth Admin",
       "type": "function",
     },
     {
@@ -2250,6 +2278,8 @@ exports[`build-reference-content — javascript/v2 > matches snapshot 1`] = `
     },
     {
       "id": "auth-mfa",
+      "isFunc": false,
+      "product": "auth",
       "slug": "auth-mfa",
       "title": "Auth MFA",
       "type": "function",
@@ -2305,6 +2335,8 @@ exports[`build-reference-content — javascript/v2 > matches snapshot 1`] = `
     },
     {
       "id": "auth-passkey",
+      "isFunc": false,
+      "product": "auth",
       "slug": "auth-passkey",
       "title": "Auth Passkey",
       "type": "function",
@@ -2360,6 +2392,8 @@ exports[`build-reference-content — javascript/v2 > matches snapshot 1`] = `
     },
     {
       "id": "oauth-admin",
+      "isFunc": false,
+      "product": "auth",
       "slug": "oauth-admin",
       "title": "OAuth Admin",
       "type": "function",
@@ -2408,6 +2442,8 @@ exports[`build-reference-content — javascript/v2 > matches snapshot 1`] = `
     },
     {
       "id": "oauth-server",
+      "isFunc": false,
+      "product": "auth",
       "slug": "oauth-server",
       "title": "OAuth Server",
       "type": "function",
@@ -2449,8 +2485,10 @@ exports[`build-reference-content — javascript/v2 > matches snapshot 1`] = `
     },
     {
       "id": "passkey-admin",
+      "isFunc": false,
+      "product": "auth",
       "slug": "passkey-admin",
-      "title": "Passkey admin",
+      "title": "Passkey Admin",
       "type": "function",
     },
     {
@@ -2698,6 +2736,8 @@ exports[`build-reference-content — javascript/v2 > matches snapshot 1`] = `
     },
     {
       "id": "analytics-buckets",
+      "isFunc": false,
+      "product": "storage",
       "slug": "analytics-buckets",
       "title": "Analytics Buckets",
       "type": "function",
@@ -2732,6 +2772,8 @@ exports[`build-reference-content — javascript/v2 > matches snapshot 1`] = `
     },
     {
       "id": "file-buckets",
+      "isFunc": false,
+      "product": "storage",
       "slug": "file-buckets",
       "title": "File Buckets",
       "type": "function",
@@ -2892,6 +2934,8 @@ exports[`build-reference-content — javascript/v2 > matches snapshot 1`] = `
     },
     {
       "id": "vector-buckets",
+      "isFunc": false,
+      "product": "storage",
       "slug": "vector-buckets",
       "title": "Vector Buckets",
       "type": "function",
@@ -4267,12 +4311,6 @@ Passkey support is an experimental feature. Enable it when creating the client:"
           "isFunc": false,
           "items": [
             {
-              "id": "using-filters",
-              "slug": "using-filters",
-              "title": "Using Filters",
-              "type": "function",
-            },
-            {
               "id": "using-filters-containedby",
               "product": "database",
               "slug": "using-filters-containedby",
@@ -4471,12 +4509,6 @@ Passkey support is an experimental feature. Enable it when creating the client:"
           "id": "using-modifiers",
           "isFunc": false,
           "items": [
-            {
-              "id": "using-modifiers",
-              "slug": "using-modifiers",
-              "title": "Using modifiers",
-              "type": "function",
-            },
             {
               "id": "using-modifiers-abortsignal",
               "product": "database",
@@ -4794,12 +4826,6 @@ Passkey support is an experimental feature. Enable it when creating the client:"
           "isFunc": false,
           "items": [
             {
-              "id": "auth-admin",
-              "slug": "auth-admin",
-              "title": "Overview",
-              "type": "function",
-            },
-            {
               "id": "auth-admin-createprovider",
               "product": "auth",
               "slug": "auth-admin-createprovider",
@@ -4915,12 +4941,6 @@ Passkey support is an experimental feature. Enable it when creating the client:"
           "isFunc": false,
           "items": [
             {
-              "id": "auth-mfa",
-              "slug": "auth-mfa",
-              "title": "Auth MFA",
-              "type": "function",
-            },
-            {
               "id": "auth-mfa-challenge",
               "product": "auth",
               "slug": "auth-mfa-challenge",
@@ -4979,12 +4999,6 @@ Passkey support is an experimental feature. Enable it when creating the client:"
           "id": "auth-passkey",
           "isFunc": false,
           "items": [
-            {
-              "id": "auth-passkey",
-              "slug": "auth-passkey",
-              "title": "Auth Passkey",
-              "type": "function",
-            },
             {
               "id": "auth-passkey-delete",
               "product": "auth",
@@ -5045,12 +5059,6 @@ Passkey support is an experimental feature. Enable it when creating the client:"
           "isFunc": false,
           "items": [
             {
-              "id": "oauth-admin",
-              "slug": "oauth-admin",
-              "title": "OAuth Admin",
-              "type": "function",
-            },
-            {
               "id": "oauth-admin-createclient",
               "product": "auth",
               "slug": "oauth-admin-createclient",
@@ -5103,12 +5111,6 @@ Passkey support is an experimental feature. Enable it when creating the client:"
           "isFunc": false,
           "items": [
             {
-              "id": "oauth-server",
-              "slug": "oauth-server",
-              "title": "OAuth Server",
-              "type": "function",
-            },
-            {
               "id": "oauth-server-approveauthorization",
               "product": "auth",
               "slug": "oauth-server-approveauthorization",
@@ -5153,12 +5155,6 @@ Passkey support is an experimental feature. Enable it when creating the client:"
           "id": "passkey-admin",
           "isFunc": false,
           "items": [
-            {
-              "id": "passkey-admin",
-              "slug": "passkey-admin",
-              "title": "Passkey admin",
-              "type": "function",
-            },
             {
               "id": "passkey-admin-deletepasskey",
               "product": "auth",
@@ -5419,12 +5415,6 @@ Passkey support is an experimental feature. Enable it when creating the client:"
           "isFunc": false,
           "items": [
             {
-              "id": "analytics-buckets",
-              "slug": "analytics-buckets",
-              "title": "Analytics Buckets",
-              "type": "function",
-            },
-            {
               "id": "analytics-buckets-createbucket",
               "product": "storage",
               "slug": "analytics-buckets-createbucket",
@@ -5462,12 +5452,6 @@ Passkey support is an experimental feature. Enable it when creating the client:"
           "id": "file-buckets",
           "isFunc": false,
           "items": [
-            {
-              "id": "file-buckets",
-              "slug": "file-buckets",
-              "title": "File Buckets",
-              "type": "function",
-            },
             {
               "id": "file-buckets-copy",
               "product": "storage",
@@ -5632,12 +5616,6 @@ Passkey support is an experimental feature. Enable it when creating the client:"
           "id": "vector-buckets",
           "isFunc": false,
           "items": [
-            {
-              "id": "vector-buckets",
-              "slug": "vector-buckets",
-              "title": "Vector Buckets",
-              "type": "function",
-            },
             {
               "id": "vector-buckets-createbucket",
               "product": "storage",
