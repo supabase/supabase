@@ -2,7 +2,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { clientSdkIds, REFERENCES } from '~/content/navigation.references'
-import { parseTypeSpec } from '~/features/docs/Reference.typeSpec'
+import { SUPPORTS_NEW_REFERENCE_PROCESS } from '~/features/docs/Reference.constants'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { deepFilterRec } from '~/features/helpers.fn'
 import type { Json } from '~/features/helpers.types'
@@ -156,21 +156,6 @@ export function flattenCommonClientLibSections(tree: Array<AbbrevApiReferenceSec
   }, [] as Array<AbbrevApiReferenceSection>)
 }
 
-async function writeTypes() {
-  const types = await parseTypeSpec()
-
-  await writeFile(
-    join(GENERATED_DIRECTORY, 'typeSpec.json'),
-    JSON.stringify(types, (key, value) => {
-      if (key === 'methods' || key === 'variables') {
-        return Object.fromEntries(value.entries())
-      } else {
-        return value
-      }
-    })
-  )
-}
-
 async function writeSdkReferenceSections() {
   return Promise.all(
     clientSdkIds
@@ -181,6 +166,10 @@ async function writeSdkReferenceSections() {
           version,
         }))
       })
+      // Libs that opted into the new pipeline emit their own outputs via
+      // `scripts/build-reference-content.ts`. Skip them here so the legacy
+      // script doesn't need a YAML spec file for them at all.
+      .filter(({ sdkId, version }) => !SUPPORTS_NEW_REFERENCE_PROCESS.has(`${sdkId}-${version}`))
       .flatMap(async ({ sdkId, version }) => {
         const spec = await getSpec(REFERENCES[sdkId].meta[version].specFile)
 
@@ -366,7 +355,6 @@ async function run() {
     await mkdir(GENERATED_DIRECTORY, { recursive: true })
 
     await Promise.all([
-      writeTypes(),
       writeSdkReferenceSections(),
       writeCliReferenceSections(),
       writeApiReferenceSections(),
