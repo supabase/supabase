@@ -39,6 +39,8 @@ export const SignInPartner = () => {
     return () => { 
       isMounted = false
     }
+  // Intentionally omitting 'router' to prevent Next.js router reference mutations
+  // from triggering duplicate re-renders and spamming the auth endpoints.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []) 
 
