@@ -10,8 +10,10 @@ export const DefaultFormatter = (p: PropsWithChildren<RenderCellProps<SupaRow, u
   const snap = useTableEditorTableStateSnapshot()
   let value = p.row[p.column.key]
 
-  // Check if this column has sensitive data masking enabled
-  const isMasked = snap.sensitiveDataColumns.has(p.column.key as string)
+  // Check if column should be masked: marked sensitive AND not temporarily revealed
+  const isMasked =
+    snap.sensitiveDataColumns.has(p.column.key as string) &&
+    !snap.temporarilyRevealedColumns.has(p.column.key as string)
 
   if (value === null) return <NullValue />
   if (value === '') return <EmptyValue />

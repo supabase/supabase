@@ -82,16 +82,17 @@ export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
 
   function onToggleSensitiveData() {
     const isMasked = snap.sensitiveDataColumns.has(columnKey)
+    const isTemporarilyRevealed = snap.temporarilyRevealedColumns.has(columnKey)
 
-    if (isMasked) {
-      // Temporarily reveal for 5 seconds
+    if (isMasked && !isTemporarilyRevealed) {
+      // Temporarily reveal for 5 seconds (don't persist)
       const existingTimeout = tempRevealTimeouts.get(columnKey)
       if (existingTimeout) clearTimeout(existingTimeout)
 
-      state.toggleSensitiveDataColumn(columnKey) // unmask
+      state.temporarilyRevealedColumns.add(columnKey)
 
       const timeout = setTimeout(() => {
-        state.toggleSensitiveDataColumn(columnKey) // re-mask
+        state.temporarilyRevealedColumns.delete(columnKey)
         setTempRevealTimeouts((prev) => {
           const next = new Map(prev)
           next.delete(columnKey)
@@ -102,12 +103,13 @@ export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
       setTempRevealTimeouts((prev) => new Map(prev).set(columnKey, timeout))
       toast.info('Data will be hidden again in 5 seconds')
     } else {
-      // Column is currently revealed, immediately re-mask it
+      // Column is being revealed (either temp or persistent), toggle persistent mask
       const existingTimeout = tempRevealTimeouts.get(columnKey)
       if (existingTimeout) clearTimeout(existingTimeout)
 
-      state.toggleSensitiveDataColumn(columnKey) // mask
+      state.toggleSensitiveDataColumn(columnKey)
 
+      state.temporarilyRevealedColumns.delete(columnKey)
       setTempRevealTimeouts((prev) => {
         const next = new Map(prev)
         next.delete(columnKey)
@@ -203,7 +205,8 @@ export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
           )}
         </DropdownMenuItem>
         <DropdownMenuItem className="space-x-2" onClick={onToggleSensitiveData}>
-          {snap.sensitiveDataColumns.has(columnKey) ? (
+          {snap.sensitiveDataColumns.has(columnKey) &&
+          !snap.temporarilyRevealedColumns.has(columnKey) ? (
             <>
               <Eye size={14} strokeWidth={1.5} />
               <span>Show data</span>

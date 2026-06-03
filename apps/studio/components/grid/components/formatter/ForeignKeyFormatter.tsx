@@ -25,7 +25,9 @@ export const ForeignKeyFormatter = (props: Props) => {
   const snap = useTableEditorTableStateSnapshot()
   const { data: project } = useSelectedProjectQuery()
 
-  const isMasked = snap.sensitiveDataColumns.has(column.key as string)
+  const isMasked =
+    snap.sensitiveDataColumns.has(column.key as string) &&
+    !snap.temporarilyRevealedColumns.has(column.key as string)
 
   const { data, isPending: isLoading } = useTableEditorQuery({
     projectRef: project?.ref,

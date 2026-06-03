@@ -56,12 +56,12 @@ export const createTableEditorTableState = ({
   )
 
   // Initialize sensitive data columns from both column metadata and localStorage
+  // defaultSensitiveColumns: columns marked [SENSITIVE] in DB schema (source of truth)
   const defaultSensitiveColumns = new Set(
     table.columns.filter((col) => isSensitiveDataColumn(col.comment)).map((col) => col.name)
   )
-  const savedSensitiveColumns = new Set(savedState?.sensitiveDataColumns ?? [])
-  // Merge: saved state takes precedence for explicitly toggled columns
-  const allSensitiveColumns = new Set([...defaultSensitiveColumns, ...savedSensitiveColumns])
+  // userToggledColumns: columns user has explicitly toggled OFF (persisted)
+  const userToggledColumns = new Set<string>((savedState as any)?.sensitiveDataColumns ?? [])
 
   const state = proxy({
     /* Table */
@@ -88,11 +88,13 @@ export const createTableEditorTableState = ({
         { gridColumns: state.gridColumns }
       )
 
-      // Recalculate which columns should be masked based on updated column definitions
-      const updatedDefaultSensitiveColumns = new Set(
-        table.columns.filter((col) => isSensitiveDataColumn(col.comment)).map((col) => col.name)
+      // Preserve user's toggle choices across table updates
+      // Only clear toggles for columns that no longer exist
+      const currentColumnNames = new Set(table.columns.map((col) => col.name))
+      const preservedToggles = new Set(
+        Array.from(state.userToggledSensitiveColumns).filter((col) => currentColumnNames.has(col))
       )
-      state.sensitiveDataColumns = proxySet(updatedDefaultSensitiveColumns)
+      state.userToggledSensitiveColumns = proxySet(preservedToggles)
 
       state.table = supaTable
       state.gridColumns = gridColumns
@@ -114,13 +116,28 @@ export const createTableEditorTableState = ({
 
     /* Columns */
     gridColumns,
-    sensitiveDataColumns: proxySet<string>(allSensitiveColumns),
+    userToggledSensitiveColumns: proxySet<string>(userToggledColumns),
+    temporarilyRevealedColumns: proxySet<string>(),
     toggleSensitiveDataColumn: (columnKey: string) => {
-      if (state.sensitiveDataColumns.has(columnKey)) {
-        state.sensitiveDataColumns.delete(columnKey)
+      // Track which columns user has toggled OFF from their default masked state
+      if (state.userToggledSensitiveColumns.has(columnKey)) {
+        state.userToggledSensitiveColumns.delete(columnKey)
       } else {
-        state.sensitiveDataColumns.add(columnKey)
+        state.userToggledSensitiveColumns.add(columnKey)
       }
+    },
+    get sensitiveDataColumns() {
+      // Single source of truth: columns marked sensitive = defaults minus user toggles (persistent only)
+      const defaultSensitiveColumns = new Set(
+        state.table.columns
+          .filter((col) => isSensitiveDataColumn(col.comment))
+          .map((col) => col.name)
+      )
+      return new Set(
+        Array.from(defaultSensitiveColumns).filter(
+          (col) => !state.userToggledSensitiveColumns.has(col)
+        )
+      )
     },
     moveColumn: (fromKey: string, toKey: string) => {
       const fromIdx = state.gridColumns.findIndex((x) => x.key === fromKey)
@@ -278,8 +295,8 @@ export const TableEditorTableStateContextProvider = ({
           gridColumns: state.gridColumns,
           projectRef,
           tableId: state.table.id,
-          sensitiveDataColumns: Array.from(state.sensitiveDataColumns),
-        })
+          sensitiveDataColumns: Array.from(state.userToggledSensitiveColumns),
+        } as any)
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
