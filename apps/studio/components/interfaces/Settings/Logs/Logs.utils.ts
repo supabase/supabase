@@ -303,13 +303,34 @@ export const LOG_TABLE_SQL: Record<LogsTableName, SafeLogSqlFragment> = {
   [LogsTableName.PG_UPGRADE]: safeSql`pg_upgrade_logs`,
   [LogsTableName.PG_CRON]: safeSql`pg_cron_logs`,
   [LogsTableName.ETL]: safeSql`etl_replication_logs`,
+  [LogsTableName.MULTIGRES]: safeSql`multigres_logs`,
 }
 
 /**
  * SQL query to retrieve only one log
  */
-export const genSingleLogQuery = (table: LogsTableName, id: string): SafeLogSqlFragment =>
-  safeSql`select id, timestamp, event_message, metadata from ${LOG_TABLE_SQL[table]} where id = ${analyticsLiteral(id)} limit 1`
+export const genSingleLogQuery = (table: LogsTableName, id: string): SafeLogSqlFragment => {
+  // multigres logs have no metadata column
+  const metadataColumn = table === LogsTableName.MULTIGRES ? safeSql`` : safeSql`, metadata`
+  return safeSql`select id, timestamp, event_message${metadataColumn} from ${LOG_TABLE_SQL[table]} where id = ${analyticsLiteral(id)} limit 1`
+}
+
+/**
+ * Multigres logs store their structured payload as a JSON string in
+ * `event_message`. Parse it into a plain object, returning `null` when the
+ * value is missing, not valid JSON, or not a plain object (e.g. an array).
+ */
+export const parseMultigresEventMessage = (
+  eventMessage: unknown
+): Record<string, unknown> | null => {
+  if (typeof eventMessage !== 'string') return null
+  try {
+    const parsed = JSON.parse(eventMessage)
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : null
+  } catch {
+    return null
+  }
+}
 
 /**
  * Determine if we should show the user an upgrade prompt while browsing logs
@@ -699,6 +720,8 @@ function getErrorCondition(table: LogsTableName): SafeLogSqlFragment {
       return safeSql`metadata.level IN ('error', 'fatal')`
     case 'pg_cron_logs':
       return safeSql`parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')`
+    case 'multigres_logs':
+      return safeSql`JSON_VALUE(event_message, '$.level') IN ('ERROR', 'FATAL', 'PANIC')`
     default:
       return safeSql`false`
   }
@@ -716,6 +739,8 @@ function getWarningCondition(table: LogsTableName): SafeLogSqlFragment {
       return safeSql`response.status_code >= 400 AND response.status_code < 500`
     case 'function_logs':
       return safeSql`metadata.level IN ('warning')`
+    case 'multigres_logs':
+      return safeSql`JSON_VALUE(event_message, '$.level') IN ('WARN', 'WARNING')`
     default:
       return safeSql`false`
   }
@@ -830,6 +855,7 @@ const QUERY_TYPE_LABELS: Record<QueryType, string> = {
   pg_cron: 'pg_cron',
   pgbouncer: 'PgBouncer',
   etl: 'ETL',
+  multigres: 'Multigres',
 }
 
 const LOG_TABLE_TO_SERVICE_LABEL: Record<LogsTableName, string> = {
@@ -847,6 +873,7 @@ const LOG_TABLE_TO_SERVICE_LABEL: Record<LogsTableName, string> = {
   pg_upgrade_logs: 'Postgres upgrade',
   pg_cron_logs: 'pg_cron',
   etl_replication_logs: 'ETL',
+  multigres_logs: 'Multigres',
 }
 
 const isLogsTableName = (value: string): value is LogsTableName =>
