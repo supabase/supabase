@@ -1,11 +1,11 @@
 import { ColumnDef } from '@tanstack/react-table'
-import { Checkbox, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Checkbox, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { STATUS_CODE_LABELS } from '../UnifiedLogs.constants'
 import { ColumnFilterSchema, ColumnSchema } from '../UnifiedLogs.schema'
+import { parseAuthLogEventMessage } from '../UnifiedLogs.utils'
 import { HoverCardTimestamp } from './HoverCardTimestamp'
 import { LogTypeIcon } from './LogTypeIcon'
-import { TextWithTooltip } from './TextWithTooltip'
 import { DataTableColumnLevelIndicator } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnLevelIndicator'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 
@@ -184,7 +184,10 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
     {
       accessorKey: 'method',
       header: 'Method',
-      filterFn: 'arrIncludesSome',
+      // Filtering is server-side via the `filter` URL param, like every other
+      // column in this table. The built-in `arrIncludesSome` would receive the
+      // wrapped { operator, values } shape and reject it.
+      filterFn: (_row, _columnId, _filterValue) => true,
       cell: ({ row }) => {
         const value = row.getValue<ColumnSchema['method']>('method')
         return <span className="text-foreground-lighter">{value}</span>
@@ -203,10 +206,6 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
     {
       accessorKey: 'pathname',
       header: 'Pathname',
-      cell: ({ row }) => {
-        const value = row.getValue<ColumnFilterSchema['pathname']>('pathname') ?? ''
-        return <TextWithTooltip text={value} />
-      },
       enableSorting: false,
       enableResizing: false,
       size: 250,
@@ -216,14 +215,25 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
         cellClassName: 'font-mono tracking-tight w-[250px]',
         headerClassName: 'w-[250px]',
       },
+      cell: ({ row }) => {
+        const value = row.getValue<ColumnFilterSchema['pathname']>('pathname') ?? ''
+        return value
+      },
     },
     // Event message column - controlled by columnVisibility
     {
       accessorKey: 'event_message',
       header: 'Event message',
+      // No client-side filterFn — event_message uses server-side LIKE/ILIKE via
+      // the `filter` URL param (see translateFilter in UnifiedLogs.queries.ts).
+      // We still need a no-op so TanStack's default `includesString` doesn't run
+      // against the wrapped { operator, values } shape we write.
+      filterFn: () => true,
       cell: ({ row }) => {
         const value = row.getValue<ColumnSchema['event_message']>('event_message')
+        const logType = row.original.log_type
         const logCount = row.original.log_count
+        const displayMessage = logType === 'auth' ? parseAuthLogEventMessage(value) : value
 
         return (
           <div className="flex flex-row gap-2 items-center">
@@ -239,9 +249,11 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
                 </TooltipContent>
               </Tooltip>
             )}
-            {value && (
-              <span className="text-muted-foreground">
-                <TextWithTooltip text={value} />
+            {displayMessage && (
+              <span
+                className={cn('text-muted-foreground', logType === 'auth' && 'capitalize-sentence')}
+              >
+                {displayMessage}
               </span>
             )}
           </div>

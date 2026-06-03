@@ -6,13 +6,13 @@ import { EdgeFunctionRenderer } from './EdgeFunctionRenderer'
 import { render } from '@/tests/helpers'
 
 const {
-  mockSendEvent,
+  mockTrack,
   mockUseEdgeFunctionQuery,
   mockUseParams,
   mockUseProjectSettingsV2Query,
   mockUseSelectedOrganizationQuery,
 } = vi.hoisted(() => ({
-  mockSendEvent: vi.fn(),
+  mockTrack: vi.fn(),
   mockUseEdgeFunctionQuery: vi.fn(),
   mockUseParams: vi.fn(),
   mockUseProjectSettingsV2Query: vi.fn(),
@@ -36,8 +36,8 @@ vi.mock('@/data/edge-functions/edge-function-query', () => ({
   useEdgeFunctionQuery: mockUseEdgeFunctionQuery,
 }))
 
-vi.mock('@/data/telemetry/send-event-mutation', () => ({
-  useSendEventMutation: () => ({ mutate: mockSendEvent }),
+vi.mock('@/lib/telemetry/track', () => ({
+  useTrack: () => mockTrack,
 }))
 
 vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
@@ -78,7 +78,7 @@ vi.mock('./ConfirmFooter', () => ({
 
 describe('EdgeFunctionRenderer', () => {
   beforeEach(() => {
-    mockSendEvent.mockReset()
+    mockTrack.mockReset()
     mockUseEdgeFunctionQuery.mockReset()
     mockUseParams.mockReturnValue({ ref: 'project-ref' })
     mockUseProjectSettingsV2Query.mockReturnValue({ data: undefined })
@@ -106,11 +106,11 @@ describe('EdgeFunctionRenderer', () => {
 
     await user.click(screen.getByRole('button', { name: 'Deploy' }))
     expect(onApprove).not.toHaveBeenCalled()
-    expect(mockSendEvent).not.toHaveBeenCalled()
+    expect(mockTrack).not.toHaveBeenCalled()
 
     await user.click(screen.getByRole('button', { name: 'Replace function' }))
     expect(onApprove).toHaveBeenCalledTimes(1)
-    expect(mockSendEvent).toHaveBeenCalledTimes(1)
+    expect(mockTrack).toHaveBeenCalledTimes(1)
   })
 
   it('deploys immediately when no existing function is found', async () => {
@@ -131,6 +131,6 @@ describe('EdgeFunctionRenderer', () => {
     await user.click(screen.getByRole('button', { name: 'Deploy' }))
 
     expect(onApprove).toHaveBeenCalledTimes(1)
-    expect(mockSendEvent).toHaveBeenCalledTimes(1)
+    expect(mockTrack).toHaveBeenCalledTimes(1)
   })
 })

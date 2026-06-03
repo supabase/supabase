@@ -21,8 +21,6 @@ export interface DataTableInfiniteProps<TData, TValue, _TMeta> {
   totalRows?: number
   filterRows?: number
   totalRowsFetched?: number
-  isFetching?: boolean
-  isLoading?: boolean
   hasNextPage?: boolean
   fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<unknown>
   setColumnOrder: (columnOrder: string[]) => void
@@ -239,7 +237,7 @@ function DataTableRow<TData>({
   onSelect: () => void
 }) {
   useQueryState('live', searchParamsParser.live)
-  const rowClassName = (table.options.meta as any)?.getRowClassName?.(row)
+  const rowClassName = cn('group/row', (table.options.meta as any)?.getRowClassName?.(row))
   const cells = row.getVisibleCells()
 
   return (

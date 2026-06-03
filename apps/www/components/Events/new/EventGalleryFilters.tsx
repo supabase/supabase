@@ -46,6 +46,15 @@ export function EventGalleryFilters() {
             </Badge>
           )
         })}
+        {(categories['on-demand'] ?? 0) > 0 && (
+          <Badge
+            variant={selectedCategories.includes('on-demand') ? 'success' : 'default'}
+            className="cursor-pointer"
+            onClick={() => toggleCategory('on-demand')}
+          >
+            On-demand ({categories['on-demand']})
+          </Badge>
+        )}
       </div>
     </div>
   )

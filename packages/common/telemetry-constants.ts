@@ -319,10 +319,13 @@ export interface ProjectCreationDefaultPrivilegesExposedEvent {
     dataApiDefaultPrivileges: boolean
     /**
      * Raw value of the dataApiRevokeOnCreateDefault PostHog flag at exposure time.
-     * true = revoke cohort (checkbox defaulted to unchecked)
-     * false = control cohort (checkbox defaulted to checked)
+     * Accepts boolean (current rollout shape) or string (post-multivariate-migration
+     * variant name, e.g. 'test' / 'control'). See GROWTH-877 for the migration plan.
+     * true | 'test' = revoke cohort (checkbox defaulted to unchecked)
+     * false = outside the rollout (checkbox defaulted to checked)
+     * 'control' = in-experiment control arm (checkbox defaulted to checked)
      */
-    dataApiRevokeOnCreateDefaultEnabled: boolean
+    dataApiRevokeOnCreateDefaultEnabled: boolean | string
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -381,14 +384,17 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      */
     dataApiDefaultPrivilegesGranted?: boolean
     /**
-     * Whether the dataApiRevokeOnCreateDefault PostHog flag was enabled for this user.
+     * Raw value of the dataApiRevokeOnCreateDefault PostHog flag at submission time.
      * Controls only the default checkbox state of "Automatically expose new tables and functions"
      * at project creation. Tracking it lets us correlate flag cohort with user choice.
-     * true = user is in the staged rollout cohort (checkbox defaulted to unchecked)
+     * Accepts boolean (current rollout shape) or string (post-multivariate-migration
+     * variant name, e.g. 'test' / 'control'). See GROWTH-877 for the migration plan.
+     * true | 'test' = user is in the treatment arm (checkbox defaulted to unchecked)
      * false = user is outside the rollout (checkbox defaulted to checked)
+     * 'control' = in-experiment control arm (checkbox defaulted to checked)
      * omitted = PostHog flags had not loaded at the time of project creation
      */
-    dataApiRevokeOnCreateDefaultEnabled?: boolean
+    dataApiRevokeOnCreateDefaultEnabled?: boolean | string
   }
   groups: TelemetryGroups
 }
@@ -1461,6 +1467,21 @@ export interface AiAssistantInSupportFormClickedEvent {
 }
 
 /**
+ * User clicked the Assistant follow-up card after submitting a support ticket.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/support/new
+ */
+export interface SupportAssistantFollowUpCardClickedEvent {
+  action: 'support_assistant_follow_up_card_clicked'
+  properties: {
+    ticketCategory: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
  * User rated an AI assistant message with thumbs up or thumbs down.
  *
  * @group Events
@@ -1916,6 +1937,8 @@ export interface HomeConnectActionClickedEvent {
   groups: TelemetryGroups
 }
 
+export type ConnectSheetSource = 'header_button' | 'connect_section' | 'keyboard_shortcut'
+
 /**
  * User opened the ConnectSheet panel.
  *
@@ -1929,7 +1952,7 @@ export interface ConnectSheetOpenedEvent {
     /**
      * Where the sheet was opened from
      */
-    source: 'header_button' | 'connect_section'
+    source: ConnectSheetSource
   }
   groups: TelemetryGroups
 }
@@ -2427,7 +2450,6 @@ export interface LogDrainSaveButtonClickedEvent {
       | 'clickhouse'
       | 'webhook'
       | 'datadog'
-      | 'elastic'
       | 'loki'
       | 'sentry'
       | 's3'
@@ -2458,7 +2480,6 @@ export interface LogDrainRemovedEvent {
       | 'clickhouse'
       | 'webhook'
       | 'datadog'
-      | 'elastic'
       | 'loki'
       | 'sentry'
       | 's3'
@@ -2896,39 +2917,9 @@ export interface ComputeBadgeUpgradeClickedEvent {
   properties: {
     computeSize: string
     planId: string
-    upgradeType: 'pro_upgrade' | 'free_micro_upgrade' | 'compute_upgrade'
+    upgradeType: 'free_micro_upgrade' | 'compute_upgrade'
   }
   groups: TelemetryGroups
-}
-
-/**
- * Fly.io deprecation banner rendered for a user with at least one Fly.io project or branch.
- *
- * @group Events
- * @source studio
- */
-export interface FlyDeprecationBannerExposedEvent {
-  action: 'fly_deprecation_banner_exposed'
-  groups: TelemetryGroups
-  properties: {
-    primaryCount: number
-    branchCount: number
-  }
-}
-
-/**
- * User dismissed the Fly.io deprecation banner.
- *
- * @group Events
- * @source studio
- */
-export interface FlyDeprecationBannerDismissedEvent {
-  action: 'fly_deprecation_banner_dismissed'
-  groups: TelemetryGroups
-  properties: {
-    primaryCount: number
-    branchCount: number
-  }
 }
 
 /**
@@ -3370,6 +3361,7 @@ export type TelemetryEvent =
   | SupabaseUiCommandCopyButtonClickedEvent
   | SupportTicketSubmittedEvent
   | AiAssistantInSupportFormClickedEvent
+  | SupportAssistantFollowUpCardClickedEvent
   | OrganizationMfaEnforcementUpdatedEvent
   | ForeignDataWrapperCreatedEvent
   | StorageBucketCreatedEvent
@@ -3437,8 +3429,6 @@ export type TelemetryEvent =
   | OrgMenuBackClickedEvent
   | OrgMenuItemClickedEvent
   | ComputeBadgeUpgradeClickedEvent
-  | FlyDeprecationBannerExposedEvent
-  | FlyDeprecationBannerDismissedEvent
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
   | AccessTokenCreatedEvent

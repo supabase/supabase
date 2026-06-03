@@ -2,7 +2,18 @@ import { useParams } from 'common'
 import { includes, without } from 'lodash'
 import { useReducer, useState } from 'react'
 import { toast } from 'sonner'
-import { Modal, TextArea } from 'ui'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  TextArea,
+} from 'ui'
 
 import { generateUpgradeReasons } from '../helpers'
 import { useSendUpgradeFeedbackMutation } from '@/data/feedback/upgrade-survey-send'
@@ -60,23 +71,18 @@ const UpgradeSurveyModal = ({
   }
 
   return (
-    <>
-      <Modal
-        alignFooter="right"
-        size="xlarge"
-        loading={isSubmitting}
-        visible={visible}
-        onCancel={onClose}
-        onConfirm={onSubmit}
-        cancelText="Skip"
-        header="We're excited for your upgrade"
-      >
-        <Modal.Content className="space-y-4">
-          <p className="text-sm text-foreground-light">
+    <Dialog open={visible} onOpenChange={onClose}>
+      <DialogContent size="xlarge">
+        <DialogHeader>
+          <DialogTitle>We're excited for your upgrade</DialogTitle>
+          <DialogDescription>
             What reasons motivated your decision to upgrade? Your feedback helps us improve Supabase
             as much as we can.
-          </p>
-          <div className="space-y-8 mt-6">
+          </DialogDescription>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <DialogSection>
+          <div className="flex flex-col space-y-8`">
             <div className="flex flex-wrap gap-2" data-toggle="buttons">
               {upgradeReasons.map((option) => {
                 const active = selectedReasons.find((x) => x === option)
@@ -119,9 +125,17 @@ const UpgradeSurveyModal = ({
               />
             </div>
           </div>
-        </Modal.Content>
-      </Modal>
-    </>
+        </DialogSection>
+        <DialogFooter>
+          <Button type="default" disabled={isSubmitting} onClick={() => onClose()}>
+            Skip
+          </Button>
+          <Button type="primary" disabled={isSubmitting} loading={isSubmitting} onClick={onSubmit}>
+            Confirm
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 

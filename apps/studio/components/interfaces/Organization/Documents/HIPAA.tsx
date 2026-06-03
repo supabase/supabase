@@ -6,12 +6,10 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from '@/components/layouts/Scaffold'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const HIPAA = () => {
-  const { data: organization } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   return (
     <ScaffoldSection className="py-12">
@@ -39,12 +37,7 @@ export const HIPAA = () => {
               href="https://forms.supabase.com/hipaa2"
               target="_blank"
               rel="noreferrer noopener"
-              onClick={() =>
-                sendEvent({
-                  action: 'hipaa_request_button_clicked',
-                  groups: { organization: organization?.slug ?? 'Unknown' },
-                })
-              }
+              onClick={() => track('hipaa_request_button_clicked')}
             >
               Request HIPAA
             </a>

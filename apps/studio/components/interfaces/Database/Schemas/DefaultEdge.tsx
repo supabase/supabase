@@ -8,15 +8,14 @@ import {
   useReactFlow,
 } from '@xyflow/react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { useState } from 'react'
+import { memo, useCallback, useState } from 'react'
 import { Badge, cn } from 'ui'
 
 import { useSchemaGraphContext } from './SchemaGraphContext'
 import { EdgeData } from './Schemas.constants'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 
-export const DefaultEdge = ({
+const DefaultEdgeComponent = ({
   id,
   animated,
   data,
@@ -73,6 +72,8 @@ export const DefaultEdge = ({
   )
 }
 
+export const DefaultEdge = memo(DefaultEdgeComponent)
+
 const EdgeRelationInfo = ({
   data,
   source,
@@ -94,7 +95,7 @@ const EdgeRelationInfo = ({
   const [show, setShow] = useState(false)
   const reactFlowInstance = useReactFlow()
 
-  const checkIfShouldBeDisplayed = useStaticEffectEvent(
+  const checkIfShouldBeDisplayed = useCallback(
     (relationInfoElement: HTMLDivElement | null) => {
       if (!relationInfoElement) return
       const sourceNode = reactFlowInstance.getNode(source)
@@ -131,7 +132,8 @@ const EdgeRelationInfo = ({
 
       // If it is, hide it as they are too close
       setShow(!isNodeIntersectingWithSource && !isNodeIntersectingWithTarget)
-    }
+    },
+    [reactFlowInstance, source, target]
   )
 
   return (

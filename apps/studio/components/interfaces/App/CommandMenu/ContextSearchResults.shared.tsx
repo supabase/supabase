@@ -1,6 +1,6 @@
 'use client'
 
-import { cn, CommandList_Shadcn_ } from 'ui'
+import { cn, CommandList } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
 import { TextHighlighter } from 'ui-patterns/CommandMenu'
 import { CommandMenuGroup } from 'ui-patterns/CommandMenu/internal/CommandMenuGroup'
@@ -86,7 +86,7 @@ export function ResultsList({
   })
 
   return (
-    <CommandList_Shadcn_
+    <CommandList
       className={cn(
         'max-h-full! flex-1 min-h-0 overflow-y-auto overflow-x-hidden bg-transparent',
         className
@@ -106,6 +106,6 @@ export function ResultsList({
           </CommandMenuItem>
         ))}
       </CommandMenuGroup>
-    </CommandList_Shadcn_>
+    </CommandList>
   )
 }
