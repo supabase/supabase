@@ -1,15 +1,4 @@
-import {
-  ArrowDown,
-  ArrowUp,
-  ChevronDown,
-  Copy,
-  Edit,
-  Eye,
-  EyeOff,
-  Lock,
-  Trash,
-  Unlock,
-} from 'lucide-react'
+import { ArrowDown, ArrowUp, ChevronDown, Copy, Edit, Eye, Lock, Trash, Unlock } from 'lucide-react'
 import { useContext, useEffect, useState } from 'react'
 import type { CalculatedColumn } from 'react-data-grid'
 import { toast } from 'sonner'
@@ -205,20 +194,16 @@ export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
           )}
         </DropdownMenuItem>
         {(snap.sensitiveDataColumns.has(columnKey) ||
-          snap.temporarilyRevealedColumns.has(columnKey)) && (
-          <DropdownMenuItem className="space-x-2" onClick={onToggleSensitiveData}>
-            {snap.sensitiveDataColumns.has(columnKey) &&
-            !snap.temporarilyRevealedColumns.has(columnKey) ? (
-              <>
-                <Eye size={14} strokeWidth={1.5} />
-                <span>Show data</span>
-              </>
-            ) : (
-              <>
-                <EyeOff size={14} strokeWidth={1.5} />
-                <span>Hide sensitive data</span>
-              </>
-            )}
+          snap.userToggledSensitiveColumns.has(columnKey)) && (
+          <DropdownMenuItem
+            className="space-x-2"
+            disabled={snap.temporarilyRevealedColumns.has(columnKey)}
+            onClick={onToggleSensitiveData}
+          >
+            <Eye size={14} strokeWidth={1.5} />
+            <span>
+              {snap.temporarilyRevealedColumns.has(columnKey) ? 'Data revealed (5s)' : 'Show data'}
+            </span>
           </DropdownMenuItem>
         )}
         {snap.editable && (
