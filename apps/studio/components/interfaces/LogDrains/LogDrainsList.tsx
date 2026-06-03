@@ -26,11 +26,6 @@ import AlertError from '@/components/ui/AlertError'
 import { LogDrainData } from '@/data/log-drains/log-drains-query'
 import type { ResponseError } from '@/types'
 
-/**
- * Presentational list of log drains, shared between project and organization scopes.
- * Data fetching, entitlement checks and the delete mutation live in the scope-specific
- * container that renders this component.
- */
 export function LogDrainsList({
   logDrains,
   isLoading,
@@ -48,7 +43,6 @@ export function LogDrainsList({
   isDeleting?: boolean
   onNewDrainClick: (src: LogDrainType) => void
   onDeleteDrain: (drain: LogDrainData) => void
-  /** When provided, renders a "Test connection" row action (org audit log drains only). */
   onTestDrain?: (drain: LogDrainData) => void
 }) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
@@ -62,7 +56,6 @@ export function LogDrainsList({
   const syslogEnabled = useFlag('syslogLogDrain')
   const hasLogDrains = !!logDrains?.length
 
-  // Close the delete modal once a delete request completes (success or error).
   const wasDeleting = useRef(false)
   useEffect(() => {
     if (wasDeleting.current && !isDeleting) {

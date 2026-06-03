@@ -33,11 +33,6 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
-/**
- * Organization-scoped audit log drains container. Owns data fetching, the
- * `audit_log_drains` entitlement check and the create/update/delete/test mutations,
- * then renders the shared presentational form and list.
- */
 export function OrgAuditLogDrains() {
   const { slug } = useParams() as { slug: string }
   const track = useTrack()

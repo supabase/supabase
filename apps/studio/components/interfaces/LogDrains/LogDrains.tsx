@@ -10,10 +10,6 @@ import { LogDrainData, useLogDrainsQuery } from '@/data/log-drains/log-drains-qu
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useTrack } from '@/lib/telemetry/track'
 
-/**
- * Project-scoped log drains container. Owns data fetching, the `log_drains` entitlement
- * check and the delete mutation, then renders the shared presentational `LogDrainsList`.
- */
 export function LogDrains({
   onNewDrainClick,
   onUpdateDrainClick: _onUpdateDrainClick,

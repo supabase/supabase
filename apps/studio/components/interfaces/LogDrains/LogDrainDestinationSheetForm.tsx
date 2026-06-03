@@ -331,9 +331,7 @@ export function LogDrainDestinationSheetForm({
   isLoading?: boolean
   onSubmit: (values: LogDrainDestinationSubmitValues) => void
   mode: 'create' | 'update'
-  /** Names of existing drains in the current scope, used for the duplicate-name check. */
   existingDrainNames?: string[]
-  /** Called when the save button is clicked, so the caller can attach scope-aware telemetry. */
   onSaveClick?: (type: LogDrainType) => void
 }) {
   // NOTE(kamil): This used to be `any` for a long long time, but after moving to Zod,
