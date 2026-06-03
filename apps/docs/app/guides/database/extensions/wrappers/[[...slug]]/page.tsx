@@ -15,7 +15,7 @@ import { linkTransform, type UrlTransformFunction } from '~/lib/mdx/plugins/rehy
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
-import { getGitHubFileContents, octokit, OCTOKIT_RETRY_OPTIONS } from '~/lib/octokit'
+import { getGitHubFileContents, octokit } from '~/lib/octokit'
 import type { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 import { isFeatureEnabled } from 'common'
 import matter from 'gray-matter'
@@ -32,19 +32,53 @@ const repo = 'wrappers'
 const docsDir = 'docs/catalog'
 const externalSite = 'https://supabase.github.io/wrappers'
 
-async function getLatestDocsTag() {
+type DocsTagsQueryResponse = {
+  repository: {
+    refs: {
+      nodes: { name: string }[] | null
+      pageInfo: { hasNextPage: boolean; endCursor: string | null }
+    }
+  }
+}
+
+const docsTagsQuery = `
+  query DocsTagsQuery($owner: String!, $name: String!, $after: String) {
+    repository(owner: $owner, name: $name) {
+      refs(
+        refPrefix: "refs/tags/",
+        orderBy: { field: TAG_COMMIT_DATE, direction: DESC },
+        first: 5,
+        after: $after
+      ) {
+        nodes { name }
+        pageInfo { hasNextPage endCursor }
+      }
+    }
+  }
+`
+
+async function getLatestDocsTag(after: string | null = null): Promise<string | null> {
   try {
-    const { data } = await octokit().request('GET /repos/{owner}/{repo}/git/matching-refs/{ref}', {
+    /**
+     * We use GraphQL as it's the only way to use `orderBy` on Github API.
+     */
+    const {
+      repository: {
+        refs: {
+          nodes,
+          pageInfo: { hasNextPage, endCursor },
+        },
+      },
+    } = await octokit().graphql<DocsTagsQueryResponse>(docsTagsQuery, {
       owner: org,
-      repo,
-      ref: 'tags/docs',
-      request: OCTOKIT_RETRY_OPTIONS,
+      name: repo,
+      after,
     })
 
-    const latestRef = data.at(-1)
-
-    const latestTag = latestRef?.ref.replace(/^refs\/tags\//, '')
-    return latestTag
+    return (
+      nodes?.find(({ name }) => /^docs_v\d+\.\d+\.\d+/.test(name))?.name ??
+      (hasNextPage && endCursor ? await getLatestDocsTag(endCursor) : null)
+    )
   } catch (error) {
     console.error(`Error fetching docs tags for wrappers federated pages: ${error}`)
     return null
@@ -397,6 +431,7 @@ const getContent = async (params: Params) => {
     ;({ remoteFile, meta } = federatedPage)
 
     const tag = await getLatestDocsTag()
+
     if (!tag) {
       throw new Error('No latest docs tag found for federated wrappers pages')
     }
