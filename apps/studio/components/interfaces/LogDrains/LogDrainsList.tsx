@@ -1,4 +1,4 @@
-import { IS_PLATFORM, useFlag } from 'common'
+import { IS_PLATFORM } from 'common'
 import { MoreHorizontal, PlugZap, TrashIcon } from 'lucide-react'
 import { cloneElement, useEffect, useRef, useState } from 'react'
 import {
@@ -21,6 +21,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 import { LogDrainsCard } from './LogDrainsCard'
+import { useEnabledLogDrainTypes } from './useEnabledLogDrainTypes'
 import { VoteLink } from './VoteLink'
 import AlertError from '@/components/ui/AlertError'
 import { LogDrainData } from '@/data/log-drains/log-drains-query'
@@ -48,12 +49,7 @@ export function LogDrainsList({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedLogDrain, setSelectedLogDrain] = useState<LogDrainData | null>(null)
 
-  const sentryEnabled = useFlag('SentryLogDrain')
-  const s3Enabled = useFlag('S3logdrain')
-  const axiomEnabled = useFlag('axiomLogDrain')
-  const otlpEnabled = useFlag('otlpLogDrain')
-  const last9Enabled = useFlag('Last9LogDrain')
-  const syslogEnabled = useFlag('syslogLogDrain')
+  const enabledDrainTypes = useEnabledLogDrainTypes()
   const hasLogDrains = !!logDrains?.length
 
   const wasDeleting = useRef(false)
@@ -81,15 +77,7 @@ export function LogDrainsList({
     return (
       <>
         <div className="grid lg:grid-cols-3 gap-4">
-          {LOG_DRAIN_TYPES.filter((t) => {
-            if (t.value === 'sentry') return sentryEnabled
-            if (t.value === 's3') return s3Enabled
-            if (t.value === 'axiom') return axiomEnabled
-            if (t.value === 'otlp') return otlpEnabled
-            if (t.value === 'last9') return last9Enabled
-            if (t.value === 'syslog') return syslogEnabled
-            return true
-          }).map((src) => (
+          {enabledDrainTypes.map((src) => (
             <LogDrainsCard
               key={src.value}
               title={src.name}

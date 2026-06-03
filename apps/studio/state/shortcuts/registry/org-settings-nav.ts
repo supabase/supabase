@@ -83,7 +83,7 @@ export const orgSettingsNavRegistry: RegistryDefinations<OrgSettingsNavShortcutI
   [ORG_SETTINGS_NAV_SHORTCUT_IDS.NAV_ORG_SETTINGS_AUDIT_LOG_DRAINS]: {
     id: ORG_SETTINGS_NAV_SHORTCUT_IDS.NAV_ORG_SETTINGS_AUDIT_LOG_DRAINS,
     label: 'Go to Audit log drains',
-    sequence: ['S', 'R'],
+    sequence: ['S', 'N'],
     showInSettings: false,
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_ORG_SETTINGS,
     options: { ignoreInputs: true },

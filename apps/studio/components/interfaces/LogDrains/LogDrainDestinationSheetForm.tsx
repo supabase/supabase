@@ -440,8 +440,10 @@ export function LogDrainDestinationSheetForm({
                   return
                 }
 
-                form.handleSubmit((values) => onSubmit(toSubmitValues(values)))(e)
-                onSaveClick?.(form.getValues('type'))
+                form.handleSubmit((values) => {
+                  onSubmit(toSubmitValues(values))
+                  onSaveClick?.(values.type)
+                })(e)
               }}
             >
               <div className="space-y-8 px-content">

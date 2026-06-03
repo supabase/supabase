@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IS_PLATFORM, useFlag, useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { ChevronDown } from 'lucide-react'
 import { cloneElement, useState, type ReactElement } from 'react'
 import { toast } from 'sonner'
@@ -16,10 +16,8 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { LogDrainDestinationSheetForm } from '@/components/interfaces/LogDrains/LogDrainDestinationSheetForm'
 import { LogDrains } from '@/components/interfaces/LogDrains/LogDrains'
-import {
-  LOG_DRAIN_TYPES,
-  LogDrainType,
-} from '@/components/interfaces/LogDrains/LogDrains.constants'
+import { LogDrainType } from '@/components/interfaces/LogDrains/LogDrains.constants'
+import { useEnabledLogDrainTypes } from '@/components/interfaces/LogDrains/useEnabledLogDrainTypes'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
@@ -57,12 +55,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
   const { hasAccess: hasAccessToLogDrains, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('log_drains')
 
-  const sentryEnabled = useFlag('SentryLogDrain')
-  const s3Enabled = useFlag('S3logdrain')
-  const axiomEnabled = useFlag('axiomLogDrain')
-  const otlpEnabled = useFlag('otlpLogDrain')
-  const last9Enabled = useFlag('Last9LogDrain')
-  const syslogEnabled = useFlag('syslogLogDrain')
+  const enabledDrainTypes = useEnabledLogDrainTypes()
 
   const { data: logDrains } = useLogDrainsQuery(
     { ref },
@@ -237,15 +230,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
                     />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" side="bottom">
-                    {LOG_DRAIN_TYPES.filter((t) => {
-                      if (t.value === 'sentry') return sentryEnabled
-                      if (t.value === 's3') return s3Enabled
-                      if (t.value === 'axiom') return axiomEnabled
-                      if (t.value === 'otlp') return otlpEnabled
-                      if (t.value === 'last9') return last9Enabled
-                      if (t.value === 'syslog') return syslogEnabled
-                      return true
-                    }).map((drainType) => (
+                    {enabledDrainTypes.map((drainType) => (
                       <DropdownMenuItem
                         key={drainType.value}
                         onClick={() => handleNewClick(drainType.value)}

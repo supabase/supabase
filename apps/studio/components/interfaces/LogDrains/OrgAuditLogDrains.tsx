@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IS_PLATFORM, useFlag, useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { ChevronDown } from 'lucide-react'
 import { cloneElement, useState } from 'react'
 import { toast } from 'sonner'
@@ -15,8 +15,9 @@ import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { LogDrainDestinationSheetForm } from './LogDrainDestinationSheetForm'
-import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
+import { LogDrainType } from './LogDrains.constants'
 import { LogDrainsList } from './LogDrainsList'
+import { useEnabledLogDrainTypes } from './useEnabledLogDrainTypes'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useAuditLogDrainsQuery } from '@/data/log-drains/audit-log-drains-query'
@@ -54,12 +55,7 @@ export function OrgAuditLogDrains() {
   const [pendingLogDrainValues, setPendingLogDrainValues] =
     useState<AuditLogDrainCreateVariables | null>(null)
 
-  const sentryEnabled = useFlag('SentryLogDrain')
-  const s3Enabled = useFlag('S3logdrain')
-  const axiomEnabled = useFlag('axiomLogDrain')
-  const otlpEnabled = useFlag('otlpLogDrain')
-  const last9Enabled = useFlag('Last9LogDrain')
-  const syslogEnabled = useFlag('syslogLogDrain')
+  const enabledDrainTypes = useEnabledLogDrainTypes()
 
   const {
     data: logDrains,
@@ -105,15 +101,6 @@ export function OrgAuditLogDrains() {
   })
 
   const isLoading = createLoading || updateLoading
-  const filteredDrainTypes = LOG_DRAIN_TYPES.filter((t) => {
-    if (t.value === 'sentry') return sentryEnabled
-    if (t.value === 's3') return s3Enabled
-    if (t.value === 'axiom') return axiomEnabled
-    if (t.value === 'otlp') return otlpEnabled
-    if (t.value === 'last9') return last9Enabled
-    if (t.value === 'syslog') return syslogEnabled
-    return true
-  })
 
   function handleNewClick(src: LogDrainType) {
     setSelectedLogDrain({ type: src })
@@ -185,7 +172,7 @@ export function OrgAuditLogDrains() {
                 />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" side="bottom">
-                {filteredDrainTypes.map((drainType) => (
+                {enabledDrainTypes.map((drainType) => (
                   <DropdownMenuItem
                     key={drainType.value}
                     onClick={() => handleNewClick(drainType.value)}
@@ -241,7 +228,8 @@ export function OrgAuditLogDrains() {
             setIsCreateConfirmModalOpen(true)
           } else {
             if (!selectedLogDrain?.token) {
-              throw new Error('Audit log drain token is required')
+              toast.error('Audit log drain token is required')
+              return
             }
             updateLogDrain(logDrainValues)
           }
@@ -267,6 +255,7 @@ export function OrgAuditLogDrains() {
         variant="default"
         title="Confirm Audit Log Drain Creation"
         visible={isCreateConfirmModalOpen}
+        loading={createLoading}
         onConfirm={() => {
           if (pendingLogDrainValues) {
             createLogDrain(pendingLogDrainValues)

@@ -26,7 +26,6 @@ export async function getAuditLogDrains({ slug }: AuditLogDrainsVariables, signa
 }
 
 export type AuditLogDrainsData = LogDrainData[]
-export type AuditLogDrainData = LogDrainData
 export type AuditLogDrainsError = ResponseError
 
 export const useAuditLogDrainsQuery = <TData = AuditLogDrainsData>(
