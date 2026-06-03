@@ -1,6 +1,5 @@
 import { BookOpen, Check, ChevronsUpDown, Copy, ExternalLink, List, X } from 'lucide-react'
 import Link from 'next/link'
-import { Popover as PopoverPrimitive } from 'radix-ui'
 import { useState } from 'react'
 import { logConstants } from 'shared-data'
 import {
@@ -14,7 +13,9 @@ import {
   CommandList,
   copyToClipboard,
   Popover,
+  PopoverContent,
   PopoverTrigger,
+  ScrollArea,
   SidePanel,
   Tooltip,
   TooltipContent,
@@ -101,7 +102,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
           </SidePanel.Content>
           <SidePanel.Separator />
           <div className="px-4 pb-4 flex flex-col gap-4">
-            <Popover open={open} onOpenChange={setOpen}>
+            <Popover open={open} onOpenChange={setOpen} modal={false}>
               <PopoverTrigger asChild>
                 <Button
                   type="default"
@@ -114,39 +115,36 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
                   {selectedSchema?.name ?? 'Select source...'}
                 </Button>
               </PopoverTrigger>
-              <PopoverPrimitive.Content
-                align="center"
-                sideOffset={4}
-                style={{ width: 'var(--radix-popover-trigger-width)' }}
-                className="z-50 rounded-md border border-overlay bg-overlay p-0 text-popover-foreground shadow-md outline-hidden animate-in data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
-              >
+              <PopoverContent className="p-0 pointer-events-auto" sameWidthAsTrigger>
                 <Command>
                   <CommandInput placeholder="Search source..." />
-                  <CommandList>
+                  <CommandList onWheel={(event) => event.stopPropagation()}>
                     <CommandEmpty>No source found.</CommandEmpty>
                     <CommandGroup>
-                      {logConstants.schemas.map((schema) => (
-                        <CommandItem
-                          key={schema.reference}
-                          value={schema.reference}
-                          onSelect={() => {
-                            setSelectedSchema(schema)
-                            setOpen(false)
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              'mr-2 h-4 w-4',
-                              selectedSchema === schema ? 'opacity-100' : 'opacity-0'
-                            )}
-                          />
-                          {schema.name}
-                        </CommandItem>
-                      ))}
+                      <ScrollArea className={logConstants.schemas.length > 7 ? 'h-[210px]' : ''}>
+                        {logConstants.schemas.map((schema) => (
+                          <CommandItem
+                            key={schema.reference}
+                            value={schema.reference}
+                            onSelect={() => {
+                              setSelectedSchema(schema)
+                              setOpen(false)
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                'mr-2 h-4 w-4',
+                                selectedSchema === schema ? 'opacity-100' : 'opacity-0'
+                              )}
+                            />
+                            {schema.name}
+                          </CommandItem>
+                        ))}
+                      </ScrollArea>
                     </CommandGroup>
                   </CommandList>
                 </Command>
-              </PopoverPrimitive.Content>
+              </PopoverContent>
             </Popover>
             <Table
               head={[
