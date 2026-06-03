@@ -232,7 +232,7 @@ test.describe('Database', () => {
         page,
         'pg-meta',
         ref,
-        'tables?include_columns=true&included_schemas=public'
+        'query?key=project:default-schema:public-infinite_tables'
       )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/tables?schema=public`))
       await wait
@@ -256,7 +256,7 @@ test.describe('Database', () => {
         page,
         'pg-meta',
         ref,
-        'tables?include_columns=true&included_schemas=auth'
+        'query?key=project:default-schema:auth-infinite_tables'
       )
       await page.getByRole('option', { name: 'auth' }).click()
       await authSchemaWait
@@ -293,7 +293,7 @@ test.describe('Database', () => {
         page,
         'pg-meta',
         ref,
-        'tables?include_columns=true&included_schemas=public'
+        'query?key=project:default-schema:public-infinite_tables'
       )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/tables?schema=public`))
       // Wait for database tables to be populated
@@ -313,7 +313,6 @@ test.describe('Database', () => {
 
       // validate table creation
       await createTableWait
-      await waitForDatabaseToLoad(page, ref)
       await expect(page.getByRole('dialog')).not.toBeVisible()
 
       await expect(page.getByText(databaseTableNameNew, { exact: true })).toBeVisible()
@@ -435,7 +434,7 @@ test.describe('Database', () => {
         page,
         'pg-meta',
         ref,
-        'tables?include_columns=true&included_schemas=public'
+        'query?key=project:default-schema:public-infinite_tables'
       )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/tables?schema=public`))
 

@@ -850,7 +850,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `API_JWT_JWKS` | JWT | Both | JWKS JSON used to verify tenant JWTs during self-host seeding. Read by `priv/repo/seeds.exs` and `priv/repo/dev_seeds.exs`. | Used only by the seed script (`SEED_SELF_HOST=true`). Required when using the new API keys and new auth. |
+| `API_JWT_JWKS` | JWKS | Both | JSON Web Key Set used to verify tenant JWTs during self-host seeding. Read by `priv/repo/seeds.exs` and `priv/repo/dev_seeds.exs`. | Used only by the seed script (`SEED_SELF_HOST=true`). Required when using the new API keys and new auth. |
 | `API_JWT_SECRET` | string | Both | Symmetric HS256 secret used to sign tokens for the tenant management API and the default self-host tenant. | Required for the tenant management API in production. |
 | `API_TOKEN_BLOCKLIST` | string (CSV) | Self-hosted | Comma-separated list of tokens blocked from tenant management API access. | Default: empty list. |
 | `APP_NAME` | string | Both | Application/node name. Used to build the Phoenix endpoint URL host, libcluster DNS basename, and Erlang `RELEASE_NODE`. | Required - raises `APP_NAME not available` if empty. Default: empty (build) / `realtime` (Erlang release script). |
