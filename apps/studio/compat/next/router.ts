@@ -142,7 +142,13 @@ export function useRouter() {
       // downstream `.split('/')` calls crash.
       route: pathPattern,
       query: { ...params, ...search },
-      asPath: location.href,
+      // Next's pages-router `asPath` is path + query + hash (with basePath),
+      // *without* the origin. Returning `location.href` here regresses any
+      // consumer that does prefix/suffix checks against route segments —
+      // e.g. OrganizationSettingsMenu compares `asPath` against `/org/foo/
+      // general` to drive the active-state, which never matches when the
+      // value starts with `http://localhost:8082/...`.
+      asPath: `${location.pathname}${location.search}${location.hash}`,
       // Mirror Next's pages-router contract for `basePath`:
       //   - no basePath configured → '' (empty string)
       //   - configured            → '/dashboard' (leading slash, no trailing)
