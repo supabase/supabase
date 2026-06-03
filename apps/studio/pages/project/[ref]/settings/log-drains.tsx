@@ -128,6 +128,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             type: selectedLogDrain?.type ? selectedLogDrain.type : 'webhook',
           }}
           isLoading={isLoading}
+          existingDrainNames={logDrains?.map((drain) => drain.name) ?? []}
           onSubmit={({ name, description, type, ...values }) => {
             const logDrainValues = {
               name,

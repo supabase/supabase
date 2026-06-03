@@ -22,8 +22,8 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 
-import { AuditLogDrainDestinationSheetForm } from '@/components/interfaces/AuditLogDrains/AuditLogDrainDestinationSheetForm'
 import { AuditLogDrains } from '@/components/interfaces/AuditLogDrains/AuditLogDrains'
+import { LogDrainDestinationSheetForm } from '@/components/interfaces/LogDrains/LogDrainDestinationSheetForm'
 import {
   LOG_DRAIN_TYPES,
   LogDrainType,
@@ -196,7 +196,7 @@ const AuditLogDrainsSettings: NextPageWithLayout = () => {
         </PageHeaderMeta>
       </PageHeader>
 
-      <AuditLogDrainDestinationSheetForm
+      <LogDrainDestinationSheetForm
         mode={mode}
         open={open}
         onOpenChange={(v) => {
@@ -210,6 +210,8 @@ const AuditLogDrainsSettings: NextPageWithLayout = () => {
           type: selectedLogDrain?.type ? selectedLogDrain.type : 'webhook',
         }}
         isLoading={isLoading}
+        existingDrainNames={logDrains?.map((drain) => drain.name) ?? []}
+        saveShortcutId={SHORTCUT_IDS.AUDIT_LOG_DRAINS_SAVE_DESTINATION}
         onSubmit={({ name, description, type, ...values }) => {
           const logDrainValues = {
             name,

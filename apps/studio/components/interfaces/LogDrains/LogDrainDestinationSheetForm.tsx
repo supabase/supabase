@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IS_PLATFORM, useFlag, useParams } from 'common'
+import { IS_PLATFORM, useFlag } from 'common'
 import Link from 'next/link'
 import { ReactNode, useEffect, useMemo, useRef } from 'react'
 import { useForm } from 'react-hook-form'
@@ -53,11 +53,11 @@ import {
 } from './LogDrains.utils'
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { Shortcut } from '@/components/ui/Shortcut'
-import { LogDrainData, useLogDrainsQuery } from '@/data/log-drains/log-drains-query'
+import { LogDrainData } from '@/data/log-drains/log-drains-query'
 import { DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { httpEndpointUrlSchema } from '@/lib/validation/http-url'
-import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { SHORTCUT_IDS, type ShortcutId } from '@/state/shortcuts/registry'
 
 const FORM_ID = 'log-drain-destination-form'
 
@@ -321,6 +321,8 @@ export function LogDrainDestinationSheetForm({
   onSubmit,
   isLoading,
   mode,
+  existingDrainNames = [],
+  saveShortcutId = SHORTCUT_IDS.LOG_DRAINS_SAVE_DESTINATION,
 }: {
   open: boolean
   onOpenChange: (v: boolean) => void
@@ -328,6 +330,10 @@ export function LogDrainDestinationSheetForm({
   isLoading?: boolean
   onSubmit: (values: LogDrainDestinationSubmitValues) => void
   mode: 'create' | 'update'
+  /** Existing drain names used to enforce a unique destination name on create. */
+  existingDrainNames?: string[]
+  /** Shortcut bound to the "Save destination" button — lets callers scope it to their page. */
+  saveShortcutId?: ShortcutId
 }) {
   // NOTE(kamil): This used to be `any` for a long long time, but after moving to Zod,
   // it produces a correct union type of all possible configs. Unfortunately, this type was not designed correctly
@@ -348,11 +354,6 @@ export function LogDrainDestinationSheetForm({
   const otlpEnabled = useFlag('otlpLogDrain')
   const last9Enabled = useFlag('Last9LogDrain')
   const syslogEnabled = useFlag('syslogLogDrain')
-
-  const { ref } = useParams()
-  const { data: logDrains } = useLogDrainsQuery({
-    ref,
-  })
 
   const track = useTrack()
   const formRef = useRef<HTMLFormElement>(null)
@@ -435,8 +436,7 @@ export function LogDrainDestinationSheetForm({
 
                 // Temp check to make sure the name is unique
                 const logDrainName = form.getValues('name')
-                const logDrainExists =
-                  !!logDrains?.length && logDrains?.find((drain) => drain.name === logDrainName)
+                const logDrainExists = existingDrainNames.includes(logDrainName)
                 if (logDrainExists && mode === 'create') {
                   toast.error('Log drain name already exists')
                   return
@@ -1039,7 +1039,7 @@ export function LogDrainDestinationSheetForm({
               <TaxDisclaimer />
             </div>
             <Shortcut
-              id={SHORTCUT_IDS.LOG_DRAINS_SAVE_DESTINATION}
+              id={saveShortcutId}
               onTrigger={() => formRef.current?.requestSubmit()}
               options={{ enabled: open && !isLoading }}
               side="top"
