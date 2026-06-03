@@ -15,7 +15,7 @@ import { linkTransform, type UrlTransformFunction } from '~/lib/mdx/plugins/rehy
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
-import { getGitHubFileContents } from '~/lib/octokit'
+import { getGitHubFileContents, octokit, OCTOKIT_RETRY_OPTIONS } from '~/lib/octokit'
 import type { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 import { isFeatureEnabled } from 'common'
 import matter from 'gray-matter'
@@ -29,9 +29,27 @@ import { Admonition } from 'ui-patterns'
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
 const repo = 'wrappers'
-const branch = 'main'
 const docsDir = 'docs/catalog'
 const externalSite = 'https://supabase.github.io/wrappers'
+
+async function getLatestDocsTag() {
+  try {
+    const { data } = await octokit().request('GET /repos/{owner}/{repo}/git/matching-refs/{ref}', {
+      owner: org,
+      repo,
+      ref: 'tags/docs',
+      request: OCTOKIT_RETRY_OPTIONS,
+    })
+
+    const latestRef = data.at(-1)
+
+    const latestTag = latestRef?.ref.replace(/^refs\/tags\//, '')
+    return latestTag
+  } catch (error) {
+    console.error(`Error fetching docs tags for wrappers federated pages: ${error}`)
+    return null
+  }
+}
 
 // Each external docs page is mapped to a local page
 const pageMap = [
@@ -378,16 +396,21 @@ const getContent = async (params: Params) => {
     let remoteFile: string
     ;({ remoteFile, meta } = federatedPage)
 
-    editLink = `${org}/${repo}/blob/${branch}/${docsDir}/${remoteFile}`
+    const tag = await getLatestDocsTag()
+    if (!tag) {
+      throw new Error('No latest docs tag found for federated wrappers pages')
+    }
+
+    editLink = `${org}/${repo}/blob/${tag}/${docsDir}/${remoteFile}`
 
     let rawContent = await getGitHubFileContents({
       org,
       repo,
       path: `${docsDir}/${remoteFile}`,
-      branch,
+      branch: tag,
     })
 
-    assetsBaseUrl = `https://raw.githubusercontent.com/${org}/${repo}/${branch}/docs/assets/`
+    assetsBaseUrl = `https://raw.githubusercontent.com/${org}/${repo}/${tag}/docs/assets/`
 
     const { content: contentWithoutFrontmatter } = matter(rawContent)
     content = removeRedundantH1(contentWithoutFrontmatter)
