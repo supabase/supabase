@@ -179,12 +179,12 @@ export function useRouter() {
       route: pathPattern,
       query: { ...params, ...search },
       // Next's pages-router `asPath` is path + query + hash (with basePath),
-      // *without* the origin. Returning `location.href` here regresses any
-      // consumer that does prefix/suffix checks against route segments —
-      // e.g. OrganizationSettingsMenu compares `asPath` against `/org/foo/
-      // general` to drive the active-state, which never matches when the
-      // value starts with `http://localhost:8082/...`.
-      asPath: `${location.pathname}${location.search}${location.hash}`,
+      // *without* the origin. Use TanStack's `location.href` which is
+      // already path+search+hash, basepath-included, no origin. Avoid
+      // hand-concatenating from `location.search` — that's the parsed
+      // search object, not a string; `${location.search}` throws
+      // "Cannot convert object to primitive value" during SSR prerender.
+      asPath: location.href,
       // Mirror Next's pages-router contract for `basePath`:
       //   - no basePath configured → '' (empty string)
       //   - configured            → '/dashboard' (leading slash, no trailing)
