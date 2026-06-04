@@ -554,7 +554,13 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
           >
             Cancel
           </Button>
-          <Button type="primary" form={formId} htmlType="submit" disabled={isExecuting}>
+          <Button
+            type="primary"
+            form={formId}
+            htmlType="submit"
+            disabled={isExecuting}
+            loading={isExecuting}
+          >
             Create index
           </Button>
         </SheetFooter>
