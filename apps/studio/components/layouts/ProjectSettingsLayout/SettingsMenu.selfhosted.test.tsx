@@ -42,6 +42,7 @@ describe('useGenerateSettingsMenu (self-hosted)', () => {
       projectSettingsLegacyJwtKeys: false,
       billingAll: true,
       logsAll: true,
+      projectSettingsLogDrains: true,
     } as any)
   })
 
@@ -63,6 +64,21 @@ describe('useGenerateSettingsMenu (self-hosted)', () => {
       projectSettingsLegacyJwtKeys: false,
       billingAll: true,
       logsAll: false,
+      projectSettingsLogDrains: true,
+    } as any)
+
+    const { result } = renderHook(() => useGenerateSettingsMenu())
+    const configGroup = result.current.find((group) => group.title === 'Configuration')
+
+    expect(configGroup?.items.some((item) => item.key === 'log-drains')).toBe(false)
+  })
+
+  it('hides Log Drains in self-hosted mode when project_settings:log_drains is disabled', () => {
+    vi.mocked(useIsFeatureEnabled).mockReturnValue({
+      projectSettingsLegacyJwtKeys: false,
+      billingAll: true,
+      logsAll: true,
+      projectSettingsLogDrains: false,
     } as any)
 
     const { result } = renderHook(() => useGenerateSettingsMenu())

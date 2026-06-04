@@ -19,8 +19,18 @@ export const useGenerateSettingsMenu = () => {
   const {
     projectSettingsLegacyJwtKeys: legacyJwtKeysEnabled,
     billingAll: billingEnabled,
-    logsAll: showLogDrains,
-  } = useIsFeatureEnabled(['project_settings:legacy_jwt_keys', 'billing:all', 'logs:all'])
+    logsAll,
+    projectSettingsLogDrains,
+  } = useIsFeatureEnabled([
+    'project_settings:legacy_jwt_keys',
+    'billing:all',
+    'logs:all',
+    'project_settings:log_drains',
+  ])
+
+  // Log drains rely on the analytics backend (gated by logs:all) and on the dedicated
+  // log_drains flag. Keep this in sync with ProjectSettings.Commands.tsx.
+  const showLogDrains = logsAll && projectSettingsLogDrains
 
   const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 

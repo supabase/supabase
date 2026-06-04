@@ -46,6 +46,7 @@ describe('useGenerateSettingsMenu', () => {
       projectSettingsLegacyJwtKeys: false,
       billingAll: true,
       logsAll: true,
+      projectSettingsLogDrains: true,
     } as any)
   })
 
@@ -101,7 +102,7 @@ describe('useGenerateSettingsMenu', () => {
     expect(configurationGroup?.items.some((item) => item.name === 'Dashboard')).toBe(false)
   })
 
-  it('includes log drains when logs:all is enabled', () => {
+  it('includes log drains when logs:all and project_settings:log_drains are enabled', () => {
     const { result } = renderHook(() => useGenerateSettingsMenu())
     const configurationGroup = result.current.find((group) => group.title === 'Configuration')
 
@@ -113,6 +114,21 @@ describe('useGenerateSettingsMenu', () => {
       projectSettingsLegacyJwtKeys: false,
       billingAll: true,
       logsAll: false,
+      projectSettingsLogDrains: true,
+    } as any)
+
+    const { result } = renderHook(() => useGenerateSettingsMenu())
+    const configurationGroup = result.current.find((group) => group.title === 'Configuration')
+
+    expect(configurationGroup?.items.some((item) => item.key === 'log-drains')).toBe(false)
+  })
+
+  it('hides log drains when project_settings:log_drains is disabled', () => {
+    vi.mocked(useIsFeatureEnabled).mockReturnValue({
+      projectSettingsLegacyJwtKeys: false,
+      billingAll: true,
+      logsAll: true,
+      projectSettingsLogDrains: false,
     } as any)
 
     const { result } = renderHook(() => useGenerateSettingsMenu())
