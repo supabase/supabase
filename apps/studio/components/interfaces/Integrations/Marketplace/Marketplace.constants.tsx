@@ -39,6 +39,9 @@ export const FEATURED_INTEGRATION_IDS = [
   'aikido-security',
   'doppler',
   'resend',
+  'cron',
+  'queues',
+  'data_api',
 ] as const
 
 export type MarketplaceIntegrationType = 'oauth' | 'postgres_extension' | 'template' | 'wrapper'
