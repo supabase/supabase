@@ -112,8 +112,8 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
             isTransparent && 'border-transparent backdrop-blur-none'
           )}
         >
-          <div className="relative flex justify-between h-16 mx-auto lg:container lg:px-16 xl:px-20">
-            <div className="flex items-center px-6 lg:px-0 flex-1 sm:items-stretch justify-between">
+          <div className="relative flex justify-between h-16 mx-auto max-w-[var(--container-max-w,75rem)] px-6 w-full">
+            <div className="flex items-center flex-1 sm:items-stretch justify-between">
               <div className="flex items-center">
                 <div className="flex items-center shrink-0">
                   <RightClickBrandLogo />
