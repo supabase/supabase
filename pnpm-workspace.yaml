@@ -59,6 +59,12 @@ minimumReleaseAgeExclude:
   - mermaid
   - '@mermaid-js/parser'
 
+packageExtensions:
+  swiper@*:
+    peerDependencies:
+      react: '*'
+      react-dom: '*'
+
 onlyBuiltDependencies:
   - node-pty
   - supabase

@@ -1,0 +1,1 @@
+export { filterTemplates } from 'templates'

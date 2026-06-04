@@ -1,0 +1,11 @@
+{
+  "id": "storage-image-colors",
+  "name": "Image Color Extraction",
+  "description": "Extract primary and secondary vibrant colors from uploaded images via storage trigger and an Edge Function",
+  "category": "Storage",
+  "version": "1.0.0",
+  "tags": ["storage", "images", "colors", "palette", "media", "triggers", "functions"],
+  "dependencies": {
+    "required": ["storage", "database", "functions"]
+  }
+}

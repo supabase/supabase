@@ -1,6 +1,6 @@
 import { range } from 'lib/helpers'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import { cn } from 'ui'
 import { TweetCard } from 'ui-patterns/TweetCard'
 
@@ -15,7 +15,8 @@ interface Props {
 const tweetsData = topTweets
 
 const TwitterSocialProof: React.FC<Props> = ({ className }) => {
-  const { basePath } = useRouter()
+  const router = useRouter()
+  const basePath = router?.basePath ?? ''
   const isSm = useBreakpoint()
   const isMd = useBreakpoint(1024)
 

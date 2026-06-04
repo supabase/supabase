@@ -1,0 +1,21 @@
+{
+  "id": "multi-tenant-rbac",
+  "name": "Multi-tenant RBAC",
+  "description": "Organizations, membership roles, permissions, and tenant-scoped RLS policies",
+  "category": "Auth",
+  "version": "1.0.0",
+  "tags": [
+    "multi-tenant",
+    "organizations",
+    "rbac",
+    "permissions",
+    "rls",
+    "saas"
+  ],
+  "dependencies": {
+    "required": [
+      "auth",
+      "database"
+    ]
+  }
+}

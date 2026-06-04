@@ -1,0 +1,3 @@
+[storage]
+enabled = true
+file_size_limit = "50MB"

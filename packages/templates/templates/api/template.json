@@ -1,0 +1,17 @@
+{
+  "id": "api",
+  "name": "Data API",
+  "description": "PostgREST API for database access over HTTP",
+  "category": "API",
+  "version": "1.0.0",
+  "tags": [
+    "api",
+    "rest",
+    "postgrest"
+  ],
+  "dependencies": {
+    "required": [
+      "database"
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "id": "app-rate-limits",
+  "name": "App Rate Limits",
+  "description": "Application-level usage quotas and cost guards with fixed-window and token-bucket helpers",
+  "category": "Security",
+  "version": "1.0.0",
+  "tags": ["rate-limits", "quotas", "usage", "security", "cost-controls"],
+  "dependencies": {
+    "required": ["database", "api"]
+  }
+}

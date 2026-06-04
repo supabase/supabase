@@ -1,0 +1,17 @@
+{
+  "id": "realtime-comments",
+  "name": "Realtime Comments",
+  "description": "Comments table configured for realtime collaborative feeds",
+  "category": "Realtime",
+  "version": "1.0.0",
+  "tags": [
+    "realtime",
+    "comments",
+    "collaboration"
+  ],
+  "dependencies": {
+    "required": [
+      "database"
+    ]
+  }
+}

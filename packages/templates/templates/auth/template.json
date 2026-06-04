@@ -1,0 +1,17 @@
+{
+  "id": "auth",
+  "name": "Auth",
+  "description": "User authentication and authorization service",
+  "category": "Auth",
+  "version": "1.0.0",
+  "tags": [
+    "auth",
+    "users",
+    "sessions"
+  ],
+  "dependencies": {
+    "required": [
+      "database"
+    ]
+  }
+}

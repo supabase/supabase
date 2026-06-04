@@ -1,0 +1,30 @@
+{
+  "name": "templates",
+  "version": "0.0.0",
+  "description": "Supabase project composer templates",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./node": "./node.ts"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "clean": "rimraf node_modules",
+    "generate": "tsx scripts/generate.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest --run"
+  },
+  "dependencies": {
+    "smol-toml": "^1.3.4"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "tsconfig": "workspace:*",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "license": "MIT"
+}

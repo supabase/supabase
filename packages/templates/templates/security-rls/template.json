@@ -1,0 +1,17 @@
+{
+  "id": "security-rls",
+  "name": "Auto-enable RLS",
+  "description": "Event trigger that automatically enables Row Level Security on new public tables",
+  "category": "Security",
+  "version": "1.0.0",
+  "tags": [
+    "security",
+    "rls",
+    "event-trigger"
+  ],
+  "dependencies": {
+    "required": [
+      "database"
+    ]
+  }
+}

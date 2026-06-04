@@ -57,7 +57,7 @@ export const DevelopersDropdown = () => {
             <ChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
           </Link>
           <ul className="flex flex-col gap-5">
-            {latestBlogPosts?.slice(0, 2).map((post: any) => (
+            {latestBlogPosts?.slice(0, 1).map((post: any) => (
               <li key={post.title}>
                 <Link
                   href={post.url}
@@ -73,6 +73,27 @@ export const DevelopersDropdown = () => {
               </li>
             ))}
           </ul>
+        </div>
+        <div className="flex-col gap-2 py-8 px-10 border-t">
+          <Link
+            href="/composer"
+            className="group flex items-center gap-1 text-foreground-lighter hover:text-foreground text-xs uppercase tracking-widest font-mono mb-5 focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-xs focus-visible:text-foreground"
+          >
+            <span>Composer</span>
+            <ChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
+          </Link>
+          <Link
+            href="/composer"
+            className="group flex flex-col focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
+          >
+            <p className="text-foreground-light mb-0 line-clamp-2 group-hover:text-foreground group-focus-visible:text-foreground">
+              Start cooking
+            </p>
+            <p className="text-sm line-clamp-2 text-foreground-lighter leading-relaxed mb-0! group-hover:text-foreground-light group-focus-visible:text-foreground-light">
+              Choose the Supabase features you want, mix and match handcrafted templates, and
+              kickstart your project with an exportable scaffold.
+            </p>
+          </Link>
         </div>
       </div>
     </div>

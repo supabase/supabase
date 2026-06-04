@@ -1,0 +1,24 @@
+{
+  "id": "ai-automatic-embeddings",
+  "name": "Automatic Embeddings",
+  "description": "Queue, triggers, and Edge Function scaffold to generate and sync embeddings automatically",
+  "category": "AI",
+  "version": "1.0.0",
+  "tags": [
+    "ai",
+    "embeddings",
+    "pgmq",
+    "pg_cron",
+    "openai"
+  ],
+  "dependencies": {
+    "required": [
+      "database",
+      "functions",
+      "ai-vector-search"
+    ],
+    "optional": [
+      "queues"
+    ]
+  }
+}

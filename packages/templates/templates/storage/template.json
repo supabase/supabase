@@ -1,0 +1,17 @@
+{
+  "id": "storage",
+  "name": "Storage",
+  "description": "S3-compatible object storage for files",
+  "category": "Core",
+  "version": "1.0.0",
+  "tags": [
+    "storage",
+    "files",
+    "s3"
+  ],
+  "dependencies": {
+    "required": [
+      "database"
+    ]
+  }
+}

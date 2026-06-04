@@ -1,0 +1,6 @@
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+max_rows = 1000
+extra_search_path = ["public", "extensions"]

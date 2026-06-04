@@ -1,0 +1,33 @@
+{
+  "templates": [
+    "database",
+    "functions",
+    "storage",
+    "auth",
+    "api",
+    "graphql",
+    "security-rls",
+    "multi-tenant-rbac",
+    "auth-email",
+    "storage-avatars",
+    "storage-pdf-thumbnails",
+    "storage-image-colors",
+    "storage-image-blurhash",
+    "realtime-comments",
+    "functions-stripe-webhook",
+    "analytics-events",
+    "observability-logs",
+    "queues",
+    "ai-vector-search",
+    "agent",
+    "ai-automatic-embeddings",
+    "ai-rag-pipeline",
+    "ai-storage-rag-ingest",
+    "durable-workflows",
+    "app-rate-limits",
+    "functions-resend-email",
+    "presence-rooms",
+    "feature-flags",
+    "mcp-server"
+  ]
+}
