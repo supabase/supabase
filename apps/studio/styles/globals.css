@@ -433,3 +433,11 @@ div[data-radix-portal]:not(.portal--toast) {
 [data-rmiz-modal-img] {
   image-rendering: high-quality;
 }
+
+.prose.text-sm ol > li::before {
+  top: 0.05rem;
+}
+
+.prose.text-sm ul > li::before {
+  top: 0.65rem;
+}
