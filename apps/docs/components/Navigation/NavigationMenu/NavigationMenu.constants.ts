@@ -2184,6 +2184,11 @@ export const storage: NavMenuConstant = {
           url: '/guides/storage/vector/querying-vectors' as `/${string}`,
         },
         {
+          name: 'Local Development',
+          url: '/guides/storage/vector/local-development' as `/${string}`,
+          enabled: billingEnabled,
+        },
+        {
           name: 'Limits',
           url: '/guides/storage/vector/limits' as `/${string}`,
           enabled: billingEnabled,
