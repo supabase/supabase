@@ -145,10 +145,10 @@ export const useAvailableIntegrations = () => {
   // (marketplace uses dash-separated slugs, studio uses underscore-separated ids).
   const marketplaceWrappers = useMemo(() => {
     const map: Record<string, MarketplaceIntegration> = {}
-      ; (data ?? []).forEach((integration) => {
-        if (!isForeignDataWrapper(integration)) return
-        map[integration.slug.replaceAll('-', '_')] = integration
-      })
+    ;(data ?? []).forEach((integration) => {
+      if (!isForeignDataWrapper(integration)) return
+      map[integration.slug.replaceAll('-', '_')] = integration
+    })
     return map
   }, [data])
 

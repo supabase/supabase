@@ -120,9 +120,9 @@ export type IntegrationDefinition = {
   listingId?: string
   oauthAppId?: string
 } & (
-    | { type: 'wrapper'; meta: WrapperMeta }
-    | { type: 'postgres_extension' | 'custom' | 'oauth' | 'template' }
-  )
+  | { type: 'wrapper'; meta: WrapperMeta }
+  | { type: 'postgres_extension' | 'custom' | 'oauth' | 'template' }
+)
 
 const authorSupabase = {
   name: 'Supabase',
