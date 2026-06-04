@@ -10,7 +10,7 @@ import { API_URL, IS_PLATFORM } from '@/lib/constants'
 const getAnonId = async (id: string) => {
   const encoder = new TextEncoder()
   const data = encoder.encode(id)
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data as BufferSource)
   const hashArray = Array.from(new Uint8Array(hashBuffer))
   const base64String = btoa(hashArray.map((byte) => String.fromCharCode(byte)).join(''))
 

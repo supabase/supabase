@@ -20,7 +20,16 @@ import { buildStudioPageTitle } from '@/lib/page-title'
 const GenericOrganizationPage: NextPage = () => {
   const router = useRouter()
   const { appTitle } = useCustomContent(['app:title'])
-  const { routeSlug, ...queryParams } = router.query
+  // Under TanStack this page is mounted via `routes/org/[_]/$.tsx`,
+  // which surfaces the trailing path as `_splat` (string), not as Next's
+  // `routeSlug` (string[]). Normalise both shapes to an array so
+  // downstream URL building (buildOrgUrl) keeps working.
+  const { routeSlug: rawRouteSlug, _splat, ...queryParams } = router.query
+  const routeSlug: string[] | undefined = Array.isArray(rawRouteSlug)
+    ? rawRouteSlug
+    : typeof _splat === 'string' && _splat
+      ? _splat.split('/')
+      : undefined
   const queryString =
     Object.keys(queryParams).length > 0
       ? new URLSearchParams(queryParams as Record<string, string>).toString()

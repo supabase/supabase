@@ -155,5 +155,4 @@ export const createClient = (request: NextRequest) => {
 }
 
 // [Joshen] Used as a dynamic import
-// eslint-disable-next-line no-restricted-exports
 export default ContentFile

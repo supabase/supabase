@@ -59,7 +59,7 @@
     "@octokit/plugin-retry": "^8.1.0",
     "@sentry/nextjs": "catalog:",
     "@supabase/supabase-js": "catalog:",
-    "@tanstack/react-query": "^5.13.4",
+    "@tanstack/react-query": "~5.83.0",
     "acorn": "^8.11.3",
     "acorn-typescript": "^1.4.13",
     "ai-commands": "workspace:*",
