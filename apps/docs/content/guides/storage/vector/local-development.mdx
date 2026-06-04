@@ -20,6 +20,7 @@ In local development, vector buckets uses pg_vector as the underlying storage en
 The Hosted version uses S3Vectors as the Storage engine for vectors, which is optimized for large-scale vector storage and similarity search. This means that while you can develop and test your vector bucket integrations locally, there may be differences in performance and behavior compared to the cloud environment.
 
 The API remain consistent between local and hosted environments, so you can build your application logic against the local pg_vector implementation and expect it to work with the S3Vectors engine in production.
+
 </Admonition>
 
 ## Setting up local vector buckets
