@@ -4,6 +4,8 @@
 .github
 about
 docker
+!docker
+!docker/**
 examples
 i18n
 **/node_modules
