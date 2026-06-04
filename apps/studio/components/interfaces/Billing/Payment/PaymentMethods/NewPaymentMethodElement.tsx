@@ -357,8 +357,8 @@ export const NewPaymentMethodElement = forwardRef(
               </TooltipTrigger>
               <TooltipContent side="top" className="w-72">
                 Select this only if your business is tax-registered. You’ll be asked for a tax ID
-                (e.g. US EIN, VAT, GST), which is required to issue a compliant business invoice. If you’re
-                not tax-registered, leave this unchecked — you’ll still receive a receipt.
+                (e.g. US EIN, VAT, GST), which is required to issue a compliant business invoice. If
+                you’re not tax-registered, leave this unchecked. You’ll still receive a receipt.
               </TooltipContent>
             </Tooltip>
           </div>
