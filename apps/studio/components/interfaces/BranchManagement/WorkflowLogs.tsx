@@ -157,7 +157,8 @@ export const WorkflowLogs = ({ branch }: WorkflowLogsProps) => {
                             <AlertDialogHeader>
                               <AlertDialogTitle>Retrigger the workflow</AlertDialogTitle>
                               <AlertDialogDescription>
-                                This will re-run all steps of the workflow.
+                                This will re-run all steps of the workflow. The branch instance
+                                might be unavailable for a few minutes.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
