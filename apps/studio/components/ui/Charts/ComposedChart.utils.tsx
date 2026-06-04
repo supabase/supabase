@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
 
+import { type FormatStyle, type MetricDoc } from './chart-view-model'
 import { CHART_COLORS, DateTimeFormats } from './Charts.constants'
 import { formatPercentage, numberFormatter } from './Charts.utils'
 import { useFormatDateTime, useTimezone } from '@/lib/datetime'
@@ -26,6 +27,7 @@ export interface ReportAttributes {
   showMaxValue?: boolean
   valuePrecision?: number
   docsUrl?: string
+  doc?: MetricDoc
   syncId?: string
   showGrid?: boolean
   YAxisProps?: {
@@ -59,6 +61,8 @@ export type MultiAttribute = {
   format?: string
   description?: string
   docsLink?: string
+  formatStyle?: FormatStyle
+  doc?: MetricDoc
   isMaxValue?: boolean
   type?: 'line' | 'area-bar'
   omitFromTotal?: boolean
