@@ -1,6 +1,6 @@
 import Breadcrumbs from '~/components/Breadcrumbs'
-import GuidesSidebar from '~/components/GuidesSidebar'
 import { TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
+import { GuideArticleColumn, GuideMobileAiButton, GuideSecondarySidebar } from '~/features/ai-sidebar/GuideLayout'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import type { WithRequired } from '~/features/helpers.types'
 import { resolveBreadcrumbs } from '~/lib/breadcrumbs'
@@ -77,14 +77,7 @@ const GuideTemplate = ({
   return (
     <TocAnchorsProvider>
       <div className={'grid grid-cols-12 relative gap-4'}>
-        <div
-          className={cn(
-            'relative',
-            'transition-all ease-out',
-            'duration-100',
-            'col-span-12 md:col-span-9'
-          )}
-        >
+        <GuideArticleColumn>
           {breadcrumbJsonLd && (
             <script
               type="application/ld+json"
@@ -92,6 +85,7 @@ const GuideTemplate = ({
             />
           )}
           <Breadcrumbs className="mb-2" />
+          <GuideMobileAiButton />
           <article
             // Used to get headings for the table of contents
             id="sb-docs-guide-main-article"
@@ -130,24 +124,8 @@ const GuideTemplate = ({
               </a>
             </footer>
           </article>
-        </div>
-        <GuidesSidebar
-          video={meta?.tocVideo}
-          hideToc={hideToc}
-          className={cn(
-            'hidden md:flex',
-            'col-span-3 self-start',
-            'sticky',
-            /**
-             * --header-height: height of nav
-             * 1px: height of nav border
-             * 2rem: content padding
-             */
-            'top-[calc(var(--header-height)+1px+2rem)]',
-            // 3rem accounts for 2rem of top padding + 1rem of extra breathing room
-            'max-h-[calc(100vh-var(--header-height)-3rem)]'
-          )}
-        />
+        </GuideArticleColumn>
+        <GuideSecondarySidebar video={meta?.tocVideo} hideToc={hideToc} />
       </div>
     </TocAnchorsProvider>
   )

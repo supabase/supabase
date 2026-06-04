@@ -27,7 +27,7 @@ import swift from 'react-syntax-highlighter/dist/cjs/languages/hljs/swift'
 import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
 import xml from 'react-syntax-highlighter/dist/cjs/languages/hljs/xml'
 import yaml from 'react-syntax-highlighter/dist/cjs/languages/hljs/yaml'
-import { Button, cn, copyToClipboard } from 'ui'
+import { Button, cn, copyToClipboard, AiIconAnimation, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { monokaiCustomTheme } from './CodeBlock.utils'
 
@@ -75,6 +75,7 @@ export interface CodeBlockProps {
   renderer?: SyntaxHighlighterProps['renderer']
   handleCopy?: (value?: string) => void
   onCopyCallback?: () => void
+  onExplainWithAi?: (params: { content: string; language: string }) => void
 }
 
 /**
@@ -113,6 +114,7 @@ export const CodeBlock = ({
   focusable = true,
   onCopyCallback = noop,
   handleCopy,
+  onExplainWithAi,
 }: CodeBlockProps) => {
   const { resolvedTheme } = useTheme()
   const isDarkTheme = resolvedTheme?.includes('dark')!
@@ -254,8 +256,8 @@ export const CodeBlock = ({
           {!hideCopy && (value || children) && className ? (
             <div
               className={[
-                'absolute right-2 top-2',
-                'opacity-0 group-hover:opacity-100 transition',
+                'absolute right-2 top-2 flex gap-1',
+                'opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity',
                 `${isDarkTheme ? 'dark' : ''}`,
               ].join(' ')}
             >
@@ -267,6 +269,25 @@ export const CodeBlock = ({
               >
                 {copied ? 'Copied' : ''}
               </Button>
+              {onExplainWithAi && codeValue && typeof codeValue === 'string' ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="default"
+                      className="px-1.5"
+                      icon={<AiIconAnimation size={14} allowHoverEffect />}
+                      onClick={() =>
+                        onExplainWithAi({
+                          content: codeValue,
+                          language: lang,
+                        })
+                      }
+                      aria-label="Explain using AI"
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent>Explain using AI</TooltipContent>
+                </Tooltip>
+              ) : null}
             </div>
           ) : null}
         </div>

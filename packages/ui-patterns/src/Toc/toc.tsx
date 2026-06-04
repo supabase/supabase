@@ -83,8 +83,8 @@ export function TOCItems({
           showTrack && 'border-s'
         )}
       >
-        {items.map((item) => (
-          <TOCItem key={item.url} item={item} />
+        {items.map((item, index) => (
+          <TOCItem key={`${item.url}-${item.depth}-${index}`} item={item} />
         ))}
       </div>
     </>

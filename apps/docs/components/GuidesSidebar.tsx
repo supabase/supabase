@@ -1,13 +1,15 @@
 'use client'
 
 import { Feedback } from '~/components/Feedback'
+import { useDocsAiSidebarOptional } from '~/features/ai-sidebar'
+import { useActionKey } from '~/hooks/useActionKey'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { isFeatureEnabled } from 'common'
 import { Chatgpt, Claude } from 'icons'
 import { Check, Copy, ExternalLink } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { cn } from 'ui'
+import { AiIconAnimation, cn } from 'ui'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 import { Toc, TOCItems, TOCScrollArea } from 'ui-patterns/Toc'
 
@@ -18,6 +20,36 @@ interface TOCHeader {
   text: string
   link: string
   level: number
+}
+
+function SupabaseAiTool({ className }: { className?: string }) {
+  const sidebar = useDocsAiSidebarOptional()
+  const actionKey = useActionKey()
+  const modifierKey = actionKey?.[0] ?? '⌘'
+
+  if (!sidebar) return null
+
+  return (
+    <section className={cn(className)} aria-labelledby="supabase-ai-title">
+      <h3
+        id="supabase-ai-title"
+        className="mb-3 flex items-center gap-1.5 font-mono text-xs uppercase text-foreground-light"
+      >
+        <AiIconAnimation size={14} allowHoverEffect />
+        Supabase AI
+      </h3>
+      <button
+        type="button"
+        onClick={() => sidebar.open()}
+        className="text-left text-xs text-foreground-lighter transition-colors hover:text-foreground"
+      >
+        Open with{' '}
+        <kbd className="rounded border border-default px-1 py-0.5 font-mono text-[10px] text-foreground-light">
+          {modifierKey}J
+        </kbd>
+      </button>
+    </section>
+  )
 }
 
 function AiTools({ className }: { className?: string }) {
@@ -127,6 +159,9 @@ const GuidesSidebar = ({
             <Feedback key={pathname} />
           </div>
         )}
+        <div className="pl-5">
+          <SupabaseAiTool key={`${pathname}-supabase-ai`} />
+        </div>
         <div className="pl-5">
           <AiTools key={pathname} />
         </div>

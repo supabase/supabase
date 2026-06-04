@@ -38,19 +38,24 @@ export async function clippy(
     throw new Error("No message with role 'user'")
   }
 
-  // Moderate the content to comply with OpenAI T&C
-  const moderationResponses = await Promise.all(
-    contextMessages.map((message) => openai.moderations.create({ input: message.content }))
-  )
+  // Moderate the content to comply with OpenAI T&C (skipped in local dev to avoid rate limits)
+  const skipModeration =
+    process.env.SKIP_AI_MODERATION === 'true' || process.env.NODE_ENV === 'development'
 
-  for (const moderationResponse of moderationResponses) {
-    const [results] = moderationResponse.results
+  if (!skipModeration) {
+    const moderationResponses = await Promise.all(
+      contextMessages.map((message) => openai.moderations.create({ input: message.content }))
+    )
 
-    if (results.flagged) {
-      throw new UserError('Flagged content', {
-        flagged: true,
-        categories: results.categories,
-      })
+    for (const moderationResponse of moderationResponses) {
+      const [results] = moderationResponse.results
+
+      if (results.flagged) {
+        throw new UserError('Flagged content', {
+          flagged: true,
+          categories: results.categories,
+        })
+      }
     }
   }
 

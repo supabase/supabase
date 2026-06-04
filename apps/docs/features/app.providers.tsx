@@ -7,6 +7,7 @@ import { TooltipProvider } from 'ui'
 
 import { AuthContainer } from './auth/auth.client'
 import { DocsCommandMenu, DocsCommandProvider } from './command'
+import { DocsAiSidebar, DocsAiSidebarProvider } from './ai-sidebar'
 import { QueryClientProvider } from './data/queryClient.client'
 import { PageTelemetry } from './telemetry/telemetry.client'
 import { Toaster } from './toaster'
@@ -27,13 +28,16 @@ function GlobalProviders({ children }: PropsWithChildren) {
             <ThemeProvider>
               <TooltipProvider delayDuration={0}>
                 <DocsCommandProvider>
-                  <div className="flex flex-col">
-                    <SiteLayout>
-                      {children}
-                      <DocsCommandMenu />
-                    </SiteLayout>
+                  <DocsAiSidebarProvider>
+                    <div className="flex flex-col">
+                      <SiteLayout>
+                        {children}
+                        <DocsCommandMenu />
+                      </SiteLayout>
+                      <DocsAiSidebar />
+                    </div>
                     <ThemeSandbox />
-                  </div>
+                  </DocsAiSidebarProvider>
                 </DocsCommandProvider>
                 <Toaster />
                 <DevToolbar />

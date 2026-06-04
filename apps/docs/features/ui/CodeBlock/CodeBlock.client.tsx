@@ -5,6 +5,8 @@ import { type MouseEvent, useCallback, useEffect, useState, useRef } from 'react
 import { type ThemedToken } from 'shiki'
 import { type NodeHover } from 'twoslash'
 import { cn, copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
+import { CodeBlockAiButton } from '~/features/ai-sidebar'
 import { getFontStyle } from './CodeBlock.utils'
 
 export function AnnotatedSpan({
@@ -115,7 +117,13 @@ export function CodeCopyButton({ className, content }: { className?: string; con
   )
 }
 
-export function CodeBlockControls({ content }: { content: string }) {
+export function CodeBlockControls({
+  content,
+  language = 'text',
+}: {
+  content: string
+  language?: string
+}) {
   const [isWrapped, setIsWrapped] = useState(false)
   const wrapperRef = useRef<HTMLDivElement>(null)
 
@@ -136,7 +144,10 @@ export function CodeBlockControls({ content }: { content: string }) {
   }, [])
 
   return (
-    <div ref={wrapperRef} className="hidden group-hover:flex absolute top-2 right-2 gap-1">
+    <div
+      ref={wrapperRef}
+      className="absolute top-2 right-2 flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity"
+    >
       <Tooltip>
         <TooltipTrigger asChild>
           <button
@@ -154,6 +165,7 @@ export function CodeBlockControls({ content }: { content: string }) {
         <TooltipContent>{isWrapped ? 'Disable word wrap' : 'Enable word wrap'}</TooltipContent>
       </Tooltip>
       <CodeCopyButton content={content} />
+      <CodeBlockAiButton content={content} language={language} />
     </div>
   )
 }
