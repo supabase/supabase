@@ -19,7 +19,8 @@ export const getReportAttributesV2: (
   maxConnections?: MaxConnectionsData,
   pgBouncerMaxConnections?: number,
   isSpendCapEnabled?: boolean,
-  showDiskIOBurstBalanceChart?: boolean
+  showDiskIOBurstBalanceChart?: boolean,
+  showMemoryCommitmentChart?: boolean
 ) => ReportAttributes[] = (
   entitledFeatures,
   project,
@@ -27,7 +28,8 @@ export const getReportAttributesV2: (
   maxConnections,
   pgBouncerMaxConnections,
   isSpendCapEnabled,
-  showDiskIOBurstBalanceChart
+  showDiskIOBurstBalanceChart,
+  showMemoryCommitmentChart
 ) => {
   const computeVariantId = mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
   const provisionedDiskIops = diskConfig?.attributes?.iops
@@ -96,7 +98,7 @@ export const getReportAttributesV2: (
       id: 'memory-commitment',
       label: 'Memory commitment',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-commitment`,
-      hide: false,
+      hide: !showMemoryCommitmentChart,
       showTooltip: true,
       showLegend: true,
       hideChartType: false,
