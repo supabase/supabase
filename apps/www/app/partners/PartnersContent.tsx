@@ -104,7 +104,7 @@ export default function PartnersContent({ featuredPartners }: Props) {
                   outerClassName="hover:shadow-none! md:row-span-2 md:grid md:grid-rows-subgrid"
                   innerClassName="inset-x-0 h-full md:grid md:grid-rows-subgrid md:row-span-2"
                 >
-                  <div className="items-start space-y-3 p-4 lg:p-6">
+                  <div className="items-start flex flex-col gap-3 p-4 lg:p-6">
                     <h3 className="text-foreground text-xl tracking-tight">{tier.title}</h3>
                     <p className="text-foreground-lighter text-sm text-pretty flex-1">
                       {tier.description}

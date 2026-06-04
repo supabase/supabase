@@ -10,6 +10,8 @@ import {
   Webhook,
 } from 'lucide-react'
 
+import { PARTNER_TYPES } from '../../components/Partners/PartnerIntakeForm'
+
 export const PARTNER_FORM_ANCHOR = '#become-a-partner'
 
 const partnersPageData = {
@@ -65,12 +67,20 @@ const partnersPageData = {
             composing their stack.
           </>
         ),
+        cta: {
+          label: 'Apply as Integration Partner',
+          link: `?partner_type=${PARTNER_TYPES.technology}${PARTNER_FORM_ANCHOR}`,
+        },
         bestFor:
           'developer tools, SaaS products, hosting, observability, auth, billing, and anything else developers add to a Postgres project.',
       },
       {
         title: 'Solution Partner',
         description: 'You build on Supabase on behalf of clients.',
+        cta: {
+          label: 'Apply as Solution Partner',
+          link: `?partner_type=${PARTNER_TYPES.solutions}${PARTNER_FORM_ANCHOR}`,
+        },
         bestFor: 'agencies, consultancies, and service providers.',
       },
     ],

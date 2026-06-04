@@ -12,7 +12,7 @@ import { parseAsString, useQueryState } from 'nuqs'
  * stable (lowercase, snake-case) because they're referenced in `showWhen`
  * rules below and in the Notion `sendWhen` gating in `partnerIntakeCrm`.
  */
-const PARTNER_TYPES = {
+export const PARTNER_TYPES = {
   technology: 'technology',
   solutions: 'solutions',
   startup: 'startup',
@@ -282,6 +282,9 @@ export default function PartnerIntakeForm({ className }: PartnerIntakeFormProps)
 
   return (
     <MarketingForm
+      // forces a remount so the partnerType preset
+      // applies whenever the URL value changes.
+      key={partnerType}
       className={className}
       fields={fields}
       submitLabel="Submit application"
