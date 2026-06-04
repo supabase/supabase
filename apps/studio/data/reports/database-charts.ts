@@ -95,7 +95,7 @@ export const getReportAttributesV2: (
     {
       id: 'memory-commitment',
       label: 'Memory commitment',
-      docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-usage`,
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-commitment`,
       hide: false,
       showTooltip: true,
       showLegend: true,
