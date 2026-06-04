@@ -83,9 +83,7 @@ export const useAvailableIntegrations = () => {
             content,
             built_by: authorName,
             listing_logo: listingLogo,
-            // TODO - We need to rename this in the database, as app ID is what we typically
-            //        surface in the UI and is what will be more generally available.
-            oauth_client_id: oauthAppId,
+            oauth_app_id: oauthAppId,
           } = integration
 
           const status = undefined
@@ -112,6 +110,7 @@ export const useAvailableIntegrations = () => {
             installIdentificationMethod: installMethod ?? undefined,
             secretKeyPrefix: secretKeyPrefix ?? undefined,
             edgeFunctionSecretName: edgeFunctionSecretName ?? undefined,
+            oauthAppId: oauthAppId ?? undefined,
             listingId: listingId ?? undefined,
             author,
             requiredExtensions: [],
