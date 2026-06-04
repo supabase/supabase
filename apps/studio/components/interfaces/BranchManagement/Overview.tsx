@@ -361,54 +361,55 @@ const PreviewBranchActions = ({
             <Pencil size={14} /> Edit branch
           </DropdownMenuItemTooltip>
 
-          <DropdownMenuItemTooltip
-            className="gap-x-2"
-            disabled={!canUpdateBranches || !isBranchActiveHealthy || isUpdatingBranch}
-            onSelect={(e) => {
-              e.stopPropagation()
-              setShowConfirmRetriggersModal(true)
-            }}
-            onClick={(e) => {
-              e.stopPropagation()
-              setShowConfirmRetriggersModal(true)
-            }}
-            tooltip={{
-              content: {
-                side: 'left',
-                text: !canUpdateBranches
-                  ? `You need additional permissions to ${branch.git_branch ? 'resync' : 'rebase'} branches`
-                  : !isBranchActiveHealthy
-                    ? `Branch is still initializing. Please wait for it to become healthy before ${branch.git_branch ? 'resyncing' : 'rebasing'}.`
-                    : undefined,
-              },
-            }}
-          >
-            <Redo size={14} /> {branch.git_branch ? 'Resync branch' : 'Rebase branch'}
-          </DropdownMenuItemTooltip>
-
           {!branch.deletion_scheduled_at && (
-            <DropdownMenuItemTooltip
-              className="gap-x-2"
-              disabled={isResetting || !isBranchActiveHealthy}
-              onSelect={(e) => {
-                e.stopPropagation()
-                setShowConfirmResetModal(true)
-              }}
-              onClick={(e) => {
-                e.stopPropagation()
-                setShowConfirmResetModal(true)
-              }}
-              tooltip={{
-                content: {
-                  side: 'left',
-                  text: !isBranchActiveHealthy
-                    ? 'Branch is still initializing. Please wait for it to become healthy before resetting.'
-                    : undefined,
-                },
-              }}
-            >
-              <RefreshCw size={14} /> Reset branch
-            </DropdownMenuItemTooltip>
+            <>
+              <DropdownMenuItemTooltip
+                className="gap-x-2"
+                disabled={!canUpdateBranches || !isBranchActiveHealthy || isUpdatingBranch}
+                onSelect={(e) => {
+                  e.stopPropagation()
+                  setShowConfirmRetriggersModal(true)
+                }}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowConfirmRetriggersModal(true)
+                }}
+                tooltip={{
+                  content: {
+                    side: 'left',
+                    text: !canUpdateBranches
+                      ? `You need additional permissions to ${branch.git_branch ? 'resync' : 'rebase'} branches`
+                      : !isBranchActiveHealthy
+                        ? `Branch is still initializing. Please wait for it to become healthy before ${branch.git_branch ? 'resyncing' : 'rebasing'}.`
+                        : undefined,
+                  },
+                }}
+              >
+                <Redo size={14} /> {branch.git_branch ? 'Resync branch' : 'Rebase branch'}
+              </DropdownMenuItemTooltip>
+              <DropdownMenuItemTooltip
+                className="gap-x-2"
+                disabled={isResetting || !isBranchActiveHealthy}
+                onSelect={(e) => {
+                  e.stopPropagation()
+                  setShowConfirmResetModal(true)
+                }}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowConfirmResetModal(true)
+                }}
+                tooltip={{
+                  content: {
+                    side: 'left',
+                    text: !isBranchActiveHealthy
+                      ? 'Branch is still initializing. Please wait for it to become healthy before resetting.'
+                      : undefined,
+                  },
+                }}
+              >
+                <RefreshCw size={14} /> Reset branch
+              </DropdownMenuItemTooltip>
+            </>
           )}
 
           {!branch.deletion_scheduled_at && (
