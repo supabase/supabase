@@ -35,7 +35,7 @@ export function InstallOAuthIntegrationButton({ integration }: InstallOAuthInteg
     if (!integration) return false
 
     return isOAuthInstalled({ integration, projectData: data })
-  }, [data])
+  }, [data, integration])
 
   const handleInstallClick = async () => {
     if (!integration || !projectRef) return
