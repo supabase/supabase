@@ -1,0 +1,11 @@
+{
+  "id": "multi-tenant-rbac-edge-auth",
+  "name": "Edge RBAC Helpers",
+  "description": "Enforce organization RBAC in Edge Functions next to your app code—authorization at the application layer instead of in RLS policies",
+  "category": "Auth",
+  "version": "1.0.0",
+  "tags": ["multi-tenant", "organizations", "rbac", "permissions", "functions", "edge"],
+  "dependencies": {
+    "required": ["multi-tenant-rbac", "functions"]
+  }
+}

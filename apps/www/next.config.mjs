@@ -53,6 +53,7 @@ const nextConfig = {
     // needed to make the octokit packages work in /changelog
     '@octokit/plugin-paginate-graphql',
   ],
+  devIndicators: false,
   experimental: {
     // needed to make the octokit packages work in /changelog
     esmExternals: 'loose',

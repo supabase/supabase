@@ -38,11 +38,8 @@ Invite another user by inserting a membership row:
 
 ```sql
 insert into public.organization_members (organization_id, user_id, role)
-values (
-  '00000000-0000-0000-0000-000000000000',
-  '11111111-1111-1111-1111-111111111111',
-  'member'
-);
+values
+  ('00000000-0000-0000-0000-000000000000', '11111111-1111-1111-1111-111111111111', 'member');
 ```
 
 The insert is allowed only if the current user has `members.invite` for that organization. Assigning elevated roles such as `admin` or `owner` requires `members.update`.
@@ -51,10 +48,10 @@ The insert is allowed only if the current user has `members.invite` for that org
 
 The seed file grants these permissions:
 
-| Role | Intended use |
-| ---- | ------------ |
-| `owner` | Full organization, membership, and project control. |
-| `admin` | Manage organization settings, invite members, and manage projects. |
+| Role     | Intended use                                                       |
+| -------- | ------------------------------------------------------------------ |
+| `owner`  | Full organization, membership, and project control.                |
+| `admin`  | Manage organization settings, invite members, and manage projects. |
 | `member` | Read organization and membership data, and create/update projects. |
 
 Adjust `supabase/seed.sql` before production if your app needs a stricter default. For example, remove `projects.create` or `projects.update` from `member` for read-only members.
@@ -179,6 +176,10 @@ This keeps policies stable when the schema changes and makes it easier to map UI
 ## Notes
 
 This template does not rely on JWT custom claims for authorization. The database checks the current user's organization membership at query time, so a user can safely have different roles in different organizations.
+
+## Edge Functions
+
+For shared TypeScript helpers that call `authorize()` from Edge Functions, add the **Edge RBAC Helpers** template. It adds `supabase/functions/_shared` helpers without creating a new function node in the composer diagram.
 
 ## Dependencies
 

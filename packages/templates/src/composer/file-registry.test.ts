@@ -96,6 +96,24 @@ describe('extractFromFile', () => {
     ])
   })
 
+  it('does not treat _shared helpers as deployable edge functions', () => {
+    expect(
+      extractFromFile({
+        path: 'supabase/functions/_shared/authorize.ts',
+        content: '',
+        templateId: 't',
+      })
+    ).toEqual([])
+
+    expect(
+      extractFromFile({
+        path: 'supabase/functions/_shared/index.ts',
+        content: '',
+        templateId: 't',
+      })
+    ).toEqual([])
+  })
+
   it('extracts SQL tables with schema as parent', () => {
     const candidates = extractFromFile({
       path: 'schema.sql',

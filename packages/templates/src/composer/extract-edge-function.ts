@@ -8,7 +8,7 @@ export function getEdgeFunctionName(path: string): string | null {
 
 export const extractEdgeFunction: ResourceExtractor = ({ path, templateId }) => {
   const name = getEdgeFunctionName(path)
-  if (!name) return []
+  if (!name || name === '_shared') return []
 
   return [
     {

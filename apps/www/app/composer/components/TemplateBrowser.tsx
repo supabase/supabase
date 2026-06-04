@@ -1,9 +1,9 @@
 'use client'
 
 import { Search } from 'lucide-react'
-import { cn, Input } from 'ui'
+import { Button, cn, Input } from 'ui'
 
-import { canRemoveTemplate, type DependencyResolution } from '../lib/composer'
+import { canRemoveTemplate, type DependencyResolution, type MergeResult } from '../lib/composer'
 import { filterTemplates } from '../lib/template-filter'
 import { groupTemplatesByCategory, sortCategories, type Template } from '../lib/templates'
 import { ComposerBreadcrumbs } from './ComposerHeader'
@@ -25,6 +25,8 @@ interface TemplateBrowserProps {
   onAddTemplate: (id: string) => void
   onRemoveTemplate: (id: string) => void
   onHoverTemplate: (id: string | null) => void
+  mergeResult: MergeResult | null
+  onContinue: () => void
 }
 
 export function TemplateBrowser({
@@ -38,6 +40,8 @@ export function TemplateBrowser({
   onAddTemplate,
   onRemoveTemplate,
   onHoverTemplate,
+  mergeResult,
+  onContinue,
 }: TemplateBrowserProps) {
   const templatesByCategory = groupTemplatesByCategory(filterTemplates(templates, search))
   const categories = sortCategories(Object.keys(templatesByCategory))
@@ -82,7 +86,9 @@ export function TemplateBrowser({
             <div className="space-y-6">
               {categories.map((category) => (
                 <div key={category}>
-                  <h3 className="heading-meta mb-2">{category}</h3>
+                  <p className="text-xs font-mono uppercase tracking-wide text-foreground-light mb-2">
+                    {category}
+                  </p>
                   <div className="grid grid-cols-2 gap-2">
                     {templatesByCategory[category].map((template) => {
                       const isSelected = selectedIds.has(template.id)
@@ -116,6 +122,16 @@ export function TemplateBrowser({
             </div>
           )}
         </div>
+      </div>
+
+      <div className="relative z-10 shrink-0 bg-background px-4 pb-4">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 bottom-full z-10 h-10 bg-linear-to-t from-background to-transparent"
+        />
+        <Button block type="secondary" size="small" disabled={!mergeResult} onClick={onContinue}>
+          Continue
+        </Button>
       </div>
     </section>
   )

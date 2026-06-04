@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 
 import { CodeTabsPanel } from './components/CodeTabsPanel'
 import { ComposerFlow } from './components/ComposerFlow'
-import { ComposerActions } from './components/ComposerHeader'
+import { CreateProjectOverlay } from './components/CreateProjectOverlay'
 import { TemplateBrowser } from './components/TemplateBrowser'
 import { TemplateDetailSheet } from './components/TemplateDetailSheet'
 import {
@@ -27,7 +27,7 @@ export default function ProjectComposerClient({ templates }: ProjectComposerClie
     () => new Set(getDefaultEnabledTemplateIds(templates))
   )
   const [search, setSearch] = useState('')
-  const [copied, setCopied] = useState(false)
+  const [isCreateOverlayOpen, setIsCreateOverlayOpen] = useState(false)
   const [hoveredTemplateId, setHoveredTemplateId] = useState<string | null>(null)
   const [activeFilePath, setActiveFilePath] = useState<string | null>(null)
   const [detailTemplateId, setDetailTemplateId] = useState<string | null>(null)
@@ -70,14 +70,6 @@ export default function ProjectComposerClient({ templates }: ProjectComposerClie
     })
   }
 
-  async function copyCommand() {
-    if (!mergeResult) return
-
-    await navigator.clipboard.writeText(`supabase init --composition ${mergeResult.compositionId}`)
-    setCopied(true)
-    window.setTimeout(() => setCopied(false), 2000)
-  }
-
   async function downloadComposition() {
     if (!mergeResult) return
 
@@ -101,39 +93,44 @@ export default function ProjectComposerClient({ templates }: ProjectComposerClie
               onAddTemplate={addTemplate}
               onRemoveTemplate={removeTemplate}
               onHoverTemplate={setHoveredTemplateId}
+              mergeResult={mergeResult}
+              onContinue={() => setIsCreateOverlayOpen(true)}
             />
           </div>
 
           <div className="flex min-h-0 flex-col overflow-hidden pt-4 pr-4 pb-4">
             <section className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border bg">
-              <ComposerActions
-                mergeResult={mergeResult}
-                copied={copied}
-                onCopyCommand={copyCommand}
-                onDownload={downloadComposition}
-              />
+              <div className="relative flex min-h-0 flex-1 flex-col">
+                <div className="min-h-0 flex-1">
+                  <ComposerFlow
+                    templates={templates}
+                    resolution={resolution}
+                    mergeResult={mergeResult}
+                    resources={resources}
+                    hoveredTemplateId={hoveredTemplateId}
+                    onSelectFile={setActiveFilePath}
+                  />
+                </div>
 
-              <div className="min-h-0 flex-1">
-                <ComposerFlow
-                  templates={templates}
-                  resolution={resolution}
-                  mergeResult={mergeResult}
-                  resources={resources}
-                  hoveredTemplateId={hoveredTemplateId}
-                  onSelectFile={setActiveFilePath}
-                />
-              </div>
-
-              <div className="h-[320px] shrink-0">
-                <CodeTabsPanel
-                  mergeResult={mergeResult}
-                  activeFilePath={activeFilePath}
-                  onActiveFilePathChange={setActiveFilePath}
-                />
+                <div className="h-[320px] shrink-0">
+                  <CodeTabsPanel
+                    mergeResult={mergeResult}
+                    activeFilePath={activeFilePath}
+                    onActiveFilePathChange={setActiveFilePath}
+                  />
+                </div>
               </div>
             </section>
           </div>
         </div>
+
+        {isCreateOverlayOpen && mergeResult ? (
+          <CreateProjectOverlay
+            mergeResult={mergeResult}
+            onClose={() => setIsCreateOverlayOpen(false)}
+            onDownload={downloadComposition}
+          />
+        ) : null}
 
         <TemplateDetailSheet
           template={detailTemplate}

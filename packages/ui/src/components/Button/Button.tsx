@@ -54,9 +54,8 @@ const buttonVariants = cva(
           bg-foreground
           text-background hover:text-border-stronger
           focus-visible:text-border-control
-          border-foreground-light hover:border-foreground-lighter
+          border-transparent
           focus-visible:outline-border-strong
-          data-[state=open]:border-foreground-lighter
           data-[state=open]:outline-border-strong
         `,
         /** @deprecated use 'primary' instead */

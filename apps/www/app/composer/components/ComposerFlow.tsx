@@ -314,13 +314,21 @@ function buildPrototypeFlow({
   return { nodes, edges }
 }
 
+function NodeIcon({ icon: Icon }: { icon: LucideIcon }) {
+  return (
+    <div className="flex size-7 shrink-0 items-center justify-center rounded bg-background">
+      <Icon className="size-3 text-foreground-lighter" strokeWidth={1.5} />
+    </div>
+  )
+}
+
 function DatabaseNode({ data }: NodeProps) {
   return (
     <div className="relative" style={{ width: NODE_WIDTH }}>
       <Handle type="source" position={Position.Bottom} id="bottom" className="opacity-0" />
       <Card>
-        <CardContent className="flex flex-col items-center gap-2 border-none px-2 py-1.5 text-center">
-          <Database className="size-4 text-foreground-lighter" strokeWidth={1.5} />
+        <CardContent className="flex flex-col items-center gap-2 border-none p-0.5 text-center">
+          <NodeIcon icon={Database} />
           <div className="flex min-w-0 flex-1 flex-col leading-tight">
             <span className="truncate text-xs font-medium">{String(data.label)}</span>
             {data.sublabel ? (
@@ -344,8 +352,8 @@ function FeatureNode({ data }: NodeProps) {
       <Handle type="target" position={Position.Top} id="target-top" className="opacity-0" />
       <Handle type="source" position={Position.Bottom} id="source-bottom" className="opacity-0" />
       <Card className={cn(isWarning && 'border-warning/40 bg-warning/10')}>
-        <CardContent className="flex flex-row items-center gap-2 border-none px-2 py-1.5 text-left">
-          <Icon className="size-4 shrink-0 text-foreground-lighter" strokeWidth={1.5} />
+        <CardContent className="flex flex-row items-center gap-2 border-none p-0.5 text-left">
+          <NodeIcon icon={Icon} />
           <div className="flex min-w-0 flex-1 flex-col leading-tight">
             <span className="truncate text-xs font-medium">{String(data.label)}</span>
             {data.sublabel ? (

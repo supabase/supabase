@@ -8,6 +8,7 @@
     "graphql",
     "security-rls",
     "multi-tenant-rbac",
+    "multi-tenant-rbac-edge-auth",
     "auth-email",
     "storage-avatars",
     "storage-pdf-thumbnails",
