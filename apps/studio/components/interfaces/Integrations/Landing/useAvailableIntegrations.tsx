@@ -83,6 +83,9 @@ export const useAvailableIntegrations = () => {
             content,
             built_by: authorName,
             listing_logo: listingLogo,
+            // TODO - We need to rename this in the database, as app ID is what we typically
+            //        surface in the UI and is what will be more generally available.
+            oauth_client_id: oauthAppId,
           } = integration
 
           const status = undefined
@@ -143,10 +146,10 @@ export const useAvailableIntegrations = () => {
   // (marketplace uses dash-separated slugs, studio uses underscore-separated ids).
   const marketplaceWrappers = useMemo(() => {
     const map: Record<string, MarketplaceIntegration> = {}
-    ;(data ?? []).forEach((integration) => {
-      if (!isForeignDataWrapper(integration)) return
-      map[integration.slug.replaceAll('-', '_')] = integration
-    })
+      ; (data ?? []).forEach((integration) => {
+        if (!isForeignDataWrapper(integration)) return
+        map[integration.slug.replaceAll('-', '_')] = integration
+      })
     return map
   }, [data])
 
