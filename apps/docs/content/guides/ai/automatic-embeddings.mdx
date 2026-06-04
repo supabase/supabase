@@ -277,7 +277,7 @@ begin
       group by batch_num
     )
   -- Finally aggregate all batches into array
-  select array_agg(batch_array)
+  select coalesce(array_agg(batch_array), array[]::jsonb[])
   from batched_jobs
   into job_batches;
 

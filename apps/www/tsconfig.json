@@ -1,42 +1,51 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "tsconfig/nextjs.json",
   "compilerOptions": {
-    // @deprecated: use @/ instead of importing from root
-    "baseUrl": ".",
+    "allowJs": true,
+    "lib": ["dom", "dom.iterable", "esnext"],
     "paths": {
-      "contentlayer/generated": ["./.contentlayer/generated"],
-      // ~/ is deprecated, use @/ instead
+      // @deprecated: use @/ instead of importing from root
       "~/*": ["./*"],
       "@/*": ["./*"],
-      "@ui/*": ["./../../packages/ui/src/*"]
+      "contentlayer/generated": ["./.contentlayer/generated"],
+      // @deprecated: use @/ prefix instead
+      ".generated/*": ["./.generated/*"],
+      // @deprecated: use @/ prefix instead
+      "app/*": ["./app/*"],
+      // @deprecated: use @/ prefix instead
+      "components/*": ["./components/*"],
+      // @deprecated: use @/ prefix instead
+      "data/*": ["./data/*"],
+      // @deprecated: use @/ prefix instead
+      "hooks/*": ["./hooks/*"],
+      // @deprecated: use @/ prefix instead
+      "internals/*": ["./internals/*"],
+      // @deprecated: use @/ prefix instead
+      "layouts/*": ["./layouts/*"],
+      // @deprecated: use @/ prefix instead
+      "lib/*": ["./lib/*"],
+      // @deprecated: use @/ prefix instead
+      "pages/*": ["./pages/*"],
+      // @deprecated: use @/ prefix instead
+      "public/*": ["./public/*"],
+      // @deprecated: use @/ prefix instead
+      "scripts/*": ["./scripts/*"],
+      // @deprecated: use @/ prefix instead
+      "styles/*": ["./styles/*"],
+      // @deprecated: use @/ prefix instead
+      "types": ["./types"],
+      // @deprecated: use @/ prefix instead
+      "types/*": ["./types/*"]
     },
-    "downlevelIteration": true,
-    "target": "ES2021",
-    "module": "esnext",
-    "jsx": "preserve",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "noEmit": true,
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ]
+    "plugins": [{ "name": "next" }]
   },
-  "exclude": ["node_modules", "supabase"],
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    ".contentlayer/generated",
-    "./../../packages/ui/src/**/*.d.ts"
-  ]
+    ".contentlayer/generated"
+  ],
+  "exclude": ["node_modules", "supabase"]
 }

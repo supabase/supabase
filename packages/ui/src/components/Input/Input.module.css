@@ -3,9 +3,9 @@
 } */
 
 /* .sbui-input {
-  @apply block box-border pl-3 pr-3 py-2 w-full rounded-md shadow-sm text-sm border border-solid transition-all;
+  @apply block box-border pl-3 pr-3 py-2 w-full rounded-md shadow-xs text-sm border border-solid transition-all;
   @apply bg-white text-input-value-light border-input-border-light;
-  @apply focus:ring-input-border-focus-light focus:border-input-border-focus-light focus:outline-none;
+  @apply focus:ring-input-border-focus-light focus:border-input-border-focus-light focus:outline-hidden;
 
   @apply dark:bg-transparent dark:text-input-value-dark dark:border-input-border-dark;
   @apply dark:focus:border-input-border-focus-dark dark:focus:ring-input-border-focus-dark;

@@ -142,18 +142,16 @@ A Prisma migration is referencing a schema it is not permitted to manage.
 
 ### Solutions: [#solutions-cross-schema-references]
 
-- Multi-Schema support: If the external schema isn't Supabase managed, modify your `prisma.schema` file to enable the multi-Schema preview
+- Multi-schema support: If the external schema isn't Supabase managed, list the relevant schemas on the `datasource` block in your `schema.prisma` file.
 
-```ts prisma.schema
+```prisma schema.prisma
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["multiSchema"]  //Add line
+  provider = "prisma-client"
+  output   = "../generated/prisma"
 }
 
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
   schemas   = ["public", "other_schema"] //list out relevant schemas
 }
 ```

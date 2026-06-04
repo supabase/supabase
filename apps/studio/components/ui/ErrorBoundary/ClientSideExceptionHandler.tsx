@@ -1,12 +1,13 @@
-import { ExternalLink } from 'lucide-react'
-
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
+import { safeLocalStorage, safeSessionStorage } from 'common'
+import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { Button, cn } from 'ui'
 import { Admonition } from 'ui-patterns'
+
 import CopyButton from '../CopyButton'
 import { InlineLinkClassName } from '../InlineLink'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 
 interface ClientSideExceptionHandlerProps {
   message: string
@@ -26,12 +27,8 @@ export const ClientSideExceptionHandler = ({
   const isProduction = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
   const handleClearStorage = () => {
-    try {
-      localStorage.clear()
-      sessionStorage.clear()
-    } catch (e) {
-      // ignore
-    }
+    safeLocalStorage.clear()
+    safeSessionStorage.clear()
     window.location.reload()
   }
 

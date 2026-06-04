@@ -1,8 +1,9 @@
 import { SupabaseClient } from '@supabase/supabase-js'
-import { ApplicationError, clippy, UserError } from 'ai-commands/edge'
-import { isFeatureEnabled } from 'common/enabled-features'
+import { ApplicationError, UserError, clippy } from 'ai-commands/edge'
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
+
+import { isFeatureEnabled } from 'common/enabled-features'
 
 export const runtime = 'edge'
 /* To avoid OpenAI errors, restrict to the Vercel Edge Function regions that
@@ -56,8 +57,7 @@ export async function POST(req: NextRequest) {
     }
 
     const useAltSearchIndex = !isFeatureEnabled('search:fullIndex')
-    // @ts-ignore: We have 6 version of openai and the types are not compatible with each other, we need to consolidate to one
-    const response = await clippy(openai as any, supabaseClient, messages, {
+    const response = await clippy(openai, supabaseClient, messages, {
       useAltSearchIndex,
     })
 

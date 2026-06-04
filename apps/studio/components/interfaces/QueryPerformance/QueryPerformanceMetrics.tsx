@@ -1,15 +1,13 @@
-import React, { useMemo } from 'react'
-import { parseAsJson, useQueryStates } from 'nuqs'
 import { Info } from 'lucide-react'
+import { parseAsJson, useQueryStates } from 'nuqs'
+import React, { useMemo } from 'react'
+import { cn, Skeleton, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { Skeleton, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { useQueryPerformanceQuery } from '../Reports/Reports.queries'
-import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
+import { useQueryPerformanceQuery } from './useQueryPerformanceQuery'
+import { NumericFilter } from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
 
 export const QueryPerformanceMetrics = () => {
-  const { data: queryMetrics, isLoading } = useQueryPerformanceQuery({
-    preset: 'queryMetrics',
-  })
+  const { data: queryMetrics, isLoading } = useQueryPerformanceQuery({ preset: 'queryMetrics' })
 
   const [, setSearchParams] = useQueryStates({
     totalTimeFilter: parseAsJson<NumericFilter | null>((value) =>
@@ -72,7 +70,7 @@ export const QueryPerformanceMetrics = () => {
                         <button
                           type="button"
                           aria-label="How are slow queries calculated?"
-                          className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-200 text-foreground-lighter transition-colors hover:bg-surface-300 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-foreground-lighter"
+                          className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-200 text-foreground-lighter transition-colors hover:bg-surface-300 hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-foreground-lighter"
                           onClick={(e) => {
                             e.stopPropagation()
                           }}
@@ -92,7 +90,7 @@ export const QueryPerformanceMetrics = () => {
                         <button
                           type="button"
                           aria-label={`What is ${card.title}?`}
-                          className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-200 text-foreground-lighter transition-colors hover:bg-surface-300 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-foreground-lighter"
+                          className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-200 text-foreground-lighter transition-colors hover:bg-surface-300 hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-foreground-lighter"
                           onClick={(e) => {
                             e.stopPropagation()
                           }}

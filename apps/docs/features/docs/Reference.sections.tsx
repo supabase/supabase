@@ -9,7 +9,7 @@ import {
   getTypeSpec,
 } from '~/features/docs/Reference.generated.singleton'
 import { getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
-import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
+import type { MethodTypes, VariableTypes } from '~/features/docs/Reference.typeSpec'
 import { formatMethodSignature } from '~/features/docs/Reference.typeSpec'
 import {
   ApiOperationRequestBodyDetails,
@@ -171,13 +171,9 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
 
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
-      <StickyHeader title={command.title} className="col-[1_/_-1]" monoFont={true} />
-      <div className="w-full min-w-0">
-        {command.description && (
-          <ReactMarkdown className="prose w-full break-words mb-8">
-            {command.description}
-          </ReactMarkdown>
-        )}
+      <StickyHeader title={command.title} className="col-span-full" monoFont={true} />
+      <div className="w-full min-w-0 prose wrap-break-word mb-8">
+        {command.description && <ReactMarkdown>{command.description}</ReactMarkdown>}
         {command.usage && (
           <div className="mb-8">
             <h3 className="mb-2 text-base text-foreground">Usage</h3>
@@ -210,7 +206,7 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
         {(command.flags ?? []).length > 0 && (
           <>
             <h3 className="mb-3 text-base text-foreground">Flags</h3>
-            <ul>
+            <ul className="not-prose">
               {command.flags.map((flag, index) => (
                 <li key={index} className="border-t last-of-type:border-b py-5 flex flex-col gap-3">
                   <div className="flex flex-wrap items-baseline gap-3">
@@ -224,9 +220,9 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
                     )}
                   </div>
                   {flag.description && (
-                    <ReactMarkdown className="prose break-words text-sm">
-                      {flag.description}
-                    </ReactMarkdown>
+                    <div className="prose wrap-break-word text-sm">
+                      <ReactMarkdown>{flag.description}</ReactMarkdown>
+                    </div>
                   )}
                 </li>
               ))}
@@ -324,7 +320,7 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
             )}
           </>
         }
-        className="col-[1_/_-1]"
+        className="col-span-full"
       />
       <div className="flex flex-col gap-12">
         <div className="flex items-center gap-2">
@@ -346,9 +342,9 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
           </code>
         </div>
         {endpointDetails.description && (
-          <ReactMarkdown className="prose break-words mb-8">
-            {endpointDetails.description}
-          </ReactMarkdown>
+          <div className="prose wrap-break-word mb-8">
+            <ReactMarkdown>{endpointDetails.description}</ReactMarkdown>
+          </div>
         )}
         {endpointDetails['x-oauth-scope'] && (
           <section>
@@ -359,6 +355,20 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
                   {endpointDetails['x-oauth-scope']}
                 </span>
               </li>
+            </ul>
+          </section>
+        )}
+        {endpointDetails['x-allowed-plans'] && (
+          <section>
+            <h3 className="mb-3 text-base text-foreground">
+              This endpoint is only available on the following plans:
+            </h3>
+            <ul>
+              {endpointDetails['x-allowed-plans'].map((plan) => (
+                <li key={plan} className="list-['-'] ml-2 pl-2">
+                  <span className="font-mono text-sm font-medium text-foreground">{plan}</span>
+                </li>
+              ))}
             </ul>
           </section>
         )}
@@ -460,13 +470,14 @@ async function FunctionSection({
   const fn = fns?.find((fn) => fn.id === section.id)
   if (!fn) return null
 
-  let types: MethodTypes | undefined
+  let types: MethodTypes | VariableTypes | undefined
   if (useTypeSpec && '$ref' in fn) {
-    types = await getTypeSpec(fn['$ref'] as string)
+    types = await getTypeSpec(sdkId, version, fn['$ref'] as string)
   }
 
   const fullDescription = [
     types?.comment?.shortText,
+    types?.comment?.text,
     'description' in fn && (fn.description as string),
     'notes' in fn && (fn.notes as string),
   ]
@@ -476,11 +487,11 @@ async function FunctionSection({
 
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
-      <StickyHeader {...section} className="col-[1_/_-1]" />
+      <StickyHeader {...section} className="col-span-full" />
 
       {/* Display method signature below title */}
-      {types && formatMethodSignature(types) && (
-        <div className="col-[1_/_-1] -mt-2 mb-4">
+      {types && 'params' in types && formatMethodSignature(types) && (
+        <div className="col-span-full -mt-2 mb-4">
           <code className="text-sm text-foreground-muted font-mono">
             {formatMethodSignature(types)}
           </code>
@@ -488,7 +499,7 @@ async function FunctionSection({
       )}
 
       <div className="overflow-hidden flex flex-col gap-8">
-        <div className="prose break-words text-sm">
+        <div className="prose wrap-break-word text-sm">
           <MDXRemoteRefs source={fullDescription} />
         </div>
         <FnParameterDetails
@@ -500,12 +511,18 @@ async function FunctionSection({
                 }))
               : 'params' in fn
                 ? (fn.params as Array<object>).map((param) => ({ ...param, __overwritten: true }))
-                : types?.params
+                : types && 'params' in types
+                  ? types.params
+                  : undefined
           }
-          altParameters={types?.altSignatures?.map(({ params }) => params)}
+          altParameters={
+            types && 'altSignatures' in types
+              ? types.altSignatures?.map(({ params }) => params)
+              : undefined
+          }
           className="max-w-[80ch]"
         />
-        {!!types?.ret && <ReturnTypeDetails returnType={types.ret} />}
+        {types && 'ret' in types && !!types.ret && <ReturnTypeDetails returnType={types.ret} />}
       </div>
       <div className="overflow-auto">
         {(() => {
@@ -543,7 +560,6 @@ async function FunctionSection({
                 <TabsContent_Shadcn_ key={example.id} value={example.id}>
                   <MDXRemoteRefs source={example.code} />
                   <div className="flex flex-col gap-2 mt-2">
-                    {/* Only YAML examples have data/response/description fields */}
                     {'data' in example && !!example.data?.sql && (
                       <CollapsibleDetails title="Data source" content={example.data.sql} />
                     )}

@@ -1,19 +1,19 @@
 {
   "company": [
     {
-      "number": "180+",
-      "text": "team members\n\nin 35+ countries"
+      "number": "280+",
+      "text": "team members\n\nin 55+ countries"
     },
     {
-      "number": "15+",
+      "number": "20+",
       "text": "languages spoken"
     },
     {
-      "number": "$496M",
-      "text": "in funding"
+      "number": "$500M",
+      "text": "raised"
     },
     {
-      "number": "430,000+",
+      "number": "540,000+",
       "text": "community members"
     },
     {
@@ -25,27 +25,27 @@
     {
       "icon": "egoless",
       "title": "Egoless",
-      "text": "Willing to do the schlep, the team goals come first."
+      "text": "Mission driven, work for the good of colleagues."
     },
     {
-      "icon": "curious",
-      "title": "Polyglot",
-      "text": "Broad skillsets. Growth mindset."
-    },
-    {
-      "icon": "process",
-      "title": "Process Driven",
-      "text": "Engineer yourself out of the job."
+      "icon": "kaizen",
+      "title": "Kaizen Mindset",
+      "text": "Iterative approach, continuously improve all functions."
     },
     {
       "icon": "honesty",
-      "title": "Intellectual Honesty",
-      "text": "Put our own biases aside."
+      "title": "Truth Seeking",
+      "text": "Intellectually honest, act with integrity, recognize biases."
     },
     {
-      "icon": "flexibility",
-      "title": "Kaizen mindset",
-      "text": "Continuously improve all functions."
+      "icon": "batteries",
+      "title": "Batteries Included",
+      "text": "High ownership, intrinsically motivated, care about quality."
+    },
+    {
+      "icon": "undeniable",
+      "title": "Undeniable",
+      "text": "So good you earn respect, reliable, consistently deliver."
     }
   ],
   "contributors": [

@@ -1,5 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { partition } from 'lodash'
 import {
   Clock,
@@ -7,6 +8,7 @@ import {
   Infinity,
   MoreVertical,
   Pencil,
+  Redo,
   RefreshCw,
   Shield,
   Trash2,
@@ -14,21 +16,6 @@ import {
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
-import { useBranchQuery } from 'data/branches/branch-query'
-import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
-import { useBranchRestoreMutation } from 'data/branches/branch-restore-mutation'
-import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
-import type { Branch } from 'data/branches/branches-query'
-import { branchKeys } from 'data/branches/keys'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   DropdownMenu,
@@ -38,9 +25,23 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } from './BranchPanels'
 import { EditBranchModal } from './EditBranchModal'
 import { PreviewBranchesEmptyState } from './EmptyStates'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
+import { useBranchPushMutation } from '@/data/branches/branch-push-mutation'
+import { useBranchQuery } from '@/data/branches/branch-query'
+import { useBranchResetMutation } from '@/data/branches/branch-reset-mutation'
+import { useBranchRestoreMutation } from '@/data/branches/branch-restore-mutation'
+import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
+import type { Branch } from '@/data/branches/branches-query'
+import { branchKeys } from '@/data/branches/keys'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from '@/lib/constants'
 
 interface OverviewProps {
   isGithubConnected: boolean
@@ -236,7 +237,6 @@ const PreviewBranchActions = ({
   onSelectDeleteBranch: () => void
   generateCreatePullRequestURL: (branchName?: string) => string
 }) => {
-  const gitlessBranching = useIsBranching2Enabled()
   const queryClient = useQueryClient()
   const { project_ref: branchRef, parent_project_ref: projectRef } = branch
 
@@ -264,6 +264,7 @@ const PreviewBranchActions = ({
     setShowPersistentBranchDeleteConfirmationModal,
   ] = useState(false)
   const [showEditBranchModal, setShowEditBranchModal] = useState(false)
+  const [showConfirmRetriggersModal, setShowConfirmRetriggersModal] = useState(false)
 
   const { mutate: resetBranch, isPending: isResetting } = useBranchResetMutation({
     onSuccess() {
@@ -287,6 +288,20 @@ const PreviewBranchActions = ({
       setShowBranchModeSwitch(false)
     },
   })
+
+  const { mutate: branchPushMutate, isPending: isRetriggering } = useBranchPushMutation({
+    onSuccess() {
+      toast.success('Success! Please allow a few minutes for the branch to update.')
+      setShowConfirmRetriggersModal(false)
+    },
+    onError: (data) => {
+      toast.error(`Failed to trigger workflow: ${data.message}`)
+    },
+  })
+
+  const onRetriggerBranch = () => {
+    branchPushMutate({ branchRef, projectRef })
+  }
 
   const onRestoreBranch = () => {
     restoreBranch({ branchRef, projectRef })
@@ -321,57 +336,80 @@ const PreviewBranchActions = ({
           />
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" side="bottom" align="end">
-          {/* Edit Branch (gitless) */}
-          {gitlessBranching && (
-            <DropdownMenuItemTooltip
-              className="gap-x-2"
-              disabled={!canUpdateBranches || !isBranchActiveHealthy || isUpdatingBranch}
-              onSelect={(e) => {
-                e.stopPropagation()
-                setShowEditBranchModal(true)
-              }}
-              onClick={(e) => {
-                e.stopPropagation()
-                setShowEditBranchModal(true)
-              }}
-              tooltip={{
-                content: {
-                  side: 'left',
-                  text: !canUpdateBranches
-                    ? 'You need additional permissions to edit branches'
-                    : !isBranchActiveHealthy
-                      ? 'Branch is still initializing. Please wait for it to become healthy before editing.'
-                      : undefined,
-                },
-              }}
-            >
-              <Pencil size={14} /> Edit branch
-            </DropdownMenuItemTooltip>
-          )}
+          <DropdownMenuItemTooltip
+            className="gap-x-2"
+            disabled={!canUpdateBranches || !isBranchActiveHealthy || isUpdatingBranch}
+            onSelect={(e) => {
+              e.stopPropagation()
+              setShowEditBranchModal(true)
+            }}
+            onClick={(e) => {
+              e.stopPropagation()
+              setShowEditBranchModal(true)
+            }}
+            tooltip={{
+              content: {
+                side: 'left',
+                text: !canUpdateBranches
+                  ? 'You need additional permissions to edit branches'
+                  : !isBranchActiveHealthy
+                    ? 'Branch is still initializing. Please wait for it to become healthy before editing.'
+                    : undefined,
+              },
+            }}
+          >
+            <Pencil size={14} /> Edit branch
+          </DropdownMenuItemTooltip>
 
           {!branch.deletion_scheduled_at && (
-            <DropdownMenuItemTooltip
-              className="gap-x-2"
-              disabled={isResetting || !isBranchActiveHealthy}
-              onSelect={(e) => {
-                e.stopPropagation()
-                setShowConfirmResetModal(true)
-              }}
-              onClick={(e) => {
-                e.stopPropagation()
-                setShowConfirmResetModal(true)
-              }}
-              tooltip={{
-                content: {
-                  side: 'left',
-                  text: !isBranchActiveHealthy
-                    ? 'Branch is still initializing. Please wait for it to become healthy before resetting.'
-                    : undefined,
-                },
-              }}
-            >
-              <RefreshCw size={14} /> Reset branch
-            </DropdownMenuItemTooltip>
+            <>
+              <DropdownMenuItemTooltip
+                className="gap-x-2"
+                disabled={!canUpdateBranches || !isBranchActiveHealthy || isUpdatingBranch}
+                onSelect={(e) => {
+                  e.stopPropagation()
+                  setShowConfirmRetriggersModal(true)
+                }}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowConfirmRetriggersModal(true)
+                }}
+                tooltip={{
+                  content: {
+                    side: 'left',
+                    text: !canUpdateBranches
+                      ? `You need additional permissions to ${branch.git_branch ? 'resync' : 'rebase'} branches`
+                      : !isBranchActiveHealthy
+                        ? `Branch is still initializing. Please wait for it to become healthy before ${branch.git_branch ? 'resyncing' : 'rebasing'}.`
+                        : undefined,
+                  },
+                }}
+              >
+                <Redo size={14} /> {branch.git_branch ? 'Resync branch' : 'Rebase branch'}
+              </DropdownMenuItemTooltip>
+              <DropdownMenuItemTooltip
+                className="gap-x-2"
+                disabled={isResetting || !isBranchActiveHealthy}
+                onSelect={(e) => {
+                  e.stopPropagation()
+                  setShowConfirmResetModal(true)
+                }}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowConfirmResetModal(true)
+                }}
+                tooltip={{
+                  content: {
+                    side: 'left',
+                    text: !isBranchActiveHealthy
+                      ? 'Branch is still initializing. Please wait for it to become healthy before resetting.'
+                      : undefined,
+                  },
+                }}
+              >
+                <RefreshCw size={14} /> Reset branch
+              </DropdownMenuItemTooltip>
+            </>
           )}
 
           {!branch.deletion_scheduled_at && (
@@ -503,9 +541,25 @@ const PreviewBranchActions = ({
       </ConfirmationModal>
 
       <ConfirmationModal
+        variant="default"
+        visible={showConfirmRetriggersModal}
+        confirmLabel={branch.git_branch ? 'Resync' : 'Rebase'}
+        title={branch.git_branch ? 'Confirm branch resync' : 'Confirm branch rebase'}
+        loading={isRetriggering}
+        onCancel={() => setShowConfirmRetriggersModal(false)}
+        onConfirm={onRetriggerBranch}
+      >
+        <p className="text-sm text-foreground-light">
+          {branch.git_branch
+            ? 'This will re-run all steps of the workflow based on the latest git branch state.'
+            : 'This will re-run all steps of the workflow based on the latest dashboard state.'}
+        </p>
+      </ConfirmationModal>
+
+      <ConfirmationModal
         variant="warning"
         visible={showPersistentBranchDeleteConfirmationModal}
-        confirmLabel={'Switch to preview'}
+        confirmLabel="Switch to preview"
         title="Branch must be switched to preview before deletion"
         loading={isUpdatingBranch}
         onCancel={() => setShowPersistentBranchDeleteConfirmationModal(false)}

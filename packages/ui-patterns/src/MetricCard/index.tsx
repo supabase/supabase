@@ -72,7 +72,7 @@ const MetricCardHeader = React.forwardRef<HTMLDivElement, MetricCardHeaderProps>
       <div
         ref={ref}
         className={cn(
-          'py-4 px-6 flex flex-row items-center justify-between gap-2 space-y-0 pb-0 border-b-0 relative',
+          'p-card flex flex-row items-center justify-between gap-2 space-y-0 pb-0 border-b-0 relative',
           className
         )}
         {...props}
@@ -111,7 +111,7 @@ const MetricCardContent = React.forwardRef<HTMLDivElement, MetricCardContentProp
     <CardContent
       ref={ref}
       className={cn(
-        'pb-4 px-6 pt-0 flex-1 flex h-full items-start gap-1 overflow-hidden border-b-0',
+        'p-card pt-0 flex-1 flex h-full items-start gap-1 overflow-hidden border-b-0',
         orientation === 'horizontal' ? 'flex-row' : 'flex-col ',
         className
       )}
@@ -217,7 +217,7 @@ const SparklineTooltip = ({ active, payload, label }: RechartsTooltipProps<any, 
   }
 
   return (
-    <div className="bg-black/90 text-white p-2 rounded text-xs">
+    <div className="bg-black/90 text-white p-2 rounded-sm text-xs">
       {label && (
         <div className="dark:text-foreground-light text-white/60">
           {formatTimestamp(payload[0].payload.timestamp)}

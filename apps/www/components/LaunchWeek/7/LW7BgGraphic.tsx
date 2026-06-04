@@ -18,7 +18,7 @@ export default function LW7BgGraphic() {
   return (
     <div
       className={[
-        "relative h-[300px] md:h-[700px] overflow-hidden before:content[' '] before:absolute before:bottom-0 before:h-[200px] md:before:h-[600px] before:z-20 before:w-full before:bg-gradient-to-t before:from-[#1C1C1C] before:via-[#1C1C1C40] before:to-transparent",
+        "relative h-[300px] md:h-[700px] overflow-hidden before:content[' '] before:absolute before:bottom-0 before:h-[200px] md:before:h-[600px] before:z-20 before:w-full before:bg-linear-to-t before:from-[#1C1C1C] before:via-[#1C1C1C40] before:to-transparent",
         styles['gradient-overlay'],
       ].join(' ')}
     >

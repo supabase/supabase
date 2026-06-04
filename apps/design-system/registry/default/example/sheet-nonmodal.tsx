@@ -20,7 +20,7 @@ export default function SheetNonmodal() {
         <SheetHeader>
           <SheetTitle>Log details</SheetTitle>
         </SheetHeader>
-        <div className="overflow-auto flex-grow px-0">
+        <div className="overflow-auto grow px-0">
           <SheetSection>
             <p className="text-sm text-foreground-lighter">
               This sheet does not block the underlying content, but it does overlap it.

@@ -1,11 +1,11 @@
-import { type MouseEvent, type ReactNode, type UIEvent } from 'react'
-import DataGrid, { type Column, Row } from 'react-data-grid'
-
-import AlertError from 'components/ui/AlertError'
-import type { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
-import type { ResponseError } from 'types'
+import { type MouseEvent, type UIEvent } from 'react'
+import DataGrid, { Row, type Column } from 'react-data-grid'
 import { cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import AlertError from '@/components/ui/AlertError'
+import type { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
+import type { ResponseError } from '@/types'
 
 interface CronJobsTabDataGridProps {
   columns: readonly Column<CronJob>[]
@@ -15,7 +15,6 @@ interface CronJobsTabDataGridProps {
   searchQuery?: string | null
   onScroll: (event: UIEvent<HTMLDivElement>) => void
   onRowClick: (row: CronJob, event: MouseEvent<HTMLDivElement>) => void
-  overlay?: ReactNode
 }
 
 export const CronJobsTabDataGrid = ({
@@ -26,16 +25,13 @@ export const CronJobsTabDataGrid = ({
   searchQuery,
   onScroll,
   onRowClick,
-  overlay,
 }: CronJobsTabDataGridProps) => {
-  const fallbackContent = overlay ? (
-    <div className="absolute top-20 px-6 w-full flex justify-center">{overlay}</div>
-  ) : isLoading ? (
+  const fallbackContent = isLoading ? (
     <div className="absolute top-12 px-6 w-full">
       <GenericSkeletonLoader />
     </div>
   ) : error ? (
-    <div className="absolute top-28 px-10 flex flex-col items-center justify-center w-full">
+    <div className="absolute top-14 px-10 flex flex-col items-center justify-center w-full">
       <AlertError subject="Failed to retrieve cron jobs" error={error} />
     </div>
   ) : (
@@ -55,7 +51,7 @@ export const CronJobsTabDataGrid = ({
 
   return (
     <DataGrid
-      className="flex-grow border-t-0"
+      className="grow border-t-0! border-b-0!"
       rowHeight={44}
       headerRowHeight={36}
       columns={columns}
@@ -65,7 +61,7 @@ export const CronJobsTabDataGrid = ({
       rowClass={() => {
         return cn(
           'cursor-pointer',
-          '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+          '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
           '[&>.rdg-cell:first-child>div]:ml-8'
         )
       }}

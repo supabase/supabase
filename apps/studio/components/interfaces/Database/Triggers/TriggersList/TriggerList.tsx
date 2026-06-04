@@ -1,17 +1,9 @@
-import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { includes, sortBy } from 'lodash'
 import { Check, Copy, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
 import Link from 'next/link'
-
-import { useParams } from 'common'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { parseAsJson, parseAsString, useQueryState } from 'nuqs'
 import {
   Badge,
   Button,
@@ -23,25 +15,30 @@ import {
   TableCell,
   TableRow,
 } from 'ui'
-import { generateTriggerCreateSQL } from './TriggerList.utils'
+
+import {
+  generateTriggerCreateSQL,
+  getDatabaseFunctionsHref,
+  type PostgresTrigger,
+} from './TriggerList.utils'
+import { selectFilterSchema } from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useDatabaseTriggersQuery } from '@/data/database-triggers/database-triggers-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface TriggerListProps {
-  schema: string
-  filterString: string
-  isLocked: boolean
   editTrigger: (trigger: PostgresTrigger) => void
   duplicateTrigger: (trigger: PostgresTrigger) => void
   deleteTrigger: (trigger: PostgresTrigger) => void
 }
 
-export const TriggerList = ({
-  schema,
-  filterString,
-  isLocked,
-  editTrigger,
-  duplicateTrigger,
-  deleteTrigger,
-}: TriggerListProps) => {
+export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: TriggerListProps) => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const aiSnap = useAiAssistantStateSnapshot()
@@ -52,15 +49,27 @@ export const TriggerList = ({
     'triggers'
   )
 
+  const { selectedSchema: schema } = useQuerySchemaState()
+  const { isSchemaLocked: isLocked } = useIsProtectedSchema({ schema })
+  const [filterString] = useQueryState('search', parseAsString.withDefault(''))
+  const [tablesFilter] = useQueryState(
+    'tables',
+    parseAsJson(selectFilterSchema.parse).withDefault([])
+  )
+
   const { data: triggers } = useDatabaseTriggersQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const filteredTriggers = (triggers ?? []).filter(
-    (x) =>
-      includes(x.name.toLowerCase(), filterString.toLowerCase()) ||
-      (x.function_name && includes(x.function_name.toLowerCase(), filterString.toLowerCase()))
-  )
+  const filteredTriggers = (triggers ?? []).filter((x) => {
+    const search = filterString?.toLowerCase()
+    const matchesSearch =
+      !search ||
+      x.name.toLowerCase().includes(search) ||
+      (!!x.function_name && includes(x.function_name.toLowerCase(), search))
+    const matchesTables = !tablesFilter?.length || tablesFilter.includes(x.table)
+    return matchesSearch && matchesTables
+  })
   const _triggers = sortBy(
     filteredTriggers.filter((x) => x.schema == schema),
     (trigger) => trigger.name.toLocaleLowerCase()
@@ -126,7 +135,7 @@ export const TriggerList = ({
           <TableCell className="space-x-2">
             {x.function_name ? (
               <Link
-                href={`/project/${projectRef}/database/functions?search=${x.function_name}&schema=${x.function_schema}`}
+                href={getDatabaseFunctionsHref(projectRef, x.function_schema, x.function_name)}
                 className="text-link-table-cell block max-w-40 text-foreground-light"
               >
                 {x.function_name}
@@ -177,7 +186,6 @@ export const TriggerList = ({
                       <DropdownMenuItem
                         className="space-x-2"
                         onClick={() => {
-                          const sql = generateTriggerCreateSQL(x)
                           editTrigger(x)
                         }}
                       >

@@ -1,8 +1,7 @@
+import { useParams } from 'common'
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import { Fragment, ReactNode } from 'react'
-
-import { useParams } from 'common'
 import { cn } from 'ui'
 import {
   Breadcrumb,
@@ -12,6 +11,7 @@ import {
   BreadcrumbPage as BreadcrumbPageItem,
   BreadcrumbSeparator,
 } from 'ui/src/components/shadcn/ui/breadcrumb'
+
 import { ScaffoldDescription, ScaffoldTitle } from '../Scaffold'
 
 interface PageHeaderProps {
@@ -95,7 +95,7 @@ export const PageHeader = ({
             ) : null}
           </div>
           {isCompact && (
-            <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex items-center gap-2 shrink-0">
               {secondaryActions && (
                 <div className="flex items-center gap-2">{secondaryActions}</div>
               )}

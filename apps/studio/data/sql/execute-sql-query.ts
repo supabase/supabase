@@ -1,19 +1,20 @@
-import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
-import { QueryKey, useQuery } from '@tanstack/react-query'
-import { handleError as handleErrorFetchers, post } from 'data/fetchers'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { MB, PROJECT_STATUS } from 'lib/constants'
 import {
   ROLE_IMPERSONATION_NO_RESULTS,
   ROLE_IMPERSONATION_SQL_LINE_COUNT,
-} from 'lib/role-impersonation'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+  SafeSqlFragment,
+} from '@supabase/pg-meta'
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
+import { QueryKey, useQuery } from '@tanstack/react-query'
 
 import { sqlKeys } from './keys'
 import {
   calculateSummary,
   createNodeTree,
 } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.parser'
+import { handleError as handleErrorFetchers, post } from '@/data/fetchers'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { MB, PROJECT_STATUS } from '@/lib/constants'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 /**
  * [Joshen] Done a bit of stress testing and experimentation, tho we should still observe and tweak where necessary
@@ -21,13 +22,13 @@ import {
  * Reckon we ensure that the dashboard just caps query costs at "heavy", so that it doesn't impact the DB for other queries
  * (e.g from the user's application)
  */
-const COST_THRESHOLD = 100_000
+const COST_THRESHOLD = 200_000
 export const COST_THRESHOLD_ERROR = 'Query cost exceeds threshold'
 
 export type ExecuteSqlVariables = {
   projectRef?: string
   connectionString?: string | null
-  sql: string
+  sql: SafeSqlFragment
   queryKey?: QueryKey
   handleError?: (error: ResponseError) => { result: any }
   isRoleImpersonationEnabled?: boolean
@@ -112,6 +113,11 @@ export async function executeSql<T = any>(
         body: {
           query: `explain ${sql}`,
           disable_statement_timeout: isStatementTimeoutDisabled,
+        },
+        params: {
+          ...options.params,
+          // @ts-expect-error: This is just a client side thing to identify queries better
+          query: { key: 'preflight-check' },
         },
       })
       const parsedTree = !!costCheck ? createNodeTree(costCheck) : undefined

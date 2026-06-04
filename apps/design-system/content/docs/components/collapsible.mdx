@@ -1,67 +1,51 @@
 ---
 title: Collapsible
-description: An interactive component which expands/collapses a panel.
+description: An expandable content region using the shadcn Collapsible primitive.
 component: true
-featured: true
-links:
-  doc: https://www.radix-ui.com/docs/primitives/components/collapsible
-  api: https://www.radix-ui.com/docs/primitives/components/collapsible#api-reference
-source:
-  radix: true
-  shadcn: true
 ---
 
+Collapsible is a low-level primitive for revealing and hiding related content. Use it when a component needs custom trigger or content composition.
+
+Use Collapsible for generic disclosure behaviour: rows, sections, menus, tool details, and custom layouts. Use [Collapsible Alert](../fragments/collapsible-alert) instead when the disclosure is an alert-styled callout that should keep standard alert padding, variants, trigger styling, and toggle treatment.
+
 <ComponentPreview name="collapsible-demo" peekCode wide />
-
-## Installation
-
-<Tabs defaultValue="cli">
-
-<TabsList>
-  <TabsTrigger value="cli">CLI</TabsTrigger>
-  <TabsTrigger value="manual">Manual</TabsTrigger>
-</TabsList>
-<TabsContent value="cli">
-
-```bash
-npx shadcn-ui@latest add collapsible
-```
-
-</TabsContent>
-
-<TabsContent value="manual">
-
-<Steps>
-
-<Step>Install the following dependencies:</Step>
-
-```bash
-npm install @radix-ui/react-collapsible
-```
-
-<Step>Copy and paste the following code into your project.</Step>
-
-<ComponentSource name="collapsible" />
-
-<Step>Update the import paths to match your project setup.</Step>
-
-</Steps>
-
-</TabsContent>
-
-</Tabs>
 
 ## Usage
 
 ```tsx
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from 'ui/src/components/shadcn/ui/collapsible'
 ```
 
 ```tsx
 <Collapsible>
-  <CollapsibleTrigger>Can I use this in my project?</CollapsibleTrigger>
+  <CollapsibleTrigger>Toggle</CollapsibleTrigger>
   <CollapsibleContent>
-    Yes. Free to use for personal and commercial projects. No attribution required.
+    <p>Content revealed when expanded.</p>
   </CollapsibleContent>
 </Collapsible>
+```
+
+### Default open
+
+```tsx
+<Collapsible defaultOpen>
+  <CollapsibleTrigger>Details</CollapsibleTrigger>
+  <CollapsibleContent>
+    <p>This section is expanded by default.</p>
+  </CollapsibleContent>
+</Collapsible>
+```
+
+### Animation
+
+Add animation classes to `CollapsibleContent` when animated open and close transitions are needed.
+
+```tsx
+<CollapsibleContent className="data-closed:animate-collapsible-up data-open:animate-collapsible-down">
+  <p>Content revealed when expanded.</p>
+</CollapsibleContent>
 ```

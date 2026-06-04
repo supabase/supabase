@@ -32,7 +32,7 @@ function PostGrid({ id, className, header, subheader, posts }: PostGridProps) {
               key={post.slug}
             >
               {post.imgThumb && (
-                <div className="w-full aspect-video relative rounded-t-md dark:[mask-image:linear-gradient(to_bottom,_#000_0%,_#000_60%,_transparent_100%)]">
+                <div className="w-full aspect-video relative rounded-t-md dark:mask-[linear-gradient(to_bottom,#000_0%,#000_60%,transparent_100%)]">
                   <Image
                     src={
                       post.imgThumb.startsWith('/') || post.imgThumb.startsWith('http')
@@ -47,8 +47,8 @@ function PostGrid({ id, className, header, subheader, posts }: PostGridProps) {
               )}
 
               <div className="p-3 mt-auto flex flex-col gap-1">
-                <h3 className="p !mb-0 !text-foreground line-clamp-1">{post.title}</h3>
-                <p className="text-sm !mb-0 !text-foreground-light inline-flex items-center gap-2">
+                <h3 className="p mb-0! text-foreground! line-clamp-1">{post.title}</h3>
+                <p className="text-sm mb-0! text-foreground-light! inline-flex items-center gap-2">
                   <span>{post.readingTime}</span>
                 </p>
               </div>

@@ -1,12 +1,12 @@
 import { noop } from 'lodash'
-import { Select } from 'ui'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from 'ui'
 
-import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import { POSTGRES_DATA_TYPES } from '../SidePanelEditor.constants'
 import type { ColumnField } from '../SidePanelEditor.types'
 import { typeExpressionSuggestions } from './ColumnEditor.constants'
 import type { Suggestion } from './ColumnEditor.types'
 import InputWithSuggestions from './InputWithSuggestions'
+import type { EnumeratedType } from '@/data/enumerated-types/enumerated-types-query'
 
 interface ColumnDefaultValueProps {
   columnFields: ColumnField
@@ -36,21 +36,28 @@ const ColumnDefaultValue = ({
 
     if (enumType !== undefined) {
       return (
-        <Select
-          label="Default Value"
-          layout="vertical"
-          value={formattedValue}
-          onChange={(event: any) => onUpdateField({ defaultValue: event.target.value })}
-        >
-          <Select.Option key="empty-enum" value="">
-            NULL
-          </Select.Option>
-          {enumValues.map((value: string) => (
-            <Select.Option key={value} value={value}>
-              {value}
-            </Select.Option>
-          ))}
-        </Select>
+        <>
+          <label className="block text-foreground-light">Default Value</label>
+          <Select
+            name="select-editor"
+            value={formattedValue}
+            onValueChange={(value) => onUpdateField({ defaultValue: value })}
+          >
+            <SelectTrigger>
+              <SelectValue id="select-editor" placeholder="NULL" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value={null as any}>NULL</SelectItem>
+                {enumValues.map((value) => (
+                  <SelectItem key={value} value={value}>
+                    {value}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </>
       )
     }
   }

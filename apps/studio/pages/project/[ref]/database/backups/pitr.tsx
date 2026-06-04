@@ -1,23 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AlertCircle } from 'lucide-react'
-
 import { useParams } from 'common'
-import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
-import { PITRNotice } from 'components/interfaces/Database/Backups/PITR/PITRNotice'
-import { PITRSelection } from 'components/interfaces/Database/Backups/PITR/PITRSelection'
-import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import AlertError from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import NoPermission from 'components/ui/NoPermission'
-import { UpgradeToPro } from 'components/ui/UpgradeToPro'
-import { useBackupsQuery } from 'data/database/backups-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useIsOrioleDbInAws, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
+import { AlertCircle } from 'lucide-react'
+import { Alert, AlertDescription, AlertTitle } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -29,6 +13,22 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import DatabaseBackupsNav from '@/components/interfaces/Database/Backups/DatabaseBackupsNav'
+import { PITRNotice } from '@/components/interfaces/Database/Backups/PITR/PITRNotice'
+import { PITRSelection } from '@/components/interfaces/Database/Backups/PITR/PITRSelection'
+import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import AlertError from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import NoPermission from '@/components/ui/NoPermission'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useBackupsQuery } from '@/data/database/backups-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsOrioleDbInAws, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL, PROJECT_STATUS } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
 
 const DatabasePhysicalBackups: NextPageWithLayout = () => {
   return (
@@ -58,25 +58,25 @@ const DatabasePhysicalBackups: NextPageWithLayout = () => {
 
 DatabasePhysicalBackups.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+    <DatabaseLayout title="Backups">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 
 const PITR = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data: organization } = useSelectedOrganizationQuery()
+  const { hasAccess: hasAccessToPitr, isLoading: isLoadingEntitlements } =
+    useCheckEntitlements('pitr.available_variants')
   const isOrioleDbInAws = useIsOrioleDbInAws()
   const {
     data: backups,
     error,
-    isPending: isLoading,
+    isPending: isLoadingBackups,
     isError,
     isSuccess,
   } = useBackupsQuery({ projectRef })
 
-  const plan = organization?.plan?.id
-  const isFreePlan = plan === 'free'
+  const isLoading = isLoadingBackups || isLoadingEntitlements
   const isEnabled = backups?.pitr_enabled
   const isActiveHealthy = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
@@ -109,26 +109,26 @@ const PITR = () => {
         <>
           {!isEnabled ? (
             <UpgradeToPro
-              addon={isFreePlan ? undefined : 'pitr'}
+              addon={hasAccessToPitr ? 'pitr' : undefined}
               source="pitr"
-              featureProposition="enable Point in Time Recovery"
+              featureProposition="enable Point-in-Time Recovery"
               primaryText="Point in Time Recovery is a Pro Plan add-on"
               secondaryText={
-                isFreePlan
+                !hasAccessToPitr
                   ? 'Roll back your database to a specific second. Starts at $100/month. Pro Plan already includes daily backups at no extra cost.'
-                  : 'Please enable the add-on to enable point in time recovery for your project.'
+                  : 'Enable the add-on to add point-in-time recovery to your project.'
               }
             />
           ) : !isActiveHealthy ? (
-            <Alert_Shadcn_>
+            <Alert>
               <AlertCircle />
-              <AlertTitle_Shadcn_>
+              <AlertTitle>
                 Point in Time Recovery is not available while project is offline
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+              </AlertTitle>
+              <AlertDescription>
                 Your project needs to be online to restore your database with Point in Time Recovery
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
+              </AlertDescription>
+            </Alert>
           ) : (
             <>
               <PITRNotice />

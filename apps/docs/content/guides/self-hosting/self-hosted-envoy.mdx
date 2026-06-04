@@ -1,0 +1,318 @@
+---
+title: 'Envoy API Gateway'
+description: 'Architecture and configuration of the Envoy API gateway for self-hosted Supabase.'
+subtitle: 'Architecture and configuration of the Envoy API gateway for self-hosted Supabase.'
+---
+
+Self-hosted Supabase ships with an optional [Envoy](https://www.envoyproxy.io/)-based API gateway. It accepts incoming client requests, routes them to internal services (Auth, PostgREST, Realtime, Storage, Edge Functions, postgres-meta, Studio), and enforces API key authentication by translating opaque `sb_` keys into the internal credentials used by those services.
+
+This guide explains the architecture, configuration layout, and security posture of the Envoy gateway for operators who want to understand or customize it. It is not an Envoy tutorial - for reference on filters, routes, and clusters, see the [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/).
+
+## Before you begin
+
+- Complete the [Self-Hosting with Docker](/docs/guides/self-hosting/docker) setup
+- To enable opaque `sb_` key translation, see [New API Keys and Asymmetric Authentication](/docs/guides/self-hosting/self-hosted-auth-keys)
+
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
+## Enabling the Envoy gateway
+
+The Envoy gateway is provided as a Docker Compose override.
+
+<Admonition type="note">
+
+If your stack is already running from the initial setup, bring it down first with `docker compose down`.
+
+</Admonition>
+
+Start your self-hosted Supabase stack with both the base compose file and the Envoy override:
+
+```sh
+docker compose -f docker-compose.yml -f docker-compose.envoy.yml up -d
+```
+
+The override disables the default Kong gateway and starts Envoy on the same port (default `8000`). It also reconfigures the Functions service to wait for Envoy via a dependency.
+
+Envoy is registered as the `api-gw` service and also exposes `kong` as a network alias; the base Kong service likewise exposes `api-gw`. Either hostname resolves to whichever gateway is currently active, so internal configs that hardcode `kong:8000` (for example, in Edge Functions or Studio) keep working without changes.
+
+### Verify
+
+Confirm the gateway is routing requests and enforcing API keys:
+
+```sh
+curl -i -H "apikey: your-service-role-key" http://<your-domain>/rest/v1/
+```
+
+A `200 OK` response from PostgREST confirms the gateway is up. A `401 Unauthorized` without the `apikey` header confirms enforcement is active.
+
+## Architecture
+
+Envoy runs as a single container (`supabase-envoy`) with one listener on port `8000`. Every incoming request passes through an ordered chain of HTTP filters before being forwarded to an upstream cluster:
+
+```
+Client
+  │
+  ▼
+Listener (port 8000)
+  │
+  ▼
+HTTP filter chain
+  ├─ CORS
+  ├─ Basic Auth  (dashboard only)
+  ├─ Lua: copy ?apikey query to header
+  ├─ Lua: translate opaque keys in query
+  ├─ Lua: translate opaque keys in header
+  ├─ Lua: mirror apikey to x-api-key (Realtime WS)
+  ├─ Lua: synthesize Authorization header
+  ├─ Lua: 401 for missing/invalid API key
+  ├─ RBAC  (global: service_role → /pg/, apikey → other API routes;
+  │         per-route DENY override on /mcp)
+  └─ Router
+          │
+          ▼
+Upstream clusters
+  ├─ auth        (auth:9999)
+  ├─ rest        (rest:3000)
+  ├─ realtime    (realtime-dev.supabase-realtime:4000)
+  ├─ storage     (storage:5000)
+  ├─ functions   (functions:9000)
+  ├─ meta        (meta:8080)
+  └─ studio      (studio:3000)
+```
+
+Routes are matched in the order declared in the listener config. Each route selects an upstream cluster, rewrites the request path prefix, and can override filter behavior (for example, disabling basic auth on API routes or denying all traffic on MCP routes).
+
+## Configuration file structure
+
+All Envoy configuration lives in `./volumes/api/envoy/` (relative to the directory containing `docker-compose.yml`):
+
+| File                   | Purpose                                                                                                                                                                                     |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `envoy.yaml`           | Bootstrap configuration. Points Envoy at the CDS and LDS files, configures the admin interface, and sets an overload manager limit on downstream connections.                               |
+| `cds.yaml`             | Cluster Discovery Service - upstream service definitions (DNS, ports, health checks, connect timeouts, circuit breakers).                                                                   |
+| `lds.template.yaml`    | Listener Discovery Service template. Defines the listener, filter chain, routes, RBAC policy, and CORS policy. Contains placeholders for keys and credentials.                              |
+| `docker-entrypoint.sh` | Renders the LDS template into `lds.yaml` at container startup by substituting environment variables, computes a SHA1+base64 hash of `DASHBOARD_PASSWORD` for basic auth, then starts Envoy. |
+
+### How the configuration is rendered at startup
+
+Envoy cannot natively read environment variables inside its config. The entrypoint script renders environment-specific values into the listener config with `sed` before launching Envoy:
+
+1. A SHA1+base64 hash of `DASHBOARD_PASSWORD` is computed and joined with `DASHBOARD_USERNAME` into a single `DASHBOARD_BASIC_AUTH` string in the `username:{SHA}<base64-encoded-sha1>` format that Envoy's `basic_auth` filter expects. Other hash formats are not supported.
+2. The following variables are then substituted into `lds.template.yaml` and the result is written to `lds.yaml`:
+
+| Variable                      | Used for                                                                  |
+| ----------------------------- | ------------------------------------------------------------------------- |
+| `ANON_KEY`                    | Legacy HS256 anon JWT (API key validation, RBAC)                          |
+| `SERVICE_ROLE_KEY`            | Legacy HS256 service_role JWT (API key validation, RBAC)                  |
+| `SUPABASE_PUBLISHABLE_KEY`    | Opaque `sb_publishable_*` key (translation source)                        |
+| `SUPABASE_SECRET_KEY`         | Opaque `sb_secret_*` key (translation source)                             |
+| `ANON_KEY_ASYMMETRIC`         | Pre-signed ES256 anon JWT (translation target; internal use only)         |
+| `SERVICE_ROLE_KEY_ASYMMETRIC` | Pre-signed ES256 service_role JWT (translation target; internal use only) |
+| `DASHBOARD_BASIC_AUTH`        | Dashboard basic auth credentials (computed in step 1)                     |
+
+3. If all four of `SUPABASE_SECRET_KEY`, `SUPABASE_PUBLISHABLE_KEY`, `ANON_KEY_ASYMMETRIC`, and `SERVICE_ROLE_KEY_ASYMMETRIC` are set, opaque key translation is enabled. Otherwise, Envoy runs in legacy-only mode and only legacy HS256 keys are accepted. The entrypoint prints which mode is active to the container log at startup.
+
+<Admonition type="note">
+
+Configuration changes require restarting the container so the entrypoint re-renders the template:
+
+```sh
+docker compose -f docker-compose.yml -f docker-compose.envoy.yml restart api-gw
+```
+
+</Admonition>
+
+## Routes
+
+Routes are matched in the order declared. The first matching prefix wins. Protected routes require a valid `apikey` header; open routes pass through without API key validation.
+
+| Path prefix                               | Upstream  | Path rewrite             | Access control    | Notes                                                                  |
+| ----------------------------------------- | --------- | ------------------------ | ----------------- | ---------------------------------------------------------------------- |
+| `/auth/v1/verify`                         | auth      | `/verify`                | Open              | Email verification                                                     |
+| `/auth/v1/callback`                       | auth      | `/callback`              | Open              | OAuth callback                                                         |
+| `/auth/v1/authorize`                      | auth      | `/authorize`             | Open              | OAuth authorize                                                        |
+| `/auth/v1/.well-known/jwks.json`          | auth      | `/.well-known/jwks.json` | Open              | JWKS for third-party verification                                      |
+| `/.well-known/oauth-authorization-server` | auth      | -                        | Open              | OAuth 2.0 Authorization Server Metadata (RFC 8414)                     |
+| `/sso/saml/acs`                           | auth      | -                        | Open              | SAML assertion consumer                                                |
+| `/sso/saml/metadata`                      | auth      | -                        | Open              | SAML metadata                                                          |
+| `/functions/v1/`                          | functions | `/`                      | Bypass            | Edge Functions runtime performs its own JWT verification; 150s timeout |
+| `/storage/v1/`                            | storage   | `/`                      | Bypass            | Storage performs its own authorization                                 |
+| `/auth/v1/`                               | auth      | `/`                      | API key           | Protected Auth endpoints                                               |
+| `/rest/v1/`                               | rest      | `/`                      | API key           | PostgREST                                                              |
+| `/graphql/v1`                             | rest      | `/rpc/graphql`           | API key           | pg_graphql (adds `Content-Profile: graphql_public`)                    |
+| `/realtime/v1/api`                        | realtime  | `/api`                   | API key           | Realtime REST API                                                      |
+| `/realtime/v1/`                           | realtime  | `/socket/`               | API key           | Realtime WebSocket                                                     |
+| `/pg/`                                    | meta      | `/`                      | Service role only | postgres-meta - used by Studio for database access                     |
+| `/api/mcp`                                | studio    | -                        | Denied            | MCP endpoint (blocked by default via RBAC DENY)                        |
+| `/mcp`                                    | studio    | `/api/mcp`               | Denied            | MCP endpoint (blocked by default via RBAC DENY)                        |
+| `/` (catch-all)                           | studio    | -                        | Basic auth        | Dashboard; strips inbound `Authorization` header                       |
+
+<Admonition type="note">
+
+MCP routes are denied at the gateway by default. Allowing local access requires editing the RBAC rule on the `/mcp` route. See the inline comments in `lds.template.yaml` for the allowed pattern, and [Enabling MCP Server Access](/docs/guides/self-hosting/enable-mcp) for the security model.
+
+</Admonition>
+
+## Authentication
+
+The gateway handles three authentication-related steps: dashboard basic auth on the catch-all route, API key enforcement on protected routes, and an opaque-to-internal key translation step that runs before enforcement.
+
+### Dashboard basic auth
+
+The catch-all `/` route requires HTTP basic auth with credentials from `DASHBOARD_USERNAME` and `DASHBOARD_PASSWORD`. The `Authorization` header is stripped (regardless of scheme) before the request is forwarded to Studio, so the basic auth credentials never reach the upstream service.
+
+### API key enforcement on protected routes
+
+The protected routes (`/auth/v1/`, `/rest/v1/`, `/graphql/v1`, `/realtime/v1/api`, `/realtime/v1/`, `/pg/`) require the `apikey` header to contain a valid configured key. Acceptable keys are the new opaque `sb_publishable_*` and `sb_secret_*` keys (translated to internal JWTs) or the legacy `ANON_KEY` and `SERVICE_ROLE_KEY` HS256 JWT API keys.
+
+A Lua filter rejects missing or invalid keys with HTTP `401 Unauthorized`. An RBAC filter then applies finer-grained rules:
+
+- `/pg/` - only `service_role` keys (`sb_secret_*` or legacy `SERVICE_ROLE_KEY`) are allowed (HTTP `403` otherwise).
+- All other protected routes - any valid configured key is allowed.
+
+### Opaque key translation
+
+When the new API keys (`sb_publishable_*`, `sb_secret_*`) are configured, a chain of Lua filters translates opaque keys into the corresponding pre-signed internal JWTs before the request reaches API key enforcement and upstream services. **The entire chain is skipped on `/functions/v1/`**: the Edge Runtime receives the original `apikey` and `Authorization` headers unchanged.
+
+The chain operates in this order:
+
+1. **Query parameter copy.** If the request has `?apikey=...` but no `apikey` header, the value is copied into the `apikey` header. This normalizes query-only clients (such as Realtime WebSocket connections from browsers, where custom headers are not available).
+2. **Query parameter translation.** If the `apikey` query parameter contains an opaque key, it is replaced - both in the URL and in the `apikey` header - with the corresponding pre-signed internal JWT.
+3. **Header translation.** If the `apikey` header contains an opaque key, it is replaced with the corresponding pre-signed internal JWT.
+4. **`x-api-key` mirror.** On the Realtime WebSocket route, the `apikey` value is copied into the `x-api-key` header (which Realtime reads first for WebSocket authentication).
+5. **`Authorization` synthesis.** If the client did not send a real JWT in the `Authorization` header (or sent only a `Bearer sb_*` value, which is not a valid JWT), the gateway synthesizes `Authorization: Bearer <apikey>` from the (potentially translated) `apikey` header. This is skipped on the Realtime WebSocket route, which uses `x-api-key` instead.
+
+For background on opaque vs asymmetric keys, see [New API Keys and Asymmetric Authentication](/docs/guides/self-hosting/self-hosted-auth-keys).
+
+## Forwarded headers and CORS
+
+### X-Forwarded headers
+
+Envoy attaches forwarded headers to every upstream request so downstream services can reconstruct the original client-facing URL.
+
+| Header               | Value                                                                             |
+| -------------------- | --------------------------------------------------------------------------------- |
+| `X-Forwarded-Host`   | The client's `Host` header (added if not already present)                         |
+| `X-Forwarded-Port`   | The listener port (`8000`)                                                        |
+| `X-Forwarded-Proto`  | Set automatically by Envoy based on the connection (`http` or `https`)            |
+| `X-Forwarded-Prefix` | Set per-route to the matched path prefix (for example, `/storage/v1` for Storage) |
+| `X-Forwarded-For`    | Set automatically because `use_remote_address: true` is enabled on the listener   |
+
+<Admonition type="caution">
+
+`X-Forwarded-Prefix` is required by Storage for S3 signature v4 verification and for constructing TUS upload Location URLs.
+
+</Admonition>
+
+### CORS
+
+The gateway applies a permissive CORS policy at the virtual-host level:
+
+- All origins allowed
+- Methods: `GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD, CONNECT, TRACE`
+- All request and response headers allowed
+- Preflight max-age: 3600 seconds
+
+This matches both the current Supabase platform behavior and the previous Kong-based gateway. The auth boundary for Supabase APIs is the `apikey` header rather than the request origin.
+
+<Admonition type="note">
+
+If you customize the `cors:` block in `lds.template.yaml` to enable `allow_credentials: true`, you must restrict `allow_origin_string_match` to specific origins - browsers (and Envoy) reject the combination of credentials with a wildcard origin.
+
+</Admonition>
+
+## Security hardening
+
+The gateway is configured with these production-oriented settings:
+
+| Setting                                               | Purpose                                                                                                                                                                                            |
+| ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `normalize_path: true`, `merge_slashes: true`         | Prevents path-confusion bypass of RBAC prefix rules                                                                                                                                                |
+| `path_with_escaped_slashes_action: REJECT_REQUEST`    | Rejects requests that contain URL-encoded slashes in the path                                                                                                                                      |
+| `use_remote_address: true`                            | Treats Envoy as an edge proxy: uses the peer connection IP as the trusted client address (rather than trusting client-supplied `X-Forwarded-For`) and strips untrusted `x-envoy-*` request headers |
+| `headers_with_underscores_action: REJECT_REQUEST`     | Blocks header smuggling attacks that exploit underscore-vs-hyphen normalization                                                                                                                    |
+| `per_connection_buffer_limit_bytes: 32768`            | Caps per-connection buffer memory to 32 KiB                                                                                                                                                        |
+| `max_active_downstream_connections: 30000`            | Overload manager limit on total downstream connections                                                                                                                                             |
+| Admin interface bound to `127.0.0.1:9901`             | The admin API is reachable only from inside the container, not from other containers or the host                                                                                                   |
+| Image pinned to `envoyproxy/envoy:v1.37.2` (or newer) | Includes published security patches for Envoy 1.37.x                                                                                                                                               |
+
+<Admonition type="caution">
+
+The Envoy admin interface at `127.0.0.1:9901` exposes `/config_dump`, which contains the fully rendered configuration including all API keys, JWTs, and the basic auth hash in plaintext. Never expose port 9901 to other containers or to the host.
+
+</Admonition>
+
+<Admonition type="note">
+
+The gateway listens on plain HTTP only and does not terminate TLS. For public deployments, terminate TLS at an upstream reverse proxy - the Docker setup ships `docker-compose.caddy.yml` and `docker-compose.nginx.yml` for this purpose.
+
+</Admonition>
+
+## Customizing the configuration
+
+All routing, filter, and cluster changes are made in the YAML files under `./volumes/api/envoy/`.
+
+- **Adding or modifying routes.** Edit `lds.template.yaml`. Routes are ordered - place new routes before the catch-all `/` route to ensure they match. Keep per-route `basic_auth: disabled` for API routes and set an appropriate RBAC override if the route should bypass the global policy.
+- **Adding a new upstream service.** Add a cluster definition to `cds.yaml` with the service's DNS name and port, then reference it from a route's `cluster:` field.
+- **Adding a new environment variable.** Placeholders in the template use the `${VAR_NAME}` form. If you add a placeholder, update both `docker-compose.envoy.yml` (to pass the variable into the container) and `docker-entrypoint.sh` (to substitute it with `sed`).
+- **Applying changes.** Envoy reads the rendered `lds.yaml` from the filesystem. Configuration changes require restarting the container so the entrypoint re-renders the template:
+
+```sh
+docker compose -f docker-compose.yml -f docker-compose.envoy.yml restart api-gw
+```
+
+<Admonition type="note">
+
+This guide does not cover Envoy's route, filter, and cluster reference. See the [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/) for the full configuration surface.
+
+</Admonition>
+
+## Admin interface
+
+Envoy exposes an admin interface on `127.0.0.1:9901` inside the container, with endpoints like `/ready`, `/clusters`, `/stats`, and `/config_dump`. The standard `envoyproxy/envoy` image is minimal (no `curl` or `wget`), so the admin endpoints are not reachable via `docker exec` without adding tooling.
+
+The simplest way to query the admin interface during debugging is to run a short-lived `curl` container that joins the same network namespace as `supabase-envoy`:
+
+```sh
+docker run --rm --network container:supabase-envoy curlimages/curl http://127.0.0.1:9901/clusters
+```
+
+```sh
+docker run --rm --network container:supabase-envoy curlimages/curl http://127.0.0.1:9901/stats
+```
+
+```sh
+docker run --rm --network container:supabase-envoy curlimages/curl http://127.0.0.1:9901/config_dump
+```
+
+<Admonition type="caution">
+
+`/config_dump` includes secrets in plaintext. Never expose port `9901` to a public network or untrusted host, and never share its output without first removing secrets.
+
+</Admonition>
+
+## Troubleshooting
+
+### Logs
+
+Envoy writes access logs and filter output to stdout. View them with:
+
+```sh
+docker compose -f docker-compose.yml -f docker-compose.envoy.yml logs api-gw
+```
+
+The access log format is a standard combined log with the request method, original path, response code, and bytes sent.
+
+### Common issues
+
+- **`401 Unauthorized` on a protected route.** The `apikey` header is missing or does not match any configured key. Verify that the header value exactly matches one of `ANON_KEY`, `SERVICE_ROLE_KEY`, `SUPABASE_PUBLISHABLE_KEY`, or `SUPABASE_SECRET_KEY` in your `.env` file. Note that `SUPABASE_PUBLISHABLE_KEY` and `SUPABASE_SECRET_KEY` are only accepted when the new key configuration is fully set up - see [New API Keys and Asymmetric Authentication](/docs/guides/self-hosting/self-hosted-auth-keys).
+- **`403 Forbidden` on `/pg/`.** The `/pg/` route requires a service_role key (`SUPABASE_SECRET_KEY` or legacy `SERVICE_ROLE_KEY`). Anon and publishable keys are rejected.
+- **`403 Forbidden` on `/api/mcp` or `/mcp`.** These routes are blocked by default. See [Enabling MCP Server Access](/docs/guides/self-hosting/enable-mcp).
+- **`SignatureDoesNotMatch` on S3 requests to Storage.** Verify that the Storage service configuration in `docker-compose.yml` contains `REQUEST_ALLOW_X_FORWARDED_PATH=true` and `STORAGE_PUBLIC_URL`. Storage uses the `X-Forwarded-Prefix` header the gateway sends to reconstruct the original request path for SigV4 verification.
+- **`400 Bad Request` with underscore headers.** `headers_with_underscores_action: REJECT_REQUEST` is enabled. Some clients send headers like `X_Forwarded_For` with underscores; these are rejected. Use hyphens in header names.
+
+## See also
+
+- [New API Keys and Asymmetric Authentication](/docs/guides/self-hosting/self-hosted-auth-keys) - Background on opaque keys and asymmetric JWTs
+- [Configure Reverse Proxy and HTTPS](/docs/guides/self-hosting/self-hosted-proxy-https) - Caddy or Nginx in front of the gateway
+- [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/) - Filter, route, and cluster reference
