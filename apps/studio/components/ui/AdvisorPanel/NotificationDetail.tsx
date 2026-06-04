@@ -1,10 +1,11 @@
 import { Archive, ArchiveRestoreIcon, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
-import { Markdown } from 'components/interfaces/Markdown'
-import { Notification, NotificationData } from 'data/notifications/notifications-v2-query'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+
+import { Markdown } from '@/components/interfaces/Markdown'
+import { Notification, NotificationData } from '@/data/notifications/notifications-v2-query'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 
 interface NotificationDetailProps {
   notification: Notification
@@ -69,9 +70,9 @@ export const NotificationDetail = ({ notification, onUpdateStatus }: Notificatio
           const key = `${notification.id}-action-${idx}`
           if (action.url !== undefined) {
             const url = action.url.includes('[ref]')
-              ? action.url.replace('[ref]', project?.ref ?? '_')
+              ? action.url.replace('[ref]', project?.ref ?? data.project_ref ?? '_')
               : action.url.includes('[slug]')
-                ? action.url.replace('[slug]', organization?.slug ?? '_')
+                ? action.url.replace('[slug]', organization?.slug ?? data.org_slug ?? '_')
                 : action.url
             return (
               <Button key={key} type="default" icon={<ExternalLink strokeWidth={1.5} />} asChild>

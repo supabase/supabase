@@ -8,7 +8,7 @@ export const alertVariants = cva(
     // Container
     'relative w-full text-sm rounded-lg border p-4',
     // Icon SVG
-    '[&>svg~*]:pl-10 [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground [&>svg]:w-[23px] [&>svg]:h-[23px] [&>svg]:p-1 [&>svg]:flex [&>svg]:rounded'
+    '[&>svg~*]:pl-10 [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground [&>svg]:w-[23px] [&>svg]:h-[23px] [&>svg]:p-1 [&>svg]:flex [&>svg]:rounded-sm'
   ),
   {
     variants: {
@@ -16,9 +16,9 @@ export const alertVariants = cva(
         default:
           'bg-surface-200/25 border-default text-foreground [&>svg]:text-background [&>svg]:bg-foreground',
         destructive:
-          'bg-destructive-200 border-destructive-400 [&>svg]:text-destructive-200 [&>svg]:bg-destructive-600',
+          'bg-destructive-200 border-destructive-400 text-foreground [&>svg]:text-destructive-200 [&>svg]:bg-destructive-600',
         warning:
-          'bg-warning-200 border-warning-400 [&>svg]:text-warning-200 [&>svg]:bg-warning-600',
+          'bg-warning-200 border-warning-400 text-foreground [&>svg]:text-warning-200 [&>svg]:bg-warning-600',
       },
     },
     defaultVariants: {

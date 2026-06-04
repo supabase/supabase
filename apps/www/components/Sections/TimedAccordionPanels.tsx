@@ -39,7 +39,7 @@ const TimedPanel = ({
       onClick={() => isSm && onClick && onClick()}
       className={cn(
         'relative hover:text-foreground w-full h-[500px] text-left text-lg flex flex-col group transition-all',
-        isActive ? 'text-foreground md:flex-[2]' : 'text-foreground-light md:flex-[1]'
+        isActive ? 'text-foreground md:flex-2' : 'text-foreground-light md:flex-1'
       )}
       aria-selected={isActive}
       role="tab"
@@ -57,7 +57,7 @@ const TimedPanel = ({
           <p
             className={cn(
               'pt-2 text-foreground-lighter text-sm max-w-[220px] md:opacity-0 transition-opacity lg:opacity-100',
-              isActive && '!opacity-100'
+              isActive && 'opacity-100!'
             )}
           >
             {paragraph}
@@ -71,7 +71,7 @@ const TimedPanel = ({
         >
           <div
             className={cn(
-              'absolute z-20 w-full h-full inset-0 bg-gradient-to-r from-transparent to-background-surface-100 transition-opacity pointer-events-none',
+              'absolute z-20 w-full h-full inset-0 bg-linear-to-r from-transparent to-background-surface-100 transition-opacity pointer-events-none',
               isActive && 'opacity-0'
             )}
           />
@@ -79,7 +79,7 @@ const TimedPanel = ({
         </div>
       </Panel>
       {!isSm && isActive && (
-        <div className="opacity-0 animate-fade-in absolute bottom-0 w-full h-[1px] bg-border-strong group-hover:opacity-100 rounded-full overflow-hidden">
+        <div className="opacity-0 animate-fade-in absolute bottom-0 w-full h-px bg-border-strong group-hover:opacity-100 rounded-full overflow-hidden">
           <LazyMotion features={domAnimation}>
             <m.div
               className={cn(

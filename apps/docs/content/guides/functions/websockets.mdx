@@ -13,6 +13,8 @@ This allows you to:
 - Create WebSocket relay servers for external APIs
 - Establish both incoming and outgoing WebSocket connections
 
+For a production-ready reconnect pattern with session persistence and replay, see [Resumable WebSockets with Edge Functions](/docs/guides/functions/examples/resumable-websockets).
+
 ---
 
 ## Creating WebSocket servers
@@ -135,9 +137,11 @@ To authenticate the user making WebSocket requests, you can pass the JWT in URL 
 ```ts
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
+const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL'),
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+  // If you want to use a different api key, change 'default' to your preferred key name
+  SUPABASE_SECRET_KEYS['default']
 )
 
 Deno.serve((req) => {
@@ -188,9 +192,11 @@ Deno.serve((req) => {
 ```ts
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
+const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL'),
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+  // If you want to use a different api key, change 'default' to your preferred key name
+  SUPABASE_SECRET_KEYS['default']
 )
 
 Deno.serve((req) => {
@@ -244,6 +250,8 @@ Deno.serve((req) => {
 The maximum duration is capped based on the wall-clock, CPU, and memory limits. The Function will shutdown when it reaches one of these [limits](/docs/guides/functions/limits).
 
 </Admonition>
+
+When using WebSockets, keep in mind that the HTTP request is considered complete after `Deno.upgradeWebSocket(req)` returns the response. To prevent early worker retirement while the socket is still open, keep an unresolved `EdgeRuntime.waitUntil()` promise that resolves in `socket.onclose`.
 
 ---
 

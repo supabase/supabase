@@ -1,20 +1,15 @@
 'use client'
 
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import {
-  cn,
-  Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverAnchor_Shadcn_,
-  PopoverContent_Shadcn_,
-} from 'ui'
+import { cn, Input, Popover, PopoverAnchor, PopoverContent } from 'ui'
+
 import { DefaultCommandList } from './DefaultCommandList'
 import { useFilterBar } from './FilterBarContext'
 import { FilterCondition } from './FilterCondition'
 import { useDeferredBlur, useHighlightNavigation } from './hooks'
 import { buildPropertyItems } from './menuItems'
 import { FilterGroup as FilterGroupType } from './types'
-import { pathsEqual } from './utils'
+import { buildFilterPlaceholder, pathsEqual } from './utils'
 
 export type FilterGroupProps = {
   group: FilterGroupType
@@ -26,10 +21,11 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
     filterProperties,
     activeInput,
     freeformText,
-    isLoading,
     supportsOperators,
     actions,
     variant,
+    highlightedConditionPath,
+    freeformDefaultProperty,
     handleInputBlur,
     handleGroupFreeformFocus,
     handleGroupFreeformChange,
@@ -45,7 +41,6 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
 
   const isActive = activeInput?.type === 'group' && pathsEqual(path, activeInput.path)
 
-  // Reset local value when group freeform value is cleared
   useEffect(() => {
     if (freeformText === '') {
       setLocalFreeformValue('')
@@ -82,6 +77,26 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
     return activeInput.type === 'operator' && pathsEqual(conditionPath, activeInput.path)
   }
 
+  const isPropertyActiveForCondition = (conditionPath: number[]) => {
+    if (!activeInput) return false
+    return activeInput.type === 'property' && pathsEqual(conditionPath, activeInput.path)
+  }
+
+  const isConditionHighlighted = (conditionPath: number[]) => {
+    if (!highlightedConditionPath) return false
+    return pathsEqual(conditionPath, highlightedConditionPath)
+  }
+
+  // Free-text search only applies to the root group's input — nested groups don't synthesize
+  // a "Search <property>" item.
+  const resolvedFreeformDefaultProperty = useMemo(
+    () =>
+      path.length === 0 && freeformDefaultProperty
+        ? filterProperties.find((p) => p.name === freeformDefaultProperty)
+        : undefined,
+    [path.length, freeformDefaultProperty, filterProperties]
+  )
+
   const items = useMemo(
     () =>
       buildPropertyItems({
@@ -89,8 +104,25 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
         inputValue: (isActive ? freeformText : localFreeformValue) || '',
         actions,
         supportsOperators,
+        freeformDefaultProperty: resolvedFreeformDefaultProperty,
       }),
-    [filterProperties, isActive, freeformText, localFreeformValue, actions, supportsOperators]
+    [
+      filterProperties,
+      isActive,
+      freeformText,
+      localFreeformValue,
+      actions,
+      supportsOperators,
+      resolvedFreeformDefaultProperty,
+    ]
+  )
+
+  const emptyPlaceholder = useMemo(
+    () =>
+      buildFilterPlaceholder(filterProperties, {
+        hasActions: actions && actions.length > 0,
+      }),
+    [filterProperties, actions]
   )
 
   // Only the root group should expand to fill available space
@@ -105,7 +137,8 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
     (index) => {
       if (items[index]) handleSelectMenuItem(items[index])
     },
-    handleKeyDown
+    handleKeyDown,
+    { skipEnterWhenFilterHighlighted: highlightedConditionPath !== null }
   )
 
   useEffect(() => {
@@ -119,11 +152,11 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
         path.length > 0
           ? "before:content-['('] before:text-foreground-muted after:content-[')'] after:text-foreground-muted"
           : ''
-      } ${isRootGroup ? 'flex-1 min-w-0' : ''} ${variant === 'pill' ? 'py-2' : ''}`}
+      } ${isRootGroup ? 'flex-1 min-w-0' : ''}`}
     >
       <div
         className={cn(
-          'flex items-stretch',
+          'flex items-center flex-wrap',
           isRootGroup ? 'flex-1 min-w-0' : '',
           variant === 'pill' ? 'gap-1' : 'gap-0'
         )}
@@ -155,15 +188,17 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                   path={currentPath}
                   isActive={isConditionActive(currentPath)}
                   isOperatorActive={isOperatorActive(currentPath)}
+                  isPropertyActive={isPropertyActiveForCondition(currentPath)}
+                  isHighlighted={isConditionHighlighted(currentPath)}
                 />
               )}
             </React.Fragment>
           )
         })}
-        <Popover_Shadcn_ open={isActive && !isLoading && items.length > 0}>
-          <PopoverAnchor_Shadcn_ asChild>
+        <Popover open={isActive && items.length > 0 && !highlightedConditionPath}>
+          <PopoverAnchor asChild>
             {isRootGroup ? (
-              <Input_Shadcn_
+              <Input
                 ref={freeformInputRef}
                 type="text"
                 value={isActive ? freeformText : localFreeformValue}
@@ -171,15 +206,19 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                 onFocus={() => handleGroupFreeformFocus(path)}
                 onBlur={handleFreeformBlur}
                 onKeyDown={handleFreeformKeyDown}
-                className="border-none bg-transparent text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full flex-1 h-auto min-w-0 px-2 py-0"
+                className="border-none bg-transparent text-xs focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full flex-1 h-auto min-w-0 px-2 py-1"
                 placeholder={
-                  group.conditions.length === 0 ? 'Search or filter...' : '+ Search or filter...'
+                  group.conditions.length === 0 ? emptyPlaceholder : 'Add more filters...'
                 }
-                disabled={isLoading}
+                data-testid="filter-bar-freeform-input"
+                autoComplete="off"
+                data-1p-ignore
+                data-lpignore="true"
+                data-form-type="other"
               />
             ) : (
-              <div className="relative inline-block">
-                <Input_Shadcn_
+              <div className="relative inline-block py-1">
+                <Input
                   ref={freeformInputRef}
                   type="text"
                   value={isActive ? freeformText : localFreeformValue}
@@ -187,21 +226,23 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                   onFocus={() => handleGroupFreeformFocus(path)}
                   onBlur={handleFreeformBlur}
                   onKeyDown={handleFreeformKeyDown}
-                  className="h-full border-none bg-transparent py-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full absolute left-0 top-0 px-2"
+                  className="h-full border-none bg-transparent py-0 text-xs md:text-xs focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full absolute left-0 top-0 px-2"
                   placeholder="+ Add filter"
-                  disabled={isLoading}
+                  autoComplete="off"
+                  data-1p-ignore
+                  data-lpignore="true"
+                  data-form-type="other"
                 />
                 <span className="invisible whitespace-pre text-xs block">
                   {(isActive ? freeformText : localFreeformValue) || '+'}
                 </span>
               </div>
             )}
-          </PopoverAnchor_Shadcn_>
-          <PopoverContent_Shadcn_
-            className="min-w-[220px] p-0"
+          </PopoverAnchor>
+          <PopoverContent
+            className="min-w-[220px] max-w-[360px] p-0"
             align="start"
             side="bottom"
-            portal
             onOpenAutoFocus={(e) => e.preventDefault()}
             onCloseAutoFocus={(e) => e.preventDefault()}
             onInteractOutside={(e) => {
@@ -217,8 +258,8 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
               onSelect={handleSelectMenuItem}
               includeIcon
             />
-          </PopoverContent_Shadcn_>
-        </Popover_Shadcn_>
+          </PopoverContent>
+        </Popover>
       </div>
     </div>
   )

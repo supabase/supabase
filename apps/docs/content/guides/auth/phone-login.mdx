@@ -48,7 +48,8 @@ With OTP, a user can sign in without setting a password on their account. They n
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('url', 'anonKey')
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 const { data, error } = await supabase.auth.signInWithOtp({
@@ -74,6 +75,15 @@ try await supabase.auth.signInWithOTP(
 ```kotlin
 supabase.auth.signInWith(OTP) {
     phone = "+13334445555"
+}
+```
+
+To send the OTP via WhatsApp instead of SMS (requires Twilio or Twilio Verify provider):
+
+```kotlin
+supabase.auth.signInWith(OTP) {
+    phone = "+13334445555"
+    channel = Phone.Channel.WHATSAPP
 }
 ```
 
@@ -123,7 +133,8 @@ You should present a form to the user so they can input the 6 digit pin, then se
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('url', 'anonKey')
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 const {
@@ -226,7 +237,8 @@ To update a user's phone number, the user must be logged in. Call [`updateUser()
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('url', 'anonKey')
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 const { data, error } = await supabase.auth.updateUser({

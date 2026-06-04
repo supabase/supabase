@@ -1,8 +1,10 @@
-import { Settings } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import {
+  useCallback,
   useEffect,
-  useMemo,
+  useEffectEvent,
   useRef,
   useState,
   type Dispatch,
@@ -10,43 +12,28 @@ import {
   type SetStateAction,
 } from 'react'
 import { usePreviousDistinct } from 'react-use'
+import { Button, Switch } from 'ui'
+import { Admonition } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
+import { getApiEndpoint } from '@/components/interfaces/Integrations/DataApi/DataApi.utils'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { defaultPrivilegesQueryOptions } from '@/data/privileges/default-privileges-query'
 import { useTableApiAccessQuery } from '@/data/privileges/table-api-access-query'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
+import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { useIsSchemaExposed } from '@/hooks/misc/useIsSchemaExposed'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import {
-  API_ACCESS_ROLES,
-  API_PRIVILEGE_TYPES,
   checkDataApiPrivilegesNonEmpty,
   DEFAULT_DATA_API_PRIVILEGES,
   EMPTY_DATA_API_PRIVILEGES,
-  isApiPrivilegeType,
-  type ApiAccessRole,
   type ApiPrivilegesByRole,
 } from '@/lib/data-api-types'
+import { useTrack } from '@/lib/telemetry/track'
 import type { DeepReadonly, Prettify } from '@/lib/type-helpers'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useIsSchemaExposed } from 'hooks/misc/useIsSchemaExposed'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Button, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Switch } from 'ui'
-import { Admonition } from 'ui-patterns'
-import { Input } from 'ui-patterns/DataInputs/Input'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import {
-  MultiSelector,
-  MultiSelectorContent,
-  MultiSelectorItem,
-  MultiSelectorList,
-  MultiSelectorTrigger,
-} from 'ui-patterns/multi-select'
-
-const ROLE_LABELS: Record<ApiAccessRole, string> = {
-  anon: 'Anonymous (anon)',
-  authenticated: 'Authenticated',
-}
 
 namespace ApiAccessToggleProps {
   type New = {
@@ -127,11 +114,23 @@ const useTableApiAccessHandler = (
     : isDuplicate
       ? params.templateTableName
       : params.tableName
+  const isNewTableQuery = isNewTable && enabled
+  const defaultPrivilegesQuery = useQuery(
+    defaultPrivilegesQueryOptions(
+      {
+        projectRef: project?.ref,
+        connectionString: project?.connectionString ?? undefined,
+        schema: currentTableSchema,
+      },
+      { enabled: isNewTableQuery }
+    )
+  )
+
   const canResolvePrivilegeParams = Boolean(
     shouldReadExistingGrants &&
-      project?.ref &&
-      permissionsTemplateSchema &&
-      permissionsTemplateTable
+    project?.ref &&
+    permissionsTemplateSchema &&
+    permissionsTemplateTable
   )
   const isPrivilegesQueryEnabled = enabled && canResolvePrivilegeParams
   const apiAccessStatus = useTableApiAccessQuery(
@@ -148,21 +147,37 @@ const useTableApiAccessHandler = (
     ? apiAccessStatus.data?.[permissionsTemplateTable]
     : undefined
 
+  const defaultPrivilegesEnabled = defaultPrivilegesQuery.data ?? true
+  const defaultPrivilegesForNewTable = defaultPrivilegesEnabled
+    ? DEFAULT_DATA_API_PRIVILEGES
+    : EMPTY_DATA_API_PRIVILEGES
+
   const [privileges, setPrivileges] = useState<DeepReadonly<ApiPrivilegesByRole>>(
-    DEFAULT_DATA_API_PRIVILEGES
+    defaultPrivilegesForNewTable
   )
 
   const hasLoadedInitialData = useRef(false)
 
-  const resetState = useStaticEffectEvent(() => {
+  const resetState = useEffectEvent(() => {
     hasLoadedInitialData.current = !shouldReadExistingGrants
-    setPrivileges(DEFAULT_DATA_API_PRIVILEGES)
+    setPrivileges(defaultPrivilegesForNewTable)
   })
   useEffect(() => {
     resetState()
-  }, [params.type, selectedSchema, permissionsTemplateSchema, permissionsTemplateTable, resetState])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [params.type, selectedSchema, permissionsTemplateSchema, permissionsTemplateTable])
 
-  const syncApiPrivileges = useStaticEffectEvent(() => {
+  const syncDefaultPrivileges = useEffectEvent(() => {
+    if (!isNewTable) return
+    if (!defaultPrivilegesQuery.isSuccess) return
+    setPrivileges(defaultPrivilegesForNewTable)
+  })
+  useEffect(() => {
+    syncDefaultPrivileges()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [defaultPrivilegesQuery.status])
+
+  const syncApiPrivileges = useEffectEvent(() => {
     if (hasLoadedInitialData.current) return
     if (!apiAccessStatus.isSuccess) return
     if (!privilegesForTable) return
@@ -180,11 +195,13 @@ const useTableApiAccessHandler = (
   })
   useEffect(() => {
     syncApiPrivileges()
-  }, [apiAccessStatus.status, syncApiPrivileges])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [apiAccessStatus.status])
 
   const isPending =
     !enabled ||
     schemaExposure.status === 'pending' ||
+    (isNewTable && defaultPrivilegesQuery.isPending) ||
     (shouldReadExistingGrants && apiAccessStatus.isPending)
   if (isPending) {
     return { isError: false, isPending: true, isSuccess: false, data: undefined }
@@ -233,17 +250,17 @@ export const useTableApiAccessHandlerWithHistory = (
   const privileges = innerResult.data?.schemaExposed ? innerResult.data.privileges : undefined
   const previous = usePreviousDistinct(privileges)
 
-  const clearAllPrivileges = useStaticEffectEvent(() => {
+  const clearAllPrivileges = useCallback(() => {
     if (!innerResult.isSuccess) return
     if (!innerResult.data.schemaExposed) return
     innerResult.data?.setPrivileges(EMPTY_DATA_API_PRIVILEGES)
-  })
+  }, [innerResult])
 
-  const restorePreviousPrivileges = useStaticEffectEvent(() => {
+  const restorePreviousPrivileges = useCallback(() => {
     if (!innerResult.isSuccess) return
     if (!innerResult.data.schemaExposed) return
     innerResult.data?.setPrivileges(previous ?? DEFAULT_DATA_API_PRIVILEGES)
-  })
+  }, [innerResult, previous])
 
   if (!innerResult.isSuccess) {
     return innerResult
@@ -255,10 +272,11 @@ export const useTableApiAccessHandlerWithHistory = (
   }
 }
 
-type ApiAccessToggleProps = {
+type ApiAccessToggleComponentProps = {
   projectRef?: string
   schemaName?: string
   tableName?: string
+  isNewRecord: boolean
   handler: TableApiAccessHandlerWithHistoryReturn
 }
 
@@ -266,10 +284,10 @@ export const ApiAccessToggle = ({
   projectRef,
   schemaName,
   tableName,
+  isNewRecord,
   handler,
-}: ApiAccessToggleProps): ReactNode => {
-  const [isPrivilegesPopoverOpen, setIsPrivilegesPopoverOpen] = useState(false)
-
+}: ApiAccessToggleComponentProps): ReactNode => {
+  const track = useTrack()
   const isPending = handler.isPending
   const isError = handler.isError
   const isSchemaExposed = handler.data?.schemaExposed
@@ -283,6 +301,13 @@ export const ApiAccessToggle = ({
     if (!handler.isSuccess) return
     if (!isSchemaExposed) return
 
+    if (isNewRecord) {
+      track('table_api_access_toggle_clicked', {
+        newState: checked ? 'enabled' : 'disabled',
+        schemaName: schemaName ?? 'unknown',
+      })
+    }
+
     if (checked) {
       handler.data?.restorePreviousPrivileges()
     } else {
@@ -290,101 +315,36 @@ export const ApiAccessToggle = ({
     }
   }
 
-  const handlePrivilegesChange = (role: ApiAccessRole) => (values: string[]) => {
-    if (!handler.isSuccess) return
-    if (!isSchemaExposed) return
-    if (!privileges) return
-
-    handler.data?.setPrivileges((oldPrivileges) => {
-      return {
-        ...oldPrivileges,
-        [role]: values.filter(isApiPrivilegeType),
-      }
-    })
-  }
-
-  const totalAvailablePrivileges = API_ACCESS_ROLES.length * API_PRIVILEGE_TYPES.length
-  const totalSelectedPrivileges = Object.values(privileges ?? {}).reduce(
-    (sum, rolePrivileges) => sum + rolePrivileges.length,
-    0
-  )
-  const hasPartialPrivileges =
-    totalSelectedPrivileges > 0 && totalSelectedPrivileges < totalAvailablePrivileges
-
   return (
     <div className="space-y-3">
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <div className="space-y-1">
-            <p className="text-sm text-foreground flex items-center gap-1.5">
-              Data API Access
-              <InfoTooltip side="top" className="max-w-80">
-                This controls which operations the <code className="text-xs">anon</code> and{' '}
-                <code className="text-xs">authenticated</code> roles can perform on this table via
-                the Data API. Unselected privileges are revoked from these roles.
-              </InfoTooltip>
-            </p>
+          <div>
+            <h5>Data API Access</h5>
             <p className="text-sm text-foreground-lighter">
               Allow this table to be queried via Supabase client libraries or the API directly
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <Popover_Shadcn_
-              open={isPrivilegesPopoverOpen}
-              onOpenChange={setIsPrivilegesPopoverOpen}
-            >
-              <PopoverTrigger_Shadcn_ asChild disabled={isDisabled || !hasNonEmptyPrivileges}>
-                <Button type="text" className="w-6 h-6 p-0 text-foreground-light">
-                  <Settings strokeWidth={1.5} size={16} />
-                  {hasPartialPrivileges && (
-                    <span className="absolute right-0 top-0 h-1.5 w-1.5 rounded-full bg-foreground shadow-sm" />
-                  )}
-                </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ align="end" className="w-[420px] space-y-3">
-                {!isDisabled && (
-                  <>
-                    <p className="text-sm text-foreground">Adjust API privileges per role</p>
-                    <div className="space-y-2">
-                      {API_ACCESS_ROLES.map((role) => (
-                        <div key={role} className="space-y-2">
-                          <p className="text-sm text-foreground flex items-center gap-1.5">
-                            {ROLE_LABELS[role]}
-                          </p>
-                          <MultiSelector
-                            values={(privileges?.[role] as string[]) ?? []}
-                            onValuesChange={handlePrivilegesChange(role)}
-                          >
-                            <MultiSelectorTrigger
-                              label="Select privileges"
-                              badgeLimit={4}
-                              deletableBadge={true}
-                            />
-                            <MultiSelectorContent>
-                              <MultiSelectorList>
-                                {API_PRIVILEGE_TYPES.map((privilege) => (
-                                  <MultiSelectorItem key={privilege} value={privilege}>
-                                    {privilege}
-                                  </MultiSelectorItem>
-                                ))}
-                              </MultiSelectorList>
-                            </MultiSelectorContent>
-                          </MultiSelector>
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+          {isNewRecord ? (
             <Switch
               checked={hasNonEmptyPrivileges}
               onCheckedChange={handleMasterToggle}
               disabled={isDisabled}
             />
-          </div>
+          ) : (
+            <Button asChild type="default" icon={<ExternalLink />}>
+              <Link
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`/project/${projectRef}/integrations/data_api/settings`}
+              >
+                Manage access
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
+
       <SchemaExposureOptions
         projectRef={projectRef}
         schemaName={schemaName}
@@ -392,7 +352,6 @@ export const ApiAccessToggle = ({
         isPending={isPending}
         isError={isError}
         isSchemaExposed={isSchemaExposed}
-        hasNonEmptyPrivileges={!!privileges ? hasNonEmptyPrivileges : undefined}
       />
     </div>
   )
@@ -405,7 +364,6 @@ const SchemaExposureOptions = ({
   isPending,
   isError,
   isSchemaExposed,
-  hasNonEmptyPrivileges,
 }: {
   projectRef?: string
   schemaName?: string
@@ -413,54 +371,39 @@ const SchemaExposureOptions = ({
   isPending: boolean
   isError: boolean
   isSchemaExposed?: boolean
-  hasNonEmptyPrivileges?: boolean
 }): ReactNode => {
   const { selectedDatabaseId } = useDatabaseSelectorStateSnapshot()
 
-  const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
+  const { data: resolvedEndpoint } = useProjectApiUrl({ projectRef })
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef })
   const { data: databases } = useReadReplicasQuery({ projectRef })
 
-  const apiEndpoint = useMemo(() => {
-    const isCustomDomainActive = customDomainData?.customDomain?.status === 'active'
-    if (isCustomDomainActive && selectedDatabaseId === projectRef) {
-      return `https://${customDomainData.customDomain.hostname}`
-    }
-
-    const loadBalancerSelected = selectedDatabaseId === 'load-balancer'
-    if (loadBalancerSelected) {
-      return loadBalancers?.[0]?.endpoint
-    }
-
-    const selectedDatabase = databases?.find((db) => db.identifier === selectedDatabaseId)
-    return selectedDatabase?.restUrl
-  }, [
-    projectRef,
-    databases,
+  const selectedDatabase = databases?.find((db) => db.identifier === selectedDatabaseId)
+  const apiBaseUrl = getApiEndpoint({
     selectedDatabaseId,
-    customDomainData?.customDomain?.status,
-    customDomainData?.customDomain?.hostname,
+    projectRef,
+    resolvedEndpoint,
     loadBalancers,
-  ])
-  const apiBaseUrl = useMemo(() => {
-    if (!apiEndpoint) return undefined
-    return apiEndpoint.endsWith('/') ? apiEndpoint.slice(0, -1) : apiEndpoint
-  }, [apiEndpoint])
+    selectedDatabase,
+  })
 
   const tablePath = !(schemaName && tableName)
     ? undefined
     : schemaName === 'public'
       ? tableName
       : `${schemaName}.${tableName}`
-  const apiUrl = apiBaseUrl && tablePath ? `${apiBaseUrl}/${tablePath}` : undefined
+  const apiUrl = apiBaseUrl && tablePath ? `${apiBaseUrl}${tablePath}` : undefined
 
   return (
     <>
       {isError && (
-        <Admonition type="warning" title="An error occurred while fetching Data API settings." />
+        <Admonition
+          type="warning"
+          description="An error occurred while fetching Data API settings."
+        />
       )}
 
-      {isSchemaExposed && apiUrl && hasNonEmptyPrivileges && (
+      {isSchemaExposed && apiUrl && (
         <Input
           copy
           readOnly
@@ -478,7 +421,7 @@ const SchemaExposureOptions = ({
               To enable API access for this table, you need to first expose the{' '}
               <code className="text-xs">{schemaName}</code> schema in your{' '}
               <Link
-                href={`/project/${projectRef}/settings/api`}
+                href={`/project/${projectRef}/integrations/data_api/overview`}
                 className="text-foreground hover:underline"
               >
                 API settings

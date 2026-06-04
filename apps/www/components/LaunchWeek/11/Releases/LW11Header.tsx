@@ -7,11 +7,11 @@ import Link from 'next/link'
 const LW11Header = ({ className }: { className?: string }) => {
   return (
     <div className={cn('relative w-full overflow-visible pt-10 sm:pt-8', className)}>
-      <SectionContainer className="h-full flex flex-col items-start gap-4 !max-w-none lg:!container !pb-4 md:!pb-10">
+      <SectionContainer className="h-full flex flex-col items-start gap-4 max-w-none! lg:container! pb-4! md:pb-10!">
         <Image
           src="/images/launchweek/ga/ga-black.svg"
           alt="GA logo"
-          className="dark:hidden w-20 md:w-24 aspect-[104/57] h-auto"
+          className="dark:hidden w-20 md:w-24 aspect-104/57 h-auto"
           priority
           quality={100}
           width={300}
@@ -20,7 +20,7 @@ const LW11Header = ({ className }: { className?: string }) => {
         <Image
           src="/images/launchweek/ga/ga-white.svg"
           alt="GA logo"
-          className="hidden dark:block w-20 md:w-24 aspect-[104/57] h-auto"
+          className="hidden dark:block w-20 md:w-24 aspect-104/57 h-auto"
           priority
           quality={100}
           width={300}

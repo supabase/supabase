@@ -1,5 +1,6 @@
 import type { SVGProps } from 'react'
 import { cn } from 'ui'
+import type { ThreadSource } from '~/types/contribute'
 
 export function RedditIcon(props: SVGProps<SVGSVGElement>) {
   return (
@@ -43,6 +44,20 @@ export function GitHubIcon(props: SVGProps<SVGSVGElement>) {
   )
 }
 
+export function ChannelIcon({ channel, className }: { channel: ThreadSource; className?: string }) {
+  const iconClassName = cn('h-4 w-4', className)
+  if (channel === 'discord') {
+    return <DiscordIcon className={cn(iconClassName, 'text-[#5865F2]')} />
+  }
+  if (channel === 'reddit') {
+    return <RedditIcon className={cn(iconClassName, 'text-[#FF4500]')} />
+  }
+  if (channel === 'github') {
+    return <GitHubIcon className={cn(iconClassName, 'text-foreground')} />
+  }
+  return null
+}
+
 export function AllIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
@@ -51,9 +66,9 @@ export function AllIcon(props: SVGProps<SVGSVGElement>) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       {...props}
     >
       <path d="M16 5H3" />

@@ -1,29 +1,29 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Download } from 'lucide-react'
-import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { Button } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import NoPermission from 'components/ui/NoPermission'
-import { getDocument } from 'data/documents/document-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { Button } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+} from '@/components/layouts/Scaffold'
+import NoPermission from '@/components/ui/NoPermission'
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
+import { getDocument } from '@/data/documents/document-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const SOC2 = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const slug = organization?.slug
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
@@ -47,19 +47,15 @@ export const SOC2 = () => {
   const handleDownloadClick = () => {
     if (!slug) return
 
-    sendEvent({
-      action: 'document_view_button_clicked',
-      properties: { documentName: 'SOC2' },
-      groups: { organization: slug },
-    })
+    track('document_view_button_clicked', { documentName: 'SOC2' })
     setIsOpen(true)
   }
 
   return (
-    <ScaffoldSection>
-      <ScaffoldSectionDetail className="sticky space-y-6 top-12">
-        <p className="text-base m-0">SOC2 Type 2</p>
-        <div className="space-y-2 text-sm text-foreground-light m-0">
+    <ScaffoldSection className="py-12">
+      <ScaffoldSectionDetail>
+        <h4 className="mb-5">SOC2 Type 2</h4>
+        <div className="space-y-2 text-sm text-foreground-light [&_p]:m-0">
           <p>
             Organizations on Team Plan or above have access to our most recent SOC2 Type 2 report.
           </p>
@@ -67,19 +63,22 @@ export const SOC2 = () => {
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
         {isLoadingPermissions || isLoadingEntitlement ? (
-          <div className="flex items-center justify-center h-full">
+          <div className="@lg:flex items-center justify-center h-full">
             <ShimmeringLoader className="w-24" />
           </div>
         ) : !canReadSubscriptions ? (
           <NoPermission resourceText="access our SOC2 Type 2 report" />
         ) : !hasAccessToSoc2Report ? (
-          <div className="flex items-center justify-center h-full">
-            <Link href={`/org/${slug}/billing?panel=subscriptionPlan&source=soc2`}>
-              <Button type="default">Upgrade to Team</Button>
-            </Link>
+          <div className="@lg:flex items-center justify-center h-full">
+            <UpgradePlanButton
+              variant="default"
+              plan="Team"
+              source="org-documents-soc2"
+              featureProposition="download the SOC2 Type 2report"
+            />
           </div>
         ) : (
-          <div className="flex items-center justify-center h-full">
+          <div className="@lg:flex items-center justify-center h-full">
             <Button
               type="default"
               icon={<Download />}

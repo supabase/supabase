@@ -1,5 +1,4 @@
-import { Button } from 'ui'
-import { Textarea } from 'ui'
+import { Button, Textarea } from 'ui'
 
 export default function TextareaWithButton() {
   return (

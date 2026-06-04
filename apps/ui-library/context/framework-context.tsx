@@ -1,7 +1,9 @@
 'use client'
 
-import { frameworkTitles } from '@/config/docs'
+import { safeLocalStorage } from 'common'
 import { createContext, useContext, useEffect, useState } from 'react'
+
+import { frameworkTitles } from '@/config/docs'
 
 type Framework = keyof typeof frameworkTitles
 type FrameworkContextType = {
@@ -16,7 +18,7 @@ export function FrameworkProvider({ children }: { children: React.ReactNode }) {
 
   // Initialize from localStorage on mount (client-side only)
   useEffect(() => {
-    const storedFramework = localStorage.getItem('preferredFramework')
+    const storedFramework = safeLocalStorage.getItem('preferredFramework')
     if (storedFramework && Object.keys(frameworkTitles).includes(storedFramework)) {
       setFrameworkState(storedFramework as Framework)
     }
@@ -25,7 +27,7 @@ export function FrameworkProvider({ children }: { children: React.ReactNode }) {
   // Update localStorage when framework changes
   const setFramework = (newFramework: Framework) => {
     setFrameworkState(newFramework)
-    localStorage.setItem('preferredFramework', newFramework)
+    safeLocalStorage.setItem('preferredFramework', newFramework)
   }
 
   return (

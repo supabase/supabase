@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-import { get, handleError } from 'data/fetchers'
-import { MAX_RETRY_FAILURE_COUNT } from 'data/query-client'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { logDrainsKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { MAX_RETRY_FAILURE_COUNT } from '@/data/query-client'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type LogDrainsVariables = {
   ref?: string

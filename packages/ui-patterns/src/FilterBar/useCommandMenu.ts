@@ -1,14 +1,15 @@
+import { Sparkles } from 'lucide-react'
 import { useMemo } from 'react'
 import * as React from 'react'
-import { Sparkles } from 'lucide-react'
-import { ActiveInput } from './hooks'
-import { FilterProperty, FilterGroup } from './types'
+
+import { ActiveInputState, FilterGroup, FilterProperty } from './types'
 import {
   findConditionByPath,
   isCustomOptionObject,
-  isFilterOptionObject,
   isFilterOperatorObject,
+  isFilterOptionObject,
 } from './utils'
+
 // Deprecated soon; kept for compatibility during refactor
 
 export type CommandItem = {
@@ -29,7 +30,7 @@ export function useCommandMenu({
   aiApiUrl,
   supportsOperators,
 }: {
-  activeInput: ActiveInput
+  activeInput: ActiveInputState
   freeformText: string
   activeFilters: FilterGroup
   filterProperties: FilterProperty[]
@@ -92,7 +93,7 @@ export function useCommandMenu({
 }
 
 function getOperatorItems(
-  activeInput: Extract<ActiveInput, { type: 'operator' }>,
+  activeInput: Extract<ActiveInputState, { type: 'operator' }>,
   activeFilters: FilterGroup,
   filterProperties: FilterProperty[]
 ): CommandItem[] {
@@ -115,7 +116,7 @@ function getOperatorItems(
 }
 
 function getInputValue(
-  activeInput: ActiveInput,
+  activeInput: ActiveInputState,
   freeformText: string,
   activeFilters: FilterGroup
 ): string {
@@ -136,7 +137,7 @@ function getPropertyItems(filterProperties: FilterProperty[], inputValue: string
 }
 
 function getValueItems(
-  activeInput: Extract<ActiveInput, { type: 'value' }>,
+  activeInput: Extract<ActiveInputState, { type: 'value' }>,
   activeFilters: FilterGroup,
   filterProperties: FilterProperty[],
   propertyOptionsCache: Record<string, { options: any[]; searchValue: string }>,

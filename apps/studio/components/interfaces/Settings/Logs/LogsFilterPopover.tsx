@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
-
-import { Button, cn } from 'ui'
-import type { FilterSet, Filters } from './Logs.types'
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
-import { Label } from '@ui/components/shadcn/ui/label'
 import { Checkbox } from '@ui/components/shadcn/ui/checkbox'
+import { Label } from '@ui/components/shadcn/ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
+import { useEffect, useMemo, useState } from 'react'
+import { Button, cn } from 'ui'
+
+import type { Filters, FilterSet } from './Logs.types'
 
 interface LogsFilterPopoverProps {
   options: FilterSet
@@ -69,7 +69,7 @@ const LogsFilterPopover = ({
           <span>{options.label}</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent align={align} className="p-0 w-60" portal={true}>
+      <PopoverContent align={align} className="p-0 w-60">
         <form
           onSubmit={(e) => {
             e.preventDefault()
@@ -78,11 +78,11 @@ const LogsFilterPopover = ({
             setOpen(false)
           }}
         >
-          {options.options.map((x, i: number) => (
+          {options.options.map((x) => (
             <Label
               key={x.key}
               htmlFor={`${options.key}.${x.key}`}
-              className="flex items-start hover:bg-overlay-hover overflow-hidden p-2 m-1 rounded-sm gap-3 transition-all duration-150 ease-in-out"
+              className="flex items-start hover:bg-overlay-hover overflow-hidden p-2 m-1 rounded-xs gap-3 transition-all duration-150 ease-in-out"
             >
               <div>
                 <Checkbox

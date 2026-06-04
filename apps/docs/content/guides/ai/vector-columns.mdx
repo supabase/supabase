@@ -72,7 +72,7 @@ In general, embeddings with fewer dimensions perform best. See our [analysis on 
 In this example we'll generate a vector using Transformers.js, then store it in the database using the Supabase JavaScript client.
 
 ```js
-import { pipeline } from '@xenova/transformers'
+import { pipeline } from '@huggingface/transformers'
 const generateEmbedding = await pipeline('feature-extraction', 'Supabase/gte-small')
 
 const title = 'First post!'
@@ -154,6 +154,12 @@ const { data: documents } = await supabaseClient.rpc('match_documents', {
 ```
 
 In this example `embedding` would be another embedding you wish to compare against your table of pre-generated embedding documents. For example if you were building a search engine, every time the user submits their query you would first generate an embedding on the search query itself, then pass it into the above `rpc()` function to match.
+
+<Admonition type="tip">
+
+To filter your vector search by another column from the JS client, extend the function above with an extra parameter and `where` clause. See [Filtering vector search by metadata](/docs/guides/ai/semantic-search#filtering-vector-search-by-metadata) for a worked example.
+
+</Admonition>
 
 <Admonition type="tip">
 

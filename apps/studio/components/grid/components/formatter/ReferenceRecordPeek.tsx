@@ -1,25 +1,37 @@
-import { PostgresTable } from '@supabase/postgres-meta'
-import { Key } from 'lucide-react'
-import DataGrid, { Column } from 'react-data-grid'
-
+import type { PGTable } from '@supabase/pg-meta'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
+import { Key } from 'lucide-react'
+import { useMemo, useRef } from 'react'
+import DataGrid, { CalculatedColumn, Column } from 'react-data-grid'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { BinaryFormatter } from './BinaryFormatter'
+import { BooleanFormatter } from './BooleanFormatter'
+import { CellContextMenuWrapper } from './CellContextMenuWrapper'
+import { DefaultFormatter } from './DefaultFormatter'
+import { JsonFormatter } from './JsonFormatter'
+import { COLUMN_MIN_WIDTH } from '@/components/grid/constants'
+import type { SupaColumn, SupaRow } from '@/components/grid/types'
 import {
   ESTIMATED_CHARACTER_PIXEL_WIDTH,
   getColumnDefaultWidth,
-} from 'components/grid/utils/gridColumns'
-import { convertByteaToHex } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
-import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
-import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+} from '@/components/grid/utils/gridColumns'
+import {
+  isArrayColumn,
+  isBinaryColumn,
+  isBoolColumn,
+  isJsonColumn,
+} from '@/components/grid/utils/types'
+import { EditorTablePageLink } from '@/data/prefetchers/project.$ref.editor.$id'
+import { useTableRowsQuery } from '@/data/table-rows/table-rows-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface ReferenceRecordPeekProps {
-  table: PostgresTable
+  table: PGTable
   column: string
-  value: any
+  value: string | number | Record<string, unknown>
 }
 
 export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPeekProps) => {
@@ -35,7 +47,6 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
   } = useTableRowsQuery(
     {
       projectRef: project?.ref,
-      connectionString: project?.connectionString,
       tableId: table.id,
       filters: [{ column, operator: '=', value }],
       page: 1,
@@ -44,59 +55,63 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
     { placeholderData: keepPreviousData }
   )
 
-  const primaryKeys = table.primary_keys.map((x) => x.name)
+  const rows = useMemo(() => data?.rows ?? [], [data?.rows])
+  const selectedCellRef = useRef<{ idx: number; rowIdx: number } | null>(null)
 
-  const columns = (table?.columns ?? []).map((column) => {
-    const columnDefaultWidth = getColumnDefaultWidth({
-      dataType: column.data_type,
-      format: column.format,
-    } as any)
-    const columnWidthBasedOnName =
-      (column.name.length + column.format.length) * ESTIMATED_CHARACTER_PIXEL_WIDTH
-    const columnWidth =
-      columnDefaultWidth < columnWidthBasedOnName ? columnWidthBasedOnName : columnDefaultWidth
-    const isPrimaryKey = primaryKeys.includes(column.name)
+  const primaryKeys = useMemo(() => table.primary_keys.map((x) => x.name), [table.primary_keys])
 
-    const res: Column<any> = {
-      key: column.name,
-      name: column.name,
-      resizable: false,
-      draggable: false,
-      sortable: false,
-      width: columnWidth,
-      minWidth: COLUMN_MIN_WIDTH,
-      headerCellClass: 'outline-none !shadow-none',
-      renderHeaderCell: () => (
-        <div className="flex h-full items-center justify-center gap-x-2">
-          {isPrimaryKey && (
-            <Tooltip>
-              <TooltipTrigger>
-                <Key size={14} strokeWidth={2} className="text-brand rotate-45" />
-              </TooltipTrigger>
-              <TooltipContent side="bottom">Primary key</TooltipContent>
-            </Tooltip>
-          )}
-          <span className="text-xs truncate">{column.name}</span>
-          <span className="text-xs text-foreground-light font-normal">{column.format}</span>
-        </div>
-      ),
-      renderCell: ({ column: col, row }) => {
-        const value = row[col.name as any]
-        const formattedValue = column.format === 'bytea' ? convertByteaToHex(value) : value
-        return (
-          <div
-            className={cn(
-              'flex items-center h-full w-full whitespace-pre',
-              formattedValue === null && 'text-foreground-lighter'
+  const columns = useMemo(() => {
+    return (table?.columns ?? []).map((column) => {
+      const columnDefaultWidth = getColumnDefaultWidth({
+        dataType: column.data_type,
+        format: column.format,
+      } as Pick<SupaColumn, 'dataType' | 'format'> as SupaColumn)
+      const columnWidthBasedOnName =
+        (column.name.length + column.format.length) * ESTIMATED_CHARACTER_PIXEL_WIDTH
+      const columnWidth =
+        columnDefaultWidth < columnWidthBasedOnName ? columnWidthBasedOnName : columnDefaultWidth
+      const isPrimaryKey = primaryKeys.includes(column.name)
+
+      const res: Column<SupaRow> = {
+        key: column.name,
+        name: column.name,
+        resizable: false,
+        draggable: false,
+        sortable: false,
+        width: columnWidth,
+        minWidth: COLUMN_MIN_WIDTH,
+        headerCellClass: 'outline-hidden shadow-none!',
+        renderHeaderCell: () => (
+          <div className="flex h-full items-center justify-center gap-x-2">
+            {isPrimaryKey && (
+              <Tooltip>
+                <TooltipTrigger>
+                  <Key size={14} strokeWidth={2} className="text-brand rotate-45" />
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Primary key</TooltipContent>
+              </Tooltip>
             )}
-          >
-            {formattedValue === null ? 'NULL' : formattedValue}
+            <span className="text-xs truncate">{column.name}</span>
+            <span className="text-xs text-foreground-light font-normal">{column.format}</span>
           </div>
-        )
-      },
-    }
-    return res
-  })
+        ),
+        renderCell: (props) => (
+          <CellContextMenuWrapper value={props.row[props.column.key]}>
+            {isBinaryColumn(column.data_type) ? (
+              <BinaryFormatter {...props} />
+            ) : isBoolColumn(column.data_type) ? (
+              <BooleanFormatter {...props} />
+            ) : isJsonColumn(column.data_type) && !isArrayColumn(column.data_type) ? (
+              <JsonFormatter {...props} />
+            ) : (
+              <DefaultFormatter {...props} />
+            )}
+          </CellContextMenuWrapper>
+        ),
+      }
+      return res
+    })
+  }, [table?.columns, primaryKeys])
 
   return (
     <>
@@ -110,7 +125,14 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
       <DataGrid
         className="h-32 rounded-b border-0"
         columns={columns}
-        rows={data?.rows ?? []}
+        rows={rows}
+        onSelectedCellChange={(args: {
+          column: CalculatedColumn<SupaRow, unknown>
+          rowIdx: number
+          row: SupaRow
+        }) => {
+          selectedCellRef.current = { idx: args.column.idx, rowIdx: args.rowIdx }
+        }}
         onCellDoubleClick={(_, e) => {
           e.preventDefault()
           e.stopPropagation()

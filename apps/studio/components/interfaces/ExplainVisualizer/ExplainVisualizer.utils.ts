@@ -3,10 +3,10 @@ import {
   Database,
   GitMerge,
   Hash,
+  Layers,
   ListFilter,
   SortAsc,
   Zap,
-  Layers,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -133,6 +133,12 @@ export function isExplainQuery(rows: readonly unknown[]): boolean {
   return 'QUERY PLAN' in firstRow && Object.keys(firstRow).length === 1
 }
 
+export function isTextFormatExplain(rows: readonly unknown[]): boolean {
+  if (!isExplainQuery(rows)) return false
+  const firstRow = rows[0] as Record<string, unknown>
+  return typeof firstRow['QUERY PLAN'] === 'string'
+}
+
 export function isExplainSql(sql: string): boolean {
   return /^\s*explain\b/i.test(sql)
 }
@@ -167,7 +173,7 @@ export function getScanBarColor(operation: string): string {
   }
 
   // Default neutral color for other operations
-  return 'bg-foreground/[0.06]'
+  return 'bg-foreground/6'
 }
 
 export function getScanBorderColor(operation: string): string {

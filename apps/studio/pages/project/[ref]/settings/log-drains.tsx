@@ -1,30 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useState } from 'react'
-import { toast } from 'sonner'
-
-import { IS_PLATFORM, useParams } from 'common'
-import { LogDrainDestinationSheetForm } from 'components/interfaces/LogDrains/LogDrainDestinationSheetForm'
-import { LogDrains } from 'components/interfaces/LogDrains/LogDrains'
-import { LOG_DRAIN_TYPES, LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { DocsButton } from 'components/ui/DocsButton'
-import {
-  LogDrainCreateVariables,
-  useCreateLogDrainMutation,
-} from 'data/log-drains/create-log-drain-mutation'
-import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
-import { useUpdateLogDrainMutation } from 'data/log-drains/update-log-drain-mutation'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { DOCS_URL } from 'lib/constants'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
 import { ChevronDown } from 'lucide-react'
-import { cloneElement } from 'react'
-import type { NextPageWithLayout } from 'types'
+import { cloneElement, useState, type ReactElement } from 'react'
+import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
+  Alert,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -33,6 +13,30 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import { LogDrainDestinationSheetForm } from '@/components/interfaces/LogDrains/LogDrainDestinationSheetForm'
+import { LogDrains } from '@/components/interfaces/LogDrains/LogDrains'
+import {
+  LOG_DRAIN_TYPES,
+  LogDrainType,
+} from '@/components/interfaces/LogDrains/LogDrains.constants'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { Shortcut } from '@/components/ui/Shortcut'
+import {
+  LogDrainCreateVariables,
+  useCreateLogDrainMutation,
+} from '@/data/log-drains/create-log-drain-mutation'
+import { LogDrainData, useLogDrainsQuery } from '@/data/log-drains/log-drains-query'
+import { useUpdateLogDrainMutation } from '@/data/log-drains/update-log-drain-mutation'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { DOCS_URL } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import type { NextPageWithLayout } from '@/types'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
   const { can: canManageLogDrains, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
@@ -51,6 +55,13 @@ const LogDrainsSettings: NextPageWithLayout = () => {
   const { hasAccess: hasAccessToLogDrains, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('log_drains')
 
+  const sentryEnabled = useFlag('SentryLogDrain')
+  const s3Enabled = useFlag('S3logdrain')
+  const axiomEnabled = useFlag('axiomLogDrain')
+  const otlpEnabled = useFlag('otlpLogDrain')
+  const last9Enabled = useFlag('Last9LogDrain')
+  const syslogEnabled = useFlag('syslogLogDrain')
+
   const { data: logDrains } = useLogDrainsQuery(
     { ref },
     { enabled: !isLoadingEntitlement && hasAccessToLogDrains }
@@ -59,10 +70,12 @@ const LogDrainsSettings: NextPageWithLayout = () => {
   const { mutate: createLogDrain, isPending: createLoading } = useCreateLogDrainMutation({
     onSuccess: () => {
       toast.success('Log drain destination created')
+      setIsCreateConfirmModalOpen(false)
       setOpen(false)
     },
     onError: () => {
       toast.error('Failed to create log drain')
+      setIsCreateConfirmModalOpen(false)
       setOpen(false)
     },
   })
@@ -92,6 +105,12 @@ const LogDrainsSettings: NextPageWithLayout = () => {
     setOpen(true)
   }
 
+  function handleAddDestinationClick() {
+    setSelectedLogDrain(null)
+    setMode('create')
+    setOpen(true)
+  }
+
   const content = (
     <ScaffoldSection isFullWidth id="log-drains" className="gap-6">
       <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
@@ -105,8 +124,8 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             setOpen(v)
           }}
           defaultValues={{
-            type: selectedLogDrain?.type || 'webhook',
             ...selectedLogDrain,
+            type: selectedLogDrain?.type ? selectedLogDrain.type : 'webhook',
           }}
           isLoading={isLoading}
           onSubmit={({ name, description, type, ...values }) => {
@@ -136,9 +155,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
         {isLoadingPermissions ? (
           <GenericSkeletonLoader />
         ) : !canManageLogDrains ? (
-          <Alert_Shadcn_ variant="default">
-            You do not have permission to manage log drains
-          </Alert_Shadcn_>
+          <Alert variant="default">You do not have permission to manage log drains</Alert>
         ) : (
           <LogDrains onUpdateDrainClick={handleUpdateClick} onNewDrainClick={handleNewClick} />
         )}
@@ -155,7 +172,6 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             setPendingLogDrainValues(null)
           }
           setIsCreateConfirmModalOpen(false)
-          setOpen(false)
         }}
         onCancel={() => {
           setIsCreateConfirmModalOpen(false)
@@ -189,18 +205,22 @@ const LogDrainsSettings: NextPageWithLayout = () => {
           <>
             {!(logDrains?.length === 0) && (
               <div className="flex items-center">
-                <Button
-                  disabled={!hasAccessToLogDrains || !canManageLogDrains}
-                  onClick={() => {
-                    setSelectedLogDrain(null)
-                    setMode('create')
-                    setOpen(true)
-                  }}
-                  type="primary"
-                  className="rounded-r-none px-3"
+                <Shortcut
+                  id={SHORTCUT_IDS.LOG_DRAINS_ADD_DESTINATION}
+                  onTrigger={handleAddDestinationClick}
+                  options={{ enabled: hasAccessToLogDrains && canManageLogDrains }}
+                  side="bottom"
+                  tooltipOpen={open ? false : undefined}
                 >
-                  Add destination
-                </Button>
+                  <Button
+                    disabled={!hasAccessToLogDrains || !canManageLogDrains}
+                    onClick={handleAddDestinationClick}
+                    type="primary"
+                    className="rounded-r-none px-3"
+                  >
+                    Add destination
+                  </Button>
+                </Shortcut>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
@@ -211,7 +231,15 @@ const LogDrainsSettings: NextPageWithLayout = () => {
                     />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" side="bottom">
-                    {LOG_DRAIN_TYPES.map((drainType) => (
+                    {LOG_DRAIN_TYPES.filter((t) => {
+                      if (t.value === 'sentry') return sentryEnabled
+                      if (t.value === 's3') return s3Enabled
+                      if (t.value === 'axiom') return axiomEnabled
+                      if (t.value === 'otlp') return otlpEnabled
+                      if (t.value === 'last9') return last9Enabled
+                      if (t.value === 'syslog') return syslogEnabled
+                      return true
+                    }).map((drainType) => (
                       <DropdownMenuItem
                         key={drainType.value}
                         onClick={() => handleNewClick(drainType.value)}
@@ -243,7 +271,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
   return content
 }
 
-LogDrainsSettings.getLayout = (page) => (
+LogDrainsSettings.getLayout = (page: ReactElement) => (
   <DefaultLayout>
     <SettingsLayout title="Log Drains">{page}</SettingsLayout>
   </DefaultLayout>

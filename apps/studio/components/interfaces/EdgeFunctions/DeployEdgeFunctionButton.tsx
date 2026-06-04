@@ -1,47 +1,56 @@
-import { ChevronDown, Code, Terminal } from 'lucide-react'
-import { parseAsString, useQueryState } from 'nuqs'
-import { useRouter } from 'next/router'
-
 import { useParams } from 'common'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { ChevronDown, Code, Terminal } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { parseAsString, useQueryState } from 'nuqs'
 import {
   AiIconAnimation,
-  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useIsProjectActive } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const DeployEdgeFunctionButton = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const [, setCreateMethod] = useQueryState('create', parseAsString)
+
+  const isProjectActive = useIsProjectActive()
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button type="primary" iconRight={<ChevronDown className="w-4 h-4" strokeWidth={1.5} />}>
+      <DropdownMenuTrigger asChild disabled={!isProjectActive}>
+        <ButtonTooltip
+          type="primary"
+          disabled={!isProjectActive}
+          iconRight={<ChevronDown className="w-4 h-4" strokeWidth={1.5} />}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: !isProjectActive
+                ? 'Unable to deploy function as project is inactive'
+                : undefined,
+            },
+          }}
+        >
           Deploy a new function
-        </Button>
+        </ButtonTooltip>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80">
         <DropdownMenuItem
           onSelect={() => {
             router.push(`/project/${ref}/functions/new`)
-            sendEvent({
-              action: 'edge_function_via_editor_button_clicked',
-              properties: { origin: 'secondary_action' },
-              groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-            })
+            track('edge_function_via_editor_button_clicked', { origin: 'secondary_action' })
           }}
           className="gap-4"
         >
@@ -55,11 +64,7 @@ export const DeployEdgeFunctionButton = () => {
           className="gap-4"
           onSelect={() => {
             setCreateMethod('cli')
-            sendEvent({
-              action: 'edge_function_via_cli_button_clicked',
-              properties: { origin: 'secondary_action' },
-              groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-            })
+            track('edge_function_via_cli_button_clicked', { origin: 'secondary_action' })
           }}
         >
           <Terminal className="shrink-0" size={16} strokeWidth={1.5} />
@@ -95,11 +100,7 @@ export const DeployEdgeFunctionButton = () => {
                 ],
               },
             })
-            sendEvent({
-              action: 'edge_function_ai_assistant_button_clicked',
-              properties: { origin: 'secondary_action' },
-              groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-            })
+            track('edge_function_ai_assistant_button_clicked', { origin: 'secondary_action' })
           }}
         >
           <AiIconAnimation className="shrink-0" size={16} />

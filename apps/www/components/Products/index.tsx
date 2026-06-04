@@ -32,7 +32,7 @@ const Products: React.FC<Props> = (props) => {
   }
 
   return (
-    <SectionContainer className="!pt-0 grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-4 xl:gap-3 2xl:gap-6 md:grid-cols-12">
+    <SectionContainer className="pt-0! grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-4 xl:gap-3 2xl:gap-6 md:grid-cols-12">
       <ProductCard
         isDatabase
         className="col-span-6 md:col-span-12 xl:col-span-6"
@@ -119,8 +119,8 @@ const Products: React.FC<Props> = (props) => {
         image={<RealtimeVisual className="hidden sm:block" />}
         className="
           col-span-6 pointer-events-none xl:col-span-3
-          hover:!cursor-[url('/images/index/products/realtime-cursor-light.svg'),_auto]
-          dark:hover:!cursor-[url('/images/index/products/realtime-cursor-dark.svg'),_auto]
+          hover:cursor-[url('/images/index/products/realtime-cursor-light.svg'),auto]!
+          dark:hover:cursor-[url('/images/index/products/realtime-cursor-dark.svg'),auto]!
         "
       />
       <ProductCard

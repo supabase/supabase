@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
-import { ActiveInput } from './hooks'
-import { FilterProperty, FilterGroup, isGroup } from './types'
+
+import { ActiveInputState, FilterGroup, FilterProperty, isGroup } from './types'
 import { updateGroupAtPath } from './utils'
 
 export function useAIFilter({
@@ -15,7 +15,7 @@ export function useAIFilter({
   setError,
   setIsCommandMenuVisible,
 }: {
-  activeInput: ActiveInput
+  activeInput: ActiveInputState
   aiApiUrl?: string
   freeformText: string
   filterProperties: FilterProperty[]

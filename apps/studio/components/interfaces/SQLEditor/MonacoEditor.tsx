@@ -1,21 +1,25 @@
 import Editor, { Monaco, OnMount } from '@monaco-editor/react'
-import { useRouter } from 'next/router'
-import { MutableRefObject, useEffect, useRef, useState } from 'react'
-
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProfile } from 'lib/profile'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { useTabsStateSnapshot } from 'state/tabs'
+import { useRouter } from 'next/router'
+import { MutableRefObject, useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
+
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
 import { createSqlSnippetSkeletonV2 } from './SQLEditor.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { getEditorSelectionParts } from '@/components/ui/AIEditor/utils'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProfile } from '@/lib/profile'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useTabsStateSnapshot } from '@/state/tabs'
 
 export type MonacoEditorProps = {
   id: string
@@ -25,6 +29,8 @@ export type MonacoEditorProps = {
   monacoRef: MutableRefObject<Monaco | null>
   autoFocus?: boolean
   executeQuery: () => void
+  executeExplainQuery: () => void
+  prettifyQuery: () => void
   onHasSelection: (value: boolean) => void
   onMount?: (editor: IStandaloneCodeEditor) => void
   onPrompt?: (value: {
@@ -46,6 +52,8 @@ const MonacoEditor = ({
   placeholder = '',
   className,
   executeQuery,
+  executeExplainQuery,
+  prettifyQuery,
   onHasSelection,
   onPrompt,
   onMount,
@@ -64,10 +72,9 @@ const MonacoEditor = ({
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
     true
   )
-  const [isAIAssistantHotkeyEnabled] = useLocalStorageQuery<boolean>(
-    LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.AI_ASSISTANT),
-    true
-  )
+  const isAIAssistantHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.AI_ASSISTANT_TOGGLE)
+  const isCommandMenuHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.COMMAND_MENU_OPEN)
+  const setCommandMenuOpen = useSetCommandMenuOpen()
 
   // [Joshen] Lodash debounce doesn't seem to be working here, so opting to use useDebounce
   const [value, setValue] = useState('')
@@ -80,6 +87,21 @@ const MonacoEditor = ({
   const executeQueryRef = useRef(executeQuery)
   executeQueryRef.current = executeQuery
 
+  const executeExplainQueryRef = useRef(executeExplainQuery)
+  executeExplainQueryRef.current = executeExplainQuery
+
+  const prettifyQueryRef = useRef(prettifyQuery)
+  prettifyQueryRef.current = prettifyQuery
+
+  const aiHotkeyEnabledRef = useRef(isAIAssistantHotkeyEnabled)
+  aiHotkeyEnabledRef.current = isAIAssistantHotkeyEnabled
+
+  const commandMenuHotkeyEnabledRef = useRef(isCommandMenuHotkeyEnabled)
+  commandMenuHotkeyEnabledRef.current = isCommandMenuHotkeyEnabled
+
+  const setCommandMenuOpenRef = useRef(setCommandMenuOpen)
+  setCommandMenuOpenRef.current = setCommandMenuOpen
+
   const handleEditorOnMount: OnMount = async (editor, monaco) => {
     editorRef.current = editor
     monacoRef.current = monaco
@@ -88,6 +110,29 @@ const MonacoEditor = ({
     if (model !== null) {
       monacoRef.current.editor.setModelMarkers(model, 'owner', [])
     }
+
+    // Blur the editor on Escape so users can hop out to the rest of the UI.
+    // The precondition defers to Monaco's own Escape consumers (suggest widget,
+    // find widget, parameter hints, snippet/rename mode, inline suggestions) and
+    // to selection/multi-cursor cancellation, so inline features keep working.
+    editor.addCommand(
+      monaco.KeyCode.Escape,
+      () => {
+        ;(document.activeElement as HTMLElement | null)?.blur()
+      },
+      [
+        'editorTextFocus',
+        '!editorHasSelection',
+        '!editorHasMultipleSelections',
+        '!suggestWidgetVisible',
+        '!findWidgetVisible',
+        '!parameterHintsVisible',
+        '!renameInputVisible',
+        '!inSnippetMode',
+        '!accessibilityHelpWidgetVisible',
+        '!inlineSuggestionVisible',
+      ].join(' && ')
+    )
 
     editor.addAction({
       id: 'run-query',
@@ -101,6 +146,17 @@ const MonacoEditor = ({
     })
 
     editor.addAction({
+      id: 'run-explain-query',
+      label: 'Run EXPLAIN ANALYZE',
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Enter],
+      contextMenuGroupId: 'operation',
+      contextMenuOrder: 1,
+      run: () => {
+        executeExplainQueryRef.current()
+      },
+    })
+
+    editor.addAction({
       id: 'save-query',
       label: 'Save Query',
       keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyS],
@@ -108,6 +164,17 @@ const MonacoEditor = ({
       contextMenuOrder: 0,
       run: () => {
         if (snippet) snapV2.addNeedsSaving(snippet.snippet.id)
+      },
+    })
+
+    editor.addAction({
+      id: 'prettify-query',
+      label: 'Prettify SQL',
+      keybindings: [monaco.KeyMod.Alt | monaco.KeyMod.Shift | monaco.KeyCode.KeyF],
+      contextMenuGroupId: 'operation',
+      contextMenuOrder: 2,
+      run: () => {
+        prettifyQueryRef.current()
       },
     })
 
@@ -134,7 +201,7 @@ const MonacoEditor = ({
       label: 'Toggle AI Assistant',
       keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyI],
       run: () => {
-        if (isAIAssistantHotkeyEnabled) {
+        if (aiHotkeyEnabledRef.current) {
           toggleSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
         }
       },
@@ -144,31 +211,22 @@ const MonacoEditor = ({
       editor.addAction({
         id: 'generate-sql',
         label: 'Generate SQL',
-        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK],
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyK],
         run: () => {
-          const selection = editor.getSelection()
-          const model = editor.getModel()
-          if (!model || !selection) return
-
-          const allLines = model.getLinesContent()
-
-          const startLineIndex = selection.startLineNumber - 1
-          const endLineIndex = selection.endLineNumber
-
-          const beforeSelection = allLines.slice(0, startLineIndex).join('\n') + '\n'
-          const selectedText = allLines.slice(startLineIndex, endLineIndex).join('\n')
-          const afterSelection = '\n' + allLines.slice(endLineIndex).join('\n')
-
-          onPrompt({
-            selection: selectedText,
-            beforeSelection,
-            afterSelection,
-            startLineNumber: selection?.startLineNumber ?? 0,
-            endLineNumber: selection?.endLineNumber ?? 0,
-          })
+          const selectionParts = getEditorSelectionParts(editor)
+          if (selectionParts) onPrompt(selectionParts)
         },
       })
     }
+
+    // Monaco claims Cmd+K as a chord prefix, which swallows the global command
+    // menu shortcut while the editor is focused. Intercept it here and open the
+    // command menu directly so it works the same inside and outside the editor.
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK, () => {
+      if (commandMenuHotkeyEnabledRef.current) {
+        setCommandMenuOpenRef.current(true)
+      }
+    })
 
     editor.onDidChangeCursorSelection(({ selection }) => {
       const noSelection =
@@ -233,7 +291,7 @@ const MonacoEditor = ({
         onMount={handleEditorOnMount}
         onChange={handleEditorChange}
         defaultLanguage="pgsql"
-        defaultValue={snippet?.snippet.content?.sql}
+        defaultValue={snippet?.snippet.content?.unchecked_sql}
         path={id}
         options={{
           tabSize: 2,

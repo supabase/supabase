@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { serviceStatusKeys } from './keys'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type EdgeFunctionServiceStatusVariables = {
   projectRef?: string

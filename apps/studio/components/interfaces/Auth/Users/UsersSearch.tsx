@@ -1,7 +1,30 @@
+import { AuthUsersSearchSubmittedEvent } from 'common/telemetry-constants'
 import { Search, X } from 'lucide-react'
-import { SetStateAction } from 'react'
+import { parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
+import { Dispatch, forwardRef, SetStateAction } from 'react'
+import {
+  Button,
+  cn,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
-import { SpecificFilterColumn } from './Users.constants'
+import {
+  PHONE_NUMBER_LEFT_PREFIX_REGEX,
+  SpecificFilterColumn,
+  UUIDV4_LEFT_PREFIX_REGEX,
+} from './Users.constants'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { useTrack } from '@/lib/telemetry/track'
 
 const getSearchPlaceholder = (column: SpecificFilterColumn): string => {
   switch (column) {
@@ -20,84 +43,100 @@ const getSearchPlaceholder = (column: SpecificFilterColumn): string => {
   }
 }
 
-import {
-  Button,
-  cn,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectSeparator_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
-
 interface UsersSearchProps {
   search: string
-  searchInvalid: boolean
-  specificFilterColumn: SpecificFilterColumn
-  setSearch: (value: SetStateAction<string>) => void
-  setFilterKeywords: (value: string) => void
-  setSpecificFilterColumn: (value: SpecificFilterColumn) => void
+  setSearch: Dispatch<SetStateAction<string>>
   improvedSearchEnabled?: boolean
+  telemetryProps: Omit<AuthUsersSearchSubmittedEvent['properties'], 'trigger'>
+  onSelectFilterColumn: (value: SpecificFilterColumn) => void
 }
 
-export const UsersSearch = ({
-  search,
-  searchInvalid,
-  specificFilterColumn,
-  setSearch,
-  setFilterKeywords,
-  setSpecificFilterColumn,
-  improvedSearchEnabled = false,
-}: UsersSearchProps) => {
+export const UsersSearch = forwardRef<HTMLInputElement, UsersSearchProps>(function UsersSearch(
+  { search, setSearch, improvedSearchEnabled = false, telemetryProps, onSelectFilterColumn },
+  ref
+) {
+  const [, setSelectedId] = useQueryState(
+    'show',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const [, setFilterKeywords] = useQueryState('keywords', { defaultValue: '' })
+  const [specificFilterColumn] = useQueryState<SpecificFilterColumn>(
+    'filter',
+    parseAsStringEnum<SpecificFilterColumn>([
+      'id',
+      'email',
+      'phone',
+      'name',
+      'freeform',
+    ]).withDefault('email')
+  )
+
+  const track = useTrack()
+
+  const searchInvalid =
+    !search ||
+    specificFilterColumn === 'freeform' ||
+    specificFilterColumn === 'email' ||
+    specificFilterColumn === 'name'
+      ? false
+      : specificFilterColumn === 'id'
+        ? !search.match(UUIDV4_LEFT_PREFIX_REGEX)
+        : !search.match(PHONE_NUMBER_LEFT_PREFIX_REGEX)
+
+  const onSubmitSearch = () => {
+    const s = search.trim().toLocaleLowerCase()
+    setFilterKeywords(s)
+    setSelectedId(null)
+    track('auth_users_search_submitted', {
+      trigger: 'search_input',
+      ...telemetryProps,
+      keywords: s,
+    })
+  }
+
   return (
     <div className="flex items-center">
       <div className="text-xs h-[26px] flex items-center px-1.5 border border-strong rounded-l-md bg-surface-300">
         <Search size={14} />
       </div>
 
-      <Select_Shadcn_
+      <Select
         value={specificFilterColumn}
-        onValueChange={(v) => setSpecificFilterColumn(v as typeof specificFilterColumn)}
+        onValueChange={(v) => onSelectFilterColumn(v as typeof specificFilterColumn)}
       >
-        <SelectTrigger_Shadcn_
+        <SelectTrigger
           size="tiny"
           className={cn(
-            'w-[130px] !bg-transparent rounded-none -ml-[1px]',
+            'w-[130px] bg-transparent! rounded-none -ml-px',
             specificFilterColumn === 'freeform' && 'text-warning'
           )}
         >
-          <SelectValue_Shadcn_ />
-        </SelectTrigger_Shadcn_>
-        <SelectContent_Shadcn_>
-          <SelectGroup_Shadcn_>
-            <SelectItem_Shadcn_ value="id" className="text-xs">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectItem value="id" className="text-xs">
               User ID
-            </SelectItem_Shadcn_>
-            <SelectItem_Shadcn_ value="email" className="text-xs">
+            </SelectItem>
+            <SelectItem value="email" className="text-xs">
               Email address
-            </SelectItem_Shadcn_>
+            </SelectItem>
             {improvedSearchEnabled && (
-              <SelectItem_Shadcn_ value="name" className="text-xs">
+              <SelectItem value="name" className="text-xs">
                 Name
-              </SelectItem_Shadcn_>
+              </SelectItem>
             )}
-            <SelectItem_Shadcn_ value="phone" className="text-xs">
+            <SelectItem value="phone" className="text-xs">
               Phone number
-            </SelectItem_Shadcn_>
+            </SelectItem>
             {!improvedSearchEnabled && (
               <>
-                <SelectSeparator_Shadcn_ />
+                <SelectSeparator />
                 <Tooltip>
                   <TooltipTrigger>
-                    <SelectItem_Shadcn_ value="freeform" className="text-xs">
+                    <SelectItem value="freeform" className="text-xs">
                       Unified search
-                    </SelectItem_Shadcn_>
+                    </SelectItem>
                   </TooltipTrigger>
                   <TooltipContent side="right" className="w-64 text-center">
                     Search by all columns at once, including mid-string search. May impact database
@@ -106,27 +145,31 @@ export const UsersSearch = ({
                 </Tooltip>
               </>
             )}
-          </SelectGroup_Shadcn_>
-        </SelectContent_Shadcn_>
-      </Select_Shadcn_>
+          </SelectGroup>
+        </SelectContent>
+      </Select>
 
       <Input
+        ref={ref}
         size="tiny"
+        containerClassName="w-[245px] rounded-l-none -ml-px"
         className={cn(
-          'w-[245px] bg-transparent rounded-l-none -ml-[1px]',
+          'bg-transparent',
           searchInvalid ? 'text-red-900 dark:border-red-900' : '',
           search.length > 1 && 'pr-6'
         )}
         placeholder={getSearchPlaceholder(specificFilterColumn)}
         value={search}
-        onChange={(e) => {
-          const value = e.target.value.replace(/\s+/g, '').toLowerCase()
-          setSearch(value)
-        }}
+        onChange={(e) => setSearch(e.target.value)}
         onKeyDown={(e) => {
           if (e.code === 'Enter' || e.code === 'NumpadEnter') {
-            if (!searchInvalid) setFilterKeywords(search.trim().toLocaleLowerCase())
+            if (!searchInvalid) onSubmitSearch()
+            return
           }
+          onSearchInputEscape(search, () => {
+            setSearch('')
+            setFilterKeywords('')
+          })(e)
         }}
         actions={
           search ? (
@@ -145,4 +188,4 @@ export const UsersSearch = ({
       />
     </div>
   )
-}
+})

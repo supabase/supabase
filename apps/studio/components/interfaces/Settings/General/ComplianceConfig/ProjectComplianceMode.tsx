@@ -1,17 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useComplianceConfigUpdateMutation } from 'data/config/project-compliance-config-mutation'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import { Card, CardContent, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import {
   PageSection,
@@ -21,6 +12,15 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+
+import AlertError from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useComplianceConfigUpdateMutation } from '@/data/config/project-compliance-config-mutation'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 export const ComplianceConfig = () => {
   const { ref } = useParams()

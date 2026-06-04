@@ -1,15 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useMemo, useRef } from 'react'
+import { IS_PLATFORM, useParams } from 'common'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { AlertError } from 'components/ui/AlertError'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { NoPermission } from 'components/ui/NoPermission'
-import { useAPIKeyDeleteMutation } from 'data/api-keys/api-key-delete-mutation'
-import { APIKeysData, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import {
   Card,
   Table,
@@ -21,8 +14,15 @@ import {
   TableRow,
 } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+
 import { APIKeyRow } from './APIKeyRow'
 import { CreatePublishableAPIKeyDialog } from './CreatePublishableAPIKeyDialog'
+import { AlertError } from '@/components/ui/AlertError'
+import { FormHeader } from '@/components/ui/Forms/FormHeader'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { useAPIKeyDeleteMutation } from '@/data/api-keys/api-key-delete-mutation'
+import { APIKeysData, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 export const PublishableAPIKeys = () => {
   const { ref: projectRef } = useParams()
@@ -34,6 +34,7 @@ export const PublishableAPIKeys = () => {
   const {
     data: apiKeysData = [],
     error,
+    isSuccess: isSuccessApiKeys,
     isPending: isLoadingApiKeys,
     isError: isErrorApiKeys,
   } = useAPIKeysQuery({ projectRef, reveal: false }, { enabled: canReadAPIKeys })
@@ -53,41 +54,42 @@ export const PublishableAPIKeys = () => {
     [apiKeysData]
   )
 
-  // Track the ID being deleted to exclude it from error checking
-  const deletingAPIKeyIdRef = useRef<string | null>(null)
+  const showSelfHostedEmptyState =
+    !IS_PLATFORM && publishableApiKeys.length === 0 && !isLoadingApiKeys && !isLoadingPermissions
 
-  const { value: apiKeyToDelete, setValue: setAPIKeyToDelete } = useQueryStateWithSelect({
-    urlKey: 'deletePublishableKey',
-    select: (id: string) => (id ? publishableApiKeys?.find((key) => key.id === id) : undefined),
-    enabled: !!publishableApiKeys?.length,
-    onError: (_error, selectedId) => {
-      handleErrorOnDelete(deletingAPIKeyIdRef, selectedId, `API Key not found`)
-    },
-  })
+  const [deleteId, setDeleteId] = useQueryState('deletePublishableKey', parseAsString)
+  const apiKeyToDelete = publishableApiKeys?.find((key) => key.id === deleteId)
 
-  const { mutate: deleteAPIKey, isPending: isDeletingAPIKey } = useAPIKeyDeleteMutation({
+  const {
+    mutate: deleteAPIKey,
+    isPending: isDeletingAPIKey,
+    isSuccess: isDeleteSuccess,
+  } = useAPIKeyDeleteMutation({
     onSuccess: () => {
       toast.success('Successfully deleted publishable key')
-      setAPIKeyToDelete(null)
-    },
-    onError: () => {
-      deletingAPIKeyIdRef.current = null
+      setDeleteId(null)
     },
   })
 
   const onDeleteAPIKey = (apiKey: Extract<APIKeysData[number], { type: 'publishable' }>) => {
     if (!projectRef) return console.error('Project ref is required')
     if (!apiKey.id) return console.error('API key ID is required')
-    deletingAPIKeyIdRef.current = apiKey.id
     deleteAPIKey({ projectRef, id: apiKey.id })
   }
+
+  useEffect(() => {
+    if (isSuccessApiKeys && !!deleteId && !apiKeyToDelete && !isDeleteSuccess) {
+      toast('Unable to find publishable key')
+      setDeleteId(null)
+    }
+  }, [apiKeyToDelete, deleteId, isDeleteSuccess, isSuccessApiKeys, setDeleteId])
 
   return (
     <div>
       <FormHeader
         title="Publishable key"
         description="This key is safe to use in a browser if you have enabled Row Level Security (RLS) for your tables and configured policies."
-        actions={<CreatePublishableAPIKeyDialog />}
+        actions={IS_PLATFORM ? <CreatePublishableAPIKeyDialog /> : null}
       />
 
       {!canReadAPIKeys && !isLoadingPermissions ? (
@@ -96,6 +98,15 @@ export const PublishableAPIKeys = () => {
         <GenericSkeletonLoader />
       ) : isErrorApiKeys ? (
         <AlertError error={error} subject="Failed to load API keys" />
+      ) : showSelfHostedEmptyState ? (
+        <Card>
+          <div className="rounded-b-md! overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
+            <p className="text-sm text-foreground">No publishable API keys found</p>
+            <p className="text-sm text-foreground-light">
+              This may be a configuration issue. Ensure your API keys are available to Studio.
+            </p>
+          </div>
+        </Card>
       ) : (
         <Card className="bg-surface-100">
           <Table>
@@ -103,14 +114,14 @@ export const PublishableAPIKeys = () => {
               <TableRow className="bg-200">
                 <TableHead>Name</TableHead>
                 <TableHead>API Key</TableHead>
-                <TableHead />
+                {IS_PLATFORM && <TableHead />}
               </TableRow>
             </TableHeader>
 
             <TableBody>
               {hasApiKeys && publishableApiKeys.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={3} className="p-0">
+                  <TableCell colSpan={IS_PLATFORM ? 3 : 2} className="p-0">
                     <Admonition showIcon={false} type="default" className="border-0 rounded-none">
                       <p className="text-foreground-light">No publishable keys created yet</p>
                     </Admonition>
@@ -125,14 +136,14 @@ export const PublishableAPIKeys = () => {
                   isDeleting={apiKeyToDelete?.id === apiKey.id && isDeletingAPIKey}
                   isDeleteModalOpen={apiKeyToDelete?.id === apiKey.id}
                   onDelete={() => onDeleteAPIKey(apiKey)}
-                  setKeyToDelete={setAPIKeyToDelete}
+                  setKeyToDelete={setDeleteId}
                 />
               ))}
             </TableBody>
 
             <TableFooter className="border-t">
               <TableRow className="border-b-0">
-                <TableCell colSpan={3} className="py-2">
+                <TableCell colSpan={IS_PLATFORM ? 3 : 2} className="py-2">
                   <p className="text-xs text-foreground-lighter font-normal">
                     Publishable keys can be safely shared publicly
                   </p>

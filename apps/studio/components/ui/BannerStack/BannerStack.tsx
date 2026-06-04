@@ -1,7 +1,7 @@
+import { AnimatePresence, motion } from 'framer-motion'
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+
 import { useBannerStack } from './BannerStackProvider'
-import { cn } from 'ui'
 
 export const BannerStack = () => {
   const { banners } = useBannerStack()
@@ -63,10 +63,7 @@ export const BannerStack = () => {
                   zIndex: 30 + reverseIndex,
                   transformOrigin: 'center bottom',
                 }}
-                className={cn(
-                  'w-full max-w-72',
-                  !isHovered && index === 0 && 'pointer-events-none'
-                )}
+                className="w-full max-w-72"
               >
                 {banner.content}
               </motion.div>

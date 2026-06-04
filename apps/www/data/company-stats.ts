@@ -13,8 +13,8 @@ export const companyStats = {
     label: 'Databases launched daily',
   },
   developersRegistered: {
-    number: 5_000_000,
-    text: '5,000,000+',
+    number: 7_000_000,
+    text: '7,000,000+',
     label: 'Users',
   },
   developersRegisteredChange: {

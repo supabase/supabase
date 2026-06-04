@@ -1,39 +1,15 @@
-import authors from 'lib/authors.json'
 import Image from 'next/image'
 import Link from 'next/link'
-import type PostTypes from 'types/post'
 
-// Extend PostTypes for CMS blog posts
-interface CMSPostTypes extends PostTypes {
-  isCMS?: boolean
-  authors?: Array<{
-    author: string
-    author_id: string
-    position: string
-    author_url: string
-    author_image_url: {
-      url: string
-    }
-    username: string
-  }>
-}
+import authors from '@/lib/authors.json'
+import {
+  BLOG_FEATURED_IMAGE_SIZES,
+  BLOG_PLACEHOLDER_IMAGE,
+  getBlogThumbnailImage,
+} from '@/lib/blog-images'
+import type PostTypes from '@/types/post'
 
-function FeaturedThumb(blog: PostTypes | CMSPostTypes) {
-  // First check if this is a CMS post
-  if ('isCMS' in blog && blog.isCMS) {
-    // For CMS posts, display author directly from the blog data
-    const cmsBlog = blog as CMSPostTypes
-    const author =
-      cmsBlog.authors?.map((author) => ({
-        author: author.author || 'Unknown Author',
-        author_image_url: author.author_image_url || null,
-        author_url: author.author_url || '#',
-        position: author.position || '',
-      })) || []
-
-    return renderFeaturedThumb(blog, author)
-  }
-
+function FeaturedThumb(blog: PostTypes) {
   // For static posts, look up author info from authors.json
   const authorArray = blog.author?.split(',').map((a) => a.trim()) || []
   const author = []
@@ -51,17 +27,7 @@ function FeaturedThumb(blog: PostTypes | CMSPostTypes) {
 }
 
 function renderFeaturedThumb(blog: PostTypes, author: any[]) {
-  const imageUrl = blog.isCMS
-    ? blog.thumb
-      ? blog.thumb
-      : blog.image
-        ? blog.image
-        : '/images/blog/blog-placeholder.png'
-    : blog.thumb
-      ? `/images/blog/${blog.thumb}`
-      : blog.image
-        ? `/images/blog/${blog.image}`
-        : '/images/blog/blog-placeholder.png'
+  const imageUrl = getBlogThumbnailImage(blog) ?? BLOG_PLACEHOLDER_IMAGE
 
   return (
     <div key={blog.slug} className="w-full">
@@ -69,12 +35,11 @@ function renderFeaturedThumb(blog: PostTypes, author: any[]) {
         href={`${blog.path}`}
         className="grid gap-4 lg:grid-cols-7 lg:gap-8 xl:gap-12 hover:bg-surface-200 dark:hover:bg-surface-75 p-2 sm:p-4 rounded-xl"
       >
-        <div className="relative w-full aspect-[2/1] lg:col-span-3 lg:aspect-[3/2] overflow-auto rounded-lg border">
+        <div className="relative w-full aspect-2/1 lg:col-span-3 lg:aspect-3/2 overflow-auto rounded-lg border">
           <Image
             src={imageUrl}
             fill
-            sizes="100%"
-            quality={100}
+            sizes={BLOG_FEATURED_IMAGE_SIZES}
             priority
             className="object-cover bg-alternative"
             alt="blog thumbnail"
@@ -83,12 +48,12 @@ function renderFeaturedThumb(blog: PostTypes, author: any[]) {
         <div className="flex flex-col space-y-2 lg:col-span-4 xl:justify-center max-w-xl">
           <div className="text-lighter flex space-x-2 text-sm">
             <span>{blog.formattedDate}</span>
-            <span>•</span>
+            <span>·</span>
             <span>{blog.readingTime}</span>
           </div>
 
           <div>
-            <h2 className="h2 lg:!text-2xl xl:!text-3xl !mb-2">{blog.title}</h2>
+            <h2 className="h2 lg:text-2xl! xl:text-3xl! mb-2!">{blog.title}</h2>
             <p className="p xl:text-lg">{blog.description}</p>
           </div>
 

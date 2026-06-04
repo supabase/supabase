@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
-import { useWorkflowRunsQuery } from 'data/workflow-runs/workflow-runs-query'
-import { useWorkflowRunQuery } from 'data/workflow-runs/workflow-run-query'
+import { useActionRunQuery } from '@/data/actions/action-detail-query'
+import { useActionRunLogsQuery } from '@/data/actions/action-logs-query'
 
 interface UseWorkflowManagementProps {
   workflowRunId?: string
   projectRef?: string
-  onWorkflowComplete?: (status: string) => void
+  onWorkflowComplete?: (status: 'SUCCESS' | 'FAILED') => void
 }
 
 export const useWorkflowManagement = ({
@@ -16,43 +16,38 @@ export const useWorkflowManagement = ({
 }: UseWorkflowManagementProps) => {
   const [hasRefetched, setHasRefetched] = useState(false)
 
-  // Get workflow runs and logs
-  const { data: workflowRuns } = useWorkflowRunsQuery(
-    { projectRef },
+  const { data: workflowRun } = useActionRunQuery(
+    { projectRef, runId: workflowRunId },
     {
-      enabled: Boolean(workflowRunId),
-      refetchInterval: 3000,
+      refetchInterval: (query) => {
+        return query.state.error?.code === 404 ? false : 2000
+      },
       refetchOnMount: 'always',
       staleTime: 0,
     }
   )
 
-  const { data: workflowRunLogs } = useWorkflowRunQuery(
-    { projectRef, workflowRunId },
+  const { data: workflowRunLogs } = useActionRunLogsQuery(
+    { projectRef, runId: workflowRunId },
     {
-      refetchInterval: 2000,
+      refetchInterval: (query) => {
+        return query.state.error?.code === 404 ? false : 2000
+      },
       refetchOnMount: 'always',
       staleTime: 0,
     }
   )
-
-  // Find current workflow run
-  const currentWorkflowRun = workflowRuns?.find((run) => run.id === workflowRunId)
 
   // Handle workflow completion
   useEffect(() => {
-    if (!currentWorkflowRun?.status || !workflowRunId) return
-
-    const isComplete = ['FUNCTIONS_DEPLOYED', 'MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'].includes(
-      currentWorkflowRun.status
-    )
+    if (!workflowRun || !workflowRunId) return
 
     // Only refetch once per workflow completion
-    if (isComplete && !hasRefetched) {
+    if (!!workflowRun.status && workflowRun.status !== 'RUNNING' && !hasRefetched) {
       setHasRefetched(true)
-      onWorkflowComplete?.(currentWorkflowRun.status)
+      onWorkflowComplete?.(workflowRun.status)
     }
-  }, [currentWorkflowRun?.status, workflowRunId, hasRefetched, onWorkflowComplete])
+  }, [workflowRunId, hasRefetched, onWorkflowComplete, workflowRun])
 
   // Reset refetch flag when workflow ID changes
   useEffect(() => {
@@ -60,7 +55,7 @@ export const useWorkflowManagement = ({
   }, [workflowRunId])
 
   return {
-    currentWorkflowRun,
-    workflowRunLogs: workflowRunLogs?.logs,
+    run: workflowRun,
+    logs: workflowRunLogs,
   }
 }
