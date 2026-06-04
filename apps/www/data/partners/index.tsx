@@ -23,7 +23,7 @@ const partnersPageData = {
     h1: <>Build with Supabase. Reach 9 million developers.</>,
     subheader: <>Ship integrations and offer services that help businesses build on Supabase.</>,
     cta: {
-      label: 'Become a partner',
+      label: 'Apply as a Partner',
       link: PARTNER_FORM_ANCHOR,
     },
     secondaryCta: {

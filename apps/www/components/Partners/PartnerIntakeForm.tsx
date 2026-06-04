@@ -15,9 +15,6 @@ import { parseAsString, useQueryState } from 'nuqs'
 export const PARTNER_TYPES = {
   technology: 'technology',
   solutions: 'solutions',
-  startup: 'startup',
-  whitelabel: 'whitelabel',
-  events: 'events',
   other: 'other',
 } as const
 
@@ -29,18 +26,6 @@ const partnerTypeOptions = [
   {
     value: PARTNER_TYPES.solutions,
     label: 'Solution Partner — agency, consultancy, or service provider',
-  },
-  {
-    value: PARTNER_TYPES.startup,
-    label: 'Startup Partner — VC, accelerator, education, or community program',
-  },
-  {
-    value: PARTNER_TYPES.whitelabel,
-    label: 'Whitelabel — platform provisioning Supabase backends for your users',
-  },
-  {
-    value: PARTNER_TYPES.events,
-    label: 'Hackathon / Events — sponsorship, hackathons, student events',
   },
   {
     value: PARTNER_TYPES.other,
@@ -208,36 +193,6 @@ const fields: MarketingFormField[] = [
       { value: 'mixed', label: 'Mixed' },
     ],
     showWhen: { field: 'partner_type', equals: PARTNER_TYPES.solutions },
-  },
-
-  // ----- Startup Partners -----
-  {
-    name: 'program_type',
-    label: 'Describe your program',
-    type: 'select',
-    required: true,
-    placeholder: 'Select a program type',
-    options: [
-      { value: 'vc', label: 'VC' },
-      { value: 'accelerator', label: 'Accelerator' },
-      { value: 'ecosystem', label: 'Ecosystem' },
-      { value: 'education', label: 'Education' },
-    ],
-    showWhen: { field: 'partner_type', equals: PARTNER_TYPES.startup },
-  },
-  {
-    name: 'annual_startup_count',
-    label: 'How many startups do you work with annually?',
-    type: 'text',
-    required: true,
-    showWhen: { field: 'partner_type', equals: PARTNER_TYPES.startup },
-  },
-  {
-    name: 'vertical_geo_focus',
-    label: 'Any specific vertical or geographic focus?',
-    type: 'textarea',
-    rows: 3,
-    showWhen: { field: 'partner_type', equals: PARTNER_TYPES.startup },
   },
 
   // ----- General trailing field -----

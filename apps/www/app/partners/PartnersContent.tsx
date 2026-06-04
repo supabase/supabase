@@ -13,7 +13,7 @@ import SectionHeading from '@/components/Layouts/SectionHeading'
 import Panel from '@/components/Panel'
 import BecomeAPartner from '@/components/Partners/BecomeAPartner'
 import ProductHeaderCentered from '@/components/Sections/ProductHeaderCentered'
-import pageData, { PARTNER_FORM_ANCHOR, type PARTNER_TIER } from '@/data/partners'
+import pageData, { type PARTNER_TIER } from '@/data/partners'
 
 type FeaturedPartner = { slug: string; title: string; logo: string }
 
@@ -88,14 +88,7 @@ export default function PartnersContent({ featuredPartners }: Props) {
       <div className="bg-alternative border-y">
         <SectionContainer>
           <div className="mt-10 grid gap-6 md:grid-cols-3 md:grid-rows-[auto_auto] md:gap-y-0">
-            <div>
-              <SectionHeading eyebrow="Programs" title={pageData.waysToPartner.title} />
-              <Button asChild type="default" size="small" className="mt-6">
-                <Link href={PARTNER_FORM_ANCHOR} target="_blank">
-                  Apply to partner with Supabase
-                </Link>
-              </Button>
-            </div>
+            <SectionHeading eyebrow="Programs" title={pageData.waysToPartner.title} />
             {pageData.waysToPartner.tiers.map((tier: PARTNER_TIER) => {
               const timeToLaunch = (tier as { timeToLaunch?: string }).timeToLaunch
               return (
@@ -113,7 +106,7 @@ export default function PartnersContent({ featuredPartners }: Props) {
                       <Button
                         asChild
                         size="tiny"
-                        type="default"
+                        type="primary"
                         className="mt-4"
                         iconRight={tier.cta?.icon}
                       >
