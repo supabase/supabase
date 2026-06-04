@@ -55,7 +55,7 @@
     "supports-color": "^8.0.0",
     "tailwindcss": "catalog:",
     "tsx": "catalog:",
-    "turbo": "2.9.6",
+    "turbo": "2.9.14",
     "typescript": "catalog:",
     "zod": "catalog:"
   },

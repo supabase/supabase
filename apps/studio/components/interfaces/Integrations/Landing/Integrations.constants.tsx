@@ -69,7 +69,7 @@ export type IntegrationDefinition = {
   icon: (props?: { className?: string; style?: Record<string, string | number> }) => ReactNode
   description: string | null
   content?: string | null
-  files?: string[]
+  files?: { src: string; alt: string }[]
   docsUrl: string | null
   siteUrl?: string | null
   author: {

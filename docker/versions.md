@@ -1,5 +1,16 @@
 # Docker Image Versions
 
+## 2026-06-03
+- supabase/studio:2026.06.03-sha-0bca601 (prev supabase/studio:2026.04.27-sha-5f60601)
+- supabase/gotrue:v2.189.0 (prev supabase/gotrue:v2.186.0)
+- postgrest/postgrest:v14.12 (prev postgrest/postgrest:v14.8)
+- supabase/realtime:v2.102.3 (prev supabase/realtime:v2.76.5)
+- supabase/storage-api:v1.60.4 (prev supabase/storage-api:v1.48.26)
+- supabase/postgres-meta:v0.96.6 (prev supabase/postgres-meta:v0.96.3)
+- supabase/edge-runtime:v1.74.0 (prev supabase/edge-runtime:v1.71.2)
+- supabase/supavisor:2.9.5 (prev supabase/supavisor:2.7.4)
+- supabase/logflare:1.43.1 (prev supabase/logflare:1.36.1)
+
 ## 2026-04-27
 - supabase/studio:2026.04.27-sha-5f60601 (prev supabase/studio:2026.04.08-sha-205cbe7)
 
@@ -69,56 +80,56 @@
 - supabase/logflare:1.26.12 (prev supabase/logflare:1.22.6)
 
 ## 2025-11-12
-- supabase/studio:2025.11.10-sha-5291fe3 (prev 2025.10.27-sha-85b84e0)
-- supabase/gotrue:v2.182.1 (prev v2.180.0)
-- supabase/realtime:v2.63.0 (prev v2.57.2)
-- supabase/storage-api:v1.29.0 (prev v1.28.2)
-- supabase/edge-runtime:v1.69.23 (prev v1.69.15)
-- supabase/supavisor:2.7.4 (prev 2.7.3)
+- supabase/studio:2025.11.10-sha-5291fe3 (prev supabase/studio:2025.10.27-sha-85b84e0)
+- supabase/gotrue:v2.182.1 (prev supabase/gotrue:v2.180.0)
+- supabase/realtime:v2.63.0 (prev supabase/realtime:v2.57.2)
+- supabase/storage-api:v1.29.0 (prev supabase/storage-api:v1.28.2)
+- supabase/edge-runtime:v1.69.23 (prev supabase/edge-runtime:v1.69.15)
+- supabase/supavisor:2.7.4 (prev supabase/supavisor:2.7.3)
 
 ## 2025-10-28
-- supabase/studio:2025.10.27-sha-85b84e0 (prev 2025.10.20-sha-5005fc6)
-- supabase/realtime:v2.57.2 (prev v2.56.0)
-- supabase/storage-api:v1.28.2 (prev v1.28.1)
-- supabase/postgres-meta:v0.93.1 (prev v0.93.0)
-- supabase/edge-runtime:v1.69.15 (prev v1.69.14)
+- supabase/studio:2025.10.27-sha-85b84e0 (prev supabase/studio:2025.10.20-sha-5005fc6)
+- supabase/realtime:v2.57.2 (prev supabase/realtime:v2.56.0)
+- supabase/storage-api:v1.28.2 (prev supabase/storage-api:v1.28.1)
+- supabase/postgres-meta:v0.93.1 (prev supabase/postgres-meta:v0.93.0)
+- supabase/edge-runtime:v1.69.15 (prev supabase/edge-runtime:v1.69.14)
 
 ## 2025-10-21
-- supabase/studio:2025.10.20-sha-5005fc6 (prev 2025.10.01-sha-8460121)
-- supabase/realtime:v2.56.0 (prev v2.51.11)
-- supabase/storage-api:v1.28.1 (prev v1.28.0)
-- supabase/postgres-meta:v0.93.0 (prev v0.91.6)
-- supabase/edge-runtime:v1.69.14 (prev v1.69.6)
-- supabase/supavisor:2.7.3 (prev 2.7.0)
+- supabase/studio:2025.10.20-sha-5005fc6 (prev supabase/studio:2025.10.01-sha-8460121)
+- supabase/realtime:v2.56.0 (prev supabase/realtime:v2.51.11)
+- supabase/storage-api:v1.28.1 (prev supabase/storage-api:v1.28.0)
+- supabase/postgres-meta:v0.93.0 (prev supabase/postgres-meta:v0.91.6)
+- supabase/edge-runtime:v1.69.14 (prev supabase/edge-runtime:v1.69.6)
+- supabase/supavisor:2.7.3 (prev supabase/supavisor:2.7.0)
 
 ## 2025-10-13
-- supabase/logflare:1.22.6 (prev 1.22.4)
+- supabase/logflare:1.22.6 (prev supabase/logflare:1.22.4)
 
 ## 2025-10-08
-- supabase/studio:2025.10.01-sha-8460121 (prev 2025.06.30-sha-6f5982d)
-- supabase/gotrue:v2.180.0 (prev v2.177.0)
-- postgrest/postgrest:v13.0.7 (prev v12.2.12)
-- supabase/realtime:v2.51.11 (prev v2.34.47)
-- supabase/storage-api:v1.28.0 (prev v1.25.7)
-- supabase/postgres-meta:v0.91.6 (prev v0.91.0)
-- supabase/logflare:1.22.4 (prev 1.14.2)
-- supabase/postgres:15.8.1.085 (prev 15.8.1.060)
-- supabase/supavisor:2.7.0 (prev 2.5.7)
+- supabase/studio:2025.10.01-sha-8460121 (prev supabase/studio:2025.06.30-sha-6f5982d)
+- supabase/gotrue:v2.180.0 (prev supabase/gotrue:v2.177.0)
+- postgrest/postgrest:v13.0.7 (prev postgrest/postgrest:v12.2.12)
+- supabase/realtime:v2.51.11 (prev supabase/realtime:v2.34.47)
+- supabase/storage-api:v1.28.0 (prev supabase/storage-api:v1.25.7)
+- supabase/postgres-meta:v0.91.6 (prev supabase/postgres-meta:v0.91.0)
+- supabase/logflare:1.22.4 (prev supabase/logflare:1.14.2)
+- supabase/postgres:15.8.1.085 (prev supabase/postgres:15.8.1.060)
+- supabase/supavisor:2.7.0 (prev supabase/supavisor:2.5.7)
 
 ## 2025-07-15
-- supabase/gotrue:v2.177.0 (prev v2.176.1)
-- supabase/storage-api:v1.25.7 (prev v1.24.7)
-- supabase/postgres-meta:v0.91.0 (prev v0.89.3)
-- supabase/supavisor:2.5.7 (prev 2.5.6)
+- supabase/gotrue:v2.177.0 (prev supabase/gotrue:v2.176.1)
+- supabase/storage-api:v1.25.7 (prev supabase/storage-api:v1.24.7)
+- supabase/postgres-meta:v0.91.0 (prev supabase/postgres-meta:v0.89.3)
+- supabase/supavisor:2.5.7 (prev supabase/supavisor:2.5.6)
 
 ## 2025-07-02
-- supabase/studio:2025.06.30-sha-6f5982d (prev 2025.06.02-sha-8f2993d)
-- supabase/gotrue:v2.176.1 (prev v2.174.0)
-- supabase/storage-api:v1.24.7 (prev v1.23.0)
-- supabase/supavisor:2.5.6 (prev 2.5.1)
+- supabase/studio:2025.06.30-sha-6f5982d (prev supabase/studio:2025.06.02-sha-8f2993d)
+- supabase/gotrue:v2.176.1 (prev supabase/gotrue:v2.174.0)
+- supabase/storage-api:v1.24.7 (prev supabase/storage-api:v1.23.0)
+- supabase/supavisor:2.5.6 (prev supabase/supavisor:2.5.1)
 
 ## 2025-06-03
-- supabase/studio:2025.06.02-sha-8f2993d (prev 2025.05.19-sha-3487831)
-- supabase/gotrue:v2.174.0 (prev v2.172.1)
-- supabase/storage-api:v1.23.0 (prev v1.22.17)
-- supabase/postgres-meta:v0.89.3 (prev v0.89.0)
+- supabase/studio:2025.06.02-sha-8f2993d (prev supabase/studio:2025.05.19-sha-3487831)
+- supabase/gotrue:v2.174.0 (prev supabase/gotrue:v2.172.1)
+- supabase/storage-api:v1.23.0 (prev supabase/storage-api:v1.22.17)
+- supabase/postgres-meta:v0.89.3 (prev supabase/postgres-meta:v0.89.0)

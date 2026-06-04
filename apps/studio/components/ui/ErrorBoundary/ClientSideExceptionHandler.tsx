@@ -1,4 +1,5 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { safeLocalStorage, safeSessionStorage } from 'common'
 import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { Button, cn } from 'ui'
@@ -26,12 +27,8 @@ export const ClientSideExceptionHandler = ({
   const isProduction = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
   const handleClearStorage = () => {
-    try {
-      localStorage.clear()
-      sessionStorage.clear()
-    } catch (e) {
-      // ignore
-    }
+    safeLocalStorage.clear()
+    safeSessionStorage.clear()
     window.location.reload()
   }
 
