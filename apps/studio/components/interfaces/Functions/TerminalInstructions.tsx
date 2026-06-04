@@ -6,6 +6,7 @@ import { ComponentPropsWithoutRef, ElementRef, forwardRef, useState } from 'reac
 import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
 import type { Commands } from './Functions.types'
+import { getInvokeAuthHeader } from './TerminalInstructions.utils'
 import CommandRender from '@/components/interfaces/Functions/CommandRender'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useAccessTokensQuery } from '@/data/access-tokens/access-tokens-query'
@@ -70,23 +71,20 @@ export const TerminalInstructions = forwardRef<
       comment: 'Deploy your function',
     },
     {
-      // Publishable keys aren't JWTs, so they must be sent on the `apikey` header; passing
-      // them on `Authorization: Bearer` makes the platform reject the request with `Invalid
-      // JWT`. Legacy `anon` keys are JWTs and use `Authorization: Bearer`.
-      command: `curl -L -X POST 'https://${projectRef}.supabase.${restUrlTld}/functions/v1/hello-world' -H '${
-        isPublishableKey ? `apikey: ${apiKey}` : `Authorization: Bearer ${apiKey}`
-      }' --data '{"name":"Functions"}'`,
+      command: `curl -L -X POST 'https://${projectRef}.supabase.${restUrlTld}/functions/v1/hello-world' -H '${getInvokeAuthHeader(
+        { isPublishableKey, keyValue: apiKey }
+      )}' --data '{"name":"Functions"}'`,
       description: 'Invokes the hello-world function',
       jsx: () => {
         return (
           <>
             <span className="text-brand-600">curl</span> -L -X POST '{functionsEndpoint}
             /hello-world' -H '
-            {isPublishableKey
-              ? `apikey: ${keyPlaceholder}`
-              : `Authorization: Bearer ${keyPlaceholder}`}
-            '{' '}
-            {`--data '{"name":"Functions"}'`}
+            {getInvokeAuthHeader({
+              isPublishableKey,
+              keyValue: keyPlaceholder,
+            })}
+            ' {`--data '{"name":"Functions"}'`}
           </>
         )
       },
