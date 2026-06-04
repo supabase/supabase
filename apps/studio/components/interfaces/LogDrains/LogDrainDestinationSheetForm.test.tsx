@@ -1,6 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ComponentProps } from 'react'
+import { toast } from 'sonner'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { LogDrainDestinationSheetForm } from './LogDrainDestinationSheetForm'
@@ -119,7 +120,8 @@ describe('LogDrainDestinationSheetForm', () => {
     await user.type(screen.getByPlaceholderText('My Destination'), 'existing-drain')
     submitForm()
 
-    await waitFor(() => expect(onSubmit).not.toHaveBeenCalled())
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Log drain name already exists'))
+    expect(onSubmit).not.toHaveBeenCalled()
   })
 
   it('invokes onSaveClick with the destination type when saving', async () => {
