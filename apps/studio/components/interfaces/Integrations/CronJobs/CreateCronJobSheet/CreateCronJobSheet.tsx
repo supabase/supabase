@@ -1,31 +1,22 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useWatch } from '@ui/components/shadcn/ui/form'
+import { useParams } from 'common'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-
-import { useWatch } from '@ui/components/shadcn/ui/form'
-import { useParams } from 'common'
-import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { getDatabaseCronJob } from 'data/database-cron-jobs/database-cron-job-query'
-import { useDatabaseCronJobCreateMutation } from 'data/database-cron-jobs/database-cron-jobs-create-mutation'
-import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  Input,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Separator,
+  Sheet,
+  SheetContent,
   SheetFooter,
   SheetHeader,
   SheetSection,
@@ -34,8 +25,14 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { CRONJOB_DEFINITIONS } from '../CronJobs.constants'
-import { buildCronQuery, buildHttpRequestCommand, parseCronJobCommand } from '../CronJobs.utils'
+import {
+  buildCronCreateQuery,
+  buildCronUpdateQuery,
+  buildHttpRequestCommand,
+  parseCronJobCommand,
+} from '../CronJobs.utils'
 import { EdgeFunctionSection } from '../EdgeFunctionSection'
 import { HttpBodyFieldSection } from '../HttpBodyFieldSection'
 import { HTTPHeaderFieldsSection } from '../HttpHeaderFieldsSection'
@@ -48,13 +45,24 @@ import {
   type CronJobType,
 } from './CreateCronJobSheet.constants'
 import { CronJobScheduleSection } from './CronJobScheduleSection'
+import { EnableExtensionModal } from '@/components/interfaces/Database/Extensions/EnableExtensionModal'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { getDatabaseCronJob } from '@/data/database-cron-jobs/database-cron-job-query'
+import { useDatabaseCronJobCreateMutation } from '@/data/database-cron-jobs/database-cron-jobs-create-mutation'
+import { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
+import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { isGreaterThanOrEqual } from '@/lib/semver'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface CreateCronJobSheetProps {
-  selectedCronJob?: Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'>
-  supportsSeconds: boolean
-  onDirty: (isDirty: boolean) => void
+  open: boolean
+  selectedCronJob?: Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'> &
+    Partial<Pick<CronJob, 'jobid'>>
   onClose: () => void
-  onCloseWithConfirmation: () => void
 }
 
 const FORM_ID = 'create-cron-job-sidepanel'
@@ -83,31 +91,29 @@ const buildCommand = (values: CronJobType) => {
   return command
 }
 
-export const CreateCronJobSheet = ({
-  selectedCronJob,
-  supportsSeconds,
-  onDirty,
-  onClose,
-  onCloseWithConfirmation: confirmOnClose,
-}: CreateCronJobSheetProps) => {
+export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCronJobSheetProps) => {
   const { childId } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
   const [searchQuery] = useQueryState('search', parseAsString.withDefault(''))
   const [isLoadingGetCronJob, setIsLoadingGetCronJob] = useState(false)
 
   const jobId = Number(childId)
-  const isEditing = !!selectedCronJob?.jobname
+  const isEditing = selectedCronJob?.jobid !== undefined
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
 
-  const { data } = useDatabaseExtensionsQuery({
+  const { data = [] } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const pgNetExtension = (data ?? []).find((ext) => ext.name === 'pg_net')
+  const pgNetExtension = data.find((ext) => ext.name === 'pg_net')
   const pgNetExtensionInstalled = pgNetExtension?.installed_version != undefined
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const pgCronExtension = data.find((ext) => ext.name === 'pg_cron')
+  const supportsSeconds = pgCronExtension?.installed_version
+    ? isGreaterThanOrEqual(pgCronExtension.installed_version, '1.5')
+    : false
+
   const { mutate: upsertCronJob, isPending: isUpserting } = useDatabaseCronJobCreateMutation()
   const isLoading = isLoadingGetCronJob || isUpserting
 
@@ -118,24 +124,17 @@ export const CreateCronJobSheet = ({
 
   const cronJobValues = parseCronJobCommand(selectedCronJob?.command || '', project?.ref!)
 
+  const defaultValues = {
+    name: selectedCronJob?.jobname || '',
+    schedule: selectedCronJob?.schedule || '*/5 * * * *',
+    supportsSeconds,
+    values: cronJobValues,
+  }
+
   const form = useForm<CreateCronJobForm>({
     resolver: zodResolver(FormSchema),
-    defaultValues: {
-      name: selectedCronJob?.jobname || '',
-      schedule: selectedCronJob?.schedule || '*/5 * * * *',
-      supportsSeconds,
-      values: cronJobValues,
-    },
+    defaultValues,
   })
-
-  useEffect(() => {
-    const subscription = form.watch(() => {
-      const isDirty = form.formState.isDirty
-      onDirty(isDirty)
-    })
-
-    return () => subscription.unsubscribe()
-  }, [form, onDirty])
 
   const [
     cronType,
@@ -162,41 +161,23 @@ export const CreateCronJobSheet = ({
     ],
   })
 
-  // update the snippet field when the user changes the any values in the form
-  useEffect(() => {
-    const command = buildCommand({
-      type: cronType,
-      method,
-      edgeFunctionName,
-      timeoutMs,
-      httpHeaders,
-      httpBody,
-      functionName,
-      schema,
-      endpoint,
-      snippet: '',
-    })
-    if (command) {
-      form.setValue('values.snippet', command)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    edgeFunctionName,
-    endpoint,
-    method,
-    // for some reason, the httpHeaders are not memoized and cause the useEffect to trigger even when the value is the same
-    JSON.stringify(httpHeaders),
-    httpBody,
-    timeoutMs,
-    schema,
-    functionName,
-    form,
-  ])
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
+    checkIsDirty: () => form.formState.isDirty,
+    onClose: () => onClose(),
+  })
 
   const onSubmit: SubmitHandler<CreateCronJobForm> = async ({ name, schedule, values }) => {
     if (!project) return console.error('Project is required')
 
     if (!isEditing) {
+      if (!name) {
+        return form.setError(
+          'name',
+          { type: 'manual', message: 'Please provide a name for your cron job' },
+          { shouldFocus: true }
+        )
+      }
+
       try {
         setIsLoadingGetCronJob(true)
         const checkExistingJob = await getDatabaseCronJob({
@@ -207,20 +188,27 @@ export const CreateCronJobSheet = ({
         const nameExists = !!checkExistingJob
 
         if (nameExists) {
-          return form.setError('name', {
-            type: 'manual',
-            message: 'A cron job with this name already exists',
-          })
+          return form.setError(
+            'name',
+            {
+              type: 'manual',
+              message: 'A cron job with this name already exists',
+            },
+            { shouldFocus: true }
+          )
         }
       } catch (error: any) {
         toast.error(`Failed to validate cron job name: ${error.message}`)
+        return
       } finally {
         setIsLoadingGetCronJob(false)
       }
     }
 
-    const command = `$$${values.snippet}$$`
-    const query = buildCronQuery(name, schedule, command)
+    const query =
+      isEditing && selectedCronJob?.jobid !== undefined
+        ? buildCronUpdateQuery(selectedCronJob.jobid, schedule, values.snippet)
+        : buildCronCreateQuery(name, schedule, values.snippet)
 
     upsertCronJob(
       {
@@ -240,29 +228,9 @@ export const CreateCronJobSheet = ({
           }
 
           if (isEditing) {
-            sendEvent({
-              action: 'cron_job_updated',
-              properties: {
-                type: values.type,
-                schedule: schedule,
-              },
-              groups: {
-                project: project?.ref ?? 'Unknown',
-                organization: org?.slug ?? 'Unknown',
-              },
-            })
+            track('cron_job_updated', { type: values.type, schedule: schedule })
           } else {
-            sendEvent({
-              action: 'cron_job_created',
-              properties: {
-                type: values.type,
-                schedule: schedule,
-              },
-              groups: {
-                project: project?.ref ?? 'Unknown',
-                organization: org?.slug ?? 'Unknown',
-              },
-            })
+            track('cron_job_created', { type: values.type, schedule: schedule })
           }
 
           onClose()
@@ -272,177 +240,225 @@ export const CreateCronJobSheet = ({
     setIsLoadingGetCronJob(false)
   }
 
+  // update the snippet field when the user changes the any values in the form
+  useEffect(() => {
+    const command = buildCommand({
+      type: cronType,
+      method,
+      edgeFunctionName,
+      timeoutMs,
+      httpHeaders,
+      httpBody,
+      functionName,
+      schema,
+      endpoint,
+      snippet: '',
+    })
+    if (command) {
+      form.setValue('values.snippet', command)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    cronType,
+    edgeFunctionName,
+    endpoint,
+    method,
+    // for some reason, the httpHeaders are not memoized and cause the useEffect to trigger even when the value is the same
+    JSON.stringify(httpHeaders),
+    httpBody,
+    timeoutMs,
+    schema,
+    functionName,
+    form,
+  ])
+
+  useEffect(() => {
+    if (open && !!pgCronExtension) form.reset(defaultValues)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
+
   return (
     <>
-      <div className="flex flex-col h-full" tabIndex={-1}>
-        <SheetHeader>
-          <SheetTitle>
-            {isEditing ? `Edit ${selectedCronJob.jobname}` : `Create a new cron job`}
-          </SheetTitle>
-        </SheetHeader>
+      <DiscardChangesConfirmationDialog {...modalProps} />
 
-        <div className="overflow-auto flex-grow">
-          <Form_Shadcn_ {...form}>
-            <form
-              id={FORM_ID}
-              className="flex-grow overflow-auto"
-              onSubmit={form.handleSubmit(onSubmit)}
-            >
-              <SheetSection>
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItemLayout label="Name" layout="vertical" className="gap-1 relative">
-                      <FormControl_Shadcn_>
-                        <Input_Shadcn_ {...field} disabled={isEditing} />
-                      </FormControl_Shadcn_>
-                      <span className="text-foreground-lighter text-xs absolute top-0 right-0">
-                        Cron jobs cannot be renamed once created
-                      </span>
-                    </FormItemLayout>
-                  )}
-                />
-              </SheetSection>
-              <Separator />
-              <CronJobScheduleSection form={form} supportsSeconds={supportsSeconds} />
-              <Separator />
-              <SheetSection>
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="values.type"
-                  render={({ field }) => (
-                    <FormItemLayout label="Type" layout="vertical" className="gap-1">
-                      <FormControl_Shadcn_>
-                        <RadioGroupStacked
-                          id="function_type"
-                          name="function_type"
-                          value={field.value}
-                          disabled={field.disabled}
-                          onValueChange={(value) => field.onChange(value)}
-                        >
-                          {CRONJOB_DEFINITIONS.map((definition) => (
-                            <RadioGroupStackedItem
-                              key={definition.value}
-                              id={definition.value}
-                              value={definition.value}
-                              disabled={
-                                !pgNetExtensionInstalled &&
-                                (definition.value === 'http_request' ||
-                                  definition.value === 'edge_function')
-                              }
-                              label=""
-                              showIndicator={false}
+      <Sheet open={open} onOpenChange={handleOpenChange}>
+        <SheetContent size="lg">
+          <div className="flex flex-col h-full" tabIndex={-1}>
+            <SheetHeader>
+              <SheetTitle>
+                {isEditing
+                  ? `Edit ${selectedCronJob.jobname || 'cron job'}`
+                  : `Create a new cron job`}
+              </SheetTitle>
+            </SheetHeader>
+
+            <div className="overflow-auto grow">
+              <Form {...form}>
+                <form
+                  id={FORM_ID}
+                  className="grow overflow-auto"
+                  onSubmit={form.handleSubmit(onSubmit)}
+                >
+                  <SheetSection>
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItemLayout label="Name" layout="vertical" className="gap-1 relative">
+                          <FormControl>
+                            <Input {...field} disabled={isEditing} />
+                          </FormControl>
+                          <span className="text-foreground-lighter text-xs absolute top-0 right-0">
+                            Cron jobs cannot be renamed once created
+                          </span>
+                        </FormItemLayout>
+                      )}
+                    />
+                  </SheetSection>
+                  <Separator />
+                  <CronJobScheduleSection form={form} supportsSeconds={supportsSeconds} />
+                  <Separator />
+                  <SheetSection>
+                    <FormField
+                      control={form.control}
+                      name="values.type"
+                      render={({ field }) => (
+                        <FormItemLayout label="Type" layout="vertical" className="gap-1">
+                          <FormControl>
+                            <RadioGroupStacked
+                              id="function_type"
+                              name="function_type"
+                              value={field.value}
+                              disabled={field.disabled}
+                              onValueChange={(value) => field.onChange(value)}
                             >
-                              <div className="flex items-center gap-x-5">
-                                <div className="text-foreground">{definition.icon}</div>
-                                <div className="flex flex-col">
-                                  <div className="flex gap-x-2">
-                                    <p className="text-foreground">{definition.label}</p>
+                              {CRONJOB_DEFINITIONS.map((definition) => (
+                                <RadioGroupStackedItem
+                                  key={definition.value}
+                                  id={definition.value}
+                                  value={definition.value}
+                                  disabled={
+                                    !pgNetExtensionInstalled &&
+                                    (definition.value === 'http_request' ||
+                                      definition.value === 'edge_function')
+                                  }
+                                  label=""
+                                  showIndicator={false}
+                                >
+                                  <div className="flex items-center gap-x-5">
+                                    <div className="text-foreground">{definition.icon}</div>
+                                    <div className="flex flex-col">
+                                      <div className="flex gap-x-2">
+                                        <p className="text-foreground">{definition.label}</p>
+                                      </div>
+                                      <p className="text-foreground-light">
+                                        {definition.description}
+                                      </p>
+                                    </div>
                                   </div>
-                                  <p className="text-foreground-light">{definition.description}</p>
-                                </div>
-                              </div>
-                              {!pgNetExtensionInstalled &&
-                              (definition.value === 'http_request' ||
-                                definition.value === 'edge_function') ? (
-                                <div className="w-full flex gap-x-2 pl-11 py-2 items-center">
-                                  <WarningIcon />
-                                  <span className="text-xs">
-                                    <code>pg_net</code> needs to be installed to use this type
-                                  </span>
-                                </div>
-                              ) : null}
-                            </RadioGroupStackedItem>
-                          ))}
-                        </RadioGroupStacked>
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
+                                  {!pgNetExtensionInstalled &&
+                                  (definition.value === 'http_request' ||
+                                    definition.value === 'edge_function') ? (
+                                    <div className="w-full flex gap-x-2 pl-11 py-2 items-center">
+                                      <WarningIcon />
+                                      <span className="text-xs">
+                                        <code>pg_net</code> needs to be installed to use this type
+                                      </span>
+                                    </div>
+                                  ) : null}
+                                </RadioGroupStackedItem>
+                              ))}
+                            </RadioGroupStacked>
+                          </FormControl>
+                        </FormItemLayout>
+                      )}
+                    />
+                    {!pgNetExtensionInstalled && (
+                      <Admonition
+                        type="note"
+                        // @ts-ignore
+                        title={
+                          <span>
+                            Enable <code className="text-code-inline w-min">pg_net</code> for HTTP
+                            requests or Edge Functions
+                          </span>
+                        }
+                        description={
+                          <div className="flex flex-col gap-y-2">
+                            <span>
+                              This will allow you to send HTTP requests or trigger an edge function
+                              within your cron jobs
+                            </span>
+                            <ButtonTooltip
+                              type="default"
+                              className="w-min"
+                              disabled={!canToggleExtensions}
+                              onClick={() => setShowEnableExtensionModal(true)}
+                              tooltip={{
+                                content: {
+                                  side: 'bottom',
+                                  text: !canToggleExtensions
+                                    ? 'You need additional permissions to enable database extensions'
+                                    : undefined,
+                                },
+                              }}
+                            >
+                              Install pg_net extension
+                            </ButtonTooltip>
+                          </div>
+                        }
+                      />
+                    )}
+                  </SheetSection>
+                  <Separator />
+                  {cronType === 'http_request' && (
+                    <>
+                      <HttpRequestSection form={form} />
+                      <Separator />
+                      <HTTPHeaderFieldsSection variant={cronType} />
+                      <Separator />
+                      <HttpBodyFieldSection form={form} />
+                    </>
                   )}
-                />
-                {!pgNetExtensionInstalled && (
-                  <Admonition
-                    type="note"
-                    // @ts-ignore
-                    title={
-                      <span>
-                        Enable <code className="text-code-inline w-min">pg_net</code> for HTTP
-                        requests or Edge Functions
-                      </span>
-                    }
-                    description={
-                      <div className="flex flex-col gap-y-2">
-                        <span>
-                          This will allow you to send HTTP requests or trigger an edge function
-                          within your cron jobs
-                        </span>
-                        <ButtonTooltip
-                          type="default"
-                          className="w-min"
-                          disabled={!canToggleExtensions}
-                          onClick={() => setShowEnableExtensionModal(true)}
-                          tooltip={{
-                            content: {
-                              side: 'bottom',
-                              text: !canToggleExtensions
-                                ? 'You need additional permissions to enable database extensions'
-                                : undefined,
-                            },
-                          }}
-                        >
-                          Install pg_net extension
-                        </ButtonTooltip>
-                      </div>
-                    }
-                  />
-                )}
-              </SheetSection>
-              <Separator />
-              {cronType === 'http_request' && (
-                <>
-                  <HttpRequestSection form={form} />
-                  <Separator />
-                  <HTTPHeaderFieldsSection variant={cronType} />
-                  <Separator />
-                  <HttpBodyFieldSection form={form} />
-                </>
-              )}
-              {cronType === 'edge_function' && (
-                <>
-                  <EdgeFunctionSection form={form} />
-                  <Separator />
-                  <HTTPHeaderFieldsSection variant={cronType} />
-                  <Separator />
-                  <HttpBodyFieldSection form={form} />
-                </>
-              )}
-              {cronType === 'sql_function' && <SqlFunctionSection form={form} />}
-              {cronType === 'sql_snippet' && <SqlSnippetSection form={form} />}
-            </form>
-          </Form_Shadcn_>
-        </div>
-        <SheetFooter>
-          <Button
-            size="tiny"
-            type="default"
-            htmlType="button"
-            onClick={confirmOnClose}
-            disabled={isLoading}
-          >
-            Cancel
-          </Button>
-          <Button
-            size="tiny"
-            type="primary"
-            form={FORM_ID}
-            htmlType="submit"
-            disabled={isLoading}
-            loading={isLoading}
-          >
-            {isEditing ? `Save cron job` : 'Create cron job'}
-          </Button>
-        </SheetFooter>
-      </div>
+                  {cronType === 'edge_function' && (
+                    <>
+                      <EdgeFunctionSection form={form} />
+                      <Separator />
+                      <HTTPHeaderFieldsSection variant={cronType} />
+                      <Separator />
+                      <HttpBodyFieldSection form={form} />
+                    </>
+                  )}
+                  {cronType === 'sql_function' && <SqlFunctionSection form={form} />}
+                  {cronType === 'sql_snippet' && <SqlSnippetSection form={form} />}
+                </form>
+              </Form>
+            </div>
+            <SheetFooter>
+              <Button
+                size="tiny"
+                type="default"
+                htmlType="button"
+                onClick={confirmOnClose}
+                disabled={isLoading}
+              >
+                Cancel
+              </Button>
+              <Button
+                size="tiny"
+                type="primary"
+                form={FORM_ID}
+                htmlType="submit"
+                disabled={isLoading}
+                loading={isLoading}
+              >
+                {isEditing ? `Save cron job` : 'Create cron job'}
+              </Button>
+            </SheetFooter>
+          </div>
+        </SheetContent>
+      </Sheet>
+
       {pgNetExtension && (
         <EnableExtensionModal
           visible={showEnableExtensionModal}

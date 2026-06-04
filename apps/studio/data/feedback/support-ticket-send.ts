@@ -1,10 +1,11 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
+
 // End of third-party imports
 
-import type { ExtendedSupportCategories } from 'components/interfaces/Support/Support.constants'
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+import type { ExtendedSupportCategories } from '@/components/interfaces/Support/Support.constants'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type sendSupportTicketVariables = {
   subject: string
@@ -20,6 +21,8 @@ export type sendSupportTicketVariables = {
   siteUrl?: string
   additionalRedirectUrls?: string
   dashboardSentryIssueId?: string
+  dashboardLogs?: string
+  dashboardStudioVersion?: string
 }
 
 export async function sendSupportTicket({
@@ -36,6 +39,8 @@ export async function sendSupportTicket({
   siteUrl,
   additionalRedirectUrls,
   dashboardSentryIssueId,
+  dashboardLogs,
+  dashboardStudioVersion,
 }: sendSupportTicketVariables) {
   const { data, error } = await post('/platform/feedback/send', {
     body: {
@@ -54,6 +59,8 @@ export async function sendSupportTicket({
       browserInformation,
       allowSupportAccess,
       dashboardSentryIssueId,
+      dashboardLogs,
+      dashboardStudioVersion,
     },
   })
 

@@ -10,7 +10,7 @@ You can view your users on the [Users page](/dashboard/project/_/auth/users) of 
 
 For security, the Auth schema is not exposed in the auto-generated API. If you want to access users data via the API, you can create your own user tables in the `public` schema.
 
-Make sure to protect the table by enabling [Row Level Security](/docs/guides/database/postgres/row-level-security). Reference the `auth.users` table to ensure data integrity. Specify `on delete cascade` in the reference. For example, a `public.profiles` table might look like this:
+Make sure to protect the table by enabling [Row Level Security](/docs/guides/database/postgres/row-level-security) and only granting the necessary privileges for each role. Reference the `auth.users` table to ensure data integrity. Specify `on delete cascade` in the reference. For example, a `public.profiles` table might look like this:
 
 ```sql
 create table public.profiles (
@@ -21,6 +21,12 @@ create table public.profiles (
   primary key (id)
 );
 
+-- Grant the privileges the roles need
+GRANT SELECT ON public.profiles TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO service_role;
+
+-- Enable row level security for the table
 alter table public.profiles enable row level security;
 ```
 

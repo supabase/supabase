@@ -2,7 +2,7 @@
 
 import { useSearchParamsShallow } from 'common'
 import { xor } from 'lodash'
-import { Children, useEffect, useRef, type FC, type PropsWithChildren } from 'react'
+import { Children, isValidElement, useEffect, useRef, type FC, type PropsWithChildren } from 'react'
 import { type TabsProps } from 'ui'
 
 const isString = (maybeStr: unknown): maybeStr is string => typeof maybeStr === 'string'
@@ -27,10 +27,14 @@ const withQueryParams =
     onClick,
     ...props
   }: Props & QueryParamsProps) => {
-    const children = Children.toArray(childrenUnvalidated)
-    const tabIdsTemp = children
-      .map((child) => !!child && typeof child === 'object' && 'props' in child && child.props.id)
-      .filter(isString)
+    // Avoid Children.toArray — it clones elements (accessing element.ref) which
+    // triggers a React 19 warning. Children.forEach iterates without cloning.
+    const tabIdsTemp: string[] = []
+    Children.forEach(childrenUnvalidated, (child) => {
+      if (isValidElement(child) && isString((child.props as any).id)) {
+        tabIdsTemp.push((child.props as any).id)
+      }
+    })
     // Store in ref to avoid stale data in later timeout
     const tabIdsRef = useRef(tabIdsTemp)
     tabIdsRef.current = tabIdsTemp

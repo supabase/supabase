@@ -1,25 +1,25 @@
 import { usePrevious } from '@uidotdev/usehooks'
+import { useParams } from 'common/hooks/useParams'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-
-import { useParams } from 'common/hooks/useParams'
-import { SQLEditor } from 'components/interfaces/SQLEditor/SQLEditor'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
-import { useEditorType } from 'components/layouts/editors/EditorsLayout.hooks'
-import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
-import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
-import { useContentIdQuery } from 'data/content/content-id-query'
-import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from 'lib/constants'
-import { SnippetWithContent, useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { createTabId, useTabsStateSnapshot } from 'state/tabs'
-import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { generateSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
+
+import { SQLEditor } from '@/components/interfaces/SQLEditor/SQLEditor'
+import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { EditorBaseLayout } from '@/components/layouts/editors/EditorBaseLayout'
+import { useEditorType } from '@/components/layouts/editors/EditorsLayout.hooks'
+import SQLEditorLayout from '@/components/layouts/SQLEditorLayout/SQLEditorLayout'
+import { SQLEditorMenu } from '@/components/layouts/SQLEditorLayout/SQLEditorMenu'
+import { useContentIdQuery } from '@/data/content/content-id-query'
+import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from '@/lib/constants'
+import { SnippetWithContent, useSnippets, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
+import type { NextPageWithLayout } from '@/types'
 
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
@@ -69,7 +69,7 @@ const SqlEditor: NextPageWithLayout = () => {
         snapV2.setSnippet(ref, data as unknown as SnippetWithContent)
       } else {
         setLastVisitedSnippet(undefined)
-        router.push(`/project/${ref}/sql/new`)
+        router.replace(`/project/${ref}/sql/new`)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -84,7 +84,7 @@ const SqlEditor: NextPageWithLayout = () => {
       content === undefined
     ) {
       const snippet = allSnippets.find((snippet) => snippet.id === history.sql)
-      if (snippet !== undefined) router.push(`/project/${ref}/sql/${history.sql}`)
+      if (snippet !== undefined) router.replace(`/project/${ref}/sql/${history.sql}`)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, allSnippets, content])

@@ -1,4 +1,4 @@
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 
 export const HOOK_EVENTS = [
   {

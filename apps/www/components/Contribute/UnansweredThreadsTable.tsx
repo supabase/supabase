@@ -1,5 +1,6 @@
 'use client'
 
+import type { ThreadRow } from '~/types/contribute'
 import { Filter, MessageSquareReply, Search, X } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
@@ -10,10 +11,10 @@ import {
   Button,
   Card,
   cn,
-  Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Table,
   TableBody,
   TableCaption,
@@ -23,9 +24,8 @@ import {
   TableRow,
 } from 'ui'
 
-import type { ThreadRow } from '~/types/contribute'
 import { FilterPopover } from './FilterPopover'
-import { DiscordIcon, GitHubIcon, RedditIcon } from './Icons'
+import { ChannelIcon, DiscordIcon, GitHubIcon, RedditIcon } from './Icons'
 
 interface TabConfig {
   id: string
@@ -35,7 +35,7 @@ interface TabConfig {
 }
 
 function CountSkeleton() {
-  return <span className="inline-block min-w-[24px] h-5 bg-surface-300 animate-pulse rounded" />
+  return <span className="inline-block min-w-[24px] h-5 bg-surface-300 animate-pulse rounded-sm" />
 }
 
 function ThreadsTable({
@@ -296,7 +296,7 @@ export function UnansweredThreadsTable({
           {/* Search Input */}
           <form onSubmit={handleSearchSubmit} className="relative md:max-w-xs w-full flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-foreground-lighter" />
-            <Input_Shadcn_
+            <Input
               type="text"
               size="tiny"
               placeholder="Search threads by title..."
@@ -393,36 +393,13 @@ function ThreadRow({
   }
 
   return (
-    <TableRow className="relative group [&.hovering-badge>td]:hover:!bg-transparent">
+    <TableRow className="relative group [&.hovering-badge>td]:hover:bg-transparent!">
       {/* Thread title and product areas */}
-      <TableCell className="min-w-[400px]">
+      <TableCell className="w-auto max-w-[600px]">
         <div className="flex items-center gap-3 overflow-hidden">
           {/* Channel icon */}
-          <div className="flex items-center justify-center bg-surface-200 h-10 w-10 rounded-md">
-            {thread.channel === 'discord' && (
-              <DiscordIcon
-                className={cn(
-                  'h-4 w-4',
-                  thread.channel === 'discord' ? 'text-[#5865F2]' : 'text-foreground-lighter'
-                )}
-              />
-            )}
-            {thread.channel === 'reddit' && (
-              <RedditIcon
-                className={cn(
-                  'h-4 w-4',
-                  thread.channel === 'reddit' ? 'text-[#FF4500]' : 'text-foreground-lighter'
-                )}
-              />
-            )}
-            {thread.channel === 'github' && (
-              <GitHubIcon
-                className={cn(
-                  'h-4 w-4',
-                  thread.channel === 'github' ? 'text-foreground' : 'text-foreground-lighter'
-                )}
-              />
-            )}
+          <div className="flex items-center justify-center bg-surface-200 h-10 w-10 rounded-md shrink-0">
+            <ChannelIcon channel={thread.channel} />
           </div>
           <div className="min-w-0 flex-1 flex flex-col gap-y-0.5">
             {/* Thread title */}
@@ -483,7 +460,7 @@ function ThreadRow({
         </div>
       </TableCell>
       {/* Stack */}
-      <TableCell>
+      <TableCell className="w-[300px]">
         <div
           onMouseEnter={(e) => {
             const row = e.currentTarget.closest('tr')
@@ -530,8 +507,8 @@ function ThreadRow({
                     )
                   })}
                   {filteredStack.length > 5 && (
-                    <Popover_Shadcn_>
-                      <PopoverTrigger_Shadcn_ asChild>
+                    <Popover>
+                      <PopoverTrigger asChild>
                         <button
                           type="button"
                           onClick={(e) => {
@@ -557,8 +534,8 @@ function ThreadRow({
                             + {filteredStack.length - 5}
                           </Badge>
                         </button>
-                      </PopoverTrigger_Shadcn_>
-                      <PopoverContent_Shadcn_ className="max-w-[300px] p-3">
+                      </PopoverTrigger>
+                      <PopoverContent className="max-w-[300px] p-3">
                         <div className="flex flex-wrap gap-2">
                           {overflowStacks.map((tech: string) => {
                             const isActive = currentStack === tech
@@ -582,8 +559,8 @@ function ThreadRow({
                             )
                           })}
                         </div>
-                      </PopoverContent_Shadcn_>
-                    </Popover_Shadcn_>
+                      </PopoverContent>
+                    </Popover>
                   )}
                 </>
               )
@@ -595,8 +572,8 @@ function ThreadRow({
       </TableCell>
 
       {/* Replies */}
-      <TableCell className="text-right">
-        <div className="flex flex-row items-center gap-2">
+      <TableCell className="text-right w-[100px]">
+        <div className="flex flex-row items-center justify-end gap-2">
           {thread.message_count !== null && thread.message_count !== undefined && (
             <MessageSquareReply
               size={18}
@@ -640,7 +617,7 @@ function highlightText(text: string, searchTerm: string | null): ReactNode {
     }
     // Add the highlighted match
     parts.push(
-      <mark key={index} className="bg-brand-200 dark:bg-brand-500 dark:!text-foreground px-0.5">
+      <mark key={index} className="bg-brand-200 dark:bg-brand-500 dark:text-foreground! px-0.5">
         {text.slice(index, index + searchTerm.length)}
       </mark>
     )

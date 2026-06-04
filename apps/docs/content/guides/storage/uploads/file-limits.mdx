@@ -28,3 +28,12 @@ Additionally, you can specify the maximum file size on a per [bucket level](/doc
 ## Per bucket restrictions
 
 You can have different restrictions on a per bucket level such as restricting the file types (e.g. `pdf`, `images`, `videos`) or the maximum file size, which should be lower than the global limit. To apply these limits on a bucket level see [Creating Buckets](/docs/guides/storage/buckets/creating-buckets#restricting-uploads).
+
+## File name restrictions
+
+File names can only include the following characters:
+
+- **Alphanumeric**: `A-Z`, `a-z`, `0-9`
+- **Punctuation**: `_` (underscore), `-` (hyphen), `.` (dot), `'` (apostrophe), `,` (comma)
+- **Special characters**: `!`, `*`, `&`, `$`, `@`, `=`, `;`, `:`, `+`, `?`, `(`, `)`
+- **Whitespace**

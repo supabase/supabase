@@ -61,7 +61,7 @@ export const docsConfig: DocsConfig = {
       items: [
         {
           title: 'Introduction',
-          href: '/docs/ui-patterns/ui-patterns',
+          href: '/docs/ui-patterns/introduction',
           items: [],
           priority: true,
         },
@@ -86,13 +86,18 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          href: '/docs/ui-patterns/modality',
-          title: 'Modality',
+          title: 'Markdown',
+          href: '/docs/ui-patterns/markdown',
           items: [],
         },
         {
-          href: '/docs/ui-patterns/navigation',
+          title: 'Modality',
+          href: '/docs/ui-patterns/modality',
+          items: [],
+        },
+        {
           title: 'Navigation',
+          href: '/docs/ui-patterns/navigation',
           items: [],
         },
         {
@@ -108,13 +113,23 @@ export const docsConfig: DocsConfig = {
       items: [
         {
           title: 'Introduction',
-          href: '/docs/fragments/fragment-components',
+          href: '/docs/fragments/introduction',
           items: [],
           priority: true,
         },
         {
           title: 'Admonition',
           href: '/docs/fragments/admonition',
+          items: [],
+        },
+        {
+          title: 'Collapsible Alert',
+          href: '/docs/fragments/collapsible-alert',
+          items: [],
+        },
+        {
+          title: 'Collapsible Card Section',
+          href: '/docs/fragments/collapsible-card-section',
           items: [],
         },
         {
@@ -128,13 +143,18 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Modal',
-          href: '/docs/fragments/modal',
+          title: 'Page Container',
+          href: '/docs/fragments/page-container',
           items: [],
         },
         {
-          title: 'Page Container',
-          href: '/docs/fragments/page-container',
+          title: 'Page Breadcrumbs',
+          href: '/docs/fragments/page-breadcrumbs',
+          items: [],
+        },
+        {
+          title: 'Page Nav',
+          href: '/docs/fragments/page-nav',
           items: [],
         },
         {
@@ -165,6 +185,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Data Input',
           href: '/docs/fragments/data-input',
+          items: [],
+        },
+        {
+          title: 'Error Display',
+          href: '/docs/fragments/error-display',
           items: [],
         },
         {
@@ -202,6 +227,21 @@ export const docsConfig: DocsConfig = {
           href: '/docs/fragments/confirmation-modal',
           items: [],
         },
+        {
+          title: 'Status Codes',
+          href: '/docs/fragments/status-codes',
+          items: [],
+        },
+        {
+          title: 'Key/Value Field Array',
+          href: '/docs/fragments/key-value-field-array',
+          items: [],
+        },
+        {
+          title: 'Single Value Field Array',
+          href: '/docs/fragments/single-value-field-array',
+          items: [],
+        },
       ],
     },
     {
@@ -210,7 +250,7 @@ export const docsConfig: DocsConfig = {
       items: [
         {
           title: 'Introduction',
-          href: '/docs/components/atom-components',
+          href: '/docs/components/introduction',
           items: [],
           priority: true,
         },
@@ -490,6 +530,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Expanding Textarea',
           href: '/docs/components/expanding-textarea',
+          items: [],
+        },
+        {
+          title: 'Keyboard Shortcut',
+          href: '/docs/components/keyboard-shortcut',
           items: [],
         },
       ],

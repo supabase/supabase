@@ -2,7 +2,6 @@
 
 import { Check, Copy } from 'lucide-react'
 import * as React from 'react'
-
 import { Button, cn, copyToClipboard } from 'ui'
 
 interface CopyButtonProps extends React.HTMLAttributes<HTMLButtonElement> {

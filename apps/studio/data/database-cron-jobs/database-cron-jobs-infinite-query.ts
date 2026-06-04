@@ -1,12 +1,15 @@
+import { getCronJobsSql } from '@supabase/pg-meta'
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 import { databaseCronJobsKeys } from './keys'
+import { COST_THRESHOLD_ERROR, executeSql } from '@/data/sql/execute-sql-query'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
-const CRON_JOBS_PAGE_LIMIT = 20
+// The value is intentionally high because the data grid needs to overflow so that `onScroll` event work and trigger
+// the infinite loading. If the value is too low, there won't be enough items to overflow and trigger the event.
+export const CRON_JOBS_PAGE_LIMIT = 40
 
-type DatabaseCronJobRunsVariables = {
+export type DatabaseCronJobRunsVariables = {
   projectRef?: string
   connectionString?: string | null
   searchTerm?: string
@@ -17,49 +20,10 @@ export type CronJob = {
   jobname: string | null
   active: boolean
   command: string
-  latest_run: string
   schedule: string
-  status: string
+  latest_run?: string
+  status?: string
 }
-
-// [Joshen] Just to call out that I had AI help me with this, so please let me know if this can be optimized
-const getCronJobSql = ({ searchTerm, page }: { searchTerm?: string; page: number }) =>
-  `
-WITH latest_runs AS (
-  SELECT 
-    jobid,
-    status,
-    MAX(start_time) AS latest_run
-  FROM cron.job_run_details
-  GROUP BY jobid, status
-), most_recent_runs AS (
-  SELECT 
-    jobid, 
-    status, 
-    latest_run
-  FROM latest_runs lr1
-  WHERE latest_run = (
-    SELECT MAX(latest_run) 
-    FROM latest_runs lr2 
-    WHERE lr2.jobid = lr1.jobid
-  )
-)
-SELECT 
-  job.jobid,
-  job.jobname,
-  job.schedule,
-  job.command,
-  job.active,
-  mr.latest_run,
-  mr.status
-FROM 
-  cron.job job
-LEFT JOIN most_recent_runs mr ON job.jobid = mr.jobid
-${!!searchTerm ? `WHERE job.jobname ILIKE '%${searchTerm}%'` : ''}
-ORDER BY job.jobid
-LIMIT ${CRON_JOBS_PAGE_LIMIT}
-OFFSET ${page * CRON_JOBS_PAGE_LIMIT};
-`.trim()
 
 export async function getDatabaseCronJobs({
   projectRef,
@@ -72,8 +36,9 @@ export async function getDatabaseCronJobs({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: getCronJobSql({ searchTerm, page }),
+    sql: getCronJobsSql({ searchTerm, page, limit: CRON_JOBS_PAGE_LIMIT }),
     queryKey: ['cron-jobs'],
+    preflightCheck: true,
   })
 
   return result
@@ -113,6 +78,10 @@ export const useCronJobsInfiniteQuery = <TData = DatabaseCronJobsInfiniteData>(
       const hasNextPage = lastPage.length >= CRON_JOBS_PAGE_LIMIT
       if (!hasNextPage) return undefined
       return page
+    },
+    retry: (failureCount, error) => {
+      if (error.message === COST_THRESHOLD_ERROR) return false
+      return failureCount < 3
     },
     ...options,
   })

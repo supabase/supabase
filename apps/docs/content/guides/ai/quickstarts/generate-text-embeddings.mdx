@@ -138,12 +138,12 @@ Let's build an Edge Function that will accept an input string and generate an em
 
       ```shell
       curl --request POST 'http://localhost:54321/functions/v1/embed' \
-        --header 'Authorization: Bearer ANON_KEY' \
         --header 'Content-Type: application/json' \
+        --header 'apikey: SUPABASE_PUBLISHABLE_KEY' \
         --data '{ "input": "hello world" }'
       ```
 
-      Be sure to replace `ANON_KEY` with your project's anonymous key. You can get this key by running `supabase status`.
+      Be sure to replace `SUPABASE_PUBLISHABLE_KEY` with your project's publishable key. You can get this key by running `supabase status`.
 
     </StepHikeCompact.Details>
 

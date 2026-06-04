@@ -49,7 +49,7 @@ const RevVersionDropdown = ({
           border
           hover:border-control
           hover:bg-overlay-hover
-          border-control px-2 h-[32px] rounded
+          border-control px-2 h-[32px] rounded-sm
           font-mono
           flex items-center gap-1 text-foreground-muted text-xs group-hover:text-foreground transition
           "

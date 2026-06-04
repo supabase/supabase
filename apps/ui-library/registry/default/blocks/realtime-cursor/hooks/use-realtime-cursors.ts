@@ -1,6 +1,7 @@
-import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'
-import { RealtimeChannel, REALTIME_SUBSCRIBE_STATES } from '@supabase/supabase-js'
+import { REALTIME_SUBSCRIBE_STATES, RealtimeChannel } from '@supabase/supabase-js'
 import { useCallback, useEffect, useRef, useState } from 'react'
+
+import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'
 
 /**
  * Throttle a callback to a certain delay, It will only call the callback if the delay has passed, with the arguments

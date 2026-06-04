@@ -1,9 +1,9 @@
-import { QueryClient, onlineManager } from '@tanstack/react-query'
+import { onlineManager, QueryClient } from '@tanstack/react-query'
 import { match } from 'path-to-regexp'
 import { useState } from 'react'
 
-import { IS_PLATFORM } from 'lib/constants'
-import { ResponseError } from 'types'
+import { IS_PLATFORM } from '@/lib/constants'
+import { ResponseError } from '@/types'
 
 // When running locally we don't need the internet
 // so we can pretend we're online all the time

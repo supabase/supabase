@@ -10,7 +10,7 @@ import ExamplesMobile from './ExamplesMobile'
 const BuiltWithSupabase = () => {
   return (
     <>
-      <SectionContainer id="examples" className="xl:pt-32 !pb-0">
+      <SectionContainer id="examples" className="xl:pt-32 pb-0!">
         <div className="text-center flex flex-col items-center">
           <h3 className="h2">Start building in seconds</h3>
           <p className="p max-w-[300px] md:max-w-none">
@@ -23,7 +23,7 @@ const BuiltWithSupabase = () => {
             <Button
               asChild
               type="default"
-              icon={<IconGitHubSolid size="tiny" className="!w-full !h-full" />}
+              icon={<IconGitHubSolid size="tiny" className="w-full! h-full!" />}
               size="small"
             >
               <Link href="https://github.com/supabase/supabase/tree/master/examples">
@@ -33,7 +33,7 @@ const BuiltWithSupabase = () => {
           </div>
         </div>
       </SectionContainer>
-      <SectionContainer className="relative w-full !px-0 lg:!px-16 xl:!px-20 !pb-0 mb-16 md:mb-12 lg:mb-12 !pt-6 max-w-[1400px]">
+      <SectionContainer className="relative w-full px-0! lg:px-16! xl:px-20! pb-0! mb-16 md:mb-12 lg:mb-12 pt-6! max-w-[1400px]">
         <ExamplesMobile examples={Examples.slice(0, 6)} className="lg:hidden" />
         <div className="hidden lg:grid grid-cols-12 gap-5 mt-4">
           {Examples.slice(0, 6).map((example, i) => {

@@ -1,10 +1,83 @@
-import { describe, test, expect } from 'vitest'
-import { DiskType } from './ui/DiskManagement.constants'
+import { describe, expect, test } from 'vitest'
+
 import {
+  calculateBaselineIopsForComputeSize,
+  calculateComputeSizeRequiredForIops,
   calculateDiskSizePrice,
   calculateIOPSPrice,
+  calculateMaxIopsAllowedForDiskSizeWithGp3,
+  calculateMaxIopsForComputeSize,
   calculateThroughputPrice,
+  mapAddOnVariantIdToComputeSize,
+  mapComputeSizeNameToAddonVariantId,
 } from './DiskManagement.utils'
+import { DiskType } from './ui/DiskManagement.constants'
+
+describe('DiskManagement utils', () => {
+  describe('mapComputeSizeNameToAddonVariantId', () => {
+    test('maps known infra sizes to addon variant ids', () => {
+      expect(mapComputeSizeNameToAddonVariantId('4xlarge')).toBe('ci_4xlarge')
+    })
+
+    test('falls back to nano for unknown infra sizes', () => {
+      // @ts-expect-error intentional invalid value for runtime guard
+      expect(mapComputeSizeNameToAddonVariantId('unknown-size')).toBe('ci_nano')
+    })
+  })
+
+  describe('mapAddOnVariantIdToComputeSize', () => {
+    test('maps known addon ids to display names', () => {
+      expect(mapAddOnVariantIdToComputeSize('ci_4xlarge')).toBe('4XL')
+    })
+
+    test('falls back to Nano on invalid addon id', () => {
+      // @ts-expect-error intentional invalid value for runtime guard
+      expect(mapAddOnVariantIdToComputeSize('ci_invalid')).toBe('Nano')
+    })
+  })
+
+  describe('calculateBaselineIopsForComputeSize / calculateMaxIopsForComputeSize', () => {
+    test('returns 0 for invalid compute ids', () => {
+      expect(calculateBaselineIopsForComputeSize('invalid')).toBe(0)
+      expect(calculateMaxIopsForComputeSize('invalid')).toBe(0)
+    })
+
+    test('returns baseline and max for valid compute ids', () => {
+      expect(calculateBaselineIopsForComputeSize('ci_2xlarge')).toBe(12000)
+      expect(calculateMaxIopsForComputeSize('ci_2xlarge')).toBe(20000)
+    })
+  })
+
+  describe('calculateComputeSizeRequiredForIops', () => {
+    test('returns smallest size that satisfies requested IOPS', () => {
+      expect(calculateComputeSizeRequiredForIops(500)).toBe('ci_nano')
+      expect(calculateComputeSizeRequiredForIops(19000)).toBe('ci_large')
+      expect(calculateComputeSizeRequiredForIops(45000)).toBe('ci_12xlarge')
+    })
+
+    test('falls back to largest size when exceeding known max', () => {
+      const fallback = calculateComputeSizeRequiredForIops(500000)
+      expect([
+        'ci_48xlarge',
+        'ci_48xlarge_optimized_cpu',
+        'ci_48xlarge_optimized_memory',
+        'ci_48xlarge_high_memory',
+      ]).toContain(fallback)
+    })
+  })
+})
+
+describe('calculateMaxIopsAllowedForDiskSizeWithGp3', () => {
+  // Regression: old code returned `3000 * size`, letting a 2 GB disk request 6000 IOPS
+  // which the platform rejects. The real ceiling is 500 IOPS/GB capped at 16 000.
+  test('caps a sub-6 GB disk at the 3000 IOPS floor (not 3000 × size)', () => {
+    expect(calculateMaxIopsAllowedForDiskSizeWithGp3(2)).toBe(3000)
+  })
+
+  test('caps large disks at 16 000 IOPS', () => {
+    expect(calculateMaxIopsAllowedForDiskSizeWithGp3(100)).toBe(16000)
+  })
+})
 
 describe('DiskManagement.utils.ts:calculateDiskSizePrice', () => {
   test('GP3 with 8GB to GP3 with 10GB for pro plan', () => {

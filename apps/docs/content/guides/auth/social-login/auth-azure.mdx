@@ -31,6 +31,19 @@ Setting up OAuth with Azure consists of four broad steps:
 
 ## Obtain a client ID and secret
 
+### Local development with Azure OAuth
+
+Azure does not allow `127.0.0.1` as a redirect URI hostname and requires
+the use of `localhost`.
+
+To enable Azure OAuth during local Supabase development, configure the
+Supabase API external URL in your `config.toml`:
+
+```toml
+[api]
+external_url = "http://localhost:54321"
+```
+
 - Once your app has been registered, the client ID can be found under the [list of app registrations](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps) under the column titled _Application (client) ID_.
 - You can also find it in the app overview screen.
 - Place the Client ID in the Azure configuration screen in the Supabase Auth dashboard.
@@ -150,7 +163,8 @@ When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/a
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 async function signInWithAzure() {
@@ -212,7 +226,8 @@ When your user signs out, call [signOut()](/docs/reference/javascript/auth-signo
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 async function signOut() {
@@ -262,7 +277,8 @@ Azure OAuth2.0 doesn't return the `provider_refresh_token` by default. If you ne
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 async function signInWithAzure() {

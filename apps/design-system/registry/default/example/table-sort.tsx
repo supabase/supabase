@@ -1,13 +1,12 @@
 import { useMemo, useState } from 'react'
-
 import {
   Card,
   Table,
   TableBody,
   TableCell,
   TableHead,
-  TableHeadSort,
   TableHeader,
+  TableHeadSort,
   TableRow,
 } from 'ui'
 

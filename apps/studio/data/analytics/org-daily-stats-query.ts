@@ -1,16 +1,16 @@
 import { useQuery } from '@tanstack/react-query'
-
 import type { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { analyticsKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export enum EgressType {
   REST = 'egress_rest',
   AUTH = 'egress_auth',
   STORAGE = 'egress_storage',
   REALTIME = 'egress_realtime',
-  FUNCTIONS = 'egress_functions',
+  FUNCTIONS = 'egress_function',
   SUPAVISOR = 'egress_supavisor',
   LOGDRAIN = 'egress_logdrain',
 }

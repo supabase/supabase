@@ -32,7 +32,6 @@ For example:
 20240906123045_create_profiles.sql
 ```
 
-
 ## SQL Guidelines
 
 Write Postgres-compatible SQL code for Supabase migration files that:
@@ -44,9 +43,8 @@ Write Postgres-compatible SQL code for Supabase migration files that:
 - When creating a new table, you MUST enable Row Level Security (RLS) even if the table is intended for public access.
 - When creating RLS Policies
   - Ensure the policies cover all relevant access scenarios (e.g. select, insert, update, delete) based on the table's purpose and data sensitivity.
-  - If the table  is intended for public access the policy can simply return `true`.
+  - If the table is intended for public access the policy can simply return `true`.
   - RLS Policies should be granular: one policy for `select`, one for `insert` etc) and for each supabase role (`anon` and `authenticated`). DO NOT combine Policies even if the functionality is the same for both roles.
   - Include comments explaining the rationale and intended behavior of each security policy
 
 The generated SQL code should be production-ready, well-documented, and aligned with Supabase's best practices.
-

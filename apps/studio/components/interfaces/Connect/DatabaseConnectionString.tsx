@@ -1,50 +1,50 @@
+import { useParams } from 'common'
 import { BookOpen, ChevronDown, ExternalLink } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
-import { HTMLAttributes, ReactNode, useEffect, useMemo, useState } from 'react'
-
-import { useParams } from 'common'
-import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import AlertError from 'components/ui/AlertError'
-import { DatabaseSelector } from 'components/ui/DatabaseSelector'
-import { InlineLink } from 'components/ui/InlineLink'
-import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
-import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
-import { pluckObjectFields } from 'lib/helpers'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { HTMLAttributes, ReactNode, useEffect, useState } from 'react'
 import {
   Badge,
   Button,
-  CodeBlock,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
-  DIALOG_PADDING_X,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-  Select_Shadcn_,
-  Separator,
   cn,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+  DIALOG_PADDING_X,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Separator,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import {
   CONNECTION_PARAMETERS,
-  type ConnectionStringMethod,
+  connectionStringMethodOptions,
   DATABASE_CONNECTION_TYPES,
   DatabaseConnectionType,
   IPV4_ADDON_TEXT,
   PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT,
-  connectionStringMethodOptions,
+  type ConnectionStringMethod,
 } from './Connect.constants'
 import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
 import { getConnectionStrings } from './DatabaseSettings.utils'
-import examples, { Example } from './DirectConnectionExamples'
+import { examples, type Example } from './DirectConnectionExamples'
+import { getAddons } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
+import AlertError from '@/components/ui/AlertError'
+import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
+import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
+import { pluckObjectFields } from '@/lib/helpers'
+import { useTrack } from '@/lib/telemetry/track'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 const StepLabel = ({
   number,
@@ -65,8 +65,13 @@ const StepLabel = ({
  */
 export const DatabaseConnectionString = () => {
   const { ref: projectRef } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
   const state = useDatabaseSelectorStateSnapshot()
+  const {
+    hasAccess: hasDedicatedPooler,
+    isLoading: isLoadingEntitlement,
+    isSuccess: isSuccessEntitlement,
+  } = useCheckEntitlements('dedicated_pooler')
+  const sharedPoolerPreferred = !hasDedicatedPooler
 
   // URL state management
   const [queryType, setQueryType] = useQueryState('type', parseAsString.withDefault('uri'))
@@ -75,10 +80,6 @@ export const DatabaseConnectionString = () => {
 
   const [selectedTab, setSelectedTab] = useState<DatabaseConnectionType>('uri')
   const [selectedMethod, setSelectedMethod] = useState<ConnectionStringMethod>('direct')
-
-  const sharedPoolerPreferred = useMemo(() => {
-    return org?.plan?.id === 'free'
-  }, [org])
 
   // Sync URL state with component state on mount and when URL changes
   useEffect(() => {
@@ -177,9 +178,9 @@ export const DatabaseConnectionString = () => {
       : isSuccessSupavisorConfig
 
   const error = poolerError || readReplicasError
-  const isLoading = isLoadingPoolerConfig || isLoadingReadReplicas
+  const isLoading = isLoadingPoolerConfig || isLoadingReadReplicas || isLoadingEntitlement
   const isError = isErrorPoolerConfig || isErrorReadReplicas
-  const isSuccess = isSuccessPoolerConfig && isSuccessReadReplicas
+  const isSuccess = isSuccessPoolerConfig && isSuccessReadReplicas && isSuccessEntitlement
 
   const sharedPoolerConfig = supavisorConfig?.find((x) => x.identifier === state.selectedDatabaseId)
   const poolingConfiguration = sharedPoolerPreferred ? sharedPoolerConfig : pgbouncerConfig
@@ -192,7 +193,7 @@ export const DatabaseConnectionString = () => {
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const { ipv4: ipv4Addon } = getAddons(addons?.selected_addons ?? [])
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
   const emptyState = { db_user: '', db_host: '', db_port: '', db_name: '' }
@@ -205,15 +206,11 @@ export const DatabaseConnectionString = () => {
     const connectionInfo = DATABASE_CONNECTION_TYPES.find((type) => type.id === connectionTypeId)
     const connectionType = connectionInfo?.label ?? 'Unknown'
     const lang = connectionInfo?.lang ?? 'Unknown'
-    sendEvent({
-      action: 'connection_string_copied',
-      properties: {
-        connectionType,
-        lang,
-        connectionMethod: connectionStringMethod,
-        connectionTab: 'Connection String',
-      },
-      groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+    track('connection_string_copied', {
+      connectionType,
+      lang,
+      connectionMethod: connectionStringMethod,
+      connectionTab: 'Connection String',
     })
   }
 
@@ -221,7 +218,7 @@ export const DatabaseConnectionString = () => {
     connectionInfo,
     poolingInfo: {
       connectionString: sharedPoolerConfig?.connection_string ?? '',
-      db_host: isReplicaSelected ? connectionInfo.db_host : sharedPoolerConfig?.db_host ?? '',
+      db_host: isReplicaSelected ? connectionInfo.db_host : (sharedPoolerConfig?.db_host ?? ''),
       db_name: sharedPoolerConfig?.db_name ?? '',
       db_port: sharedPoolerConfig?.db_port ?? 0,
       db_user: sharedPoolerConfig?.db_user ?? '',
@@ -233,11 +230,11 @@ export const DatabaseConnectionString = () => {
     connectionInfo,
     poolingInfo: {
       connectionString: isReplicaSelected
-        ? poolingConfiguration?.connection_string.replace(
+        ? (poolingConfiguration?.connection_string.replace(
             poolingConfiguration?.db_host,
             connectionInfo.db_host
-          ) ?? ''
-        : poolingConfiguration?.connection_string ?? '',
+          ) ?? '')
+        : (poolingConfiguration?.connection_string ?? ''),
       db_host: isReplicaSelected ? connectionInfo.db_host : poolingConfiguration?.db_host,
       db_name: poolingConfiguration?.db_name ?? '',
       db_port: poolingConfiguration?.db_port ?? 0,
@@ -286,24 +283,24 @@ export const DatabaseConnectionString = () => {
             <span className="w-1/2 md:w-auto flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
               Type
             </span>
-            <Select_Shadcn_ value={selectedTab} onValueChange={handleTabChange}>
-              <SelectTrigger_Shadcn_ size="small" className="w-full md:w-auto rounded-l-none">
-                <SelectValue_Shadcn_ />
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
+            <Select value={selectedTab} onValueChange={handleTabChange}>
+              <SelectTrigger size="small" className="w-full md:w-auto rounded-l-none">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
                 {DATABASE_CONNECTION_TYPES.map((type) => (
-                  <SelectItem_Shadcn_ key={type.id} value={type.id}>
+                  <SelectItem key={type.id} value={type.id}>
                     {type.label}
-                  </SelectItem_Shadcn_>
+                  </SelectItem>
                 ))}
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
+              </SelectContent>
+            </Select>
           </div>
           <DatabaseSelector
-            portal={false}
+            align="start"
             buttonProps={{
               size: 'small',
-              className: 'w-full justify-between pr-2.5 [&_svg]:h-4',
+              className: 'w-full pr-2.5 [&_svg]:h-4',
             }}
             className="w-full md:w-auto [&>span]:w-1/2 [&>span]:md:w-auto"
             onSelectId={handleDatabaseChange}
@@ -312,13 +309,13 @@ export const DatabaseConnectionString = () => {
             <span className="w-1/2 md:w-auto flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
               Method
             </span>
-            <Select_Shadcn_ value={selectedMethod} onValueChange={handleMethodChange}>
-              <SelectTrigger_Shadcn_ size="small" className="w-full md:w-auto rounded-l-none">
-                <SelectValue_Shadcn_ size="tiny">
+            <Select value={selectedMethod} onValueChange={handleMethodChange}>
+              <SelectTrigger size="small" className="w-full md:w-auto rounded-l-none">
+                <SelectValue size="tiny">
                   {connectionStringMethodOptions[selectedMethod].label}
-                </SelectValue_Shadcn_>
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_ className="max-w-sm">
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent className="max-w-sm">
                 {Object.keys(connectionStringMethodOptions).map((method) => (
                   <ConnectionStringMethodSelectItem
                     key={method}
@@ -326,8 +323,8 @@ export const DatabaseConnectionString = () => {
                     poolerBadge={method === 'transaction' ? poolerBadge : undefined}
                   />
                 ))}
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <p className="text-xs inline-flex items-center gap-1 text-foreground-lighter">
@@ -462,7 +459,12 @@ export const DatabaseConnectionString = () => {
                   }}
                   notice={['Does not support PREPARE statements']}
                   parameters={[
-                    { ...CONNECTION_PARAMETERS.host, value: poolingConfiguration?.db_host ?? '' },
+                    {
+                      ...CONNECTION_PARAMETERS.host,
+                      value: isReplicaSelected
+                        ? connectionInfo.db_host
+                        : (poolingConfiguration?.db_host ?? ''),
+                    },
                     {
                       ...CONNECTION_PARAMETERS.port,
                       value: poolingConfiguration?.db_port.toString() ?? '6543',
@@ -479,26 +481,26 @@ export const DatabaseConnectionString = () => {
                   {!sharedPoolerPreferred && !ipv4Addon && (
                     <>
                       <Separator className="w-full" />
-                      <Collapsible_Shadcn_ className="group">
-                        <CollapsibleTrigger_Shadcn_
+                      <Collapsible className="group">
+                        <CollapsibleTrigger
                           asChild
-                          className="w-full justify-start !last:rounded-b group-data-[state=open]:rounded-b-none border-light px-3"
+                          className="w-full justify-start !last:rounded-b group-data-open:rounded-b-none px-3"
                         >
                           <Button
                             type="default"
                             size="large"
                             iconRight={
-                              <ChevronDown className="transition group-data-[state=open]:rotate-180" />
+                              <ChevronDown className="transition group-data-open:rotate-180" />
                             }
-                            className="text-foreground !bg-dash-sidebar justify-between"
+                            className="text-foreground bg-dash-sidebar! justify-between"
                           >
                             <div className="text-xs flex items-center gap-x-2 py-2 px-1">
                               <span>Using the Shared Pooler</span>
                               <Badge variant="success">IPv4 compatible</Badge>
                             </div>
                           </Button>
-                        </CollapsibleTrigger_Shadcn_>
-                        <CollapsibleContent_Shadcn_ className="bg-dash-sidebar rounded-b border text-xs">
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="bg-dash-sidebar rounded-b border text-xs">
                           <CodeBlock
                             wrapperClassName={cn(
                               '[&_pre]:border-x-0 [&_pre]:border-t-0 [&_pre]:px-4 [&_pre]:py-3',
@@ -514,8 +516,8 @@ export const DatabaseConnectionString = () => {
                             Only recommended when your network does not support IPv6. Added latency
                             compared to dedicated pooler.
                           </p>
-                        </CollapsibleContent_Shadcn_>
-                      </Collapsible_Shadcn_>
+                        </CollapsibleContent>
+                      </Collapsible>
                     </>
                   )}
                 </ConnectionPanel>
@@ -581,8 +583,8 @@ export const DatabaseConnectionString = () => {
       {selectedTab === 'python' && (
         <>
           <Separator />
-          <Collapsible_Shadcn_ className="px-8 py-5">
-            <CollapsibleTrigger_Shadcn_ className="group [&[data-state=open]>div>svg]:!-rotate-180">
+          <Collapsible className="px-8 py-5">
+            <CollapsibleTrigger className="group [&[data-state=open]>div>svg]:-rotate-180!">
               <div className="flex items-center gap-x-2 w-full">
                 <p className="text-xs text-foreground-light group-hover:text-foreground transition">
                   Connecting to SQL Alchemy
@@ -593,8 +595,8 @@ export const DatabaseConnectionString = () => {
                   size={14}
                 />
               </div>
-            </CollapsibleTrigger_Shadcn_>
-            <CollapsibleContent_Shadcn_ className="my-2">
+            </CollapsibleTrigger>
+            <CollapsibleContent className="my-2">
               <div className="text-foreground-light text-xs grid gap-2">
                 <p>
                   Please use <code>postgresql://</code> instead of <code>postgres://</code> as your
@@ -606,8 +608,8 @@ export const DatabaseConnectionString = () => {
                 </p>
                 <p className="text-sm font-mono tracking-tight text-foreground-lighter"></p>
               </div>
-            </CollapsibleContent_Shadcn_>
-          </Collapsible_Shadcn_>
+            </CollapsibleContent>
+          </Collapsible>
         </>
       )}
 
@@ -653,7 +655,7 @@ const ConnectionStringMethodSelectItem = ({
   }
 
   return (
-    <SelectItem_Shadcn_ value={method} className="[&>span:first-child]:top-3.5">
+    <SelectItem value={method} className="[&>span:first-child]:top-3.5">
       <div className="flex flex-col w-full py-1">
         <div className="flex gap-x-2 items-center">
           {connectionStringMethodOptions[method].label}
@@ -665,6 +667,6 @@ const ConnectionStringMethodSelectItem = ({
           {badges.map((badge) => badge)}
         </div>
       </div>
-    </SelectItem_Shadcn_>
+    </SelectItem>
   )
 }

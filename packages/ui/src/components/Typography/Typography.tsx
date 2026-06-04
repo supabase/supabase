@@ -1,11 +1,12 @@
 import React from 'react'
+
+import Link from './Link'
+import Text from './Text'
+import Title from './Title'
 // @ts-ignore
 import TypographyStyles from './Typography.module.css'
-import Title from './Title'
-import Text from './Text'
-import Link from './Link'
 
-function Typography({ children, className, tag = 'div', style }: any) {
+function Typography({ children, tag = 'div', style }: any) {
   // let classes = [
   //   TypographyStyles['sbui-typography'],
   //   TypographyStyles['sbui-typography-container'],

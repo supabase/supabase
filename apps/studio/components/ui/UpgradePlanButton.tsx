@@ -1,15 +1,15 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useFlag, useParams } from 'common'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
-
-import { useFlag, useParams } from 'common'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button } from 'ui'
+
 import { ButtonTooltip } from './ButtonTooltip'
 import { RequestUpgradeToBillingOwners } from './RequestUpgradeToBillingOwners'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 export const PLAN_REQUEST_EMPTY_PLACEHOLDER =
   '<Specify which plan to upgrade to: Pro | Team | Enterprise>'
@@ -17,13 +17,15 @@ export const PLAN_REQUEST_EMPTY_PLACEHOLDER =
 interface UpgradePlanButtonProps {
   /** Stick to camel case for consistency */
   source: string
-  type?: 'default' | 'primary'
+  variant?: 'default' | 'primary'
   plan?: 'Pro' | 'Team' | 'Enterprise'
-  addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
+  addon?: 'pitr' | 'customDomain' | 'ipv4' | 'spendCap' | 'computeSize'
   /** Used in the default message template for request upgrade dialog, e.g: "Upgrade to ..." */
   featureProposition?: string
   disabled?: boolean
   className?: string
+  slug?: string
+  onClick?: () => void
 }
 
 /**
@@ -33,25 +35,29 @@ interface UpgradePlanButtonProps {
  */
 export const UpgradePlanButton = ({
   source,
-  type = 'primary',
+  variant: type = 'primary',
   plan = 'Pro',
   addon,
   featureProposition,
   disabled,
   children,
   className,
+  slug: slugParam,
+  onClick,
 }: PropsWithChildren<UpgradePlanButtonProps>) => {
   const { ref } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
   const isFreePlan = organization?.plan?.id === 'free'
-  const slug = organization?.slug ?? '_'
+  const slug = slugParam ?? organization?.slug ?? '_'
 
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { billingAll } = useIsFeatureEnabled(['billing:all'])
 
   const { can: canUpdateSubscription } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
-    'stripe.subscriptions'
+    'stripe.subscriptions',
+    undefined,
+    { organizationSlug: slug }
   )
 
   const subject = `Enquiry to upgrade ${!!plan ? `to ${plan} ` : ''}plan for organization`
@@ -69,7 +75,13 @@ export const UpgradePlanButton = ({
         : `/project/${ref ?? '_'}/settings/addons?panel=${addon}&source=${source}`
       : `/org/${slug ?? '_'}/billing?panel=subscriptionPlan&source=${source}`
 
-  const linkChildren = children || (!!addon ? 'Enable add-on' : `Upgrade to ${plan}`)
+  const linkChildren =
+    children ||
+    (isOnPaidPlanAndRequestingToPurchaseAddon
+      ? addon === 'computeSize'
+        ? 'Change compute size'
+        : 'Enable add-on'
+      : `Upgrade to ${plan}`)
   const link = billingAll ? (
     <Link href={href}>{linkChildren}</Link>
   ) : (
@@ -85,6 +97,7 @@ export const UpgradePlanButton = ({
         addon={addon}
         featureProposition={featureProposition}
         className={className}
+        type={type}
       >
         {children}
       </RequestUpgradeToBillingOwners>
@@ -95,7 +108,7 @@ export const UpgradePlanButton = ({
     return (
       <ButtonTooltip
         disabled
-        type="primary"
+        type={type}
         className={className}
         tooltip={{
           content: {
@@ -110,7 +123,7 @@ export const UpgradePlanButton = ({
   }
 
   return (
-    <Button asChild type={type} disabled={disabled} className={className}>
+    <Button asChild type={type} disabled={disabled} className={className} onClick={onClick}>
       {link}
     </Button>
   )
