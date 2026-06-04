@@ -1,17 +1,7 @@
 import { groupBy } from 'lodash'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useState } from 'react'
-import { toast } from 'sonner'
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
   Button,
   cn,
   Dialog,
@@ -36,7 +26,6 @@ import {
   type ActionRunStep,
   type ActionStatus,
 } from '@/data/actions/action-runs-query'
-import { useBranchPushMutation } from '@/data/branches/branch-push-mutation'
 import type { Branch } from '@/data/branches/branches-query'
 
 interface WorkflowLogsProps {
@@ -72,12 +61,6 @@ export const WorkflowLogs = ({ branch }: WorkflowLogsProps) => {
     { projectRef, runId: selectedWorkflowRun?.id },
     { enabled: isOpen && Boolean(selectedWorkflowRun) }
   )
-
-  const { mutateAsync: branchPushMutate } = useBranchPushMutation({
-    onError: (data) => {
-      toast.error(`Failed to trigger workflow: ${data.message}`)
-    },
-  })
 
   const showStatusIcon = !HEALTHY_STATUSES.includes(status)
   const isUnhealthy = UNHEALTHY_STATUSES.includes(status)
@@ -149,33 +132,6 @@ export const WorkflowLogs = ({ branch }: WorkflowLogsProps) => {
                           </div>
                           {workflowRun.id !== projectRef && <ArrowRight size={16} />}
                         </button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button type="text">Retrigger</Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Retrigger the workflow</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This will re-run all steps of the workflow. The branch instance
-                                might be unavailable for a few minutes.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => {
-                                  return branchPushMutate({
-                                    branchRef: workflowRun.branch_id,
-                                    projectRef: projectRef,
-                                  })
-                                }}
-                              >
-                                Retrigger
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
                       </li>
                     ))}
                   </ul>
