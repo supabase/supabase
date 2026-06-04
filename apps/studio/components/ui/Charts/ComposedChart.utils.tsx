@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
 
+import { getChartValueFlags } from './chart-formatters'
 import { type FormatStyle, type MetricDoc } from './chart-view-model'
 import { CHART_COLORS, DateTimeFormats } from './Charts.constants'
 import { formatPercentage, numberFormatter } from './Charts.utils'
@@ -175,17 +176,11 @@ export const CustomTooltip = ({
         ? Number(rawDataPoint[maxValueAttribute.attribute])
         : undefined
     const hasFiniteMaxValue = typeof maxValue === 'number' && Number.isFinite(maxValue)
-    const isRamChart =
-      !payload?.some((p: any) => p.dataKey.toLowerCase() === 'ram_usage') &&
-      payload?.some((p: any) => p.dataKey.toLowerCase().includes('ram_'))
-    const isSwapChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('swap_'))
-    const isMemoryChart = isRamChart || isSwapChart
-    const isDBSizeChart =
-      payload?.some((p: any) => p.dataKey.toLowerCase().includes('disk_fs_')) ||
-      payload?.some((p: any) => p.dataKey.toLowerCase().includes('pg_database_size'))
-    const isNetworkChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('network_'))
-    const isBytesFormat = format === 'bytes' || format === 'bytes-per-second'
-    const shouldFormatBytes = isBytesFormat || isMemoryChart || isDBSizeChart || isNetworkChart
+    const { isBytesFormat, isMemoryChart, isNetworkChart, shouldFormatBytes } = getChartValueFlags(
+      payload.map((p: any) => p.dataKey),
+      typeof format === 'string' ? format : undefined,
+      attributes
+    )
     const byteUnitSuffix = format === 'bytes-per-second' ? '/s' : ''
 
     const attributesToIgnore =

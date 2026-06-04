@@ -17,6 +17,7 @@ import {
 import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
 
+import { getChartValueFlags } from './chart-formatters'
 import { ChartHeader } from './ChartHeader'
 import { ChartHighlightAction, ChartHighlightActions } from './ChartHighlightActions'
 import {
@@ -371,22 +372,12 @@ export function ComposedChart({
     [data, normalizeVisibleStackToPercent, visibleAttributes]
   )
 
-  const isPercentage = format === '%'
-  const isRamChart =
-    !chartData?.some((att: any) => att.name.toLowerCase() === 'ram_usage') &&
-    chartData?.some((att: any) => att.name.toLowerCase().includes('ram_'))
-  const isSwapChart = chartData?.some((att: any) => att.name.toLowerCase().includes('swap_'))
-  const isMemoryChart = isRamChart || isSwapChart
-  const isDiskSpaceChart = chartData?.some((att: any) =>
-    att.name.toLowerCase().includes('disk_space_')
-  )
-  const isDBSizeChart = chartData?.some((att: any) =>
-    att.name.toLowerCase().includes('pg_database_size')
-  )
-  const isNetworkChart = chartData?.some((att: any) => att.name.toLowerCase().includes('network_'))
-  const isBytesFormat = format === 'bytes' || format === 'bytes-per-second'
-  const shouldFormatBytes =
-    isBytesFormat || isMemoryChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
+  const { isPercentage, isBytesFormat, isMemoryChart, isNetworkChart, shouldFormatBytes } =
+    getChartValueFlags(
+      chartData.map((c) => c.name),
+      format,
+      attributes
+    )
   const yMaxFromVisible = Math.max(
     0,
     ...visibleAttributes.map((att) => (typeof att.value === 'number' ? att.value : 0))
