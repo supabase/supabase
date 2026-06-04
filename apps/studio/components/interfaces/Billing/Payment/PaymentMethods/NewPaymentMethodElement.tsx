@@ -12,7 +12,7 @@ import {
   type SetupIntent,
 } from '@stripe/stripe-js'
 import { Form } from '@ui/components/shadcn/ui/form'
-import { Check, ChevronsUpDown } from 'lucide-react'
+import { Check, ChevronsUpDown, HelpCircle } from 'lucide-react'
 import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -34,6 +34,9 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
@@ -345,6 +348,19 @@ export const NewPaymentMethodElement = forwardRef(
             <label htmlFor="business" className="text-foreground text-sm leading-none">
               I’m purchasing as a business
             </label>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <HelpCircle
+                  size={14}
+                  className="text-foreground-lighter hover:text-foreground transition"
+                />
+              </TooltipTrigger>
+              <TooltipContent side="top" className="w-72">
+                Select this only if your business is tax-registered. You’ll be asked for a tax ID
+                (e.g. US EIN, VAT, GST), which is required to issue a compliant business invoice. If you’re
+                not tax-registered, leave this unchecked — you’ll still receive a receipt.
+              </TooltipContent>
+            </Tooltip>
           </div>
         )}
 
