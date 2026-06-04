@@ -254,7 +254,7 @@ export const MarketplaceIndex = () => {
                 integrations={featured}
                 installedIds={installedIds}
                 primaryIntegrationId="grafana"
-                secondaryIntegrationIds={['cron', 'queues', 'data_api']}
+                secondaryIntegrationIds={['cron', 'queues']}
               />
             )}
 
