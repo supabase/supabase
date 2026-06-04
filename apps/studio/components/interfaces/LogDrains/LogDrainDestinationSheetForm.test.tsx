@@ -1,6 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ComponentProps } from 'react'
+import { toast } from 'sonner'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { LogDrainDestinationSheetForm } from './LogDrainDestinationSheetForm'
@@ -108,6 +109,37 @@ describe('LogDrainDestinationSheetForm', () => {
       undefined
     )
     expect(screen.getByRole('button', { name: 'Save destination' })).toBeInTheDocument()
+  })
+
+  it('blocks submission when the destination name matches an existing drain', async () => {
+    const user = userEvent.setup()
+    const { onSubmit } = renderForm({ existingDrainNames: ['existing-drain'] })
+
+    await screen.findByRole('dialog')
+
+    await user.type(screen.getByPlaceholderText('My Destination'), 'existing-drain')
+    submitForm()
+
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Log drain name already exists'))
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
+  it('invokes onSaveClick with the destination type when saving', async () => {
+    const user = userEvent.setup()
+    const onSaveClick = vi.fn()
+    const { onSubmit } = renderForm({ onSaveClick })
+
+    await screen.findByRole('dialog')
+
+    await user.type(screen.getByPlaceholderText('My Destination'), 'Webhook sink')
+    await user.type(
+      screen.getByPlaceholderText('https://example.com/log-drain'),
+      'https://logs.example.com/ingest'
+    )
+    submitForm()
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
+    expect(onSaveClick).toHaveBeenCalledWith('webhook')
   })
 
   it('shows the protobuf content type header for OTLP create mode', async () => {
