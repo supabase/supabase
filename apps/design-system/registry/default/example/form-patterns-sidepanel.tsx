@@ -675,11 +675,7 @@ export default function FormPatternsSidePanel() {
                       <FormControl className="col-span-6">
                         <Popover>
                           <PopoverTrigger asChild>
-                            <Button
-                              type="outline"
-                              className="bg-control focus:ring-background-control focus:border-control focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-background-control focus-visible:ring-offset-2 focus-visible:ring-offset-foreground-muted disabled:cursor-not-allowed disabled:text-foreground-muted w-full justify-start text-left font-normal px-3 py-4"
-                              icon={<CalendarIcon className="h-4 w-4" />}
-                            >
+                            <Button type="input" block icon={<CalendarIcon className="h-4 w-4" />}>
                               {field.value ? format(field.value, 'PPP') : 'Pick a date'}
                             </Button>
                           </PopoverTrigger>

@@ -73,7 +73,7 @@ const formSchema = z
     region: z.string().min(1, 'Region is required'),
     schemas: z.array(z.string()).min(1, 'At least one schema is required'),
     queueType: z.enum(['basic', 'partitioned']),
-    expiryDate: z.date().optional(),
+    expiryDate: z.date(),
     password: z.string().min(8, 'Password must be at least 8 characters'),
     duration: z
       .union([
@@ -324,16 +324,17 @@ export default function FormPatternsPageLayout() {
                       >
                         <FormControl>
                           <div className="flex gap-4 items-center">
-                            <button
-                              type="button"
+                            <Button
+                              htmlType="button"
+                              type="outline"
                               onClick={() => uploadButtonRef.current?.click()}
-                              className="flex items-center justify-center h-10 w-10 shrink-0 text-foreground-lighter hover:text-foreground-light overflow-hidden rounded-full bg-cover border hover:border-strong focus-visible:outline-brand-600"
+                              className="flex items-center justify-center h-10 w-10 shrink-0 overflow-hidden rounded-full"
                               style={{
                                 backgroundImage: logoUrl ? `url("${logoUrl}")` : 'none',
                               }}
                             >
                               {!logoUrl && <Upload size={14} />}
-                            </button>
+                            </Button>
                             <div className="flex gap-2 items-center">
                               <Button
                                 type="default"
@@ -674,8 +675,8 @@ export default function FormPatternsPageLayout() {
                           <Popover>
                             <PopoverTrigger asChild>
                               <Button
-                                type="outline"
-                                className="bg-control focus:ring-background-control focus:border-control focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-background-control focus-visible:ring-offset-2 focus-visible:ring-offset-foreground-muted disabled:cursor-not-allowed disabled:text-foreground-muted w-full justify-start text-left font-normal px-3 py-4"
+                                type="input"
+                                block
                                 icon={<CalendarIcon className="h-4 w-4" />}
                               >
                                 {field.value ? format(field.value, 'PPP') : 'Pick a date'}
