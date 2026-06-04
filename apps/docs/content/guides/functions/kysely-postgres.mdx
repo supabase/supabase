@@ -198,6 +198,7 @@ import {
   PostgresIntrospector,
   PostgresQueryCompiler,
 } from 'https://esm.sh/kysely@0.23.4'
+import { withSupabase } from 'npm:@supabase/server@1'
 
 import { PostgresDriver } from './DenoPostgresDriver.ts'
 
@@ -245,31 +246,36 @@ const db = new Kysely<Database>({
   },
 })
 
-Deno.serve(async (_req) => {
-  try {
-    // Run a query
-    const animals = await db.selectFrom('animals').select(['id', 'animal', 'created_at']).execute()
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (_req, ctx) => {
+    try {
+      // Run a query
+      const animals = await db
+        .selectFrom('animals')
+        .select(['id', 'animal', 'created_at'])
+        .execute()
 
-    // Neat, it's properly typed \o/
-    console.log(animals[0].created_at.getFullYear())
+      // Neat, it's properly typed \o/
+      console.log(animals[0].created_at.getFullYear())
 
-    // Encode the result as pretty printed JSON
-    const body = JSON.stringify(
-      animals,
-      (key, value) => (typeof value === 'bigint' ? value.toString() : value),
-      2
-    )
+      // Encode the result as pretty printed JSON
+      const body = JSON.stringify(
+        animals,
+        (key, value) => (typeof value === 'bigint' ? value.toString() : value),
+        2
+      )
 
-    // Return the response with the correct content type header
-    return new Response(body, {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-      },
-    })
-  } catch (err) {
-    console.error(err)
-    return new Response(String(err?.message ?? err), { status: 500 })
-  }
-})
+      // Return the response with the correct content type header
+      return new Response(body, {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+      })
+    } catch (err) {
+      console.error(err)
+      return new Response(String(err?.message ?? err), { status: 500 })
+    }
+  }),
+}
 ```
