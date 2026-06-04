@@ -30,6 +30,8 @@ Store the `RESEND_API_KEY` in your `.env` file.
 Paste the following code into the `index.ts` file:
 
 ```tsx
+import { withSupabase } from 'npm:@supabase/server@1'
+
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
 
 const handler = async (_request: Request): Promise<Response> => {
@@ -49,15 +51,10 @@ const handler = async (_request: Request): Promise<Response> => {
 
   const data = await res.json()
 
-  return new Response(JSON.stringify(data), {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
+  return Response.json(data)
 }
 
-Deno.serve(handler)
+export default { fetch: withSupabase({ auth: 'none' }, handler) }
 ```
 
 ### 3. Deploy and send email
