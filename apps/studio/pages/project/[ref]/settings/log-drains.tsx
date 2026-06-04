@@ -145,9 +145,8 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             } else {
               if (!logDrainValues.id || !selectedLogDrain?.token) {
                 throw new Error('Log drain ID and token is required')
-              } else {
-                updateLogDrain(logDrainValues)
               }
+              updateLogDrain(logDrainValues)
             }
           }}
         />

@@ -177,7 +177,6 @@ export function LogDrains({
                         />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="max-w-[140px]" align="end">
-                        {/* Jordi: Updating log drains is disabled temporarily.
                         <DropdownMenuItem
                           onClick={() => {
                             onUpdateDrainClick(drain)
@@ -185,7 +184,7 @@ export function LogDrains({
                         >
                           <Pencil className="h-4 w-4 mr-2" />
                           Update
-                        </DropdownMenuItem> */}
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => {
                             setSelectedLogDrain(drain)
