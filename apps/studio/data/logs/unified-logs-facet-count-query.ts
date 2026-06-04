@@ -4,7 +4,7 @@ import { useFlag } from 'common'
 import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
 import { logsAllEndpointUrl } from './logs-endpoint'
-import { bqIdent, safeSql } from './safe-analytics-sql'
+import { quotedIdent, safeSql } from './safe-analytics-sql'
 import {
   getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
@@ -34,12 +34,14 @@ export async function getUnifiedLogsFacetCount(
   }
 
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
+  const cteName = quotedIdent(facet.replaceAll('.', '_') + '_count')
+
   const sql = useOtel
     ? getFacetCountQuery({ search, facet, facetSearch })
     : safeSql`
 ${getUnifiedLogsCTE()},
-${getFacetCountCTE({ search, facet, facetSearch })}
-SELECT dimension, value, count from ${bqIdent(facet + '_count')};
+${getFacetCountCTE({ search, facet, facetSearch, cteName })}
+SELECT dimension, value, count from ${cteName};
 `
 
   const endpoint = logsAllEndpointUrl(useOtel)

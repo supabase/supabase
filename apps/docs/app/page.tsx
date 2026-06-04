@@ -31,7 +31,7 @@ const generateMetadata = async (_, parent: ResolvingMetadata): Promise<Metadata>
         media: parentAlternates.media || undefined,
         types: {
           ...(parentAlternates.types ?? {}),
-          'text/markdown': '/llms-full.txt',
+          'text/markdown': 'https://supabase.com/llms-full.txt',
         },
       }),
     },

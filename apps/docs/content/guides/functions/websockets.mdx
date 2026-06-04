@@ -13,6 +13,8 @@ This allows you to:
 - Create WebSocket relay servers for external APIs
 - Establish both incoming and outgoing WebSocket connections
 
+For a production-ready reconnect pattern with session persistence and replay, see [Resumable WebSockets with Edge Functions](/docs/guides/functions/examples/resumable-websockets).
+
 ---
 
 ## Creating WebSocket servers
@@ -248,6 +250,8 @@ Deno.serve((req) => {
 The maximum duration is capped based on the wall-clock, CPU, and memory limits. The Function will shutdown when it reaches one of these [limits](/docs/guides/functions/limits).
 
 </Admonition>
+
+When using WebSockets, keep in mind that the HTTP request is considered complete after `Deno.upgradeWebSocket(req)` returns the response. To prevent early worker retirement while the socket is still open, keep an unresolved `EdgeRuntime.waitUntil()` promise that resolves in `socket.onclose`.
 
 ---
 

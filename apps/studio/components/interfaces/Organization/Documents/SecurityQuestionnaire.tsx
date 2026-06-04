@@ -12,16 +12,16 @@ import {
 } from '@/components/layouts/Scaffold'
 import NoPermission from '@/components/ui/NoPermission'
 import { getDocument } from '@/data/documents/document-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const SecurityQuestionnaire = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const slug = organization?.slug
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
@@ -45,11 +45,7 @@ export const SecurityQuestionnaire = () => {
   const handleDownloadClick = () => {
     if (!slug) return
 
-    sendEvent({
-      action: 'document_view_button_clicked',
-      properties: { documentName: 'Standard Security Questionnaire' },
-      groups: { organization: slug },
-    })
+    track('document_view_button_clicked', { documentName: 'Standard Security Questionnaire' })
     fetchQuestionnaire(slug)
   }
 

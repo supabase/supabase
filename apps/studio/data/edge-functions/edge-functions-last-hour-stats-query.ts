@@ -2,8 +2,14 @@ import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 
 import { edgeFunctionsKeys } from './keys'
-import { handleError, post } from '@/data/fetchers'
-import { quoteLiteral } from '@/lib/pg-format'
+import { handleError } from '@/data/fetchers'
+import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
+import {
+  analyticsLiteral,
+  joinSqlFragments,
+  safeSql,
+  type SafeLogSqlFragment,
+} from '@/data/logs/safe-analytics-sql'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type EdgeFunctionsLastHourStatsVariables = { projectRef?: string; functionIds?: string[] }
@@ -17,13 +23,13 @@ export type EdgeFunctionLastHourStats = {
 
 export type EdgeFunctionsLastHourStatsResponse = Record<string, EdgeFunctionLastHourStats>
 
-function getEdgeFunctionsLastHourStatsSql(functionIds: string[]) {
-  const functionIdFilter =
+function getEdgeFunctionsLastHourStatsSql(functionIds: string[]): SafeLogSqlFragment {
+  const functionIdFilter: SafeLogSqlFragment =
     functionIds.length > 0
-      ? `  and function_id in (${functionIds.map(quoteLiteral).join(', ')})\n`
-      : ''
+      ? safeSql`  and function_id in (${joinSqlFragments(functionIds.map(analyticsLiteral), ', ')})\n`
+      : safeSql``
 
-  return `
+  return safeSql`
 -- edge-functions-last-hour-stats
 select
   function_id,
@@ -50,23 +56,17 @@ export async function getEdgeFunctionsLastHourStats(
   const endDate = dayjs().toISOString()
   const startDate = dayjs().subtract(1, 'hour').toISOString()
 
-  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-    params: {
-      path: { ref: projectRef },
-      // @ts-ignore [Joshen] Just to easily identify this request in the network tools
-      query: { key: 'last-hour-stats' },
-    },
-    body: {
-      sql: getEdgeFunctionsLastHourStatsSql(functionIds),
-      iso_timestamp_start: startDate,
-      iso_timestamp_end: endDate,
-    },
+  const data = await executeAnalyticsSql({
+    projectRef,
+    endpoint: '/platform/projects/{ref}/analytics/endpoints/logs.all',
+    sql: getEdgeFunctionsLastHourStatsSql(functionIds),
+    iso_timestamp_start: startDate,
+    iso_timestamp_end: endDate,
+    key: 'last-hour-stats',
     signal,
   })
 
-  if (error || data?.error) {
-    handleError(error ?? data?.error)
-  }
+  if (data?.error) handleError(data.error)
 
   const result = (data?.result ?? []) as {
     function_id: string

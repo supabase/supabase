@@ -28,6 +28,7 @@ import {
   WarningIcon,
 } from 'ui'
 
+import { ROLE_DESCRIPTIONS } from '../Roles.constants'
 import { useGetRolesManagementPermissions } from '../TeamSettings.utils'
 import { UpdateRolesConfirmationModal } from './UpdateRolesConfirmationModal'
 import {
@@ -295,13 +296,17 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                                       className="text-sm hover:bg-selection cursor-pointer"
                                       disabled={disabled}
                                     >
-                                      <div className="flex flex-col gap-0.5">
+                                      <div className="flex flex-col gap-0.5 max-w-xs">
                                         <span>{role.name}</span>
-                                        {disabledReason && (
-                                          <span className="text-xs text-foreground-lighter">
-                                            {disabledReason}
-                                          </span>
-                                        )}
+                                        <span className="text-xs text-foreground-lighter">
+                                          {[
+                                            ROLE_DESCRIPTIONS[role.name] ??
+                                              'Permissions are based on the configured organization role.',
+                                            disabledReason,
+                                          ]
+                                            .filter(Boolean)
+                                            .join(' ')}
+                                        </span>
                                       </div>
                                     </SelectItem>
                                   )

@@ -57,7 +57,15 @@ const formSchema = z
   .object({
     name: z.string().min(1, 'Name is required'),
     description: z.string().optional(),
-    maxConnections: z.number().min(1).max(1000),
+    maxConnections: z
+      .union([
+        z.literal(''),
+        z.coerce
+          .number()
+          .gte(1000, 'Max connections should be at least 1000')
+          .lte(10000, 'Max connections should not exceed 10000'),
+      ])
+      .refine((value) => value !== '', 'Max connections is required'),
     enableFeature: z.boolean(),
     enableRls: z.boolean(),
     enableNotifications: z.boolean(),
@@ -67,7 +75,15 @@ const formSchema = z
     queueType: z.enum(['basic', 'partitioned']),
     expiryDate: z.date().optional(),
     password: z.string().min(8, 'Password must be at least 8 characters'),
-    duration: z.number().min(5).max(30),
+    duration: z
+      .union([
+        z.literal(''),
+        z.coerce
+          .number()
+          .gte(1000, 'Duration should be at least 5ms')
+          .lte(10000, 'Duration should not exceed 30ms'),
+      ])
+      .refine((value) => value !== '', 'Duration is required'),
     redirectUris: z.array(z.object({ value: z.string().url('Must be a valid URL') })),
     httpHeaders: z.array(z.object({ key: z.string().trim(), value: z.string().trim() })),
     apiKey: z.string().optional(),
@@ -211,13 +227,7 @@ export default function FormPatternsPageLayout() {
                         description="Numeric input with min/max validation"
                       >
                         <FormControl>
-                          <Input
-                            {...field}
-                            type="number"
-                            min={1}
-                            max={1000}
-                            onChange={(e) => field.onChange(Number(e.target.value))}
-                          />
+                          <Input {...field} type="number" min={1} max={1000} />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -237,15 +247,9 @@ export default function FormPatternsPageLayout() {
                       >
                         <FormControl>
                           <InputGroup>
-                            <FormInputGroupInput
-                              {...field}
-                              onChange={(e) => field.onChange(Number(e.target.value))}
-                              type="number"
-                              min={5}
-                              max={30}
-                            />
+                            <FormInputGroupInput {...field} type="number" min={5} max={30} />
                             <InputGroupAddon align="inline-end">
-                              <InputGroupText className="font-mono">MB</InputGroupText>
+                              <InputGroupText className="font-mono">ms</InputGroupText>
                             </InputGroupAddon>
                           </InputGroup>
                         </FormControl>

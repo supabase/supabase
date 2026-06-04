@@ -1,6 +1,11 @@
 import dayjs from 'dayjs'
 
 import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
+import {
+  groupLogsFiltersByColumn,
+  parseLogsFilterUrlParams,
+  type LogsFilterOperator,
+} from './UnifiedLogs.filters'
 import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
 import {
   joinSqlFragments,
@@ -9,14 +14,14 @@ import {
   type SafeLogSqlFragment,
 } from '@/data/logs/safe-analytics-sql'
 
-// Pagination and control parameters
-const PAGINATION_PARAMS = ['sort', 'start', 'size', 'uuid', 'cursor', 'direction', 'live'] as const
-
-// Special filter parameters that need custom handling
-const SPECIAL_FILTER_PARAMS = ['date'] as const
-
-// Combined list of all parameters to exclude from standard filtering
-const EXCLUDED_QUERY_PARAMS = [...PAGINATION_PARAMS, ...SPECIAL_FILTER_PARAMS] as const
+// Operator fragments for SQL emission. `safeSql` rejects plain strings, so we
+// pre-brand the keywords we want to switch between.
+const IN_OP = safeSql`IN`
+const NOT_IN_OP = safeSql`NOT IN`
+const LIKE_OP = safeSql`LIKE`
+const NOT_LIKE_OP = safeSql`NOT LIKE`
+const ILIKE_OP = safeSql`ILIKE`
+const NOT_ILIKE_OP = safeSql`NOT ILIKE`
 
 // Facets the count query is allowed to be invoked for. Reject anything else
 // at the entry point rather than letting an unsupported value reach
@@ -94,94 +99,83 @@ const logTypeWherePredicate = (logTypes: string[]): SafeLogSqlFragment => {
 }
 
 /**
- * Translates a frontend filter key/value pair into an underlying SQL predicate.
- * The OTEL endpoint won't accept queries that reference derived aliases like
- * `log_type` or `level` in WHERE for some shapes, so we always emit raw-column
- * predicates (source/severity_text/log_attributes[…]).
+ * Translates one (column, values, operator) group from the parsed `filter` URL
+ * param into an underlying SQL predicate. The OTEL endpoint rejects queries
+ * that reference derived aliases like `log_type` or `level` in WHERE for some
+ * shapes, so we always emit raw-column predicates (source/severity_text/
+ * log_attributes[…]). For `<>`, IN becomes NOT IN, LIKE becomes NOT LIKE, and
+ * multi-value lists are joined with AND so the row must not match *any* value.
  */
-const translateFilter = (key: string, value: unknown): SafeLogSqlFragment | null => {
-  if (value === null || value === undefined) return null
+const translateFilter = (
+  key: string,
+  values: readonly string[],
+  operator: LogsFilterOperator
+): SafeLogSqlFragment | null => {
+  if (values.length === 0) return null
 
-  const arr = Array.isArray(value) ? (value.length > 0 ? value : null) : null
-  if (Array.isArray(value) && !arr) return null
+  const isNeq = operator === '<>'
+  const inOp = isNeq ? NOT_IN_OP : IN_OP
+  const likeOp = isNeq ? NOT_LIKE_OP : LIKE_OP
+  const joinAndOr = isNeq ? ' AND ' : ' OR '
 
-  const inList = (values: readonly unknown[]): SafeLogSqlFragment =>
+  const inList = (vals: readonly string[]): SafeLogSqlFragment =>
     safeSql`(${joinSqlFragments(
-      values.map((v) => lit(String(v))),
+      vals.map((v) => lit(v)),
       ','
     )})`
 
   switch (key) {
     case 'log_type': {
-      const types = (arr ?? [value]).map((v) => String(v))
-      const branches = types.map(
-        (t) => safeSql`(${LOG_TYPE_PREDICATE[t] ?? safeSql`source = ${lit(t)}`})`
-      )
-      return safeSql`(${joinSqlFragments(branches, ' OR ')})`
+      const branches = values.map((t) => {
+        const pred = LOG_TYPE_PREDICATE[t] ?? safeSql`source = ${lit(t)}`
+        return isNeq ? safeSql`NOT (${pred})` : safeSql`(${pred})`
+      })
+      return safeSql`(${joinSqlFragments(branches, joinAndOr)})`
     }
-    case 'level': {
+    case 'level':
       // No simple raw column for level; reference the inline CASE expression.
-      const levels = arr ?? [value]
-      return safeSql`(${LEVEL_EXPR}) IN ${inList(levels.map((v) => String(v)))}`
-    }
+      return safeSql`(${LEVEL_EXPR}) ${inOp} ${inList(values)}`
     case 'method':
-      return arr
-        ? safeSql`${ATTR.method} IN ${inList(arr)}`
-        : safeSql`${ATTR.method} = ${lit(String(value))}`
-    case 'status': {
+      return safeSql`${ATTR.method} ${inOp} ${inList(values)}`
+    case 'status':
       // Match the displayed status: HTTP response code for gateway rows,
       // Postgres SQLSTATE for postgres rows. Inline STATUS_EXPR so e.g.
       // filtering on '00000' picks up postgres success rows.
-      const statuses = arr ?? [value]
-      return safeSql`(${STATUS_EXPR}) IN ${inList(statuses.map((v) => String(v)))}`
-    }
+      return safeSql`(${STATUS_EXPR}) ${inOp} ${inList(values)}`
     case 'pathname':
-      return arr
-        ? safeSql`(${joinSqlFragments(
-            arr.map((v) => safeSql`${ATTR.path} LIKE ${lit('%' + String(v) + '%')}`),
-            ' OR '
-          )})`
-        : safeSql`${ATTR.path} LIKE ${lit('%' + String(value) + '%')}`
+      return safeSql`(${joinSqlFragments(
+        values.map((v) => safeSql`${ATTR.path} ${likeOp} ${lit('%' + v + '%')}`),
+        joinAndOr
+      )})`
     case 'host':
       // Best-effort: use full request URL since `host` isn't a top-level field.
-      return arr
-        ? safeSql`(${joinSqlFragments(
-            arr.map(
-              (v) => safeSql`log_attributes['request.url'] LIKE ${lit('%' + String(v) + '%')}`
-            ),
-            ' OR '
-          )})`
-        : safeSql`log_attributes['request.url'] LIKE ${lit('%' + String(value) + '%')}`
-    default:
-      // Unknown filter key — fall back to a generic equality on log_attributes.
-      return arr
-        ? safeSql`log_attributes[${lit(key)}] IN ${inList(arr)}`
-        : safeSql`log_attributes[${lit(key)}] = ${lit(String(value))}`
-  }
-}
-
-/**
- * Builds an array of WHERE predicate fragments from search params, optionally
- * skipping a specific facet field (used when computing faceted counts).
- * `log_type` is always handled separately (see `logTypeWherePredicate`).
- */
-const buildPredicates = (
-  search: QuerySearchParamsType,
-  excludeField?: string
-): SafeLogSqlFragment[] => {
-  const predicates: SafeLogSqlFragment[] = []
-  Object.entries(search).forEach(([key, value]) => {
-    if (key === excludeField) return
-    if (key === 'log_type') return
-    if ((EXCLUDED_QUERY_PARAMS as readonly string[]).includes(key)) return
-    try {
-      const predicate = translateFilter(key, value)
-      if (predicate) predicates.push(predicate)
-    } catch {
-      // analyticsLiteral rejected an unsupported input — drop the predicate.
+      return safeSql`(${joinSqlFragments(
+        values.map((v) => safeSql`log_attributes['request.url'] ${likeOp} ${lit('%' + v + '%')}`),
+        joinAndOr
+      )})`
+    case 'event_message': {
+      // event_message is a top-level column, not a log_attributes key. ILIKE/NOT ILIKE
+      // auto-wrap with `%…%` so the user can type "permission denied" as a substring
+      // search; explicit `%`s in the input are passed through unchanged. Multiple
+      // ILIKE values join with OR (match any); multiple NOT ILIKE values join with AND
+      // (the row must contain none of them).
+      if (operator === '~~*' || operator === '!~~*') {
+        const op = operator === '~~*' ? ILIKE_OP : NOT_ILIKE_OP
+        const join = operator === '!~~*' ? ' AND ' : ' OR '
+        const pattern = (v: string) => (v.includes('%') ? v : '%' + v + '%')
+        return safeSql`(${joinSqlFragments(
+          values.map((v) => safeSql`event_message ${op} ${lit(pattern(v))}`),
+          join
+        )})`
+      }
+      // = / <> still emit exact match against the column — defensive; the
+      // FilterBar doesn't expose them for event_message, but a hand-crafted URL
+      // might.
+      return safeSql`event_message ${inOp} ${inList(values)}`
     }
-  })
-  return predicates
+    default:
+      return safeSql`log_attributes[${lit(key)}] ${inOp} ${inList(values)}`
+  }
 }
 
 const whereClause = (predicates: SafeLogSqlFragment[]): SafeLogSqlFragment =>
@@ -259,13 +253,46 @@ const buildBaseWhere = (
   search: QuerySearchParamsType,
   excludeField?: string
 ): SafeLogSqlFragment[] => {
-  const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]
+  const grouped = groupLogsFiltersByColumn(parseLogsFilterUrlParams(search.filter))
   const parts: SafeLogSqlFragment[] = []
+
   if (excludeField !== 'log_type') {
-    parts.push(logTypeWherePredicate(effectiveLogTypes))
+    const logTypeFilter = grouped.log_type
+    if (logTypeFilter) {
+      const pred = translateFilter('log_type', logTypeFilter.values, logTypeFilter.operator)
+      if (pred) parts.push(pred)
+    } else {
+      parts.push(logTypeWherePredicate([...DEFAULT_LOG_TYPES]))
+    }
   }
-  parts.push(...buildPredicates(search, excludeField))
+
+  for (const [key, { operator, values }] of Object.entries(grouped)) {
+    if (key === excludeField) continue
+    if (key === 'log_type') continue // handled above
+    try {
+      const predicate = translateFilter(key, values, operator)
+      if (predicate) parts.push(predicate)
+    } catch {
+      // analyticsLiteral rejected an unsupported input — drop the predicate.
+    }
+  }
+
   return parts
+}
+
+/**
+ * Returns a WHERE predicate that excludes Postgres connection lifecycle messages.
+ * Applied only to the row query and chart query so sidebar facets remain unaffected
+ * (the OTEL endpoint's UNION ALL count query fails silently when this predicate is
+ * included there, returning empty facet data).
+ */
+const connectionLogsFilter = (search: QuerySearchParamsType): SafeLogSqlFragment | null => {
+  if (!search.hide_connection_logs) return null
+  return safeSql`(source != 'postgres_logs' OR (
+    event_message NOT LIKE 'connection received%' AND
+    event_message NOT LIKE 'connection authenticated%' AND
+    event_message NOT LIKE 'connection authorized%'
+  ))`
 }
 
 /**
@@ -273,6 +300,8 @@ const buildBaseWhere = (
  */
 export const getUnifiedLogsQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
   const predicates = buildBaseWhere(search)
+  const connFilter = connectionLogsFilter(search)
+  if (connFilter) predicates.push(connFilter)
   return safeSql`
 SELECT ${rowProjection()}
 FROM logs
@@ -390,6 +419,8 @@ export const getLogsChartQuery = (search: QuerySearchParamsType): SafeLogSqlFrag
   const truncationLevel = calculateChartBucketing(search)
   const truncFn = truncationFunction(truncationLevel)
   const predicates = buildBaseWhere(search)
+  const connFilter = connectionLogsFilter(search)
+  if (connFilter) predicates.push(connFilter)
 
   return safeSql`
 SELECT

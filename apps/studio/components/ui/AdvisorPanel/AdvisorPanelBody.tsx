@@ -41,6 +41,7 @@ interface AdvisorPanelBodyProps {
   hiddenItemsCount: number
   hasAnyFilters: boolean
   hasProjectRef?: boolean
+  projectNameByRef?: ReadonlyMap<string, string>
 }
 
 export const AdvisorPanelBody = ({
@@ -54,6 +55,7 @@ export const AdvisorPanelBody = ({
   hiddenItemsCount,
   hasAnyFilters,
   hasProjectRef = true,
+  projectNameByRef,
 }: AdvisorPanelBodyProps) => {
   // Show notice if no project ref and trying to view project-specific tabs
   if (!hasProjectRef && activeTab !== 'messages' && activeTab !== 'all') {
@@ -101,7 +103,7 @@ export const AdvisorPanelBody = ({
           const isUnread = notification?.status === 'new'
 
           const primaryText = getAdvisorPanelItemDisplayTitle(item)
-          const secondaryText = getAdvisorItemSecondaryText(item)
+          const secondaryText = getAdvisorItemSecondaryText(item, projectNameByRef)
           const metadataText =
             secondaryText ?? (item.createdAt ? formatItemDate(item.createdAt) : undefined)
           // Date strings (e.g. "a few seconds ago") come from formatItemDate and

@@ -12,6 +12,7 @@ type LogTable =
   | 'pgbouncer_logs'
   | 'pg_cron_logs'
   | 'pg_upgrade_logs'
+  | 'multigres_logs'
 
 type LogSchema = {
   name: string
@@ -321,6 +322,23 @@ const schemas: LogSchema[] = [
     fields: [
       { path: 'event_message', type: 'string' },
       { path: 'id', type: 'string' },
+      { path: 'timestamp', type: 'datetime' },
+    ],
+  },
+  {
+    name: 'Multigres',
+    reference: 'multigres_logs',
+    fields: [
+      { path: 'cluster', type: 'string' },
+      { path: 'component', type: 'string' },
+      { path: 'event_message', type: 'string' },
+      { path: 'id', type: 'string' },
+      { path: 'namespace', type: 'string' },
+      { path: 'node_name', type: 'string' },
+      { path: 'pod_name', type: 'string' },
+      { path: 'project', type: 'string' },
+      { path: 'region', type: 'string' },
+      { path: 'stack', type: 'string' },
       { path: 'timestamp', type: 'datetime' },
     ],
   },

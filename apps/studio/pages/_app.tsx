@@ -61,6 +61,7 @@ import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/const
 import { TimezoneProvider, useTimezone } from '@/lib/datetime'
 import { ProfileProvider } from '@/lib/profile'
 import { Telemetry } from '@/lib/telemetry'
+import { ToastErrorTracker } from '@/lib/toast-errors'
 import { Toaster } from '@/lib/toaster'
 import { AiAssistantStateContextProvider } from '@/state/ai-assistant-state'
 import type { AppPropsWithLayout } from '@/types'
@@ -207,7 +208,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         applicationName="Supabase Studio"
                         route={isNonProdEnv ? '/favicon/staging' : '/favicon'}
                       />
-                      <TooltipProvider delayDuration={0}>
+                      <TooltipProvider>
                         <RouteValidationWrapper>
                           <ThemeProvider>
                             <DevToolbarProvider apiUrl={API_URL}>
@@ -234,6 +235,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         </RouteValidationWrapper>
                       </TooltipProvider>
                       <Telemetry />
+                      <ToastErrorTracker />
                       {!isTestEnv && (
                         <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
                       )}
