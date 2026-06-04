@@ -35,29 +35,25 @@ interface Types {
 }
 
 const ProductHeaderCentered = (props: Types) => (
-  <div
-    className={cn(
-      'container relative w-full mx-auto px-6 pt-2 pb-0 sm:px-16 xl:px-20',
-      props.className
-    )}
-  >
+  <div className={cn('container relative w-full mx-auto px-6 sm:px-16 xl:px-20', props.className)}>
     <div className="flex flex-col text-center items-center">
-      {props.image && typeof props.image === 'string' ? (
-        <div className="relative w-full max-w-[630px] mx-auto z-0 aspect-[2.3/1] -mt-8 -mb-8 md:-mb-12 lg:-mb-12">
-          <Image
-            src={props.image}
-            priority
-            layout="fill"
-            objectFit="contain"
-            objectPosition="top"
-            alt=""
-          />
-        </div>
-      ) : (
-        <div className="col-span-12 mt-8 lg:col-span-7 lg:mt-0 xl:col-span-6 xl:col-start-7">
-          {props.image}
-        </div>
-      )}
+      {props.image &&
+        (typeof props.image === 'string' ? (
+          <div className="relative w-full max-w-[630px] mx-auto z-0 aspect-[2.3/1] -mt-8 -mb-8 md:-mb-12 lg:-mb-12">
+            <Image
+              src={props.image}
+              priority
+              layout="fill"
+              objectFit="contain"
+              objectPosition="top"
+              alt=""
+            />
+          </div>
+        ) : (
+          <div className="col-span-12 mt-8 lg:col-span-7 lg:mt-0 xl:col-span-6 xl:col-start-7">
+            {props.image}
+          </div>
+        ))}
       <div className="relative w-full z-10 flex flex-col items-center space-y-2 mx-auto max-w-2xl">
         {props.announcement && (
           <AnnouncementBadge {...props.announcement} className="pb-4 md:pb-4 z-10" />
@@ -78,7 +74,7 @@ const ProductHeaderCentered = (props: Types) => (
           ) : null}
         </div>
         <div className={cn('flex flex-col items-center', styles['appear-from-bottom'])}>
-          <h1 className="h1 text-3xl md:text-4xl text-balance" key={`h1`}>
+          <h1 className="h1 text-3xl md:text-4xl! lg:text-5xl! text-balance" key={`h1`}>
             {props.h1}
           </h1>
           <p className="p text-foreground-light text-balance">{props.subheader}</p>

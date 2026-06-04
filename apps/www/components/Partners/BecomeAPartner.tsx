@@ -1,25 +1,32 @@
 import { Suspense } from 'react'
 
+import BackgroundPattern from './BackgroundPattern'
 import PartnerIntakeForm from './PartnerIntakeForm'
+import SectionContainer from '@/components/Layouts/SectionContainer'
+import SectionHeading from '@/components/Layouts/SectionHeading'
 
 export default function BecomeAPartner() {
   return (
-    <div className="border-t bg-alternative">
-      <div
+    <div className="relative overflow-hidden border-y bg-alternative">
+      <BackgroundPattern />
+      <SectionContainer
         id="become-a-partner"
-        className="mx-auto max-w-3xl flex flex-col gap-10 py-24 px-6 md:py-32"
+        className="relative mx-auto max-w-3xl flex flex-col gap-10 py-24 px-6 md:py-32"
       >
-        <div className="flex flex-col items-center gap-4 text-center text-balance">
-          <h2 className="text-3xl md:text-4xl tracking-tight">Become a Supabase Partner</h2>
-          <p className="text-foreground-light text-lg max-w-xl">
-            Tell us about your company and the program you&apos;re interested in. Our team reviews
-            every application and will reach out if there&apos;s a good fit.
-          </p>
-        </div>
+        <SectionHeading
+          align="center"
+          title={
+            <>
+              Apply to become a <span className="text-brand-link block">Supabase partner</span>
+            </>
+          }
+          description="Tell us about your company, what you’re building and the program you're interested in.
+            We review every application and follow up within a week."
+        />
         <Suspense>
           <PartnerIntakeForm />
         </Suspense>
-      </div>
+      </SectionContainer>
     </div>
   )
 }

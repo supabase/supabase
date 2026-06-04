@@ -6,24 +6,19 @@ import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Button } from 'ui'
 
+import BackgroundPattern from '../../components/Partners/BackgroundPattern'
 import DefaultLayout from '@/components/Layouts/Default'
 import SectionContainer from '@/components/Layouts/SectionContainer'
+import SectionHeading from '@/components/Layouts/SectionHeading'
 import Panel from '@/components/Panel'
 import BecomeAPartner from '@/components/Partners/BecomeAPartner'
 import ProductHeaderCentered from '@/components/Sections/ProductHeaderCentered'
-import pageData, { PARTNER_FORM_ANCHOR } from '@/data/partners'
+import pageData, { PARTNER_FORM_ANCHOR, type PARTNER_TIER } from '@/data/partners'
 
 type FeaturedPartner = { slug: string; title: string; logo: string }
 
 interface Props {
   featuredPartners: FeaturedPartner[]
-}
-
-interface SectionEyebrowProps {
-  eyebrow?: string
-  title: string
-  description?: string
-  align?: 'left' | 'center'
 }
 
 const FaqList = ({ items }: { items: { question: string; answer: string }[] }) => {
@@ -49,31 +44,14 @@ const FaqList = ({ items }: { items: { question: string; answer: string }[] }) =
   )
 }
 
-const SectionHeading = ({ eyebrow, title, description, align = 'left' }: SectionEyebrowProps) => (
-  <div
-    className={
-      align === 'center' ? 'flex flex-col items-center text-center gap-3' : 'flex flex-col gap-3'
-    }
-  >
-    {eyebrow && (
-      <span className="text-brand font-mono text-sm uppercase tracking-wide">{eyebrow}</span>
-    )}
-    <h2 className="text-foreground text-3xl md:text-4xl tracking-tight max-w-[35ch] text-balance">
-      {title}
-    </h2>
-    {description && (
-      <p className="text-foreground-lighter text-lg max-w-[56ch] text-pretty">{description}</p>
-    )}
-  </div>
-)
-
 export default function PartnersContent({ featuredPartners }: Props) {
   const { heroSection } = pageData
 
   return (
     <DefaultLayout>
-      {/* Hero — centered (page entry) */}
-      <div className="bg-alternative border-b">
+      {/* Hero */}
+      <div className="relative bg-alternative border-b">
+        <BackgroundPattern />
         <SectionContainer>
           <ProductHeaderCentered
             title={heroSection.title}
@@ -85,7 +63,7 @@ export default function PartnersContent({ featuredPartners }: Props) {
         </SectionContainer>
       </div>
 
-      {/* Three reasons to partner — left-aligned */}
+      {/* Three reasons to partner */}
       <SectionContainer>
         <SectionHeading
           eyebrow={pageData.reasonsSection.eyebrow}
@@ -106,24 +84,27 @@ export default function PartnersContent({ featuredPartners }: Props) {
         </div>
       </SectionContainer>
 
-      {/* Ways to partner — left-aligned, card grid */}
+      {/* Ways to partner */}
       <div className="bg-alternative border-y">
         <SectionContainer>
-          <SectionHeading
-            eyebrow="Programs"
-            title={pageData.waysToPartner.title}
-            description={pageData.waysToPartner.description}
-          />
           <div className="mt-10 grid gap-6 md:grid-cols-3 md:grid-rows-[auto_auto] md:gap-y-0">
-            {pageData.waysToPartner.tiers.map((tier) => {
+            <div>
+              <SectionHeading eyebrow="Programs" title={pageData.waysToPartner.title} />
+              <Button asChild type="default" size="small" className="mt-6">
+                <Link href={PARTNER_FORM_ANCHOR} target="_blank">
+                  Apply to partner with Supabase
+                </Link>
+              </Button>
+            </div>
+            {pageData.waysToPartner.tiers.map((tier: PARTNER_TIER) => {
               const timeToLaunch = (tier as { timeToLaunch?: string }).timeToLaunch
               return (
                 <Panel
                   key={tier.title}
                   outerClassName="hover:shadow-none! md:row-span-2 md:grid md:grid-rows-subgrid"
-                  innerClassName="flex flex-col h-full md:grid md:grid-rows-subgrid md:row-span-2"
+                  innerClassName="inset-x-0 h-full md:grid md:grid-rows-subgrid md:row-span-2"
                 >
-                  <div className="flex flex-col items-start gap-3 flex-1 p-4 lg:p-6">
+                  <div className="items-start space-y-3 p-4 lg:p-6">
                     <h3 className="text-foreground text-xl tracking-tight">{tier.title}</h3>
                     <p className="text-foreground-lighter text-sm text-pretty flex-1">
                       {tier.description}
@@ -134,21 +115,21 @@ export default function PartnersContent({ featuredPartners }: Props) {
                         size="tiny"
                         type="default"
                         className="mt-4"
-                        iconRight={tier.cta.icon}
+                        iconRight={tier.cta?.icon}
                       >
-                        <Link href={tier.cta.link}>{tier.cta.label}</Link>
+                        <Link href={tier.cta?.link}>{tier.cta?.label}</Link>
                       </Button>
                     )}
                   </div>
-                  <dl className="flex flex-col gap-4 p-4 lg:p-6 bg-surface-200 border-t">
-                    <div className="flex flex-col gap-1">
+                  <dl className="space-y-4 p-4 lg:p-6 bg-surface-200 border-t">
+                    <div className="space-y-1">
                       <dt className="text-foreground-lighter font-mono text-xs uppercase tracking-wide">
                         Best for
                       </dt>
                       <dd className="text-foreground-light text-sm text-pretty">{tier.bestFor}</dd>
                     </div>
                     {tier.whatYouGet && (
-                      <div className="flex flex-col gap-1">
+                      <div className="space-y-1">
                         <dt className="text-foreground-lighter font-mono text-xs uppercase tracking-wide">
                           What you get
                         </dt>
@@ -158,7 +139,7 @@ export default function PartnersContent({ featuredPartners }: Props) {
                       </div>
                     )}
                     {timeToLaunch && (
-                      <div className="flex flex-col gap-1">
+                      <div className="space-y-1">
                         <dt className="text-foreground-lighter font-mono text-xs uppercase tracking-wide">
                           Time to launch
                         </dt>
@@ -170,17 +151,10 @@ export default function PartnersContent({ featuredPartners }: Props) {
               )
             })}
           </div>
-          <div className="mt-8 flex justify-start">
-            <Button asChild type="default" size="small">
-              <Link href={PARTNER_FORM_ANCHOR} target="_blank">
-                Apply to partner with Supabase
-              </Link>
-            </Button>
-          </div>
         </SectionContainer>
       </div>
 
-      {/* What partnership gets you — left-aligned split */}
+      {/* What partnership gets you */}
       <SectionContainer>
         <div className="grid gap-12 md:grid-cols-2 md:gap-16 items-start">
           <SectionHeading
@@ -189,7 +163,7 @@ export default function PartnersContent({ featuredPartners }: Props) {
             description="Open to companies building real integrations on Postgres."
           />
           <ul role="list" className="flex flex-col gap-3">
-            {pageData.benefits.items.map((item) => (
+            {pageData.benefits.items.map((item: any) => (
               <li key={item} className="flex items-start gap-3">
                 <span
                   aria-hidden="true"
@@ -197,14 +171,14 @@ export default function PartnersContent({ featuredPartners }: Props) {
                 >
                   <Check size={12} strokeWidth={2.5} className="shrink-0" />
                 </span>
-                <span className="text-foreground-light text-pretty">{item}</span>
+                <span className="text-foreground-lighter text-pretty">{item}</span>
               </li>
             ))}
           </ul>
         </div>
       </SectionContainer>
 
-      {/* How to apply — left-aligned */}
+      {/* How to apply */}
       <div className="bg-alternative border-y">
         <SectionContainer>
           <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
@@ -232,13 +206,11 @@ export default function PartnersContent({ featuredPartners }: Props) {
         </SectionContainer>
       </div>
 
-      {/* Featured partners — infinite marquee */}
+      {/* Featured partners */}
       {featuredPartners.length > 0 && (
         <SectionContainer>
           <div className="flex flex-col items-center text-center gap-3">
-            <span className="text-brand font-mono text-sm uppercase tracking-wide">
-              Featured partners
-            </span>
+            <span className="text-brand font-mono text-sm uppercase tracking-wide">Partners</span>
             <h2 className="text-foreground text-3xl md:text-4xl tracking-tight max-w-[35ch] text-balance">
               {pageData.featuredPartners.title}
             </h2>
@@ -294,15 +266,11 @@ export default function PartnersContent({ featuredPartners }: Props) {
         </SectionContainer>
       )}
 
-      {/* Ways you can integrate with Supabase — left-aligned, dl */}
+      {/* Ways you can integrate with Supabase */}
       <div className="bg-alternative border-y">
-        <SectionContainer className="max-w-6xl">
-          <SectionHeading
-            eyebrow="Integration points"
-            title={pageData.integrationOptions.title}
-            description={pageData.integrationOptions.description}
-          />
-          <dl className="mt-12 grid gap-4 md:grid-cols-2">
+        <SectionContainer className="grid gap-4 xl:grid-cols-3 xl:gap-12 items-start">
+          <SectionHeading eyebrow="Integration points" title={pageData.integrationOptions.title} />
+          <dl className="col-span-2 grid gap-2 lg:grid-cols-2 xl:grid-cols-3">
             {pageData.integrationOptions.options.map((option) => (
               <Link
                 key={option.title}
@@ -339,19 +307,15 @@ export default function PartnersContent({ featuredPartners }: Props) {
         </SectionContainer>
       </div>
 
-      {/* FAQ — centered title, constrained list width */}
+      {/* FAQ */}
       <SectionContainer>
-        <div className="flex flex-col items-center text-center gap-3 mb-12">
-          <h2 className="text-foreground text-2xl sm:text-3xl tracking-tight max-w-[35ch] text-balance">
-            {pageData.faq.title}
-          </h2>
-        </div>
-        <div className="mx-auto max-w-3xl">
+        <SectionHeading title={pageData.faq.title} align="center" />
+        <div className="mx-auto max-w-2xl mt-12">
           <FaqList items={pageData.faq.items} />
         </div>
       </SectionContainer>
 
-      {/* Inline partner intake form — anchor target for every "become a partner" CTA */}
+      {/* Inline partner intake form */}
       <BecomeAPartner />
     </DefaultLayout>
   )

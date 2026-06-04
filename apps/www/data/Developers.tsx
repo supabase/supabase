@@ -25,12 +25,6 @@ export const data = {
           icon: () => <Pencil className="w-4 h-4" />,
         },
         {
-          text: 'Marketplace',
-          description: 'Explore native and third-party integrations directly from your project.',
-          url: '/marketplace',
-          icon: () => <Store className="w-4 h-4" />,
-        },
-        {
           text: 'Supabase UI',
           url: 'https://supabase.com/ui',
           icon: (props: any) => (

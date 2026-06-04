@@ -406,7 +406,7 @@ export default function MarketingForm({
         onSubmit={handleSubmit}
         className={
           card
-            ? 'border border-muted rounded-2xl p-6 sm:p-8 flex flex-col gap-6'
+            ? 'border bg-surface-75 rounded-2xl shadow-xl p-6 sm:p-8 flex flex-col gap-6'
             : 'flex flex-col gap-6'
         }
       >
@@ -417,7 +417,7 @@ export default function MarketingForm({
         */}
         <div
           aria-hidden="true"
-          className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden"
+          className="absolute left-[-9999px] top-auto h-px w-px overflow-hidden"
         >
           <label>
             Website

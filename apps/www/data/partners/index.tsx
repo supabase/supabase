@@ -15,16 +15,11 @@ export const PARTNER_FORM_ANCHOR = '#become-a-partner'
 const partnersPageData = {
   metaTitle: 'Partner with Supabase',
   metaDescription:
-    'Reach 9 million developers. Ship integrations that feel native to Postgres, in front of the developers already building on it.',
+    'Reach 9 million developers. Ship integrations and offer services that help businesses build on Supabase.',
   heroSection: {
     title: 'Partners',
     h1: <>Build with Supabase. Reach 9 million developers.</>,
-    subheader: (
-      <>
-        Ship integrations that feel native to Postgres, in front of the developers already building
-        on it.
-      </>
-    ),
+    subheader: <>Ship integrations and offer services that help businesses build on Supabase.</>,
     cta: {
       label: 'Become a partner',
       link: PARTNER_FORM_ANCHOR,
@@ -60,74 +55,69 @@ const partnersPageData = {
   ],
   waysToPartner: {
     title: 'Ways to partner',
-    description:
-      'Three paths in. Pick the one that fits where you are today. Partners often start in one and grow into the next.',
     tiers: [
       {
-        title: 'Partner Catalog',
+        title: 'Integration Partner',
         description: (
           <>
-            A listing on the <span className="text-foreground">Supabase Partner Catalog</span>, open
-            to anyone with a real integration or a real relationship with Supabase.
+            You've built something that works with Supabase: a tool, extension, connector, or
+            service. We list it, co-market it, and put it in front of developers who are actively
+            composing their stack.
           </>
         ),
-        bestFor: 'SaaS, agencies, templates, hosting.',
-        whatYouGet: 'Listing, logo, category, outbound link.',
-        timeToLaunch: 'Days',
-        cta: {
-          label: 'Browse the Partner Catalog',
-          link: '/partners/catalog',
-          icon: <ArrowRight size={18} strokeWidth={1.5} />,
-        },
-      },
-      {
-        title: 'Supabase Marketplace',
-        description:
-          'An install surface inside the dashboard, the moment a developer is composing their stack. Many integrations install in one click through Supabase OAuth: scoped, revocable, no copy-pasted service role keys.',
         bestFor:
-          'Things developers add at runtime. Observability, billing, secrets, email, security, compliance.',
-        whatYouGet:
-          'Everything in the Catalog, plus in-dashboard install, plus joint launch treatment.',
-        timeToLaunch: 'Weeks',
-        cta: {
-          label: 'Browse the Supabase Marketplace',
-          link: 'https://supabase.com/dashboard/project/_/integrations',
-          icon: <ArrowRight size={18} strokeWidth={1.5} />,
-        },
+          'developer tools, SaaS products, hosting, observability, auth, billing, and anything else developers add to a Postgres project.',
       },
       {
-        title: 'Strategic partnerships',
-        description:
-          'Joint go-to-market, co-built features, named launches, named investments. Talk to us directly.',
-        bestFor: 'Hyperscalers, platforms, foundational tools.',
-        whatYouGet: 'Defined per partnership.',
-        timeToLaunch: 'By arrangement',
+        title: 'Solution Partner',
+        description: 'You build on Supabase on behalf of clients.',
+        bestFor: 'agencies, consultancies, and service providers.',
       },
     ],
   },
   benefits: {
-    title: 'What partnership gets you',
+    title: 'What your Supabase partnership gets you',
+    description: 'Distribution to developers already shipping on Postgres, and much more.',
     items: [
-      'Distribution to developers already shipping on Postgres',
-      'Co-marketing across Launch Weeks, blog, social, and Discord',
-      'A direct line to the Supabase product team',
-      'A working integration your own sales team can point at',
+      <>
+        <strong className="block text-foreground font-normal">
+          A listing in the Partner Catalog:
+        </strong>{' '}
+        Searchable by category, visible to developers actively evaluating tools
+      </>,
+      <>
+        <strong className="block text-foreground font-normal">Co-marketing:</strong> Supabase's
+        highest-traffic moments like Launch Weeks, with blog, social, and Discord reach
+      </>,
+      <>
+        <strong className="block text-foreground font-normal">
+          A direct line to the product team:
+        </strong>{' '}
+        Actual engineers who know the integration surface, not a support queue
+      </>,
+      <>
+        <strong className="block text-foreground font-normal">
+          Something your sales team can use:
+        </strong>{' '}
+        A Supabase-verified listing is a trust signal with developers who already know us
+      </>,
     ],
   },
   howToApply: {
-    title: 'How to apply',
+    title: 'Ways to apply',
     steps: [
       {
         title: 'Apply',
-        description: "Five minutes. What you build, who it's for, and how it works with Supabase.",
+        description:
+          "This takes five minutes. Tell us what you build, who it's for, and how it connects to Supabase.",
       },
       {
         title: 'Review',
-        description: 'Usually a week. Faster if the integration is already shipped.',
+        description: 'This takes a week. It’s faster if the integration is already live.',
       },
       {
         title: 'Launch',
-        description: 'We help with the listing, the integration, and the launch post.',
+        description: 'We help with the listing, the integration, and the launch moment.',
       },
     ],
     cta: {
@@ -136,15 +126,13 @@ const partnersPageData = {
     },
   },
   featuredPartners: {
-    title: 'Featured partners',
+    title: 'In good company',
     description: 'Companies building with Supabase, integrating with Supabase, or both.',
     // Order to lead the logo wall with at launch.
     leadSlugs: ['grafana', 'stripe', 'resend', 'doppler', 'aikido', 'vanta', 'cipherstash'],
   },
   integrationOptions: {
     title: 'Ways you can integrate with Supabase',
-    description:
-      'Every Supabase project is a full Postgres database. Pick the integration point that fits your product.',
     options: [
       {
         title: 'OAuth App',
@@ -195,21 +183,26 @@ const partnersPageData = {
     items: [
       {
         question: 'Is there a fee to be listed?',
-        answer: 'No. The Catalog and Marketplace are curated, not paid.',
+        answer: 'No. The partner catalog is free.',
+      },
+      {
+        question: 'Can I apply before my integration is built?',
+        answer:
+          "Yes, though your application moves faster if the integration is already live. Tell us what you're building and where you are, and we’ll go from there.",
       },
       {
         question: 'How long is review?',
-        answer:
-          'About a week. Faster if the integration is shipped and the application is specific.',
+        answer: 'Usually a week. We get back to you either way.',
       },
       {
-        question: 'Can I apply before the integration is built?',
-        answer: "Yes. Tell us the plan, we'll help you scope it.",
+        question: 'What’s the difference between an Integration Partner and a Solution Partner?',
+        answer:
+          'Integration partners build technical products that connect to Supabase. Solution partners are agencies or consultancies that build on Supabase for clients.',
       },
       {
-        question: 'Catalog vs. Marketplace?',
+        question: 'Do I need to be a Supabase customer?',
         answer:
-          'Catalog lives on supabase.com and is open to any real integration. Marketplace lives in the dashboard and is for in-product, often one-click installs. Every Marketplace partner is a Catalog partner.',
+          'No, but your integration should work with Supabase projects. Most partners build on a free plan to start.',
       },
     ],
   },
@@ -221,6 +214,19 @@ const partnersPageData = {
     },
     icon: <ArrowUpRight strokeWidth={1.5} />,
   },
+}
+
+export type PARTNER_TIER = {
+  title: string
+  description: React.ReactNode
+  bestFor: string
+  whatYouGet?: string
+  timeToLaunch?: string
+  cta?: {
+    label: string
+    link: string
+    icon?: React.ReactNode
+  }
 }
 
 export default partnersPageData
