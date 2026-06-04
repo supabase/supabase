@@ -68,13 +68,12 @@ export function OrgAuditLogDrains() {
   const { mutate: createLogDrain, isPending: createLoading } = useCreateAuditLogDrainMutation({
     onSuccess: () => {
       toast.success('Audit log drain destination created')
+      setPendingLogDrainValues(null)
       setIsCreateConfirmModalOpen(false)
       setOpen(false)
     },
     onError: () => {
       toast.error('Failed to create audit log drain')
-      setIsCreateConfirmModalOpen(false)
-      setOpen(false)
     },
   })
 
@@ -258,11 +257,9 @@ export function OrgAuditLogDrains() {
         visible={isCreateConfirmModalOpen}
         loading={createLoading}
         onConfirm={() => {
-          if (pendingLogDrainValues) {
+          if (pendingLogDrainValues && !createLoading) {
             createLogDrain(pendingLogDrainValues)
-            setPendingLogDrainValues(null)
           }
-          setIsCreateConfirmModalOpen(false)
         }}
         onCancel={() => {
           setIsCreateConfirmModalOpen(false)

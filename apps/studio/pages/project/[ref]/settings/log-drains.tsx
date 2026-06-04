@@ -143,10 +143,10 @@ const LogDrainsSettings: NextPageWithLayout = () => {
               setIsCreateConfirmModalOpen(true)
             } else {
               if (!logDrainValues.id || !selectedLogDrain?.token) {
-                throw new Error('Log drain ID and token is required')
-              } else {
-                updateLogDrain(logDrainValues)
+                toast.error('Unable to update log drain: missing ID or token')
+                return
               }
+              updateLogDrain(logDrainValues)
             }
           }}
         />
