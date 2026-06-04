@@ -8,9 +8,10 @@ import { ShimmeringLoader } from 'ui-patterns'
 
 import { navigateToSection } from './Content/Content.utils'
 import { API_DOCS_CATEGORIES, DOCS_CONTENT, DOCS_MENU } from './ProjectAPIDocs.constants'
+import { useApiDocsFunctions, useApiDocsTables } from './useApiDocsEntities'
 import { InfiniteListDefault, type RowComponentBaseProps } from '@/components/ui/InfiniteList'
+import { NotExposedEntitiesIndicator } from '@/components/ui/NotExposedEntitiesIndicator'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
-import { useOpenAPISpecQuery } from '@/data/open-api/api-spec-query'
 import { usePaginatedBucketsQuery, type Bucket } from '@/data/storage/buckets-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
@@ -184,20 +185,15 @@ const Subsections = ({ category }: SubsectionsProps): ReactNode => {
 }
 
 const TablesSubsections = (): ReactNode => {
-  const { ref } = useParams()
   const snap = useAppStateSnapshot()
 
-  const { data, isLoading } = useOpenAPISpecQuery(
-    { projectRef: ref },
-    { staleTime: 1000 * 60 * 10 }
-  )
-  const tables = data?.tables ?? []
+  const { visibleEntities: tables, excludedCount, isLoading } = useApiDocsTables()
 
   // TODO: handle infinite loading of tables
   return (
     <>
       {isLoading && <LoadingIndicator />}
-      {tables.length > 0 && <Separator />}
+      {(tables.length > 0 || excludedCount > 0) && <Separator />}
       {tables.map((table) => (
         <button
           key={table.name}
@@ -207,25 +203,26 @@ const TablesSubsections = (): ReactNode => {
           {table.name}
         </button>
       ))}
+      <NotExposedEntitiesIndicator
+        count={excludedCount}
+        entityNoun="table"
+        entityNounPlural="tables"
+        onNavigate={() => snap.setShowProjectApiDocs(false)}
+      />
     </>
   )
 }
 
 const DbFunctionsSubsections = (): ReactNode => {
-  const { ref } = useParams()
   const snap = useAppStateSnapshot()
 
-  const { data, isLoading } = useOpenAPISpecQuery(
-    { projectRef: ref },
-    { staleTime: 1000 * 60 * 10 }
-  )
-  const functions = data?.functions ?? []
+  const { visibleEntities: functions, excludedCount, isLoading } = useApiDocsFunctions()
 
   // TODO: handle virtualization of DB functions
   return (
     <>
       {isLoading && <LoadingIndicator />}
-      {functions.length > 0 && <Separator />}
+      {(functions.length > 0 || excludedCount > 0) && <Separator />}
       {functions.map((fn) => (
         <button
           key={fn.name}
@@ -237,6 +234,12 @@ const DbFunctionsSubsections = (): ReactNode => {
           {fn.name}
         </button>
       ))}
+      <NotExposedEntitiesIndicator
+        count={excludedCount}
+        entityNoun="function"
+        entityNounPlural="functions"
+        onNavigate={() => snap.setShowProjectApiDocs(false)}
+      />
     </>
   )
 }

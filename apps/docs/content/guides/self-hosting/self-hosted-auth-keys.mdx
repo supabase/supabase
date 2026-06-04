@@ -10,7 +10,7 @@ You can configure self-hosted Supabase to use the [new API keys](/docs/guides/ge
 
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 
-- Complete the [Docker setup guide](/docs/guides/self-hosting/docker), including running `generate-keys.sh` so that `JWT_SECRET`, `ANON_KEY`, and `SERVICE_ROLE_KEY` are set in your `.env` file
+- Complete the [Docker setup guide](/docs/guides/self-hosting/docker) so that `JWT_SECRET`, `ANON_KEY`, and `SERVICE_ROLE_KEY` are set in your `.env` file. [Quick start (Linux)](/docs/guides/self-hosting/docker#quick-start-linux) handles this automatically; the manual path runs [`generate-keys.sh`](/docs/guides/self-hosting/docker#generate-keys-and-secrets).
 - If you are upgrading an existing self-hosted Supabase environment, make sure to check the [changelog](https://github.com/supabase/supabase/blob/master/docker/CHANGELOG.md) and add/update the following files:
   - `.env.example` (merge new sections into your `.env` file)
   - `docker-compose.yml`
