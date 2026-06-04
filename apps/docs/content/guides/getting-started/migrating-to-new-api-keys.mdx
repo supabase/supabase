@@ -4,15 +4,9 @@ title: 'Migrating to publishable and secret API keys'
 description: 'Move from legacy JWT-based anon and service_role keys to publishable and secret keys.'
 ---
 
-Supabase has changed the way API keys work. The legacy `anon` and `service_role` keys are based on your project's JWT secret, which makes them hard to rotate without downtime. The new publishable (`sb_publishable_...`) and secret (`sb_secret_...`) keys can be created, named, and revoked independently, so you can rotate a single key without touching the rest of your app.
+<$Partial path="api_keys_deprecation.mdx" />
 
 This guide covers migrating an **existing project.** Both key types work simultaneously, so you can swap clients one at a time and deactivate the legacy keys only after nothing depends on them.
-
-<Admonition type="note">
-
-The legacy `anon` and `service_role` keys keep working until the end of 2026. You don't have to migrate today, but doing it early lets you rotate keys safely from now on.
-
-</Admonition>
 
 ## Before you start
 
