@@ -35,14 +35,14 @@ const isSensitiveDataInComment = (comment: string | null | undefined): boolean =
 const encodeCommentWithSensitivityFlag = (
   comment: string | null | undefined,
   isSensitive: boolean
-): string | undefined => {
+): string | null => {
   let cleanComment = comment?.replace(SENSITIVE_DATA_MARKER, '').trim() ?? ''
   if (isSensitive && cleanComment) {
     return `${SENSITIVE_DATA_MARKER} ${cleanComment}`
   } else if (isSensitive) {
     return SENSITIVE_DATA_MARKER
   }
-  return cleanComment || undefined
+  return cleanComment || null
 }
 
 const decodeCommentWithoutSensitivityFlag = (comment: string | null | undefined): string | null => {
@@ -166,7 +166,7 @@ export const generateCreateColumnPayload = (
     comment: encodeCommentWithSensitivityFlag(
       field.comment?.trim(),
       field.isSensitiveData ?? false
-    ),
+    ) as string | undefined,
     type: { schema: field.formatSchema, name: field.format, isArray: field.isArray },
     check: trimSafeSqlFragment(field.check) ?? undefined,
     isUnique: field.isUnique,
@@ -198,7 +198,7 @@ export const generateUpdateColumnPayload = (
   const comment = encodeCommentWithSensitivityFlag(
     field.comment?.trim(),
     field.isSensitiveData ?? false
-  )
+  ) as string | undefined
   const check = trimSafeSqlFragment(field.check) ?? undefined
 
   const payload: Partial<UpdateColumnPayload> = {}

@@ -524,19 +524,7 @@ export const ColumnEditor = ({
                   id="isSensitiveData"
                   checked={columnFields.isSensitiveData ?? false}
                   onCheckedChange={() => {
-                    const SENSITIVE_DATA_MARKER = '[SENSITIVE]'
-                    const isSensitive = !columnFields.isSensitiveData
-                    let updatedComment = columnFields.comment || ''
-
-                    if (isSensitive && !updatedComment.includes(SENSITIVE_DATA_MARKER)) {
-                      updatedComment = updatedComment
-                        ? `${updatedComment} ${SENSITIVE_DATA_MARKER}`
-                        : SENSITIVE_DATA_MARKER
-                    } else if (!isSensitive) {
-                      updatedComment = updatedComment.replace(SENSITIVE_DATA_MARKER, '').trim()
-                    }
-
-                    onUpdateField({ isSensitiveData: isSensitive, comment: updatedComment })
+                    onUpdateField({ isSensitiveData: !columnFields.isSensitiveData })
                   }}
                 />
               </FormItemLayout>
