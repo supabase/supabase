@@ -163,7 +163,10 @@ export const generateCreateColumnPayload = (
     table: table.name,
     isIdentity,
     name: field.name.trim(),
-    comment: encodeCommentWithSensitivityFlag(field.comment?.trim(), field.isSensitiveData ?? false),
+    comment: encodeCommentWithSensitivityFlag(
+      field.comment?.trim(),
+      field.isSensitiveData ?? false
+    ),
     type: { schema: field.formatSchema, name: field.format, isArray: field.isArray },
     check: trimSafeSqlFragment(field.check) ?? undefined,
     isUnique: field.isUnique,
@@ -192,7 +195,10 @@ export const generateUpdateColumnPayload = (
 
   // Only append the properties which are getting updated
   const name = field.name.trim()
-  const comment = encodeCommentWithSensitivityFlag(field.comment?.trim(), field.isSensitiveData ?? false)
+  const comment = encodeCommentWithSensitivityFlag(
+    field.comment?.trim(),
+    field.isSensitiveData ?? false
+  )
   const check = trimSafeSqlFragment(field.check) ?? undefined
 
   const payload: Partial<UpdateColumnPayload> = {}

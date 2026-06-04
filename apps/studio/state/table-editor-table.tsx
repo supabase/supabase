@@ -55,7 +55,6 @@ export const createTableEditorTableState = ({
     savedState
   )
 
-  
   // userToggledColumns: columns user has explicitly toggled OFF (persisted)
   const userToggledColumns = new Set<string>((savedState as any)?.sensitiveDataColumns ?? [])
 
