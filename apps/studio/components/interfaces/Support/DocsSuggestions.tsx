@@ -58,12 +58,14 @@ interface DocsSuggestions_ResultsProps {
 
 function DocsSuggestions_Results({ results, isStale }: DocsSuggestions_ResultsProps) {
   return (
-    <ul
-      className={cn(
-        'flex flex-col gap-y-0.5 transition-opacity duration-200',
-        isStale ? 'opacity-50' : 'opacity-100'
-      )}
-    >
+    <div>
+      <p className="text-sm text-foreground-light">Below are some articles that might help with your issue</p>
+      <ul
+        className={cn(
+          'flex flex-col gap-y-0.5 transition-opacity duration-200',
+          isStale ? 'opacity-50' : 'opacity-100'
+        )}
+      >
       {results.slice(0, 5).map((page) => {
         return (
           <li key={page.id} className="flex items-center gap-x-1">
@@ -84,5 +86,6 @@ function DocsSuggestions_Results({ results, isStale }: DocsSuggestions_ResultsPr
         )
       })}
     </ul>
+    </div>
   )
 }
