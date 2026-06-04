@@ -1,6 +1,9 @@
 import { COMPUTE_DISK, COMPUTE_MAX_IOPS } from 'shared-data'
 
-import { mapComputeSizeNameToAddonVariantId } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
+import {
+  hasBurstableIO,
+  mapComputeSizeNameToAddonVariantId,
+} from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { compactNumberFormatter } from '@/components/ui/Charts/Charts.utils'
 import { ReportAttributes } from '@/components/ui/Charts/ComposedChart.utils'
 import { DiskAttributesData } from '@/data/config/disk-attributes-query'
@@ -8,19 +11,6 @@ import { MaxConnectionsData } from '@/data/database/max-connections-query'
 import { Project } from '@/data/projects/project-detail-query'
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
-
-// Compute variants below 4XL run on EBS instances that draw on a burst
-// credit pool for disk IO, so the burst balance chart only makes sense for
-// these. Larger instances have dedicated IOPS and don't expose this metric.
-const BURSTABLE_IO_VARIANTS = new Set([
-  'ci_nano',
-  'ci_micro',
-  'ci_small',
-  'ci_medium',
-  'ci_large',
-  'ci_xlarge',
-  'ci_2xlarge',
-])
 
 export const getReportAttributesV2: (
   entitledFeatures: string[],
@@ -46,8 +36,8 @@ export const getReportAttributesV2: (
     typeof provisionedDiskIops === 'number' && typeof computeIopsLimit === 'number'
       ? Math.min(provisionedDiskIops, computeIopsLimit)
       : provisionedDiskIops
-  const hasBurstableIO = BURSTABLE_IO_VARIANTS.has(computeVariantId)
-  const showBurstBalanceChart = !!showDiskIOBurstBalanceChart && hasBurstableIO
+  const showBurstBalanceChart =
+    !!showDiskIOBurstBalanceChart && hasBurstableIO(project?.infra_compute_size)
   const baselineThroughputMBps = COMPUTE_DISK[computeVariantId]?.baselineThroughputMBps
   const baselineThroughputLabel =
     typeof baselineThroughputMBps === 'number' ? `${baselineThroughputMBps} MB/s` : 'its baseline'
@@ -106,7 +96,7 @@ export const getReportAttributesV2: (
       id: 'swap-usage',
       label: 'Swap usage',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-usage`,
-      hide: false,
+      hide: true,
       showTooltip: true,
       showLegend: false,
       hideChartType: false,

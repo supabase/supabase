@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Button, Checkbox, Label, Modal } from 'ui'
+import { Button, Checkbox, DialogFooter, DialogSection, Label } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
@@ -177,7 +177,7 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
 
   if (customerProfileLoading || isCustomerTaxIdLoading) {
     return (
-      <Modal.Content>
+      <DialogSection>
         <div className="space-y-2">
           <ShimmeringLoader />
           <ShimmeringLoader className="w-3/4" />
@@ -186,13 +186,13 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
           <ShimmeringLoader />
           <ShimmeringLoader />
         </div>
-      </Modal.Content>
+      </DialogSection>
     )
   }
 
   return (
-    <div>
-      <Modal.Content
+    <>
+      <DialogSection
         className={`transition ${isSaving ? 'pointer-events-none opacity-75' : 'opacity-100'}`}
       >
         <NewPaymentMethodElement
@@ -233,9 +233,8 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
             Use the billing address as my organization's primary address
           </Label>
         </div>
-      </Modal.Content>
-      <Modal.Separator />
-      <Modal.Content className="flex items-center space-x-2">
+      </DialogSection>
+      <DialogFooter>
         <Button
           htmlType="button"
           size="small"
@@ -257,8 +256,8 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
         >
           Add payment method
         </Button>
-      </Modal.Content>
-    </div>
+      </DialogFooter>
+    </>
   )
 }
 

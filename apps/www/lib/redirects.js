@@ -1,13 +1,8 @@
 module.exports = [
   {
     permanent: true,
-    source: '/project-composer',
-    destination: '/composer',
-  },
-  {
-    permanent: true,
-    source: '/project-composer/:path*',
-    destination: '/composer/:path*',
+    source: '/blog/pricing',
+    destination: '/pricing',
   },
   {
     permanent: true,
@@ -3212,16 +3207,6 @@ module.exports = [
     ],
     destination: '/dashboard/redeem?code=:code',
     permanent: false,
-  },
-  {
-    permanent: true,
-    source: '/docs/llms.txt',
-    destination: '/llms.txt',
-  },
-  {
-    permanent: true,
-    source: '/docs/llms-full.txt',
-    destination: '/llms-full.txt',
   },
   // Legacy product .txt URLs → new .md routes
   { permanent: true, source: '/llms/homepage.txt', destination: '/homepage.md' },

@@ -2,6 +2,7 @@ import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { AuthError } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
+import { useAuthError } from 'common'
 import { Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -13,12 +14,13 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
 import { LastSignInWrapper } from './LastSignInWrapper'
+import AlertError from '@/components/ui/AlertError'
 import { useAddLoginEvent } from '@/data/misc/audit-login-mutation'
 import { getMfaAuthenticatorAssuranceLevel } from '@/data/profile/mfa-authenticator-assurance-level-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useLastSignIn } from '@/hooks/misc/useLastSignIn'
 import { captureCriticalError } from '@/lib/error-reporting'
 import { auth, buildPathWithParams, getReturnToPath } from '@/lib/gotrue'
+import { useTrack } from '@/lib/telemetry/track'
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Must be a valid email'),
@@ -48,7 +50,7 @@ export const SignInForm = () => {
     setReturnTo(getReturnToPath())
   }, [])
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { mutate: addLoginEvent } = useAddLoginEvent()
 
   let forgotPasswordUrl = `/forgot-password`
@@ -86,10 +88,7 @@ export const SignInForm = () => {
         }
 
         toast.success(`Signed in successfully!`, { id: toastId })
-        sendEvent({
-          action: 'sign_in',
-          properties: { category: 'account', method: 'email' },
-        })
+        track('sign_in', { category: 'account', method: 'email' })
         addLoginEvent({})
 
         await queryClient.resetQueries()
@@ -118,9 +117,12 @@ export const SignInForm = () => {
     }
   }
 
+  const authError = useAuthError()
+
   return (
     <Form {...form}>
       <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
+        {authError && <AlertError error={authError} subject="Error while signing in" />}
         <FormField
           key="email"
           name="email"
