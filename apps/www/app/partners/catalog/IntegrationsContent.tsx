@@ -6,16 +6,7 @@ import Panel from '~/components/Panel'
 import { searchCatalogPartners } from '~/lib/marketplaceDb'
 import type { Partner } from '~/types/partners'
 import { getCategoryIcon } from 'common/marketplace-categories'
-import {
-  ArrowRight,
-  ArrowUpRight,
-  Filter,
-  LayoutGrid,
-  List,
-  Loader,
-  Search,
-  Store,
-} from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Filter, LayoutGrid, List, Loader, Search } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
@@ -61,25 +52,16 @@ export default function IntegrationsContent({
     new Map(initialPartners?.flatMap((p) => p.categories).map((c) => [c.slug, c]) ?? []).values()
   ).sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
 
-  const [
-    {
-      q: search,
-      cat: selectedCategories,
-      partner: partnerOnly,
-      marketplace: oneClickOnly,
-      view: viewMode,
-    },
-    setFilters,
-  ] = useQueryStates(
-    {
-      q: parseAsString.withDefault(''),
-      cat: parseAsArrayOf(parseAsString).withDefault([]),
-      partner: parseAsBoolean.withDefault(false),
-      marketplace: parseAsBoolean.withDefault(false),
-      view: parseAsStringEnum<ViewMode>(['grid', 'list']).withDefault('grid'),
-    },
-    { history: 'replace' }
-  )
+  const [{ q: search, cat: selectedCategories, partner: partnerOnly, view: viewMode }, setFilters] =
+    useQueryStates(
+      {
+        q: parseAsString.withDefault(''),
+        cat: parseAsArrayOf(parseAsString).withDefault([]),
+        partner: parseAsBoolean.withDefault(false),
+        view: parseAsStringEnum<ViewMode>(['grid', 'list']).withDefault('grid'),
+      },
+      { history: 'replace' }
+    )
 
   const [debouncedSearchTerm] = useDebounce(search, 300)
   const [isSearching, setIsSearching] = useState(false)
@@ -114,12 +96,9 @@ export default function IntegrationsContent({
     })
 
   const OFFICIAL_PARTNER_SLUGS = new Set(['grafana', 'stripe', 'aikido', 'doppler', 'resend'])
-  const availableInMarketplace = (p: Partner) => p.publishedInMarketplace
 
-  const HAS_ACTIVE_FILTERS =
-    search.trim() !== '' || selectedCategories.length > 0 || partnerOnly || oneClickOnly
-  const activeFilterCount =
-    selectedCategories.length + (partnerOnly ? 1 : 0) + (oneClickOnly ? 1 : 0)
+  const HAS_ACTIVE_FILTERS = search.trim() !== '' || selectedCategories.length > 0 || partnerOnly
+  const activeFilterCount = selectedCategories.length + (partnerOnly ? 1 : 0)
 
   const categoryFiltered =
     selectedCategories.length > 0
@@ -130,16 +109,11 @@ export default function IntegrationsContent({
     ? categoryFiltered.filter((p) => OFFICIAL_PARTNER_SLUGS.has(p.slug))
     : categoryFiltered
 
-  const filtered = oneClickOnly ? partnerFiltered.filter(availableInMarketplace) : partnerFiltered
+  const filtered = partnerFiltered
 
   const featuredPartners = filtered
     .filter((p) => p.featured)
-    .sort((a, b) => {
-      if (a.publishedInMarketplace === b.publishedInMarketplace) {
-        return a.title.localeCompare(b.title)
-      }
-      return a.publishedInMarketplace ? -1 : 1
-    })
+    .sort((a, b) => a.title.localeCompare(b.title))
   const listPartners = HAS_ACTIVE_FILTERS
     ? [...filtered.filter((p) => p.featured), ...filtered.filter((p) => !p.featured)]
     : filtered.filter((p) => !p.featured)
@@ -149,20 +123,6 @@ export default function IntegrationsContent({
   // Uses wrapping <label> elements (no id/htmlFor) to avoid duplicate HTML IDs in the DOM.
   const filtersPanel = (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-3 border-b border-muted pb-4">
-        <label className="flex cursor-pointer items-center justify-between gap-3 text-foreground-light transition-colors hover:text-foreground">
-          <span className="flex flex-1 items-center gap-2 text-sm text-left">
-            <Store size={13} className="shrink-0 text-foreground-lighter" />
-            Marketplace
-          </span>
-          <Checkbox
-            checked={oneClickOnly}
-            onCheckedChange={(checked) => setFilters({ marketplace: !!checked })}
-            className="[&_input]:m-0"
-          />
-        </label>
-      </div>
-
       <div className="flex flex-col gap-2.5">
         <h2 className="text-xs font-mono uppercase text-foreground-lighter">Categories</h2>
         {allCategories.map((category) => {
@@ -187,11 +147,7 @@ export default function IntegrationsContent({
       </div>
 
       {HAS_ACTIVE_FILTERS && (
-        <Button
-          block
-          type="dashed"
-          onClick={() => setFilters({ cat: [], partner: false, marketplace: false, q: '' })}
-        >
+        <Button block type="dashed" onClick={() => setFilters({ cat: [], partner: false, q: '' })}>
           Clear all filters
         </Button>
       )}
@@ -213,7 +169,7 @@ export default function IntegrationsContent({
               </p>
             </div>
             <Button asChild size="tiny" className="shrink-0">
-              <Link href="/partners#become-a-partner">Apply to become a partner</Link>
+              <Link href="/partners#become-a-partner">Apply as a Partner</Link>
             </Button>
           </div>
         </div>
@@ -311,31 +267,6 @@ export default function IntegrationsContent({
                     </Link>
                   ))}
                 </div>
-              </div>
-            )}
-
-            {/* Marketplace callout — shown when the Marketplace filter is active */}
-            {oneClickOnly && (
-              <div className="rounded-xl border bg-surface-100 p-5 flex flex-col items-start gap-1.5">
-                <div className="flex items-center gap-2">
-                  <Store size={16} className="shrink-0" />
-                  <h2 className="text-foreground text-base">Supabase Integrations Marketplace</h2>
-                </div>
-                <p className="text-foreground-lighter text-sm">
-                  The Marketplace is where you can explore, install and manage integrations directly
-                  from your project.
-                </p>
-                <Button
-                  asChild
-                  size="tiny"
-                  type="default"
-                  iconRight={<ArrowUpRight />}
-                  className="shrink-0 mt-2"
-                >
-                  <Link href="https://supabase.com/dashboard/project/_/integrations">
-                    Explore Marketplace
-                  </Link>
-                </Button>
               </div>
             )}
 
@@ -474,7 +405,7 @@ export default function IntegrationsContent({
         >
           <h2 className="h2 text-balance">Interested in partnering with Supabase?</h2>
           <Button asChild size="medium" iconRight={<ArrowRight />}>
-            <Link href="/partners#become-a-partner">Apply to become a partner</Link>
+            <Link href="/partners#become-a-partner">Apply as a Partner</Link>
           </Button>
         </div>
       </div>
