@@ -36,7 +36,7 @@ There are 4 types of API keys that you can use with Supabase:
 
 Supabase has changed the way keys work to improve project security and developer experience. You can read [the full announcement](https://github.com/orgs/supabase/discussions/29260).
 
-`anon` and `service_role` keys are based on the project's JWT secret. They are generated when your project is created and you can only change them when you rotate the JWT secret. This can cause significant issues in production applications. **You should now use the `sb_publishable_xxx` and `sb_secret_xxx` keys instead**.
+`anon` and `service_role` keys are based on the project's JWT secret. They are generated when your project is created and you can only change them when you rotate the JWT secret. This can cause significant issues in production applications. **You should now use the `sb_publishable_xxx` and `sb_secret_xxx` keys instead**. See [Migrate to publishable and secret API keys](/docs/guides/getting-started/migrating-to-new-api-keys) for a step-by-step guide.
 
 You can still find legacy keys in the **Legacy anon, service_role API keys** tab of the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard:
 

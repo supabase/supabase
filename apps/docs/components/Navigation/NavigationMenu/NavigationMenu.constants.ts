@@ -341,6 +341,10 @@ export const gettingstarted: NavMenuConstant = {
     { name: 'Local Development', url: '/guides/cli/getting-started' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
     {
+      name: 'Migrating to new API keys',
+      url: '/guides/getting-started/migrating-to-new-api-keys',
+    },
+    {
       name: 'Framework Quickstarts',
       enabled: frameworkQuickstartsEnabled,
       items: [
