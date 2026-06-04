@@ -403,7 +403,7 @@ export const Grid = memo(
                   ref={ref}
                   className={cn(
                     gridClass,
-                    'grow border-t-0! border-b-0!',
+                    'grow border-t-default! border-b-0!',
                     isContextMenuOpen && 'rdg-context-menu-open'
                   )}
                   rowClass={computedRowClass}
