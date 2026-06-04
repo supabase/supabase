@@ -36,6 +36,8 @@ export const TerminalInstructions = forwardRef<
 
   const { anonKey, publishableKey } = getKeys(apiKeys)
   const apiKey = publishableKey?.api_key ?? anonKey?.api_key ?? '[YOUR ANON KEY]'
+  const isPublishableKey = !!publishableKey?.api_key
+  const keyPlaceholder = isPublishableKey ? '[YOUR PUBLISHABLE KEY]' : '[YOUR ANON KEY]'
 
   // get the .co or .net TLD from the restUrl
   const restUrl = `https://${endpoint}`
@@ -68,14 +70,22 @@ export const TerminalInstructions = forwardRef<
       comment: 'Deploy your function',
     },
     {
-      command: `curl -L -X POST 'https://${projectRef}.supabase.${restUrlTld}/functions/v1/hello-world' -H 'Authorization: Bearer ${apiKey}'${anonKey?.type === 'publishable' ? ` -H 'apikey: ${apiKey}'` : ''} --data '{"name":"Functions"}'`,
+      // Publishable keys aren't JWTs, so they must be sent on the `apikey` header; passing
+      // them on `Authorization: Bearer` makes the platform reject the request with `Invalid
+      // JWT`. Legacy `anon` keys are JWTs and use `Authorization: Bearer`.
+      command: `curl -L -X POST 'https://${projectRef}.supabase.${restUrlTld}/functions/v1/hello-world' -H '${
+        isPublishableKey ? `apikey: ${apiKey}` : `Authorization: Bearer ${apiKey}`
+      }' --data '{"name":"Functions"}'`,
       description: 'Invokes the hello-world function',
       jsx: () => {
         return (
           <>
             <span className="text-brand-600">curl</span> -L -X POST '{functionsEndpoint}
-            /hello-world' -H 'Authorization: Bearer [YOUR ANON KEY]'
-            {anonKey?.type === 'publishable' ? " -H 'apikey: [YOUR ANON KEY]' " : ''}
+            /hello-world' -H '
+            {isPublishableKey
+              ? `apikey: ${keyPlaceholder}`
+              : `Authorization: Bearer ${keyPlaceholder}`}
+            '{' '}
             {`--data '{"name":"Functions"}'`}
           </>
         )
