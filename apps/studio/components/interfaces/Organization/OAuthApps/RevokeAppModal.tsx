@@ -40,24 +40,31 @@ export const RevokeAppModal = ({ selectedApp, onClose }: RevokeAppModalProps) =>
     <AlertDialog open={selectedApp !== undefined} onOpenChange={onClose}>
       <AlertDialogContent size="medium">
         <AlertDialogHeader>
-          <AlertDialogTitle>{`Confirm to revoke ${selectedApp?.name}`}</AlertDialogTitle>
+          <AlertDialogTitle>{`Revoke access for ${selectedApp?.name}?`}</AlertDialogTitle>
           <AlertDialogDescription>
             <div className="flex flex-col space-y-2">
               <Admonition
                 type="warning"
                 title="This action cannot be undone"
-                description={`${selectedApp?.name} application will no longer have access to your organization's settings
+                description={`${selectedApp?.name} will no longer have access to your organization's settings
           and projects.`}
               />
               <ul className="space-y-5">
                 <li className="flex gap-3 text-sm">
                   <Lock size={14} className="shrink-0" />
                   <div>
-                    <strong>Before you remove this app, consider:</strong>
+                    <strong>Before you remove this app:</strong>
                     <ul className="space-y-2 mt-2">
                       <li className="list-disc ml-4">
-                        No users are currently using this application. The application will no
-                        longer have access to your organization after being revoked.
+                        Ensure that no users are currently using the application.
+                      </li>
+                      <li className="list-disc ml-4">
+                        The application will no longer have access to your organization after being
+                        revoked.
+                      </li>
+                      <li className="list-disc ml-4">
+                        Restoring access will require an organization administrator to re-authorize
+                        the application.
                       </li>
                     </ul>
                   </div>
