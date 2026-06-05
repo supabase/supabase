@@ -37,12 +37,6 @@ const {
 
 const SOURCES: Source[] = [
   {
-    title: 'Supabase Guides',
-    relPath: 'llms/guides.txt',
-    fetch: fetchGuideSources,
-    enabled: true,
-  },
-  {
     title: 'Supabase Reference (JavaScript)',
     relPath: 'llms/js.txt',
     fetch: async () =>
