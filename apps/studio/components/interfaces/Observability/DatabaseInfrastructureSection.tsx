@@ -17,6 +17,7 @@ import {
 import { useInfraMonitoringAttributesQuery } from '@/data/analytics/infra-monitoring-query'
 import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 
 type DatabaseInfrastructureSectionProps = {
   interval: '1hr' | '1day' | '7day'
@@ -25,6 +26,9 @@ type DatabaseInfrastructureSectionProps = {
   isLoading: boolean
   slowQueriesCount?: number
   slowQueriesLoading?: boolean
+  tableHitRate?: number | null
+  indexHitRate?: number | null
+  hitRatesLoading?: boolean
 }
 
 export const DatabaseInfrastructureSection = ({
@@ -34,9 +38,13 @@ export const DatabaseInfrastructureSection = ({
   isLoading: _dbLoading,
   slowQueriesCount = 0,
   slowQueriesLoading = false,
+  tableHitRate,
+  indexHitRate,
+  hitRatesLoading = false,
 }: DatabaseInfrastructureSectionProps) => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const track = useTrack()
 
   // refreshKey forces date recalculation when user clicks refresh button
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -262,6 +270,48 @@ export const DatabaseInfrastructureSection = ({
             </MetricCardContent>
           </MetricCard>
         </Link>
+
+        <MetricCard
+          isLoading={hitRatesLoading}
+          onClick={() => track('observability_table_hit_rate_card_clicked')}
+        >
+          <MetricCardHeader
+            href={`/project/${projectRef}/observability/query-performance`}
+            linkTooltip="Go to query performance"
+          >
+            <MetricCardLabel tooltip="Percentage of table block reads served from shared memory (buffer cache) vs disk. Values above 99% are healthy. Lower values suggest the shared_buffers setting may need tuning or the working set exceeds available memory.">
+              Table Hit Rate
+            </MetricCardLabel>
+          </MetricCardHeader>
+          <MetricCardContent>
+            {tableHitRate != null ? (
+              <MetricCardValue>{tableHitRate.toFixed(2)}%</MetricCardValue>
+            ) : (
+              <MetricCardValue>--</MetricCardValue>
+            )}
+          </MetricCardContent>
+        </MetricCard>
+
+        <MetricCard
+          isLoading={hitRatesLoading}
+          onClick={() => track('observability_index_hit_rate_card_clicked')}
+        >
+          <MetricCardHeader
+            href={`/project/${projectRef}/observability/query-performance`}
+            linkTooltip="Go to query performance"
+          >
+            <MetricCardLabel tooltip="Percentage of index block reads served from shared memory (buffer cache) vs disk. Values above 99% are healthy. Low values may indicate missing indexes or insufficient memory.">
+              Index Hit Rate
+            </MetricCardLabel>
+          </MetricCardHeader>
+          <MetricCardContent>
+            {indexHitRate != null ? (
+              <MetricCardValue>{indexHitRate.toFixed(2)}%</MetricCardValue>
+            ) : (
+              <MetricCardValue>--</MetricCardValue>
+            )}
+          </MetricCardContent>
+        </MetricCard>
       </div>
     </div>
   )

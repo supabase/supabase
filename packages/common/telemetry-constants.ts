@@ -3283,6 +3283,30 @@ export interface RLSTesterRunQueryClickedEvent {
 }
 
 /**
+ * User clicked the Table Hit Rate card in the Observability overview.
+ *
+ * @group Events
+ * @source studio
+ * @page /observability/overview
+ */
+export interface ObservabilityTableHitRateCardClickedEvent {
+  action: 'observability_table_hit_rate_card_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the Index Hit Rate card in the Observability overview.
+ *
+ * @group Events
+ * @source studio
+ * @page /observability/overview
+ */
+export interface ObservabilityIndexHitRateCardClickedEvent {
+  action: 'observability_index_hit_rate_card_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -3471,3 +3495,5 @@ export type TelemetryEvent =
   | HeaderLocalDropdownOpenedEvent
   | HeaderLocalVersionPopoverOpenedEvent
   | RLSTesterRunQueryClickedEvent
+  | ObservabilityTableHitRateCardClickedEvent
+  | ObservabilityIndexHitRateCardClickedEvent

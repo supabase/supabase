@@ -143,6 +143,21 @@ export function generateRegexpWhereSafe(
   return prepend ? safeLogSql`WHERE ${joined}` : safeLogSql`AND ${joined}`
 }
 
+/**
+ * SQL fragment that returns table and index buffer-cache hit rates.
+ * Shared between the Query Performance report and the Observability overview.
+ */
+export const QUERY_HIT_RATE_SQL = safeSql`-- reports-query-performance-cache-and-index-hit-rate
+select
+    'index hit rate' as name,
+    (sum(idx_blks_hit)) / nullif(sum(idx_blks_hit + idx_blks_read),0) as ratio
+  from pg_statio_user_indexes
+  union all
+  select
+    'table hit rate' as name,
+    sum(heap_blks_hit) / nullif(sum(heap_blks_hit) + sum(heap_blks_read),0) as ratio
+  from pg_statio_user_tables;`
+
 export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
   [Presets.API]: {
     title: 'API',
@@ -566,16 +581,7 @@ select
       },
       queryHitRate: {
         queryType: 'db',
-        safeSql: (_params) => safeSql`-- reports-query-performance-cache-and-index-hit-rate
-select
-    'index hit rate' as name,
-    (sum(idx_blks_hit)) / nullif(sum(idx_blks_hit + idx_blks_read),0) as ratio
-  from pg_statio_user_indexes
-  union all
-  select
-    'table hit rate' as name,
-    sum(heap_blks_hit) / nullif(sum(heap_blks_hit) + sum(heap_blks_read),0) as ratio
-  from pg_statio_user_tables;`,
+        safeSql: (_params) => QUERY_HIT_RATE_SQL,
       },
       unified: {
         queryType: 'db',

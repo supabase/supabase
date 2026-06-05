@@ -10,6 +10,7 @@ import { DatabaseInfrastructureSection } from './DatabaseInfrastructureSection'
 import { useObservabilityOverviewData } from './ObservabilityOverview.utils'
 import { ObservabilityOverviewFooter } from './ObservabilityOverviewFooter'
 import { ServiceHealthTable } from './ServiceHealthTable'
+import { useHitRates } from './useHitRates'
 import { useSlowQueriesCount } from './useSlowQueriesCount'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
@@ -52,12 +53,16 @@ export const ObservabilityOverview = () => {
     refreshKey
   )
 
+  const { tableHitRate, indexHitRate, isLoading: hitRatesLoading } = useHitRates()
+
   const handleRefresh = useCallback(() => {
     setRefreshKey((prev) => prev + 1)
     queryClient.invalidateQueries({ queryKey: ['projects', projectRef, 'service-health'] })
     queryClient.invalidateQueries({ queryKey: ['project-metrics'] })
     queryClient.invalidateQueries({ queryKey: ['infra-monitoring'] })
     queryClient.invalidateQueries({ queryKey: ['max-connections'] })
+    // invalidates useDbQuery-based hooks (slow queries count, hit rates)
+    queryClient.invalidateQueries({ queryKey: ['projects', projectRef, 'db'] })
   }, [queryClient, projectRef])
 
   useShortcut(SHORTCUT_IDS.OBSERVABILITY_REFRESH, handleRefresh)
@@ -192,6 +197,9 @@ export const ObservabilityOverview = () => {
           isLoading={dbServiceData.isLoading}
           slowQueriesCount={slowQueriesCount}
           slowQueriesLoading={slowQueriesLoading}
+          tableHitRate={tableHitRate}
+          indexHitRate={indexHitRate}
+          hitRatesLoading={hitRatesLoading}
         />
 
         <ServiceHealthTable
