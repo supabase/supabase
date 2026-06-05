@@ -49,7 +49,7 @@ export const MarketplaceFeaturedHeroGrid = ({
       <div className="mb-2">
         <h2 className="text-sm">Featured integrations</h2>
       </div>
-      <div className="grid grid-cols-4 gap-4 items-stretch">
+      <div className="grid grid-cols-4 gap-3 items-stretch">
         {/* Primary card - 1/2 width (2/4) */}
         <div className="col-span-2">
           <IntegrationCard
