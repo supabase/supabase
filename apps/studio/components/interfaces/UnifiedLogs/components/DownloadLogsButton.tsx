@@ -101,16 +101,16 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
   return (
     <>
       <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-        <DropdownMenuTrigger asChild>
-          <ShortcutTooltip shortcutId={SHORTCUT_IDS.UNIFIED_LOGS_DOWNLOAD} side="bottom">
+        <ShortcutTooltip shortcutId={SHORTCUT_IDS.UNIFIED_LOGS_DOWNLOAD} side="bottom">
+          <DropdownMenuTrigger asChild>
             <Button
               type="default"
               className="w-[26px]"
               icon={<Download className="text-foreground" />}
               aria-label="Download logs"
             />
-          </ShortcutTooltip>
-        </DropdownMenuTrigger>
+          </DropdownMenuTrigger>
+        </ShortcutTooltip>
         <DropdownMenuContent align="end" className="w-44">
           {isLogs && IS_PLATFORM && (
             <DropdownMenuItem asChild className="gap-x-2">
