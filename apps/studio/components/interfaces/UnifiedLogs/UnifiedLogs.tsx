@@ -40,7 +40,7 @@ import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
 import {
   buildFilterSearchUpdate,
-  groupLogsFiltersByColumn,
+  logsFiltersToColumnFilters,
   parseLogsFilterUrlParams,
 } from './UnifiedLogs.filters'
 import { useLiveMode, useResetFocus } from './UnifiedLogs.hooks'
@@ -91,12 +91,9 @@ export const UnifiedLogs = () => {
 
   const defaultColumnSorting = search.sort ? [search.sort] : []
   const defaultColumnVisibility = { uuid: false }
-  // Column filters are seeded from the repeatable `filter` URL param. Each entry
-  // (`col:opAbbrev:value`) is grouped per column into a wrapped { operator, values }
-  // shape that the query builder reads back.
-  const defaultColumnFilters = Object.entries(
-    groupLogsFiltersByColumn(parseLogsFilterUrlParams(search.filter))
-  ).map(([id, value]) => ({ id, value }))
+  // Column filters are seeded from the repeatable `filter` URL param so the sidebar
+  // checkboxes and top filter bar both render their state on load.
+  const defaultColumnFilters = logsFiltersToColumnFilters(parseLogsFilterUrlParams(search.filter))
 
   const [topBarHeight, setTopBarHeight] = useState(0)
   const topBarRef = useRef<HTMLDivElement>(null)

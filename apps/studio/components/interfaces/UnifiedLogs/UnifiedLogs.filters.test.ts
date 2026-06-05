@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest'
 import {
   buildFilterSearchUpdate,
   columnFiltersToLogsFilters,
+  logsFiltersToColumnFilters,
   logsFiltersToUrlParams,
+  parseLogsFilterUrlParams,
 } from './UnifiedLogs.filters'
 
 describe('columnFiltersToLogsFilters', () => {
@@ -51,6 +53,39 @@ describe('columnFiltersToLogsFilters', () => {
       { id: 'method', value: undefined },
     ])
     expect(filters).toEqual([])
+  })
+})
+
+describe('logsFiltersToColumnFilters', () => {
+  it('seeds an `=` group as a bare string[] so sidebar checkboxes render ticked', () => {
+    // The shared checkbox only reads Array.isArray(value); a wrapped
+    // { operator, values } object leaves every box unticked on URL load.
+    const columnFilters = logsFiltersToColumnFilters([
+      { column: 'log_type', operator: '=', value: 'postgres' },
+      { column: 'log_type', operator: '=', value: 'postgrest' },
+    ])
+    expect(columnFilters).toEqual([{ id: 'log_type', value: ['postgres', 'postgrest'] }])
+  })
+
+  it('keeps non-eq groups wrapped so the operator survives a round-trip', () => {
+    const columnFilters = logsFiltersToColumnFilters([
+      { column: 'event_message', operator: '~~*', value: 'error' },
+    ])
+    expect(columnFilters).toEqual([
+      { id: 'event_message', value: { operator: '~~*', values: ['error'] } },
+    ])
+  })
+
+  it('round-trips an eq URL filter back to the same param without flipping the operator', () => {
+    const seeded = logsFiltersToColumnFilters(parseLogsFilterUrlParams(['method:eq:GET']))
+    const update = buildFilterSearchUpdate(seeded, [{ value: 'method', type: 'checkbox' }])
+    expect(update.filter).toEqual(['method:eq:GET'])
+  })
+
+  it('round-trips a neq URL filter without downgrading it to eq', () => {
+    const seeded = logsFiltersToColumnFilters(parseLogsFilterUrlParams(['method:neq:GET']))
+    const update = buildFilterSearchUpdate(seeded, [{ value: 'method', type: 'checkbox' }])
+    expect(update.filter).toEqual(['method:neq:GET'])
   })
 })
 

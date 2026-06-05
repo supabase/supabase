@@ -81,6 +81,18 @@ export const groupLogsFiltersByColumn = (
   return grouped
 }
 
+// Seeds table column filters from URL-parsed logs filters. Equality groups (what
+// the sidebar checkboxes write) become a bare string[] so the checkboxes render
+// ticked on load; non-eq groups (top filter bar's neq/ilike) keep the wrapped
+// { operator, values } shape so the operator survives a round-trip.
+export const logsFiltersToColumnFilters = (
+  filters: LogsFilter[]
+): { id: string; value: string[] | LogsColumnFilterValue }[] => {
+  return Object.entries(groupLogsFiltersByColumn(filters)).map(([id, group]) =>
+    group.operator === '=' ? { id, value: group.values } : { id, value: group }
+  )
+}
+
 export const columnFiltersToLogsFilters = (
   columnFilters: { id: string; value: unknown }[],
   filterableNames?: Set<string>
