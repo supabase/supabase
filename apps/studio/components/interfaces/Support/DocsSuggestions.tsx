@@ -64,7 +64,7 @@ function DocsSuggestions_Results({ results, isStale }: DocsSuggestions_ResultsPr
       </p>
       <ul
         className={cn(
-          'flex flex-col gap-y-0.5 transition-opacity duration-200',
+          'flex flex-col gap-y-0.5 py-1 transition-opacity duration-200',
           isStale ? 'opacity-50' : 'opacity-100'
         )}
       >
