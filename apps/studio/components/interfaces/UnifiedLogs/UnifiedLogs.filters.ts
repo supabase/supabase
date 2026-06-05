@@ -87,20 +87,43 @@ export const columnFiltersToLogsFilters = (
 ): LogsFilter[] => {
   const filters: LogsFilter[] = []
   for (const { id, value } of columnFilters) {
-    // Skip columns that don't serialize into the `filter` param (e.g. the
-    // `date` timerange brush, which round-trips through its own URL key).
+    // `date` (timerange brush) round-trips through its own URL key, not `filter`.
     if (filterableNames && !filterableNames.has(id)) continue
     if (value === null || value === undefined) continue
-    // The top filter bar writes a wrapped { operator, values }, while the shared
-    // sidebar checkbox writes a bare string[] (TanStack convention). Normalize
-    // the bare array to the default `=` operator so sidebar clicks serialize and
-    // re-run the query the same way the filter bar does.
-    const { operator, values } = isLogsFilterColumnValue(value)
-      ? value
-      : { operator: '=' as LogsFilterOperator, values: Array.isArray(value) ? value : [value] }
+    // Filter bar writes a wrapped { operator, values }; sidebar checkboxes write a
+    // bare string[] — normalize the latter to an `=` filter so both serialize alike.
+    const fallback: LogsColumnFilterValue = {
+      operator: '=',
+      values: (Array.isArray(value) ? value : [value]).map(String),
+    }
+    const { operator, values } = isLogsFilterColumnValue(value) ? value : fallback
     for (const v of values) {
-      filters.push({ column: id, operator, value: String(v) })
+      filters.push({ column: id, operator, value: v })
     }
   }
   return filters
+}
+
+// Builds the URL-state patch for a filter apply. Equality/pattern filters collapse
+// into the repeatable `filter` param; timerange fields keep their own per-column key
+// (their range semantics aren't expressible as eq/neq/like).
+export const buildFilterSearchUpdate = (
+  columnFilters: { id: string; value: unknown }[],
+  filterFields: { value: string; type: string }[]
+): Record<string, unknown> => {
+  const filterableNames = new Set(
+    filterFields.filter((field) => field.type !== 'timerange').map((field) => field.value)
+  )
+  const filterEntries = logsFiltersToUrlParams(
+    columnFiltersToLogsFilters(columnFilters, filterableNames)
+  )
+  const update: Record<string, unknown> = {
+    filter: filterEntries.length > 0 ? filterEntries : null,
+  }
+  for (const field of filterFields) {
+    if (field.type !== 'timerange') continue
+    const current = columnFilters.find((c) => c.id === field.value)?.value
+    update[field.value] = current ?? null
+  }
+  return update
 }

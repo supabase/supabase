@@ -39,9 +39,8 @@ import { ServiceFlowPanel } from './ServiceFlowPanel'
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
 import {
-  columnFiltersToLogsFilters,
+  buildFilterSearchUpdate,
   groupLogsFiltersByColumn,
-  logsFiltersToUrlParams,
   parseLogsFilterUrlParams,
 } from './UnifiedLogs.filters'
 import { useLiveMode, useResetFocus } from './UnifiedLogs.hooks'
@@ -294,26 +293,9 @@ export const UnifiedLogs = () => {
     })
   }, [facets])
 
-  // Debounced filter application to avoid too many API calls when user clicks multiple filters quickly.
-  // All equality/pattern column filters serialize into the repeatable `filter` URL param. Slider/timerange
-  // column filters keep their dedicated per-column URL keys so things like the timeline brush still
-  // round-trip — they have their own range semantics and aren't covered by eq/neq/like.
+  // Debounced to avoid too many API calls when the user clicks multiple filters quickly.
   const applyFilterSearch = () => {
-    const filterableNames = new Set(
-      filterFields.filter((field) => field.type !== 'timerange').map((field) => field.value)
-    )
-    const filterEntries = logsFiltersToUrlParams(
-      columnFiltersToLogsFilters(columnFilters, filterableNames)
-    )
-    const update: Record<string, unknown> = {
-      filter: filterEntries.length > 0 ? filterEntries : null,
-    }
-    for (const field of filterFields) {
-      if (field.type !== 'timerange') continue
-      const current = columnFilters.find((c) => c.id === field.value)?.value
-      update[field.value] = current ?? null
-    }
-    setSearch(update)
+    setSearch(buildFilterSearchUpdate(columnFilters, filterFields))
   }
 
   const debouncedApplyFilterSearch = useDebounce(applyFilterSearch, 250)
