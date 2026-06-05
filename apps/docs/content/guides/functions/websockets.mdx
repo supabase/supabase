@@ -149,7 +149,7 @@ const supabase = createClient(
 export default {
   fetch: async (req) => {
     const upgrade = req.headers.get('upgrade') || ''
-    if (upgrade.toLowerCase() != 'WebSocket') {
+    if (upgrade.toLowerCase() != 'websocket') {
       return new Response("request isn't trying to upgrade to WebSocket.", { status: 400 })
     }
 
@@ -206,7 +206,7 @@ const supabase = createClient(
 export default {
   fetch: async (req) => {
     const upgrade = req.headers.get('upgrade') || ''
-    if (upgrade.toLowerCase() != 'WebSocket') {
+    if (upgrade.toLowerCase() != 'websocket') {
       return new Response("request isn't trying to upgrade to WebSocket.", { status: 400 })
     }
 
@@ -214,7 +214,8 @@ export default {
     const customProtocols = (req.headers.get('Sec-WebSocket-Protocol') ?? '')
       .split(',')
       .map((p) => p.trim())
-    const jwt = customProtocols.find((p) => p.startsWith('jwt')).replace('jwt-', '')
+    const jwtProtocol = customProtocols.find((p) => p.startsWith('jwt-'))
+    const jwt = jwtProtocol ? jwtProtocol.replace('jwt-', '') : null
 
     if (!jwt) {
       console.error('Auth token not provided')

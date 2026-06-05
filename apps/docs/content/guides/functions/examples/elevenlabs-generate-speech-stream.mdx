@@ -111,7 +111,7 @@ const client = new ElevenLabsClient({
 
 // Deploy with verify_jwt = false
 export default {
-  fetch: withSupabase({ auth: 'secret' }, async (req, ctx) => {
+  fetch: withSupabase({ auth: 'none' }, async (req, ctx) => {
     // Upload audio to Supabase Storage in a background task
     async function uploadAudioToStorage(stream: ReadableStream, requestHash: string) {
       const { data, error } = await ctx.supabaseAdmin.storage

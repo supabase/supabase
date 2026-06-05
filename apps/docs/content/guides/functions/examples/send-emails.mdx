@@ -54,7 +54,7 @@ const handler = async (_request: Request): Promise<Response> => {
   return Response.json(data)
 }
 
-export default { fetch: withSupabase({ auth: 'none' }, handler) }
+export default { fetch: withSupabase({ auth: ['user', 'secret'] }, handler) }
 ```
 
 ### 3. Deploy and send email
@@ -66,7 +66,12 @@ supabase start
 supabase functions serve --no-verify-jwt --env-file .env
 ```
 
-Test it: http://localhost:54321/functions/v1/resend
+The function accepts a signed-in user's JWT or a secret key, so it can be triggered from your app (via `supabase.functions.invoke`) or from a database function. Test it locally with a secret key:
+
+```bash
+curl -i --request POST 'http://localhost:54321/functions/v1/resend' \
+  --header 'apikey: <SUPABASE_SECRET_KEY>'
+```
 
 Deploy function to Supabase:
 
@@ -79,8 +84,6 @@ supabase functions deploy resend --no-verify-jwt
 When you deploy to Supabase, make sure that your `RESEND_API_KEY` is set in [Edge Function Secrets Management](/dashboard/project/_/functions/secrets)
 
 </Admonition>
-
-Open the endpoint URL to send an email:
 
 ### 4. Try it yourself
 
