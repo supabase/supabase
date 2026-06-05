@@ -28,7 +28,7 @@ You're an expert in writing TypeScript and Deno JavaScript runtime. Generate **h
 
    This is the request handler contract for Supabase Edge Functions, and it also runs unchanged on Cloudflare Workers and Bun. Always wrap this handler with `withSupabase` to secure and configure it (see guideline 8).
 
-8. Write your handler with `withSupabase` from `npm:@supabase/server@1`. One wrapper gives you:
+8. Write your handler with `withSupabase` from `npm:@supabase/server@^1`. One wrapper gives you:
    - Authentication: verifies the caller's credentials.
    - Authorization: only lets through callers that match the `auth` mode you declare.
    - Pre-configured clients on `ctx`: `ctx.supabase` (scoped to the caller's RLS) and `ctx.supabaseAdmin` (bypasses RLS).
@@ -37,7 +37,7 @@ You're an expert in writing TypeScript and Deno JavaScript runtime. Generate **h
    Your one decision is the `auth` mode:
 
    ```ts
-   import { withSupabase } from 'npm:@supabase/server@1'
+   import { withSupabase } from 'npm:@supabase/server@^1'
 
    export default {
      fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
@@ -75,7 +75,7 @@ You're an expert in writing TypeScript and Deno JavaScript runtime. Generate **h
    `withSupabase` reads these for you, so prefer it over reading keys by hand. If you must read a key without the SDK, parse the JSON map and index it by name: `const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)`, then `SUPABASE_SECRET_KEYS['default']` for the default secret key. The publishable keys work the same way through `SUPABASE_PUBLISHABLE_KEYS`.
 
 10. To set other environment variables (ie. secrets) users can put them in an env file and run `supabase secrets set --env-file path/to/env-file`.
-11. A single Edge Function can handle multiple routes. It is recommended to use a library like Hono or Express to handle the routes as it's easier for developers to understand and maintain. Each route must be prefixed with `/function-name` so they are routed correctly. For per-route Supabase auth with Hono, use the adapter from `npm:@supabase/server@1/adapters/hono`.
+11. A single Edge Function can handle multiple routes. It is recommended to use a library like Hono or Express to handle the routes as it's easier for developers to understand and maintain. Each route must be prefixed with `/function-name` so they are routed correctly. For per-route Supabase auth with Hono, use the adapter from `npm:@supabase/server@^1/adapters/hono`.
 12. File write operations are ONLY permitted on the `/tmp` directory. You can use either Deno or Node File APIs.
 13. Use the `EdgeRuntime.waitUntil(promise)` static method to run long-running tasks in the background without blocking the response to a request. Do NOT assume it is available in the request / execution context.
 
@@ -84,7 +84,7 @@ You're an expert in writing TypeScript and Deno JavaScript runtime. Generate **h
 ### Recommended: Edge Function with `withSupabase`
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server@1'
+import { withSupabase } from 'npm:@supabase/server@^1'
 
 export default {
   fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {

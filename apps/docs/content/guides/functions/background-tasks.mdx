@@ -19,7 +19,7 @@ This allows you to:
 You can use `EdgeRuntime.waitUntil(promise)` to explicitly mark background tasks. The Function instance continues to run until the promise provided to `waitUntil` completes.
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server@1'
+import { withSupabase } from 'npm:@supabase/server@^1'
 
 // Mark the asyncLongRunningTask's returned promise as a background task.
 // ⚠️ We are NOT using `await` because we don't want it to block!
@@ -35,7 +35,7 @@ export default {
 You can call `EdgeRuntime.waitUntil` in the request handler too. This will not block the request.
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server@1'
+import { withSupabase } from 'npm:@supabase/server@^1'
 
 export default {
   fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
@@ -50,7 +50,7 @@ export default {
 You can listen to the `beforeunload` event handler to be notified when the Function is about to be shut down.
 
 ```tsx
-import { withSupabase } from 'npm:@supabase/server@1'
+import { withSupabase } from 'npm:@supabase/server@^1'
 
 EdgeRuntime.waitUntil(asyncLongRunningTask())
 

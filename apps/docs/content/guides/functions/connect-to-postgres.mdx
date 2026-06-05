@@ -16,7 +16,7 @@ You can also use other Postgres clients like [Deno Postgres](https://deno.land/x
 The [`withSupabase`](/docs/guides/functions/auth) wrapper from `@supabase/server` hands you a `supabase-js` client (`ctx.supabase`) already scoped to the caller's Row Level Security policies, so you don't manage keys or authorization headers yourself. It also provides `ctx.supabaseAdmin` for privileged operations that bypass Row Level Security. Responses are automatically formatted as JSON. This is the recommended approach for most applications:
 
 ```ts index.ts
-import { withSupabase } from 'npm:@supabase/server@1'
+import { withSupabase } from 'npm:@supabase/server@^1'
 
 export default {
   fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {

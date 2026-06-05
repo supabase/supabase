@@ -28,7 +28,7 @@ Here's the code of the Edge Function, you can change the response to handle the 
 
 ```ts index.ts
 import { WebClient } from 'https://deno.land/x/slack_web_api@6.7.2/mod.js'
-import { withSupabase } from 'npm:@supabase/server@1'
+import { withSupabase } from 'npm:@supabase/server@^1'
 
 const slackBotToken = Deno.env.get('SLACK_TOKEN') ?? ''
 const botClient = new WebClient(slackBotToken)

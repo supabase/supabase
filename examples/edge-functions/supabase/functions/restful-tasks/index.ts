@@ -2,7 +2,7 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 
-import { withSupabase } from 'npm:@supabase/server@1'
+import { withSupabase } from 'npm:@supabase/server@^1'
 import type { SupabaseClient } from 'npm:@supabase/supabase-js@2'
 
 interface Task {

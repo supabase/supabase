@@ -39,7 +39,7 @@ Here's a simple hello world example using some popular web frameworks:
 <TabPanel id="deno" label="Deno">
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server@1'
+import { withSupabase } from 'npm:@supabase/server@^1'
 
 export default {
   fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
@@ -130,7 +130,7 @@ app.get('/hello-world', (c) => {
 export default { fetch: app.fetch }
 ```
 
-To add Supabase auth per route, use the Hono adapter from `npm:@supabase/server@1/adapters/hono`. See [Securing Edge Functions](/docs/guides/functions/auth).
+To add Supabase auth per route, use the Hono adapter from `npm:@supabase/server@^1/adapters/hono`. See [Securing Edge Functions](/docs/guides/functions/auth).
 
 </TabPanel>
 
@@ -161,7 +161,7 @@ Keep in mind paths must be prefixed by function name. Route parameters can only 
 <TabPanel id="deno" label="Deno">
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server@1'
+import { withSupabase } from 'npm:@supabase/server@^1'
 
 interface Task {
   id: string
@@ -401,7 +401,7 @@ app.delete('/:id', async (c) => {
 export default { fetch: app.fetch }
 ```
 
-To add Supabase auth per route, use the Hono adapter from `npm:@supabase/server@1/adapters/hono`. See [Securing Edge Functions](/docs/guides/functions/auth).
+To add Supabase auth per route, use the Hono adapter from `npm:@supabase/server@^1/adapters/hono`. See [Securing Edge Functions](/docs/guides/functions/auth).
 
 </TabPanel>
 

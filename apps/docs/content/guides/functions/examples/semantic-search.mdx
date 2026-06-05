@@ -38,7 +38,7 @@ create index on embeddings using hnsw (embedding vector_ip_ops);
 You can deploy the [following edge function](https://github.com/supabase/supabase/blob/master/examples/ai/edge-functions/supabase/functions/generate-embedding/index.ts) as a [database webhook](/docs/guides/database/webhooks) to generate the embeddings for any text content inserted into the table:
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server@1'
+import { withSupabase } from 'npm:@supabase/server@^1'
 
 const model = new Supabase.ai.Session('gte-small')
 
@@ -105,7 +105,7 @@ $$;
 You can use `supabase-js` to first generate the embedding for the search term and then invoke the Postgres function to find the relevant results from your stored embeddings, right from your [Supabase Edge Function](https://github.com/supabase/supabase/blob/master/examples/ai/edge-functions/supabase/functions/search/index.ts):
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server@1'
+import { withSupabase } from 'npm:@supabase/server@^1'
 
 const model = new Supabase.ai.Session('gte-small')
 

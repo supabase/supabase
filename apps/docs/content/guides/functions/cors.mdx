@@ -11,7 +11,7 @@ To invoke edge functions from the browser, you need to handle [CORS Preflight](h
 The [`withSupabase`](/docs/guides/functions/auth) wrapper handles CORS and preflight (`OPTIONS`) requests for you, so you don't add headers manually:
 
 ```ts index.ts
-import { withSupabase } from 'npm:@supabase/server@1'
+import { withSupabase } from 'npm:@supabase/server@^1'
 
 export default {
   fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {

@@ -47,7 +47,7 @@ And add the code to the `index.ts` file:
 // We need to mock the file system for the AWS SDK to work.
 import { prepareVirtualFile } from 'https://deno.land/x/mock_file@v1.1.2/mod.ts'
 import { BedrockRuntimeClient, InvokeModelCommand } from 'npm:@aws-sdk/client-bedrock-runtime'
-import { withSupabase } from 'npm:@supabase/server@1'
+import { withSupabase } from 'npm:@supabase/server@^1'
 import { decode } from 'npm:base64-arraybuffer'
 
 console.log('Hello from Amazon Bedrock!')
