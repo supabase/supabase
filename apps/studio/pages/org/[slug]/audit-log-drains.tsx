@@ -35,7 +35,7 @@ const OrgAuditLogDrainsPage: NextPageWithLayout = () => {
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>
-      <PageContainer size="default">
+      <PageContainer size="default" className="pt-8">
         <OrgAuditLogDrains />
       </PageContainer>
     </>
