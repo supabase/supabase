@@ -316,7 +316,7 @@ function buildPrototypeFlow({
 
 function NodeIcon({ icon: Icon }: { icon: LucideIcon }) {
   return (
-    <div className="flex size-7 shrink-0 items-center justify-center rounded bg-background">
+    <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-background">
       <Icon className="size-3 text-foreground-lighter" strokeWidth={1.5} />
     </div>
   )
@@ -327,7 +327,7 @@ function DatabaseNode({ data }: NodeProps) {
     <div className="relative" style={{ width: NODE_WIDTH }}>
       <Handle type="source" position={Position.Bottom} id="bottom" className="opacity-0" />
       <Card>
-        <CardContent className="flex flex-col items-center gap-2 border-none p-0.5 text-center">
+        <CardContent className="flex flex-col items-center gap-2 border-none px-0.5 py-2 text-center">
           <NodeIcon icon={Database} />
           <div className="flex min-w-0 flex-1 flex-col leading-tight">
             <span className="truncate text-xs font-medium">{String(data.label)}</span>
