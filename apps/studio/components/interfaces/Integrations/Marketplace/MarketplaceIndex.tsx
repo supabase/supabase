@@ -253,8 +253,8 @@ export const MarketplaceIndex = () => {
               <MarketplaceFeaturedHeroGrid
                 integrations={featured}
                 installedIds={installedIds}
-                primaryIntegrationId="grafana"
-                secondaryIntegrationIds={['cron', 'queues']}
+                primaryIntegrationId={featured[0].id}
+                secondaryIntegrationIds={featured.slice(1, 3).map((i) => i.id)}
               />
             )}
 

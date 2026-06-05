@@ -56,8 +56,8 @@ export const MarketplaceFeaturedHeroGrid = ({
       <div className="mb-2">
         <h2 className="text-sm">Featured integrations</h2>
       </div>
-      <div className="grid grid-cols-1 @md:grid-cols-2 @3xl:grid-cols-4 gap-3 items-stretch">
-        <div className="col-span-1 @md:col-span-2">
+      <div className="grid grid-cols-1 @lg:grid-cols-2 @3xl:grid-cols-4 gap-3 items-stretch">
+        <div className="col-span-1 @lg:col-span-2">
           <Link
             href={`/project/${ref}/integrations/${primaryIntegration.id}/overview`}
             className="block h-full rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:ring-offset-1 focus-visible:ring-offset-background"
