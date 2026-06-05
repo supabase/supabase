@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { parseSchemaComment } from 'stripe-experiment-sync/supabase'
 
 import { type WrapperMeta } from '../Wrappers/Wrappers.types'
@@ -57,14 +58,27 @@ export const useProjectOAuthIntegrationData = (
     partnerIntegrations: usePartnerIntegrationsQuery({ projectRef }, { enabled }),
     oauthApps: useAuthorizedAppsQuery({ slug: org?.slug }, { enabled: !!org }),
   }
-  return {
-    data: {
+
+  // memoize to prevent object creation from triggering a re-render when the result data is used
+  // as a dependency.
+  const data = useMemo(() => {
+    return {
       apiKeys: queries.apiKeys.data ?? [],
       edgeFunctionSecrets: queries.edgeFunctionSecrets.data ?? [],
       authConfig: queries.authConfig.data,
       partnerIntegrations: queries.partnerIntegrations.data ?? [],
       oauthApps: queries.oauthApps.data ?? [],
-    },
+    }
+  }, [
+    queries.apiKeys.data,
+    queries.edgeFunctionSecrets.data,
+    queries.authConfig.data,
+    queries.partnerIntegrations.data,
+    queries.oauthApps.data,
+  ])
+
+  return {
+    data,
     error:
       Object.values(queries)
         .map((q) => q.error)
