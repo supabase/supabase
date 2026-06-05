@@ -201,7 +201,7 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
               disabled={subscriptionUpdateDisabled || isSubmitting}
               onClick={onSubmit}
             >
-              Confirm downgrade
+              Downgrade Now
             </Button>
           </ProjectUpdateDisabledTooltip>
         </DialogFooter>
