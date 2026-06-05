@@ -8,7 +8,9 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export function DataTableResetButton() {
   const { table } = useDataTable()
-  useShortcut(SHORTCUT_IDS.DATA_TABLE_RESET_FILTERS, () => table.resetColumnFilters())
+  useShortcut(SHORTCUT_IDS.DATA_TABLE_RESET_FILTERS, () => table.resetColumnFilters(), {
+    registerInCommandMenu: true,
+  })
 
   return (
     <ShortcutTooltip

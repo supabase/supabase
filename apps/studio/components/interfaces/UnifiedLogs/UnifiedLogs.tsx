@@ -342,7 +342,9 @@ export const UnifiedLogs = () => {
   const isMobile = useIsMobile()
   const [isFilterBarOpen, setIsFilterBarOpen] = useState(!isMobile)
 
-  useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS, () => setIsFilterBarOpen((prev) => !prev))
+  useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS, () => setIsFilterBarOpen((prev) => !prev), {
+    registerInCommandMenu: true,
+  })
   useShortcut(SHORTCUT_IDS.UNIFIED_LOGS_CLEAR_FILTERS, () => table.resetColumnFilters(), {
     enabled: columnFilters.length > 0,
     registerInCommandMenu: true,

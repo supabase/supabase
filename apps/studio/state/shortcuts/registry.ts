@@ -261,19 +261,19 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
   },
   [SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS]: {
     id: SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS,
-    label: 'Toggle data table filter controls',
+    label: 'Toggle filter sidebar',
     sequence: ['Mod+B'],
     showInSettings: false,
   },
   [SHORTCUT_IDS.DATA_TABLE_RESET_FILTERS]: {
     id: SHORTCUT_IDS.DATA_TABLE_RESET_FILTERS,
-    label: 'Reset data table filters',
+    label: 'Reset filters',
     sequence: ['Mod+Escape'],
     showInSettings: false,
   },
   [SHORTCUT_IDS.DATA_TABLE_RESET_COLUMNS]: {
     id: SHORTCUT_IDS.DATA_TABLE_RESET_COLUMNS,
-    label: 'Reset data table columns',
+    label: 'Reset columns',
     sequence: ['Mod+U'],
     showInSettings: false,
   },

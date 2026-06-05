@@ -19,7 +19,7 @@ interface LiveButtonProps {
 export function LiveButton({ fetchPreviousPage, searchParamsParser }: LiveButtonProps) {
   const [{ live, date, sort }, setSearch] = useQueryStates(searchParamsParser)
   const { table } = useDataTable()
-  useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_LIVE, handleClick)
+  useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_LIVE, handleClick, { registerInCommandMenu: true })
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout
