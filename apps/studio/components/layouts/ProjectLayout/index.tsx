@@ -25,7 +25,7 @@ import {
 } from 'ui'
 
 import { useEditorType } from '../editors/EditorsLayout.hooks'
-import { useSetMainScrollContainer } from '../MainScrollContainerContext'
+import { useMainScrollContainer, useSetMainScrollContainer } from '../MainScrollContainerContext'
 import { useMobileSheet } from '../Navigation/NavigationBar/MobileSheetContext'
 import ProductMenuBar from '../Navigation/ProductMenuBar'
 import BuildingState from './BuildingState'
@@ -169,6 +169,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const pathname = getPathnameWithoutQuery(router.asPath, router.pathname)
     const currentSectionKey = getSectionKeyFromPathname(pathname)
 
+    const mainScrollContainer = useMainScrollContainer()
     const setMainScrollContainer = useSetMainScrollContainer()
     const combinedRef = mergeRefs(ref, setMainScrollContainer)
 
@@ -244,6 +245,10 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       })
       return unregister
     }, [registerOpenMenu, productMenu, product, currentSectionKey, setMobileSheetContent])
+
+    useLayoutEffect(() => {
+      mainScrollContainer?.scrollTo({ top: 0, left: 0 })
+    }, [pathname, mainScrollContainer])
 
     return (
       <>

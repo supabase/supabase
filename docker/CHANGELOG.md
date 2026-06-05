@@ -159,7 +159,7 @@ See per-service updates below for details. Only the most important changes relev
 - ⚠️ Added `PGRST_DB_SCHEMAS`, `PGRST_DB_EXTRA_SEARCH_PATH`, and `PGRST_DB_MAX_ROWS` to Studio configuration (requires `docker-compose.yml` update) - PR [#43268](https://github.com/supabase/supabase/pull/43268)
 
 ### MCP Server
-- Updated to `v0.7.0` - [Release](https://github.com/supabase-community/supabase-mcp/releases/tag/v0.7.0)
+- Updated to `v0.7.0` - [Release](https://github.com/supabase/mcp/releases/tag/v0.7.0)
 
 ### API gateway
 - ⚠️ Updated Kong to `3.9.1` - PR [#43554](https://github.com/supabase/supabase/pull/43554)
@@ -206,7 +206,7 @@ See per-service updates below for details. Only the most important changes relev
 - Added Edge Functions management UI (requires `docker-compose.yml` update) - PR [#40690](https://github.com/supabase/supabase/pull/40690), PR [#42322](https://github.com/supabase/supabase/pull/42322), PR [#42349](https://github.com/supabase/supabase/pull/42349), PR [#42350](https://github.com/supabase/supabase/pull/42350)
 
 ### MCP Server
-- Updated to `v0.6.3` - [Release](https://github.com/supabase-community/supabase-mcp/releases/tag/v0.6.3)
+- Updated to `v0.6.3` - [Release](https://github.com/supabase/mcp/releases/tag/v0.6.3)
 
 ### Auth
 - Updated to `v2.186.0` - [Changelog](https://github.com/supabase/auth/blob/master/CHANGELOG.md) | [Release](https://github.com/supabase/auth/releases/tag/v2.186.0)
@@ -304,7 +304,7 @@ See per-service updates below for details. Only the most important changes relev
 - Fixed an issue with the Users page not being updated on changes - PR [#41254](https://github.com/supabase/supabase/pull/41254)
 
 ### MCP Server
-- Updated to `v0.5.10` - [Release](https://github.com/supabase-community/supabase-mcp/releases/tag/v0.5.10)
+- Updated to `v0.5.10` - [Release](https://github.com/supabase/mcp/releases/tag/v0.5.10)
 
 ### Auth
 - Updated to `v2.184.0` - [Changelog](https://github.com/supabase/auth/blob/master/CHANGELOG.md) | [Release](https://github.com/supabase/auth/releases/tag/v2.184.0)
@@ -325,7 +325,7 @@ See per-service updates below for details. Only the most important changes relev
 - ⚠️ Fixed security issues related to [React2Shell](https://vercel.com/kb/bulletin/react2shell)
 
 ### MCP Server
-- Updated to `v0.5.9` - [Release](https://github.com/supabase-community/supabase-mcp/releases/tag/v0.5.9)
+- Updated to `v0.5.9` - [Release](https://github.com/supabase/mcp/releases/tag/v0.5.9)
 - ⚠️ Changed MCP tool `get_anon_key` to `get_publishable_keys`
 
 ### PostgREST
