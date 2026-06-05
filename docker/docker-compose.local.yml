@@ -1,0 +1,150 @@
+# docker-compose.local.yml
+#
+# All-in-one override to run THIS fork locally with a single command.
+# It does two things the default stack does NOT:
+#   1. Builds Studio from your local source (apps/studio) instead of pulling the
+#      published image, so the "Sites" product + self-hosted edge-function
+#      management (UI + API routes) are actually present.
+#   2. Adds the web-hosting stack: nginx + the privileged hosting-agent sidecar
+#      + SFTP (and optional FTPS behind the `ftps` profile).
+#
+# Usage (run from the docker/ directory):
+#   cp .env.example .env
+#   # then set, at minimum: POSTGRES_PASSWORD, DASHBOARD_PASSWORD, JWT_SECRET,
+#   # HOSTING_AGENT_TOKEN (`openssl rand -hex 32`), PROXY_DOMAIN, CERTBOT_EMAIL
+#   docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build
+#
+# Or register it once so plain `docker compose up -d --build` picks it up:
+#   sh run.sh config add local
+#   docker compose up -d --build
+#
+# Access:
+#   - Dashboard (direct, easiest locally): http://localhost:8000  (kong)
+#   - Dashboard via nginx + TLS:           https://<PROXY_DOMAIN> (self-signed
+#     cert on first boot until certbot obtains a real one; needs a public domain)
+#   - Hosted sites: served by nginx on ports 80/443 at each site's domain.
+
+services:
+  # Build Studio from local source instead of the prebuilt `image:` in the base
+  # file. Context is the repo root (..); .dockerignore keeps node_modules/.next
+  # out of the build context. `ignoreBuildErrors` in next.config lets the image
+  # build even though `pnpm typecheck` currently has 1 unused-var error.
+  studio:
+    build:
+      context: ..
+      dockerfile: apps/studio/Dockerfile
+      target: production
+    environment:
+      WEB_HOSTING_ROOT: /var/www
+      HOSTING_AGENT_URL: http://hosting-agent:9000
+      HOSTING_AGENT_TOKEN: ${HOSTING_AGENT_TOKEN}
+    volumes:
+      - ./volumes/www:/var/www
+
+  # Inject the self-hosted edge-function secrets that Studio manages from the
+  # dashboard. Studio writes them to <EDGE_FUNCTIONS_MANAGEMENT_FOLDER>/.env,
+  # i.e. the host file ./volumes/functions/.env (the same volume the edge
+  # runtime mounts at /home/deno/functions). Without this the secrets are stored
+  # but never reach the running functions.
+  #
+  # `required: false` keeps `up` working before any secret exists — the file is
+  # created when you save the first secret in Studio. Env vars are NOT
+  # hot-reloaded: run `docker compose restart functions` after adding/changing
+  # secrets. (If your Docker Compose is older than v2.24, it lacks `required`;
+  # then `touch volumes/functions/.env` once and use a plain list item instead.)
+  functions:
+    env_file:
+      - path: ./volumes/functions/.env
+        required: false
+
+  # TLS-terminating reverse proxy. Serves the dashboard and the per-site server
+  # blocks written by the hosting-agent (template `include /etc/nginx/sites/*`).
+  nginx:
+    container_name: supabase-nginx
+    image: jonasal/nginx-certbot:6.2.0-nginx1.31.0
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      kong:
+        condition: service_healthy
+      studio:
+        condition: service_healthy
+    environment:
+      PROXY_DOMAIN: ${PROXY_DOMAIN}
+      CERTBOT_EMAIL: ${CERTBOT_EMAIL}
+      PROXY_AUTH_USERNAME: ${DASHBOARD_USERNAME}
+      PROXY_AUTH_PASSWORD: ${DASHBOARD_PASSWORD}
+    command:
+      - /bin/bash
+      - -c
+      - |
+        printf '%s:%s\n' "$${PROXY_AUTH_USERNAME}" "$$(openssl passwd -apr1 "$${PROXY_AUTH_PASSWORD}")" > /etc/nginx/user_conf.d/dashboard-passwd && \
+        envsubst '$${PROXY_DOMAIN}' < /etc/nginx/supabase-nginx.conf.tpl > /etc/nginx/user_conf.d/nginx.conf && \
+        /scripts/start_nginx_certbot.sh
+    volumes:
+      - ./volumes/proxy/nginx/supabase-nginx.conf.tpl:/etc/nginx/supabase-nginx.conf.tpl:ro
+      # Per-site server blocks written by the hosting agent (included by the template).
+      - ./volumes/proxy/nginx/sites:/etc/nginx/sites
+      # Static/SPA docroots served by nginx (read-only is enough to serve).
+      - ./volumes/www:/var/www:ro
+      - nginx_letsencrypt:/etc/letsencrypt
+
+  # Privileged sidecar that owns nginx site config + reloads. Studio calls it
+  # over the internal network with a bearer token — Studio itself never touches
+  # the Docker socket. This is the single component with elevated host access.
+  hosting-agent:
+    container_name: supabase-hosting-agent
+    build:
+      context: ./hosting-agent
+    restart: unless-stopped
+    environment:
+      HOSTING_AGENT_TOKEN: ${HOSTING_AGENT_TOKEN}
+      NGINX_CONTAINER_NAME: supabase-nginx
+      NGINX_SITES_DIR: /etc/nginx/sites
+      KONG_UPSTREAM: kong_upstream
+    volumes:
+      - ./volumes/proxy/nginx/sites:/etc/nginx/sites
+      # Needed to send a reload (SIGHUP) signal to the nginx container.
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  # Secure file access to the docroots (recommended). One chrooted user per site.
+  sftp:
+    container_name: supabase-sftp
+    image: atmoz/sftp:alpine
+    restart: unless-stopped
+    ports:
+      - "${SFTP_PORT:-2222}:22"
+    volumes:
+      - ./volumes/www:/home
+      - ./volumes/sftp/users.conf:/etc/sftp/users.conf:ro
+      - ./volumes/sftp/ssh:/etc/ssh/keys:ro
+
+  # Optional FTP-over-TLS for classic FTP clients. Off by default; enable with
+  # `--profile ftps`. Set FTPS_PASS in .env before enabling.
+  ftps:
+    container_name: supabase-ftps
+    image: garethflowers/ftp-server:latest
+    restart: unless-stopped
+    profiles:
+      - ftps
+    environment:
+      FTP_USER: ${FTPS_USER:-supabase}
+      FTP_PASS: ${FTPS_PASS:-}
+    ports:
+      - "${FTPS_PORT:-21}:21"
+      - "40000-40009:40000-40009"
+    volumes:
+      - ./volumes/www:/home/user
+
+  # NOTE: For a production deployment where only nginx should be internet-facing,
+  # also stop exposing kong directly by adding a kong override:
+  #   kong:
+  #     ports: !reset []
+  #     environment:
+  #       KONG_PORT_MAPS: "443:8000,443:8443"
+  # Left out here so the dashboard stays reachable at http://localhost:8000 locally.
+
+volumes:
+  nginx_letsencrypt:
