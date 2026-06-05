@@ -23,6 +23,7 @@ import { getTableAdmonitionMessage, getTableDataApiStatus } from './PolicyTableR
 import { PolicyTableRowHeader } from './PolicyTableRowHeader'
 import AlertError from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { QuickStartSnippet } from '@/components/ui/QuickStartSnippet'
 import { useTableApiAccessQuery } from '@/data/privileges/table-api-access-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
@@ -151,7 +152,22 @@ const PolicyTableRowComponent = ({
       {showPolicies && (
         <CardContent className="p-0">
           {policies.length === 0 ? (
-            <p className="text-foreground-lighter text-sm p-4">No policies created yet</p>
+            <div className="p-4 flex flex-col items-start gap-3">
+              <p className="text-foreground-lighter text-sm">
+                No policies created yet. Most tables need at least one policy per role + command
+                pair. As a starting point:
+              </p>
+              <QuickStartSnippet
+                caption="Allow signed-in users to read their own rows:"
+                snippet={`create policy "Users can read their own rows"
+on ${table.schema}.${table.name}
+for select
+to authenticated
+using ((select auth.uid()) = user_id);`}
+                language="sql"
+                className="max-w-full mt-0"
+              />
+            </div>
           ) : (
             <Table className="table-fixed">
               <TableHeader>
