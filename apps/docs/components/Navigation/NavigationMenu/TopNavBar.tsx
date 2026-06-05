@@ -121,7 +121,9 @@ const HeaderLogo = memo(() => {
         height={navigationLogo?.height ?? 18}
         alt="Supabase wordmark"
       />
-      <span className="font-mono text-sm font-medium text-brand-link mb-px">DOCS</span>
+      <span className="font-mono text-sm font-medium text-brand-link mb-px ml-2 pl-2 border-l border-default">
+        DOCS
+      </span>
     </Link>
   )
 })

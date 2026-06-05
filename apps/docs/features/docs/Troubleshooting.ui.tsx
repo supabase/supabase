@@ -1,18 +1,18 @@
 import Link from 'next/link'
 import { Fragment } from 'react'
-
 import { cn } from 'ui'
+
 import { TroubleshootingFilter } from './Troubleshooting.ui.client'
 import {
-  type ITroubleshootingEntry,
-  type ITroubleshootingMetadata,
   getArticleSlug,
   getTroubleshootingUpdatedDates,
+  type ITroubleshootingEntry,
+  type ITroubleshootingMetadata,
 } from './Troubleshooting.utils'
 import {
   formatError,
-  TROUBLESHOOTING_DATA_ATTRIBUTES,
   TROUBLESHOOTING_CONTAINER_ID,
+  TROUBLESHOOTING_DATA_ATTRIBUTES,
 } from './Troubleshooting.utils.shared'
 
 export async function TroubleshootingPreview({ entry }: { entry: ITroubleshootingEntry }) {
@@ -104,7 +104,7 @@ export function TroubleshootingHeader({
   return (
     <div className="lg:sticky lg:top-(--header-height) lg:z-10 bg-background">
       <div className="pt-8 pb-6 px-5">
-        <h1 className="text-4xl tracking-tight mb-7">{title}</h1>
+        <h1 className="font-heading text-4xl tracking-tight mb-7">{title}</h1>
         <p className="text-lg text-foreground-light">{description}</p>
         <hr className="my-7" aria-hidden />
         <TroubleshootingFilter

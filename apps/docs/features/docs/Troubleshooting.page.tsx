@@ -1,9 +1,10 @@
-import { Github } from 'lucide-react'
-import Link from 'next/link'
-import { cn } from 'ui'
 import Breadcrumbs from '~/components/Breadcrumbs'
 import { Feedback } from '~/components/Feedback'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
+import { Github } from 'lucide-react'
+import Link from 'next/link'
+import { cn } from 'ui'
+
 import { MDXRemoteBase } from './MdxBase'
 import { getTroubleshootingUpdatedDates, type ITroubleshootingEntry } from './Troubleshooting.utils'
 import { formatError, serializeTroubleshootingSearchParams } from './Troubleshooting.utils.shared'
@@ -21,7 +22,7 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
       <div className="px-5 py-8 lg:px-0 lg:py-0">
         <Breadcrumbs minLength={1} forceDisplayOnMobile />
         <article className="prose max-w-none mt-4">
-          <h1>{entry.data.title}</h1>
+          <h1 className="font-heading">{entry.data.title}</h1>
           {dateUpdated && (
             <p className="text-sm text-foreground-lighter">
               Last edited: {dateUpdated.toLocaleDateString()}

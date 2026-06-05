@@ -1,9 +1,7 @@
+import MenuIconPicker from '~/components/Navigation/NavigationMenu/MenuIconPicker'
 import { Github } from 'lucide-react'
 import Link from 'next/link'
-
 import { cn } from 'ui'
-
-import MenuIconPicker from '~/components/Navigation/NavigationMenu/MenuIconPicker'
 
 interface ClientLibHeaderProps {
   menuData: {
@@ -29,7 +27,7 @@ function ClientLibHeader({ menuData, className }: ClientLibHeaderProps) {
         />
       )}
       <div className="flex flex-col gap-2">
-        <h1 id="introduction" className="text-3xl text-foreground">
+        <h1 id="introduction" className="font-heading text-3xl text-foreground">
           {menuData.title} Client Library
         </h1>
         <span
