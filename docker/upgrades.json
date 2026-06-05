@@ -1,0 +1,22 @@
+{
+  "_schema": {
+    "description": "Manual-action manifest for self-hosted upgrades, read by update.sh via the generated upgrades.json. See the header comment in upgrades.yml for the authoring rules. Only releases needing manual action appear as date keys.",
+    "fields": {
+      "breaking": "bool - requires explicit user confirmation before applying",
+      "gate": "string|null - script to run before upgrading past this release (e.g. utils/upgrade-pg17.sh)",
+      "migration_guide_url": "string|null - link to the per-release migration guide",
+      "requires": "string[] - free-text manual steps shown to the user"
+    },
+    "example": {
+      "2026-08-01": {
+        "breaking": true,
+        "gate": "utils/upgrade-pg17.sh",
+        "migration_guide_url": "https://github.com/orgs/supabase/discussions/46080",
+        "requires": [
+          "Back up your database before proceeding.",
+          "Run utils/upgrade-pg17.sh to migrate Postgres 15 -> 17, then recreate containers."
+        ]
+      }
+    }
+  }
+}

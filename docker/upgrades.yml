@@ -1,0 +1,46 @@
+# Upgrade manifest — SOURCE OF TRUTH. Hand-edit this file.
+#
+# Read by docker/update.sh (indirectly) to gate upgrades. After editing,
+# regenerate the JSON the runtime actually reads and commit BOTH files:
+#
+#   sh utils/gen-upgrades-json.sh
+#
+# (CI checks upgrades.yml and upgrades.json stay in sync.) update.sh parses the
+# generated upgrades.json with jq, so user machines never need yq.
+#
+# Top-level keys are release dates (YYYY-MM-DD); post-RFC, self-hosted/vX.Y.Z
+# tags. ONLY add an entry for a release that needs an action a file diff cannot
+# encode: a data migration, a run-this-first script, or a breaking default.
+# Routine config changes are applied automatically by update.sh's 3-way merge
+# and must NOT be listed here. The CHANGELOG is the human narrative; this file
+# is the machine-readable gate.
+#
+# Entry shape:
+#   "YYYY-MM-DD":
+#     breaking: true|false          # require explicit confirmation
+#     gate: utils/some-script.sh    # or null — must be run before upgrading past this release
+#     migration_guide_url: https://…  # or null
+#     requires:                     # free-text manual steps shown to the user
+#       - Step one.
+#       - Step two.
+
+_schema:
+  description: >-
+    Manual-action manifest for self-hosted upgrades, read by update.sh via the
+    generated upgrades.json. See the header comment in upgrades.yml for the
+    authoring rules. Only releases needing manual action appear as date keys.
+  fields:
+    breaking: "bool - requires explicit user confirmation before applying"
+    gate: "string|null - script to run before upgrading past this release (e.g. utils/upgrade-pg17.sh)"
+    migration_guide_url: "string|null - link to the per-release migration guide"
+    requires: "string[] - free-text manual steps shown to the user"
+  example:
+    "2026-08-01":
+      breaking: true
+      gate: utils/upgrade-pg17.sh
+      migration_guide_url: https://github.com/orgs/supabase/discussions/46080
+      requires:
+        - Back up your database before proceeding.
+        - Run utils/upgrade-pg17.sh to migrate Postgres 15 -> 17, then recreate containers.
+
+# --- Release entries below (none active yet; current releases need no gate) ---

@@ -203,15 +203,33 @@ install_aws() {
     rm -rf "$tmp"
 }
 
+REPO_URL="${SUPABASE_REPO_URL:-https://github.com/supabase/supabase}"
 SRC_DIR=""
 SRC_TMP=""
+SRC_REF=""   # the release tag we installed, or empty when falling back to master
+
+# Highest self-hosted/v* tag on the remote, or empty. Queries the URL directly.
+latest_release_tag() {
+    git ls-remote --tags --refs "$REPO_URL" 2>/dev/null \
+        | sed 's#^.*refs/tags/##' \
+        | grep -E '^self-hosted/v[0-9]' \
+        | sort -V | tail -n1
+}
 
 prepare_source() {
-    log "Sparse-cloning supabase repo"
     SRC_TMP=$(mktemp -d) || return 1
-    git clone --filter=blob:none --no-checkout --depth=1 --quiet \
-        https://github.com/supabase/supabase "$SRC_TMP/supabase" 2>/dev/null || \
-    { rm -rf "$SRC_TMP"; return 1; }
+    SRC_REF=$(latest_release_tag)
+    if [ -n "$SRC_REF" ]; then
+        log "Installing latest release: $SRC_REF"
+        git clone --filter=blob:none --no-checkout --depth=1 --quiet \
+            --branch "$SRC_REF" "$REPO_URL" "$SRC_TMP/supabase" 2>/dev/null || \
+        { rm -rf "$SRC_TMP"; return 1; }
+    else
+        log "No self-hosted/v* release tags found; installing from master"
+        git clone --filter=blob:none --no-checkout --depth=1 --quiet \
+            "$REPO_URL" "$SRC_TMP/supabase" 2>/dev/null || \
+        { rm -rf "$SRC_TMP"; return 1; }
+    fi
 
     cd "$SRC_TMP/supabase" || { rm -rf "$SRC_TMP"; return 1; }
     git sparse-checkout init --cone && \
@@ -272,6 +290,24 @@ if [ -f "$target/.env.example" ] && [ ! -f "$target/.env" ]; then
 fi
 
 cd "$target"
+
+# Record the version this deployment was created from so update.sh can later
+# 3-way merge newer vendor files against it. This file is per-deployment state
+# (gitignored), not vendor content — see .gitignore. Prefer the release tag;
+# fall back to the commit SHA when installing from master (no tags yet).
+if [ -n "$SRC_REF" ]; then
+    src_ref="$SRC_REF"
+else
+    src_ref=$(git -C "$SRC_TMP/supabase" rev-parse HEAD 2>/dev/null || true)
+fi
+src_date=$(grep -oE '## \[[0-9]{4}-[0-9]{2}-[0-9]{2}\]' CHANGELOG.md 2>/dev/null \
+    | head -n1 | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' || true)
+{
+    echo "# Supabase self-hosted version stamp. Managed by setup.sh / update.sh."
+    [ -n "$src_ref" ]  && echo "ref=$src_ref"
+    [ -n "$src_date" ] && echo "date=$src_date"
+} > .supabase-version
+[ -n "$src_ref" ] && log "Recorded base version ${src_ref} in .supabase-version"
 
 current_public_url=$(read_env SUPABASE_PUBLIC_URL)
 current_api_url=$(read_env API_EXTERNAL_URL)
