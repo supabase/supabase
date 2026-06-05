@@ -85,13 +85,13 @@ describe('LogDrainDestinationSheetForm', () => {
     useTrackMock.mockReturnValue(trackMock)
   })
 
-  it('shows the JSON content type header for webhook create mode', async () => {
+  it('does not prefill a Content-Type header for webhook create mode', async () => {
     renderForm()
 
     await screen.findByRole('dialog')
 
-    expect(screen.getByDisplayValue('Content-Type')).toBeInTheDocument()
-    expect(screen.getByDisplayValue('application/json')).toBeInTheDocument()
+    expect(screen.queryByDisplayValue('Content-Type')).not.toBeInTheDocument()
+    expect(screen.queryByDisplayValue('application/json')).not.toBeInTheDocument()
   })
 
   it('wraps the save button with the save destination shortcut while open', async () => {
@@ -169,8 +169,8 @@ describe('LogDrainDestinationSheetForm', () => {
     const headerNameInputs = screen.getAllByPlaceholderText('Header name')
     const headerValueInputs = screen.getAllByPlaceholderText('Header value')
 
-    await user.type(headerNameInputs[1], 'X-API-Key')
-    await user.type(headerValueInputs[1], 'secret-key')
+    await user.type(headerNameInputs[0], 'X-API-Key')
+    await user.type(headerValueInputs[0], 'secret-key')
 
     submitForm()
 
@@ -179,7 +179,6 @@ describe('LogDrainDestinationSheetForm', () => {
       expect.objectContaining({
         type: 'webhook',
         headers: {
-          'Content-Type': 'application/json',
           'X-API-Key': 'secret-key',
         },
       })
@@ -199,12 +198,15 @@ describe('LogDrainDestinationSheetForm', () => {
       'https://logs.example.com/ingest'
     )
     await user.click(screen.getByRole('button', { name: 'Add a new header' }))
+    await user.click(screen.getByRole('button', { name: 'Add a new header' }))
 
     const headerNameInputs = screen.getAllByPlaceholderText('Header name')
     const headerValueInputs = screen.getAllByPlaceholderText('Header value')
 
-    await user.type(headerNameInputs[1], 'Content-Type')
-    await user.type(headerValueInputs[1], 'application/custom')
+    await user.type(headerNameInputs[0], 'X-Custom')
+    await user.type(headerValueInputs[0], 'one')
+    await user.type(headerNameInputs[1], 'X-Custom')
+    await user.type(headerValueInputs[1], 'two')
 
     submitForm()
 
@@ -231,11 +233,9 @@ describe('LogDrainDestinationSheetForm', () => {
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
         type: 'webhook',
-        headers: {
-          'Content-Type': 'application/json',
-        },
       })
     )
+    expect(onSubmit.mock.calls[0][0]).not.toHaveProperty('headers')
     expect(screen.queryByText('undefined')).not.toBeInTheDocument()
   })
 
@@ -253,7 +253,7 @@ describe('LogDrainDestinationSheetForm', () => {
     await user.click(screen.getByRole('button', { name: 'Add a new header' }))
 
     const headerNameInputs = screen.getAllByPlaceholderText('Header name')
-    await user.type(headerNameInputs[1], 'X-Draft-Only')
+    await user.type(headerNameInputs[0], 'X-Draft-Only')
 
     submitForm()
 
@@ -276,7 +276,7 @@ describe('LogDrainDestinationSheetForm', () => {
     await user.click(screen.getByRole('button', { name: 'Add a new header' }))
 
     const headerValueInputs = screen.getAllByPlaceholderText('Header value')
-    await user.type(headerValueInputs[1], 'draft-value')
+    await user.type(headerValueInputs[0], 'draft-value')
 
     submitForm()
 
