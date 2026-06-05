@@ -61,6 +61,9 @@ services:
 
       SNIPPETS_MANAGEMENT_FOLDER: /app/snippets
       EDGE_FUNCTIONS_MANAGEMENT_FOLDER: /app/edge-functions
+      # Mirrors the edge-runtime's global VERIFY_JWT so Studio's invoke snippet shows the
+      # Authorization header when JWT verification is enforced.
+      FUNCTIONS_VERIFY_JWT: ${FUNCTIONS_VERIFY_JWT}
     volumes:
       - ./volumes/snippets:/app/snippets:z
       - ./volumes/functions:/app/edge-functions:ro,z
