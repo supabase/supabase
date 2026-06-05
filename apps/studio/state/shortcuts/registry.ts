@@ -57,6 +57,7 @@ import { STORAGE_BUCKETS_SHORTCUT_IDS, storageBucketsRegistry } from './registry
 import { STORAGE_EXPLORER_SHORTCUT_IDS, storageExplorerRegistry } from './registry/storage-explorer'
 import { STORAGE_NAV_SHORTCUT_IDS, storageNavRegistry } from './registry/storage-nav'
 import { TABLE_EDITOR_SHORTCUT_IDS, tableEditorRegistry } from './registry/table-editor'
+import { UNIFIED_LOGS_SHORTCUT_IDS, unifiedLogsRegistry } from './registry/unified-logs'
 import { ShortcutDefinition } from './types'
 
 /**
@@ -83,7 +84,6 @@ export const SHORTCUT_IDS = {
   OPERATION_QUEUE_SAVE: 'operation-queue.save',
   OPERATION_QUEUE_TOGGLE: 'operation-queue.toggle',
   OPERATION_QUEUE_UNDO: 'operation-queue.undo',
-  UNIFIED_LOGS_RESET_FOCUS: 'unified-logs.reset-focus',
   NAV_HOME: 'nav.home',
   NAV_TABLE_EDITOR: 'nav.table-editor',
   NAV_SQL_EDITOR: 'nav.sql-editor',
@@ -123,6 +123,9 @@ export const SHORTCUT_IDS = {
 
   // Table editor shortcuts
   ...TABLE_EDITOR_SHORTCUT_IDS,
+
+  // Unified Logs page shortcuts
+  ...UNIFIED_LOGS_SHORTCUT_IDS,
 
   // SQL editor shortcuts
   ...SQL_EDITOR_SHORTCUT_IDS,
@@ -304,12 +307,6 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
     sequence: ['Mod+Z'],
     showInSettings: false,
   },
-  [SHORTCUT_IDS.UNIFIED_LOGS_RESET_FOCUS]: {
-    id: SHORTCUT_IDS.UNIFIED_LOGS_RESET_FOCUS,
-    label: 'Reset focus in logs',
-    sequence: ['Mod+.'],
-    showInSettings: false,
-  },
   [SHORTCUT_IDS.NAV_HOME]: {
     id: SHORTCUT_IDS.NAV_HOME,
     label: 'Go to Project Overview',
@@ -479,6 +476,9 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
 
   // Table editor shortcut registration
   ...tableEditorRegistry,
+
+  // Unified Logs page shortcut registration
+  ...unifiedLogsRegistry,
 
   // SQL editor shortcut registration
   ...sqlEditorRegistry,

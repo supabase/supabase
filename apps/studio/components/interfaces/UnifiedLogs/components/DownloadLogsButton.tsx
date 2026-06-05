@@ -27,8 +27,10 @@ import {
 } from 'ui'
 
 import { QuerySearchParamsType } from '../UnifiedLogs.types'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useGetUnifiedLogsMutation } from '@/data/logs/get-unified-logs'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const DEFAULT_NUM_ROWS = '100'
 const DEFAULT_DURATION = '1'
@@ -44,6 +46,11 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
   const [numRows, setNumRows] = useState(DEFAULT_NUM_ROWS)
   const [numHours, setNumHours] = useState(DEFAULT_NUM_ROWS)
   const [selectedFormat, setSelectedFormat] = useState<'csv' | 'json'>()
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+  useShortcut(SHORTCUT_IDS.UNIFIED_LOGS_DOWNLOAD, () => setIsMenuOpen(true), {
+    registerInCommandMenu: true,
+  })
 
   const { mutate: retrieveLogs, isPending } = useGetUnifiedLogsMutation({
     onSuccess: (res) => {
@@ -93,14 +100,16 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <DropdownMenuTrigger asChild>
-          <ButtonTooltip
-            type="default"
-            className="w-[26px]"
-            icon={<Download className="text-foreground" />}
-            tooltip={{ content: { side: 'bottom', text: 'Download logs' } }}
-          />
+          <ShortcutTooltip shortcutId={SHORTCUT_IDS.UNIFIED_LOGS_DOWNLOAD} side="bottom">
+            <Button
+              type="default"
+              className="w-[26px]"
+              icon={<Download className="text-foreground" />}
+              aria-label="Download logs"
+            />
+          </ShortcutTooltip>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-44">
           {isLogs && IS_PLATFORM && (
