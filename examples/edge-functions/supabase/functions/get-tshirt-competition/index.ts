@@ -31,12 +31,7 @@ export default {
       const size = url.searchParams.get('size')
       const answer = url.searchParams.get('answer')
 
-      if (
-        !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email ?? '') ||
-        !answer ||
-        !twitter ||
-        !size
-      ) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email ?? '') || !answer || !twitter || !size) {
         throw new Error(
           `Please provide valid 'email', 'twitter', 'size', and 'answer' params. HINT: https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/get-tshirt-competition/index.ts`
         )

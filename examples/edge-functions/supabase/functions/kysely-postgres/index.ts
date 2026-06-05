@@ -89,7 +89,7 @@ export default {
       })
     } catch (err) {
       console.error(err)
-      return new Response(String(err?.message ?? err), { status: 500 })
+      return new Response('Internal Server Error', { status: 500 })
     }
   }),
 }
