@@ -1,0 +1,18 @@
+# docker-compose.studio-build.yml
+#
+# Build Studio from local source (apps/studio) so the fork's "Sites" + self-hosted
+# edge-function management UI/API are present. Pair with docker-compose.local.yml.
+#
+# Context is the repo root (..); .dockerignore keeps node_modules/.next out of the
+# build context. `ignoreBuildErrors` in next.config lets the image build despite
+# the known unused-var typecheck error.
+#
+# NOTE: building Studio (a large Next.js app) is RAM-heavy. On a small server,
+# pull a prebuilt image instead — see docker-compose.studio-image.yml and
+# `install.sh --studio-image <ref>`.
+services:
+  studio:
+    build:
+      context: ..
+      dockerfile: apps/studio/Dockerfile
+      target: production

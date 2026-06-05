@@ -12,9 +12,10 @@
 #   3. (Optional) Adds a swapfile on low-RAM hosts so the Studio build won't OOM.
 #   4. Generates ALL secrets and API keys into docker/.env
 #      (legacy HS256 keys + asymmetric ES256/JWKS + opaque keys + a hosting token).
-#   5. Wires the all-in-one override (docker-compose.local.yml): builds Studio from
-#      source + nginx + hosting-agent + SFTP + edge-function secrets env_file.
-#   6. Builds and starts the full stack, waits for health.
+#   5. Wires the overrides: the web-hosting stack (nginx + hosting-agent + SFTP +
+#      edge-function secrets env_file) plus EITHER building Studio from source
+#      (default) OR pulling a prebuilt fork image (--studio-image <ref>).
+#   6. Builds/pulls and starts the full stack, waits for health.
 #   7. Prints AND saves every URL, login, password and secret to
 #      docker/ACCESS-CREDENTIALS.txt (chmod 600).
 #
@@ -29,6 +30,9 @@
 #   --domain <d>   | DOMAIN   Public domain pointing at this server (enables real TLS).
 #                            Omit for local/IP mode (self-signed cert, dashboard on :8000).
 #   --email  <e>   | EMAIL    Let's Encrypt contact email (default: admin@<domain>).
+#   --studio-image <ref> | STUDIO_IMAGE  Pull a prebuilt Studio image instead of
+#                           building on this host (best for small servers), e.g.
+#                           ghcr.io/<owner>/supabase-studio:fork.
 #   --enable-ftps            Also start the FTPS service (off by default).
 #   --skip-deps             Don't install system packages (also skips apt upgrade).
 #   --reset-secrets         Regenerate .env even if it already exists (DESTRUCTIVE for an
@@ -64,11 +68,13 @@ SKIP_DEPS=0
 RESET_SECRETS=0
 NO_SWAP=0
 ASSUME_YES=0
+STUDIO_IMAGE="${STUDIO_IMAGE:-}"
 
 while [ $# -gt 0 ]; do
   case "$1" in
     --user)     DASH_USER="${2:-}"; shift 2 ;;
     --password) DASH_PASS="${2:-}"; shift 2 ;;
+    --studio-image) STUDIO_IMAGE="${2:-}"; shift 2 ;;
     --domain) DOMAIN="${2:-}"; shift 2 ;;
     --email)  EMAIL="${2:-}";  shift 2 ;;
     --enable-ftps)   ENABLE_FTPS=1; shift ;;
@@ -88,9 +94,17 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOCKER_DIR="$SCRIPT_DIR"
 REPO_ROOT="$(cd "$DOCKER_DIR/.." && pwd)"
 
+# Studio image strategy: build from source (default) or pull a prebuilt image.
+if [ -n "$STUDIO_IMAGE" ]; then STUDIO_MODE="image"; else STUDIO_MODE="build"; fi
+
 [ -f "$DOCKER_DIR/docker-compose.yml" ] || die "docker-compose.yml not found in $DOCKER_DIR"
 [ -f "$DOCKER_DIR/docker-compose.local.yml" ] || die "docker-compose.local.yml missing — this installer needs the fork override."
-[ -f "$REPO_ROOT/apps/studio/Dockerfile" ] || die "apps/studio/Dockerfile missing. You only have the docker/ folder — clone the FULL repo so Studio can be built from source."
+if [ "$STUDIO_MODE" = "build" ]; then
+  [ -f "$DOCKER_DIR/docker-compose.studio-build.yml" ] || die "docker-compose.studio-build.yml missing."
+  [ -f "$REPO_ROOT/apps/studio/Dockerfile" ] || die "apps/studio/Dockerfile missing. You only have the docker/ folder — clone the FULL repo to build Studio, or use --studio-image <ref> to pull a prebuilt image."
+else
+  [ -f "$DOCKER_DIR/docker-compose.studio-image.yml" ] || die "docker-compose.studio-image.yml missing."
+fi
 
 # Root / sudo
 if [ "$(id -u)" -eq 0 ]; then SUDO=""; else
@@ -180,18 +194,22 @@ install_deps() {
 # ----------------------------------------------------------------------------
 maybe_swap() {
   [ "$NO_SWAP" -eq 1 ] && return
+  [ "$STUDIO_MODE" = "image" ] && return   # no on-host build → no big RAM need
   local mem_kb swap_kb
   mem_kb=$(awk '/MemTotal/{print $2}' /proc/meminfo 2>/dev/null || echo 0)
   swap_kb=$(awk '/SwapTotal/{print $2}' /proc/meminfo 2>/dev/null || echo 0)
-  if [ "$mem_kb" -gt 0 ] && [ "$mem_kb" -lt 3145728 ] && [ "$swap_kb" -lt 1048576 ]; then
+  # Building Studio (Next.js) needs ~4-6 GB. Add swap when RAM+swap looks short.
+  if [ "$mem_kb" -gt 0 ] && [ "$mem_kb" -lt 6291456 ] && [ "$swap_kb" -lt 2097152 ]; then
     if [ ! -f /swapfile ]; then
-      log "Low RAM ($((mem_kb/1024)) MB) and little swap — creating a 4G swapfile to avoid an OOM-killed build"
-      $SUDO fallocate -l 4G /swapfile 2>/dev/null || $SUDO dd if=/dev/zero of=/swapfile bs=1M count=4096 status=none
+      log "RAM is $((mem_kb/1024)) MB — creating an 8G swapfile so the Studio build is not OOM-killed (use --no-swap to skip, or --studio-image to avoid building)"
+      $SUDO fallocate -l 8G /swapfile 2>/dev/null || $SUDO dd if=/dev/zero of=/swapfile bs=1M count=8192 status=none
       $SUDO chmod 600 /swapfile
       $SUDO mkswap /swapfile >/dev/null
       $SUDO swapon /swapfile
       grep -q '/swapfile' /etc/fstab 2>/dev/null || echo '/swapfile none swap sw 0 0' | $SUDO tee -a /etc/fstab >/dev/null
-      ok "4G swap enabled"
+      ok "8G swap enabled"
+    else
+      warn "/swapfile already exists ($((swap_kb/1024)) MB swap total) — not creating another. If the build still OOMs, add more swap or use --studio-image."
     fi
   fi
 }
@@ -293,9 +311,15 @@ configure_env() {
   set_env API_EXTERNAL_URL "$PUBLIC_URL"
   set_env SITE_URL "$PUBLIC_URL"
 
-  # Make plain `docker compose ...` pick up the override too
-  set_env COMPOSE_FILE "docker-compose.yml:docker-compose.local.yml"
-  ok "Override wired into COMPOSE_FILE"
+  # Make plain `docker compose ...` pick up the right overrides too.
+  if [ "$STUDIO_MODE" = "image" ]; then
+    set_env STUDIO_IMAGE "$STUDIO_IMAGE"
+    set_env COMPOSE_FILE "docker-compose.yml:docker-compose.local.yml:docker-compose.studio-image.yml"
+    ok "Studio image: $STUDIO_IMAGE (wired into COMPOSE_FILE)"
+  else
+    set_env COMPOSE_FILE "docker-compose.yml:docker-compose.local.yml:docker-compose.studio-build.yml"
+    ok "Overrides wired into COMPOSE_FILE (build Studio from source)"
+  fi
 
   # Tidy a stale non-secret identifier; if FTPS is enabled, ensure it has a password.
   [ "$(get_env POOLER_TENANT_ID)" = "your-tenant-id" ] && set_env POOLER_TENANT_ID "supabase"
@@ -325,13 +349,23 @@ prepare_dirs() {
 # ----------------------------------------------------------------------------
 # 5. Build + up + wait
 # ----------------------------------------------------------------------------
-COMPOSE=(docker compose -f docker-compose.yml -f docker-compose.local.yml)
+if [ "$STUDIO_MODE" = "image" ]; then
+  COMPOSE=(docker compose -f docker-compose.yml -f docker-compose.local.yml -f docker-compose.studio-image.yml)
+else
+  COMPOSE=(docker compose -f docker-compose.yml -f docker-compose.local.yml -f docker-compose.studio-build.yml)
+fi
 PROFILE_ARGS=()
 [ "$ENABLE_FTPS" -eq 1 ] && PROFILE_ARGS=(--profile ftps)
 
 build_and_up() {
-  log "Building Studio from source and starting the stack (first build can take several minutes)"
-  DOCKER_BUILDKIT=1 "${COMPOSE[@]}" "${PROFILE_ARGS[@]}" up -d --build
+  if [ "$STUDIO_MODE" = "image" ]; then
+    log "Pulling images (Studio: $STUDIO_IMAGE) and starting the stack"
+    "${COMPOSE[@]}" "${PROFILE_ARGS[@]}" pull
+    "${COMPOSE[@]}" "${PROFILE_ARGS[@]}" up -d
+  else
+    log "Building Studio from source and starting the stack (first build can take several minutes)"
+    DOCKER_BUILDKIT=1 "${COMPOSE[@]}" "${PROFILE_ARGS[@]}" up -d --build
+  fi
   ok "Containers started"
 }
 

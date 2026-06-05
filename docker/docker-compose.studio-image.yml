@@ -1,0 +1,18 @@
+# docker-compose.studio-image.yml
+#
+# Run Studio from a PREBUILT fork image instead of building on this host — the
+# reliable path for small servers (no on-server `next build`). Pair with
+# docker-compose.local.yml.
+#
+# Set STUDIO_IMAGE to the image reference, e.g.
+#   ghcr.io/<owner>/supabase-studio:fork
+# `install.sh --studio-image <ref>` sets it for you and writes it to .env.
+#
+# Build & publish that image with the GitHub Actions workflow
+# (.github/workflows/build-studio-image.yml) or, on any machine with enough RAM:
+#   docker build -f apps/studio/Dockerfile --target production -t <ref> .
+#   docker push <ref>
+services:
+  studio:
+    image: ${STUDIO_IMAGE:?set STUDIO_IMAGE to a prebuilt fork image reference (or use install.sh --studio-image)}
+    pull_policy: always

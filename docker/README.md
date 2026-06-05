@@ -55,10 +55,22 @@ Cette unique commande va :
 2. Ajouter un **swapfile** sur les petits serveurs (peu de RAM) pour éviter que le build de Studio soit tué (OOM) — désactivable avec `--no-swap`.
 3. Générer **tous** les secrets et clés API dans `docker/.env` — `JWT_SECRET`, `ANON_KEY`/`SERVICE_ROLE_KEY` (legacy), clés asymétriques JWKS + clés opaques `sb_publishable_*`/`sb_secret_*`, `POSTGRES_PASSWORD`, `DASHBOARD_PASSWORD`, et un `HOSTING_AGENT_TOKEN` aléatoire — puis régler les URLs publiques.
 4. Créer les dossiers hôtes (dont des **clés hôte SFTP persistantes**) et câbler l'override dans `COMPOSE_FILE`.
-5. **Builder Studio depuis la source** et démarrer nginx + hosting-agent + SFTP + toute la stack Supabase, en attendant la santé des services.
+5. **Builder Studio depuis la source** (ou **pull une image pré-buildée** avec `--studio-image`, voir ci-dessous) et démarrer nginx + hosting-agent + SFTP + toute la stack Supabase, en attendant la santé des services.
 6. Afficher **et enregistrer** tous les accès, logins, mots de passe et secrets dans `docker/ACCESS-CREDENTIALS.txt` (`chmod 600`).
 
-> Le premier build compile Studio (une app Next.js) — compte plusieurs minutes. Les lancements suivants réutilisent le cache.
+> Le premier build compile Studio (une app Next.js) — compte plusieurs minutes et **plusieurs Go de RAM**. Sur un petit serveur, utilise plutôt l'image pré-buildée ci-dessous.
+
+### Petit serveur : image pré-buildée (sans builder sur place)
+
+Builder Studio sur le serveur (`next build`) est gourmand en RAM et peut échouer (OOM) sur un petit VPS. Plus fiable : builder l'image **une fois** ailleurs, puis la **pull** sur le serveur.
+
+1. **Publier l'image** via GitHub Actions → GHCR : onglet **Actions** du dépôt → workflow **« Build self-hosted Studio image »** → *Run workflow*. Il build et pousse `ghcr.io/<owner>/supabase-studio:fork`. Ensuite, rends le package GHCR **public** (Packages → settings), ou fais `docker login ghcr.io` sur le serveur.
+   _Sans CI_ : sur une machine ≥ 8 Go de RAM, `docker build -f apps/studio/Dockerfile --target production -t <ref> . && docker push <ref>`.
+2. **Installer en mode pull** sur le serveur (aucun build, juste un téléchargement) :
+   ```bash
+   sudo bash docker/install.sh --studio-image ghcr.io/<owner>/supabase-studio:fork
+   ```
+   En mode image, le `next build` n'a jamais lieu sur le serveur (et aucun swap n'est créé).
 
 ### Options
 
@@ -68,6 +80,7 @@ Cette unique commande va :
 | `--password <p>` / `DASHBOARD_PASSWORD` | Mot de passe du dashboard (demandé ; vide = généré). Évite `$` et `\`. |
 | `--domain <d>` / `DOMAIN` | Domaine public pointant vers le serveur — active le vrai TLS Let's Encrypt. |
 | `--email <e>` / `EMAIL` | Email de contact Let's Encrypt (défaut `admin@<domaine>`). |
+| `--studio-image <ref>` / `STUDIO_IMAGE` | **Pull une image Studio pré-buildée** au lieu de builder sur le serveur (idéal petit VPS), ex. `ghcr.io/<owner>/supabase-studio:fork`. |
 | `--enable-ftps` | Démarre aussi le service FTPS (désactivé par défaut ; mot de passe généré s'il manque). |
 | `--skip-deps` | N'installe pas les paquets système (saute aussi `apt upgrade`). |
 | `--reset-secrets` | Régénère `.env` même s'il existe. **Destructif** pour une base existante. |
@@ -100,8 +113,8 @@ git pull && docker compose up -d --build   # mettre à jour après un pull
 ### Dépannage
 
 - **`docker compose: unknown shorthand flag: 'f'`** — le plugin Compose v2 manque ; le script l'installe. Correctif manuel : `apt-get install -y docker-compose-plugin`.
-- **Build tué (exit 137 / OOM)** — plus de RAM pendant `next build` ; laisse le script ajouter du swap, ou ajoute un swapfile manuellement.
-- **`apps/studio/Dockerfile missing`** — tu n'as que le dossier `docker/` ; clone le dépôt **complet** pour builder Studio.
+- **Build tué (exit 137 / OOM) ou bloqué sur « Creating an optimized production build »** — plus assez de RAM pendant `next build`. Le mieux : **ne pas builder sur le serveur** → utilise `--studio-image` (voir « Petit serveur : image pré-buildée »). Sinon, laisse le script ajouter du swap (8 Go), ou ajoute-en manuellement.
+- **`apps/studio/Dockerfile missing`** — tu n'as que le dossier `docker/` ; clone le dépôt **complet** pour builder Studio, ou passe en mode `--studio-image` (qui n'a pas besoin de `apps/studio`).
 - **Certificat TLS non émis** — l'enregistrement A du domaine doit pointer vers le serveur et les ports 80/443 être joignables ; en attendant, nginx sert un certificat auto-signé.
 - **Connexion au dashboard impossible alors que le mot de passe semble correct** — évite `$` et `\` dans le mot de passe (Docker Compose les ré-interprète) ; le script les refuse désormais.
 

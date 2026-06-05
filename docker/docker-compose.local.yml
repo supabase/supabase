@@ -1,22 +1,17 @@
 # docker-compose.local.yml
 #
-# All-in-one override to run THIS fork locally with a single command.
-# It does two things the default stack does NOT:
-#   1. Builds Studio from your local source (apps/studio) instead of pulling the
-#      published image, so the "Sites" product + self-hosted edge-function
-#      management (UI + API routes) are actually present.
-#   2. Adds the web-hosting stack: nginx + the privileged hosting-agent sidecar
-#      + SFTP (and optional FTPS behind the `ftps` profile).
+# Web-hosting stack overlay for THIS fork: nginx + the privileged hosting-agent
+# sidecar + SFTP (+ optional FTPS behind the `ftps` profile), the Studio
+# hosting-agent wiring, and the edge-function secrets env_file.
 #
-# Usage (run from the docker/ directory):
-#   cp .env.example .env
-#   # then set, at minimum: POSTGRES_PASSWORD, DASHBOARD_PASSWORD, JWT_SECRET,
-#   # HOSTING_AGENT_TOKEN (`openssl rand -hex 32`), PROXY_DOMAIN, CERTBOT_EMAIL
-#   docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build
+# This file is AGNOSTIC about how Studio's image is produced. Pair it with ONE of:
+#   - docker-compose.studio-build.yml  → build Studio from local source (apps/studio)
+#   - docker-compose.studio-image.yml  → pull a prebuilt fork image (set STUDIO_IMAGE)
+# install.sh wires the right combination into COMPOSE_FILE for you.
 #
-# Or register it once so plain `docker compose up -d --build` picks it up:
-#   sh run.sh config add local
-#   docker compose up -d --build
+# Manual usage (build from source), from the docker/ directory:
+#   docker compose -f docker-compose.yml -f docker-compose.local.yml \
+#                  -f docker-compose.studio-build.yml up -d --build
 #
 # Access:
 #   - Dashboard (direct, easiest locally): http://localhost:8000  (kong)
@@ -25,15 +20,10 @@
 #   - Hosted sites: served by nginx on ports 80/443 at each site's domain.
 
 services:
-  # Build Studio from local source instead of the prebuilt `image:` in the base
-  # file. Context is the repo root (..); .dockerignore keeps node_modules/.next
-  # out of the build context. `ignoreBuildErrors` in next.config lets the image
-  # build even though `pnpm typecheck` currently has 1 unused-var error.
+  # Studio gains the web-hosting root + hosting-agent connection. HOW Studio's
+  # image is produced (build from source vs pull a prebuilt fork image) is decided
+  # by a separate override (studio-build / studio-image), so this stays agnostic.
   studio:
-    build:
-      context: ..
-      dockerfile: apps/studio/Dockerfile
-      target: production
     environment:
       WEB_HOSTING_ROOT: /var/www
       HOSTING_AGENT_URL: http://hosting-agent:9000
