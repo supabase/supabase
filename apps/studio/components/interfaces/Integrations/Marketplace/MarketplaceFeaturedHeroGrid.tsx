@@ -120,7 +120,7 @@ export const MarketplaceFeaturedHeroGrid = ({
                 className="block h-full rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:ring-offset-1 focus-visible:ring-offset-background"
               >
                 <Card className="flex flex-col overflow-hidden h-full hover:border-stronger">
-                  <div className="relative w-full h-28 bg-surface-400 shrink-0">
+                  <div className="hidden @lg:block relative w-full h-28 bg-surface-400 shrink-0">
                     {image ? (
                       <Image
                         fill
