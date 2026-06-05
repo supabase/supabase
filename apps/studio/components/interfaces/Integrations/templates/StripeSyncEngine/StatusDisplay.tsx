@@ -17,6 +17,7 @@ export const StatusDisplay = ({
   isUninstallInitiated,
   isUpgrade,
   timedOut,
+  version,
 }: {
   status: SchemaInstallationStatus
   isInstallRequested: boolean
@@ -25,6 +26,7 @@ export const StatusDisplay = ({
   isUninstallInitiated: boolean
   isUpgrade?: boolean
   timedOut: boolean
+  version?: string
 }) => {
   const installed = isInstalled(status)
   const installError = hasInstallError(status)
@@ -71,10 +73,11 @@ export const StatusDisplay = ({
   if (installed) {
     return (
       <span className="flex items-center gap-2 text-foreground-light text-sm">
-        <Check size={14} strokeWidth={1.5} className="text-brand" /> Installed
+        <Check size={14} strokeWidth={1.5} className="text-brand" /> {version ? `Installed v${version}` : 'Installed'}
       </span>
     )
   }
+
   return (
     <span className="flex items-center gap-2 text-foreground-light text-sm">Not installed</span>
   )
