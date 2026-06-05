@@ -50,7 +50,7 @@ export type Database = {
           listing_logo: string | null
           listing_tsv: unknown
           marketplace_url: string | null
-          oauth_client_id: string | null
+          oauth_app_id: string | null
           partner_id: string | null
           partner_logo: string | null
           partner_name: string | null
