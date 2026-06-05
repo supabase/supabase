@@ -1,7 +1,6 @@
-import React from 'https://esm.sh/react@18.2.0?deno-std=0.140.0'
 import { ImageResponse } from 'https://deno.land/x/og_edge@0.0.4/mod.ts'
-import { createClient } from 'jsr:@supabase/supabase-js@2'
-import { corsHeaders } from '../_shared/cors.ts'
+import React from 'https://esm.sh/react@18.2.0?deno-std=0.140.0'
+
 import { getTweets } from './getTweet.ts'
 import Tweet from './Tweet.tsx'
 
@@ -12,15 +11,11 @@ const STORAGE_URL =
 const FONT_URL = `${STORAGE_URL}/CircularStd-Book.otf`
 const font = fetch(new URL(FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
 
-export async function handler(req: Request) {
+export async function handler(req: Request, ctx) {
   const url = new URL(req.url)
   const tweetId = url.searchParams.get('tweetId')
 
-  if (!tweetId)
-    return new Response(JSON.stringify({ error: 'missing tweetId param' }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 400,
-    })
+  if (!tweetId) return Response.json({ error: 'missing tweetId param' }, { status: 400 })
 
   try {
     // Try to get image from Supabase Storage CDN.
@@ -64,17 +59,8 @@ export async function handler(req: Request) {
       }
     )
 
-    const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
-
-    const supabaseAdminClient = createClient(
-      // Supabase API URL - env var exported by default when deployed.
-      Deno.env.get('SUPABASE_URL') ?? '',
-      // Supabase API SECRET KEY - env var exported by default when deployed.
-      SUPABASE_SECRET_KEYS['default'] ?? ''
-    )
-
     // Upload image to storage.
-    const { error } = await supabaseAdminClient.storage
+    const { error } = await ctx.supabaseAdmin.storage
       .from('images')
       .upload(`tweet-to-image/${tweetId}.png`, generatedImage.body!, {
         contentType: 'image/png',
@@ -85,9 +71,6 @@ export async function handler(req: Request) {
 
     return generatedImage
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 400,
-    })
+    return Response.json({ error: error.message }, { status: 400 })
   }
 }
