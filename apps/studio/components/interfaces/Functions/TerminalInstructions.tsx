@@ -5,8 +5,12 @@ import { useRouter } from 'next/router'
 import { ComponentPropsWithoutRef, ElementRef, forwardRef, useState } from 'react'
 import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
+import {
+  formatInvokeHeaderArgs,
+  getInvokeHeaders,
+  USER_JWT_PLACEHOLDER,
+} from './Functions.utils'
 import type { Commands } from './Functions.types'
-import { getInvokeAuthHeader } from './TerminalInstructions.utils'
 import CommandRender from '@/components/interfaces/Functions/CommandRender'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useAccessTokensQuery } from '@/data/access-tokens/access-tokens-query'
@@ -71,20 +75,32 @@ export const TerminalInstructions = forwardRef<
       comment: 'Deploy your function',
     },
     {
-      command: `curl -L -X POST 'https://${projectRef}.supabase.${restUrlTld}/functions/v1/hello-world' -H '${getInvokeAuthHeader(
-        { isPublishableKey, keyValue: apiKey }
-      )}' --data '{"name":"Functions"}'`,
+      // New functions default to `verify_jwt: true`, so this first-run snippet assumes the
+      // platform enforces JWT verification and shows both the `apikey` header (the publishable
+      // key) and an `Authorization` header carrying a user JWT placeholder.
+      command: `curl -L -X POST 'https://${projectRef}.supabase.${restUrlTld}/functions/v1/hello-world' ${formatInvokeHeaderArgs(
+        getInvokeHeaders({
+          isPublishableKey,
+          keyValue: apiKey,
+          verifyJwt: true,
+          authJwt: USER_JWT_PLACEHOLDER,
+        })
+      )} --data '{"name":"Functions"}'`,
       description: 'Invokes the hello-world function',
       jsx: () => {
         return (
           <>
             <span className="text-brand-600">curl</span> -L -X POST '{functionsEndpoint}
-            /hello-world' -H '
-            {getInvokeAuthHeader({
-              isPublishableKey,
-              keyValue: keyPlaceholder,
-            })}
-            ' {`--data '{"name":"Functions"}'`}
+            /hello-world'{' '}
+            {formatInvokeHeaderArgs(
+              getInvokeHeaders({
+                isPublishableKey,
+                keyValue: keyPlaceholder,
+                verifyJwt: true,
+                authJwt: USER_JWT_PLACEHOLDER,
+              })
+            )}{' '}
+            {`--data '{"name":"Functions"}'`}
           </>
         )
       },

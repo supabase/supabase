@@ -68,6 +68,7 @@ export const EdgeFunctionDetails = () => {
   }, [showAllEdgeFunctionInvocationExamples])
 
   const [showKey, setShowKey] = useState(false)
+  const [useAnonJwt, setUseAnonJwt] = useState(false)
   const [selectedTab, setSelectedTab] = useState(invocationTabs[0].id)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
@@ -101,7 +102,10 @@ export const EdgeFunctionDetails = () => {
 
   const { anonKey, publishableKey } = getKeys(apiKeys)
   const apiKey = publishableKey?.api_key ?? anonKey?.api_key ?? '[YOUR ANON KEY]'
-  const apiKeyLabel = publishableKey?.api_key ? 'publishable key' : 'anon key'
+
+  // Track the live form value so the invoke snippet stays in sync with the "Verify JWT" toggle
+  // (and updates immediately when it's flipped), rather than only the last-saved server value.
+  const verifyJwt = form.watch('verify_jwt')
 
   const { managementCommands } = generateCLICommands({
     selectedFunction,
@@ -259,13 +263,16 @@ export const EdgeFunctionDetails = () => {
                     </TabsTrigger>
                   ))}
                   {selectedTab === 'curl' && (
-                    <Button
-                      type="default"
-                      className="ml-auto -translate-y-2 translate-x-3"
-                      onClick={() => setShowKey(!showKey)}
-                    >
-                      {showKey ? 'Hide' : 'Show'} {apiKeyLabel}
-                    </Button>
+                    <div className="ml-auto -translate-y-2 translate-x-3 flex gap-2">
+                      {verifyJwt && !!anonKey?.api_key && (
+                        <Button type="default" onClick={() => setUseAnonJwt(!useAnonJwt)}>
+                          {useAnonJwt ? 'Use user JWT' : 'Use anon JWT'}
+                        </Button>
+                      )}
+                      <Button type="default" onClick={() => setShowKey(!showKey)}>
+                        {showKey ? 'Hide' : 'Show'} keys
+                      </Button>
+                    </div>
                   )}
                 </TabsList>
                 {invocationTabs.map((tab) => {
@@ -274,6 +281,9 @@ export const EdgeFunctionDetails = () => {
                     functionUrl,
                     functionName: selectedFunction?.name ?? '',
                     apiKey,
+                    verifyJwt,
+                    anonKey: anonKey?.api_key,
+                    useAnonJwt,
                   })
 
                   return (
@@ -295,6 +305,9 @@ export const EdgeFunctionDetails = () => {
                               functionUrl,
                               functionName: selectedFunction?.name ?? '',
                               apiKey,
+                              verifyJwt,
+                              anonKey: anonKey?.api_key,
+                              useAnonJwt,
                             })
                           )
                         }}

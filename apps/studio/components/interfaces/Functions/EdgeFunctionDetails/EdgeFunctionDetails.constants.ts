@@ -1,3 +1,5 @@
+import { getInvokeHeaders, USER_JWT_PLACEHOLDER } from '../Functions.utils'
+
 interface InvocationTab {
   id: string
   label: string
@@ -8,6 +10,9 @@ interface InvocationTab {
     functionUrl: string
     functionName: string
     apiKey: string
+    verifyJwt?: boolean
+    anonKey?: string
+    useAnonJwt?: boolean
   }) => string
 }
 
@@ -16,20 +21,28 @@ export const INVOCATION_TABS: InvocationTab[] = [
     id: 'curl',
     label: 'cURL',
     language: 'bash',
-    code: ({ showKey, functionUrl, apiKey }) => {
+    code: ({ showKey, functionUrl, apiKey, verifyJwt, anonKey, useAnonJwt }) => {
       const isPublishableKey = apiKey.includes('publishable')
       const obfuscatedName = isPublishableKey ? 'SUPABASE_PUBLISHABLE_KEY' : 'SUPABASE_ANON_KEY'
       const keyValue = showKey ? apiKey : obfuscatedName
 
-      // Publishable and secret keys aren't JWTs, so they must be sent on the `apikey`
-      // header. Passing them on `Authorization: Bearer` makes the platform reject the
-      // request with `Invalid JWT`. Legacy `anon` keys are JWTs and use `Authorization`.
-      const authHeader = isPublishableKey
-        ? `-H 'apikey: ${keyValue}'`
-        : `-H 'Authorization: Bearer ${keyValue}'`
+      // When the function enforces JWT verification, the `Authorization` header needs a valid
+      // JWT. Default to a user JWT placeholder; the "Use anon JWT" toggle swaps in the legacy
+      // anon key (obfuscated unless the key is shown) so the snippet runs as-is.
+      const authJwt =
+        useAnonJwt && anonKey ? (showKey ? anonKey : 'SUPABASE_ANON_KEY') : USER_JWT_PLACEHOLDER
+
+      const headerArgs = getInvokeHeaders({
+        isPublishableKey,
+        keyValue,
+        verifyJwt: !!verifyJwt,
+        authJwt,
+      })
+        .map((header) => `  -H '${header.name}: ${header.value}' \\`)
+        .join('\n')
 
       return `curl -L -X POST '${functionUrl}' \\
-  ${authHeader} \\
+${headerArgs}
   -H 'Content-Type: application/json' \\
   --data '{"name":"Functions"}'`
     },
