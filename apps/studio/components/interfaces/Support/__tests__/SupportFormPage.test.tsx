@@ -1,5 +1,6 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { platformComponents as components } from 'api-types'
 import dayjs from 'dayjs'
 import { http, HttpResponse } from 'msw'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
@@ -9,21 +10,68 @@ import { SupportForm, SupportFormPage, SupportFormStatusButton } from '../Suppor
 // End of third-party imports
 
 import { API_URL, BASE_PATH } from '@/lib/constants'
-import { createMockOrganization, createMockProject } from '@/tests/helpers'
+import { createMockOrganizationResponse, createMockProject } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock, mswServer } from '@/tests/lib/msw'
+import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
+
+type ProjectDetailResponse = components['schemas']['ProjectDetailResponse']
+type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse']
+type OrganizationProjectsProject = OrganizationProjectsResponse['projects'][number]
+type SendFeedbackResponse = components['schemas']['SendFeedbackResponse']
+
+// Builders that return shapes matching the OpenAPI contract for endpoints
+// the support form depends on. The test only exercises a few fields, but the
+// constraints catch silent drift between mocks and the API.
+const toProjectDetailResponse = (project: {
+  id: number
+  ref: string
+  name: string
+  organization_id: number
+}): ProjectDetailResponse => ({
+  id: project.id,
+  ref: project.ref,
+  name: project.name,
+  organization_id: project.organization_id,
+  cloud_provider: 'AWS',
+  db_host: `db.${project.ref}.example.com`,
+  high_availability: false,
+  inserted_at: new Date().toISOString(),
+  integration_source: null,
+  is_branch_enabled: false,
+  is_physical_backups_enabled: false,
+  region: 'us-east-1',
+  restUrl: `https://${project.ref}.example.com/rest`,
+  status: 'ACTIVE_HEALTHY',
+  subscription_id: 'subscription-1',
+  updated_at: new Date().toISOString(),
+})
+
+const toOrganizationProject = (project: {
+  ref: string
+  name: string
+}): OrganizationProjectsProject => ({
+  cloud_provider: 'AWS',
+  databases: [],
+  inserted_at: new Date().toISOString(),
+  integration_source: null,
+  is_branch: false,
+  name: project.name,
+  ref: project.ref,
+  region: 'us-east-1',
+  status: 'ACTIVE_HEALTHY',
+})
 
 type Screen = typeof screen
 
 const mockOrganizations = [
-  createMockOrganization({
+  createMockOrganizationResponse({
     id: 1,
     slug: 'org-1',
     name: 'Organization 1',
     plan: { id: 'free', name: 'Free' },
   }),
-  createMockOrganization({
+  createMockOrganizationResponse({
     id: 2,
     slug: 'org-2',
     name: 'Organization 2',
@@ -421,8 +469,8 @@ describe('SupportFormPage', () => {
         const { ref } = params as { ref: string }
         const project = mockProjects.projects.find((candidate) => candidate.ref === ref)
         return project
-          ? HttpResponse.json(project)
-          : HttpResponse.json({ msg: 'Project not found' }, { status: 404 })
+          ? HttpResponse.json<ProjectDetailResponse>(toProjectDetailResponse(project))
+          : HttpResponse.json<APIErrorBody>({ message: 'Project not found' }, { status: 404 })
       },
     })
 
@@ -461,8 +509,8 @@ describe('SupportFormPage', () => {
 
         const paginated = sorted.slice(offset, offset + limit)
 
-        return HttpResponse.json({
-          projects: paginated,
+        return HttpResponse.json<OrganizationProjectsResponse>({
+          projects: paginated.map(toOrganizationProject),
           pagination: {
             count: projects.length,
             limit,
@@ -706,7 +754,7 @@ describe('SupportFormPage', () => {
       path: '/platform/feedback/send',
       response: async ({ request }) => {
         submitSpy(await request.json())
-        return HttpResponse.json({ ok: true })
+        return HttpResponse.json<SendFeedbackResponse>({ result: 'ok' })
       },
     })
 
@@ -751,7 +799,7 @@ describe('SupportFormPage', () => {
       path: '/platform/feedback/send',
       response: async ({ request }) => {
         submitSpy(await request.json())
-        return HttpResponse.json({ ok: true })
+        return HttpResponse.json<SendFeedbackResponse>({ result: 'ok' })
       },
     })
 
@@ -795,7 +843,7 @@ describe('SupportFormPage', () => {
       path: '/platform/feedback/send',
       response: async ({ request }) => {
         submitSpy(await request.json())
-        return HttpResponse.json({ ok: true })
+        return HttpResponse.json<SendFeedbackResponse>({ result: 'ok' })
       },
     })
 
@@ -898,7 +946,7 @@ describe('SupportFormPage', () => {
       path: '/platform/feedback/send',
       response: async ({ request }) => {
         submitSpy(await request.json())
-        return HttpResponse.json({ ok: true })
+        return HttpResponse.json<SendFeedbackResponse>({ result: 'ok' })
       },
     })
 
@@ -990,7 +1038,7 @@ describe('SupportFormPage', () => {
       path: '/platform/feedback/send',
       response: async ({ request }) => {
         submitSpy(await request.json())
-        return HttpResponse.json({ ok: true })
+        return HttpResponse.json<SendFeedbackResponse>({ result: 'ok' })
       },
     })
 
@@ -1013,8 +1061,8 @@ describe('SupportFormPage', () => {
         const { ref } = params as { ref: string }
         const project = mockProjects.projects.find((candidate) => candidate.ref === ref)
         return project
-          ? HttpResponse.json(project)
-          : HttpResponse.json({ msg: 'Project not found' }, { status: 404 })
+          ? HttpResponse.json<ProjectDetailResponse>(toProjectDetailResponse(project))
+          : HttpResponse.json<APIErrorBody>({ message: 'Project not found' }, { status: 404 })
       },
     })
 
@@ -1190,7 +1238,7 @@ describe('SupportFormPage', () => {
       response: async () => {
         submitSpy()
         await submission.promise
-        return HttpResponse.json({ ok: true })
+        return HttpResponse.json<SendFeedbackResponse>({ result: 'ok' })
       },
     })
 
@@ -1301,7 +1349,7 @@ describe('SupportFormPage', () => {
       path: '/platform/feedback/send',
       response: async ({ request }) => {
         submitSpy(await request.json())
-        return HttpResponse.json({ ok: true })
+        return HttpResponse.json<SendFeedbackResponse>({ result: 'ok' })
       },
     })
 
@@ -1370,7 +1418,7 @@ describe('SupportFormPage', () => {
       path: '/platform/feedback/send',
       response: async ({ request }) => {
         submitSpy(await request.json())
-        return HttpResponse.json({ ok: true })
+        return HttpResponse.json<SendFeedbackResponse>({ result: 'ok' })
       },
     })
 
@@ -1433,7 +1481,7 @@ describe('SupportFormPage', () => {
       path: '/platform/feedback/send',
       response: async ({ request }) => {
         submitSpy(await request.json())
-        return HttpResponse.json({ ok: true })
+        return HttpResponse.json<SendFeedbackResponse>({ result: 'ok' })
       },
     })
 
@@ -1495,7 +1543,7 @@ describe('SupportFormPage', () => {
       method: 'post',
       path: '/platform/feedback/send',
       response: async () => {
-        return HttpResponse.json({ message: errorMessage }, { status: 500 })
+        return HttpResponse.json<APIErrorBody>({ message: errorMessage }, { status: 500 })
       },
     })
 
@@ -1534,7 +1582,7 @@ describe('SupportFormPage', () => {
       path: '/platform/feedback/send',
       response: async ({ request }) => {
         submitSpy(await request.json())
-        return HttpResponse.json({ ok: true })
+        return HttpResponse.json<SendFeedbackResponse>({ result: 'ok' })
       },
     })
 
@@ -1614,7 +1662,7 @@ describe('SupportFormPage', () => {
       path: '/platform/feedback/send',
       response: async ({ request }) => {
         submitSpy(await request.json())
-        return HttpResponse.json({ ok: true })
+        return HttpResponse.json<SendFeedbackResponse>({ result: 'ok' })
       },
     })
 
@@ -1731,7 +1779,7 @@ describe('SupportFormPage', () => {
       path: '/platform/feedback/send',
       response: async ({ request }) => {
         submitSpy(await request.json())
-        return HttpResponse.json({ ok: true })
+        return HttpResponse.json<SendFeedbackResponse>({ result: 'ok' })
       },
     })
 

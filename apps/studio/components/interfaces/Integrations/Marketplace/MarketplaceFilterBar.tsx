@@ -1,4 +1,5 @@
 import { ChevronDown, LayoutGrid, List, Search } from 'lucide-react'
+import type { Ref } from 'react'
 import {
   Button,
   cn,
@@ -19,12 +20,14 @@ import {
   type MarketplaceIntegrationType,
   type MarketplaceSource,
 } from './Marketplace.constants'
+import { onSearchInputEscape } from '@/lib/keyboard'
 
 export type ViewMode = 'list' | 'grid'
 
 interface MarketplaceFilterBarProps {
   resultCount: number
   search: string
+  searchInputRef?: Ref<HTMLInputElement>
   onSearchChange: (value: string) => void
   category: string | null
   onCategoryChange: (value: string | null) => void
@@ -49,6 +52,7 @@ const triggerCls = 'inline-flex flex-row gap-2'
 export const MarketplaceFilterBar = ({
   resultCount,
   search,
+  searchInputRef,
   onSearchChange,
   category,
   onCategoryChange,
@@ -75,15 +79,17 @@ export const MarketplaceFilterBar = ({
   return (
     <div
       className={cn(
-        'sticky top-0 z-5 -mx-6 flex flex-wrap items-center gap-2 px-6 py-3 xl:-mx-10 xl:px-10',
+        'sticky top-0 z-20 -mx-6 flex flex-wrap items-center gap-2 px-6 py-3 xl:-mx-10 xl:px-10',
         'bg-dash-sidebar/95 backdrop-blur',
         showClear ? 'border-b border-muted' : 'border-b border-transparent'
       )}
     >
       <Input
+        ref={searchInputRef}
         value={search}
         size="tiny"
         onChange={(e) => onSearchChange(e.target.value)}
+        onKeyDown={onSearchInputEscape(search, onSearchChange)}
         placeholder={`Search integration${resultCount === 1 ? '' : 's'}…`}
         icon={<Search size={14} />}
         containerClassName="w-full min-w-40 max-w-60 grow flex-1"

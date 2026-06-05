@@ -11,6 +11,7 @@ import { type APIKey } from '@/data/api-keys/api-keys-query'
 import { type DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
 import { type Schema } from '@/data/database/schemas-query'
 import { type FDW } from '@/data/fdw/fdws-query'
+import { IntegrationStatus } from '@/data/partners/integration-status-query'
 import { type ProjectSecret } from '@/data/secrets/secrets-query'
 
 export const isStripeSyncEngineInstalled = (schemas: Schema[]) => {
@@ -23,11 +24,19 @@ export const isOAuthInstalled = ({
   integration,
   apiKeys,
   secrets,
+  partnerIntegrations: partnerIntegrations,
 }: {
   integration: IntegrationDefinition
   apiKeys: APIKey[]
   secrets: ProjectSecret[]
+  partnerIntegrations: IntegrationStatus[]
 }) => {
+  if (integration.installIdentificationMethod === 'integration_status') {
+    return partnerIntegrations.some(
+      (i) => i.listing_slug === integration.id && i.status === 'ready'
+    )
+  }
+
   if (integration.installIdentificationMethod === 'secret_key_prefix') {
     const prefix = integration.secretKeyPrefix
     if (!prefix) return false
