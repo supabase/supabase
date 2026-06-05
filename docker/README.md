@@ -7,11 +7,107 @@
 
 # Self-Hosted Supabase with Docker
 
-This is the official Docker Compose setup for self-hosted Supabase. It provides a complete stack with all Supabase services running locally or on your infrastructure.
+Configuration Docker Compose pour Supabase auto-hébergé : une stack complète avec tous les services Supabase, en local ou sur ton infrastructure.
 
-## Getting Started
+> **Ce fork ajoute deux fonctionnalités**, pilotables directement depuis le dashboard Studio :
+> - **Sites** — hébergement web statique/SPA intégré via nginx (déploie un front-end, obtiens un bloc serveur + TLS).
+> - **Gestion des edge functions en auto-hébergé** — déployer, éditer, supprimer des fonctions et gérer leurs secrets depuis le dashboard (l'amont les garde en lecture seule).
+>
+> Ces fonctionnalités vivent dans le **code source** de Studio : l'image publiée `supabase/studio` ne les contient **pas**. Le script d'installation build donc Studio depuis la source. Voir [docker-compose.local.yml](./docker-compose.local.yml) pour l'override utilisé.
 
-Follow the detailed setup guide in our documentation: [Self-Hosting with Docker](https://supabase.com/docs/guides/self-hosting/docker)
+## 🚀 Installation en une commande
+
+Le script [`install.sh`](./install.sh) installe tout en autonomie : il met le système à jour, installe Docker + les plugins **buildx** et **compose**, te demande le login/mot de passe du dashboard, génère tous les secrets, build Studio depuis la source, démarre la stack complète **+** les services d'hébergement web (nginx + hosting-agent + SFTP), attend que tout soit *healthy*, puis affiche et enregistre tous les accès.
+
+### Les ajouts de ce fork
+
+En plus de la stack Supabase standard (Postgres, Auth, Storage, Realtime, Kong, Studio, Edge Runtime…), l'override démarre :
+
+- **nginx (jonasal/nginx-certbot)** — reverse proxy qui termine le TLS, sert le dashboard et les sites hébergés (certificats Let's Encrypt automatiques).
+- **hosting-agent** — petit sidecar privilégié ([`hosting-agent/`](./hosting-agent/)) qui écrit les blocs serveur nginx et recharge nginx pour la fonctionnalité Sites. C'est le **seul** composant ayant accès au socket Docker (Studio n'y touche jamais).
+- **SFTP (atmoz/sftp)** — accès SFTP chrooté aux docroots des sites (FTPS optionnel via le profil `ftps`).
+
+### Prérequis
+
+- Un serveur Linux (Debian/Ubuntu recommandé), lancé en **root** ou avec `sudo`.
+- Le **dépôt complet** cloné — pas seulement le dossier `docker/` — car Studio est buildé depuis `apps/studio`.
+- Ports entrants ouverts : **80, 443, 8000, 2222** (et **22** pour SSH). Pour un vrai certificat TLS, fais pointer l'**enregistrement A** de ton domaine vers le serveur.
+
+### Installation de A à Z
+
+```bash
+# 1. Cloner le fork COMPLET sur le serveur (le script a besoin de apps/studio pour builder Studio)
+git clone <url-de-ton-fork> supabase
+cd supabase
+
+# 2a. Mode local / IP — certificat auto-signé, dashboard sur http://<ip-serveur>:8000
+sudo bash docker/install.sh
+
+# 2b. Ou avec un domaine — vrai TLS Let's Encrypt
+sudo bash docker/install.sh --domain supa.exemple.com --email toi@exemple.com
+```
+
+Au démarrage, le script **te demande le nom d'utilisateur et le mot de passe** souhaités pour le dashboard (laisse le mot de passe vide pour en générer un fort ; évite `$` et `\`). Tu peux aussi les fournir en non-interactif via `--user` / `--password` (ou les variables `DASHBOARD_USERNAME` / `DASHBOARD_PASSWORD`), et `-y` pour ne rien demander.
+
+Cette unique commande va :
+
+1. Faire `apt update` **+ `apt upgrade`**, puis installer **Docker Engine + CLI + containerd + les plugins buildx & compose** (dépôt Docker officiel), plus `openssl`, `git`, `jq`, `curl`, `gnupg`. (Corrige l'erreur `docker compose: unknown flag -f`.)
+2. Ajouter un **swapfile** sur les petits serveurs (peu de RAM) pour éviter que le build de Studio soit tué (OOM) — désactivable avec `--no-swap`.
+3. Générer **tous** les secrets et clés API dans `docker/.env` — `JWT_SECRET`, `ANON_KEY`/`SERVICE_ROLE_KEY` (legacy), clés asymétriques JWKS + clés opaques `sb_publishable_*`/`sb_secret_*`, `POSTGRES_PASSWORD`, `DASHBOARD_PASSWORD`, et un `HOSTING_AGENT_TOKEN` aléatoire — puis régler les URLs publiques.
+4. Créer les dossiers hôtes (dont des **clés hôte SFTP persistantes**) et câbler l'override dans `COMPOSE_FILE`.
+5. **Builder Studio depuis la source** et démarrer nginx + hosting-agent + SFTP + toute la stack Supabase, en attendant la santé des services.
+6. Afficher **et enregistrer** tous les accès, logins, mots de passe et secrets dans `docker/ACCESS-CREDENTIALS.txt` (`chmod 600`).
+
+> Le premier build compile Studio (une app Next.js) — compte plusieurs minutes. Les lancements suivants réutilisent le cache.
+
+### Options
+
+| Flag / variable d'env | Effet |
+| --- | --- |
+| `--user <u>` / `DASHBOARD_USERNAME` | Nom d'utilisateur du dashboard (demandé ; défaut `supabase`). |
+| `--password <p>` / `DASHBOARD_PASSWORD` | Mot de passe du dashboard (demandé ; vide = généré). Évite `$` et `\`. |
+| `--domain <d>` / `DOMAIN` | Domaine public pointant vers le serveur — active le vrai TLS Let's Encrypt. |
+| `--email <e>` / `EMAIL` | Email de contact Let's Encrypt (défaut `admin@<domaine>`). |
+| `--enable-ftps` | Démarre aussi le service FTPS (désactivé par défaut ; mot de passe généré s'il manque). |
+| `--skip-deps` | N'installe pas les paquets système (saute aussi `apt upgrade`). |
+| `--reset-secrets` | Régénère `.env` même s'il existe. **Destructif** pour une base existante. |
+| `--no-swap` | Ne crée jamais de swapfile. |
+| `-y`, `--yes` | Non-interactif : ne demande rien (utilise flags/env/défauts). |
+| `-h`, `--help` | Affiche l'aide. |
+
+### Après l'installation — accès
+
+Tout est affiché dans la console et enregistré dans [`docker/ACCESS-CREDENTIALS.txt`](./ACCESS-CREDENTIALS.txt) (logins, mots de passe **et tous les secrets**, `chmod 600`) :
+
+- **Dashboard** — `http://<ip-serveur>:8000` (ou `https://<domaine>`) ; identifiants dans la sortie.
+- **API** — URL de base + clés `anon`, `service_role`, publishable et secret, + le JWT secret.
+- **Base de données** — chaîne de connexion Postgres (via Supavisor, ports 5432 / 6543).
+- **Sites** — à gérer depuis **Studio → Sites** ; nginx sert chaque site sur 80/443.
+- **Edge functions** — code et secrets gérés depuis **Studio → Edge Functions**. Après changement de secrets : `docker compose restart functions`.
+- **SFTP** — aucun utilisateur par défaut. Ajoute-en un **par site** dans [`volumes/sftp/users.conf`](./volumes/sftp/users.conf) (format `user:pass:e:1001`), en utilisant le **slug du site comme nom d'utilisateur** pour que les fichiers atterrissent dans le bon docroot, puis `docker compose restart sftp`.
+
+### Gérer la stack
+
+Depuis le dossier `docker/` (l'override est câblé dans `COMPOSE_FILE`, donc un `docker compose` simple fonctionne) :
+
+```bash
+docker compose ps                 # statut
+docker compose logs -f studio     # suivre les logs d'un service
+docker compose down               # tout arrêter
+git pull && docker compose up -d --build   # mettre à jour après un pull
+```
+
+### Dépannage
+
+- **`docker compose: unknown shorthand flag: 'f'`** — le plugin Compose v2 manque ; le script l'installe. Correctif manuel : `apt-get install -y docker-compose-plugin`.
+- **Build tué (exit 137 / OOM)** — plus de RAM pendant `next build` ; laisse le script ajouter du swap, ou ajoute un swapfile manuellement.
+- **`apps/studio/Dockerfile missing`** — tu n'as que le dossier `docker/` ; clone le dépôt **complet** pour builder Studio.
+- **Certificat TLS non émis** — l'enregistrement A du domaine doit pointer vers le serveur et les ports 80/443 être joignables ; en attendant, nginx sert un certificat auto-signé.
+- **Connexion au dashboard impossible alors que le mot de passe semble correct** — évite `$` et `\` dans le mot de passe (Docker Compose les ré-interprète) ; le script les refuse désormais.
+
+## Installation manuelle (guide amont)
+
+Tu préfères tout configurer à la main, ou faire tourner la stack standard sans les ajouts du fork ? Suis le guide officiel : [Self-Hosting with Docker](https://supabase.com/docs/guides/self-hosting/docker)
 
 The guide covers:
 - Prerequisites (Git and Docker)
@@ -38,6 +134,12 @@ This Docker Compose configuration includes the following services:
 - **[Vector](https://github.com/vectordotdev/vector)** - High-performance observability data pipeline for logs
 - **[Supavisor](https://github.com/supabase/supavisor)** - Supabase's Postgres connection pooler
 
+Added by this fork (web hosting / Sites, started with the one-command installer or the [nginx override](./docker-compose.nginx.yml)):
+
+- **[nginx-certbot](https://github.com/JonasAlfredsson/docker-nginx-certbot)** - TLS-terminating reverse proxy that serves the dashboard and the hosted sites, with automatic Let's Encrypt certificates
+- **hosting-agent** - small privileged sidecar ([`hosting-agent/`](./hosting-agent/)) that writes nginx server blocks and reloads nginx for the Sites feature — the only component with access to the Docker socket
+- **[sftp](https://github.com/atmoz/sftp)** - chrooted SFTP access to the site docroots (optional FTPS available behind the `ftps` profile)
+
 ## Documentation
 
 - **[Self-Hosting with Docker](https://supabase.com/docs/guides/self-hosting/docker)** - Setup and configuration guides
@@ -45,6 +147,8 @@ This Docker Compose configuration includes the following services:
 - **[versions.md](./versions.md)** - Complete history of Docker image versions for rollback reference
 - **[Ask DeepWiki / Supabase](https://deepwiki.com/supabase/supabase/3-self-hosted-deployment)** - DeepWiki-generated description of self-hosted configuration
 - **[CONFIG.md](./CONFIG.md)** - Configuration reference for all environment variables
+- **[install.sh](./install.sh)** - Autonomous one-command installer for this fork (Sites + edge-function management)
+- **[docker-compose.local.yml](./docker-compose.local.yml)** - All-in-one override: builds Studio from source + web-hosting stack
 
 ## Updates
 

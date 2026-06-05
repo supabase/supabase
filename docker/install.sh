@@ -5,30 +5,36 @@
 # management (Studio is built from local source so those features are present).
 #
 # What it does, end to end:
-#   1. Installs system dependencies (Docker Engine + Compose v2 plugin, openssl,
-#      git, jq, curl) — fixes the common "docker compose: unknown flag -f".
-#   2. (Optional) Adds a swapfile on low-RAM hosts so the Studio build won't OOM.
-#   3. Generates ALL secrets and API keys into docker/.env
+#   1. Asks for the dashboard login/password you want (or generates a password).
+#   2. Installs ALL system dependencies: apt update + apt upgrade, then Docker
+#      Engine + CLI + containerd + the buildx & compose v2 plugins (official repo),
+#      plus openssl, git, jq, curl, gnupg. Fixes "docker compose: unknown flag -f".
+#   3. (Optional) Adds a swapfile on low-RAM hosts so the Studio build won't OOM.
+#   4. Generates ALL secrets and API keys into docker/.env
 #      (legacy HS256 keys + asymmetric ES256/JWKS + opaque keys + a hosting token).
-#   4. Wires the all-in-one override (docker-compose.local.yml): builds Studio from
+#   5. Wires the all-in-one override (docker-compose.local.yml): builds Studio from
 #      source + nginx + hosting-agent + SFTP + edge-function secrets env_file.
-#   5. Builds and starts the full stack, waits for health.
-#   6. Prints AND saves every URL, credential and access detail.
+#   6. Builds and starts the full stack, waits for health.
+#   7. Prints AND saves every URL, login, password and secret to
+#      docker/ACCESS-CREDENTIALS.txt (chmod 600).
 #
 # Run as root from the FULL repo (apps/studio must be present), e.g.:
 #   bash docker/install.sh
 #   DOMAIN=supa.example.com EMAIL=you@example.com bash docker/install.sh
-#   bash docker/install.sh --domain supa.example.com --email you@example.com --enable-ftps
+#   bash docker/install.sh --user admin --password 's3cret' --domain supa.example.com --email you@example.com
 #
 # Flags / env vars:
-#   --domain <d> | DOMAIN   Public domain pointing at this server (enables real TLS).
-#                           Omit for local/IP mode (self-signed cert, dashboard on :8000).
-#   --email  <e> | EMAIL    Let's Encrypt contact email (default: admin@<domain>).
-#   --enable-ftps           Also start the FTPS service (off by default).
-#   --skip-deps             Don't install system packages.
+#   --user <u>     | DASHBOARD_USERNAME   Desired dashboard username (prompted; default supabase).
+#   --password <p> | DASHBOARD_PASSWORD   Desired dashboard password (prompted; blank = generated).
+#   --domain <d>   | DOMAIN   Public domain pointing at this server (enables real TLS).
+#                            Omit for local/IP mode (self-signed cert, dashboard on :8000).
+#   --email  <e>   | EMAIL    Let's Encrypt contact email (default: admin@<domain>).
+#   --enable-ftps            Also start the FTPS service (off by default).
+#   --skip-deps             Don't install system packages (also skips apt upgrade).
 #   --reset-secrets         Regenerate .env even if it already exists (DESTRUCTIVE for an
 #                           existing database — only on a fresh install).
 #   --no-swap               Never create a swapfile.
+#   -y, --yes               Non-interactive: don't prompt; use flags/env/defaults.
 #   -h, --help              Show this help.
 
 set -euo pipefail
@@ -51,21 +57,26 @@ die()  { printf "${C_RED}✗ %s${C_RESET}\n" "$*" >&2; exit 1; }
 # ----------------------------------------------------------------------------
 DOMAIN="${DOMAIN:-}"
 EMAIL="${EMAIL:-}"
+DASH_USER="${DASHBOARD_USERNAME:-}"
+DASH_PASS="${DASHBOARD_PASSWORD:-}"
 ENABLE_FTPS=0
 SKIP_DEPS=0
 RESET_SECRETS=0
 NO_SWAP=0
+ASSUME_YES=0
 
 while [ $# -gt 0 ]; do
   case "$1" in
+    --user)     DASH_USER="${2:-}"; shift 2 ;;
+    --password) DASH_PASS="${2:-}"; shift 2 ;;
     --domain) DOMAIN="${2:-}"; shift 2 ;;
     --email)  EMAIL="${2:-}";  shift 2 ;;
     --enable-ftps)   ENABLE_FTPS=1; shift ;;
     --skip-deps)     SKIP_DEPS=1;   shift ;;
     --reset-secrets) RESET_SECRETS=1; shift ;;
     --no-swap)       NO_SWAP=1;     shift ;;
-    -y|--yes)        shift ;;
-    -h|--help)       sed -n '2,40p' "$0"; exit 0 ;;
+    -y|--yes)        ASSUME_YES=1;  shift ;;
+    -h|--help)       awk 'NR==1{next} /^#/{sub(/^# ?/,"");print;next} {exit}' "$0"; exit 0 ;;
     *) die "Unknown argument: $1 (use --help)" ;;
   esac
 done
@@ -92,46 +103,68 @@ cd "$DOCKER_DIR"
 # ----------------------------------------------------------------------------
 # 1. System dependencies
 # ----------------------------------------------------------------------------
+setup_docker_repo() {
+  # Configure Docker's official APT repository (Debian/Ubuntu, idempotent).
+  local distro codename arch
+  # shellcheck disable=SC1091
+  . /etc/os-release 2>/dev/null || true
+  distro="${ID:-debian}"; case "$distro" in ubuntu|debian) ;; *) distro="debian" ;; esac
+  codename="${VERSION_CODENAME:-}"; [ -n "$codename" ] || codename="$(lsb_release -cs 2>/dev/null || echo bookworm)"
+  arch="$(dpkg --print-architecture 2>/dev/null || echo amd64)"
+  $SUDO install -m 0755 -d /etc/apt/keyrings
+  $SUDO curl -fsSL "https://download.docker.com/linux/${distro}/gpg" -o /etc/apt/keyrings/docker.asc
+  $SUDO chmod a+r /etc/apt/keyrings/docker.asc
+  echo "deb [arch=${arch} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/${distro} ${codename} stable" \
+    | $SUDO tee /etc/apt/sources.list.d/docker.list >/dev/null
+  $SUDO apt-get update -qq
+}
+
 install_deps() {
   if [ "$SKIP_DEPS" -eq 1 ]; then log "Skipping dependency installation (--skip-deps)"; return; fi
-  log "Installing system dependencies"
+  log "Installing system dependencies (apt update + upgrade + Docker & plugins)"
 
   if command -v apt-get >/dev/null 2>&1; then
     export DEBIAN_FRONTEND=noninteractive
+    local APT_OPTS; APT_OPTS=(-y -o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef)
     $SUDO apt-get update -qq
-    $SUDO apt-get install -y -qq ca-certificates curl openssl git jq >/dev/null
-    ok "base packages (curl, openssl, git, jq)"
-  else
-    warn "Non-apt distro: ensure curl, openssl, git, jq are installed yourself."
-  fi
+    log "Upgrading existing packages (apt upgrade)"
+    $SUDO apt-get upgrade "${APT_OPTS[@]}" -qq >/dev/null 2>&1 || warn "apt upgrade reported issues (continuing)"
+    log "Installing prerequisites"
+    $SUDO apt-get install "${APT_OPTS[@]}" -qq \
+      ca-certificates curl gnupg openssl git jq lsb-release apt-transport-https >/dev/null
+    ok "base packages (curl, gnupg, openssl, git, jq, lsb-release)"
 
-  # Docker Engine
-  if ! command -v docker >/dev/null 2>&1; then
-    log "Installing Docker Engine (get.docker.com)"
-    curl -fsSL https://get.docker.com | $SUDO sh
-    ok "Docker installed"
-  else
-    ok "Docker already present ($(docker --version | awk '{print $3}' | tr -d ,))"
-  fi
-
-  # Compose v2 plugin
-  if ! docker compose version >/dev/null 2>&1; then
-    log "Installing Docker Compose v2 plugin"
-    if command -v apt-get >/dev/null 2>&1 && $SUDO apt-get install -y -qq docker-compose-plugin >/dev/null 2>&1; then
-      :
+    if ! command -v docker >/dev/null 2>&1; then
+      log "Installing Docker Engine + CLI + containerd + buildx + compose (official repo)"
+      setup_docker_repo
+      $SUDO apt-get install "${APT_OPTS[@]}" -qq \
+        docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin >/dev/null \
+        || { warn "Repo install failed — falling back to get.docker.com"; curl -fsSL https://get.docker.com | $SUDO sh; }
+      ok "Docker Engine + plugins installed"
     else
-      # Fallback: drop the plugin binary in place
-      local arch; arch="$(uname -m)"; case "$arch" in x86_64) arch=x86_64 ;; aarch64|arm64) arch=aarch64 ;; esac
-      $SUDO mkdir -p /usr/local/lib/docker/cli-plugins
-      $SUDO curl -fsSL "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-${arch}" \
-        -o /usr/local/lib/docker/cli-plugins/docker-compose
-      $SUDO chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+      ok "Docker already present ($(docker --version | awk '{print $3}' | tr -d ,))"
+      if ! docker compose version >/dev/null 2>&1 || ! docker buildx version >/dev/null 2>&1; then
+        log "Adding missing Docker plugins (compose / buildx)"
+        [ -f /etc/apt/sources.list.d/docker.list ] || setup_docker_repo
+        $SUDO apt-get install "${APT_OPTS[@]}" -qq docker-buildx-plugin docker-compose-plugin >/dev/null 2>&1 || true
+      fi
     fi
-    docker compose version >/dev/null 2>&1 || die "Compose plugin install failed."
-    ok "Compose plugin installed ($(docker compose version --short 2>/dev/null))"
   else
-    ok "Compose plugin already present ($(docker compose version --short 2>/dev/null))"
+    warn "Non-apt distro: install Docker + the compose & buildx plugins manually."
+    command -v docker >/dev/null 2>&1 || curl -fsSL https://get.docker.com | $SUDO sh
   fi
+
+  # Ensure the Compose plugin works (static-binary fallback as a last resort).
+  if ! docker compose version >/dev/null 2>&1; then
+    local arch; arch="$(uname -m)"; case "$arch" in x86_64) arch=x86_64 ;; aarch64|arm64) arch=aarch64 ;; esac
+    $SUDO mkdir -p /usr/local/lib/docker/cli-plugins
+    $SUDO curl -fsSL "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-${arch}" \
+      -o /usr/local/lib/docker/cli-plugins/docker-compose
+    $SUDO chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+  fi
+  docker compose version >/dev/null 2>&1 || die "Docker Compose plugin is not available."
+  ok "Compose plugin ready ($(docker compose version --short 2>/dev/null))"
+  if docker buildx version >/dev/null 2>&1; then ok "buildx ready"; else warn "buildx unavailable — classic builder will be used (slower)."; fi
 
   # Daemon running?
   if ! docker info >/dev/null 2>&1; then
@@ -178,6 +211,40 @@ set_env() {
 }
 
 # ----------------------------------------------------------------------------
+# Ask for the desired dashboard login / password (interactive; flags/env override)
+# ----------------------------------------------------------------------------
+prompt_credentials() {
+  log "Dashboard (Studio) login"
+  if [ -z "$DASH_USER" ]; then
+    if [ "$ASSUME_YES" -eq 0 ] && [ -t 0 ]; then
+      printf "  Choose a dashboard username [supabase]: "; read -r DASH_USER || true
+    fi
+    [ -n "$DASH_USER" ] || DASH_USER="supabase"
+  fi
+  # Reject passwords Docker Compose would re-interpret ($ and \), or the printed
+  # password would not match the one the containers actually receive.
+  if [ -n "$DASH_PASS" ]; then
+    case "$DASH_PASS" in
+      *'$'*|*'\'*) die "Dashboard password must not contain '\$' or '\\' (Docker Compose re-interprets them). Use a different --password." ;;
+    esac
+  fi
+  if [ -z "$DASH_PASS" ]; then
+    if [ "$ASSUME_YES" -eq 0 ] && [ -t 0 ]; then
+      local p2
+      while :; do
+        printf "  Choose a dashboard password (blank = auto-generate): "; read -rs DASH_PASS || true; echo
+        [ -z "$DASH_PASS" ] && { warn "No password entered — a strong one will be generated."; break; }
+        case "$DASH_PASS" in *'$'*|*'\'*) warn "Avoid '\$' and '\\' (Compose re-interprets them) — choose another."; DASH_PASS=""; continue ;; esac
+        printf "  Confirm password: "; read -rs p2 || true; echo
+        [ "$DASH_PASS" = "$p2" ] && break
+        warn "Passwords did not match — try again."
+      done
+    fi
+  fi
+  ok "Username: ${DASH_USER}$([ -n "$DASH_PASS" ] && echo '  (custom password set)' || echo '  (password will be generated)')"
+}
+
+# ----------------------------------------------------------------------------
 # 3. Secrets / .env
 # ----------------------------------------------------------------------------
 PUBLIC_IP=""
@@ -204,6 +271,12 @@ configure_env() {
     ok "HOSTING_AGENT_TOKEN generated"
   fi
 
+  # Dashboard login: apply the chosen username, and the chosen password if any
+  # (otherwise keep the strong one generated by generate-keys.sh).
+  set_env DASHBOARD_USERNAME "${DASH_USER:-supabase}"
+  if [ -n "$DASH_PASS" ]; then set_env DASHBOARD_PASSWORD "$DASH_PASS"; fi
+  ok "Dashboard credentials configured (user: ${DASH_USER:-supabase})"
+
   # URLs + TLS contact
   if [ -n "$DOMAIN" ]; then
     PUBLIC_URL="https://$DOMAIN"
@@ -223,6 +296,13 @@ configure_env() {
   # Make plain `docker compose ...` pick up the override too
   set_env COMPOSE_FILE "docker-compose.yml:docker-compose.local.yml"
   ok "Override wired into COMPOSE_FILE"
+
+  # Tidy a stale non-secret identifier; if FTPS is enabled, ensure it has a password.
+  [ "$(get_env POOLER_TENANT_ID)" = "your-tenant-id" ] && set_env POOLER_TENANT_ID "supabase"
+  if [ "$ENABLE_FTPS" -eq 1 ] && { [ -z "$(get_env FTPS_PASS)" ] || [ "$RESET_SECRETS" -eq 1 ]; }; then
+    set_env FTPS_PASS "$(openssl rand -hex 16)"
+    ok "FTPS password generated"
+  fi
 }
 
 # ----------------------------------------------------------------------------
@@ -233,6 +313,12 @@ prepare_dirs() {
   mkdir -p volumes/www volumes/sftp/ssh volumes/proxy/nginx/sites volumes/functions
   # env_file target must exist for older Compose versions; empty is fine.
   [ -f volumes/functions/.env ] || { printf '%s\n' '# Managed by Supabase Studio — edge function secrets' > volumes/functions/.env; }
+  # Persistent SFTP host keys so the fingerprint stays stable across restarts.
+  if command -v ssh-keygen >/dev/null 2>&1 && [ -z "$(ls -A volumes/sftp/ssh 2>/dev/null)" ]; then
+    ssh-keygen -t ed25519 -f volumes/sftp/ssh/ssh_host_ed25519_key -N '' -q 2>/dev/null || true
+    ssh-keygen -t rsa -b 4096 -f volumes/sftp/ssh/ssh_host_rsa_key -N '' -q 2>/dev/null || true
+    ok "SFTP host keys generated (stable fingerprint)"
+  fi
   ok "volumes/www, volumes/sftp/ssh, volumes/proxy/nginx/sites, volumes/functions"
 }
 
@@ -275,7 +361,8 @@ open_firewall() {
   $SUDO ufw allow 80/tcp   >/dev/null 2>&1 || true
   $SUDO ufw allow 443/tcp  >/dev/null 2>&1 || true
   $SUDO ufw allow 8000/tcp >/dev/null 2>&1 || true
-  $SUDO ufw allow "$(get_env SFTP_PORT || echo 2222)/tcp" >/dev/null 2>&1 || true
+  local sp; sp="$(get_env SFTP_PORT)"; [ -n "$sp" ] || sp=2222
+  $SUDO ufw allow "${sp}/tcp" >/dev/null 2>&1 || true
   [ "$ENABLE_FTPS" -eq 1 ] && { $SUDO ufw allow 21/tcp >/dev/null 2>&1 || true; $SUDO ufw allow 40000:40009/tcp >/dev/null 2>&1 || true; }
   ok "firewall rules added (22, 80, 443, 8000, SFTP)"
 }
@@ -329,13 +416,27 @@ print_summary() {
     echo "  hosting-agent token (internal): $hat"
     echo
     echo "SFTP (upload site files) — host $PUBLIC_IP, port $sftp_port"
-    echo "  Add users in docker/volumes/sftp/users.conf (format: user:pass:e:1001),"
+    echo "  No SFTP user exists by default. Add one PER SITE in"
+    echo "  docker/volumes/sftp/users.conf (format: user:pass:e:1001), using the"
+    echo "  site's SLUG as the username so uploads land in that site's docroot,"
     echo "  then: $ docker compose restart sftp"
     echo
     echo "EDGE FUNCTIONS"
     echo "  Manage code + secrets from Studio → Edge Functions (self-hosted write path)."
     echo "  Secrets are written to volumes/functions/.env and injected via env_file;"
     echo "  after changing secrets: $ docker compose restart functions"
+    echo
+    echo "ALL SECRETS (keep this file private — full machine config lives in docker/.env)"
+    for k in DASHBOARD_USERNAME DASHBOARD_PASSWORD \
+             POSTGRES_PASSWORD JWT_SECRET ANON_KEY SERVICE_ROLE_KEY \
+             SUPABASE_PUBLISHABLE_KEY SUPABASE_SECRET_KEY \
+             ANON_KEY_ASYMMETRIC SERVICE_ROLE_KEY_ASYMMETRIC \
+             SECRET_KEY_BASE VAULT_ENC_KEY PG_META_CRYPTO_KEY \
+             LOGFLARE_PUBLIC_ACCESS_TOKEN LOGFLARE_PRIVATE_ACCESS_TOKEN \
+             S3_PROTOCOL_ACCESS_KEY_ID S3_PROTOCOL_ACCESS_KEY_SECRET \
+             HOSTING_AGENT_TOKEN; do
+      v="$(get_env "$k")"; [ -n "$v" ] && printf '  %s=%s\n' "$k" "$v"
+    done
     echo
     echo "MANAGE THE STACK (from docker/)"
     echo "  Status : docker compose ps"
@@ -346,7 +447,7 @@ print_summary() {
   } | tee "$out"
   chmod 600 "$out"
   echo
-  ok "Saved a copy to: $out  (chmod 600)"
+  ok "Saved logins, passwords and all secrets to: $out  (chmod 600)"
   echo
   printf "${C_YLW}Open these ports on your cloud firewall/security group if not already: 80, 443, 8000, %s%s${C_RESET}\n" \
     "$sftp_port" "$([ "$ENABLE_FTPS" -eq 1 ] && echo ', 21, 40000-40009')"
@@ -357,6 +458,7 @@ print_summary() {
 # Run
 # ----------------------------------------------------------------------------
 log "Self-hosted Supabase (fork) — autonomous install starting"
+prompt_credentials
 install_deps
 maybe_swap
 configure_env
