@@ -73,16 +73,17 @@ const data: () => {
     metadata: {
       metaTitle: 'Hosted Postgres | Supabase',
       metaDescription:
-        'A managed Postgres database in seconds, free to start and $25 a month in production. Plus a dashboard, backups, Point-in-Time Recovery, connection pooling, read replicas, and the full Postgres extension ecosystem.',
+        'A managed Postgres database in seconds, free to start and just $25 a month in production. Plus a dashboard, backups, Point-in-Time Recovery, connection pooling, read replicas, and the full Postgres extension ecosystem.',
     },
     heroSection: {
       id: 'hero',
       title: 'Hosted Postgres',
-      h1: <>A managed Postgres database in seconds.</>,
+      h1: <>Managed Postgres in seconds.</>,
       subheader: [
         <>
-          Free to start, $25 a month in production. If all you want is Postgres, this is the best
-          place to run it — and the rest of the platform is here when you need it.
+          Free to start, just $25 a month in production. More than a database: backups, logs,
+          advisors, connection pooling, APIs, and everything you need to run Postgres in production.
+          The rest of the platform is ready when you need it.
         </>,
       ],
       image: undefined,
@@ -111,7 +112,7 @@ const data: () => {
       footer: (
         <div className="flex flex-col items-center gap-6 mt-8">
           <p className="text-center text-foreground-light">
-            Postgres trusted in production by teams of every size
+            Postgres is trusted in production by teams of every size
           </p>
           <Logos showHeading={false} className="pb-0!" />
           <p className="text-center text-sm text-foreground-lighter">
@@ -143,16 +144,16 @@ const data: () => {
         {
           id: 'free-to-start',
           icon: Wallet,
-          heading: 'Free to start, $25 in production',
+          heading: 'Free to start, $25 when you need more',
           subheading:
-            'Launch a database for free. Move to a production instance for $25 a month with daily backups, no project pausing, and email support.',
+            'Launch a database for free in seconds. Upgrade to Pro for daily backups, email support, and additional production features.',
         },
         {
           id: 'more-than-a-database',
           icon: LayoutDashboard,
           heading: 'More than a database, from day one',
           subheading:
-            'Every project ships with a dashboard, a SQL editor, a table editor, logs, query and security advisors, and auto-generated APIs.',
+            'Every project ships with a Dashboard, a SQL Editor, a Table Editor, logs, performance and security advisors, and auto-generated APIs.',
         },
         {
           id: 'built-to-scale',
@@ -198,8 +199,9 @@ const data: () => {
     },
     included: {
       id: 'included',
-      heading: 'Everything you get with hosted Postgres',
-      subheading: 'The database is the start. Every project comes with the tooling to run it well.',
+      heading: 'More than a database',
+      subheading:
+        'Backups, connection pooling, branching, observability, point-in-time recovery, and developer tools included from day one.',
       features: [
         {
           id: 'managed-postgres',
@@ -292,9 +294,9 @@ const data: () => {
     },
     bundled: {
       id: 'bundled',
-      heading: 'Tools most hosts charge extra for, included',
+      heading: 'Your database is an application platform',
       subheading:
-        'These usually mean another vendor, another bill, and another integration to maintain. With Supabase they are already part of your database.',
+        'Generate APIs, schedule work, trigger workflows, manage secrets, and connect external systems without leaving Postgres.',
       features: [
         {
           id: 'rest-apis',
@@ -440,7 +442,8 @@ const data: () => {
     securitySection: {
       id: 'security',
       label: 'Security',
-      heading: 'Trusted for medical records, missions to the moon, and everything in between',
+      heading:
+        'Postgres is trusted for medical records, missions to the moon, and everything in between',
       subheading:
         'Keep your data secure with SOC 2, HIPAA, and GDPR compliance. Your data is encrypted at rest and in transit, with built-in tools for monitoring and managing security threats.',
       features: [
@@ -494,7 +497,7 @@ const data: () => {
       id: 'platform-upsell',
       title: <>Postgres now. The rest of the backend when you want it.</>,
       subtitle:
-        'Your hosted Postgres comes from the same platform that gives you Auth, Storage, Edge Functions, Realtime, and Vector search. Start with the database. Add the rest later without migrating, re-architecting, or changing vendors. Use one, or use all.',
+        'Your hosted Postgres comes from the same platform that gives you Auth, Storage, Edge Functions, Realtime, and Vector search. Start with the database. Add the rest later without migrating, re-architecting, or changing vendors.',
       primaryCta: {
         label: 'Explore the full platform',
         url: '/',
@@ -530,7 +533,7 @@ const data: () => {
             '## Overview of implementing Supabase Auth SSR\n1. Install @supabase/supabase-js and...',
           code: `1. Install @supabase/supabase-js and @supabase/ssr packages.
 2. Set up environment variables.
-3. Write two utility functions with \u0060createClient\u0060 functions to create a browser client and a server client. 
+3. Write two utility functions with \u0060createClient\u0060 functions to create a browser client and a server client.
 4. Hook up middleware to refresh auth tokens
 `,
           language: 'markdown',
