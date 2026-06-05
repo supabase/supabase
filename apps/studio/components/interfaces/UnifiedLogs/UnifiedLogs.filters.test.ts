@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
-import { columnFiltersToLogsFilters, logsFiltersToUrlParams } from './UnifiedLogs.filters'
+import {
+  buildFilterSearchUpdate,
+  columnFiltersToLogsFilters,
+  logsFiltersToUrlParams,
+} from './UnifiedLogs.filters'
 
 describe('columnFiltersToLogsFilters', () => {
   it('serializes a bare string[] (sidebar checkbox) using the default `=` operator', () => {
-    // The shared DataTable checkbox writes a plain array via setFilterValue.
-    // It must still round-trip into the `filter` URL param, otherwise clicking
-    // a sidebar facet never re-runs the query (the reported regression).
     const filters = columnFiltersToLogsFilters([
       { id: 'log_type', value: ['postgres', 'postgrest'] },
     ])
@@ -33,9 +34,6 @@ describe('columnFiltersToLogsFilters', () => {
   })
 
   it('excludes columns not in filterableNames (e.g. the `date` timerange brush)', () => {
-    // `date` is a plain [start, end] array; it round-trips through its own URL
-    // key, so it must not leak into the `filter` param now that bare arrays are
-    // normalized.
     const filterable = new Set(['log_type', 'method'])
     const filters = columnFiltersToLogsFilters(
       [
@@ -53,5 +51,43 @@ describe('columnFiltersToLogsFilters', () => {
       { id: 'method', value: undefined },
     ])
     expect(filters).toEqual([])
+  })
+})
+
+describe('buildFilterSearchUpdate', () => {
+  const fields = [
+    { value: 'date', type: 'timerange' },
+    { value: 'log_type', type: 'checkbox' },
+    { value: 'method', type: 'checkbox' },
+  ]
+
+  it('serializes a bare sidebar checkbox into the `filter` param (the regression)', () => {
+    // The reported bug: a sidebar click produced an empty `filter` so the query
+    // never re-ran. This guards the click-to-URL wiring, not just the transform.
+    const update = buildFilterSearchUpdate([{ id: 'log_type', value: ['postgres'] }], fields)
+    expect(update.filter).toEqual(['log_type:eq:postgres'])
+  })
+
+  it('clears the `filter` param to null when no equality filters are set', () => {
+    const update = buildFilterSearchUpdate([{ id: 'log_type', value: null }], fields)
+    expect(update.filter).toBeNull()
+  })
+
+  it('routes a timerange to its own URL key, never into `filter`', () => {
+    const range = [new Date('2026-05-08T00:00:00Z'), new Date('2026-05-08T01:00:00Z')]
+    const update = buildFilterSearchUpdate(
+      [
+        { id: 'date', value: range },
+        { id: 'method', value: ['GET'] },
+      ],
+      fields
+    )
+    expect(update.filter).toEqual(['method:eq:GET'])
+    expect(update.date).toBe(range)
+  })
+
+  it('nulls an absent timerange key so a cleared brush is removed from the URL', () => {
+    const update = buildFilterSearchUpdate([{ id: 'method', value: ['GET'] }], fields)
+    expect(update.date).toBeNull()
   })
 })
