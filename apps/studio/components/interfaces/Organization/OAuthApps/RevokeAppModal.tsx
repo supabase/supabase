@@ -53,14 +53,14 @@ export const RevokeAppModal = ({ selectedApp, onClose }: RevokeAppModalProps) =>
                 <li className="flex gap-3 text-sm">
                   <Lock size={14} className="shrink-0" />
                   <div>
-                    <strong>Before you remove this app:</strong>
+                    <strong>Before you remove this app, consider:</strong>
                     <ul className="space-y-2 mt-2">
-                      <li className="list-disc ml-4">
-                        Ensure that no users are currently using the application.
-                      </li>
                       <li className="list-disc ml-4">
                         The application will no longer have access to your organization after being
                         revoked.
+                      </li>
+                      <li className="list-disc ml-4">
+                        This will remove the application for all members in your organization.
                       </li>
                       <li className="list-disc ml-4">
                         Restoring access will require an organization administrator to re-authorize
