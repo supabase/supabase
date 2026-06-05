@@ -41,6 +41,7 @@
   --color-warning-400: hsl(var(--warning-400));
   --color-warning-500: hsl(var(--warning-500));
   --color-warning-600: hsl(var(--warning-600));
+  --color-warning-700: hsl(var(--warning-700));
   --color-warning: hsl(var(--warning-default));
   --color-brand-200: hsl(var(--brand-200));
   --color-brand-300: hsl(var(--brand-300));
@@ -321,6 +322,9 @@
   --text-color-lighter: hsl(var(--foreground-lighter));
   --text-color-muted: hsl(var(--foreground-muted));
   --text-color-contrast: hsl(var(--foreground-contrast));
+  --text-color-brand: hsl(var(--brand-text));
+  --text-color-destructive: hsl(var(--destructive-text));
+  --text-color-warning: hsl(var(--warning-text));
 
   /* misc theme tokens — typography, breakpoints, sizing, transform-origin */
   --font-sans: var(
