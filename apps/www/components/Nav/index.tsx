@@ -4,6 +4,7 @@ import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
 import ScrollProgress from 'components/ScrollProgress'
 import { getMenu } from 'data/nav'
 import { DevToolbarTrigger } from 'dev-tools'
+import { DASHBOARD_SIGNUP_URL, DASHBOARD_URL } from 'lib/constants'
 import { useSendTelemetryEvent } from 'lib/telemetry'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -173,7 +174,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                     <>
                       <Button type="default" className="hidden lg:block" asChild>
                         <Link
-                          href="https://supabase.com/dashboard"
+                          href={DASHBOARD_URL}
                           onClick={() =>
                             sendTelemetryEvent({
                               action: 'sign_in_button_clicked',
@@ -186,7 +187,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                       </Button>
                       <Button className="hidden lg:block" asChild>
                         <Link
-                          href="https://supabase.com/dashboard/sign-up"
+                          href={DASHBOARD_SIGNUP_URL}
                           onClick={() =>
                             sendTelemetryEvent({
                               action: 'start_project_button_clicked',

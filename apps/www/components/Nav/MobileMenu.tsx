@@ -14,6 +14,7 @@ import SupabaseWordmark from './SupabaseWordmark'
 import staticContent from '@/.generated/staticContent/_index.json'
 import ProductModulesData from '@/data/ProductModules'
 import { DEFAULT_EASE } from '@/lib/animations'
+import { DASHBOARD_SIGNUP_URL, DASHBOARD_URL } from '@/lib/constants'
 import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 interface Props {
@@ -251,7 +252,7 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
                   ) : (
                     <>
                       <Link
-                        href="https://supabase.com/dashboard"
+                        href={DASHBOARD_URL}
                         passHref
                         legacyBehavior
                         onClick={() =>
@@ -268,7 +269,7 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
                         </Button>
                       </Link>
                       <Link
-                        href="https://supabase.com/dashboard/sign-up"
+                        href={DASHBOARD_SIGNUP_URL}
                         passHref
                         legacyBehavior
                         onClick={() =>
