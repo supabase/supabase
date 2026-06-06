@@ -1694,6 +1694,24 @@ functions:
             ),
           );
           ```
+  - id: exchange-code-for-session
+    title: 'exchangeCodeForSession()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.exchangeCodeForSession'
+    notes: |
+      - Used when `flowType` is set to `AuthFlowType.pkce` in the Auth configuration.
+    params:
+      - name: authCode
+        isOptional: false
+        type: String
+        description: The code to exchange.
+    examples:
+      - id: exchange-auth-code
+        name: Exchange Auth Code
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase.auth.exchangeCodeForSession('34e770dd-9ff9-416c-87fa-43b31d7ef225');
+          ```
   - id: refresh-session
     title: 'refreshSession()'
     notes: |
