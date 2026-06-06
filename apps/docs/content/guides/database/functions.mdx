@@ -240,7 +240,7 @@ where id = 1;
 <TabPanel id="js" label="JavaScript">
 
 ```js
-const { data, error } = supabase.rpc('get_planets').eq('id', 1)
+const { data, error } = await supabase.rpc('get_planets').eq('id', 1)
 ```
 
 </TabPanel>
