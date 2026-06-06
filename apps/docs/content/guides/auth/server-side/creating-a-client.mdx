@@ -855,6 +855,13 @@ language="typescript"
 </TabPanel>
 </Tabs>
 
+## Sign in with OAuth
+
+If you need OAuth sign-in in an SSR app, use the PKCE flow and redirect to
+`data.url` on the server before handling the callback route.
+
+<$Partial path="oauth_pkce_flow.mdx" />
+
 ## Caching considerations
 
 If your app uses ISR (Incremental Static Regeneration) or is deployed behind a CDN, caching of HTTP responses can cause users to receive another user's session. When a session is refreshed, the new token is written to the response via `Set-Cookie`. If that response is cached and served to a different user, that user will be signed in as the wrong person.
