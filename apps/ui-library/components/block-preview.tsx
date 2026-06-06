@@ -9,41 +9,56 @@ interface ComponentPreviewProps extends React.HTMLAttributes<HTMLDivElement> {
   isPair?: boolean
 }
 
-export function BlockPreview({ name, wide = false, isPair = false }: ComponentPreviewProps) {
-  const BlockPreview = React.useMemo(() => {
+export function BlockPreview({
+  name,
+  wide = false,
+  isPair = false,
+  className,
+  ...props
+}: ComponentPreviewProps) {
+
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+  const iframeSrc = `${basePath}/example/${name}`
+
+  const previewContent = React.useMemo(() => {
     return (
-      <div className="w-full h-full flex items-center justify-center">
+      <div className="flex items-center justify-center w-full h-full">
         <React.Suspense
           fallback={
-            <div className="flex items-center text-sm text-muted-foreground">Loading...</div>
+            <div className="flex items-center text-sm text-muted-foreground">
+              Loading...
+            </div>
           }
         >
           <iframe
-            src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/example/${name}`}
+            src={iframeSrc}
+            name="preview-frame"
             style={{
               border: 'none',
               width: '100%',
               height: '100%',
               display: 'block',
             }}
-            name="preview-frame"
           />
         </React.Suspense>
       </div>
     )
-  }, [name])
+  }, [iframeSrc])
 
   const wideClasses = wide ? '2xl:-ml-12 2xl:-mr-12' : ''
 
   return (
-    <div className={cn('mt-4 w-full', wideClasses)}>
+    <div
+      className={cn('mt-4 w-full', wideClasses, className)}
+      {...props}
+    >
       <div
         className={cn(
-          'relative border rounded-lg overflow-hidden bg-muted min-h-[150px] h-[600px]',
+          'relative overflow-hidden rounded-lg border bg-muted min-h-[150px] h-[600px]',
           isPair && 'rounded-none'
         )}
       >
-        {BlockPreview}
+        {previewContent}
       </div>
     </div>
   )
