@@ -41,6 +41,12 @@ describe('parseParameters', () => {
     const userIdParam = result.find((p) => p.name === 'userId')
     expect(userIdParam?.occurrences).toBe(2)
   })
+
+  it('does not treat postgres casts as parameters', () => {
+    const sql = 'SELECT now()::text, 1::int'
+
+    expect(parseParameters(sql)).toEqual([])
+  })
 })
 
 describe('processParameterizedSql', () => {
@@ -74,5 +80,16 @@ describe('processParameterizedSql', () => {
     const result = processParameterizedSql(sql, {})
     expect(result).toBe('SELECT * FROM items WHERE status = open')
     expect(result).not.toContain('@set')
+  })
+
+  it('does not replace postgres casts', () => {
+    const sql = 'SELECT now()::text, :id'
+
+    const result = processParameterizedSql(sql, {
+      id: '123',
+    })
+
+    expect(result).toContain('now()::text')
+    expect(result).toContain('123')
   })
 })
