@@ -1,5 +1,5 @@
 import { ArrowUpRight, BookOpen } from 'lucide-react'
-import { Button, cn } from 'ui'
+import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
 
@@ -27,6 +27,7 @@ export const MarketplaceDetail = () => {
     pageSubTitle,
     integration,
     isInstalled,
+    areRequiredExtensionsInstalled,
     isAvailableLoading,
     isInstalledLoading,
     Component,
@@ -74,6 +75,23 @@ export const MarketplaceDetail = () => {
         <Button type="outline" disabled>
           Installed
         </Button>
+      )
+    }
+    if (integration.type === 'wrapper' && areRequiredExtensionsInstalled) {
+      return (
+        <Tooltip>
+          <TooltipTrigger>
+            <Button type="outline" className="shrink-0" disabled>
+              Installed
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" align="end" className="w-64 text-pretty">
+            <p>Required extensions are already installed</p>
+            <p className="text-foreground-lighter">
+              Visit the <i>Wrappers</i> tab to add a new {integration.name} instance.
+            </p>
+          </TooltipContent>
+        </Tooltip>
       )
     }
     return <InstallIntegrationSheet integration={integration} />

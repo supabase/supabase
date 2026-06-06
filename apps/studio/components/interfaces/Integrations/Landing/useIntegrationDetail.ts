@@ -36,20 +36,22 @@ export const useIntegrationDetail = () => {
     [installedIntegrations, id]
   )
 
-  const installableExtensions = (extensions ?? []).filter((ext) =>
-    (integration?.requiredExtensions ?? []).includes(ext.name)
-  )
-  const extensionsInstalled = installableExtensions.every((x) => x.installed_version)
+  const isInstalled = !!integration && !!installation
 
-  // installedIntegrations doesn't return wrappers unless there's a wrapper created
-  const isInstalled =
-    !!integration && (!!installation || (integration.type === 'wrapper' && extensionsInstalled))
+  // True when all pg extensions required by this integration are already enabled.
+  // Used by wrappers to hide the "Install integration" button once the shared
+  // extensions are in place — wrapper instances are managed via the Wrappers tab.
+  const areRequiredExtensionsInstalled = useMemo(() => {
+    if (!integration?.requiredExtensions?.length || !extensions) return false
+    return integration.requiredExtensions.every(
+      (name) => !!extensions.find((ext) => ext.name === name)?.installed_version
+    )
+  }, [integration, extensions])
 
   const navItems = useMemo(() => {
     if (!integration?.navigation) return []
-    return isInstalled
-      ? integration.navigation
-      : integration.navigation.filter((nav) => nav.route === 'overview')
+    if (isInstalled || integration.type === 'wrapper') return integration.navigation
+    return integration.navigation.filter((nav) => nav.route === 'overview')
   }, [integration, isInstalled])
 
   const activeRoute = pageId ?? 'overview'
@@ -115,6 +117,7 @@ export const useIntegrationDetail = () => {
     integration,
     installation,
     isInstalled,
+    areRequiredExtensionsInstalled,
     isAvailableLoading,
     isInstalledLoading,
     Component,
