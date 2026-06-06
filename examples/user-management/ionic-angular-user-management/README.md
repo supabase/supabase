@@ -23,7 +23,7 @@ This demonstrates how to use:
 
 ## Instant deploy
 
-The Vercel deployment will guide you through creating a Supabase account and project. After installation of the Supabase integration, all relevant environment variables will be set up so that the project is usable immediately after deployment 🚀.
+The Vercel deployment will guide you through creating a Supabase account and project. After installation of the Supabase integration, all relevant environment variables will be set up so that the project is usable immediately after deployment ??.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?project-name=supabase-ionic-angular&repo-name=supabase-ionic-angular&envDescription=Find%20the%20Supabase%20URL%20and%20key%20in%20the%20your%20auto-generated%20docs%20at%20app.supabase.io&repository-url=https%3A%2F%2Fgithub.com%2Fmhartington%2Fsupabase-ionic-angular%2Ftree%2Fmain)
 
@@ -63,7 +63,7 @@ Populate this file with your URL and Key.
 
 ### 5. Run the application
 
-Run the application: `ionic serve` and the browser will open to `https://localhost:8100/` and you are ready to go 🚀.
+Run the application: `ionic serve` and the browser will open to `https://localhost:8100/` and you are ready to go ??.
 
 ## Supabase details
 
@@ -71,7 +71,7 @@ Run the application: `ionic serve` and the browser will open to `https://localho
 
 This project uses very high-level Authorization using Postgres' Role Level Security.
 When you start a Postgres database on Supabase, we populate it with an `auth` schema, and some helper functions.
-When a user logs in, they are issued a JWT with the role `authenticated` and thier UUID.
+When a user logs in, they are issued a JWT with the role `authenticated` and their UUID.
 We can use these details to provide fine-grained control over what each user can and cannot do.
 
 This is a trimmed-down schema, with the policies:
