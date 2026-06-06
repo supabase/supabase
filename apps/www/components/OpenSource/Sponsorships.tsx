@@ -17,7 +17,7 @@ const Sponsorships = ({ sponsorships }: { sponsorships: any[] }) => {
       </div>
       <div className="relative w-full h-fit grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         {sponsorships.map((link) => (
-          <Link href={link.url} key={link.name} target="_blank">
+          <Link href={link.url} key={link.name} target="_blank" rel="noreferrer">
             <Panel
               innerClassName={cn(
                 'relative group flex flex-col gap-2 p-4 ',
