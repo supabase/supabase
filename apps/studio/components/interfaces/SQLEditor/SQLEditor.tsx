@@ -33,8 +33,10 @@ import {
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
 import { RunQueryWarningModal } from './RunQueryWarningModal'
 import {
+  clampSqlEditorFontSize,
   generateSnippetTitle,
   ROWS_PER_PAGE_OPTIONS,
+  SQL_EDITOR_FONT_SIZE_DEFAULT,
   sqlAiDisclaimerComment,
   untitledSnippetTitle,
 } from './SQLEditor.constants'
@@ -73,6 +75,7 @@ import { lintKeys } from '@/data/lint/keys'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { isError } from '@/data/utils/error-check'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -655,6 +658,21 @@ export const SQLEditor = () => {
 
   const [isCompletionLoading, setIsCompletionLoading] = useState<boolean>(false)
 
+  const [sqlEditorFontSizeStored] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_FONT_SIZE,
+    SQL_EDITOR_FONT_SIZE_DEFAULT
+  )
+
+  const sqlEditorFontSize = useMemo(
+    () =>
+      clampSqlEditorFontSize(
+        typeof sqlEditorFontSizeStored === 'number' && Number.isFinite(sqlEditorFontSizeStored)
+          ? sqlEditorFontSizeStored
+          : SQL_EDITOR_FONT_SIZE_DEFAULT
+      ),
+    [sqlEditorFontSizeStored]
+  )
+
   const complete = useCallback(
     async (
       _prompt: string,
@@ -906,6 +924,7 @@ export const SQLEditor = () => {
                         language="pgsql"
                         original={defaultSqlDiff.original}
                         modified={defaultSqlDiff.modified}
+                        options={{ fontSize: sqlEditorFontSize }}
                         onMount={(editor) => {
                           diffEditorRef.current = editor
                           setIsDiffEditorMounted(true)
@@ -937,6 +956,7 @@ export const SQLEditor = () => {
                   )}
                   <div key={id} className="w-full h-full relative">
                     <MonacoEditor
+                      fontSize={sqlEditorFontSize}
                       autoFocus
                       placeholder={
                         !promptState.isOpen && !editorRef.current?.getValue()
