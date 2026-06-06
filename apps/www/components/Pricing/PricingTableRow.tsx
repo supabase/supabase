@@ -89,6 +89,18 @@ export const pricingTooltips: PricingTooltips = {
   'security.logDrain': {
     main: 'Only events processed and sent to destinations are counted. Egress required to export logs count towards usage.\nEgress through Log Drains is rolled up into the unified egress and benefits from the unified egress quota.',
   },
+  'security.soc2': {
+    main: (
+      <span className="prose text-xs">
+        The Supabase platform is SOC 2 Type 2 compliant on all plans. Access to the SOC 2 Type 2
+        report is available to Team and Enterprise customers. Read more in our{' '}
+        <Link href="/docs/guides/security/soc-2-compliance" target="_blank">
+          docs
+        </Link>
+        .
+      </span>
+    ),
+  },
   'security.hipaa': {
     main: 'Available as a paid add-on on Team Plan and above.',
   },
