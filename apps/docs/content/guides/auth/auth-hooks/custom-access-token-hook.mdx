@@ -291,7 +291,7 @@ as $$
     is_admin boolean;
   begin
     -- Check if the user is marked as admin in the profiles table
-    select is_admin into is_admin from profiles where user_id = (event->>'user_id')::uuid;
+    select p.is_admin into is_admin from public.profiles p where p.user_id = (event->>'user_id')::uuid;
 
     -- Proceed only if the user is an admin
     if is_admin then
