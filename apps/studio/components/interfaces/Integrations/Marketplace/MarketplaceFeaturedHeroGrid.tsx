@@ -62,19 +62,25 @@ export const MarketplaceFeaturedHeroGrid = ({
             href={`/project/${ref}/integrations/${primaryIntegration.id}/overview`}
             className="block h-full rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:ring-offset-1 focus-visible:ring-offset-background"
           >
-            <Card className="flex flex-row overflow-hidden h-full min-h-[168px] hover:border-stronger">
-              <div className="flex flex-col gap-2.5 p-4 flex-1 min-w-0">
+            <Card className="relative flex flex-row overflow-hidden h-full min-h-[168px] hover:border-stronger">
+              <div className="relative z-10 flex flex-col gap-2.5 p-4 flex-1 min-w-0">
                 <div className="flex items-start justify-between">
                   <IntegrationLogo integration={primaryIntegration} />
-                  {primaryInstalled && <Badge variant="success">Installed</Badge>}
+                  {!primaryInstalled && <Badge variant="success">Installed</Badge>}
                 </div>
-                <div>
-                  <div className="mb-1 text-sm font-medium">{primaryIntegration.name}</div>
+                <div className="@lg:max-w-2/3">
+                  <div className="mb-1 text-sm font-medium text-pretty">
+                    {primaryIntegration.name}
+                  </div>
                   {primaryIntegration.description && (
-                    <p className="line-clamp-3 text-xs leading-snug text-foreground-light">
+                    <p className="line-clamp-3 text-xs leading-snug text-foreground-light text-balance">
                       {primaryIntegration.description}
                     </p>
                   )}
+                  <div className="text-xs flex items-center gap-1 text-foreground-lighter shrink-0 mt-4">
+                    <span>Built by</span>
+                    <span>{primaryIntegration.author?.name}</span>
+                  </div>
                 </div>
                 <div className="flex-1" />
                 <div className="flex items-center justify-between gap-2 pt-2.5">
@@ -84,13 +90,9 @@ export const MarketplaceFeaturedHeroGrid = ({
                       <Badge variant="warning">{primaryIntegration.status}</Badge>
                     )}
                   </div>
-                  <div className="text-xs flex items-center gap-1 text-foreground-lighter shrink-0">
-                    <span>Built by</span>
-                    <span>{primaryIntegration.author?.name}</span>
-                  </div>
                 </div>
               </div>
-              <div className="relative w-2/5 shrink-0 bg-surface-400">
+              <div className="absolute inset-0 left-auto w-2/5 @lg:w-3/5 shrink-0 bg-surface-400">
                 {primaryImage ? (
                   <Image
                     fill
@@ -103,6 +105,7 @@ export const MarketplaceFeaturedHeroGrid = ({
                     {primaryIntegration.icon({ className: 'w-10 h-10 text-foreground' })}
                   </div>
                 )}
+                <div className="absolute inset-0 bg-linear-to-r from-surface-100 to-transparent" />
               </div>
             </Card>
           </Link>
