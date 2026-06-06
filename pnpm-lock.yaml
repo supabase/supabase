@@ -1759,6 +1759,9 @@ importers:
       react-countdown:
         specifier: ^2.3.5
         version: 2.3.5(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      react-data-grid:
+        specifier: 7.0.0-beta.47
+        version: 7.0.0-beta.47(patch_hash=803f02d6cede565990ab9675326b93195b98bcc6477a4811715405892c257488)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       react-dom:
         specifier: 'catalog:'
         version: 19.2.6(react@19.2.6)
