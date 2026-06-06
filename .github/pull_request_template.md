@@ -1,4 +1,4 @@
-## I have read the [CONTRIBUTING.md](https://github.com/supabase/supabase/blob/master/CONTRIBUTING.md) file.
+## I have read the [CONTRIBUTING.md](https://github.com/supabase/supabase/blob/master/CONTRIBUTING.md) guide and the [AI_POLICY.md](https://github.com/supabase/supabase/blob/master/AI_POLICY.md).
 
 YES/NO
 
