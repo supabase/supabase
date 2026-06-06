@@ -11,6 +11,7 @@
 - [Dutch / Nederlands](/i18n/README.nl.md)
 - [English](https://github.com/supabase/supabase)
 - [Estonian / eesti keel](/i18n/README.et.md)
+- [Filipino / Tagalog](/i18n/README.tl.md)
 - [Finnish / Suomalainen](/i18n/README.fi.md)
 - [French / Français](/i18n/README.fr.md)
 - [German / Deutsch](/i18n/README.de.md)
