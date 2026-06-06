@@ -25,8 +25,8 @@ import {
 import { AdvisorRulesPreview } from './AdvisorRulesPreview'
 import { CLSPreview } from './CLSPreview'
 import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
-import { JitDbAccessPreview } from './JitDbAccessPreview'
 import { IntegrationsLayoutPreview } from './IntegrationsLayoutPreview'
+import { JitDbAccessPreview } from './JitDbAccessPreview'
 import { PgDeltaDiffPreview } from './PgDeltaDiffPreview'
 import { PlatformWebhooksPreview } from './PlatformWebhooksPreview'
 import { RLSTesterPreview } from './RLSTesterPreview'
@@ -152,7 +152,7 @@ export const FeaturePreviewModal = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="h-auto min-h-0 max-h-auto md:max-h-[550px] p-4 pb-0 flex flex-col">
+              <div className="w-full h-auto min-h-0 max-h-auto md:max-h-[550px] p-4 pb-0 flex flex-col">
                 <div className="flex items-center justify-between border-b gap-2 pb-3">
                   <p>{selectedFeature?.name}</p>
                   <div className="flex items-center gap-x-2">
