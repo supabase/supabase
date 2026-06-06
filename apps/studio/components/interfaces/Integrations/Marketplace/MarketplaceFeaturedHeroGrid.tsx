@@ -66,7 +66,7 @@ export const MarketplaceFeaturedHeroGrid = ({
               <div className="relative z-10 flex flex-col gap-2.5 p-4 flex-1 min-w-0">
                 <div className="flex items-start justify-between">
                   <IntegrationLogo integration={primaryIntegration} />
-                  {!primaryInstalled && <Badge variant="success">Installed</Badge>}
+                  {primaryInstalled && <Badge variant="success">Installed</Badge>}
                 </div>
                 <div className="@lg:max-w-2/3">
                   <div className="mb-1 text-sm font-medium text-pretty">
@@ -123,7 +123,7 @@ export const MarketplaceFeaturedHeroGrid = ({
                 className="block h-full rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:ring-offset-1 focus-visible:ring-offset-background"
               >
                 <Card className="flex flex-col overflow-hidden h-full hover:border-stronger">
-                  <div className="hidden @lg:block relative w-full h-28 bg-surface-400 shrink-0">
+                  <div className="hidden @lg:block relative w-full h-28 bg-alternative shrink-0">
                     {image ? (
                       <Image
                         fill
