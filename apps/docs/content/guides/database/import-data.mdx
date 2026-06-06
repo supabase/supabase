@@ -67,7 +67,35 @@ For databases using the Postgres engine, we recommend using the [pg_dump](https:
 
 ### Option 3: Using Postgres copy command
 
-Read more about [Bulk data loading.](/docs/guides/database/tables#bulk-data-loading)
+For local `psql` imports, choose a connection mode first:
+
+1. Start with the **Direct connection** string from
+   [Connect](/dashboard/project/_?showConnect=true). This is the preferred path for
+   Postgres-native commands such as `psql`, `pg_dump`, and restore/import workflows.
+2. If direct connection fails (for example, your environment does not support IPv6), switch to
+   the **Session pooler** connection string (`:5432`) from
+   [Connect](/dashboard/project/_?showConnect=true&method=session).
+3. Avoid using **Transaction pooler** (`:6543`) for bulk imports.
+
+```bash
+# Preferred: direct connection (IPv6-capable environments)
+export SUPABASE_DB_URL="postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres"
+
+# Fallback: session pooler (works for IPv4 and IPv6)
+# Note: session pooler username includes your project ref.
+# export SUPABASE_DB_URL="postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres"
+
+# Verify the connection before importing
+psql "$SUPABASE_DB_URL" -c '\conninfo'
+
+# Import a local CSV file
+psql "$SUPABASE_DB_URL" -c "\COPY public.movies FROM './movies.csv' WITH (FORMAT csv, HEADER true)"
+```
+
+Read more about:
+
+- [Bulk data loading](/docs/guides/database/tables#bulk-data-loading)
+- [Choosing the right connection method](/docs/guides/database/connecting-to-postgres#how-to-choose-the-right-connection-method)
 
 ### Option 4: Using the Supabase API
 
