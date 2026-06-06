@@ -36,7 +36,7 @@ curl -X POST "https://api.supabase.com/v1/projects/$PROJECT_REF/network-restrict
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "db_allowed_cidrs": [
+    "dbAllowedCidrs": [
       "192.168.0.1/24",
     ]
   }'
