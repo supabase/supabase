@@ -1,13 +1,13 @@
-import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
+import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
 
-import type { ContentFileProps } from '@/components/interfaces/Connect/Connect.types'
+import { SimpleCodeBlock } from 'ui'
 import {
   ConnectTabContent,
   ConnectTabs,
   ConnectTabTrigger,
   ConnectTabTriggers,
-} from '@/components/interfaces/Connect/ConnectTabs'
-import { IS_PLATFORM } from '@/lib/constants'
+} from 'components/interfaces/Connect/ConnectTabs'
+import { IS_PLATFORM } from 'lib/constants'
 
 const ContentFile = ({ connectionStringPooler }: ContentFileProps) => {
   return (
@@ -15,8 +15,6 @@ const ContentFile = ({ connectionStringPooler }: ContentFileProps) => {
       <ConnectTabTriggers>
         <ConnectTabTrigger value=".env.local" />
         <ConnectTabTrigger value="prisma/schema.prisma" />
-        <ConnectTabTrigger value="prisma.config.ts" />
-        <ConnectTabTrigger value="db.ts" />
       </ConnectTabTriggers>
 
       <ConnectTabContent value=".env.local">
@@ -57,44 +55,14 @@ DIRECT_URL="${IS_PLATFORM ? connectionStringPooler.sessionShared : connectionStr
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
-        `}
-        </SimpleCodeBlock>
-      </ConnectTabContent>
-      <ConnectTabContent value="prisma.config.ts">
-        <SimpleCodeBlock className="bash" parentClassName="min-h-72">
-          {`
-import "dotenv/config";
-import { defineConfig, env } from "prisma/config";
-
-export default defineConfig({
-  datasource: {
-    url: env("DIRECT_URL"),
-  },
-});
-        `}
-        </SimpleCodeBlock>
-      </ConnectTabContent>
-      <ConnectTabContent value="db.ts">
-        <SimpleCodeBlock className="bash" parentClassName="min-h-72">
-          {`
-import { PrismaClient } from "../../generated/prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
-
-const createPrismaClient = () =>
-  new PrismaClient({
-    adapter,
-    log:
-      process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
-  });
         `}
         </SimpleCodeBlock>
       </ConnectTabContent>
