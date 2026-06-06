@@ -9,7 +9,7 @@ sidebar_label: 'LangChain'
 
 ## Initializing your database
 
-Prepare you database with the relevant tables:
+Prepare your database with the relevant tables:
 
 <Tabs
   scrollable
@@ -75,8 +75,16 @@ $$;
 
 ## Usage
 
-You can now search your documents using any Node.js application. This is intended to be run on a secure server route.
+You can now search your documents using any Node.js or Python application. This is intended to be run on a secure server route.
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 ```js
 import { SupabaseVectorStore } from '@langchain/community/vectorstores/supabase'
 import { OpenAIEmbeddings } from '@langchain/openai'
@@ -108,10 +116,53 @@ export const run = async () => {
 }
 ```
 
+</TabPanel>
+<TabPanel id="python" label="Python">
+```python
+import os
+from langchain_community.vectorstores import SupabaseVectorStore
+from langchain_openai import OpenAIEmbeddings
+from supabase import Client, create_client
+
+supabase_url = os.environ.get("SUPABASE_URL")
+supabase_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+if not supabase_url:
+    raise ValueError("Expected SUPABASE_URL")
+if not supabase_key:
+    raise ValueError("Expected SUPABASE_SERVICE_ROLE_KEY")
+
+supabase: Client = create_client(supabase_url, supabase_key)
+
+embeddings = OpenAIEmbeddings()
+
+vector_store = SupabaseVectorStore.from_texts(
+    ["Hello world", "Bye bye", "What's this?"],
+    embeddings,
+    metadatas=[{"id": 2}, {"id": 1}, {"id": 3}],
+    client=supabase,
+    table_name="documents",
+    query_name="match_documents",
+)
+
+matched_docs = vector_store.similarity_search("Hello world", k=1)
+print(matched_docs)
+```
+
+</TabPanel>
+</Tabs>
+
 ### Simple metadata filtering
 
 Given the above `match_documents` Postgres function, you can also pass a filter parameter to only return documents with a specific metadata field value. This filter parameter is a JSON object, and the `match_documents` function will use the Postgres JSONB Containment operator `@>` to filter documents by the metadata field values you specify. See details on the [Postgres JSONB Containment operator](https://www.postgresql.org/docs/current/datatype-json.html#JSON-CONTAINMENT) for more information.
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 ```js
 import { SupabaseVectorStore } from '@langchain/community/vectorstores/supabase'
 import { OpenAIEmbeddings } from '@langchain/openai'
@@ -147,10 +198,53 @@ export const run = async () => {
 }
 ```
 
+</TabPanel>
+<TabPanel id="python" label="Python">
+```python
+import os
+from langchain_community.vectorstores import SupabaseVectorStore
+from langchain_openai import OpenAIEmbeddings
+from supabase import Client, create_client
+
+supabase_url = os.environ.get("SUPABASE_URL")
+supabase_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+if not supabase_url:
+    raise ValueError("Expected SUPABASE_URL")
+if not supabase_key:
+    raise ValueError("Expected SUPABASE_SERVICE_ROLE_KEY")
+
+supabase: Client = create_client(supabase_url, supabase_key)
+
+embeddings = OpenAIEmbeddings()
+
+vector_store = SupabaseVectorStore.from_texts(
+    ["Hello world", "Hello world", "Hello world"],
+    embeddings,
+    metadatas=[{"user_id": 2}, {"user_id": 1}, {"user_id": 3}],
+    client=supabase,
+    table_name="documents",
+    query_name="match_documents",
+)
+
+matched_docs = vector_store.similarity_search("Hello world", k=1, filter={"user_id": 3})
+print(matched_docs)
+```
+
+</TabPanel>
+</Tabs>
+
 ### Advanced metadata filtering
 
 You can also use query builder-style filtering ([similar to how the Supabase JavaScript library works](/docs/reference/javascript/using-filters)) instead of passing an object. Note that since the filter properties will be in the metadata column, you need to use arrow operators (`->` for integer or `->>` for text) as defined in [PostgREST API documentation](https://postgrest.org/en/stable/references/api/tables_views.html?highlight=operators#json-columns) and specify the data type of the property (e.g. the column should look something like `metadata->some_int_value::int`).
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 ```js
 import { SupabaseFilterRPCCall, SupabaseVectorStore } from '@langchain/community/vectorstores/supabase'
 import { OpenAIEmbeddings } from '@langchain/openai'
@@ -215,6 +309,74 @@ export const run = async () => {
   console.log(resultA, resultB)
 }
 ```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+```python
+import os
+from langchain_community.vectorstores import SupabaseVectorStore
+from langchain_core.documents import Document
+from langchain_openai import OpenAIEmbeddings
+from supabase import Client, create_client
+
+supabase_url = os.environ.get("SUPABASE_URL")
+supabase_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+if not supabase_url:
+    raise ValueError("Expected SUPABASE_URL")
+if not supabase_key:
+    raise ValueError("Expected SUPABASE_SERVICE_ROLE_KEY")
+
+supabase: Client = create_client(supabase_url, supabase_key)
+
+embeddings = OpenAIEmbeddings()
+
+store = SupabaseVectorStore(
+    embedding=embeddings,
+    client=supabase,
+    table_name="documents",
+)
+
+docs = [
+    Document(
+        page_content="This is a long text, but it actually means something because vector database does not understand Lorem Ipsum. So I would need to expand upon the notion of quantum fluff, a theoretical concept where subatomic particles coalesce to form transient multidimensional spaces. Yet, this abstraction holds no real-world application or comprehensible meaning, reflecting a cosmic puzzle.",
+        metadata={"b": 1, "c": 10, "stuff": "right"},
+    ),
+    Document(
+        page_content="This is a long text, but it actually means something because vector database does not understand Lorem Ipsum. So I would need to proceed by discussing the echo of virtual tweets in the binary corridors of the digital universe. Each tweet, like a pixelated canary, hums in an unseen frequency, a fascinatingly perplexing phenomenon that, while conjuring vivid imagery, lacks any concrete implication or real-world relevance, portraying a paradox of multidimensional spaces in the age of cyber folklore.",
+        metadata={"b": 2, "c": 9, "stuff": "right"},
+    ),
+    Document(page_content="hello", metadata={"b": 1, "c": 9, "stuff": "right"}),
+    Document(page_content="hello", metadata={"b": 1, "c": 9, "stuff": "wrong"}),
+    Document(page_content="hi", metadata={"b": 2, "c": 8, "stuff": "right"}),
+    Document(page_content="bye", metadata={"b": 3, "c": 7, "stuff": "right"}),
+    Document(page_content="what's this", metadata={"b": 4, "c": 6, "stuff": "right"}),
+]
+
+store.add_documents(docs)
+
+func_filter_a = lambda rpc: (
+    rpc
+    .filter("metadata->b::int", "lt", 3)
+    .filter("metadata->c::int", "gt", 7)
+    .text_search("content", "'multidimensional' & 'spaces'", config="english")
+)
+
+result_a = store.similarity_search("quantum", k=4, filter=func_filter_a)
+
+func_filter_b = lambda rpc: (
+    rpc
+    .filter("metadata->b::int", "lt", 3)
+    .filter("metadata->c::int", "gt", 7)
+    .filter("metadata->>stuff", "eq", "right")
+)
+
+result_b = store.similarity_search("hello", k=2, filter=func_filter_b)
+
+print(result_a, result_b)
+```
+
+</TabPanel>
+</Tabs>
 
 ## Hybrid search
 
