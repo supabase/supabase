@@ -80,7 +80,11 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
   const { mutateAsync: updateFDW } = useFDWUpdateMutation()
   const { mutateAsync: dropForeignTable } = useFDWDropForeignTableMutation()
   const { mutateAsync: deleteNamespaceTable, isPending: isDeletingNamespaceTable } =
-    useIcebergNamespaceTableDeleteMutation({ onError: () => {} })
+    useIcebergNamespaceTableDeleteMutation({
+      onError: (error: any) => {
+        toast.error(`Failed to delete namespace table: ${error.message}`)
+      },
+    })
   const { mutateAsync: updatePublication } = useUpdatePublicationMutation()
   const { mutateAsync: startPipeline } = useStartPipelineMutation()
 
@@ -237,7 +241,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
       toast.success('Successfully removed table!')
       setShowRemoveTableModal(false)
     } catch (error: any) {
-      toast.error(`Failed to remove table: ${error.message}`)
+      // Error handled by mutation onError
     } finally {
       setIsRemovingTable(false)
     }
@@ -276,7 +280,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
 
       toast.success(`Successfully removed table "${table.name}"!`)
     } catch (error: any) {
-      toast.error(`Failed to remove table: ${error.message}`)
+      // Error handled by mutation onError
     } finally {
       setIsRemovingTable(false)
     }
