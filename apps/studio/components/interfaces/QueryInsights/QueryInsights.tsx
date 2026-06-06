@@ -10,6 +10,7 @@ import { QueryInsightsHealth } from './QueryInsightsHealth/QueryInsightsHealth'
 import { QueryInsightsTable } from './QueryInsightsTable/QueryInsightsTable'
 import {
   aggregateLogsByQuery,
+  aggregateLogsToMinuteBuckets,
   filterSystemLogs,
   parseSupamonitorLogs,
   transformLogsToChartData,
@@ -63,7 +64,15 @@ export const QueryInsights = ({ dateRange }: QueryInsightsProps) => {
 
   const parsedLogs = useMemo(() => parseSupamonitorLogs(logData || []), [logData])
   const filteredLogs = useMemo(() => filterSystemLogs(parsedLogs), [parsedLogs])
-  const chartData = useMemo(() => transformLogsToChartData(filteredLogs), [filteredLogs])
+  const chartData = useMemo(
+    () =>
+      aggregateLogsToMinuteBuckets(
+        filteredLogs,
+        new Date(effectiveDateRange.iso_timestamp_start).getTime(),
+        new Date(effectiveDateRange.iso_timestamp_end).getTime()
+      ),
+    [filteredLogs, effectiveDateRange]
+  )
   const selectedChartData = useMemo(
     () =>
       selectedQuery
