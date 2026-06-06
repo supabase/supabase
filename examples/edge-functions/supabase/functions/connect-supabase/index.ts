@@ -36,7 +36,6 @@ router.get('/connect-supabase/login', async (ctx) => {
 router.get('/connect-supabase/oauth2/callback', async (ctx) => {
   // Make sure the codeVerifier is present for the user's session.
   const codeVerifier = ctx.state.session.get('codeVerifier') as string
-  console.log('codeVerifier', codeVerifier)
   if (!codeVerifier) throw new Error('No codeVerifier!')
 
   // Exchange the authorization code for an access token.
@@ -54,7 +53,6 @@ router.get('/connect-supabase/oauth2/callback', async (ctx) => {
       code_verifier: codeVerifier,
     }),
   }).then((res) => res.json())
-  console.log('tokens', tokens)
   // TODO: Make sure to store the tokens in your DB for future use.
 
   // Use the access token to make an authenticated API request.
