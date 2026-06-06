@@ -140,6 +140,10 @@ install_deps() {
   if command -v apt-get >/dev/null 2>&1; then
     export DEBIAN_FRONTEND=noninteractive
     local APT_OPTS; APT_OPTS=(-y -o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef)
+    # Heal a previously interrupted apt/dpkg run (common on cheap VPS) so the
+    # prerequisite install below doesn't abort with "dpkg was interrupted".
+    $SUDO dpkg --configure -a 2>/dev/null || true
+    $SUDO apt-get install -f "${APT_OPTS[@]}" -qq >/dev/null 2>&1 || true
     $SUDO apt-get update -qq
     log "Upgrading existing packages (apt upgrade)"
     $SUDO apt-get upgrade "${APT_OPTS[@]}" -qq >/dev/null 2>&1 || warn "apt upgrade reported issues (continuing)"
