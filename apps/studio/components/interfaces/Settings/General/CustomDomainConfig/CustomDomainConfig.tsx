@@ -35,7 +35,7 @@ export const CustomDomainConfig = () => {
   const plan = organization?.plan?.id
 
   const { data: addons, isPending: isLoadingAddons } = useProjectAddonsQuery({ projectRef: ref })
-  const hasCustomDomainAddon = !!addons?.selected_addons.find((x) => x.type === 'custom_domain')
+  const hasCustomDomainAddon = !!addons?.selected_addons?.find((x) => x.type === 'custom_domain')
 
   const {
     data: customDomainData,

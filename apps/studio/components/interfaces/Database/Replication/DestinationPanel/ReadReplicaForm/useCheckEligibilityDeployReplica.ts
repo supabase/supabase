@@ -38,7 +38,7 @@ export const useCheckEligibilityDeployReplica = () => {
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   // Will be following the primary's compute size for the time being
-  const currentComputeAddon = addons?.selected_addons.find(
+  const currentComputeAddon = addons?.selected_addons?.find(
     (addon) => addon.type === 'compute_instance'
   )?.variant.identifier
 

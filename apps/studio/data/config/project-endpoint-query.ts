@@ -7,7 +7,10 @@ export const useProjectApiUrl = (
   { enabled = true }: { enabled?: boolean } = {}
 ) => {
   const { data } = useProjectAddonsQuery({ projectRef }, { enabled })
-  const hasCustomDomainsAddon = !!data?.selected_addons.find((x) => x.type === 'custom_domain')
+  // [console fork] selected_addons can be undefined before the addons query resolves (or
+  // when it returns a minimal payload on self-host) — guard the .find() so the global
+  // Connect sheet / API-url hook doesn't crash the whole project page.
+  const hasCustomDomainsAddon = !!data?.selected_addons?.find((x) => x.type === 'custom_domain')
 
   const {
     data: customDomainData,

@@ -33,7 +33,7 @@ export const useGenerateDatabaseMenu = (): ProductMenuGroup[] => {
   const { data: addons } = useProjectAddonsQuery({ projectRef: project?.ref })
 
   const pgNetExtensionExists = (data ?? []).some((ext) => ext.name === 'pg_net')
-  const pitrEnabled = addons?.selected_addons.some((addon) => addon.type === 'pitr') ?? false
+  const pitrEnabled = addons?.selected_addons?.some((addon) => addon.type === 'pitr') ?? false
   const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
   const enablePgReplicate = useIsETLPrivateAlpha()
 

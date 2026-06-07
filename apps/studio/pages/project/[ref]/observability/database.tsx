@@ -108,7 +108,7 @@ const DatabaseUsage = () => {
 
   // PGBouncer connections
   const { data: addons } = useProjectAddonsQuery({ projectRef: project?.ref })
-  const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
+  const computeInstance = addons?.selected_addons?.find((addon) => addon.type === 'compute_instance')
   const poolingOptimizations =
     POOLING_OPTIMIZATIONS[
       (computeInstance?.variant.identifier as keyof typeof POOLING_OPTIMIZATIONS) ??

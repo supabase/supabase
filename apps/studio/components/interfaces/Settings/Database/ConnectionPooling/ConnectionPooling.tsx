@@ -94,8 +94,8 @@ export const ConnectionPooling = () => {
   const { mutate: updatePoolerConfig, isPending: isUpdatingPoolerConfig } =
     usePgbouncerConfigurationUpdateMutation()
 
-  const hasIpv4Addon = !!addons?.selected_addons.find((addon) => addon.type === 'ipv4')
-  const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
+  const hasIpv4Addon = !!addons?.selected_addons?.find((addon) => addon.type === 'ipv4')
+  const computeInstance = addons?.selected_addons?.find((addon) => addon.type === 'compute_instance')
   const computeSize =
     computeInstance?.variant.name ?? capitalize(project?.infra_compute_size) ?? 'Nano'
   const poolingOptimizations =

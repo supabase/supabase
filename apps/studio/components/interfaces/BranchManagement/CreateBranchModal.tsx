@@ -130,7 +130,7 @@ export const CreateBranchModal = () => {
     { projectRef },
     { enabled: showCreateBranchModal }
   )
-  const computeAddon = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
+  const computeAddon = addons?.selected_addons?.find((addon) => addon.type === 'compute_instance')
   const computeSize = computeAddon
     ? (computeAddon.variant.identifier.split('ci_')[1] as DesiredInstanceSize)
     : undefined

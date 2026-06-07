@@ -97,7 +97,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
     }
   }, [computeSize, availableOptions])
 
-  const subscriptionPitr = addons?.selected_addons.find((addon) => addon.type === 'pitr')
+  const subscriptionPitr = addons?.selected_addons?.find((addon) => addon.type === 'pitr')
 
   const computeSizePrice = calculateComputeSizePrice({
     availableOptions: availableOptions,

@@ -17,7 +17,7 @@ export const useGetReplicaCost = () => {
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const { data: diskConfiguration } = useDiskAttributesQuery({ projectRef })
 
-  const currentComputeAddon = addons?.selected_addons.find(
+  const currentComputeAddon = addons?.selected_addons?.find(
     (addon) => addon.type === 'compute_instance'
   )?.variant.identifier
   const computeAddons =
