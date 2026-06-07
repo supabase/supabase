@@ -1,4 +1,5 @@
 import { useFlag, useParams } from 'common'
+import { useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import type { CloudProvider } from 'shared-data'
 import {
@@ -67,6 +68,8 @@ export const RegionSelector = ({
   layout = 'horizontal',
 }: RegionSelectorProps) => {
   const { slug } = useParams()
+  // [console fork] type-to-filter the region list (autocomplete).
+  const [regionSearch, setRegionSearch] = useState('')
   const cloudProvider = form.getValues('cloudProvider') as CloudProvider
 
   const smartRegionEnabled = useFlag('enableSmartRegion')
@@ -191,6 +194,17 @@ export const RegionSelector = ({
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
+                    {/* [console fork] type-to-filter autocomplete */}
+                    <div className="sticky top-0 z-10 bg-overlay p-2 border-b border-default">
+                      <input
+                        autoFocus
+                        placeholder="Search regions…"
+                        value={regionSearch}
+                        onChange={(e) => setRegionSearch(e.target.value)}
+                        onKeyDown={(e) => e.stopPropagation()}
+                        className="flex h-8 w-full rounded-md border border-control bg-foreground/[.026] px-3 text-sm placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground-muted"
+                      />
+                    </div>
                     {/* [console fork] Our own infrastructure options */}
                     <SelectGroup>
                       <SelectLabel>Custom</SelectLabel>
@@ -246,7 +260,16 @@ export const RegionSelector = ({
 
                     <SelectGroup>
                       <SelectLabel>Specific regions</SelectLabel>
-                      {regionOptions.map((value) => {
+                      {regionOptions
+                        .filter((value) => {
+                          const q = regionSearch.trim().toLowerCase()
+                          if (!q) return true
+                          return (
+                            value.name.toLowerCase().includes(q) ||
+                            value.code.toLowerCase().includes(q)
+                          )
+                        })
+                        .map((value) => {
                         return (
                           <SelectItem
                             key={value.code}
