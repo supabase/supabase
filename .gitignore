@@ -165,4 +165,4 @@ keys.json
 # examples
 examples/**/package-lock.json
 examples/**/yarn.lock
-examples/**/pnpm-lock.yaml
+examples/**/pnpm-lock.yamlapps/studio/.snippets/
