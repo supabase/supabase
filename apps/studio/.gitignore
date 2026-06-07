@@ -40,3 +40,4 @@ yarn-error.log*
 .sentryclirc
 
 certificates
+.auth-config/
