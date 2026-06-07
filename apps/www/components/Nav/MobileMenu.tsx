@@ -6,7 +6,7 @@ import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Button } from 'ui'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Button, cn } from 'ui'
 import { TextLink } from 'ui-patterns/TextLink'
 
 import MenuItem from './MenuItem'
@@ -168,29 +168,33 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
     </AccordionContent>
   )
 
-  const Menu = () => (
-    <Accordion type="multiple" className="px-0">
-      {menu.primaryNav.map((menuItem: any) => (
-        <m.div variants={listItem} className="border-b [&>div]:rounded-none!">
-          {menuItem.hasDropdown ? (
-            <AccordionItem id={menuItem.title} value={menuItem.title} className="border-none">
-              <AccordionTrigger className="py-2 pl-2 pr-4 text-base font-medium text-foreground hover:bg-surface-200">
+  const Menu = () => {
+    const className = 'py-2 pl-2 pr-4 text-base font-medium text-foreground hover:bg-surface-200'
+    return (
+      <Accordion type="multiple" className="px-0">
+        {menu.primaryNav.map((menuItem: any) => (
+          <m.div variants={listItem} className="border-b [&>div]:rounded-none!">
+            {menuItem.hasDropdown ? (
+              <AccordionItem id={menuItem.title} value={menuItem.title} className="border-none">
+                <AccordionTrigger className={className}>{menuItem.title}</AccordionTrigger>
+                <AccordionMenuItem menuItem={menuItem} />
+              </AccordionItem>
+            ) : (
+              <Link
+                href={menuItem.url}
+                className={cn(
+                  className,
+                  'block focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-foreground-lighter focus-visible:rounded-sm'
+                )}
+              >
                 {menuItem.title}
-              </AccordionTrigger>
-              <AccordionMenuItem menuItem={menuItem} />
-            </AccordionItem>
-          ) : (
-            <Link
-              href={menuItem.url}
-              className="block py-2 pl-3 pr-4 text-base font-medium text-foreground hover:bg-surface-200 focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-foreground-lighter focus-visible:rounded-sm"
-            >
-              {menuItem.title}
-            </Link>
-          )}
-        </m.div>
-      ))}
-    </Accordion>
-  )
+              </Link>
+            )}
+          </m.div>
+        ))}
+      </Accordion>
+    )
+  }
 
   return (
     <LazyMotion features={domAnimation}>
