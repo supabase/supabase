@@ -28,14 +28,14 @@ When you delete a project, the following are permanently removed and **cannot be
 
 You can delete a project through any of these methods:
 
-### Via Dashboard
+### Via dashboard
 
 1. Navigate to your project's **Settings** > **Danger Zone**
 2. Click **Delete Project**
 3. Enter your project name exactly as it appears to confirm
 4. Review the confirmation dialog and click **Delete**
 
-### Via Supabase CLI
+### Via supabase CLI
 
 ```bash
 supabase projects delete <project-ref>
@@ -43,7 +43,7 @@ supabase projects delete <project-ref>
 
 For more information, see the [Supabase CLI documentation](/docs/reference/cli/supabase-projects-delete).
 
-### Via Management API
+### Via management API
 
 ```bash
 curl -X DELETE https://api.supabase.com/v1/projects/<project-ref> \
@@ -52,11 +52,11 @@ curl -X DELETE https://api.supabase.com/v1/projects/<project-ref> \
 
 See the [Management API documentation](/docs/reference/api/v1-delete-a-project) for details.
 
-## Protective Measures To Consider
+## Protective measures to consider
 
 To safeguard against accidental deletion, consider the following:
 
-### 1. Export Critical Data
+### 1. Export critical data
 
 - **Database backups**: Use `pg_dump` to export your PostgreSQL database:
 
@@ -73,20 +73,20 @@ pg_dump postgres://user:password@db.<project_id>.supabase.co:5432/postgres > bac
 - **Selective exports**: Export specific tables or schemas needed for your records
 - **External storage**: Save backups to S3, Google Cloud Storage, or your local machine
 
-### 2. Download Storage Objects
+### 2. Download storage objects
 
 - Back up all important files from Storage buckets
 - Use the Supabase dashboard or API to download files in bulk
 - Store in a secure location outside of Supabase
 
-### 3. Document Configuration
+### 3. Document configuration
 
 - Export Edge Function code and configurations from the dashboard
 - Save authentication provider settings (OAuth, SAML, etc.)
 - Document any custom database functions, triggers, or policies
 - Record webhook configurations and integrations
 
-### 4. Enable Access Controls
+### 4. Enable access controls
 
 <Admonition type="caution">
 
