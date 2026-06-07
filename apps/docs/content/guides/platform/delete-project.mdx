@@ -11,11 +11,11 @@ Deleted projects cannot be recovered. All data, backups, and configurations are 
 
 </Admonition>
 
-## What Gets Deleted
+## What gets deleted
 
 When you delete a project, the following are permanently removed and **cannot be recovered**:
 
-- **Database and all data**: Your entire PostgreSQL database, including all tables, schemas, and records
+- **Database and all data**: Your entire Postgres database, including all tables, schemas, and records
 - **Edge Functions**: All deployed Edge Functions and their source code are removed
 - **Storage objects**: All files in Storage buckets are permanently deleted
 - **Backups**: All automated backups and point-in-time recovery snapshots are deleted
@@ -24,7 +24,7 @@ When you delete a project, the following are permanently removed and **cannot be
 - **API keys and credentials**: All project API keys, service role keys, and webhooks are invalidated
 - **Custom domains and SSL certificates**: Any custom domains linked to the project are removed
 
-## How to Delete a Project
+## How to delete a project
 
 You can delete a project through any of these methods:
 
@@ -41,7 +41,7 @@ You can delete a project through any of these methods:
 supabase projects delete <project-ref>
 ```
 
-For more information, see the [Supabase CLI documentation](https://supabase.com/docs/reference/cli/supabase-projects-delete).
+For more information, see the [Supabase CLI documentation](/docs/reference/cli/supabase-projects-delete).
 
 ### Via Management API
 
@@ -50,7 +50,7 @@ curl -X DELETE https://api.supabase.com/v1/projects/<project-ref> \
   -H "Authorization: Bearer <access-token>"
 ```
 
-See the [Management API documentation](https://supabase.com/docs/reference/api/v1-delete-a-project) for details.
+See the [Management API documentation](/docs/reference/api/v1-delete-a-project) for details.
 
 ## Protective Measures To Consider
 
@@ -91,7 +91,7 @@ pg_dump postgres://user:password@db.<project_id>.supabase.co:5432/postgres > bac
 <Admonition type="caution">
 
 Restrict who can delete projects within your organization to prevent accidental deletion by team members.
-See [Access Controls](https://supabase.com/docs/guides/platform/access-control)
+See [Access Controls](/docs/guides/platform/access-control)
 
 </Admonition>
 
@@ -99,13 +99,13 @@ See [Access Controls](https://supabase.com/docs/guides/platform/access-control)
 - Require multi-factor authentication (MFA) for sensitive operations
 - Use the Supabase dashboard to configure team member permissions
 
-### 5. Monitor Project Activity
+### 5. Monitor project activity
 
 - Enable audit logging to track who has access to your project
 - Review and revoke unnecessary API keys before deletion
 - Check for any scheduled jobs or integrations that depend on the project
 
-## After Deletion
+## After deletion
 
 Once a project is deleted:
 
@@ -120,7 +120,7 @@ Deleted projects do not free up your account's project quota immediately. Contac
 
 </Admonition>
 
-## Alternative: Pause Your Project
+## Alternative: pause your project
 
 If you're unsure about deletion, consider pausing your project instead:
 
@@ -130,10 +130,10 @@ If you're unsure about deletion, consider pausing your project instead:
 
 To pause a project, navigate to **Settings** > **General** and click **Pause Project**.
 
-## Need Help?
+## Need help?
 
 If you're unsure about deletion or need assistance:
 
 - Review this guide and the protection measures above
-- Contact [Supabase support](https://supabase.com/support) for guidance
+- Contact [Supabase support](/supabase.com/support) for guidance
 - Consider reaching out to your team before deleting shared projects
