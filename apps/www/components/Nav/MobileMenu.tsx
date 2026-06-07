@@ -178,7 +178,11 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
     return (
       <Accordion type="multiple" className="px-0">
         {menu.primaryNav.map((menuItem: any) => (
-          <m.div variants={listItem} className="border-b [&>div]:rounded-none!">
+          <m.div
+            key={menuItem.title}
+            variants={listItem}
+            className="border-b [&>div]:rounded-none!"
+          >
             {menuItem.hasDropdown ? (
               <AccordionItem id={menuItem.title} value={menuItem.title} className="border-none">
                 <AccordionTrigger className={className}>{menuItem.title}</AccordionTrigger>
