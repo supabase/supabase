@@ -36,7 +36,7 @@ export const getConnectionStrings = ({
   direct: ConnectionStrings
   pooler: ConnectionStrings
 } => {
-  const isMd5 = poolingInfo?.connectionString.includes('options=reference')
+  const isMd5 = poolingInfo?.connectionString?.includes('options=reference')
   const { projectRef } = metadata
   const password = '[YOUR-PASSWORD]'
 
@@ -162,7 +162,7 @@ export const constructConnStringSyntax = (
     portNumber: string
   }
 ) => {
-  const isMd5 = connString.includes('options=reference')
+  const isMd5 = connString?.includes('options=reference')
   const poolerHostDetails = [
     { value: cloudProvider.toLocaleLowerCase(), tooltip: 'Cloud provider' },
     { value: '-0-', tooltip: undefined },

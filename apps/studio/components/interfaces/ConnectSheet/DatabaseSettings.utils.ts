@@ -118,7 +118,7 @@ export const getConnectionStrings = ({
   direct: ConnectionStrings
   pooler: ConnectionStrings
 } => {
-  const isMd5 = poolingInfo?.connectionString.includes('options=reference')
+  const isMd5 = poolingInfo?.connectionString?.includes('options=reference')
   const { projectRef } = metadata
   const password = '[YOUR-PASSWORD]'
 
