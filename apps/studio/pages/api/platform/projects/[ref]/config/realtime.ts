@@ -1,4 +1,4 @@
-import { bff, consoleGet, consoleFetch } from '@/lib/console-bff'
+import { bff, consoleFetch } from '@/lib/console-bff'
 
 // [console fork] Realtime configuration (reads/writes the project's _realtime.tenants
 // row; applies live). Proxied to the control-plane.

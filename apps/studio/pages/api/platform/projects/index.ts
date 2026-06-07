@@ -1,3 +1,5 @@
+import { AWS_REGIONS } from 'shared-data'
+
 import {
   bff,
   consoleFetch,
@@ -6,6 +8,17 @@ import {
   resolveOrg,
   type BackendOrg,
 } from '@/lib/console-bff'
+
+// [console fork] The region SelectItem's value is the display NAME (e.g. "East US
+// (North Virginia)"), but the control-plane keys regions by AWS code ("us-east-1").
+// Resolve name -> code here so dedicated (EC2) projects create correctly.
+const REGION_NAME_TO_CODE: Record<string, string> = Object.fromEntries(
+  Object.values(AWS_REGIONS).map((r: any) => [r.displayName, r.code])
+)
+function resolveRegionCode(label: string | undefined): string {
+  if (!label || label === 'Shared Infrastructure') return 'shared'
+  return REGION_NAME_TO_CODE[label] ?? label // already a code, or unknown -> pass through
+}
 
 function mapProject(p: any, org: { id: string; slug: string }) {
   const region = p.region ?? 'shared'
@@ -67,8 +80,8 @@ export default bff({
         method: 'POST',
         body: JSON.stringify({
           name: b.name,
-          // Map the dashboard region label to our backend region id.
-          region: b.db_region === 'Shared Infrastructure' ? 'shared' : (b.db_region || 'shared'),
+          // Map the dashboard region label (display name) to our backend region code.
+          region: resolveRegionCode(b.db_region),
           dbPassword: b.db_pass,
           postgresType: b.postgres_engine === 'oriole' ? 'orioledb' : 'postgres',
           // [console fork] honor the create-form Data API + RLS toggles
