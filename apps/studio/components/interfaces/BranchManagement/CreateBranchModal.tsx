@@ -459,13 +459,11 @@ export const CreateBranchModal = () => {
                       <>
                         {isErrorDiskAttr ? (
                           <>
-                            <p className="text-sm text-foreground">
-                              Branch disk size will incur additional cost per month
-                            </p>
+                            <p className="text-sm text-foreground">Branch disk size</p>
                             <p className="text-sm text-foreground-light">
-                              The additional cost and time taken to create a data branch is relative
-                              to the size of your database. We are unable to provide an estimate as
-                              we were unable to retrieve your project's disk configuration
+                              The time taken to create a data branch is relative to the size of your
+                              database. We are unable to provide an estimate as we were unable to
+                              retrieve your project's disk configuration.
                             </p>
                           </>
                         ) : (

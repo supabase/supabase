@@ -100,7 +100,7 @@ export const GetStartedHero = () => {
         <Row col1="4" col2="Connect Supabase" col3="In progress" />
         <Row col1="5" col2="Deploy project" col3="Not started" />
         <Row col1="6" col2="Get users" col3="Not started" />
-        <Row col1="7" col2="Upgrade to Pro" col3="Not started" />
+        <Row col1="7" col2="Invite your team" col3="Not started" />
       </div>
     </div>
   )
