@@ -1,4 +1,5 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
+import { safeLocalStorage, safeSessionStorage } from 'common'
 import { compact } from 'lodash'
 import { useSearchParams } from 'next/navigation'
 import { parseAsNativeArrayOf, parseAsString, useQueryStates } from 'nuqs'
@@ -148,7 +149,7 @@ export function loadTableEditorStateFromLocalStorage(
 ): SavedState | undefined {
   const storageKey = getStorageKey(STORAGE_KEY_PREFIX, projectRef)
   // Prefer sessionStorage (scoped to current tab) over localStorage
-  const jsonStr = sessionStorage.getItem(storageKey) ?? localStorage.getItem(storageKey)
+  const jsonStr = safeSessionStorage.getItem(storageKey) ?? safeLocalStorage.getItem(storageKey)
   if (!jsonStr) return
   const json = JSON.parse(jsonStr)
   return json[tableId]
@@ -200,7 +201,7 @@ export function saveTableEditorStateToLocalStorage({
   sensitiveDataColumns?: string[]
 }) {
   const storageKey = getStorageKey(STORAGE_KEY_PREFIX, projectRef)
-  const savedStr = sessionStorage.getItem(storageKey) ?? localStorage.getItem(storageKey)
+  const savedStr = safeSessionStorage.getItem(storageKey) ?? safeLocalStorage.getItem(storageKey)
 
   const config = {
     ...(gridColumns !== undefined && { gridColumns }),
@@ -218,8 +219,8 @@ export function saveTableEditorStateToLocalStorage({
     savedJson = { [tableId]: config }
   }
   // Save to both localStorage and sessionStorage so it's consistent to current tab
-  localStorage.setItem(storageKey, JSON.stringify(savedJson))
-  sessionStorage.setItem(storageKey, JSON.stringify(savedJson))
+  safeLocalStorage.setItem(storageKey, JSON.stringify(savedJson))
+  safeSessionStorage.setItem(storageKey, JSON.stringify(savedJson))
 }
 
 export const saveTableEditorStateToLocalStorageDebounced = AwesomeDebouncePromise(

@@ -3,8 +3,8 @@ import { Button, cn } from 'ui'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
 
+import { MarketplaceDetailBreadrumbs } from './MarketplaceDetailBreadcrumbs'
 import { MarketplaceDetailHero } from './MarketplaceDetailHero'
-import { MarketplaceDetailTopBar } from './MarketplaceDetailTopBar'
 import { OverviewTab } from './OverviewTab'
 import { IntegrationDetailTabShortcuts } from '@/components/interfaces/Integrations/Integration/IntegrationDetailTabShortcuts'
 import { InstallIntegrationSheet } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallIntegrationSheet'
@@ -38,9 +38,9 @@ export const MarketplaceDetail = () => {
   if (isAvailableLoading || isInstalledLoading) {
     return (
       <>
-        <MarketplaceDetailTopBar title="" />
-        <div className={cn(centeredContentClass, 'border-b bg-surface-75 pt-10')}>
-          <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 pb-6">
+        <MarketplaceDetailBreadrumbs isLoading />
+        <div className={cn(centeredContentClass, 'max-w-none border-b bg-surface-75 pt-10')}>
+          <div className="mx-auto flex w-full flex-col gap-3 pb-6">
             <ShimmeringLoader className="h-9 w-64" />
             <ShimmeringLoader className="h-4 w-96" />
           </div>
@@ -55,7 +55,7 @@ export const MarketplaceDetail = () => {
   if (!integration) {
     return (
       <>
-        <MarketplaceDetailTopBar title="Integration not found" />
+        <MarketplaceDetailBreadrumbs title="Integration not found" />
         <div className={cn(centeredContentClass, 'py-8')}>
           <Admonition type="warning" title="This integration is not currently available">
             Please try again later or contact support if the problem persists.
@@ -86,7 +86,7 @@ export const MarketplaceDetail = () => {
   return (
     <>
       <IntegrationDetailTabShortcuts tabs={tabs} />
-      <MarketplaceDetailTopBar
+      <MarketplaceDetailBreadrumbs
         title={integration.name}
         isInstalled={isInstalled}
         actions={

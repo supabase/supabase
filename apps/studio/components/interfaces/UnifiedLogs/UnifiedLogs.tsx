@@ -342,7 +342,13 @@ export const UnifiedLogs = () => {
   const isMobile = useIsMobile()
   const [isFilterBarOpen, setIsFilterBarOpen] = useState(!isMobile)
 
-  useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS, () => setIsFilterBarOpen((prev) => !prev))
+  useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS, () => setIsFilterBarOpen((prev) => !prev), {
+    registerInCommandMenu: true,
+  })
+  useShortcut(SHORTCUT_IDS.UNIFIED_LOGS_CLEAR_FILTERS, () => table.resetColumnFilters(), {
+    enabled: columnFilters.length > 0,
+    registerInCommandMenu: true,
+  })
 
   useEffect(() => {
     if (isMobile) {
@@ -414,7 +420,11 @@ export const UnifiedLogs = () => {
                 </div>
 
                 <div className="ml-auto flex items-center gap-x-2">
-                  <RefreshButton isLoading={isRefetchingData} onRefresh={refetchAllData} />
+                  <RefreshButton
+                    isLoading={isRefetchingData}
+                    onRefresh={refetchAllData}
+                    shortcutId={SHORTCUT_IDS.UNIFIED_LOGS_REFRESH}
+                  />
                   <DataTableViewOptions />
                   <DownloadLogsButton searchParameters={searchParameters} />
                   {fetchPreviousPage ? (

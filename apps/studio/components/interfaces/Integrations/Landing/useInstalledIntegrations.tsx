@@ -5,14 +5,12 @@ import {
   hasRequiredExtensions,
   isOAuthInstalled,
   isStripeSyncEngineInstalled,
+  useProjectOAuthIntegrationData,
 } from './Landing.utils'
 import { useAvailableIntegrations } from './useAvailableIntegrations'
-import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useFDWsQuery } from '@/data/fdw/fdws-query'
-import { usePartnerIntegrationsQuery } from '@/data/partners/integration-status-query'
-import { useSecretsQuery } from '@/data/secrets/secrets-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { EMPTY_ARR } from '@/lib/void'
 
@@ -27,64 +25,17 @@ export const useInstalledIntegrations = () => {
     isError: isErrorAvailableIntegrations,
   } = useAvailableIntegrations()
 
-  const hasSecretKeyPrefixIntegration = useMemo(() => {
-    return allIntegrations.some(
-      (integration) =>
-        integration.type === 'oauth' &&
-        integration.installIdentificationMethod === 'secret_key_prefix' &&
-        !!integration.secretKeyPrefix
-    )
-  }, [allIntegrations])
-
-  const hasEdgeFunctionSecretNameIntegration = useMemo(() => {
-    return allIntegrations.some(
-      (integration) =>
-        integration.type === 'oauth' &&
-        integration.installIdentificationMethod === 'edge_function_secret_name' &&
-        !!integration.edgeFunctionSecretName
-    )
-  }, [allIntegrations])
-
-  const hasCallbackStatusIntegration = useMemo(() => {
-    return allIntegrations.some(
-      (integration) =>
-        integration.type === 'oauth' &&
-        integration.installIdentificationMethod === 'integration_status'
-    )
+  const hasOAuthIntegration = useMemo(() => {
+    return allIntegrations.some((integration) => integration.type === 'oauth')
   }, [allIntegrations])
 
   const {
-    data: apiKeys = EMPTY_ARR,
-    error: apiKeysError,
-    isError: isErrorApiKeys,
-    isLoading: isApiKeysLoading,
-    isSuccess: isSuccessApiKeys,
-  } = useAPIKeysQuery(
-    { projectRef: project?.ref, reveal: false },
-    { enabled: hasSecretKeyPrefixIntegration }
-  )
-
-  const {
-    data: edgeFunctionSecrets = EMPTY_ARR,
-    error: edgeFunctionSecretsError,
-    isError: isErrorEdgeFunctionSecrets,
-    isLoading: isEdgeFunctionSecretsLoading,
-    isSuccess: isSuccessEdgeFunctionSecrets,
-  } = useSecretsQuery(
-    { projectRef: project?.ref },
-    { enabled: hasEdgeFunctionSecretNameIntegration }
-  )
-
-  const {
-    data: partnerIntegrations = EMPTY_ARR,
-    error: partnerIntegrationsError,
-    isError: isErrorPartnerIntegrations,
-    isLoading: isPartnerIntegrationsLoading,
-    isSuccess: isSuccessPartnerIntegrations,
-  } = usePartnerIntegrationsQuery(
-    { projectRef: project?.ref },
-    { enabled: hasCallbackStatusIntegration }
-  )
+    data: oauthData,
+    error: oauthDataError,
+    isError: isErrorOAuthData,
+    isLoading: isOAuthDataLoading,
+    isSuccess: isSuccessOAuthData,
+  } = useProjectOAuthIntegrationData(project?.ref, { enabled: hasOAuthIntegration })
 
   const {
     data: wrappers = EMPTY_ARR,
@@ -137,48 +88,38 @@ export const useInstalledIntegrations = () => {
         if (integration.type === 'oauth') {
           return isOAuthInstalled({
             integration,
-            apiKeys,
-            partnerIntegrations,
-            secrets: edgeFunctionSecrets,
+            projectData: oauthData,
           })
         }
         return false
       })
       .sort((a, b) => a.name.localeCompare(b.name))
-  }, [allIntegrations, wrappers, extensions, schemas, isHooksEnabled, apiKeys, edgeFunctionSecrets])
+  }, [allIntegrations, wrappers, extensions, schemas, isHooksEnabled, oauthData])
 
   const error =
     fdwError ||
     extensionsError ||
     schemasError ||
     availableIntegrationsError ||
-    (hasSecretKeyPrefixIntegration ? apiKeysError : null) ||
-    (hasEdgeFunctionSecretNameIntegration ? edgeFunctionSecretsError : null) ||
-    (hasCallbackStatusIntegration ? partnerIntegrationsError : null)
+    (hasOAuthIntegration ? oauthDataError : null)
   const isLoading =
     isSchemasLoading ||
     isFDWLoading ||
     isExtensionsLoading ||
     isAvailableIntegrationsLoading ||
-    (hasSecretKeyPrefixIntegration && isApiKeysLoading) ||
-    (hasEdgeFunctionSecretNameIntegration && isEdgeFunctionSecretsLoading) ||
-    (hasCallbackStatusIntegration && isPartnerIntegrationsLoading)
+    (hasOAuthIntegration && isOAuthDataLoading)
   const isError =
     isErrorFDWs ||
     isErrorExtensions ||
     isErrorSchemas ||
     isErrorAvailableIntegrations ||
-    (hasSecretKeyPrefixIntegration && isErrorApiKeys) ||
-    (hasEdgeFunctionSecretNameIntegration && isErrorEdgeFunctionSecrets) ||
-    (hasCallbackStatusIntegration && isErrorPartnerIntegrations)
+    (hasOAuthIntegration && isErrorOAuthData)
   const isSuccess =
     isSuccessFDWs &&
     isSuccessExtensions &&
     isSuccessSchemas &&
     isSuccessAvailableIntegrations &&
-    (!hasSecretKeyPrefixIntegration || isSuccessApiKeys) &&
-    (!hasEdgeFunctionSecretNameIntegration || isSuccessEdgeFunctionSecrets) &&
-    (!hasCallbackStatusIntegration || isSuccessPartnerIntegrations)
+    (!hasOAuthIntegration || isSuccessOAuthData)
 
   return {
     // show all integrations at once instead of showing partial results
