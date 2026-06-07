@@ -213,7 +213,10 @@ const ComposedChartHandler = ({
     return combined as DataPoint[]
   }, [data, attributeQueries, attributes])
 
-  const loading = isLoading || attributeQueries.some((query: any) => query.isLoading)
+  // [console fork] Before a lazy chart scrolls into view its queries are disabled
+  // (no data yet) — treat that as loading, not "Unable to load" (which read as broken).
+  const loading =
+    !isVisible || isLoading || attributeQueries.some((query: any) => query.isLoading)
 
   const _highlightedValue = useMemo(() => {
     if (highlightedValue !== undefined) return highlightedValue

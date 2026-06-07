@@ -35,6 +35,28 @@ function parseBytes(s: string | undefined): number {
 
 type Metrics = { cpuPercent: number; ramUsed: number; ramTotal: number; diskSize: number; diskUsed: number }
 
+// The Observability page fires ~15 infra requests at once; each `docker stats`/`df`
+// is slow (~2-5s). Cache one sample per project (short TTL) + de-dupe in-flight reads
+// so concurrent requests share a single docker sample and don't time out.
+const metricsCache = new Map<string, { at: number; value: Metrics }>()
+const inflight = new Map<string, Promise<Metrics>>()
+const METRICS_TTL_MS = 10_000
+
+async function getMetrics(ref: string): Promise<Metrics> {
+  const cached = metricsCache.get(ref)
+  if (cached && Date.now() - cached.at < METRICS_TTL_MS) return cached.value
+  const existing = inflight.get(ref)
+  if (existing) return existing
+  const p = readMetrics(ref)
+    .then((value) => {
+      metricsCache.set(ref, { at: Date.now(), value })
+      return value
+    })
+    .finally(() => inflight.delete(ref))
+  inflight.set(ref, p)
+  return p
+}
+
 async function readMetrics(ref: string): Promise<Metrics> {
   const cores = Math.max(1, os.cpus()?.length || 1)
   const hostMem = os.totalmem() || 0
@@ -127,7 +149,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
   const interval = String(req.query.interval ?? '1h')
   const timestamps = buildTimestamps(String(req.query.startDate ?? ''), String(req.query.endDate ?? ''), interval)
 
-  const m = await readMetrics(ref)
+  const m = await getMetrics(ref)
   const values: Record<string, number> = {}
   for (const a of attributes) values[a] = valueFor(a, m)
 
