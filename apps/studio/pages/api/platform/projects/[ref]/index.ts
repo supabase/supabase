@@ -40,6 +40,14 @@ export default bff({
       postgres_engine: p.postgresType ?? 'postgres',
       db_host: p.connection?.host ?? null,
       restUrl: p.connection?.apiUrl ?? null,
+      is_branch: false,
+      parent_project_ref: undefined,
+      // [console fork] expose the stored project toggles so the UI reflects them
+      // (Data API on/off, auto-RLS + auto-expose for new tables).
+      dataApiEnabled: p.dataApiEnabled ?? true,
+      autoApiEnabled: p.dataApiEnabled ?? true,
+      autoEnableRls: p.autoEnableRls ?? true,
+      autoExposeNewTables: p.autoExposeNewTables ?? true,
       // Direct DB connection string (password is a placeholder; never exposed).
       connectionString: p.connection?.dbPort
         ? `postgresql://postgres:[YOUR-PASSWORD]@${p.connection.host ?? 'localhost'}:${p.connection.dbPort}/postgres`
