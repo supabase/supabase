@@ -15,7 +15,7 @@ export default bff({
         .status(status && status >= 400 ? status : 502)
         .json({ message: (data as any)?.message ?? 'Failed to update connection' })
     }
-    return res.status(204).end()
+    return res.status(200).json({})
   },
   DELETE: async (req, res) => {
     const id = String(req.query.connection_id ?? '')
@@ -29,6 +29,6 @@ export default bff({
         .status(status && status >= 400 ? status : 502)
         .json({ message: (data as any)?.message ?? 'Failed to delete connection' })
     }
-    return res.status(204).end()
+    return res.status(200).json({})
   },
 })
