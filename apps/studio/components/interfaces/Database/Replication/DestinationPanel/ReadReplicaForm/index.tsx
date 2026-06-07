@@ -16,9 +16,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { ReadReplicaEligibilityWarnings } from './ReadReplicaEligibilityWarnings'
-import { ReadReplicaPricingDialog } from './ReadReplicaPricingDialog'
 import { useCheckEligibilityDeployReplica } from './useCheckEligibilityDeployReplica'
-import { useGetReplicaCost } from './useGetReplicaCost'
 import { AVAILABLE_REPLICA_REGIONS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { Region, useReadReplicaSetUpMutation } from '@/data/read-replicas/replica-setup-mutation'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
@@ -36,7 +34,6 @@ export const ReadReplicaForm = ({ onSuccess, onClose }: ReadReplicaFormProps) =>
   const [defaultRegion] = Object.entries(AWS_REGIONS).find(
     ([_, name]) => name === AWS_REGIONS_DEFAULT
   ) ?? ['ap-southeast-1']
-  const { totalCost } = useGetReplicaCost()
   const { can: canDeployReplica } = useCheckEligibilityDeployReplica()
 
   const [selectedRegion, setSelectedRegion] = useState<string>(defaultRegion)
@@ -113,12 +110,14 @@ export const ReadReplicaForm = ({ onSuccess, onClose }: ReadReplicaFormProps) =>
         </FormItemLayout>
       </SheetSection>
       <SheetFooter className="justify-between!">
-        <div className="flex items-center gap-x-4">
-          <InfoIcon className="h-5 w-5" />
-          <p className="text-sm">
-            New replica will cost an additional <span translate="no">{totalCost}/month</span>
+        {/* [console fork] Self-host: no billing. Read replicas run on dedicated (EC2)
+            infrastructure, so they require the org's AWS credentials. */}
+        <div className="flex items-center gap-x-3">
+          <InfoIcon className="h-5 w-5 shrink-0" />
+          <p className="text-sm text-foreground-light">
+            Read replicas are deployed on dedicated (AWS/EC2) infrastructure and require your
+            organization's AWS credentials.
           </p>
-          <ReadReplicaPricingDialog />
         </div>
 
         <div className="flex items-center gap-x-2">
