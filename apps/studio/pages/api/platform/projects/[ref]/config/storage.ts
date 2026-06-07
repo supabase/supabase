@@ -9,6 +9,8 @@ const DEFAULT = {
     s3Protocol: { enabled: true },
     icebergCatalog: { enabled: false },
   },
+  capabilities: { list_v2: true },
+  external: { upstreamTarget: 'main' },
 }
 
 export default bff({
