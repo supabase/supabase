@@ -126,10 +126,23 @@ export async function resolveOrg(req: import('next').NextApiRequest, slug: strin
  * service_role key, so the BFF can proxy pg-meta / data-plane calls to the
  * per-project containers.
  */
-export async function getProjectDataPlane(
+type DataPlane = { baseUrl: string; serviceKey: string }
+
+// [console fork] Resolving a project's data plane costs TWO control-plane round-trips
+// (project + api-keys). The storage explorer fires bursts of BFF calls (one per open
+// folder, plus tus's per-chunk onBeforeRequest temporary-key fetch), and without a
+// cache those bursts pile concurrent requests on the backend → multi-second stalls →
+// uploads/listings appear to hang at 0/100%. Cache per ref with a short TTL and
+// de-dupe in-flight resolutions (same approach as the infra-monitoring cache). Host /
+// port / service key only change on (re)provision, so a 30s TTL is safe.
+const DATA_PLANE_TTL_MS = 30_000
+const dataPlaneCache = new Map<string, { value: DataPlane | null; expiresAt: number }>()
+const dataPlaneInflight = new Map<string, Promise<DataPlane | null>>()
+
+async function resolveDataPlane(
   req: import('next').NextApiRequest,
   ref: string
-): Promise<{ baseUrl: string; serviceKey: string } | null> {
+): Promise<DataPlane | null> {
   const [{ data: project }, { data: keys }] = await Promise.all([
     consoleGet<any>(req, `/api/v1/projects/${ref}`),
     consoleGet<{ serviceRoleKey?: string }>(req, `/api/v1/projects/${ref}/api-keys`),
@@ -138,6 +151,30 @@ export async function getProjectDataPlane(
   const host = project?.connection?.host ?? 'localhost'
   if (!port || !keys?.serviceRoleKey) return null
   return { baseUrl: `http://${host}:${port}`, serviceKey: keys.serviceRoleKey }
+}
+
+export async function getProjectDataPlane(
+  req: import('next').NextApiRequest,
+  ref: string
+): Promise<DataPlane | null> {
+  const now = Date.now()
+  const cached = dataPlaneCache.get(ref)
+  if (cached && cached.expiresAt > now) return cached.value
+
+  const inflight = dataPlaneInflight.get(ref)
+  if (inflight) return inflight
+
+  const promise = resolveDataPlane(req, ref)
+    .then((value) => {
+      // Only cache successful resolutions; let failures retry immediately.
+      if (value) dataPlaneCache.set(ref, { value, expiresAt: Date.now() + DATA_PLANE_TTL_MS })
+      return value
+    })
+    .finally(() => {
+      dataPlaneInflight.delete(ref)
+    })
+  dataPlaneInflight.set(ref, promise)
+  return promise
 }
 
 /**
