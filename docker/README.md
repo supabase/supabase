@@ -45,19 +45,20 @@ This Docker Compose configuration includes the following services:
 - **[versions.md](./versions.md)** - Complete history of Docker image versions for rollback reference
 - **[Ask DeepWiki / Supabase](https://deepwiki.com/supabase/supabase/3-self-hosted-deployment)** - DeepWiki-generated description of self-hosted configuration
 - **[CONFIG.md](./CONFIG.md)** - Configuration reference for all environment variables
+- **[UPGRADING.md](./UPGRADING.md)** - Upgrade an existing deployment with `update.sh`
 
 ## Updates
 
-To update your self-hosted Supabase instance:
+Back up your database, then:
 
-1. Review [CHANGELOG.md](./CHANGELOG.md) for breaking changes
-2. Check [versions.md](./versions.md) for new image versions
-3. Update `docker-compose.yml` if there are configuration changes
-4. Pull the latest images: `docker compose pull`
-5. Stop services: `docker compose down`
-6. Start services with new configuration: `docker compose up -d`
+```sh
+sh update.sh --dry-run   # optional preview
+sh update.sh
+sh run.sh pull && sh run.sh recreate
+```
 
-**Note:** Consider to always backup your database before updating.
+See **[UPGRADING.md](./UPGRADING.md)** for conflicts, breaking changes, pinning a
+release, and older installs without `.supabase-version`.
 
 ## Community & Support
 

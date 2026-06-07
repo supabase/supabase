@@ -78,6 +78,9 @@ cat > docker/CHANGELOG.md <<'EOF'
 EOF
 printf 'base kong\n' > docker/volumes/api/kong.yml
 printf 'remove me\n'  > docker/old-only.txt
+cp "$DOCKER_DIR/.gitignore" docker/.gitignore
+mkdir -p docker/volumes/functions/main
+printf 'base main\n' > docker/volumes/functions/main/index.ts
 git add -A && git commit -qm base && git tag b-base
 
 # target commit
@@ -104,6 +107,9 @@ cat > docker/CHANGELOG.md <<'EOF'
 - old stuff
 EOF
 printf 'brand new\n' > docker/new-only.txt
+printf 'target main\n' > docker/volumes/functions/main/index.ts
+mkdir -p docker/volumes/functions/hello
+printf 'target hello\n' > docker/volumes/functions/hello/index.ts
 cat > docker/upgrades.json <<'EOF'
 {
   "2026-02-01": {
@@ -115,7 +121,9 @@ cat > docker/upgrades.json <<'EOF'
 }
 EOF
 git rm -q docker/old-only.txt
-git add -A && git commit -qm target && git tag b-target
+git add -A
+git add -f docker/volumes/functions/hello/index.ts
+git commit -qm target && git tag b-target
 # Release tag for the default-target (latest self-hosted/v*) path.
 git tag self-hosted/v1.0.0
 
@@ -140,6 +148,13 @@ make_deploy() { # <dir>
     sedi "s#supabase/studio:OLD#supabase/studio:USER-PINNED#" "$d/docker-compose.yml"
     # user adds a line to kong (upstream unchanged -> clean merge, must survive)
     printf 'user added line\n' >> "$d/volumes/api/kong.yml"
+    # user-owned paths per .gitignore (must not be touched by the merge)
+    mkdir -p "$d/volumes/snippets" "$d/volumes/functions/my-fn"
+    printf 'USER_SNIPPET\n' > "$d/volumes/snippets/user.sql"
+    printf 'user fn\n' > "$d/volumes/functions/my-fn/index.ts"
+    # legacy sample fn in snapshot at target but gitignored — must not overwrite
+    mkdir -p "$d/volumes/functions/hello"
+    printf 'user hello\n' > "$d/volumes/functions/hello/index.ts"
     # version stamp pointing at the base
     printf 'ref=b-base\ndate=2026-01-02\n' > "$d/.supabase-version"
 }
@@ -176,6 +191,10 @@ assert_file_contains  "$WORK/apply.log" "Run the demo migration first." "manifes
 assert_file_contains  "$WORK/apply.log" "utils/demo-migrate.sh" "manifest gate script surfaced"
 assert_file_contains  "$WORK/apply.log" "example.test/guide"    "manifest migration guide surfaced"
 if ls backups/*.tgz >/dev/null 2>&1; then ok "backup archive created"; else bad "no backup archive"; fi
+assert_file_contains  "volumes/snippets/user.sql" "USER_SNIPPET"     "snippets left untouched"
+assert_file_contains  "volumes/functions/my-fn/index.ts" "user fn"   "custom edge fn left untouched"
+assert_file_contains  "volumes/functions/main/index.ts" "target main" "vendor main/index.ts updated"
+assert_file_contains  "volumes/functions/hello/index.ts" "user hello" "gitignored fn in snapshot not overwritten"
 
 echo ""
 echo "=== update.sh: default target resolves to latest self-hosted/v* tag ==="
