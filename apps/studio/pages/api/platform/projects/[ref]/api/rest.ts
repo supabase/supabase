@@ -1,10 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next'
+import { getProjectDataPlane } from '@/lib/console-bff'
 
 import apiWrapper from '@/lib/api/apiWrapper'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const dp = await getProjectDataPlane(req, String(req.query.ref ?? ''))
+  if (!dp) return res.status(503).json({ error: { message: 'Project is not running' } })
   const { method } = req
 
   switch (method) {
@@ -19,10 +22,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 const handleGet = async (_req: NextApiRequest, res: NextApiResponse) => {
-  const response = await fetch(`${process.env.SUPABASE_URL}/rest/v1/`, {
+  const response = await fetch(`${dp.baseUrl}/rest/v1/`, {
     method: 'GET',
     headers: {
-      apikey: process.env.SUPABASE_SERVICE_KEY!,
+      apikey: dp.serviceKey,
     },
   })
   if (response.ok) {

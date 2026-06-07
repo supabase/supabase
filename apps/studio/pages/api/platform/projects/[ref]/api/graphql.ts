@@ -1,10 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next'
+import { getProjectDataPlane } from '@/lib/console-bff'
 
 import apiWrapper from '@/lib/api/apiWrapper'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const dp = await getProjectDataPlane(req, String(req.query.ref ?? ''))
+  if (!dp) return res.status(503).json({ error: { message: 'Project is not running' } })
   const { method } = req
 
   switch (method) {
@@ -20,10 +23,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   const authorizationHeader = req.headers['x-graphql-authorization']
 
-  const response = await fetch(`${process.env.SUPABASE_URL}/graphql/v1`, {
+  const response = await fetch(`${dp.baseUrl}/graphql/v1`, {
     method: 'POST',
     headers: {
-      apikey: process.env.SUPABASE_SERVICE_KEY!,
+      apikey: dp.serviceKey,
       Authorization:
         (Array.isArray(authorizationHeader) ? authorizationHeader[0] : authorizationHeader) ??
         `Bearer ${process.env.SUPABASE_ANON_KEY}`,
