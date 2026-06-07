@@ -31,6 +31,24 @@ Shallow + sparse clone. Sparse paths: `apps/studio`, `packages`, `patches`.
 > Backend (separate `supabase-console` repo) change for Inc 1: `src/auth/auth.ts` adds `APP_URL`
 > (the dashboard origin) to better-auth `trustedOrigins` so proxied sign-in passes the origin check.
 
+## Required `apps/studio/.env.local` (gitignored — recreate locally)
+
+```
+NEXT_PUBLIC_IS_PLATFORM=true
+NEXT_PUBLIC_BASE_PATH=/dashboard            # mount whole app under /dashboard (matches supabase.com)
+NEXT_PUBLIC_API_URL=http://localhost:8082/dashboard/api   # BFF (/platform/*) lives under basePath
+NEXT_PUBLIC_SITE_URL=http://localhost:8082
+NEXT_PUBLIC_ENVIRONMENT=local
+NEXT_PUBLIC_GOTRUE_URL=http://localhost:8082/api/auth
+CONSOLE_API_URL=http://localhost:3000        # control-plane backend (auth proxy target)
+SENTRY_IGNORE_API_RESOLUTION_ERROR=1
+```
+
+All dashboard routes are served under `/dashboard/*` (e.g. `/dashboard/sign-in`,
+`/dashboard/organizations`, `/dashboard/org/{slug}`, `/dashboard/project/{ref}`,
+`/dashboard/account/me`) — exact parity with supabase.com. The `/api/auth/*` proxy uses
+`basePath: false`, so auth stays at the origin root regardless of the base path.
+
 ## How to run (Increment 0)
 
 The upstream `dev` script uses POSIX `${STUDIO_PORT:-8082}` which fails on Windows shells. Run
