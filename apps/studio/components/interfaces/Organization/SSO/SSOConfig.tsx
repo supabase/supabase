@@ -97,8 +97,9 @@ export const SSOConfig = () => {
   const FORM_ID = 'sso-config-form'
 
   const { data: organization } = useSelectedOrganizationQuery()
-  const { hasAccess: hasAccessToSso, isLoading: isLoadingEntitlement } =
-    useCheckEntitlements('auth.platform.sso')
+  // [console fork] Self-host: SSO is never plan-gated.
+  const hasAccessToSso = true
+  const isLoadingEntitlement = false
 
   const {
     data: ssoConfig,

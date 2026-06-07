@@ -10,11 +10,11 @@ export default bff({
     const org = (Array.isArray(orgs) ? orgs : []).find((o) => o.slug === slug)
     if (!org) return res.status(404).json({ error: { message: 'Organization not found' } })
 
-    const { data: projects } = await consoleGet<any[]>(
+    const { data } = await consoleGet<{ projects: any[] }>(
       req,
       `/api/v1/organizations/${org.id}/projects`
     )
-    const list = Array.isArray(projects) ? projects : []
+    const list = Array.isArray(data?.projects) ? data.projects : []
     const limit = Number(req.query.limit ?? 96)
     const offset = Number(req.query.offset ?? 0)
 
