@@ -35,7 +35,9 @@ export default bff({
       cloud_provider: 'AWS',
       region: p.region ?? 'shared',
       status: STATUS_MAP[p.status] ?? 'UNKNOWN',
-      infra_compute_size: p.infraComputeSize ?? 'micro',
+      // [console fork] shared infra has no compute tier -> undefined so the UI shows
+      // "Shared Infrastructure" instead of a misleading compute size.
+      infra_compute_size: p.infrastructureType === 'shared' ? undefined : (p.infraComputeSize ?? 'micro'),
       inserted_at: p.createdAt ?? p.inserted_at ?? null,
       postgres_engine: p.postgresType ?? 'postgres',
       db_host: p.connection?.host ?? null,

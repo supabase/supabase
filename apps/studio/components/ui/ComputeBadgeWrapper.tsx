@@ -101,7 +101,15 @@ export const ComputeBadgeWrapper = ({
 
   const isLoading = isLoadingAddons || isLoadingSubscriptions
 
-  if (!computeSize) return null
+  // [console fork] Shared-infra projects have no compute tier — show that instead
+  // of a misleading "Micro" badge (or nothing).
+  if (!computeSize) {
+    return (
+      <span className="inline-flex items-center rounded-full border border-default bg-surface-200 px-2 py-0.5 text-xs text-foreground-light">
+        Shared Infrastructure
+      </span>
+    )
+  }
 
   return (
     <HoverCard onOpenChange={() => setOpenState(!open)} openDelay={280}>

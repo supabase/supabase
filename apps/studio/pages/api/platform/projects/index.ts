@@ -10,7 +10,9 @@ import {
 function mapProject(p: any, org: { id: string; slug: string }) {
   const region = p.region ?? 'shared'
   const cloud_provider = p.cloudProvider ?? 'AWS'
-  const infra_compute_size = p.infraComputeSize ?? 'micro'
+  // [console fork] shared infra has no compute tier (shows "Shared Infrastructure").
+  const infra_compute_size =
+    p.infrastructureType === 'shared' ? undefined : (p.infraComputeSize ?? 'micro')
   const status = mapProjectStatus(p.status)
   return {
     id: p.id,
