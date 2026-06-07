@@ -122,8 +122,8 @@
   "sdk:python": true,
   "sdk:swift": true,
 
-  "storage:analytics": true,
-  "storage:vectors": true,
+  "storage:analytics": false,
+  "storage:vectors": false,
 
   "search:fullIndex": true,
 

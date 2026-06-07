@@ -20,8 +20,8 @@ const DEFAULT = {
   features: {
     imageTransformation: { enabled: true },
     s3Protocol: { enabled: true },
-    icebergCatalog: { enabled: true, maxCatalogs: 2 },
-    vectorBuckets: { enabled: true },
+    icebergCatalog: { enabled: false, maxCatalogs: 2 },
+    vectorBuckets: { enabled: false },
   },
   capabilities: { list_v2: true },
   external: { upstreamTarget: 'main' },

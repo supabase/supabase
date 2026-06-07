@@ -84,6 +84,15 @@ const PUSHER_URL_WS = 'wss://*.pusher.com'
 
 const GOOGLE_MAPS_API_URL = 'https://maps.googleapis.com'
 
+// [console fork] Self-host: each project's data plane (kong) runs on a dynamic
+// localhost port (e.g. http://localhost:20006). The dashboard talks to those
+// endpoints DIRECTLY from the browser for resumable (tus) uploads and for image
+// previews / public URLs — not through the BFF — so the per-project origins must
+// be allowed by the CSP or the browser blocks them ("violates ... connect-src").
+// We can't enumerate the ports ahead of time, so allow any localhost port.
+const SELF_HOST_LOCAL_PROJECTS = 'http://localhost:* http://127.0.0.1:*'
+const SELF_HOST_LOCAL_PROJECTS_WS = 'ws://localhost:* ws://127.0.0.1:* wss://localhost:* wss://127.0.0.1:*'
+
 export function getCSP() {
   const DEFAULT_SRC_URLS = [
     API_URL,
@@ -109,6 +118,9 @@ export function getCSP() {
     POSTHOG_URL,
     ...(!!NIMBUS_PROD_PROJECTS_URL ? [NIMBUS_PROD_PROJECTS_URL, NIMBUS_PROD_PROJECTS_URL_WS] : []),
     CLOUDFLARE_CDN_URL,
+    // [console fork] allow direct browser → per-project kong (uploads/realtime/etc.)
+    SELF_HOST_LOCAL_PROJECTS,
+    SELF_HOST_LOCAL_PROJECTS_WS,
   ]
   const SCRIPT_SRC_URLS = [
     CLOUDFLARE_CDN_URL,
@@ -137,6 +149,9 @@ export function getCSP() {
     USERCENTRICS_URLS,
     MARKETPLACE_API_URL,
     ...(!!NIMBUS_PROD_PROJECTS_URL ? [NIMBUS_PROD_PROJECTS_URL, NIMBUS_PROD_PROJECTS_URL_WS] : []),
+    // [console fork] image previews / public URLs are served straight from the
+    // project's storage endpoint on a local port.
+    SELF_HOST_LOCAL_PROJECTS,
   ]
   const STYLE_SRC_URLS = [CLOUDFLARE_CDN_URL, SUPABASE_ASSETS_URL]
   const FONT_SRC_URLS = [CLOUDFLARE_CDN_URL, SUPABASE_ASSETS_URL]
@@ -163,6 +178,9 @@ export function getCSP() {
     `img-src 'self'`,
     `blob:`,
     `data:`,
+    // [console fork] image previews / public URLs are served from the project's
+    // storage endpoint, which may be a custom domain (https) or a local port.
+    `https:`,
     ...IMG_SRC_URLS,
     ...(isDevOrStaging
       ? [SUPABASE_STAGING_PROJECTS_URL, NIMBUS_STAGING_PROJECTS_URL, VERCEL_URL]
@@ -196,6 +214,13 @@ export function getCSP() {
     `connect-src 'self'`,
     `data:`,
     `blob:`,
+    // [console fork] Self-host has no single parent project domain (cloud uses
+    // *.supabase.co). Projects can live on a custom domain, an EC2 host, or a
+    // local port — all reached directly from the browser (tus uploads, realtime).
+    // Allow the https: scheme broadly (custom domains / dedicated are TLS) plus
+    // local http ports for shared infra. This is the self-host analog of cloud's
+    // project-domain wildcard.
+    `https:`,
     ...DEFAULT_SRC_URLS,
     ...(isDevOrStaging
       ? [
