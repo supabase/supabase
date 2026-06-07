@@ -90,13 +90,6 @@ const nextConfig = {
               permanent: false,
             },
             {
-              // [console fork] /org should always land on the organizations list
-              // (not the last-visited org).
-              source: '/org',
-              destination: '/organizations',
-              permanent: false,
-            },
-            {
               source: '/register',
               destination: '/sign-up',
               permanent: false,
