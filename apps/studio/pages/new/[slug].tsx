@@ -167,7 +167,8 @@ const Wizard: NextPageWithLayout = () => {
       githubRepositoryId: '',
       githubInstallationId: undefined,
       githubRepositoryName: '',
-      instanceSize: canChooseInstanceSize ? sizes[0] : undefined,
+      // [console fork] smallest dedicated tier that boots the full stack (~4GB).
+      instanceSize: canChooseInstanceSize ? 'medium' : undefined,
       dataApi: true,
       dataApiDefaultPrivileges: !isDataApiRevokeOnCreateDefault,
       enableRlsEventTrigger: false,

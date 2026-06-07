@@ -25,7 +25,7 @@ function mapProject(p: any, org: { id: string; slug: string }) {
   const cloud_provider = p.cloudProvider ?? 'AWS'
   // [console fork] shared infra has no compute tier (shows "Shared Infrastructure").
   const infra_compute_size =
-    p.infrastructureType === 'shared' ? undefined : (p.infraComputeSize ?? 'micro')
+    p.infrastructureType === 'shared' ? undefined : (p.computeSize ?? 'medium')
   const status = mapProjectStatus(p.status)
   return {
     id: p.id,
@@ -83,6 +83,7 @@ export default bff({
           // Map the dashboard region label (display name) to our backend region code.
           region: resolveRegionCode(b.db_region),
           dbPassword: b.db_pass,
+          computeSize: b.desired_instance_size,
           postgresType: b.postgres_engine === 'oriole' ? 'orioledb' : 'postgres',
           // [console fork] honor the create-form Data API + RLS toggles
           dataApiEnabled: b.data_api_use_api_schema ?? true,

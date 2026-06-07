@@ -62,6 +62,9 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
                         form.getValues('cloudProvider') as CloudProvider
                       )
                     )
+                    // [console fork] A dedicated project runs the full self-hosting
+                    // stack (~15 containers, ~4GB), so don't offer tiers it can't boot.
+                    .filter((option) => !['nano', 'micro', 'small'].includes(option))
                     .map((option) => {
                       return (
                         <SelectItem key={option} value={option}>
