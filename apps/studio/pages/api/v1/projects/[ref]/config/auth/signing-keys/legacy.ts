@@ -1,24 +1,6 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { bff } from '@/lib/console-bff'
 
-import apiWrapper from '@/lib/api/apiWrapper'
-import { getLegacySigningKey } from '@/lib/api/self-hosted/signing-keys'
-
-export default function legacySigningKey(req: NextApiRequest, res: NextApiResponse) {
-  return apiWrapper(req, res, handler)
-}
-
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'GET':
-      return handleGet(req, res)
-    default:
-      res.setHeader('Allow', ['GET'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
-
-const handleGet = async (_req: NextApiRequest, res: NextApiResponse) => {
-  return res.status(200).json(getLegacySigningKey())
-}
+// [console fork] No legacy JWKS signing key surfaced (projects use HS256 JWTs).
+export default bff({
+  GET: async (_req, res) => res.status(404).json({ error: { message: 'No legacy signing key' } }),
+})
