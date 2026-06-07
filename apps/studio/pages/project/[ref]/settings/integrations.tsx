@@ -1,5 +1,4 @@
 import { IntegrationSettings } from '@/components/interfaces/Settings/Integrations/IntegrationsSettings'
-import { ProjectGitHubDeployPanel } from '@/components/interfaces/Settings/Integrations/ProjectGitHubDeployPanel'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
 import {
@@ -20,8 +19,6 @@ const ProjectSettingsIntegrations: NextPageWithLayout = () => {
       </ScaffoldContainer>
       <ScaffoldDivider />
       <IntegrationSettings />
-      <ScaffoldDivider />
-      <ProjectGitHubDeployPanel />
     </>
   )
 }
