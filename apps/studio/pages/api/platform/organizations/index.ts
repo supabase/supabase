@@ -23,7 +23,7 @@ export default bff({
     if (!ok || !data) {
       return res
         .status(status && status >= 400 ? status : 502)
-        .json({ error: { message: (data as any)?.message ?? 'Failed to create organization' } })
+        .json({ error: { message: (data as any)?.error?.message ?? (data as any)?.message ?? 'Failed to create organization' } })
     }
     const { data: profile } = await consoleGet(req, '/api/v1/account/profile')
     return res.status(201).json(mapOrganization(data, profile?.email ?? 'billing@example.com'))

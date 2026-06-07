@@ -20,7 +20,7 @@ export default bff({
     if (!ok) {
       return res
         .status(status && status >= 400 ? status : 502)
-        .json({ message: (data as any)?.message ?? 'Failed to create branch' })
+        .json({ message: (data as any)?.error?.message ?? (data as any)?.message ?? 'Failed to create branch' })
     }
     return res.status(201).json(data ?? {})
   },

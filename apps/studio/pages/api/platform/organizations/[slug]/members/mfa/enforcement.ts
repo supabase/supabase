@@ -21,7 +21,7 @@ export default bff({
     if (!ok) {
       return res
         .status(status && status >= 400 ? status : 502)
-        .json({ error: { message: (data as any)?.message ?? 'Failed to update MFA enforcement' } })
+        .json({ error: { message: (data as any)?.error?.message ?? (data as any)?.message ?? 'Failed to update MFA enforcement' } })
     }
     return res.status(200).json({ enforced: data?.mfaRequired ?? enforced })
   },

@@ -69,7 +69,7 @@ export default bff({
     if (!ok) {
       return res
         .status(status && status >= 400 ? status : 502)
-        .json({ message: (data as any)?.message ?? 'Failed to create standby key' })
+        .json({ message: (data as any)?.error?.message ?? (data as any)?.message ?? 'Failed to create standby key' })
     }
     const now = new Date().toISOString()
     return res.status(201).json({

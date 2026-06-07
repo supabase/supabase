@@ -17,7 +17,7 @@ export default bff({
     if (!ok) {
       return res
         .status(status && status >= 400 ? status : 502)
-        .json({ message: (data as any)?.message ?? 'Failed to update branch' })
+        .json({ message: (data as any)?.error?.message ?? (data as any)?.message ?? 'Failed to update branch' })
     }
     return res.status(200).json(data ?? {})
   },
@@ -29,7 +29,7 @@ export default bff({
     if (!ok) {
       return res
         .status(status && status >= 400 ? status : 502)
-        .json({ message: (data as any)?.message ?? 'Failed to delete branch' })
+        .json({ message: (data as any)?.error?.message ?? (data as any)?.message ?? 'Failed to delete branch' })
     }
     return res.status(200).json(data ?? { message: 'ok' })
   },

@@ -13,7 +13,7 @@ export default bff({
     if (!ok) {
       return res
         .status(status && status >= 400 ? status : 502)
-        .json({ message: (data as any)?.message ?? 'Failed to list connections', connections: [] })
+        .json({ message: (data as any)?.error?.message ?? (data as any)?.message ?? 'Failed to list connections', connections: [] })
     }
     return res.status(200).json(data ?? { connections: [] })
   },
@@ -25,7 +25,7 @@ export default bff({
     if (!ok) {
       return res
         .status(status && status >= 400 ? status : 502)
-        .json({ message: (data as any)?.message ?? 'Failed to create connection' })
+        .json({ message: (data as any)?.error?.message ?? (data as any)?.message ?? 'Failed to create connection' })
     }
     return res.status(201).json(data ?? {})
   },

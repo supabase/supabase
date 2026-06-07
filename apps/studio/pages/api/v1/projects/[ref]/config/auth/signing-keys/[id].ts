@@ -29,7 +29,7 @@ export default bff({
     if (!ok) {
       return res
         .status(status && status >= 400 ? status : 502)
-        .json({ message: (data as any)?.message ?? 'Failed to update signing key' })
+        .json({ message: (data as any)?.error?.message ?? (data as any)?.message ?? 'Failed to update signing key' })
     }
     return res.status(200).json({ id, status: req.body?.status })
   },
@@ -46,7 +46,7 @@ export default bff({
     if (!ok) {
       return res
         .status(status && status >= 400 ? status : 502)
-        .json({ message: (data as any)?.message ?? 'Failed to revoke signing key' })
+        .json({ message: (data as any)?.error?.message ?? (data as any)?.message ?? 'Failed to revoke signing key' })
     }
     return res.status(200).json({ id })
   },

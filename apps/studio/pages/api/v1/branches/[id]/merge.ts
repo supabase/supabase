@@ -12,7 +12,7 @@ export default bff({
     if (!ok) {
       return res
         .status(status && status >= 400 ? status : 502)
-        .json({ message: (data as any)?.message ?? 'Failed to merge branch' })
+        .json({ message: (data as any)?.error?.message ?? (data as any)?.message ?? 'Failed to merge branch' })
     }
     return res.status(200).json(data ?? {})
   },

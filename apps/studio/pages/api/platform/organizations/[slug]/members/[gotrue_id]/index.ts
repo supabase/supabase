@@ -25,7 +25,7 @@ async function setMemberRole(req: any, res: any, roleId: number) {
   if (!ok) {
     return res
       .status(status && status >= 400 ? status : 502)
-      .json({ error: { message: (data as any)?.message ?? 'Failed to update member role' } })
+      .json({ error: { message: (data as any)?.error?.message ?? (data as any)?.message ?? 'Failed to update member role' } })
   }
   return res.status(200).json({ gotrue_id: userId, role_ids: [roleId] })
 }

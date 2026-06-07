@@ -11,6 +11,6 @@ export default bff({
     })
     return res
       .status(status && status >= 400 ? status : 501)
-      .json({ message: (data as any)?.message ?? 'Branch push is not yet supported on self-host' })
+      .json({ message: (data as any)?.error?.message ?? (data as any)?.message ?? 'Branch push is not yet supported on self-host' })
   },
 })

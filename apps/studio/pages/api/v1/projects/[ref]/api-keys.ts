@@ -65,7 +65,7 @@ export default bff({
     if (!ok) {
       return res
         .status(status && status >= 400 ? status : 502)
-        .json({ error: { message: (data as any)?.message ?? 'Failed to create API key' } })
+        .json({ error: { message: (data as any)?.error?.message ?? (data as any)?.message ?? 'Failed to create API key' } })
     }
     const key = type === 'secret' ? data?.secretKey : data?.publishableKey
     return res.status(201).json(newKey(type, name, key ?? ''))

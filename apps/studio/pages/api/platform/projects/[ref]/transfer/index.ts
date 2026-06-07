@@ -11,7 +11,7 @@ export default bff({
     if (!ok) {
       return res
         .status(status && status >= 400 ? status : 502)
-        .json({ error: { message: (data as any)?.message ?? 'Failed to transfer project' } })
+        .json({ error: { message: (data as any)?.error?.message ?? (data as any)?.message ?? 'Failed to transfer project' } })
     }
     return res.status(200).json(data)
   },

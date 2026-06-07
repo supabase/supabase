@@ -17,7 +17,7 @@ export default bff({
     if (!ok) {
       return res
         .status(status && status >= 400 ? status : 502)
-        .json({ message: (data as any)?.message ?? 'Failed to set secrets' })
+        .json({ message: (data as any)?.error?.message ?? (data as any)?.message ?? 'Failed to set secrets' })
     }
     return res.status(201).json(data ?? [])
   },
@@ -30,7 +30,7 @@ export default bff({
     if (!ok) {
       return res
         .status(status && status >= 400 ? status : 502)
-        .json({ message: (data as any)?.message ?? 'Failed to delete secrets' })
+        .json({ message: (data as any)?.error?.message ?? (data as any)?.message ?? 'Failed to delete secrets' })
     }
     return res.status(200).json(data ?? [])
   },

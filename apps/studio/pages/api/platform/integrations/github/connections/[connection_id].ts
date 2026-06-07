@@ -13,7 +13,7 @@ export default bff({
     if (!ok) {
       return res
         .status(status && status >= 400 ? status : 502)
-        .json({ message: (data as any)?.message ?? 'Failed to update connection' })
+        .json({ message: (data as any)?.error?.message ?? (data as any)?.message ?? 'Failed to update connection' })
     }
     return res.status(200).json({})
   },
@@ -27,7 +27,7 @@ export default bff({
     if (!ok) {
       return res
         .status(status && status >= 400 ? status : 502)
-        .json({ message: (data as any)?.message ?? 'Failed to delete connection' })
+        .json({ message: (data as any)?.error?.message ?? (data as any)?.message ?? 'Failed to delete connection' })
     }
     return res.status(200).json({})
   },

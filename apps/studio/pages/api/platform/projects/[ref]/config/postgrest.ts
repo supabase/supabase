@@ -42,7 +42,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!ok) {
       return res
         .status(status && status >= 400 ? status : 502)
-        .json({ error: { message: (data as any)?.message ?? 'Failed to update Data API' } })
+        .json({ error: { message: (data as any)?.error?.message ?? (data as any)?.message ?? 'Failed to update Data API' } })
     }
     return res.status(200).json(configFor((data as any)?.dataApiEnabled ?? enabled))
   }

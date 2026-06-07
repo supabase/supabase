@@ -37,7 +37,7 @@ export default bff({
     if (!ok || !data) {
       return res
         .status(status && status >= 400 ? status : 502)
-        .json({ error: { message: (data as any)?.message ?? 'Failed to update profile' } })
+        .json({ error: { message: (data as any)?.error?.message ?? (data as any)?.message ?? 'Failed to update profile' } })
     }
     return res.status(200).json(toPlatformProfile(data))
   },
