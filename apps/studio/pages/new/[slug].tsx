@@ -147,7 +147,7 @@ const Wizard: NextPageWithLayout = () => {
       dbPass: '',
       dbPassStrength: 0,
       dbPassStrengthMessage: '',
-      dbRegion: undefined,
+      dbRegion: 'Shared Infrastructure',
       githubRepositoryId: '',
       githubInstallationId: undefined,
       githubRepositoryName: '',

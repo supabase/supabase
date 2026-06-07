@@ -153,8 +153,8 @@ export const RegionSelector = ({
                       <div className="mt-2 rounded-md border border-default bg-surface-200 px-3 py-2 text-foreground-light">
                         <p className="text-foreground">Shared Infrastructure</p>
                         <p className="mt-1">
-                          Your project runs as an isolated Postgres + Supabase stack on our managed
-                          shared cluster, rather than on a dedicated cloud region. Best for
+                          Your project runs as an isolated Postgres + Supabase stack on your own
+                          shared infrastructure, rather than on a dedicated cloud region. Best for
                           development, internal tools, and lower-traffic projects. You can move to
                           dedicated infrastructure later.
                         </p>

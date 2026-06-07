@@ -100,6 +100,29 @@ export function mapOrganization(org: BackendOrg, billingEmail: string) {
   }
 }
 
+/** Resolve an org slug -> our backend org (with string id). */
+export async function resolveOrg(req: import('next').NextApiRequest, slug: string) {
+  const { data: orgs } = await consoleGet<BackendOrg[]>(req, '/api/auth/organization/list')
+  return (Array.isArray(orgs) ? orgs : []).find((o) => o.slug === slug) ?? null
+}
+
+/** better-auth get-full-organization (members + invitations) by slug. */
+export async function getFullOrg(req: import('next').NextApiRequest, slug: string) {
+  const { data } = await consoleGet<any>(
+    req,
+    `/api/auth/organization/get-full-organization?organizationSlug=${encodeURIComponent(slug)}`
+  )
+  return data
+}
+
+// Our org roles mapped to stable numeric ids the dashboard's member rows reference.
+export const ROLE_NAME_TO_ID: Record<string, number> = { owner: 1, administrator: 2, developer: 3 }
+export const ORG_ROLES = [
+  { id: 1, name: 'Owner', description: 'Full access including org deletion', base_role_id: null, projects: [] },
+  { id: 2, name: 'Administrator', description: 'Manage projects and members', base_role_id: null, projects: [] },
+  { id: 3, name: 'Developer', description: 'Work within projects', base_role_id: null, projects: [] },
+]
+
 /** A wildcard permission granting the member everything within an org. */
 export function wildcardPermission(organizationSlug: string) {
   return {
