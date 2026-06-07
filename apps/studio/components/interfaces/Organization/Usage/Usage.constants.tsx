@@ -92,9 +92,9 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
       name: 'Egress',
       unit: 'bytes',
       description:
-        'Contains any outgoing traffic including Database, Storage, Realtime, Auth, API, Edge Functions, Pooler and Log Drains.\nBilling is based on the total sum of uncached egress in GB throughout your billing period.\nEgress via cache hits is billed separately.',
+        'Contains any outgoing traffic including Database, Storage, Realtime, Auth, API, Edge Functions, Pooler and Log Drains.\n',
       chartDescription:
-        'The breakdown of different egress types is inclusive of cached egress, even though it is billed separately. The data refreshes every hour.',
+        'The breakdown of different egress types is inclusive of cached egress. The data refreshes every hour.',
       links: [
         {
           name: 'Documentation',
@@ -109,7 +109,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
       name: 'Cached Egress',
       unit: 'bytes',
       description:
-        'Contains any outgoing traffic that is served from a cache hit. Includes API, Storage and Edge Functions.\nBilling is based on the total sum of cached egress in GB throughout your billing period.',
+        'Contains any outgoing traffic that is served from a cache hit.\n',
       chartDescription: 'The data refreshes every hour.',
       links: [
         {
@@ -185,7 +185,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
       chartPrefix: 'Average',
       unit: 'bytes',
       description:
-        "Each Supabase project comes with a dedicated disk. Each project gets 8 GB of disk for free. Billing is based on the provisioned disk size. Disk automatically scales up when you get close to it's size.\nEach hour your project is using more than 8 GB of GP3 disk, it incurs the overages in GB-Hrs, i.e. a 16 GB disk incurs 8 GB-Hrs every hour. Extra disk size costs $0.125/GB/month ($0.000171/GB-Hr).",
+        "Each Supabase project comes with a dedicated disk. Each project gets a dedicated disk that scales automatically as your data grows.\n",
       links: [
         {
           name: 'Documentation',
@@ -207,7 +207,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
       chartPrefix: 'Cumulative',
       unit: 'bytes',
       description:
-        'Database size refers to the actual amount of space used by all your database objects, as reported by Postgres.\nBilling is prorated down to the hour and will be displayed GB-Hrs.',
+        'Database size refers to the actual amount of space used by all your database objects, as reported by Postgres.',
       chartDescription: 'The data refreshes every hour.',
     })
   }
@@ -220,7 +220,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
     chartPrefix: 'Average',
     unit: 'bytes',
     description:
-      'Sum of all objects in your storage buckets.\nBilling is prorated down to the hour and will be displayed GB-Hrs.',
+      'Sum of all objects in your storage buckets.',
     chartDescription: 'The data refreshes every hour.',
     links: [
       {
@@ -254,12 +254,12 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           attributes: [{ key: PricingMetric.MONTHLY_ACTIVE_USERS.toLowerCase(), color: 'white' }],
           name: 'Monthly Active Users',
           chartPrefix: 'Cumulative',
-          chartSuffix: 'in billing period',
+          chartSuffix: 'in period',
           unit: 'absolute',
           description:
-            'Users who log in or refresh their token count towards MAU.\nBilling is based on the sum of distinct users requesting your API throughout the billing period. Resets every billing cycle.',
+            'Users who log in or refresh their token count towards MAU.\n',
           chartDescription:
-            'The data is refreshed over a period of 24 hours and resets at the beginning of every billing period.\nThe data points are relative to the beginning of your billing period and will reset with your billing period.',
+            'The data is refreshed over a period of 24 hours.',
           links: [
             {
               name: 'Auth',
@@ -275,12 +275,12 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           ],
           name: 'Monthly Active SSO Users',
           chartPrefix: 'Cumulative',
-          chartSuffix: 'in billing period',
+          chartSuffix: 'in period',
           unit: 'absolute',
           description:
-            'SSO users who log in or refresh their token count towards SSO MAU.\nBilling is based on the sum of distinct Single Sign-On users requesting your API throughout the billing period. Resets every billing cycle.',
+            'SSO users who log in or refresh their token count towards SSO MAU.\n',
           chartDescription:
-            'The data refreshes over a period of 24 hours and resets at the beginning of every billing period.\nThe data points are relative to the beginning of your billing period and will reset with your billing period.',
+            'The data refreshes over a period of 24 hours.',
           links: [
             {
               name: 'SSO with SAML 2.0',
@@ -296,12 +296,12 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           ],
           name: 'Storage Image Transformations',
           chartPrefix: 'Cumulative',
-          chartSuffix: 'in billing period',
+          chartSuffix: 'in period',
           unit: 'absolute',
           description:
-            'We count all images that were transformed in the billing period, ignoring any transformations.\nUsage example: You transform one image with four different size transformations and another image with just a single transformation. It counts as two, as only two images were transformed.\nBilling is based on the count of (origin) images that used transformations throughout the billing period. Resets every billing cycle.',
+            'We count all images that were transformed in the selected period.\nUsage example: You transform one image with four different size transformations and another image with just a single transformation. It counts as two, as only two images were transformed.\n',
           chartDescription:
-            'The data refreshes every 24 hours.\nThe data points are relative to the beginning of your billing period and will reset with your billing period.',
+            'The data refreshes every 24 hours.',
           links: [
             {
               name: 'Documentation',
@@ -316,7 +316,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           name: 'Edge Function Invocations',
           unit: 'absolute',
           description:
-            'Every serverless function invocation independent of response status is counted.\nBilling is based on the sum of all invocations throughout your billing period.',
+            'Every serverless function invocation independent of response status is counted.\n',
           chartDescription: 'The data refreshes every hour.',
           links: [
             {
@@ -332,7 +332,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           name: 'Realtime Messages',
           unit: 'absolute',
           description:
-            "Count of messages going through Realtime. Includes database changes, broadcast and presence. \nUsage example: If you do a database change and 5 clients listen to that change via Realtime, that's 5 messages. If you broadcast a message and 4 clients listen to that, that's 5 messages (1 message sent, 4 received).\nBilling is based on the total amount of messages throughout your billing period.",
+            "Count of messages going through Realtime. Includes database changes, broadcast and presence. \nUsage example: If you do a database change and 5 clients listen to that change via Realtime, that's 5 messages. If you broadcast a message and 4 clients listen to that, that's 5 messages (1 message sent, 4 received).\n",
           chartDescription: 'The data refreshes every hour.',
           links: [
             {
@@ -351,7 +351,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           chartPrefix: 'Max',
           unit: 'absolute',
           description:
-            'Total number of successful connections. Connections attempts are not counted towards usage.\nBilling is based on the maximum amount of concurrent peak connections throughout your billing period.',
+            'Total number of successful connections. Connections attempts are not counted towards usage.\n',
           chartDescription: 'The data refreshes every hour.',
           links: [
             {
@@ -375,7 +375,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           name: 'Log Ingestion',
           unit: 'absolute',
           description:
-            'Total amount of logs ingested across all projects.\nBilling is based on the total amount of logs ingested in Gigabyte.',
+            'Total amount of logs ingested across all projects.\n',
           chartDescription: 'The data refreshes every hour.',
           links: [],
         },
@@ -386,7 +386,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           name: 'Log Query',
           unit: 'absolute',
           description:
-            'Total amount of logs queried across all projects.\nBilling is based on the total amount of logs queried in Gigabyte.',
+            'Total amount of logs queried across all projects.\n',
           chartDescription: 'The data refreshes every hour.',
           links: [],
         },
@@ -397,7 +397,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           name: 'Log Storage',
           unit: 'absolute',
           description:
-            'Total amount of logs stored on the platform. Log retention depends on your platform agreement.\nBilling is based on the total amount of logs stored and factors in the retention period.',
+            'Total amount of logs stored on the platform.\n',
           chartDescription: 'The data refreshes every hour.',
           links: [],
         },
