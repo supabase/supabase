@@ -1,5 +1,3 @@
-import { IS_PLATFORM } from 'common'
-
 import { useProjectSettingsV2Query } from './project-settings-v2-query'
 import { useCustomDomainsQuery } from '@/data/custom-domains/custom-domains-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
