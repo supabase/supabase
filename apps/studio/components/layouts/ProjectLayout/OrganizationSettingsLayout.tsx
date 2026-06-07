@@ -41,6 +41,12 @@ export const generateOrganizationSettingsMenuItems = ({
     label: 'General',
     href: `/org/${slug}/general`,
   },
+  // [console fork] Per-org BYO-AWS credentials for dedicated infrastructure.
+  {
+    key: 'aws-credentials',
+    label: 'AWS Credentials',
+    href: `/org/${slug}/aws-credentials`,
+  },
   ...(showSecuritySettings
     ? [
         {
@@ -119,6 +125,12 @@ export const generateOrganizationSettingsSections = ({
       label: 'General',
       href: `/org/${slug}/general`,
       shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS_GENERAL,
+    },
+    {
+      // [console fork] Per-org BYO-AWS credentials for dedicated infrastructure.
+      key: 'aws-credentials',
+      label: 'AWS Credentials',
+      href: `/org/${slug}/aws-credentials`,
     },
     ...(showSecuritySettings
       ? [
