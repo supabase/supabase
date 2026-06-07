@@ -31,6 +31,10 @@ export async function HEAD() {
 export async function GET() {
   if (!IS_PLATFORM) return new Response(null, { status: 404 })
 
+  // [console fork] No external incident.io integration on self-host.
+  return NextResponse.json({ incidents: [] }, { headers: { 'Cache-Control': CACHE_CONTROL_SETTINGS } })
+
+  // eslint-disable-next-line no-unreachable
   try {
     const incidents = await getBannerIncidents()
     return NextResponse.json(
