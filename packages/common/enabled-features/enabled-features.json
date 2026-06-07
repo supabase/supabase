@@ -39,7 +39,7 @@
   "dashboard_auth:show_testimonial": true,
   "dashboard_auth:show_tos": true,
 
-  "database:replication": true,
+  "database:replication": false,
   "database:roles": true,
   "database:restore_to_new_project": true,
   "database:network_restrictions": true,
@@ -75,7 +75,7 @@
   "integrations:vercel": true,
   "integrations:aws_private_link": true,
 
-  "infrastructure:read_replicas": true,
+  "infrastructure:read_replicas": false,
 
   "logs:all": true,
   "logs:templates": true,
