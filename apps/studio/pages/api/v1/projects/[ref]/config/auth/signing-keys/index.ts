@@ -1,8 +1,16 @@
-import { bff, consoleGet } from '@/lib/console-bff'
+import { bff, consoleFetch, consoleGet } from '@/lib/console-bff'
 
+type StandbyKey = {
+  kid: string
+  algorithm: string
+  status: string
+  public_jwk?: unknown
+  created_at?: string
+}
 type SigningInfo = {
   current?: { kid: string; algorithm: string; public_jwk?: unknown; created_at?: string } | null
   legacy?: { kid: string; algorithm: string; created_at?: string } | null
+  standby?: StandbyKey[]
 }
 
 // Stable uuid-format id from a key id (kid) so the dashboard can key rows.
@@ -29,6 +37,16 @@ export default bff({
         updated_at: data.current.created_at ?? now,
       })
     }
+    for (const sb of data?.standby ?? []) {
+      keys.push({
+        id: uuidFromKid(sb.kid),
+        algorithm: sb.algorithm ?? 'ES256',
+        status: sb.status ?? 'standby',
+        public_jwk: sb.public_jwk,
+        created_at: sb.created_at ?? now,
+        updated_at: sb.created_at ?? now,
+      })
+    }
     if (data?.legacy) {
       keys.push({
         id: uuidFromKid(data.legacy.kid),
@@ -40,13 +58,26 @@ export default bff({
     }
     return res.status(200).json({ keys })
   },
-  // [console fork] Standby-key creation / rotation isn't available on self-host: the
-  // project's ES256 signing key is derived deterministically from its JWT secret, so
-  // there's a single in-use key (plus the legacy HS256 verifier). Return a clear
-  // message instead of a raw error.
-  POST: async (_req, res) =>
-    res.status(400).json({
-      message:
-        'Standby keys and rotation are not available on self-host — this project uses a fixed ES256 signing key derived from its JWT secret (with the legacy HS256 key for verification).',
-    }),
+  // Create a standby ES256 signing key (the project also keeps its derived current key).
+  POST: async (req, res) => {
+    const ref = String(req.query.ref ?? '')
+    const { ok, status, data } = await consoleFetch<any>(
+      req,
+      `/api/v1/projects/${ref}/signing-keys`,
+      { method: 'POST', body: JSON.stringify(req.body ?? {}) }
+    )
+    if (!ok) {
+      return res
+        .status(status && status >= 400 ? status : 502)
+        .json({ message: (data as any)?.message ?? 'Failed to create standby key' })
+    }
+    const now = new Date().toISOString()
+    return res.status(201).json({
+      id: uuidFromKid((data as any)?.kid ?? 'standby'),
+      algorithm: (data as any)?.algorithm ?? 'ES256',
+      status: (data as any)?.status ?? 'standby',
+      created_at: (data as any)?.created_at ?? now,
+      updated_at: (data as any)?.created_at ?? now,
+    })
+  },
 })
