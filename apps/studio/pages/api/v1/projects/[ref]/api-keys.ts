@@ -1,29 +1,39 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { bff, consoleGet } from '@/lib/console-bff'
 
-import apiWrapper from '@/lib/api/apiWrapper'
-import {
-  applyRevealToApiKey,
-  getNonPlatformApiKeys,
-  parseRevealQuery,
-} from '@/lib/api/self-hosted/api-keys'
-
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
-
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'GET':
-      return handleGetAll(req, res)
-    default:
-      res.setHeader('Allow', ['GET'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
-
-const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
-  const reveal = parseRevealQuery(req.query.reveal)
-  const response = getNonPlatformApiKeys().map((key) => applyRevealToApiKey(key, reveal))
-
-  return res.status(200).json(response)
-}
+// [console fork] GET /v1/projects/{ref}/api-keys -> our /api/v1/projects/:ref/api-keys.
+// Our backend issues legacy HS256 JWTs (anon + service_role); map them to the
+// management-API api-keys array shape the dashboard renders.
+export default bff({
+  GET: async (req, res) => {
+    const ref = String(req.query.ref ?? '')
+    const { data } = await consoleGet<{ anonKey?: string; serviceRoleKey?: string }>(
+      req,
+      `/api/v1/projects/${ref}/api-keys`
+    )
+    const keys = [
+      {
+        id: 'anon',
+        type: 'legacy',
+        name: 'anon',
+        api_key: data?.anonKey ?? '',
+        prefix: '',
+        description: 'Legacy anon (public) key',
+        hash: '',
+        inserted_at: null,
+        updated_at: null,
+      },
+      {
+        id: 'service_role',
+        type: 'legacy',
+        name: 'service_role',
+        api_key: data?.serviceRoleKey ?? '',
+        prefix: '',
+        description: 'Legacy service_role (secret) key',
+        hash: '',
+        inserted_at: null,
+        updated_at: null,
+      },
+    ]
+    return res.status(200).json(keys)
+  },
+})
