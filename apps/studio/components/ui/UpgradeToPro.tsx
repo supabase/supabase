@@ -41,6 +41,10 @@ export const UpgradeToPro = ({
   className,
   docsUrl,
 }: UpgradeToProProps) => {
+  // [console fork] Self-hosted: nothing is plan-gated, so never show upgrade prompts.
+  return null
+
+  // eslint-disable-next-line no-unreachable
   return (
     <Admonition
       type="default"

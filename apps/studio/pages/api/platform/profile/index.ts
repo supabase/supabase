@@ -10,8 +10,8 @@ function toPlatformProfile(profile: any) {
     last_name: profile.lastName ?? '',
     free_project_limit: 100,
     is_alpha_user: false,
-    // No billing anywhere in this product.
-    disabled_features: ['billing:all'],
+    // Self-host: no billing, no legal documents (nothing is plan-gated).
+    disabled_features: ['billing:all', 'organization:show_legal_documents'],
     is_platform_admin: !!profile.isPlatformAdmin,
   }
 }

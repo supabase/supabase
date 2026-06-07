@@ -29,7 +29,6 @@ import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
 import { useOrganizationMfaToggleMutation } from '@/data/organizations/organization-mfa-mutation'
 import { useOrganizationMfaQuery } from '@/data/organizations/organization-mfa-query'
-import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useProfile } from '@/lib/profile'
 import { useTrack } from '@/lib/telemetry/track'
@@ -53,8 +52,9 @@ export const SecuritySettings = () => {
   )
   const track = useTrack()
 
-  const { hasAccess: hasAccessToEnforceMfa, isLoading: isLoadingEntitlement } =
-    useCheckEntitlements('security.enforce_mfa')
+  // [console fork] Self-host: nothing is plan-gated. MFA enforcement is always available.
+  const hasAccessToEnforceMfa = true
+  const isLoadingEntitlement = false
 
   const {
     data: mfaConfig,

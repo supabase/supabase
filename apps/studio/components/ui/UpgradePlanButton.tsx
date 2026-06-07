@@ -45,6 +45,10 @@ export const UpgradePlanButton = ({
   slug: slugParam,
   onClick,
 }: PropsWithChildren<UpgradePlanButtonProps>) => {
+  // [console fork] Self-hosted: no plans, so never show an upgrade button.
+  return null
+
+  // eslint-disable-next-line no-unreachable
   const { ref } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
   const isFreePlan = organization?.plan?.id === 'free'
