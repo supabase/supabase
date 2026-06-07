@@ -90,11 +90,11 @@ const RealtimeVisual: React.FC<Props> = ({ className }) => {
             d="M3.58385 1.69742C2.57836 0.865603 1.05859 1.58076 1.05859 2.88572V35.6296C1.05859 37.1049 2.93111 37.7381 3.8265 36.5656L12.5863 25.0943C12.6889 24.96 12.8483 24.8812 13.0173 24.8812H27.3245C28.7697 24.8812 29.4211 23.0719 28.3076 22.1507L3.58385 1.69742Z"
             fill="hsl(var(--background-surface-200))"
             stroke="hsl(var(--foreground-lighter))"
-            stroke-linejoin="round"
+            strokeLinejoin="round"
           />
         </svg>
 
-        <div className="!w-[66.70px] !h-[33.35px] absolute left-full flex items-center justify-center gap-1 -top-6 border border-foreground-lighter/70 rounded-full bg-surface-100">
+        <div className="w-[66.70px]! h-[33.35px]! absolute left-full flex items-center justify-center gap-1 -top-6 border border-foreground-lighter/70 rounded-full bg-surface-100">
           <div className="w-1.5 h-1.5 rounded-full bg-foreground-lighter animate-[pulse_600ms_cubic-bezier(0.4,0,0.6,1)_infinite] pause group-hover:run" />
           <div className="w-1.5 h-1.5 rounded-full bg-foreground-lighter animate-[pulse_600ms_cubic-bezier(0.4,0,0.6,1)_200ms_infinite] pause group-hover:run" />
           <div className="w-1.5 h-1.5 rounded-full bg-foreground-lighter animate-[pulse_600ms_cubic-bezier(0.4,0,0.6,1)_400ms_infinite] pause group-hover:run" />
@@ -122,11 +122,11 @@ const RealtimeVisual: React.FC<Props> = ({ className }) => {
             d="M3.58385 1.69742C2.57836 0.865603 1.05859 1.58076 1.05859 2.88572V35.6296C1.05859 37.1049 2.93111 37.7381 3.8265 36.5656L12.5863 25.0943C12.6889 24.96 12.8483 24.8812 13.0173 24.8812H27.3245C28.7697 24.8812 29.4211 23.0719 28.3076 22.1507L3.58385 1.69742Z"
             fill="hsl(var(--background-surface-200))"
             stroke="hsl(var(--foreground-lighter))"
-            stroke-linejoin="round"
+            strokeLinejoin="round"
           />
         </svg>
 
-        <div className="!w-[55px] !h-[28px] absolute left-full flex items-center justify-center gap-1 -top-6 border border-foreground-muted rounded-full bg-surface-100 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="w-[55px]! h-[28px]! absolute left-full flex items-center justify-center gap-1 -top-6 border border-foreground-muted rounded-full bg-surface-100 opacity-0 group-hover:opacity-100 transition-opacity">
           <div className="w-1.5 h-1.5 rounded-full bg-foreground-lighter animate-[pulse_600ms_cubic-bezier(0.4,0,0.6,1)_infinite] pause group-hover:run" />
           <div className="w-1.5 h-1.5 rounded-full bg-foreground-lighter animate-[pulse_600ms_cubic-bezier(0.4,0,0.6,1)_200ms_infinite] pause group-hover:run" />
           <div className="w-1.5 h-1.5 rounded-full bg-foreground-lighter animate-[pulse_600ms_cubic-bezier(0.4,0,0.6,1)_400ms_infinite] pause group-hover:run" />
@@ -152,6 +152,7 @@ const RealtimeVisual: React.FC<Props> = ({ className }) => {
       {/* Gradient to hide animation under text to maintain readability */}
       <div
         className="
+          visual-overlay
           absolute pointer-events-none
           w-full h-full max-h-[400px] lg:max-h-none
           inset-0 top-auto

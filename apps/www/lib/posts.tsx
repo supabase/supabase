@@ -1,14 +1,34 @@
 import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
+
+import { validateBlogFrontmatterImages } from './blog-images'
 import { generateReadingTime } from './helpers'
-import { BlogPost } from '../.contentlayer/generated'
 
 type Directories = '_blog' | '_case-studies' | '_customers' | '_alternatives' | '_events'
 
 // substring amount for file names
 // based on YYYY-MM-DD format
 export const FILENAME_SUBSTRING = 11
+
+export type Post = {
+  slug: string
+  title?: string
+  description?: string
+  author?: string
+  imgSocial?: string
+  imgThumb?: string
+  categories?: string[]
+  tags?: string[]
+  date?: string
+  toc_depth?: number
+  formattedDate: string
+  readingTime: string
+  url: string
+  path: string
+
+  [key: string]: any // Allow additional properties from frontmatter
+}
 
 type GetSortedPostsParams = {
   directory: Directories
@@ -25,7 +45,7 @@ export const getSortedPosts = ({
   tags,
   categories,
   currentPostSlug,
-}: GetSortedPostsParams) => {
+}: GetSortedPostsParams): Post[] => {
   //Finding directory named "blog" from the current working directory of Node.
   const postDirectory = path.join(process.cwd(), directory)
 
@@ -46,6 +66,10 @@ export const getSortedPosts = ({
       const { data, content } = matter(fileContents) as unknown as {
         data: { [key: string]: any; tags?: string[] }
         content: string
+      }
+
+      if (directory === '_blog') {
+        validateBlogFrontmatterImages(data as { imgSocial?: string; imgThumb?: string }, fullPath)
       }
 
       const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' }
@@ -149,8 +173,18 @@ export const getPostdata = async (slug: string, directory: string) => {
    */
   const found = folderfiles.filter((x) => x.includes(slug))[0]
 
+  if (!found) {
+    throw Object.assign(new Error(`Post not found: ${slug}`), { code: 'POST_NOT_FOUND' })
+  }
+
   const fullPath = path.join(postDirectory, found)
   const postContent = fs.readFileSync(fullPath, 'utf8')
+
+  if (directory === '_blog') {
+    const { data } = matter(postContent) as unknown as { data: { [key: string]: any } }
+    validateBlogFrontmatterImages(data as { imgSocial?: string; imgThumb?: string }, fullPath)
+  }
+
   return postContent
 }
 

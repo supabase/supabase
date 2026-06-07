@@ -1,11 +1,16 @@
-import { IntegrationSettings } from 'components/interfaces/Organization'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import type { NextPageWithLayout } from 'types'
+import { IntegrationSettings } from '@/components/interfaces/Organization/IntegrationSettings/IntegrationSettings'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import OrganizationLayout from '@/components/layouts/OrganizationLayout'
+import type { NextPageWithLayout } from '@/types'
 
 const OrgIntegrationSettings: NextPageWithLayout = () => {
   return <IntegrationSettings />
 }
 
-OrgIntegrationSettings.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
+OrgIntegrationSettings.getLayout = (page) => (
+  <DefaultLayout>
+    <OrganizationLayout title="Integrations">{page}</OrganizationLayout>
+  </DefaultLayout>
+)
 
 export default OrgIntegrationSettings

@@ -1,17 +1,22 @@
 import { Check } from 'lucide-react'
-
 import { PricingInformation } from 'shared-data'
-import { pickFeatures } from 'shared-data/plans'
 import { Button, cn } from 'ui'
+
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 
 export interface EnterpriseCardProps {
   plan: PricingInformation
   isCurrentPlan: boolean
-  billingPartner: 'fly' | 'aws' | 'vercel_marketplace' | undefined
 }
 
-const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: EnterpriseCardProps) => {
-  const features = pickFeatures(plan, billingPartner)
+export const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => {
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+
+  const features = plan.features
+  const currentPlan = selectedOrganization?.plan.name
+
+  const track = useTrack()
 
   return (
     <div
@@ -25,11 +30,11 @@ const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: EnterpriseCardP
         <div className="flex items-center space-x-2">
           <p className={cn('text-brand text-sm uppercase')}>{plan.name}</p>
           {isCurrentPlan ? (
-            <div className="text-xs bg-surface-300 text-foreground-light rounded px-2 py-0.5">
+            <div className="text-xs bg-surface-300 text-foreground-light rounded-sm px-2 py-0.5">
               Current plan
             </div>
           ) : plan.nameBadge ? (
-            <div className="text-xs bg-surface-200 text-brand rounded px-2 py-0.5">
+            <div className="text-xs bg-surface-200 text-brand rounded-sm px-2 py-0.5">
               {plan.nameBadge}
             </div>
           ) : null}
@@ -37,11 +42,22 @@ const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: EnterpriseCardP
 
         <p className="text-sm mt-2 mb-4">{plan.description}</p>
 
-        <a href={plan.href} className="hidden md:block" target="_blank">
-          <Button block type="default" size="tiny">
+        <Button
+          block
+          asChild
+          type="default"
+          size="tiny"
+          onClick={() =>
+            track('studio_pricing_plan_cta_clicked', {
+              selectedPlan: 'Enterprise',
+              currentPlan,
+            })
+          }
+        >
+          <a href={plan.href} className="hidden md:block" target="_blank">
             {plan.cta}
-          </Button>
-        </a>
+          </a>
+        </Button>
       </div>
 
       <div className="flex flex-col justify-center col-span-2 px-4 md:px-0">
@@ -62,14 +78,23 @@ const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: EnterpriseCardP
           ))}
         </ul>
 
-        <a href={plan.href} className="visible md:hidden mt-8" target="_blank">
-          <Button block type="default" size="tiny">
+        <Button
+          block
+          asChild
+          type="default"
+          size="tiny"
+          onClick={() =>
+            track('studio_pricing_plan_cta_clicked', {
+              selectedPlan: 'Enterprise',
+              currentPlan,
+            })
+          }
+        >
+          <a href={plan.href} className="visible md:hidden mt-8" target="_blank">
             {plan.cta}
-          </Button>
-        </a>
+          </a>
+        </Button>
       </div>
     </div>
   )
 }
-
-export default EnterpriseCard

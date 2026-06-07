@@ -1,18 +1,18 @@
 'use client'
 
+import { resolveBreadcrumbs } from '~/lib/breadcrumbs'
+import { useBreakpoint } from 'common'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import React, { Fragment, Suspense } from 'react'
-
-import { useBreakpoint } from 'common'
 import {
-  Breadcrumb_Shadcn_ as Breadcrumb,
-  BreadcrumbList_Shadcn_ as BreadcrumbList,
-  BreadcrumbItem_Shadcn_ as BreadcrumbItem,
-  BreadcrumbLink_Shadcn_ as BreadcrumbLink,
-  BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
-  BreadcrumbPage_Shadcn_ as BreadcrumbPage,
-  BreadcrumbEllipsis_Shadcn_ as BreadcrumbEllipsis,
+  Breadcrumb,
+  BreadcrumbEllipsis,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
   Button,
   cn,
   Drawer,
@@ -25,9 +25,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-
-import * as NavItems from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
-import { getMenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu.utils'
 
 interface BreadcrumbsProps extends React.HTMLAttributes<HTMLDivElement> {
   minLength?: number
@@ -107,17 +104,17 @@ const BreadcrumbsInternal = ({
                   <DrawerTrigger aria-label="Toggle Menu">
                     <BreadcrumbEllipsis className="h-4 w-4" />
                   </DrawerTrigger>
-                  <DrawerContent showHandle={false}>
+                  <DrawerContent>
                     <div className="grid gap-1 px-4">
-                      {breadcrumbs
-                        .slice(1, -2)
-                        .map((crumb) =>
-                          crumb.url ? (
-                            <Link href={crumb.url}>{crumb.title || crumb.name}</Link>
-                          ) : (
-                            crumb.title || crumb.name
-                          )
-                        )}
+                      {breadcrumbs.slice(1, -2).map((crumb, index) =>
+                        crumb.url ? (
+                          <Link key={index} href={crumb.url}>
+                            {crumb.title || crumb.name}
+                          </Link>
+                        ) : (
+                          crumb.title || crumb.name
+                        )
+                      )}
                     </div>
                     <DrawerFooter className="pt-4">
                       <DrawerClose asChild>
@@ -131,12 +128,12 @@ const BreadcrumbsInternal = ({
             <BreadcrumbSeparator />
           </>
         )}
-        {appendedBreadcrumbs?.map((crumb, i) => (
-          <Fragment key={crumb.url}>
+        {appendedBreadcrumbs?.map((crumb, index) => (
+          <Fragment key={index}>
             <BreadcrumbItem
               className={cn(
                 'flex items-center overflow-hidden',
-                i === appendedBreadcrumbs.length - 1 && 'md:text-foreground-light'
+                index === appendedBreadcrumbs.length - 1 && 'md:text-foreground-light'
               )}
             >
               {crumb.url ? (
@@ -148,7 +145,7 @@ const BreadcrumbsInternal = ({
               )}
             </BreadcrumbItem>
             <BreadcrumbSeparator
-              className={cn(i === appendedBreadcrumbs.length - 1 && 'md:hidden')}
+              className={cn(index === appendedBreadcrumbs.length - 1 && 'md:hidden')}
             />
           </Fragment>
         ))}
@@ -159,43 +156,5 @@ const BreadcrumbsInternal = ({
 
 function useBreadcrumbs() {
   const pathname = usePathname()
-
-  const isTroubleshootingPage = pathname.startsWith('/guides/troubleshooting')
-  if (isTroubleshootingPage) {
-    const breadcrumbs = [{ name: 'Troubleshooting', url: '/guides/troubleshooting' }]
-    return breadcrumbs
-  }
-
-  const isAiPromptsPage = pathname.startsWith('/guides/getting-started/ai-prompts')
-  if (isAiPromptsPage) {
-    const breadcrumbs = [
-      { name: 'Getting started', url: '/guides/getting-started' },
-      { name: 'AI Prompts', url: '/guides/getting-started/ai-prompts' },
-    ]
-    return breadcrumbs
-  }
-
-  const menuId = getMenuId(pathname)
-  const menu = NavItems[menuId]
-  return findMenuItemByUrl(menu, pathname, [])
-}
-
-function findMenuItemByUrl(menu, targetUrl, parents = []) {
-  // If the menu has items, recursively search through them
-  if (menu.items) {
-    for (let item of menu.items) {
-      const result = findMenuItemByUrl(item, targetUrl, [...parents, menu])
-      if (result) {
-        return result
-      }
-    }
-  }
-
-  // Check if the current menu object itself has the target URL
-  if (menu.url === targetUrl) {
-    return [...parents, menu]
-  }
-
-  // If the URL is not found, return null
-  return null
+  return resolveBreadcrumbs(pathname)
 }

@@ -8,8 +8,8 @@ hideToc: true
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    
-    <QuickstartDbSetup />
+
+    <$Partial path="quickstart_db_setup.mdx" />
 
   </StepHikeCompact.Step>
 
@@ -27,9 +27,11 @@ hideToc: true
 
     <StepHikeCompact.Details title="Install the Supabase client library">
 
-      Install Supabase package dependency using Xcode by following Apple's [tutorial](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app).
+      Add the [supabase-swift](https://github.com/supabase/supabase-swift) package to your app using the Swift Package Manager.
 
-      Make sure to add `Supabase` product package as dependency to the application.
+      In Xcode, navigate to **File > Add Package Dependencies...** and enter the repository URL `https://github.com/supabase/supabase-swift` in the search bar. For detailed instructions, see Apple's [tutorial on adding package dependencies](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app).
+
+      Make sure to add `Supabase` product package as a dependency to your application target.
 
     </StepHikeCompact.Details>
 
@@ -39,23 +41,26 @@ hideToc: true
 
     <StepHikeCompact.Details title="Initialize the Supabase client">
 
-      Create a new `Supabase.swift` file add a new supabase instance using your project URL and public API (anon) key:
+      Create a new `Supabase.swift` file add a new Supabase instance using your project URL and publishable key:
 
       <ProjectConfigVariables variable="url" />
-      <ProjectConfigVariables variable="anonKey" />
+      <ProjectConfigVariables variable="publishable" />
+
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```swift Supabase.swift
+      ```swift name=Supabase.swift
       import Supabase
 
       let supabase = SupabaseClient(
         supabaseURL: URL(string: "YOUR_SUPABASE_URL")!,
-        supabaseKey: "YOUR_SUPABASE_ANON_KEY"
+        supabaseKey: "YOUR_SUPABASE_PUBLISHABLE_KEY"
       )
       ```
+
+      <$Partial path="api_settings_steps.mdx" variables={{ "framework": "swift", "tab": "mobiles" }} />
 
     </StepHikeCompact.Code>
 
@@ -63,18 +68,18 @@ hideToc: true
 
   <StepHikeCompact.Step step={5}>
 
-    <StepHikeCompact.Details title="Create a data model for countries">
+    <StepHikeCompact.Details title="Create a data model for instruments">
 
     Create a decodable struct to deserialize the data from the database.
 
-    Add the following code to a new file named `Country.swift`.
+    Add the following code to a new file named `Instrument.swift`.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```swift Supabase.swift
-      struct Country: Decodable, Identifiable {
+      ```swift name=Instrument.swift
+      struct Instrument: Decodable, Identifiable {
         let id: Int
         let name: String
       }
@@ -96,23 +101,25 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```swift ContentView.swift
+      ```swift name=ContentView.swift
+      import SwiftUI
+
       struct ContentView: View {
 
-        @State var countries: [Country] = []
+        @State var instruments: [Instrument] = []
 
         var body: some View {
-          List(countries) { country in
-            Text(country.name)
+          List(instruments) { instrument in
+            Text(instrument.name)
           }
           .overlay {
-            if countries.isEmpty {
+            if instruments.isEmpty {
               ProgressView()
             }
           }
           .task {
             do {
-              countries = try await supabase.from("countries").select().execute().value
+              instruments = try await supabase.from("instruments").select().execute().value
             } catch {
               dump(error)
             }
@@ -135,3 +142,12 @@ hideToc: true
   </StepHikeCompact.Step>
 
 </StepHikeCompact>
+
+## Setting up deep links
+
+If you want to implement authentication features like magic links or OAuth, you need to set up deep links to redirect users back to your app. For instructions on configuring custom URL schemes for your iOS app, see the [deep linking guide](/docs/guides/auth/native-mobile-deep-linking?platform=swift).
+
+## Next steps
+
+- Learn how to build a complete user management app with authentication in the [Swift tutorial](/docs/guides/getting-started/tutorials/with-swift)
+- Explore the [supabase-swift](https://github.com/supabase/supabase-swift) library on GitHub

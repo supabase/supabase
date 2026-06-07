@@ -1,20 +1,37 @@
+import * as Sentry from '@sentry/nextjs'
 import { useQueryClient } from '@tanstack/react-query'
+import { getAccessToken, useParams } from 'common'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useEffectEvent, useState } from 'react'
 import { toast } from 'sonner'
+import { LogoLoader } from 'ui'
 
-import SignInMfaForm from 'components/interfaces/SignIn/SignInMfaForm'
-import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
-import { Loading } from 'components/ui/Loading'
-import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
-import type { NextPageWithLayout } from 'types'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import { SignInMfaForm } from '@/components/interfaces/SignIn/SignInMfaForm'
+import SignInLayout from '@/components/layouts/SignInLayout/SignInLayout'
+import { useAddLoginEvent } from '@/data/misc/audit-login-mutation'
+import useLatest from '@/hooks/misc/useLatest'
+import { auth, buildPathWithParams, getReturnToPath } from '@/lib/gotrue'
+import { useTrack } from '@/lib/telemetry/track'
+import type { NextPageWithLayout } from '@/types'
 
 const SignInMfaPage: NextPageWithLayout = () => {
   const router = useRouter()
+
   const queryClient = useQueryClient()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const {
+    // current methods for mfa are github and sso
+    method: signInMethod = 'unknown',
+  } = useParams()
+  const signInMethodRef = useLatest(signInMethod)
+
+  const track = useTrack()
+  const onSignInTracked = useEffectEvent(() => {
+    track('sign_in', {
+      category: 'account',
+      method: signInMethodRef.current,
+    })
+  })
+  const { mutate: addLoginEvent } = useAddLoginEvent()
 
   const [loading, setLoading] = useState(true)
 
@@ -24,9 +41,10 @@ const SignInMfaPage: NextPageWithLayout = () => {
       .initialize()
       .then(async ({ error }) => {
         if (error) {
-          // if there was a problem signing in via the url, don't redirect
-          setLoading(false)
-          return
+          // OAuth/SSO callback failed — bounce back to /sign-in so the error renders under the
+          // correct heading instead of "Two-factor authentication". The error is held in the
+          // shared auth context and surfaces via useAuthError() on /sign-in.
+          return router.replace({ pathname: '/sign-in', query: router.query })
         }
 
         const token = await getAccessToken()
@@ -43,12 +61,14 @@ const SignInMfaPage: NextPageWithLayout = () => {
           }
 
           if (data.currentLevel === data.nextLevel) {
-            sendEvent({ action: TelemetryActions.SIGN_IN, properties: { category: 'account' } })
+            onSignInTracked()
+            addLoginEvent({})
+
             await queryClient.resetQueries()
             router.push(getReturnToPath())
             return
-          }
-          if (data.currentLevel !== data.nextLevel) {
+          } else {
+            // Show the MFA form
             setLoading(false)
             return
           }
@@ -59,13 +79,20 @@ const SignInMfaPage: NextPageWithLayout = () => {
           return
         }
       })
-      .catch(() => {}) // catch all errors thrown by auth methods
+      .catch((error) => {
+        Sentry.captureException(error)
+        console.error('Auth initialization error:', error)
+        toast.error('Failed to initialize authentication. Please try again.')
+        setLoading(false)
+        router.push({ pathname: '/sign-in', query: router.query })
+      })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   if (loading) {
     return (
-      <div className="flex flex-col flex-1 bg-alternative h-full items-center justify-center">
-        <Loading />
+      <div className="flex flex-col flex-1 bg-alternative h-screen items-center justify-center">
+        <LogoLoader />
       </div>
     )
   }

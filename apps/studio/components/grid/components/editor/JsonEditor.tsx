@@ -1,21 +1,28 @@
+import { useParams } from 'common'
 import { Maximize } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
 import { toast } from 'sonner'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
-import { useParams } from 'common'
-import { useTrackedState } from 'components/grid/store/Store'
-import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
-import { isTableLike } from 'data/table-editor/table-editor-types'
-import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
-import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { prettifyJSON, removeJSONTrailingComma, tryParseJson } from 'lib/helpers'
-import { Popover, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 import { BlockKeys } from '../common/BlockKeys'
 import { MonacoEditor } from '../common/MonacoEditor'
 import { NullValue } from '../common/NullValue'
 import { TruncatedWarningOverlay } from './TruncatedWarningOverlay'
+import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { isValueTruncated } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
+import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
+import { isTableLike } from '@/data/table-editor/table-editor-types'
+import { useGetCellValueMutation } from '@/data/table-rows/get-cell-value-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { prettifyJSON, removeJSONTrailingComma, tryParseJson } from '@/lib/helpers'
 
 const verifyJSON = (value: string) => {
   try {
@@ -26,8 +33,10 @@ const verifyJSON = (value: string) => {
   }
 }
 
-interface JsonEditorProps<TRow, TSummaryRow = unknown>
-  extends RenderEditCellProps<TRow, TSummaryRow> {
+interface JsonEditorProps<TRow, TSummaryRow = unknown> extends RenderEditCellProps<
+  TRow,
+  TSummaryRow
+> {
   isEditable: boolean
   onExpandEditor: (column: string, row: TRow) => void
 }
@@ -52,18 +61,16 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   onRowChange,
   onExpandEditor,
 }: JsonEditorProps<TRow, TSummaryRow>) => {
-  const state = useTrackedState()
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
+  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
 
   const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id,
   })
-
-  const gridColumn = state.gridColumns.find((x) => x.name == column.key)
 
   const rawInitialValue = row[column.key as keyof TRow] as unknown
   const initialValue =
@@ -73,15 +80,12 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
 
   const jsonString = prettifyJSON(initialValue ? tryFormatInitialValue(initialValue) : '')
 
-  const isTruncated =
-    typeof initialValue === 'string' &&
-    initialValue.endsWith('...') &&
-    initialValue.length > MAX_CHARACTERS
-
+  const isTruncated = isValueTruncated(initialValue)
   const [isPopoverOpen, setIsPopoverOpen] = useState(true)
   const [value, setValue] = useState<string | null>(jsonString)
+  const applyChangesLabel = isQueueOperationsEnabled ? 'Queue changes' : 'Save changes'
 
-  const { mutate: getCellValue, isLoading, isSuccess } = useGetCellValueMutation()
+  const { mutate: getCellValue, isPending, isSuccess } = useGetCellValueMutation()
 
   const loadFullValue = () => {
     if (selectedTable === undefined || project === undefined || !isTableLike(selectedTable)) return
@@ -151,37 +155,31 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
       onRowChange({ ...row, [column.key]: jsonValue }, true)
       setIsPopoverOpen(false)
     } else {
-      const { onError } = state
-      if (onError) onError(Error('Please enter a valid JSON'))
+      toast.error('Please enter a valid JSON')
     }
   }
 
   return (
-    <Popover
-      open={isPopoverOpen}
-      side="bottom"
-      align="start"
-      sideOffset={-35}
-      className="rounded-none"
-      overlay={
-        isTruncated && !isSuccess ? (
-          <div
-            style={{ width: `${gridColumn?.width || column.width}px` }}
-            className="flex items-center justify-center flex-col relative"
-          >
-            <MonacoEditor
-              readOnly
-              onChange={() => {}}
-              width={`${gridColumn?.width || column.width}px`}
-              value={value ?? ''}
-              language="markdown"
-            />
-            <TruncatedWarningOverlay isLoading={isLoading} loadFullValue={loadFullValue} />
+    <Popover open={isPopoverOpen}>
+      <PopoverTrigger asChild>
+        <div
+          className={`${
+            !!value && jsonString.trim().length == 0 ? 'sb-grid-fill-container' : ''
+          } sb-grid-json-editor__trigger`}
+          onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+        >
+          {value === null || value === '' ? <NullValue /> : jsonString}
+        </div>
+      </PopoverTrigger>
+      <PopoverContent side="bottom" align="start" sideOffset={-35} className="rounded-none p-0">
+        {isTruncated && !isSuccess ? (
+          <div className="flex items-center justify-center flex-col relative">
+            <MonacoEditor readOnly onChange={() => {}} value={value ?? ''} language="markdown" />
+            <TruncatedWarningOverlay isLoading={isPending} loadFullValue={loadFullValue} />
           </div>
         ) : (
           <BlockKeys value={value} onEscape={cancelChanges} onEnter={saveChanges}>
             <MonacoEditor
-              width={`${gridColumn?.width || column.width}px`}
               value={value ?? ''}
               language="json"
               readOnly={!isEditable}
@@ -191,48 +189,39 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
               {isEditable && (
                 <div className="space-y-1">
                   <div className="flex items-center space-x-2">
-                    <div className="px-1.5 py-[2.5px] rounded bg-selection border border-strong flex items-center justify-center">
+                    <div className="px-1.5 py-[2.5px] rounded-sm bg-selection border border-strong flex items-center justify-center">
                       <span className="text-[10px]">⏎</span>
                     </div>
-                    <p className="text-xs text-foreground-light">Save changes</p>
+                    <p className="text-xs text-foreground-light">{applyChangesLabel}</p>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <div className="px-1 py-[2.5px] rounded bg-selection border border-strong flex items-center justify-center">
+                    <div className="px-1 py-[2.5px] rounded-sm bg-selection border border-strong flex items-center justify-center">
                       <span className="text-[10px]">Esc</span>
                     </div>
                     <p className="text-xs text-foreground-light">Cancel changes</p>
                   </div>
                 </div>
               )}
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_ asChild>
+              <Tooltip>
+                <TooltipTrigger asChild>
                   <div
                     className={[
-                      'border border-strong rounded p-1 flex items-center justify-center',
+                      'border border-strong rounded-sm p-1 flex items-center justify-center',
                       'transition cursor-pointer bg-selection hover:bg-border-strong',
                     ].join(' ')}
                     onClick={() => onSelectExpand()}
                   >
                     <Maximize size={12} strokeWidth={2} />
                   </div>
-                </TooltipTrigger_Shadcn_>
-                <TooltipContent_Shadcn_ side="bottom" align="center">
+                </TooltipTrigger>
+                <TooltipContent side="bottom" align="center">
                   <span>Expand editor</span>
-                </TooltipContent_Shadcn_>
-              </Tooltip_Shadcn_>
+                </TooltipContent>
+              </Tooltip>
             </div>
           </BlockKeys>
-        )
-      }
-    >
-      <div
-        className={`${
-          !!value && jsonString.trim().length == 0 ? 'sb-grid-fill-container' : ''
-        } sb-grid-json-editor__trigger`}
-        onClick={() => setIsPopoverOpen(!isPopoverOpen)}
-      >
-        {value === null || value === '' ? <NullValue /> : jsonString}
-      </div>
+        )}
+      </PopoverContent>
     </Popover>
   )
 }

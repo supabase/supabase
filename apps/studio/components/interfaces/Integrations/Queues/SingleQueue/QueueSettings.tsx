@@ -1,28 +1,11 @@
+import { useParams } from 'common'
 import { isEqual } from 'lodash'
 import { HelpCircle, Settings } from 'lucide-react'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
-import {
-  TablePrivilegesGrant,
-  useTablePrivilegesGrantMutation,
-} from 'data/privileges/table-privileges-grant-mutation'
-import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
-import {
-  TablePrivilegesRevoke,
-  useTablePrivilegesRevokeMutation,
-} from 'data/privileges/table-privileges-revoke-mutation'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import {
   Button,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
   Sheet,
   SheetContent,
   SheetDescription,
@@ -38,15 +21,30 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
+import { Admonition } from 'ui-patterns/admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { pgmqArchiveTable, pgmqQueueTable } from '../Queues.utils'
 import { getQueueFunctionsMapping } from './Queue.utils'
-import { Admonition } from 'ui-patterns'
-import Link from 'next/link'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useQueuesExposePostgrestStatusQuery } from '@/data/database-queues/database-queues-expose-postgrest-status-query'
+import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
+import {
+  TablePrivilegesGrant,
+  useTablePrivilegesGrantMutation,
+} from '@/data/privileges/table-privileges-grant-mutation'
+import { useTablePrivilegesQuery } from '@/data/privileges/table-privileges-query'
+import {
+  TablePrivilegesRevoke,
+  useTablePrivilegesRevokeMutation,
+} from '@/data/privileges/table-privileges-revoke-mutation'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const ACTIONS = ['select', 'insert', 'update', 'delete']
 const ROLES = ['anon', 'authenticated', 'postgres', 'service_role']
@@ -56,7 +54,7 @@ interface QueueSettingsProps {}
 
 export const QueueSettings = ({}: QueueSettingsProps) => {
   const { childId: name } = useParams()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   const [open, setOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -67,7 +65,13 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
     connectionString: project?.connectionString,
   })
 
-  const { data, error, isLoading, isSuccess, isError } = useDatabaseRolesQuery({
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+  } = useDatabaseRolesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -80,15 +84,17 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
     connectionString: project?.connectionString,
     schema: 'pgmq',
   })
-  const queueTable = queueTables?.find((x) => x.name === `q_${name}`)
-  const archiveTable = queueTables?.find((x) => x.name === `a_${name}`)
+  const queueRelname = name ? pgmqQueueTable(name) : undefined
+  const archiveRelname = name ? pgmqArchiveTable(name) : undefined
+  const queueTable = queueTables?.find((x) => x.name === queueRelname)
+  const archiveTable = queueTables?.find((x) => x.name === archiveRelname)
 
   const { data: allTablePrivileges, isSuccess: isSuccessPrivileges } = useTablePrivilegesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
   const queuePrivileges = allTablePrivileges?.find(
-    (x) => x.schema === 'pgmq' && x.name === `q_${name}`
+    (x) => x.schema === 'pgmq' && x.name === queueRelname
   )
 
   const { mutateAsync: grantPrivilege } = useTablePrivilegesGrantMutation()
@@ -246,13 +252,13 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
             {isExposed && (
               <>
                 These will also determine access to each function available from the{' '}
-                <code className="text-xs">pgmq_public</code> schema.
+                <code className="text-code-inline">pgmq_public</code> schema.
               </>
             )}
           </SheetDescription>
         </SheetHeader>
 
-        <SheetSection className="p-0 flex-grow">
+        <SheetSection className="p-0 grow">
           {!isExposed ? (
             <Admonition
               type="default"
@@ -275,7 +281,7 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
             <Admonition
               type="default"
               className="rounded-none border-x-0 border-t-0"
-              title="Only relevant roles for managing queues via client libraries or PostgREST are shown here"
+              description="Only relevant roles for managing queues via client libraries or PostgREST are shown here."
             />
           )}
           <Table>
@@ -286,16 +292,13 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
                   const relatedFunctions = getQueueFunctionsMapping(x)
                   return (
                     <TableHead key={x}>
-                      <Tooltip_Shadcn_>
-                        <TooltipTrigger_Shadcn_ className="mx-auto flex items-center gap-x-1 capitalize text-foreground-light font-normal">
+                      <Tooltip>
+                        <TooltipTrigger className="mx-auto flex items-center gap-x-1 capitalize text-foreground-light font-normal">
                           {x}
                           {isExposed && <HelpCircle size={14} strokeWidth={1.5} />}
-                        </TooltipTrigger_Shadcn_>
+                        </TooltipTrigger>
                         {isExposed && (
-                          <TooltipContent_Shadcn_
-                            side="bottom"
-                            className="w-64 flex flex-col gap-y-1"
-                          >
+                          <TooltipContent side="bottom" className="w-64 flex flex-col gap-y-1">
                             <p>
                               Required for{' '}
                               {relatedFunctions.length === 6
@@ -308,9 +311,9 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
                                 <code key={`${x}_${y}`}>{y}</code>
                               ))}
                             </div>
-                          </TooltipContent_Shadcn_>
+                          </TooltipContent>
                         )}
-                      </Tooltip_Shadcn_>
+                      </Tooltip>
                     </TableHead>
                   )
                 })}

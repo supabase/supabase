@@ -8,7 +8,7 @@ export function useAutoScroll({ enabled = true }: UseAutoScrollProps = {}) {
   const [container, setContainer] = useState<HTMLDivElement | null>(null)
   const [isSticky, setIsSticky] = useState(true)
   const isStickyRef = useRef(true)
-  const lastScrollHeightRef = useRef<number>()
+  const lastScrollHeightRef = useRef<number>(null)
 
   const ref = useCallback((element: HTMLDivElement | null) => {
     if (element) {
@@ -30,17 +30,21 @@ export function useAutoScroll({ enabled = true }: UseAutoScrollProps = {}) {
   useEffect(() => {
     if (!container || !enabled) return
 
+    let timeoutId: NodeJS.Timeout
+
     const resizeObserver = new ResizeObserver(() => {
-      // Prevent duplicate scroll events from phantom height changes
-      if (
-        lastScrollHeightRef.current !== undefined &&
-        container.scrollHeight !== lastScrollHeightRef.current
-      ) {
-        lastScrollHeightRef.current = container.scrollHeight
-        if (isStickyRef.current) {
-          scrollToEnd()
+      clearTimeout(timeoutId)
+      timeoutId = setTimeout(() => {
+        if (
+          lastScrollHeightRef.current != null &&
+          container.scrollHeight !== lastScrollHeightRef.current
+        ) {
+          lastScrollHeightRef.current = container.scrollHeight
+          if (isStickyRef.current) {
+            scrollToEnd()
+          }
         }
-      }
+      }, 100)
     })
 
     const handleScroll = () => {
@@ -59,10 +63,11 @@ export function useAutoScroll({ enabled = true }: UseAutoScrollProps = {}) {
     container.addEventListener('scroll', handleScroll)
 
     return () => {
+      clearTimeout(timeoutId)
       resizeObserver.disconnect()
       container.removeEventListener('scroll', handleScroll)
     }
   }, [container, enabled, scrollToEnd])
 
-  return { ref, isSticky, scrollToEnd }
+  return { ref, isSticky, scrollToEnd, setIsSticky }
 }

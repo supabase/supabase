@@ -1,14 +1,17 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
+import { ExternalLink, Loader, Monitor, Server } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 import { Badge, Button } from 'ui'
 
-import ShimmerLine from 'components/ui/ShimmerLine'
-import { invalidateProjectDetailsQuery, type Project } from 'data/projects/project-detail-query'
-import { setProjectPostgrestStatus } from 'data/projects/projects-query'
-import pingPostgrest from 'lib/pingPostgrest'
-import { Loader, Monitor, Server, ExternalLink } from 'lucide-react'
+import ShimmerLine from '@/components/ui/ShimmerLine'
+import {
+  useInvalidateProjectDetailsQuery,
+  useSetProjectPostgrestStatus,
+  type Project,
+} from '@/data/projects/project-detail-query'
+import { DOCS_URL } from '@/lib/constants'
+import pingPostgrest from '@/lib/pingPostgrest'
 
 export interface ConnectingStateProps {
   project: Project
@@ -16,8 +19,10 @@ export interface ConnectingStateProps {
 
 const ConnectingState = ({ project }: ConnectingStateProps) => {
   const { ref } = useParams()
-  const queryClient = useQueryClient()
-  const checkProjectConnectionIntervalRef = useRef<number>()
+  const checkProjectConnectionIntervalRef = useRef<number>(null)
+
+  const { setProjectPostgrestStatus } = useSetProjectPostgrestStatus()
+  const { invalidateProjectDetailsQuery } = useInvalidateProjectDetailsQuery()
 
   useEffect(() => {
     if (!project.restUrl) return
@@ -26,16 +31,20 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
     // pingPostgrest timeouts in 2s, wait for another 2s before checking again
     checkProjectConnectionIntervalRef.current = window.setInterval(testProjectConnection, 4000)
     return () => {
-      clearInterval(checkProjectConnectionIntervalRef.current)
+      if (checkProjectConnectionIntervalRef.current) {
+        clearInterval(checkProjectConnectionIntervalRef.current)
+      }
     }
   }, [project])
 
   const testProjectConnection = async () => {
     const result = await pingPostgrest(project.ref)
     if (result) {
-      clearInterval(checkProjectConnectionIntervalRef.current)
-      setProjectPostgrestStatus(queryClient, project.ref, 'ONLINE')
-      await invalidateProjectDetailsQuery(queryClient, project.ref)
+      if (checkProjectConnectionIntervalRef.current) {
+        clearInterval(checkProjectConnectionIntervalRef.current)
+      }
+      setProjectPostgrestStatus(project.ref, 'ONLINE')
+      await invalidateProjectDetailsQuery(project.ref)
     }
   }
 
@@ -46,7 +55,7 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
           <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:space-y-0 lg:space-x-6">
             <h1 className="text-3xl">{project.name}</h1>
             <div>
-              <Badge variant="brand">
+              <Badge variant="success">
                 <div className="flex items-center gap-2">
                   <Loader className="animate-spin" size={12} />
                   <span>Connecting to project</span>
@@ -54,7 +63,7 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
               </Badge>
             </div>
           </div>
-          <div className="flex h-[500px] items-center justify-center rounded border border-overlay bg-surface-100 p-8">
+          <div className="flex h-[500px] items-center justify-center rounded-sm border border-overlay bg-surface-100 p-8">
             <div className="w-[440px] space-y-4">
               <div className="mx-auto flex max-w-[300px] items-center justify-center">
                 <div>
@@ -86,10 +95,8 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
                 </Button>
                 <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                   <Link
-                    href={
-                      'https://supabase.com/docs/guides/platform/troubleshooting#unable-to-connect-to-your-supabase-project'
-                    }
-                    className="translate-y-[1px]"
+                    href={`${DOCS_URL}/guides/troubleshooting?products=platform#unable-to-connect-to-your-supabase-project`}
+                    className="translate-y-px"
                   >
                     Troubleshooting
                   </Link>

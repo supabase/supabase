@@ -12,7 +12,7 @@ const UseCases: FC<Props> = (props) => {
     <SectionContainer className="text grid gap-8 lg:gap-12 md:grid-cols-2">
       <div className="lg:pb-8 md:h-full w-full flex flex-col justify-between gap-2">
         <div className="flex flex-col gap-2 md:max-w-md">
-          <h1 className="h1 !m-0">Request a demo</h1>
+          <h1 className="h1 m-0!">Request a demo</h1>
           <p className="md:text-lg text-foreground-lighter">
             We can take your requirements and show you how Supabase can help you achieve your goals.
           </p>

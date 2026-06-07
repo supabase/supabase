@@ -1,129 +1,139 @@
-import { motion } from 'framer-motion'
-import { User } from 'lucide-react'
-import { PropsWithChildren } from 'react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
+import { UIMessage as VercelMessage } from '@ai-sdk/react'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import { cn } from 'ui'
 
-import { AiIconAnimation, cn, CodeBlock, markdownComponents, WarningIcon } from 'ui'
-import CollapsibleCodeBlock from './CollapsibleCodeBlock'
-import { SqlSnippet } from './SqlSnippet'
+import { DeleteMessageConfirmModal } from './DeleteMessageConfirmModal'
+import { MessageActions } from './Message.Actions'
+import type { AddToolApprovalResponse, MessageInfo } from './Message.Context'
+import { MessageProvider, useMessageActionsContext, useMessageInfoContext } from './Message.Context'
+import { MessageDisplay } from './Message.Display'
+
+function AssistantMessage({ message }: { message: VercelMessage }) {
+  const { id, variant, state, isLastMessage, readOnly, rating, isLoading } = useMessageInfoContext()
+  const { onCancelEdit, onRate } = useMessageActionsContext()
+
+  const handleRate = (newRating: 'positive' | 'negative', reason?: string) => {
+    onRate?.(id, newRating, reason)
+  }
+
+  return (
+    <MessageDisplay.Container
+      className={cn(
+        variant === 'warning' && 'bg-warning-200',
+        state === 'predecessor-editing' && 'opacity-50 transition-opacity cursor-pointer'
+      )}
+      onClick={state === 'predecessor-editing' ? onCancelEdit : undefined}
+    >
+      <MessageDisplay.MainArea>
+        <MessageDisplay.Content message={message} />
+      </MessageDisplay.MainArea>
+      {!readOnly && isLastMessage && onRate && !isLoading && (
+        <MessageActions alwaysShow>
+          <MessageActions.ThumbsUp
+            onClick={() => handleRate('positive')}
+            isActive={rating === 'positive'}
+            disabled={!!rating}
+          />
+          <MessageActions.ThumbsDown
+            onClick={(reason) => handleRate('negative', reason)}
+            isActive={rating === 'negative'}
+            disabled={!!rating}
+          />
+        </MessageActions>
+      )}
+    </MessageDisplay.Container>
+  )
+}
+
+function UserMessage({ message }: { message: VercelMessage }) {
+  const { id, variant, state } = useMessageInfoContext()
+  const { onCancelEdit, onEdit, onDelete } = useMessageActionsContext()
+  const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false)
+
+  return (
+    <>
+      <MessageDisplay.Container
+        className={cn(
+          'mt-6 text-foreground',
+          variant === 'warning' && 'bg-warning-200',
+          state === 'predecessor-editing' && 'opacity-50 transition-opacity cursor-pointer'
+        )}
+        onClick={state === 'predecessor-editing' ? onCancelEdit : undefined}
+      >
+        <MessageDisplay.MainArea>
+          <MessageDisplay.ProfileImage />
+          <MessageDisplay.Content message={message} />
+        </MessageDisplay.MainArea>
+        <MessageActions>
+          <MessageActions.Edit
+            onClick={state === 'idle' ? () => onEdit(id) : onCancelEdit}
+            tooltip={state === 'idle' ? 'Edit message' : 'Cancel editing'}
+          />
+          <MessageActions.Delete onClick={() => setShowDeleteConfirmModal(true)} />
+        </MessageActions>
+      </MessageDisplay.Container>
+      <DeleteMessageConfirmModal
+        visible={showDeleteConfirmModal}
+        onConfirm={() => {
+          onDelete(id)
+          setShowDeleteConfirmModal(false)
+          toast.success('Message deleted successfully')
+        }}
+        onCancel={() => setShowDeleteConfirmModal(false)}
+      />
+    </>
+  )
+}
 
 interface MessageProps {
   id: string
-  role: 'function' | 'system' | 'user' | 'assistant' | 'data' | 'tool'
-  content?: string
+  message: VercelMessage
   isLoading: boolean
   readOnly?: boolean
-  action?: React.ReactNode
   variant?: 'default' | 'warning'
+  addToolApprovalResponse?: AddToolApprovalResponse
+  onDelete: (id: string) => void
+  onEdit: (id: string) => void
+  isAfterEditedMessage: boolean
+  isBeingEdited: boolean
+  onCancelEdit: () => void
+  isLastMessage?: boolean
+  onRate?: (id: string, rating: 'positive' | 'negative', reason?: string) => void
+  rating?: 'positive' | 'negative' | null
 }
 
-export const Message = function Message({
-  id,
-  role,
-  content,
-  isLoading,
-  readOnly,
-  children,
-  action = null,
-  variant = 'default',
-}: PropsWithChildren<MessageProps>) {
-  const isUser = role === 'user'
+export function Message(props: MessageProps) {
+  const message = props.message
+  const { role } = message
+  const isUserMessage = role === 'user'
 
-  if (!content) return null
+  const messageInfo = {
+    id: props.id,
+    isLoading: props.isLoading,
+    readOnly: props.readOnly,
+    variant: props.variant,
+    isUserMessage,
+    state: props.isBeingEdited
+      ? 'editing'
+      : props.isAfterEditedMessage
+        ? 'predecessor-editing'
+        : 'idle',
+    isLastMessage: props.isLastMessage,
+    rating: props.rating,
+  } satisfies MessageInfo
+
+  const messageActions = {
+    addToolApprovalResponse: props.addToolApprovalResponse,
+    onDelete: props.onDelete,
+    onEdit: props.onEdit,
+    onCancelEdit: props.onCancelEdit,
+    onRate: props.onRate,
+  }
 
   return (
-    <motion.div
-      layout="position"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className={cn(
-        'mb-5 text-foreground-light text-sm',
-        isUser && 'text-foreground',
-        variant === 'warning' && 'bg-warning-200'
-      )}
-    >
-      {children}
-
-      {variant === 'warning' && <WarningIcon className="w-6 h-6" />}
-
-      {action}
-
-      <div className="flex gap-4 w-auto overflow-hidden">
-        {isUser ? (
-          <figure className="w-5 h-5 shrink-0 bg-foreground rounded-full flex items-center justify-center">
-            <User size={16} strokeWidth={1.5} className="text-background" />
-          </figure>
-        ) : (
-          <AiIconAnimation size={20} className="text-foreground-muted shrink-0" />
-        )}
-        <ReactMarkdown
-          className="space-y-5 flex-1 [&>*>code]:text-xs [&>*>*>code]:text-xs min-w-0 [&_li]:space-y-4"
-          remarkPlugins={[remarkGfm]}
-          components={{
-            ...markdownComponents,
-            pre: (props: any) => {
-              const language = props.children[0].props.className?.replace('language-', '') || 'sql'
-
-              return (
-                <div className="w-auto -ml-[36px] overflow-x-hidden">
-                  {language === 'sql' ? (
-                    readOnly ? (
-                      <CollapsibleCodeBlock
-                        value={props.children[0].props.children[0]}
-                        language="sql"
-                        hideLineNumbers
-                      />
-                    ) : (
-                      <SqlSnippet
-                        readOnly={readOnly}
-                        isLoading={isLoading}
-                        sql={props.children[0].props.children}
-                      />
-                    )
-                  ) : (
-                    <CodeBlock
-                      hideLineNumbers
-                      value={props.children[0].props.children}
-                      language={language}
-                      className={cn(
-                        'max-h-96 max-w-none block border rounded !bg-transparent !py-3 !px-3.5 prose dark:prose-dark text-foreground',
-                        '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap [&>code]:block [&>code>span]:text-foreground'
-                      )}
-                    />
-                  )}
-                </div>
-              )
-            },
-            ol: (props: any) => {
-              return <ol className="flex flex-col gap-y-4">{props.children}</ol>
-            },
-            li: (props: any) => {
-              return <li className="[&>pre]:mt-2">{props.children}</li>
-            },
-            h3: (props: any) => {
-              return <h3 className="underline">{props.children}</h3>
-            },
-            code: (props: any) => {
-              return <code className={cn('text-xs', props.className)}>{props.children}</code>
-            },
-            a: (props: any) => {
-              return (
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href={props.href}
-                  className="underline transition underline-offset-2 decoration-foreground-lighter hover:decoration-foreground text-foreground"
-                >
-                  {props.children}
-                </a>
-              )
-            },
-          }}
-        >
-          {content}
-        </ReactMarkdown>
-      </div>
-    </motion.div>
+    <MessageProvider messageInfo={messageInfo} messageActions={messageActions}>
+      {isUserMessage ? <UserMessage message={message} /> : <AssistantMessage message={message} />}
+    </MessageProvider>
   )
 }

@@ -1,48 +1,63 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Check, ChevronUp, ExternalLink } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useParams } from 'common'
+import { Check } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import { useQueryState } from 'nuqs'
+import { useCallback, useEffect, useId, useMemo, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DocsButton } from 'components/ui/DocsButton'
-import type { components } from 'data/api'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { BASE_PATH } from 'lib/constants'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
   Button,
-  Collapsible,
   Form,
-  Input,
-  WarningIcon,
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetSection,
+  SheetTitle,
 } from 'ui'
-import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
+import { Admonition } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
+import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
+import { AuthAlert } from './AuthAlert'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
-import { Markdown } from 'components/interfaces/Markdown'
-import { Admonition } from 'ui-patterns'
+import { Markdown } from '@/components/interfaces/Markdown'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { ResourceItem } from '@/components/ui/Resource/ResourceItem'
+import type { components } from '@/data/api'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useHasEntitlementAccess } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { BASE_PATH } from '@/lib/constants'
 
-export interface ProviderFormProps {
+interface ProviderFormProps {
   config: components['schemas']['GoTrueConfigResponse']
   provider: Provider
+  isActive: boolean
 }
 
-const ProviderForm = ({ config, provider }: ProviderFormProps) => {
-  const ref = useRef<HTMLButtonElement>(null)
-  const [open, setOpen] = useState(false)
-  const { ref: projectRef, provider: urlProvider } = useParams()
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
+const doubleNegativeKeys = ['SMS_AUTOCONFIRM']
 
-  const doubleNegativeKeys = ['MAILER_AUTOCONFIRM', 'SMS_AUTOCONFIRM']
-  const canUpdateConfig: boolean = useCheckPermissions(
+export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) => {
+  const { resolvedTheme } = useTheme()
+  const { ref: projectRef } = useParams()
+  const { data: organization } = useSelectedOrganizationQuery()
+  const [urlProvider, setUrlProvider] = useQueryState('provider', { defaultValue: '' })
+
+  const [open, setOpen] = useState(false)
+  const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()
+
+  const { data: endpoint } = useProjectApiUrl({ projectRef })
+
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )
@@ -66,275 +81,236 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
     )
   }
 
-  const showAlert = (title: string) => {
-    switch (title) {
-      // TODO (KM): Remove after 10th October 2024 when we disable the provider
-      case 'Slack (Deprecated)':
-        return (
-          <Alert_Shadcn_ variant="warning">
-            <WarningIcon />
-            <AlertTitle_Shadcn_>Slack (Deprecated) Provider</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              Recently, Slack has updated their OAuth API. Please use the new Slack (OIDC) provider
-              below. Developers using this provider should move over to the new provider. Please
-              refer to our{' '}
-              <a
-                href="https://supabase.com/docs/guides/auth/social-login/auth-slack"
-                className="underline"
-                target="_blank"
-              >
-                documentation
-              </a>{' '}
-              for more details.
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
-        )
-      case 'Phone':
-        return (
-          config.HOOK_SEND_SMS_ENABLED && (
-            <Alert_Shadcn_>
-              <WarningIcon />
-              <AlertTitle_Shadcn_>
-                SMS provider settings are disabled while the SMS hook is enabled.
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_ className="flex flex-col gap-y-3">
-                <p>The SMS hook will be used in place of the SMS provider configured</p>
-                <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
-                  <Link href={`/project/${projectRef}/auth/hooks`}>View auth hooks</Link>
-                </Button>
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-          )
-        )
-      default:
-        return null
-    }
-  }
+  const hasEntitlementAccess = useHasEntitlementAccess()
 
-  const { data: settings } = useProjectSettingsV2Query({ projectRef })
-  const protocol = settings?.app_config?.protocol ?? 'https'
-  const endpoint = settings?.app_config?.endpoint
-  const apiUrl = `${protocol}://${endpoint}`
-
-  const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
-
-  const generateInitialValues = () => {
-    const initialValues: { [x: string]: string | boolean } = {}
-
-    // the config is already loaded through the parent component
-    Object.keys(provider.properties).forEach((key) => {
-      // When the key is a 'double negative' key, we must reverse the boolean before adding it to the form
-      const isDoubleNegative = doubleNegativeKeys.includes(key)
-
-      if (provider.title === 'SAML 2.0') {
-        const configValue = (config as any)[key]
-        initialValues[key] =
-          configValue || (provider.properties[key].type === 'boolean' ? false : '')
-      } else {
-        if (isDoubleNegative) {
-          initialValues[key] = !(config as any)[key]
-        } else {
-          const configValue = (config as any)[key]
-          initialValues[key] = configValue
-            ? configValue
-            : provider.properties[key].type === 'boolean'
-              ? false
-              : ''
+  const getValuesForProvider = useCallback(
+    (config: components['schemas']['GoTrueConfigResponse']) => {
+      const values: { [x: string]: string | boolean } = {}
+      Object.keys(provider.properties).forEach((key) => {
+        // This ensures the default value is visibly selected
+        if (key === 'PASSWORD_REQUIRED_CHARACTERS' && config.PASSWORD_REQUIRED_CHARACTERS === '') {
+          values[key] = NO_REQUIRED_CHARACTERS
+          return
         }
-      }
-    })
 
-    return initialValues
-  }
+        const isDoubleNegative = doubleNegativeKeys.includes(key)
+        if (provider.title === 'SAML 2.0') {
+          const configValue = (config as any)[key]
+          values[key] = configValue || (provider.properties[key].type === 'boolean' ? false : '')
+        } else {
+          if (isDoubleNegative) {
+            values[key] = !(config as any)[key]
+          } else {
+            const configValue = (config as any)[key]
+            values[key] = configValue
+              ? configValue
+              : provider.properties[key].type === 'boolean'
+                ? false
+                : ''
+          }
+        }
+      })
+      return values
+    },
+    [provider]
+  )
 
-  const isSAMLEnabled: boolean =
-    provider.title === 'SAML 2.0' && config && (config as any)['SAML_ENABLED']
-  // [Joel] Introduced as the new LinkedIn provider has a corresponding config var of LINKEDIN_OIDC
-  const isLinkedInOIDCEnabled: boolean =
-    provider.title === 'LinkedIn (OIDC)' &&
-    config &&
-    (config as any)['EXTERNAL_LINKEDIN_OIDC_ENABLED']
-  const isSlackOIDCEnabled =
-    provider.title === 'Slack (OIDC)' && config['EXTERNAL_SLACK_OIDC_ENABLED']
-  const isExternalProviderAndEnabled: boolean =
-    config && (config as any)[`EXTERNAL_${provider?.title?.toUpperCase()}_ENABLED`]
+  const INITIAL_VALUES = useMemo(() => {
+    // This check will always be true but let us avoid adding an eslint disable comment on unused memo dependencies
+    // which could hide real issues in the future.
+    // Adding the provider in the memo dependencies ensures the INITIAL_VALUES is properly applied
+    if (!provider) return
+    return getValuesForProvider(config)
+  }, [config, getValuesForProvider, provider])
 
-  // [Joshen] Doing this check as SAML doesn't follow the same naming structure as the other provider options
-  const isActive: boolean =
-    isSAMLEnabled || isExternalProviderAndEnabled || isLinkedInOIDCEnabled || isSlackOIDCEnabled
-  const INITIAL_VALUES = generateInitialValues()
-
-  const onSubmit = (values: any, { resetForm }: any) => {
+  const onSubmit = (values: any) => {
     const payload = { ...values }
-
-    // Format payload for the following checks:
-    // 1. Convert all empty string values to null
-    // 2. When the key is a 'double negative' key, we must reverse the boolean before the payload can be sent
     Object.keys(values).map((x: string) => {
       if (doubleNegativeKeys.includes(x)) payload[x] = !values[x]
       if (payload[x] === '') payload[x] = null
     })
 
+    // The backend uses empty string to represent no required characters in the password
+    if (payload.PASSWORD_REQUIRED_CHARACTERS === NO_REQUIRED_CHARACTERS) {
+      payload.PASSWORD_REQUIRED_CHARACTERS = ''
+    }
+
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
       {
-        onSuccess: () => {
-          resetForm({ values: { ...values }, initialValues: { ...values } })
+        onSuccess: (newValues) => {
           setOpen(false)
+          setUrlProvider(null)
+          form.reset(getValuesForProvider(newValues))
           toast.success('Successfully updated settings')
         },
       }
     )
   }
 
+  // Handle clicking on a provider in the list
+  const handleProviderClick = () => setUrlProvider(provider.title)
+
+  const handleOpenChange = (isOpen: boolean) => {
+    // Remove provider query param from URL when closed
+    if (!isOpen) setUrlProvider(null)
+  }
+
+  // Open or close the form based on the query parameter
   useEffect(() => {
-    if (urlProvider?.toLowerCase() === provider.title.toLowerCase()) {
-      setOpen(true)
-      ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    const isProviderInQuery = urlProvider.toLowerCase() === provider.title.toLowerCase()
+    setOpen(isProviderInQuery)
+  }, [urlProvider, provider.title])
+
+  const form = useForm({
+    defaultValues: INITIAL_VALUES,
+    resolver: zodResolver(provider.validationSchema),
+    shouldUnregister: false,
+  })
+
+  useEffect(() => {
+    if (open) {
+      form.reset(INITIAL_VALUES)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [urlProvider])
+  }, [open, form, INITIAL_VALUES])
+  const formId = useId()
 
   return (
-    <Collapsible
-      open={open}
-      onOpenChange={setOpen}
-      className={ProviderCollapsibleClasses.join(' ')}
-    >
-      <Collapsible.Trigger asChild>
-        <button
-          ref={ref}
-          type="button"
-          className="group flex w-full items-center justify-between rounded py-3 px-6 text-foreground"
-        >
-          <div className="flex items-center gap-3">
-            <ChevronUp
-              className="text-border-stronger transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
-              strokeWidth={2}
-              width={14}
-            />
+    <>
+      <ResourceItem
+        onClick={handleProviderClick}
+        media={
+          <img
+            src={`${BASE_PATH}/img/icons/${provider.misc.iconKey}${provider.misc.hasLightIcon && !resolvedTheme?.includes('dark') ? '-light' : ''}.svg`}
+            width={18}
+            height={18}
+            alt={`${provider.title} auth icon`}
+          />
+        }
+        meta={
+          isActive ? (
+            <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-brand">
+              <span className="rounded-full bg-brand p-0.5 text-xs text-brand-200">
+                <Check strokeWidth={2} size={12} />
+              </span>
+              <span className="px-1">Enabled</span>
+            </div>
+          ) : (
+            <div className="rounded-md border border-strong bg-surface-100 py-1 px-3 text-xs text-foreground-lighter">
+              Disabled
+            </div>
+          )
+        }
+      >
+        {provider.title}
+      </ResourceItem>
+
+      <Sheet open={open} onOpenChange={handleOpenChange}>
+        <SheetContent className="flex flex-col gap-0" size="lg">
+          <SheetHeader className="shrink-0 flex items-center gap-4">
             <img
-              src={`${BASE_PATH}/img/icons/${provider.misc.iconKey}.svg`}
+              src={`${BASE_PATH}/img/icons/${provider.misc.iconKey}${provider.misc.hasLightIcon && !resolvedTheme?.includes('dark') ? '-light' : ''}.svg`}
               width={18}
+              height={18}
               alt={`${provider.title} auth icon`}
             />
-            <span className="text-sm">{provider.title}</span>
-          </div>
-          <div className="flex items-center gap-3">
-            {isActive ? (
-              <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-brand">
-                <span className="rounded-full bg-brand p-0.5 text-xs text-brand-200">
-                  <Check strokeWidth={2} size={12} />
-                </span>
-                <span className="px-1">Enabled</span>
-              </div>
-            ) : (
-              <div className="rounded-md border border-strong bg-surface-100 py-1 px-3 text-xs text-foreground-lighter">
-                Disabled
-              </div>
-            )}
-          </div>
-        </button>
-      </Collapsible.Trigger>
-      <Form
-        name={`provider-${provider.title}-form`}
-        initialValues={INITIAL_VALUES}
-        validationSchema={provider.validationSchema}
-        onSubmit={onSubmit}
-      >
-        {({ handleReset, initialValues, values, setFieldValue }: any) => {
-          const noChanges = JSON.stringify(initialValues) === JSON.stringify(values)
-          return (
-            <Collapsible.Content>
-              <div className="group border-t border-strong bg-surface-100 py-6 px-6 text-foreground">
-                <div className="mx-auto my-6 max-w-lg space-y-6">
-                  {showAlert(provider.title)}
-                  {Object.keys(provider.properties).map((x: string) => (
-                    <FormField
-                      key={x}
-                      name={x}
-                      setFieldValue={setFieldValue}
-                      properties={provider.properties[x]}
-                      formValues={values}
-                      disabled={
-                        // TODO (KM): Remove after 10th October 2024 when we disable the provider
-                        shouldDisableField(x) || !canUpdateConfig
-                      }
-                    />
-                  ))}
+            <SheetTitle>{provider.title}</SheetTitle>
+          </SheetHeader>
+          <Form {...form}>
+            <form
+              id={formId}
+              name={formId}
+              className="overflow-y-auto grow px-0"
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
+              <AuthAlert
+                title={provider.title}
+                isHookSendSMSEnabled={config.HOOK_SEND_SMS_ENABLED}
+              />
 
-                  {provider?.misc?.alert && (
-                    <Admonition
-                      type="warning"
-                      title={provider.misc.alert.title}
-                      description={
-                        <>
-                          <ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>
-                        </>
-                      }
-                    />
-                  )}
+              {Object.keys(provider.properties).map((x: string) => {
+                const { entitlementKey } = provider.properties[x]
+                const hasAccess = entitlementKey == null || hasEntitlementAccess(entitlementKey)
 
-                  {provider.misc.requiresRedirect && (
-                    <>
-                      <Input
-                        copy
-                        readOnly
-                        disabled
-                        label="Callback URL (for OAuth)"
-                        value={
-                          customDomainData?.customDomain?.status === 'active'
-                            ? `https://${customDomainData.customDomain?.hostname}/auth/v1/callback`
-                            : `${apiUrl}/auth/v1/callback`
-                        }
-                        descriptionText={
-                          <Markdown
-                            content={provider.misc.helper}
-                            className="text-foreground-lighter"
-                          />
-                        }
+                return (
+                  <FormField
+                    key={x}
+                    projectRef={projectRef}
+                    organizationSlug={organization?.slug}
+                    name={x}
+                    properties={provider.properties[x]}
+                    control={form.control}
+                    readOnly={shouldDisableField(x) || !canUpdateConfig}
+                    hasAccess={hasAccess}
+                  />
+                )
+              })}
+
+              {provider?.misc?.alert && (
+                <SheetSection>
+                  <Admonition
+                    type="warning"
+                    title={provider.misc.alert.title}
+                    description={<ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>}
+                  />
+                </SheetSection>
+              )}
+
+              {provider.misc.requiresRedirect && (
+                <SheetSection>
+                  <FormItemLayout
+                    layout="horizontal"
+                    label="Callback URL (for OAuth)"
+                    description={
+                      <Markdown
+                        content={provider.misc.helper}
+                        className="text-foreground-lighter"
                       />
-                    </>
-                  )}
-                  <div className="flex items-center justify-between">
-                    <DocsButton href={provider.link} />
-                    <div className="flex items-center gap-x-3">
-                      <Button
-                        type="default"
-                        htmlType="reset"
-                        onClick={() => {
-                          handleReset()
-                          setOpen(false)
-                        }}
-                        disabled={isUpdatingConfig}
-                      >
-                        Cancel
-                      </Button>
-                      <ButtonTooltip
-                        htmlType="submit"
-                        loading={isUpdatingConfig}
-                        disabled={isUpdatingConfig || !canUpdateConfig || noChanges}
-                        tooltip={{
-                          content: {
-                            side: 'bottom',
-                            text: !canUpdateConfig
-                              ? 'You need additional permissions to update provider settings'
-                              : undefined,
-                          },
-                        }}
-                      >
-                        Save
-                      </ButtonTooltip>
-                    </div>
-                  </div>
-                </div>
+                    }
+                  >
+                    <Input copy readOnly value={endpoint ? `${endpoint}/auth/v1/callback` : ''} />
+                  </FormItemLayout>
+                </SheetSection>
+              )}
+            </form>
+          </Form>
+          <SheetFooter className="shrink-0">
+            <div className="flex items-center justify-between w-full">
+              <DocsButton href={provider.link} />
+              <div className="flex items-center gap-x-3">
+                <Button
+                  type="default"
+                  htmlType="reset"
+                  onClick={() => {
+                    setOpen(false)
+                    setUrlProvider(null)
+                    form.reset()
+                  }}
+                  disabled={isUpdatingConfig}
+                >
+                  Cancel
+                </Button>
+                <ButtonTooltip
+                  form={formId}
+                  htmlType="submit"
+                  loading={isUpdatingConfig}
+                  disabled={isUpdatingConfig || !canUpdateConfig || !form.formState.isDirty}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: !canUpdateConfig
+                        ? 'You need additional permissions to update provider settings'
+                        : undefined,
+                    },
+                  }}
+                >
+                  Save
+                </ButtonTooltip>
               </div>
-            </Collapsible.Content>
-          )
-        }}
-      </Form>
-    </Collapsible>
+            </div>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+    </>
   )
 }
-
-export default ProviderForm

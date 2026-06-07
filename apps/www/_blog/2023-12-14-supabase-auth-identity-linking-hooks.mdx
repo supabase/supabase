@@ -8,11 +8,10 @@ tags:
   - launch-week
   - auth
 date: '2023-12-14'
-published_at: '2023-12-14:00:05.000-07:00'
 toc_depth: 3
 author: stojan,joel,kangmingtay
-image: lwx-supabase-auth/auth-og.png
-thumb: lwx-supabase-auth/auth-thumb.png
+imgSocial: lwx-supabase-auth/auth-og.png
+imgThumb: lwx-supabase-auth/auth-thumb.png
 ---
 
 We're excited to announce four new features for Supabase Auth:
@@ -63,7 +62,7 @@ const { data, error } = await supabase.auth.unlinkIdentity(googleIdentity)
 
 Currently, these methods support linking an OAuth identity. To link an email or phone identity to the user, you can use the [`updateUser()`](/docs/reference/javascript/auth-updateuser)method.
 
-Manual linking is disabled by default. You can enable it for your project in [the dashboard Auth settings](/dashboard/project/_/settings/auth).
+Manual linking is disabled by default. You can enable it for your project in [the dashboard Auth settings](/dashboard/project/_/auth/providers).
 
 <Img
   alt="How to enable manual linking"
@@ -119,13 +118,13 @@ Passwords can be inherently insecure due to common user behaviors like choosing 
 
 Even though OAuth and magiclinks are more secure, we recognize passwords are here to stay. We want to make the potential pitfalls less user-prone. To accomplish that, we have integrated the [HaveIBeenPwned.org](https://haveibeenpwned.com/) _Pwned Passwords API_ in Supabase Auth to prevent users from using leaked passwords.
 
-<Admonition type="note" label="Go library">
+<Admonition type="note" title="Go library">
 
 ℹ️ We have open-sourced a Go library for interacting with the [HaveIBeenPwned.org](http://HaveIBeenPwned.org) Pwned Passwords API that we use in our Auth server. Check out the [repository](https://github.com/supabase/hibp) and feel free to contribute!
 
 </Admonition>
 
-As an additional step, we have added the ability to specify password requirements for your users. This can be configured from your project’s Auth settings in [the dashboard](/dashboard/project/_/settings/auth):
+As an additional step, we have added the ability to specify password requirements for your users. This can be configured from your project’s Auth settings in [the dashboard](/dashboard/project/_/auth/providers):
 
 <Img
   alt="Adding password requirements"

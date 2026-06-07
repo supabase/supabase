@@ -1,6 +1,6 @@
 'use client'
 
-import type { Session } from '@supabase/supabase-js'
+import type { AuthError, Session } from '@supabase/supabase-js'
 import {
   createContext,
   PropsWithChildren,
@@ -10,7 +10,11 @@ import {
   useMemo,
   useState,
 } from 'react'
-import { gotrueClient } from './gotrue'
+
+import { clearLocalStorage } from './constants/local-storage'
+import { gotrueClient, type User } from './gotrue'
+
+export type { User }
 
 const DEFAULT_SESSION: any = {
   access_token: undefined,
@@ -40,10 +44,12 @@ const DEFAULT_SESSION: any = {
 type AuthState =
   | {
       session: Session | null
+      error: AuthError | null
       isLoading: false
     }
   | {
       session: null
+      error: AuthError | null
       isLoading: true
     }
 
@@ -51,6 +57,7 @@ export type AuthContext = { refreshSession: () => Promise<Session | null> } & Au
 
 export const AuthContext = createContext<AuthContext>({
   session: null,
+  error: null,
   isLoading: true,
   refreshSession: () => Promise.resolve(null),
 })
@@ -63,14 +70,32 @@ export const AuthProvider = ({
   alwaysLoggedIn,
   children,
 }: PropsWithChildren<AuthProviderProps>) => {
-  const [state, setState] = useState<AuthState>({ session: null, isLoading: true })
+  const [state, setState] = useState<AuthState>({ session: null, error: null, isLoading: true })
+
+  useEffect(() => {
+    let mounted = true
+    gotrueClient.initialize().then(({ error }) => {
+      if (mounted && error !== null) {
+        setState((prev) => ({ ...prev, error }))
+      }
+    })
+
+    return () => {
+      mounted = false
+    }
+  }, [])
 
   // Keep the session in sync
   useEffect(() => {
     const {
       data: { subscription },
     } = gotrueClient.onAuthStateChange((_event, session) => {
-      setState({ session, isLoading: false })
+      setState((prev) => ({
+        session,
+        // If there is a session, we clear the error
+        error: session !== null ? null : prev.error,
+        isLoading: false,
+      }))
     })
 
     return subscription.unsubscribe
@@ -88,7 +113,7 @@ export const AuthProvider = ({
 
   const value = useMemo(() => {
     if (alwaysLoggedIn) {
-      return { session: DEFAULT_SESSION, isLoading: false, refreshSession } as const
+      return { session: DEFAULT_SESSION, error: null, isLoading: false, refreshSession } as const
     } else {
       return { ...state, refreshSession } as const
     }
@@ -113,34 +138,39 @@ export const useIsLoggedIn = () => {
   return user !== null
 }
 
-let currentSession: Session | null = null
+export const useAuthError = () => useAuth().error
 
-gotrueClient.onAuthStateChange((event, session) => {
-  currentSession = session
-})
+export const useIsMFAEnabled = () => {
+  const user = useUser()
+
+  return user !== null && user.factors && user.factors.length > 0
+}
+
+export const signOut = async () => await gotrueClient.signOut()
+
+export const logOut = async () => {
+  await signOut()
+  clearLocalStorage()
+}
+
+gotrueClient.onAuthStateChange((_event, _session) => {})
 
 /**
- * Grabs the currently available access token, or calls getSession.
+ * Gets a current access token.
+ *
+ * Calls getSession, which will refresh the token if needed.
  */
 export async function getAccessToken() {
   // ignore if server-side
   if (typeof window === 'undefined') return undefined
 
-  const aboutToExpire = currentSession?.expires_at
-    ? currentSession.expires_at - Math.ceil(Date.now() / 1000) < 30
-    : false
-
-  if (!currentSession || aboutToExpire) {
-    const {
-      data: { session },
-      error,
-    } = await gotrueClient.getSession()
-    if (error) {
-      throw error
-    }
-
-    return session?.access_token
+  const {
+    data: { session },
+    error,
+  } = await gotrueClient.getSession()
+  if (error) {
+    throw error
   }
 
-  return currentSession.access_token
+  return session?.access_token
 }

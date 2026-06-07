@@ -1,3 +1,7 @@
+import type { UntrustedSqlFragment } from '@supabase/pg-meta'
+
+import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+
 export interface UserContent<
   T = Dashboards.Content | SqlSnippets.Content | LogSqlSnippets.Content,
 > {
@@ -14,6 +18,7 @@ export interface UserContent<
   project_id?: number
   updated_at?: string // '2021-08-26T08:24:52.040695+00:00'
   updated_by?: Owner
+  favorite?: boolean
 }
 
 export interface UserContentMap {
@@ -31,17 +36,15 @@ export namespace SqlSnippets {
     content_id: string
 
     // A full SQL query - this will be hashed on the /content endpoint
-    sql: string
+    // Named unchecked_sql to highlight that this SQL must never be run automatically
+    // without user confirmation — it may originate from untrusted sources like URL params.
+    unchecked_sql: UntrustedSqlFragment
 
     // we can add some versioning to this schema in case we need to change the format.
     schema_version: string
 
-    // show sql snippet as a favorite.
-    // this could be problematic if sql snippets have visibility that is != 'user'
-    favorite: boolean
-
     chart?: {
-      type: 'bar'
+      type: 'bar' | 'line'
       cumulative: boolean
       xKey: string
       yKey: string
@@ -67,7 +70,6 @@ export namespace Dashboards {
    */
   export interface Content {
     schema_version: 1 // we can add some versioning to this schema in case we need to change the format.
-
     period_start: {
       time_period?: string // "0m", "1m", "5m", "1h", "1d", "1w", "1M", "1y"
       date?: string // "2017-01-01T00:00:00.000Z"
@@ -78,7 +80,6 @@ export namespace Dashboards {
     }
     interval: '1m' | '5m' | '1h' | '1d' | '1w' | '1M' | '1y' // this is the data interval
     layout: Chart[]
-    favorite?: boolean // not used yet
   }
 
   /**
@@ -104,32 +105,11 @@ export namespace Dashboards {
     y: number
     w: number
     h: number
+    label: string
     attribute: ChartType
-    provider: 'daily-stats' | 'prometheus'
-    chart_type: 'bar' | 'line' | 'area'
-    // title: string // Eventually we might need this "per chart" right?
-  }
-}
-
-export namespace SqlSnippets {
-  /**
-   * To be stored in the database: public.user_content.content
-   * In this case there is only one thing to store, but it's good to
-   * nest it in an object for future expansion.
-   */
-  export interface Content {
-    // unique id of the sql snippet, possibly to used so snippets can support versioning
-    content_id: string
-
-    // A full SQL query - this will be hashed on the /content endpoint
-    sql: string
-
-    // we can add some versioning to this schema in case we need to change the format.
-    schema_version: string
-
-    // show sql snippet as a favorite.
-    // this could be problematic if sql snippets have visibility that is != 'user'
-    favorite: boolean
+    provider: 'daily-stats' | 'infra-monitoring'
+    chart_type: 'bar' | 'line'
+    chartConfig?: Partial<ChartConfig>
   }
 }
 
@@ -148,9 +128,5 @@ export namespace LogSqlSnippets {
 
     // we can add some versioning to this schema in case we need to change the format.
     schema_version: string
-
-    // show sql snippet as a favorite.
-    // this could be problematic if sql snippets have visibility that is != 'user'
-    favorite: boolean
   }
 }

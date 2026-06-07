@@ -33,7 +33,7 @@ functions:
           Future<void> main() async {
             await Supabase.initialize(
               url: 'https://xyzcompany.supabase.co',
-              anonKey: 'public-anon-key',
+              anonKey: 'publishable-or-anon-key',
             );
 
             runApp(MyApp());
@@ -48,7 +48,7 @@ functions:
           ```dart
           final supabase = SupabaseClient(
             'https://xyzcompany.supabase.co',
-            'public-anon-key',
+            'publishable-or-anon-key',
           );
           ```
   - id: sign-up
@@ -173,7 +173,7 @@ functions:
           ```dart
           await supabase.auth.signInWithOtp(
             phone: '+13334445555',
-            channel: OtpChannel.whatsapp,  
+            channel: OtpChannel.whatsapp,
           );
           ```
   - id: sign-in-with-apple
@@ -459,7 +459,7 @@ functions:
   - id: auth-mfa-api
     title: 'Overview'
     notes: |
-      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace. 
+      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace.
 
       Currently, we only support time-based one-time password (TOTP) as the 2nd factor. We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
 
@@ -685,7 +685,7 @@ functions:
   - id: generate-link
     title: 'generateLink()'
     notes: |
-      Generates email links and OTPs to be sent via a custom email provider.
+      Generates email links and OTPs. This will not send links or OTPs to the end user. This function is for custom admin functionality.
       - The following types can be passed into `generateLink()`: `signup`, `magiclink`, `invite`, `recovery`, `emailChangeCurrent`, `emailChangeNew`, `phoneChange`.
       - `generateLink()` only generates the email link for `email_change_email` if the "Secure email change" setting is enabled under the "Email" provider in your Supabase project.
       - `generateLink()` handles the creation of the user for `signup`, `invite` and `magiclink`.
@@ -1049,17 +1049,17 @@ functions:
           ```
 
   - id: rpc
-    title: 'Stored Procedures: rpc()'
+    title: 'Database Functions: rpc()'
     description: |
-      You can call stored procedures as a "Remote Procedure Call".
+      You can call functions as a "Remote Procedure Call".
 
       That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
       It's especially useful when the logic rarely changes - like password resets and updates.
     examples:
-      - id: call-a-stored-procedure
-        name: Call a stored procedure
+      - id: call-a-database-function
+        name: Call a database function
         isSpotlight: true
-        description: This is an example invoking a stored procedure.
+        description: This is an example invoking a database function.
         code: |
           ```dart
           final data = await supabase
@@ -1309,7 +1309,18 @@ functions:
             }
           }
           ```
-
+  - id: file-buckets
+    title: 'Overview'
+    notes: |
+      This section contains methods for working with File Buckets.
+  # - id: analytics-buckets
+  #   title: 'Overview'
+  #   notes: |
+  #     This section contains methods for working with Analytics Buckets.
+  # - id: vector-buckets
+  #   title: 'Overview'
+  #   notes: |
+  #     This section contains methods for working with Vector Buckets.
   - id: list-buckets
     description: |
       Retrieves the details of all Storage buckets within an existing product.
@@ -1683,7 +1694,7 @@ functions:
           final data = await supabase
             .from('countries')
             .select('name, cities(name)')
-            .eq('name', 'United States')
+            .eq('name', 'Rohan')
             .limit(1,  foreignTable: 'cities' );
           ```
 
@@ -1709,7 +1720,7 @@ functions:
           final data = await supabase
             .from('countries')
             .select('name, cities(name)')
-            .eq('name', 'United States')
+            .eq('name', 'Rohan')
             .order('name', foreignTable: 'cities');
           ```
 
@@ -1854,47 +1865,47 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
+            .from('orchestral_sections')
             .select('''
               name,
-              cities!inner (
+              instruments!inner (
                 name
               )
             ''')
-            .eq('cities.name', 'Bali');
+            .eq('instruments.name', 'violin');
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
           response: |
             ```json
             {
               "data": [
                 {
-                  "name": "Indonesia",
-                  "cities": [
+                  "name": "strings",
+                  "characters": [
                     {
-                      "name": "Bali"
+                      "name": "violin"
                     }
                   ]
                 }
@@ -1931,9 +1942,9 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)');
+            .from('instruments')
+            .select('name, section_id')
+            .or('id.gt.20,and(name.eq.violin,section_id.eq.3)');
           ```
 
   - id: not
@@ -1944,7 +1955,7 @@ functions:
       - `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
 
         ```dart
-        .not('name','eq','Paris')
+        .not('name','eq','violin')
         .not('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
         .not('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
         .not('id','in','(6,7)')  // Use Postgres list () and 'in' for in_ filter.
@@ -1957,36 +1968,36 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .not('name', 'eq', 'Paris');
+            .from('instruments')
+            .select('name, section_id')
+            .not('name', 'eq', 'violin');
           ```
       - id: with-update
         name: With `update()`
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .not('name', 'eq', 'Paris');
+            .from('instruments')
+            .update({ 'name': 'piano' })
+            .not('name', 'eq', 'guitar');
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
+            .from('instruments')
             .delete()
-            .not('name', 'eq', 'Paris');
+            .not('name', 'eq', 'harp');
           ```
       - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
-            .rpc('echo_all_cities)
-            .not('name', 'eq', 'Paris');
+            .rpc('echo_all_instruments')
+            .not('name', 'eq', 'violin');
           ```
 
   - id: match
@@ -2000,36 +2011,36 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .match({'name': 'Beijing', 'country_id': 156});
+            .from('instruments')
+            .select('name, section_id')
+            .match({'name': 'drums', 'section_id': 2});
           ```
       - id: with-update
         name: With `update()`
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .match({'name': 'Beijing', 'country_id': 156});
+            .from('instruments')
+            .update({ 'name': 'piano' })
+            .match({'name': 'harpsichord', 'section_id': 2});
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
+            .from('instruments')
             .delete()
-            .match({'name': 'Beijing', 'country_id': 156});
+            .match({'name': 'harpsichord', 'country_id': 2});
           ```
       - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
-            .rpc('echo_all_cities')
-            .match({'name': 'Beijing', 'country_id': 156});
+            .rpc('echo_all_instruments')
+            .match({'name': 'violin', 'country_id': 3});
           ```
 
   - id: eq
@@ -2043,36 +2054,36 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .eq('name', 'The shire');
+            .from('instruments')
+            .select('name, section_id')
+            .eq('name', 'xylophone');
           ```
       - id: with-update
         name: With `update()`
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .eq('name', 'San Francisco');
+            .from('instruments')
+            .update({ 'name': 'piano' })
+            .eq('name', 'harpsichord');
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
+            .from('instruments')
             .delete()
-            .eq('name', 'Mordor');
+            .eq('name', 'tambourine');
           ```
       - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
-            .rpc('echo_all_cities')
-            .eq('name', 'San Francisco');
+            .rpc('echo_all_instruments')
+            .eq('name', 'guqin');
           ```
 
   - id: neq
@@ -2086,36 +2097,36 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .neq('name', 'The shire');
+            .from('instruments')
+            .select('name, section_id')
+            .neq('name', 'violin');
           ```
       - id: with-update
         name: With `update()`
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .neq('name', 'San Francisco');
+            .from('instruments')
+            .update({ 'name': 'piano' })
+            .neq('name', 'harp');
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
+            .from('instruments')
             .delete()
-            .neq('name', 'Mordor');
+            .neq('name', 'cello');
           ```
       - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
-            .rpc('echo_all_cities')
-            .neq('name', 'Lagos');
+            .rpc('echo_all_instruments')
+            .neq('name', 'violin');
           ```
 
   - id: gt
@@ -2155,7 +2166,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_cities')
             .gt('country_id', 250);
@@ -2198,7 +2209,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_cities')
             .gte('country_id', 250);
@@ -2241,7 +2252,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_cities')
             .lt('country_id', 250);
@@ -2285,7 +2296,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_cities')
             .lte('country_id', 250);
@@ -2329,7 +2340,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_cities')
             .like('name', '%la%');
@@ -2372,7 +2383,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_cities')
             .ilike('name', '%la%');
@@ -2417,7 +2428,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_cities')
             .is_('name', null);
@@ -2438,7 +2449,7 @@ functions:
           final data = await supabase
             .from('cities')
             .select('name, country_id')
-            .in_('name', ['Rio de Janeiro', 'San Francisco']);
+            .in_('name', ['Minas Tirith', 'Minas Morgul']);
           ```
       - id: with-update
         name: With `update()`
@@ -2446,8 +2457,8 @@ functions:
           ```dart
           final data = await supabase
             .from('cities')
-            .update({ 'name': 'Mordor' })
-            .in_('name', ['Rio de Janeiro', 'San Francisco']);
+            .update({ 'name': 'Minas Morgul' })
+            .in_('name', ['Minas Ithil', 'Minas Tirith']);
           ```
       - id: with-delete
         name: With `delete()`
@@ -2456,16 +2467,16 @@ functions:
           final data = await supabase
             .from('cities')
             .delete()
-            .in_('name', ['Rio de Janeiro', 'San Francisco']);
+            .in_('name', ['Minas Tirith', 'Minas Morgul']);
           ```
       - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_cities')
-            .in_('name', ['Rio de Janeiro', 'San Francisco']);
+            .in_('name', ['Minas Tirith', 'Minas Morgul']);
           ```
 
   - id: contains
@@ -2503,7 +2514,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_countries')
             .contains('main_exports', ['oil']);
@@ -2544,7 +2555,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_countries')
             .containedBy('main_exports', ['cars', 'food', 'machine']);
@@ -2585,7 +2596,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_countries')
             .rangeLt('population_range_millions', '[150, 250]');
@@ -2626,7 +2637,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_countries')
             .rangeGt('population_range_millions', '[150, 250]');
@@ -2667,7 +2678,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_countries')
             .rangeGte('population_range_millions', '[150, 250]');
@@ -2709,7 +2720,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_countries')
             .rangeLte('population_range_millions', [150, 250]);
@@ -2750,7 +2761,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_countries')
             .rangeAdjacent('population_range_millions', '[70, 185]');
@@ -2791,7 +2802,7 @@ functions:
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_countries')
             .overlaps('main_exports', ['computers', 'minerals']);
@@ -2883,7 +2894,7 @@ functions:
           final data = await supabase
             .from('cities')
             .select('name, country_id')
-            .filter('name', 'in', '("Paris","Tokyo")');
+            .filter('name', 'in', '("Minas Tirith","Minas Morgul")');
           ```
       - id: with-update
         name: With `update()`
@@ -2891,8 +2902,8 @@ functions:
           ```dart
           final data = await supabase
             .from('cities')
-            .update({ 'name': 'Mordor' })
-            .filter('name', 'in', '("Paris","Tokyo")');
+            .update({ 'name': 'Minas Morgul' })
+            .filter('name', 'in', '("Minas Ithil","Minas Tirith")');
           ```
       - id: with-delete
         name: With `delete()`
@@ -2901,16 +2912,16 @@ functions:
           final data = await supabase
             .from('cities')
             .delete()
-            .filter('name', 'in', '("Paris","Tokyo")');
+            .filter('name', 'in', '("Minas Tirith","Minas Morgul")');
           ```
       - id: with-rpc
         name: With `rpc()`
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_cities')
-            .filter('name', 'in', '("Paris","Tokyo")');
+            .filter('name', 'in', '("Minas Tirith","Minas Morgul")');
           ```
       - id: filter-embedded-resources
         name: Filter embedded resources
@@ -2919,5 +2930,5 @@ functions:
           final data = await supabase
             .from('cities')
             .select('name, countries ( name )')
-            .filter('countries.name', 'in', '("France","Japan")');
+            .filter('countries.name', 'in', '("Rohan","Gondor")');
           ```

@@ -1,32 +1,37 @@
-import dayjs from 'dayjs'
-import { RefreshCw } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect } from 'react'
-
 import { useParams } from 'common'
-import { LOGS_TABLES } from 'components/interfaces/Settings/Logs/Logs.constants'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { User } from 'data/auth/users-infinite-query'
-import useLogsPreview from 'hooks/analytics/useLogsPreview'
+import { ExternalLink, RefreshCw } from 'lucide-react'
+import Link from 'next/link'
+import { useQueryState } from 'nuqs'
+import { useEffect } from 'react'
 import { Button, cn, CriticalIcon, Separator } from 'ui'
 import { Admonition, TimestampInfo } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { UserHeader } from './UserHeader'
-import { PANEL_PADDING } from './UserPanel'
+import { PANEL_PADDING } from './Users.constants'
+import { LOGS_TABLES } from '@/components/interfaces/Settings/Logs/Logs.constants'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { User } from '@/data/auth/users-infinite-query'
+import useLogsPreview from '@/hooks/analytics/useLogsPreview'
+import { useLogsUrlState } from '@/hooks/analytics/useLogsUrlState'
 
 interface UserLogsProps {
   user: User
 }
 
+const API_LOGS_QUERY = (userId: string) =>
+  `select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nWHERE (\n  metadata[SAFE_OFFSET(0)].request[SAFE_OFFSET(0)].sb[SAFE_OFFSET(0)].auth_user\n    = '${userId}'\n)\nlimit 100`
+
 export const UserLogs = ({ user }: UserLogsProps) => {
   const { ref } = useParams()
+  const { filters, setFilters } = useLogsUrlState()
+  const [, setFiltersValue] = useQueryState('f')
 
   const {
     logData: authLogs,
     isSuccess: isSuccessAuthLogs,
     isLoading: isLoadingAuthLogs,
-    filters,
     refresh,
-    setFilters,
   } = useLogsPreview({
     projectRef: ref as string,
     table: LOGS_TABLES.auth,
@@ -36,12 +41,35 @@ export const UserLogs = ({ user }: UserLogsProps) => {
 
   useEffect(() => {
     if (user.id) setFilters({ ...filters, search_query: user.id })
+
+    return () => {
+      setFiltersValue(null)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.id])
 
   return (
     <div>
       <UserHeader user={user} />
+
+      <Separator />
+
+      <div className={cn('flex flex-col gap-y-3', PANEL_PADDING)}>
+        <div>
+          <p>API logs</p>
+          <p className="text-sm text-foreground-light">
+            View edge logs for requests made by this user
+          </p>
+        </div>
+
+        <Button asChild type="default" className="w-min">
+          <Link
+            href={`/project/${ref}/logs/explorer?q=${encodeURIComponent(API_LOGS_QUERY(user.id ?? ''))}`}
+          >
+            Open in Log Explorer
+          </Link>
+        </Button>
+      </div>
 
       <Separator />
 
@@ -100,7 +128,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
           />
         ) : (
           <div>
-            <div className="border border-b-0 rounded-t divide-y">
+            <div className="border border-b-0 rounded-t-md divide-y overflow-hidden">
               {authLogs.map((log) => {
                 const status = ((log.status ?? '-') as any).toString()
                 const is400 = status.startsWith('4')
@@ -118,7 +146,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
                       <div
                         className={cn(
                           'flex items-center justify-center gap-x-1',
-                          !!log.status && 'border px-1 py-0.5 rounded',
+                          !!log.status && 'border px-1 py-0.5 rounded-sm',
                           is400
                             ? 'text-warning border-warning bg-warning-300'
                             : is500
@@ -127,15 +155,25 @@ export const UserLogs = ({ user }: UserLogsProps) => {
                         )}
                       >
                         {(is400 || is500) && (
-                          <CriticalIcon
-                            hideBackground
-                            className={cn(is400 && 'text-warning-600')}
-                          />
+                          <CriticalIcon hideBackground className={cn(is400 && 'text-warning')} />
                         )}
                         {status}
                       </div>
                     </div>
-                    <p className="text-xs text-foreground-light px-2 truncate">{`${log.path} | ${log.msg}`}</p>
+                    <p className="group relative flex items-center py-1.5 text-xs text-foreground-light px-2 truncate w-full">
+                      {`${log.path} | ${log.msg}`}
+
+                      <ButtonTooltip
+                        type="outline"
+                        asChild
+                        tooltip={{ content: { text: 'Open in logs' } }}
+                        className="px-1.5 absolute right-0 top-0 opacity-0 group-hover:opacity-100 transition bg-background focus-visible:opacity-100"
+                      >
+                        <Link href={`/project/${ref}/logs/auth-logs?log=${log.id}`}>
+                          <ExternalLink size="12" className="text-foreground-light" />
+                        </Link>
+                      </ButtonTooltip>
+                    </p>
                   </div>
                 )
               })}

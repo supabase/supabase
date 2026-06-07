@@ -1,3 +1,5 @@
+@reference './globals.css';
+
 /* [data-theme="light"] {
   display: block;
 } */
@@ -15,7 +17,7 @@
 }
 
 [data-rehype-pretty-code-fragment] {
-  @apply relative text-white;
+  @apply relative;
 }
 
 [data-rehype-pretty-code-fragment] code {

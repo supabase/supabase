@@ -1,30 +1,30 @@
 'use client'
 
-import { Slot } from '@radix-ui/react-slot'
-import { VariantProps, cva } from 'class-variance-authority'
+import { cva, VariantProps } from 'class-variance-authority'
 import { Loader2 } from 'lucide-react'
-import { cloneElement, forwardRef, isValidElement } from 'react'
+import { Slot } from 'radix-ui'
+import { cloneElement, forwardRef, isValidElement, ReactNode } from 'react'
+
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from '../../lib/constants'
 import { cn } from '../../lib/utils/cn'
-import { IconContext } from '../Icon/IconContext'
 
 export type ButtonVariantProps = VariantProps<typeof buttonVariants>
 const buttonVariants = cva(
-  `relative 
+  `relative
   flex items-center justify-center
-  cursor-pointer 
-  inline-flex 
-  items-center 
-  space-x-2 
-  text-center 
-  font-regular 
-  ease-out 
-  duration-200 
+  cursor-pointer
+  inline-flex
+  items-center
+  space-x-2
+  text-center
+  font-regular
+  ease-out
+  duration-200
   rounded-md
-  outline-none 
-  transition-all 
-  outline-0 
-  focus-visible:outline-4 
+  outline-hidden
+  transition-all
+  outline-0
+  focus-visible:outline-4
   focus-visible:outline-offset-1
   border
   `,
@@ -32,7 +32,7 @@ const buttonVariants = cva(
     variants: {
       type: {
         primary: `
-          bg-brand-400 dark:bg-brand-500 
+          bg-brand-400 dark:bg-brand-500
           hover:bg-brand/80 dark:hover:bg-brand/50
           text-foreground
           border-brand-500/75 dark:border-brand/30
@@ -59,7 +59,7 @@ const buttonVariants = cva(
           data-[state=open]:border-foreground-lighter
           data-[state=open]:outline-border-strong
         `,
-        // @deprecated use 'primary' instead
+        /** @deprecated use 'primary' instead */
         alternative: `
           text-foreground
           bg-brand-400 hover:bg-brand-500
@@ -91,10 +91,8 @@ const buttonVariants = cva(
         link: `
           text-brand-600
           border
-          border-transparent
+          border-transparent/0
           hover:bg-brand-400
-          border-opacity-0
-          bg-opacity-0
           shadow-none
           focus-visible:outline-border-strong
           data-[state=open]:bg-brand-400
@@ -157,7 +155,7 @@ const buttonVariants = cva(
   }
 )
 
-const IconContainerVariants = cva('', {
+const IconContainerVariants = cva('inline-flex items-center justify-center shrink-0', {
   variants: {
     size: {
       tiny: '[&_svg]:h-[14px] [&_svg]:w-[14px]',
@@ -178,7 +176,7 @@ const IconContainerVariants = cva('', {
       link: 'text-brand-600',
       text: 'text-foreground-lighter',
       danger: 'text-destructive-600',
-      warning: 'text-warning-600',
+      warning: 'text-warning',
     },
   },
 })
@@ -196,7 +194,7 @@ const loadingVariants = cva('', {
       link: 'text-brand-600',
       text: 'text-foreground-muted',
       danger: 'text-destructive-600',
-      warning: 'text-warning-600',
+      warning: 'text-warning',
     },
     loading: {
       default: '',
@@ -208,7 +206,8 @@ const loadingVariants = cva('', {
 export interface ButtonProps
   // omit `type` as we use it to change type of button
   // replaced with `htmlType`
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type'>,
+  extends
+    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type'>,
     // omit 'disabled' as it is included in HTMLButtonElement
     Omit<ButtonVariantProps, 'disabled'>,
     Omit<LoadingVariantProps, 'type'> {
@@ -239,13 +238,19 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const Comp = asChild ? Slot : 'button'
-    const { className } = props
+    const Comp = asChild ? Slot.Slot : 'button'
+    const { className, tabIndex } = props
     const showIcon = loading || icon
     // decrecating 'showIcon' for rightIcon
     const _iconLeft: React.ReactNode = icon ?? iconLeft
     // if loading, button is disabled
     const disabled = loading === true || props.disabled
+
+    // Set default tabIndex for proper Safari focus handling
+    // - Explicit tabIndex prop takes precedence
+    // - If disabled, default to -1 (unless explicitly set)
+    // - Otherwise, default to 0 for keyboard accessibility
+    const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
 
     return (
       <Comp
@@ -254,10 +259,16 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         type={htmlType}
         {...props}
         disabled={disabled}
+        tabIndex={computedTabIndex}
         className={cn(buttonVariants({ type, size, disabled, block, rounded }), className)}
+        onClick={(e) => {
+          // [Joshen] Prevents redirecting if Button is used with a link-based child element
+          if (disabled) return e.preventDefault()
+          else props?.onClick?.(e)
+        }}
       >
         {asChild ? (
-          isValidElement(children) ? (
+          isValidElement<{ children: ReactNode }>(children) ? (
             cloneElement(
               children,
               undefined,

@@ -1,9 +1,10 @@
-import * as React from 'react'
-import { Minus, Plus } from 'lucide-react'
-import { Bar, BarChart, ResponsiveContainer } from 'recharts'
+'use client'
 
-import { Button } from 'ui'
+import { Minus, Plus } from 'lucide-react'
+import * as React from 'react'
+import { Bar, BarChart, ResponsiveContainer } from 'recharts'
 import {
+  Button,
   Drawer,
   DrawerClose,
   DrawerContent,

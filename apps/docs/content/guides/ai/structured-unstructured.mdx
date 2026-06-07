@@ -13,7 +13,7 @@ Most vector stores treat metadata associated with embeddings like NoSQL, unstruc
 ```sql
 create table docs (
   id uuid primary key,
-  embedding vector(3),
+  embedding extensions.vector(3),
   content text,
   url text
 );
@@ -31,7 +31,7 @@ Notice that we've associated two pieces of metadata, `content` and `url`, with t
 ```sql
 create table docs (
   id uuid primary key,
-  embedding vector(3),
+  embedding extensions.vector(3),
   meta jsonb
 );
 
@@ -84,7 +84,7 @@ The structured metadata style is recommended when the fields being tracked are k
 ```sql
 create table docs (
   id uuid primary key,
-  embedding vector(3),
+  embedding extensions.vector(3),
   content text,
   url string,
   meta jsonb

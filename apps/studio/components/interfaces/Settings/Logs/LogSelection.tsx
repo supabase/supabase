@@ -1,81 +1,134 @@
-import { MousePointerClick, X } from 'lucide-react'
+import { Check, Copy, MousePointerClick, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import {
   Button,
-  CodeBlock,
+  cn,
+  copyToClipboard,
+  Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
-  Tabs_Shadcn_,
-  cn,
 } from 'ui'
-import AuthSelectionRenderer from './LogSelectionRenderers/AuthSelectionRenderer'
-import DatabaseApiSelectionRender from './LogSelectionRenderers/DatabaseApiSelectionRender'
-import DatabasePostgresSelectionRender from './LogSelectionRenderers/DatabasePostgresSelectionRender'
-import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
-import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionInvocationSelectionRender'
-import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
-import type { LogData, QueryType } from './Logs.types'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { WarehouseSelectionRenderer } from './LogSelectionRenderers/WarehouseSelectionRenderer'
+
+import type { LogData, PreviewLogData, QueryType } from './Logs.types'
+import { apiKey, role as extractRole, jwtAPIKey, parseMultigresEventMessage } from './Logs.utils'
+import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 export interface LogSelectionProps {
   log?: LogData
   onClose: () => void
   queryType?: QueryType
   projectRef: string
-  collectionName?: string
   isLoading: boolean
   error?: string | object
 }
 
 const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectionProps) => {
+  const [showCopied, setShowCopied] = useState(false)
+
+  useEffect(() => {
+    if (!showCopied) return
+    const timer = setTimeout(() => setShowCopied(false), 2000)
+    return () => clearTimeout(timer)
+  }, [showCopied])
+
   const LogDetails = () => {
     if (error) return <LogErrorState error={error} />
     if (!log) return <LogDetailEmptyState />
-    // if (!log.metadata) return <DefaultPreviewSelectionRenderer log={log} />
 
     switch (queryType) {
-      case 'warehouse':
-        return <WarehouseSelectionRenderer log={log} />
       case 'api':
-        return <DatabaseApiSelectionRender log={log} />
+        const status = log?.metadata?.[0]?.response?.[0]?.status_code
+        const method = log?.metadata?.[0]?.request?.[0]?.method
+        const path = log?.metadata?.[0]?.request?.[0]?.path
+        const search = log?.metadata?.[0]?.request?.[0]?.search
+        const user_agent = log?.metadata?.[0]?.request?.[0]?.headers[0].user_agent
+        const error_code = log?.metadata?.[0]?.response?.[0]?.headers?.[0]?.x_sb_error_code
+        const apikey = jwtAPIKey(log?.metadata) ?? apiKey(log?.metadata)
+        const role = extractRole(log?.metadata)
+
+        const { id, metadata, timestamp, event_message, ...rest } = log
+
+        const apiLog = {
+          id,
+          status,
+          method,
+          path,
+          search,
+          user_agent,
+          timestamp,
+          event_message,
+          metadata,
+          ...(apikey ? { apikey } : null),
+          ...(error_code ? { error_code } : null),
+          ...(role ? { role } : null),
+          ...rest,
+        }
+
+        return <DefaultPreviewSelectionRenderer log={apiLog} />
+
+      case 'multigres': {
+        const parsedMultigresMessage = parseMultigresEventMessage(log.event_message)
+        // Spread the log last so its canonical fields (id, timestamp, event_message)
+        // always win over any same-named keys inside the parsed event_message.
+        const multigresLog = (
+          parsedMultigresMessage ? { ...parsedMultigresMessage, ...log } : log
+        ) as PreviewLogData
+        return <DefaultPreviewSelectionRenderer log={multigresLog} />
+      }
 
       case 'database':
-        return <DatabasePostgresSelectionRender log={log} />
-      case 'pg_cron':
-        return <DatabasePostgresSelectionRender log={log} />
-
-      case 'fn_edge':
-        return <FunctionInvocationSelectionRender log={log} />
-
-      case 'functions':
-        return <FunctionLogsSelectionRender log={log} />
-
-      case 'auth':
-        return <AuthSelectionRenderer log={log} />
+        const hint = log?.metadata?.[0]?.parsed?.[0]?.hint
+        const detail = log?.metadata?.[0]?.parsed?.[0]?.detail
+        const query = log?.metadata?.[0]?.parsed?.[0]?.query
+        const postgresLog = {
+          ...(hint && { hint }),
+          ...(detail && { detail }),
+          ...(query && { query }),
+          ...log,
+        }
+        return <DefaultPreviewSelectionRenderer log={postgresLog} />
       default:
         return <DefaultPreviewSelectionRenderer log={log} />
     }
   }
 
   return (
-    <div className="relative flex h-full flex-grow flex-col overflow-y-scroll bg-surface-100 border-t">
-      <div className="relative flex-grow flex flex-col h-full">
+    <div className="relative flex h-full grow flex-col overflow-y-scroll bg-surface-100 border-t">
+      <div className="relative grow flex flex-col h-full">
         <Tabs_Shadcn_ defaultValue="details" className="flex flex-col h-full">
-          <TabsList_Shadcn_ className="px-2 pt-2">
+          <TabsList_Shadcn_ className="px-2 pt-2 relative">
             <TabsTrigger_Shadcn_ className="px-3" value="details">
               Details
             </TabsTrigger_Shadcn_>
             <TabsTrigger_Shadcn_ disabled={!log} className="px-3" value="raw">
               Raw
             </TabsTrigger_Shadcn_>
-            <Button
-              type="text"
-              className="ml-auto absolute top-2 right-2 cursor-pointer transition hover:text-foreground h-6 w-6 px-0 py-0 flex items-center justify-center"
-              onClick={onClose}
-            >
-              <X size={14} strokeWidth={2} className="text-foreground-lighter" />
-            </Button>
+
+            <div className="*:px-1.5 *:text-foreground-lighter ml-auto flex gap-1 absolute right-2 top-2">
+              <ButtonTooltip
+                disabled={!log || isLoading}
+                type="text"
+                tooltip={{
+                  content: {
+                    side: 'left',
+                    text: isLoading ? 'Loading log...' : 'Copy as JSON',
+                  },
+                }}
+                icon={showCopied ? <Check /> : <Copy />}
+                onClick={() => {
+                  setShowCopied(true)
+                  copyToClipboard(JSON.stringify(log, null, 2))
+                }}
+              />
+
+              <Button type="text" onClick={onClose}>
+                <X size={14} strokeWidth={2} />
+              </Button>
+            </div>
           </TabsList_Shadcn_>
           <div className="flex-1 h-full">
             {isLoading ? (
@@ -125,7 +178,7 @@ function LogDetailEmptyState({
           'flex w-full max-w-sm flex-col items-center justify-center gap-6 text-center transition-all delay-300 duration-500'
         )}
       >
-        <div className="relative flex h-4 w-32 items-center rounded border border-control px-2">
+        <div className="relative flex h-4 w-32 items-center rounded-sm border border-control px-2">
           <div className="h-0.5 w-2/3 rounded-full bg-surface-300"></div>
           <div className="absolute right-1 -bottom-4">
             <MousePointerClick size="24" strokeWidth={1} />

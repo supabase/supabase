@@ -1,8 +1,8 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
+import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { formatCurrency } from 'lib/helpers'
-import { Badge, cn, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import { formatCurrency } from '@/lib/helpers'
 
 interface BillingChangeBadgeProps {
   beforePrice?: number
@@ -13,7 +13,7 @@ interface BillingChangeBadgeProps {
   free?: boolean
 }
 
-const BillingChangeBadge = ({
+export const BillingChangeBadge = ({
   beforePrice,
   afterPrice,
   show,
@@ -33,15 +33,15 @@ const BillingChangeBadge = ({
           <Badge
             variant="default"
             className={cn(
-              !free ? `bg-alternative` : `bg-violet-200 border-violet-900 text-violet-1100`,
-              `bg-opacity-100 text-warning`,
+              free ? `bg-violet-200 border-violet-900` : 'bg-alternative',
+              `text-warning`,
               className
             )}
           >
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
+            <Tooltip>
+              <TooltipTrigger asChild>
                 <div className="flex items-center gap-1">
-                  <span className="text-xs font-mono text-foreground-muted">
+                  <span className="text-xs font-mono text-foreground-muted" translate="no">
                     {formatCurrency(beforePrice)}
                   </span>
                   <ChevronRight size={12} strokeWidth={2} className="text-foreground-muted" />
@@ -53,20 +53,17 @@ const BillingChangeBadge = ({
                     )}
                     animate={{ scale: [1, 1.1, 1] }}
                     transition={{ duration: 0.12 }}
+                    translate="no"
                   >
                     {`${formatCurrency(afterPrice)}/month`}
                   </motion.span>
                 </div>
-              </TooltipTrigger_Shadcn_>
-              {tooltip !== undefined && (
-                <TooltipContent_Shadcn_ side="bottom">{tooltip}</TooltipContent_Shadcn_>
-              )}
-            </Tooltip_Shadcn_>
+              </TooltipTrigger>
+              {tooltip !== undefined && <TooltipContent side="bottom">{tooltip}</TooltipContent>}
+            </Tooltip>
           </Badge>
         </motion.div>
       )}
     </AnimatePresence>
   )
 }
-
-export { BillingChangeBadge }

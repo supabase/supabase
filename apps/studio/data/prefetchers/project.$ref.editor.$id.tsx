@@ -2,39 +2,42 @@ import { QueryClient, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useCallback } from 'react'
 
-import { loadTableEditorSortsAndFiltersFromLocalStorage } from 'components/grid/SupabaseGrid'
+import PrefetchableLink, { PrefetchableLinkProps } from './PrefetchableLink'
 import {
   formatFilterURLParams,
   formatSortURLParams,
+  loadTableEditorStateFromLocalStorage,
   parseSupaTable,
-} from 'components/grid/SupabaseGrid.utils'
-import { Filter, Sort } from 'components/grid/types'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
-import { prefetchTableRows } from 'data/table-rows/table-rows-query'
-import { ImpersonationRole } from 'lib/role-impersonation'
-import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import { TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE } from 'state/table-editor'
-import PrefetchableLink, { PrefetchableLinkProps } from './PrefetchableLink'
+} from '@/components/grid/SupabaseGrid.utils'
+import { Filter, Sort } from '@/components/grid/types'
+import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
+import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
+import { prefetchTableRows } from '@/data/table-rows/table-rows-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { RoleImpersonationState } from '@/lib/role-impersonation'
+import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
+import { TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE } from '@/state/table-editor'
 
 interface PrefetchEditorTablePageArgs {
   queryClient: QueryClient
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
+  readReplicaIdentifier?: string
   id: number
   sorts?: Sort[]
   filters?: Filter[]
-  impersonatedRole?: ImpersonationRole
+  roleImpersonationState?: RoleImpersonationState
 }
 
 export function prefetchEditorTablePage({
   queryClient,
   projectRef,
   connectionString,
+  readReplicaIdentifier,
   id,
   sorts,
   filters,
-  impersonatedRole,
+  roleImpersonationState,
 }: PrefetchEditorTablePageArgs) {
   return prefetchTableEditor(queryClient, {
     projectRef,
@@ -45,17 +48,18 @@ export function prefetchEditorTablePage({
       const supaTable = parseSupaTable(entity)
 
       const { sorts: localSorts = [], filters: localFilters = [] } =
-        loadTableEditorSortsAndFiltersFromLocalStorage(projectRef, entity.name, entity.schema) ?? {}
+        loadTableEditorStateFromLocalStorage(projectRef, entity.id) ?? {}
 
       prefetchTableRows(queryClient, {
         projectRef,
         connectionString,
+        readReplicaIdentifier,
         tableId: id,
         sorts: sorts ?? formatSortURLParams(supaTable.name, localSorts),
         filters: filters ?? formatFilterURLParams(localFilters),
         page: 1,
         limit: TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE,
-        impersonatedRole,
+        roleImpersonationState,
       })
     }
   })
@@ -64,7 +68,8 @@ export function prefetchEditorTablePage({
 export function usePrefetchEditorTablePage() {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
+  const { connectionString, identifier: readReplicaIdentifier } = useConnectionStringForReadOps()
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
   return useCallback(
@@ -79,16 +84,17 @@ export function usePrefetchEditorTablePage() {
       prefetchEditorTablePage({
         queryClient,
         projectRef: project.ref,
-        connectionString: project.connectionString,
+        connectionString,
+        readReplicaIdentifier,
         id,
         sorts,
         filters,
-        impersonatedRole: roleImpersonationState.role,
+        roleImpersonationState: roleImpersonationState as RoleImpersonationState,
       }).catch(() => {
         // eat prefetching errors as they are not critical
       })
     },
-    [project, queryClient, roleImpersonationState.role, router]
+    [connectionString, readReplicaIdentifier, project, queryClient, roleImpersonationState, router]
   )
 }
 

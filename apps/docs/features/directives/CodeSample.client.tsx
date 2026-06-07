@@ -42,7 +42,7 @@ function MultipleSources({ children, sources }: PropsWithChildren<{ sources: (st
       {children}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="block -mt-4 mb-4 ml-auto text-foreground-lighter text-sm focus-visible:outline-none focus-visible:underline">
+          <button className="block -mt-4 mb-4 ml-auto text-foreground-lighter text-sm focus-visible:outline-hidden focus-visible:underline">
             View sources
           </button>
         </DropdownMenuTrigger>
@@ -69,7 +69,7 @@ function SingleSource({ children, source }: PropsWithChildren<{ source: string |
         href={source.toString()}
         target="_blank"
         rel="noopener noreferrer"
-        className="block -mt-4 mb-4 text-right no-underline text-foreground-lighter text-sm"
+        className="block -mt-5 mb-4 text-right no-underline text-foreground-lighter text-sm"
       >
         View source
       </Link>

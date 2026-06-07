@@ -4,6 +4,7 @@ export interface IApiEndPoint {
   method: 'get' | 'post' | 'put' | 'delete' | 'patch'
   summary?: string
   description?: string
+  deprecated?: boolean
   parameters: Array<{
     name: string
     required: boolean
@@ -23,6 +24,8 @@ export interface IApiEndPoint {
   }
   tags?: Array<string>
   security?: Array<ISecurityOption>
+  'x-oauth-scope'?: string
+  'x-allowed-plans'?: string[]
 }
 
 export type ISchema =
@@ -32,6 +35,7 @@ export type ISchema =
   | ISchemaEnum
   | ISchemaBoolean
   | ISchemaNumber
+  | ISchemaFile
   | ISchemaArray
   | ISchemaAllOf
   | ISchemaAnyOf
@@ -65,6 +69,11 @@ interface ISchemaString extends ISchemaBase {
   minLength?: number
   maxLength?: number
   pattern?: string
+}
+
+interface ISchemaFile extends ISchemaBase {
+  type: 'file'
+  format?: 'binary'
 }
 
 interface ISchemaObject extends ISchemaBase {
@@ -110,7 +119,7 @@ interface IApiFormUrlEncodedDTO {
   }
 }
 
-type ISecurityOption = IBearerSecurity | IOAuth2Security
+type ISecurityOption = IBearerSecurity | IOAuth2Security | IFgaSecurity
 
 interface IBearerSecurity {
   bearer: []
@@ -118,6 +127,10 @@ interface IBearerSecurity {
 
 interface IOAuth2Security {
   oauth2: Array<'read' | 'write'>
+}
+
+interface IFgaSecurity {
+  fga_permissions: string[]
 }
 
 export function getTypeDisplayFromSchema(schema: ISchema) {
@@ -165,6 +178,10 @@ export function getTypeDisplayFromSchema(schema: ISchema) {
     return {
       displayName: 'string',
     }
+  } else if (schema.type === 'file') {
+    return {
+      displayName: 'file',
+    }
   } else if (schema.type === 'array') {
     return {
       displayName: `Array<${getTypeDisplayFromSchema(schema.items).displayName}>`,
@@ -173,5 +190,10 @@ export function getTypeDisplayFromSchema(schema: ISchema) {
     return {
       displayName: 'object',
     }
+  }
+
+  // Default fallback for unhandled schema types
+  return {
+    displayName: 'unknown',
   }
 }

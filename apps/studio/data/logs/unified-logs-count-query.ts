@@ -1,0 +1,100 @@
+import { useQuery } from '@tanstack/react-query'
+import { useFlag } from 'common'
+
+import { executeAnalyticsSql } from './execute-analytics-sql'
+import { logsKeys } from './keys'
+import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
+import {
+  getUnifiedLogsISOStartEnd,
+  UNIFIED_LOGS_QUERY_OPTIONS,
+  UnifiedLogsVariables,
+} from './unified-logs-infinite-query'
+import { getLogsCountQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
+import { getLogsCountQuery as getLogsCountQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
+import { FacetMetadataSchema } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.schema'
+import { ExecuteSqlError } from '@/data/sql/execute-sql-query'
+import { UseCustomQueryOptions } from '@/types'
+
+export async function getUnifiedLogsCount(
+  { projectRef, search, useOtel = false }: UnifiedLogsVariables & { useOtel?: boolean },
+  signal?: AbortSignal
+) {
+  if (typeof projectRef === 'undefined') {
+    throw new Error('projectRef is required for getUnifiedLogsCount')
+  }
+
+  const sql = pickLogsQueryBuilder(useOtel, getLogsCountQuery, getLogsCountQueryBq)(search)
+  const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
+
+  const endpoint = logsAllEndpointUrl(useOtel)
+  const data = await executeAnalyticsSql({
+    projectRef,
+    endpoint,
+    sql,
+    iso_timestamp_start: isoTimestampStart,
+    iso_timestamp_end: isoTimestampEnd,
+    signal,
+  })
+
+  // Process count results into facets structure
+  const facets: Record<string, FacetMetadataSchema> = {}
+  const countsByDimension: Record<string, Map<string, number>> = {}
+  let totalRowCount = 0
+
+  // Group by dimension
+  if (data?.result) {
+    data.result.forEach((row: any) => {
+      const dimension = row.dimension
+      const value = row.value
+      const count = Number(row.count || 0)
+
+      // Set total count if this is the total dimension
+      if (dimension === 'total' && value === 'all') {
+        totalRowCount = count
+      }
+
+      // Initialize dimension map if not exists
+      if (!countsByDimension[dimension]) {
+        countsByDimension[dimension] = new Map()
+      }
+
+      // Add count to the dimension map
+      countsByDimension[dimension].set(value, count)
+    })
+  }
+
+  // Convert dimension maps to facets structure
+  Object.entries(countsByDimension).forEach(([dimension, countsMap]) => {
+    // Skip the 'total' dimension as it's not a facet
+    if (dimension === 'total') return
+
+    const dimensionTotal = Array.from(countsMap.values()).reduce((sum, count) => sum + count, 0)
+
+    facets[dimension] = {
+      total: dimensionTotal,
+      rows: Array.from(countsMap.entries()).map(([value, count]) => ({ value, total: count })),
+    }
+  })
+
+  return { totalRowCount, facets }
+}
+
+export type UnifiedLogsCountData = Awaited<ReturnType<typeof getUnifiedLogsCount>>
+export type UnifiedLogsCountError = ExecuteSqlError
+
+export const useUnifiedLogsCountQuery = <TData = UnifiedLogsCountData>(
+  { projectRef, search }: UnifiedLogsVariables,
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<UnifiedLogsCountData, UnifiedLogsCountError, TData> = {}
+) => {
+  const useOtel = useFlag('otelUnifiedLogs')
+  return useQuery<UnifiedLogsCountData, UnifiedLogsCountError, TData>({
+    queryKey: [...logsKeys.unifiedLogsCount(projectRef, search), { otel: useOtel }],
+    queryFn: ({ signal }) => getUnifiedLogsCount({ projectRef, search, useOtel }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...UNIFIED_LOGS_QUERY_OPTIONS,
+    ...options,
+  })
+}

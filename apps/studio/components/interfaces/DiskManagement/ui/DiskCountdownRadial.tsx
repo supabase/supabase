@@ -1,13 +1,13 @@
+import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
-
-import { useParams } from 'common'
-import CountdownTimerRadial from 'components/ui/CountdownTimer/CountdownTimerRadial'
-import CountdownTimerSpan from 'components/ui/CountdownTimer/CountdownTimerSpan'
-import { useRemainingDurationForDiskAttributeUpdate } from 'data/config/disk-attributes-query'
-import { COOLDOWN_DURATION } from 'data/config/disk-attributes-update-mutation'
 import { Card, CardContent } from 'ui'
+
 import FormMessage from './FormMessage'
+import CountdownTimerRadial from '@/components/ui/CountdownTimer/CountdownTimerRadial'
+import CountdownTimerSpan from '@/components/ui/CountdownTimer/CountdownTimerSpan'
+import { useRemainingDurationForDiskAttributeUpdate } from '@/data/config/disk-attributes-query'
+import { COOLDOWN_DURATION } from '@/data/config/disk-attributes-update-mutation'
 
 export function DiskCountdownRadial() {
   const { ref } = useParams()
@@ -46,16 +46,16 @@ export function DiskCountdownRadial() {
           exit={{ opacity: 0, height: 0 }}
           transition={{ duration: 0.2 }}
         >
-          <Card className="px-2 rounded bg-surface-100">
+          <Card className="px-2 rounded-sm bg-surface-100">
             <CardContent className="py-3 flex gap-3 px-3 items-start">
               <CountdownTimerRadial progress={progressPercentage} />
               <div className="flex flex-col gap-2">
                 <div>
                   <p className="text-foreground text-sm p-0">
-                    6-hour cooldown period is in progress
+                    4-hour cooldown period is in progress
                   </p>
                   <p className="text-foreground-lighter text-sm p-0">
-                    You can't modify your disk configuration again until the 6-hour cool down period
+                    You can't modify your disk configuration again until the 4-hour cool down period
                     ends.
                   </p>
                 </div>

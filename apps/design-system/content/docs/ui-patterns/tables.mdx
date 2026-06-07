@@ -1,0 +1,83 @@
+---
+title: Tables
+description: Display structured data in a scannable, organized way.
+---
+
+Tables are a fundamental pattern for displaying structured data in rows and columns. They provide a scannable, organized way to present collections of related information, making it easy for users to compare values, identify patterns, and take action on specific items.
+
+The choice of table pattern depends on several factors: the complexity of the data, the level of interactivity required, the amount of data being displayed, and the context within the page layout.
+
+## Components
+
+There are three main table patterns, each suited to different use cases:
+
+- [Table](../components/table) is a low-level, presentational table component.
+- [Data Table](#data-table) builds on [Table](../components/table) and [TanStack Table](https://tanstack.com/table) to provide a feature-rich data browsing experience (sorting, filtering, pagination, etc.).
+- [Data Grid](#data-grid) is a separate grid implementation used for highly interactive, spreadsheet-like surfaces and very large datasets.
+
+Use Table when:
+
+- You need simple, static display
+- No filtering or complex behavior is needed
+
+Use Data Table when:
+
+- You need sorting, pagination, filtering, search, or row actions
+- You want TanStack-powered behavior with table semantics
+
+Use Data Grid when:
+
+- You need virtualization today
+- You need column resizing
+- You need spreadsheet-like editing
+
+Data Table and Data Grid are both _pattern components_: they are composed from primitives and built per use case. They are not available as standalone components.
+
+### Table
+
+[Table](../components/table) is designed for simple, static tabular data presentation. It is a presentational wrapper around the HTML `<table>` element. Use it when:
+
+- Displaying a fixed, known number of rows
+- The data is primarily read-only
+- Sort, filter, or search actions are not required or can be basic
+
+<ComponentPreview name="table-demo" peekCode wide />
+
+### Data Table
+
+Data Table is a pattern component and is not exposed as a Design System component. It is built on top of [Table](../components/table) and [TanStack Table](https://tanstack.com/table).
+
+Data Table extends Table with column definitions and row models (via TanStack) for complex sorting, filtering, and row actions. Use it when:
+
+- Displaying large datasets that require pagination
+- Users need to perform complex sort, filter, or search actions through the data
+- Row selection is required
+
+Data Table does not yet support virtualization, resizable columns, or advanced editors. These capabilities are planned as part of [consolidation with Data Grid](#future).
+
+<ComponentPreview name="data-table-demo" peekCode wide />
+
+As you can see from the above example, Data Table’s composition is heavily dependent on use case. We do not yet have a shared Design System component for this reason.
+
+Follow [Shadcn’s Data Table documentation](https://ui.shadcn.com/docs/components/data-table) for a complete guide on building upon the Data Table pattern for each specific use case. These patterns map closely to the approaches we follow internally.
+
+### Data Grid
+
+Data Grid is a pattern component and is not exposed as a Design System component. It is based on [React Data Grid](https://comcast.github.io/react-data-grid/#/CommonFeatures) and originally adopted for areas including Studio’s Table Editor, Query Performance, and other high-interaction surfaces.
+
+Use it only when you need virtualization, column resizing, or complex cell editing. Otherwise [Data Table](#data-table) is simpler and more flexible.
+
+<ComponentPreview name="data-grid-demo" peekCode wide />
+
+## Future
+
+Data Table and Data Grid overlap significantly. We’re looking at consolidating these into one data table component, which will likely be improvements to Data Table given the numerous advantages of TanStack Table and difficulties extending React Data Grid.
+
+The likely direction is a single Data Table component built on TanStack Table, with
+
+- Virtualization
+- Resizable columns
+- Plug-in cell editors
+- Shared filtering/sorting utilities
+- Shared UI patterns (horizontal and vertical filter bars, date pickers, side panels)
+- Accessible, semantic HTML table markup

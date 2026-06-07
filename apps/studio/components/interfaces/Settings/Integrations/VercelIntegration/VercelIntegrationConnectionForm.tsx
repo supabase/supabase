@@ -1,26 +1,32 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Input,
+  Switch,
+} from 'ui'
 import * as z from 'zod'
 
-import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormActions } from '@/components/ui/Forms/FormActions'
 import type {
   EnvironmentTargets,
   Integration,
   IntegrationProjectConnection,
-} from 'data/integrations/integrations.types'
-import { useVercelConnectionUpdateMutation } from 'data/integrations/vercel-connection-update-mutate'
-import {
-  FormControl_Shadcn_,
-  FormDescription_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
-  Form_Shadcn_,
-  Input_Shadcn_,
-  Switch,
-} from 'ui'
+} from '@/data/integrations/integrations.types'
+import { useVercelConnectionUpdateMutation } from '@/data/integrations/vercel-connection-update-mutate'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from '@/lib/constants'
 
 const VercelIntegrationConnectionForm = ({
   disabled,
@@ -31,7 +37,11 @@ const VercelIntegrationConnectionForm = ({
   connection: IntegrationProjectConnection
   integration: Integration
 }) => {
-  const envSyncTargets = connection.env_sync_targets ?? []
+  // NOTE(kamil): Ignore sync targets for Vercel Marketplace as it's not synchronized using integration,
+  // but through a separate marketplace mechanism. It's not theoretically necessary, but we might have some stale data.
+  const { data: org } = useSelectedOrganizationQuery()
+  const envSyncTargets =
+    org?.managed_by === 'vercel-marketplace' ? [] : (connection.env_sync_targets ?? [])
 
   const FormSchema = z.object({
     environmentVariablesProduction: z.boolean().default(envSyncTargets.includes('production')),
@@ -50,7 +60,7 @@ const VercelIntegrationConnectionForm = ({
     },
   })
 
-  const { mutate: updateVercelConnection, isLoading } = useVercelConnectionUpdateMutation({
+  const { mutate: updateVercelConnection, isPending } = useVercelConnectionUpdateMutation({
     onSuccess: () => {
       form.reset(form.getValues())
       toast.success(`Updated Vercel connection`)
@@ -81,105 +91,126 @@ const VercelIntegrationConnectionForm = ({
   const vercelConnectionFormId = `vercel-connection-form-${connection.id}`
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form
         id={vercelConnectionFormId}
         onSubmit={form.handleSubmit(onSubmit)}
         className={'w-full space-y-6'}
       >
         <div className="px-6 py-4 flex flex-col gap-y-4">
-          <h5 className="text-foreground text-sm">
-            Sync environment variables for selected target environments
-          </h5>
           <div className="flex flex-col gap-4">
-            <FormField_Shadcn_
-              control={form.control}
-              name="environmentVariablesProduction"
-              render={({ field }) => (
-                <FormItem_Shadcn_ className="space-y-0 flex gap-x-4">
-                  <FormControl_Shadcn_>
-                    <Switch
-                      disabled={disabled}
-                      className="mt-1"
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl_Shadcn_>
-                  <div>
-                    <FormLabel_Shadcn_ className="!text">Production</FormLabel_Shadcn_>
-                    <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
-                      Sync environment variables for <code>production</code> environment.
-                    </FormDescription_Shadcn_>
-                  </div>
-                </FormItem_Shadcn_>
-              )}
-            />
-            <FormField_Shadcn_
-              control={form.control}
-              name="environmentVariablesPreview"
-              render={({ field }) => (
-                <FormItem_Shadcn_ className="space-y-0 flex gap-x-4">
-                  <FormControl_Shadcn_>
-                    <Switch
-                      disabled={disabled}
-                      className="mt-1"
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl_Shadcn_>
-                  <div>
-                    <FormLabel_Shadcn_ className="!text">Preview</FormLabel_Shadcn_>
-                    <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
-                      Sync environment variables for <code>preview</code> environment.
-                    </FormDescription_Shadcn_>
-                  </div>
-                </FormItem_Shadcn_>
-              )}
-            />
-            <FormField_Shadcn_
-              control={form.control}
-              name="environmentVariablesDevelopment"
-              render={({ field }) => (
-                <FormItem_Shadcn_ className="space-y-0 flex gap-x-4">
-                  <FormControl_Shadcn_>
-                    <Switch
-                      disabled={disabled}
-                      className="mt-1"
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl_Shadcn_>
-                  <div>
-                    <FormLabel_Shadcn_ className="!text">Development</FormLabel_Shadcn_>
-                    <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
-                      Sync environment variables for <code>development</code> environment.
-                    </FormDescription_Shadcn_>
-                  </div>
-                </FormItem_Shadcn_>
-              )}
-            />
+            {org?.managed_by === 'vercel-marketplace' ? (
+              <Alert>
+                <AlertTitle className="text-sm">Vercel Marketplace managed project</AlertTitle>
+                <AlertDescription className="text-xs">
+                  This project is managed via Vercel Marketplace. Environment variables are
+                  automatically synchronized for your connected Vercel projects. This integration
+                  purpose is synchronizing preview deployments environment variables with our{' '}
+                  <Link
+                    target="_blank"
+                    rel="noreferrer"
+                    href={`${DOCS_URL}/guides/platform/branching`}
+                    className="underline"
+                  >
+                    Branching
+                  </Link>{' '}
+                  feature.
+                </AlertDescription>
+              </Alert>
+            ) : (
+              <div>
+                <h5 className="text-foreground ">
+                  Sync environment variables for selected target environments
+                </h5>
+
+                <FormField
+                  control={form.control}
+                  name="environmentVariablesProduction"
+                  render={({ field }) => (
+                    <FormItem className="space-y-0 flex gap-x-4">
+                      <FormControl>
+                        <Switch
+                          disabled={disabled}
+                          className="mt-1"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div>
+                        <FormLabel className="!text">Production</FormLabel>
+                        <FormDescription className="text-xs text-foreground-lighter">
+                          Sync environment variables for <code>production</code> environment.
+                        </FormDescription>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="environmentVariablesPreview"
+                  render={({ field }) => (
+                    <FormItem className="space-y-0 flex gap-x-4">
+                      <FormControl>
+                        <Switch
+                          disabled={disabled}
+                          className="mt-1"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div>
+                        <FormLabel className="!text">Preview</FormLabel>
+                        <FormDescription className="text-xs text-foreground-lighter">
+                          Sync environment variables for <code>preview</code> environment.
+                        </FormDescription>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="environmentVariablesDevelopment"
+                  render={({ field }) => (
+                    <FormItem className="space-y-0 flex gap-x-4">
+                      <FormControl>
+                        <Switch
+                          disabled={disabled}
+                          className="mt-1"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div>
+                        <FormLabel className="!text">Development</FormLabel>
+                        <FormDescription className="text-xs text-foreground-lighter">
+                          Sync environment variables for <code>development</code> environment.
+                        </FormDescription>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
           </div>
-          <h5 className="mt-2 text-foreground text-sm">
-            Customize public environment variable prefix
-          </h5>
+          <h5 className="mt-2 text-foreground">Customize public environment variable prefix</h5>
           <div className="flex flex-col gap-4">
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="publicEnvVarPrefix"
               render={({ field }) => (
-                <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
-                  <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
+                <FormItem className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
+                  <FormLabel className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
                     Prefix
-                  </FormLabel_Shadcn_>
-                  <FormControl_Shadcn_ className="col-span-8">
-                    <Input_Shadcn_
+                  </FormLabel>
+                  <FormControl className="col-span-8">
+                    <Input
                       {...field}
                       className="w-full"
                       disabled={disabled}
                       placeholder="An empty prefix will result in no public env vars"
                     />
-                  </FormControl_Shadcn_>
-                  <FormDescription_Shadcn_ className="col-start-5 col-span-8 text-xs">
+                  </FormControl>
+                  <FormDescription className="col-start-5 col-span-8 text-xs">
                     e.g.{' '}
                     <code
                       className="cursor-pointer"
@@ -211,16 +242,16 @@ const VercelIntegrationConnectionForm = ({
                       PUBLIC_
                     </code>
                     , etc.
-                  </FormDescription_Shadcn_>
+                  </FormDescription>
 
-                  <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
-                </FormItem_Shadcn_>
+                  <FormMessage className="col-start-5 col-span-8" />
+                </FormItem>
               )}
             />
           </div>
 
           {form.formState.isDirty ? (
-            <p className="mt-2 text-sm text-warning-600">
+            <p className="mt-2 text-sm text-warning">
               Note: Changing these settings will <strong>not</strong> trigger a resync of
               environment variables.
             </p>
@@ -232,12 +263,12 @@ const VercelIntegrationConnectionForm = ({
             disabled={disabled}
             form={vercelConnectionFormId}
             hasChanges={form.formState.isDirty}
-            isSubmitting={isLoading}
+            isSubmitting={isPending}
             handleReset={() => form.reset()}
           />
         </div>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }
 

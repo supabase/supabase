@@ -1,36 +1,19 @@
 'use client'
 
+import { useBreakpoint } from 'common'
 import { ChevronDown, RotateCw, Search, X } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
-import { useEffect, useRef, useState, Suspense, useCallback } from 'react'
-
-import {
-  Input_Shadcn_,
-  cn,
-  Button_Shadcn_,
-  Collapsible_Shadcn_ as Collapsible,
-  CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
-  CollapsibleContent_Shadcn_ as CollapsibleContent,
-} from 'ui'
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Button_Shadcn_, cn, Collapsible, CollapsibleContent, CollapsibleTrigger, Input } from 'ui'
+import { MultiSelector } from 'ui-patterns/multi-select'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
-import { MultiSelect } from '~/components/MultiSelect.client'
-import {
-  MultiSelector,
-  MultiSelectorContent,
-  MultiSelectorInput,
-  MultiSelectorItem,
-  MultiSelectorList,
-  MultiSelectorTrigger,
-} from 'ui-patterns/multi-select'
 import { type ITroubleshootingMetadata } from './Troubleshooting.utils'
 import {
-  formatError,
   TROUBLESHOOTING_CONTAINER_ID,
   TROUBLESHOOTING_DATA_ATTRIBUTES,
   troubleshootingSearchParams,
 } from './Troubleshooting.utils.shared'
-import { useBreakpoint } from 'common'
 
 function useTroubleshootingSearchState() {
   const [_state, _setState] = useQueryStates(troubleshootingSearchParams)
@@ -107,7 +90,9 @@ function entryMatchesFilter(
     selectedTags.length === 0 || selectedTags.some((tag) => dataKeywords?.includes(tag))
   const errorsMatch =
     selectedErrorCodes.length === 0 ||
-    selectedErrorCodes.some((error) => dataErrors.includes(error))
+    selectedErrorCodes.some((error) =>
+      dataErrors.some((errorCode) => errorCode.includes(error.toString()))
+    )
   const searchMatch =
     searchState === '' || content.toLowerCase().includes(searchState.toLowerCase())
 
@@ -115,10 +100,10 @@ function entryMatchesFilter(
 }
 
 interface TroubleshootingFilterProps {
-  products: string[]
+  className?: string
+  products?: string[]
   errors: ITroubleshootingMetadata['errors']
   keywords: string[]
-  className?: string
 }
 
 export function TroubleshootingFilter(props: TroubleshootingFilterProps) {
@@ -146,13 +131,10 @@ function TroubleshootingFilterMobileCollapsed(props: TroubleshootingFilterProps)
         <CollapsibleTrigger className="group w-full pb-6 text-foreground-light">
           <div className="flex items-center justify-between gap-2">
             <span>Filters</span>
-            <ChevronDown
-              size={16}
-              className="group-data-[state=open]:rotate-180 transition-transform"
-            />
+            <ChevronDown size={16} className="group-data-open:rotate-180 transition-transform" />
           </div>
           {numberFiltersApplied > 0 && (
-            <div className="group-data-[state=open]:hidden text-sm text-left">
+            <div className="group-data-open:hidden text-sm text-left">
               {numberFiltersApplied} filter{numberFiltersApplied > 1 ? 's' : ''} applied
             </div>
           )}
@@ -200,29 +182,50 @@ function TroubleshootingFilterInternal({
     allEntries.current = entries
   }, [])
 
+  const allErrorCodes: string[] = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          errors?.flatMap((error) => {
+            const result: string[] = []
+            if (error.http_status_code) {
+              result.push(String(error.http_status_code))
+            }
+            if (error.code) {
+              result.push(error.code)
+            }
+            return result
+          }) ?? []
+        )
+      ),
+    [errors]
+  )
+
   return (
     <>
       <h2 className="sr-only">Search and filter</h2>
       <div className={cn('flex flex-wrap gap-2 items-center', className)}>
-        <MultiSelector values={selectedProducts} onValuesChange={setSelectedProducts}>
-          <MultiSelector.Trigger badgeLimit={1} className="w-48" label="Products" />
-          <MultiSelector.Content>
-            <MultiSelector.List>
-              {products?.map((product) => (
-                <MultiSelector.Item key={`product-${product}`} value={product}>
-                  {product}
-                </MultiSelector.Item>
-              ))}
-            </MultiSelector.List>
-          </MultiSelector.Content>
-        </MultiSelector>
+        {!!products && (
+          <MultiSelector values={selectedProducts} onValuesChange={setSelectedProducts}>
+            <MultiSelector.Trigger badgeLimit={1} className="w-48" label="Products" />
+            <MultiSelector.Content>
+              <MultiSelector.List>
+                {products?.map((product) => (
+                  <MultiSelector.Item key={`product-${product}`} value={product}>
+                    {product}
+                  </MultiSelector.Item>
+                ))}
+              </MultiSelector.List>
+            </MultiSelector.Content>
+          </MultiSelector>
+        )}
         <MultiSelector values={selectedErrorCodes} onValuesChange={setSelectedErrorCodes}>
           <MultiSelector.Trigger badgeLimit={1} className="w-48" label="Error codes" />
           <MultiSelector.Content>
             <MultiSelector.List>
-              {errors?.map((error) => (
-                <MultiSelector.Item key={`error-${error.code}`} value={error.code}>
-                  {error.code}
+              {allErrorCodes.map((error) => (
+                <MultiSelector.Item key={`error-${error}`} value={error}>
+                  {error}
                 </MultiSelector.Item>
               ))}
             </MultiSelector.List>
@@ -241,7 +244,7 @@ function TroubleshootingFilterInternal({
           </MultiSelector.Content>
         </MultiSelector>
         <div className="relative">
-          <Input_Shadcn_
+          <Input
             id="troubleshooting-search"
             ref={searchInputRef}
             type="text"
@@ -368,17 +371,17 @@ function TroubleshootingListControllerInternal() {
       selectedTags.length === 0
     ) {
       allEntries.current.forEach((entry) => {
-        entry.hidden = false
+        entry.style.removeProperty('display')
       })
     } else {
       allEntries.current.forEach((entry) => {
-        entry.hidden = !entryMatchesFilter(
-          entry,
-          selectedProducts,
-          selectedErrorCodes,
-          selectedTags,
-          searchState
-        )
+        if (
+          entryMatchesFilter(entry, selectedProducts, selectedErrorCodes, selectedTags, searchState)
+        ) {
+          entry.style.removeProperty('display')
+        } else {
+          entry.style.display = 'none'
+        }
       })
     }
   }, [searchState, selectedProducts, selectedErrorCodes, selectedTags])

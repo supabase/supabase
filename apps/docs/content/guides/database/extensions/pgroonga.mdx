@@ -1,11 +1,11 @@
 ---
 id: 'pgroonga'
 title: 'PGroonga: Multilingual Full Text Search'
-description: 'Full Text Search for multiple languages in PostgreSQL'
+description: 'Full Text Search for multiple languages in Postgres'
 tocVideo: 'Mmmv9g_MiBA'
 ---
 
-`PGroonga` is a PostgreSQL extension adding a full text search indexing method based on [Groonga](https://groonga.org). While native PostgreSQL supports full text indexing, it is limited to alphabet and digit based languages. `PGroonga` offers a wider range of character support making it viable for a superset of languages supported by PostgreSQL including Japanese, Chinese, etc.
+`PGroonga` is a Postgres extension adding a full text search indexing method based on [Groonga](https://groonga.org). While native Postgres supports full text indexing, it is limited to alphabet and digit based languages. `PGroonga` offers a wider range of character support making it viable for a superset of languages supported by Postgres including Japanese, Chinese, etc.
 
 ## Enable the extension
 
@@ -18,7 +18,7 @@ tocVideo: 'Mmmv9g_MiBA'
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
+1. Go to the [Database](/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
 3. Search for `pgroonga` and enable the extension.
 
@@ -65,13 +65,13 @@ To test the full text index, we'll add some data.
 ```sql
 insert into memos(content)
 values
-  ('PostgreSQL is a relational database management system.'),
+  ('Postgres is a relational database management system.'),
   ('Groonga is a fast full text search engine that supports all languages.'),
-  ('PGroonga is a PostgreSQL extension that uses Groonga as index.'),
+  ('PGroonga is a Postgres extension that uses Groonga as index.'),
   ('There is groonga command.');
 ```
 
-The PostgreSQL query planner is smart enough to know that, for extremely small tables, it's faster to scan the whole table rather than loading an index. To force the index to be used, we can disable sequential scans:
+The Postgres query planner is smart enough to know that, for extremely small tables, it's faster to scan the whole table rather than loading an index. To force the index to be used, we can disable sequential scans:
 
 {/* prettier-ignore */}
 ```sql
@@ -117,7 +117,7 @@ And the result:
 id | content  
 ----+------------------------------------------------------------------------
 2 | Groonga is a fast full text search engine that supports all languages.
-3 | PGroonga is a PostgreSQL extension that uses Groonga as index.
+3 | PGroonga is a Postgres extension that uses Groonga as index.
 4 | There is groonga command.
 (3 rows)
 ```
@@ -136,7 +136,7 @@ And the result:
 ```markdown
 id | content  
 ----+----------------------------------------------------------------
-3 | PGroonga is a PostgreSQL extension that uses Groonga as index.
+3 | PGroonga is a Postgres extension that uses Groonga as index.
 (1 row)
 ```
 
@@ -154,8 +154,8 @@ And the result:
 ```markdown
 id | content  
 ----+----------------------------------------------------------------
-1 | PostgreSQL is a relational database management system.
-3 | PGroonga is a PostgreSQL extension that uses Groonga as index.
+1 | Postgres is a relational database management system.
+3 | PGroonga is a Postgres extension that uses Groonga as index.
 (2 rows)
 ```
 
@@ -173,7 +173,7 @@ And the result:
 ```markdown
 id | content  
 ----+--------------------------------------------------------
-1 | PostgreSQL is a relational database management system.
+1 | Postgres is a relational database management system.
 (1 row)
 ```
 

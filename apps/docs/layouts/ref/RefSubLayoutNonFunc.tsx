@@ -4,6 +4,7 @@ import { highlightSelectedNavItem } from 'ui/src/components/CustomHTMLElements/C
 import { useRouter } from 'next/compat/router'
 import { useNavigationMenuContext } from '~/components/Navigation/NavigationMenu/NavigationMenu.Context'
 import { menuState } from '~/hooks/useMenuState'
+import { safeHistoryReplaceState } from '~/lib/historyUtils'
 
 interface ISectionContainer {
   id: string
@@ -60,7 +61,7 @@ const StickyHeader: FC<StickyHeader> = (props) => {
     onChange: (inView, entry) => {
       if (inView && window) highlightSelectedNavItem(entry.target.attributes['data-ref-id'].value)
       if (inView && props.scrollSpyHeader) {
-        window.history.replaceState(null, '', entry.target.id)
+        safeHistoryReplaceState(entry.target.id)
         // if (setActiveRefItem) setActiveRefItem(entry.target.attributes['data-ref-id'].value)
         menuState.setMenuActiveRefId(entry.target.attributes['data-ref-id'].value)
         // router.push(`/reference/javascript/${entry.target.attributes['data-ref-id'].value}`, null, {

@@ -1,0 +1,54 @@
+import { literal, safeSql } from '@supabase/pg-meta/src/pg-format'
+import { useQuery } from '@tanstack/react-query'
+
+import { CronJob } from './database-cron-jobs-infinite-query'
+import { databaseCronJobsKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
+
+export type DatabaseCronJobVariables = {
+  projectRef?: string
+  connectionString?: string | null
+  id?: number
+  name?: string
+}
+
+export async function getDatabaseCronJob({
+  projectRef,
+  connectionString,
+  id,
+  name,
+}: DatabaseCronJobVariables) {
+  if (!projectRef) throw new Error('Project ref is required')
+
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql: !!id
+      ? safeSql`SELECT * FROM cron.job where jobid = ${literal(id)};`
+      : safeSql`SELECT * FROM cron.job where jobname = ${literal(name)};`,
+    queryKey: ['cron-job', id],
+  })
+
+  return result[0]
+}
+
+export type DatabaseCronJobData = CronJob
+export type DatabaseCronJobError = ResponseError
+
+export const useCronJobQuery = <TData = DatabaseCronJobData>(
+  { projectRef, connectionString, id, name }: DatabaseCronJobVariables,
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<DatabaseCronJobData, DatabaseCronJobError, TData> = {}
+) =>
+  useQuery<DatabaseCronJobData, DatabaseCronJobError, TData>({
+    queryKey: databaseCronJobsKeys.job(projectRef, id ?? name),
+    queryFn: () => getDatabaseCronJob({ projectRef, connectionString, id }),
+    enabled:
+      enabled &&
+      typeof projectRef !== 'undefined' &&
+      (typeof id !== 'undefined' || typeof name !== 'undefined'),
+    ...options,
+  })

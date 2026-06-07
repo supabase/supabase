@@ -1,3 +1,3 @@
-export const resourceKeys = {
+export const aiKeys = {
   apiKey: () => ['api-key'] as const,
 }

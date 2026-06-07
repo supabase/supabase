@@ -1,7 +1,6 @@
-import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
-import { useRouter } from 'next/router'
 import { Check } from 'lucide-react'
 
+import SectionContainer from '~/components/Layouts/SectionContainer'
 import AuthVisual from './AuthVisual'
 import DataAPIsVisual from './DataAPIsVisual'
 import DatabaseVisual from './DatabaseVisual'
@@ -10,11 +9,9 @@ import ProductCard from './ProductCard'
 import RealtimeVisual from './RealtimeVisual'
 import StorageVisual from './StorageVisual'
 import VectorVisual from './VectorVisual'
-import SectionContainer from '~/components/Layouts/SectionContainer'
 
 import { PRODUCT_MODULES_SHORTNAMES, PRODUCT_SHORTNAMES } from 'shared-data/products'
-import gaEvents from '~/lib/gaEvents'
-import Telemetry from '~/lib/telemetry'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 import type { ProductType } from '~/data/MainProducts'
 
@@ -23,60 +20,19 @@ interface Props {
 }
 
 const Products: React.FC<Props> = (props) => {
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
+  const _sendTelemetryEvent = useSendTelemetryEvent()
 
   const sendTelemetryEvent = async (
     product: PRODUCT_SHORTNAMES | PRODUCT_MODULES_SHORTNAMES | 'data-api'
   ) => {
-    switch (product) {
-      case PRODUCT_SHORTNAMES.DATABASE:
-        return await Telemetry.sendEvent(
-          gaEvents['www_hp_subhero_products_database'],
-          telemetryProps,
-          router
-        )
-      case PRODUCT_SHORTNAMES.AUTHENTICATION:
-        return await Telemetry.sendEvent(
-          gaEvents['www_hp_subhero_products_auth'],
-          telemetryProps,
-          router
-        )
-      case PRODUCT_SHORTNAMES.STORAGE:
-        return await Telemetry.sendEvent(
-          gaEvents['www_hp_subhero_products_storage'],
-          telemetryProps,
-          router
-        )
-      case PRODUCT_SHORTNAMES.FUNCTIONS:
-        return await Telemetry.sendEvent(
-          gaEvents['www_hp_subhero_products_edgeFunctions'],
-          telemetryProps,
-          router
-        )
-      case PRODUCT_SHORTNAMES.REALTIME:
-        return await Telemetry.sendEvent(
-          gaEvents['www_hp_subhero_products_realtime'],
-          telemetryProps,
-          router
-        )
-      case PRODUCT_MODULES_SHORTNAMES.VECTOR:
-        return await Telemetry.sendEvent(
-          gaEvents['www_hp_subhero_products_vector'],
-          telemetryProps,
-          router
-        )
-      case 'data-api':
-        return await Telemetry.sendEvent(
-          gaEvents['www_hp_subhero_products_data-api'],
-          telemetryProps,
-          router
-        )
-    }
+    return await _sendTelemetryEvent({
+      action: 'homepage_product_card_clicked',
+      properties: { product },
+    })
   }
 
   return (
-    <SectionContainer className="!pt-0 grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-4 xl:gap-3 2xl:gap-6 md:grid-cols-12">
+    <SectionContainer className="pt-0! grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-4 xl:gap-3 2xl:gap-6 md:grid-cols-12">
       <ProductCard
         isDatabase
         className="col-span-6 md:col-span-12 xl:col-span-6"
@@ -163,8 +119,8 @@ const Products: React.FC<Props> = (props) => {
         image={<RealtimeVisual className="hidden sm:block" />}
         className="
           col-span-6 pointer-events-none xl:col-span-3
-          hover:!cursor-[url('/images/index/products/realtime-cursor-light.svg'),_auto]
-          dark:hover:!cursor-[url('/images/index/products/realtime-cursor-dark.svg'),_auto]
+          hover:cursor-[url('/images/index/products/realtime-cursor-light.svg'),auto]!
+          dark:hover:cursor-[url('/images/index/products/realtime-cursor-dark.svg'),auto]!
         "
       />
       <ProductCard

@@ -28,16 +28,21 @@ functions:
 
       ### OAuth and OTP link verification
 
-      [supabase-kt](https://github.com/supabase-community/supabase-kt) provides several platform implementations for OAuth and OTP link verification. 
+      [supabase-kt](https://github.com/supabase-community/supabase-kt) provides several platform implementations for OAuth and OTP link verification.
+
+      OAuth sign-ins can be triggered via `supabase.auth.signInWith(Provider)` and the callback has to be handled differently on each Kotlin target.
+      OTP link verification stands for opening your app, and directly signing-in via the clicked link. This is only supported on Mobile devices & Web targets.
+
+      The following will explain how each target handles OAuth and OTP link verification, if supported.
 
       **On Desktop platforms (JVM, MacOS\*, Linux, Windows)**, it uses a HTTP Callback Server to receive the session data from a successful OAuth login. The success page can be customized via `AuthConfig#httpCallbackConfig` \
-      \* If no deeplinks are being used.
+      \* If no deeplinks are being used. This works as-is, by default.
 
-      *Note: OTP link verification such as sign ups are not supported on JVM. You may have to send a verification token rather than a url in your email. To send the token, rather than a redirect url, change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`* 
+      *Note: OTP link verification such as sign ups are not supported on JVM. You may have to send a verification token rather than a url in your email. To send the token, rather than a redirect url, change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`*
 
       **On Android, iOS & MacOS**, OAuth and OTP verification use deeplinks. Refer to the guide below on how to setup deeplinks. Alternatively you can use [Native Google Auth](/docs/guides/auth/social-login/auth-google?platform=android). \
       **On JS**, it uses the website origin as the callback url. Session importing gets handled automatically. \
-      **tvOS & watchOS** currently have no default implementation. Feel free to create a PR. 
+      **tvOS & watchOS** currently have no default implementation. Feel free to create a PR.
 
       You always make your own implementation and use `auth.parseSessionFromFragment(fragment)` or `auth.parseSessionFromUrl(url)` to let [supabase-kt](https://github.com/supabase-community/supabase-kt) handle the parsing after receiving a callback.
       Then you can simply use `auth.importSession(session)`.
@@ -127,7 +132,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "public-anon-key"
+              supabaseKey = "your-publishable-key"
           ) {
               install(Auth)
               install(Postgrest)
@@ -140,7 +145,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "public-anon-key"
+              supabaseKey = "your-publishable-key"
           ) {
               install(Auth) {
                   alwaysAutoRefresh = false // default: true
@@ -197,7 +202,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "public-anon-key"
+              supabaseKey = "your-publishable-key"
           ) {
               install(Postgrest) {
                   defaultSchema = "schema" // default: "public"
@@ -213,13 +218,17 @@ functions:
           `customUrl` - Custom url for the PostgREST API. Can be safely ignored when using Supabase. Default: `null`
 
           `jwtToken` - Plugin specific JWT Token. Can be ignored when using the Auth plugin. Default: `null`
+
+          `urlLengthLimit` - The maximum URL length for requests. When exceeded, the request is automatically sent as POST with query parameters in the body. Default: `null` (unlimited)
+
+          `timeout` - The timeout for PostgREST requests. Default: `30.seconds`
       - id: configure-storage
         name: Configure Storage module
         code: |
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "public-anon-key"
+              supabaseKey = "your-publishable-key"
           ) {
               install(Storage) {
                   transferTimeout = 90.seconds // Default: 120 seconds
@@ -246,7 +255,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "public-anon-key"
+              supabaseKey = "your-publishable-key"
           ) {
               install(Realtime) {
                   reconnectDelay = 5.seconds // Default: 7 seconds
@@ -273,7 +282,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "public-anon-key"
+              supabaseKey = "your-publishable-key"
           ) {
               install(Functions) {
                   //no custom settings
@@ -290,7 +299,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "public-anon-key"
+              supabaseKey = "your-publishable-key"
           ) {
               install(GraphQL) {
                   apolloConfiguration {
@@ -396,7 +405,7 @@ functions:
               .select {
                   count(Count.EXACT)
               }
-              .count()!!
+              .countOrNull() ?: 0
           ```
       - id: querying-json-data
         name: Querying JSON data
@@ -449,8 +458,8 @@ functions:
         code: |
           ```kotlin
           val city = City(name = "The Shire", countryId = 554)
-          val result = supabase.from("cities").insert(city) { 
-              select() 
+          val result = supabase.from("cities").insert(city) {
+              select()
           }.decodeSingle<City>()
           ```
       - id: bulk-create
@@ -487,15 +496,15 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.from("countries").update(
+          supabase.from("characters").update(
               {
-                 Country::name setTo "Australia"
+                 Country::name setTo "Han Solo"
                  //or
-                 set("name", "Australia")
+                 set("name", "Han Solo")
               }
           ) {
               filter {
-                  Country::id eq 1
+                  Character::id eq 1
                   //or
                   eq("id", 1)
               }
@@ -505,31 +514,31 @@ functions:
         name: Update a record and return it
         code: |
           ```kotlin
-          val newCountry = supabase.from("countries").update(
+          val newCharacter = supabase.from("characters").update(
               {
-                 Country::name setTo "Australia"
+                 Character::name setTo "Han Solo"
                  //or
-                 set("name", "Australia")
+                 set("name", "Han Solo")
               }
           ) {
               select()
               filter {
-                  Country::id eq 1
+                  Character::id eq 1
                   //or
                   eq("id", 1)
               }
-          }.decodeSingle<Country>()
+          }.decodeSingle<Character>()
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Australia');
+              (1, 'Han');
             ```
         response: |
           ```json
@@ -537,7 +546,7 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Australia"
+                "name": "Han Solo"
               }
             ],
             "status": 200,
@@ -640,7 +649,7 @@ functions:
           val count = supabase.from("users").upsert(toUpsert) {
               count(Count.EXACT)
               onConflict = "username"
-          }.count()
+          }.countOrNull() ?: 0
           ```
 
   - id: delete
@@ -688,9 +697,9 @@ functions:
           }.decodeSingle<City>()
           ```
   - id: rpc
-    title: 'Stored Procedures: rpc()'
+    title: 'Database Functions: rpc()'
     description: |
-      You can call stored procedures as a "Remote Procedure Call".
+      You can call functions as a "Remote Procedure Call".
 
       That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
       It's especially useful when the logic rarely changes - like password resets and updates.
@@ -719,10 +728,10 @@ functions:
             type: String
             description: The schema to use for the function. Defaults to `public`
     examples:
-      - id: call-a-stored-procedure
-        name: Call a stored procedure
+      - id: call-a-database-function
+        name: Call a database function
         isSpotlight: true
-        description: This is an example invoking a stored procedure.
+        description: This is an example invoking a database function.
         code: |
           ```kotlin
           supabase.postgrest.rpc("hello_world")
@@ -786,8 +795,8 @@ functions:
                      City::population lt 700000
                   }
                   or { //when either one of the filters are true
-                     City::name eq "London"
-                     City::name eq "Berlin"
+                     City::name eq "Hobbiton"
+                     City::name eq "Edoras"
                   }
               }
           }
@@ -842,15 +851,15 @@ functions:
           ```kotlin
           val columns = Columns.raw("""
               name,
-              cities!inner (
+              instruments!inner (
                   name
               )
           """.trimIndent())
-          supabase.from("countries").select(
+          supabase.from("orchestral_sections").select(
                 columns = columns
           ) {
               filter {
-                  eq("cities.name", "Bali")
+                  eq("instruments.name", "flute")
               }
           }
           ```
@@ -858,34 +867,34 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
           response: |
             ```json
             {
               "data": [
                 {
-                  "name": "Indonesia",
-                  "cities": [
+                  "name": "strings",
+                  "instruments": [
                     {
-                      "name": "Bali"
+                      "name": "flute"
                     }
                   ]
                 }
@@ -917,10 +926,10 @@ functions:
               filter {
                   or {
                       Country::id eq 2
-                      Country::name eq "Algeria"
+                      Country::name eq "Mordor"
                       //or
                       eq("id", 2)
-                      eq("name", "Algeria")
+                      eq("name", "Mordor")
                   }
               }
           }
@@ -935,7 +944,7 @@ functions:
                       Country::id gt 3
                       and {
                          Country::id eq 1
-                         Country::name eq "Afghanistan"
+                         Country::name eq "Mordor"
                       }
                   }
               }
@@ -969,7 +978,7 @@ functions:
           ```kotlin
           supabase.from("countries").select {
               filter {
-                  filterNot("name", FilterOperation.IS, "")
+                  filterNot("name", FilterOperator.IS, "")
               }
           }
           ```
@@ -1008,9 +1017,9 @@ functions:
           val toUpdate = City(name = "Mordor")
           supabase.from("cities").update(toUpdate) {
               filter {
-                  City::name eq "San Francisco"
+                  City::name eq "Hobbiton"
                   //or
-                  eq("name", "San Francisco")
+                  eq("name", "Hobbiton")
               }
           }
           ```
@@ -1580,9 +1589,9 @@ functions:
           ```kotlin
           supabase.from("cities").select(columns = Columns.list("name")) {
               filter {
-                 City::name isIn listOf("Rio de Janeiro", "San Francisco")
+                 City::name isIn listOf("Hobbiton", "Edoras")
                  //or
-                 isIn("name", listOf("Rio de Janeiro", "San Francisco"))
+                 isIn("name", listOf("Hobbiton", "Edoras"))
               }
           }
           ```
@@ -1593,9 +1602,9 @@ functions:
           val toUpdate = City(name = "Mordor")
           supabase.from("cities").update(toUpdate) {
               filter {
-                 City::name isIn listOf("Rio de Janeiro", "San Francisco")
+                 City::name isIn listOf("Hobbiton", "Edoras")
                  //or
-                 isIn("name", listOf("Rio de Janeiro", "San Francisco"))
+                 isIn("name", listOf("Hobbiton", "Edoras"))
               }
           }
           ```
@@ -1605,9 +1614,9 @@ functions:
           ```kotlin
           supabase.from("cities").delete {
               filter {
-                 City::name isIn listOf("Rio de Janeiro", "San Francisco")
+                 City::name isIn listOf("Hobbiton", "Edoras")
                  //or
-                 isIn("name", listOf("Rio de Janeiro", "San Francisco"))
+                 isIn("name", listOf("Hobbiton", "Edoras"))
               }
           }
           ```
@@ -1617,9 +1626,9 @@ functions:
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
               filter {
-                 City::name isIn listOf("Rio de Janeiro", "San Francisco")
+                 City::name isIn listOf("Hobbiton", "Edoras")
                  //or
-                 isIn("name", listOf("Rio de Janeiro", "San Francisco"))
+                 isIn("name", listOf("Hobbiton", "Edoras"))
               }
           }
           ```
@@ -2225,24 +2234,24 @@ functions:
         name: With `select()`
         code: |
           ```kotlin
-          supabase.from("countries").select {
+          supabase.from("characters").select {
               filter {
-                 filter(column = "name", operator = FilterOperator.IN, value = "('Algeria', 'Japan')")
-              } 
+                 filter(column = "name", operator = FilterOperator.IN, value = "('Han', 'Katniss')")
+              }
           }
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
@@ -2250,7 +2259,7 @@ functions:
             "data": [
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Han"
               }
             ],
             "status": 200,
@@ -2265,15 +2274,15 @@ functions:
           ```kotlin
           val columns = Columns.raw("""
               name,
-              cities!inner (
+              instruments!inner (
                   name
               )
           """.trimIndent())
-          supabase.from("countries").select(
+          supabase.from("orchestral_sections").select(
              columns = columns
           ) {
               filter {
-                  filter(column = "cities.name", operator = FilterOperator.EQ, value = "Bali")
+                  filter(column = "instruments.name", operator = FilterOperator.EQ, value = "flute")
               }
           }
           ```
@@ -2281,34 +2290,34 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'flute'),
+              (2, 'violin');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 1, 'violin'),
+              (2, 2, 'flute');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Indonesia",
-                "cities": [
+                "name": "woodwinds",
+                "instruments": [
                   {
-                    "name": "Bali"
+                    "name": "flute"
                   }
                 ]
               }
@@ -2342,7 +2351,7 @@ functions:
         name: With `upsert()`
         code: |
           ```kotlin
-          val toUpsert = Country(id = 2, name = "Algeria")
+          val toUpsert = Country(id = 2, name = "Mordor")
           val count = supabase.from("countries").upsert(toUpsert) {
               select()
           }.decodeSingle<Country>()
@@ -2356,7 +2365,7 @@ functions:
             insert into
               countries (id, name)
             values
-              (1, 'Afghanistan');
+              (1, 'The Shire');
             ```
         response: |
           ```json
@@ -2364,7 +2373,7 @@ functions:
             "data": [
               {
                 "id": 2,
-                "name": "Algeria"
+                "name": "Mordor"
               }
             ],
             "status": 201,
@@ -2400,22 +2409,22 @@ functions:
         name: With `select()`
         code: |
           ```kotlin
-          supabase.from("countries").select(columns = Columns.list("id", "name")) {
-             order(column = "id", order = Order.ASCENDING)
+          supabase.from("characters").select(columns = Columns.list("id", "name")) {
+             order(column = "id", order = Order.DESCENDING)
           }
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
@@ -2423,15 +2432,15 @@ functions:
             "data": [
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Han"
               },
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "Leia"
               },
               {
                 "id": 1,
-                "name": "Afghanistan"
+                "name": "Luke"
               }
             ],
             "status": 200,
@@ -2446,57 +2455,57 @@ functions:
           ```kotlin
           val columns = Columns.raw("""
               name,
-              cities (
+              instruments (
                   name
               )
           """.trimIndent())
-          supabase.from("countries").select(
+          supabase.from("orchestral_sections").select(
               columns = columns
           ) {
-              order(column = "id", order = Order.ASCENDING, referencedTable = "cities")
+              order(column = "id", order = Order.DESCENDING, referencedTable = "instruments")
           }
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'United States'),
-              (2, 'Vanuatu');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 1, 'Atlanta'),
-              (2, 1, 'New York City');
+              (1, 1, 'harp'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "United States",
-                "cities": [
+                "name": "strings",
+                "instruments": [
                   {
-                    "name": "New York City"
+                    "name": "violin"
                   },
                   {
-                    "name": "Atlanta"
+                    "name": "harp"
                   }
                 ]
               },
               {
-                "name": "Vanuatu",
-                "cities": []
+                "name": "woodwinds",
+                "instruments": []
               }
             ],
             "status": 200,
@@ -2506,6 +2515,64 @@ functions:
         description: |
           Ordering on foreign tables doesn't affect the ordering of
           the parent table.
+        hideCodeBlock: true
+      - id: order-parent-table-by-a-referenced-table
+        name: Order parent table by a referenced table
+        code: |
+          ```kotlin
+          val columns = Columns.raw("""
+              name,
+              section:orchestral_sections(name)
+          """.trimIndent())
+          supabase.from("instruments").select(
+              columns = columns
+          ) {
+              order(column = "orchestral_sections(name)", order = Order.ASCENDING)
+          }
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              orchestral_sections (id int8 primary key, name text);
+            create table
+              instruments (
+                id int8 primary key,
+                section_id int8 not null references orchestral_sections,
+                name text
+              );
+
+            insert into
+              orchestral_sections (id, name)
+            values
+              (1, 'strings'),
+              (2, 'woodwinds');
+            insert into
+              instruments (id, section_id, name)
+            values
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "violin",
+                "section": { "name": "strings" }
+              },
+              {
+                "name": "flute",
+                "section": { "name": "woodwinds" }
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          Ordering with `referenced_table(col)` affects the ordering of the
+          parent table.
         hideCodeBlock: true
 
   - id: limit
@@ -2527,7 +2594,7 @@ functions:
         name: With `select()`
         code: |
           ```kotlin
-          supabase.from("countries").select {
+          supabase.from("characters").select {
               limit(count = 1)
           }
           ```
@@ -2535,21 +2602,21 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Afghanistan"
+                "name": "Luke"
               }
             ],
             "status": 200,
@@ -2564,47 +2631,47 @@ functions:
           ```kotlin
           val columns = Columns.raw("""
               name,
-              cities (
+              instruments (
                   name
               )
           """)
-          supabase.from("countries").select(
+          supabase.from("orchestral_sections").select(
               columns = columns
           ) {
-              limit(count = 1, referencedTable = "cities")
+              limit(count = 1, referencedTable = "instruments")
           }
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'United States');
+              (1, 'strings');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 1, 'Atlanta'),
-              (2, 1, 'New York City');
+              (1, 1, 'harp'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "United States",
-                "cities": [
+                "name": "strings",
+                "instruments": [
                   {
-                    "name": "Atlanta"
+                    "name": "harp"
                   }
                 ]
               }
@@ -2636,7 +2703,7 @@ functions:
         name: With `select()`
         code: |
           ```kotlin
-          supabase.from("countries").select {
+          supabase.from("characters").select {
               range(1L..5L)
           }
           ```
@@ -2644,24 +2711,24 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Afghanistan"
+                "name": "Luke"
               },
               {
-                "name": "Albania"
+                "name": "Leia"
               }
             ],
             "status": 200,
@@ -2678,7 +2745,7 @@ functions:
         name: With `select()`
         code: |
           ```kotlin
-          val result = supabase.from("countries").select(Columns.list("name")) {
+          val result = supabase.from("characters").select(Columns.list("name")) {
               limit(1)
               single()
           }
@@ -2687,20 +2754,20 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
           {
             "data": {
-              "name": "Afghanistan"
+              "name": "Luke"
             },
             "status": 200,
             "statusText": "OK"
@@ -2717,7 +2784,7 @@ functions:
         name: Return data as CSV
         code: |
           ```kotlin
-          val (csvData, _) = supabase.from("countries").select {
+          val (csvData, _) = supabase.from("characters").select {
               csv()
           }
           ```
@@ -2725,19 +2792,19 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
           {
-            "data": "id,name\n1,Afghanistan\n2,Albania\n3,Algeria",
+            "data": "id,name\n1,Luke\n2,Leia\n3,Han",
             "status": 200,
             "statusText": "OK"
           }
@@ -2746,6 +2813,25 @@ functions:
           By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
         hideCodeBlock: true
         isSpotlight: true
+
+  - id: strip-nulls
+    title: stripNulls()
+    description: |
+      Strip null values from the response.
+    notes: |
+      - Requires PostgREST 11.2.0 or later.
+    examples:
+      - id: strip-nulls
+        name: Strip null values
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val data = supabase
+            .from("characters")
+            .select {
+              stripNulls()
+            }
+          ```
 
   - id: explain
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.explain'
@@ -2788,7 +2874,7 @@ functions:
         name: Get the execution plan
         code: |
           ```kotlin
-          val result = supabase.from("countries").select {
+          val result = supabase.from("characters").select {
               explain()
           }
           ```
@@ -2796,20 +2882,20 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```
           Aggregate  (cost=33.34..33.36 rows=1 width=112)
             ->  Limit  (cost=0.00..18.33 rows=1000 width=40)
-                  ->  Seq Scan on countries  (cost=0.00..22.00 rows=1200 width=40)
+                  ->  Seq Scan on characters  (cost=0.00..22.00 rows=1200 width=40)
           ```
         description: |
           By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
@@ -2825,7 +2911,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val supabase = createSupabaseClient(supabaseURL = "https://xyzcompany.supabase.co'", supabaseKey = "public-anon-key") { ... }
+          val supabase = createSupabaseClient(supabaseUrl = "https://xyzcompany.supabase.co", supabaseKey = "your-publishable-key") { ... }
           val auth = supabase.auth
           ```
   - id: sign-up
@@ -3049,6 +3135,10 @@ functions:
             isOptional: true
             type: String?
             description: The captcha token when having captcha enabled.
+          - name: data
+            isOptional: true
+            type: JsonObject?
+            description: '**Deprecated** — use `extraData` or user metadata on the sign-up flow instead. Will be removed in a future release.'
 
     examples:
       - id: sign-in-with-id-token
@@ -3060,9 +3150,6 @@ functions:
               provider = Google //Also supported: Apple, Azure and Facebook
               //optional:
               nonce = "nonce"
-              data = buildJsonObject {
-                  //...
-              }
           }
           ```
   - id: sign-in-with-otp
@@ -3102,6 +3189,10 @@ functions:
             isOptional: true
             type: String?
             description: The captcha token when having captcha enabled.
+          - name: channel
+            isOptional: true
+            type: Phone.Channel?
+            description: The channel to send the OTP to when using phone sign-in. Defaults to SMS. Set to `Phone.Channel.WHATSAPP` for WhatsApp delivery.
     examples:
       - id: sign-in-with-email
         name: Sign in with email
@@ -3123,6 +3214,17 @@ functions:
               phone = "+4912345679"
           }
           ```
+      - id: sign-in-with-whatsapp-otp
+        name: Sign in with WhatsApp OTP
+        isSpotlight: false
+        description: The user will be sent a WhatsApp message which contains an OTP. Requires a Twilio or Twilio Verify provider to be configured.
+        code: |
+          ```kotlin
+          supabase.auth.signInWith(OTP) {
+              phone = "+4912345679"
+              channel = Phone.Channel.WHATSAPP
+          }
+          ```
   - id: sign-in-with-oauth
     title: 'signInWith(OAuthProvider)'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOAuth'
@@ -3130,11 +3232,14 @@ functions:
       - This method is used for signing in using a third-party provider.
       - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
       - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
+      - The `signInWith(Provider)` method can be called anywhere, you can treat it like any other suspending function. 
+      - This method will not wait for the OAuth response and will return after the corresponding platform implementation was called, which is by default opening the system browser.
+      - The callback will happen differently on the targets. On Mobile devices it will be handled via `handleDeeplinks()`, if set up. On Desktop and JS devices it will be automatically handled.
     params:
       - name: provider
         isOptional: false
         type: OAuthProvider
-        description: The OAuth provider to use for the user's authentication, for example `Google` or `Github`.
+        description: The OAuth provider to use for the user's authentication, for example `Google` or `GitHub`.
       - name: redirectUrl
         isOptional: true
         type: String?
@@ -3293,7 +3398,7 @@ functions:
     title: 'Verify OTPs'
     $ref: '@supabase/gotrue-js.GoTrueClient.verifyOtp'
     notes: |
-      - Verifying an OTP is done through either `verifyPhoneOtp` or `verifyEmailOtp`.     
+      - Verifying an OTP is done through either `verifyPhoneOtp` or `verifyEmailOtp`.
       - The verification type used should be determined based on the corresponding auth method called before using `verifyPhoneOtp`/`verifyEmailOtp` to sign up / sign-in a user.
     params:
       - name: type
@@ -3488,6 +3593,10 @@ functions:
             isOptional: true
             type: JsonObject
             description: The new user data.
+          - name: currentPassword
+            isOptional: true
+            type: String?
+            description: The current password. Required when reauthentication is needed to change the password.
     examples:
       - id: update-the-email-for-an-authenticated-user
         name: Update the email for an authenticated user
@@ -3539,7 +3648,7 @@ functions:
     title: 'linkIdentity()'
     $ref: '@supabase/gotrue-js.GoTrueClient.linkIdentity'
     notes: |
-      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/auth/providers).
       - The user needs to be signed in to call `linkIdentity()`.
       - If the candidate identity is already linked to the existing user or another user, `linkIdentity()` will fail.
       - This method works similarly to `signInWith()` using an OAuthProvider. To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
@@ -3576,11 +3685,19 @@ functions:
           //Example:
           supabase.auth.linkIdentity(Google)
           ```
+      - id: link-identity-idtoken
+        name: Link an identity to a user via an id token
+        isSpotlight: true
+        code: |
+          ```kotlin
+          supabase.auth.linkIdentityWithIdToken(Google, idToken = "receivedToken")
+          ```
+
   - id: unlink-identity
     title: 'unlinkIdentity()'
     $ref: '@supabase/gotrue-js.GoTrueClient.unlinkIdentity'
     notes: |
-      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/auth/providers).
       - The user needs to be signed in to call `unlinkIdentity()`.
       - The user must have at least 2 identities in order to unlink an identity.
       - The identity to be unlinked must belong to the user.
@@ -3662,9 +3779,11 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.onAuthStateChange'
     notes: |
       Listen to session changes.
+      - `sessionStatus` is a `Flow<SessionStatus>` that emits the current session status. Everything related to the session is handled by this flow.
+      - `events` is a `Flow<AuthEvent>` that emits auth events. This flow is used to listen to auth events that are independent of the current session, like OTP errors, refresh failures, etc. Experimental.
     examples:
       - id: listen-to-auth-changes
-        name: Listen to auth changes
+        name: Listen to session status changes
         isSpotlight: true
         code: |
           ```kotlin
@@ -3684,7 +3803,9 @@ functions:
                       }
                   }
                   SessionStatus.Initializing -> println("Initializing")
-                  is SessionStatus.RefreshFailure -> println("Refresh failure ${it.cause}") //Either a network error or a internal server error
+                  is SessionStatus.RefreshFailure -> {
+                      println("Session expired and could not be refreshed")
+                  }
                   is SessionStatus.NotAuthenticated -> {
                       if(it.isSignOut) {
                           println("User signed out")
@@ -3701,6 +3822,20 @@ functions:
           - `Initializing`,
           - `RefreshFailure(cause)`,
           - `Authenticated(session, source)`
+      - id: listen-to-events
+        name: Listen to auth events
+        isSpotlight: false
+        code: |
+          ```kotlin
+          supabase.auth.events.collect {
+            when(it) {
+              is AuthEvent.OtpError ->
+                println("Found error in current URL / deeplink during the OAuth flow: ${it.error}")
+              is AuthEvent.RefreshFailure -> 
+                println("Failed to refresh session: ${it.error}")
+            }
+          }
+          ```
   - id: reset-password-for-email
     title: 'Send a password reset request'
     notes: |
@@ -3812,7 +3947,7 @@ functions:
         code: |
           ```kotlin
           val factor = supabase.auth.mfa.enroll(factorType = FactorType.Phone, friendlyName = "Your friendly Name") {
-                phone = "+123456789" 
+                phone = "+123456789"
           }
 
           // Use the id to create a challenge and send an SMS with a code to the user.
@@ -3979,11 +4114,59 @@ functions:
           //flow variant, automatically emitting new values on session changes
           val statusFlow = supabase.auth.mfa.statusFlow
           ```
+  - id: get-claims
+    title: 'getClaims()'
+    description: |
+      Extracts the JWT claims from the access token by first verifying the JWT against the server's JSON Web Key Set (JWKS) endpoint.
+    notes: |
+      - Prefer this method over `retrieveUser()` as JWKS responses are cached, resulting in significantly faster responses.
+      - If the project is not using an asymmetric JWT signing key (like ECC or RSA), it sends a request to the Auth server (similar to `retrieveUser()`) to verify the JWT.
+      - Returns a `ClaimsResponse` containing `claims` (a `JwtPayload` with typed accessors for standard JWT fields), `header`, and `signature`.
+      - Standard claims available on `JwtPayload`: `iss`, `sub`, `aud`, `exp`, `iat`, `role`, `aal`, `sessionId`, `email`, `phone`, `isAnonymous`, `amr`, `appMetadata`, `userMetadata`.
+      - Use `claims.getClaim<T>(key)` or `claims.getClaimOrNull<T>(key)` for custom claims.
+    params:
+      - name: jwt
+        isOptional: true
+        type: String?
+        description: An optional specific JWT to verify. If not provided, uses the current session's access token.
+      - name: options
+        isOptional: true
+        type: ClaimsRequestBuilder.() -> Unit
+        description: Options to customize the behavior, such as allowing expired tokens.
+        subContent:
+          - name: allowExpired
+            isOptional: true
+            type: Boolean
+            description: Whether to allow expired JWTs. Defaults to `false`.
+    examples:
+      - id: get-claims-basic
+        name: Get claims from current session
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val response = supabase.auth.getClaims()
+          val email = response.claims.email
+          val role = response.claims.role
+          val aal = response.claims.aal
+          ```
+      - id: get-claims-custom
+        name: Get a custom claim
+        code: |
+          ```kotlin
+          val response = supabase.auth.getClaims()
+          val customValue = response.claims.getClaimOrNull<String>("my_custom_claim")
+          ```
+      - id: get-claims-specific-jwt
+        name: Verify a specific JWT
+        code: |
+          ```kotlin
+          val response = supabase.auth.getClaims(jwt = "your-jwt-token")
+          ```
   - id: admin-api
     title: 'Overview'
     notes: |
-      - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
-      - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the browser.
+      - Any method under the `supabase.auth.admin` namespace requires a `secret` key.
+      - These methods are considered admin methods and should be called on a trusted server. Never expose your `secret` key in the browser.
     examples:
       - id: create-auth-admin-client
         name: Create server-side auth client
@@ -3995,11 +4178,11 @@ functions:
               supabaseKey = "supabaseKey"
           ) {
               install(Auth) {
-                  minimalSettings() //disables session saving and auto-refreshing
+                  minimalConfig() //disables session saving and auto-refreshing
               }
-              // install other plugins (these will use the service role key)
+              // install other plugins (these will use the secret key)
           }
-          supabase.auth.importAuthToken("service_role")
+          supabase.auth.importAuthToken("your-secret-key")
 
           // Access auth admin api
           val adminAuthClient = supabase.auth.admin
@@ -4195,7 +4378,7 @@ functions:
     title: 'generateLink()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.generateLink'
     notes: |
-      Generates email links and OTPs to be sent via a custom email provider.
+      Generates email links and OTPs. This will not send links or OTPs to the end user. This function is for custom admin functionality.
     params:
       - name: type
         isOptional: false
@@ -4413,6 +4596,118 @@ functions:
           ```kotlin
           supabase.auth.admin.deleteFactor(uid = "id", factorId = "factor_id")
           ```
+  - id: oauth-admin-api
+    title: OAuth Admin API
+    notes: |
+      The OAuth Admin API allows you to manage OAuth clients programmatically.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+      These functions should only be called on a server. Never expose your `secret key` in the browser.
+  - id: admin-oauth-list-clients
+    title: 'admin.oauth.listClients()'
+    notes: |
+      Lists all OAuth 2.1 clients. Requires a `secret key`.
+    params:
+      - name: page
+        isOptional: true
+        type: Int?
+        description: The page number for pagination.
+      - name: perPage
+        isOptional: true
+        type: Int?
+        description: The number of results per page.
+    examples:
+      - id: list-oauth-clients
+        name: List all OAuth clients
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val clients = supabase.auth.admin.oauth.listClients()
+          ```
+  - id: admin-oauth-create-client
+    title: 'admin.oauth.createClient()'
+    notes: |
+      Creates a new OAuth 2.1 client. Requires a `secret key`.
+    examples:
+      - id: create-oauth-client
+        name: Create an OAuth client
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val client = supabase.auth.admin.oauth.createClient {
+              name = "My App"
+              redirectUris = listOf("https://example.com/callback")
+          }
+          ```
+  - id: admin-oauth-get-client
+    title: 'admin.oauth.getClient()'
+    notes: |
+      Retrieves an OAuth 2.1 client by ID. Requires a `secret key`.
+    params:
+      - name: clientId
+        isOptional: false
+        type: String
+        description: The ID of the OAuth client to retrieve.
+    examples:
+      - id: get-oauth-client
+        name: Get an OAuth client
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val client = supabase.auth.admin.oauth.getClient(clientId = "client_id")
+          ```
+  - id: admin-oauth-update-client
+    title: 'admin.oauth.updateClient()'
+    notes: |
+      Updates an existing OAuth 2.1 client. Requires a `secret key`.
+    params:
+      - name: clientId
+        isOptional: false
+        type: String
+        description: The ID of the OAuth client to update.
+    examples:
+      - id: update-oauth-client
+        name: Update an OAuth client
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val client = supabase.auth.admin.oauth.updateClient(clientId = "client_id") {
+              name = "Updated App Name"
+          }
+          ```
+  - id: admin-oauth-delete-client
+    title: 'admin.oauth.deleteClient()'
+    notes: |
+      Deletes an OAuth 2.1 client. Requires a `secret key`.
+    params:
+      - name: clientId
+        isOptional: false
+        type: String
+        description: The ID of the OAuth client to delete.
+    examples:
+      - id: delete-oauth-client
+        name: Delete an OAuth client
+        isSpotlight: true
+        code: |
+          ```kotlin
+          supabase.auth.admin.oauth.deleteClient(clientId = "client_id")
+          ```
+  - id: admin-oauth-regenerate-client-secret
+    title: 'admin.oauth.regenerateClientSecret()'
+    notes: |
+      Regenerates the client secret for an OAuth 2.1 client. Requires a `secret key`.
+    params:
+      - name: clientId
+        isOptional: false
+        type: String
+        description: The ID of the OAuth client whose secret should be regenerated.
+    examples:
+      - id: regenerate-client-secret
+        name: Regenerate client secret
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val client = supabase.auth.admin.oauth.regenerateClientSecret(clientId = "client_id")
+          ```
   - id: invoke
     title: 'invoke()'
     description: |
@@ -4465,6 +4760,27 @@ functions:
           ```
         description: |
           The return type of the invoking methods is an `HttpResponse`. You can access the response body via `response.body<T>()`, where `T` can be any serializable type.
+      - id: invoke-with-streaming
+        name: Invoke with streaming (SSE)
+        description: |
+          You can invoke edge functions that return Server-Sent Events (SSE) and consume them as a Kotlin Flow.
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val function = supabase.functions.buildEdgeFunction("streaming-function")
+
+          // Collect SSE events as a Flow
+          function.collectAsFlow(
+              body = buildJsonObject {
+                  put("prompt", "Hello!")
+              }
+          ).collect { event ->
+              println("Event: ${event.event}")
+              println("Data: ${event.data}")
+              // Decode typed data
+              val response = event.decodeAs<MyResponse>()
+          }
+          ```
       - id: reuse-function
         name: Reuse function by saving it to a variable
         isSpotlight: true
@@ -4585,8 +4901,6 @@ functions:
           }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
 
           channel.subscribe(blockUntilSubscribed = true)
-
-          channel.broadcast(event = "message", Message("I joined!", "John"))
           ```
       - id: listen-to-presence-updates
         name: Listen to presence updates
@@ -4600,7 +4914,7 @@ functions:
           }
 
           //if you want more control and want to receive the raw data, use the `presenceChangeFlow` method
-          val presenceFlow = channel.presenceDataFlow<PresenceState>() 
+          val presenceFlow = channel.presenceDataFlow<PresenceState>()
 
           //Collect the flow
           presenceFlow.onEach {
@@ -4772,7 +5086,41 @@ functions:
           You have two methods you can use if you want to listen for updates on a specific database row:
           - `postgresSingleDataFlow` fetches the initial data matching the filter and then emits updates based on realtime events.
           - `postgresChangeFlow` emits the raw data received by realtime. To filter the realtime queries, use the `filter` method.
-
+  - id: broadcast-message
+    title: broadcastMessage()
+    description: |
+      Broadcast a message to all connected clients to a channel.
+    notes: |
+      - When using REST you don't need to subscribe to the channel
+    $ref: '@supabase/realtime-js.RealtimeChannel.send'
+    examples:
+      - id: send-a-message
+        name: Send a message via websocket
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val channel = supabase.channel("room1")
+          channel.subscribe(blockUntilSubscribed = true)
+          channel.broadcast("cursor-pos", message = buildJsonObject {
+            put("x", 10)
+            put("y", 20)
+          })
+          ```
+        response: |
+          ```
+          ok | timed out | error
+          ```
+      - id: send-a-message-via-rest
+        name: Send a message via REST
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val channel = supabase.channel("room1")
+          channel.broadcast("cursor-pos", message = buildJsonObject {
+            put("x", 10)
+            put("y", 20)
+          })
+          ```
   - id: remove-channel
     description: |
       Unsubscribes and removes Realtime channel from Realtime client.
@@ -4832,6 +5180,10 @@ functions:
           ```kotlin
           val channels = supabase.realtime.subscriptions.entries
           ```
+  - id: file-buckets
+    title: 'Overview'
+    notes: |
+      This section contains methods for working with File Buckets.
   - id: list-buckets
     title: listBuckets()
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
@@ -4983,6 +5335,594 @@ functions:
         code: |
           ```kotlin
           supabase.storage.deleteBucket(bucketId = "icons")
+          ```
+
+  - id: analytics-buckets
+    title: 'Overview'
+    notes: |
+      This section contains methods for working with Analytics Buckets.
+      - Analytics buckets are accessed via the `supabase.storage.analytics` namespace.
+      - Analytics buckets are used for storing and querying analytics data.
+
+  - id: storageanalytics-createbucket
+    title: 'analytics.createBucket()'
+    description: |
+      Creates a new Analytics bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+      - Analytics buckets are used for storing and querying analytics data.
+    params:
+      - name: name
+        isOptional: false
+        type: String
+        description: The name of the analytics bucket to create.
+    examples:
+      - id: create-analytics-bucket
+        name: Create analytics bucket
+        code: |
+          ```kotlin
+          val bucket = supabase.storage.analytics.createBucket("analytics-bucket")
+          ```
+        response: |
+          ```json
+          {
+            "name": "analytics-bucket",
+            "type": "ANALYTICS",
+            "created_at": "2024-12-03T18:00:00.000Z",
+            "updated_at": "2024-12-03T18:00:00.000Z"
+          }
+          ```
+
+  - id: storageanalytics-listbuckets
+    title: 'analytics.listBuckets()'
+    description: |
+      Lists all Analytics buckets with optional filtering and sorting.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: filter
+        isOptional: true
+        type: StorageListFilter.Buckets.() -> Unit
+        description: Filter block for the operation.
+        subContent:
+          - name: limit
+            isOptional: true
+            type: Int
+            description: Maximum number of buckets to return.
+          - name: offset
+            isOptional: true
+            type: Int
+            description: Number of buckets to skip.
+          - name: sortColumn
+            isOptional: true
+            type: BucketSortColumn
+            description: 'Column to sort by. Options: `BucketSortColumn.ID`, `BucketSortColumn.NAME`, `BucketSortColumn.CREATED_AT`, `BucketSortColumn.UPDATED_AT`.'
+          - name: sortOrder
+            isOptional: true
+            type: SortOrder
+            description: 'Sort order. Options: `SortOrder.ASC`, `SortOrder.DESC`.'
+          - name: search
+            isOptional: true
+            type: String
+            description: Search term to filter buckets by name.
+    examples:
+      - id: list-analytics-buckets
+        name: List analytics buckets
+        code: |
+          ```kotlin
+          val buckets = supabase.storage.analytics.listBuckets {
+              limit = 50
+              offset = 2
+              search = "myString"
+              sortBy(BucketSortColumn.ID, SortOrder.ASC)
+          }
+          ```
+        response: |
+          ```json
+          [
+            {
+              "name": "analytics-bucket",
+              "type": "ANALYTICS",
+              "created_at": "2024-12-03T18:00:00.000Z",
+              "updated_at": "2024-12-03T18:00:00.000Z"
+            }
+          ]
+          ```
+
+  - id: storageanalytics-deletebucket
+    title: 'analytics.deleteBucket()'
+    description: |
+      Deletes an Analytics bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: name
+        isOptional: false
+        type: String
+        description: The name of the analytics bucket to delete.
+    examples:
+      - id: delete-analytics-bucket
+        name: Delete analytics bucket
+        code: |
+          ```kotlin
+          val responseMessage = supabase.storage.analytics.deleteBucket("analytics-bucket")
+          ```
+        response: |
+          ```json
+          {
+            "message": "Successfully deleted"
+          }
+          ```
+
+  - id: vector-buckets
+    title: 'Overview'
+    notes: |
+      This section contains methods for working with Vector Buckets.
+
+  - id: storagevectors-create-bucket
+    title: 'vectors.createBucket()'
+    description: |
+      Creates a new Vector bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+      - Vector buckets are used for storing and querying vector embeddings.
+    params:
+      - name: name
+        isOptional: false
+        type: String
+        description: The name of the vector bucket to create.
+    examples:
+      - id: create-vector-bucket
+        name: Create vector bucket
+        code: |
+          ```kotlin
+          supabase.storage.vectors.createBucket("vectors-bucket")
+          ```
+
+  - id: storagevectors-get-bucket
+    title: 'vectors.getBucket()'
+    description: |
+      Retrieves details of a Vector bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: name
+        isOptional: false
+        type: String
+        description: The name of the vector bucket to retrieve.
+    examples:
+      - id: get-vector-bucket
+        name: Get vector bucket
+        code: |
+          ```kotlin
+          val bucket = supabase.storage.vectors.getBucket("vectors-bucket")
+          ```
+        response: |
+          ```json
+          {
+            "vectorBucket": {
+              "vectorBucketName": "vectors-bucket",
+              "creationTime": "2024-12-03T18:00:00.000Z"
+            }
+          }
+          ```
+
+  - id: storagevectors-list-buckets
+    title: 'vectors.listBuckets()'
+    description: |
+      Lists all Vector buckets with optional pagination.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: filter
+        isOptional: true
+        type: VectorBucketFilter.() -> Unit
+        description: Optional filter block for the operation.
+        subContent:
+          - name: prefix
+            isOptional: true
+            type: String
+            description: Filter buckets by name prefix.
+          - name: maxResults
+            isOptional: true
+            type: Int
+            description: Maximum number of buckets to return.
+          - name: nextToken
+            isOptional: true
+            type: String
+            description: Token for pagination.
+    examples:
+      - id: list-vector-buckets
+        name: List vector buckets
+        code: |
+          ```kotlin
+          val response = supabase.storage.vectors.listBuckets {
+              prefix = "myPrefix"
+              maxResults = 20
+              nextToken = "nextToken"
+          }
+          println(response.vectorBuckets)
+          ```
+        response: |
+          ```json
+          {
+            "vectorBuckets": [
+              {
+                "vectorBucketName": "vectors-bucket"
+              }
+            ],
+            "nextToken": null
+          }
+          ```
+
+  - id: storagevectors-delete-bucket
+    title: 'vectors.deleteBucket()'
+    description: |
+      Deletes a Vector bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: name
+        isOptional: false
+        type: String
+        description: The name of the vector bucket to delete.
+    examples:
+      - id: delete-vector-bucket
+        name: Delete vector bucket
+        code: |
+          ```kotlin
+          supabase.storage.vectors.deleteBucket("vectors-bucket")
+          ```
+
+  - id: vectorbucket-createindex
+    title: 'vectors.from().createIndex()'
+    description: |
+      Creates a new vector index in a vector bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: options
+        isOptional: false
+        type: CreateIndexOptions.() -> Unit
+        description: Configuration block for the operation.
+        subContent:
+          - name: indexName
+            isOptional: false
+            type: String
+            description: The name of the index to create.
+          - name: dimension
+            isOptional: false
+            type: Int
+            description: The dimension of the vectors in this index.
+          - name: distanceMetric
+            isOptional: false
+            type: DistanceMetric
+            description: 'The distance metric to use. Options: `DistanceMetric.COSINE`, `DistanceMetric.EUCLIDEAN`.'
+          - name: dataType
+            isOptional: false
+            type: VectorDataType
+            description: The data type of the vectors.
+          - name: metadataConfiguration
+            isOptional: true
+            type: MetadataConfiguration
+            description: Optional metadata configuration for the index.
+    examples:
+      - id: create-vector-index
+        name: Create vector index
+        code: |
+          ```kotlin
+          supabase.storage.vectors
+            .from("vectors-bucket")
+            .createIndex {
+              indexName = "my-index"
+              dimension = 128
+              distanceMetric = DistanceMetric.COSINE
+              dataType = VectorDataType.FLOAT32
+            }
+          ```
+
+  - id: vectorbucket-getindex
+    title: 'vectors.from().getIndex()'
+    description: |
+      Retrieves details of a vector index.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: indexName
+        isOptional: false
+        type: String
+        description: The name of the index to retrieve.
+    examples:
+      - id: get-vector-index
+        name: Get vector index
+        code: |
+          ```kotlin
+          val index = supabase.storage.vectors
+              .from("vectors-bucket")
+              .getIndex("index-name")
+          ```
+
+  - id: vectorbucket-listindexes
+    title: 'vectors.from().listIndexes()'
+    description: |
+      Lists all indexes in a vector bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: options
+        isOptional: false
+        type: ListIndexesOptions.() -> Unit
+        description: Configuration block for the operation.
+        subContent:
+          - name: nextToken
+            isOptional: true
+            type: String
+            description: Token for pagination.
+          - name: maxResults
+            isOptional: true
+            type: Int
+            description: Maximum number of indexes to return.
+          - name: prefix
+            isOptional: true
+            type: String
+            description: Filter indexes by name prefix.
+    examples:
+      - id: list-vector-indexes
+        name: List vector indexes
+        code: |
+          ```kotlin
+          val response = supabase.storage.vectors
+            .from("vectors-bucket")
+            .listIndexes { 
+                maxResults = 20
+                prefix = "myPrefix"
+                nextToken = "nextToken"
+            }
+          println(response.indexes)
+          ```
+
+  - id: vectorbucket-deleteindex
+    title: 'vectors.from().deleteIndex()'
+    description: |
+      Deletes a vector index.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: indexName
+        isOptional: false
+        type: String
+        description: The name of the index to delete.
+    examples:
+      - id: delete-vector-index
+        name: Delete vector index
+        code: |
+          ```kotlin
+          supabase.storage.vectors
+            .from("vectors-bucket")
+            .deleteIndex("index-name")
+          ```
+
+  - id: vectorindex-putvectors
+    title: 'vectors.from().index().putVectors()'
+    description: |
+      Inserts or updates vectors in an index.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: vectors
+        isOptional: false
+        type: List<VectorObject>
+        description: List of vector objects to insert or update.
+    examples:
+      - id: put-vectors
+        name: Put vectors
+        code: |
+          ```kotlin
+          supabase.storage.vectors
+            .from("vectors-bucket")
+            .index("index-name")
+            .putVectors(listOf(
+                VectorObject("vector-1", VectorData(floatArrayOf(2.0f, 3.0f, 4.0f)), buildJsonObject { put("meta", true) })
+            ))
+          ```
+
+  - id: vectorindex-getvectors
+    title: 'vectors.from().index().getVectors()'
+    description: |
+      Retrieves vectors by their keys.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: options
+        isOptional: false
+        type: GetVectorOptions.() -> Unit
+        description: Configuration block for the operation.
+        subContent:
+          - name: keys
+            isOptional: false
+            type: List<String>
+            description: List of vector keys to retrieve.
+          - name: returnData
+            isOptional: true
+            type: Boolean
+            description: Whether to return vector data. Defaults to `true`.
+          - name: returnMetadata
+            isOptional: true
+            type: Boolean
+            description: Whether to return metadata. Defaults to `true`.
+    examples:
+      - id: get-vectors
+        name: Get vectors
+        code: |
+          ```kotlin
+          val vectors = supabase.storage.vectors
+              .from("vectors-bucket")
+              .index("index-name")
+              .getVectors {
+                  keys.add("vector-1")
+              }
+          ```
+
+  - id: vectorindex-listvectors
+    title: 'vectors.from().index().listVectors()'
+    description: |
+      Lists vectors in an index with optional pagination.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: options
+        isOptional: true
+        type: ListVectorsOptions.() -> Unit
+        description: Optional configuration block for the operation. If omitted, default pagination and response settings are used.
+        subContent:
+          - name: maxResults
+            isOptional: true
+            type: Int
+            description: Maximum number of vectors to return.
+          - name: nextToken
+            isOptional: true
+            type: String
+            description: Token for pagination.
+          - name: returnData
+            isOptional: true
+            type: Boolean
+            description: Whether to return vector data. Defaults to `true`.
+          - name: returnMetadata
+            isOptional: true
+            type: Boolean
+            description: Whether to return metadata. Defaults to `true`.
+          - name: segmentCount
+            isOptional: true
+            type: Int
+            description: Number of segments for distributed queries.
+          - name: segmentIndex
+            isOptional: true
+            type: Int
+            description: Segment index for distributed queries.
+    examples:
+      - id: list-vectors
+        name: List vectors
+        code: |
+          ```kotlin
+          val response = supabase.storage.vectors
+            .from("vectors-bucket")
+            .index("index-name")
+            .listVectors()
+          println(response.vectors)
+          ```
+
+  - id: vectorindex-queryvectors
+    title: 'vectors.from().index().queryVectors()'
+    description: |
+      Queries vectors using a query vector to find similar vectors.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: options
+        isOptional: false
+        type: QueryVectorsOptions.() -> Unit
+        description: Configuration block for the query.
+        subContent:
+          - name: queryVector
+            isOptional: false
+            type: VectorData
+            description: The query vector to search with.
+          - name: topK
+            isOptional: true
+            type: Int
+            description: Number of results to return.
+          - name: filter
+            isOptional: true
+            type: VectorFilter
+            description: Optional filter to apply to the query.
+          - name: returnDistance
+            isOptional: true
+            type: Boolean
+            description: Whether to return distance scores. Defaults to `true`.
+          - name: returnMetadata
+            isOptional: true
+            type: Boolean
+            description: Whether to return metadata. Defaults to `true`.
+    examples:
+      - id: query-vectors
+        name: Query vectors
+        code: |
+          ```kotlin
+          val response = supabase.storage.vectors
+              .from("vectors-bucket")
+              .index("index-name")
+              .queryVectors {
+                  queryVector = VectorData(floatArrayOf(3.0f, 4.0f, 1.0f))
+                  topK = 10
+              }
+          println(response.vectors)
+          ```
+
+  - id: vectorindex-deletevectors
+    title: 'vectors.from().index().deleteVectors()'
+    description: |
+      Deletes vectors by their keys.
+    notes: |
+      - This is an alpha feature and may change in the future.
+      - Keys batch size must be between 1 and 500.
+    params:
+      - name: bucketName
+        isOptional: false
+        type: String
+        description: The name of the vector bucket.
+      - name: indexName
+        isOptional: false
+        type: String
+        description: The name of the index.
+      - name: keys
+        isOptional: false
+        type: List<String>
+        description: List of vector keys to delete. Must contain between 1 and 500 keys.
+    examples:
+      - id: delete-vectors
+        name: Delete vectors
+        code: |
+          ```kotlin
+          supabase.storage.vectors
+              .from("vectors-bucket")
+              .index("index-name")
+              .deleteVectors(listOf("vector-1", "vector-2"))
+          ```
+
+  - id: storagefile-exists
+    title: 'storage.from().exists()'
+    description: |
+      Checks the existence of a file.
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The file path, including the file name. For example `folder/image.png`.
+    examples:
+      - id: check-file-existence
+        name: Check file existence
+        code: |
+          ```kotlin
+          val exists = supabase.storage.from("avatars").exists("folder/avatar1.png")
+          ```
+
+  - id: storagefile-info
+    title: 'storage.from().info()'
+    description: |
+      Retrieves the details of an existing file.
+      Returns detailed file metadata including size, content type, and timestamps.
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The file path, including the file name. For example `folder/image.png`.
+    examples:
+      - id: get-file-info
+        name: Get file info
+        code: |
+          ```kotlin
+          val file = supabase.storage.from("avatars").info("folder/avatar1.png")
+          println(file.size)
           ```
 
   - id: from-upload

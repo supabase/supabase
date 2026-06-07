@@ -1,20 +1,22 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import NoPermission from 'components/ui/NoPermission'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useHooksEnableMutation } from 'data/database/hooks-enable-mutation'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { toast } from 'sonner'
 import { Admonition } from 'ui-patterns'
-import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-export const WebhooksOverviewTab = () => {
-  const { project } = useProjectContext()
+import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
+import { RequiredExtensionsSection } from '../Integration/RequiredExtensionsSection'
+import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import NoPermission from '@/components/ui/NoPermission'
+import { useHooksEnableMutation } from '@/data/database/hooks-enable-mutation'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+
+const WebhooksContent = () => {
   const { ref: projectRef } = useParams()
+  const { data: project } = useSelectedProjectQuery()
 
   const {
     data: schemas,
@@ -26,10 +28,12 @@ export const WebhooksOverviewTab = () => {
   })
 
   const isHooksEnabled = schemas?.some((schema) => schema.name === 'supabase_functions')
-  const canReadWebhooks = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'triggers')
-  const isPermissionsLoaded = usePermissionsLoaded()
+  const { can: canReadWebhooks, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_READ,
+    'triggers'
+  )
 
-  const { mutate: enableHooks, isLoading: isEnablingHooks } = useHooksEnableMutation({
+  const { mutate: enableHooks, isPending: isEnablingHooks } = useHooksEnableMutation({
     onSuccess: async () => {
       await refetch()
       toast.success('Successfully enabled webhooks')
@@ -41,15 +45,7 @@ export const WebhooksOverviewTab = () => {
     enableHooks({ ref: projectRef })
   }
 
-  if (isPermissionsLoaded && !canReadWebhooks) {
-    return (
-      <div className="p-10">
-        <NoPermission isFullPage resourceText="view database webhooks" />
-      </div>
-    )
-  }
-
-  if (!isSchemasLoaded) {
+  if (!isSchemasLoaded || isLoadingPermissions) {
     return (
       <div className="p-10">
         <GenericSkeletonLoader />
@@ -57,38 +53,47 @@ export const WebhooksOverviewTab = () => {
     )
   }
 
+  if (!canReadWebhooks) {
+    return (
+      <div className="p-10">
+        <NoPermission isFullPage resourceText="view database webhooks" />
+      </div>
+    )
+  }
+
+  if (isSchemasLoaded && isHooksEnabled) return null
+
   return (
-    <IntegrationOverviewTab
-      actions={
-        isSchemasLoaded && isHooksEnabled ? null : (
-          <Admonition
-            showIcon={false}
-            type="default"
-            title="Enable database webhooks on your project"
-          >
-            <p>
-              Database Webhooks can be used to trigger serverless functions or send requests to an
-              HTTP endpoint
-            </p>
-            <ButtonTooltip
-              className="w-fit"
-              onClick={() => enableHooksForProject()}
-              disabled={!isPermissionsLoaded || isEnablingHooks}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text:
-                    isPermissionsLoaded && !canReadWebhooks
-                      ? 'You need additional permissions to enable webhooks'
-                      : undefined,
-                },
-              }}
-            >
-              Enable webhooks
-            </ButtonTooltip>
-          </Admonition>
-        )
-      }
-    />
+    <Admonition showIcon={false} type="default" title="Enable database webhooks on your project">
+      <p>
+        Database Webhooks can be used to trigger serverless functions or send requests to an HTTP
+        endpoint
+      </p>
+      <ButtonTooltip
+        className="mt-2 w-fit"
+        onClick={() => enableHooksForProject()}
+        disabled={isEnablingHooks}
+        tooltip={{
+          content: {
+            side: 'bottom',
+            text: !canReadWebhooks
+              ? 'You need additional permissions to enable webhooks'
+              : undefined,
+          },
+        }}
+      >
+        Enable webhooks
+      </ButtonTooltip>
+    </Admonition>
   )
+}
+
+export const WebhooksOverviewTab = () => {
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
+
+  if (isMarketplaceEnabled) {
+    return <RequiredExtensionsSection />
+  }
+
+  return <IntegrationOverviewTab hideRequiredExtensionsSection actions={<WebhooksContent />} />
 }

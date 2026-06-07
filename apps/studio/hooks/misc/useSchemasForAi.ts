@@ -1,6 +1,7 @@
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { Dispatch, SetStateAction } from 'react'
+
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 /**
  * Returns which schemas are ok to be sent to AI.

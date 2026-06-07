@@ -1,16 +1,12 @@
-import { products, PRODUCT_MODULES } from 'shared-data'
-import {
-  PRODUCT_MODULES_NAMES,
-  PRODUCT_MODULES_SHORTNAMES,
-  PRODUCT_NAMES,
-  PRODUCT_SHORTNAMES,
-} from 'shared-data/products'
+import type { ReactNode } from 'react'
+import { products } from 'shared-data'
+import { PRODUCT_NAMES, PRODUCT_SHORTNAMES } from 'shared-data/products'
 
 export type ProductType = {
   [key: string]: {
     name: string
     icon: string
-    description: string | JSX.Element
+    description: ReactNode
     description_short: string
     label: string
     url: string
@@ -79,19 +75,6 @@ const MainProducts: ProductType = {
     label: '',
     url: '/realtime',
   },
-  // [PRODUCT_MODULES_SHORTNAMES.VECTOR]: {
-  //   name: PRODUCT_MODULES_NAMES.VECTOR,
-  //   icon: PRODUCT_MODULES.vector.icon[24],
-  //   description: (
-  //     <>
-  //       Integrate your favorite ML-models to{' '}
-  //       <strong>store, index and search vector embeddings</strong>.
-  //     </>
-  //   ),
-  //   description_short: 'AI toolkit to manage embeddings',
-  //   label: '',
-  //   url: '/vector',
-  // },
 }
 
 export default MainProducts

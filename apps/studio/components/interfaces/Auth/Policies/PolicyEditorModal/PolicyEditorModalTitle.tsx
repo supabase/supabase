@@ -1,9 +1,10 @@
 import { noop } from 'lodash'
 import { ChevronLeft, FlaskConical } from 'lucide-react'
-
-import { DocsButton } from 'components/ui/DocsButton'
 import { Button } from 'ui'
+
 import { POLICY_MODAL_VIEWS } from '../Policies.constants'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { DOCS_URL } from '@/lib/constants'
 
 interface PolicyEditorModalTitleProps {
   view: string
@@ -59,10 +60,7 @@ const PolicyEditorModalTitle = ({
             Try Supabase Assistant
           </Button>
         )}
-        <DocsButton
-          className="mt-[-4px]"
-          href="https://supabase.com/docs/learn/auth-deep-dive/auth-policies"
-        />
+        <DocsButton className="mt-[-4px]" href={`${DOCS_URL}/learn/auth-deep-dive/auth-policies`} />
       </div>
     </div>
   )

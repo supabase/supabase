@@ -1,29 +1,44 @@
 import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
+import type { PropsWithChildren } from 'react'
 
-import { ProductMenu } from 'components/ui/ProductMenu'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { withAuth } from 'hooks/misc/withAuth'
-import { useFlag } from 'hooks/ui/useFlag'
-import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import { ProjectLayout } from '../ProjectLayout'
 import { generateRealtimeMenu } from './RealtimeMenu.utils'
+import { ProductMenu } from '@/components/ui/ProductMenu'
+import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { withAuth } from '@/hooks/misc/withAuth'
+
+/**
+ * Menu-only component for the Realtime section. Used by the desktop sidebar and by the
+ * mobile sheet submenu. Must not wrap ProjectLayout so that opening the realtime submenu
+ * in the mobile sheet does not overwrite registerOpenMenu and break the menu button.
+ */
+export const RealtimeProductMenu = () => {
+  const router = useRouter()
+  const { data: project } = useSelectedProjectQuery()
+  const page = router.pathname.split('/')[4]
+
+  return <ProductMenu page={page} menu={generateRealtimeMenu(project ?? undefined)} />
+}
 
 export interface RealtimeLayoutProps {
   title: string
 }
 
-const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutProps>) => {
-  const project = useSelectedProject()
-
+export const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutProps>) => {
+  const { data: project } = useSelectedProjectQuery()
   const router = useRouter()
   const page = router.pathname.split('/')[4]
+  const menu = generateRealtimeMenu(project)
 
   return (
     <ProjectLayout
-      title={title}
       product="Realtime"
-      productMenu={<ProductMenu page={page} menu={generateRealtimeMenu(project!)} />}
+      browserTitle={{ section: title }}
+      productMenu={<ProductMenu page={page} menu={menu} />}
+      isBlocking={false}
     >
+      <ProductMenuShortcuts menu={menu} />
       {children}
     </ProjectLayout>
   )

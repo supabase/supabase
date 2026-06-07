@@ -1,53 +1,100 @@
+import { useParams } from 'common'
 import dynamic from 'next/dynamic'
 import { forwardRef, HTMLAttributes, useMemo } from 'react'
-
-import { useParams } from 'common'
-import { getConnectionStrings } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseSettings.utils'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
-import { pluckObjectFields } from 'lib/helpers'
 import { cn } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { CopyCallbackContext } from 'ui-patterns/SimpleCodeBlock'
+
+import { getAddons } from '../Billing/Subscription/Subscription.utils'
 import type { projectKeys } from './Connect.types'
+import { getConnectionStrings } from './DatabaseSettings.utils'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
+import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { pluckObjectFields } from '@/lib/helpers'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface ConnectContentTabProps extends HTMLAttributes<HTMLDivElement> {
   projectKeys: projectKeys
   filePath: string
+  connectionTab: 'App Frameworks' | 'Mobile Frameworks' | 'ORMs'
+  selectedFrameworkOrTool: string
   connectionStringPooler?: {
-    transaction: string
-    session: string
+    transactionShared: string
+    sessionShared: string
+    transactionDedicated?: string
+    sessionDedicated?: string
+    ipv4SupportedForDedicatedPooler: boolean
+    direct?: string
   }
-  connectionStringDirect?: string
 }
 
-const ConnectTabContentNew = forwardRef<HTMLDivElement, ConnectContentTabProps>(
-  ({ projectKeys, filePath, ...props }, ref) => {
+export const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabProps>(
+  ({ projectKeys, filePath, connectionTab, selectedFrameworkOrTool, ...props }, ref) => {
     const { ref: projectRef } = useParams()
+    const track = useTrack()
+    const { hasAccess: allowPgBouncerSelection } = useCheckEntitlements('dedicated_pooler')
+
+    const handleCopy = () => {
+      const trackingProperties: {
+        connectionTab: 'App Frameworks' | 'Mobile Frameworks' | 'ORMs'
+        selectedItem: string
+        connectionType?: string
+        lang?: string
+      } = {
+        connectionTab,
+        selectedItem: selectedFrameworkOrTool,
+      }
+
+      // Only include connectionType and lang for App Frameworks and Mobile Frameworks
+      if (connectionTab !== 'ORMs') {
+        trackingProperties.connectionType = 'Framework snippet'
+        trackingProperties.lang = filePath.split('/').pop() ?? 'unknown'
+      }
+
+      track('connection_string_copied', trackingProperties)
+    }
 
     const { data: settings } = useProjectSettingsV2Query({ projectRef })
-    const { data: poolingInfo } = usePoolingConfigurationQuery({ projectRef })
+    const { data: pgbouncerConfig } = usePgbouncerConfigQuery({ projectRef })
+    const { data: supavisorConfig } = useSupavisorConfigurationQuery({ projectRef })
+    const { data: addons } = useProjectAddonsQuery({ projectRef })
+    const { ipv4: ipv4Addon } = getAddons(addons?.selected_addons ?? [])
 
     const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
     const emptyState = { db_user: '', db_host: '', db_port: '', db_name: '' }
     const connectionInfo = pluckObjectFields(settings || emptyState, DB_FIELDS)
-    const poolingConfiguration = poolingInfo?.find((x) => x.database_type === 'PRIMARY')
+    const poolingConfigurationShared = supavisorConfig?.find((x) => x.database_type === 'PRIMARY')
+    const poolingConfigurationDedicated = allowPgBouncerSelection ? pgbouncerConfig : undefined
 
-    const connectionStringsPooler =
-      poolingConfiguration !== undefined
-        ? getConnectionStrings(connectionInfo, poolingConfiguration, {
-            projectRef,
-            usePoolerConnection: true,
+    const connectionStringsShared = getConnectionStrings({
+      connectionInfo,
+      poolingInfo: {
+        connectionString: poolingConfigurationShared?.connection_string ?? '',
+        db_host: poolingConfigurationShared?.db_host ?? '',
+        db_name: poolingConfigurationShared?.db_name ?? '',
+        db_port: poolingConfigurationShared?.db_port ?? 0,
+        db_user: poolingConfigurationShared?.db_user ?? '',
+      },
+      metadata: { projectRef },
+    })
+
+    const connectionStringsDedicated =
+      poolingConfigurationDedicated !== undefined
+        ? getConnectionStrings({
+            connectionInfo,
+            poolingInfo: {
+              connectionString: poolingConfigurationDedicated.connection_string,
+              db_host: poolingConfigurationDedicated.db_host,
+              db_name: poolingConfigurationDedicated.db_name,
+              db_port: poolingConfigurationDedicated.db_port,
+              db_user: poolingConfigurationDedicated.db_user,
+            },
+            metadata: { projectRef },
           })
-        : { uri: '' }
-    const connectionStringsDirect =
-      poolingConfiguration !== undefined
-        ? getConnectionStrings(connectionInfo, poolingConfiguration, {
-            projectRef,
-            usePoolerConnection: false,
-          })
-        : { uri: '' }
-    const connectionStringPoolerTransaction = connectionStringsPooler.uri
-    const connectionStringPoolerSession = connectionStringsPooler.uri.replace('6543', '5432')
+        : undefined
 
     const ContentFile = useMemo(() => {
       return dynamic<ConnectContentTabProps>(() => import(`./content/${filePath}/content`), {
@@ -61,20 +108,26 @@ const ConnectTabContentNew = forwardRef<HTMLDivElement, ConnectContentTabProps>(
 
     return (
       <div ref={ref} {...props} className={cn('border rounded-lg', props.className)}>
-        <ContentFile
-          projectKeys={projectKeys}
-          filePath={filePath}
-          connectionStringPooler={{
-            transaction: connectionStringPoolerTransaction,
-            session: connectionStringPoolerSession,
-          }}
-          connectionStringDirect={connectionStringsDirect.uri}
-        />
+        <CopyCallbackContext.Provider value={handleCopy}>
+          <ContentFile
+            projectKeys={projectKeys}
+            filePath={filePath}
+            connectionTab={connectionTab}
+            selectedFrameworkOrTool={selectedFrameworkOrTool}
+            connectionStringPooler={{
+              transactionShared: connectionStringsShared.pooler.uri,
+              sessionShared: connectionStringsShared.pooler.uri.replace('6543', '5432'),
+              transactionDedicated: connectionStringsDedicated?.pooler.uri,
+              sessionDedicated: connectionStringsDedicated?.pooler.uri.replace('6543', '5432'),
+              ipv4SupportedForDedicatedPooler: !!ipv4Addon,
+              direct: connectionStringsShared.direct.uri,
+            }}
+            onCopy={handleCopy}
+          />
+        </CopyCallbackContext.Provider>
       </div>
     )
   }
 )
 
-ConnectTabContentNew.displayName = 'ConnectTabContentNew'
-
-export default ConnectTabContentNew
+ConnectTabContent.displayName = 'ConnectTabContent'

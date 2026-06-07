@@ -1,12 +1,13 @@
-import { DiskManagementForm } from 'components/interfaces/DiskManagement/DiskManagementForm'
-import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
+import { DiskManagementForm } from '@/components/interfaces/DiskManagement/DiskManagementForm'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
 import {
   ScaffoldContainer,
   ScaffoldDescription,
   ScaffoldHeader,
   ScaffoldTitle,
-} from 'components/layouts/Scaffold'
-import type { NextPageWithLayout } from 'types'
+} from '@/components/layouts/Scaffold'
+import type { NextPageWithLayout } from '@/types'
 
 const AuthSettings: NextPageWithLayout = () => {
   return (
@@ -24,5 +25,9 @@ const AuthSettings: NextPageWithLayout = () => {
   )
 }
 
-AuthSettings.getLayout = (page) => <SettingsLayout>{page}</SettingsLayout>
+AuthSettings.getLayout = (page) => (
+  <DefaultLayout>
+    <SettingsLayout title="Compute and Disk">{page}</SettingsLayout>
+  </DefaultLayout>
+)
 export default AuthSettings

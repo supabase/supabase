@@ -1,116 +1,181 @@
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { ExternalLink, XIcon } from 'lucide-react'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
 import type { PropsWithChildren } from 'react'
+import { Alert, AlertDescription, AlertTitle, Button, cn } from 'ui'
 
-import { useParams } from 'common'
-import PartnerIcon from 'components/ui/PartnerIcon'
-import { PARTNER_TO_NAME } from 'components/ui/PartnerManagedResource'
-import { useVercelRedirectQuery } from 'data/integrations/vercel-redirect-query'
-import { useCurrentPath } from 'hooks/misc/useCurrentPath'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
-import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, NavMenu, NavMenuItem } from 'ui'
-import AccountLayout from './AccountLayout/AccountLayout'
-import { ScaffoldContainer, ScaffoldDivider, ScaffoldHeader, ScaffoldTitle } from './Scaffold'
+import { useRegisterOrgMenu } from './OrganizationLayout/useRegisterOrgMenu'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import PartnerIcon from '@/components/ui/PartnerIcon'
+import { useAwsRedirectQuery } from '@/data/integrations/aws-redirect-query'
+import { useVercelRedirectQuery } from '@/data/integrations/vercel-redirect-query'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { withAuth } from '@/hooks/misc/withAuth'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
+import { buildStudioPageTitle } from '@/lib/page-title'
 
-const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
-  const selectedOrganization = useSelectedOrganization()
-  const currentPath = useCurrentPath()
-  const { slug } = useParams()
+interface OrganizationLayoutProps {
+  title: string
+}
 
-  const invoicesEnabledOnProfileLevel = useIsFeatureEnabled('billing:invoices')
-  const invoicesEnabled = invoicesEnabledOnProfileLevel
+// [Joshen] Just for page title generation for org settings pages
+const settingsPages = ['general', 'security', 'sso', 'apps', 'audit', 'documents']
 
-  const { data, isSuccess } = useVercelRedirectQuery({
-    installationId: selectedOrganization?.partner_id,
+type MarketplaceBannerRedirectSource = 'vercel' | 'aws'
+
+type MarketplaceBannerConfig = {
+  title: string
+  description: string
+  redirectSource?: MarketplaceBannerRedirectSource
+}
+
+const MARKETPLACE_BANNER_CONFIG: Record<
+  | typeof MANAGED_BY.VERCEL_MARKETPLACE
+  | typeof MANAGED_BY.AWS_MARKETPLACE
+  | typeof MANAGED_BY.STRIPE_PROJECTS,
+  MarketplaceBannerConfig
+> = {
+  [MANAGED_BY.VERCEL_MARKETPLACE]: {
+    title: 'This organization is managed via Vercel Marketplace',
+    description: 'Billing and some organization access settings are managed in Vercel.',
+    redirectSource: 'vercel',
+  },
+  [MANAGED_BY.AWS_MARKETPLACE]: {
+    title: 'This organization is billed via AWS Marketplace',
+    description: 'Changes to billing and payment details must be made in AWS.',
+    redirectSource: 'aws',
+  },
+  [MANAGED_BY.STRIPE_PROJECTS]: {
+    title: 'This organization is connected to Stripe',
+    description: 'Changes here will be reflected in your connected Stripe account.',
+  },
+}
+
+const DEFAULT_ORGANIZATION_MARKETPLACE_BANNER_DISMISS_KEY =
+  LOCAL_STORAGE_KEYS.ORGANIZATION_MARKETPLACE_BANNER_DISMISSED('unknown', MANAGED_BY.SUPABASE)
+
+function getMarketplaceBannerDismissKey({
+  organizationSlug,
+  managedBy,
+}: {
+  organizationSlug?: string
+  managedBy?: string
+}) {
+  if (!organizationSlug || !managedBy) return DEFAULT_ORGANIZATION_MARKETPLACE_BANNER_DISMISS_KEY
+
+  return LOCAL_STORAGE_KEYS.ORGANIZATION_MARKETPLACE_BANNER_DISMISSED(organizationSlug, managedBy)
+}
+
+function getMarketplaceBannerConfig(managedBy?: string): MarketplaceBannerConfig | undefined {
+  switch (managedBy) {
+    case MANAGED_BY.VERCEL_MARKETPLACE:
+      return MARKETPLACE_BANNER_CONFIG[MANAGED_BY.VERCEL_MARKETPLACE]
+    case MANAGED_BY.AWS_MARKETPLACE:
+      return MARKETPLACE_BANNER_CONFIG[MANAGED_BY.AWS_MARKETPLACE]
+    case MANAGED_BY.STRIPE_PROJECTS:
+      return MARKETPLACE_BANNER_CONFIG[MANAGED_BY.STRIPE_PROJECTS]
+    default:
+      return undefined
+  }
+}
+
+const OrganizationLayoutContent = ({
+  children,
+  title,
+}: PropsWithChildren<OrganizationLayoutProps>) => {
+  const router = useRouter()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { appTitle } = useCustomContent(['app:title'])
+  const [isBannerDismissed, setIsBannerDismissed] = useLocalStorageQuery<boolean>(
+    getMarketplaceBannerDismissKey({
+      organizationSlug: selectedOrganization?.slug,
+      managedBy: selectedOrganization?.managed_by,
+    }),
+    false
+  )
+
+  // Keep title intent close to each page (getLayout) to avoid route-to-title drift in this layout.
+  const isSettingsSurface = settingsPages.some((x) => router.pathname.endsWith(x))
+  const pageTitle = buildStudioPageTitle({
+    section: title,
+    surface: isSettingsSurface ? 'Organization Settings' : undefined,
+    org: selectedOrganization?.name,
+    brand: appTitle || 'Supabase',
   })
 
-  const navMenuItems = [
-    {
-      label: 'General',
-      href: `/org/${slug}/general`,
-    },
-    {
-      label: 'Team',
-      href: `/org/${slug}/team`,
-    },
-    {
-      label: 'Integrations',
-      href: `/org/${slug}/integrations`,
-    },
-    {
-      label: 'Billing',
-      href: `/org/${slug}/billing`,
-    },
-    {
-      label: 'Usage',
-      href: `/org/${slug}/usage`,
-    },
-    {
-      label: 'Invoices',
-      href: `/org/${slug}/invoices`,
-      hidden: !invoicesEnabled,
-    },
-    {
-      label: 'OAuth Apps',
-      href: `/org/${slug}/apps`,
-    },
-    {
-      label: 'Audit Logs',
-      href: `/org/${slug}/audit`,
-    },
-    {
-      label: 'Legal Documents',
-      href: `/org/${slug}/documents`,
-    },
-  ]
+  const vercelQuery = useVercelRedirectQuery(
+    { installationId: selectedOrganization?.partner_id },
+    { enabled: selectedOrganization?.managed_by === MANAGED_BY.VERCEL_MARKETPLACE }
+  )
 
-  const filteredNavMenuItems = navMenuItems.filter((item) => !item.hidden)
+  const awsQuery = useAwsRedirectQuery(
+    { organizationSlug: selectedOrganization?.slug },
+    { enabled: selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE }
+  )
+
+  const bannerConfig = getMarketplaceBannerConfig(selectedOrganization?.managed_by)
+
+  const selectedRedirectQuery = (() => {
+    if (!bannerConfig?.redirectSource) return undefined
+
+    switch (bannerConfig.redirectSource) {
+      case 'aws':
+        return awsQuery
+      case 'vercel':
+        return vercelQuery
+      default:
+        return undefined
+    }
+  })()
 
   return (
-    <AccountLayout
-      title={selectedOrganization?.name ?? 'Supabase'}
-      breadcrumbs={[{ key: `org-settings`, label: 'Settings' }]}
-    >
-      <ScaffoldHeader className="pb-0">
-        <ScaffoldContainer id="billing-page-top">
-          <ScaffoldTitle className="pb-3">
-            {selectedOrganization?.name ?? 'Organization'} settings
-          </ScaffoldTitle>
-          <NavMenu
-            className="border-none max-w-full overflow-y-hidden overflow-x-auto"
-            aria-label="Organization menu navigation"
-          >
-            {filteredNavMenuItems.map((item) => (
-              <NavMenuItem key={item.label} active={currentPath === item.href}>
-                <Link href={item.href}>{item.label}</Link>
-              </NavMenuItem>
-            ))}
-          </NavMenu>
-        </ScaffoldContainer>
-      </ScaffoldHeader>
-
-      <ScaffoldDivider />
-
-      {selectedOrganization && selectedOrganization?.managed_by !== 'supabase' && (
-        <ScaffoldContainer className="mt-8">
-          <Alert_Shadcn_ variant="default" className="flex items-center gap-4">
-            <PartnerIcon organization={selectedOrganization} showTooltip={false} size="medium" />
-            <AlertTitle_Shadcn_ className="flex-1">
-              This organization is managed by {PARTNER_TO_NAME[selectedOrganization.managed_by]}.
-            </AlertTitle_Shadcn_>
-            <Button type="default" iconRight={<ExternalLink />} asChild disabled={!isSuccess}>
-              <a href={data?.url} target="_blank" rel="noopener noreferrer">
-                Manage
-              </a>
-            </Button>
-          </Alert_Shadcn_>
-        </ScaffoldContainer>
+    <div className={cn('h-full w-full flex flex-col overflow-hidden')}>
+      {pageTitle && (
+        <Head>
+          <title>{pageTitle}</title>
+          <meta name="description" content="Supabase Studio" />
+        </Head>
       )}
-
-      {children}
-    </AccountLayout>
+      {selectedOrganization && bannerConfig && !isBannerDismissed && (
+        <Alert
+          variant="default"
+          className="flex items-center gap-4 border-t-0 border-x-0 rounded-none"
+        >
+          <PartnerIcon organization={selectedOrganization} showTooltip={false} size="medium" />
+          <div className="flex-1">
+            <AlertTitle>{bannerConfig.title}</AlertTitle>
+            <AlertDescription>{bannerConfig.description}</AlertDescription>
+          </div>
+          <div className="flex items-center gap-2">
+            {selectedRedirectQuery?.data?.url && (
+              <Button asChild type="default" iconRight={<ExternalLink />}>
+                <a href={selectedRedirectQuery.data.url} target="_blank" rel="noopener noreferrer">
+                  Manage
+                </a>
+              </Button>
+            )}
+            <ButtonTooltip
+              type="text"
+              icon={<XIcon size={14} />}
+              className="h-7 w-7 p-0"
+              onClick={() => setIsBannerDismissed(true)}
+              aria-label="Dismiss banner"
+              tooltip={{ content: { text: 'Dismiss' } }}
+            />
+          </div>
+        </Alert>
+      )}
+      <main className="h-full w-full overflow-y-auto flex flex-col">{children}</main>
+    </div>
   )
 }
 
-export default OrganizationLayout
+const OrganizationLayout = ({ children, title }: PropsWithChildren<OrganizationLayoutProps>) => {
+  useRegisterOrgMenu()
+  return <OrganizationLayoutContent title={title}>{children}</OrganizationLayoutContent>
+}
+
+export default withAuth(OrganizationLayout)

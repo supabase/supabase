@@ -1,22 +1,21 @@
-import { useRouter } from 'next/router'
-
 import Layout from '~/components/Layouts/Default'
-
-import SectionHeader from 'components/UI/SectionHeader'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import Panel from '~/components/Panel'
+import { breadcrumbs } from '~/lib/breadcrumbs'
+import { breadcrumbListSchema, serializeJsonLd } from '~/lib/json-ld'
 import CTABanner from 'components/CTABanner/index'
 import ImageGrid from 'components/ImageGrid'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-
-import PressData from 'data/Press'
+import SectionHeader from 'components/UI/SectionHeader'
 import CommunityData from 'data/Community'
 import CompaniesData from 'data/Companies'
 import InvestorData from 'data/Investors'
-
+import PressData from 'data/Press'
+import { NextSeo } from 'next-seo'
+import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
-
-import { Button, Card_legacy_, Space } from 'ui'
-import { NextSeo } from 'next-seo'
+import { useRouter } from 'next/router'
+import { Button } from 'ui'
 
 type Props = {}
 
@@ -43,6 +42,14 @@ const Index = ({}: Props) => {
           ],
         }}
       />
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.company)),
+          }}
+        />
+      </Head>
       <Layout>
         <Header />
         <Community />
@@ -75,31 +82,16 @@ const Header = () => {
 }
 
 const Team = () => {
-  interface iIconLink {
-    link: string
-    icon: React.ReactNode
-  }
-
-  const IconLink = ({ link, icon }: iIconLink) => {
-    return (
-      <a href={link} target="_blank">
-        <div className="opacity-50 transition-opacity hover:opacity-75">{icon}</div>
-      </a>
-    )
-  }
-
   return (
     <div className="border-t border-default">
       <SectionContainer>
-        <SectionHeader title="Team" paragraph={<div></div>} />
+        <SectionHeader title="Team" />
         <div className="grid grid-cols-2 md:grid-cols-12">
           <div className="col-span-8 ">
-            <p>
-              <p className="text-foreground text-lg">
-                Supabase is fully remote, with a strong affinity for open source maintainers and
-                ex-Founders. Our engineering team is made up of developers from AWS, Google,
-                Palantir, Stripe, and other YC companies.
-              </p>
+            <p className="text-foreground text-lg">
+              Supabase is fully remote, with a strong affinity for open source maintainers and
+              ex-Founders. Our engineering team is made up of developers from AWS, Google, Palantir,
+              Stripe, and other YC companies.
             </p>
           </div>
           <div className=" col-span-4 pt-8 md:mt-0 md:text-right">
@@ -110,53 +102,6 @@ const Team = () => {
             </a>
           </div>
         </div>
-        {/* <div className="mt-5 grid md:gap-8 grid-cols-2 lg:grid-cols-4 w-full">
-        {TeamData.filter((x) => x.active).map((x) => (
-          <div key={x.name}>
-            <div className="flex flex-col lg:flex-row space-y-3 lg:space-y-0 lg:space-x-4">
-              <div>
-                <Image
-                  src={x.img}
-                  alt={x.name}
-                  width={40}
-                  height={40}
-                  className="rounded-md shadow-md object-contain"
-                />
-              </div>
-              <div className="flex flex-col justify-center space-y-2">
-                <div>
-                  <h5 className="mb-0">
-                    {x.name}
-                  </h5>
-                  <p className="mb-0">
-                    {x.department}
-                  </p>
-                </div>
-                <div className="flex space-x-2 text-gray-300 dark:text-gray-500">
-                  {x.twitter && (
-                    <IconLink
-                      icon={<IconTwitter size={14} strokeWidth={2} fill={'currentColor'} />}
-                      link={x.twitter}
-                    />
-                  )}
-                  {x.github && (
-                    <IconLink
-                      icon={<IconGitHub size={14} strokeWidth={2} fill={'currentColor'} />}
-                      link={x.github}
-                    />
-                  )}
-                  {x.linkedin && (
-                    <IconLink
-                      icon={<IconLinkedin size={14} strokeWidth={2} fill={'currentColor'} />}
-                      link={x.linkedin}
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div> */}
       </SectionContainer>
     </div>
   )
@@ -167,19 +112,6 @@ const Community = () => {
 
   return (
     <SectionContainer className="pt-0 lg:pt-0">
-      {/* <SectionHeader
-        title={'Community'}
-        paragraph={
-          <>
-            <p>
-              <p className="text-lg">
-                Join one of the world's fastest growing open source communities. Let's build
-                together.
-              </p>
-            </p>
-          </>
-        }
-      /> */}
       <div className="space-y-16">
         <div className="relative grid max-w-5xl grid-cols-2 gap-8 lg:grid-cols-4 ">
           {CommunityData.map((x, i) => (
@@ -236,12 +168,8 @@ const Investors = () => {
           title="Our investors"
           paragraph={
             <>
-              <p>
-                <p className="text-lg">
-                  We've raised over $116 million in funding, backed by some of the world's leading
-                  investors.
-                </p>
-              </p>
+              We've raised over $116 million in funding, backed by some of the world's leading
+              investors.
             </>
           }
         />
@@ -303,33 +231,55 @@ const Press = () => {
       </div>
       <div className="mx-auto mt-5 grid gap-5 lg:max-w-none lg:grid-cols-3">
         {PressData.filter((x) => x.type == 'article').map((x) => (
-          <Link href={x.href} key={x.href} target="_blank">
-            <Card_legacy_ key={`press_${x.href}`} hoverable className="h-36">
-              <Space className="h-40 justify-between" direction="vertical">
-                <div>
-                  <h1 className="text-foreground text-xl">{x.type.toUpperCase()}</h1>
+          <Link
+            href={x.href}
+            key={x.href}
+            target="_blank"
+            className="flex flex-col justify-start items-stretch group cursor-pointer transition rounded-xl focus-visible:ring-2 focus-visible:ring-foreground-lighter outline-hidden outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-foreground-lighter"
+          >
+            <Panel
+              hasActiveOnHover
+              outerClassName="h-full"
+              innerClassName="flex md:flex-col gap-3 sm:gap-2 h-full items-start p-2"
+            >
+              <div className="md:p-2 md:pt-1 flex flex-col h-full md:h-auto grow gap-0.5 md:gap-1.5 justify-center md:justify-start">
+                <h3 className="text-sm md:text-base text-foreground leading-5!">
+                  {x.type.toUpperCase()}
+                </h3>
+                <div className="flex flex-wrap items-center gap-1 mb-0.5">
                   <p className="text-foreground-light line-clamp block h-12 overflow-hidden text-ellipsis text-base">
                     {x.title}
                   </p>
                 </div>
-              </Space>
-            </Card_legacy_>
+              </div>
+            </Panel>
           </Link>
         ))}
       </div>
       <div className="mx-auto mt-5 grid gap-5 sm:grid-cols-2 lg:max-w-none lg:grid-cols-4">
         {PressData.filter((x) => x.type == 'podcast').map((x) => (
-          <Link href={x.href} key={x.href} target="_blank">
-            <Card_legacy_ key={`press_${x.href}`} hoverable className="h-36">
-              <Space className="h-40 justify-between" direction="vertical">
-                <div>
-                  <h1 className="text-foreground text-xl">{x.type.toUpperCase()}</h1>
+          <Link
+            href={x.href}
+            key={x.href}
+            target="_blank"
+            className="flex flex-col justify-start items-stretch group cursor-pointer transition rounded-xl focus-visible:ring-2 focus-visible:ring-foreground-lighter outline-hidden outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-foreground-lighter"
+          >
+            <Panel
+              hasActiveOnHover
+              outerClassName="h-full"
+              innerClassName="flex md:flex-col gap-3 sm:gap-2 h-full items-start p-2"
+            >
+              <div className="md:p-2 md:pt-1 flex flex-col h-full md:h-auto grow gap-0.5 md:gap-1.5 justify-center md:justify-start">
+                <h3 className="text-sm md:text-base text-foreground leading-5!">
+                  {x.type.toUpperCase()}
+                </h3>
+                <div className="flex flex-wrap items-center gap-1 mb-0.5">
                   <p className="text-foreground-light line-clamp block h-12 overflow-hidden text-ellipsis text-base">
                     {x.title}
                   </p>
                 </div>
-              </Space>
-            </Card_legacy_>
+              </div>
+            </Panel>
           </Link>
         ))}
       </div>

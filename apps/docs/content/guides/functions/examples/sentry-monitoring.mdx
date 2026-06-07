@@ -3,12 +3,12 @@ title: 'Monitoring with Sentry'
 description: 'Monitor Edge Functions with the Sentry Deno SDK.'
 ---
 
-Add the [Sentry Deno SDK](https://docs.sentry.io/platforms/javascript/guides/deno/) to your Supabase Edge Functions to easily track exceptions and get notified of errors or performance issues.
+Add the [Sentry Deno SDK](https://docs.sentry.io/platforms/javascript/guides/deno/) to your Supabase Edge Functions to track exceptions and get notified of errors or performance issues.
 
 ### Prerequisites
 
 - [Create a Sentry account](https://sentry.io/signup/).
-- Make sure you have the latest version of the [Supabase CLI](https://supabase.com/docs/guides/cli#installation) installed.
+- Make sure you have the latest version of the [Supabase CLI](/docs/guides/cli#installation) installed.
 
 ### 1. Create Supabase function
 
@@ -50,6 +50,8 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } })
   } catch (e) {
     Sentry.captureException(e)
+    // Flush Sentry before the running process closes
+    await Sentry.flush(2000)
     return new Response(JSON.stringify({ msg: 'error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
@@ -81,9 +83,4 @@ Find the complete example on [GitHub](https://github.com/supabase/supabase/tree/
 
 ## Working with scopes
 
-Sentry Deno SDK currently do not support `Deno.serve` instrumentation, which means that there is no scope separation between requests.
-Because of that, when the Edge Functions runtime is reused between multiple requests, all globally captured breadcrumbs and contextual data
-will be shared, which is not the desired behavior. To work around this, all default integrations in the example code above are disabled,
-and you should be relying on [`withScope`](https://docs.sentry.io/platforms/javascript/enriching-events/scopes/#using-withscope) to encapsulate
-all Sentry SDK API calls, or [pass context directly](https://docs.sentry.io/platforms/javascript/enriching-events/context/#passing-context-directly)
-to the `captureException` or `captureMessage` calls.
+Sentry Deno SDK currently do not support `Deno.serve` instrumentation, which means that there is no scope separation between requests. Because of that, when the Edge Functions runtime is reused between multiple requests, all globally captured breadcrumbs and contextual data will be shared, which is not the desired behavior. To work around this, all default integrations in the example code above are disabled, and you should be relying on [`withScope`](https://docs.sentry.io/platforms/javascript/enriching-events/scopes/#using-withscope) to encapsulate all Sentry SDK API calls, or [pass context directly](https://docs.sentry.io/platforms/javascript/enriching-events/context/#passing-context-directly) to the `captureException` or `captureMessage` calls.

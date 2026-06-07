@@ -2,21 +2,25 @@ import { useEffect, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { StepHikeContext } from './StepHikeContext'
 
-const StepHike = ({ children, title }) => {
-  const [activeStep, setActiveStep] = useState(undefined)
+const StepHike = ({ children }) => {
+  const [activeStep, setActiveStep] = useState<{ titleId: string; step: number } | undefined>(
+    undefined
+  )
 
   // check if there are any children
   if (!children) throw 'StepHike component requires <StepHike.Step> children'
 
-  const steps = children.filter((x) => {
+  const steps = children.filter((x: any) => {
     return x.type.name === 'Step'
   })
 
   useEffect(() => {
-    setActiveStep({
-      titleId: steps[0].props.title.replaceAll(' ', '-').toLowerCase(),
-      step: 0,
-    })
+    if (steps.length > 0) {
+      setActiveStep({
+        titleId: steps[0].props.title.replaceAll(' ', '-').toLowerCase(),
+        step: 0,
+      })
+    }
   }, [])
 
   // check if there is at least 1 StepHike subcomponent
@@ -73,7 +77,7 @@ const Step = ({ children, title, step }) => {
       "
               >
                 <div className="flex items-center gap-6">
-                  <div className="border bg-selection border-strong flex w-7 h-7 items-center justify-center rounded text-base text-foreground font-semibold font-mono">
+                  <div className="border bg-selection border-strong flex w-7 h-7 items-center justify-center rounded-sm text-base text-foreground font-semibold font-mono">
                     {step}
                   </div>
                   <h3 className="text-foreground text-xl" id={cleanTitleId}>

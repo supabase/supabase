@@ -1,8 +1,8 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
 import { isNaN, noop } from 'lodash'
 import { Clock } from 'lucide-react'
 import { ChangeEvent, useEffect, useState } from 'react'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import type { Time } from './PITR.types'
 import { formatNumberToTwoDigits, formatTimeToTimeString } from './PITR.utils'
@@ -91,8 +91,8 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
         ].join(' ')}
       >
         <Clock className="text-foreground-light" size={18} strokeWidth={1.5} />
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger className="w-1/4" tabIndex={-1}>
+        <Tooltip>
+          <TooltipTrigger className="w-1/4" tabIndex={-1}>
             <input
               type="text"
               maxLength={2}
@@ -103,26 +103,15 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
               aria-label="Hours"
               onBlur={(event) => onInputBlur(event, 'h')}
               onChange={(event) => onInputChange(event, 'h')}
-              className="w-full text-sm bg-transparent p-0 text-center outline-none border-none focus:ring-0"
+              className="w-full text-sm bg-transparent p-0 text-center outline-hidden border-none focus:ring-0"
             />
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'bg-alternative rounded py-1 px-2 leading-none shadow',
-                  'border-background border',
-                ].join(' ')}
-              >
-                <span className="text-foreground text-xs">Hours (HH)</span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
+          </TooltipTrigger>
+
+          <TooltipContent side="bottom">Hours (HH)</TooltipContent>
+        </Tooltip>
         <span>:</span>
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger className="w-1/4" tabIndex={-1}>
+        <Tooltip>
+          <TooltipTrigger className="w-1/4" tabIndex={-1}>
             <input
               type="text"
               maxLength={2}
@@ -133,26 +122,15 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
               aria-label="Minutes"
               onBlur={(event) => onInputBlur(event, 'm')}
               onChange={(event) => onInputChange(event, 'm')}
-              className="w-full text-sm bg-transparent p-0 text-center outline-none border-none focus:ring-0"
+              className="w-full text-sm bg-transparent p-0 text-center outline-hidden border-none focus:ring-0"
             />
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'bg-alternative rounded py-1 px-2 leading-none shadow',
-                  'border-background border',
-                ].join(' ')}
-              >
-                <span className="text-foreground text-xs">Minutes (MM)</span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
+          </TooltipTrigger>
+
+          <TooltipContent side="bottom">Minutes (MM)</TooltipContent>
+        </Tooltip>
         <span>:</span>
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger className="w-1/4" tabIndex={-1}>
+        <Tooltip>
+          <TooltipTrigger className="w-1/4" tabIndex={-1}>
             <input
               type="text"
               maxLength={2}
@@ -163,23 +141,11 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
               aria-label="Seconds"
               onBlur={(event) => onInputBlur(event, 's')}
               onChange={(event) => onInputChange(event, 's')}
-              className="w-full text-sm bg-transparent p-0 text-center outline-none border-none focus:ring-0"
+              className="w-full text-sm bg-transparent p-0 text-center outline-hidden border-none focus:ring-0"
             />
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'bg-alternative rounded py-1 px-2 leading-none shadow',
-                  'border-background border',
-                ].join(' ')}
-              >
-                <span className="text-foreground text-xs">Seconds (SS)</span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Seconds (SS)</TooltipContent>
+        </Tooltip>
       </div>
       {error && <p className="text-sm text-red-900">{error}</p>}
     </>

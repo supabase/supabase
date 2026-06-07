@@ -1,192 +1,221 @@
-import { isEmpty } from 'lodash'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Eye, EyeOff } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
+import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { z } from 'zod'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-create-mutation'
-import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
-import { useVaultSecretUpdateMutation } from 'data/vault/vault-secret-update-mutation'
-import type { VaultSecret } from 'types'
-import { Button, Form, Input, Modal } from 'ui'
-import EncryptionKeySelector from '../Keys/EncryptionKeySelector'
-import { EyeOff, Eye } from 'lucide-react'
+import { useVaultSecretDecryptedValueQuery } from '@/data/vault/vault-secret-decrypted-value-query'
+import { useVaultSecretUpdateMutation } from '@/data/vault/vault-secret-update-mutation'
+import { useVaultSecretsQuery } from '@/data/vault/vault-secrets-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import type { VaultSecret } from '@/types'
 
-interface EditSecretModalProps {
-  selectedSecret: VaultSecret | undefined
-  onClose: () => void
-}
+const SecretSchema = z.object({
+  name: z.string().min(1, 'Please provide a name for your secret'),
+  description: z.string().optional(),
+  secret: z.string().min(1, 'Please enter your secret value'),
+})
 
-const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
-  const [selectedKeyId, setSelectedKeyId] = useState<string>()
+const formId = 'edit-vault-secret-form'
+
+export const EditSecretModal = () => {
+  const { data: project } = useSelectedProjectQuery()
+
+  const { data: secrets = [], isSuccess } = useVaultSecretsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const [secretIdToEdit, setSelectedSecretToEdit] = useQueryState('edit', parseAsString)
+  const secret = secrets.find((secret) => secret.id === secretIdToEdit)
+
   const [showSecretValue, setShowSecretValue] = useState(false)
-  const { project } = useProjectContext()
 
-  const { mutateAsync: addKeyMutation } = usePgSodiumKeyCreateMutation()
-  const { mutateAsync: updateSecret } = useVaultSecretUpdateMutation()
+  const { data, isPending: isLoadingSecretValue } = useVaultSecretDecryptedValueQuery(
+    {
+      projectRef: project?.ref,
+      id: secret?.id,
+      connectionString: project?.connectionString,
+    },
+    { enabled: !!project?.ref }
+  )
 
-  let INITIAL_VALUES = {
-    name: selectedSecret?.name ?? '',
-    description: selectedSecret?.description ?? '',
-    secret: selectedSecret?.decryptedSecret ?? '',
+  const values = {
+    name: secret?.name ?? '',
+    description: secret?.description ?? '',
+    secret: secret?.decryptedSecret ?? data ?? '',
+  }
+
+  const form = useForm<z.infer<typeof SecretSchema>>({
+    resolver: zodResolver(SecretSchema),
+    defaultValues: values,
+    values,
+  })
+
+  const { mutate: updateSecret, isPending: isSubmitting } = useVaultSecretUpdateMutation()
+
+  const onSubmit: SubmitHandler<z.infer<typeof SecretSchema>> = async (values) => {
+    if (!project) return console.error('Project is required')
+    if (!secret) return console.error('Secret is required')
+
+    const payload: Partial<VaultSecret> = {
+      secret: values.secret,
+    }
+    if (values.name !== secret.name) payload.name = values.name
+    if (values.description !== secret.description) payload.description = values.description
+
+    if (Object.keys(payload).length > 0) {
+      updateSecret(
+        {
+          projectRef: project.ref,
+          connectionString: project?.connectionString,
+          id: secret.id,
+          ...payload,
+        },
+        {
+          onSuccess: () => {
+            toast.success('Successfully updated secret')
+            setSelectedSecretToEdit(null)
+          },
+          onError: (error) => {
+            toast.error(`Failed to update secret: ${error.message}`)
+          },
+        }
+      )
+    }
   }
 
   useEffect(() => {
-    if (selectedSecret !== undefined) {
-      setShowSecretValue(false)
-      setSelectedKeyId(selectedSecret.key_id)
+    if (isSuccess && !!secretIdToEdit && !secret) {
+      toast('Secret not found')
+      setSelectedSecretToEdit(null)
     }
-  }, [selectedSecret])
-
-  const validate = (values: any) => {
-    const errors: any = {}
-    if (values.name.length === 0) errors.name = 'Please provide a name for your secret'
-    if (values.secret.length === 0) errors.secret = 'Please enter your secret value'
-    return errors
-  }
-
-  const onUpdateSecret = async (values: any, { setSubmitting }: any) => {
-    if (!project) return console.error('Project is required')
-
-    try {
-      const payload: Partial<VaultSecret> = {}
-      if (values.name !== selectedSecret?.name) payload.name = values.name
-      if (values.description !== selectedSecret?.description)
-        payload.description = values.description
-      if (selectedKeyId !== selectedSecret?.key_id) {
-        let encryptionKeyId = selectedKeyId
-        if (values.keyId === 'create-new') {
-          const addKeyRes = await addKeyMutation({
-            projectRef: project?.ref!,
-            connectionString: project?.connectionString,
-            name: values.keyName || undefined,
-          })
-          if (addKeyRes.error) {
-            return toast.error(`Failed to create new key: ${addKeyRes.error.message}`)
-          } else {
-            encryptionKeyId = addKeyRes[0].id
-          }
-        }
-
-        payload.key_id = encryptionKeyId
-      }
-      payload.secret = values.secret
-
-      if (!isEmpty(payload) && selectedSecret) {
-        setSubmitting(true)
-        const res = await updateSecret({
-          projectRef: project.ref,
-          connectionString: project?.connectionString,
-          id: selectedSecret.id,
-          ...payload,
-        })
-        if (!res.error) {
-          toast.success('Successfully updated secret')
-          setSubmitting(false)
-          onClose()
-        } else {
-          toast.error(`Failed to update secret: ${res.error.message}`)
-          setSubmitting(false)
-        }
-      }
-    } finally {
-    }
-  }
+  }, [isSuccess, secretIdToEdit, secret, setSelectedSecretToEdit])
 
   return (
-    <Modal
-      hideFooter
-      size="medium"
-      visible={selectedSecret !== undefined}
-      onCancel={onClose}
-      header={<h5 className="text-sm text-foreground">Edit secret</h5>}
+    <Dialog
+      open={!!secret}
+      onOpenChange={(open) => {
+        if (!open) {
+          form.reset()
+          setSelectedSecretToEdit(null)
+        }
+      }}
     >
-      <Form
-        id="add-new-secret-form"
-        initialValues={INITIAL_VALUES}
-        validate={validate}
-        validateOnBlur={false}
-        onSubmit={onUpdateSecret}
-      >
-        {({ isSubmitting, resetForm }: any) => {
-          const {
-            data,
-            isLoading: isLoadingSecretValue,
-            isSuccess: isSuccessSecretValue,
-            // [Joshen] JFYI this is breaking rules of hooks, will be fixed once we move to
-            // using react hook form instead
-            // eslint-disable-next-line react-hooks/rules-of-hooks
-          } = useVaultSecretDecryptedValueQuery(
-            {
-              projectRef: project?.ref!,
-              id: selectedSecret?.id!,
-              connectionString: project?.connectionString,
-            },
-            { enabled: !!(project?.ref && selectedSecret?.id) }
-          )
-
-          // [Joshen] JFYI this is breaking rules of hooks, will be fixed once we move to
-          // using react hook form instead
-          // eslint-disable-next-line react-hooks/rules-of-hooks
-          useEffect(() => {
-            if (selectedSecret !== undefined && isSuccessSecretValue) {
-              resetForm({
-                values: { ...INITIAL_VALUES, secret: data },
-                initialValues: { ...INITIAL_VALUES, secret: data },
-              })
-            }
-          }, [selectedSecret, isSuccessSecretValue])
-
-          return isLoadingSecretValue ? (
-            <Modal.Content>
-              <GenericSkeletonLoader />
-            </Modal.Content>
-          ) : (
-            <>
-              <Modal.Content className="space-y-4">
-                <Input id="name" label="Name" />
-                <Input id="description" label="Description" labelOptional="Optional" />
-                <Input
-                  id="secret"
-                  type={showSecretValue ? 'text' : 'password'}
-                  label="Secret value"
-                  actions={
-                    <div className="mr-1">
-                      <Button
-                        type="default"
-                        icon={showSecretValue ? <EyeOff /> : <Eye />}
-                        onClick={() => setShowSecretValue(!showSecretValue)}
-                      />
-                    </div>
-                  }
-                />
-              </Modal.Content>
-              <Modal.Separator />
-              <Modal.Content className="space-y-4">
-                <EncryptionKeySelector
-                  id="keyId"
-                  nameId="keyName"
-                  label="Select a key to encrypt your secret with"
-                  labelOptional="Optional"
-                  selectedKeyId={selectedKeyId}
-                  onSelectKey={setSelectedKeyId}
-                />
-              </Modal.Content>
-              <Modal.Separator />
-              <Modal.Content className="flex items-center justify-end space-x-2">
-                <Button type="default" disabled={isSubmitting} onClick={() => onClose()}>
-                  Cancel
-                </Button>
-                <Button htmlType="submit" disabled={isSubmitting} loading={isSubmitting}>
-                  Update secret
-                </Button>
-              </Modal.Content>
-            </>
-          )
-        }}
-      </Form>
-    </Modal>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit secret</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        {isLoadingSecretValue ? (
+          <DialogSection>
+            <GenericSkeletonLoader />
+          </DialogSection>
+        ) : (
+          <>
+            <DialogSection>
+              <Form {...form}>
+                <form
+                  id={formId}
+                  className="flex flex-col gap-4"
+                  autoComplete="off"
+                  onSubmit={form.handleSubmit(onSubmit)}
+                >
+                  <FormField
+                    key="name"
+                    name="name"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItemLayout name="name" label="Name">
+                        <FormControl>
+                          <Input id="name" {...field} />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                  <FormField
+                    key="description"
+                    name="description"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItemLayout
+                        name="description"
+                        label="Description"
+                        labelOptional="Optional"
+                      >
+                        <FormControl>
+                          <Input id="description" {...field} data-lpignore="true" />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                  <FormField
+                    key="secret"
+                    name="secret"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItemLayout name="secret" label="Secret value">
+                        <FormControl>
+                          <div className="relative">
+                            <Input
+                              id="secret"
+                              type={showSecretValue ? 'text' : 'password'}
+                              {...field}
+                              data-lpignore="true"
+                            />
+                            <Button
+                              type="default"
+                              title={showSecretValue ? `Hide secret value` : `Show secret value`}
+                              aria-label={
+                                showSecretValue ? `Hide secret value` : `Show secret value`
+                              }
+                              className="absolute right-1 top-1 w-7"
+                              icon={showSecretValue ? <EyeOff /> : <Eye />}
+                              onClick={() => setShowSecretValue(!showSecretValue)}
+                            />
+                          </div>
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                </form>
+              </Form>
+            </DialogSection>
+            <DialogFooter>
+              <Button
+                type="default"
+                disabled={isSubmitting}
+                onClick={() => {
+                  form.reset()
+                  setSelectedSecretToEdit(null)
+                }}
+              >
+                Cancel
+              </Button>
+              <Button form={formId} htmlType="submit" loading={isSubmitting}>
+                Update secret
+              </Button>
+            </DialogFooter>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
   )
 }
-
-export default EditSecretModal

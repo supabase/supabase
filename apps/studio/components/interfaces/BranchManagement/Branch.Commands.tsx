@@ -1,10 +1,10 @@
 import { Forward, GitBranch } from 'lucide-react'
-
-import { useBranchesQuery } from 'data/branches/branches-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { PageType, useRegisterCommands, useRegisterPage, useSetPage } from 'ui-patterns/CommandMenu'
+
 import { COMMAND_MENU_SECTIONS } from '../App/CommandMenu/CommandMenu.utils'
 import { orderCommandSectionsByPriority } from '../App/CommandMenu/ordering'
+import { useBranchesQuery } from '@/data/branches/branches-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const SWITCH_BRANCH_PAGE_NAME = 'Switch branch'
 const EMPTY_ARRAY = [] as Array<any>
@@ -12,12 +12,12 @@ const EMPTY_ARRAY = [] as Array<any>
 export function useBranchCommands() {
   const setPage = useSetPage()
 
-  const selectedProject = useSelectedProject()
+  const { data: selectedProject } = useSelectedProjectQuery()
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
 
   let { data: branches } = useBranchesQuery(
     {
-      projectRef: selectedProject?.parentRef,
+      projectRef: selectedProject?.parent_project_ref || selectedProject?.ref,
     },
     { enabled: isBranchingEnabled }
   )

@@ -1,20 +1,20 @@
-import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useQuery } from '@tanstack/react-query'
+import { platformComponents as components } from 'api-types'
 
-import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
+import { getManagedByFromOrganizationPartner } from './managed-by-utils'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OrganizationVariables = { slug?: string }
 export type OrganizationDetail = components['schemas']['OrganizationSlugResponse']
+export type OrganizationPlanID = OrganizationDetail['plan']['id']
 
-function castOrganizationSlugResponseToOrganization(
-  org: components['schemas']['OrganizationSlugResponse']
-) {
+export function castOrganizationSlugResponseToOrganization(org: OrganizationDetail) {
   return {
     ...org,
     billing_email: org.billing_email ?? 'Unknown',
-    managed_by: org.slug.startsWith('vercel_icfg_') ? 'vercel-marketplace' : 'supabase',
+    managed_by: getManagedByFromOrganizationPartner(org.billing_partner, org.integration_source),
     partner_id: org.slug.startsWith('vercel_') ? org.slug.replace('vercel_', '') : undefined,
   }
 }
@@ -35,15 +35,20 @@ export type OrganizationsError = ResponseError
 
 export const useOrganizationQuery = <TData = OrganizationsData>(
   { slug }: OrganizationVariables,
-  { enabled = true, ...options }: UseQueryOptions<OrganizationsData, OrganizationsError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<OrganizationsData, OrganizationsError, TData> = {}
 ) => {
-  return useQuery<OrganizationsData, OrganizationsError, TData>(
-    organizationKeys.detail(slug),
-    ({ signal }) => getOrganization({ slug }, signal),
-    { enabled: enabled && typeof slug !== 'undefined', ...options, staleTime: 30 * 60 * 1000 }
-  )
+  return useQuery<OrganizationsData, OrganizationsError, TData>({
+    queryKey: organizationKeys.detail(slug),
+    queryFn: ({ signal }) => getOrganization({ slug }, signal),
+    enabled: enabled && typeof slug !== 'undefined',
+    ...options,
+    staleTime: 30 * 60 * 1000,
+  })
 }
 
 export function invalidateOrganizationsQuery(client: QueryClient) {
-  return client.invalidateQueries(organizationKeys.list())
+  return client.invalidateQueries({ queryKey: organizationKeys.list() })
 }

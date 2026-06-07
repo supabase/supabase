@@ -1,17 +1,19 @@
-import matter from 'gray-matter'
-import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
-
-import { MDXRemote } from 'next-mdx-remote'
-import { NextSeo } from 'next-seo'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Button } from 'ui'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
+import { breadcrumbs } from '~/lib/breadcrumbs'
 import { SITE_ORIGIN } from '~/lib/constants'
+import { breadcrumbListSchema, serializeJsonLd } from '~/lib/json-ld'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
+import matter from 'gray-matter'
+import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
+import { MDXClient } from 'next-mdx-remote-client/csr'
+import { NextSeo } from 'next-seo'
+import Head from 'next/head'
+import Image from 'next/image'
+import Link from 'next/link'
+import { Button } from 'ui'
 
 // table of contents extractor
 const toc = require('markdown-toc')
@@ -89,6 +91,11 @@ function CaseStudyPage(props: any) {
     url: `${SITE_ORIGIN}/customers/${slug}`,
   }
 
+  const breadcrumbItems = [
+    ...breadcrumbs.customersIndex,
+    { name: meta_title ?? title, url: `https://supabase.com/customers/${slug}` },
+  ]
+
   return (
     <>
       <NextSeo
@@ -112,6 +119,14 @@ function CaseStudyPage(props: any) {
           ],
         }}
       />
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(breadcrumbListSchema(breadcrumbItems)),
+          }}
+        />
+      </Head>
       <DefaultLayout>
         <div
           className="
@@ -142,7 +157,7 @@ function CaseStudyPage(props: any) {
                       Customer Stories
                     </Link>
                     <h1 className="text-foreground text-4xl font-semibold xl:text-5xl">{title}</h1>
-                    <h2 className="text-foreground text-xl xl:text-2xl">{description}</h2>
+                    <p className="text-foreground text-xl xl:text-2xl">{description}</p>
                   </div>
 
                   <div className="grid grid-cols-12 prose max-w-none gap-8 lg:gap-20">
@@ -164,9 +179,9 @@ function CaseStudyPage(props: any) {
                               object-contain
                               m-0
 
-                              [[data-theme*=dark]_&]:brightness-200
-                              [[data-theme*=dark]_&]:contrast-0
-                              [[data-theme*=dark]_&]:filter
+                              in-data-[theme*=dark]:brightness-200
+                              in-data-[theme*=dark]:contrast-0
+                              in-data-[theme*=dark]:filter
                             "
                           />
                         </div>
@@ -213,7 +228,7 @@ function CaseStudyPage(props: any) {
                       </div>
                     </div>
                     <div className="xm:col-span-7 col-span-12 lg:col-span-8 xl:col-span-8 ">
-                      <MDXRemote {...content} components={mdxComponents()} />
+                      <MDXClient {...content} components={mdxComponents()} />
                     </div>
                   </div>
                 </article>

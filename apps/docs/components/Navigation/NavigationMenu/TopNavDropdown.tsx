@@ -19,20 +19,26 @@ import {
   cn,
   themes,
 } from 'ui'
-
 import MenuIconPicker from './MenuIconPicker'
+import { isFeatureEnabled } from 'common'
 
 const menu = [
   [
-    {
-      label: 'Supabase.com',
-      icon: 'home',
-      href: 'https://supabase.com',
-      otherProps: {
-        target: '_blank',
-        rel: 'noreferrer noopener',
-      },
-    },
+    isFeatureEnabled('docs:navigation_dropdown_links_home')
+      ? {
+          label: 'Supabase.com',
+          icon: 'home',
+          href: 'https://supabase.com',
+          otherProps: {
+            target: '_blank',
+            rel: 'noreferrer noopener',
+          },
+        }
+      : {
+          label: 'Dashboard',
+          icon: 'home',
+          href: '../dashboard',
+        },
     {
       label: 'GitHub',
       icon: 'github',
@@ -64,13 +70,13 @@ const TopNavDropdown = () => {
           title="Menu dropdown button"
           className={cn(
             buttonVariants({ type: 'default' }),
-            'text-foreground-light border-default w-[30px] min-w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30 hover:border-strong data-[state=open]:border-stronger hover:!bg-overlay-hover/50 bg-transparent'
+            'text-foreground-light border-default w-[30px] min-w-[30px] h-[30px] data-open:bg-overlay-hover/30 hover:border-strong data-open:border-stronger hover:bg-overlay-hover/50! bg-transparent'
           )}
         >
           <Menu size={18} strokeWidth={1} />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent side="bottom" align="end" className="w-64">
+      <DropdownMenuContent side="bottom" align="end" className="w-52">
         {menu.map((menuSection, sectionIdx) => (
           <Fragment key={`topnav--${sectionIdx}`}>
             {sectionIdx !== 0 && <DropdownMenuSeparator key={`topnav--${sectionIdx}`} />}

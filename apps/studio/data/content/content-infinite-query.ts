@@ -1,0 +1,73 @@
+import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
+
+import { Content, ContentType } from './content-query'
+import { remapSqlContentFields } from './content-remap'
+import { contentKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { UseCustomInfiniteQueryOptions } from '@/types'
+
+interface GetContentVariables {
+  projectRef?: string
+  cursor?: string | undefined
+  type: ContentType
+  name?: string
+  limit?: number
+  sort?: 'name' | 'inserted_at'
+}
+
+export async function getContent(
+  { projectRef, type, name, limit = 10, sort, cursor }: GetContentVariables,
+  signal?: AbortSignal
+) {
+  if (typeof projectRef === 'undefined') {
+    throw new Error('projectRef is required for getContent')
+  }
+
+  const { data, error } = await get('/platform/projects/{ref}/content', {
+    params: {
+      path: { ref: projectRef },
+      query: {
+        type,
+        name,
+        sort_by: sort,
+        limit: limit.toString(),
+        cursor,
+      },
+    },
+    signal,
+  })
+
+  if (error) handleError(error)
+
+  return {
+    cursor: data.cursor,
+    content: remapSqlContentFields(data.data as unknown as Content[]),
+  }
+}
+
+export type ContentData = Awaited<ReturnType<typeof getContent>>
+export type ContentError = unknown
+
+export const useContentInfiniteQuery = <TData = ContentData>(
+  { projectRef, type, name, limit, sort }: GetContentVariables,
+  {
+    enabled = true,
+    ...options
+  }: UseCustomInfiniteQueryOptions<
+    ContentData,
+    ContentError,
+    InfiniteData<TData>,
+    readonly unknown[],
+    string | undefined
+  > = {}
+) => {
+  return useInfiniteQuery({
+    queryKey: contentKeys.infiniteList(projectRef, { type, name, limit, sort }),
+    queryFn: ({ signal, pageParam }) =>
+      getContent({ projectRef, type, name, limit, sort, cursor: pageParam }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    initialPageParam: undefined,
+    getNextPageParam: (lastPage) => lastPage.cursor,
+    ...options,
+  })
+}

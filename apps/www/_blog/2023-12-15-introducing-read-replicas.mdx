@@ -8,11 +8,10 @@ tags:
   - launch-week
   - postgres
 date: '2023-12-15'
-published_at: '2023-12-15:01:00.000-07:00'
 toc_depth: 3
 author: angelico_de_los_reyes
-image: lwx-read-replicas/introducing-read-replicas-og.png
-thumb: lwx-read-replicas/read-replicas-thumb.png
+imgSocial: lwx-read-replicas/introducing-read-replicas-og.png
+imgThumb: lwx-read-replicas/read-replicas-thumb.png
 ---
 
 Today, we are launching support for Postgres Read Replicas. You can use Read Replicas to:
@@ -55,7 +54,7 @@ However, certain workloads may push against the CPU and memory limits of a singl
 
 This is where horizontal scaling is useful. You can add read replicas to scale more easily. Instead of a single database handling all of your traffic, you can split the traffic across multiple databases.
 
-<Admonition type="note" label="Compute Size">
+<Admonition type="note" title="Compute Size">
 
 Our read replicas will inherit the compute size of its primary. They will eventually scale independently.
 

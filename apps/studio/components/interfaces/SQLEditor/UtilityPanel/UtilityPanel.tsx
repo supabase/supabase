@@ -1,26 +1,31 @@
-import { useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
-import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
-import { contentKeys } from 'data/content/keys'
-import { Snippet } from 'data/content/sql-folders-query'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_ } from 'ui'
+import { toast } from 'sonner'
+import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+
 import { ChartConfig } from './ChartConfig'
-import ResultsDropdown from './ResultsDropdown'
-import UtilityActions from './UtilityActions'
-import UtilityTabResults from './UtilityTabResults'
+import { UtilityActions } from './UtilityActions'
+import { UtilityTabExplain } from './UtilityTabExplain'
+import { UtilityTabResults } from './UtilityTabResults'
+import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
+import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
+import { Snippet } from '@/data/content/sql-folders-query'
+import { useTrack } from '@/lib/telemetry/track'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 export type UtilityPanelProps = {
   id: string
   isExecuting?: boolean
+  isExplainExecuting?: boolean
   isDebugging?: boolean
   isDisabled?: boolean
   hasSelection: boolean
   prettifyQuery: () => void
   executeQuery: () => void
+  executeExplainQuery: () => void
   onDebug: () => void
+  buildDebugPrompt: () => string
+  activeTab?: string
+  onActiveTabChange?: (tab: string) => void
 }
 
 const DEFAULT_CHART_CONFIG: ChartConfig = {
@@ -32,22 +37,35 @@ const DEFAULT_CHART_CONFIG: ChartConfig = {
   showGrid: false,
 }
 
-const UtilityPanel = ({
+export const UtilityPanel = ({
   id,
   isExecuting,
+  isExplainExecuting,
   isDebugging,
   isDisabled,
   hasSelection,
   prettifyQuery,
   executeQuery,
+  executeExplainQuery,
   onDebug,
+  buildDebugPrompt,
+  activeTab = 'results',
+  onActiveTabChange,
 }: UtilityPanelProps) => {
   const { ref } = useParams()
-  const queryClient = useQueryClient()
+  const track = useTrack()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const snippet = snapV2.snippets[id]?.snippet
   const result = snapV2.results[id]?.[0]
+
+  const handleTabChange = (tab: string) => {
+    // When switching to the explain tab, trigger the explain query
+    if (tab === 'explain') {
+      executeExplainQuery()
+    }
+    onActiveTabChange?.(tab)
+  }
 
   const { mutate: upsertContent } = useContentUpsertMutation({
     invalidateQueriesOnSuccess: false,
@@ -69,7 +87,7 @@ const UtilityPanel = ({
 
       snapV2.updateSnippet({ id, snippet: newSnippet as unknown as Snippet })
     },
-    onError: async (err, newContent, context) => {
+    onError: async (_err, _newContent, _context) => {
       toast.error(`Failed to update chart. Please try again.`)
     },
   })
@@ -108,17 +126,36 @@ const UtilityPanel = ({
   }
 
   return (
-    <Tabs_Shadcn_ defaultValue="results" className="w-full h-full flex flex-col">
+    <Tabs_Shadcn_
+      value={activeTab}
+      onValueChange={handleTabChange}
+      className="w-full h-full flex flex-col"
+    >
       <TabsList_Shadcn_ className="flex justify-between gap-2 px-4 overflow-x-auto min-h-[42px]">
         <div className="flex items-center gap-4">
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
-            <span className="translate-y-[1px]">Results</span>
+            <span className="translate-y-px">Results</span>
+          </TabsTrigger_Shadcn_>
+          <TabsTrigger_Shadcn_ className="py-3 text-xs" value="explain">
+            <span className="translate-y-px">Explain</span>
           </TabsTrigger_Shadcn_>
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="chart">
-            <span className="translate-y-[1px]">Chart</span>
+            <span className="translate-y-px">Chart</span>
           </TabsTrigger_Shadcn_>
-          {result?.rows && <ResultsDropdown id={id} />}
+
+          {result?.rows && (
+            <DownloadResultsButton
+              type="text"
+              results={result.rows as any[]}
+              fileName={`Supabase Snippet ${snippet.name}`}
+              onDownloadAsCSV={() => track('sql_editor_result_download_csv_clicked')}
+              onCopyAsMarkdown={() => track('sql_editor_result_copy_markdown_clicked')}
+              onCopyAsJSON={() => track('sql_editor_result_copy_json_clicked')}
+              onCopyAsCSV={() => track('sql_editor_result_copy_csv_clicked')}
+            />
+          )}
         </div>
+
         <UtilityActions
           id={id}
           isExecuting={isExecuting}
@@ -128,21 +165,25 @@ const UtilityPanel = ({
           executeQuery={executeQuery}
         />
       </TabsList_Shadcn_>
-      <TabsContent_Shadcn_ asChild value="results" className="mt-0 flex-grow">
+
+      <TabsContent_Shadcn_ asChild value="results" className="mt-0 grow">
         <UtilityTabResults
           id={id}
           isExecuting={isExecuting}
           isDisabled={isDisabled}
           onDebug={onDebug}
+          buildDebugPrompt={buildDebugPrompt}
           isDebugging={isDebugging}
         />
       </TabsContent_Shadcn_>
 
-      <TabsContent_Shadcn_ asChild value="chart" className="mt-0 flex-grow">
+      <TabsContent_Shadcn_ asChild value="explain" className="mt-0 grow">
+        <UtilityTabExplain id={id} isExecuting={isExplainExecuting} />
+      </TabsContent_Shadcn_>
+
+      <TabsContent_Shadcn_ asChild value="chart" className="mt-0 grow">
         <ChartConfig results={result} config={chartConfig} onConfigChange={onConfigChange} />
       </TabsContent_Shadcn_>
     </Tabs_Shadcn_>
   )
 }
-
-export default UtilityPanel

@@ -70,3 +70,10 @@ describe('prod smoke test: crawler pages return correct data', () => {
     expect(headings.includes('examples')).toBe(true)
   })
 })
+
+describe('prod smoke test: ref pages without crawler versions', async () => {
+  it('returns 200', async () => {
+    const result = await fetch(REFERENCE_DOCS_URL + '/api/v1-deploy-a-function')
+    expect(result.status).toBe(200)
+  })
+})

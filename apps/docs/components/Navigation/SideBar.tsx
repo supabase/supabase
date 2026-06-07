@@ -1,10 +1,10 @@
+import { REFERENCES } from '~/content/navigation.references'
+import { ArrowLeft, ChevronRight } from 'lucide-react'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { REFERENCES } from '~/content/navigation.references'
+import { Accordion } from 'radix-ui'
 
-import * as Accordion from '@radix-ui/react-accordion'
-import { ArrowLeft, ChevronRight } from 'lucide-react'
 import { NavMenuGroup, NavMenuSection } from './Navigation.types'
 
 const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
@@ -28,7 +28,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
     if (foundItem) return group
   })
 
-  const currentSubSection: NavMenuSection =
+  const currentSubSection: NavMenuSection | undefined =
     currentSection !== undefined
       ? currentSection.items.find((section) => {
           if (section.items.length === 0) {
@@ -56,9 +56,9 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
           </Link>
           {referenceMeta !== undefined && (
             <div className="my-5 flex items-center space-x-4">
-              <div className="h-10 w-10 rounded bg-surface-100 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-sm bg-surface-100 flex items-center justify-center">
                 <Image
-                  className="rounded"
+                  className="rounded-sm"
                   width={24}
                   height={24}
                   alt={referenceMeta.name}
@@ -77,7 +77,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
               <div
                 key={item.name}
                 className={[
-                  'py-1.5 px-5 rounded text-sm transition',
+                  'py-1.5 px-5 rounded-sm text-sm transition',
                   `${
                     item.url === pathname
                       ? 'bg-background text-brand-link'
@@ -105,7 +105,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                   size={14}
                   strokeWidth={2}
                 />
-                <span className="text-foreground text-sm group-hover:text-brand transition">
+                <span className="text-foreground text-sm group-hover:text-brand-link transition">
                   {group.label}
                 </span>
               </Accordion.Trigger>
@@ -113,13 +113,13 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                 {group.items.map((section: NavMenuSection) => {
                   if (section.items.length === 0) {
                     return (
-                      <Link href={section.url} key={section.name}>
+                      <Link href={section.url || '#'} key={section.name}>
                         <div
                           className={[
-                            'py-1.5 px-5 rounded text-sm transition',
+                            'py-1.5 px-5 rounded-sm text-sm transition',
                             `${
                               section.url === pathname
-                                ? 'bg-background text-brand'
+                                ? 'bg-background text-brand-link'
                                 : 'text-foreground-light hover:text-foreground'
                             }`,
                           ].join(' ')}
@@ -144,20 +144,20 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                               size={14}
                               strokeWidth={2}
                             />
-                            <span className="text-foreground text-sm group-hover:text-brand transition">
+                            <span className="text-foreground text-sm group-hover:text-brand-link transition">
                               {section.name}
                             </span>
                           </Accordion.Trigger>
                           <Accordion.Content className="my-2 data-open:animate-slide-down data-closed:animate-slide-up">
                             {section.items.map((item: NavMenuSection) => (
-                              <Link key={item.name} href={item.url}>
+                              <Link key={item.name} href={item.url || '#'}>
                                 <div
                                   key={item.name}
                                   className={[
-                                    'py-1.5 ml-4 px-5 rounded text-sm transition',
+                                    'py-1.5 ml-4 px-5 rounded-sm text-sm transition',
                                     `${
                                       item.url === pathname
-                                        ? 'bg-background text-brand'
+                                        ? 'bg-background text-brand-link'
                                         : 'text-foreground-light hover:text-foreground'
                                     }`,
                                   ].join(' ')}

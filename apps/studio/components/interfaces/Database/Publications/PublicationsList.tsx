@@ -1,34 +1,69 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop } from 'lodash'
-import { useState } from 'react'
+import { useParams } from 'common'
+import { AlertCircle, Info, Search } from 'lucide-react'
+import Link from 'next/link'
+import { useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Button, Input, Toggle } from 'ui'
+import {
+  Button,
+  Card,
+  Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Table from 'components/to-be-cleaned/Table'
-import InformationBox from 'components/ui/InformationBox'
-import NoSearchResults from 'components/ui/NoSearchResults'
-import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
-import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import PublicationSkeleton from './PublicationSkeleton'
-import { Search, AlertCircle } from 'lucide-react'
+import { PublicationSkeleton } from './PublicationSkeleton'
+import AlertError from '@/components/ui/AlertError'
+import InformationBox from '@/components/ui/InformationBox'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
+import { useDatabasePublicationUpdateMutation } from '@/data/database-publications/database-publications-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface PublicationEvent {
   event: string
   key: string
 }
 
-interface PublicationsListProps {
-  onSelectPublication: (id: number) => void
-}
-
-const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps) => {
-  const { project } = useProjectContext()
+export const PublicationsList = () => {
+  const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
   const [filterString, setFilterString] = useState<string>('')
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
-  const { data, isLoading } = useDatabasePublicationsQuery({
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search publications' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
+    setFilterString('')
+  })
+
+  const {
+    data = [],
+    error,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+  } = useDatabasePublicationsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -39,11 +74,10 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
     },
   })
 
-  const canUpdatePublications = useCheckPermissions(
+  const { can: canUpdatePublications, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'publications'
   )
-  const isPermissionsLoaded = usePermissionsLoaded()
 
   const publicationEvents: PublicationEvent[] = [
     { event: 'Insert', key: 'publish_insert' },
@@ -51,10 +85,11 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
     { event: 'Delete', key: 'publish_delete' },
     { event: 'Truncate', key: 'publish_truncate' },
   ]
-  const publications =
+  const publications = (
     filterString.length === 0
-      ? data ?? []
-      : (data ?? []).filter((publication) => publication.name.includes(filterString))
+      ? data
+      : data.filter((publication) => publication.name.includes(filterString))
+  ).sort((a, b) => a.id - b.id)
 
   const [toggleListenEventValue, setToggleListenEventValue] = useState<{
     publication: any
@@ -77,90 +112,126 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
 
   return (
     <>
-      <div className="mb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <Input
-              size="tiny"
-              icon={<Search size="14" />}
-              placeholder={'Filter'}
-              value={filterString}
-              onChange={(e) => setFilterString(e.target.value)}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center">
+          <Input
+            ref={searchInputRef}
+            size="tiny"
+            icon={<Search />}
+            className="w-48"
+            placeholder="Search for a publication"
+            value={filterString}
+            onChange={(e) => setFilterString(e.target.value)}
+            onKeyDown={onSearchInputEscape(filterString, setFilterString)}
+          />
+        </div>
+        {isPermissionsLoaded && !canUpdatePublications && (
+          <div className="w-[500px]">
+            <InformationBox
+              icon={<AlertCircle className="text-foreground-light" strokeWidth={2} />}
+              title="You need additional permissions to update database publications"
             />
           </div>
-          {isPermissionsLoaded && !canUpdatePublications && (
-            <div className="w-[500px]">
-              <InformationBox
-                icon={<AlertCircle className="text-foreground-light" strokeWidth={2} />}
-                title="You need additional permissions to update database publications"
-              />
-            </div>
-          )}
-        </div>
+        )}
       </div>
 
-      <Table
-        head={[
-          <Table.th key="header.name">Name</Table.th>,
-          <Table.th key="header.id">System ID</Table.th>,
-          <Table.th key="header.insert">Insert</Table.th>,
-          <Table.th key="header.update">Update</Table.th>,
-          <Table.th key="header.delete">Delete</Table.th>,
-          <Table.th key="header.truncate">Truncate</Table.th>,
-          <Table.th key="header.source" className="text-right">
-            Source
-          </Table.th>,
-        ]}
-        body={
-          isLoading
-            ? Array.from({ length: 5 }).map((_, i) => <PublicationSkeleton key={i} index={i} />)
-            : publications.map((x) => (
-                <Table.tr className="border-t" key={x.name}>
-                  <Table.td className="px-4 py-3">{x.name}</Table.td>
-                  <Table.td>{x.id}</Table.td>
-                  {publicationEvents.map((event) => (
-                    <Table.td key={event.key}>
-                      <Toggle
-                        size="tiny"
-                        checked={(x as any)[event.key]}
-                        disabled={!canUpdatePublications}
-                        onChange={() => {
-                          setToggleListenEventValue({
-                            publication: x,
-                            event,
-                            currentStatus: (x as any)[event.key],
-                          })
-                        }}
-                      />
-                    </Table.td>
-                  ))}
-                  <Table.td className="px-4 py-3 pr-2">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        type="default"
-                        style={{ paddingTop: 3, paddingBottom: 3 }}
-                        onClick={() => onSelectPublication(x.id)}
-                      >
-                        {x.tables == null
-                          ? 'All tables'
-                          : `${x.tables.length} ${
-                              x.tables.length > 1 || x.tables.length == 0 ? 'tables' : 'table'
-                            }`}
-                      </Button>
-                    </div>
-                  </Table.td>
-                </Table.tr>
-              ))
-        }
-      />
+      <div className="w-full overflow-hidden overflow-x-auto">
+        <Card>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>System ID</TableHead>
+                <TableHead>Insert</TableHead>
+                <TableHead>Update</TableHead>
+                <TableHead>Delete</TableHead>
+                <TableHead>Truncate</TableHead>
+                <TableHead />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading &&
+                Array.from({ length: 2 }).map((_, i) => <PublicationSkeleton key={i} index={i} />)}
 
-      {!isLoading && publications.length === 0 && (
-        <NoSearchResults
-          searchString={filterString}
-          onResetFilter={() => setFilterString('')}
-          className="rounded-t-none border-t-0"
-        />
-      )}
+              {isError && (
+                <TableRow>
+                  <TableCell colSpan={7}>
+                    <AlertError error={error} subject="Failed to retrieve publications" />
+                  </TableCell>
+                </TableRow>
+              )}
+
+              {!isLoading && publications.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={7}>
+                    <NoSearchResults
+                      searchString={filterString}
+                      onResetFilter={() => setFilterString('')}
+                      className="border-none !p-0"
+                    />
+                  </TableCell>
+                </TableRow>
+              )}
+
+              {isSuccess &&
+                publications.map((x) => (
+                  <TableRow key={x.name}>
+                    <TableCell>
+                      <div className="flex items-center gap-x-2">
+                        {x.name}
+                        {/* [Joshen] Making this tooltip very specific for these 2 publications */}
+                        {['supabase_realtime', 'supabase_realtime_messages_publication'].includes(
+                          x.name
+                        ) && (
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Info size={14} className="text-foreground-light" />
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                              {x.name === 'supabase_realtime'
+                                ? 'Managed by Supabase and handles Postgres changes'
+                                : x.name === 'supabase_realtime_messages_publication'
+                                  ? 'Managed by Supabase and handles broadcasts from the database'
+                                  : undefined}
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>{x.id}</TableCell>
+                    {publicationEvents.map((event) => (
+                      <TableCell key={event.key}>
+                        <Switch
+                          size="small"
+                          checked={(x as any)[event.key]}
+                          disabled={!canUpdatePublications}
+                          onClick={() => {
+                            setToggleListenEventValue({
+                              publication: x,
+                              event,
+                              currentStatus: (x as any)[event.key],
+                            })
+                          }}
+                        />
+                      </TableCell>
+                    ))}
+                    <TableCell>
+                      <div className="flex justify-end">
+                        <Button asChild type="default" style={{ paddingTop: 3, paddingBottom: 3 }}>
+                          <Link href={`/project/${ref}/database/publications/${x.id}`}>
+                            {x.tables === null
+                              ? 'All tables'
+                              : `${x.tables.length} ${x.tables.length === 1 ? 'table' : 'tables'}`}
+                          </Link>
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </Card>
+      </div>
 
       <ConfirmationModal
         visible={toggleListenEventValue !== null}
@@ -181,5 +252,3 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
     </>
   )
 }
-
-export default PublicationsList

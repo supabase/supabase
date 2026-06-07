@@ -1,75 +1,114 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import dayjs from 'dayjs'
-import { ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
-import Link from 'next/link'
+import { IS_PLATFORM, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { FormActions } from 'components/ui/Forms/FormActions'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { FormPanel } from 'components/ui/Forms/FormPanel'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
-import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
-import { useEdgeFunctionUpdateMutation } from 'data/edge-functions/edge-functions-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
+  Card,
+  CardContent,
+  CardFooter,
+  cn,
+  copyToClipboard,
   CriticalIcon,
   Form,
-  Input,
-  Modal,
-  Toggle,
-  cn,
+  FormControl,
+  FormField,
+  Switch,
+  Tabs_Shadcn_ as Tabs,
+  TabsContent_Shadcn_ as TabsContent,
+  TabsList_Shadcn_ as TabsList,
+  TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
-import CommandRender from '../CommandRender'
-import { generateCLICommands } from './EdgeFunctionDetails.utils'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
+import z from 'zod'
 
-const EdgeFunctionDetails = () => {
+import CommandRender from '../CommandRender'
+import { INVOCATION_TABS } from './EdgeFunctionDetails.constants'
+import { generateCLICommands } from './EdgeFunctionDetails.utils'
+import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
+import { useEdgeFunctionDeleteMutation } from '@/data/edge-functions/edge-functions-delete-mutation'
+import { useEdgeFunctionUpdateMutation } from '@/data/edge-functions/edge-functions-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+
+const FormSchema = z.object({
+  name: z.string().min(0, 'Name is required'),
+  verify_jwt: z.boolean(),
+})
+
+export const EdgeFunctionDetails = () => {
   const router = useRouter()
   const { ref: projectRef, functionSlug } = useParams()
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [showInstructions, setShowInstructions] = useState(false)
 
-  const { data: settings } = useProjectSettingsV2Query({ projectRef })
-  const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
+  const showAllEdgeFunctionInvocationExamples = useIsFeatureEnabled(
+    'edge_functions:show_all_edge_function_invocation_examples'
+  )
+  const invocationTabs = useMemo(() => {
+    if (showAllEdgeFunctionInvocationExamples) return INVOCATION_TABS
+    return INVOCATION_TABS.filter((tab) => tab.id === 'curl' || tab.id === 'supabase-js')
+  }, [showAllEdgeFunctionInvocationExamples])
+
+  const [showKey, setShowKey] = useState(false)
+  const [selectedTab, setSelectedTab] = useState(invocationTabs[0].id)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+
+  const { can: canUpdateEdgeFunctionPermission } = useAsyncCheckPermissions(
+    PermissionAction.FUNCTIONS_WRITE,
+    '*'
+  )
+
+  const canUpdateEdgeFunction = IS_PLATFORM && canUpdateEdgeFunctionPermission
+
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
+
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
-  const { mutate: updateEdgeFunction, isLoading: isUpdating } = useEdgeFunctionUpdateMutation()
-  const { mutate: deleteEdgeFunction, isLoading: isDeleting } = useEdgeFunctionDeleteMutation({
+
+  const { data: endpoint } = useProjectApiUrl({ projectRef })
+  const functionUrl = `${endpoint}/functions/v1/${selectedFunction?.slug}`
+
+  const { mutate: updateEdgeFunction, isPending: isUpdating } = useEdgeFunctionUpdateMutation()
+  const { mutate: deleteEdgeFunction, isPending: isDeleting } = useEdgeFunctionDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted "${selectedFunction?.name}"`)
       router.push(`/project/${projectRef}/functions`)
     },
   })
 
-  const formId = 'edge-function-update-form'
-  const canUpdateEdgeFunction = useCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
+  const form = useForm({
+    resolver: zodResolver(FormSchema),
+    defaultValues: { name: '', verify_jwt: false },
+  })
 
-  const { anonKey } = getAPIKeys(settings)
-  const apiKey = anonKey?.api_key ?? '[YOUR ANON KEY]'
+  const { anonKey, publishableKey } = getKeys(apiKeys)
+  const apiKey = publishableKey?.api_key ?? anonKey?.api_key ?? '[YOUR ANON KEY]'
 
-  const protocol = settings?.app_config?.protocol ?? 'https'
-  const endpoint = settings?.app_config?.endpoint ?? ''
-  const functionUrl =
-    customDomainData?.customDomain?.status === 'active'
-      ? `https://${customDomainData.customDomain.hostname}/functions/v1/${selectedFunction?.slug}`
-      : `${protocol}://${endpoint}/functions/v1/${selectedFunction?.slug}`
-
-  const { managementCommands, secretCommands, invokeCommands } = generateCLICommands(
+  const { managementCommands } = generateCLICommands({
     selectedFunction,
     functionUrl,
-    apiKey
-  )
+    anonKey: apiKey,
+  })
 
-  const onUpdateFunction = async (values: any, { resetForm }: any) => {
+  const onUpdateFunction: SubmitHandler<z.infer<typeof FormSchema>> = async (values: any) => {
     if (!projectRef) return console.error('Project ref is required')
     if (selectedFunction === undefined) return console.error('No edge function selected')
 
@@ -81,7 +120,6 @@ const EdgeFunctionDetails = () => {
       },
       {
         onSuccess: () => {
-          resetForm({ values, initialValues: values })
           toast.success(`Successfully updated edge function`)
         },
       }
@@ -94,204 +132,257 @@ const EdgeFunctionDetails = () => {
     deleteEdgeFunction({ projectRef, slug: selectedFunction.slug })
   }
 
-  const hasImportMap = useMemo(
-    () => selectedFunction?.import_map || selectedFunction?.import_map_path,
-    [selectedFunction]
-  )
+  useEffect(() => {
+    if (selectedFunction) {
+      form.reset({
+        name: selectedFunction.name,
+        verify_jwt: selectedFunction.verify_jwt,
+      })
+    }
+  }, [selectedFunction])
 
   return (
-    <>
-      <div className="space-y-4 pb-16 pt-3">
-        <Form id={formId} initialValues={{}} onSubmit={onUpdateFunction}>
-          {({ handleReset, values, initialValues, resetForm }: any) => {
-            const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
-
-            // [Alaister] although this "technically" is breaking the rules of React hooks
-            // it won't error because the hooks are always rendered in the same order
-            // eslint-disable-next-line react-hooks/rules-of-hooks
-            useEffect(() => {
-              if (selectedFunction !== undefined) {
-                const formValues = {
-                  name: selectedFunction?.name,
-                  verify_jwt: selectedFunction?.verify_jwt,
-                }
-                resetForm({ values: formValues, initialValues: formValues })
-              }
-            }, [selectedFunction])
-
-            return (
-              <>
-                <FormPanel
-                  disabled={!canUpdateEdgeFunction}
-                  footer={
-                    <div className="flex py-4 px-8">
-                      <FormActions
-                        form={formId}
-                        isSubmitting={isUpdating}
-                        hasChanges={hasChanges}
-                        handleReset={handleReset}
-                        helper={
-                          !canUpdateEdgeFunction
-                            ? 'You need additional permissions to update this function'
-                            : undefined
-                        }
-                      />
-                    </div>
-                  }
-                >
-                  <FormSection header={<FormSectionLabel>Function Details</FormSectionLabel>}>
-                    <FormSectionContent loading={selectedFunction === undefined}>
-                      <Input id="name" name="name" label="Name" disabled={!canUpdateEdgeFunction} />
-                      <Input
-                        disabled
-                        id="slug"
-                        name="slug"
-                        label="Slug"
-                        value={selectedFunction?.slug}
-                      />
-                      <Input disabled copy label="Endpoint URL" value={functionUrl} />
-                      <Input disabled label="Region" value="All functions are deployed globally" />
-                      <Input
-                        disabled
-                        label="Created at"
-                        value={dayjs(selectedFunction?.created_at ?? 0).format(
-                          'dddd, MMMM D, YYYY h:mm A'
-                        )}
-                      />
-                      <Input
-                        disabled
-                        label="Last updated at"
-                        value={dayjs(selectedFunction?.updated_at ?? 0).format(
-                          'dddd, MMMM D, YYYY h:mm A'
-                        )}
-                      />
-                      <Input disabled label="Deployments" value={selectedFunction?.version ?? 0} />
-                    </FormSectionContent>
-                  </FormSection>
-                  <FormSection header={<FormSectionLabel>Function Configuration</FormSectionLabel>}>
-                    <FormSectionContent loading={selectedFunction === undefined}>
-                      <Toggle
-                        id="verify_jwt"
+    <PageContainer size="small">
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Function configuration</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onUpdateFunction)}>
+              <Card>
+                <CardContent>
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        label="Name"
+                        layout="flex-row-reverse"
+                        description="Your slug and endpoint URL will remain the same"
+                      >
+                        <FormControl>
+                          <Input {...field} className="w-64" disabled={!canUpdateEdgeFunction} />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
+                {IS_PLATFORM && (
+                  <>
+                    <CardContent>
+                      <FormField
+                        control={form.control}
                         name="verify_jwt"
-                        disabled={!canUpdateEdgeFunction}
-                        label="Enforce JWT Verification"
-                        descriptionText="Require a valid JWT in the authorization header when invoking the function"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            label="Verify JWT with legacy secret"
+                            layout="flex-row-reverse"
+                            description={
+                              <>
+                                <p className="mb-2">
+                                  Requires a JWT signed{' '}
+                                  <em className="text-foreground not-italic">
+                                    only by the legacy secret
+                                  </em>{' '}
+                                  in the{' '}
+                                  <code className="text-code-inline break-keep!">
+                                    Authorization
+                                  </code>{' '}
+                                  header. The <code className="text-code-inline">anon</code> key
+                                  satisfies this.
+                                </p>
+                                <p>
+                                  Recommended: OFF with JWT and custom auth logic in your function
+                                  code.
+                                </p>
+                              </>
+                            }
+                          >
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                disabled={!canUpdateEdgeFunction}
+                              />
+                            </FormControl>
+                          </FormItemLayout>
+                        )}
                       />
-                      <div className="space-y-1 border rounded border-default bg-surface-200 px-4 py-4">
-                        <div className="flex items-center space-x-2">
-                          <p className="text-sm">
-                            Import maps are{' '}
-                            <span className={cn(hasImportMap ? 'text-brand' : 'text-amber-900')}>
-                              {hasImportMap ? 'used' : 'not used'}
-                            </span>{' '}
-                            for this function
-                          </p>
-                        </div>
-                        <p className="text-sm text-foreground-light">
-                          Import maps allow the use of bare specifiers in functions instead of
-                          explicit import URLs
-                        </p>
-                        <div className="!mt-4">
-                          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-                            <Link
-                              href="https://supabase.com/docs/guides/functions/import-maps"
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              More about import maps
-                            </Link>
-                          </Button>
-                        </div>
-                      </div>
-                    </FormSectionContent>
-                  </FormSection>
-                </FormPanel>
-              </>
-            )
-          }}
-        </Form>
+                    </CardContent>
 
-        <div
-          className="space-y-6 rounded border bg-surface-100 px-6 py-4 drop-shadow-sm transition-all overflow-hidden"
-          style={{ maxHeight: showInstructions ? 800 : 66 }}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded border bg-foreground p-2 text-background">
-                <Terminal size={18} strokeWidth={2} />
-              </div>
-              <h4>Command line access</h4>
-            </div>
-            <div className="cursor-pointer" onClick={() => setShowInstructions(!showInstructions)}>
-              {showInstructions ? (
-                <Minimize2 size={14} strokeWidth={1.5} />
-              ) : (
-                <Maximize2 size={14} strokeWidth={1.5} />
-              )}
-            </div>
-          </div>
+                    <CardFooter className="flex justify-end space-x-2">
+                      {form.formState.isDirty && (
+                        <Button type="default" onClick={() => form.reset()}>
+                          Cancel
+                        </Button>
+                      )}
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        loading={isUpdating}
+                        disabled={!canUpdateEdgeFunction || !form.formState.isDirty}
+                      >
+                        Save changes
+                      </Button>
+                    </CardFooter>
+                  </>
+                )}
+              </Card>
+            </form>
+          </Form>
+        </PageSectionContent>
+      </PageSection>
 
-          <h5 className="text-base">Deployment management</h5>
-          <CommandRender commands={managementCommands} />
-          <h5 className="text-base">Invoke </h5>
-          <CommandRender commands={invokeCommands} />
-          <h5 className="text-base">Secrets management</h5>
-          <CommandRender commands={secretCommands} />
-        </div>
-
-        <div className="!mt-8">
-          <FormHeader title="Delete Edge Function" description="" />
-          <Alert_Shadcn_ variant="destructive">
-            <CriticalIcon />
-            <AlertTitle_Shadcn_>
-              Once your function is deleted, it can no longer be restored
-            </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              Make sure you have made a backup if you want to restore your edge function
-            </AlertDescription_Shadcn_>
-            <AlertDescription_Shadcn_ className="mt-3">
-              <ButtonTooltip
-                type="danger"
-                disabled={!canUpdateEdgeFunction}
-                loading={selectedFunction?.id === undefined}
-                onClick={() => setShowDeleteModal(true)}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: !canUpdateEdgeFunction
-                      ? 'You need additional permissions to delete edge functions'
-                      : undefined,
-                  },
-                }}
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Invoke function</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <Card>
+            <CardContent className="px-0">
+              <Tabs
+                className="w-full"
+                defaultValue="curl"
+                value={selectedTab}
+                onValueChange={setSelectedTab}
               >
-                Delete edge function
-              </ButtonTooltip>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
-        </div>
-      </div>
+                <TabsList className="flex flex-wrap gap-4 px-6">
+                  {invocationTabs.map((tab) => (
+                    <TabsTrigger key={tab.id} value={tab.id}>
+                      {tab.label}
+                    </TabsTrigger>
+                  ))}
+                  {selectedTab === 'curl' && (
+                    <Button
+                      type="default"
+                      className="ml-auto -translate-y-2 translate-x-3"
+                      onClick={() => setShowKey(!showKey)}
+                    >
+                      {showKey ? 'Hide' : 'Show'} anon key
+                    </Button>
+                  )}
+                </TabsList>
+                {invocationTabs.map((tab) => {
+                  const code = tab.code({
+                    showKey,
+                    functionUrl,
+                    functionName: selectedFunction?.name ?? '',
+                    apiKey,
+                  })
 
-      <Modal
-        size="small"
-        alignFooter="right"
-        header={<h3>Confirm to delete {selectedFunction?.name}</h3>}
-        visible={showDeleteModal}
-        loading={isDeleting}
-        onCancel={() => setShowDeleteModal(false)}
-        onConfirm={onConfirmDelete}
-      >
-        <Modal.Content>
-          <Alert_Shadcn_ variant="warning">
-            <CriticalIcon />
-            <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              Ensure that you have made a backup if you want to restore your edge function
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
-        </Modal.Content>
-      </Modal>
-    </>
+                  return (
+                    <TabsContent key={tab.id} value={tab.id}>
+                      <CodeBlock
+                        value={code}
+                        wrapperClassName="[&>div]:top-0 [&>div]:right-3 px-6"
+                        className={cn(
+                          'p-0 text-xs mt-0! border-none ',
+                          showKey ? '[&>code]:break-all' : '[&>code]:wrap-break-word'
+                        )}
+                        language={tab.language}
+                        wrapLines={false}
+                        hideLineNumbers={tab.hideLineNumbers}
+                        handleCopy={() => {
+                          copyToClipboard(
+                            tab.code({
+                              showKey: true,
+                              functionUrl,
+                              functionName: selectedFunction?.name ?? '',
+                              apiKey,
+                            })
+                          )
+                        }}
+                      />
+                    </TabsContent>
+                  )
+                })}
+              </Tabs>
+            </CardContent>
+          </Card>
+        </PageSectionContent>
+      </PageSection>
+
+      {IS_PLATFORM && (
+        <>
+          <PageSection>
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Develop locally</PageSectionTitle>
+              </PageSectionSummary>
+            </PageSectionMeta>
+            <PageSectionContent>
+              <div className="rounded-sm border bg-surface-100 px-6 py-4 drop-shadow-xs">
+                <div className="space-y-6">
+                  <CommandRender
+                    commands={[
+                      {
+                        command: `supabase functions download ${selectedFunction?.slug}`,
+                        description: 'Download the function to your local machine',
+                        jsx: () => (
+                          <>
+                            <span className="text-brand">supabase</span> functions download{' '}
+                            {selectedFunction?.slug}
+                          </>
+                        ),
+                        comment: '1. Download the function',
+                      },
+                    ]}
+                  />
+                  <CommandRender commands={[managementCommands[0]]} />
+                  <CommandRender commands={[managementCommands[1]]} />
+                </div>
+              </div>
+            </PageSectionContent>
+          </PageSection>
+          <PageSection>
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Delete function</PageSectionTitle>
+              </PageSectionSummary>
+            </PageSectionMeta>
+            <PageSectionContent>
+              <Alert variant="destructive">
+                <CriticalIcon />
+                <AlertTitle>Once your function is deleted, it can no longer be restored</AlertTitle>
+                <AlertDescription>
+                  Make sure you have made a backup if you want to restore your edge function
+                </AlertDescription>
+                <AlertDescription className="mt-3">
+                  <Button
+                    type="danger"
+                    disabled={!canUpdateEdgeFunction}
+                    loading={selectedFunction?.id === undefined}
+                    onClick={() => setShowDeleteModal(true)}
+                  >
+                    Delete edge function
+                  </Button>
+                </AlertDescription>
+              </Alert>
+            </PageSectionContent>
+          </PageSection>
+          <ConfirmationModal
+            visible={showDeleteModal}
+            loading={isDeleting}
+            variant="destructive"
+            confirmLabel="Delete"
+            confirmLabelLoading="Deleting"
+            title={`Confirm to delete ${selectedFunction?.name}`}
+            onCancel={() => setShowDeleteModal(false)}
+            onConfirm={onConfirmDelete}
+            alert={{
+              base: { variant: 'destructive' },
+              title: 'This action cannot be undone',
+              description:
+                'Ensure that you have made a backup if you want to restore your edge function',
+            }}
+          />
+        </>
+      )}
+    </PageContainer>
   )
 }
-
-export default EdgeFunctionDetails

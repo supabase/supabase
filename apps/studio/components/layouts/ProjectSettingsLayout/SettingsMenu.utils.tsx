@@ -1,155 +1,242 @@
+import { useFlag, useParams } from 'common'
 import { ArrowUpRight } from 'lucide-react'
 
-import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import type { Project } from 'data/projects/project-detail-query'
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
-import type { Organization } from 'types'
+import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
-export const generateSettingsMenu = (
-  ref?: string,
-  project?: Project,
-  organization?: Organization,
-  features?: {
-    auth?: boolean
-    edgeFunctions?: boolean
-    storage?: boolean
-    invoices?: boolean
-    diskAndCompute?: boolean
+export const useGenerateSettingsMenu = () => {
+  const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
+  const showDashboardPreferences = useFlag('dashboardPreferences')
+
+  const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
+
+  const {
+    projectSettingsLegacyJwtKeys: legacyJwtKeysEnabled,
+    billingAll: billingEnabled,
+    logsAll,
+    projectSettingsLogDrains,
+  } = useIsFeatureEnabled([
+    'project_settings:legacy_jwt_keys',
+    'billing:all',
+    'logs:all',
+    'project_settings:log_drains',
+  ])
+
+  // Log drains rely on the analytics backend (gated by logs:all) and on the dedicated
+  // log_drains flag. Keep this in sync with ProjectSettings.Commands.tsx.
+  const showLogDrains = logsAll && projectSettingsLogDrains
+
+  const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
+
+  if (!IS_PLATFORM) {
+    return [
+      {
+        title: 'Configuration',
+        items: [
+          {
+            name: 'General',
+            key: 'general',
+            url: `/project/${ref}/settings/general`,
+            items: [],
+          },
+          {
+            name: 'API Keys',
+            key: 'api-keys',
+            url: `/project/${ref}/settings/api-keys`,
+            items: [],
+          },
+          {
+            name: 'JWT Keys',
+            key: 'jwt',
+            url: legacyJwtKeysEnabled
+              ? `/project/${ref}/settings/jwt`
+              : `/project/${ref}/settings/jwt/signing-keys`,
+            items: [],
+          },
+          ...(showLogDrains
+            ? [
+                {
+                  name: `Log Drains`,
+                  key: `log-drains`,
+                  url: `/project/${ref}/settings/log-drains`,
+                  items: [],
+                  shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_LOG_DRAINS,
+                },
+              ]
+            : []),
+        ],
+      },
+      {
+        title: 'Integrations',
+        items: [
+          {
+            name: 'Data API',
+            key: 'api',
+            url: `/project/${ref}/integrations/data_api/overview`,
+            items: [],
+            rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
+          },
+          {
+            name: 'Vault',
+            key: 'vault',
+            url: `/project/${ref}/integrations/vault/overview`,
+            items: [],
+            rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
+            label: 'Beta',
+          },
+        ],
+      },
+    ]
   }
-): ProductMenuGroup[] => {
-  const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
-  const buildingUrl = `/project/${ref}`
-
-  const authEnabled = features?.auth ?? true
-  const edgeFunctionsEnabled = features?.edgeFunctions ?? true
-  const storageEnabled = features?.storage ?? true
-  const newDiskComputeEnabled = features?.diskAndCompute ?? false
 
   return [
     {
-      title: 'Project Settings',
+      title: 'Configuration',
       items: [
         {
           name: 'General',
           key: 'general',
           url: `/project/${ref}/settings/general`,
           items: [],
+          shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_GENERAL,
         },
-        ...(IS_PLATFORM && newDiskComputeEnabled
-          ? [
-              {
-                name: 'Compute and Disk',
-                key: 'compute-and-disk',
-                url: `/project/${ref}/settings/compute-and-disk`,
-                items: [],
-              },
-            ]
-          : []),
+        {
+          name: 'Compute and Disk',
+          key: 'compute-and-disk',
+          url: `/project/${ref}/settings/compute-and-disk`,
+          items: [],
+          disabled: !isProjectActive,
+          shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_COMPUTE_AND_DISK,
+        },
         {
           name: 'Infrastructure',
           key: 'infrastructure',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/infrastructure`,
+          url: `/project/${ref}/settings/infrastructure`,
           items: [],
+          disabled: !isProjectActive,
+          shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_INFRASTRUCTURE,
         },
-        ...(IS_PLATFORM
+
+        {
+          name: 'Integrations',
+          key: 'integrations',
+          url: `/project/${ref}/settings/integrations`,
+          items: [],
+          disabled: !isProjectActive,
+          shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_INTEGRATIONS,
+        },
+        ...(platformWebhooksEnabled
           ? [
               {
-                name: 'Integrations',
-                key: 'integrations',
-                url: `/project/${ref}/settings/integrations`,
+                name: 'Webhooks',
+                key: 'webhooks',
+                url: `/project/${ref}/settings/webhooks`,
                 items: [],
+                disabled: !isProjectActive,
+                shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_WEBHOOKS,
               },
             ]
           : []),
+
         {
-          name: 'Add Ons',
-          key: 'addons',
-          url: `/project/${ref}/settings/addons`,
+          name: 'API Keys',
+          key: 'api-keys',
+          url: `/project/${ref}/settings/api-keys`,
           items: [],
+          disabled: !isProjectActive,
+          shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_API_KEYS,
         },
         {
-          name: 'Vault',
-          key: 'vault',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/vault/overview`,
+          name: 'JWT Keys',
+          key: 'jwt',
+          url: legacyJwtKeysEnabled
+            ? `/project/${ref}/settings/jwt`
+            : `/project/${ref}/settings/jwt/signing-keys`,
           items: [],
-          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
-          label: 'Alpha',
+          disabled: !isProjectActive,
+          shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_JWT_KEYS,
         },
-      ],
-    },
-    {
-      title: 'Configuration',
-      items: [
-        {
-          name: 'Database',
-          key: 'database',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/database`,
-          items: [],
-        },
-        {
-          name: 'API',
-          key: 'api',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
-          items: [],
-        },
-        ...(IS_PLATFORM && authEnabled
-          ? [
-              {
-                name: 'Authentication',
-                key: 'auth',
-                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/auth`,
-                items: [],
-              },
-            ]
-          : []),
-        ...(IS_PLATFORM && storageEnabled
-          ? [
-              {
-                name: 'Storage',
-                key: 'storage',
-                url: `/project/${ref}/settings/storage`,
-                items: [],
-              },
-            ]
-          : []),
-        ...(IS_PLATFORM && edgeFunctionsEnabled
-          ? [
-              {
-                name: 'Edge Functions',
-                key: 'functions',
-                url: `/project/${ref}/settings/functions`,
-                items: [],
-              },
-            ]
-          : []),
-        ...(IS_PLATFORM
+
+        ...(showLogDrains
           ? [
               {
                 name: `Log Drains`,
                 key: `log-drains`,
                 url: `/project/${ref}/settings/log-drains`,
                 items: [],
+                disabled: !isProjectActive,
+                shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_LOG_DRAINS,
+              },
+            ]
+          : []),
+        {
+          name: 'Add-ons',
+          key: 'addons',
+          url: `/project/${ref}/settings/addons`,
+          items: [],
+          shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_ADDONS,
+        },
+        ...(showDashboardPreferences
+          ? [
+              {
+                name: 'Dashboard',
+                key: 'dashboard',
+                url: `/project/${ref}/settings/dashboard`,
+                items: [],
+                shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_DASHBOARD,
               },
             ]
           : []),
       ],
     },
-
+    {
+      title: 'Integrations',
+      items: [
+        {
+          name: 'Data API',
+          key: 'api',
+          url: `/project/${ref}/integrations/data_api/overview`,
+          items: [],
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
+          disabled: !isProjectActive,
+        },
+        {
+          name: 'Vault',
+          key: 'vault',
+          url: `/project/${ref}/integrations/vault/overview`,
+          items: [],
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
+          label: 'Beta',
+          disabled: !isProjectActive,
+        },
+      ],
+    },
     {
       title: 'Billing',
       items: [
-        {
-          name: 'Subscription',
-          key: 'subscription',
-          url: `/org/${organization?.slug}/billing`,
-          items: [],
-        },
-
+        ...(billingEnabled
+          ? [
+              {
+                name: 'Subscription',
+                key: 'subscription',
+                url: `/org/${organization?.slug}/billing`,
+                items: [],
+                rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
+              },
+            ]
+          : []),
         {
           name: 'Usage',
           key: 'usage',
           url: `/org/${organization?.slug}/usage?projectRef=${ref}`,
           items: [],
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
         },
       ],
     },

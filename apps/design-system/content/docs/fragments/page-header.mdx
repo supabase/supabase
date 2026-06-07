@@ -1,0 +1,65 @@
+---
+title: Page Header
+description: A compound component for page title, description, and actions.
+fragment: true
+---
+
+Compound header for page context: optional icon, title, description, and aside actions. Breadcrumbs and sub navigation use [Page Breadcrumbs](./page-breadcrumbs) and [Page Nav](./page-nav) as siblings above this component — see [Layout patterns](../ui-patterns/layout).
+
+<ComponentPreview
+  name="page-header-demo"
+  description="Title, description, icon, and aside actions"
+  align="start"
+  className="p-0"
+  padded={false}
+  peekCode
+  wide
+/>
+
+## Quick reference
+
+| Piece                   | Role                                                                         |
+| ----------------------- | ---------------------------------------------------------------------------- |
+| `PageHeaderMeta`        | Wrapper for icon, summary, and aside — use when the page needs a title block |
+| `PageHeaderIcon`        | Optional icon to the left of the summary                                     |
+| `PageHeaderSummary`     | Groups `PageHeaderTitle` and `PageHeaderDescription`                         |
+| `PageHeaderTitle`       | Page heading (`h1`)                                                          |
+| `PageHeaderDescription` | Supporting text below the title                                              |
+| `PageHeaderAside`       | Page-level actions when there is no filter row above a table                 |
+
+**Sizes:** `small`, `default`, `large`, `full` — passed to `PageHeader` and applied to the meta container width.
+
+## Example
+
+```tsx
+<PageHeader size="default">
+  <PageHeaderMeta>
+    <PageHeaderIcon>
+      <Card className="flex h-14 w-14 shrink-0 items-center justify-center">
+        <Database className="h-5 w-5" />
+      </Card>
+    </PageHeaderIcon>
+    <PageHeaderSummary>
+      <PageHeaderTitle>Templates</PageHeaderTitle>
+      <PageHeaderDescription>Manage email templates for your project.</PageHeaderDescription>
+    </PageHeaderSummary>
+    <PageHeaderAside>
+      <Button type="primary" size="tiny">
+        Create template
+      </Button>
+    </PageHeaderAside>
+  </PageHeaderMeta>
+</PageHeader>
+```
+
+## Sub-components
+
+- `PageHeader` — root; `size` variants: `small`, `default`, `large`, `full`
+- `PageHeaderMeta` — groups icon, summary, and aside
+- `PageHeaderIcon` — optional icon (inside `PageHeaderMeta`)
+- `PageHeaderSummary` — title and description (inside `PageHeaderMeta`)
+- `PageHeaderTitle` — page heading (`h1`)
+- `PageHeaderDescription` — supporting text
+- `PageHeaderAside` — actions when meta is shown
+
+Legacy sub-components `PageHeaderBreadcrumb` and `PageHeaderNavigationTabs` remain for existing pages; prefer [Page Breadcrumbs](./page-breadcrumbs) and [Page Nav](./page-nav) for new work.

@@ -1,112 +1,129 @@
-import Panel from 'components/ui/Panel'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { BASE_PATH, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
 import {
-  Label_Shadcn_,
-  RadioGroup_Shadcn_,
-  RadioGroupLargeItem_Shadcn_,
+  Card,
+  CardContent,
+  Label,
+  RadioGroup,
+  RadioGroupLargeItem,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Separator,
   singleThemes,
-  Switch,
   Theme,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
-const ThemeSettings = () => {
+import { DEFAULT_SIDEBAR_BEHAVIOR } from '@/components/interfaces/Sidebar'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { BASE_PATH } from '@/lib/constants'
+
+export const ThemeSettings = () => {
   const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
 
-  const [allowNavPanelToExpand, setAllowNavPanelToExpand] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
-    true
+  const [sidebarBehaviour, setSidebarBehaviour] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
+    DEFAULT_SIDEBAR_BEHAVIOR
   )
-
-  const [expandNavigationPanel, setExpandNavigationPanel] = useState(allowNavPanelToExpand)
-
   /**
    * Avoid Hydration Mismatch
    * https://github.com/pacocoursey/next-themes?tab=readme-ov-file#avoid-hydration-mismatch
    */
   // useEffect only runs on the client, so now we can safely show the UI
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  useEffect(() => setMounted(true), [])
 
-  if (!mounted) {
-    return null
-  }
+  if (!mounted) return null
 
   function SingleThemeSelection() {
     return (
-      <form>
-        <RadioGroup_Shadcn_
-          name="theme"
-          onValueChange={setTheme}
-          aria-label="Choose a theme"
-          defaultValue={theme}
-          value={theme}
-          className="flex flex-wrap gap-5"
-        >
-          {singleThemes.map((theme: Theme) => (
-            <RadioGroupLargeItem_Shadcn_
-              className="grow p-3"
-              key={theme.value}
-              value={theme.value}
-              label={theme.name}
-            >
-              <SVG src={`${BASE_PATH}/img/themes/${theme.value}.svg?v=2`} />
-            </RadioGroupLargeItem_Shadcn_>
-          ))}
-        </RadioGroup_Shadcn_>
-      </form>
+      <RadioGroup
+        name="theme"
+        onValueChange={setTheme}
+        aria-label="Choose a theme"
+        defaultValue={theme}
+        value={theme}
+        className="grid grid-cols-2 gap-4"
+      >
+        {singleThemes.map((theme: Theme) => (
+          <RadioGroupLargeItem
+            className="p-3 w-full"
+            key={theme.value}
+            value={theme.value}
+            label={theme.name}
+          >
+            <SVG src={`${BASE_PATH}/img/themes/${theme.value}.svg?v=2`} />
+          </RadioGroupLargeItem>
+        ))}
+      </RadioGroup>
     )
   }
 
-  function handleExpandNavigationPanel() {
-    setExpandNavigationPanel(!expandNavigationPanel)
-    setAllowNavPanelToExpand(!allowNavPanelToExpand)
-  }
-
   return (
-    <Panel title={<h5 key="panel-title">Appearance</h5>}>
-      <Panel.Content className="grid gap-8">
-        <div className="grid grid-cols-12">
-          <div className="col-span-4 flex flex-col gap-5">
-            <Label_Shadcn_ htmlFor="theme" className="text-light">
-              Theme mode
-            </Label_Shadcn_>
-            <p className="text-sm text-foreground-light max-w-[220px]">
-              Choose how Supabase looks to you. Select a single theme, or sync with your system.
-            </p>
-          </div>
+    <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Appearance</PageSectionTitle>
+          <PageSectionDescription>
+            Choose how Supabase looks and behaves in the dashboard.
+          </PageSectionDescription>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
+        <Card>
+          <CardContent className="grid grid-cols-12 gap-6">
+            <div className="col-span-full md:col-span-4 flex flex-col gap-2">
+              <Label htmlFor="theme" className="text-foreground">
+                Theme mode
+              </Label>
+              <p className="text-sm text-foreground-light">
+                Choose how Supabase looks to you. Select a single theme, or sync with your system.
+              </p>
+            </div>
 
-          <div className="col-span-8 flex flex-col gap-4">
-            <p className="text-sm text-light">Supabase will use your selected theme</p>
-            <SingleThemeSelection />
-          </div>
-        </div>
-
-        <Separator />
-
-        <FormItemLayout
-          isReactForm={false}
-          label="Expand Navigation menu"
-          layout="flex-row-reverse"
-          description="Allow the Navigation panel to expand on hover"
-          className="pb-3"
-        >
-          <Switch
-            size="large"
-            checked={expandNavigationPanel}
-            onCheckedChange={() => handleExpandNavigationPanel()}
-          />
-        </FormItemLayout>
-      </Panel.Content>
-    </Panel>
+            <div className="col-span-full md:col-span-8 flex flex-col gap-4">
+              <SingleThemeSelection />
+            </div>
+          </CardContent>
+          <Separator />
+          <CardContent>
+            <FormItemLayout
+              isReactForm={false}
+              label="Sidebar behavior"
+              layout="flex-row-reverse"
+              description="Choose your preferred sidebar behavior: open, closed, or expand on hover."
+            >
+              <Select
+                value={sidebarBehaviour}
+                onValueChange={setSidebarBehaviour}
+                aria-label="Select an option"
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose an option" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="open">Expanded</SelectItem>
+                  <SelectItem value="closed">Collapsed</SelectItem>
+                  <SelectItem value="expandable">Expand on hover</SelectItem>
+                </SelectContent>
+              </Select>
+            </FormItemLayout>
+          </CardContent>
+        </Card>
+      </PageSectionContent>
+    </PageSection>
   )
 }
-
-export default ThemeSettings

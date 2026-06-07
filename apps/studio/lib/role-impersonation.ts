@@ -1,5 +1,8 @@
-import type { User } from 'data/auth/users-infinite-query'
+import { getImpersonationSQL, type SafeSqlFragment } from '@supabase/pg-meta'
+
 import { uuidv4 } from './helpers'
+import type { User } from '@/data/auth/users-infinite-query'
+import { RoleImpersonationState as ValtioRoleImpersonationState } from '@/state/role-impersonation-state'
 
 type PostgrestImpersonationRole =
   | {
@@ -13,44 +16,72 @@ type PostgrestImpersonationRole =
   | {
       type: 'postgrest'
       role: 'authenticated'
-      user: User
+      userType: 'native'
+      user?: User
+      aal?: 'aal1' | 'aal2'
+    }
+  | {
+      type: 'postgrest'
+      role: 'authenticated'
+      userType: 'external'
+      externalAuth?: {
+        sub: string
+        additionalClaims?: Record<string, any>
+      }
       aal?: 'aal1' | 'aal2'
     }
 
 export type PostgrestRole = PostgrestImpersonationRole['role']
 
-export type CustomImpersonationRole = {
+type CustomImpersonationRole = {
   type: 'custom'
   role: string
 }
 
 export type ImpersonationRole = PostgrestImpersonationRole | CustomImpersonationRole
 
-function getPostgrestClaims(projectRef: string, role: PostgrestImpersonationRole) {
-  let expiryDate = new Date()
-  expiryDate.setTime(expiryDate.getTime() + 60 * 60 * 1000) // 1 hour
+export function getExp1HourFromNow() {
+  return Math.floor((Date.now() + 60 * 60 * 1000) / 1000)
+}
 
-  const exp = Math.floor(expiryDate.getTime() / 1000)
+export function getPostgrestClaims(projectRef: string, role: PostgrestImpersonationRole) {
+  const exp = getExp1HourFromNow()
   const nowTimestamp = Math.floor(Date.now() / 1000)
 
   if (role.role === 'authenticated') {
-    const user = role.user
+    // Supabase native auth case
+    if (role.userType === 'native' && role.user) {
+      const user = role.user
+      return {
+        aal: role.aal ?? 'aal1',
+        amr: [{ method: 'password', timestamp: nowTimestamp }],
+        app_metadata: user.raw_app_meta_data,
+        aud: 'authenticated',
+        email: user.email,
+        exp,
+        iat: nowTimestamp,
+        iss: `https://${projectRef}.supabase.co/auth/v1`,
+        phone: user.phone,
+        role: user.role ?? role.role,
+        session_id: uuidv4(),
+        sub: user.id,
+        user_metadata: user.raw_user_meta_data,
+        is_anonymous: user.is_anonymous,
+      }
+    }
 
-    return {
-      aal: role.aal ?? 'aal1',
-      amr: [{ method: 'password', timestamp: nowTimestamp }],
-      app_metadata: user.raw_app_meta_data,
-      aud: 'authenticated',
-      email: user.email,
-      exp,
-      iat: nowTimestamp,
-      iss: `https://${projectRef}.supabase.co/auth/v1`,
-      phone: user.phone,
-      role: user.role ?? role.role,
-      session_id: uuidv4(),
-      sub: user.id,
-      user_metadata: user.raw_user_meta_data,
-      is_anonymous: user.is_anonymous,
+    // External auth case
+    if (role.userType === 'external' && role.externalAuth) {
+      return {
+        aal: role.aal ?? 'aal1',
+        aud: 'authenticated',
+        exp,
+        iat: nowTimestamp,
+        role: 'authenticated',
+        session_id: uuidv4(),
+        sub: role.externalAuth.sub,
+        ...role.externalAuth.additionalClaims,
+      }
     }
   }
 
@@ -63,55 +94,20 @@ function getPostgrestClaims(projectRef: string, role: PostgrestImpersonationRole
   }
 }
 
-function getPostgrestRoleImpersonationSql(projectRef: string, role: PostgrestImpersonationRole) {
-  const claims = getPostgrestClaims(projectRef, role)
-
-  return /* SQL */ `
-    select set_config('role', '${role.role}', true),
-           set_config('request.jwt.claims', '${JSON.stringify(claims)}', true),
-           set_config('request.method', 'POST', true),
-           set_config('request.path', '/impersonation-example-request-path', true),
-           set_config('request.headers', '{"accept": "*/*"}', true);
-  `.trim()
-}
-
-// Includes getPostgrestRoleImpersonationSql() and wrapWithRoleImpersonation()
-export const ROLE_IMPERSONATION_SQL_LINE_COUNT = 11
-export const ROLE_IMPERSONATION_NO_RESULTS = 'ROLE_IMPERSONATION_NO_RESULTS'
-
-function getCustomRoleImpersonationSql(roleName: string) {
-  return /* SQL */ `
-    set local role '${roleName}';
-  `
-}
-
-interface WrapWithRoleImpersonationOptions {
-  projectRef: string
-  role?: ImpersonationRole
-}
+export type RoleImpersonationState = Pick<ValtioRoleImpersonationState, 'role' | 'claims'>
 
 export function wrapWithRoleImpersonation(
-  sql: string,
-  { projectRef, role }: WrapWithRoleImpersonationOptions
-) {
-  if (role === undefined) {
-    return sql
-  }
+  sql: SafeSqlFragment,
+  state?: RoleImpersonationState
+): SafeSqlFragment {
+  const { role, claims } = state ?? { role: undefined, claims: undefined }
 
-  const impersonationSql =
-    role.type === 'postgrest'
-      ? getPostgrestRoleImpersonationSql(projectRef, role)
-      : getCustomRoleImpersonationSql(role.role)
+  if (role === undefined) return sql
 
-  return /* SQL */ `
-    ${impersonationSql}
-
-    -- If the users sql returns no rows, pg-meta will
-    -- fallback to returning the result of the impersonation sql.
-    select 1 as "${ROLE_IMPERSONATION_NO_RESULTS}";
-
-    ${sql}
-  `
+  const unexpiredClaims =
+    claims !== undefined ? { ...claims, exp: getExp1HourFromNow() } : undefined
+  const impersonationSql = getImpersonationSQL({ role: role, unexpiredClaims, sql })
+  return impersonationSql
 }
 
 function encodeText(data: string) {
@@ -161,6 +157,10 @@ export function getRoleImpersonationJWT(
   jwtSecret: string,
   role: PostgrestImpersonationRole
 ): Promise<string> {
-  const claims = getPostgrestClaims(projectRef, role)
+  const claims = {
+    ...getPostgrestClaims(projectRef, role),
+    exp: getExp1HourFromNow(),
+  }
+
   return createToken(claims, jwtSecret)
 }

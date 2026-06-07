@@ -1,19 +1,17 @@
-import React, { FC } from 'react'
-
-import { cn } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-
 import type { LucideIcon } from 'lucide-react'
+import React, { type FC, type ReactNode } from 'react'
+import { cn } from 'ui'
 
 interface Props {
   id: string
-  label: string | JSX.Element
-  heading: string | JSX.Element
+  label?: ReactNode
+  heading: ReactNode
   features: Feature[]
 }
 
 type Feature = {
-  icon: LucideIcon
+  icon: LucideIcon | any
   heading: string
   subheading: string
 }

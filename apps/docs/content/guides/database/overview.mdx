@@ -1,97 +1,44 @@
 ---
 id: 'database'
 title: 'Database'
-description: 'Use Supabase to manage your data.'
+description: 'Every Supabase project is a full Postgres database. Learn how to connect, manage, and secure your data.'
 sidebar_label: 'Overview'
 ---
 
-Every Supabase project comes with a full [Postgres](https://www.postgresql.org/) database, a free and open source database which is considered one of the world's most stable and advanced databases.
+Every Supabase project has a full [Postgres](https://www.postgresql.org/) database — not a Postgres abstraction.
 
-## Features
+<Admonition type="tip" label="Working with your database">
 
-### Table view
+You can work with a project's database in several ways:
 
-You don't have to be a database expert to start using Supabase. Our table view makes Postgres as easy to use as a spreadsheet.
+- Visually using the [**Table Editor**](/dashboard/project/_/editor) section of the Dashboard.
+- With query syntax using the [**SQL Editor**](/dashboard/project/_/sql) section of the Dashboard.
+- Programmatically using a variety of methods.
 
-![Table View.](/docs/img/table-view.png)
-
-### Relationships
-
-Dig into the relationships within your data.
-
-<video width="99%" loop muted playsInline controls={true}>
-  <source
-    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/relational-drilldown-zoom.mp4"
-    type="video/mp4"
-  />
-</video>
-
-### Clone tables
-
-You can duplicate your tables, just like you would inside a spreadsheet.
-
-<video width="99%" muted playsInline controls={true}>
-  <source
-    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/duplicate-tables.mp4"
-    type="video/mp4"
-  />
-</video>
-
-### The SQL editor
-
-Supabase comes with a SQL Editor. You can also save your favorite queries to run later!
-
-<video width="99%" muted playsInline controls={true}>
-  <source
-    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/favorites.mp4"
-    type="video/mp4"
-  />
-</video>
-
-### Additional features
-
-- Supabase extends Postgres with realtime functionality using our [Realtime Server](https://github.com/supabase/realtime).
-- Every project is a full Postgres database, with `postgres` level access.
-- Supabase manages your database backups.
-- Import data directly from a CSV or excel spreadsheet.
-
-<Admonition type="note">
-
-Database backups **do not** include objects stored via the Storage API, as the database only includes metadata about these objects. Restoring an old backup does not restore objects that have been deleted since then.
+Read the [Connect to your database](/docs/guides/database/connecting-to-postgres#how-to-connect-to-your-postgres-databases) guide for details on connection strings and options.
 
 </Admonition>
 
-### Extensions
+The database is the foundation that Auth, Storage, Realtime, and Edge Functions are built on, and Supabase manages daily database backups and offers point-in-time recovery on paid plans.
 
-To expand the functionality of your Postgres database, you can use extensions.
-You can enable Postgres extensions with the click of a button within the Supabase dashboard.
+## Get started
 
-<video width="99%" muted playsInline controls={true}>
-  <source
-    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/toggle-extensions.mp4"
-    type="video/mp4"
-  />
-</video>
+If you're new to the database section, these are the pages to read first:
 
-[Learn more](/docs/guides/database/extensions) about all the extensions provided on Supabase.
+- **[Connect to your database](/docs/guides/database/connecting-to-postgres)**: Connection strings, the Supavisor connection pooler, and when to use direct, transaction, or session mode.
+- **[Tables and data](/docs/guides/database/tables)**: Create tables and relationships, and edit rows from the Dashboard.
+- **[Import data](/docs/guides/database/import-data)**: Load existing data from CSV files, `pg_dump`, or another Postgres database.
+- **[Secure your data](/docs/guides/database/secure-data)**: Row Level Security (RLS) is how Supabase makes the database safe to query directly from the client. Read this before exposing any table to your app.
+- **[Extensions](/docs/guides/database/extensions)**: Enable Postgres extensions — including `pgvector` for embeddings, `PostGIS` for geospatial data, and `pg_cron` for scheduled jobs — from the Dashboard.
+- **[Run SQL commands](/dashboard/project/_/sql)**: Use the Dashboard's SQL Editor for ad-hoc queries and saved snippets.
 
-## Terminology
+## Going further
 
-### Postgres or PostgreSQL?
+Once you've covered the basics, these guides help with other use cases and features:
 
-PostgreSQL the database was derived from the POSTGRES Project, a package written at the University of California at Berkeley in 1986.
-This package included a query language called "PostQUEL".
-
-In 1994, Postgres95 was built on top of POSTGRES code, adding an SQL language interpreter as a replacement for PostQUEL.
-Eventually, Postgres95 was renamed to PostgreSQL to reflect the SQL query capability.
-
-After this, many people referred to it as Postgres since it's less prone to confusion. Supabase is all about simplicity, so we also refer to it as Postgres.
-
-## Tips
-
-Read about resetting your database password [here](/docs/guides/database/managing-passwords) and changing the timezone of your server [here](/docs/guides/database/managing-timezones).
-
-## Next steps
-
-- Read more about [Postgres](https://www.postgresql.org/about/)
-- Sign in: [supabase.com/dashboard](https://supabase.com/dashboard)
+- **[Database functions](/docs/guides/database/functions)** and **[triggers](/docs/guides/database/postgres/triggers)**: Run logic inside the database in response to inserts, updates, or deletes.
+- **[Database webhooks](/docs/guides/database/webhooks)**: Send row changes to an external HTTP endpoint.
+- **[Replication and read replicas](/docs/guides/database/replication)**: Stream changes to other systems or read from a geographically closer replica.
+- **[Backups](/docs/guides/platform/backups)**: Daily backups on every project, with point-in-time recovery on paid plans. Backups cover the database itself; objects stored through the Storage API are not included.
+- **[Query performance and optimization](/docs/guides/database/query-optimization)**: Indexes, the query planner, and tools for finding slow queries.
+- **[Roles and permissions](/docs/guides/database/postgres/roles)**: The Postgres roles Supabase ships with and how to add your own.

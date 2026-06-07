@@ -1,41 +1,48 @@
-import { CpuIcon, Lock, Microchip } from 'lucide-react'
-import { useMemo } from 'react'
-import { UseFormReturn } from 'react-hook-form'
-
-import { components } from 'api-types'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
-import { cn, FormField_Shadcn_, RadioGroupCard, RadioGroupCardItem, Skeleton } from 'ui'
+import { ChevronRight, CpuIcon, Lock, Microchip } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { UseFormReturn } from 'react-hook-form'
+import {
+  Button,
+  cn,
+  FormField,
+  RadioGroupCard,
+  RadioGroupCardItem,
+  Skeleton,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import { ComputeBadge } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
-import { ComputeInstanceAddonVariantId } from '../DiskManagement.types'
+import { ComputeInstanceAddonVariantId, InfraInstanceSize } from '../DiskManagement.types'
 import {
   calculateComputeSizePrice,
+  ComputeAddonVariant,
   getAvailableComputeOptions,
-  showMicroUpgrade,
 } from '../DiskManagement.utils'
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import FormMessage from '../ui/FormMessage'
 import { NoticeBar } from '../ui/NoticeBar'
-import { InstanceSpecs } from 'lib/constants'
-import { DocsButton } from 'components/ui/DocsButton'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { getCloudProviderArchitecture } from '@/lib/cloudprovider-utils'
+import { DOCS_URL } from '@/lib/constants'
+
+const INITIALLY_VISIBLE_COUNT = 6
 
 /**
  * to do: this could be a type from api-types
  */
-type ComputeOption = {
-  identifier: ComputeInstanceAddonVariantId
-  name: string
-  price: number
-  price_interval: 'monthly' | 'hourly'
-  meta?: InstanceSpecs
-}
-
 type ComputeSizeFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>
   disabled?: boolean
@@ -43,38 +50,25 @@ type ComputeSizeFieldProps = {
 
 export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
   const { ref } = useParams()
-  const org = useSelectedOrganization()
-  const { control, formState, setValue, trigger } = form
+  const { data: org } = useSelectedOrganizationQuery()
+  const { data: project, isPending: isProjectLoading } = useSelectedProjectQuery()
 
-  const {
-    /**
-     * no error/isError states handled here, as a parent component handles them
-     */
-    data: subscription,
-  } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
+  const { hasAccess: entitledUpdateCompute, isLoading: isEntitlementLoading } =
+    useCheckEntitlements('instances.compute_update_available_sizes')
 
-  const {
-    /**
-     * projectContext is used for:
-     *   - cloud provider
-     *   - infra_compute_size
-     */
-    project,
-    /**
-     * isLoading is used to avoid a useCheckPermissions() race condition
-     */
-    isLoading: isProjectLoading,
-    /**
-     * to do: there is no error/isError variables available for useProjectContext
-     */
-  } = useProjectContext()
+  const showComputePrice = useIsFeatureEnabled('project_addons:show_compute_price')
+
+  const { computeSize } = form.watch()
+
   const {
     data: addons,
-    isLoading: isAddonsLoading,
+    isPending: isAddonsLoading,
     error: addonsError,
   } = useProjectAddonsQuery({ projectRef: ref })
 
-  const isLoading = isProjectLoading || isAddonsLoading
+  const isLoading = isProjectLoading || isAddonsLoading || isEntitlementLoading
+
+  const { control, formState, setValue, trigger } = form
 
   const availableAddons = useMemo(() => {
     return addons?.available_addons ?? []
@@ -88,20 +82,46 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
     return getAvailableComputeOptions(availableAddons, project?.cloud_provider)
   }, [availableAddons, project?.cloud_provider])
 
+  // Expand by default if the project's current compute size is beyond the initial visible set
+  const [showAllSizes, setShowAllSizes] = useState(() => {
+    const idx = availableOptions.findIndex((o) => o.identifier === computeSize)
+    return idx >= INITIALLY_VISIBLE_COUNT
+  })
+
+  // Expand whenever the selected size falls outside the visible set — covers both initial data
+  // load (availableOptions starts empty) and computeSize changes after mount (e.g. form reset)
+  useEffect(() => {
+    const idx = availableOptions.findIndex((o) => o.identifier === computeSize)
+    if (idx >= INITIALLY_VISIBLE_COUNT) {
+      setShowAllSizes(true)
+    }
+  }, [computeSize, availableOptions])
+
+  const subscriptionPitr = addons?.selected_addons.find((addon) => addon.type === 'pitr')
+
   const computeSizePrice = calculateComputeSizePrice({
     availableOptions: availableOptions,
     oldComputeSize: form.formState.defaultValues?.computeSize || 'ci_micro',
     newComputeSize: form.getValues('computeSize'),
-    plan: subscription?.plan.id ?? 'free',
+    plan: org?.plan.id ?? 'free',
   })
 
-  const showUpgradeBadge = showMicroUpgrade(
-    subscription?.plan.id ?? 'free',
-    project?.infra_compute_size ?? 'nano'
-  )
+  const projectComputeSize = project?.infra_compute_size ?? 'nano'
+  const showUpgradeBadge = entitledUpdateCompute && projectComputeSize === 'nano'
+
+  const selectedOptionIndex = availableOptions.findIndex((o) => o.identifier === computeSize)
+  const selectedOptionIsHidden = selectedOptionIndex >= INITIALLY_VISIBLE_COUNT
+
+  // Always show all options if the selected one would be outside the visible slice,
+  // so the active card is never hidden from the user.
+  const visibleOptions =
+    showAllSizes || selectedOptionIsHidden
+      ? availableOptions
+      : availableOptions.slice(0, INITIALLY_VISIBLE_COUNT)
+  const hasHiddenOptions = availableOptions.length > INITIALLY_VISIBLE_COUNT
 
   return (
-    <FormField_Shadcn_
+    <FormField
       name="computeSize"
       control={control}
       render={({ field }) => (
@@ -120,12 +140,13 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
         >
           <FormItemLayout
             layout="horizontal"
-            label={'Compute size'}
+            label="Compute size"
             id={field.name}
+            className="gap-5"
             labelOptional={
               <>
                 <BillingChangeBadge
-                  className={'mb-2'}
+                  className="mb-2"
                   show={
                     formState.isDirty &&
                     formState.dirtyFields.computeSize &&
@@ -133,7 +154,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                   }
                   beforePrice={Number(computeSizePrice.oldPrice)}
                   afterPrice={Number(computeSizePrice.newPrice)}
-                  free={showUpgradeBadge && form.watch('computeSize') === 'ci_micro' ? true : false}
+                  free={showUpgradeBadge && computeSize === 'ci_micro' ? true : false}
                 />
                 <p className="text-foreground-lighter">
                   Hardware resources allocated to your Postgres database
@@ -142,7 +163,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                 <div className="mt-3">
                   <DocsButton
                     abbrev={false}
-                    href="https://supabase.com/docs/guides/platform/compute-and-disk"
+                    href={`${DOCS_URL}/guides/platform/compute-and-disk`}
                   />
                 </div>
 
@@ -151,15 +172,21 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                   type="default"
                   className="mt-3 border-violet-900 bg-violet-200 [&_h5]:text-violet-1100"
                   visible={showUpgradeBadge && form.watch('computeSize') === 'ci_nano'}
-                  title={'Upgrade to Micro Compute at no additional charge'}
+                  title={'Upgrade to Micro Compute'}
                   description="This Project is already paying for Micro Compute. You can upgrade to Micro Compute at any time when convenient."
                 />
               </>
             }
           >
-            <div className={!addonsError ? 'grid grid-cols-2 xl:grid-cols-3 flex-wrap gap-3' : ''}>
+            <div
+              className={
+                !addonsError
+                  ? 'grid gap-4 grid-cols-[repeat(auto-fit,minmax(min(100%,13em),1fr))]'
+                  : ''
+              }
+            >
               {isLoading ? (
-                Array(10)
+                Array(INITIALLY_VISIBLE_COUNT)
                   .fill(0)
                   .map((_, i) => <Skeleton key={i} className="w-full h-[110px] rounded-md" />)
               ) : addonsError ? (
@@ -167,69 +194,160 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                   <p>{addonsError?.message}</p>
                 </FormMessage>
               ) : (
-                availableOptions.map((compute: ComputeOption) => {
-                  const cpuArchitecture = getCloudProviderArchitecture(project?.cloud_provider)
+                <>
+                  {visibleOptions.map((compute) => {
+                    const cpuArchitecture = getCloudProviderArchitecture(project?.cloud_provider)
 
-                  const lockedOption =
-                    subscription?.plan.id !== 'free' &&
-                    project?.infra_compute_size !== 'nano' &&
-                    compute.identifier === 'ci_nano'
+                    const lockedMicroDueToPITR =
+                      compute.identifier === 'ci_micro' && !!subscriptionPitr
+                    const lockedNanoDueToPlan =
+                      org?.plan.id !== 'free' &&
+                      project?.infra_compute_size !== 'nano' &&
+                      compute.identifier === 'ci_nano'
 
-                  const price =
-                    subscription?.plan.id !== 'free' &&
-                    project?.infra_compute_size === 'nano' &&
-                    compute.identifier === 'ci_nano'
-                      ? availableOptions.find(
-                          (option: ComputeOption) => option.identifier === 'ci_micro'
-                        )?.price
-                      : compute.price
+                    const lockedOption = lockedNanoDueToPlan || lockedMicroDueToPITR
 
-                  return (
-                    <RadioGroupCardItem
-                      id={compute.identifier}
-                      key={compute.identifier}
-                      showIndicator={false}
-                      value={compute.identifier}
-                      className={cn(
-                        'relative text-sm text-left flex flex-col gap-0 px-0 py-3 [&_label]:w-full group] w-full h-[110px]',
-                        lockedOption && 'opacity-50'
-                      )}
-                      disabled={disabled || lockedOption}
-                      // @ts-expect-error
-                      label={
-                        <>
-                          {showUpgradeBadge && compute.identifier === 'ci_micro' && (
-                            <div className="absolute -top-4 -right-3 text-violet-1100 flex items-center gap-1 bg-surface-75 py-0.5 px-2 rounded-full border border-violet-900">
-                              <span>No additional charge</span>
-                            </div>
-                          )}
-                          <div className="w-full flex flex-col gap-3 justify-between">
-                            <div className="relative px-3 opacity-50 group-data-[state=checked]:opacity-100 flex justify-between">
-                              <ComputeBadge
-                                className="inline-flex font-semibold"
-                                infraComputeSize={
-                                  compute.name as components['schemas']['DbInstanceSize']
-                                }
-                              />
-                              <div className="flex items-center space-x-1">
-                                {lockedOption ? (
-                                  <div className="bg border rounded-lg h-7 w-7 flex items-center justify-center">
-                                    <Lock size={14} />
+                    const price =
+                      org?.plan.id !== 'free' &&
+                      project?.infra_compute_size === 'nano' &&
+                      compute.identifier === 'ci_nano'
+                        ? availableOptions.find(
+                            (option: ComputeAddonVariant) => option.identifier === 'ci_micro'
+                          )?.price
+                        : compute.price
+
+                    const cpuLabel = (() => {
+                      const cpuCores = compute.meta?.cpu_cores
+                      if (typeof cpuCores === 'number') {
+                        return `${cpuCores}-core ${cpuArchitecture} CPU`
+                      }
+                      if (cpuCores) {
+                        return `${cpuCores} CPU`
+                      }
+                      return 'CPU'
+                    })()
+
+                    return (
+                      <RadioGroupCardItem
+                        showIndicator={false}
+                        id={compute.identifier}
+                        key={compute.identifier}
+                        value={compute.identifier}
+                        className={cn(
+                          'relative text-sm text-left flex flex-col gap-0 px-0 py-3 [&_label]:w-full group w-full h-[110px]',
+                          lockedOption && 'opacity-50'
+                        )}
+                        disabled={disabled || lockedOption}
+                        label={
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div>
+                                {showUpgradeBadge && compute.identifier === 'ci_micro' && (
+                                  <div className="absolute -top-4 -right-3 text-violet-1100 flex items-center gap-1 bg-surface-75 py-0.5 px-2 rounded-full border border-violet-900">
+                                    <span>No additional charge</span>
                                   </div>
-                                ) : (
-                                  <>
-                                    <span className="text-foreground text-sm font-semibold">
-                                      ${price}
-                                    </span>
-                                    <span className="text-foreground-light translate-y-[1px]">
-                                      {' '}
-                                      / {compute.price_interval === 'monthly' ? 'month' : 'hour'}
-                                    </span>
-                                  </>
                                 )}
+                                <div className="w-full flex flex-col gap-3 justify-between">
+                                  <div className="relative px-3 opacity-50 group-data-checked:opacity-100 flex justify-between">
+                                    <ComputeBadge
+                                      className="inline-flex font-semibold"
+                                      infraComputeSize={compute.name as InfraInstanceSize}
+                                    />
+                                    <div className="flex items-center space-x-1">
+                                      {lockedOption ? (
+                                        <div className="bg border rounded-lg h-7 w-7 flex items-center justify-center">
+                                          <Lock size={14} />
+                                        </div>
+                                      ) : (
+                                        showComputePrice && (
+                                          <>
+                                            <span
+                                              className="text-foreground text-sm font-semibold"
+                                              translate="no"
+                                            >
+                                              ${price}
+                                            </span>
+                                            <span className="text-foreground-light translate-y-px">
+                                              {' '}
+                                              /{' '}
+                                              {compute.price_interval === 'monthly'
+                                                ? 'month'
+                                                : 'hour'}
+                                            </span>
+                                          </>
+                                        )
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  <div className="w-full">
+                                    <div className="px-3 text-sm flex flex-col gap-1">
+                                      <div className="text-foreground-light flex gap-2 items-center">
+                                        <Microchip
+                                          strokeWidth={1}
+                                          size={14}
+                                          className="text-foreground-lighter"
+                                        />
+                                        <span>
+                                          {compute.identifier === 'ci_nano' && 'Up to '}
+                                          {compute.meta?.memory_gb ?? 0} GB memory
+                                        </span>
+                                      </div>
+                                      <div className="text-foreground-light flex gap-2 items-center">
+                                        <CpuIcon
+                                          strokeWidth={1}
+                                          size={14}
+                                          className="text-foreground-lighter"
+                                        />
+                                        <span>{cpuLabel}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </TooltipTrigger>
+                            {lockedMicroDueToPITR && (
+                              <TooltipContent side="bottom" className="w-64 text-center">
+                                Project has PITR enabled which requires a minimum of Small compute.
+                                Please{' '}
+                                <InlineLink href="/project/_/settings/addons?panel=pitr">
+                                  disable PITR
+                                </InlineLink>{' '}
+                                first before selecting Micro
+                              </TooltipContent>
+                            )}
+                          </Tooltip>
+                        }
+                      />
+                    )
+                  })}
+
+                  {showAllSizes && (
+                    <RadioGroupCardItem
+                      id="larger-compute"
+                      key="larger-compute"
+                      showIndicator={false}
+                      value="larger-compute"
+                      onClick={(e) => e.preventDefault()}
+                      className={cn(
+                        'relative text-sm text-left flex flex-col gap-0 px-0 py-3 [&_label]:w-full group w-full h-[110px]'
+                      )}
+                      label={
+                        <SupportLink
+                          queryParams={{
+                            projectRef: ref,
+                            category: SupportCategories.SALES_ENQUIRY,
+                            subject: 'Enquiry about larger instance sizes',
+                          }}
+                        >
+                          <div className="w-full flex flex-col gap-3 justify-between">
+                            <div className="relative px-3 flex justify-between">
+                              <ComputeBadge infraComputeSize=">16XL" />
+
+                              <div className="flex items-center space-x-1 opacity-50 ">
+                                <span className="text-foreground-light text-sm">Contact Us</span>
                               </div>
                             </div>
-
                             <div className="w-full">
                               <div className="px-3 text-sm flex flex-col gap-1">
                                 <div className="text-foreground-light flex gap-2 items-center">
@@ -238,10 +356,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                     size={14}
                                     className="text-foreground-lighter"
                                   />
-                                  <span>
-                                    {compute.identifier === 'ci_nano' && 'Up to '}
-                                    {compute.meta?.memory_gb ?? 0} GB memory
-                                  </span>
+                                  <span>Custom memory</span>
                                 </div>
                                 <div className="text-foreground-light flex gap-2 items-center">
                                   <CpuIcon
@@ -249,23 +364,39 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                     size={14}
                                     className="text-foreground-lighter"
                                   />
-                                  <span>
-                                    {compute.meta?.cpu_cores ?? 0}
-                                    {compute.meta?.cpu_cores !== 'Shared' &&
-                                      `-core ${cpuArchitecture}`}{' '}
-                                    CPU
-                                  </span>
+                                  <span>Custom CPU</span>
                                 </div>
                               </div>
                             </div>
                           </div>
-                        </>
+                        </SupportLink>
                       }
                     />
-                  )
-                })
+                  )}
+                </>
               )}
             </div>
+
+            {!isLoading && !addonsError && hasHiddenOptions && (
+              <Button
+                type="default"
+                size="tiny"
+                className="mt-4"
+                aria-expanded={showAllSizes}
+                // Prevent collapsing when the selected size would become hidden
+                disabled={showAllSizes && selectedOptionIsHidden}
+                onClick={() => setShowAllSizes((prev) => !prev)}
+                icon={
+                  <ChevronRight
+                    size={14}
+                    strokeWidth={1.5}
+                    className={cn('transition-transform', showAllSizes && '-rotate-90')}
+                  />
+                }
+              >
+                {showAllSizes ? 'Show fewer sizes' : 'Show all sizes'}
+              </Button>
+            )}
           </FormItemLayout>
         </RadioGroupCard>
       )}

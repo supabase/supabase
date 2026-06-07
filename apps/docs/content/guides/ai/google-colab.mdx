@@ -15,7 +15,7 @@ sidebar_label: 'Google Colab'
 
 Google Colab is a hosted Jupyter Notebook service. It provides free access to computing resources, including GPUs and TPUs, and is well-suited to machine learning, data science, and education. We can use Colab to manage collections using [Supabase Vecs](/docs/guides/ai/vecs-python-client).
 
-In this tutorial we'll connect to a database running on the Supabase [platform](https://supabase.com/dashboard/). If you don't already have a database, you can create one here: [database.new](https://database.new).
+In this tutorial we'll connect to a database running on the Supabase [platform](/dashboard/). If you don't already have a database, you can create one here: [database.new](https://database.new).
 
 ## Create a new notebook
 
@@ -37,7 +37,7 @@ pip install vecs
 
 ## Connect to your database
 
-Find the Postgres pooler connection string for your Supabase project in the [database settings](https://supabase.com/dashboard/project/_/settings/database) of the dashboard. Copy the "URI" format, which should look something like `postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:6543/postgres`
+On your project dashboard, click [Connect](/dashboard/project/_?showConnect=true). The connection string should look like `postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:6543/postgres`
 
 Create a new code block below the install block (`ctrl+m b`) and add the following code using the Postgres URI you copied above:
 
@@ -77,7 +77,7 @@ collection.upsert(
 )
 ```
 
-This will create a table inside your database within the `vecs` schema, called `colab_collection`. You can view the inserted items in the [Table Editor](https://supabase.com/dashboard/project/_/editor/), by selecting the `vecs` schema from the schema dropdown.
+This will create a table inside your database within the `vecs` schema, called `colab_collection`. You can view the inserted items in the [Table Editor](/dashboard/project/_/editor/), by selecting the `vecs` schema from the schema dropdown.
 
 ![Colab documents](/docs/img/ai/google-colab/colab-documents.png)
 

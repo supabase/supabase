@@ -1,27 +1,40 @@
-import { Code } from 'lucide-react'
-import { useAppStateSnapshot } from 'state/app-state'
-import { Button } from 'ui'
+import { BookOpenText } from 'lucide-react'
+
+import { ButtonTooltip } from './ButtonTooltip'
+import { useTrack } from '@/lib/telemetry/track'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 interface APIDocsButtonProps {
   section?: string[]
+  source: string
+  label?: string
+  tooltip?: string
 }
 
-const APIDocsButton = ({ section }: APIDocsButtonProps) => {
+export const APIDocsButton = ({ section, source, label, tooltip }: APIDocsButtonProps) => {
   const snap = useAppStateSnapshot()
+  const track = useTrack()
 
   return (
-    <Button
+    <ButtonTooltip
       size="tiny"
       type="default"
       onClick={() => {
         if (section) snap.setActiveDocsSection(section)
         snap.setShowProjectApiDocs(true)
+
+        track('api_docs_opened', { source })
       }}
-      icon={<Code strokeWidth={1.5} className="text-foreground-muted" />}
+      icon={<BookOpenText />}
+      className={label ? undefined : 'w-7'}
+      tooltip={{
+        content: {
+          side: 'bottom',
+          text: tooltip ?? 'API Docs',
+        },
+      }}
     >
-      API Docs
-    </Button>
+      {label}
+    </ButtonTooltip>
   )
 }
-
-export default APIDocsButton

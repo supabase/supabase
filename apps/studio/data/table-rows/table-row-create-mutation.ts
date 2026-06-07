@@ -1,21 +1,22 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { Query } from '@supabase/pg-meta/src/query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { Query } from 'components/grid/query/Query'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
-import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import type { ResponseError } from 'types'
 import { tableRowKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
+import { useTrack } from '@/lib/telemetry/track'
+import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type TableRowCreateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   table: { id: number; name: string; schema?: string }
   payload: any
   enumArrayColumns: string[]
   returning?: boolean
-  impersonatedRole?: ImpersonationRole
+  roleImpersonationState?: RoleImpersonationState
 }
 
 export function getTableRowCreateSql({
@@ -37,21 +38,18 @@ export async function createTableRow({
   payload,
   enumArrayColumns,
   returning,
-  impersonatedRole,
+  roleImpersonationState,
 }: TableRowCreateVariables) {
   const sql = wrapWithRoleImpersonation(
     getTableRowCreateSql({ table, payload, enumArrayColumns, returning }),
-    {
-      projectRef,
-      role: impersonatedRole,
-    }
+    roleImpersonationState
   )
 
   const { result } = await executeSql({
     projectRef,
     connectionString,
     sql,
-    isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+    isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
   })
 
   return result
@@ -64,27 +62,39 @@ export const useTableRowCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<TableRowCreateData, ResponseError, TableRowCreateVariables>,
+  UseCustomMutationOptions<TableRowCreateData, ResponseError, TableRowCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
+  const track = useTrack()
 
-  return useMutation<TableRowCreateData, ResponseError, TableRowCreateVariables>(
-    (vars) => createTableRow(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, table } = variables
-        await queryClient.invalidateQueries(tableRowKeys.tableRowsAndCount(projectRef, table.id))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(data.message)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<TableRowCreateData, ResponseError, TableRowCreateVariables>({
+    mutationFn: (vars) => createTableRow(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, table } = variables
+
+      track(
+        'table_data_added',
+        {
+          method: 'table_editor',
+          schema_name: table.schema,
+          table_name: table.name,
+        },
+        { project: projectRef }
+      )
+
+      await queryClient.invalidateQueries({
+        queryKey: tableRowKeys.tableRowsAndCount(projectRef, table.id),
+      })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(data.message)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -1,16 +1,23 @@
 export type projectKeys = {
   apiUrl: string | null
   anonKey: string | null
+  publishableKey: string | null
 }
 
 export interface ContentFileProps {
   projectKeys: {
     apiUrl: string
-    anonKey: string
+    anonKey?: string
+    publishableKey?: string
   }
   connectionStringPooler: {
-    transaction: string
-    session: string
+    transactionShared: string
+    sessionShared: string
+    transactionDedicated?: string
+    sessionDedicated?: string
+    ipv4SupportedForDedicatedPooler: boolean
+    direct?: string
   }
-  connectionStringDirect: string
+  connectionTab: 'App Frameworks' | 'Mobile Frameworks' | 'ORMs'
+  onCopy?: () => void
 }

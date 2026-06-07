@@ -1,15 +1,4 @@
-import { isEqual } from 'lodash'
-import { ChevronRight, XCircle } from 'lucide-react'
-import type { HTMLAttributes, PropsWithChildren } from 'react'
-
-import {
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  cn,
-  CodeBlock,
-} from 'ui'
-
+import ApiSchema from '~/components/ApiSchema'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import { MDXRemoteRefs } from '~/features/docs/Reference.mdx'
 import type {
@@ -21,10 +10,14 @@ import type {
 import { TYPESPEC_NODE_ANONYMOUS } from '~/features/docs/Reference.typeSpec'
 import { ReferenceSectionWrapper } from '~/features/docs/Reference.ui.client'
 import { normalizeMarkdown } from '~/features/docs/Reference.utils'
+import { isEqual } from 'lodash-es'
+import { ChevronRight, XCircle } from 'lucide-react'
+import type { HTMLAttributes, PropsWithChildren } from 'react'
+import ReactMarkdown from 'react-markdown'
+import { Badge, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
+
 import { getTypeDisplayFromSchema, IApiEndPoint, type ISchema } from './Reference.api.utils'
 import { API_REFERENCE_REQUEST_BODY_SCHEMA_DATA_ATTRIBUTES } from './Reference.ui.shared'
-import ReactMarkdown from 'react-markdown'
-import ApiSchema from '~/components/ApiSchema'
 
 interface SectionProps extends PropsWithChildren {
   link: string
@@ -37,11 +30,11 @@ function Section({ slug, link, columns = 'single', children }: SectionProps) {
 
   return (
     <ReferenceSectionWrapper
-      id={slug}
+      id={slug || ''}
       link={link}
       className={cn(
         'grid grid-cols-[1fr] gap-x-16 gap-y-8',
-        singleColumn ? 'max-w-3xl' : '@4xl/article:grid-cols-[1fr,1fr]'
+        singleColumn ? 'max-w-3xl' : '@4xl/article:grid-cols-[1fr_1fr]'
       )}
     >
       {children}
@@ -67,7 +60,7 @@ function Examples({ children }: PropsWithChildren) {
 
 function EducationSection({ children, slug, ...props }: SectionProps) {
   return (
-    <ReferenceSectionWrapper id={slug} className={'prose max-w-none'} {...props}>
+    <ReferenceSectionWrapper id={slug || ''} className={'prose max-w-none'} {...props}>
       {children}
     </ReferenceSectionWrapper>
   )
@@ -90,7 +83,7 @@ export const RefSubLayout = {
 }
 
 interface StickyHeaderProps {
-  title?: string
+  title?: React.ReactNode | string
   monoFont?: boolean
   className?: string
 }
@@ -100,7 +93,7 @@ export function StickyHeader({ title, monoFont = false, className }: StickyHeade
     <h2
       tabIndex={-1} // For programmatic focus on auto-scroll to section
       className={cn(
-        'sticky top-0 z-[1]',
+        'sticky top-0 z-1',
         'w-full',
         // Enough padding to cover the background when stuck to the top,
         // then readjust with negative margin to prevent it looking too
@@ -108,10 +101,10 @@ export function StickyHeader({ title, monoFont = false, className }: StickyHeade
         'pt-[calc(var(--header-height)+1rem)] -mt-[calc(var(--header-height)+1rem-2px)]',
         // Same for bottom
         'pb-8 -mb-3',
-        'bg-gradient-to-b from-background from-85% to-transparent to-100%',
+        'bg-linear-to-b from-background from-85% to-transparent to-100%',
         'text-2xl font-medium text-foreground',
         'scroll-mt-[calc(var(--header-height)+1rem)]',
-        'focus:outline-none',
+        'focus:outline-hidden',
         monoFont && 'font-mono',
         className
       )}
@@ -123,27 +116,24 @@ export function StickyHeader({ title, monoFont = false, className }: StickyHeade
 
 export function CollapsibleDetails({ title, content }: { title: string; content: string }) {
   return (
-    <Collapsible_Shadcn_>
-      <CollapsibleTrigger_Shadcn_
+    <Collapsible>
+      <CollapsibleTrigger
         className={cn(
           'group',
           'w-full h-8',
-          'border bg-surface-100 rounded',
+          'border bg-surface-100 rounded-sm',
           'px-5',
           'flex items-center gap-3',
           'text-xs text-foreground-light',
-          'data-[state=open]:bg-surface-200',
-          'data-[state=open]:rounded-b-none data-[state=open]:border-b-0',
-          'transition-safe-all ease-out'
+          'data-open:bg-surface-200',
+          'data-open:rounded-b-none data-open:border-b-0',
+          'transition motion-reduce:duration-1 ease-out'
         )}
       >
-        <ChevronRight
-          size={12}
-          className="group-data-[state=open]:rotate-90 transition-transform"
-        />
+        <ChevronRight size={12} className="group-data-open:rotate-90 transition-transform" />
         {title}
-      </CollapsibleTrigger_Shadcn_>
-      <CollapsibleContent_Shadcn_
+      </CollapsibleTrigger>
+      <CollapsibleContent
         className={cn(
           'border border-default bg-surface-100 rounded-b',
           'px-5 py-2',
@@ -151,8 +141,8 @@ export function CollapsibleDetails({ title, content }: { title: string; content:
         )}
       >
         <MDXRemoteRefs source={content} />
-      </CollapsibleContent_Shadcn_>
-    </Collapsible_Shadcn_>
+      </CollapsibleContent>
+    </Collapsible>
   )
 }
 
@@ -200,7 +190,7 @@ function ParamOrTypeDetails({ paramOrType }: { paramOrType: object }) {
     'description' in paramOrType
       ? (paramOrType.description as string)
       : isFromTypespec(paramOrType)
-        ? paramOrType.comment?.shortText ?? ''
+        ? (paramOrType.comment?.shortText ?? '')
         : ''
 
   const subContent =
@@ -210,6 +200,8 @@ function ParamOrTypeDetails({ paramOrType }: { paramOrType: object }) {
         ? getSubDetails(paramOrType)
         : undefined
 
+  const defaultOpen = isDefaultExpanded(paramOrType)
+
   return (
     <>
       <div className="flex flex-wrap items-baseline gap-3">
@@ -218,14 +210,14 @@ function ParamOrTypeDetails({ paramOrType }: { paramOrType: object }) {
             ? '[Anonymous]'
             : (paramOrType.name as string)}
         </span>
-        <RequiredBadge
-          isOptional={
-            'isOptional' in paramOrType ? (paramOrType.isOptional as boolean | 'NA') : false
-          }
-        />
+        {'isOptional' in paramOrType && paramOrType.isOptional === true ? (
+          <Badge variant="default">Optional</Badge>
+        ) : 'isOptional' in paramOrType && paramOrType.isOptional === false ? (
+          <Badge variant="warning">Required</Badge>
+        ) : null}
         {/* @ts-ignore */}
         {paramOrType?.comment?.tags?.some((tag) => tag.tag === 'deprecated') && (
-          <span className="text-xs text-warning-600">Deprecated</span>
+          <span className="text-xs text-warning">Deprecated</span>
         )}
         <span className="text-xs text-foreground-muted">{getTypeName(paramOrType)}</span>
       </div>
@@ -234,7 +226,9 @@ function ParamOrTypeDetails({ paramOrType }: { paramOrType: object }) {
           <MDXRemoteBase source={description} customPreprocess={normalizeMarkdown} />
         </div>
       )}
-      {subContent && subContent.length > 0 && <TypeSubDetails details={subContent} />}
+      {subContent && subContent.length > 0 && (
+        <TypeSubDetails details={subContent} defaultOpen={defaultOpen || false} />
+      )}
     </>
   )
 }
@@ -242,25 +236,30 @@ function ParamOrTypeDetails({ paramOrType }: { paramOrType: object }) {
 export function ReturnTypeDetails({ returnType }: { returnType: MethodTypes['ret'] }) {
   // These custom names that aren't defined aren't particularly meaningful, so
   // just don't display them.
-  const isNameOnlyType = returnType.type.type === 'nameOnly'
+  const isNameOnlyType = returnType?.type?.type === 'nameOnly'
   if (isNameOnlyType) return
 
   const subContent = getSubDetails(returnType)
+  const isDefaultOpen = returnType ? isDefaultExpanded(returnType) : false
 
   return (
     <div>
       <h3 className="mb-3 text-base text-foreground">Return Type</h3>
       <div className="border-t border-b py-5 flex flex-col gap-3">
-        <div className="text-xs text-foreground-muted">{getTypeName(returnType)}</div>
-        {returnType.comment?.shortText && (
+        <div className="text-xs text-foreground-muted">
+          {returnType ? getTypeName(returnType) : ''}
+        </div>
+        {returnType?.comment?.shortText && (
           <div className="prose text-sm">
             <MDXRemoteBase
-              source={returnType.comment?.shortText}
+              source={returnType?.comment?.shortText}
               customPreprocess={normalizeMarkdown}
             />
           </div>
         )}
-        {subContent && subContent.length > 0 && <TypeSubDetails details={subContent} />}
+        {subContent && subContent.length > 0 && (
+          <TypeSubDetails defaultOpen={isDefaultOpen || false} details={subContent} />
+        )}
       </div>
     </div>
   )
@@ -269,13 +268,15 @@ export function ReturnTypeDetails({ returnType }: { returnType: MethodTypes['ret
 function TypeSubDetails({
   details,
   className,
+  defaultOpen = false,
 }: {
   details: Array<SubContent> | Array<CustomTypePropertyType> | Array<TypeDetails>
   className?: string
+  defaultOpen?: boolean
 }) {
   return (
-    <Collapsible_Shadcn_>
-      <CollapsibleTrigger_Shadcn_
+    <Collapsible defaultOpen={defaultOpen}>
+      <CollapsibleTrigger
         className={cn(
           'group',
           'w-fit rounded-full',
@@ -284,8 +285,8 @@ function TypeSubDetails({
           'flex items-center gap-2',
           'text-left text-sm text-foreground-light',
           'hover:bg-surface-100',
-          'data-[state=open]:w-full',
-          'data-[state=open]:rounded-b-none data-[state=open]:rounded-tl-lg data-[state=open]:rounded-tr-lg',
+          'data-open:w-full',
+          'data-open:rounded-b-none data-open:rounded-tl-lg data-open:rounded-tr-lg',
           'transition [transition-property:width,background-color]',
           className
         )}
@@ -294,13 +295,13 @@ function TypeSubDetails({
           size={14}
           className={cn(
             'text-foreground-muted',
-            'group-data-[state=closed]:rotate-45',
+            'group-data-closed:rotate-45',
             'transition-transform'
           )}
         />
         Details
-      </CollapsibleTrigger_Shadcn_>
-      <CollapsibleContent_Shadcn_>
+      </CollapsibleTrigger>
+      <CollapsibleContent>
         <ul className={cn('border-b border-x border-default', 'rounded-b-lg')}>
           {details.map(
             (detail: SubContent | CustomTypePropertyType | TypeDetails, index: number) => (
@@ -317,27 +318,9 @@ function TypeSubDetails({
             )
           )}
         </ul>
-      </CollapsibleContent_Shadcn_>
-    </Collapsible_Shadcn_>
+      </CollapsibleContent>
+    </Collapsible>
   )
-}
-
-export function RequiredBadge({ isOptional }: { isOptional: boolean | 'NA' }) {
-  return isOptional === true ? (
-    <span className="font-mono text-[10px] text-foreground-lighter tracking-wide">Optional</span>
-  ) : isOptional === false ? (
-    <span
-      className={cn(
-        'inline-block',
-        'px-2 py-0.25 rounded-full',
-        '-translate-y-[0.125rem]', // retranslate to undo visual misalignment from the y-padding
-        'border border-amber-700 bg-amber-300',
-        'font-mono text-[10px] text-amber-900 uppercase tracking-wide'
-      )}
-    >
-      Required
-    </span>
-  ) : undefined
 }
 
 export function ApiSchemaParamDetails({ param }: { param: IApiEndPoint['parameters'][number] }) {
@@ -347,8 +330,12 @@ export function ApiSchemaParamDetails({ param }: { param: IApiEndPoint['paramete
         <span className="font-mono text-sm font-medium text-foreground break-all">
           {param.name}
         </span>
-        <RequiredBadge isOptional={!param.required} />
-        {param.schema?.deprecated && <span className="text-xs text-warning-600">Deprecated</span>}
+        {param.required ? (
+          <Badge variant="warning">Required</Badge>
+        ) : (
+          <Badge variant="default">Optional</Badge>
+        )}
+        {param.schema?.deprecated && <span className="text-xs text-warning">Deprecated</span>}
         {param.schema && (
           <span className="text-xs text-foreground-muted">
             {getTypeDisplayFromSchema(param.schema)?.displayName ?? ''}
@@ -356,7 +343,9 @@ export function ApiSchemaParamDetails({ param }: { param: IApiEndPoint['paramete
         )}
       </div>
       {param.description && (
-        <ReactMarkdown className="prose break-words text-sm">{param.description}</ReactMarkdown>
+        <div className="prose wrap-break-word text-sm">
+          <ReactMarkdown>{param.description}</ReactMarkdown>
+        </div>
       )}
       {param.schema && <ApiSchemaParamSubdetails schema={param.schema} />}
     </li>
@@ -368,7 +357,7 @@ export function ApiOperationRequestBodyDetails({
 }: {
   requestBody: IApiEndPoint['requestBody']
 }) {
-  const availableSchemes = Object.keys(requestBody.content) as Array<
+  const availableSchemes = Object.keys(requestBody?.content || {}) as Array<
     'application/json' | 'application/x-www-form-urlencoded'
   >
 
@@ -377,7 +366,7 @@ export function ApiOperationRequestBodyDetails({
       {availableSchemes.map((scheme, index) => (
         <ApiOperationRequestBodyDetailsInternal
           key={index}
-          schema={requestBody.content[scheme].schema}
+          schema={requestBody?.content?.[scheme]?.schema || ({} as ISchema)}
           hidden={index > 0}
           {...{
             [API_REFERENCE_REQUEST_BODY_SCHEMA_DATA_ATTRIBUTES.KEY]: scheme,
@@ -437,9 +426,11 @@ function ApiOperationRequestBodyDetailsInternal({
   ) {
     return <span className="font-mono text-sm font-medium text-foreground">{schema.type}</span>
   } else if (schema.type === 'array') {
+    const itemTypeDisplay = getTypeDisplayFromSchema(schema.items)
+    const displayName = itemTypeDisplay?.displayName ?? 'unknown'
     return (
       <>
-        <span className="font-mono text-sm font-medium text-foreground">{`Array of ${getTypeDisplayFromSchema(schema.items).displayName}`}</span>
+        <span className="font-mono text-sm font-medium text-foreground">{`Array of ${displayName}`}</span>
         {!(
           'type' in schema.items &&
           ['string', 'boolean', 'number', 'integer'].includes(schema.items.type)
@@ -449,12 +440,12 @@ function ApiOperationRequestBodyDetailsInternal({
   } else if (schema.type === 'object') {
     return (
       <ul {...props}>
-        {Object.keys(schema.properties)
+        {Object.keys(schema.properties || {})
           .map((property) => ({
             name: property,
-            required: schema.required?.includes(property),
+            required: schema.required?.includes(property) || false,
             in: 'body' as const,
-            schema: schema.properties[property],
+            schema: schema.properties?.[property] || ({} as ISchema),
           }))
           .map((property, index) => (
             <ApiSchemaParamDetails key={index} param={property} />
@@ -479,7 +470,7 @@ export function ApiSchemaParamSubdetails({
         !('minLength' in schema || 'maxLength' in schema || 'pattern' in schema)) ||
       (schema.type === 'array' &&
         'type' in schema.items &&
-        ['boolean', 'number', 'integer', 'string'].includes(schema.items.type)))
+        ['boolean', 'number', 'integer', 'string', 'file'].includes(schema.items.type)))
   ) {
     return null
   }
@@ -503,8 +494,8 @@ export function ApiSchemaParamSubdetails({
               : []
 
   return (
-    <Collapsible_Shadcn_>
-      <CollapsibleTrigger_Shadcn_
+    <Collapsible>
+      <CollapsibleTrigger
         className={cn(
           'group',
           'w-fit rounded-full',
@@ -513,8 +504,8 @@ export function ApiSchemaParamSubdetails({
           'flex items-center gap-2',
           'text-left text-sm text-foreground-light',
           'hover:bg-surface-100',
-          'data-[state=open]:w-full',
-          'data-[state=open]:rounded-b-none data-[state=open]:rounded-tl-lg data-[state=open]:rounded-tr-lg',
+          'data-open:w-full',
+          'data-open:rounded-b-none data-open:rounded-tl-lg data-open:rounded-tr-lg',
           'transition [transition-property:width,background-color]',
           className
         )}
@@ -523,7 +514,7 @@ export function ApiSchemaParamSubdetails({
           size={14}
           className={cn(
             'text-foreground-muted',
-            'group-data-[state=closed]:rotate-45',
+            'group-data-closed:rotate-45',
             'transition-transform'
           )}
         />
@@ -536,8 +527,8 @@ export function ApiSchemaParamSubdetails({
               : schema.type === 'object'
                 ? 'Object schema'
                 : 'Details'}
-      </CollapsibleTrigger_Shadcn_>
-      <CollapsibleContent_Shadcn_>
+      </CollapsibleTrigger>
+      <CollapsibleContent>
         {'type' in schema && schema.type === 'object' ? (
           <div className={cn('border-b border-x border-fault', 'rounded-b-lg', 'p-5')}>
             <ApiSchema schema={schema} />
@@ -573,8 +564,8 @@ export function ApiSchemaParamSubdetails({
             ))}
           </ul>
         )}
-      </CollapsibleContent_Shadcn_>
-    </Collapsible_Shadcn_>
+      </CollapsibleContent>
+    </Collapsible>
   )
 }
 
@@ -596,7 +587,11 @@ function getTypeName(parameter: object): string {
     return parameter.type
   }
 
-  if (typeof parameter.type !== 'object' || !('type' in parameter.type)) {
+  if (
+    typeof parameter.type !== 'object' ||
+    parameter.type === null ||
+    !('type' in parameter.type)
+  ) {
     return ''
   }
 
@@ -622,7 +617,7 @@ function getTypeName(parameter: object): string {
       // @ts-ignore
       return `Promise<${getTypeName({ type: type.awaited })}>`
     case 'union':
-      return 'Union: expand to see options'
+      return 'One of the following options'
     case 'index signature':
       // Needs an extra level of wrapping to fake the wrapping parameter
       // @ts-ignore
@@ -630,7 +625,8 @@ function getTypeName(parameter: object): string {
     case 'array':
       // Needs an extra level of wrapping to fake the wrapping parameter
       // @ts-ignore
-      return `Array<${getTypeName({ type: type.elemType })}>`
+      const innerType = getTypeName({ type: type.elemType })
+      return innerType ? `Array<${innerType}>` : 'Array'
   }
 
   return ''
@@ -641,28 +637,28 @@ function nameOrDefault(node: object, fallback: string) {
 }
 
 function getSubDetails(parentType: MethodTypes['params'][number] | MethodTypes['ret']) {
-  let subDetails: Array<any>
+  let subDetails: Array<any> = []
 
-  switch (parentType.type?.type) {
+  switch (parentType?.type?.type) {
     case 'object':
-      subDetails = parentType.type.properties
+      subDetails = parentType?.type?.properties
       break
     case 'function':
       subDetails = [
-        ...(parentType.type.params.length === 0
+        ...(parentType?.type?.params?.length === 0
           ? []
           : [
               {
                 name: 'Parameters',
                 type: 'callback parameters',
                 isOptional: 'NA',
-                params: parentType.type.params.map((param) => ({
+                params: parentType?.type?.params?.map((param) => ({
                   ...param,
                   isOptional: 'NA',
                 })),
               },
             ]),
-        { name: 'Return', type: parentType.type.ret.type, isOptional: 'NA' },
+        { name: 'Return', type: parentType?.type?.ret?.type, isOptional: 'NA' },
       ]
       break
     // @ts-ignore -- Adding these fake types to take advantage of existing recursion
@@ -671,39 +667,46 @@ function getSubDetails(parentType: MethodTypes['params'][number] | MethodTypes['
       subDetails = parentType.params
       break
     case 'union':
-      subDetails = parentType.type.subTypes.map((subType, index) => ({
-        name: `union option ${index + 1}`,
+      subDetails = parentType?.type?.subTypes?.map((subType, index) => ({
+        name: `Option ${index + 1}`,
         type: { ...subType },
         isOptional: 'NA',
       }))
       break
     case 'promise':
-      if (parentType.type.awaited.type === 'union') {
-        subDetails = parentType.type.awaited.subTypes.map((subType, index) => ({
-          name: `union option ${index + 1}`,
+      if (parentType?.type?.awaited?.type === 'union') {
+        subDetails = parentType?.type?.awaited?.subTypes?.map((subType, index) => ({
+          name: `Option ${index + 1}`,
           type: { ...subType },
           isOptional: 'NA',
         }))
-      } else if (parentType.type.awaited.type === 'object') {
-        subDetails = parentType.type.awaited.properties.map((property) => ({
+      } else if (
+        parentType?.type?.awaited?.type === 'object' &&
+        'properties' in parentType.type.awaited
+      ) {
+        subDetails = (parentType.type.awaited as any).properties?.map((property) => ({
           ...property,
           isOptional: 'NA',
         }))
-      } else if (parentType.type.awaited.type === 'array') {
+      } else if (parentType?.type?.awaited?.type === 'array') {
         subDetails = [
-          { name: 'array element', type: parentType.type.awaited.elemType, isOptional: 'NA' },
+          {
+            name: 'array element',
+            type: (parentType?.type?.awaited as any)?.elemType,
+            isOptional: 'NA',
+          },
         ]
       }
       break
     case 'array':
-      if (parentType.type.elemType.type === 'union') {
+      if (parentType.type.elemType?.type === 'union') {
         subDetails = parentType.type.elemType.subTypes.map((subType, index) => ({
-          name: `union option ${index + 1}`,
+          name: `Option ${index + 1}`,
           type: { ...subType },
           isOptional: 'NA',
         }))
       }
-      if (parentType.type.elemType.type === 'object') {
+      if (parentType.type.elemType?.type === 'object') {
         subDetails = parentType.type.elemType.properties
       }
       break
@@ -832,7 +835,7 @@ function applyParameterMergeStrategy(
           if (clonedParametersByName.has(key)) {
             clonedParametersByName.set(
               key,
-              applyParameterMergeStrategy(clonedParametersByName.get(key), alternateValue)
+              applyParameterMergeStrategy(clonedParametersByName.get(key)!, alternateValue)
             )
           } else {
             clonedParametersByName.set(key, alternateValue)
@@ -852,7 +855,7 @@ function applyParameterMergeStrategy(
    *********/
 
   function mergeIntoUnion() {
-    if (alternateParameter.type.type === 'union') {
+    if (alternateParameter.type?.type === 'union') {
       const originalType = clonedParameter.type
 
       if (
@@ -862,7 +865,7 @@ function applyParameterMergeStrategy(
       } else {
         clonedParameter.type = {
           type: 'union',
-          subTypes: [originalType, ...alternateParameter.type.subTypes],
+          subTypes: [originalType as TypeDetails, ...(alternateParameter.type?.subTypes || [])],
         }
       }
     } else {
@@ -870,9 +873,25 @@ function applyParameterMergeStrategy(
       if (!isEqual(originalType, alternateParameter.type)) {
         clonedParameter.type = {
           type: 'union',
-          subTypes: [originalType, alternateParameter.type],
+          subTypes: [originalType as TypeDetails, alternateParameter.type!],
         }
       }
     }
   }
+}
+
+function isDefaultExpanded(meta: object) {
+  return (
+    'type' in meta &&
+    typeof meta.type === 'object' &&
+    meta.type &&
+    'type' in meta.type &&
+    (meta.type.type == 'union' ||
+      (meta.type.type === 'promise' &&
+        'awaited' in meta.type &&
+        typeof meta.type.awaited === 'object' &&
+        meta.type.awaited &&
+        'type' in meta.type.awaited &&
+        meta.type.awaited.type === 'union'))
+  )
 }

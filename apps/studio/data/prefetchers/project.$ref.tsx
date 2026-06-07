@@ -2,10 +2,8 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useCallback } from 'react'
 
-import { prefetchProjectLogRequestsCount } from 'data/analytics/project-log-requests-count-query'
-import { prefetchProjectLogStats } from 'data/analytics/project-log-stats-query'
-import { prefetchProjectDetail } from 'data/projects/project-detail-query'
 import PrefetchableLink, { PrefetchableLinkProps } from './PrefetchableLink'
+import { prefetchProjectDetail } from '@/data/projects/project-detail-query'
 
 export function usePrefetchProjectIndexPage() {
   const router = useRouter()
@@ -19,19 +17,6 @@ export function usePrefetchProjectIndexPage() {
       // Prefetch data
       prefetchProjectDetail(queryClient, {
         ref: projectRef,
-      }).catch(() => {
-        // eat prefetching errors as they are not critical
-      })
-
-      prefetchProjectLogRequestsCount(queryClient, {
-        projectRef,
-      }).catch(() => {
-        // eat prefetching errors as they are not critical
-      })
-
-      prefetchProjectLogStats(queryClient, {
-        projectRef,
-        interval: 'hourly',
       }).catch(() => {
         // eat prefetching errors as they are not critical
       })

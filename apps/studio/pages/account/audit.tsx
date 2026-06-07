@@ -1,35 +1,41 @@
-import { AuditLogs } from 'components/interfaces/Account'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import type { NextPageWithLayout } from 'types'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
 
-const User: NextPageWithLayout = () => {
+import { AuditLogs } from '@/components/interfaces/Account/AuditLogs'
+import AccountLayout from '@/components/layouts/AccountLayout/AccountLayout'
+import { AppLayout } from '@/components/layouts/AppLayout/AppLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import type { NextPageWithLayout } from '@/types'
+
+const Audit: NextPageWithLayout = () => {
   return (
-    <ScaffoldContainerLegacy className="gap-0">
-      <div className="flex items-center justify-between">
-        <FormHeader
-          title="Account audit logs"
-          description="View the audit log trail of actions made from your account"
-        />
-      </div>
+    <>
+      <PageHeader size="default">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Audit Logs</PageHeaderTitle>
+            <PageHeaderDescription>
+              View a detailed history of account activities and security events.
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
       <AuditLogs />
-    </ScaffoldContainerLegacy>
+    </>
   )
 }
 
-User.getLayout = (page) => (
-  <AccountLayout
-    title="Audit Logs"
-    breadcrumbs={[
-      {
-        key: `supabase-settings`,
-        label: 'Audit Logs',
-      },
-    ]}
-  >
-    {page}
-  </AccountLayout>
+Audit.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout headerTitle="Account">
+      <AccountLayout title="Audit Logs">{page}</AccountLayout>
+    </DefaultLayout>
+  </AppLayout>
 )
 
-export default User
+export default Audit

@@ -1,16 +1,11 @@
-import { AnimatePresence, motion } from 'framer-motion'
-
 import { useParams } from 'common'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
-import {
-  Alert_Shadcn_ as Alert,
-  AlertDescription_Shadcn_ as AlertDescription,
-  AlertTitle_Shadcn_ as AlertTitle,
-  InfoIcon,
-} from 'ui'
+import { AnimatePresence, motion } from 'framer-motion'
+import { Alert, AlertDescription, AlertTitle, InfoIcon } from 'ui'
+
 import { BillingChangeBadge } from './BillingChangeBadge'
 import { DISK_LIMITS, DISK_PRICING, DiskType } from './DiskManagement.constants'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 
 interface DiskManagementDiskSizeReadReplicasProps {
   isDirty: boolean
@@ -24,7 +19,7 @@ interface DiskManagementDiskSizeReadReplicasProps {
 export const DiskManagementDiskSizeReadReplicas = ({
   isDirty,
   totalSize,
-  usedSize,
+  usedSize: _usedSize,
   newTotalSize,
   oldStorageType,
   newStorageType,
@@ -33,8 +28,8 @@ export const DiskManagementDiskSizeReadReplicas = ({
 
   const { data: databases } = useReadReplicasQuery({ projectRef })
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
-  const beforePrice = totalSize * DISK_PRICING[oldStorageType]?.storage ?? 0
-  const afterPrice = newTotalSize * DISK_PRICING[newStorageType]?.storage ?? 0
+  const beforePrice = totalSize * DISK_PRICING[oldStorageType]?.storage
+  const afterPrice = newTotalSize * DISK_PRICING[newStorageType]?.storage
 
   if (readReplicas.length === 0) return null
 
@@ -79,10 +74,10 @@ export const DiskManagementDiskSizeReadReplicas = ({
       {/* Hide for now until we have the utilization for each RR specifically */}
       {/* <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
-          <div className="flex items-center cursor-pointer rounded gap-2 mt-3 text-foreground-light hover:text-foreground data-[state=open]:text-foreground group">
+          <div className="flex items-center cursor-pointer rounded gap-2 mt-3 text-foreground-light hover:text-foreground data-open:text-foreground group">
             <h3 className="text-sm">Read replica disk size information</h3>
             <ChevronDown
-              className={`h-4 w-4 transition-transform duration-200 group-data-[state=open]:transform group-data-[state=open]:rotate-180 group-data-[state=open]:text-foreground`}
+              className={`h-4 w-4 transition-transform duration-200 group-data-open:transform group-data-open:rotate-180 group-data-open:text-foreground`}
             />
           </div>
         </CollapsibleTrigger>
@@ -146,9 +141,9 @@ export const DiskManagementIOPSReadReplicas = ({
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
 
   const beforePrice =
-    (oldIOPS - DISK_LIMITS[oldStorageType]?.includedIops) * DISK_PRICING[oldStorageType]?.iops ?? 0
+    (oldIOPS - DISK_LIMITS[oldStorageType]?.includedIops) * DISK_PRICING[oldStorageType]?.iops
   const afterPrice =
-    (newIOPS - DISK_LIMITS[newStorageType]?.includedIops) * DISK_PRICING[newStorageType]?.iops ?? 0
+    (newIOPS - DISK_LIMITS[newStorageType]?.includedIops) * DISK_PRICING[newStorageType]?.iops
 
   if (readReplicas.length === 0) return null
 
@@ -205,12 +200,12 @@ export const DiskManagementThroughputReadReplicas = ({
   const beforePrice =
     oldStorageType === DiskType.GP3
       ? (oldThroughput - DISK_LIMITS[oldStorageType].includedThroughput) *
-          DISK_PRICING[oldStorageType]?.throughput ?? 0
+        DISK_PRICING[oldStorageType]?.throughput
       : 0
   const afterPrice =
     newStorageType === DiskType.GP3
       ? (newThroughput - DISK_LIMITS[newStorageType].includedThroughput) *
-          DISK_PRICING[newStorageType]?.throughput ?? 0
+        DISK_PRICING[newStorageType]?.throughput
       : 0
 
   if (readReplicas.length === 0) return null

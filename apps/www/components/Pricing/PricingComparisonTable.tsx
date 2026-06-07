@@ -1,16 +1,24 @@
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
+'use client'
 
-import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
+import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pricing/PricingTableRow'
+import Solutions from '~/data/MainProducts'
+import { Organization } from '~/data/organizations'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
+import Link from 'next/link'
+import { useState } from 'react'
 import { plans } from 'shared-data/plans'
 import { pricing } from 'shared-data/pricing'
-import { Button, Select, cn } from 'ui'
-import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pricing/PricingTableRow'
-import { Organization } from '~/data/organizations'
-import Solutions from '~/data/MainProducts'
-import gaEvents from '~/lib/gaEvents'
-import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
+import {
+  Button,
+  cn,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from 'ui'
+
 import UpgradePlan from './UpgradePlan'
 
 const MobileHeader = ({
@@ -32,11 +40,8 @@ const MobileHeader = ({
   organizations?: Organization[]
   hasExistingOrganizations?: boolean
 }) => {
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
-  const sendTelemetryEvent = async (event: TelemetryEvent) => {
-    await Telemetry.sendEvent(event, telemetryProps, router)
-  }
+  const sendTelemetryEvent = useSendTelemetryEvent()
+  const orgSlug = organizations?.[0]?.slug
 
   const selectedPlan = plans.find((p) => p.name === plan)!
   const isUpgradablePlan = selectedPlan.name === 'Pro' || selectedPlan.name === 'Team'
@@ -62,18 +67,35 @@ const MobileHeader = ({
         <UpgradePlan
           organizations={organizations}
           onClick={() =>
-            sendTelemetryEvent(
-              gaEvents[`www_pricing_comparison_${plan.toLowerCase()}_mobile_upgrade`]
-            )
+            sendTelemetryEvent({
+              action: 'www_pricing_plan_cta_clicked',
+              properties: {
+                plan,
+                showUpgradeText: true,
+                section: 'comparison_table',
+                tableMode: 'mobile',
+              },
+              ...(orgSlug && { groups: { organization: orgSlug } }),
+            })
           }
           size="medium"
+          planId={selectedPlan.planId}
         />
       ) : (
         <Button asChild size="medium" type={plan === 'Enterprise' ? 'default' : 'primary'} block>
           <Link
             href={selectedPlan.href}
             onClick={() =>
-              sendTelemetryEvent(gaEvents[`www_pricing_comparison_${plan.toLowerCase()}_mobile`])
+              sendTelemetryEvent({
+                action: 'www_pricing_plan_cta_clicked',
+                properties: {
+                  plan,
+                  showUpgradeText: false,
+                  section: 'comparison_table',
+                  tableMode: 'mobile',
+                },
+                ...(orgSlug && { groups: { organization: orgSlug } }),
+              })
             }
           >
             {selectedPlan.cta}
@@ -93,13 +115,10 @@ const PricingComparisonTable = ({
   organizations,
   hasExistingOrganizations,
 }: PricingComparisonTableProps) => {
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
   const [activeMobilePlan, setActiveMobilePlan] = useState('Free')
 
-  const sendTelemetryEvent = async (event: TelemetryEvent) => {
-    await Telemetry.sendEvent(event, telemetryProps, router)
-  }
+  const sendTelemetryEvent = useSendTelemetryEvent()
+  const orgSlug = organizations?.[0]?.slug
 
   return (
     <div
@@ -111,19 +130,23 @@ const PricingComparisonTable = ({
         {/* Free - Mobile  */}
         <div className="bg-background p-2 sticky top-14 z-10 pt-4">
           <div className="bg-surface-100 rounded-lg border py-2 px-4 flex justify-between items-center">
-            <label className="text-foreground-lighter">Change plan</label>
+            <label className="text-foreground-lighter grow">Change plan</label>
             <Select
-              id="change-plan"
               name="Change plan"
-              layout="vertical"
               value={activeMobilePlan}
-              className="min-w-[120px]"
-              onChange={(e) => setActiveMobilePlan(e.target.value)}
+              onValueChange={(value) => setActiveMobilePlan(value)}
             >
-              <Select.Option value="Free">Free</Select.Option>
-              <Select.Option value="Pro">Pro</Select.Option>
-              <Select.Option value="Team">Team</Select.Option>
-              <Select.Option value="Enterprise">Enterprise</Select.Option>
+              <SelectTrigger id="change-plan" className="w-auto min-w-[120px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="Free">Free</SelectItem>
+                  <SelectItem value="Pro">Pro</SelectItem>
+                  <SelectItem value="Team">Team</SelectItem>
+                  <SelectItem value="Enterprise">Enterprise</SelectItem>
+                </SelectGroup>
+              </SelectContent>
             </Select>
           </div>
         </div>
@@ -384,7 +407,10 @@ const PricingComparisonTable = ({
                             plan.name === 'Enterprise' && 'xl:opacity-0'
                           )}
                         >
-                          <span className="text-foreground-lighter font-mono text-xl mr-1 tracking-tighter">
+                          <span
+                            className="text-foreground-lighter font-mono text-xl mr-1 tracking-tighter"
+                            translate="no"
+                          >
                             {plan.name !== 'Enterprise' && '$'}
                             {plan.priceMonthly}
                           </span>
@@ -398,13 +424,19 @@ const PricingComparisonTable = ({
                           <UpgradePlan
                             organizations={organizations}
                             onClick={() =>
-                              sendTelemetryEvent(
-                                gaEvents[
-                                  `www_pricing_comparison_${plan.name.toLowerCase()}_upgrade`
-                                ]
-                              )
+                              sendTelemetryEvent({
+                                action: 'www_pricing_plan_cta_clicked',
+                                properties: {
+                                  plan: plan.name,
+                                  showUpgradeText: true,
+                                  section: 'comparison_table',
+                                  tableMode: 'desktop',
+                                },
+                                ...(orgSlug && { groups: { organization: orgSlug } }),
+                              })
                             }
                             size="tiny"
+                            planId={plan.planId}
                           />
                         ) : (
                           <Button
@@ -416,9 +448,16 @@ const PricingComparisonTable = ({
                             <Link
                               href={plan.href}
                               onClick={() =>
-                                sendTelemetryEvent(
-                                  gaEvents[`www_pricing_comparison_${plan.name.toLowerCase()}`]
-                                )
+                                sendTelemetryEvent({
+                                  action: 'www_pricing_plan_cta_clicked',
+                                  properties: {
+                                    plan: plan.name,
+                                    showUpgradeText: false,
+                                    section: 'comparison_table',
+                                    tableMode: 'desktop',
+                                  },
+                                  ...(orgSlug && { groups: { organization: orgSlug } }),
+                                })
                               }
                             >
                               {plan.cta}

@@ -1,5 +1,3 @@
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   Button,
   Dialog,
@@ -10,21 +8,27 @@ import {
   DialogSection,
   DialogTitle,
 } from 'ui'
+
 import { AdditionalMonthlySpend } from './AdditionalMonthlySpend'
+import { NewProjectPrice } from './RestoreToNewProject.utils'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface ConfirmRestoreDialogProps {
   open: boolean
   onOpenChange: (value: boolean) => void
   onSelectContinue: () => void
+  additionalMonthlySpend: NewProjectPrice
 }
 
 export const ConfirmRestoreDialog = ({
   open,
   onOpenChange,
   onSelectContinue,
+  additionalMonthlySpend,
 }: ConfirmRestoreDialogProps) => {
-  const { project } = useProjectContext()
-  const organization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -58,13 +62,12 @@ export const ConfirmRestoreDialog = ({
               <li>Storage objects & settings</li>
               <li>Edge Functions</li>
               <li>Auth settings & API keys</li>
-              <li>Realtime settings</li>
               <li>Database extensions and settings</li>
               <li>Read replicas</li>
             </ul>
           </ul>
         </DialogSection>
-        <AdditionalMonthlySpend />
+        <AdditionalMonthlySpend additionalMonthlySpend={additionalMonthlySpend} />
         <DialogFooter>
           <Button type="outline" onClick={() => onOpenChange(false)}>
             Cancel

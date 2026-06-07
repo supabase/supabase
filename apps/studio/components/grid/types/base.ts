@@ -1,35 +1,8 @@
 import { CalculatedColumn, RenderHeaderCellProps } from 'react-data-grid'
 
-export interface Sort {
-  table: string
-  column: string
-  ascending?: boolean
-  nullsFirst?: boolean
-}
-
-export type FilterOperator =
-  | '='
-  | '<>'
-  | '>'
-  | '<'
-  | '>='
-  | '<='
-  | '~~'
-  | '~~*'
-  | '!~~'
-  | '!~~*'
-  | 'in'
-  | 'is'
-
-export interface Filter {
-  column: string
-  operator: FilterOperator
-  value: any
-}
-
 export interface SavedState {
-  filters: Filter[]
-  sorts: Sort[]
+  filters?: string[]
+  sorts?: string[]
   gridColumns: CalculatedColumn<any, any>[]
 }
 
@@ -51,6 +24,7 @@ export type ColumnType =
   | 'text'
   | 'citext'
   | 'time'
+  | 'binary'
   | 'unknown'
 
 export interface GridForeignKey {
@@ -67,4 +41,5 @@ export interface ColumnHeaderProps<R> extends RenderHeaderCellProps<R> {
   isEncrypted: boolean | undefined
   format: string
   foreignKey?: GridForeignKey
+  comment?: string | null
 }

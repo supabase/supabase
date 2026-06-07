@@ -1,9 +1,14 @@
+import { skillBasedSolutions, useCaseSolutions } from 'data/Solutions'
 import { PrivacySettings } from 'ui-patterns/PrivacySettings'
 
 const footerData = [
   {
     title: 'Product',
     links: [
+      {
+        text: 'Pricing',
+        url: '/pricing',
+      },
       {
         text: 'Database',
         url: '/database',
@@ -33,8 +38,8 @@ const footerData = [
         url: '/modules/cron',
       },
       {
-        text: 'Pricing',
-        url: '/pricing',
+        text: 'Feature Catalog',
+        url: '/features',
       },
       {
         text: 'Launch Week',
@@ -43,8 +48,25 @@ const footerData = [
     ],
   },
   {
+    title: 'Solutions',
+    links: [
+      ...skillBasedSolutions.solutions.map((solution) => ({
+        text: solution.text,
+        url: solution.url,
+      })),
+      ...useCaseSolutions.solutions.map((solution) => ({
+        text: solution.text,
+        url: solution.url,
+      })),
+    ],
+  },
+  {
     title: 'Resources',
     links: [
+      {
+        text: 'Blog',
+        url: '/blog',
+      },
       {
         text: 'Support',
         url: '/support',
@@ -62,11 +84,11 @@ const footerData = [
         url: '/partners/integrations',
       },
       {
-        text: 'Brand Assets / Logos',
+        text: 'Brand Assets',
         url: '/brand-assets',
       },
       {
-        text: 'Security and Compliance',
+        text: 'Security & Compliance',
         url: '/security',
       },
       {
@@ -91,8 +113,29 @@ const footerData = [
         url: '/docs',
       },
       {
+        text: 'Supabase UI',
+        url: 'https://supabase.com/ui',
+      },
+      {
         text: 'Changelog',
         url: '/changelog',
+      },
+      {
+        text: 'RSS',
+        url: '/rss.xml',
+      },
+    ],
+  },
+  {
+    title: 'Community',
+    links: [
+      {
+        text: 'Events & Webinars',
+        url: '/events',
+      },
+      {
+        text: 'SupaSquad',
+        url: '/supasquad',
       },
       {
         text: 'Contributing',
@@ -103,16 +146,8 @@ const footerData = [
         url: '/open-source',
       },
       {
-        text: 'SupaSquad',
-        url: '/supasquad',
-      },
-      {
         text: 'DevTo',
         url: 'https://dev.to/supabase',
-      },
-      {
-        text: 'RSS',
-        url: '/rss.xml',
       },
     ],
   },
@@ -120,24 +155,12 @@ const footerData = [
     title: 'Company',
     links: [
       {
-        text: 'Blog',
-        url: '/blog',
-      },
-      {
-        text: 'Customer Stories',
-        url: '/customers',
-      },
-      {
-        text: 'Careers',
-        url: '/careers',
-      },
-      {
         text: 'Company',
         url: '/company',
       },
       {
-        text: 'Events & Webinars',
-        url: '/events',
+        text: 'Careers',
+        url: '/careers',
       },
       {
         text: 'General Availability',
@@ -178,6 +201,10 @@ const footerData = [
       {
         text: 'Security.txt',
         url: '/.well-known/security.txt',
+      },
+      {
+        text: 'Contact Us',
+        url: '/contact-us',
       },
     ],
   },

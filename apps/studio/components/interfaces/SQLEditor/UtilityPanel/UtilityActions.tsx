@@ -1,57 +1,49 @@
-import { useQueryClient } from '@tanstack/react-query'
-import {
-  AlignLeft,
-  Check,
-  Command,
-  CornerDownLeft,
-  Heart,
-  Keyboard,
-  Loader2,
-  MoreVertical,
-} from 'lucide-react'
+import { Hotkey } from '@tanstack/react-hotkeys'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { AlignLeft, Check, Heart, Keyboard, MoreVertical } from 'lucide-react'
 import { toast } from 'sonner'
-
-import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { detectOS } from 'lib/helpers'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-  cn,
+  KeyboardShortcut,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
+
+import { SqlRunButton } from './RunButton'
 import SavingIndicator from './SavingIndicator'
+import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
+import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { IS_PLATFORM } from '@/lib/constants'
+import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
+import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 export type UtilityActionsProps = {
   id: string
   isExecuting?: boolean
   isDisabled?: boolean
-  hasSelection: boolean
+  hasSelection?: boolean
   prettifyQuery: () => void
   executeQuery: () => void
 }
 
-const UtilityActions = ({
+export const UtilityActions = ({
   id,
   isExecuting = false,
   isDisabled = false,
-  hasSelection,
+  hasSelection = false,
   prettifyQuery,
   executeQuery,
 }: UtilityActionsProps) => {
-  const os = detectOS()
-  const client = useQueryClient()
-  const { project } = useProjectContext()
+  const { ref } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const [isAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
@@ -59,9 +51,17 @@ const UtilityActions = ({
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
     true
   )
+  const [lastSelectedDb, setLastSelectedDb] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_LAST_SELECTED_DB(ref as string),
+    ''
+  )
 
   const snippet = snapV2.snippets[id]
   const isFavorite = snippet !== undefined ? snippet.snippet.favorite : false
+
+  const hotkeySequnece: Hotkey | undefined =
+    SHORTCUT_DEFINITIONS[SHORTCUT_IDS.SQL_EDITOR_FORMAT].sequence[0]
+  const formatKeys = hotkeySequnece ? hotkeyToKeys(hotkeySequnece) : undefined
 
   const toggleIntellisense = () => {
     setIntellisenseEnabled(!intellisenseEnabled)
@@ -70,12 +70,13 @@ const UtilityActions = ({
     )
   }
 
-  const addFavorite = async () => {
-    snapV2.addFavorite(id)
-  }
+  const addFavorite = () => snapV2.addFavorite(id)
 
-  const removeFavorite = async () => {
-    snapV2.removeFavorite(id)
+  const removeFavorite = () => snapV2.removeFavorite(id)
+
+  const onSelectDatabase = (databaseId: string) => {
+    snapV2.resetResults(id)
+    setLastSelectedDb(databaseId)
   }
 
   return (
@@ -85,6 +86,7 @@ const UtilityActions = ({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
+            data-testid="sql-editor-utility-actions"
             type="default"
             className={cn('px-1', isAiOpen ? 'block 2xl:hidden' : 'hidden')}
             icon={<MoreVertical className="text-foreground-light" />}
@@ -98,26 +100,33 @@ const UtilityActions = ({
             </span>
             {intellisenseEnabled && <Check className="text-brand" size={16} />}
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            className="gap-x-2"
-            onClick={() => {
-              if (isFavorite) removeFavorite()
-              else addFavorite()
-            }}
-          >
-            <Heart
-              size={14}
-              strokeWidth={2}
-              className={
-                isFavorite ? 'fill-brand stroke-none' : 'fill-none stroke-foreground-light'
-              }
-            />
-            {isFavorite ? 'Remove from' : 'Add to'} favorites
-          </DropdownMenuItem>
-          <DropdownMenuItem className="gap-x-2" onClick={prettifyQuery}>
-            <AlignLeft size={14} strokeWidth={2} className="text-foreground-light" />
-            Prettify SQL
+          {IS_PLATFORM && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="gap-x-2"
+                onClick={() => {
+                  if (isFavorite) removeFavorite()
+                  else addFavorite()
+                }}
+              >
+                <Heart
+                  size={14}
+                  strokeWidth={2}
+                  className={
+                    isFavorite ? 'fill-brand stroke-none' : 'fill-none stroke-foreground-light'
+                  }
+                />
+                {isFavorite ? 'Remove from' : 'Add to'} favorites
+              </DropdownMenuItem>
+            </>
+          )}
+          <DropdownMenuItem className="justify-between" onClick={prettifyQuery}>
+            <span className="flex items-center gap-x-2">
+              <AlignLeft size={14} strokeWidth={2} className="text-foreground-light" />
+              Prettify SQL
+            </span>
+            {formatKeys && <KeyboardShortcut keys={formatKeys} />}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -140,8 +149,8 @@ const UtilityActions = ({
         </DropdownMenu>
 
         {IS_PLATFORM && (
-          <Tooltip_Shadcn_>
-            <TooltipTrigger_Shadcn_ asChild>
+          <Tooltip>
+            <TooltipTrigger asChild>
               {isFavorite ? (
                 <Button
                   type="text"
@@ -159,60 +168,54 @@ const UtilityActions = ({
                   icon={<Heart className="fill-none stroke-foreground-light" />}
                 />
               )}
-            </TooltipTrigger_Shadcn_>
-            <TooltipContent_Shadcn_ side="bottom">
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
               {isFavorite ? 'Remove from' : 'Add to'} favorites
-            </TooltipContent_Shadcn_>
-          </Tooltip_Shadcn_>
+            </TooltipContent>
+          </Tooltip>
         )}
 
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_ asChild>
+        <Tooltip>
+          <TooltipTrigger asChild>
             <Button
               type="text"
               onClick={prettifyQuery}
               className="px-1"
               icon={<AlignLeft strokeWidth={2} className="text-foreground-light" />}
             />
-          </TooltipTrigger_Shadcn_>
-          <TooltipContent_Shadcn_ side="bottom">Prettify SQL</TooltipContent_Shadcn_>
-        </Tooltip_Shadcn_>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="p-1 pl-2.5">
+            <div className="flex items-center gap-2.5">
+              <span>Prettify SQL</span>
+              {formatKeys && <KeyboardShortcut keys={formatKeys} />}
+            </div>
+          </TooltipContent>
+        </Tooltip>
       </div>
 
       <div className="flex items-center justify-between gap-x-2">
         <div className="flex items-center">
-          <DatabaseSelector
-            variant="connected-on-right"
-            onSelectId={() => snapV2.resetResult(id)}
+          {IS_PLATFORM && (
+            <DatabaseSelector
+              selectedDatabaseId={lastSelectedDb.length === 0 ? undefined : lastSelectedDb}
+              variant="connected-on-right"
+              onSelectId={onSelectDatabase}
+            />
+          )}
+          <RoleImpersonationPopover
+            serviceRoleLabel="postgres"
+            header="Run SQL query as a role"
+            variant={IS_PLATFORM ? 'connected-on-both' : 'connected-on-right'}
           />
-          <RoleImpersonationPopover serviceRoleLabel="postgres" variant="connected-on-both" />
-          <Button
-            onClick={() => executeQuery()}
-            disabled={isDisabled || isExecuting}
-            type="primary"
-            size="tiny"
-            iconRight={
-              isExecuting ? (
-                <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
-              ) : (
-                <div className="flex items-center space-x-1">
-                  {os === 'macos' ? (
-                    <Command size={10} strokeWidth={1.5} />
-                  ) : (
-                    <p className="text-xs text-foreground-light">CTRL</p>
-                  )}
-                  <CornerDownLeft size={10} strokeWidth={1.5} />
-                </div>
-              )
-            }
-            className="rounded-l-none min-w-[82px]"
-          >
-            {hasSelection ? 'Run selected' : 'Run'}
-          </Button>
+          <SqlRunButton
+            hasSelection={hasSelection}
+            isDisabled={isDisabled || isExecuting}
+            isExecuting={isExecuting}
+            className="rounded-l-none"
+            onClick={executeQuery}
+          />
         </div>
       </div>
     </div>
   )
 }
-
-export default UtilityActions

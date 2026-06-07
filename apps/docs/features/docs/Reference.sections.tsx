@@ -1,19 +1,5 @@
-import { Fragment } from 'react'
-import ReactMarkdown from 'react-markdown'
-import {
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-  cn,
-  CodeBlock,
-} from 'ui'
-
 import ApiSchema from '~/components/ApiSchema'
-import { REFERENCES } from '~/content/navigation.references'
-import { MDXRemoteRefs, getRefMarkdown } from '~/features/docs/Reference.mdx'
-import { MDXProviderReference } from '~/features/docs/Reference.mdx.client'
-import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
+import { clientSdkIds, REFERENCES } from '~/content/navigation.references'
 import {
   getApiEndpointById,
   getCliSpec,
@@ -22,19 +8,34 @@ import {
   getSelfHostedApiEndpointById,
   getTypeSpec,
 } from '~/features/docs/Reference.generated.singleton'
-import { type IApiEndPoint } from './Reference.api.utils'
+import { getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
+import type { MethodTypes, VariableTypes } from '~/features/docs/Reference.typeSpec'
+import { formatMethodSignature } from '~/features/docs/Reference.typeSpec'
 import {
   ApiOperationRequestBodyDetails,
   ApiSchemaParamDetails,
   CollapsibleDetails,
   FnParameterDetails,
   RefSubLayout,
-  RequiredBadge,
   ReturnTypeDetails,
   StickyHeader,
 } from '~/features/docs/Reference.ui'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { normalizeMarkdown } from '~/features/docs/Reference.utils'
+import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
+import { isFeatureEnabled } from 'common'
+import { Fragment } from 'react'
+import ReactMarkdown from 'react-markdown'
+import {
+  Badge,
+  cn,
+  Tabs_Shadcn_,
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+} from 'ui'
+
+import { type IApiEndPoint } from './Reference.api.utils'
 import { RefInternalLink } from './Reference.navigation.client'
 import { ApiOperationBodySchemeSelector } from './Reference.ui.client'
 
@@ -44,24 +45,29 @@ type RefSectionsProps = {
 }
 
 async function RefSections({ libraryId, version }: RefSectionsProps) {
-  console.log('[Enter] RefSections')
   let flattenedSections = await getFlattenedSections(libraryId, version)
-  flattenedSections = trimIntro(flattenedSections)
+  if (flattenedSections) {
+    flattenedSections = trimIntro(flattenedSections)
+  }
 
-  console.log('[PreReturn] RefSections')
+  if (!isFeatureEnabled('sdk:auth') && clientSdkIds.includes(libraryId)) {
+    flattenedSections = flattenedSections?.filter(
+      (section) =>
+        'product' in section && section.product !== 'auth' && section.product !== 'auth-admin'
+    )
+  }
+
   return (
-    <MDXProviderReference>
-      <div className="flex flex-col my-16 gap-16">
-        {flattenedSections
-          .filter((section) => section.type !== 'category')
-          .map((section, idx) => (
-            <Fragment key={`${section.id}-${idx}`}>
-              <SectionDivider />
-              <SectionSwitch libraryId={libraryId} version={version} section={section} />
-            </Fragment>
-          ))}
-      </div>
-    </MDXProviderReference>
+    <div className="flex flex-col my-16 gap-16">
+      {(flattenedSections || [])
+        .filter((section) => section.type !== 'category')
+        .map((section, idx) => (
+          <Fragment key={`${section.id}-${idx}`}>
+            <SectionDivider />
+            <SectionSwitch libraryId={libraryId} version={version} section={section} />
+          </Fragment>
+        ))}
+    </div>
   )
 }
 
@@ -165,10 +171,14 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
 
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
-      <StickyHeader title={command.title} className="col-[1_/_-1]" monoFont={true} />
-      <div>
-        {command.description && (
-          <ReactMarkdown className="prose break-words mb-8">{command.description}</ReactMarkdown>
+      <StickyHeader title={command.title} className="col-span-full" monoFont={true} />
+      <div className="w-full min-w-0 prose wrap-break-word mb-8">
+        {command.description && <ReactMarkdown>{command.description}</ReactMarkdown>}
+        {command.usage && (
+          <div className="mb-8">
+            <h3 className="mb-2 text-base text-foreground">Usage</h3>
+            <CodeBlock lang="bash">{command.usage}</CodeBlock>
+          </div>
         )}
         {(command.subcommands ?? []).length > 0 && (
           <>
@@ -196,19 +206,23 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
         {(command.flags ?? []).length > 0 && (
           <>
             <h3 className="mb-3 text-base text-foreground">Flags</h3>
-            <ul>
+            <ul className="not-prose">
               {command.flags.map((flag, index) => (
                 <li key={index} className="border-t last-of-type:border-b py-5 flex flex-col gap-3">
                   <div className="flex flex-wrap items-baseline gap-3">
                     <span className="font-mono text-sm font-medium text-foreground">
                       {flag.name}
                     </span>
-                    <RequiredBadge isOptional={!flag.required} />
+                    {flag.required ? (
+                      <Badge variant="warning">Required</Badge>
+                    ) : (
+                      <Badge variant="default">Optional</Badge>
+                    )}
                   </div>
                   {flag.description && (
-                    <ReactMarkdown className="prose break-words text-sm">
-                      {flag.description}
-                    </ReactMarkdown>
+                    <div className="prose wrap-break-word text-sm">
+                      <ReactMarkdown>{flag.description}</ReactMarkdown>
+                    </div>
                   )}
                 </li>
               ))}
@@ -242,17 +256,11 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
               </TabsList_Shadcn_>
               {command.examples.map((example) => (
                 <TabsContent_Shadcn_ key={example.id} value={example.id}>
-                  <CodeBlock
-                    language="bash"
-                    className="p-4 rounded-md border"
-                    wrapperClassName="mb-8"
-                  >
+                  <CodeBlock lang="bash" className="mb-6">
                     {example.code}
                   </CodeBlock>
                   <h3 className="text-foreground-lighter text-sm mb-2">Response</h3>
-                  <CodeBlock language="bash" className="p-4 rounded-md border">
-                    {example.response}
-                  </CodeBlock>
+                  <CodeBlock lang="txt">{example.response}</CodeBlock>
                 </TabsContent_Shadcn_>
               ))}
             </Tabs_Shadcn_>
@@ -274,6 +282,10 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
     : await getApiEndpointById(section.id)
   if (!endpointDetails) return null
 
+  const endpointFgaPermissionGroups =
+    endpointDetails.security
+      ?.filter((sec) => 'fga_permissions' in sec)
+      .map((sec) => sec.fga_permissions) ?? []
   const pathParameters = (endpointDetails.parameters ?? []).filter((param) => param.in === 'path')
   const queryParameters = (endpointDetails.parameters ?? []).filter((param) => param.in === 'query')
   const bodyParameters =
@@ -297,18 +309,89 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
 
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
-      <StickyHeader title={endpointDetails.summary} className="col-[1_/_-1]" />
+      <StickyHeader
+        title={
+          <>
+            {endpointDetails.summary}
+            {endpointDetails.deprecated && (
+              <Badge variant="warning" className="ml-2">
+                deprecated
+              </Badge>
+            )}
+          </>
+        }
+        className="col-span-full"
+      />
       <div className="flex flex-col gap-12">
         <div className="flex items-center gap-2">
-          <span className="uppercase text-sm whitespace-nowrap bg-foreground text-background rounded-full font-mono font-medium px-2 py-0.5">
+          <span
+            className={cn(
+              'uppercase text-sm whitespace-nowrap bg-foreground text-background rounded-full font-mono font-medium px-2 py-0.5',
+              endpointDetails.deprecated && 'line-through'
+            )}
+          >
             {endpointDetails.method}
           </span>
-          <code className="text-foreground-lighter break-all">{endpointDetails.path}</code>
+          <code
+            className={cn(
+              'text-foreground-lighter break-all',
+              endpointDetails.deprecated && 'line-through'
+            )}
+          >
+            {endpointDetails.path}
+          </code>
         </div>
         {endpointDetails.description && (
-          <ReactMarkdown className="prose break-words mb-8">
-            {endpointDetails.description}
-          </ReactMarkdown>
+          <div className="prose wrap-break-word mb-8">
+            <ReactMarkdown>{endpointDetails.description}</ReactMarkdown>
+          </div>
+        )}
+        {endpointDetails['x-oauth-scope'] && (
+          <section>
+            <h3 className="mb-3 text-base text-foreground">OAuth scopes</h3>
+            <ul>
+              <li key={endpointDetails['x-oauth-scope']} className="list-['-'] ml-2 pl-2">
+                <span className="font-mono text-sm font-medium text-foreground">
+                  {endpointDetails['x-oauth-scope']}
+                </span>
+              </li>
+            </ul>
+          </section>
+        )}
+        {endpointDetails['x-allowed-plans'] && (
+          <section>
+            <h3 className="mb-3 text-base text-foreground">
+              This endpoint is only available on the following plans:
+            </h3>
+            <ul>
+              {endpointDetails['x-allowed-plans'].map((plan) => (
+                <li key={plan} className="list-['-'] ml-2 pl-2">
+                  <span className="font-mono text-sm font-medium text-foreground">{plan}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+        {endpointFgaPermissionGroups.length > 0 && (
+          <section>
+            <h3 className="mb-3 text-base text-foreground">
+              The fine-grained token must include the following permissions to access this endpoint:
+            </h3>
+            <ul>
+              {endpointFgaPermissionGroups.map((group, groupIndex) => (
+                <Fragment key={groupIndex}>
+                  {groupIndex > 0 && (
+                    <li className="my-2 text-foreground-lighter text-sm italic">or</li>
+                  )}
+                  {group.map((perm, permIndex) => (
+                    <li key={permIndex} className="list-['-'] ml-2 pl-2">
+                      <span className="font-mono text-sm font-medium text-foreground">{perm}</span>
+                    </li>
+                  ))}
+                </Fragment>
+              ))}
+            </ul>
+          </section>
         )}
         {pathParameters.length > 0 && (
           <section>
@@ -384,16 +467,17 @@ async function FunctionSection({
 }: FunctionSectionProps) {
   const fns = await getFunctionsList(sdkId, version)
 
-  const fn = fns.find((fn) => fn.id === section.id)
+  const fn = fns?.find((fn) => fn.id === section.id)
   if (!fn) return null
 
-  let types: MethodTypes | undefined
+  let types: MethodTypes | VariableTypes | undefined
   if (useTypeSpec && '$ref' in fn) {
-    types = await getTypeSpec(fn['$ref'] as string)
+    types = await getTypeSpec(sdkId, version, fn['$ref'] as string)
   }
 
   const fullDescription = [
     types?.comment?.shortText,
+    types?.comment?.text,
     'description' in fn && (fn.description as string),
     'notes' in fn && (fn.notes as string),
   ]
@@ -403,9 +487,19 @@ async function FunctionSection({
 
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
-      <StickyHeader {...section} className="col-[1_/_-1]" />
+      <StickyHeader {...section} className="col-span-full" />
+
+      {/* Display method signature below title */}
+      {types && 'params' in types && formatMethodSignature(types) && (
+        <div className="col-span-full -mt-2 mb-4">
+          <code className="text-sm text-foreground-muted font-mono">
+            {formatMethodSignature(types)}
+          </code>
+        </div>
+      )}
+
       <div className="overflow-hidden flex flex-col gap-8">
-        <div className="prose break-words text-sm">
+        <div className="prose wrap-break-word text-sm">
           <MDXRemoteRefs source={fullDescription} />
         </div>
         <FnParameterDetails
@@ -417,56 +511,73 @@ async function FunctionSection({
                 }))
               : 'params' in fn
                 ? (fn.params as Array<object>).map((param) => ({ ...param, __overwritten: true }))
-                : types?.params
+                : types && 'params' in types
+                  ? types.params
+                  : undefined
           }
-          altParameters={types?.altSignatures?.map(({ params }) => params)}
+          altParameters={
+            types && 'altSignatures' in types
+              ? types.altSignatures?.map(({ params }) => params)
+              : undefined
+          }
           className="max-w-[80ch]"
         />
-        {!!types?.ret && <ReturnTypeDetails returnType={types.ret} />}
+        {types && 'ret' in types && !!types.ret && <ReturnTypeDetails returnType={types.ret} />}
       </div>
       <div className="overflow-auto">
-        {'examples' in fn && Array.isArray(fn.examples) && fn.examples.length > 0 && (
-          <Tabs_Shadcn_ defaultValue={fn.examples[0].id}>
-            <TabsList_Shadcn_ className="flex-wrap gap-2 border-0">
-              {fn.examples.map((example) => (
-                <TabsTrigger_Shadcn_
-                  key={example.id}
-                  value={example.id}
-                  className={cn(
-                    'px-2.5 py-1 rounded-full',
-                    'border-0 bg-surface-200 hover:bg-surface-300',
-                    'text-xs text-foreground-lighter',
-                    // Undoing styles from primitive component
-                    'data-[state=active]:border-0 data-[state=active]:shadow-0',
-                    'data-[state=active]:bg-foreground data-[state=active]:text-background',
-                    'transition'
-                  )}
-                >
-                  {example.name}
-                </TabsTrigger_Shadcn_>
+        {(() => {
+          // Prefer YAML examples, fallback to TypeDoc examples
+          const yamlExamples =
+            'examples' in fn && Array.isArray(fn.examples) && fn.examples.length > 0
+              ? fn.examples
+              : []
+          const examples = yamlExamples.length > 0 ? yamlExamples : types?.comment?.examples || []
+
+          if (examples.length === 0) return null
+
+          return (
+            <Tabs_Shadcn_ defaultValue={examples[0].id}>
+              <TabsList_Shadcn_ className="flex-wrap gap-2 border-0">
+                {examples.map((example) => (
+                  <TabsTrigger_Shadcn_
+                    key={example.id}
+                    value={example.id}
+                    className={cn(
+                      'px-2.5 py-1 rounded-full',
+                      'border-0 bg-surface-200 hover:bg-surface-300',
+                      'text-xs text-foreground-lighter',
+                      // Undoing styles from primitive component
+                      'data-[state=active]:border-0 data-[state=active]:shadow-0',
+                      'data-[state=active]:bg-foreground data-[state=active]:text-background',
+                      'transition'
+                    )}
+                  >
+                    {example.name}
+                  </TabsTrigger_Shadcn_>
+                ))}
+              </TabsList_Shadcn_>
+              {examples.map((example) => (
+                <TabsContent_Shadcn_ key={example.id} value={example.id}>
+                  <MDXRemoteRefs source={example.code} />
+                  <div className="flex flex-col gap-2 mt-2">
+                    {'data' in example && !!example.data?.sql && (
+                      <CollapsibleDetails title="Data source" content={example.data.sql} />
+                    )}
+                    {'response' in example && !!example.response && (
+                      <CollapsibleDetails title="Response" content={example.response} />
+                    )}
+                    {'description' in example && !!example.description && (
+                      <CollapsibleDetails
+                        title="Notes"
+                        content={normalizeMarkdown(example.description)}
+                      />
+                    )}
+                  </div>
+                </TabsContent_Shadcn_>
               ))}
-            </TabsList_Shadcn_>
-            {fn.examples.map((example) => (
-              <TabsContent_Shadcn_ key={example.id} value={example.id}>
-                <MDXRemoteRefs source={example.code} />
-                <div className="flex flex-col gap-2">
-                  {!!example.data?.sql && (
-                    <CollapsibleDetails title="Data source" content={example.data.sql} />
-                  )}
-                  {!!example.response && (
-                    <CollapsibleDetails title="Response" content={example.response} />
-                  )}
-                  {!!example.description && (
-                    <CollapsibleDetails
-                      title="Notes"
-                      content={normalizeMarkdown(example.description)}
-                    />
-                  )}
-                </div>
-              </TabsContent_Shadcn_>
-            ))}
-          </Tabs_Shadcn_>
-        )}
+            </Tabs_Shadcn_>
+          )
+        })()}
       </div>
     </RefSubLayout.Section>
   )

@@ -1,21 +1,31 @@
-import ApiExamples from 'data/products/realtime/api-examples'
-import AppExamples from 'data/products/realtime/app-examples'
-import MainProducts from '~/data/MainProducts'
-import { NextSeo } from 'next-seo'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { Button, Image } from 'ui'
+import 'swiper/css'
+
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductsNav from '~/components/Products/ProductsNav'
+import RealtimeShowcase from '~/components/Realtime/realtime-showcase'
 import APISection from '~/components/Sections/APISection'
 import ProductHeader from '~/components/Sections/ProductHeader'
+import MainProducts from '~/data/MainProducts'
 import RealtimeStyles from '~/styles/realtime.module.css'
-
+import ApiExamples from 'data/products/realtime/api-examples'
 import { Grid, Layers, Menu } from 'lucide-react'
+import { NextSeo } from 'next-seo'
+import dynamic from 'next/dynamic'
+import Head from 'next/head'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { PRODUCT_NAMES } from 'shared-data/products'
-import 'swiper/css'
+import { Button } from 'ui'
+
+import { breadcrumbs } from '@/lib/breadcrumbs'
+import { breadcrumbListSchema, serializeJsonLd, softwareApplicationSchema } from '@/lib/json-ld'
+
+const SingleQuote = dynamic(() => import('~/components/Sections/SingleQuote'))
+
+// When updating page content, also update public/llms/realtime.txt
 
 const Cursor = ({ className = '', color = 'none' }) => {
   return (
@@ -59,6 +69,27 @@ function RealtimePage() {
           ],
         }}
       />
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(
+              softwareApplicationSchema({
+                name: 'Supabase Realtime',
+                description: meta_description,
+                url: 'https://supabase.com/realtime',
+                image: `https://supabase.com${basePath}/images/realtime/og.jpg`,
+              })
+            ),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.realtime)),
+          }}
+        />
+      </Head>
       <DefaultLayout>
         <ProductsNav activePage={PRODUCT_NAMES.REALTIME} />
         <ProductHeader
@@ -67,7 +98,7 @@ function RealtimePage() {
           h1={[<span key={'authentication-h1'}>Build modern web and mobile applications</span>]}
           subheader={['Sync client state globally over WebSockets in Realtime']}
           image={[
-            <div className="bg-surface-100 border-default relative flex h-[372px] w-[560px] items-center justify-center overflow-hidden rounded border drop-shadow-md">
+            <div className="bg-surface-100 border-default relative flex h-[372px] w-[560px] items-center justify-center overflow-hidden rounded-sm border drop-shadow-md">
               <div
                 className={[
                   'border-brand-300 relative h-12 w-48 bg-brand',
@@ -81,11 +112,11 @@ function RealtimePage() {
                 </p>
               </div>
               <Cursor
-                color="var(--colors-yellow9)"
+                color="var(--color-yellow-900)"
                 className={`${RealtimeStyles['cursor-one']} absolute top-[220px] right-[130px]`}
               />
               <Cursor
-                color="var(--colors-indigo9)"
+                color="var(--color-indigo-900)"
                 className={`${RealtimeStyles['cursor-two']} absolute top-[180px] right-[280px]`}
               />
               <div
@@ -98,7 +129,7 @@ function RealtimePage() {
                 <p className="text-lg">🤔</p>
               </div>
               <Cursor
-                color="var(--colors-tomato9)"
+                color="var(--color-tomato-900)"
                 className={`${RealtimeStyles['cursor-three']} absolute top-[170px] right-[180px]`}
               />
               <div
@@ -118,8 +149,8 @@ function RealtimePage() {
                 </div>
                 <div className="mx-3 flex items-center">
                   <div className="border-foreground bg-tomato-900 relative -right-4 h-5 w-5 rounded-full border" />
-                  <div className="border-foreground bg-yellow-900 relative -right-2 z-[2] h-5 w-5 rounded-full border" />
-                  <div className="border-foreground bg-indigo-900 z-[3] h-5 w-5 rounded-full border" />
+                  <div className="border-foreground bg-yellow-900 relative -right-2 z-2 h-5 w-5 rounded-full border" />
+                  <div className="border-foreground bg-indigo-900 z-3 h-5 w-5 rounded-full border" />
                 </div>
               </div>
             </div>,
@@ -182,39 +213,36 @@ function RealtimePage() {
           </div>
         </SectionContainer>
 
-        <SectionContainer className="flex flex-col gap-8">
-          <div className="flex flex-col items-center justify-center">
-            <h2 className="h3">What you can build with Realtime</h2>
-            <p className="p mx-auto text-center lg:w-1/2">
+        <SingleQuote
+          id="quote"
+          className="pb-8! md:pb-12!"
+          quote={{
+            text: 'Supabase takes out the mental effort from our back-end infrastructure so we can focus on our customers needs.',
+            author: 'Aaron Sullivan',
+            role: 'Principal Software Engineer Epsilon3',
+            link: '/customers/epsilon3',
+            logo: (
+              <Image
+                draggable={false}
+                src="/images/blog/avatars/aaron-epsilon3.png"
+                alt="Aaron Sullivan, Principal Software Engineer Epsilon3"
+                className="w-10 h-10 rounded-full overflow-hidden object-cover"
+                width={28}
+                height={28}
+              />
+            ),
+          }}
+        />
+
+        <SectionContainer className="pb-0! mb-0!">
+          <div className="mb-12 prose">
+            <h3>What you can build with Realtime</h3>
+            <p className="text-foreground-light mt-0">
               Build any kind of Realtime application with ease, including any of these scenarios.
             </p>
           </div>
-          <div className="grid gap-10 grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
-            {AppExamples.map((example) => {
-              return (
-                <>
-                  <div className="flex flex-col gap-3">
-                    <Image
-                      alt={example.title}
-                      src={{
-                        light: `/images/realtime/example-apps/light/${example.img}?type=1`,
-                        dark: `/images/realtime/example-apps/dark/${example.img}`,
-                      }}
-                      className="bg-surface-100 rounded-lg"
-                      layout="fill"
-                      objectFit="contain"
-                    />
-                    <div className="prose">
-                      <h4>{example.title}</h4>
-                      <p className="text-sm">{example.description}</p>
-                    </div>
-                  </div>
-                </>
-              )
-            })}
-          </div>
+          <RealtimeShowcase />
         </SectionContainer>
-
         <SectionContainer>
           <APISection
             title="Simple and convenient APIs"

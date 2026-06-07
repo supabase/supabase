@@ -1,6 +1,6 @@
-import { readFile } from 'fs/promises'
-import { processMdx } from '../../helpers.mdx'
-import { BaseLoader, BaseSource } from './base'
+import { GuideModel, SubsectionModel } from '../../../resources/guide/guideModel.js'
+import { GuideModelLoader } from '../../../resources/guide/guideModelLoader.js'
+import { BaseLoader, BaseSource } from './base.js'
 
 export class MarkdownLoader extends BaseLoader {
   type = 'markdown' as const
@@ -15,8 +15,32 @@ export class MarkdownLoader extends BaseLoader {
   }
 
   async load() {
-    const contents = await readFile(this.filePath, 'utf8')
-    return [new MarkdownSource(this.source, this.path, contents, this.options)]
+    const guide = (
+      await GuideModelLoader.fromFs(this.filePath.replace(/^content\/guides/, ''))
+    ).unwrap()
+    return [
+      new MarkdownSource(
+        this.source,
+        this.path,
+        guide.content ?? '',
+        {
+          checksum: guide.checksum,
+          meta: guide.metadata,
+          sections: guide.subsections,
+        },
+        this.options
+      ),
+    ]
+  }
+
+  static fromGuideModel(source: string, guide: GuideModel): MarkdownSource {
+    const path = guide.href ? guide.href.replace('https://supabase.com/docs', '') : ''
+
+    return new MarkdownSource(source, path, guide.content ?? '', {
+      checksum: guide.checksum,
+      meta: guide.metadata,
+      sections: guide.subsections,
+    })
   }
 }
 
@@ -27,23 +51,35 @@ export class MarkdownSource extends BaseSource {
     source: string,
     path: string,
     public contents: string,
+    {
+      checksum,
+      meta,
+      sections,
+    }: { checksum?: string; meta?: Record<string, unknown>; sections: Array<SubsectionModel> },
     public options?: { yaml?: boolean }
   ) {
     super(source, path)
+    this.checksum = checksum
+    this.meta = meta ?? {}
+    this.sections = sections.map((section) => ({
+      content: section.content ?? '',
+      heading: section.title,
+      slug: section.href,
+    }))
   }
 
-  process() {
-    const { checksum, meta, sections } = processMdx(this.contents, this.options)
-
-    this.checksum = checksum
-    this.meta = meta
-    this.sections = sections
-
-    return { checksum, meta, sections }
+  async process() {
+    return {
+      checksum: this.checksum ?? '',
+      meta: this.meta,
+      sections: this.sections ?? [],
+    }
   }
 
   extractIndexedContent(): string {
     const sections = this.sections ?? []
-    return sections.map(({ content }) => content).join('\n\n')
+    const sectionText = sections.map(({ content }) => content).join('\n\n')
+
+    return `# ${this.meta?.title ?? ''}\n\n${this.meta?.subtitle ?? ''}\n\n${sectionText}`
   }
 }

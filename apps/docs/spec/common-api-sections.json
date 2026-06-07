@@ -3,7 +3,80 @@
     "title": "Introduction",
     "id": "introduction",
     "slug": "introduction",
-    "type": "markdown"
+    "type": "markdown",
+    "items": []
+  },
+  {
+    "type": "category",
+    "title": "Advisors",
+    "items": [
+      {
+        "id": "v1-get-performance-advisors",
+        "title": "Get performance advisors",
+        "slug": "v1-get-performance-advisors",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-security-advisors",
+        "title": "Get security advisors",
+        "slug": "v1-get-security-advisors",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Analytics",
+    "items": [
+      {
+        "id": "v2-create-log-drain",
+        "title": "Create log drain",
+        "slug": "v2-create-log-drain",
+        "type": "operation"
+      },
+      {
+        "id": "v2-delete-log-drain",
+        "title": "Delete log drain",
+        "slug": "v2-delete-log-drain",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-project-function-combined-stats",
+        "title": "Get project function combined stats",
+        "slug": "v1-get-project-function-combined-stats",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-project-logs",
+        "title": "Get project logs",
+        "slug": "v1-get-project-logs",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-project-usage-api-count",
+        "title": "Get project usage api count",
+        "slug": "v1-get-project-usage-api-count",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-project-usage-request-count",
+        "title": "Get project usage request count",
+        "slug": "v1-get-project-usage-request-count",
+        "type": "operation"
+      },
+      {
+        "id": "v2-list-log-drains",
+        "title": "List log drains",
+        "slug": "v2-list-log-drains",
+        "type": "operation"
+      },
+      {
+        "id": "v2-update-log-drain",
+        "title": "Update log drain",
+        "slug": "v2-update-log-drain",
+        "type": "operation"
+      }
+    ]
   },
   {
     "type": "category",
@@ -16,9 +89,33 @@
         "type": "operation"
       },
       {
+        "id": "v1-create-legacy-signing-key",
+        "title": "Create legacy signing key",
+        "slug": "v1-create-legacy-signing-key",
+        "type": "operation"
+      },
+      {
+        "id": "v1-create-project-signing-key",
+        "title": "Create project signing key",
+        "slug": "v1-create-project-signing-key",
+        "type": "operation"
+      },
+      {
+        "id": "v1-create-project-tpa-integration",
+        "title": "Create project tpa integration",
+        "slug": "v1-create-project-tpa-integration",
+        "type": "operation"
+      },
+      {
         "id": "v1-delete-a-sso-provider",
         "title": "Delete a sso provider",
         "slug": "v1-delete-a-sso-provider",
+        "type": "operation"
+      },
+      {
+        "id": "v1-delete-project-tpa-integration",
+        "title": "Delete project tpa integration",
+        "slug": "v1-delete-project-tpa-integration",
         "type": "operation"
       },
       {
@@ -34,9 +131,45 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-legacy-signing-key",
+        "title": "Get legacy signing key",
+        "slug": "v1-get-legacy-signing-key",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-project-signing-key",
+        "title": "Get project signing key",
+        "slug": "v1-get-project-signing-key",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-project-signing-keys",
+        "title": "Get project signing keys",
+        "slug": "v1-get-project-signing-keys",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-project-tpa-integration",
+        "title": "Get project tpa integration",
+        "slug": "v1-get-project-tpa-integration",
+        "type": "operation"
+      },
+      {
         "id": "v1-list-all-sso-provider",
         "title": "List all sso provider",
         "slug": "v1-list-all-sso-provider",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-project-tpa-integrations",
+        "title": "List project tpa integrations",
+        "slug": "v1-list-project-tpa-integrations",
+        "type": "operation"
+      },
+      {
+        "id": "v1-remove-project-signing-key",
+        "title": "Remove project signing key",
+        "slug": "v1-remove-project-signing-key",
         "type": "operation"
       },
       {
@@ -50,6 +183,36 @@
         "title": "Update auth service config",
         "slug": "v1-update-auth-service-config",
         "type": "operation"
+      },
+      {
+        "id": "v1-update-project-signing-key",
+        "title": "Update project signing key",
+        "slug": "v1-update-project-signing-key",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Billing",
+    "items": [
+      {
+        "id": "v1-apply-project-addon",
+        "title": "Apply project addon",
+        "slug": "v1-apply-project-addon",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-project-addons",
+        "title": "List project addons",
+        "slug": "v1-list-project-addons",
+        "type": "operation"
+      },
+      {
+        "id": "v1-remove-project-addon",
+        "title": "Remove project addon",
+        "slug": "v1-remove-project-addon",
+        "type": "operation"
       }
     ]
   },
@@ -57,6 +220,36 @@
     "type": "category",
     "title": "Database",
     "items": [
+      {
+        "id": "v1-apply-a-migration",
+        "title": "Apply a migration",
+        "slug": "v1-apply-a-migration",
+        "type": "operation"
+      },
+      {
+        "id": "v1-authorize-jit-access",
+        "title": "Authorize jit access",
+        "slug": "v1-authorize-jit-access",
+        "type": "operation"
+      },
+      {
+        "id": "v1-create-login-role",
+        "title": "Create login role",
+        "slug": "v1-create-login-role",
+        "type": "operation"
+      },
+      {
+        "id": "v1-delete-jit-access",
+        "title": "Delete jit access",
+        "slug": "v1-delete-jit-access",
+        "type": "operation"
+      },
+      {
+        "id": "v1-delete-login-roles",
+        "title": "Delete login roles",
+        "slug": "v1-delete-login-roles",
+        "type": "operation"
+      },
       {
         "id": "v1-disable-readonly-mode-temporarily",
         "title": "Disable readonly mode temporarily",
@@ -76,9 +269,51 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-a-migration",
+        "title": "Get a migration",
+        "slug": "v1-get-a-migration",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-a-snippet",
         "title": "Get a snippet",
         "slug": "v1-get-a-snippet",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-backup-schedule",
+        "title": "Get backup schedule",
+        "slug": "v1-get-backup-schedule",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-database-metadata",
+        "title": "Get database metadata",
+        "slug": "v1-get-database-metadata",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-database-openapi",
+        "title": "Get database openapi",
+        "slug": "v1-get-database-openapi",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-jit-access",
+        "title": "Get jit access",
+        "slug": "v1-get-jit-access",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-jit-access-config",
+        "title": "Get jit access config",
+        "slug": "v1-get-jit-access-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-pooler-config",
+        "title": "Get pooler config",
+        "slug": "v1-get-pooler-config",
         "type": "operation"
       },
       {
@@ -106,12 +341,6 @@
         "type": "operation"
       },
       {
-        "id": "v1-get-supavisor-config",
-        "title": "Get supavisor config",
-        "slug": "v1-get-supavisor-config",
-        "type": "operation"
-      },
-      {
         "id": "v1-list-all-backups",
         "title": "List all backups",
         "slug": "v1-list-all-backups",
@@ -121,6 +350,30 @@
         "id": "v1-list-all-snippets",
         "title": "List all snippets",
         "slug": "v1-list-all-snippets",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-jit-access",
+        "title": "List jit access",
+        "slug": "v1-list-jit-access",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-migration-history",
+        "title": "List migration history",
+        "slug": "v1-list-migration-history",
+        "type": "operation"
+      },
+      {
+        "id": "v1-patch-a-migration",
+        "title": "Patch a migration",
+        "slug": "v1-patch-a-migration",
+        "type": "operation"
+      },
+      {
+        "id": "v1-read-only-query",
+        "title": "Read only query",
+        "slug": "v1-read-only-query",
         "type": "operation"
       },
       {
@@ -136,6 +389,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-rollback-migrations",
+        "title": "Rollback migrations",
+        "slug": "v1-rollback-migrations",
+        "type": "operation"
+      },
+      {
         "id": "v1-run-a-query",
         "title": "Run a query",
         "slug": "v1-run-a-query",
@@ -145,6 +404,36 @@
         "id": "v1-setup-a-read-replica",
         "title": "Setup a read replica",
         "slug": "v1-setup-a-read-replica",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-backup-schedule",
+        "title": "Update backup schedule",
+        "slug": "v1-update-backup-schedule",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-database-password",
+        "title": "Update database password",
+        "slug": "v1-update-database-password",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-jit-access",
+        "title": "Update jit access",
+        "slug": "v1-update-jit-access",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-jit-access-config",
+        "title": "Update jit access config",
+        "slug": "v1-update-jit-access-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-pooler-config",
+        "title": "Update pooler config",
+        "slug": "v1-update-pooler-config",
         "type": "operation"
       },
       {
@@ -160,9 +449,9 @@
         "type": "operation"
       },
       {
-        "id": "v1-update-supavisor-config",
-        "title": "Update supavisor config",
-        "slug": "v1-update-supavisor-config",
+        "id": "v1-upsert-a-migration",
+        "title": "Upsert a migration",
+        "slug": "v1-upsert-a-migration",
         "type": "operation"
       }
     ]
@@ -226,6 +515,12 @@
     "title": "Edge Functions",
     "items": [
       {
+        "id": "v1-bulk-update-functions",
+        "title": "Bulk update functions",
+        "slug": "v1-bulk-update-functions",
+        "type": "operation"
+      },
+      {
         "id": "v1-create-a-function",
         "title": "Create a function",
         "slug": "v1-create-a-function",
@@ -235,6 +530,12 @@
         "id": "v1-delete-a-function",
         "title": "Delete a function",
         "slug": "v1-delete-a-function",
+        "type": "operation"
+      },
+      {
+        "id": "v1-deploy-a-function",
+        "title": "Deploy a function",
+        "slug": "v1-deploy-a-function",
         "type": "operation"
       },
       {
@@ -268,6 +569,12 @@
     "title": "Environments",
     "items": [
       {
+        "id": "v1-count-action-runs",
+        "title": "Count action runs",
+        "slug": "v1-count-action-runs",
+        "type": "operation"
+      },
+      {
         "id": "v1-create-a-branch",
         "title": "Create a branch",
         "slug": "v1-create-a-branch",
@@ -280,9 +587,21 @@
         "type": "operation"
       },
       {
+        "id": "v1-diff-a-branch",
+        "title": "Diff a branch",
+        "slug": "v1-diff-a-branch",
+        "type": "operation"
+      },
+      {
         "id": "v1-disable-preview-branching",
         "title": "Disable preview branching",
         "slug": "v1-disable-preview-branching",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-a-branch",
+        "title": "Get a branch",
+        "slug": "v1-get-a-branch",
         "type": "operation"
       },
       {
@@ -292,9 +611,33 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-action-run",
+        "title": "Get action run",
+        "slug": "v1-get-action-run",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-action-run-logs",
+        "title": "Get action run logs",
+        "slug": "v1-get-action-run-logs",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-action-runs",
+        "title": "List action runs",
+        "slug": "v1-list-action-runs",
+        "type": "operation"
+      },
+      {
         "id": "v1-list-all-branches",
         "title": "List all branches",
         "slug": "v1-list-all-branches",
+        "type": "operation"
+      },
+      {
+        "id": "v1-merge-a-branch",
+        "title": "Merge a branch",
+        "slug": "v1-merge-a-branch",
         "type": "operation"
       },
       {
@@ -310,9 +653,21 @@
         "type": "operation"
       },
       {
+        "id": "v1-restore-a-branch",
+        "title": "Restore a branch",
+        "slug": "v1-restore-a-branch",
+        "type": "operation"
+      },
+      {
         "id": "v1-update-a-branch-config",
         "title": "Update a branch config",
         "slug": "v1-update-a-branch-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-action-run-status",
+        "title": "Update action run status",
+        "slug": "v1-update-action-run-status",
         "type": "operation"
       }
     ]
@@ -331,6 +686,12 @@
         "id": "v1-exchange-oauth-token",
         "title": "Exchange oauth token",
         "slug": "v1-exchange-oauth-token",
+        "type": "operation"
+      },
+      {
+        "id": "v1-oauth-authorize-project-claim",
+        "title": "Oauth authorize project claim",
+        "slug": "v1-oauth-authorize-project-claim",
         "type": "operation"
       },
       {
@@ -358,6 +719,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-organization-entitlements",
+        "title": "Get organization entitlements",
+        "slug": "v1-get-organization-entitlements",
+        "type": "operation"
+      },
+      {
         "id": "v1-list-all-organizations",
         "title": "List all organizations",
         "slug": "v1-list-all-organizations",
@@ -373,8 +740,26 @@
   },
   {
     "type": "category",
+    "title": "Profile",
+    "items": [
+      {
+        "id": "v1-get-profile",
+        "title": "Get profile",
+        "slug": "v1-get-profile",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
     "title": "Projects",
     "items": [
+      {
+        "id": "v1-cancel-a-project-restoration",
+        "title": "Cancel a project restoration",
+        "slug": "v1-cancel-a-project-restoration",
+        "type": "operation"
+      },
       {
         "id": "v1-create-a-project",
         "title": "Create a project",
@@ -391,6 +776,30 @@
         "id": "v1-delete-network-bans",
         "title": "Delete network bans",
         "slug": "v1-delete-network-bans",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-all-projects-for-organization",
+        "title": "Get all projects for organization",
+        "slug": "v1-get-all-projects-for-organization",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-available-regions",
+        "title": "Get available regions",
+        "slug": "v1-get-available-regions",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-database-disk",
+        "title": "Get database disk",
+        "slug": "v1-get-database-disk",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-disk-utilization",
+        "title": "Get disk utilization",
+        "slug": "v1-get-disk-utilization",
         "type": "operation"
       },
       {
@@ -418,6 +827,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-project-disk-autoscale-config",
+        "title": "Get project disk autoscale config",
+        "slug": "v1-get-project-disk-autoscale-config",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-services-health",
         "title": "Get services health",
         "slug": "v1-get-services-health",
@@ -430,15 +845,63 @@
         "type": "operation"
       },
       {
+        "id": "v1-list-all-network-bans-enriched",
+        "title": "List all network bans enriched",
+        "slug": "v1-list-all-network-bans-enriched",
+        "type": "operation"
+      },
+      {
         "id": "v1-list-all-projects",
         "title": "List all projects",
         "slug": "v1-list-all-projects",
         "type": "operation"
       },
       {
+        "id": "v1-list-available-restore-versions",
+        "title": "List available restore versions",
+        "slug": "v1-list-available-restore-versions",
+        "type": "operation"
+      },
+      {
+        "id": "v1-modify-database-disk",
+        "title": "Modify database disk",
+        "slug": "v1-modify-database-disk",
+        "type": "operation"
+      },
+      {
+        "id": "v1-patch-network-restrictions",
+        "title": "Patch network restrictions",
+        "slug": "v1-patch-network-restrictions",
+        "type": "operation"
+      },
+      {
         "id": "v1-pause-a-project",
         "title": "Pause a project",
         "slug": "v1-pause-a-project",
+        "type": "operation"
+      },
+      {
+        "id": "v2-preview-a-project-transfer",
+        "title": "Preview a project transfer",
+        "slug": "v2-preview-a-project-transfer",
+        "type": "operation"
+      },
+      {
+        "id": "v1-restore-a-project",
+        "title": "Restore a project",
+        "slug": "v1-restore-a-project",
+        "type": "operation"
+      },
+      {
+        "id": "v2-transfer-a-project",
+        "title": "Transfer a project",
+        "slug": "v2-transfer-a-project",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-a-project",
+        "title": "Update a project",
+        "slug": "v1-update-a-project",
         "type": "operation"
       },
       {
@@ -451,6 +914,30 @@
         "id": "v1-upgrade-postgres-version",
         "title": "Upgrade postgres version",
         "slug": "v1-upgrade-postgres-version",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Realtime",
+    "items": [
+      {
+        "id": "v1-get-realtime-config",
+        "title": "Get realtime config",
+        "slug": "v1-get-realtime-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-shutdown-realtime",
+        "title": "Shutdown realtime",
+        "slug": "v1-shutdown-realtime",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-realtime-config",
+        "title": "Update realtime config",
+        "slug": "v1-update-realtime-config",
         "type": "operation"
       }
     ]
@@ -490,15 +977,39 @@
         "type": "operation"
       },
       {
+        "id": "v1-create-project-api-key",
+        "title": "Create project api key",
+        "slug": "v1-create-project-api-key",
+        "type": "operation"
+      },
+      {
+        "id": "v1-delete-project-api-key",
+        "title": "Delete project api key",
+        "slug": "v1-delete-project-api-key",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-pgsodium-config",
         "title": "Get pgsodium config",
         "slug": "v1-get-pgsodium-config",
         "type": "operation"
       },
       {
+        "id": "v1-get-project-api-key",
+        "title": "Get project api key",
+        "slug": "v1-get-project-api-key",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-project-api-keys",
         "title": "Get project api keys",
         "slug": "v1-get-project-api-keys",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-project-legacy-api-keys",
+        "title": "Get project legacy api keys",
+        "slug": "v1-get-project-legacy-api-keys",
         "type": "operation"
       },
       {
@@ -511,6 +1022,18 @@
         "id": "v1-update-pgsodium-config",
         "title": "Update pgsodium config",
         "slug": "v1-update-pgsodium-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-project-api-key",
+        "title": "Update project api key",
+        "slug": "v1-update-project-api-key",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-project-legacy-api-keys",
+        "title": "Update project legacy api keys",
+        "slug": "v1-update-project-legacy-api-keys",
         "type": "operation"
       }
     ]

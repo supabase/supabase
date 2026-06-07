@@ -1,109 +1,45 @@
-import '@code-hike/mdx/styles'
-import 'config/code-hike.scss'
-import '../styles/index.css'
+import '@code-hike/mdx/styles.css'
+import 'config/code-hike.css'
+import '../styles/globals.css'
+import './launch-week/launchWeek.css'
 
-import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import {
   AuthProvider,
-  IS_PROD,
+  FeatureFlagProvider,
+  IS_PLATFORM,
+  PageTelemetry,
+  TelemetryTagManager,
   ThemeProvider,
-  useTelemetryCookie,
-  useTelemetryProps,
   useThemeSandbox,
 } from 'common'
-import { DefaultSeo } from 'next-seo'
-import { AppProps } from 'next/app'
-import Head from 'next/head'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
-import { Announcement, SonnerToaster, themes } from 'ui'
-import { CommandProvider } from 'ui-patterns/CommandMenu'
-import { useConsent } from 'ui-patterns/ConsentToast'
-
 import MetaFaviconsPagesRouter, {
   DEFAULT_FAVICON_ROUTE,
   DEFAULT_FAVICON_THEME_COLOR,
 } from 'common/MetaFavicons/pages-router'
-import LW13CountdownBanner from 'ui/src/layout/banners/LW13CountdownBanner/LW13CountdownBanner'
-import { WwwCommandMenu } from '~/components/CommandMenu'
-import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION, IS_PREVIEW } from '~/lib/constants'
-import { post } from '~/lib/fetchWrapper'
-import supabase from '~/lib/supabase'
+import { DevToolbar, DevToolbarProvider } from 'dev-tools'
+import { DefaultSeo } from 'next-seo'
+import type { AppProps } from 'next/app'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import { TooltipProvider } from 'ui'
+import { CommandProvider } from 'ui-patterns/CommandMenu'
+import { useConsentToast } from 'ui-patterns/consent'
+
 import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
+import { useWwwCommandMenuTelemetry } from '../hooks/useWwwCommandMenuTelemetry'
+import { MD_PAGES } from '@/app/api-v2/md/content.generated'
+import { Toaster } from '@/app/toaster'
+import { WwwCommandMenu } from '@/components/CommandMenu'
+import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '@/lib/constants'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
-  const telemetryProps = useTelemetryProps()
-  const { hasAcceptedConsent } = useConsent()
-  const IS_DEV = !IS_PROD && !IS_PREVIEW
-  const blockEvents = IS_DEV || !hasAcceptedConsent
-
-  const title = typeof document !== 'undefined' ? document?.title : ''
-  const referrer = typeof document !== 'undefined' ? document?.referrer : ''
-
-  const { search, language, viewport_height, viewport_width } = telemetryProps
+  const { hasAcceptedConsent } = useConsentToast()
+  const { onTelemetry } = useWwwCommandMenuTelemetry()
 
   useThemeSandbox()
 
-  useTelemetryCookie({ hasAcceptedConsent, title, referrer })
-
-  function handlePageTelemetry(url: string) {
-    return post(
-      `${API_URL}/telemetry/page`,
-      {
-        page_url: url,
-        page_title: title,
-        pathname: router.pathname,
-        ph: {
-          referrer,
-          language,
-          search,
-          viewport_height,
-          viewport_width,
-          user_agent: navigator.userAgent,
-        },
-      },
-      { headers: { Version: '2' }, credentials: 'include' }
-    )
-  }
-
-  useEffect(() => {
-    if (blockEvents) return
-
-    function handleRouteChange() {
-      handlePageTelemetry(window.location.href)
-    }
-
-    // Listen for page changes after a navigation or when the query changes
-    router.events.on('routeChangeComplete', handleRouteChange)
-    return () => {
-      router.events.off('routeChangeComplete', handleRouteChange)
-    }
-  }, [router.events, blockEvents])
-
-  useEffect(() => {
-    if (!router.isReady) return
-    if (blockEvents) return
-    handlePageTelemetry(window.location.href)
-  }, [router.isReady, blockEvents])
-
-  useEffect(() => {
-    const handleBeforeUnload = async () => {
-      if (!blockEvents) {
-        await post(`${API_URL}/telemetry/page-leave`, {
-          page_url: window.location.href,
-          page_title: title,
-          pathname: router.pathname,
-        })
-      }
-    }
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-    }
-  }, [blockEvents, router.pathname, title])
-
-  const site_title = `${APP_NAME} | The Open Source Firebase Alternative`
+  const site_title = `${APP_NAME} | The Postgres Development Platform.`
   const { basePath } = useRouter()
 
   const isDarkLaunchWeek = useDarkLaunchWeeks()
@@ -113,16 +49,26 @@ export default function App({ Component, pageProps }: AppProps) {
   let faviconRoute = DEFAULT_FAVICON_ROUTE
   let themeColor = DEFAULT_FAVICON_THEME_COLOR
 
-  if (router.asPath && router.asPath.includes('/launch-week/x')) {
+  if (router.asPath?.includes('/launch-week/x')) {
     applicationName = 'Supabase LWX'
     faviconRoute = 'images/launchweek/lwx/favicon'
     themeColor = 'FFFFFF'
   }
 
+  // Advertise the .md version for AI agents on pages that have one.
+  const cleanPath = (router.asPath ?? '/').split('?')[0].split('#')[0].replace(/\/$/, '') || '/'
+  const mdSlug = cleanPath === '/' ? 'homepage' : cleanPath.slice(1)
+  const mdAlternateHref = MD_PAGES.has(mdSlug)
+    ? cleanPath === '/'
+      ? '/homepage.md'
+      : `${cleanPath}.md`
+    : null
+
   return (
     <>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        {mdAlternateHref && <link rel="alternate" type="text/markdown" href={mdAlternateHref} />}
       </Head>
       <MetaFaviconsPagesRouter
         applicationName={applicationName}
@@ -154,25 +100,30 @@ export default function App({ Component, pageProps }: AppProps) {
           cardType: 'summary_large_image',
         }}
       />
-      <SessionContextProvider supabaseClient={supabase}>
-        <AuthProvider>
-          <ThemeProvider
-            themes={themes.map((theme) => theme.value)}
-            enableSystem
-            disableTransitionOnChange
-            forcedTheme={forceDarkMode ? 'dark' : undefined}
-          >
-            <CommandProvider>
-              <Announcement>
-                <LW13CountdownBanner />
-              </Announcement>
-              <SonnerToaster position="top-right" />
-              <Component {...pageProps} />
-              <WwwCommandMenu />
-            </CommandProvider>
-          </ThemeProvider>
-        </AuthProvider>
-      </SessionContextProvider>
+
+      <AuthProvider>
+        {/* [TODO] I think we need to deconflict with the providers in layout.tsx? */}
+        <FeatureFlagProvider API_URL={API_URL} enabled={{ cc: true, ph: false }}>
+          <DevToolbarProvider apiUrl={API_URL}>
+            <ThemeProvider forcedTheme={forceDarkMode ? 'dark' : undefined}>
+              <TooltipProvider delayDuration={0}>
+                <CommandProvider app="www" onTelemetry={onTelemetry}>
+                  <Toaster />
+                  <Component {...pageProps} />
+                  <WwwCommandMenu />
+                  <PageTelemetry
+                    API_URL={API_URL}
+                    hasAcceptedConsent={hasAcceptedConsent}
+                    enabled={IS_PLATFORM}
+                  />
+                  <DevToolbar />
+                </CommandProvider>
+              </TooltipProvider>
+            </ThemeProvider>
+          </DevToolbarProvider>
+        </FeatureFlagProvider>
+      </AuthProvider>
+      <TelemetryTagManager />
     </>
   )
 }

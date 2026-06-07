@@ -1,64 +1,49 @@
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
+import type { PropsWithChildren } from 'react'
 
-import { useIsColumnLevelPrivilegesEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { ProductMenu } from 'components/ui/ProductMenu'
-import { useAuthConfigPrefetch } from 'data/auth/auth-config-query'
-import { withAuth } from 'hooks/misc/withAuth'
-import Link from 'next/link'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-import ProjectLayout from '../ProjectLayout/ProjectLayout'
-import { generateAuthMenu } from './AuthLayout.utils'
+import { ProjectLayout } from '../ProjectLayout'
+import { useGenerateAuthMenu } from './AuthLayout.utils'
+import { ProductMenu } from '@/components/ui/ProductMenu'
+import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
+import { useAuthConfigPrefetch } from '@/data/auth/auth-config-query'
+import { withAuth } from '@/hooks/misc/withAuth'
 
-export interface AuthLayoutProps {
-  title?: string
-}
-
-const AuthProductMenu = () => {
+export const AuthProductMenu = () => {
+  const router = useRouter()
   const { ref: projectRef = 'default' } = useParams()
-  const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
 
   useAuthConfigPrefetch({ projectRef })
-
-  const router = useRouter()
   const page = router.pathname.split('/')[4]
+  const menu = useGenerateAuthMenu()
 
-  return (
-    <>
-      <ProductMenu page={page} menu={generateAuthMenu(projectRef)} />
-      {columnLevelPrivileges && (
-        <div className="px-3">
-          <Alert_Shadcn_>
-            <AlertTitle_Shadcn_ className="text-sm">
-              Column Privileges has been shifted
-            </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_ className="text-xs">
-              <p className="mb-2">It can now be found in the menu under the database section.</p>
-              <Button asChild type="default" size="tiny">
-                <Link href={`/project/${projectRef}/database/column-privileges`}>
-                  Head over to Database
-                </Link>
-              </Button>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
-        </div>
-      )}
-    </>
-  )
+  return <ProductMenu page={page} menu={menu} />
 }
 
-const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => {
+const AuthLayout = ({ title, children }: PropsWithChildren<{ title: string }>) => {
+  const router = useRouter()
+  const { ref: projectRef = 'default' } = useParams()
+
+  useAuthConfigPrefetch({ projectRef })
+  const page = router.pathname.split('/')[4]
+  const menu = useGenerateAuthMenu()
+
   return (
     <ProjectLayout
-      title={title || 'Authentication'}
       product="Authentication"
-      productMenu={<AuthProductMenu />}
+      browserTitle={{ section: title }}
+      productMenu={<ProductMenu page={page} menu={menu} />}
       isBlocking={false}
     >
+      <ProductMenuShortcuts menu={menu} />
       {children}
     </ProjectLayout>
   )
 }
 
+/**
+ * Layout for all auth pages on the dashboard, wrapped with withAuth to verify logged in state
+ *
+ * Handles rendering the navigation for each section under the auth pages.
+ */
 export default withAuth(AuthLayout)

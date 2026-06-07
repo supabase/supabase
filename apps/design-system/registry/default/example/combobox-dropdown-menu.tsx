@@ -1,17 +1,15 @@
 'use client'
 
-import * as React from 'react'
 import { Calendar, MoreHorizontal, Tags, Trash, User } from 'lucide-react'
-
-import { Button, CommandList_Shadcn_ } from 'ui'
+import * as React from 'react'
 import {
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-} from 'ui'
-import {
+  Button,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -23,6 +21,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  ScrollArea,
 } from 'ui'
 
 const labels = [
@@ -73,26 +72,28 @@ export default function ComboboxDropdownMenu() {
                 Apply label
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent className="p-0">
-                <Command_Shadcn_>
-                  <CommandInput_Shadcn_ placeholder="Filter label..." autoFocus={true} />
-                  <CommandList_Shadcn_>
-                    <CommandEmpty_Shadcn_>No label found.</CommandEmpty_Shadcn_>
-                    <CommandGroup_Shadcn_>
-                      {labels.map((label) => (
-                        <CommandItem_Shadcn_
-                          key={label}
-                          value={label}
-                          onSelect={(value) => {
-                            setLabel(value)
-                            setOpen(false)
-                          }}
-                        >
-                          {label}
-                        </CommandItem_Shadcn_>
-                      ))}
-                    </CommandGroup_Shadcn_>
-                  </CommandList_Shadcn_>
-                </Command_Shadcn_>
+                <Command>
+                  <CommandInput placeholder="Filter label..." autoFocus={true} />
+                  <ScrollArea className="h-20">
+                    <CommandList>
+                      <CommandEmpty>No label found.</CommandEmpty>
+                      <CommandGroup>
+                        {labels.map((label) => (
+                          <CommandItem
+                            key={label}
+                            value={label}
+                            onSelect={(value) => {
+                              setLabel(value)
+                              setOpen(false)
+                            }}
+                          >
+                            {label}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </ScrollArea>
+                </Command>
               </DropdownMenuSubContent>
             </DropdownMenuSub>
             <DropdownMenuSeparator />

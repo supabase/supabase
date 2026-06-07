@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react'
-import Link from 'next/link'
 import { AnimatePresence } from 'framer-motion'
+import { Pencil, Users, Users2 } from 'lucide-react'
+import Link from 'next/link'
+import React, { useEffect, useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { cn } from 'ui'
-import LogoLoader from 'ui/src/components/LogoLoader'
+import { cn, LogoLoader } from 'ui'
 
 import RepoCard from './RepoCard'
 
@@ -18,9 +18,7 @@ const Tab = ({ isActive, label, icon, onClick }: TabProps) => (
   <button
     onClick={onClick}
     className={`rounded-full px-4 md:px-3 py-2 md:py-1 nowrap flex group gap-1 transition-all ${
-      isActive
-        ? 'text-strong bg-surface-300'
-        : 'text-foreground-lighter bg-surface-200 hover:bg-overlay-hover'
+      isActive ? 'bg-surface-300' : 'text-foreground-lighter bg-surface-200 hover:bg-overlay-hover'
     }`}
     aria-selected={isActive}
     role="tab"
@@ -105,7 +103,7 @@ const Repos = ({ tabs }: Props) => {
 
   return (
     <div className="flex flex-col gap-8 xl:gap-10">
-      <div className="flex mx-auto items-center gap-6 text-sm sm:gap-8">
+      <div className="flex flex-wrap mx-auto items-center justify-center gap-y-6 gap-x-8 text-sm">
         <Link
           href="https://github.com/supabase/supabase/blob/master/DEVELOPERS.md"
           className="text-foreground-lighter hover:underline flex gap-1 items-center"
@@ -121,6 +119,21 @@ const Repos = ({ tabs }: Props) => {
         >
           <GitHubIcon />
           Code of Conduct
+        </Link>
+        <Link
+          href="/open-source/contributing/supasquad"
+          className="text-foreground-lighter hover:underline flex gap-1.5 items-center"
+        >
+          <Users className="w-4 h-4" />
+          SupaSquad
+        </Link>
+        <Link
+          href="https://docs.google.com/forms/d/e/1FAIpQLSfJoQ6_uWymc4DJok2YVY8K_jp27S6HrnOIKmtHuDhBCWetDg/viewform?pli=1"
+          className="text-foreground-lighter hover:underline flex gap-1.5 items-center"
+          target="_blank"
+        >
+          <Pencil className="w-4 h-4" />
+          Community Content Program
         </Link>
       </div>
       <div className="w-full gap-2 flex flex-col items-center">
@@ -142,17 +155,17 @@ const Repos = ({ tabs }: Props) => {
                     : SWIPER_STATE.MIDDLE
               )
             }
-            className="relative flex md:!hidden justify-center max-w-full w-full overflow-hidden items-center rounded-full bg-surface-100 p-2"
+            className="relative flex md:hidden! justify-center max-w-full w-full overflow-hidden items-center rounded-full bg-surface-100 p-2"
           >
             <div
               className={cn(
-                'not-sr-only absolute inset-0 left-auto bg-gradient-to-r from-transparent to-background-surface-100 w-10 z-20 pointer-events-none opacity-0 transition-opacity',
+                'not-sr-only absolute inset-0 left-auto bg-linear-to-r from-transparent to-background-surface-100 w-10 z-20 pointer-events-none opacity-0 transition-opacity',
                 swiperState !== SWIPER_STATE.END && 'opacity-100'
               )}
             />
             <div
               className={cn(
-                'not-sr-only absolute inset-0 right-auto bg-gradient-to-l from-transparent to-background-surface-100 w-10 z-20 pointer-events-none opacity-0 transition-opacity',
+                'not-sr-only absolute inset-0 right-auto bg-linear-to-l from-transparent to-background-surface-100 w-10 z-20 pointer-events-none opacity-0 transition-opacity',
                 swiperState !== SWIPER_STATE.START && 'opacity-100'
               )}
             />
@@ -209,7 +222,7 @@ const GitHubIcon = () => (
     viewBox="0 0 24 24"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    className="fill-foreground-lighter grouopp-hover:fill-foreground"
+    className="fill-foreground-lighter grouop-hover:fill-foreground w-4 h-4"
   >
     <path
       fillRule="evenodd"

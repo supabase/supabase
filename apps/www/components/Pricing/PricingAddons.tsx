@@ -1,8 +1,9 @@
+'use client'
+
 import { ArrowUpRight } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { FC } from 'react'
 import { Button, cn } from 'ui'
 import CostControlAnimation from './CostControlAnimation'
@@ -16,7 +17,7 @@ const addons = [
     description:
       "The Pro Plan has a spend cap enabled by default to keep costs under control. If you want to scale beyond the plan's included quota, simply switch off the spend cap to pay for additional resources.",
     ctaText: 'Learn about Cost Control',
-    ctaLink: 'https://supabase.com/docs/guides/platform/spend-cap',
+    ctaLink: 'https://supabase.com/docs/guides/platform/cost-control#spend-cap',
     ctaTarget: '_blank',
   },
   {
@@ -63,8 +64,8 @@ const PricingAddons: FC = () => {
 }
 
 const AddonCard = ({ addon }: any) => {
-  const { basePath } = useRouter()
   const { resolvedTheme } = useTheme()
+  const basePath = '' // basePath is empty string in next.config.mjs
 
   const isHighlightCard = addon.id === 'addon-cost-control'
 
@@ -77,13 +78,15 @@ const AddonCard = ({ addon }: any) => {
 
   const HighlightCard = () => (
     <>
-      <div className="relative order-last lg:order-first w-full max-w-full lg:w-auto lg:h-full aspect-[2/1] lg:aspect-[3/2] p-4 pt-0 lg:pt-4 lg:pr-0">
+      <div className="relative order-last lg:order-first w-full max-w-full lg:w-auto lg:h-full aspect-2/1 lg:aspect-3/2 p-4 pt-0 lg:pt-4 lg:pr-0">
         {addon.heroImg}
       </div>
 
       <div className="p-4 gap-4 flex flex-col justify-center">
         <div className="flex flex-col gap-2">
-          <p className="text-[13px] text-foreground-lighter">{addon.price}</p>
+          <p className="text-[13px] text-foreground-lighter" translate="no">
+            {addon.price}
+          </p>
           <div className="flex items-center gap-2">
             <h3 className="text-foreground text-2xl">{addon.name}</h3>
           </div>
@@ -126,7 +129,9 @@ const AddonCard = ({ addon }: any) => {
       </div>
       <div className="p-4 lg:pl-0 lg:-ml-2 xl:ml-0 gap-4 col-span-2">
         <div className="flex flex-col gap-2">
-          <p className="text-[13px] text-foreground-lighter">{addon.price}</p>
+          <p className="text-[13px] text-foreground-lighter" translate="no">
+            {addon.price}
+          </p>
           <div className="flex items-center gap-2">
             <Image
               src={`${basePath}/images/pricing/${addon.icon}${

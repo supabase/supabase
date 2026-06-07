@@ -1,24 +1,31 @@
-import { useRouter } from 'next/router'
+import { useParams } from 'common'
+import { parseAsString, useQueryState } from 'nuqs'
 
-import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
-import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
-import type { NextPageWithLayout } from 'types'
-import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
+import { LogsTableName } from '@/components/interfaces/Settings/Logs/Logs.constants'
+import { LogsPreviewer } from '@/components/interfaces/Settings/Logs/LogsPreviewer'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import LogsLayout from '@/components/layouts/LogsLayout/LogsLayout'
+import type { NextPageWithLayout } from '@/types'
 
 export const LogPage: NextPageWithLayout = () => {
-  const router = useRouter()
-  const { ref } = router.query
+  const { ref } = useParams()
+  const [identifier] = useQueryState('db', parseAsString)
 
   return (
     <LogsPreviewer
+      condensedLayout
+      queryType="database"
       projectRef={ref as string}
-      condensedLayout={true}
       tableName={LogsTableName.POSTGRES}
-      queryType={'database'}
+      filterOverride={!!identifier ? { identifier } : undefined}
     />
   )
 }
 
-LogPage.getLayout = (page) => <LogsLayout title="Postgres Logs">{page}</LogsLayout>
+LogPage.getLayout = (page) => (
+  <DefaultLayout>
+    <LogsLayout title="Postgres Logs">{page}</LogsLayout>
+  </DefaultLayout>
+)
 
 export default LogPage

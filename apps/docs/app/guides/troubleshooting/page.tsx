@@ -1,5 +1,3 @@
-import { type Metadata } from 'next'
-
 import { TroubleshootingPreview } from '~/features/docs/Troubleshooting.ui'
 import {
   TroubleshootingFilter,
@@ -15,9 +13,10 @@ import {
 import { TROUBLESHOOTING_CONTAINER_ID } from '~/features/docs/Troubleshooting.utils.shared'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 import { PROD_URL } from '~/lib/constants'
+import { getCustomContent } from '~/lib/custom-content/getCustomContent'
+import { type Metadata } from 'next'
 
-// 60 seconds/minute * 60 minutes/hour * 24 hours/day
-// export const revalidate = 86_400
+const { metadataTitle } = getCustomContent(['metadata:title'])
 
 export default async function GlobalTroubleshootingPage() {
   const troubleshootingEntries = await getAllTroubleshootingEntries()
@@ -26,7 +25,7 @@ export default async function GlobalTroubleshootingPage() {
   const errors = await getAllTroubleshootingErrors()
 
   return (
-    <SidebarSkeleton hideSideNav className="w-full max-w-screen-lg mx-auto">
+    <SidebarSkeleton hideSideNav className="w-full max-w-(--breakpoint-lg) mx-auto">
       <div className="py-8 px-5">
         <h1 className="text-4xl tracking-tight mb-7">Troubleshooting</h1>
         <p className="text-lg text-foreground-light">
@@ -41,11 +40,14 @@ export default async function GlobalTroubleshootingPage() {
         />
         <TroubleshootingListController />
         <TroubleshootingFilterEmptyState />
-        <div id={TROUBLESHOOTING_CONTAINER_ID}>
+        <div id={TROUBLESHOOTING_CONTAINER_ID} className="@container/troubleshooting">
           <h2 className="sr-only">Matching troubleshooting entries</h2>
-          <ul>
+          <ul className="grid @4xl/troubleshooting:grid-cols-[78%_15%_7%]">
             {troubleshootingEntries.map((entry) => (
-              <li key={entry.data.database_id}>
+              <li
+                key={entry.data.database_id}
+                className="grid grid-cols-subgrid @4xl/troubleshooting:col-span-3"
+              >
                 <TroubleshootingPreview entry={entry} />
               </li>
             ))}
@@ -57,7 +59,7 @@ export default async function GlobalTroubleshootingPage() {
 }
 
 export const metadata: Metadata = {
-  title: 'Supabase Docs | Troubleshooting',
+  title: `${metadataTitle || 'Supabase'} | Troubleshooting`,
   alternates: {
     canonical: `${PROD_URL}/guides/troubleshooting`,
   },

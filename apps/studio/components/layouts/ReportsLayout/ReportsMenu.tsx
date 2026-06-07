@@ -1,41 +1,61 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Plus } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
-import { CreateReportModal } from 'components/interfaces/Reports/Reports.CreateReportModal'
-import { UpdateCustomReportModal } from 'components/interfaces/Reports/Reports.UpdateModal'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
-import { Content, useContentQuery } from 'data/content/content-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useProfile } from 'lib/profile'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Menu, cn } from 'ui'
+import { Plus } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
+import { Menu } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { ReportMenuItem } from './ReportMenuItem'
+import { CreateReportModal } from '@/components/interfaces/Reports/CreateReportModal'
+import { UpdateCustomReportModal } from '@/components/interfaces/Reports/UpdateModal'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { ProductMenu } from '@/components/ui/ProductMenu'
+import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
+import { Content, useContentQuery } from '@/data/content/content-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useProfile } from '@/lib/profile'
 
 const ReportsMenu = () => {
   const router = useRouter()
   const { profile } = useProfile()
   const { ref, id } = useParams()
   const pageKey = (id || router.pathname.split('/')[4]) as string
-  const storageEnabled = useIsFeatureEnabled('project_storage:all')
 
-  const canCreateCustomReport = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'report', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
+  const storageSupported = useIsFeatureEnabled('project_storage:all')
 
-  const { data: content, isLoading } = useContentQuery({
+  const { can: canCreateCustomReport } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'user_content',
+    {
+      resource: { type: 'report', owner_id: profile?.id },
+      subject: { id: profile?.id },
+    }
+  )
+
+  // Preserve date range query parameters when navigating
+  const preservedQueryParams = useMemo(() => {
+    const { its, ite, isHelper, helperText } = router.query
+    const params = new URLSearchParams()
+
+    if (its && typeof its === 'string') params.set('its', its)
+    if (ite && typeof ite === 'string') params.set('ite', ite)
+    if (isHelper && typeof isHelper === 'string') params.set('isHelper', isHelper)
+    if (helperText && typeof helperText === 'string') params.set('helperText', helperText)
+
+    const queryString = params.toString()
+    return queryString ? `?${queryString}` : ''
+  }, [router.query])
+
+  const { data: content, isPending: isLoading } = useContentQuery({
     projectRef: ref,
     type: 'report',
   })
-  const { mutate: deleteReport, isLoading: isDeleting } = useContentDeleteMutation({
+  const { mutate: deleteReport, isPending: isDeleting } = useContentDeleteMutation({
     onSuccess: () => {
       setDeleteModalOpen(false)
       toast.success('Successfully deleted report')
@@ -47,7 +67,10 @@ const ReportsMenu = () => {
   })
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
-  const [showNewReportModal, setShowNewReportModal] = useState(false)
+  const [showNewReportModal, setShowNewReportModal] = useQueryState(
+    'newReport',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
   const [selectedReportToDelete, setSelectedReportToDelete] = useState<Content>()
   const [selectedReportToUpdate, setSelectedReportToUpdate] = useState<Content>()
 
@@ -77,7 +100,7 @@ const ReportsMenu = () => {
       name: r.name,
       description: r.description || '',
       key: r.id || idx + '-report',
-      url: `/project/${ref}/reports/${r.id}`,
+      url: `/project/${ref}/reports/${r.id}${preservedQueryParams}`,
       hasDropdownActions: true,
       report: r,
     }))
@@ -93,31 +116,55 @@ const ReportsMenu = () => {
       key: 'builtin-reports',
       items: [
         {
-          name: 'API',
+          name: 'API Gateway',
           key: 'api-overview',
-          url: `/project/${ref}/reports/api-overview`,
+          url: `/project/${ref}/reports/api-overview${preservedQueryParams}`,
         },
-        ...(storageEnabled
+        {
+          name: 'Auth',
+          key: 'auth',
+          url: `/project/${ref}/reports/auth${preservedQueryParams}`,
+        },
+        {
+          name: 'Database',
+          key: 'database',
+          url: `/project/${ref}/reports/database${preservedQueryParams}`,
+        },
+        {
+          name: 'Edge Functions',
+          key: 'edge-functions',
+          url: `/project/${ref}/reports/edge-functions${preservedQueryParams}`,
+        },
+        {
+          name: 'Query Performance',
+          key: 'query-performance',
+          url: `/project/${ref}/reports/query-performance${preservedQueryParams}`,
+        },
+        {
+          name: 'PostgREST',
+          key: 'postgrest',
+          url: `/project/${ref}/reports/postgrest${preservedQueryParams}`,
+        },
+        {
+          name: 'Realtime',
+          key: 'realtime',
+          url: `/project/${ref}/reports/realtime${preservedQueryParams}`,
+        },
+        ...(storageSupported
           ? [
               {
                 name: 'Storage',
                 key: 'storage',
-                url: `/project/${ref}/reports/storage`,
+                url: `/project/${ref}/reports/storage${preservedQueryParams}`,
               },
             ]
           : []),
-
-        {
-          name: 'Database',
-          key: 'database',
-          url: `/project/${ref}/reports/database`,
-        },
       ],
     },
   ]
 
   return (
-    <Menu type="pills" className="mt-6">
+    <div className="mt-6">
       {isLoading ? (
         <div className="px-5 my-4 space-y-2">
           <ShimmeringLoader />
@@ -132,7 +179,7 @@ const ReportsMenu = () => {
               type="default"
               icon={<Plus />}
               disabled={!canCreateCustomReport}
-              className="justify-start flex-grow"
+              className="justify-start grow"
               onClick={() => {
                 setShowNewReportModal(true)
               }}
@@ -150,7 +197,7 @@ const ReportsMenu = () => {
           </div>
 
           {reportMenuItems.length > 0 ? (
-            <div>
+            <Menu type="pills">
               <Menu.Group
                 title={<span className="uppercase font-mono">Your custom reports</span>}
               />
@@ -168,36 +215,16 @@ const ReportsMenu = () => {
                   }}
                 />
               ))}
-            </div>
+            </Menu>
           ) : null}
 
-          {menuItems.map((item) => (
-            <div key={item.key + '-menu-group'}>
-              {item.items ? (
-                <>
-                  <Menu.Group title={<span className="uppercase font-mono">{item.title}</span>} />
-                  <div key={item.key} className="flex flex-col">
-                    {item.items.map((subItem) => (
-                      <li
-                        key={subItem.key}
-                        className={cn(
-                          'pr-2 mt-1 text-foreground-light group-hover:text-foreground/80 text-sm',
-                          'flex items-center justify-between rounded-md group relative',
-                          subItem.key === pageKey
-                            ? 'bg-surface-300 text-foreground'
-                            : 'hover:bg-surface-200'
-                        )}
-                      >
-                        <Link href={subItem.url} className="flex-grow h-7 flex items-center pl-3">
-                          {subItem.name}
-                        </Link>
-                      </li>
-                    ))}
-                  </div>
-                </>
-              ) : null}
-            </div>
-          ))}
+          <ProductMenu
+            page={pageKey}
+            menu={menuItems.map((item) => ({
+              ...item,
+              items: item.items.map((subItem) => ({ ...subItem, items: [] })),
+            }))}
+          />
 
           <UpdateCustomReportModal
             onCancel={() => setSelectedReportToUpdate(undefined)}
@@ -232,7 +259,7 @@ const ReportsMenu = () => {
           />
         </div>
       )}
-    </Menu>
+    </div>
   )
 }
 

@@ -1,18 +1,21 @@
+'use client'
+
 import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import { PlanId } from 'shared-data/plans'
 
 import {
   Button,
   ButtonProps,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
   Dialog,
   DialogClose,
   DialogContent,
@@ -22,9 +25,9 @@ import {
   DialogSection,
   DialogTitle,
   DialogTrigger,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 import { Organization } from '~/data/organizations'
 
@@ -32,9 +35,10 @@ interface UpgradePlanProps {
   organizations?: Organization[]
   onClick?: () => void
   size?: ButtonProps['size']
+  planId: PlanId
 }
 
-const UpgradePlan = ({ organizations = [], onClick, size = 'large' }: UpgradePlanProps) => {
+const UpgradePlan = ({ organizations = [], onClick, size = 'large', planId }: UpgradePlanProps) => {
   const [open, setOpen] = useState(false)
   const [value, setValue] = useState('')
 
@@ -54,8 +58,8 @@ const UpgradePlan = ({ organizations = [], onClick, size = 'large' }: UpgradePla
         </DialogHeader>
 
         <DialogSection className="py-2">
-          <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-            <PopoverTrigger_Shadcn_ asChild>
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
               <Button
                 type="default"
                 role="combobox"
@@ -75,15 +79,15 @@ const UpgradePlan = ({ organizations = [], onClick, size = 'large' }: UpgradePla
                   'Select an organization...'
                 )}
               </Button>
-            </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ className="w-[300px] p-0">
-              <Command_Shadcn_>
-                <CommandInput_Shadcn_ placeholder="Select organization..." />
-                <CommandList_Shadcn_>
-                  <CommandEmpty_Shadcn_>No organizations found.</CommandEmpty_Shadcn_>
-                  <CommandGroup_Shadcn_>
+            </PopoverTrigger>
+            <PopoverContent className="w-[300px] p-0">
+              <Command>
+                <CommandInput placeholder="Select organization..." />
+                <CommandList>
+                  <CommandEmpty>No organizations found.</CommandEmpty>
+                  <CommandGroup>
                     {organizations.map((organization) => (
-                      <CommandItem_Shadcn_
+                      <CommandItem
                         key={organization.slug}
                         value={organization.slug}
                         onSelect={(currentValue) => {
@@ -99,12 +103,12 @@ const UpgradePlan = ({ organizations = [], onClick, size = 'large' }: UpgradePla
                           )}
                         />
                         {organization.name}
-                      </CommandItem_Shadcn_>
+                      </CommandItem>
                     ))}
-                  </CommandGroup_Shadcn_>
-                  <CommandSeparator_Shadcn_ />
-                  <CommandGroup_Shadcn_>
-                    <CommandItem_Shadcn_
+                  </CommandGroup>
+                  <CommandSeparator />
+                  <CommandGroup>
+                    <CommandItem
                       value="new-organization"
                       onSelect={(currentValue) => {
                         setValue(currentValue === value ? '' : currentValue)
@@ -119,12 +123,12 @@ const UpgradePlan = ({ organizations = [], onClick, size = 'large' }: UpgradePla
                         )}
                       />
                       <Plus className="h-4 w-4 mr-2" /> Create a new organization
-                    </CommandItem_Shadcn_>
-                  </CommandGroup_Shadcn_>
-                </CommandList_Shadcn_>
-              </Command_Shadcn_>
-            </PopoverContent_Shadcn_>
-          </Popover_Shadcn_>
+                    </CommandItem>
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
         </DialogSection>
 
         <DialogSection>
@@ -142,7 +146,7 @@ const UpgradePlan = ({ organizations = [], onClick, size = 'large' }: UpgradePla
             <Link
               href={
                 value === 'new-organization'
-                  ? `/dashboard/new`
+                  ? `/dashboard/new?plan=${planId}`
                   : `/dashboard/org/${value}/billing?panel=subscriptionPlan`
               }
             >

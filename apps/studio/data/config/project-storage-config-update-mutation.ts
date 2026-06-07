@@ -1,19 +1,15 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { components } from 'api-types'
 import { toast } from 'sonner'
 
-import { patch } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import type { ResponseError } from 'types'
 import { configKeys } from './keys'
+import { handleError, patch } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
-export type ProjectStorageConfigUpdateUpdateVariables = {
+type StorageConfigUpdatePayload = components['schemas']['UpdateStorageConfigBody']
+
+export type ProjectStorageConfigUpdateUpdateVariables = StorageConfigUpdatePayload & {
   projectRef: string
-  fileSizeLimit: number
-  features?: {
-    imageTransformation: {
-      enabled: boolean
-    }
-  }
 }
 
 export async function updateProjectStorageConfigUpdate({
@@ -21,12 +17,12 @@ export async function updateProjectStorageConfigUpdate({
   fileSizeLimit,
   features,
 }: ProjectStorageConfigUpdateUpdateVariables) {
-  const response = await patch(`${API_URL}/projects/${projectRef}/config/storage`, {
-    fileSizeLimit,
-    features,
+  const { data, error } = await patch('/platform/projects/{ref}/config/storage', {
+    params: { path: { ref: projectRef } },
+    body: { fileSizeLimit, features },
   })
-  if (response.error) throw response.error
-  return response
+  if (error) handleError(error)
+  return data
 }
 
 type ProjectStorageConfigUpdateUpdateData = Awaited<
@@ -38,7 +34,7 @@ export const useProjectStorageConfigUpdateUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     ProjectStorageConfigUpdateUpdateData,
     ResponseError,
     ProjectStorageConfigUpdateUpdateVariables
@@ -51,10 +47,11 @@ export const useProjectStorageConfigUpdateUpdateMutation = ({
     ProjectStorageConfigUpdateUpdateData,
     ResponseError,
     ProjectStorageConfigUpdateUpdateVariables
-  >((vars) => updateProjectStorageConfigUpdate(vars), {
+  >({
+    mutationFn: (vars) => updateProjectStorageConfigUpdate(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(configKeys.storage(projectRef))
+      await queryClient.invalidateQueries({ queryKey: configKeys.storage(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

@@ -51,7 +51,7 @@ const NavFlyOutMenu = (props: any) => {
 const VideoShot = (props: any) => {
   const { src } = props
   return (
-    <div className="p-2 rounded-xl bg-gradient-to-b from-border-strong to-background-surface-300">
+    <div className="p-2 rounded-xl bg-linear-to-b from-border-strong to-background-surface-300">
       <div className="rounded-md shadow-lg" style={{ height: 'fit-content' }}>
         <div className="flex items-center justify-start w-full h-5 px-2 bg-border-strong rounded-t-md">
           <div className="w-2 h-2 mr-2 rounded-full bg-overlay" />
@@ -114,7 +114,7 @@ const Hero = (props: Props) => {
     >
       <div className="container grid items-center h-full grid-cols-12 gap-4 px-8 py-20 mx-auto text-foreground-light lg:px-28">
         <div className="col-span-12 text-foreground md:col-span-9 lg:col-span-8 xl:col-span-6">
-          <p className="mb-10 text-4xl">Supabase is an open source Firebase alternative.</p>
+          <p className="mb-10 text-4xl">Supabase is the Postgres development platform.</p>
           <p className="text-2xl">
             Today, we're moving to <span className="text-brand">Beta</span>
           </p>

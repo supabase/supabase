@@ -1,116 +1,176 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Key } from 'lucide-react'
-
 import { useParams } from 'common'
-import type { showApiKey } from 'components/interfaces/Docs/Docs.types'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { EyeOff, Key } from 'lucide-react'
+import { useMemo } from 'react'
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
+  ToggleGroup,
+  ToggleGroupItem,
 } from 'ui'
+
+import type { ShowApiKey } from '@/components/interfaces/Docs/Docs.types'
+import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
 
 interface LangSelectorProps {
-  selectedLang: string
-  showApiKey: showApiKey
-  setSelectedLang: (selectedLang: string) => void
-  setShowApiKey: (showApiKey: showApiKey) => void
+  selectedLang: 'js' | 'bash'
+  selectedApiKey: ShowApiKey
+  setSelectedLang: (selectedLang: 'js' | 'bash') => void
+  setSelectedApiKey: (key: ShowApiKey) => void
 }
 
-const LangSelector = ({
+export const LangSelector = ({
   selectedLang,
-  showApiKey,
+  selectedApiKey,
   setSelectedLang,
-  setShowApiKey,
+  setSelectedApiKey,
 }: LangSelectorProps) => {
   const { ref: projectRef } = useParams()
-  const canReadServiceKey = useCheckPermissions(
-    PermissionAction.READ,
-    'service_api_keys.service_role_key'
+
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { data: apiKeys = [], isPending: isLoadingAPIKeys } = useAPIKeysQuery(
+    {
+      projectRef,
+      reveal: false,
+    },
+    { enabled: canReadAPIKeys }
   )
 
-  const { data: settings } = useProjectSettingsV2Query({ projectRef })
-  const { anonKey: anonApiKey, serviceKey: serviceApiKey } = getAPIKeys(settings)
+  const legacyKeys = useMemo(() => apiKeys.filter(({ type }) => type === 'legacy'), [apiKeys])
+  const publishableKeys = useMemo(
+    () => apiKeys.filter(({ type }) => type === 'publishable'),
+    [apiKeys]
+  )
+  const secretKeys = useMemo(() => apiKeys.filter(({ type }) => type === 'secret'), [apiKeys])
 
   return (
-    <div className="p-1 w-1/2 ml-auto">
-      <div className="z-0 flex justify-end">
-        <button
-          type="button"
-          onClick={() => setSelectedLang('js')}
-          className={`${
-            selectedLang == 'js'
-              ? 'bg-surface-100 font-medium text-foreground'
-              : 'bg-alternative text-foreground-lighter'
-          } relative inline-flex items-center border-r border-background p-1 px-2 text-sm transition hover:text-foreground focus:outline-none`}
-        >
+    <div className="flex items-center gap-x-1">
+      <ToggleGroup
+        type="single"
+        value={selectedLang}
+        variant="outline"
+        onValueChange={(value) => {
+          if (value) setSelectedLang(value as 'js' | 'bash')
+        }}
+        size="sm"
+        className="flex-1 flex"
+      >
+        <ToggleGroupItem value="js" className="flex-1 px-2 py-1 h-7 text-xs">
           JavaScript
-        </button>
-        <button
-          type="button"
-          onClick={() => setSelectedLang('bash')}
-          className={`${
-            selectedLang == 'bash'
-              ? 'bg-surface-100 font-medium text-foreground'
-              : 'bg-alternative text-foreground-lighter'
-          } relative inline-flex items-center border-r border-background p-1 px-2 text-sm transition hover:text-foreground focus:outline-none`}
-        >
+        </ToggleGroupItem>
+        <ToggleGroupItem value="bash" className="flex-1 px-2 py-1 h-7 text-xs">
           Bash
-        </button>
-        {selectedLang == 'bash' && (
-          <div className="flex">
-            <div className="flex items-center gap-2 p-1 pl-2 text-xs text-foreground-lighter">
-              <Key size={12} strokeWidth={1.5} />
-              <span>Project API key :</span>
-            </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button type="default">{showApiKey.name}</Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" side="bottom">
-                <>
-                  <DropdownMenuItem key="hide" onClick={() => setShowApiKey(DEFAULT_KEY)}>
-                    hide
-                  </DropdownMenuItem>
-                  {anonApiKey && (
-                    <DropdownMenuItem
-                      key="anon"
-                      onClick={() =>
-                        setShowApiKey({
-                          key: anonApiKey.api_key ?? '-',
-                          name: 'anon (public)',
-                        })
-                      }
-                    >
-                      <p>anon (public)</p>
-                    </DropdownMenuItem>
-                  )}
-                  {canReadServiceKey && (
-                    <DropdownMenuItem
-                      key="service"
-                      onClick={() =>
-                        setShowApiKey({
-                          key: serviceApiKey?.api_key ?? '-',
-                          name: 'service_role (secret)',
-                        })
-                      }
-                    >
-                      <p>service_role (secret)</p>
-                    </DropdownMenuItem>
-                  )}
-                </>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        )}
-      </div>
+        </ToggleGroupItem>
+      </ToggleGroup>
+      {selectedLang == 'bash' ? (
+        canReadAPIKeys &&
+        !isLoadingAPIKeys &&
+        apiKeys &&
+        apiKeys.length > 0 && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button type="default" size="tiny" className="p-0 h-7 w-7">
+                {selectedApiKey.key === DEFAULT_KEY.key ? (
+                  <EyeOff size={12} strokeWidth={1.5} />
+                ) : (
+                  <Key size={12} strokeWidth={1.5} />
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" side="bottom" className="w-48">
+              <DropdownMenuRadioGroup value={selectedApiKey.key}>
+                <DropdownMenuRadioItem
+                  key="hide"
+                  value={DEFAULT_KEY.key}
+                  onClick={() => setSelectedApiKey(DEFAULT_KEY)}
+                >
+                  Hide keys
+                </DropdownMenuRadioItem>
+
+                {publishableKeys.length > 0 && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuLabel>Publishable keys</DropdownMenuLabel>
+                    {publishableKeys.map((key) => {
+                      const value = key.api_key
+                      return (
+                        <DropdownMenuRadioItem
+                          key={key.id}
+                          value={value}
+                          onClick={() =>
+                            setSelectedApiKey({
+                              name: `Publishable key: ${key.name}`,
+                              key: value,
+                            })
+                          }
+                        >
+                          {key.name}
+                        </DropdownMenuRadioItem>
+                      )
+                    })}
+                  </>
+                )}
+
+                {secretKeys.length > 0 && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuLabel>Secret keys</DropdownMenuLabel>
+                    {secretKeys.map((key) => {
+                      const value = key.prefix + '...'
+                      return (
+                        <DropdownMenuRadioItem
+                          key={key.id}
+                          value={value}
+                          onClick={() =>
+                            setSelectedApiKey({ name: `Secret key: ${key.name}`, key: value })
+                          }
+                        >
+                          {key.name}
+                        </DropdownMenuRadioItem>
+                      )
+                    })}
+                  </>
+                )}
+
+                {legacyKeys.length > 0 && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuGroup>
+                      <DropdownMenuLabel>JWT-based legacy keys</DropdownMenuLabel>
+                      {legacyKeys.map((key) => {
+                        const value = key.api_key
+                        return (
+                          <DropdownMenuRadioItem
+                            key={key.id}
+                            value={value}
+                            onClick={() =>
+                              setSelectedApiKey({ name: `Legacy key: ${key.name}`, key: value })
+                            }
+                          >
+                            {key.name}
+                          </DropdownMenuRadioItem>
+                        )
+                      })}
+                    </DropdownMenuGroup>
+                  </>
+                )}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
+      ) : (
+        <div className="w-7 h-7" />
+      )}
     </div>
   )
 }
-
-export default LangSelector

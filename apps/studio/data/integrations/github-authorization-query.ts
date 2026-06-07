@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { integrationKeys } from './keys'
+import { get } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 // FIXME(kamil): Do not retry, a single check is fine.
 export async function getGitHubAuthorization(signal?: AbortSignal) {
@@ -21,10 +21,12 @@ export type GitHubAuthorizationError = ResponseError
 export const useGitHubAuthorizationQuery = <TData = GitHubAuthorizationData>({
   enabled = true,
   ...options
-}: UseQueryOptions<GitHubAuthorizationData, GitHubAuthorizationError, TData> = {}) => {
-  return useQuery<GitHubAuthorizationData, GitHubAuthorizationError, TData>(
-    integrationKeys.githubAuthorization(),
-    ({ signal }) => getGitHubAuthorization(signal),
-    { enabled, staleTime: 0, ...options }
-  )
+}: UseCustomQueryOptions<GitHubAuthorizationData, GitHubAuthorizationError, TData> = {}) => {
+  return useQuery<GitHubAuthorizationData, GitHubAuthorizationError, TData>({
+    queryKey: integrationKeys.githubAuthorization(),
+    queryFn: ({ signal }) => getGitHubAuthorization(signal),
+    enabled,
+    staleTime: 0,
+    ...options,
+  })
 }

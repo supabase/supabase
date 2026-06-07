@@ -1,43 +1,13 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import saveAs from 'file-saver'
-import {
-  Clipboard,
-  Copy,
-  Download,
-  Edit,
-  Eye,
-  Lock,
-  MoreHorizontal,
-  Table2,
-  Trash,
-  Unlock,
-} from 'lucide-react'
+import { useParams } from 'common'
+import { Copy, Download, Edit, Globe, Lock, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
-import Papa from 'papaparse'
+import { type CSSProperties } from 'react'
 import { toast } from 'sonner'
-
-import { IS_PLATFORM } from 'common'
 import {
-  MAX_EXPORT_ROW_COUNT,
-  MAX_EXPORT_ROW_COUNT_MESSAGE,
-} from 'components/grid/components/header/Header'
-import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
-import {
-  formatTableRowsToSQL,
-  getEntityLintDetails,
-} from 'components/interfaces/TableGridEditor/TableEntity.utils'
-import type { ItemRenderer } from 'components/ui/InfiniteList'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { Entity } from 'data/entity-types/entity-types-infinite-query'
-import { useProjectLintsQuery } from 'data/lint/lint-query'
-import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
-import { getTableEditor } from 'data/table-editor/table-editor-query'
-import { isTableLike } from 'data/table-editor/table-editor-types'
-import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import {
+  Badge,
+  Button,
   cn,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -46,37 +16,108 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  TreeViewItemVariant,
 } from 'ui'
-import { useProjectContext } from '../ProjectLayout/ProjectContext'
-import { copyToClipboard } from 'lib/helpers'
+
+import { useExportAllRowsAsCsv, useExportAllRowsAsSql } from './ExportAllRows'
+import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
+import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
+import { getEntityLintDetails } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
+import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { getTableDefinition } from '@/data/database/table-definition-query'
+import { getViewDefinition } from '@/data/database/view-definition-query'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import { Entity } from '@/data/entity-types/entity-types-infinite-query'
+import { useProjectLintsQuery } from '@/data/lint/lint-query'
+import { EditorTablePageLink } from '@/data/prefetchers/project.$ref.editor.$id'
+import type {
+  TableApiAccessData,
+  TableApiAccessMap,
+} from '@/data/privileges/table-api-access-query'
+import { useTableRowsCountQuery } from '@/data/table-rows/table-rows-count-query'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { formatSql } from '@/lib/formatSql'
+import {
+  useRoleImpersonationStateSnapshot,
+  type RoleImpersonationState,
+} from '@/state/role-impersonation-state'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 export interface EntityListItemProps {
-  id: number
+  id: number | string
   projectRef: string
+  item: Entity
   isLocked: boolean
+  isActive?: boolean
+  style?: CSSProperties
+  onExportCLI: () => void
+  apiAccessMap?: TableApiAccessMap
 }
 
-const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
+// [jordi] Used to determine the entity is a table and not a view or other unsupported entity type
+function isTableLikeEntityListItem(entity: { type?: string }) {
+  return entity?.type === ENTITY_TYPE.TABLE || entity?.type === ENTITY_TYPE.PARTITIONED_TABLE
+}
+
+export const EntityListItem = ({
   id,
   projectRef,
   item: entity,
   isLocked,
-}) => {
-  const { project } = useProjectContext()
+  isActive: _isActive,
+  style,
+  onExportCLI,
+  apiAccessMap,
+}: EntityListItemProps) => {
+  const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
 
+  const tabId = createTabId(entity.type, { id: entity.id })
+  const tabs = useTabsStateSnapshot()
+  const isPreview = tabs.previewTabId === tabId
+
   const isActive = Number(id) === entity.id
   const canEdit = isActive && !isLocked
+
+  const { filters } = useTableFilter()
+  const roleImpersonationState = useRoleImpersonationStateSnapshot()
+  const { data: countData } = useTableRowsCountQuery(
+    {
+      projectRef,
+      tableId: entity.id,
+      filters,
+      enforceExactCount: false,
+      roleImpersonationState: roleImpersonationState as RoleImpersonationState,
+    },
+    {
+      enabled: isTableLikeEntityListItem(entity) && isActive,
+    }
+  )
+  const rowCount = countData?.count
 
   const { data: lints = [] } = useProjectLintsQuery({
     projectRef: project?.ref,
   })
 
-  const tableHasLints: boolean = getEntityLintDetails(
+  const tableHasRlsDisabledLint: boolean = getEntityLintDetails(
     entity.name,
     'rls_disabled_in_public',
     ['ERROR'],
+    lints,
+    selectedSchema
+  ).hasLint
+
+  const tableHasRlsEnabledNoPolicyLint: boolean = getEntityLintDetails(
+    entity.name,
+    'rls_enabled_no_policy',
+    ['ERROR', 'WARN', 'INFO'],
     lints,
     selectedSchema
   ).hasLint
@@ -97,272 +138,113 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     selectedSchema
   ).hasLint
 
+  const foreignTableHasLints: boolean = getEntityLintDetails(
+    entity.name,
+    'foreign_table_in_api',
+    ['ERROR', 'WARN'],
+    lints,
+    selectedSchema
+  ).hasLint
+
+  const apiAccessData = apiAccessMap?.[entity.name]
+
   const formatTooltipText = (entityType: string) => {
-    return Object.entries(ENTITY_TYPE)
-      .find(([, value]) => value === entityType)?.[0]
-      ?.toLowerCase()
-      ?.split('_')
-      ?.join(' ')
+    const text =
+      Object.entries(ENTITY_TYPE)
+        .find(([, value]) => value === entityType)?.[0]
+        ?.toLowerCase()
+        ?.split('_')
+        ?.join(' ') || ''
+    // Return sentence case (capitalize first letter only)
+    return text.charAt(0).toUpperCase() + text.slice(1)
   }
 
-  const exportTableAsCSV = async () => {
-    if (IS_PLATFORM && !project?.connectionString) {
-      return console.error('Connection string is required')
-    }
-    const toastId = toast.loading(`Exporting ${entity.name} as CSV...`)
+  const { exportCsv, confirmationModal: exportCsvConfirmationModal } = useExportAllRowsAsCsv({
+    enabled: true,
+    projectRef,
+    connectionString: project?.connectionString ?? null,
+    entity,
+    type: 'fetch_all',
+    totalRows: rowCount,
+  })
 
-    try {
-      const table = await getTableEditor({
-        id: entity.id,
-        projectRef,
-        connectionString: project?.connectionString,
-      })
-      if (isTableLike(table) && table.live_rows_estimate > MAX_EXPORT_ROW_COUNT) {
-        return toast.error(
-          <div className="text-foreground prose text-sm">{MAX_EXPORT_ROW_COUNT_MESSAGE}</div>,
-          { id: toastId }
-        )
-      }
-
-      const supaTable = table && parseSupaTable(table)
-
-      if (!supaTable) {
-        return toast.error(`Failed to export table: ${entity.name}`, { id: toastId })
-      }
-
-      const rows = await fetchAllTableRows({
-        projectRef,
-        connectionString: project?.connectionString,
-        table: supaTable,
-      })
-      const formattedRows = rows.map((row) => {
-        const formattedRow = row
-        Object.keys(row).map((column) => {
-          if (typeof row[column] === 'object' && row[column] !== null)
-            formattedRow[column] = JSON.stringify(formattedRow[column])
-        })
-        return formattedRow
-      })
-
-      if (formattedRows.length > 0) {
-        const csv = Papa.unparse(formattedRows, {
-          columns: supaTable.columns.map((column) => column.name),
-        })
-        const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-        saveAs(csvData, `${entity!.name}_rows.csv`)
-      }
-
-      toast.success(`Successfully exported ${entity.name} as CSV`, { id: toastId })
-    } catch (error: any) {
-      toast.error(`Failed to export table: ${error.message}`, { id: toastId })
-    }
-  }
-
-  const exportTableAsSQL = async () => {
-    if (IS_PLATFORM && !project?.connectionString) {
-      return console.error('Connection string is required')
-    }
-    const toastId = toast.loading(`Exporting ${entity.name} as SQL...`)
-
-    try {
-      const table = await getTableEditor({
-        id: entity.id,
-        projectRef,
-        connectionString: project?.connectionString,
-      })
-
-      if (isTableLike(table) && table.live_rows_estimate > MAX_EXPORT_ROW_COUNT) {
-        return toast.error(
-          <div className="text-foreground prose text-sm">{MAX_EXPORT_ROW_COUNT_MESSAGE}</div>,
-          { id: toastId }
-        )
-      }
-
-      const supaTable = table && parseSupaTable(table)
-
-      if (!supaTable) {
-        return toast.error(`Failed to export table: ${entity.name}`, { id: toastId })
-      }
-
-      const rows = await fetchAllTableRows({
-        projectRef,
-        connectionString: project?.connectionString,
-        table: supaTable,
-      })
-      const formattedRows = rows.map((row) => {
-        const formattedRow = row
-        Object.keys(row).map((column) => {
-          if (typeof row[column] === 'object' && row[column] !== null)
-            formattedRow[column] = JSON.stringify(formattedRow[column])
-        })
-        return formattedRow
-      })
-
-      if (formattedRows.length > 0) {
-        const sqlStatements = formatTableRowsToSQL(supaTable, formattedRows)
-        const sqlData = new Blob([sqlStatements], { type: 'text/sql;charset=utf-8;' })
-        saveAs(sqlData, `${entity!.name}_rows.sql`)
-      }
-
-      toast.success(`Successfully exported ${entity.name} as SQL`, { id: toastId })
-    } catch (error: any) {
-      toast.error(`Failed to export table: ${error.message}`, { id: toastId })
-    }
-  }
-
-  const EntityTooltipTrigger = ({ entity }: { entity: Entity }) => {
-    let tooltipContent = null
-
-    switch (entity.type) {
-      case ENTITY_TYPE.TABLE:
-        if (tableHasLints) {
-          tooltipContent = 'RLS disabled'
-        }
-        break
-      case ENTITY_TYPE.VIEW:
-        if (viewHasLints) {
-          tooltipContent = 'Security definer view'
-        }
-        break
-      case ENTITY_TYPE.MATERIALIZED_VIEW:
-        if (materializedViewHasLints) {
-          tooltipContent = 'Security definer view'
-        }
-        break
-      case ENTITY_TYPE.FOREIGN_TABLE:
-        tooltipContent = 'RLS is not enforced on foreign tables'
-        break
-      default:
-        break
-    }
-
-    if (tooltipContent) {
-      return (
-        <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
-          <Tooltip.Trigger className="min-w-4" asChild>
-            <Unlock
-              size={14}
-              strokeWidth={2}
-              className={cn('min-w-4', isActive ? 'text-warning-600' : 'text-warning-500')}
-            />
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content
-              side="bottom"
-              className={[
-                'rounded bg-alternative py-1 px-2 leading-none shadow',
-                'border border-background',
-                'text-xs text-foreground',
-              ].join(' ')}
-            >
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              {tooltipContent}
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
-      )
-    }
-
-    return null
-  }
+  const { exportSql, confirmationModal: exportSqlConfirmationModal } = useExportAllRowsAsSql({
+    enabled: true,
+    projectRef,
+    connectionString: project?.connectionString ?? null,
+    entity,
+    type: 'fetch_all',
+    totalRows: rowCount,
+  })
 
   return (
-    <div className="px-2">
-      <EditorTablePageLink
-        title={entity.name}
-        id={String(entity.id)}
-        href={`/project/${projectRef}/editor/${entity.id}?schema=${selectedSchema}`}
-        role="button"
-        aria-label={`View ${entity.name}`}
-        className={cn(
-          'w-full',
-          'flex items-center gap-2',
-          'py-1 px-2',
-          'text-light',
-          'rounded-md',
-          isActive ? 'bg-selection' : 'hover:bg-surface-200 focus:bg-surface-200',
-          'group',
-          'transition'
-        )}
-      >
-        <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
-          <Tooltip.Trigger className="min-w-4" asChild>
-            {entity.type === ENTITY_TYPE.TABLE ? (
-              <Table2
-                size={15}
-                strokeWidth={1.5}
-                className={cn(
-                  'text-foreground-muted group-hover:text-foreground-lighter',
-                  isActive && 'text-foreground-lighter',
-                  'transition-colors'
-                )}
-              />
-            ) : entity.type === ENTITY_TYPE.VIEW ? (
-              <Eye
-                size={15}
-                strokeWidth={1.5}
-                className={cn(
-                  'text-foreground-muted group-hover:text-foreground-lighter',
-                  isActive && 'text-foreground-lighter',
-                  'transition-colors'
-                )}
-              />
-            ) : (
-              <div
-                className={cn(
-                  'flex items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold',
-                  entity.type === ENTITY_TYPE.FOREIGN_TABLE && 'text-yellow-900 bg-yellow-500',
-                  entity.type === ENTITY_TYPE.MATERIALIZED_VIEW && 'text-purple-1000 bg-purple-500',
-                  entity.type === ENTITY_TYPE.PARTITIONED_TABLE &&
-                    'text-foreground-light bg-border-stronger'
-                )}
-              >
-                {Object.entries(ENTITY_TYPE)
-                  .find(([, value]) => value === entity.type)?.[0]?.[0]
-                  ?.toUpperCase()}
-              </div>
-            )}
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content
-              side="bottom"
-              className={[
-                'rounded bg-alternative py-1 px-2 leading-none shadow',
-                'border border-background',
-                'text-xs text-foreground capitalize',
-              ].join(' ')}
-            >
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              {formatTooltipText(entity.type)}
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
+    <EditorTablePageLink
+      title={entity.name}
+      style={style}
+      id={String(entity.id)}
+      href={buildTableEditorUrl({ projectRef, tableId: entity.id, schema: entity.schema })}
+      role="button"
+      aria-label={`View ${entity.name}`}
+      className={cn(
+        TreeViewItemVariant({
+          isSelected: isActive && !isPreview,
+          isPreview,
+        }),
+        'pl-4 pr-1'
+      )}
+      onDoubleClick={(e) => {
+        e.preventDefault()
+        const tabId = createTabId(entity.type, { id: entity.id })
+        tabs.makeTabPermanent(tabId)
+      }}
+    >
+      <>
+        {isActive && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
+        <Tooltip disableHoverableContent={true}>
+          <TooltipTrigger className="min-w-4">
+            <EntityTypeIcon type={entity.type} isActive={isActive} />
+          </TooltipTrigger>
+          <TooltipContent side="bottom">{formatTooltipText(entity.type)}</TooltipContent>
+        </Tooltip>
         <div
           className={cn(
-            'truncate',
-            'overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-2 relative w-full',
+            'truncate overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-2 relative w-full',
             isActive && 'text-foreground'
           )}
         >
           <span
             className={cn(
               isActive ? 'text-foreground' : 'text-foreground-light group-hover:text-foreground',
-              'text-sm',
-              'transition',
-              'truncate'
+              'text-sm transition truncate'
             )}
           >
             {entity.name}
           </span>
-          <EntityTooltipTrigger entity={entity} />
+          <EntityTooltipTrigger
+            entity={entity}
+            tableHasRlsDisabledLint={tableHasRlsDisabledLint}
+            tableHasRlsEnabledNoPolicyLint={tableHasRlsEnabledNoPolicyLint}
+            viewHasLints={viewHasLints}
+            materializedViewHasLints={materializedViewHasLints}
+            foreignTableHasLints={foreignTableHasLints}
+            apiAccessData={apiAccessData}
+          />
         </div>
 
         {canEdit && (
           <DropdownMenu>
-            <DropdownMenuTrigger className="text-foreground-lighter transition-all hover:text-foreground data-[state=open]:text-foreground">
-              <MoreHorizontal size={14} strokeWidth={2} />
+            <DropdownMenuTrigger
+              asChild
+              className="text-foreground-lighter transition-all text-transparent group-hover:text-foreground data-open:text-foreground"
+            >
+              <Button
+                type="text"
+                className="w-6 h-6"
+                icon={<MoreVertical size={14} strokeWidth={2} />}
+                onClick={(e) => e.preventDefault()}
+              />
             </DropdownMenuTrigger>
-            <DropdownMenuContent side="bottom" align="start" className="w-44">
+            <DropdownMenuContent side="bottom" align="start" className="w-52">
               <DropdownMenuItem
                 key="copy-name"
                 className="space-x-2"
@@ -371,9 +253,88 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                   copyToClipboard(entity.name)
                 }}
               >
-                <Clipboard size={12} />
+                <Copy size={12} className="shrink-0" />
                 <span>Copy name</span>
               </DropdownMenuItem>
+
+              {isTableLikeEntityListItem(entity) && (
+                <DropdownMenuItem
+                  key="copy-schema"
+                  className="space-x-2"
+                  onClick={async (e) => {
+                    e.stopPropagation()
+                    const toastId = toast.loading('Getting table schema...')
+
+                    const formattedSchema = getTableDefinition({
+                      id: entity.id,
+                      projectRef: project?.ref,
+                      connectionString: project?.connectionString,
+                    }).then((tableDefinition) => {
+                      if (!tableDefinition) {
+                        throw new Error('Failed to get table schema')
+                      }
+                      return formatSql(tableDefinition)
+                    })
+
+                    try {
+                      await copyToClipboard(formattedSchema, () => {
+                        toast.success('Table schema copied to clipboard', { id: toastId })
+                      })
+                    } catch (err: unknown) {
+                      if (err instanceof Error) {
+                        toast.error('Failed to copy schema: ' + (err.message || err), {
+                          id: toastId,
+                        })
+                      }
+                    }
+                  }}
+                >
+                  <Copy size={12} className="shrink-0" />
+                  <span>Copy table schema</span>
+                </DropdownMenuItem>
+              )}
+
+              {(entity.type === ENTITY_TYPE.VIEW ||
+                entity.type === ENTITY_TYPE.MATERIALIZED_VIEW) && (
+                <DropdownMenuItem
+                  key="copy-view-definition"
+                  className="space-x-2"
+                  onClick={async (e) => {
+                    e.stopPropagation()
+                    const label =
+                      entity.type === ENTITY_TYPE.MATERIALIZED_VIEW ? 'materialized view' : 'view'
+                    const toastId = toast.loading(`Getting ${label} definition...`)
+
+                    const formattedDefinition = getViewDefinition({
+                      id: entity.id,
+                      projectRef: project?.ref,
+                      connectionString: project?.connectionString,
+                      includeCreateStatement: true,
+                    }).then((definition) => {
+                      if (!definition) {
+                        throw new Error(`Failed to get ${label} definition`)
+                      }
+                      return formatSql(definition)
+                    })
+
+                    try {
+                      await copyToClipboard(formattedDefinition, () => {
+                        toast.success(
+                          `${label[0].toUpperCase() + label.slice(1)} definition copied to clipboard`,
+                          { id: toastId }
+                        )
+                      })
+                    } catch (err: any) {
+                      toast.error(`Failed to copy ${label} definition: ` + (err.message || err), {
+                        id: toastId,
+                      })
+                    }
+                  }}
+                >
+                  <Copy size={12} className="shrink-0" />
+                  <span>Copy definition</span>
+                </DropdownMenuItem>
+              )}
 
               {entity.type === ENTITY_TYPE.TABLE && (
                 <>
@@ -387,7 +348,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                       snap.onEditTable()
                     }}
                   >
-                    <Edit size={12} />
+                    <Edit size={12} className="shrink-0" />
                     <span>Edit table</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
@@ -398,22 +359,22 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                       snap.onDuplicateTable()
                     }}
                   >
-                    <Copy size={12} />
+                    <Copy size={12} className="shrink-0" />
                     <span>Duplicate table</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem key="view-policies" className="space-x-2" asChild>
                     <Link
                       key="view-policies"
-                      href={`/project/${projectRef}/auth/policies?schema=${selectedSchema}&search=${entity.id}`}
+                      href={`/project/${projectRef}/auth/policies?schema=${encodeURIComponent(selectedSchema ?? '')}&search=${encodeURIComponent(String(entity.id))}`}
                     >
-                      <Lock size={12} />
+                      <Lock size={12} className="shrink-0" />
                       <span>View policies</span>
                     </Link>
                   </DropdownMenuItem>
 
                   <DropdownMenuSub>
                     <DropdownMenuSubTrigger className="gap-x-2">
-                      <Download size={12} />
+                      <Download size={12} className="shrink-0" />
                       Export data
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent>
@@ -422,7 +383,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                         className="space-x-2"
                         onClick={(e) => {
                           e.stopPropagation()
-                          exportTableAsCSV()
+                          exportCsv()
                         }}
                       >
                         <span>Export table as CSV</span>
@@ -432,10 +393,20 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                         className="gap-x-2"
                         onClick={(e) => {
                           e.stopPropagation()
-                          exportTableAsSQL()
+                          exportSql()
                         }}
                       >
                         <span>Export table as SQL</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        key="download-table-cli"
+                        className="gap-x-2"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onExportCLI()
+                        }}
+                      >
+                        <span>Export table via CLI</span>
                       </DropdownMenuItem>
                     </DropdownMenuSubContent>
                   </DropdownMenuSub>
@@ -449,17 +420,231 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                       snap.onDeleteTable()
                     }}
                   >
-                    <Trash size={12} />
+                    <Trash size={12} className="shrink-0" />
                     <span>Delete table</span>
+                  </DropdownMenuItem>
+                </>
+              )}
+
+              {entity.type === ENTITY_TYPE.VIEW && (
+                <>
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="gap-x-2">
+                      <Download size={12} className="shrink-0" />
+                      Export data
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                      <DropdownMenuItem
+                        key="download-view-csv"
+                        className="space-x-2"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          exportCsv()
+                        }}
+                      >
+                        <span>Export view as CSV</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        key="download-view-sql"
+                        className="gap-x-2"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          exportSql()
+                        }}
+                      >
+                        <span>Export view as SQL</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    key="delete-view"
+                    className="gap-x-2"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      snap.onDeleteView()
+                    }}
+                  >
+                    <Trash size={12} className="shrink-0" />
+                    <span>Delete view</span>
+                  </DropdownMenuItem>
+                </>
+              )}
+
+              {entity.type === ENTITY_TYPE.MATERIALIZED_VIEW && (
+                <>
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="gap-x-2">
+                      <Download size={12} className="shrink-0" />
+                      Export data
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                      <DropdownMenuItem
+                        key="download-mv-csv"
+                        className="space-x-2"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          exportCsv()
+                        }}
+                      >
+                        <span>Export view as CSV</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        key="download-mv-sql"
+                        className="gap-x-2"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          exportSql()
+                        }}
+                      >
+                        <span>Export view as SQL</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    key="delete-materialized-view"
+                    className="gap-x-2"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      snap.onDeleteMaterializedView()
+                    }}
+                  >
+                    <Trash size={12} className="shrink-0" />
+                    <span>Delete view</span>
                   </DropdownMenuItem>
                 </>
               )}
             </DropdownMenuContent>
           </DropdownMenu>
         )}
-      </EditorTablePageLink>
-    </div>
+      </>
+      {exportCsvConfirmationModal}
+      {exportSqlConfirmationModal}
+    </EditorTablePageLink>
   )
 }
 
-export default EntityListItem
+const EntityTooltipTrigger = ({
+  entity,
+  tableHasRlsDisabledLint,
+  tableHasRlsEnabledNoPolicyLint,
+  viewHasLints,
+  materializedViewHasLints,
+  foreignTableHasLints,
+  apiAccessData,
+}: {
+  entity: Entity
+  tableHasRlsDisabledLint: boolean
+  tableHasRlsEnabledNoPolicyLint: boolean
+  viewHasLints: boolean
+  materializedViewHasLints: boolean
+  foreignTableHasLints: boolean
+  apiAccessData?: TableApiAccessData
+}) => {
+  const { ref } = useParams()
+
+  let tooltipContent = null
+  const accessWarning = 'Data is publicly accessible via API'
+  const learnMoreCTA = (
+    <InlineLink
+      href={`/project/${ref}/editor/${entity.id}?schema=${entity.schema}&showWarning=true`}
+    >
+      Learn more
+    </InlineLink>
+  )
+
+  switch (entity.type) {
+    case ENTITY_TYPE.TABLE:
+      if (tableHasRlsDisabledLint) {
+        tooltipContent = (
+          <>
+            This table can be accessed by anyone via the Data API as RLS is disabled. {learnMoreCTA}
+            .
+          </>
+        )
+      }
+      break
+    case ENTITY_TYPE.VIEW:
+      if (viewHasLints) {
+        tooltipContent = (
+          <>
+            {accessWarning} as this is a Security definer view. {learnMoreCTA}.
+          </>
+        )
+      }
+      break
+    case ENTITY_TYPE.MATERIALIZED_VIEW:
+      if (materializedViewHasLints) {
+        tooltipContent = (
+          <>
+            {accessWarning} as this is a Security definer view {learnMoreCTA}.
+          </>
+        )
+      }
+      break
+    case ENTITY_TYPE.FOREIGN_TABLE:
+      if (foreignTableHasLints) {
+        tooltipContent = (
+          <>
+            {accessWarning} as RLS is not enforced on foreign tables. {learnMoreCTA}.
+          </>
+        )
+      }
+      break
+    default:
+      break
+  }
+
+  if (tooltipContent) {
+    return (
+      <Tooltip>
+        <TooltipTrigger className="min-w-4">
+          <Badge variant="destructive">Unrestricted</Badge>
+        </TooltipTrigger>
+        <TooltipContent side="right" className="max-w-52">
+          {tooltipContent}
+        </TooltipContent>
+      </Tooltip>
+    )
+  }
+
+  const isRlsEnabledNoPolicies =
+    entity.type === ENTITY_TYPE.TABLE &&
+    apiAccessData?.apiAccessType === 'access' &&
+    tableHasRlsEnabledNoPolicyLint
+  if (isRlsEnabledNoPolicies) {
+    return (
+      <Tooltip>
+        <TooltipTrigger className="min-w-4" aria-label="Table exposed via Data API">
+          <Globe size={14} strokeWidth={1} className="text-foreground-lighter" />
+        </TooltipTrigger>
+        <TooltipContent side="right" className="max-w-52">
+          This table can be accessed via the Data API but no RLS policies exist so no data will be
+          returned
+        </TooltipContent>
+      </Tooltip>
+    )
+  }
+
+  const isApiExposedWithRlsAndPolicies =
+    apiAccessData?.apiAccessType === 'access' && !tableHasRlsEnabledNoPolicyLint
+  if (isApiExposedWithRlsAndPolicies) {
+    return (
+      <Tooltip>
+        <TooltipTrigger className="min-w-4" aria-label="Table exposed via Data API">
+          <Globe size={14} strokeWidth={1} className="text-foreground-lighter" />
+        </TooltipTrigger>
+        <TooltipContent side="right">This table can be accessed via the Data API</TooltipContent>
+      </Tooltip>
+    )
+  }
+
+  return null
+}
