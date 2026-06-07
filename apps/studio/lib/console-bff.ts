@@ -100,6 +100,21 @@ export function mapOrganization(org: BackendOrg, billingEmail: string) {
   }
 }
 
+// Map our control-plane project status -> dashboard project status enum.
+const PROJECT_STATUS_MAP: Record<string, string> = {
+  provisioning: 'COMING_UP',
+  active: 'ACTIVE_HEALTHY',
+  ACTIVE_HEALTHY: 'ACTIVE_HEALTHY',
+  failed: 'INIT_FAILED',
+  paused: 'INACTIVE',
+  pausing: 'PAUSING',
+  resuming: 'RESTORING',
+  removed: 'REMOVED',
+}
+export function mapProjectStatus(status?: string) {
+  return (status && PROJECT_STATUS_MAP[status]) || 'UNKNOWN'
+}
+
 /** Resolve an org slug -> our backend org (with string id). */
 export async function resolveOrg(req: import('next').NextApiRequest, slug: string) {
   const { data: orgs } = await consoleGet<BackendOrg[]>(req, '/api/auth/organization/list')

@@ -1,17 +1,31 @@
-import { bff, consoleFetch, consoleGet, resolveOrg, type BackendOrg } from '@/lib/console-bff'
+import {
+  bff,
+  consoleFetch,
+  consoleGet,
+  mapProjectStatus,
+  resolveOrg,
+  type BackendOrg,
+} from '@/lib/console-bff'
 
 function mapProject(p: any, org: { id: string; slug: string }) {
+  const region = p.region ?? 'shared'
+  const cloud_provider = p.cloudProvider ?? 'AWS'
+  const infra_compute_size = p.infraComputeSize ?? 'micro'
+  const status = mapProjectStatus(p.status)
   return {
     id: p.id,
     ref: p.ref,
     name: p.name,
-    status: p.status ?? 'ACTIVE_HEALTHY',
+    status,
     organization_id: org.id,
     organization_slug: org.slug,
-    cloud_provider: p.cloudProvider ?? 'AWS',
-    region: p.region ?? 'local',
+    cloud_provider,
+    region,
     inserted_at: p.createdAt ?? p.inserted_at ?? null,
-    infra_compute_size: p.infraComputeSize ?? 'micro',
+    infra_compute_size,
+    // The dashboard reads project.databases (e.g. getComputeSize); always provide
+    // the primary database entry (identifier === ref).
+    databases: [{ identifier: p.ref, cloud_provider, region, status, infra_compute_size }],
   }
 }
 

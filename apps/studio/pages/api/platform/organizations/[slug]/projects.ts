@@ -1,4 +1,4 @@
-import { bff, consoleGet, type BackendOrg } from '@/lib/console-bff'
+import { bff, consoleGet, mapProjectStatus, type BackendOrg } from '@/lib/console-bff'
 
 // [console fork] GET /platform/organizations/{slug}/projects.
 // Resolves slug -> orgId via better-auth, then lists our control-plane projects
@@ -20,18 +20,25 @@ export default bff({
 
     return res.status(200).json({
       pagination: { count: list.length, limit, offset },
-      projects: list.map((p) => ({
-        id: p.id,
-        ref: p.ref,
-        name: p.name,
-        status: p.status ?? 'ACTIVE_HEALTHY',
-        organization_id: org.id,
-        organization_slug: org.slug,
-        cloud_provider: p.cloudProvider ?? 'AWS',
-        region: p.region ?? 'local',
-        inserted_at: p.createdAt ?? p.inserted_at ?? null,
-        infra_compute_size: p.infraComputeSize ?? 'micro',
-      })),
+      projects: list.map((p) => {
+        const region = p.region ?? 'shared'
+        const cloud_provider = p.cloudProvider ?? 'AWS'
+        const infra_compute_size = p.infraComputeSize ?? 'micro'
+        const status = mapProjectStatus(p.status)
+        return {
+          id: p.id,
+          ref: p.ref,
+          name: p.name,
+          status,
+          organization_id: org.id,
+          organization_slug: org.slug,
+          cloud_provider,
+          region,
+          inserted_at: p.createdAt ?? p.inserted_at ?? null,
+          infra_compute_size,
+          databases: [{ identifier: p.ref, cloud_provider, region, status, infra_compute_size }],
+        }
+      }),
     })
   },
 })
