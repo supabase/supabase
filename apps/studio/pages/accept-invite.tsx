@@ -56,6 +56,12 @@ const AcceptInvitePage: NextPageWithLayout = () => {
     }
   }
 
+  // router.query is empty until the router is ready on the client; don't flash the
+  // "invalid" state before the invitationId has hydrated.
+  if (!router.isReady) {
+    return <div className="text-sm text-foreground-light">Loading your invitation…</div>
+  }
+
   if (!invitationId) {
     return (
       <div className="text-sm text-foreground-light">
