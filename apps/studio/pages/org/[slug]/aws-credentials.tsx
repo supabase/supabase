@@ -41,6 +41,18 @@ const OrgAwsCredentials: NextPageWithLayout = () => {
   const [defaultRegion, setDefaultRegion] = useState('us-east-1')
   const [isSaving, setIsSaving] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [regions, setRegions] = useState<{ code: string; name: string }[]>([])
+
+  useEffect(() => {
+    let active = true
+    fetch('/dashboard/api/platform/aws/regions')
+      .then((r) => (r.ok ? r.json() : { regions: [] }))
+      .then((d) => active && setRegions(d.regions ?? []))
+      .catch(() => {})
+    return () => {
+      active = false
+    }
+  }, [])
 
   const refresh = async () => {
     setIsLoading(true)
@@ -173,7 +185,16 @@ const OrgAwsCredentials: NextPageWithLayout = () => {
                   value={defaultRegion}
                   onChange={(e) => setDefaultRegion(e.target.value)}
                   placeholder="us-east-1"
+                  list="aws-regions"
+                  autoComplete="off"
                 />
+                <datalist id="aws-regions">
+                  {regions.map((r) => (
+                    <option key={r.code} value={r.code}>
+                      {r.name}
+                    </option>
+                  ))}
+                </datalist>
               </div>
             </CardContent>
             <CardFooter className="justify-end gap-x-2">
