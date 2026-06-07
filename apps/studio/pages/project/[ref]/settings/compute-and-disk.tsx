@@ -1,4 +1,4 @@
-import { ComputeResize } from '@/components/interfaces/Settings/Compute/ComputeResize'
+import { ComputeAndDiskForm } from '@/components/interfaces/Settings/Compute/ComputeAndDiskForm'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
 import {
@@ -29,7 +29,7 @@ const AuthSettings: NextPageWithLayout = () => {
       </ScaffoldContainer>
       <ScaffoldContainer className="mt-4">
         {isDedicated ? (
-          <ComputeResize />
+          <ComputeAndDiskForm />
         ) : (
           <div className="rounded-md border border-default bg-surface-100 p-6 text-sm text-foreground-light">
             This is a shared-infrastructure project — its compute is managed automatically and has
