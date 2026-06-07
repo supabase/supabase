@@ -22,7 +22,6 @@ import DefaultLayout from '@/components/layouts/DefaultLayout'
 import AlertError from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import NoPermission from '@/components/ui/NoPermission'
-import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useBackupsQuery } from '@/data/database/backups-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -65,8 +64,7 @@ DatabasePhysicalBackups.getLayout = (page) => (
 const PITR = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { hasAccess: hasAccessToPitr, isLoading: isLoadingEntitlements } =
-    useCheckEntitlements('pitr.available_variants')
+  const { isLoading: isLoadingEntitlements } = useCheckEntitlements('pitr.available_variants')
   const isOrioleDbInAws = useIsOrioleDbInAws()
   const {
     data: backups,
@@ -108,17 +106,13 @@ const PITR = () => {
       {isSuccess && (
         <>
           {!isEnabled ? (
-            <UpgradeToPro
-              addon={hasAccessToPitr ? 'pitr' : undefined}
-              source="pitr"
-              featureProposition="enable Point-in-Time Recovery"
-              primaryText="Point in Time Recovery is a Pro Plan add-on"
-              secondaryText={
-                !hasAccessToPitr
-                  ? 'Roll back your database to a specific second. Starts at $100/month. Pro Plan already includes daily backups at no extra cost.'
-                  : 'Enable the add-on to add point-in-time recovery to your project.'
-              }
-            />
+            <Admonition
+              type="default"
+              title="Point-in-Time Recovery is not available on shared infrastructure"
+              description="PITR requires continuous WAL archiving, which shared-infrastructure projects don't run. Use logical backups (download / restore) on the Scheduled backups tab — or a dedicated project — for recovery."
+            >
+              <DocsButton abbrev={false} className="mt-2" href={`${DOCS_URL}/guides/platform/backups`} />
+            </Admonition>
           ) : !isActiveHealthy ? (
             <Alert>
               <AlertCircle />
