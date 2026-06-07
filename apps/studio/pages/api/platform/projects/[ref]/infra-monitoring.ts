@@ -1,4 +1,5 @@
 import { execFile } from 'child_process'
+import os from 'os'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { promisify } from 'util'
 
@@ -35,23 +36,25 @@ function parseBytes(s: string | undefined): number {
 type Metrics = { cpuPercent: number; ramUsed: number; ramTotal: number; diskSize: number; diskUsed: number }
 
 async function readMetrics(ref: string): Promise<Metrics> {
-  const m: Metrics = { cpuPercent: 0, ramUsed: 0, ramTotal: 0, diskSize: 0, diskUsed: 0 }
+  const cores = Math.max(1, os.cpus()?.length || 1)
+  const hostMem = os.totalmem() || 0
+  const m: Metrics = { cpuPercent: 0, ramUsed: 0, ramTotal: hostMem, diskSize: 0, diskUsed: 0 }
   try {
     const { stdout } = await execFileP(
       'docker',
-      ['stats', '--no-stream', '--format', '{{.Name}};{{.CPUPerc}};{{.MemUsage}};{{.MemPerc}}'],
+      ['stats', '--no-stream', '--format', '{{.Name}};{{.CPUPerc}};{{.MemUsage}}'],
       { timeout: 8000, windowsHide: true }
     )
+    let cpuSum = 0
     for (const line of stdout.split('\n')) {
-      const [name, cpu, mem, memPerc] = line.split(';')
+      const [name, cpu, mem] = line.split(';')
       if (!name || !name.startsWith(`sb-${ref}-`)) continue
-      m.cpuPercent += parseFloat((cpu || '0').replace('%', '')) || 0
-      const used = parseBytes((mem || '').split('/')[0])
-      m.ramUsed += used
-      const pct = parseFloat((memPerc || '0').replace('%', ''))
-      if (pct > 0) m.ramTotal = Math.max(m.ramTotal, used / (pct / 100))
+      cpuSum += parseFloat((cpu || '0').replace('%', '')) || 0
+      m.ramUsed += parseBytes((mem || '').split('/')[0])
     }
-    if (m.cpuPercent > 100) m.cpuPercent = 100
+    // docker CPU% is per-core (100% = one full core); normalise to host capacity.
+    m.cpuPercent = Math.min(100, Number((cpuSum / cores).toFixed(2)))
+    if (hostMem > 0) m.ramUsed = Math.min(m.ramUsed, hostMem)
   } catch {
     /* docker unavailable -> zeros */
   }

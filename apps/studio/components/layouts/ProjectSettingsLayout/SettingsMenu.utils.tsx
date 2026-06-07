@@ -106,23 +106,9 @@ export const useGenerateSettingsMenu = () => {
           items: [],
           shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_GENERAL,
         },
-        {
-          name: 'Compute and Disk',
-          key: 'compute-and-disk',
-          url: `/project/${ref}/settings/compute-and-disk`,
-          items: [],
-          disabled: !isProjectActive,
-          shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_COMPUTE_AND_DISK,
-        },
-        {
-          name: 'Infrastructure',
-          key: 'infrastructure',
-          url: `/project/${ref}/settings/infrastructure`,
-          items: [],
-          disabled: !isProjectActive,
-          shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_INFRASTRUCTURE,
-        },
-
+        // [console fork] Compute and Disk + Infrastructure are dedicated-EC2 concepts
+        // (compute tiers, disk autoscaling/IOPS/throughput, instance/region) that don't
+        // apply to shared infrastructure — removed.
         {
           name: 'Integrations',
           key: 'integrations',
