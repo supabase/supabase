@@ -14,6 +14,66 @@ import { useParams } from './hooks'
 type TrackFeatureFlagVariables = components['schemas']['TelemetryFeatureFlagBody']
 export type CallFeatureFlagsResponse = components['schemas']['TelemetryCallFeatureFlagsResponse']
 
+// [console fork] ConfigCat isn't available on self-host, so we seed the flag store
+// with these defaults. Features we support are enabled; "disable*" flags are kept
+// false so those features stay available; cloud-only/unsupported stay false.
+export const SELF_HOST_CONFIGCAT_FLAGS: Record<string, boolean> = {
+  // supported features
+  auditLogsLogDrain: true,
+  scopedPAT: true,
+  allowDataBranching: true,
+  jitDbAccess: true,
+  CustomOauthProviders: true,
+  privateApps: true,
+  platformWebhooks: true,
+  edgeFunctionsOverview: true,
+  observabilityOverview: true,
+  authOverviewPage: true,
+  unifiedLogs: true,
+  dashboardPreferences: true,
+  improvedUserSearch: true,
+  rlsTesterSandbox: true,
+  pgdeltaDiff: true,
+  ShowPrettyExplain: true,
+  showChToggleInLogExplorer: true,
+  textConfirmationModalClickToCopy: true,
+  timezonePicker: true,
+  showApiKeysLastUsed: true,
+  // keep these features ENABLED (false = "not disabled")
+  disableProjectCreationAndUpdate: false,
+  disableProjectRestarts: false,
+  disableProjectTransfer: false,
+  disableProjectUpgrade: false,
+  disableLegacyJwtSecretRotation: false,
+  disableOrioleProjectCreation: false,
+  disableAssistantPrompts: false,
+  // log-drain backends we don't implement yet (webhook is the supported default)
+  S3logdrain: false,
+  SentryLogDrain: false,
+  axiomLogDrain: false,
+  otlpLogDrain: false,
+  Last9LogDrain: false,
+  syslogLogDrain: false,
+  // cloud-only / not-applicable / banners
+  marketplaceIntegrations: false,
+  customDomainsDisabledDueToQuota: false,
+  analyticsBucketsTableCreation: false,
+  edgeFunctionsRequestMetrics: false,
+  enablePasskeyAuth: false,
+  enableSmartRegion: false,
+  newHomepageUsageV2: false,
+  newProjectInternalOnlyConfiguration: false,
+  multigresLogs: false,
+  ongoingIncident: false,
+  showNoticeBanner: false,
+  clockSkewBanner: false,
+  storageMigrationCallout: false,
+  supportAssistantFollowUp: false,
+  simplifiedSupportForm: false,
+  showDiskIOBurstBalanceChart: false,
+  showMemoryCommitmentChart: false,
+}
+
 export async function getFeatureFlags(
   API_URL: string,
   options: { organizationSlug?: string; projectRef?: string } = {}
@@ -224,6 +284,11 @@ export const FeatureFlagProvider = ({
         })
       }
 
+      // [console fork] Self-host has no ConfigCat — seed our flag defaults so
+      // flag-gated features work (and useFlag doesn't console.error on every key).
+      // ConfigCat values (when present) win via the spread order.
+      flagStore.configcat = { ...SELF_HOST_CONFIGCAT_FLAGS, ...flagStore.configcat }
+
       flagStore.hasLoaded = true
 
       if (mounted) {
@@ -275,14 +340,14 @@ export function useFlag<T = boolean>(name: string) {
   const flagStore = useFeatureFlags()
   const store = flagStore.configcat
 
-  // Flag store is empty means config cat is not loaded yet, return false
+  // [console fork] Self-host has no ConfigCat. Fall back to our defaults when the
+  // store hasn't loaded or the key is absent (instead of false + a console.error).
   if (isObjectEmpty(store)) {
-    return false
+    return (SELF_HOST_CONFIGCAT_FLAGS[name] ?? false) as T
   }
 
   if (store[name] === undefined) {
-    console.error(`Flag key "${name}" does not exist in ConfigCat flag store`)
-    return false
+    return (SELF_HOST_CONFIGCAT_FLAGS[name] ?? false) as T
   }
 
   return store[name] as T
