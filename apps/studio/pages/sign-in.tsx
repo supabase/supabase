@@ -44,6 +44,20 @@ const SignInPage: NextPageWithLayout = () => {
     }
   }, [router])
 
+  // [console fork] First run: if no admin exists yet, route to the install setup page.
+  useEffect(() => {
+    let active = true
+    fetch('/api/auth/install/status')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (active && d && d.installed === false) router.replace('/setup/install')
+      })
+      .catch(() => {})
+    return () => {
+      active = false
+    }
+  }, [router])
+
   return (
     <>
       <div className="flex flex-col gap-5">
