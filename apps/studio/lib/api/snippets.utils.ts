@@ -31,9 +31,17 @@ export const SnippetSchema = z.object({
     z.literal('org'),
     z.literal('public'),
   ]),
-  project_id: z.number().default(1),
+  project_id: z
+    .union([z.number(), z.string()])
+    .transform((v) => (typeof v === 'number' ? v : 1))
+    .default(1),
   folder_id: z.string().nullable().default(null),
-  owner_id: z.number().default(1),
+  // [console fork] our auth user id is a string uuid; normalize to the single-user
+  // owner id so the SQL-only numeric schema still validates.
+  owner_id: z
+    .union([z.number(), z.string()])
+    .transform((v) => (typeof v === 'number' ? v : 1))
+    .default(1),
   owner: z
     .object({
       id: z.number(),
