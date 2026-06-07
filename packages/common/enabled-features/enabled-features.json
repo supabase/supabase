@@ -104,7 +104,7 @@
   "project_addons:dedicated_ipv4_address": true,
   "project_addons:show_compute_price": true,
 
-  "project_settings:custom_domains": true,
+  "project_settings:custom_domains": false,
   "project_settings:show_disable_legacy_api_keys": true,
   "project_settings:legacy_jwt_keys": true,
   "project_settings:log_drains": true,
