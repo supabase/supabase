@@ -56,7 +56,8 @@ export default function StudioCommandMenu() {
     options: { orderSection: orderCommandSectionsByPriority, sectionMeta: { priority: 3 } },
   })
   useSupportCommands()
-  useChangelogCommand({ enabled: IS_PLATFORM })
+  // [console fork] Self-host: no changelog command (changelog removed everywhere).
+  useChangelogCommand({ enabled: false })
   useThemeSwitcherCommands()
   useContextSearchCommands()
 
