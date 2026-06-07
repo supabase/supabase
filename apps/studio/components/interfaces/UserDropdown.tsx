@@ -106,24 +106,7 @@ export function UserDropdown({
                   Account preferences
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem
-                className="flex gap-2 cursor-pointer"
-                onClick={() => toggleFeaturePreviewModal(true)}
-                // onSelect={() => toggleFeaturePreviewModal(true)}
-              >
-                <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                Feature previews
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex gap-2 cursor-pointer" asChild>
-                <Link
-                  href="https://supabase.com/changelog"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <ScrollText size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                  Changelog
-                </Link>
-              </DropdownMenuItem>
+              {/* [console fork] Feature previews + Changelog removed from the dropdown */}
               <DropdownMenuSeparator />
             </DropdownMenuGroup>
           </>
