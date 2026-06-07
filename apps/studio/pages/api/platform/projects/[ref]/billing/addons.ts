@@ -1,31 +1,24 @@
-import { paths } from 'api-types'
-import { NextApiRequest, NextApiResponse } from 'next'
+import { bff, consoleGet, consoleFetch } from '@/lib/console-bff'
 
-import apiWrapper from '@/lib/api/apiWrapper'
-
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
-
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'GET':
-      return handleGet(req, res)
-    default:
-      res.setHeader('Allow', ['GET'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
-
-type ResponseData =
-  paths['/platform/projects/{ref}/billing/addons']['get']['responses']['200']['content']['application/json']
-
-const handleGet = async (_req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
-  const response: ResponseData = {
-    ref: '',
-    selected_addons: [],
-    available_addons: [],
-  }
-
-  return res.status(200).json(response)
-}
+// [console fork] Compute add-ons. For dedicated projects, POST a compute_instance
+// variant resizes the EC2 instance via the control-plane.
+export default bff({
+  GET: async (req, res) => {
+    const ref = String(req.query.ref ?? '')
+    const { data } = await consoleGet<any>(req, `/api/v1/projects/${ref}/billing/addons`)
+    return res.status(200).json(data ?? { selected_addons: [], available_addons: [] })
+  },
+  POST: async (req, res) => {
+    const ref = String(req.query.ref ?? '')
+    const { ok, status, data } = await consoleFetch(req, `/api/v1/projects/${ref}/billing/addons`, {
+      method: 'POST',
+      body: JSON.stringify(req.body ?? {}),
+    })
+    if (!ok) {
+      return res
+        .status(status && status >= 400 ? status : 502)
+        .json({ message: (data as any)?.error?.message ?? (data as any)?.message ?? 'Failed to update compute' })
+    }
+    return res.status(200).json(data ?? { ok: true })
+  },
+})
