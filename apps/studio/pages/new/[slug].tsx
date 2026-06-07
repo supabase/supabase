@@ -211,7 +211,10 @@ const Wizard: NextPageWithLayout = () => {
   // an in-between render, but watchedInstanceSize is still undefined from the
   // form state carried over from the free plan. To avoid this, we set a
   // default instance size in this case.
-  const instanceSize = canChooseInstanceSize ? (watchedInstanceSize ?? sizes[0]) : undefined
+  // [console fork] Only dedicated (BYO-AWS) projects have a compute size; shared infra
+  // has no compute selection and no billing, so leave instanceSize undefined there.
+  const instanceSize =
+    dedicatedAvailable && canChooseInstanceSize ? (watchedInstanceSize ?? sizes[0]) : undefined
   const { data: membersExceededLimit = [] } = useFreeProjectLimitCheckQuery(
     { slug },
     { enabled: isFreePlan }

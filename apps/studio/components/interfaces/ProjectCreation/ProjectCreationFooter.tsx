@@ -71,7 +71,10 @@ export const ProjectCreationFooter = ({
   return (
     <div key="panel-footer" className="grid grid-cols-12 w-full gap-4 items-center">
       <div className="col-span-4">
-        {!isFreePlan &&
+        {/* [console fork] Shared infra has no compute selection (instanceSize undefined)
+            and no billing — only show compute costs for dedicated projects. */}
+        {instanceSize !== undefined &&
+          !isFreePlan &&
           !projectCreationDisabled &&
           canCreateProject &&
           additionalMonthlySpend > 0 && (
