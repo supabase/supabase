@@ -28,11 +28,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-const handleGet = async (_req: NextApiRequest, res: NextApiResponse) => {
-  const { data, error } = await ((req as any)._sb).storage.vectors.listBuckets()
-  if (error) return res.status(500).json({ error: { message: error.message } })
-
-  return res.status(200).json(data)
+const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
+  try {
+    const { data, error } = await ((req as any)._sb).storage.vectors.listBuckets()
+    if (error) throw error
+    return res.status(200).json(data)
+  } catch {
+    // [console fork] Vector storage may not be available in the project's stack version.
+    return res.status(200).json([])
+  }
 }
 
 const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
