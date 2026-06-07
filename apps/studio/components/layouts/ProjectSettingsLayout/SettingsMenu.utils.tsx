@@ -33,6 +33,10 @@ export const useGenerateSettingsMenu = () => {
   const showLogDrains = logsAll && projectSettingsLogDrains
 
   const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
+  // [console fork] Compute and Disk only applies to dedicated (EC2) projects — shared
+  // infra has no per-project instance to resize.
+  const isDedicated =
+    !!(project as any)?.infra_compute_size && (project as any)?.region !== 'shared'
 
   if (!IS_PLATFORM) {
     return [
@@ -106,9 +110,18 @@ export const useGenerateSettingsMenu = () => {
           items: [],
           shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_GENERAL,
         },
-        // [console fork] Compute and Disk + Infrastructure are dedicated-EC2 concepts
-        // (compute tiers, disk autoscaling/IOPS/throughput, instance/region) that don't
-        // apply to shared infrastructure — removed.
+        // [console fork] Compute and Disk applies only to dedicated (EC2) projects.
+        ...(isDedicated
+          ? [
+              {
+                name: 'Compute and Disk',
+                key: 'compute-and-disk',
+                url: `/project/${ref}/settings/compute-and-disk`,
+                items: [],
+                disabled: !isProjectActive,
+              },
+            ]
+          : []),
         {
           name: 'Integrations',
           key: 'integrations',

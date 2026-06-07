@@ -1,4 +1,4 @@
-import { DiskManagementForm } from '@/components/interfaces/DiskManagement/DiskManagementForm'
+import { ComputeResize } from '@/components/interfaces/Settings/Compute/ComputeResize'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
 import {
@@ -7,20 +7,37 @@ import {
   ScaffoldHeader,
   ScaffoldTitle,
 } from '@/components/layouts/Scaffold'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from '@/types'
 
 const AuthSettings: NextPageWithLayout = () => {
+  // [console fork] Dedicated projects can resize their instance; shared-infra projects
+  // have no per-project compute to change. (Replaces the cloud DiskManagementForm.)
+  const { data: project } = useSelectedProjectQuery()
+  const isDedicated = !!(project as any)?.infra_compute_size && (project as any)?.region !== 'shared'
   return (
     <>
       <ScaffoldContainer>
         <ScaffoldHeader>
           <ScaffoldTitle>Compute and Disk</ScaffoldTitle>
           <ScaffoldDescription>
-            Configure the compute and disk settings for your project.
+            {isDedicated
+              ? "Resize your dedicated project's compute instance."
+              : 'Compute is managed automatically for shared-infrastructure projects.'}
           </ScaffoldDescription>
         </ScaffoldHeader>
       </ScaffoldContainer>
-      <DiskManagementForm />
+      <ScaffoldContainer className="mt-4">
+        {isDedicated ? (
+          <ComputeResize />
+        ) : (
+          <div className="rounded-md border border-default bg-surface-100 p-6 text-sm text-foreground-light">
+            This is a shared-infrastructure project — its compute is managed automatically and has
+            no per-project instance size to change. Create a dedicated project to choose and resize
+            compute.
+          </div>
+        )}
+      </ScaffoldContainer>
     </>
   )
 }
