@@ -35,7 +35,9 @@ export async function getDefaultRegionOption({
     )['loc']
     const locLatLon = COUNTRY_LAT_LON[locationCode]
 
-    if (locLatLon === undefined) return undefined
+    // [console fork] Unknown country -> default to East US instead of returning
+    // undefined (which both errors React Query and falls back to a far region).
+    if (locLatLon === undefined) return AWS_REGIONS.EAST_US.displayName
 
     const isAWSProvider = ['AWS', 'AWS_K8S'].includes(cloudProvider)
 
@@ -61,7 +63,9 @@ export async function getDefaultRegionOption({
       ? AWS_REGIONS[closestRegion as keyof typeof AWS_REGIONS].displayName
       : FLY_REGIONS[closestRegion as keyof typeof FLY_REGIONS].displayName
   } catch (error) {
-    throw error
+    // [console fork] Geo lookup failed (network/CSP) — default to East US rather
+    // than erroring the query (which left the form on a far fallback region).
+    return AWS_REGIONS.EAST_US.displayName
   }
 }
 

@@ -3,10 +3,10 @@ import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
 import type { components } from '@/data/api'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 
-export const AWS_REGIONS_DEFAULT =
-  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
-    ? AWS_REGIONS.SOUTHEAST_ASIA
-    : AWS_REGIONS.EAST_US_2
+// [console fork] Default to East US (N. Virginia) — most self-host operators are in
+// North America and it matches the common AWS account default; far better than the
+// upstream Southeast Asia non-prod default when geo-IP can't resolve a location.
+export const AWS_REGIONS_DEFAULT = AWS_REGIONS.EAST_US
 
 // TO DO, change default to US region for prod
 export const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
