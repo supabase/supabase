@@ -175,8 +175,6 @@ export const useGenerateSettingsMenu = () => {
               },
             ]
           : []),
-        // [console fork] Add-ons (compute/PITR/custom-domain/IPv4) are paid/dedicated
-        // features that don't apply to shared infra — removed.
         ...(showDashboardPreferences
           ? [
               {
