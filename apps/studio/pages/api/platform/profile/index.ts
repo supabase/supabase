@@ -1,39 +1,26 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { bff, consoleGet } from '@/lib/console-bff'
 
-import apiWrapper from '@/lib/api/apiWrapper'
-import { DEFAULT_PROJECT } from '@/lib/constants/api'
+// [console fork] GET /platform/profile -> our /api/v1/account/profile.
+export default bff({
+  GET: async (req, res) => {
+    const { data: profile, status } = await consoleGet(req, '/api/v1/account/profile')
+    if (!profile) {
+      return res
+        .status(status && status >= 400 ? status : 502)
+        .json({ error: { message: 'Failed to load profile' } })
+    }
 
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
-
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'GET':
-      return handleGetAll(req, res)
-    default:
-      res.setHeader('Allow', ['GET'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
-
-const handleGetAll = async (_req: NextApiRequest, res: NextApiResponse) => {
-  // Platform specific endpoint
-  const response = {
-    id: 1,
-    primary_email: 'johndoe@supabase.io',
-    username: 'johndoe',
-    first_name: 'John',
-    last_name: 'Doe',
-    organizations: [
-      {
-        id: 1,
-        name: process.env.DEFAULT_ORGANIZATION_NAME || 'Default Organization',
-        slug: 'default-org-slug',
-        billing_email: 'billing@supabase.co',
-        projects: [{ ...DEFAULT_PROJECT, connectionString: '' }],
-      },
-    ],
-  }
-  return res.status(200).json(response)
-}
+    return res.status(200).json({
+      id: profile.id,
+      gotrue_id: profile.id,
+      primary_email: profile.email,
+      username: profile.username ?? profile.email,
+      first_name: profile.firstName ?? '',
+      last_name: profile.lastName ?? '',
+      free_project_limit: 100,
+      is_alpha_user: false,
+      disabled_features: [],
+      is_platform_admin: !!profile.isPlatformAdmin,
+    })
+  },
+})

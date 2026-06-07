@@ -31,6 +31,23 @@ Shallow + sparse clone. Sparse paths: `apps/studio`, `packages`, `patches`.
 > Backend (separate `supabase-console` repo) change for Inc 1: `src/auth/auth.ts` adds `APP_URL`
 > (the dashboard origin) to better-auth `trustedOrigins` so proxied sign-in passes the origin check.
 
+### Increment 2 — BFF (orgs / projects / profile)
+- `apps/studio/lib/console-bff.ts` (NEW) — BFF helpers: `consoleFetch`/`consoleGet` forward the
+  browser's session cookie + a trusted Origin to the control plane; `bff()` method-router;
+  `mapOrganization` / `wildcardPermission` shape mappers.
+- Rewrote `pages/api/platform/profile/index.ts` → `/api/v1/account/profile`.
+- Rewrote `pages/api/platform/organizations/index.ts` → better-auth org list/create (mapped).
+- Rewrote `pages/api/platform/projects/index.ts` → projects across the user's orgs, paginated shape.
+- NEW: `pages/api/platform/profile/permissions.ts` (per-org wildcard),
+  `pages/api/platform/organizations/[slug]/projects.ts` (org projects, paginated),
+  `pages/api/platform/notifications/index.ts` ([]),
+  `pages/api/platform/projects-resource-warnings.ts` ([]),
+  `pages/api/platform/telemetry/{feature-flags,identify}.ts` (stubs),
+  `pages/api/platform/stripe/invoices/overdue.ts` ([] — no billing).
+- `proxy.ts` already bypasses `/api/platform/*` (Inc 1). Verified live: `/dashboard/organizations`
+  lists real orgs and `/dashboard/org/{slug}` renders, 0 console errors.
+- Placebo data: two orgs created via better-auth (`pointless-ai`, `acme-dev`).
+
 ## Required `apps/studio/.env.local` (gitignored — recreate locally)
 
 ```

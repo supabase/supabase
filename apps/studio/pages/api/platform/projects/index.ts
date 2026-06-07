@@ -1,24 +1,37 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { bff, consoleGet, type BackendOrg } from '@/lib/console-bff'
 
-import apiWrapper from '@/lib/api/apiWrapper'
-import { DEFAULT_PROJECT } from '@/lib/constants/api'
+// [console fork] GET /platform/projects -> all projects across the user's orgs,
+// in the dashboard's paginated shape (used by the command-menu project switcher).
+export default bff({
+  GET: async (req, res) => {
+    const limit = Number(req.query.limit ?? 96)
+    const offset = Number(req.query.offset ?? 0)
 
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+    const { data: orgs } = await consoleGet<BackendOrg[]>(req, '/api/auth/organization/list')
+    const orgList = Array.isArray(orgs) ? orgs : []
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
+    const perOrg = await Promise.all(
+      orgList.map(async (org) => {
+        const { data } = await consoleGet<any[]>(req, `/api/v1/organizations/${org.id}/projects`)
+        return (Array.isArray(data) ? data : []).map((p) => ({
+          id: p.id,
+          ref: p.ref,
+          name: p.name,
+          status: p.status ?? 'ACTIVE_HEALTHY',
+          organization_id: org.id,
+          organization_slug: org.slug,
+          cloud_provider: p.cloudProvider ?? 'AWS',
+          region: p.region ?? 'local',
+          inserted_at: p.createdAt ?? p.inserted_at ?? null,
+          infra_compute_size: p.infraComputeSize ?? 'micro',
+        }))
+      })
+    )
+    const projects = perOrg.flat()
 
-  switch (method) {
-    case 'GET':
-      return handleGetAll(req, res)
-    default:
-      res.setHeader('Allow', ['GET'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
-
-const handleGetAll = async (_req: NextApiRequest, res: NextApiResponse) => {
-  // Platform specific endpoint
-  const response = [DEFAULT_PROJECT]
-  return res.status(200).json(response)
-}
+    return res.status(200).json({
+      pagination: { count: projects.length, limit, offset },
+      projects: projects.slice(offset, offset + limit),
+    })
+  },
+})
