@@ -1,25 +1,32 @@
-import { paths } from 'api-types'
-import { NextApiRequest, NextApiResponse } from 'next'
+import { bff, consoleFetch } from '@/lib/console-bff'
 
-import apiWrapper from '@/lib/api/apiWrapper'
-
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
-
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'GET':
-      return handleGet(req, res)
-    default:
-      res.setHeader('Allow', ['GET'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
-
-type ResponseData =
-  paths['/platform/integrations/github/connections']['get']['responses']['200']['content']['application/json']
-
-const handleGet = async (_req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
-  return res.status(200).json({ connections: [] })
-}
+// [console fork] GitHub repo <-> project connections. GET lists an org's
+// connections; POST links a repo to a project. Proxied to the control-plane.
+export default bff({
+  GET: async (req, res) => {
+    const orgId = String(req.query.organization_id ?? '')
+    const { ok, status, data } = await consoleFetch(
+      req,
+      `/api/v1/integrations/github/connections?organization_id=${encodeURIComponent(orgId)}`,
+      { method: 'GET' }
+    )
+    if (!ok) {
+      return res
+        .status(status && status >= 400 ? status : 502)
+        .json({ message: (data as any)?.message ?? 'Failed to list connections', connections: [] })
+    }
+    return res.status(200).json(data ?? { connections: [] })
+  },
+  POST: async (req, res) => {
+    const { ok, status, data } = await consoleFetch(req, `/api/v1/integrations/github/connections`, {
+      method: 'POST',
+      body: JSON.stringify(req.body ?? {}),
+    })
+    if (!ok) {
+      return res
+        .status(status && status >= 400 ? status : 502)
+        .json({ message: (data as any)?.message ?? 'Failed to create connection' })
+    }
+    return res.status(201).json(data ?? {})
+  },
+})
