@@ -52,7 +52,15 @@ const nextConfig = {
     clientRouterFilter: false,
   },
   async rewrites() {
+    // [console fork] Proxy better-auth to our control-plane backend so the
+    // session cookie is set on the dashboard origin (same-origin, no CORS).
+    const consoleApiUrl = process.env.CONSOLE_API_URL ?? 'http://localhost:3000'
     return [
+      {
+        source: '/api/auth/:path*',
+        destination: `${consoleApiUrl}/api/auth/:path*`,
+        basePath: false as const,
+      },
       {
         source: `/.well-known/vercel/flags`,
         destination: `https://supabase.com/.well-known/vercel/flags`,

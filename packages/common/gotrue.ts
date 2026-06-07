@@ -1,5 +1,6 @@
 import { AuthClient, navigatorLock, User } from '@supabase/auth-js'
 import { isBrowser } from './helpers'
+import { consoleGotrueShim } from './console-auth'
 
 export const STORAGE_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY || 'supabase.dashboard.auth.token'
 export const AUTH_DEBUG_KEY =
@@ -179,7 +180,10 @@ async function debuggableNavigatorLock<R>(
   }
 }
 
-export const gotrueClient = new AuthClient({
+// [console fork] The original GoTrue AuthClient is replaced by a better-auth-
+// backed shim that talks to our control-plane `/api/auth/*`. The original config
+// is kept above for reference / easy upstream re-sync. See `./console-auth.ts`.
+const _gotrueClient = new AuthClient({
   url: process.env.NEXT_PUBLIC_GOTRUE_URL,
   storageKey: STORAGE_KEY,
   detectSessionInUrl: shouldDetectSessionInUrl,
@@ -189,5 +193,8 @@ export const gotrueClient = new AuthClient({
     ? { storage: globalThis.localStorage, userStorage: globalThis.localStorage }
     : null),
 })
+void _gotrueClient
+
+export const gotrueClient = consoleGotrueShim as unknown as typeof _gotrueClient
 
 export type { User }
