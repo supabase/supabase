@@ -69,7 +69,10 @@ export default bff({
           region: b.db_region === 'Shared Infrastructure' ? 'shared' : (b.db_region || 'shared'),
           dbPassword: b.db_pass,
           postgresType: b.postgres_engine === 'oriole' ? 'orioledb' : 'postgres',
+          // [console fork] honor the create-form Data API + RLS toggles
           dataApiEnabled: b.data_api_use_api_schema ?? true,
+          autoExposeNewTables: b.data_api_use_api_schema ?? true,
+          autoEnableRls: b.use_rls ?? b.enable_rls ?? true,
         }),
       }
     )

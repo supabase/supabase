@@ -1,12 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IS_PLATFORM, useFlag } from 'common'
-import Link from 'next/link'
+import { useFlag } from 'common'
 import { ReactNode, useEffect, useMemo, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  cn,
   Form,
   FormControl,
   FormField,
@@ -51,10 +49,8 @@ import {
   logDrainHeaderEntriesSchema,
   type LogDrainHeaderRow,
 } from './LogDrains.utils'
-import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { LogDrainData } from '@/data/log-drains/log-drains-query'
-import { DOCS_URL } from '@/lib/constants'
 import { httpEndpointUrlSchema } from '@/lib/validation/http-url'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 

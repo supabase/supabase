@@ -23,7 +23,6 @@ import { useSSOConfigCreateMutation } from '@/data/sso/sso-config-create-mutatio
 import { useSSOConfigDeleteMutation } from '@/data/sso/sso-config-delete-mutation'
 import { useOrgSSOConfigQuery } from '@/data/sso/sso-config-query'
 import { useSSOConfigUpdateMutation } from '@/data/sso/sso-config-update-mutation'
-import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
 

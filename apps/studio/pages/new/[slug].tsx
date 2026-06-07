@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { AWS_REGIONS, type CloudProvider } from 'shared-data'
+import { type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
 import { Button, Form, useWatch } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -82,7 +82,7 @@ const Wizard: NextPageWithLayout = () => {
   const { slug, projectName } = useParams()
   const { appTitle } = useCustomContent(['app:title'])
   const defaultProvider = useDefaultProvider()
-  const { profile } = useProfile()
+  useProfile()
   const pageTitle = buildStudioPageTitle({
     section: 'New Project',
     brand: appTitle || 'Supabase',
@@ -286,13 +286,6 @@ const Wizard: NextPageWithLayout = () => {
     smartRegionEnabled && defaultProvider !== 'AWS_NIMBUS'
       ? availableRegionsError
       : defaultRegionError
-  const defaultRegion =
-    defaultProvider === 'AWS_NIMBUS'
-      ? AWS_REGIONS.EAST_US.displayName
-      : smartRegionEnabled
-        ? availableRegionsData?.recommendations.smartGroup.name
-        : _defaultRegion
-
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits && !hasOutstandingInvoices
   const canConfigureGitHubOnCreate =
     canCreateProject && hasAccessToGitHubIntegration && canCreateGitHubConnection
@@ -308,13 +301,6 @@ const Wizard: NextPageWithLayout = () => {
     { enabled: currentOrg !== null }
   )
 
-  const userPrimaryEmail = profile?.primary_email?.toLowerCase()
-  const isUserAtFreeProjectLimit = userPrimaryEmail
-    ? membersExceededLimit.some(
-        (member) => member.primary_email?.toLowerCase() === userPrimaryEmail
-      )
-    : false
-  const shouldShowFreeProjectInfo = !!currentOrg && !isFreePlan && !isUserAtFreeProjectLimit
   const {
     gitHubAuthorization,
     githubRepos,

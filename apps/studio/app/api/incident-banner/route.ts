@@ -41,7 +41,7 @@ export async function GET() {
       { incidents },
       { headers: { 'Cache-Control': CACHE_CONTROL_SETTINGS } }
     )
-  } catch (error) {
+  } catch (error: any) {
     let errorCode = 500
     const headers = new Headers()
 

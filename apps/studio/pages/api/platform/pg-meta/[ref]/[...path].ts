@@ -33,11 +33,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const upstream = await fetch(target, {
       method,
       headers: {
-        'Content-Type': req.headers['content-type'] ?? 'application/json',
+        'Content-Type': String(req.headers['content-type'] ?? 'application/json'),
         apikey: dp.serviceKey,
         Authorization: `Bearer ${dp.serviceKey}`,
       },
-      body: body && body.length ? body : undefined,
+      body: body && body.length ? (body as any) : undefined,
     })
 
     const text = await upstream.text()

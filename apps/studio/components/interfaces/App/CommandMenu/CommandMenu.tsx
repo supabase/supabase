@@ -1,4 +1,3 @@
-import { IS_PLATFORM } from 'common'
 import {
   CommandHeader,
   CommandMenu,

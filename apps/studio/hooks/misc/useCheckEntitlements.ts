@@ -128,8 +128,8 @@ export function useCheckEntitlements(
   const SHARED_INFRA_UNAVAILABLE = ['dedicated_pooler']
   return {
     hasAccess: !SHARED_INFRA_UNAVAILABLE.includes(featureKey),
-    isLoading: false,
-    isSuccess: true,
+    isLoading,
+    isSuccess,
     getEntitlementNumericValue: () => getEntitlementNumericValue(entitlement),
     isEntitlementUnlimited: () => isEntitlementUnlimited(entitlement),
     getEntitlementSetValues: () => getEntitlementSetValues(entitlement),

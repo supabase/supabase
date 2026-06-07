@@ -38,7 +38,7 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   if (error) return res.status(500).json({ error: { message: error.message } })
 
   const indexes = await Promise.all(
-    data.indexes.map(async ({ indexName }) => {
+    data.indexes.map(async ({ indexName }: { indexName: string }) => {
       return (await ((req as any)._sb).storage.vectors.from(id as string).getIndex(indexName)).data?.index
     })
   )

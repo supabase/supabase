@@ -1,9 +1,4 @@
 import { ReactNode } from 'react'
-import { cn } from 'ui'
-import { Admonition } from 'ui-patterns'
-
-import { DocsButton } from './DocsButton'
-import { UpgradePlanButton } from './UpgradePlanButton'
 
 interface UpgradeToProProps {
   icon?: ReactNode
@@ -25,49 +20,5 @@ interface UpgradeToProProps {
   docsUrl?: string
 }
 
-export const UpgradeToPro = ({
-  icon,
-  primaryText,
-  secondaryText,
-  plan: planToUpgrade = 'Pro',
-  addon,
-  featureProposition,
-  buttonText,
-  source = 'upgrade',
-  disabled = false,
-  fullWidth = false,
-  layout = 'horizontal',
-  variant = 'primary',
-  className,
-  docsUrl,
-}: UpgradeToProProps) => {
-  // [console fork] Self-hosted: nothing is plan-gated, so never show upgrade prompts.
-  return null
-
-  // eslint-disable-next-line no-unreachable
-  return (
-    <Admonition
-      type="default"
-      icon={icon}
-      layout={layout}
-      title={primaryText}
-      description={secondaryText}
-      className={cn(fullWidth && 'border-0 rounded-none border-b', className)}
-      actions={
-        <>
-          <UpgradePlanButton
-            plan={planToUpgrade}
-            addon={addon}
-            source={source}
-            featureProposition={featureProposition}
-            disabled={disabled}
-            variant={variant}
-          >
-            {buttonText}
-          </UpgradePlanButton>
-          {!!docsUrl && <DocsButton href={docsUrl} />}
-        </>
-      }
-    />
-  )
-}
+// [console fork] Self-hosted: nothing is plan-gated, so never show upgrade prompts.
+export const UpgradeToPro = (_props: UpgradeToProProps) => null

@@ -17,15 +17,14 @@ export const SnippetSchema = z.object({
   id: z.string().uuid(),
   inserted_at: z.string().default(() => new Date().toISOString()),
   updated_at: z.string().default(() => new Date().toISOString()),
-  type: z.literal('sql'),
+  // [console fork] Studio stores multiple content kinds here (sql, report, etc.),
+  // each with a different `content` shape — accept any type + passthrough content
+  // instead of the original SQL-only literal schema.
+  type: z.enum(['sql', 'report', 'log_sql']).default('sql'),
   name: z.string(),
   description: z.string().optional(),
   favorite: z.boolean().default(false),
-  content: z.object({
-    sql: z.string(),
-    content_id: z.string(),
-    schema_version: z.literal('1.0'),
-  }),
+  content: z.record(z.string(), z.unknown()),
   visibility: z.union([
     z.literal('user'),
     z.literal('project'),
@@ -321,7 +320,12 @@ export async function saveSnippet(snippet: Snippet): Promise<Snippet> {
   }
 
   const snippetName = sanitizeName(snippet.name)
-  const content = snippet.content.sql || ''
+  // SQL snippets store their query text; other content kinds (report/log_sql) keep
+  // their full content as JSON so nothing is lost.
+  const content =
+    snippet.type === 'sql'
+      ? String((snippet.content as any)?.sql ?? '')
+      : JSON.stringify(snippet.content ?? {})
   const folderId = snippet.folder_id || null
   const folder = entries.find((f) => f.id === folderId && f.type === 'folder')
 

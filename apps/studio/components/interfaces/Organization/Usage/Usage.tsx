@@ -85,6 +85,7 @@ export const Usage = () => {
             ) : (
               <div className="flex items-center gap-2">
                 <DateRangePicker
+                  loading={false}
                   onChange={setDateRange}
                   value={TIME_PERIODS_REPORTS[0].key}
                   options={[...TIME_PERIODS_REPORTS]}
