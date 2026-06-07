@@ -140,6 +140,21 @@ export async function getProjectDataPlane(
   return { baseUrl: `http://${host}:${port}`, serviceKey: keys.serviceRoleKey }
 }
 
+/**
+ * A supabase-js client bound to a project's running data plane (kong + service
+ * role key), for Auth-admin and Storage BFF endpoints. Returns null if the
+ * project isn't running.
+ */
+export async function getProjectClient(req: import('next').NextApiRequest, ref: string) {
+  const dp = await getProjectDataPlane(req, ref)
+  if (!dp) return null
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { createClient } = require('@supabase/supabase-js')
+  return createClient(dp.baseUrl, dp.serviceKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  })
+}
+
 /** better-auth get-full-organization (members + invitations) by slug. */
 export async function getFullOrg(req: import('next').NextApiRequest, slug: string) {
   const { data } = await consoleGet<any>(

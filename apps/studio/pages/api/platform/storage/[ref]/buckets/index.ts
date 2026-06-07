@@ -1,28 +1,26 @@
-import { createClient } from '@supabase/supabase-js'
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import apiWrapper from '@/lib/api/apiWrapper'
+import { getProjectClient } from '@/lib/console-bff'
 
-const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_KEY!)
+// [console fork] Per-project Storage buckets via the project's running data plane
+// (kong + service role key), replacing the upstream single-project global client.
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const ref = String(req.query.ref ?? '')
+  const supabase = await getProjectClient(req, ref)
+  if (!supabase) return res.status(503).json({ error: { message: 'Project is not running' } })
 
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
-
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
+  switch (req.method) {
     case 'GET':
-      return handleGet(req, res)
+      return handleGet(req, res, supabase)
     case 'POST':
-      return handlePost(req, res)
-
+      return handlePost(req, res, supabase)
     default:
       res.setHeader('Allow', ['GET', 'POST'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
+      return res.status(405).json({ data: null, error: { message: `Method ${req.method} Not Allowed` } })
   }
 }
 
-const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
+const handleGet = async (req: NextApiRequest, res: NextApiResponse, supabase: any) => {
   const { limit, offset, search, sortColumn, sortOrder } = parseStoragePaginationParams(req)
 
   const { data, error } = await supabase.storage.listBuckets({
@@ -39,7 +37,7 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   return res.status(200).json(data)
 }
 
-const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
+const handlePost = async (req: NextApiRequest, res: NextApiResponse, supabase: any) => {
   const {
     id,
     public: isPublicBucket,
