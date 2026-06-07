@@ -30,17 +30,8 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(400).json({ error: { message: error.message } })
   }
 
-  const parsed = new URL(process.env.SUPABASE_PUBLIC_URL!)
-  const remapped = (data ?? []).map((item) => {
-    if (!item.signedUrl) return item
-    const signedUrl = new URL(item.signedUrl)
-    signedUrl.protocol = parsed.protocol
-    signedUrl.host = parsed.host
-    signedUrl.port = parsed.port
-    return { ...item, signedUrl: signedUrl.href }
-  })
-
-  return res.status(201).json(remapped)
+  // [console fork] Per-project client already returns the project's kong URLs.
+  return res.status(201).json(data ?? [])
 }
 
 export default wrappedHandler

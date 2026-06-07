@@ -29,7 +29,7 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
       apikey: dp.serviceKey,
       Authorization:
         (Array.isArray(authorizationHeader) ? authorizationHeader[0] : authorizationHeader) ??
-        `Bearer ${process.env.SUPABASE_ANON_KEY}`,
+        `Bearer ${dp.serviceKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(req.body),

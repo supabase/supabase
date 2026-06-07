@@ -28,15 +28,8 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query
   const { path } = req.body
 
+  // [console fork] The per-project client already returns the project's public
+  // (kong) URL, so no host rewrite is needed.
   const { data } = ((req as any)._sb).storage.from(id as string).getPublicUrl(path)
-
-  // change the domain name to the SUPABASE_PUBLIC_URL since SUPABASE_URL is not accessible from the client
-  const publicUrl = new URL(data.publicUrl)
-  const parsed = new URL(process.env.SUPABASE_PUBLIC_URL!)
-  publicUrl.protocol = parsed.protocol
-  publicUrl.host = parsed.host
-  publicUrl.port = parsed.port
-  data.publicUrl = publicUrl.href
-
   return res.status(200).json(data)
 }
