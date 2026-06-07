@@ -59,6 +59,9 @@ NEXT_PUBLIC_ENVIRONMENT=local
 NEXT_PUBLIC_GOTRUE_URL=http://localhost:8082/api/auth
 CONSOLE_API_URL=http://localhost:3000        # control-plane backend (auth proxy target)
 SENTRY_IGNORE_API_RESOLUTION_ERROR=1
+SNIPPETS_MANAGEMENT_FOLDER=./.snippets   # required for SQL snippets + Reports (filesystem store)
+OPENAI_API_KEY=                          # set to enable the AI Assistant; blank => "no key" notice
+NEXT_PUBLIC_AI_ASSISTANT_ENABLED=true
 ```
 
 All dashboard routes are served under `/dashboard/*` (e.g. `/dashboard/sign-in`,

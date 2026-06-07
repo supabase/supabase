@@ -37,7 +37,7 @@ const HOSTED_SUPPORTED_API_URLS = [
 // [console fork] Paths we own in platform mode: better-auth (proxied to our
 // control-plane via next.config rewrites) and the BFF that translates studio's
 // /platform/* calls to our /api/v1. These must bypass the hosted 404 guard.
-const CONSOLE_FORK_PREFIXES = ['/api/auth/', '/api/platform/', '/api/v1/']
+const CONSOLE_FORK_PREFIXES = ['/api/auth/', '/api/platform/', '/api/v1/', '/api/ai/']
 
 export function proxy(request: NextRequest) {
   if (CONSOLE_FORK_PREFIXES.some((prefix) => request.nextUrl.pathname.startsWith(prefix))) {
