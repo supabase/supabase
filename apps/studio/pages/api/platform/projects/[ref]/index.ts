@@ -42,7 +42,11 @@ export default bff({
       postgres_engine: p.postgresType ?? 'postgres',
       db_host: p.connection?.host ?? null,
       restUrl: p.connection?.apiUrl ?? null,
-      is_branch: false,
+      // [console fork] Preview branches: branching is always available on self-host
+      // (no plan gate), so the branch selector + Branches page render. `is_branch`
+      // marks a project that is itself a preview branch (has a parent).
+      is_branch_enabled: true,
+      is_branch: !!p.parentProjectId,
       parent_project_ref: undefined,
       // [console fork] expose the stored project toggles so the UI reflects them
       // (Data API on/off, auto-RLS + auto-expose for new tables).
