@@ -1,5 +1,6 @@
 'use client'
 
+import { type Menu } from '~/data/nav'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { AnimatePresence, domAnimation, LazyMotion, m } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
@@ -19,10 +20,10 @@ import { useSendTelemetryEvent } from '@/lib/telemetry'
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  menu: any
+  menu: Menu
 }
 
-const MobileMenu = ({ open, setOpen, menu }: Props) => {
+export const MobileMenu = ({ open, setOpen, menu }: Props) => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
   const sendTelemetryEvent = useSendTelemetryEvent()
@@ -50,17 +51,18 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [setOpen])
 
-  const AccordionMenuItem = ({ menuItem }: any) => (
+  const AccordionMenuItem = ({ menuItem }: { menuItem: Menu['primaryNav'][number] }) => (
     <AccordionContent className="p-0">
       {menuItem.title === 'Product' ? (
         <>
-          {Object.values(menuItem.subMenu)?.map((component: any) => (
+          {Object.values(menuItem.subMenu)?.map((component) => (
             <MenuItem
               key={component.name}
               title={component.name}
               href={component.url}
               description={component.description_short}
               icon={component.icon}
+              onClick={() => setOpen(false)}
             />
           ))}
           <div>
@@ -91,6 +93,7 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
               focus-visible:text-foreground focus-visible:ring-2 focus-visible:outline-hidden
               focus-visible:rounded-sm focus-visible:ring-foreground-lighter
             "
+            onClick={() => setOpen(false)}
           >
             <div className="flex flex-col gap-1 leading-3!">
               <span>Features</span>
@@ -106,14 +109,14 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
         </>
       ) : menuItem.title === 'Developers' ? (
         <div className="px-3 mb-2 flex flex-col gap-6">
-          {menuItem.subMenu['navigation'].map((column: any) => (
+          {menuItem.subMenu['navigation'].map((column) => (
             <div key={column.label} className="flex flex-col gap-3">
               {column.label !== 'Developers' && (
                 <label className="text-foreground-lighter text-xs uppercase tracking-widest font-mono">
                   {column.label}
                 </label>
               )}
-              {column.links.map((link: any) => (
+              {column.links.map((link) => (
                 <TextLink
                   hasChevron={false}
                   key={link.text}
@@ -149,14 +152,14 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
         </div>
       ) : menuItem.title === 'Solutions' ? (
         <div className="px-3 mb-2 flex flex-col gap-6">
-          {menuItem.subMenu['navigation'].map((column: any) => (
+          {menuItem.subMenu['navigation'].map((column) => (
             <div key={column.label} className="flex flex-col gap-3">
               {column.label !== 'Solutions' && (
                 <label className="text-foreground-lighter text-xs uppercase tracking-widest font-mono">
                   {column.label}
                 </label>
               )}
-              {column.links.map((link: any) => (
+              {column.links.map((link) => (
                 <TextLink
                   hasChevron={false}
                   key={link.text}
@@ -177,7 +180,7 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
     const className = 'py-2 pl-2 pr-4 text-base font-medium text-foreground hover:bg-surface-200'
     return (
       <Accordion type="multiple" className="px-0">
-        {menu.primaryNav.map((menuItem: any) => (
+        {menu.primaryNav.map((menuItem) => (
           <m.div
             key={menuItem.title}
             variants={listItem}
@@ -190,7 +193,7 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
               </AccordionItem>
             ) : (
               <Link
-                href={menuItem.url}
+                href={menuItem.url ?? '/'}
                 className={cn(
                   className,
                   'block focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-foreground-lighter focus-visible:rounded-sm'
@@ -320,5 +323,3 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
     </LazyMotion>
   )
 }
-
-export default MobileMenu

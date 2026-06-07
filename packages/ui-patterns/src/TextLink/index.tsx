@@ -23,7 +23,6 @@ export function TextLink({
   hasChevron = true,
   chevronAnimation = 'translate',
   target = '_self',
-  onClick,
   ...props
 }: Props) {
   return (
