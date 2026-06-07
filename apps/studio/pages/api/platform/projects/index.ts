@@ -51,7 +51,8 @@ export default bff({
         method: 'POST',
         body: JSON.stringify({
           name: b.name,
-          region: b.db_region || 'Shared Infrastructure',
+          // Map the dashboard region label to our backend region id.
+          region: b.db_region === 'Shared Infrastructure' ? 'shared' : (b.db_region || 'shared'),
           dbPassword: b.db_pass,
           postgresType: b.postgres_engine === 'oriole' ? 'orioledb' : 'postgres',
           dataApiEnabled: b.data_api_use_api_schema ?? true,

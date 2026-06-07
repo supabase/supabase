@@ -452,10 +452,11 @@ const Wizard: NextPageWithLayout = () => {
 
   const isDbRegionDirty = getFieldState('dbRegion', form.formState).isDirty
   useEffect(() => {
-    if (!isDbRegionDirty && defaultRegion) {
-      setValue('dbRegion', defaultRegion)
+    // [console fork] Default to Shared Infrastructure (our only/default region).
+    if (!isDbRegionDirty) {
+      setValue('dbRegion', 'Shared Infrastructure')
     }
-  }, [defaultRegion, isDbRegionDirty, setValue])
+  }, [isDbRegionDirty, setValue])
 
   useEffect(() => {
     if (regionError) {
@@ -588,22 +589,7 @@ const Wizard: NextPageWithLayout = () => {
                         <AdvancedConfiguration form={form} />
                       )}
 
-                      {shouldShowFreeProjectInfo ? (
-                        <Admonition
-                          className="rounded-none border-0"
-                          type="note"
-                          title="Need a free project?"
-                          description={
-                            <p>
-                              You can have up to 2 free projects across all organizations.{' '}
-                              <Link className="underline text-foreground" href="/new">
-                                Create a free organization
-                              </Link>{' '}
-                              to use them.
-                            </p>
-                          }
-                        />
-                      ) : null}
+                      {/* [console fork] No free-plan limits on self-host */}
                     </>
                   )}
 
