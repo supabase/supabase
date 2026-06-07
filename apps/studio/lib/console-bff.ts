@@ -121,6 +121,25 @@ export async function resolveOrg(req: import('next').NextApiRequest, slug: strin
   return (Array.isArray(orgs) ? orgs : []).find((o) => o.slug === slug) ?? null
 }
 
+/**
+ * Resolve a project's running data-plane endpoint: its kong base URL +
+ * service_role key, so the BFF can proxy pg-meta / data-plane calls to the
+ * per-project containers.
+ */
+export async function getProjectDataPlane(
+  req: import('next').NextApiRequest,
+  ref: string
+): Promise<{ baseUrl: string; serviceKey: string } | null> {
+  const [{ data: project }, { data: keys }] = await Promise.all([
+    consoleGet<any>(req, `/api/v1/projects/${ref}`),
+    consoleGet<{ serviceRoleKey?: string }>(req, `/api/v1/projects/${ref}/api-keys`),
+  ])
+  const port = project?.connection?.kongHttpPort ?? project?.kongHttpPort
+  const host = project?.connection?.host ?? 'localhost'
+  if (!port || !keys?.serviceRoleKey) return null
+  return { baseUrl: `http://${host}:${port}`, serviceKey: keys.serviceRoleKey }
+}
+
 /** better-auth get-full-organization (members + invitations) by slug. */
 export async function getFullOrg(req: import('next').NextApiRequest, slug: string) {
   const { data } = await consoleGet<any>(
