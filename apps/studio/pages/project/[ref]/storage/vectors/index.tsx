@@ -1,37 +1,23 @@
-import { IS_PLATFORM, useParams } from 'common'
+import { useParams } from 'common'
 
-import { BucketsUpgradePlan } from '@/components/interfaces/Storage/BucketsUpgradePlan'
 import { VectorsBuckets } from '@/components/interfaces/Storage/VectorBuckets'
-import {
-  RegionLimitation,
-  VECTOR_BUCKETS_AVAILABLE_REGIONS,
-} from '@/components/interfaces/Storage/VectorBuckets/RegionLimitation'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { StorageBucketsLayout } from '@/components/layouts/StorageLayout/StorageBucketsLayout'
 import StorageLayout from '@/components/layouts/StorageLayout/StorageLayout'
 import { useIsVectorBucketsEnabled } from '@/data/config/project-storage-config-query'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from '@/types'
 
 const StorageVectorsPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
-  const { data: project } = useSelectedProjectQuery()
   const isVectorBucketsEnabled = useIsVectorBucketsEnabled({ projectRef })
 
-  // [Joshen] We're actively looking into lifting this restriction so can remove once done
-  const isAvailableInProjectRegion = VECTOR_BUCKETS_AVAILABLE_REGIONS.includes(
-    project?.region ?? ''
-  )
-
-  if (IS_PLATFORM && !isAvailableInProjectRegion) {
-    return <RegionLimitation />
-  } else if (IS_PLATFORM && !isVectorBucketsEnabled) {
-    return <BucketsUpgradePlan type="vector" />
-  } else if (!isVectorBucketsEnabled) {
+  // [console fork] Self-host: no per-region availability gate and no "Upgrade to
+  // Pro" — vector buckets are available wherever the project runs. The only switch
+  // is the Storage settings toggle (features.vectorBuckets.enabled).
+  if (!isVectorBucketsEnabled) {
     return null
-  } else {
-    return <VectorsBuckets />
   }
+  return <VectorsBuckets />
 }
 
 StorageVectorsPage.getLayout = (page) => (
