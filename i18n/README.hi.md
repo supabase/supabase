@@ -12,9 +12,9 @@
 - [x] होस्टेड पोस्टग्रेज डेटाबेस। [प्रलेखन](https://supabase.com/docs/guides/database)
 - [x] प्रमाणीकरण और प्राधिकरण। [प्रलेखन](https://supabase.com/docs/guides/auth)
 - [x] उत्पन्न एपीआईस।
-  - [x] रेस्ट। [प्रलेखन](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] रीयलटाइम सदस्यता। [प्रलेखन](https://supabase.com/docs/guides/api#realtime-api-overview)
-  - [x] ग्राफ़क्यूएल (प्रयोगात्मक)। [प्रलेखन](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] रेस्ट। [प्रलेखन](https://supabase.com/docs/guides/api)
+  - [x] ग्राफ़क्यूएल। [प्रलेखन](https://supabase.com/docs/guides/graphql)
+  - [x] रीयलटाइम सदस्यता। [प्रलेखन](https://supabase.com/docs/guides/realtime)
 - [x] फ़ंक्शंस।
   - [x] डेटाबेस फ़ंक्शंस। [प्रलेखन](https://supabase.com/docs/guides/database/functions)
   - [x] एज फ़ंक्शंस। [प्रलेखन](https://supabase.com/docs/guides/functions)
@@ -50,7 +50,7 @@
 Supabase एक [होस्टेड प्लेटफ़ॉर्म](https://supabase.com/dashboard) है। आप बिना कुछ इंस्टॉल किए साइन अप करके Supabase का इस्तेमाल शुरू कर सकते हैं।
 आप इसे [सेल्फ़-होस्ट](https://supabase.com/docs/guides/hosting/overview) भी कर सकते हैं और [लोकल तौर पर डेवलप](https://supabase.com/docs/guides/local-development) भी कर सकते हैं।
 
-![आर्किटेक्चर](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
+![आर्किटेक्चर](apps/docs/public/img/supabase-architecture.svg)
 
 - [Postgres](https://www.postgresql.org/) यह एक ऑब्जेक्ट-रिलेशनल डेटाबेस सिस्टम है, जिस पर 30 से ज़्यादा सालों से लगातार काम हो रहा है। इसी वजह से इसे भरोसेमंद होने, बेहतरीन फ़ीचर्स और शानदार परफ़ॉर्मेंस के लिए बहुत अच्छी पहचान मिली है।
 - [Realtime](https://github.com/supabase/realtime) एक एलिक्जिर सर्वर है जो आपको पोस्टग्रॉसीक्यूएल आवेषण, अपडेट्स को सुनने की अनुमति देता है और वेबसोकेट का उपयोग करके हटाता है। सुपाबेस पोस्टग्रेज की अंतर्निहित प्रतिकृति कार्यक्षमता को सुनता है, प्रतिकृति बाइट स्ट्रीम को JSON में परिवर्तित करता है, फिर JSON को वेबस्कॉक पर प्रसारित करता है।
@@ -202,7 +202,7 @@ Supabase एक [होस्टेड प्लेटफ़ॉर्म](https:
 
 ## Badges (बिल्ला/बैज)
 
-![Made with Supabase](./apps/www/public/badge-made-with-supabase.svg)
+![Made with Supabase](../apps/www/public/badge-made-with-supabase.svg)
 
 ```md
 [![Made with Supabase](https://supabase.com/badge-made-with-supabase.svg)](https://supabase.com)
@@ -219,7 +219,7 @@ Supabase एक [होस्टेड प्लेटफ़ॉर्म](https:
 </a>
 ```
 
-![Made with Supabase (dark)](./apps/www/public/badge-made-with-supabase-dark.svg)
+![Made with Supabase (dark)](../apps/www/public/badge-made-with-supabase-dark.svg)
 
 ```md
 [![Made with Supabase](https://supabase.com/badge-made-with-supabase-dark.svg)](https://supabase.com)
