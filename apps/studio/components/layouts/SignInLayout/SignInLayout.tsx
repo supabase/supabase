@@ -111,7 +111,7 @@ const SignInLayout = ({
           <nav className="relative flex items-center justify-between sm:h-10">
             <div className="flex items-center grow shrink-0 lg:grow-0">
               <div className="flex items-center justify-between w-full md:w-auto">
-                <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/organizations'}>
+                <Link href={logoLinkToMarketingSite ? 'https://github.com/notpointless/supabase-console' : '/organizations'}>
                   <img
                     src={
                       resolvedTheme?.includes('dark')

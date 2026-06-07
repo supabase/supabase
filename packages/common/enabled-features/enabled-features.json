@@ -32,7 +32,7 @@
 
   "cli:disable_custom_profiles": true,
 
-  "dashboard_auth:sign_up": true,
+  "dashboard_auth:sign_up": false,
   "dashboard_auth:sign_in_with_github": true,
   "dashboard_auth:sign_in_with_sso": true,
   "dashboard_auth:sign_in_with_email": true,

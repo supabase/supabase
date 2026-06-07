@@ -40,6 +40,10 @@ export default bff({
       infra_compute_size: p.infrastructureType === 'shared' ? undefined : (p.infraComputeSize ?? 'micro'),
       inserted_at: p.createdAt ?? p.inserted_at ?? null,
       postgres_engine: p.postgresType ?? 'postgres',
+      // [console fork] our stack runs supabase/postgres 15.8 — report it so the
+      // dashboard's Postgres-version gates (e.g. Restore to new project, PG15+) pass.
+      dbVersion: '15.8.1.085',
+      db_version: '15.8.1.085',
       db_host: p.connection?.host ?? null,
       restUrl: p.connection?.apiUrl ?? null,
       // [console fork] Preview branches: branching is always available on self-host

@@ -35,7 +35,7 @@ const ForgotPasswordLayout = ({
         <nav className="relative flex items-center justify-between sm:h-10">
           <div className="flex shrink-0 grow items-center lg:grow-0">
             <div className="flex w-full items-center justify-between md:w-auto">
-              <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/organizations'}>
+              <Link href={logoLinkToMarketingSite ? 'https://github.com/notpointless/supabase-console' : '/organizations'}>
                 <Image
                   src={
                     resolvedTheme?.includes('dark')
