@@ -22,6 +22,12 @@ export default bff({
       id: project?.id,
       ref,
       name: project?.name,
+      // Top-level DB connection fields used by the Connect dialog's direct string.
+      db_host: host,
+      db_port: conn.dbPort ?? project?.dbPort ?? 5432,
+      db_user: 'postgres',
+      db_name: 'postgres',
+      inserted_at: project?.createdAt ?? null,
       app_config: endpoint
         ? { endpoint, protocol: 'http', db_schema: 'public', storage_endpoint: endpoint }
         : undefined,
