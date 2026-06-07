@@ -92,6 +92,22 @@ const Wizard: NextPageWithLayout = () => {
   const isFreePlan = currentOrg?.plan?.id === 'free'
   const canChooseInstanceSize = !isFreePlan
 
+  // [console fork] Dedicated (BYO-AWS) infra is only available when the org has
+  // AWS credentials. Without them, only Shared Infrastructure is offered, so we
+  // hide the region + compute-size selectors entirely.
+  const [dedicatedAvailable, setDedicatedAvailable] = useState(false)
+  useEffect(() => {
+    if (!slug) return
+    let active = true
+    fetch(`/dashboard/api/platform/organizations/${slug}/console-infra`)
+      .then((r) => r.json())
+      .then((d) => active && setDedicatedAvailable(!!d?.hasAwsCredentials))
+      .catch(() => active && setDedicatedAvailable(false))
+    return () => {
+      active = false
+    }
+  }, [slug])
+
   const [lastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
     ''
@@ -572,14 +588,31 @@ const Wizard: NextPageWithLayout = () => {
                       )}
                       <ProjectNameInput form={form} />
 
-                      {canChooseInstanceSize && <ComputeSizeSelector form={form} />}
+                      {dedicatedAvailable && canChooseInstanceSize && (
+                        <ComputeSizeSelector form={form} />
+                      )}
 
                       <DatabasePasswordInput form={form} />
 
-                      <RegionSelector
-                        form={form}
-                        instanceSize={instanceSize as DesiredInstanceSize}
-                      />
+                      {dedicatedAvailable ? (
+                        <RegionSelector
+                          form={form}
+                          instanceSize={instanceSize as DesiredInstanceSize}
+                        />
+                      ) : (
+                        <Panel.Content className="border-b grid grid-cols-12 gap-4">
+                          <label className="col-span-4 text-sm text-foreground-light">
+                            Infrastructure
+                          </label>
+                          <div className="col-span-8 flex flex-col gap-1">
+                            <span className="text-foreground text-sm">Shared Infrastructure</span>
+                            <span className="text-sm text-foreground-lighter">
+                              Your project runs on shared infrastructure. Add AWS credentials to your
+                              organization to deploy dedicated projects in a specific region.
+                            </span>
+                          </div>
+                        </Panel.Content>
+                      )}
 
                       <SecurityOptions form={form} />
 
