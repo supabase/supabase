@@ -38,7 +38,9 @@ export const useProjectApiUrl = (
     isSuccessProjectSettings && endpoint ? `${protocol}://${endpoint}` : undefined
   const resolvedEndpoint = isCustomDomainsActive ? customEndpoint : hostEndpoint
   const storageEndpoint = settings?.app_config?.storage_endpoint
-    ? `${IS_PLATFORM ? 'https' : protocol}://${settings?.app_config?.storage_endpoint}`
+    ? // [console fork] use the project's actual protocol (kong is http on shared infra),
+      // don't force https just because we're in platform mode.
+      `${protocol}://${settings?.app_config?.storage_endpoint}`
     : undefined
 
   return {
