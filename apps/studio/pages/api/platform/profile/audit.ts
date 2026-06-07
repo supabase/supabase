@@ -21,7 +21,8 @@ export default bff({
         user_id: profile?.id,
         email: profile?.email,
       },
-      timestamp: new Date(l.createdAt).getTime(),
+      // The audit UI renders timestamp in MICROSECONDS (divides by 1000); send µs.
+      timestamp: new Date(l.createdAt).getTime() * 1000,
     }))
     return res.status(200).json({ result, retention_period: 0 })
   },

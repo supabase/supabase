@@ -16,7 +16,8 @@ export default bff({
       organization_slug: org.slug,
       action: { name: `${l.method} ${l.path}`, method: l.method, route: l.path, status: l.statusCode },
       actor: { token_type: 'user' },
-      timestamp: new Date(l.createdAt).getTime(),
+      // The audit UI renders timestamp in MICROSECONDS (divides by 1000); send µs.
+      timestamp: new Date(l.createdAt).getTime() * 1000,
     }))
     return res.status(200).json({ result, retention_period: 0 })
   },
