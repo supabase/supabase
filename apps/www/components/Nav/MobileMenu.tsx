@@ -75,6 +75,7 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
                   href={productModule.url}
                   description={productModule.description_short}
                   icon={productModule.icon}
+                  onClick={() => setOpen(false)}
                 />
               ))}
             </ul>
@@ -120,6 +121,7 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
                   label={link.text}
                   counter={link.text === 'Careers' && jobsCount > 0 ? jobsCount : undefined}
                   className="focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay mt-0!"
+                  onClick={() => setOpen(false)}
                 />
               ))}
             </div>
@@ -134,12 +136,14 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
               url={menuItem.subMenu['footer']['support'].url}
               label={menuItem.subMenu['footer']['support'].text}
               className="focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay"
+              onClick={() => setOpen(false)}
             />
             <TextLink
               hasChevron={false}
               url={menuItem.subMenu['footer']['systemStatus'].url}
               label={menuItem.subMenu['footer']['systemStatus'].text}
               className="focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay"
+              onClick={() => setOpen(false)}
             />
           </div>
         </div>
@@ -159,6 +163,7 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
                   url={link.url}
                   label={link.text}
                   className="focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay mt-0!"
+                  onClick={() => setOpen(false)}
                 />
               ))}
             </div>
@@ -186,6 +191,7 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
                   className,
                   'block focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-foreground-lighter focus-visible:rounded-sm'
                 )}
+                onClick={() => setOpen(false)}
               >
                 {menuItem.title}
               </Link>
