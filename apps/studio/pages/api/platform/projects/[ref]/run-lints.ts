@@ -21,12 +21,33 @@ sec_def_views as (
   from pg_class c join pg_namespace n on n.oid = c.relnamespace
   where c.relkind = 'v' and n.nspname = 'public'
     and pg_get_viewdef(c.oid) ilike '%security_definer%'
+),
+unindexed_fks as (
+  select distinct cl.relname as name, ns.nspname as schema
+  from pg_constraint con
+  join pg_class cl on cl.oid = con.conrelid
+  join pg_namespace ns on ns.oid = cl.relnamespace
+  where con.contype = 'f' and ns.nspname = 'public'
+    and not exists (
+      select 1 from pg_index i
+      where i.indrelid = con.conrelid
+        and (con.conkey[1]) = any (i.indkey[0:0])
+    )
+),
+unused_indexes as (
+  select relname as name, schemaname as schema
+  from pg_stat_user_indexes
+  where schemaname = 'public' and idx_scan = 0
 )
 select 'rls_disabled_in_public' as name, 'ERROR' as level, name as obj, schema from rls_disabled
 union all
 select 'policy_exists_rls_disabled', 'WARN', name, schema from rls_no_policy
 union all
 select 'security_definer_view', 'WARN', name, schema from sec_def_views
+union all
+select 'unindexed_foreign_keys', 'INFO', name, schema from unindexed_fks
+union all
+select 'unused_index', 'INFO', name, schema from unused_indexes
 `
 
 const META: Record<
@@ -50,6 +71,18 @@ const META: Record<
     description: 'View is defined with SECURITY DEFINER, bypassing the querying user’s RLS.',
     categories: ['SECURITY'],
     remediation: 'Recreate the view without SECURITY DEFINER unless strictly required.',
+  },
+  unindexed_foreign_keys: {
+    title: 'Unindexed Foreign Keys',
+    description: 'Foreign key column has no covering index, which can slow joins and deletes.',
+    categories: ['PERFORMANCE'],
+    remediation: 'Add an index on the foreign key column(s).',
+  },
+  unused_index: {
+    title: 'Unused Index',
+    description: 'Index has never been scanned and may be unnecessary overhead on writes.',
+    categories: ['PERFORMANCE'],
+    remediation: 'Consider dropping the index if it is not needed.',
   },
 }
 
