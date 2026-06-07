@@ -1,13 +1,6 @@
-import { cn } from 'ui'
-
+// [console fork] Self-host: no billing, so no tax disclaimer.
 interface TaxDisclaimerProps {
   className?: string
 }
 
-export const TaxDisclaimer = ({ className }: TaxDisclaimerProps) => {
-  return (
-    <p className={cn('text-xs text-foreground-muted', className)}>
-      Prices shown do not include applicable taxes.
-    </p>
-  )
-}
+export const TaxDisclaimer = (_props: TaxDisclaimerProps) => null
