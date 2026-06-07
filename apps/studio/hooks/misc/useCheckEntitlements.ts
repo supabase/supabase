@@ -123,9 +123,11 @@ export function useCheckEntitlements(
     ? isSuccessSelectedOrg && isSuccessEntitlements
     : isSuccessEntitlements
 
+  // [console fork] Self-host: nothing is plan-gated, so grant every entitlement —
+  // EXCEPT dedicated-infra capabilities that don't exist on shared infrastructure.
+  const SHARED_INFRA_UNAVAILABLE = ['dedicated_pooler']
   return {
-    // [console fork] Self-host: every feature is entitled, nothing is plan-gated.
-    hasAccess: true,
+    hasAccess: !SHARED_INFRA_UNAVAILABLE.includes(featureKey),
     isLoading: false,
     isSuccess: true,
     getEntitlementNumericValue: () => getEntitlementNumericValue(entitlement),
