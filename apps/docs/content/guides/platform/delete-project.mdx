@@ -35,7 +35,7 @@ You can delete a project through any of these methods:
 3. Enter your project name exactly as it appears to confirm
 4. Review the confirmation dialog and click **Delete**
 
-### Via supabase CLI
+### Via Supabase CLI
 
 ```bash
 supabase projects delete <project-ref>
@@ -58,7 +58,7 @@ To safeguard against accidental deletion, consider the following:
 
 ### 1. Export critical data
 
-- **Database backups**: Use `pg_dump` to export your PostgreSQL database:
+- **Database backups**: Use `pg_dump` to export your Postgres database:
 
 ```bash
 pg_dump -U postgres -d db -s -f schema.sql
@@ -120,7 +120,7 @@ Deleted projects do not free up your account's project quota immediately. Contac
 
 </Admonition>
 
-## Alternative: pause your project
+## Alternative: Pause your project
 
 If you're unsure about deletion, consider pausing your project instead:
 
