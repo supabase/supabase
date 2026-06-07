@@ -56,10 +56,8 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetRespons
 
   const params = result.data
 
-  // Platform specific endpoint
-  if (params.visibility === 'project') {
-    return res.status(200).json({ data: [] })
-  }
+  // [console fork] Single-user self-host: the filesystem store IS the project's
+  // content, so project-visibility queries return it too (don't short-circuit to []).
 
   try {
     const { cursor, snippets } = await getSnippets({

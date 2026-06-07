@@ -66,14 +66,42 @@ export type FilesystemEntry = {
   folderId: string | null
   content?: string // Only for files
   createdAt: Date
+  format?: 'sql' | 'json' // [console fork] storage format for file entries
 }
 
 const buildSnippet = (
   filename: string,
   content: string,
   folderId: string | null,
-  createdAt: Date
+  createdAt: Date,
+  format: 'sql' | 'json' = 'sql'
 ) => {
+  // [console fork] Non-SQL snippets (report/log_sql) are stored as full JSON so
+  // their content round-trips; reconstruct them directly from the file.
+  if (format === 'json') {
+    try {
+      const parsed = JSON.parse(content)
+      return {
+        id: generateDeterministicUuid([folderId, `${filename}.json`]),
+        inserted_at: parsed.inserted_at ?? createdAt.toISOString(),
+        updated_at: parsed.updated_at ?? createdAt.toISOString(),
+        type: parsed.type ?? 'report',
+        name: parsed.name ?? filename.replace('.json', ''),
+        description: parsed.description ?? '',
+        favorite: parsed.favorite ?? false,
+        content: parsed.content ?? {},
+        visibility: parsed.visibility ?? 'user',
+        project_id: parsed.project_id ?? 1,
+        folder_id: folderId,
+        owner_id: parsed.owner_id ?? 1,
+        owner: parsed.owner ?? { id: 1, username: 'johndoe' },
+        updated_by: parsed.updated_by ?? { id: 1, username: 'johndoe' },
+      } as Snippet
+    } catch {
+      /* fall through to sql reconstruction */
+    }
+  }
+
   const snippet: Snippet = {
     id: generateDeterministicUuid([folderId, `${filename}.sql`]),
     inserted_at: createdAt.toISOString(),
@@ -168,20 +196,24 @@ export async function getFilesystemEntries(): Promise<FilesystemEntry[]> {
         })
 
         await readEntriesRecursively(itemPath, item.name)
-      } else if (item.isFile() && item.name.endsWith('.sql')) {
+      } else if (item.isFile() && (item.name.endsWith('.sql') || item.name.endsWith('.json'))) {
+        // [console fork] .sql holds query text; .json holds a full non-SQL snippet
+        // (report/log_sql) so its content round-trips on reload.
+        const isJson = item.name.endsWith('.json')
         const [content, stats] = await Promise.all([
           fs.readFile(itemPath, 'utf-8'),
           fs.stat(itemPath),
         ])
-        const snippetName = item.name.replace('.sql', '')
+        const snippetName = item.name.replace(isJson ? '.json' : '.sql', '')
 
         entries.push({
-          id: generateDeterministicUuid([folderId, `${snippetName}.sql`]),
+          id: generateDeterministicUuid([folderId, item.name]),
           name: snippetName,
           type: 'file',
           folderId: folderId,
           content: content,
           createdAt: stats.birthtime,
+          format: isJson ? 'json' : 'sql',
         })
       }
     }
@@ -203,7 +235,8 @@ export const getSnippet = async (snippetId: string) => {
     foundSnippet.name,
     foundSnippet.content || '',
     foundSnippet.folderId,
-    foundSnippet.createdAt
+    foundSnippet.createdAt,
+    foundSnippet.format ?? 'sql'
   )
 }
 
@@ -293,7 +326,7 @@ export const getSnippets = async ({
   return {
     cursor: nextCursor,
     snippets: finalSnippets.map((file) =>
-      buildSnippet(file.name, file.content, file.folderId, file.createdAt)
+      buildSnippet(file.name, file.content, file.folderId, file.createdAt, file.format ?? 'sql')
     ),
   }
 }
@@ -320,21 +353,28 @@ export async function saveSnippet(snippet: Snippet): Promise<Snippet> {
   }
 
   const snippetName = sanitizeName(snippet.name)
-  // SQL snippets store their query text; other content kinds (report/log_sql) keep
-  // their full content as JSON so nothing is lost.
-  const content =
-    snippet.type === 'sql'
-      ? String((snippet.content as any)?.sql ?? '')
-      : JSON.stringify(snippet.content ?? {})
+  // [console fork] SQL snippets store their query text in a .sql file; other content
+  // kinds (report/log_sql) store the full snippet as JSON in a .json file so the
+  // content round-trips on reload.
+  const isSql = snippet.type === 'sql'
+  const content = isSql
+    ? String((snippet.content as any)?.sql ?? '')
+    : JSON.stringify(snippet)
   const folderId = snippet.folder_id || null
   const folder = entries.find((f) => f.id === folderId && f.type === 'folder')
 
   const folderPath = folder ? path.join(SNIPPETS_DIR, folder.name) : SNIPPETS_DIR
-  const filePath = path.join(folderPath, `${snippetName}.sql`)
+  const filePath = path.join(folderPath, `${snippetName}.${isSql ? 'sql' : 'json'}`)
   await fs.writeFile(filePath, content || '', 'utf-8')
   const stats = await fs.stat(filePath)
 
-  const result = buildSnippet(snippetName, content, snippet.folder_id, stats.birthtime)
+  const result = buildSnippet(
+    snippetName,
+    content,
+    snippet.folder_id,
+    stats.birthtime,
+    isSql ? 'sql' : 'json'
+  )
   return result
 }
 
@@ -349,7 +389,7 @@ export async function deleteSnippet(id: string): Promise<void> {
     throw new Error(`Snippet with id ${id} not found`)
   }
 
-  const filename = `${found.name}.sql`
+  const filename = `${found.name}.${found.format === 'json' ? 'json' : 'sql'}`
   const currentFolder = entries.find((f) => f.id === found.folderId && f.type === 'folder')
   const paths = compact([SNIPPETS_DIR, currentFolder?.name, filename])
   const filePath = path.join(...paths)
@@ -397,7 +437,8 @@ export async function updateSnippet(id: string, updates: DeepPartial<Snippet>): 
     foundSnippet.name,
     foundSnippet.content || '',
     foundSnippet.folderId,
-    foundSnippet.createdAt
+    foundSnippet.createdAt,
+    foundSnippet.format ?? 'sql'
   )
 
   // it's easier to delete the old file first and then recreate a new one
@@ -405,6 +446,9 @@ export async function updateSnippet(id: string, updates: DeepPartial<Snippet>): 
 
   const updatedSnippet = await saveSnippet({
     name: updates.name ?? snippet.name,
+    // [console fork] preserve the snippet type so reports/log_sql round-trip
+    type: (updates.type ?? snippet.type) as Snippet['type'],
+    description: updates.description ?? snippet.description,
     content: updates.content ?? snippet.content,
     // folder_id can be null
     folder_id: updates.folder_id !== undefined ? updates.folder_id : snippet.folder_id,
