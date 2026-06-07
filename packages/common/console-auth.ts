@@ -61,6 +61,21 @@ function toGotrueUser(u: any): GotrueUser {
     // MFA factors: better-auth exposes a boolean; the dashboard only checks
     // `factors.length`, so reflect the boolean as a single synthetic factor.
     factors: u?.twoFactorEnabled ? [{ id: 'totp', factor_type: 'totp', status: 'verified' }] : [],
+    // Single email identity so the account email selector has an option.
+    identities: u?.email
+      ? [
+          {
+            identity_id: u.id,
+            id: u.id,
+            user_id: u.id,
+            identity_data: { email: u.email, sub: u.id },
+            provider: 'email',
+            created_at: u?.createdAt,
+            updated_at: u?.updatedAt,
+            email: u.email,
+          },
+        ]
+      : [],
     name: u?.name,
     firstName: u?.firstName,
     lastName: u?.lastName,

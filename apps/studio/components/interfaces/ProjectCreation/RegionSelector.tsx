@@ -112,10 +112,6 @@ export const RegionSelector = ({
   const regionOptions = smartRegionEnabled ? allRegions : regionsArray
   const isLoading = smartRegionEnabled ? isLoadingAvailableRegions : isLoadingDefaultRegion
 
-  const showNonProdFields =
-    process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
-    process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-
   const allSelectableRegions = [...smartRegions, ...regionOptions]
 
   if (isErrorAvailableRegions) {
@@ -153,14 +149,15 @@ export const RegionSelector = ({
                 description={
                   <>
                     <p>Select the region closest to your users for the best performance.</p>
-                    {showNonProdFields && (
-                      <div className="mt-2 text-warning">
-                        <p>Only these regions are supported for local/staging projects:</p>
-                        <ul className="list-disc list-inside mt-1">
-                          <li>East US (North Virginia)</li>
-                          <li>Central EU (Frankfurt)</li>
-                          <li>Southeast Asia (Singapore)</li>
-                        </ul>
+                    {field.value === 'Shared Infrastructure' && (
+                      <div className="mt-2 rounded-md border border-default bg-surface-200 px-3 py-2 text-foreground-light">
+                        <p className="text-foreground">Shared Infrastructure</p>
+                        <p className="mt-1">
+                          Your project runs as an isolated Postgres + Supabase stack on our managed
+                          shared cluster, rather than on a dedicated cloud region. Best for
+                          development, internal tools, and lower-traffic projects. You can move to
+                          dedicated infrastructure later.
+                        </p>
                       </div>
                     )}
                   </>
@@ -194,6 +191,20 @@ export const RegionSelector = ({
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
+                    {/* [console fork] Our own infrastructure options */}
+                    <SelectGroup>
+                      <SelectLabel>Custom</SelectLabel>
+                      <SelectItem
+                        value="Shared Infrastructure"
+                        className="w-full [&>:nth-child(2)]:w-full"
+                      >
+                        <div className="flex items-center gap-x-3">
+                          <span className="text-foreground">Shared Infrastructure</span>
+                        </div>
+                      </SelectItem>
+                    </SelectGroup>
+                    <SelectSeparator />
+
                     {smartRegionEnabled && (
                       <>
                         <SelectGroup>
