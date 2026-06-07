@@ -250,7 +250,7 @@ const Wizard: NextPageWithLayout = () => {
     ? 0
     : monthlyInstancePrice(instanceSize) - availableComputeCredits
 
-  const { data: _defaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
+  const { data: defaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
     {
       cloudProvider: PROVIDERS[defaultProvider].id,
     },
@@ -263,6 +263,21 @@ const Wizard: NextPageWithLayout = () => {
       retry: false,
     }
   )
+
+  // [console fork] Default the region to the CLOSEST one to the user (computed from
+  // their location) instead of "Shared Infrastructure", once it resolves and only if
+  // dedicated (EC2) is available and the user hasn't picked a region yet.
+  useEffect(() => {
+    if (
+      dedicatedAvailable &&
+      defaultRegion &&
+      dbRegion === 'Shared Infrastructure' &&
+      !getFieldState('dbRegion').isDirty
+    ) {
+      setValue('dbRegion', defaultRegion)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultRegion, dedicatedAvailable])
 
   const { data: availableRegionsData, error: availableRegionsError } =
     useOrganizationAvailableRegionsQuery(
