@@ -175,13 +175,8 @@ export const useGenerateSettingsMenu = () => {
               },
             ]
           : []),
-        {
-          name: 'Add-ons',
-          key: 'addons',
-          url: `/project/${ref}/settings/addons`,
-          items: [],
-          shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_ADDONS,
-        },
+        // [console fork] Add-ons (compute/PITR/custom-domain/IPv4) are paid/dedicated
+        // features that don't apply to shared infra — removed.
         ...(showDashboardPreferences
           ? [
               {
