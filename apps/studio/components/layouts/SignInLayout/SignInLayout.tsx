@@ -21,7 +21,6 @@ type SignInLayoutProps = {
 const SignInLayout = ({
   heading,
   subheading,
-  showDisclaimer = true,
   logoLinkToMarketingSite = false,
   children,
 }: PropsWithChildren<SignInLayoutProps>) => {
@@ -33,12 +32,7 @@ const SignInLayout = ({
   const {
     dashboardAuthShowTestimonial: showTestimonial,
     brandingLargeLogo: largeLogo,
-    dashboardAuthShowTos: showTos,
-  } = useIsFeatureEnabled([
-    'dashboard_auth:show_testimonial',
-    'branding:large_logo',
-    'dashboard_auth:show_tos',
-  ])
+  } = useIsFeatureEnabled(['dashboard_auth:show_testimonial', 'branding:large_logo'])
 
   // This useEffect redirects the user to MFA if they're already halfway signed in
   useEffect(() => {
@@ -148,27 +142,7 @@ const SignInLayout = ({
               {children}
             </div>
 
-            {showDisclaimer && showTos && (
-              <div className="text-center text-balance">
-                <p className="text-xs text-foreground-lighter sm:mx-auto sm:max-w-sm">
-                  By continuing, you agree to Supabase’s{' '}
-                  <Link
-                    href="https://supabase.com/terms"
-                    className="underline hover:text-foreground-light"
-                  >
-                    Terms of Service
-                  </Link>{' '}
-                  and{' '}
-                  <Link
-                    href="https://supabase.com/privacy"
-                    className="underline hover:text-foreground-light"
-                  >
-                    Privacy Policy
-                  </Link>
-                  , and to receive periodic emails with updates.
-                </p>
-              </div>
-            )}
+            {/* [console fork] self-host: no Supabase ToS/Privacy/marketing disclaimer */}
           </main>
 
           <aside className="flex-col items-center justify-center flex-1 shrink hidden basis-1/4 xl:flex">
