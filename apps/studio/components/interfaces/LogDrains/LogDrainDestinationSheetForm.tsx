@@ -1001,41 +1001,8 @@ export function LogDrainDestinationSheetForm({
         </SheetSection>
 
         <div className="mt-auto">
-          <SheetSection
-            className={cn(
-              `border-t bg-background-alternative-200 mt-auto py-1.5 ${!IS_PLATFORM && 'hidden'}`
-            )}
-          >
-            <ul className="text-right text-foreground-light divide-y divide-dashed text-sm">
-              <li className="flex items-center justify-between gap-2 py-2" translate="no">
-                <span className="text-foreground-lighter">Additional drain cost</span>
-                <span className="text-foreground">$60 per month</span>
-              </li>
-              <li className="flex items-center justify-between gap-2 py-2" translate="no">
-                <span className="text-foreground-lighter">Per million events</span>
-                <span>+$0.20</span>
-              </li>
-              <li className="flex items-center justify-between gap-2 py-2" translate="no">
-                <span className="text-foreground-lighter">Per GB egress</span>
-                <span>+$0.09</span>
-              </li>
-            </ul>
-          </SheetSection>
-
-          <SheetFooter className="p-content mt-0! justify-between! flex-row! w-full items-center">
-            <div className="flex flex-col gap-0.5">
-              <span className="text-sm text-foreground-light">
-                <span>See full pricing breakdown</span>{' '}
-                <Link
-                  href={`${DOCS_URL}/guides/platform/manage-your-usage/log-drains`}
-                  target="_blank"
-                  className="text-foreground underline underline-offset-2 decoration-foreground-muted hover:decoration-foreground transition-all"
-                >
-                  here
-                </Link>
-              </span>
-              <TaxDisclaimer />
-            </div>
+          {/* [console fork] Self-host: no per-drain pricing / billing. */}
+          <SheetFooter className="p-content mt-0! justify-end! flex-row! w-full items-center">
             <Shortcut
               id={SHORTCUT_IDS.LOG_DRAINS_SAVE_DESTINATION}
               onTrigger={() => formRef.current?.requestSubmit()}
