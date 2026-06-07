@@ -1,4 +1,4 @@
-import { bff, consoleGet, type BackendOrg } from '@/lib/console-bff'
+import { bff, consoleFetch, consoleGet, type BackendOrg } from '@/lib/console-bff'
 
 // Map our control-plane project status -> dashboard project status enum.
 const STATUS_MAP: Record<string, string> = {
@@ -55,5 +55,19 @@ export default bff({
         ? `postgresql://postgres:[YOUR-PASSWORD]@${p.connection.host ?? 'localhost'}:${p.connection.dbPort}/postgres`
         : undefined,
     })
+  },
+
+  // [console fork] DELETE /platform/projects/{ref} -> backend delete (tears down stack).
+  DELETE: async (req, res) => {
+    const ref = String(req.query.ref ?? '')
+    const { ok, status, data } = await consoleFetch<any>(req, `/api/v1/projects/${ref}`, {
+      method: 'DELETE',
+    })
+    if (!ok) {
+      return res
+        .status(status && status >= 400 ? status : 502)
+        .json({ error: { message: (data as any)?.message ?? 'Failed to delete project' } })
+    }
+    return res.status(200).json(data ?? { ref })
   },
 })
