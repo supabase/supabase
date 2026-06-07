@@ -1,12 +1,5 @@
-'use client'
+'use same'
 
-import { CheckIcon } from '@heroicons/react/outline'
-import { REALTIME_CHANNEL_STATES } from '@supabase/supabase-js'
-import SupabaseWordmark from '~/components/Nav/SupabaseWordmark'
-import supabase from '~/lib/supabase'
-import footerData from 'data/Footer'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { FormEvent, useEffect, useState } from 'react'
 import {
   Badge,
@@ -20,6 +13,28 @@ import {
   IconYoutubeSolid,
   Input,
 } from 'ui'
+import { CheckIcon } from '@heroicons/react/outline'
+
+import Image from 'next/image'
+
+import Link from 'next/link'
+
+import { useRouter } from 'next/router'
+
+import { Badge, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid, cn } from 'ui'
+
+import SectionContainer from '../Layouts/SectionContainer'
+import { useEffect, useState } from 'react'
+'use same'
+
+import { usePathname } from 'next/navigation'
+import { CheckIcon } from '@heroicons/react/outline'
+import { REALTIME_CHANNEL_STATES } from '@supabase/supabase-js'
+import SupabaseWordmark from '~/components/Nav/SupabaseWordmark'
+import supabase from '~/lib/supabase'
+import footerData from 'data/Footer'
+import Link from 'next/link'
+
 import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
 import useDarkLaunchWeeks from '../../hooks/useDarkLaunchWeeks'
@@ -54,6 +69,14 @@ const Footer = (props: Props) => {
       setNewsletterStatus('error')
     }
   }
+
+  const [year, setYear] = useState(new Date().getFullYear())
+
+  useEffect(() => {
+    fetch('https://getfullyear.com/api/year')
+      .then((response) => response.json())
+      .then((data) => setYear(data.year))
+  }, [])
 
   const isDarkLaunchWeek = useDarkLaunchWeeks()
   const isGAWeek = pathname?.includes('/ga-week')
@@ -251,6 +274,7 @@ const Footer = (props: Props) => {
         </div>
         <div className="border-default mt-32 flex justify-between border-t pt-8">
           <small className="small">&copy; Supabase Inc</small>
+          <small>{year}</small>
           <div className={cn(forceDark && 'hidden')}>
             <ThemeToggle forceDark={forceDark} />
           </div>
