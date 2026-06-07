@@ -172,6 +172,26 @@ export const ProjectGitHubDeployPanel = () => {
             )}
           </div>
           {lastResult && <p className="text-sm text-foreground-light">{lastResult}</p>}
+
+          {connected && (
+            <div className="mt-2 flex flex-col gap-1 rounded-md border border-default bg-surface-100 p-3 text-sm text-foreground-light">
+              <p className="m-0 font-medium text-foreground">Auto-deploy on push (optional)</p>
+              <p className="m-0">
+                Add a webhook in your repo (GitHub → Settings → Webhooks) so pushes and pull
+                requests deploy automatically:
+              </p>
+              <code className="w-fit rounded bg-surface-200 px-1.5 py-0.5 text-xs">
+                POST &lt;your-backend-url&gt;/api/v1/github/webhook
+              </code>
+              <p className="m-0">
+                Content type <code>application/json</code>, events <strong>Push</strong> +{' '}
+                <strong>Pull requests</strong>, secret = the backend&apos;s{' '}
+                <code>GITHUB_WEBHOOK_SECRET</code>. Then: a push to <code>{branch || 'main'}</code>{' '}
+                deploys here, opening a PR creates a preview branch, and closing it tears the branch
+                down. (The backend must be reachable by GitHub — use a tunnel for local dev.)
+              </p>
+            </div>
+          )}
         </ScaffoldSectionContent>
       </ScaffoldSection>
     </ScaffoldContainer>
