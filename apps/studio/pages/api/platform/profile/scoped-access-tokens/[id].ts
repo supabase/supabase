@@ -1,4 +1,4 @@
-import { bff, consoleGet, consoleFetch } from '@/lib/console-bff'
+import { bff, consoleFetch } from '@/lib/console-bff'
 
 // [console fork] Single scoped access token: fetch detail / revoke.
 export default bff({
