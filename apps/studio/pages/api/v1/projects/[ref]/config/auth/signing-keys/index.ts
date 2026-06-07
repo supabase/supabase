@@ -40,4 +40,13 @@ export default bff({
     }
     return res.status(200).json({ keys })
   },
+  // [console fork] Standby-key creation / rotation isn't available on self-host: the
+  // project's ES256 signing key is derived deterministically from its JWT secret, so
+  // there's a single in-use key (plus the legacy HS256 verifier). Return a clear
+  // message instead of a raw error.
+  POST: async (_req, res) =>
+    res.status(400).json({
+      message:
+        'Standby keys and rotation are not available on self-host — this project uses a fixed ES256 signing key derived from its JWT secret (with the legacy HS256 key for verification).',
+    }),
 })
