@@ -40,6 +40,10 @@ export default bff({
       postgres_engine: p.postgresType ?? 'postgres',
       db_host: p.connection?.host ?? null,
       restUrl: p.connection?.apiUrl ?? null,
+      // Direct DB connection string (password is a placeholder; never exposed).
+      connectionString: p.connection?.dbPort
+        ? `postgresql://postgres:[YOUR-PASSWORD]@${p.connection.host ?? 'localhost'}:${p.connection.dbPort}/postgres`
+        : undefined,
     })
   },
 })

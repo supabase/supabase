@@ -470,20 +470,13 @@ export const CreateBranchModal = () => {
                           </>
                         ) : (
                           <>
-                            <p className="text-sm text-foreground">
-                              Branch disk size is billed at ${estimatedDiskCost.total.toFixed(2)}{' '}
-                              per month
-                            </p>
+                            <p className="text-sm text-foreground">Branch disk size</p>
                             <p className="text-sm text-foreground-light">
                               Creating a data branch will take about{' '}
                               <span className="text-foreground">
                                 {estimateRestoreTime(branchDiskAttributes).toFixed()} minutes
                               </span>{' '}
-                              and costs{' '}
-                              <span className="text-foreground">
-                                ${estimatedDiskCost.total.toFixed(2)}
-                              </span>{' '}
-                              per month based on your current target database volume size of{' '}
+                              based on your current target database volume size of{' '}
                               {branchDiskAttributes.size_gb} GB and your{' '}
                               <Tooltip>
                                 <TooltipTrigger>
@@ -579,20 +572,16 @@ export const CreateBranchModal = () => {
                   </figure>
                 </div>
                 <div className="flex flex-col gap-y-1">
-                  <p className="text-sm text-foreground">
-                    Branch compute is billed at $
-                    {withData ? branchComputeSize.priceHourly : instanceSizeSpecs.micro.priceHourly}{' '}
-                    per hour
-                  </p>
+                  <p className="text-sm text-foreground">Branch compute</p>
                   <p className="text-sm text-foreground-light">
                     {withData ? (
                       <>
                         <code className="text-code-inline">{branchComputeSize.label}</code> compute
-                        size is automatically selected to match your production branch. You may
-                        downgrade after creation or pause the branch when not in use to save cost.
+                        size is automatically selected to match your production branch. Pause the
+                        branch when not in use to free resources.
                       </>
                     ) : (
-                      <>This cost will continue for as long as the branch has not been removed.</>
+                      <>The branch runs until you remove it.</>
                     )}
                   </p>
                 </div>
