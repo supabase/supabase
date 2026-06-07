@@ -37,7 +37,7 @@ export default bff({
       status: STATUS_MAP[p.status] ?? 'UNKNOWN',
       // [console fork] shared infra has no compute tier -> undefined so the UI shows
       // "Shared Infrastructure" instead of a misleading compute size.
-      infra_compute_size: p.infrastructureType === 'shared' ? undefined : (p.infraComputeSize ?? 'micro'),
+      infra_compute_size: p.infrastructureType === 'shared' ? undefined : (p.computeSize ?? 'medium'),
       inserted_at: p.createdAt ?? p.inserted_at ?? null,
       postgres_engine: p.postgresType ?? 'postgres',
       // [console fork] our stack runs supabase/postgres 15.8 — report it so the
