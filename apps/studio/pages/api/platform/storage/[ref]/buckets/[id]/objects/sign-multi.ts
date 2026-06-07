@@ -22,7 +22,10 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query
   const { path, expiresIn = 60 * 60 * 24 } = req.body
 
-  const { data, error } = await ((req as any)._sb).storage
+  const supabase = await getProjectClient(req, String(req.query.ref ?? ''))
+  if (!supabase) return res.status(503).json({ error: { message: 'Project is not running' } })
+
+  const { data, error } = await supabase.storage
     .from(id as string)
     .createSignedUrls(path, expiresIn)
 

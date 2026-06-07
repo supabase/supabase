@@ -6,8 +6,6 @@ import apiWrapper from '@/lib/api/apiWrapper'
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const dp = await getProjectDataPlane(req, String(req.query.ref ?? ''))
-  if (!dp) return res.status(503).json({ error: { message: 'Project is not running' } })
   const { method } = req
 
   switch (method) {
@@ -21,6 +19,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
+  const dp = await getProjectDataPlane(req, String(req.query.ref ?? ''))
+  if (!dp) return res.status(503).json({ error: { message: 'Project is not running' } })
   const authorizationHeader = req.headers['x-graphql-authorization']
 
   const response = await fetch(`${dp.baseUrl}/graphql/v1`, {
