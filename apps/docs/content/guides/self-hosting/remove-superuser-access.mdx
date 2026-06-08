@@ -4,6 +4,8 @@ description: 'Learn how to switch from the supabase_admin to postgres role in se
 subtitle: 'Learn how to switch from the supabase_admin to postgres role in self-hosted Supabase.'
 ---
 
+<$Partial path="self_hosted_run_sh.mdx" />
+
 ## Overview
 
 In late 2022, Supabase introduced a security change in hosted projects that removed superuser access from the dashboard SQL editor and shifted ownership of user-created database objects away from `supabase_admin` toward the `postgres` role.
@@ -62,7 +64,7 @@ Studio uses its own credentials to access Postgres via `postgres-meta`, so this 
 ### Step 3: Restart Supabase
 
 ```sh
-docker compose down && docker compose up -d
+sh run.sh recreate
 ```
 
 ## Verify roles

@@ -8,6 +8,8 @@ The MCP (Model Context Protocol) server in [self-hosted Supabase](/docs/guides/s
 
 This guide explains how to securely enable access to your self-hosted MCP server.
 
+<$Partial path="self_hosted_run_sh.mdx" />
+
 ## Security considerations
 
 <Admonition type="caution">
@@ -193,7 +195,7 @@ defaultActiveId="kong"
 <TabPanel id="kong" label="Kong">
 
 ```sh
-docker compose restart kong
+sh run.sh restart kong
 ```
 
 </TabPanel>
@@ -201,8 +203,10 @@ docker compose restart kong
 <TabPanel id="envoy" label="Envoy">
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.envoy.yml restart api-gw
+sh run.sh restart api-gw
 ```
+
+This assumes the Envoy override is already active (`sh run.sh config add envoy`).
 
 </TabPanel>
 
@@ -268,5 +272,5 @@ If you are unable to connect to the MCP server:
 
 1. Update Kong configuration file to the [latest version](https://github.com/supabase/supabase/blob/master/docker/volumes/api/kong.yml) and edit carefully
 2. Confirm the Docker bridge gateway IP is correctly added in `./volumes/api/kong.yml`
-3. Check Kong's logs for errors: `docker compose logs kong`
+3. Check Kong's logs for errors: `sh run.sh logs kong`
 4. Make sure your SSH tunnel is active

@@ -15,6 +15,8 @@ Client-side integration uses the same `supabase.auth.signInWithSSO()` method doc
 
 </Admonition>
 
+<$Partial path="self_hosted_run_sh.mdx" />
+
 ## Before you begin
 
 You need:
@@ -120,14 +122,13 @@ auth:
 Apply the configuration changes:
 
 ```sh
-docker compose down && \
-docker compose up -d
+sh run.sh recreate
 ```
 
 Verify the Auth service is healthy:
 
 ```sh
-docker compose ps auth
+sh run.sh status auth
 ```
 
 ## Step 5: Retrieve your service provider metadata
@@ -539,7 +540,7 @@ The response should include `app_metadata.provider: "sso:saml"` and any mapped a
 The `GOTRUE_SAML_ENABLED` variable is not set to `true`, or the Auth container did not pick up the change. Verify the env var is passed through `docker-compose.yml` and restart:
 
 ```sh
-docker compose down && docker compose up -d
+sh run.sh recreate
 ```
 
 ### "Invalid private key" on startup
@@ -562,7 +563,7 @@ base64 -w 0 -i pk_rsa1.der
 
 - Verify `API_EXTERNAL_URL` is set to a URL the IdP can reach (not `localhost` unless testing locally)
 - Check that the API gateway routes for `/sso/saml/acs` and `/sso/saml/metadata` are configured as open (no `key-auth` plugin).
-- Check the Auth container logs: `docker compose logs auth`
+- Check the Auth container logs: `sh run.sh logs auth`
 
 ### "No SSO provider found for this domain"
 
