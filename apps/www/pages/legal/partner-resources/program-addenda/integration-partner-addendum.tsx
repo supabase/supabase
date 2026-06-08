@@ -35,11 +35,9 @@ export default function IntegrationPartnerAddendumPage() {
         subheader="An addendum to the Master Partner Program Agreement governing integration partners."
       />
       <MDXProvider components={mdxComponents()}>
-        <div className="prose max-w-none">
-          <SectionContainer>
-            <LegalDocVersions versions={versions} />
-          </SectionContainer>
-        </div>
+        <SectionContainer className="prose">
+          <LegalDocVersions versions={versions} />
+        </SectionContainer>
       </MDXProvider>
     </DefaultLayout>
   )
