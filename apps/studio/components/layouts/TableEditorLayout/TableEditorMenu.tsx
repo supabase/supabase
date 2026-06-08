@@ -165,6 +165,7 @@ export const TableEditorMenu = () => {
             shortcutId={SHORTCUT_IDS.TABLE_EDITOR_FOCUS_SCHEMA}
             label="Switch schema"
             side="bottom"
+            open={isSchemaDropdownOpen ? false : undefined}
           >
             <SchemaSelector
               className="mx-4"
