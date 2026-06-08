@@ -10,6 +10,7 @@
 #   - Running self-hosted Supabase instance
 #   - .env file with keys configured
 #   - jq (for JSON parsing)
+#   - sha256sum or shasum (for file integrity checks)
 #
 
 set -e
@@ -26,6 +27,16 @@ fi
 
 if ! command -v jq >/dev/null 2>&1; then
     echo "Error: jq not found. Install it: https://jqlang.github.io/jq/download/"
+    exit 1
+fi
+
+# Portable file hash: prefers sha256sum (Linux), falls back to shasum (macOS)
+if command -v sha256sum >/dev/null 2>&1; then
+    file_hash() { sha256sum "$1" | awk '{print $1}'; }
+elif command -v shasum >/dev/null 2>&1; then
+    file_hash() { shasum -a 256 "$1" | awk '{print $1}'; }
+else
+    echo "Error: sha256sum or shasum not found."
     exit 1
 fi
 
@@ -241,8 +252,8 @@ if [ "$create_bucket_status" = "200" ]; then
     original_size=$(wc -c < "$tmpfile" | tr -d ' ')
     download_size=$(wc -c < "$download_tmp" | tr -d ' ')
     check "Download file (size matches)" "$original_size" "$download_size"
-    original_hash=$(shasum < "$tmpfile" | awk '{print $1}')
-    download_hash=$(shasum < "$download_tmp" | awk '{print $1}')
+    original_hash=$(file_hash "$tmpfile")
+    download_hash=$(file_hash "$download_tmp")
     check "Download file (hash matches)" "$original_hash" "$download_hash"
     rm -f "$download_tmp"
 
@@ -336,6 +347,7 @@ if [ "$tus_bucket_status" = "200" ]; then
         -H "Upload-Metadata: bucketName $tus_bucket_b64,objectName $tus_object_b64,contentType $tus_mime_b64" \
         -H "x-upsert: true")
     tus_create_status=$(echo "$tus_create_resp" | grep -m1 '^HTTP/' | grep -o '[0-9][0-9][0-9]')
+    # Supabase Storage always returns an absolute Location URL (see generateUrl in storage/src/http/routes/tus/lifecycle.ts)
     tus_location=$(echo "$tus_create_resp" | grep -i '^location:' | tr -d '\r' | sed 's/^[Ll]ocation: *//')
     check "TUS: create resumable upload" "201" "$tus_create_status"
 
@@ -370,8 +382,8 @@ if [ "$tus_bucket_status" = "200" ]; then
         curl -s "$BASE_URL/storage/v1/object/public/$tus_bucket/tus-test-file.bin" -o "$tus_download_tmp"
         tus_download_size=$(wc -c < "$tus_download_tmp" | tr -d ' ')
         check "TUS: download size matches" "$tus_file_size" "$tus_download_size"
-        tus_original_hash=$(shasum < "$tusfile" | awk '{print $1}')
-        tus_download_hash=$(shasum < "$tus_download_tmp" | awk '{print $1}')
+        tus_original_hash=$(file_hash "$tusfile")
+        tus_download_hash=$(file_hash "$tus_download_tmp")
         check "TUS: download hash matches" "$tus_original_hash" "$tus_download_hash"
         rm -f "$tus_download_tmp"
     fi
