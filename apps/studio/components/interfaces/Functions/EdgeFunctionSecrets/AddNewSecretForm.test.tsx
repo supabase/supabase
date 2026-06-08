@@ -4,6 +4,7 @@ import { HttpResponse } from 'msw'
 import { describe, expect, test } from 'vitest'
 
 import { AddNewSecretForm } from './AddNewSecretForm'
+import type { ProjectSecret } from '@/data/secrets/secrets-query'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -14,7 +15,7 @@ describe('AddNewSecretForm', () => {
     addAPIMock({
       method: 'get',
       path: '/v1/projects/:ref/secrets',
-      response: () => HttpResponse.json([]),
+      response: () => HttpResponse.json<ProjectSecret[]>([]),
     })
 
     customRender(<AddNewSecretForm />)
@@ -40,7 +41,7 @@ describe('AddNewSecretForm', () => {
     addAPIMock({
       method: 'get',
       path: '/v1/projects/:ref/secrets',
-      response: () => HttpResponse.json([]),
+      response: () => HttpResponse.json<ProjectSecret[]>([]),
     })
 
     customRender(<AddNewSecretForm />)
