@@ -179,8 +179,10 @@ export function getCSP() {
     `blob:`,
     `data:`,
     // [console fork] image previews / public URLs are served from the project's
-    // storage endpoint, which may be a custom domain (https) or a local port.
+    // storage endpoint, which may be a custom domain (https), an EC2 host (http) or a
+    // local port (http).
     `https:`,
+    `http:`,
     ...IMG_SRC_URLS,
     ...(isDevOrStaging
       ? [SUPABASE_STAGING_PROJECTS_URL, NIMBUS_STAGING_PROJECTS_URL, VERCEL_URL]
@@ -215,12 +217,18 @@ export function getCSP() {
     `data:`,
     `blob:`,
     // [console fork] Self-host has no single parent project domain (cloud uses
-    // *.supabase.co). Projects can live on a custom domain, an EC2 host, or a
-    // local port — all reached directly from the browser (tus uploads, realtime).
-    // Allow the https: scheme broadly (custom domains / dedicated are TLS) plus
-    // local http ports for shared infra. This is the self-host analog of cloud's
-    // project-domain wildcard.
+    // *.supabase.co). A project's data plane is reached DIRECTLY from the browser
+    // (tus/resumable uploads, realtime websockets, image previews) and can live on:
+    //   - a shared-infra local port      -> http://localhost:<port>
+    //   - a dedicated EC2 instance host   -> http://ec2-x-x-x-x.compute.amazonaws.com:8000
+    //   - a custom domain (TLS)           -> https://db.example.com
+    // These are dynamic/arbitrary, so we can't enumerate them. Allow every project
+    // scheme broadly (the self-host analog of cloud's *.supabase.co wildcard) so EC2
+    // and custom domains both work now and in the future:
     `https:`,
+    `http:`,
+    `ws:`,
+    `wss:`,
     ...DEFAULT_SRC_URLS,
     ...(isDevOrStaging
       ? [
