@@ -23,7 +23,10 @@ export default bff({
       projects: list.map((p) => {
         const region = p.region ?? 'shared'
         const cloud_provider = p.cloudProvider ?? 'AWS'
-        const infra_compute_size = p.infraComputeSize ?? 'micro'
+        // Compute size only applies to dedicated (EC2) projects; shared infra has none
+        // (don't fall back to 'micro' — that mislabels every project).
+        const infra_compute_size =
+          p.infrastructureType === 'shared' ? undefined : (p.computeSize ?? 'medium')
         const status = mapProjectStatus(p.status)
         return {
           id: p.id,
