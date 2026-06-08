@@ -117,13 +117,13 @@ const PricingComputeSection = () => {
       <hr className="border-0 border-t" />
       <div className="flex flex-col">
         <div className="flex flex-col items-start md:flex-row gap-2 p-6 justify-between md:items-center mt-2">
-          <div className="grid gap-2 mb-2 md:mb-0">
-            <p className="ml-0.5 md:ml-0">
+          <div className="grid gap-2">
+            <p>
               <span className="border bg-alternative px-3 py-0.5 text-foreground text-sm rounded-full text-nowrap">
                 Starts from <span translate="no">$10</span>/month
               </span>
             </p>
-            <h3 className="text-foreground text-2xl">
+            <h3 className="text-foreground text-2xl ml-0.5 md:ml-0 mb-2 md:mb-0">
               Scale compute up to
               <br className="hidden sm:block" /> 64 cores and 256 GB RAM
             </h3>
