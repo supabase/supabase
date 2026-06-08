@@ -1,4 +1,4 @@
-Last updated: 2026-05-19
+Last updated: 2026-05-23
 
 # Self-hosted Supabase configuration reference
 
@@ -57,7 +57,7 @@ The image tags below are pinned in `docker-compose.yml` at the time of this docu
 | Realtime | `supabase/realtime` | [supabase/realtime](https://github.com/supabase/realtime) |
 | Storage | `supabase/storage-api` | [supabase/storage](https://github.com/supabase/storage) |
 | Edge Functions | `supabase/edge-runtime` | [supabase/edge-runtime](https://github.com/supabase/edge-runtime) |
-| Analytics | `logflare/logflare` | [logflare/logflare](https://github.com/logflare/logflare) |
+| Analytics | `supabase/logflare` | [logflare/logflare](https://github.com/logflare/logflare) |
 | Postgres | `supabase/postgres` | [supabase/postgres](https://github.com/supabase/postgres) |
 | Supavisor (Pooler) | `supabase/supavisor` | [supabase/supavisor](https://github.com/supabase/supavisor) |
 
@@ -138,7 +138,7 @@ Self-hosted Studio reads `ENABLED_FEATURES_*` env vars at container start time t
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
 | `ENABLED_FEATURES_*` | boolean | | Per-flag runtime override. Set to `true` or `false` (case-insensitive); other values are logged and ignored. | One env var per flag. Full key list: `packages/common/enabled-features/enabled-features.json`. No-op when `NEXT_PUBLIC_IS_PLATFORM=true`. |
-| `ENABLED_FEATURES_LOGS_ALL` | boolean | | Disable the entire Logs section of the dashboard. Maps to the `logs:all` feature flag. | Documented explicitly as the runtime replacement for the legacy build-time `NEXT_PUBLIC_ENABLE_LOGS`. |
+| `ENABLED_FEATURES_LOGS_ALL` | boolean | Self-hosted | Disable the entire Logs section of the dashboard. Maps to the `logs:all` feature flag. | Documented explicitly as the runtime replacement for the legacy build-time `NEXT_PUBLIC_ENABLE_LOGS`. |
 
 ### AI features
 
@@ -850,7 +850,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `API_JWT_JWKS` | JWT | Both | JWKS JSON used to verify tenant JWTs during self-host seeding. Read by `priv/repo/seeds.exs` and `priv/repo/dev_seeds.exs`. | Used only by the seed script (`SEED_SELF_HOST=true`). Required when using the new API keys and new auth. |
+| `API_JWT_JWKS` | JWKS | Both | JSON Web Key Set used to verify tenant JWTs during self-host seeding. Read by `priv/repo/seeds.exs` and `priv/repo/dev_seeds.exs`. | Used only by the seed script (`SEED_SELF_HOST=true`). Required when using the new API keys and new auth. |
 | `API_JWT_SECRET` | string | Both | Symmetric HS256 secret used to sign tokens for the tenant management API and the default self-host tenant. | Required for the tenant management API in production. |
 | `API_TOKEN_BLOCKLIST` | string (CSV) | Self-hosted | Comma-separated list of tokens blocked from tenant management API access. | Default: empty list. |
 | `APP_NAME` | string | Both | Application/node name. Used to build the Phoenix endpoint URL host, libcluster DNS basename, and Erlang `RELEASE_NODE`. | Required - raises `APP_NAME not available` if empty. Default: empty (build) / `realtime` (Erlang release script). |
@@ -1049,6 +1049,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `STORAGE_S3_MAX_SOCKETS` | integer |  | Max concurrent sockets for the S3 HTTP agent. | Default: `200` |
 | `STORAGE_S3_PRIVATE_ASSET_ENDPOINT` | URL |  | Endpoint used only when signing private source URLs for internal consumers (e.g. imgproxy). | Optional |
 | `STORAGE_S3_REGION` | string | CLI | AWS region for the S3 backend; falls back to `REGION`. | Required when `STORAGE_BACKEND=s3` |
+| `STORAGE_S3_UPLOAD_PART_SIZE` | integer (bytes) |  | Multipart upload part size in bytes. Values below the 5 MiB S3 minimum are clamped up. | Default: `16777216` (16 MiB); minimum: `5242880` (5 MiB) |
 | `STORAGE_S3_UPLOAD_QUEUE_SIZE` | integer |  | Concurrent part uploads per multipart object. | Default: `2` |
 
 ### File backend

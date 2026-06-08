@@ -199,10 +199,7 @@ describe('TemplateEditor reset to default', () => {
 
     await waitFor(() =>
       expect(resetTemplateMock).toHaveBeenCalledWith(
-        {
-          projectRef: 'project-ref',
-          template: 'confirmation',
-        },
+        { projectRef: 'project-ref', template: 'confirmation' },
         expect.any(Object)
       )
     )

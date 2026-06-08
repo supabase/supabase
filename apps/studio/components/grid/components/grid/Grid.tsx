@@ -401,7 +401,11 @@ export const Grid = memo(
                 )}
                 <DataGrid
                   ref={ref}
-                  className={cn(gridClass, 'grow', isContextMenuOpen && 'rdg-context-menu-open')}
+                  className={cn(
+                    gridClass,
+                    'grow border-t-default! border-b-0!',
+                    isContextMenuOpen && 'rdg-context-menu-open'
+                  )}
                   rowClass={computedRowClass}
                   columns={columnsWithDirtyCellClass}
                   rows={rows ?? []}

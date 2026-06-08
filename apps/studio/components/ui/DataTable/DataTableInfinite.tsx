@@ -21,8 +21,6 @@ export interface DataTableInfiniteProps<TData, TValue, _TMeta> {
   totalRows?: number
   filterRows?: number
   totalRowsFetched?: number
-  isFetching?: boolean
-  isLoading?: boolean
   hasNextPage?: boolean
   fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<unknown>
   setColumnOrder: (columnOrder: string[]) => void
@@ -65,10 +63,14 @@ export function DataTableInfinite<TData, TValue, TMeta>({
     [fetchNextPage, isFetching, totalRows, totalRowsFetched]
   )
 
-  useShortcut(SHORTCUT_IDS.DATA_TABLE_RESET_COLUMNS, () => {
-    setColumnOrder([])
-    setColumnVisibility(defaultColumnVisibility)
-  })
+  useShortcut(
+    SHORTCUT_IDS.DATA_TABLE_RESET_COLUMNS,
+    () => {
+      setColumnOrder([])
+      setColumnVisibility(defaultColumnVisibility)
+    },
+    { registerInCommandMenu: true }
+  )
 
   return (
     <Table

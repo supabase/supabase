@@ -9,7 +9,6 @@ Adam Mokan
 AJ Matias
 Akash Manimaran
 Alaister Young
-Alan De Los Santos
 Aleksi Immonen
 Alex Hall
 Alex Hsu
@@ -83,6 +82,7 @@ Dennis Senn
 Dimitrios Liappis
 Div Arora
 Divit D
+Divya Sharma
 Douglas Hunley
 Dustin Keib
 Eduardo Gurgel
@@ -92,7 +92,6 @@ Emmett Folger
 Eric Kharitonashvili
 Etienne Stalmans
 Eyal Ehrlich
-Fabrizio Cataldo
 Fabrizio Fenoglio
 Fady A
 Fatuma Abdullahi
@@ -178,6 +177,7 @@ Leonardo Santiago
 Liam Cloud Hogan
 Lindsay Moss
 Lukas Bernert
+Lukas Klingsbo
 Łukasz Niemier
 Maksym Ionutsa
 Manuel Mendez
@@ -194,6 +194,7 @@ Mats Kindahl
 Mert Yerekapan
 Michal Kleczek
 Michelle Jubrey
+Miranda Limonczenko
 Monica Khoury
 Mykhailo Mischa Lieibenson
 Natalie Roberge
@@ -201,6 +202,7 @@ Nick B
 Nick Littman
 Nick Nowlan
 Nicolas Nosenzo
+Noah Moss
 Nyannyacha
 Oli R
 Pamela Chia
@@ -217,6 +219,7 @@ Peter Lyn
 Peter Soderberg
 Pierre Ducroquet
 Qiao Han
+Quintin Willison
 Rafael Chacón
 Raminder Singh
 Raúl Barroso
@@ -243,6 +246,7 @@ Sean Oliver
 Sean Romberg
 Sean Thompson
 Sergio Cioban Filho
+Shaii O
 Shane E
 Shreekar Shetty
 Sreyas Udayavarman

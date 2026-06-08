@@ -1,3 +1,5 @@
+import { safeLocalStorage } from '../safe-storage'
+
 export const LOCAL_STORAGE_KEYS = {
   /**
    * STUDIO
@@ -5,14 +7,12 @@ export const LOCAL_STORAGE_KEYS = {
   AI_ASSISTANT_STATE: (projectRef: string | undefined) =>
     `supabase-ai-assistant-state-${projectRef}`,
   SIDEBAR_BEHAVIOR: 'supabase-sidebar-behavior',
-  EDITOR_PANEL_STATE: 'supabase-editor-panel-state',
   PROJECTS_VIEW: 'projects-view',
   PROJECTS_FILTER: 'projects-filter',
   PROJECTS_SORT: 'projects-sort',
   FEEDBACK_WIDGET_CONTENT: 'feedback-widget-content',
   FEEDBACK_WIDGET_SCREENSHOT: 'feedback-widget-screenshot',
   INCIDENT_BANNER_DISMISSED_IDS: 'incident-banner-dismissed-ids',
-  MAINTENANCE_BANNER_DISMISSED: (id: string) => `maintenance-banner-dismissed-${id}`,
   DASHBOARD_PREFERENCES: (ref: string) => `dashboard-preferences-${ref}`,
   UNIFIED_LOGS_DOCK: 'unified-logs-dock',
 
@@ -20,7 +20,6 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_CLS: 'supabase-ui-cls',
   UI_PREVIEW_INLINE_EDITOR: 'supabase-ui-preview-inline-editor',
   UI_PREVIEW_UNIFIED_LOGS: 'supabase-ui-preview-unified-logs',
-  UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
   UI_PREVIEW_ADVISOR_RULES: 'supabase-ui-advisor-rules',
   UI_PREVIEW_QUEUE_OPERATIONS: 'supabase-ui-queue-operations',
   UI_PREVIEW_PG_DELTA_DIFF: 'supabase-ui-pg-delta-diff',
@@ -29,8 +28,6 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_RLS_TESTER: 'supabase-ui-rls-tester',
   UI_PREVIEW_MARKETPLACE: 'supabase-ui-marketplace',
 
-  NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
-  TABS_INTERFACE_ACKNOWLEDGED: 'tabs-interface-acknowledge',
   AI_ASSISTANT_MCP_OPT_IN: 'ai-assistant-mcp-opt-in',
 
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
@@ -53,7 +50,6 @@ export const LOCAL_STORAGE_KEYS = {
   SQL_EDITOR_SORT: (ref: string) => `sql-editor-sort-${ref}`,
 
   LOG_EXPLORER_SPLIT_SIZE: 'supabase_log-explorer-split-size',
-  GRAPHIQL_RLS_BYPASS_WARNING: 'graphiql-rls-bypass-warning-dismissed',
   GRAPHQL_INTROSPECTION_NOTICE_COLLAPSED: (ref: string) =>
     `graphql-introspection-notice-collapsed-${ref}`,
   CLS_DIFF_WARNING: 'cls-diff-warning-dismissed',
@@ -75,15 +71,18 @@ export const LOCAL_STORAGE_KEYS = {
   EXPAND_NAVIGATION_PANEL: 'supabase-expand-navigation-panel',
   GITHUB_AUTHORIZATION_STATE: 'supabase-github-authorization-state',
   // Notice banner keys
-  FLY_DEPRECATION_2026_05_31: 'fly-deprecation-2026-05-31-dismissed',
   API_KEYS_FEEDBACK_DISMISSED: (ref: string) => `supabase-api-keys-feedback-dismissed-${ref}`,
   TERMS_OF_SERVICE_UPDATE: 'terms-of-service-update-2026-06-06',
+  SUPAVISOR_MAINTENANCE: (ref: string) => `supavisor-maintenance-2026-06-09-${ref}`,
   REPORT_DATERANGE: 'supabase-report-daterange',
   PROJECT_PAUSING_STARTED_AT: (ref: string) => `supabase-project-pausing-started-at-${ref}`,
   PROJECT_RESTORING_STARTED_AT: (ref: string) => `supabase-project-restoring-started-at-${ref}`,
 
   // api keys view switcher for new and legacy api keys
   API_KEYS_VIEW: (ref: string) => `supabase-api-keys-view-${ref}`,
+
+  // Connect sheet: remember last-used tab/framework/method etc. across opens
+  CONNECT_SHEET_PREFS: 'supabase-connect-sheet-prefs',
 
   // Shortcut preferences
   SHORTCUT_STORAGE_KEY: 'supabase-shortcut-preferences',
@@ -119,7 +118,6 @@ export const LOCAL_STORAGE_KEYS = {
     `free-micro-upgrade-banner-dismissed-${ref}`,
   STORAGE_PUBLIC_BUCKET_SELECT_POLICY_WARNING_DISMISSED: (ref: string, bucketId: string) =>
     `storage-public-bucket-select-policy-warning-dismissed-${ref}-${bucketId}`,
-  PRIVACY_NOTICE_ACKNOWLEDGED: 'privacy-notice-acknowledged-2026-03',
 
   /**
    * COMMON
@@ -168,9 +166,9 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
 ]
 
 export function clearLocalStorage() {
-  for (const key in localStorage) {
+  for (const key of safeLocalStorage.keys()) {
     if (!LOCAL_STORAGE_KEYS_ALLOWLIST.includes(key)) {
-      localStorage.removeItem(key)
+      safeLocalStorage.removeItem(key)
     }
   }
 }

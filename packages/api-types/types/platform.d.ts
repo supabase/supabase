@@ -687,6 +687,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/integrations/partners/{ref}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Lists installed marketplace integrations for the given project. */
+    get: operations['PartnerIntegrationsController_listIntegrations']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/integrations/partners/{ref}/{listing_slug}': {
     parameters: {
       query?: never
@@ -694,7 +711,8 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    get?: never
+    /** Gets the installation status of the given marketplace integration for the given project. */
+    get: operations['PartnerIntegrationsController_getIntegration']
     put?: never
     /** Creates a partner integration and returns the redirect URL */
     post: operations['PartnerIntegrationsController_createIntegration']
@@ -986,6 +1004,23 @@ export interface paths {
     head?: never
     /** Patch an audit log drain */
     patch: operations['AuditLogDrainController_patchAuditLogDrain']
+    trace?: never
+  }
+  '/platform/organizations/{slug}/analytics/audit-log-drains/{token}/test': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Test an audit log drain connection */
+    post: operations['AuditLogDrainController_testAuditLogDrain']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
     trace?: never
   }
   '/platform/organizations/{slug}/apps': {
@@ -2630,6 +2665,23 @@ export interface paths {
     patch: operations['LogDrainController_patchLogDrain']
     trace?: never
   }
+  '/platform/projects/{ref}/analytics/log-drains/{token}/test': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Test a log drain connection */
+    post: operations['LogDrainController_testLogDrain']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/projects/{ref}/api-keys/temporary': {
     parameters: {
       query?: never
@@ -2925,7 +2977,7 @@ export interface paths {
     /** Creates project's content folder */
     post: operations['ContentFoldersController_createFolder']
     /** Deletes project's content folders */
-    delete: operations['ContentFoldersController_DeleteFolder']
+    delete: operations['ContentFoldersController_deleteFolder']
     options?: never
     head?: never
     patch?: never
@@ -4519,6 +4571,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/support/verify-email': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Verify a support conversation email
+     * @description Called by the Supabase dashboard when a user clicks their email verification link. Validates the token, checks org/project ownership, updates the Front conversation custom fields, and removes unverified tags.
+     */
+    post: operations['VerifyEmailController_verifyEmail']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/telemetry/event': {
     parameters: {
       query?: never
@@ -4880,6 +4952,10 @@ export interface components {
         remediation: string
         title: string
       }[]
+    }
+    BackendConnectionTest: {
+      'connected?': boolean
+      reason: string
     }
     BackupsResponse: {
       backups: {
@@ -5511,13 +5587,13 @@ export interface components {
       custom_supabase_internal_requests?: {
         ami: {
           /**
-           * @description Exact AWS instance type to provision (e.g. `t3.nano`, `t4g.nano`). When omitted the default for `desired_instance_size` is used. Only for internal use; rejected for user-facing requests in production.
+           * @description Exact AWS instance type to provision (e.g. `t3.nano`, `t4g.nano`). Hard pin — no ODCR fallback. Only for internal use; rejected for user-facing requests in production.
            * @enum {string}
            */
           instance_type?:
             | 't4g.nano'
-            | 't3.nano'
             | 't3a.nano'
+            | 't3.nano'
             | 't4g.micro'
             | 't4g.small'
             | 't4g.medium'
@@ -5537,6 +5613,11 @@ export interface components {
             | 'c8g.48xlarge'
             | 'r8g.48xlarge'
             | 'x8g.48xlarge'
+          /**
+           * @description Preferred architecture for WPP projects. Soft hint — the worker selects the cheapest region-available type for this arch and may cross to the other arch if no ODCR capacity is available. Cannot be set together with instance_type. Only for internal use.
+           * @enum {string}
+           */
+          preferred_arch?: 'x86_64' | 'arm64'
           search_tags?: {
             [key: string]: string
           }
@@ -5733,11 +5814,6 @@ export interface components {
                */
               data_path: string
               /**
-               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-               * @example 7 days
-               */
-              expire_snapshots_older_than?: string
-              /**
                * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                * @default ducklake
                * @example ducklake
@@ -5870,11 +5946,6 @@ export interface components {
                * @example s3://<bucket-name>/
                */
               data_path: string
-              /**
-               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-               * @example 7 days
-               */
-              expire_snapshots_older_than?: string
               /**
                * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                * @default ducklake
@@ -6964,6 +7035,8 @@ export interface components {
       organization_slugs?: string[]
       permissions: string[]
       project_refs?: string[]
+      /** @enum {string} */
+      scope: 'user' | 'organization' | 'project'
       token_alias: string
     }
     GetScopedAccessTokensResponse: {
@@ -8373,12 +8446,42 @@ export interface components {
       organization_id: number
       overdue_invoice_count: number
     }
+    PartnerIntegrationListResponse: {
+      integrations: {
+        listing_slug: string
+        partner_links?: {
+          dashboard?: string
+          manage?: string
+        }
+        /** @enum {string} */
+        status: 'installing' | 'ready' | 'error'
+        user_alert?: {
+          message: string
+        }
+        version?: string
+      }[]
+    }
     PartnerIntegrationsResponse: {
       /**
        * Format: uri
        * @description URL to redirect the user's browser to
        */
       redirectUrl: string
+    }
+    PartnerIntegrationStatusResponse: {
+      install_state?: {
+        partner_links?: {
+          dashboard?: string
+          manage?: string
+        }
+        /** @enum {string} */
+        status: 'installing' | 'ready' | 'error'
+        user_alert?: {
+          message: string
+        }
+        version?: string
+      }
+      installed: boolean
     }
     PauseStatusResponse: {
       can_restore: boolean
@@ -9400,11 +9503,6 @@ export interface components {
                */
               data_path: string
               /**
-               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-               * @example 7 days
-               */
-              expire_snapshots_older_than?: string
-              /**
                * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                * @default ducklake
                * @example ducklake
@@ -9549,11 +9647,6 @@ export interface components {
                  * @example s3://<bucket-name>/
                  */
                 data_path: string
-                /**
-                 * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-                 * @example 7 days
-                 */
-                expire_snapshots_older_than?: string
                 /**
                  * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                  * @default ducklake
@@ -11391,11 +11484,6 @@ export interface components {
                */
               data_path: string
               /**
-               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-               * @example 7 days
-               */
-              expire_snapshots_older_than?: string
-              /**
                * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                * @default ducklake
                * @example ducklake
@@ -11528,11 +11616,6 @@ export interface components {
                * @example s3://<bucket-name>/
                */
               data_path: string
-              /**
-               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-               * @example 7 days
-               */
-              expire_snapshots_older_than?: string
               /**
                * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                * @default ducklake
@@ -12082,11 +12165,6 @@ export interface components {
                */
               data_path: string
               /**
-               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-               * @example 7 days
-               */
-              expire_snapshots_older_than?: string
-              /**
                * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                * @default ducklake
                * @example ducklake
@@ -12178,6 +12256,13 @@ export interface components {
     }
     VercelRedirectResponse: {
       url: string
+    }
+    VerifyEmailBody: {
+      token: string
+    }
+    VerifyEmailResponse: {
+      /** @enum {string} */
+      result: 'success'
     }
     WorkflowRunResponse: {
       branch_id: string
@@ -14116,6 +14201,108 @@ export interface operations {
       }
     }
   }
+  PartnerIntegrationsController_listIntegrations: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PartnerIntegrationListResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Project not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  PartnerIntegrationsController_getIntegration: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The slug of the listing in the marketplace database */
+        listing_slug: string
+        /** @description Supabase project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PartnerIntegrationStatusResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Project not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   PartnerIntegrationsController_createIntegration: {
     parameters: {
       query?: never
@@ -15089,6 +15276,58 @@ export interface operations {
         content?: never
       }
       /** @description Failed to patch audit log drain */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  AuditLogDrainController_testAuditLogDrain: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+        /** @description Audit log drain identifier */
+        token: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BackendConnectionTest']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to test audit log drain */
       500: {
         headers: {
           [name: string]: unknown
@@ -21204,6 +21443,58 @@ export interface operations {
       }
     }
   }
+  LogDrainController_testLogDrain: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Log drains identifier */
+        token: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BackendConnectionTest']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to test log drain */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   ApiKeysController_createTemporaryApiKey: {
     parameters: {
       query: {
@@ -22513,7 +22804,7 @@ export interface operations {
       }
     }
   }
-  ContentFoldersController_DeleteFolder: {
+  ContentFoldersController_deleteFolder: {
     parameters: {
       query: {
         ids: string
@@ -28432,6 +28723,30 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+    }
+  }
+  VerifyEmailController_verifyEmail: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['VerifyEmailBody']
+      }
+    }
+    responses: {
+      /** @description Verification successful */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['VerifyEmailResponse']
+        }
       }
     }
   }

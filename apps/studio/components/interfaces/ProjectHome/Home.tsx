@@ -1,6 +1,6 @@
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { IS_PLATFORM, useFlag, useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { useEffect, useRef } from 'react'
 import { cn } from 'ui'
@@ -17,7 +17,7 @@ import { ProjectNeedsSecuring } from '@/components/layouts/ProjectNeedsSecuring/
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from '@/lib/constants'
+import { IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 
@@ -73,10 +73,15 @@ export const ProjectHome = () => {
     setSectionOrder(mergeSectionOrder)
   }, [setSectionOrder])
 
-  const showConnectSection = !isMatureProject && !!project
+  // On self-hosted the project's `inserted_at` is hard-coded to a past date
+  // (so it always looks "mature"), and the home page is otherwise sparse —
+  // always surface the Get Connected pane there. Platform keeps the
+  // maturity gate so long-running projects don't see it forever.
+  const showConnectSection = !!project && (!IS_PLATFORM || !isMatureProject)
 
   const renderOrder = mergeSectionOrder(sectionOrder).filter((id) => {
     if (id === 'connect') return showConnectSection
+    if (id === 'usage' || id === 'custom-report') return IS_PLATFORM
     return true
   })
 
@@ -128,7 +133,7 @@ export const ProjectHome = () => {
                         </div>
                       )
                     }
-                    if (id === 'custom-report') {
+                    if (IS_PLATFORM && id === 'custom-report') {
                       return (
                         <div
                           key={id}
