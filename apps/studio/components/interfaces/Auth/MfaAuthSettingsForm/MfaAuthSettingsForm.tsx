@@ -11,6 +11,9 @@ import {
   Card,
   CardContent,
   CardFooter,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Form,
   FormControl,
   FormField,
@@ -25,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
   Switch,
+  Textarea,
   WarningIcon,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
@@ -539,12 +543,17 @@ export const MfaAuthSettingsForm = () => {
                       <FormItemLayout
                         layout="flex-row-reverse"
                         label="Phone verification message"
-                        description="To format the OTP code use `{{ .Code }}`"
+                        description="To format the OTP code use `{{ .Code }}`. Newlines are supported for WebOTP API compatibility."
                       >
+                        <FormControl_Shadcn_>
+                          <Textarea
                         <FormControl>
                           <Input
                             type="text"
                             {...field}
+                            rows={4}
+                            placeholder="Your code is {{ .Code }}"
+                            className="resize-none"
                             disabled={!canUpdateConfig || !hasAccessToMFA}
                             data-1p-ignore // 1Password
                             data-lpignore="true" // LastPass
