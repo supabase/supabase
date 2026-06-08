@@ -235,12 +235,16 @@ if [ "$create_bucket_status" = "200" ]; then
         --data-binary "@$tmpfile")
     check "Upload 7MB file" "200" "$upload_status"
 
-    # Download file and verify size
-    download_size=$(curl -s \
-        "$BASE_URL/storage/v1/object/public/$bucket_name/test-large-file.bin" | wc -c | tr -d ' ')
+    # Download file and verify integrity
+    download_tmp=$(mktemp); cleanup_files="$cleanup_files $download_tmp"
+    curl -s "$BASE_URL/storage/v1/object/public/$bucket_name/test-large-file.bin" -o "$download_tmp"
     original_size=$(wc -c < "$tmpfile" | tr -d ' ')
-    check "Download file (size matches)" "true" \
-        "$([ "$download_size" = "$original_size" ] && echo true || echo false)"
+    download_size=$(wc -c < "$download_tmp" | tr -d ' ')
+    check "Download file (size matches)" "$original_size" "$download_size"
+    original_hash=$(shasum < "$tmpfile" | awk '{print $1}')
+    download_hash=$(shasum < "$download_tmp" | awk '{print $1}')
+    check "Download file (hash matches)" "$original_hash" "$download_hash"
+    rm -f "$download_tmp"
 
     rm -f "$tmpfile"
 
@@ -291,6 +295,100 @@ if [ "$create_bucket_status" = "200" ]; then
         -H "apikey: $SERVICE_ROLE_KEY" \
         -H "Authorization: Bearer $SERVICE_ROLE_KEY")
     check "Delete bucket" "200" "$delete_bucket_status"
+fi
+
+# ---------------------------------------------
+# 6b. Storage: TUS resumable upload
+# ---------------------------------------------
+
+echo ""
+echo "--- Storage: TUS resumable upload ---"
+
+tus_bucket="smoke-tus-$$"
+
+tus_bucket_status=$(http_status "$BASE_URL/storage/v1/bucket" \
+    -X POST \
+    -H "apikey: $SERVICE_ROLE_KEY" \
+    -H "Authorization: Bearer $SERVICE_ROLE_KEY" \
+    -H "Content-Type: application/json" \
+    -d "{\"id\":\"$tus_bucket\",\"name\":\"$tus_bucket\",\"public\":true}")
+check "TUS: create bucket" "200" "$tus_bucket_status"
+
+if [ "$tus_bucket_status" = "200" ]; then
+    # Generate a ~7MB file (above Studio's 6MB TUS threshold)
+    tusfile=$(mktemp); cleanup_files="$cleanup_files $tusfile"
+    dd if=/dev/urandom of="$tusfile" bs=1048576 count=7 2>/dev/null
+    tus_file_size=$(wc -c < "$tusfile" | tr -d ' ')
+    tus_chunk_size=$((4 * 1048576))  # 4MB first chunk
+
+    # Encode TUS metadata values as base64
+    tus_bucket_b64=$(printf '%s' "$tus_bucket" | base64)
+    tus_object_b64=$(printf '%s' "tus-test-file.bin" | base64)
+    tus_mime_b64=$(printf '%s' "application/octet-stream" | base64)
+
+    # 1. Create resumable upload
+    tus_create_resp=$(curl -s -i -X POST \
+        "$BASE_URL/storage/v1/upload/resumable" \
+        -H "apikey: $SERVICE_ROLE_KEY" \
+        -H "Authorization: Bearer $SERVICE_ROLE_KEY" \
+        -H "Tus-Resumable: 1.0.0" \
+        -H "Upload-Length: $tus_file_size" \
+        -H "Upload-Metadata: bucketName $tus_bucket_b64,objectName $tus_object_b64,contentType $tus_mime_b64" \
+        -H "x-upsert: true")
+    tus_create_status=$(echo "$tus_create_resp" | grep -m1 '^HTTP/' | grep -o '[0-9][0-9][0-9]')
+    tus_location=$(echo "$tus_create_resp" | grep -i '^location:' | tr -d '\r' | sed 's/^[Ll]ocation: *//')
+    check "TUS: create resumable upload" "201" "$tus_create_status"
+
+    if [ -n "$tus_location" ]; then
+        # 2. Upload first chunk (0 to 4MB)
+        tus_chunk1_status=$(dd if="$tusfile" bs=1048576 count=4 2>/dev/null | \
+            curl -s -o /dev/null -w "%{http_code}" -X PATCH \
+            "$tus_location" \
+            -H "apikey: $SERVICE_ROLE_KEY" \
+            -H "Authorization: Bearer $SERVICE_ROLE_KEY" \
+            -H "Tus-Resumable: 1.0.0" \
+            -H "Upload-Offset: 0" \
+            -H "Content-Type: application/offset+octet-stream" \
+            --data-binary @-)
+        check "TUS: upload chunk 1 (4MB)" "204" "$tus_chunk1_status"
+
+        # 3. Upload second chunk (4MB to end)
+        tus_remaining=$((tus_file_size - tus_chunk_size))
+        tus_chunk2_status=$(dd if="$tusfile" bs=1048576 skip=4 count=3 2>/dev/null | \
+            curl -s -o /dev/null -w "%{http_code}" -X PATCH \
+            "$tus_location" \
+            -H "apikey: $SERVICE_ROLE_KEY" \
+            -H "Authorization: Bearer $SERVICE_ROLE_KEY" \
+            -H "Tus-Resumable: 1.0.0" \
+            -H "Upload-Offset: $tus_chunk_size" \
+            -H "Content-Type: application/offset+octet-stream" \
+            --data-binary @-)
+        check "TUS: upload chunk 2 (remaining)" "204" "$tus_chunk2_status"
+
+        # 4. Verify download matches original (hash check proves correct chunk reassembly)
+        tus_download_tmp=$(mktemp); cleanup_files="$cleanup_files $tus_download_tmp"
+        curl -s "$BASE_URL/storage/v1/object/public/$tus_bucket/tus-test-file.bin" -o "$tus_download_tmp"
+        tus_download_size=$(wc -c < "$tus_download_tmp" | tr -d ' ')
+        check "TUS: download size matches" "$tus_file_size" "$tus_download_size"
+        tus_original_hash=$(shasum < "$tusfile" | awk '{print $1}')
+        tus_download_hash=$(shasum < "$tus_download_tmp" | awk '{print $1}')
+        check "TUS: download hash matches" "$tus_original_hash" "$tus_download_hash"
+        rm -f "$tus_download_tmp"
+    fi
+
+    rm -f "$tusfile"
+
+    # Cleanup: delete file and bucket
+    http_status "$BASE_URL/storage/v1/object/$tus_bucket/tus-test-file.bin" \
+        -X DELETE \
+        -H "apikey: $SERVICE_ROLE_KEY" \
+        -H "Authorization: Bearer $SERVICE_ROLE_KEY" >/dev/null 2>&1
+
+    tus_delete_bucket=$(http_status "$BASE_URL/storage/v1/bucket/$tus_bucket" \
+        -X DELETE \
+        -H "apikey: $SERVICE_ROLE_KEY" \
+        -H "Authorization: Bearer $SERVICE_ROLE_KEY")
+    check "TUS: delete bucket" "200" "$tus_delete_bucket"
 fi
 
 # ---------------------------------------------
