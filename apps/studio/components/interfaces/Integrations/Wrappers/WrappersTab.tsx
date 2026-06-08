@@ -1,5 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useRouter } from 'next/router'
 import { HTMLProps, ReactNode, useCallback, useEffect, useState } from 'react'
 import { Sheet, SheetContent } from 'ui'
@@ -22,7 +23,11 @@ export const WrappersTab = () => {
   const { id } = useParams()
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
-  const [createWrapperShown, setCreateWrapperShown] = useState(false)
+
+  const [isCreating, setIsCreating] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ clearOnDefault: true })
+  )
 
   const { can: canCreateWrapper } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -52,7 +57,6 @@ export const WrappersTab = () => {
   const wrappers = data ?? []
   const wrapperMeta = WRAPPERS.find((w) => w.name === id)
 
-  // this contains a collection of all wrapper instances for the wrapper type
   const createdWrappers = wrapperMeta
     ? wrappers.filter((w) => wrapperMetaComparator(wrapperMeta, w))
     : []
@@ -61,40 +65,19 @@ export const WrappersTab = () => {
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: useCallback(() => isDirty, [isDirty]),
     onClose: useCallback(() => {
-      setCreateWrapperShown(false)
+      setIsCreating(null)
       setIsDirty(false)
-    }, []),
+    }, [setIsCreating]),
   })
-
-  const Container = useCallback(
-    ({ ...props }: { children: ReactNode } & HTMLProps<HTMLDivElement>) => (
-      <div className="w-full p-10">
-        {props.children}
-        <Sheet open={!!createWrapperShown} onOpenChange={handleOpenChange}>
-          <SheetContent size="lg" tabIndex={undefined}>
-            {wrapperMeta && (
-              <CreateWrapperSheet
-                wrapperMeta={wrapperMeta}
-                onDirty={setIsDirty}
-                onClose={() => setCreateWrapperShown(false)}
-                onCloseWithConfirmation={confirmOnClose}
-              />
-            )}
-          </SheetContent>
-        </Sheet>
-      </div>
-    ),
-    [createWrapperShown, handleOpenChange, wrapperMeta, confirmOnClose]
-  )
 
   if (!wrapperMeta) {
     return <div>Missing integration.</div>
   }
 
-  if (createdWrappers.length === 0) {
-    return (
-      <Container>
-        <div className=" w-full h-48 max-w-4xl">
+  return (
+    <div className="w-full p-10">
+      {createdWrappers.length === 0 ? (
+        <div className="w-full h-48 max-w-4xl">
           <div className="border rounded-lg h-full flex flex-col gap-y-2 items-center justify-center">
             <p className="text-sm text-foreground-light">
               No {wrapperMeta.label} wrappers have been installed
@@ -102,9 +85,43 @@ export const WrappersTab = () => {
             <AddWrapperButton onClick={() => setCreateWrapperShown(true)} />
           </div>
         </div>
-      </Container>
-    )
-  }
+      ) : (
+        <div className="max-w-5xl flex items-center gap-x-2 justify-end mb-4">
+          <DocsButton href={wrapperMeta.docsUrl} />
+          <ButtonTooltip
+            type="primary"
+            onClick={() => setIsCreating(true)}
+            disabled={!canCreateWrapper}
+            tooltip={{
+              content: {
+                text: !canCreateWrapper
+                  ? 'You need additional permissions to create a foreign data wrapper'
+                  : undefined,
+              },
+            }}
+          >
+            Add new wrapper
+          </ButtonTooltip>
+        </div>
+      )}
+
+      {createdWrappers.length > 0 && <WrapperTable />}
+
+      <Sheet open={!!isCreating} onOpenChange={handleOpenChange}>
+        <SheetContent size="lg" tabIndex={undefined}>
+          {wrapperMeta && (
+            <CreateWrapperSheet
+              wrapperMeta={wrapperMeta}
+              onDirty={setIsDirty}
+              onClose={() => {
+                setIsCreating(null)
+                setIsDirty(false)
+              }}
+              onCloseWithConfirmation={confirmOnClose}
+            />
+          )}
+        </SheetContent>
+      </Sheet>
 
   return (
     <Container>
@@ -114,6 +131,6 @@ export const WrappersTab = () => {
       </div>
       <WrapperTable />
       <DiscardChangesConfirmationDialog {...modalProps} />
-    </Container>
+    </div>
   )
 }
