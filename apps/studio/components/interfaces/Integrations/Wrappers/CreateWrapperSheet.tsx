@@ -263,14 +263,16 @@ export const CreateWrapperSheet = ({
             <SheetHeader>
               <SheetTitle>Create a {wrapperMeta.label} wrapper</SheetTitle>
             </SheetHeader>
-            <div className="flex-grow overflow-y-auto">
-              {isMarketplaceEnabled && !!requiredExtensionsToInstall?.length && (
-                <div className="px-5 pt-5 flex flex-col gap-y-4">
-                  <Admonition
-                    type="default"
-                    title="Required extensions will be installed"
-                    description="Proceeding will also install the following extensions required by this wrapper."
-                  />
+            <div className="grow overflow-y-auto">
+              {isMarketplaceEnabled && (
+                <div className="px-5 py-5 flex flex-col gap-y-4 border-b">
+                  {!!requiredExtensionsToInstall?.length && (
+                    <Admonition
+                      type="warning"
+                      title="Required extensions will be installed"
+                      description="Proceeding will also install the extensions required by this wrapper."
+                    />
+                  )}
                   <RequiredExtensionsSection hideSeparator />
                 </div>
               )}
