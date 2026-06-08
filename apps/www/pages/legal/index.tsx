@@ -1,7 +1,7 @@
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import PageHeader from '~/components/Sections/PageHeader'
-import { FileText, Folder } from 'lucide-react'
+import { FileText, List } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 
@@ -26,7 +26,7 @@ const sections = [
 
 const linkIcons = {
   document: FileText,
-  index: Folder,
+  index: List,
 }
 
 export default function LegalHubPage() {
