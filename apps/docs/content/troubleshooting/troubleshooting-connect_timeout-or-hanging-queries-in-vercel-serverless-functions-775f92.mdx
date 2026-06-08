@@ -3,9 +3,12 @@ title = "Troubleshooting 'CONNECT_TIMEOUT' or hanging queries in Serverless Func
 date_created = "2026-06-08T10:04:54+00:00"
 topics = [ "database", "functions", "supavisor" ]
 keywords = []
+database_id = "874ec842-3fc8-4d24-b675-a9dda1bf1f22"
+
 [[errors]]
 code = "CONNECT_TIMEOUT"
 message = "connection timeout errors"
+
 ---
 
 Intermittent `CONNECT_TIMEOUT` errors or queries that hang until reaching the execution limit may occur when using persistent clients, such as `postgres-js`, within Serverless Functions.
