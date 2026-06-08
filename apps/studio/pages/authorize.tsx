@@ -2,9 +2,7 @@ import { useParams } from 'common'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 
-import {
-  ApiAuthorizationScreen,
-} from '@/components/interfaces/ApiAuthorization/ApiAuthorization'
+import { ApiAuthorizationScreen } from '@/components/interfaces/ApiAuthorization/ApiAuthorization'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import type { NextPageWithLayout } from '@/types'
