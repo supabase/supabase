@@ -30,8 +30,8 @@ type GetResponseData =
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetResponseData>) => {
   const params = req.query as GetRequestData
 
-  const folders = await getFolders()
-  const { cursor, snippets } = await getSnippets({
+  const folders = await getFolders(String(req.query.ref ?? ''))
+  const { cursor, snippets } = await getSnippets(String(req.query.ref ?? ''), {
     searchTerm: params?.name,
     limit: params?.limit ? Number(params.limit) : undefined,
     cursor: params?.cursor,
@@ -50,7 +50,7 @@ type PostRequestData =
 const handlePost = async (req: NextApiRequest, res: NextApiResponse<PostResponseData>) => {
   const { name } = req.body as PostRequestData
 
-  const folder = await createFolder(name)
+  const folder = await createFolder(String(req.query.ref ?? ''), name)
 
   return res.status(201).json(folder)
 }
@@ -63,7 +63,7 @@ const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
   }
   const folderIds = ids.split(',').map((id) => id.trim())
 
-  await Promise.all(folderIds.map((id) => deleteFolder(id)))
+  await Promise.all(folderIds.map((id) => deleteFolder(String(req.query.ref ?? ''), id)))
 
   return res.status(200).json({})
 }

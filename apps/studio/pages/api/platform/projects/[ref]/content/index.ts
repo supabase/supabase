@@ -60,7 +60,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetRespons
   // content, so project-visibility queries return it too (don't short-circuit to []).
 
   try {
-    const { cursor, snippets } = await getSnippets({
+    const { cursor, snippets } = await getSnippets(String(req.query.ref ?? ''), {
       searchTerm: params.name,
       limit: params.limit,
       cursor: params.cursor,
@@ -78,7 +78,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetRespons
 const handlePut = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const updates = req.body
-    const updatedSnippet = await updateSnippet(updates.id, updates)
+    const updatedSnippet = await updateSnippet(String(req.query.ref ?? ''), updates.id, updates)
     return res.status(200).json(updatedSnippet)
   } catch (error: any) {
     if (error instanceof Error && error.message.includes('not found')) {
@@ -91,7 +91,7 @@ const handlePut = async (req: NextApiRequest, res: NextApiResponse) => {
       }
 
       try {
-        const savedSnippet = await saveSnippet(data)
+        const savedSnippet = await saveSnippet(String(req.query.ref ?? ''), data)
         return res.status(200).json(savedSnippet)
       } catch (error) {
         console.error('Error creating snippet:', error)
@@ -119,7 +119,7 @@ const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
 
   try {
     for (const id of snippetIds) {
-      await deleteSnippet(id)
+      await deleteSnippet(String(req.query.ref ?? ''), id)
     }
     res.setHeader('Content-Type', 'application/json')
     return res.status(200).send(snippetIds.map((id) => ({ id })))

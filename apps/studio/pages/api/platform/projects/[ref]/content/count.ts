@@ -24,7 +24,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   const params = req.query as GetRequestData
 
   try {
-    const { snippets } = await getSnippets({
+    const { snippets } = await getSnippets(String(req.query.ref ?? ''), {
       searchTerm: params?.name,
     })
     if (params?.name) {

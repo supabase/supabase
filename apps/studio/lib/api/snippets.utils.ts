@@ -155,22 +155,31 @@ const sanitizeName = (name: string): string => {
   return sanitized
 }
 
-/**
- * Gets a complete snapshot of the filesystem structure including files and folders
- * @returns An array of files and folders with their metadata
- */
-export async function getFilesystemEntries(): Promise<FilesystemEntry[]> {
+// [console fork] Scope the content store PER-PROJECT so snippets, reports and folders
+// don't leak across projects. Each project's content lives under <SNIPPETS_DIR>/<ref>/.
+// Every store function takes the project `ref`.
+function snippetsDir(ref: string): string {
   if (SNIPPETS_DIR === '') {
     throw new Error(
       'SNIPPETS_MANAGEMENT_FOLDER env var is not set. Please set it to use snippets properly.'
     )
   }
+  if (!ref) throw new Error('A project ref is required to access content')
+  return path.join(SNIPPETS_DIR, sanitizeName(ref))
+}
 
-  // Ensure the snippets directory exists
+/**
+ * Gets a complete snapshot of the filesystem structure including files and folders
+ * @returns An array of files and folders with their metadata
+ */
+export async function getFilesystemEntries(ref: string): Promise<FilesystemEntry[]> {
+  const baseDir = snippetsDir(ref)
+
+  // Ensure the project's snippets directory exists
   try {
-    await fs.access(SNIPPETS_DIR)
+    await fs.access(baseDir)
   } catch {
-    await fs.mkdir(SNIPPETS_DIR, { recursive: true })
+    await fs.mkdir(baseDir, { recursive: true })
   }
 
   const entries: FilesystemEntry[] = []
@@ -227,12 +236,12 @@ export async function getFilesystemEntries(): Promise<FilesystemEntry[]> {
     }
   }
 
-  await readEntriesRecursively(SNIPPETS_DIR, null)
+  await readEntriesRecursively(baseDir, null)
   return entries
 }
 
-export const getSnippet = async (snippetId: string) => {
-  const entries = await getFilesystemEntries()
+export const getSnippet = async (ref: string, snippetId: string) => {
+  const entries = await getFilesystemEntries(ref)
   const foundSnippet = entries.find((e) => e.type === 'file' && e.id === snippetId)
 
   if (!foundSnippet) {
@@ -251,21 +260,24 @@ export const getSnippet = async (snippetId: string) => {
 /**
  * Gets a filtered paginated list of snippets based on the provided criteria
  */
-export const getSnippets = async ({
-  searchTerm,
-  limit,
-  cursor,
-  sort,
-  sortOrder,
-  folderId,
-}: {
-  searchTerm?: string
-  limit?: number
-  cursor?: string
-  sortOrder?: 'asc' | 'desc'
-  sort?: 'name' | 'inserted_at'
-  folderId?: string | null
-}): Promise<{ cursor: string | undefined; snippets: Snippet[] }> => {
+export const getSnippets = async (
+  ref: string,
+  {
+    searchTerm,
+    limit,
+    cursor,
+    sort,
+    sortOrder,
+    folderId,
+  }: {
+    searchTerm?: string
+    limit?: number
+    cursor?: string
+    sortOrder?: 'asc' | 'desc'
+    sort?: 'name' | 'inserted_at'
+    folderId?: string | null
+  }
+): Promise<{ cursor: string | undefined; snippets: Snippet[] }> => {
   // Normalize and set default values
   const normalizedSearchTerm = searchTerm?.trim() ?? ''
   const normalizedLimit = limit ?? 100
@@ -282,7 +294,7 @@ export const getSnippets = async ({
     throw new Error('Limit cannot exceed 1000')
   }
 
-  const entries = await getFilesystemEntries()
+  const entries = await getFilesystemEntries(ref)
   const files = entries.filter(
     (entry): entry is FilesystemEntry & { type: 'file'; content: string } =>
       entry.type === 'file' && entry.content !== undefined && entry.content !== null
@@ -342,8 +354,9 @@ export const getSnippets = async ({
 /**
  * Saves a snippet to the filesystem
  */
-export async function saveSnippet(snippet: Snippet): Promise<Snippet> {
-  const entries = await getFilesystemEntries()
+export async function saveSnippet(ref: string, snippet: Snippet): Promise<Snippet> {
+  const baseDir = snippetsDir(ref)
+  const entries = await getFilesystemEntries(ref)
   const existingSnippet = entries.find((entry) => entry.id === snippet.id && entry.type === 'file')
 
   if (existingSnippet) {
@@ -371,7 +384,7 @@ export async function saveSnippet(snippet: Snippet): Promise<Snippet> {
   const folderId = snippet.folder_id || null
   const folder = entries.find((f) => f.id === folderId && f.type === 'folder')
 
-  const folderPath = folder ? path.join(SNIPPETS_DIR, folder.name) : SNIPPETS_DIR
+  const folderPath = folder ? path.join(baseDir, folder.name) : baseDir
   const filePath = path.join(folderPath, `${snippetName}.${isSql ? 'sql' : 'json'}`)
   await fs.writeFile(filePath, content || '', 'utf-8')
   const stats = await fs.stat(filePath)
@@ -389,8 +402,9 @@ export async function saveSnippet(snippet: Snippet): Promise<Snippet> {
 /**
  * Deletes a snippet from the filesystem
  */
-export async function deleteSnippet(id: string): Promise<void> {
-  const entries = await getFilesystemEntries()
+export async function deleteSnippet(ref: string, id: string): Promise<void> {
+  const baseDir = snippetsDir(ref)
+  const entries = await getFilesystemEntries(ref)
   const found = entries.find((entry) => entry.id === id && entry.type === 'file')
 
   if (!found) {
@@ -399,7 +413,7 @@ export async function deleteSnippet(id: string): Promise<void> {
 
   const filename = `${found.name}.${found.format === 'json' ? 'json' : 'sql'}`
   const currentFolder = entries.find((f) => f.id === found.folderId && f.type === 'folder')
-  const paths = compact([SNIPPETS_DIR, currentFolder?.name, filename])
+  const paths = compact([baseDir, currentFolder?.name, filename])
   const filePath = path.join(...paths)
 
   try {
@@ -414,8 +428,12 @@ export async function deleteSnippet(id: string): Promise<void> {
 /**
  * Updates a snippet in the filesystem. It also handles renaming and moving.
  */
-export async function updateSnippet(id: string, updates: DeepPartial<Snippet>): Promise<Snippet> {
-  const entries = await getFilesystemEntries()
+export async function updateSnippet(
+  ref: string,
+  id: string,
+  updates: DeepPartial<Snippet>
+): Promise<Snippet> {
+  const entries = await getFilesystemEntries(ref)
   const foundSnippet = entries
     .filter(
       (entry): entry is FilesystemEntry & { type: 'file'; content: string } => entry.type === 'file'
@@ -450,9 +468,9 @@ export async function updateSnippet(id: string, updates: DeepPartial<Snippet>): 
   )
 
   // it's easier to delete the old file first and then recreate a new one
-  await deleteSnippet(snippet.id)
+  await deleteSnippet(ref, snippet.id)
 
-  const updatedSnippet = await saveSnippet({
+  const updatedSnippet = await saveSnippet(ref, {
     name: updates.name ?? snippet.name,
     // [console fork] preserve the snippet type so reports/log_sql round-trip
     type: (updates.type ?? snippet.type) as Snippet['type'],
@@ -465,8 +483,11 @@ export async function updateSnippet(id: string, updates: DeepPartial<Snippet>): 
   return updatedSnippet
 }
 
-export const getFolders = async (folderId: string | null = null): Promise<Folder[]> => {
-  const entries = await getFilesystemEntries()
+export const getFolders = async (
+  ref: string,
+  folderId: string | null = null
+): Promise<Folder[]> => {
+  const entries = await getFilesystemEntries(ref)
   const folders = entries
     .filter(
       (entry): entry is FilesystemEntry & { type: 'folder' } =>
@@ -479,17 +500,18 @@ export const getFolders = async (folderId: string | null = null): Promise<Folder
 /**
  * Creates a new folder as an actual directory
  */
-export async function createFolder(_folderName: string): Promise<Folder> {
+export async function createFolder(ref: string, _folderName: string): Promise<Folder> {
+  const baseDir = snippetsDir(ref)
   const folderName = sanitizeName(_folderName)
 
-  const entries = await getFilesystemEntries()
+  const entries = await getFilesystemEntries(ref)
   const existingFolder = entries.find((folder) => folder.name === folderName)
 
   if (existingFolder) {
     throw new Error(`Folder with name ${folderName} already exists`)
   }
 
-  const folderPath = path.join(SNIPPETS_DIR, folderName)
+  const folderPath = path.join(baseDir, folderName)
 
   await fs.mkdir(folderPath, { recursive: true })
   const newFolder = buildFolder(folderName)
@@ -501,15 +523,16 @@ export async function createFolder(_folderName: string): Promise<Folder> {
  * Deletes a folder directory from the filesystem
  * @throws {Error} If the folder doesn't exist
  */
-export async function deleteFolder(id: string): Promise<void> {
-  const entries = await getFilesystemEntries()
+export async function deleteFolder(ref: string, id: string): Promise<void> {
+  const baseDir = snippetsDir(ref)
+  const entries = await getFilesystemEntries(ref)
   const folder = entries.find((f) => f.id === id && f.type === 'folder')
 
   if (!folder) {
     throw new Error(`Folder with id ${id} not found`)
   }
 
-  const folderPath = path.join(SNIPPETS_DIR, folder.name)
+  const folderPath = path.join(baseDir, folder.name)
   try {
     await fs.rm(folderPath, { recursive: true, force: true })
   } catch (error) {

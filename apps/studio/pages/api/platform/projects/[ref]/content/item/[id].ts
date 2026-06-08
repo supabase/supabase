@@ -19,7 +19,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    const snippet = await getSnippet(req.query.id as string)
+    const snippet = await getSnippet(String(req.query.ref ?? ''), req.query.id as string)
 
     return res.status(200).json(snippet)
   } catch (error) {
