@@ -42,7 +42,7 @@ export default {
 
       return Response.json({ counters })
     } catch (error) {
-      return Response.json({ error: error.message })
+      return Response.json({ error: error.message }, { status: 500 })
     }
   }),
 }

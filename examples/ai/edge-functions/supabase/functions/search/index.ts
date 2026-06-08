@@ -4,9 +4,9 @@ import { withSupabase } from 'npm:@supabase/server@^1'
 
 const model = new Supabase.ai.Session('gte-small')
 
-// Deploy with verify_jwt = false.
+// Called with a publishable key on the `apikey` header. Deploy with verify_jwt = false.
 export default {
-  fetch: withSupabase({ auth: 'secret' }, async (req, ctx) => {
+  fetch: withSupabase({ auth: 'publishable' }, async (req, ctx) => {
     const { search } = await req.json()
     if (!search) return new Response('Please provide a search param!')
     // Generate embedding for search term.
@@ -38,7 +38,7 @@ export default {
   3. Make an HTTP request:
 
   curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/search' \
-    --header 'apikey: <SUPABASE_SECRET_KEY>' \
+    --header 'apikey: <SUPABASE_PUBLISHABLE_KEY>' \
     --header 'Content-Type: application/json' \
     --data '{"search":"vehicles"}'
 

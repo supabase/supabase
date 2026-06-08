@@ -7,9 +7,9 @@ import { decode } from 'npm:base64-arraybuffer'
 
 console.log('Hello from Amazon Bedrock!')
 
-// Deploy with verify_jwt = false.
+// Called with a publishable key on the `apikey` header. Deploy with verify_jwt = false.
 export default {
-  fetch: withSupabase({ auth: 'secret' }, async (req, ctx) => {
+  fetch: withSupabase({ auth: 'publishable' }, async (req, ctx) => {
     prepareVirtualFile('./aws/config')
     prepareVirtualFile('./aws/credentials')
 
@@ -80,7 +80,7 @@ export default {
   3. Make an HTTP request:
 
   curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/image_gen' \
-    --header 'apikey: <SUPABASE_SECRET_KEY>' \
+    --header 'apikey: <SUPABASE_PUBLISHABLE_KEY>' \
     --header 'Content-Type: application/json' \
     --data '{"prompt":"A beautiful picture of a bird"}'
 */

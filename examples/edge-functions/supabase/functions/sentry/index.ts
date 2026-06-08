@@ -19,9 +19,9 @@ Sentry.init({
 Sentry.setTag('region', Deno.env.get('SB_REGION'))
 Sentry.setTag('execution_id', Deno.env.get('SB_EXECUTION_ID'))
 
-// Deploy with verify_jwt = false.
+// Public challenge endpoint, so deploy with verify_jwt = false.
 export default {
-  fetch: withSupabase({ auth: 'secret' }, async (req, ctx) => {
+  fetch: withSupabase({ auth: 'none' }, async (req, ctx) => {
     try {
       if (req.method === 'GET') {
         return new Response(
@@ -67,7 +67,7 @@ export default {
   2. Make an HTTP request:
 
   curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/sentry' \
-    --header 'apikey: <SUPABASE_SECRET_KEY>' \
+    --header 'apikey: <SUPABASE_PUBLISHABLE_KEY>' \
     --header 'Content-Type: application/json' \
     --data '{"answer":"mysql", "twitter":"thorwebdev"}'
 

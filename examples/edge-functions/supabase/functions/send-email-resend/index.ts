@@ -2,9 +2,9 @@ import { withSupabase } from 'npm:@supabase/server@^1'
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
 
-// Public endpoint, so deploy with verify_jwt = false.
+// Accepts a signed-in user's JWT or a secret key, so deploy with verify_jwt = false.
 export default {
-  fetch: withSupabase({ auth: 'none' }, async (req, ctx) => {
+  fetch: withSupabase({ auth: ['user', 'secret'] }, async (req, ctx) => {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {

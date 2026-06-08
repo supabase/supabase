@@ -8,7 +8,7 @@ import { handler } from './handler.tsx'
 
 console.log(`Function "og-image-with-storage-cdn" up and running!`)
 
-// Deploy with verify_jwt = false.
+// Public image endpoint, so deploy with verify_jwt = false.
 export default {
-  fetch: withSupabase({ auth: 'secret' }, handler),
+  fetch: withSupabase({ auth: 'none' }, handler),
 }

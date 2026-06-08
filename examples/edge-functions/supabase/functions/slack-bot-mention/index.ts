@@ -10,6 +10,8 @@ console.log(`Slack URL verification function up and running!`)
 export default {
   fetch: withSupabase({ auth: 'none' }, async (req, ctx) => {
     try {
+      // Implement your Slack request signature verification here before trusting the payload
+      // (validate `x-slack-signature` / `x-slack-request-timestamp` with your signing secret).
       const { token, challenge, type, event } = await req.json()
 
       if (type == 'url_verification') {

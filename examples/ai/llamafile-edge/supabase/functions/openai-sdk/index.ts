@@ -8,9 +8,9 @@ import { withSupabase } from 'npm:@supabase/server@^1'
 
 console.log('Hello from openai-sdk compatible!')
 
-// Public endpoint, so deploy with verify_jwt = false.
+// Called with a publishable key on the `apikey` header. Deploy with verify_jwt = false.
 export default {
-  fetch: withSupabase({ auth: 'none' }, async (req) => {
+  fetch: withSupabase({ auth: 'publishable' }, async (req) => {
     const client = new OpenAI()
     const { prompt } = await req.json()
     const stream = true
@@ -71,6 +71,7 @@ export default {
   supabase functions serve --env-file supabase/functions/.env
 
   curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/openai-sdk' \
+    --header 'apikey: <SUPABASE_PUBLISHABLE_KEY>' \
     --header 'Content-Type: application/json' \
     --data '{"prompt":"Who are you?"}'
 
