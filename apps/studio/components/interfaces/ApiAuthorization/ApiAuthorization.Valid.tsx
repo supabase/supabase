@@ -15,9 +15,7 @@ import {
 } from './ApiAuthorization.Schema'
 import { useApiAuthorizationApproveMutation } from '@/data/api-authorization/api-authorization-approve-mutation'
 import { useApiAuthorizationDeclineMutation } from '@/data/api-authorization/api-authorization-decline-mutation'
-import {
-  useApiAuthorizationQuery,
-} from '@/data/api-authorization/api-authorization-query'
+import { useApiAuthorizationQuery } from '@/data/api-authorization/api-authorization-query'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import type { Organization } from '@/types'
