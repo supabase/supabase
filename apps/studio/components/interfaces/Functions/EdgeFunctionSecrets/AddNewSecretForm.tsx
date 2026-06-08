@@ -17,6 +17,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  Textarea,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import z from 'zod'
@@ -235,25 +236,30 @@ export const AddNewSecretForm = () => {
                       <FormItem className="w-full relative">
                         <FormLabel>Value</FormLabel>
                         <FormControl>
-                          <Input
-                            {...field}
-                            textarea
-                            type={isSecretVisible(fieldItem.id) ? 'text' : 'password'}
-                            data-1p-ignore
-                            data-lpignore="true"
-                            data-form-type="other"
-                            data-bwignore
-                            actions={
-                              <div className="mr-1">
-                                <Button
-                                  type="text"
-                                  className="px-1"
-                                  icon={isSecretVisible(fieldItem.id) ? <EyeOff /> : <Eye />}
-                                  onClick={() => handleToggleSecretVisibility(fieldItem.id)}
-                                />
-                              </div>
-                            }
-                          />
+                          <div className="relative">
+                            <Textarea
+                              {...field}
+                              rows={1}
+                              data-1p-ignore
+                              data-lpignore="true"
+                              data-form-type="other"
+                              data-bwignore
+                              className="min-h-0 resize-none"
+                              style={
+                                {
+                                  WebkitTextSecurity: isSecretVisible(fieldItem.id)
+                                    ? undefined
+                                    : 'disc',
+                                } as React.CSSProperties
+                              }
+                            />
+                            <Button
+                              type="text"
+                              className="absolute right-1 top-1 px-1"
+                              icon={isSecretVisible(fieldItem.id) ? <EyeOff /> : <Eye />}
+                              onClick={() => handleToggleSecretVisibility(fieldItem.id)}
+                            />
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
