@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        config: [default, envoy, s3]
+        config: [default, logs, envoy, rustfs, envoy-rustfs]
 
     steps:
       - uses: actions/checkout@v4
@@ -49,10 +49,14 @@ jobs:
           set -euo pipefail
           cd docker
           yq -i '.services.supavisor.environment.RLIMIT_NOFILE=1024' docker-compose.yml
-          if [ "${{ matrix.config }}" = "envoy" ]; then
+          if [ "${{ matrix.config }}" = "logs" ]; then
+            docker compose -f docker-compose.yml -f docker-compose.logs.yml up --quiet-pull --wait --wait-timeout 180
+          elif [ "${{ matrix.config }}" = "envoy" ]; then
             docker compose -f docker-compose.yml -f docker-compose.envoy.yml up --quiet-pull --wait --wait-timeout 180
-          elif [ "${{ matrix.config }}" = "s3" ]; then
-            docker compose -f docker-compose.yml -f docker-compose.s3.yml up --quiet-pull --wait --wait-timeout 180
+          elif [ "${{ matrix.config }}" = "rustfs" ]; then
+            docker compose -f docker-compose.yml -f docker-compose.rustfs.yml up --quiet-pull --wait --wait-timeout 180
+          elif [ "${{ matrix.config }}" = "envoy-rustfs" ]; then
+            docker compose -f docker-compose.yml -f docker-compose.envoy.yml -f docker-compose.rustfs.yml up --quiet-pull --wait --wait-timeout 180
           else
             docker compose up --quiet-pull --wait --wait-timeout 180
           fi
