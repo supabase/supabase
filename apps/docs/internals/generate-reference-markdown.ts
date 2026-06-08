@@ -4,7 +4,7 @@ import matter from 'gray-matter'
 import yaml from 'js-yaml'
 
 const GENERATED = path.join(process.cwd(), 'features/docs/generated')
-const OUT_DIR = path.join(process.cwd(), 'public/docs/reference')
+const OUT_DIR = path.join(process.cwd(), 'public/markdown/reference')
 const MDX_ROOT = path.join(process.cwd(), 'docs/ref')
 
 type Section = {
@@ -87,7 +87,7 @@ const REFERENCES: Ref[] = [
   {
     kind: 'sdk-new',
     title: 'JavaScript Client Library Reference',
-    outFile: 'javascript.md',
+    outFile: 'js.md',
     mdxDir: path.join(MDX_ROOT, 'javascript'),
     contentDir: path.join(process.cwd(), 'content/reference/javascript/v2'),
   },
@@ -415,7 +415,7 @@ async function generate() {
     })
   )
 
-  console.log(`Generated ${REFERENCES.length} markdown files under public/docs/reference/`)
+  console.log(`Generated ${REFERENCES.length} markdown files under public/markdown/reference/`)
 }
 
 generate()

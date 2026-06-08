@@ -6,7 +6,6 @@
   "scripts": {
     "build": "next build",
     "build:analyze": "ANALYZE=true next build",
-    "build:llms": "tsx --conditions=react-server ./scripts/llms.ts",
     "build:guides-markdown": "tsx ./internals/generate-guides-markdown.ts",
     "prebuild:reference-markdown": "pnpm run codegen:references",
     "build:reference-markdown": "tsx ./internals/generate-reference-markdown.ts",
@@ -32,8 +31,8 @@
     "last-changed:reset": "pnpm run last-changed -- --reset",
     "lint": "eslint .",
     "lint:mdx": "supa-mdx-lint content --config ../../supa-mdx-lint.config.toml",
-    "postbuild": "pnpm run build:sitemap && pnpm run build:llms && ./../../scripts/upload-static-assets.sh",
-    "prebuild": "pnpm run codegen:graphql && pnpm run codegen:references && pnpm run codegen:examples && pnpm run build:guides-markdown && pnpm run build:gz-archive",
+    "postbuild": "pnpm run build:sitemap && ./../../scripts/upload-static-assets.sh",
+    "prebuild": "pnpm run codegen:graphql && pnpm run codegen:references && pnpm run codegen:examples && pnpm run build:markdown && pnpm run build:gz-archive",
     "predev": "pnpm run codegen:graphql && pnpm run codegen:references && pnpm run codegen:examples",
     "preembeddings": "pnpm run codegen:references",
     "preinstall": "npx only-allow pnpm",
