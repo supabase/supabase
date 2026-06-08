@@ -14,7 +14,7 @@ import {
   TableRow,
 } from 'ui'
 
-import { getDatabaseTriggersHref, getFilteredFunctions } from './FunctionList.utils'
+import { getDatabaseTriggersHref } from './FunctionList.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type { DatabaseFunction } from '@/data/database-functions/database-functions-query'
@@ -27,8 +27,6 @@ interface FunctionListProps {
   schema: string
   filterString: string
   isLocked: boolean
-  returnTypeFilter: string[]
-  securityFilter: string[]
   duplicateFunction: (fn: any) => void
   editFunction: (fn: any) => void
   deleteFunction: (fn: any) => void
@@ -39,8 +37,6 @@ const FunctionList = ({
   schema,
   filterString,
   isLocked,
-  returnTypeFilter,
-  securityFilter,
   duplicateFunction = noop,
   editFunction = noop,
   deleteFunction = noop,
@@ -51,20 +47,13 @@ const FunctionList = ({
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
 
-  const _functions = getFilteredFunctions({
-    functions,
-    schema,
-    filterString,
-    returnTypeFilter,
-    securityFilter,
-  })
   const projectRef = selectedProject?.ref
   const { can: canUpdateFunctions } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'functions'
   )
 
-  if (_functions.length === 0 && filterString.length === 0) {
+  if (functions.length === 0 && filterString.length === 0) {
     return (
       <TableRow key={schema}>
         <TableCell colSpan={5}>
@@ -77,7 +66,7 @@ const FunctionList = ({
     )
   }
 
-  if (_functions.length === 0 && filterString.length > 0) {
+  if (functions.length === 0 && filterString.length > 0) {
     return (
       <TableRow key={schema}>
         <TableCell colSpan={5}>
@@ -92,7 +81,7 @@ const FunctionList = ({
 
   return (
     <>
-      {_functions.map((x) => {
+      {functions.map((x) => {
         const isApiDocumentAvailable = schema == 'public' && x.return_type !== 'trigger'
 
         return (
