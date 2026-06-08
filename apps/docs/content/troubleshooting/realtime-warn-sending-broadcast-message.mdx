@@ -36,7 +36,11 @@ Partitions are created in three occasions:
 
 Each of these creates a rolling window of partitions: yesterday, today, and the next three days.
 
-Note what is _not_ in that list: calling `realtime.send` / `realtime.send_binary`, the broadcast REST endpoint, and subscribe or replication operations do not create partitions. So a project that has never had a WebSocket client connect, and whose health check and janitor have not yet run for the day, has no partition to insert into. Broadcasting from the database before that point produces the warning.
+<Admonition type="note" title="What's not included">
+
+Calling `realtime.send` / `realtime.send_binary`, the broadcast REST endpoint, and subscribe or replication operations do not create partitions. So a project that has never had a WebSocket client connect, and whose health check and janitor have not yet run for the day, has no partition to insert into. Broadcasting from the database before that point produces the warning.
+
+</Admonition>
 
 ## How to avoid it
 
