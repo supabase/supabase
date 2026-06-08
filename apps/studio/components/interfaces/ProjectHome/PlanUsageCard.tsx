@@ -1,4 +1,4 @@
-import { ArrowRight, ChevronRight } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { cn } from 'ui'
 
@@ -121,29 +121,6 @@ const ProgressRing = ({
   )
 }
 
-const MetricRow = ({ usageItem, config }: { usageItem: OrgMetricsUsage; config: MetricConfig }) => {
-  const current = usageItem.usage ?? 0
-  const limit = usageItem.pricing_free_units ?? 0
-  const ratio = limit > 0 ? current / limit : 0
-  const isOver = limit > 0 && current >= limit
-  const isApproaching = limit > 0 && ratio >= 0.8 && !isOver
-
-  return (
-    <div className="flex items-center justify-between gap-3 px-3 py-2">
-      <div className="flex items-center gap-2 min-w-0">
-        <ProgressRing ratio={ratio} isOver={isOver} isApproaching={isApproaching} />
-        <span className="text-sm text-foreground truncate">{config.label}</span>
-      </div>
-      <span className="text-xs font-mono tabular-nums whitespace-nowrap">
-        <span className={cn(isOver ? 'text-warning' : 'text-foreground-light')}>
-          {formatValue(current, config.unit)}
-        </span>
-        <span className="text-foreground-lighter"> / {formatLimit(limit, config.unit)}</span>
-      </span>
-    </div>
-  )
-}
-
 type PlanUsageCardPlacement = 'home_usage_card' | 'org_projects_list'
 
 interface PlanUsageCardProps {
@@ -163,10 +140,14 @@ const CompactMetricRow = ({
   usageItem,
   config,
   orgSlug,
+  paddingClassName = 'px-4',
 }: {
   usageItem: OrgMetricsUsage
   config: MetricConfig
   orgSlug: string
+  /** Horizontal padding for the row. Defaults to `px-4` (project list card); the embedded
+   * Primary Database node passes `px-3` to align with the node's other rows. */
+  paddingClassName?: string
 }) => {
   const current = usageItem.usage ?? 0
   const limit = usageItem.pricing_free_units ?? 0
@@ -177,7 +158,7 @@ const CompactMetricRow = ({
   return (
     <Link
       href={`/org/${orgSlug}/usage#${config.anchor}`}
-      className="group/row block px-4 hover:bg-surface-200 transition-colors"
+      className={cn('group/row block hover:bg-surface-200 transition-colors', paddingClassName)}
     >
       <div className="flex items-center justify-between gap-2 py-2 border-t border-dashed">
         <div className="flex items-center gap-2 min-w-0">
@@ -298,19 +279,18 @@ export const PlanUsageCard = ({ placement, asProjectCard = false }: PlanUsageCar
           Free plan &middot; Current billing cycle
         </span>
       </div>
-      <div className="flex flex-col divide-y border-t">
+      <div className="flex flex-col border-t [&>:first-child>*]:border-t-0">
         {visibleRows.map(({ config, usageItem }) => (
-          <MetricRow key={config.key} usageItem={usageItem} config={config} />
+          <CompactMetricRow
+            key={config.key}
+            usageItem={usageItem}
+            config={config}
+            orgSlug={organization?.slug ?? '_'}
+            paddingClassName="px-3"
+          />
         ))}
       </div>
-      <div className="flex items-center justify-between gap-2 px-3 py-2 border-t">
-        <Link
-          href={`/org/${organization?.slug ?? '_'}/usage`}
-          className="text-xs text-foreground-light hover:text-foreground inline-flex items-center gap-1"
-        >
-          View all usage
-          <ArrowRight size={11} strokeWidth={1.5} />
-        </Link>
+      <div className="flex items-center justify-end gap-2 px-3 py-2 border-t">
         <UpgradePlanButton
           source={placement}
           plan="Pro"
