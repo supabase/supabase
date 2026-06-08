@@ -126,6 +126,7 @@ vi.mock('../editors/EditorsLayout.hooks', () => ({
 }))
 
 vi.mock('../MainScrollContainerContext', () => ({
+  useMainScrollContainer: () => null,
   useSetMainScrollContainer: () => () => {},
 }))
 

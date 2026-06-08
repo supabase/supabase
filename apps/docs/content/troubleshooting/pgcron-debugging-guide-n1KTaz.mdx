@@ -58,7 +58,7 @@ If the query does not return a row, the worker has died. To revive it, you must 
 
 ### Check the `cron.job_run_details` table for more information
 
-pg_cron creates logs in its own table `cron.job_run_details"`. The below query checks for issues from the past 5 days :
+pg_cron creates logs in its own table `cron.job_run_details`. The below query checks for issues from the past 5 days :
 
 ```sql
 SELECT *
