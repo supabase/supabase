@@ -37,6 +37,7 @@ import { AuthorizeRequesterDetails } from '../AuthorizeRequesterDetails'
 import { OAuthSecrets } from '../OAuthSecrets/OAuthSecrets'
 import { ScopesPanel } from './Scopes'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { Shortcut } from '@/components/ui/Shortcut'
 import {
   OAuthAppCreateResponse,
   useOAuthAppCreateMutation,
@@ -46,6 +47,7 @@ import type { OAuthApp } from '@/data/oauth/oauth-apps-query'
 import { DOCS_URL } from '@/lib/constants'
 import { isValidHttpUrl, uuidv4 } from '@/lib/helpers'
 import { uploadAttachment } from '@/lib/upload'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export interface PublishAppSidePanelProps {
   visible: boolean
@@ -422,9 +424,16 @@ export const PublishAppSidePanel = ({
                   <Button type="default" disabled={isSubmitting} onClick={() => onClose()}>
                     Cancel
                   </Button>
-                  <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
-                    Confirm
-                  </Button>
+                  <Shortcut
+                    id={SHORTCUT_IDS.ORG_OAUTH_APPS_SUBMIT}
+                    onTrigger={() => form.handleSubmit(onSubmit)()}
+                    options={{ enabled: visible && !isSubmitting }}
+                    side="top"
+                  >
+                    <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
+                      Confirm
+                    </Button>
+                  </Shortcut>
                 </div>
               </div>
             </SidePanel.Content>

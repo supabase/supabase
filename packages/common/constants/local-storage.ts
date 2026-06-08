@@ -1,3 +1,5 @@
+import { safeLocalStorage } from '../safe-storage'
+
 export const LOCAL_STORAGE_KEYS = {
   /**
    * STUDIO
@@ -69,10 +71,9 @@ export const LOCAL_STORAGE_KEYS = {
   EXPAND_NAVIGATION_PANEL: 'supabase-expand-navigation-panel',
   GITHUB_AUTHORIZATION_STATE: 'supabase-github-authorization-state',
   // Notice banner keys
-  FLY_DEPRECATION_2026_05_31: 'fly-deprecation-2026-05-31-dismissed',
   API_KEYS_FEEDBACK_DISMISSED: (ref: string) => `supabase-api-keys-feedback-dismissed-${ref}`,
   TERMS_OF_SERVICE_UPDATE: 'terms-of-service-update-2026-06-06',
-  SUPAVISOR_MAINTENANCE: (ref: string) => `supavisor-maintenance-2026-05-21-${ref}`,
+  SUPAVISOR_MAINTENANCE: (ref: string) => `supavisor-maintenance-2026-06-09-${ref}`,
   REPORT_DATERANGE: 'supabase-report-daterange',
   PROJECT_PAUSING_STARTED_AT: (ref: string) => `supabase-project-pausing-started-at-${ref}`,
   PROJECT_RESTORING_STARTED_AT: (ref: string) => `supabase-project-restoring-started-at-${ref}`,
@@ -165,9 +166,9 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
 ]
 
 export function clearLocalStorage() {
-  for (const key in localStorage) {
+  for (const key of safeLocalStorage.keys()) {
     if (!LOCAL_STORAGE_KEYS_ALLOWLIST.includes(key)) {
-      localStorage.removeItem(key)
+      safeLocalStorage.removeItem(key)
     }
   }
 }

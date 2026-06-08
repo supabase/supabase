@@ -5,7 +5,7 @@ import { uniqBy } from 'lodash'
 
 import '@xyflow/react/dist/style.css'
 
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 
 import { TableNodeData } from './Schemas.constants'
 import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH } from './SchemaTableNode'
@@ -163,7 +163,7 @@ export async function getGraphDataFromTables(
     }
   }
 
-  const savedPositionsLocalStorage = localStorage.getItem(
+  const savedPositionsLocalStorage = safeLocalStorage.getItem(
     LOCAL_STORAGE_KEYS.SCHEMA_VISUALIZER_POSITIONS(ref ?? 'project', schema?.id ?? 0)
   )
   const savedPositions = tryParseJson(savedPositionsLocalStorage)

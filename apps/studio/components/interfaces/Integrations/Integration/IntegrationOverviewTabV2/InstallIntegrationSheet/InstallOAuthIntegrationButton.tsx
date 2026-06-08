@@ -3,11 +3,9 @@ import { useMemo } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
 
+import { isOAuthInstalled, useProjectOAuthIntegrationData } from '../../../Landing/Landing.utils'
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
-import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useInstallOAuthIntegrationMutation } from '@/data/marketplace/install-oauth-integration-mutation'
-import { useSecretsQuery } from '@/data/secrets/secrets-query'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface InstallOAuthIntegrationButtonProps {
   integration: IntegrationDefinition
@@ -15,24 +13,8 @@ interface InstallOAuthIntegrationButtonProps {
 
 export function InstallOAuthIntegrationButton({ integration }: InstallOAuthIntegrationButtonProps) {
   const { ref: projectRef } = useParams()
-  const { data: selectedOrg } = useSelectedOrganizationQuery()
 
-  const requiresApiKeysCheck =
-    integration.installIdentificationMethod === 'secret_key_prefix' && !!integration.secretKeyPrefix
-
-  const requiresEdgeFunctionSecretsCheck =
-    integration.installIdentificationMethod === 'edge_function_secret_name' &&
-    !!integration.edgeFunctionSecretName
-
-  const { data: apiKeys, isLoading: isApiKeysLoading } = useAPIKeysQuery(
-    { projectRef, reveal: false },
-    { enabled: requiresApiKeysCheck }
-  )
-
-  const { data: edgeFunctionSecrets, isPending: isEdgeFunctionSecretsLoading } = useSecretsQuery(
-    { projectRef },
-    { enabled: requiresEdgeFunctionSecretsCheck }
-  )
+  const { data, isLoading } = useProjectOAuthIntegrationData(projectRef)
 
   const { mutate: installOAuthIntegration, isPending: isInstalling } =
     useInstallOAuthIntegrationMutation({
@@ -49,46 +31,17 @@ export function InstallOAuthIntegrationButton({ integration }: InstallOAuthInteg
       },
     })
 
-  const isLoading =
-    (requiresApiKeysCheck && isApiKeysLoading) ||
-    (requiresEdgeFunctionSecretsCheck && isEdgeFunctionSecretsLoading)
-
   const isIntegrationInstalled = useMemo(() => {
     if (!integration) return false
 
-    if (integration.installIdentificationMethod === 'secret_key_prefix') {
-      const prefix = integration.secretKeyPrefix
-      if (!prefix || isApiKeysLoading || !apiKeys) return false
-      return apiKeys.some((k) => k.type === 'secret' && k.name.startsWith(prefix))
-    }
-
-    if (integration.installIdentificationMethod === 'edge_function_secret_name') {
-      const secretName = integration.edgeFunctionSecretName
-      if (!secretName || isEdgeFunctionSecretsLoading || !edgeFunctionSecrets) return false
-      return edgeFunctionSecrets.some((secret) => secret.name === secretName)
-    }
-
-    return false
-  }, [apiKeys, edgeFunctionSecrets, integration, isApiKeysLoading, isEdgeFunctionSecretsLoading])
+    return isOAuthInstalled({ integration, projectData: data })
+  }, [data, integration])
 
   const handleInstallClick = async () => {
     if (!integration || !projectRef) return
+    if (!integration.id) return toast.error('Listing ID is required')
 
-    if (integration.installUrlType === 'post') {
-      if (!integration.id) return toast.error('Listing ID is required')
-      installOAuthIntegration({ projectRef, listingSlug: integration.id })
-    } else {
-      let redirectUrl = '/'
-
-      if (integration.installUrl) {
-        const url = new URL(integration.installUrl)
-        url.searchParams.append('organization_slug', selectedOrg?.slug ?? '')
-        url.searchParams.append('project_id', projectRef)
-        redirectUrl = url.href
-      }
-
-      window.open(redirectUrl, '_blank', 'noreferrer')
-    }
+    installOAuthIntegration({ projectRef, listingSlug: integration.id })
   }
 
   return (

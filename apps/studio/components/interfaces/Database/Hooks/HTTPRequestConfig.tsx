@@ -144,12 +144,7 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
             >
               <FormControl>
                 <div className="relative">
-                  <Input
-                    {...field}
-                    type="number"
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                    className="pr-10"
-                  />
+                  <Input {...field} type="number" className="pr-10" />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground-light text-sm">
                     ms
                   </span>

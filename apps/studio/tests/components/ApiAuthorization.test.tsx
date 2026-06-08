@@ -1,5 +1,6 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { platformComponents as components } from 'api-types'
 import dayjs from 'dayjs'
 import { HttpResponse } from 'msw'
 import { describe, expect, test, vi } from 'vitest'
@@ -10,10 +11,14 @@ import {
 } from '@/components/interfaces/ApiAuthorization/ApiAuthorization'
 import type { ApiAuthorizationResponse } from '@/data/api-authorization/api-authorization-query'
 import type { ProfileContextType } from '@/lib/profile'
-import { createMockOrganization } from '@/tests/helpers'
+import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
-import type { Organization } from '@/types'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+
+type OrganizationResponse = components['schemas']['OrganizationResponse']
+type GetOAuthAuthorizationResponse = components['schemas']['GetOAuthAuthorizationResponse']
+type ApproveAuthorizationResponse = components['schemas']['ApproveAuthorizationResponse']
+type DeclineAuthorizationResponse = components['schemas']['DeclineAuthorizationResponse']
 
 // --- Fixtures ---
 
@@ -54,8 +59,12 @@ function createMockAuthResponse(
   }
 }
 
-const DEFAULT_ORG = createMockOrganization({ name: 'My Org', slug: 'my-org' })
-const SECOND_ORG = createMockOrganization({ id: 2, name: 'Second Org', slug: 'second-org' })
+const DEFAULT_ORG = createMockOrganizationResponse({ name: 'My Org', slug: 'my-org' })
+const SECOND_ORG = createMockOrganizationResponse({
+  id: 2,
+  name: 'Second Org',
+  slug: 'second-org',
+})
 
 // --- MSW helpers ---
 
@@ -66,21 +75,28 @@ function mockAuthEndpoint(authResponse: ApiAuthorizationResponse) {
   addAPIMock({
     method: 'get',
     path: '/platform/oauth/authorizations/:id',
-    response: () => HttpResponse.json(authResponse),
+    // The frontend `ApiAuthorizationResponse` widens the OpenAPI shape
+    // (looser `registration_type`, nullable `icon`/`approved_at`), and the
+    // query layer casts via `data as ApiAuthorizationResponse`. Cast here to
+    // satisfy the network-boundary contract.
+    response: () =>
+      HttpResponse.json<GetOAuthAuthorizationResponse>(
+        authResponse as unknown as GetOAuthAuthorizationResponse
+      ),
   })
 }
 
-function mockOrgsEndpoint(orgs: Array<Organization> = [DEFAULT_ORG]) {
+function mockOrgsEndpoint(orgs: OrganizationResponse[] = [DEFAULT_ORG]) {
   addAPIMock({
     method: 'get',
     path: '/platform/organizations',
-    response: () => HttpResponse.json(orgs),
+    response: () => HttpResponse.json<OrganizationResponse[]>(orgs),
   })
 }
 
 function mockBothEndpoints(
   authResponse: ApiAuthorizationResponse = createMockAuthResponse(),
-  orgs: Array<Organization> = [DEFAULT_ORG]
+  orgs: OrganizationResponse[] = [DEFAULT_ORG]
 ) {
   mockAuthEndpoint(authResponse)
   mockOrgsEndpoint(orgs)
@@ -119,7 +135,7 @@ describe('ApiAuthorizationScreen', () => {
       addAPIMock({
         method: 'get',
         path: '/platform/oauth/authorizations/:id',
-        response: () => new Promise(() => {}),
+        response: () => new Promise<never>(() => {}),
       })
       const { container } = renderScreen()
       expect(screen.getByText('Loading...')).toBeInTheDocument()
@@ -131,7 +147,7 @@ describe('ApiAuthorizationScreen', () => {
       addAPIMock({
         method: 'get',
         path: '/platform/oauth/authorizations/:id',
-        response: () => HttpResponse.json({ message: 'Not found' }, { status: 404 }),
+        response: () => HttpResponse.json<APIErrorBody>({ message: 'Not found' }, { status: 404 }),
       })
       renderScreen()
       await screen.findByText('Unable to load authorization')
@@ -170,7 +186,7 @@ describe('ApiAuthorizationScreen', () => {
           addAPIMock({
             method: 'get',
             path: '/platform/organizations',
-            response: () => new Promise(() => {}),
+            response: () => new Promise<never>(() => {}),
           })
           renderScreen()
           await screen.findByText('Authorize API access for Test App')
@@ -185,7 +201,8 @@ describe('ApiAuthorizationScreen', () => {
           addAPIMock({
             method: 'get',
             path: '/platform/organizations',
-            response: () => HttpResponse.json({ message: 'Server error' }, { status: 500 }),
+            response: () =>
+              HttpResponse.json<APIErrorBody>({ message: 'Server error' }, { status: 500 }),
           })
           renderScreen()
           await screen.findByText('Unable to load organizations')
@@ -268,7 +285,9 @@ describe('ApiAuthorizationScreen', () => {
         test('calls approve endpoint when Authorize button is clicked', async () => {
           const user = userEvent.setup()
           const approveHandler = vi.fn(() =>
-            HttpResponse.json({ url: 'https://redirect.example.com' })
+            HttpResponse.json<ApproveAuthorizationResponse>({
+              url: 'https://redirect.example.com',
+            })
           )
           mockBothEndpoints()
           addAPIMock({
@@ -286,7 +305,9 @@ describe('ApiAuthorizationScreen', () => {
       describe('decline action', () => {
         test('navigates to /organizations after cancelling', async () => {
           const user = userEvent.setup()
-          const declineHandler = vi.fn(() => HttpResponse.json({ id: 'test-auth-id' }))
+          const declineHandler = vi.fn(() =>
+            HttpResponse.json<DeclineAuthorizationResponse>({ id: 'test-auth-id' })
+          )
           mockBothEndpoints()
           addAPIMock({
             method: 'delete',

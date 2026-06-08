@@ -1,10 +1,7 @@
 name: 'Pull Request Labeler'
 
-# only docs uses the labeler at the moment
 on:
   pull_request_target:
-    paths:
-      - 'apps/docs/**/*'
 
 jobs:
   labeler:
@@ -13,4 +10,17 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/labeler@634933edcd8ababfe52f92936142cc22ac488b1b # v6.0.1
+      - id: label
+        uses: actions/labeler@634933edcd8ababfe52f92936142cc22ac488b1b # v6.0.1
+
+      - name: Comment when api-deploy-required is auto-applied
+        if: contains(steps.label.outputs.new-labels, 'api-deploy-required')
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: 'The `api-deploy-required` label was auto-applied to this PR because it updates the API types. Ensure that the new or updated API, if any, is deployed on production before **removing the label** and merging this PR.',
+            })
