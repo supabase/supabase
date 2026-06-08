@@ -1,8 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useRouter } from 'next/router'
-import { HTMLProps, ReactNode, useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Sheet, SheetContent } from 'ui'
 
 import { AddWrapperButton } from './AddWrapperButton'
@@ -21,7 +20,6 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const WrappersTab = () => {
   const { id } = useParams()
-  const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
 
   const [isCreating, setIsCreating] = useQueryState(
@@ -34,17 +32,7 @@ export const WrappersTab = () => {
     'wrappers'
   )
 
-  useEffect(() => {
-    if (router.query.action === 'new' && canCreateWrapper) {
-      setCreateWrapperShown(true)
-      const { action: _, ...remainingQuery } = router.query
-      router.replace({ pathname: router.pathname, query: remainingQuery }, undefined, {
-        shallow: true,
-      })
-    }
-  }, [router.query.action, canCreateWrapper])
-
-  useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, () => setCreateWrapperShown(true), {
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, () => setIsCreating(true), {
     label: 'Add new wrapper',
     enabled: canCreateWrapper,
   })
@@ -82,30 +70,18 @@ export const WrappersTab = () => {
             <p className="text-sm text-foreground-light">
               No {wrapperMeta.label} wrappers have been installed
             </p>
-            <AddWrapperButton onClick={() => setCreateWrapperShown(true)} />
+            <AddWrapperButton onClick={() => setIsCreating(true)} />
           </div>
         </div>
       ) : (
-        <div className="max-w-5xl flex items-center gap-x-2 justify-end mb-4">
-          <DocsButton href={wrapperMeta.docsUrl} />
-          <ButtonTooltip
-            type="primary"
-            onClick={() => setIsCreating(true)}
-            disabled={!canCreateWrapper}
-            tooltip={{
-              content: {
-                text: !canCreateWrapper
-                  ? 'You need additional permissions to create a foreign data wrapper'
-                  : undefined,
-              },
-            }}
-          >
-            Add new wrapper
-          </ButtonTooltip>
-        </div>
+        <>
+          <div className="max-w-5xl flex items-center gap-x-2 justify-end mb-4">
+            <DocsButton href={wrapperMeta.docsUrl} />
+            <AddWrapperButton type="primary" onClick={() => setIsCreating(true)} />
+          </div>
+          <WrapperTable />
+        </>
       )}
-
-      {createdWrappers.length > 0 && <WrapperTable />}
 
       <Sheet open={!!isCreating} onOpenChange={handleOpenChange}>
         <SheetContent size="lg" tabIndex={undefined}>
@@ -123,13 +99,6 @@ export const WrappersTab = () => {
         </SheetContent>
       </Sheet>
 
-  return (
-    <Container>
-      <div className="max-w-5xl flex items-center gap-x-2 justify-end mb-4">
-        <DocsButton href={wrapperMeta.docsUrl} />
-        <AddWrapperButton type="primary" onClick={() => setCreateWrapperShown(true)} />
-      </div>
-      <WrapperTable />
       <DiscardChangesConfirmationDialog {...modalProps} />
     </div>
   )

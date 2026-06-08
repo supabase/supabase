@@ -85,7 +85,7 @@ export const MarketplaceDetail = () => {
       return (
         <AddWrapperButton
           onClick={() => {
-            if (wrappersTabHref) router.push(`${wrappersTabHref}?action=new`)
+            if (wrappersTabHref) router.push(`${wrappersTabHref}?new=true`)
           }}
         />
       )
