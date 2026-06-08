@@ -3,6 +3,8 @@ import os from 'os'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { promisify } from 'util'
 
+import { consoleGet } from '@/lib/console-bff'
+
 const execFileP = promisify(execFile)
 
 // [console fork] GET /platform/projects/{ref}/infra-monitoring
@@ -42,12 +44,12 @@ const metricsCache = new Map<string, { at: number; value: Metrics }>()
 const inflight = new Map<string, Promise<Metrics>>()
 const METRICS_TTL_MS = 10_000
 
-async function getMetrics(ref: string): Promise<Metrics> {
+async function getMetrics(ref: string, req: NextApiRequest): Promise<Metrics> {
   const cached = metricsCache.get(ref)
   if (cached && Date.now() - cached.at < METRICS_TTL_MS) return cached.value
   const existing = inflight.get(ref)
   if (existing) return existing
-  const p = readMetrics(ref)
+  const p = readMetrics(ref, req)
     .then((value) => {
       metricsCache.set(ref, { at: Date.now(), value })
       return value
@@ -57,7 +59,23 @@ async function getMetrics(ref: string): Promise<Metrics> {
   return p
 }
 
-async function readMetrics(ref: string): Promise<Metrics> {
+async function readMetrics(ref: string, req: NextApiRequest): Promise<Metrics> {
+  // [console fork] Dedicated (EC2) projects have no local containers — pull real usage
+  // from the control-plane (CloudWatch CPU). Shared infra falls through to docker stats.
+  try {
+    const { data } = await consoleGet<any>(req, `/api/v1/projects/${ref}/metrics`)
+    if (data?.infra === 'ec2') {
+      return {
+        cpuPercent: Number(data.cpuPercent) || 0,
+        ramUsed: Number(data.ramUsed) || 0,
+        ramTotal: Number(data.ramTotal) || 0,
+        diskSize: Number(data.diskSize) || 0,
+        diskUsed: Number(data.diskUsed) || 0,
+      }
+    }
+  } catch {
+    /* control-plane unreachable -> fall through to local docker stats */
+  }
   const cores = Math.max(1, os.cpus()?.length || 1)
   const hostMem = os.totalmem() || 0
   const m: Metrics = { cpuPercent: 0, ramUsed: 0, ramTotal: hostMem, diskSize: 0, diskUsed: 0 }
@@ -149,7 +167,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
   const interval = String(req.query.interval ?? '1h')
   const timestamps = buildTimestamps(String(req.query.startDate ?? ''), String(req.query.endDate ?? ''), interval)
 
-  const m = await getMetrics(ref)
+  const m = await getMetrics(ref, req)
   const values: Record<string, number> = {}
   for (const a of attributes) values[a] = valueFor(a, m)
 
