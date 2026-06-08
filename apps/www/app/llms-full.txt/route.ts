@@ -65,7 +65,7 @@ async function fetchSourceContent(slug: string): Promise<string | null> {
   const docsUrl = process.env.NEXT_PUBLIC_DOCS_URL
   if (!docsUrl) return null
 
-  const response = await fetch(`${docsUrl}/markdown/reference/${slug}.txt`)
+  const response = await fetch(`${docsUrl}/markdown/reference/${slug}.md`)
   if (!response.ok) return null
 
   return response.text()
