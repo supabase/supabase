@@ -50,7 +50,7 @@ jobs:
           echo "Regenerating tsdoc files for JS client libraries..."
           echo "Source: ${SOURCE}"
           echo "Version: ${VERSION}"
-          make
+          make download.tsdoc.v2
 
       - name: Refresh reference-content snapshot
         working-directory: apps/docs
@@ -74,7 +74,7 @@ jobs:
           title: 'docs: update js sdk docs (${{ github.event.inputs.version }})'
           body: |
             Updates JS sdk documentation following stable release.
-            Ran `make` in apps/docs/spec to regenerate tsdoc files.
+            Ran `make download.tsdoc.v2` in apps/docs/spec and refreshed the reference-content snapshot.
 
             **Details:**
             - **Version:** `${{ github.event.inputs.version }}`
