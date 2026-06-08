@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/nextjs'
 import { useQueryClient } from '@tanstack/react-query'
 import { getAccessToken, useParams } from 'common'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useEffectEvent, useState } from 'react'
 import { toast } from 'sonner'
 import { LogoLoader } from 'ui'
 
@@ -10,7 +10,6 @@ import { SignInMfaForm } from '@/components/interfaces/SignIn/SignInMfaForm'
 import SignInLayout from '@/components/layouts/SignInLayout/SignInLayout'
 import { useAddLoginEvent } from '@/data/misc/audit-login-mutation'
 import useLatest from '@/hooks/misc/useLatest'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { auth, buildPathWithParams, getReturnToPath } from '@/lib/gotrue'
 import { useTrack } from '@/lib/telemetry/track'
 import type { NextPageWithLayout } from '@/types'
@@ -26,7 +25,7 @@ const SignInMfaPage: NextPageWithLayout = () => {
   const signInMethodRef = useLatest(signInMethod)
 
   const track = useTrack()
-  const onSignInTracked = useStaticEffectEvent(() => {
+  const onSignInTracked = useEffectEvent(() => {
     track('sign_in', {
       category: 'account',
       method: signInMethodRef.current,
@@ -42,9 +41,10 @@ const SignInMfaPage: NextPageWithLayout = () => {
       .initialize()
       .then(async ({ error }) => {
         if (error) {
-          // if there was a problem signing in via the url, don't redirect
-          setLoading(false)
-          return
+          // OAuth/SSO callback failed — bounce back to /sign-in so the error renders under the
+          // correct heading instead of "Two-factor authentication". The error is held in the
+          // shared auth context and surfaces via useAuthError() on /sign-in.
+          return router.replace({ pathname: '/sign-in', query: router.query })
         }
 
         const token = await getAccessToken()

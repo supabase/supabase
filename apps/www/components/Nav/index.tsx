@@ -23,7 +23,7 @@ import {
 import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
 import MenuItem from './MenuItem'
-import MobileMenu from './MobileMenu'
+import { MobileMenu } from './MobileMenu'
 import RightClickBrandLogo from './RightClickBrandLogo'
 import useDropdownMenu from './useDropdownMenu'
 

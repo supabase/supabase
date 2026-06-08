@@ -279,7 +279,7 @@ function MyBadComponent() {
 ### Round-tripping SQL from the database (NOT snippet content)
 
 ```ts
-// ✅ GOOD: SQL from the database is promoted to SafeSqlFragment at the point 
+// ✅ GOOD: SQL from the database is promoted to SafeSqlFragment at the point
 // of fetching
 
 // data/function-definitions.ts
@@ -323,10 +323,10 @@ function MyComponent() {
 
 ### Snippet content is ALWAYS UNSAFE
 
-Snippets are auto-persisted to the database and can be created or modified 
-through externally influenceable channels (e.g., prefilled from URL params). 
-The `unchecked_sql` property is typed as `UntrustedSqlFragment` to enforce this 
-— it must only be promoted to `SafeSqlFragment` via `acceptUntrustedSql` in an 
+Snippets are auto-persisted to the database and can be created or modified
+through externally influenceable channels (e.g., prefilled from URL params).
+The `unchecked_sql` property is typed as `UntrustedSqlFragment` to enforce this
+— it must only be promoted to `SafeSqlFragment` via `acceptUntrustedSql` in an
 event handler that requires explicit user action.
 
 ```ts
@@ -375,4 +375,66 @@ function SnippetRunner({ snippet }: { snippet: Snippet }) {
     </>
   )
 }
+```
+
+## Analytics SQL (BigQuery / ClickHouse)
+
+The same security model applies to analytics queries, which target BigQuery
+or ClickHouse via the
+`/platform/projects/{ref}/analytics/endpoints/logs.all{,.otel}` endpoints.
+Filter keys and values from URL parameters and UI inputs are spliced into SQL
+that runs against the project's logs, so the same injection risk exists.
+
+The brand and helpers live in `apps/studio/data/logs/safe-analytics-sql.ts`,
+intentionally **disjoint** from the pg-meta `SafeSqlFragment` brand:
+
+- `SafeLogSqlFragment` — branded type for analytics SQL.
+- `safeSql` — template tag that only accepts `SafeLogSqlFragment`
+  interpolations.
+- `analyticsLiteral(value)` — sanitizes string/number/boolean literals.
+- `quotedIdent(name)` — validates and backtick-quotes dotted identifiers.
+- `keyword(value, allowed)` — validates against an allow-list of operators.
+- `joinSqlFragments(fragments, separator)` — composes already-branded
+  fragments.
+
+The brands are kept separate because escape semantics differ — Postgres-safe
+`E'…'` strings, `::jsonb` casts, and double-quoted identifiers are unsafe for
+BigQuery and/or ClickHouse, and vice versa. Crossing the brands would silently
+emit unsafe SQL.
+
+The wire-boundary wrapper is `executeAnalyticsSql` in
+`apps/studio/data/logs/execute-analytics-sql.ts`, analogous to pg-meta's
+`executeSql`. It accepts only `SafeLogSqlFragment` for its `sql` parameter, so
+raw strings are rejected at compile time. A grep-based vitest
+(`apps/studio/tests/unit/lints/analytics-sql-boundary.test.ts`) prevents
+regressions by failing the build if any file outside
+`execute-analytics-sql.ts` calls `post()` or `get()` directly against
+`logs.all` or `logs.all.otel`.
+
+```ts
+import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
+import { analyticsLiteral, quotedIdent, safeSql } from '@/data/logs/safe-analytics-sql'
+
+// ✅ GOOD: every interpolation is sanitized.
+const sql = safeSql`
+  SELECT timestamp, event_message
+  FROM ${quotedIdent(table)}
+  WHERE id = ${analyticsLiteral(id)}
+`
+
+await executeAnalyticsSql({
+  projectRef,
+  endpoint: '/platform/projects/{ref}/analytics/endpoints/logs.all',
+  sql,
+  iso_timestamp_start,
+  iso_timestamp_end,
+})
+```
+
+```ts
+// 🛑 BAD: raw string interpolation. This fails to type-check at the
+// executeAnalyticsSql boundary because the result is `string`, not
+// `SafeLogSqlFragment`.
+const sql = `SELECT * FROM ${table} WHERE id = '${id}'`
+await executeAnalyticsSql({ projectRef, endpoint, sql, ... })
 ```

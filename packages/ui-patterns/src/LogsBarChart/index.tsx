@@ -33,6 +33,7 @@ export const LogsBarChart = ({
   chartConfig,
   hideZeroValues = false,
   hideDateRange = false,
+  hideXAxis = false,
 }: {
   data: LogsBarChartDatum[]
   onBarClick?: (datum: LogsBarChartDatum, tooltipData?: CategoricalChartState) => void
@@ -42,6 +43,7 @@ export const LogsBarChart = ({
   chartConfig?: ChartConfig
   hideZeroValues?: boolean
   hideDateRange?: boolean
+  hideXAxis?: boolean
 }) => {
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
@@ -70,10 +72,7 @@ export const LogsBarChart = ({
       data-testid="logs-bar-chart"
       className={cn('flex flex-col gap-y-3', isFullHeight ? 'h-full' : 'h-24')}
     >
-      <ChartContainer
-        className={cn('h-full', isFullHeight && 'aspect-auto')}
-        config={chartConfig ?? defaultChartConfig}
-      >
+      <ChartContainer className="h-full" config={chartConfig ?? defaultChartConfig}>
         <RechartBarChart
           data={data}
           onMouseMove={(e: any) => {
@@ -97,9 +96,9 @@ export const LogsBarChart = ({
             dataKey="timestamp"
             interval={data.length - 2}
             tick={false}
-            height={hideDateRange ? 1 : undefined}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
+            {...(hideXAxis ? { height: 1 } : {})}
           />
           <ChartTooltip
             animationDuration={0}

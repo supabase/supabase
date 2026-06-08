@@ -79,7 +79,7 @@ export const MarketplaceFilterBar = ({
   return (
     <div
       className={cn(
-        'sticky top-0 z-5 -mx-6 flex flex-wrap items-center gap-2 px-6 py-3 xl:-mx-10 xl:px-10',
+        'sticky top-0 z-20 -mx-6 flex flex-wrap items-center gap-2 px-6 py-3 xl:-mx-10 xl:px-10',
         'bg-dash-sidebar/95 backdrop-blur',
         showClear ? 'border-b border-muted' : 'border-b border-transparent'
       )}

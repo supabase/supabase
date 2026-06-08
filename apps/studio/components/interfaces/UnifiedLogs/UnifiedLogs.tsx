@@ -14,7 +14,7 @@ import {
   VisibilityState,
 } from '@tanstack/react-table'
 import { LOCAL_STORAGE_KEYS, useDebounce, useParams } from 'common'
-import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { Loader2, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -38,6 +38,11 @@ import { RowSelectionHeader } from './RowSelectionHeader'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
+import {
+  buildFilterSearchUpdate,
+  logsFiltersToColumnFilters,
+  parseLogsFilterUrlParams,
+} from './UnifiedLogs.filters'
 import { useLiveMode, useResetFocus } from './UnifiedLogs.hooks'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
@@ -84,22 +89,9 @@ export const UnifiedLogs = () => {
   const track = useTrack()
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
 
-  const {
-    sort,
-    start,
-    size,
-    id,
-    cursor,
-    direction,
-    live,
-    hide_connection_logs: _hideConnectionLogs,
-    ...filter
-  } = search
-  const defaultColumnSorting = sort ? [sort] : []
+  const defaultColumnSorting = search.sort ? [search.sort] : []
   const defaultColumnVisibility = { uuid: false }
-  const defaultColumnFilters = Object.entries(filter)
-    .map(([key, value]) => ({ id: key, value }))
-    .filter(({ value }) => value ?? undefined)
+  const defaultColumnFilters = logsFiltersToColumnFilters(parseLogsFilterUrlParams(search.filter))
 
   const [topBarHeight, setTopBarHeight] = useState(0)
   const topBarRef = useRef<HTMLDivElement>(null)
@@ -211,15 +203,17 @@ export const UnifiedLogs = () => {
   const facets = counts?.facets
   const totalFetched = flatData?.length
 
-  // Create a filtered version of the chart config based on selected levels
+  // Create a filtered version of the chart config based on level filters in the URL.
   const filteredChartConfig = useMemo(() => {
-    const levelFilter = search.level || LEVELS
+    const levelFilters = parseLogsFilterUrlParams(search.filter).filter((f) => f.column === 'level')
+    const included = levelFilters.filter((f) => f.operator === '=').map((f) => f.value)
+    const excluded = new Set(levelFilters.filter((f) => f.operator === '<>').map((f) => f.value))
+    const baseLevels: readonly string[] = included.length > 0 ? included : LEVELS
+    const activeLevels = baseLevels.filter((l) => !excluded.has(l))
     return Object.fromEntries(
-      Object.entries(CHART_CONFIG).filter(([key]) =>
-        levelFilter.includes(key as (typeof LEVELS)[number])
-      )
+      Object.entries(CHART_CONFIG).filter(([key]) => activeLevels.includes(key))
     ) as ChartConfig
-  }, [search.level])
+  }, [search.filter])
 
   const getRowClassName = <
     TData extends { date: Date; level: (typeof LEVELS)[number]; timestamp: number },
@@ -270,10 +264,6 @@ export const UnifiedLogs = () => {
     return table.getCoreRowModel().flatRows.find((row) => row.id === openRowId)
   }, [isLoading, isFetching, flatData.length, table, openRowId])
 
-  // REMINDER: this is currently needed for the cmdk search
-  // [Joshen] This is where facets are getting dynamically loaded
-  // TODO: auto search via API when the user changes the filter instead of hardcoded
-
   // Will need to refactor this bit
   // - Each facet just handles its own state, rather than getting passed down like this
   const filterFields = useMemo(() => {
@@ -298,24 +288,8 @@ export const UnifiedLogs = () => {
     })
   }, [facets])
 
-  // Debounced filter application to avoid too many API calls when user clicks multiple filters quickly
   const applyFilterSearch = () => {
-    const columnFiltersWithNullable = filterFields.map((field) => {
-      const filterValue = columnFilters.find((filter) => filter.id === field.value)
-      if (!filterValue) return { id: field.value, value: null }
-      return { id: field.value, value: filterValue.value }
-    })
-
-    const search = columnFiltersWithNullable.reduce(
-      (prev, curr) => {
-        // Add to search parameters
-        prev[curr.id as string] = curr.value
-        return prev
-      },
-      {} as Record<string, unknown>
-    )
-
-    setSearch(search)
+    setSearch(buildFilterSearchUpdate(columnFilters, filterFields))
   }
 
   const debouncedApplyFilterSearch = useDebounce(applyFilterSearch, 250)
@@ -349,7 +323,13 @@ export const UnifiedLogs = () => {
   const isMobile = useIsMobile()
   const [isFilterBarOpen, setIsFilterBarOpen] = useState(!isMobile)
 
-  useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS, () => setIsFilterBarOpen((prev) => !prev))
+  useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS, () => setIsFilterBarOpen((prev) => !prev), {
+    registerInCommandMenu: true,
+  })
+  useShortcut(SHORTCUT_IDS.UNIFIED_LOGS_CLEAR_FILTERS, () => table.resetColumnFilters(), {
+    enabled: columnFilters.length > 0,
+    registerInCommandMenu: true,
+  })
 
   useEffect(() => {
     if (isMobile) {
@@ -421,7 +401,11 @@ export const UnifiedLogs = () => {
                 </div>
 
                 <div className="ml-auto flex items-center gap-x-2">
-                  <RefreshButton isLoading={isRefetchingData} onRefresh={refetchAllData} />
+                  <RefreshButton
+                    isLoading={isRefetchingData}
+                    onRefresh={refetchAllData}
+                    shortcutId={SHORTCUT_IDS.UNIFIED_LOGS_REFRESH}
+                  />
                   <DataTableViewOptions />
                   <DownloadLogsButton searchParameters={searchParameters} />
                   {fetchPreviousPage ? (
@@ -433,16 +417,22 @@ export const UnifiedLogs = () => {
                 </div>
               </div>
 
-              <TimelineChart
-                data={unifiedLogsChart}
-                className={cn(
-                  '-mb-1.5 mt-1.5',
-                  isFetchingCharts && 'opacity-60 transition-opacity duration-150'
-                )}
-                columnId="timestamp"
-                filterColumnId="date"
-                chartConfig={filteredChartConfig}
-              />
+              {isLoading ? (
+                <div className="h-[60px] flex items-center justify-center">
+                  <Loader2 size={14} className="animate-spin text-foreground-lighter" />
+                </div>
+              ) : (
+                <TimelineChart
+                  data={unifiedLogsChart}
+                  className={cn(
+                    '-mb-1.5 mt-1.5',
+                    isFetchingCharts && 'opacity-60 transition-opacity duration-150'
+                  )}
+                  columnId="timestamp"
+                  filterColumnId="date"
+                  chartConfig={filteredChartConfig}
+                />
+              )}
             </div>
 
             <RowSelectionHeader />

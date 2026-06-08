@@ -43,13 +43,13 @@ const RailRow = ({ label, value, href, mono, icon }: RailRowProps) => {
 }
 
 interface RailGroupProps {
-  title: string
+  title?: string
   children: ReactNode
 }
 
 const RailGroup = ({ title, children }: RailGroupProps) => (
   <div className="flex flex-col gap-3 border-b pb-4 last:border-b-0">
-    <div className="font-mono text-xs uppercase text-foreground">{title}</div>
+    {title && <div className="font-mono text-xs uppercase text-foreground">{title}</div>}
     <div className="flex flex-col gap-3">{children}</div>
   </div>
 )
@@ -75,8 +75,8 @@ export const MarketplaceDetailRail = ({ integration, isInstalled }: MarketplaceD
   const siteHost = tryHostname(siteUrl)
 
   return (
-    <aside className="sticky top-6 flex flex-col gap-4 self-start text-sm">
-      <RailGroup title="About">
+    <aside className="sticky top-16 flex flex-col gap-4 self-start text-sm">
+      <RailGroup>
         <RailRow label="Type" value={typeLabel} />
         <RailRow label="Built by" value={integration.author?.name || 'Supabase'} />
         {isInstalled && <RailRow label="Status" value="Installed" />}

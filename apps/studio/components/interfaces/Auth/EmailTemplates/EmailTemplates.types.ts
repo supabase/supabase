@@ -5,7 +5,7 @@ export type KebabCase<S extends string> = S extends `${infer A}_${infer B}`
   ? `${Lowercase<A>}-${KebabCase<B>}`
   : Lowercase<S>
 
-const AUTH_TEMPLATE_TYPES = [
+export const AUTH_TEMPLATE_TYPES = [
   'CONFIRMATION',
   'EMAIL_CHANGE',
   'INVITE',
