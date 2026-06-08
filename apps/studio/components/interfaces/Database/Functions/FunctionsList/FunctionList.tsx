@@ -25,8 +25,7 @@ import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface FunctionListProps {
   schema: string
-  nameFilterString: string
-  contentFilterString: string
+  filterString: string
   isLocked: boolean
   returnTypeFilter: string[]
   securityFilter: string[]
@@ -38,8 +37,7 @@ interface FunctionListProps {
 
 const FunctionList = ({
   schema,
-  nameFilterString,
-  contentFilterString,
+  filterString,
   isLocked,
   returnTypeFilter,
   securityFilter,
@@ -54,11 +52,8 @@ const FunctionList = ({
   const { openSidebar } = useSidebarManagerSnapshot()
 
   const filteredFunctions = (functions ?? []).filter((x) => {
-    const matchesName = includes(x.name.toLowerCase(), nameFilterString.toLowerCase())
-    const matchesContent = includes(
-      x.complete_statement.toLowerCase(),
-      contentFilterString.toLowerCase()
-    )
+    const matchesName = includes(x.name.toLowerCase(), filterString.toLowerCase())
+    const matchesContent = includes(x.complete_statement.toLowerCase(), filterString.toLowerCase())
     const matchesReturnType =
       returnTypeFilter.length === 0 || returnTypeFilter.includes(x.return_type)
     const matchesSecurity =
@@ -77,7 +72,7 @@ const FunctionList = ({
     'functions'
   )
 
-  if (_functions.length === 0 && nameFilterString.length === 0) {
+  if (_functions.length === 0 && filterString.length === 0) {
     return (
       <TableRow key={schema}>
         <TableCell colSpan={5}>
@@ -90,13 +85,13 @@ const FunctionList = ({
     )
   }
 
-  if (_functions.length === 0 && nameFilterString.length > 0) {
+  if (_functions.length === 0 && filterString.length > 0) {
     return (
       <TableRow key={schema}>
         <TableCell colSpan={5}>
           <p className="text-sm text-foreground">No results found</p>
           <p className="text-sm text-foreground-light">
-            Your search for "{nameFilterString}" did not return any results
+            Your search for "{filterString}" did not return any results
           </p>
         </TableCell>
       </TableRow>

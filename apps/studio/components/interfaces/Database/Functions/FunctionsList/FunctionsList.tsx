@@ -106,16 +106,12 @@ export const FunctionsList = () => {
     }
   }
 
-  const [nameFilterString, setNameFilterString] = useQueryState(
+  const [filterString, setFilterString] = useQueryState(
     'search',
     parseAsString.withDefault('').withOptions({ clearOnDefault: true })
   )
 
   // Filters
-  const [contentFilterString, setContentFilterString] = useQueryState(
-    'content',
-    parseAsString.withDefault('').withOptions({ clearOnDefault: true })
-  )
   const [returnTypeFilter, setReturnTypeFilter] = useQueryState(
     'return_type',
     parseAsJson(selectFilterSchema.parse)
@@ -147,7 +143,7 @@ export const FunctionsList = () => {
   )
 
   useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
-    setNameFilterString('')
+    setFilterString('')
     setReturnTypeFilter(null)
     setSecurityFilter(null)
   })
@@ -286,7 +282,7 @@ export const FunctionsList = () => {
                   showError={false}
                   selectedSchemaName={selectedSchema}
                   onSelectSchema={(schema) => {
-                    setNameFilterString('')
+                    setFilterString('')
                     setSelectedSchema(schema)
                   }}
                   open={schemaSelectorOpen}
@@ -298,19 +294,10 @@ export const FunctionsList = () => {
                 placeholder="Search for a function by name"
                 size="tiny"
                 icon={<Search />}
-                value={nameFilterString}
+                value={filterString}
                 className="w-full lg:w-52"
-                onChange={(e) => setNameFilterString(e.target.value)}
-                onKeyDown={onSearchInputEscape(nameFilterString, setNameFilterString)}
-              />
-              <Input
-                placeholder="Search for a function by content"
-                size="tiny"
-                icon={<SearchCode />}
-                value={contentFilterString}
-                className="w-full lg:w-52"
-                onChange={(e) => setContentFilterString(e.target.value)}
-                onKeyDown={onSearchInputEscape(contentFilterString, setContentFilterString)}
+                onChange={(e) => setFilterString(e.target.value)}
+                onKeyDown={onSearchInputEscape(filterString, setFilterString)}
               />
               <ReportsSelectFilter
                 label="Return Type"
@@ -405,8 +392,7 @@ export const FunctionsList = () => {
               <TableBody>
                 <FunctionList
                   schema={selectedSchema}
-                  nameFilterString={nameFilterString}
-                  contentFilterString={contentFilterString}
+                  filterString={filterString}
                   isLocked={isSchemaLocked}
                   returnTypeFilter={returnTypeFilter ?? []}
                   securityFilter={securityFilter ?? []}
