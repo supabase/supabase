@@ -29,6 +29,7 @@ import WrapperTableEditor from './WrapperTableEditor'
 import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { getExtensionDefaultSchema } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/IntegrationOverviewTabV2.utils'
 import { RequiredExtensionsSection } from '@/components/interfaces/Integrations/Integration/RequiredExtensionsSection'
+import { useIntegrationDetail } from '@/components/interfaces/Integrations/Landing/useIntegrationDetail'
 import {
   FormSection,
   FormSectionContent,
@@ -44,7 +45,6 @@ import { useTrack } from '@/lib/telemetry/track'
 import type { ResponseError } from '@/types'
 
 const FORM_ID = 'create-wrapper-form'
-const WRAPPER_REQUIRED_EXTENSION_NAMES = ['wrappers', 'supabase_vault']
 
 export interface CreateWrapperSheetProps {
   wrapperMeta: WrapperMeta
@@ -61,6 +61,7 @@ export const CreateWrapperSheet = ({
 }: CreateWrapperSheetProps) => {
   const queryClient = useQueryClient()
   const isMarketplaceEnabled = useIsMarketplaceEnabled()
+  const { integration } = useIntegrationDetail()
 
   const { data: project } = useSelectedProjectQuery()
   const track = useTrack()
@@ -76,9 +77,10 @@ export const CreateWrapperSheet = ({
       extensions === undefined
         ? null
         : extensions.filter(
-            (ext) => WRAPPER_REQUIRED_EXTENSION_NAMES.includes(ext.name) && !ext.installed_version
+            (ext) =>
+              (integration?.requiredExtensions ?? []).includes(ext.name) && !ext.installed_version
           ),
-    [extensions]
+    [extensions, integration?.requiredExtensions]
   )
 
   const wrappersExtension = extensions?.find((ext) => ext.name === 'wrappers')
