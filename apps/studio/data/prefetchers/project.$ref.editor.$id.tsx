@@ -7,7 +7,6 @@ import {
   formatFilterURLParams,
   formatSortURLParams,
   loadTableEditorStateFromLocalStorage,
-  parseSupaTable,
 } from '@/components/grid/SupabaseGrid.utils'
 import { Filter, Sort } from '@/components/grid/types'
 import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
