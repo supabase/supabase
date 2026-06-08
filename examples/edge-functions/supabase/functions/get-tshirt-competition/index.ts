@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
       // Supabase API URL - env var exported by default when deployed.
       Deno.env.get('SUPABASE_URL') ?? '',
       // Supabase API SECRET KEY - env var exported by default when deployed.
-      Deno.env.get(SUPABASE_SECRET_KEYS['default']) ?? ''
+      SUPABASE_SECRET_KEYS['default'] ?? ''
     )
     // Submit email to draw
     const { error } = await supabaseAdminClient.from('get-tshirt-competition-2').upsert(

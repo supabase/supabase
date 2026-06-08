@@ -94,7 +94,7 @@ export function SectionSwitch({ libraryId, version, section }: SectionSwitchProp
   const allAvailableVersions = REFERENCES[libraryId.replaceAll('-', '_')].versions
   const isLatestVersion = allAvailableVersions.length === 0 || version === allAvailableVersions[0]
 
-  const sectionLink = `/docs/reference/${libPath}${isLatestVersion ? '' : `/${version}`}#${section.slug}`
+  const sectionLink = `/docs/reference/${libPath}/${isLatestVersion ? '' : `${version}/`}${section.slug}`
 
   switch (section.type) {
     case 'markdown':
@@ -192,7 +192,7 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
                 return (
                   <li key={index} className="ml-4">
                     <RefInternalLink
-                      href={`/reference/cli#${subcommandDetails.id}`}
+                      href={`/reference/cli/${subcommandDetails.id}`}
                       sectionSlug={subcommandDetails.id}
                     >
                       {subcommandDetails.title}
@@ -472,7 +472,7 @@ async function FunctionSection({
 
   let types: MethodTypes | VariableTypes | undefined
   if (useTypeSpec && '$ref' in fn) {
-    types = await getTypeSpec(fn['$ref'] as string)
+    types = await getTypeSpec(sdkId, version, fn['$ref'] as string)
   }
 
   const fullDescription = [

@@ -109,7 +109,7 @@ export async function waitForDatabaseToLoad(page: Page, ref: string, schema?: st
     page,
     'pg-meta',
     ref,
-    `tables?include_columns=true&included_schemas=${databaseSchema}`
+    `query?key=project:default-schema:${databaseSchema}-infinite_tables`
   )
 }
 

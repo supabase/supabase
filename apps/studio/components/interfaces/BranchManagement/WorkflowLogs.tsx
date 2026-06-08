@@ -111,7 +111,7 @@ export const WorkflowLogs = ({ branch }: WorkflowLogsProps) => {
                 (workflowRuns.length > 0 ? (
                   <ul className="divide-y">
                     {workflowRuns.map((workflowRun) => (
-                      <li key={workflowRun.id} className="px-4 py-3">
+                      <li key={workflowRun.id} className="flex justify-between px-4 py-3 gap-2">
                         <button
                           type="button"
                           disabled={workflowRun.id === projectRef}

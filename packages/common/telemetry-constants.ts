@@ -1151,6 +1151,24 @@ export interface SqlEditorQueryRunButtonClickedEvent {
 }
 
 /**
+ * User clicked on the "Cancel Subscription" Button on the billing settings page.
+ *
+ * @group Events
+ * @source studio
+ * @page /billing
+ */
+export interface StudioBillingCancelSubscriptionClickedEvent {
+  action: 'studio_billing_cancel_subscription_clicked'
+  properties: {
+    /**
+     * The plan type the org is currently on.
+     */
+    currentPlan: string
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * User clicked on the CTA button on a plan in the pricing side panel in studio.
  *
  * @group Events
@@ -2450,7 +2468,6 @@ export interface LogDrainSaveButtonClickedEvent {
       | 'clickhouse'
       | 'webhook'
       | 'datadog'
-      | 'elastic'
       | 'loki'
       | 'sentry'
       | 's3'
@@ -2481,7 +2498,6 @@ export interface LogDrainRemovedEvent {
       | 'clickhouse'
       | 'webhook'
       | 'datadog'
-      | 'elastic'
       | 'loki'
       | 'sentry'
       | 's3'
@@ -2491,6 +2507,66 @@ export interface LogDrainRemovedEvent {
       | 'syslog'
   }
   groups: TelemetryGroups
+}
+
+/**
+ * User clicked the save destination button in the add audit log drain sheet.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/org/{slug}/audit-log-drains (LogDrainDestinationSheetForm)
+ */
+export interface AuditLogDrainSaveButtonClickedEvent {
+  action: 'audit_log_drain_save_button_clicked'
+  properties: {
+    /**
+     * Type of the destination saved
+     */
+    destination:
+      | 'postgres'
+      | 'bigquery'
+      | 'clickhouse'
+      | 'webhook'
+      | 'datadog'
+      | 'loki'
+      | 'sentry'
+      | 's3'
+      | 'axiom'
+      | 'last9'
+      | 'otlp'
+      | 'syslog'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User confirmed removal of an audit log drain destination in the delete-confirm modal.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/org/{slug}/audit-log-drains
+ */
+export interface AuditLogDrainRemovedEvent {
+  action: 'audit_log_drain_removed'
+  properties: {
+    /**
+     * Type of the destination removed
+     */
+    destination:
+      | 'postgres'
+      | 'bigquery'
+      | 'clickhouse'
+      | 'webhook'
+      | 'datadog'
+      | 'loki'
+      | 'sentry'
+      | 's3'
+      | 'axiom'
+      | 'last9'
+      | 'otlp'
+      | 'syslog'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
 }
 
 type AdvisorCategory = 'PERFORMANCE' | 'SECURITY'
@@ -2919,39 +2995,9 @@ export interface ComputeBadgeUpgradeClickedEvent {
   properties: {
     computeSize: string
     planId: string
-    upgradeType: 'pro_upgrade' | 'free_micro_upgrade' | 'compute_upgrade'
+    upgradeType: 'free_micro_upgrade' | 'compute_upgrade'
   }
   groups: TelemetryGroups
-}
-
-/**
- * Fly.io deprecation banner rendered for a user with at least one Fly.io project or branch.
- *
- * @group Events
- * @source studio
- */
-export interface FlyDeprecationBannerExposedEvent {
-  action: 'fly_deprecation_banner_exposed'
-  groups: TelemetryGroups
-  properties: {
-    primaryCount: number
-    branchCount: number
-  }
-}
-
-/**
- * User dismissed the Fly.io deprecation banner.
- *
- * @group Events
- * @source studio
- */
-export interface FlyDeprecationBannerDismissedEvent {
-  action: 'fly_deprecation_banner_dismissed'
-  groups: TelemetryGroups
-  properties: {
-    primaryCount: number
-    branchCount: number
-  }
 }
 
 /**
@@ -3373,6 +3419,7 @@ export type TelemetryEvent =
   | StoragePublicBucketSelectPolicyRemovedEvent
   | StoragePublicBucketSelectPolicyWarningDismissButtonClickedEvent
   | StudioPricingPlanCtaClickedEvent
+  | StudioBillingCancelSubscriptionClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
   | MetricsAPIBannerCtaButtonClickedEvent
@@ -3438,6 +3485,8 @@ export type TelemetryEvent =
   | SidebarOpenedEvent
   | LogDrainSaveButtonClickedEvent
   | LogDrainRemovedEvent
+  | AuditLogDrainSaveButtonClickedEvent
+  | AuditLogDrainRemovedEvent
   | AdvisorDetailOpenedEvent
   | AdvisorAssistantButtonClickedEvent
   | QueryPerformanceAIExplanationButtonClickedEvent
@@ -3461,8 +3510,6 @@ export type TelemetryEvent =
   | OrgMenuBackClickedEvent
   | OrgMenuItemClickedEvent
   | ComputeBadgeUpgradeClickedEvent
-  | FlyDeprecationBannerExposedEvent
-  | FlyDeprecationBannerDismissedEvent
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
   | AccessTokenCreatedEvent

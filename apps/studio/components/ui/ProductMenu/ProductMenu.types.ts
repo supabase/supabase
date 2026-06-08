@@ -10,6 +10,8 @@ export interface ProductMenuGroup {
   name?: string
   items: ProductMenuGroupItem[]
   link?: string
+  /** Optional node rendered after the group's items (e.g. a footer note) */
+  footer?: ReactNode
 }
 
 export interface ProductMenuGroupItem {

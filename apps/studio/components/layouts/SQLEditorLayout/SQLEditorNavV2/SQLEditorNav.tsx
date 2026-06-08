@@ -176,11 +176,6 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     [privateSnippetsTreeState]
   )
 
-  const validExpandedFolderIds = useMemo(
-    () => expandedFolderIds.filter((id) => privateSnippetsTreeNodeIds.has(id)),
-    [expandedFolderIds, privateSnippetsTreeNodeIds]
-  )
-
   const privateSnippetsLastItemIds = useMemo(
     () => getLastItemIds(privateSnippetsTreeState),
     [privateSnippetsTreeState]
@@ -407,7 +402,11 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
       } else if (snippet.visibility === 'user') {
         setSectionVisibility({ ...sectionVisibility, private: true })
       }
-      if (snippet.folder_id && !expandedFolderIds.includes(snippet.folder_id)) {
+      if (
+        snippet.folder_id &&
+        !expandedFolderIds.includes(snippet.folder_id) &&
+        privateSnippetsTreeNodeIds.has(snippet.folder_id)
+      ) {
         setExpandedFolderIds([...expandedFolderIds, snippet.folder_id])
       }
     }
@@ -654,7 +653,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                   setExpandedFolderIds(expandedFolderIds.filter((x) => x !== folderId))
                 }
               }}
-              expandedIds={validExpandedFolderIds}
+              expandedIds={expandedFolderIds}
               nodeRenderer={({ element, ...props }) => {
                 const isOpened = Object.values(tabs.tabsMap).some(
                   (tab) => tab.metadata?.sqlId === element.metadata?.id

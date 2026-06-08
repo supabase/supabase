@@ -24,12 +24,14 @@ import { getSemver, semverGte, semverLte } from './LocalVersionPopover.utils'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useCLIReleaseVersionQuery } from '@/data/misc/cli-release-version-query'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
 export const LocalVersionPopover = () => {
   const track = useTrack()
-  const { data, isSuccess } = useCLIReleaseVersionQuery()
+  const { isCli } = useDeploymentMode()
+  const { data, isSuccess } = useCLIReleaseVersionQuery({ enabled: isCli })
   const { current: currentCliVersion, latest: latestCliVersion } = data || {}
   const hasLatestCLIVersion = isSuccess && !!latestCliVersion
 
