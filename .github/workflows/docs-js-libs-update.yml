@@ -54,7 +54,8 @@ jobs:
 
       - name: Refresh reference-content snapshot
         working-directory: apps/docs
-        run: npx vitest run --update scripts/build-reference-content.test.ts
+        # Using --dir (not a file path) so Vitest 4 doesn't run unrelated tests.
+        run: npx vitest run --update --dir scripts
 
       - name: Generate token
         id: app-token
@@ -64,7 +65,6 @@ jobs:
           private-key: ${{ secrets.GH_AUTOFIX_PRIVATE_KEY }}
           permission-contents: write
           permission-pull-requests: write
-
 
       - name: Create pull request
         uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6.1.0
