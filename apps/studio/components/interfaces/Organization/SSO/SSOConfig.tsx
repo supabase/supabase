@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useFlag } from 'common'
 import { Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -26,7 +27,6 @@ import { useOrgSSOConfigQuery } from '@/data/sso/sso-config-query'
 import { useSSOConfigUpdateMutation } from '@/data/sso/sso-config-update-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { usePHFlag } from '@/hooks/ui/useFlag'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -104,7 +104,13 @@ export const SSOConfig = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const { hasAccess: hasAccessToSso, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('auth.platform.sso')
-  const showIdjagSettings = true || usePHFlag('enableEnterpriseMcpAuth') // how to target org?
+  const enterpriseMcpAuthOrgs = useFlag<string>('enableEnterpriseMcpAuth')
+  const showIdjagSettings =
+    typeof enterpriseMcpAuthOrgs === 'string' &&
+    enterpriseMcpAuthOrgs
+      .split(',')
+      .map((s) => s.trim())
+      .includes(organization?.slug ?? '')
 
   const {
     data: ssoConfig,
