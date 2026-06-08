@@ -19,6 +19,9 @@ This allows you to:
 You can use `EdgeRuntime.waitUntil(promise)` to explicitly mark background tasks. The Function instance continues to run until the promise provided to `waitUntil` completes.
 
 ```ts
+// get the import and intellisense
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+
 // Mark the asyncLongRunningTask's returned promise as a background task.
 // ⚠️ We are NOT using `await` because we don't want it to block!
 EdgeRuntime.waitUntil(asyncLongRunningTask())
