@@ -22,9 +22,9 @@ import { ProtectedSchemaWarning } from '@/components/interfaces/Database/Protect
 import { ErrorMatcher } from '@/components/interfaces/ErrorHandling/ErrorMatcher'
 import { EditorMenuListSkeleton } from '@/components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { InfiniteListDefault, LoaderForIconMenuItems } from '@/components/ui/InfiniteList'
 import SchemaSelector from '@/components/ui/SchemaSelector'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { useEntityTypesQuery } from '@/data/entity-types/entity-types-infinite-query'
 import { useTableApiAccessQuery } from '@/data/privileges/table-api-access-query'
@@ -110,11 +110,9 @@ export const TableEditorMenu = () => {
     setSelectedSchema(selectedTable.schema)
   }
 
-  useShortcut(
-    SHORTCUT_IDS.TABLE_EDITOR_FOCUS_SCHEMA,
-    () => setIsSchemaDropdownOpen(true),
-    { registerInCommandMenu: true }
-  )
+  useShortcut(SHORTCUT_IDS.TABLE_EDITOR_FOCUS_SCHEMA, () => setIsSchemaDropdownOpen(true), {
+    registerInCommandMenu: true,
+  })
 
   const tableEditorTabsCleanUp = useTableEditorTabsCleanUp()
 
