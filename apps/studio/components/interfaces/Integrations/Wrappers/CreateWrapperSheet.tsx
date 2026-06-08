@@ -65,16 +65,19 @@ export const CreateWrapperSheet = ({
   const { data: project } = useSelectedProjectQuery()
   const track = useTrack()
 
-  const { data: extensions } = useDatabaseExtensionsQuery({
+  const { data: extensions, isLoading: isExtensionsLoading } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
+  // null while the query is in flight — distinct from [] which means "all installed"
   const requiredExtensionsToInstall = useMemo(
     () =>
-      (extensions ?? []).filter(
-        (ext) => WRAPPER_REQUIRED_EXTENSION_NAMES.includes(ext.name) && !ext.installed_version
-      ),
+      extensions === undefined
+        ? null
+        : extensions.filter(
+            (ext) => WRAPPER_REQUIRED_EXTENSION_NAMES.includes(ext.name) && !ext.installed_version
+          ),
     [extensions]
   )
 
@@ -137,7 +140,7 @@ export const CreateWrapperSheet = ({
     if (!project) return
     const { ref: projectRef, connectionString } = project
     const results = await Promise.allSettled(
-      requiredExtensionsToInstall.map((ext) => {
+      (requiredExtensionsToInstall ?? []).map((ext) => {
         const schema = getExtensionDefaultSchema(ext) ?? 'extensions'
         return enableExtension({
           projectRef,
@@ -184,10 +187,13 @@ export const CreateWrapperSheet = ({
       }
     }
 
-    const needsExtensions = isMarketplaceEnabled && requiredExtensionsToInstall.length > 0
+    // Extension metadata not yet resolved — block rather than silently skip the install step
+    if (isMarketplaceEnabled && requiredExtensionsToInstall === null) return
+
+    const needsExtensions = isMarketplaceEnabled && (requiredExtensionsToInstall?.length ?? 0) > 0
     const toastId = toast.loading(
       needsExtensions
-        ? `Installing extensions (${requiredExtensionsToInstall.map((e) => e.name).join(', ')})…`
+        ? `Installing extensions (${(requiredExtensionsToInstall ?? []).map((e) => e.name).join(', ')})…`
         : `Creating ${wrapperMeta.label} wrapper…`
     )
 
@@ -254,7 +260,7 @@ export const CreateWrapperSheet = ({
               <SheetTitle>Create a {wrapperMeta.label} wrapper</SheetTitle>
             </SheetHeader>
             <div className="flex-grow overflow-y-auto">
-              {isMarketplaceEnabled && requiredExtensionsToInstall.length > 0 && (
+              {isMarketplaceEnabled && !!requiredExtensionsToInstall?.length && (
                 <div className="px-5 pt-5 flex flex-col gap-y-4">
                   <Admonition
                     type="default"
@@ -510,7 +516,7 @@ export const CreateWrapperSheet = ({
                 type="primary"
                 form={FORM_ID}
                 htmlType="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || (isMarketplaceEnabled && isExtensionsLoading)}
                 loading={isSubmitting}
               >
                 Create wrapper
