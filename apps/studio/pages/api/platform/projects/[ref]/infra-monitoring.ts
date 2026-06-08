@@ -114,15 +114,20 @@ async function readMetrics(ref: string, req: NextApiRequest): Promise<Metrics> {
 }
 
 function valueFor(attr: string, m: Metrics): number {
-  if (attr.includes('cpu')) return Number(m.cpuPercent.toFixed(2))
+  // Clamp CPU to 0-100 — it's a percentage and must never exceed a full 100%.
+  if (attr.includes('cpu')) return Math.min(100, Number(m.cpuPercent.toFixed(2)))
   if (attr === 'disk_fs_size') return m.diskSize
-  if (attr.startsWith('disk_fs_used') || attr.includes('disk_usage')) return m.diskUsed
+  // The infra cards SUM the disk breakdown (system + wal + database). We only know the
+  // total used, so report it once under disk_fs_used_system and 0 for the other
+  // breakdown buckets — otherwise the sum double/triple-counts (showed ~260%).
+  if (attr === 'disk_fs_used_system' || attr.includes('disk_usage')) return m.diskUsed
+  if (attr.startsWith('disk_fs_used')) return 0
   if (attr.includes('disk_io') || attr.includes('iops') || attr.includes('throughput')) return 0
   if (attr.includes('swap') || attr.includes('network')) return 0
   if (attr.includes('ram') || attr.includes('memory')) {
     // `ram_usage` (summary) is a PERCENTAGE; the *_used/_free/_total breakdown is bytes.
     if (attr === 'ram_usage' || attr === 'max_memory_usage') {
-      return m.ramTotal > 0 ? Number(((m.ramUsed / m.ramTotal) * 100).toFixed(2)) : 0
+      return m.ramTotal > 0 ? Math.min(100, Number(((m.ramUsed / m.ramTotal) * 100).toFixed(2))) : 0
     }
     if (attr.includes('total') || attr.includes('limit')) return m.ramTotal
     if (attr.includes('free')) return Math.max(0, m.ramTotal - m.ramUsed)
