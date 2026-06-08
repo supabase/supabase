@@ -56,16 +56,22 @@ async function authMetrics(dp: { baseUrl: string; serviceKey: string }): Promise
      from auth.users`
   )
   const r = rows?.[0] ?? {}
+  // The Auth Overview schema requires a `period` ('current'|'previous') + all numeric
+  // fields on every row. We can derive active_users + sign_up_count from auth.users;
+  // request/error metrics need a log pipeline we don't run, so report 0.
+  const row = (period: 'current' | 'previous', activeUsers: number, signUps: number): Row => ({
+    period,
+    active_users: activeUsers,
+    api_error_requests: 0,
+    api_total_requests: 0,
+    auth_total_errors: 0,
+    auth_total_requests: 0,
+    password_reset_requests: 0,
+    sign_up_count: signUps,
+  })
   return [
-    {
-      active_users: Number(r.active_users ?? 0),
-      sign_up_count: Number(r.sign_up_count ?? 0),
-      api_error_requests: 0,
-      api_total_requests: 0,
-      auth_total_errors: 0,
-      auth_total_requests: 0,
-      password_reset_requests: 0,
-    },
+    row('current', Number(r.active_users ?? 0), Number(r.sign_up_count ?? 0)),
+    row('previous', 0, 0),
   ]
 }
 
