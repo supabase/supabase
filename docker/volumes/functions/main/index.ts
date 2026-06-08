@@ -145,7 +145,17 @@ Deno.serve(async (req: Request) => {
   const workerTimeoutMs = 1 * 60 * 1000
   const noModuleCache = false
   const importMapPath = null
-  const envVarsObj = Deno.env.toObject()
+  // [console fork] Merge user-defined Edge Function secrets. The control-plane writes
+  // them to .secrets.json in this volume (locally for shared infra, over SSM for EC2);
+  // we read per-request so updates apply live without restarting the container.
+  // Defensive: a missing/invalid file is ignored.
+  let userSecrets = {}
+  try {
+    userSecrets = JSON.parse(await Deno.readTextFile('/home/deno/functions/.secrets.json'))
+  } catch (_e) {
+    userSecrets = {}
+  }
+  const envVarsObj = { ...Deno.env.toObject(), ...userSecrets }
   const envVars = Object.keys(envVarsObj).map((k) => [k, envVarsObj[k]])
 
   try {
