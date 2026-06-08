@@ -29,7 +29,7 @@ app.use(async (ctx) => {
     // Supabase API URL - env var exported by default.
     Deno.env.get('SUPABASE_URL')!,
     // Supabase publishable key - env var exported by default.
-    Deno.env.get(SUPABASE_PUBLISHABLE_KEYS['default'])!
+    SUPABASE_PUBLISHABLE_KEYS['default']!
   )
 
   //upload image to Storage

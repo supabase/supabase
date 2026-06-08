@@ -23,6 +23,7 @@ export interface DowngradeModalProps {
   onClose: () => void
   onConfirm: () => void
   projects: OrgProject[]
+  confirmDisabled?: boolean
 }
 
 const ProjectDowngradeListItem = ({ projectAddon }: { projectAddon: ProjectAddon }) => {
@@ -64,6 +65,7 @@ export const DowngradeModal = ({
   onClose,
   onConfirm,
   projects,
+  confirmDisabled,
 }: DowngradeModalProps) => {
   const selectedPlan = useMemo(() => subscriptionsPlans.find((tier) => tier.id === 'tier_free'), [])
 
@@ -183,7 +185,14 @@ export const DowngradeModal = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction variant="warning" onClick={onConfirm}>
+          <AlertDialogAction
+            disabled={confirmDisabled ?? false}
+            variant="warning"
+            onClick={(e) => {
+              e.preventDefault()
+              onConfirm()
+            }}
+          >
             Confirm
           </AlertDialogAction>
         </AlertDialogFooter>

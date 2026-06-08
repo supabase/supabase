@@ -1,4 +1,4 @@
-import { FeatureFlagContext, LOCAL_STORAGE_KEYS, useFlag } from 'common'
+import { FeatureFlagContext, LOCAL_STORAGE_KEYS, safeLocalStorage, useFlag } from 'common'
 import { noop } from 'lodash'
 import { useQueryState } from 'nuqs'
 import {
@@ -39,14 +39,10 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) =
     setFlags(
       featurePreviews.reduce((a, b) => {
         const defaultOptIn = b.isDefaultOptIn
-        try {
-          const localStorageValue = window.localStorage.getItem(b.key)
-          return {
-            ...a,
-            [b.key]: !localStorageValue ? defaultOptIn : localStorageValue === 'true',
-          }
-        } catch {
-          return { ...a, [b.key]: defaultOptIn }
+        const localStorageValue = safeLocalStorage.getItem(b.key)
+        return {
+          ...a,
+          [b.key]: !localStorageValue ? defaultOptIn : localStorageValue === 'true',
         }
       }, {})
     )
@@ -62,13 +58,7 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) =
   const value = {
     flags,
     onUpdateFlag: (key: string, value: boolean) => {
-      try {
-        if (typeof window !== 'undefined' && window.localStorage) {
-          window.localStorage.setItem(key, value ? 'true' : 'false')
-        }
-      } catch {
-        // Silently fail in restricted storage modes (e.g. Safari private browsing)
-      }
+      safeLocalStorage.setItem(key, value ? 'true' : 'false')
       const updatedFlags = { ...flags, [key]: value }
       setFlags(updatedFlags)
     },

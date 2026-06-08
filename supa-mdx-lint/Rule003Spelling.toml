@@ -28,7 +28,7 @@ allow_list = [
     "[Aa]utomations?",
     "[Aa]utovacuum(s|ing|ed)?",
     "Azure MyApps",
-    "[Bb]ackend",
+    "[Bb]ackends?",
     "[Bb]ackoff",
     "[Bb]lockchains?",
     "BootEvent",
