@@ -83,6 +83,7 @@ export const useAvailableIntegrations = () => {
             content,
             built_by: authorName,
             listing_logo: listingLogo,
+            oauth_app_id: oauthAppId,
           } = integration
 
           const status = undefined
@@ -109,6 +110,7 @@ export const useAvailableIntegrations = () => {
             installIdentificationMethod: installMethod ?? undefined,
             secretKeyPrefix: secretKeyPrefix ?? undefined,
             edgeFunctionSecretName: edgeFunctionSecretName ?? undefined,
+            oauthAppId: oauthAppId ?? undefined,
             listingId: listingId ?? undefined,
             author,
             requiredExtensions: [],

@@ -1,7 +1,8 @@
 import { renderHook } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useGenerateSettingsMenu } from './SettingsMenu.utils'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const getShortcutId = (item: unknown) => (item as { shortcutId?: string } | undefined)?.shortcutId
@@ -28,9 +29,7 @@ vi.mock('@/hooks/misc/useSelectedProject', () => ({
 }))
 
 vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
-  useIsFeatureEnabled: vi
-    .fn()
-    .mockReturnValue({ projectSettingsLegacyJwtKeys: false, billingAll: true }),
+  useIsFeatureEnabled: vi.fn(),
 }))
 
 vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
@@ -38,6 +37,15 @@ vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () =
 }))
 
 describe('useGenerateSettingsMenu (self-hosted)', () => {
+  beforeEach(() => {
+    vi.mocked(useIsFeatureEnabled).mockReturnValue({
+      projectSettingsLegacyJwtKeys: false,
+      billingAll: true,
+      logsAll: true,
+      projectSettingsLogDrains: true,
+    } as any)
+  })
+
   it('includes General, API Keys, JWT Keys, and Log Drains in self-hosted mode', () => {
     const { result } = renderHook(() => useGenerateSettingsMenu())
     const configGroup = result.current.find((group) => group.title === 'Configuration')
@@ -49,6 +57,34 @@ describe('useGenerateSettingsMenu (self-hosted)', () => {
     expect(getShortcutId(configGroup?.items.find((item) => item.key === 'log-drains'))).toBe(
       SHORTCUT_IDS.NAV_PROJECT_SETTINGS_LOG_DRAINS
     )
+  })
+
+  it('hides Log Drains in self-hosted mode when logs:all is disabled', () => {
+    vi.mocked(useIsFeatureEnabled).mockReturnValue({
+      projectSettingsLegacyJwtKeys: false,
+      billingAll: true,
+      logsAll: false,
+      projectSettingsLogDrains: true,
+    } as any)
+
+    const { result } = renderHook(() => useGenerateSettingsMenu())
+    const configGroup = result.current.find((group) => group.title === 'Configuration')
+
+    expect(configGroup?.items.some((item) => item.key === 'log-drains')).toBe(false)
+  })
+
+  it('hides Log Drains in self-hosted mode when project_settings:log_drains is disabled', () => {
+    vi.mocked(useIsFeatureEnabled).mockReturnValue({
+      projectSettingsLegacyJwtKeys: false,
+      billingAll: true,
+      logsAll: true,
+      projectSettingsLogDrains: false,
+    } as any)
+
+    const { result } = renderHook(() => useGenerateSettingsMenu())
+    const configGroup = result.current.find((group) => group.title === 'Configuration')
+
+    expect(configGroup?.items.some((item) => item.key === 'log-drains')).toBe(false)
   })
 
   it('includes Data API and Vault integrations in self-hosted mode', () => {

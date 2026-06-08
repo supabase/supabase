@@ -205,6 +205,7 @@ export const TableList = ({
   const entities = formatAllEntities({ tables, views, materializedViews, foreignTables }).filter(
     (x) => visibleTypes.includes(x.type)
   )
+  const footerCount = hasNextTablesPage ? tables.length : entities.length
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
@@ -608,7 +609,7 @@ export const TableList = ({
                   <TableCell colSpan={7} className="text-foreground-muted hover:bg-inherit">
                     {isFetchingNextTablesPage
                       ? 'Loading more tables…'
-                      : `${entities.length} ${entities.length === 1 ? 'table' : 'tables'}${
+                      : `${footerCount} ${footerCount === 1 ? 'table' : 'tables'}${
                           hasNextTablesPage ? ' loaded' : ''
                         }`}
                   </TableCell>
