@@ -30,7 +30,7 @@ export const Footer: React.FC<FooterProps> = ({ enableForeignRowsQuery = true }:
     <GridFooter>
       {selectedView === 'data' && <Pagination enableForeignRowsQuery={enableForeignRowsQuery} />}
 
-      <div className="flex items-center gap-x-2">
+      <div className="flex items-center gap-x-2 ml-auto">
         {(isViewSelected || isTableSelected) && (
           <TwoOptionToggle
             width={75}
