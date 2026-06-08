@@ -55,7 +55,7 @@ export function prefetchEditorTablePage({
         connectionString,
         readReplicaIdentifier,
         tableId: id,
-        sorts: sorts ?? formatSortURLParams(supaTable.name, localSorts),
+        sorts: sorts ?? formatSortURLParams(entity, localSorts),
         filters: filters ?? formatFilterURLParams(localFilters),
         page: 1,
         limit: TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE,

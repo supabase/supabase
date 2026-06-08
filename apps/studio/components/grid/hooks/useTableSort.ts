@@ -18,8 +18,8 @@ export function useTableSort() {
   const tableName = useMemo(() => snap.table?.name || '', [snap])
 
   const sorts = useMemo(() => {
-    return formatSortURLParams(tableName, urlSorts)
-  }, [tableName, urlSorts])
+    return formatSortURLParams(snap.originalTable, urlSorts)
+  }, [snap.originalTable, urlSorts])
 
   const onApplySorts = useCallback(
     (appliedSorts: Sort[]) => {
@@ -29,7 +29,7 @@ export function useTableSort() {
         )
       }
 
-      const sortsWithTable = appliedSorts.map((sort) => ({ ...sort, table: tableName }))
+      const sortsWithTable = appliedSorts.map((sort) => ({ ...sort }))
       const newUrlSorts = sortsToUrlParams(sortsWithTable)
 
       setParams((prevParams) => ({ ...prevParams, sort: newUrlSorts }))
