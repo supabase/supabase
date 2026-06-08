@@ -83,7 +83,6 @@ jobs:
           sh tests/test-auth-keys.sh
 
       - name: Run S3 protocol tests
-        if: matrix.config == 'rustfs' || matrix.config == 'envoy-rustfs' || matrix.config == 's3'
         shell: bash
         run: |
           set -euo pipefail
