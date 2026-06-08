@@ -26,6 +26,7 @@ import { useOrgSSOConfigQuery } from '@/data/sso/sso-config-query'
 import { useSSOConfigUpdateMutation } from '@/data/sso/sso-config-update-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { usePHFlag } from '@/hooks/ui/useFlag'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -46,7 +47,7 @@ const FormSchema = z
     lastNameMapping: z.array(z.object({ value: z.string().trim() })),
     joinOrgOnSignup: z.boolean(),
     roleOnJoin: z.string().optional(),
-    oidcIssuer: z.string().trim().optional(),
+    idjagIssuerUrl: z.string().trim().optional(),
   })
   .superRefine((data, ctx) => {
     if (!data.enableSpInitiated) return
@@ -94,7 +95,7 @@ const defaultValues = {
   lastNameMapping: [{ value: '' }],
   joinOrgOnSignup: false,
   roleOnJoin: 'Developer',
-  oidcIssuer: '',
+  idjagIssuerUrl: '',
 }
 
 export const SSOConfig = () => {
@@ -103,6 +104,7 @@ export const SSOConfig = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const { hasAccess: hasAccessToSso, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('auth.platform.sso')
+  const showIdjagSettings = true || usePHFlag('enableEnterpriseMcpAuth') // how to target org?
 
   const {
     data: ssoConfig,
@@ -175,6 +177,7 @@ export const SSOConfig = () => {
         user_name_mapping: values.userNameMapping.map((item) => item.value).filter(Boolean),
         join_org_on_signup_enabled: values.joinOrgOnSignup,
         join_org_on_signup_role: roleOnJoin,
+        idjag_issuer_url: values.idjagIssuerUrl || undefined,
       },
     }
 
@@ -211,8 +214,7 @@ export const SSOConfig = () => {
           ssoConfig.last_name_mapping?.map((lastName) => ({ value: lastName })) || [],
         joinOrgOnSignup: ssoConfig.join_org_on_signup_enabled,
         roleOnJoin: ssoConfig.join_org_on_signup_role,
-        // oidc_issuer is not in the API type yet — will be added when backend is wired
-        oidcIssuer: (ssoConfig as any).oidc_issuer ?? '',
+        idjagIssuerUrl: ssoConfig.idjag_issuer_url ?? '',
       })
     }
   })
@@ -361,9 +363,11 @@ export const SSOConfig = () => {
                         <JoinOrganizationOnSignup form={form} />
                       </CardContent>
 
-                      <CardContent>
-                        <SSOAdvancedSettings form={form} />
-                      </CardContent>
+                      {showIdjagSettings && (
+                        <CardContent>
+                          <SSOAdvancedSettings form={form} />
+                        </CardContent>
+                      )}
                     </>
                   )}
 

@@ -6126,6 +6126,7 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
+          idjag_issuer_url?: string
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -6141,6 +6142,7 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
+          idjag_issuer_url?: string
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -6156,6 +6158,7 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
+          idjag_issuer_url?: string
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -6171,6 +6174,7 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
+          idjag_issuer_url?: string
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -7004,6 +7008,7 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
+          idjag_issuer_url?: string
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -7019,6 +7024,7 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
+          idjag_issuer_url?: string
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -11683,6 +11689,7 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
+          idjag_issuer_url?: string
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -11698,6 +11705,7 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
+          idjag_issuer_url?: string
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -11713,6 +11721,7 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
+          idjag_issuer_url?: string
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -11728,6 +11737,7 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
+          idjag_issuer_url?: string
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
