@@ -1,10 +1,5 @@
 import { Copy } from 'lucide-react'
-import React, {
-  ComponentProps,
-  ComponentPropsWithoutRef,
-  forwardRef,
-  useState,
-} from 'react'
+import React, { ComponentProps, ComponentPropsWithoutRef, forwardRef, useState } from 'react'
 import {
   Input as BaseInput,
   cn,
@@ -16,8 +11,7 @@ import {
   InputGroupTextarea,
 } from 'ui'
 
-export interface Props
-  extends Omit<ComponentProps<typeof BaseInput>, 'onCopy'> {
+export interface Props extends Omit<ComponentProps<typeof BaseInput>, 'onCopy'> {
   copy?: boolean
   showCopyOnHover?: boolean
   onCopy?: () => void
@@ -83,9 +77,7 @@ const Input = forwardRef<
         data-bwignore
         style={{
           ...((props.style ?? {}) as React.CSSProperties),
-          ...(isTextareaMasked
-            ? ({ WebkitTextSecurity: 'disc' } as React.CSSProperties)
-            : {}),
+          ...(isTextareaMasked ? ({ WebkitTextSecurity: 'disc' } as React.CSSProperties) : {}),
         }}
       />
     ) : (
