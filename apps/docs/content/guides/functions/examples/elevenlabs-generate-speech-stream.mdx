@@ -110,6 +110,7 @@ const client = new ElevenLabsClient({
 })
 
 // Deploy with verify_jwt = false
+// Open endpoint for testing. In production, implement an authorization layer in the handler or switch the auth mode.
 export default {
   fetch: withSupabase({ auth: 'none' }, async (req, ctx) => {
     // Upload audio to Supabase Storage in a background task

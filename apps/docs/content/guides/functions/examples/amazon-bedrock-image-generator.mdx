@@ -122,7 +122,7 @@ export default {
 ## Run the function locally
 
 1. Run `supabase start` (see: https://supabase.com/docs/reference/cli/supabase-start)
-2. Start with env: `supabase functions serve --env-file supabase/.env`
+2. Start with env: `supabase functions serve --no-verify-jwt --env-file supabase/.env`
 3. Make an HTTP request:
 
 ```bash
@@ -138,7 +138,7 @@ export default {
 
 ```bash
 supabase link
-supabase functions deploy amazon-bedrock
+supabase functions deploy amazon-bedrock --no-verify-jwt
 supabase secrets set --env-file supabase/.env
 ```
 

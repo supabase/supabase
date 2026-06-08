@@ -40,8 +40,9 @@ Sentry.init({
 Sentry.setTag('region', Deno.env.get('SB_REGION'))
 Sentry.setTag('execution_id', Deno.env.get('SB_EXECUTION_ID'))
 
+// Open endpoint for testing. In production, implement an authorization layer in the handler or switch the auth mode.
 export default {
-  fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
+  fetch: withSupabase({ auth: 'none' }, async (req, ctx) => {
     try {
       const { name } = await req.json()
       // This will throw, as `name` in our example call will be `undefined`

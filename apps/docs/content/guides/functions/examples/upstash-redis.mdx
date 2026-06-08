@@ -44,8 +44,9 @@ import { withSupabase } from 'npm:@supabase/server@^1'
 
 console.log(`Function "upstash-redis-counter" up and running!`)
 
+// Open endpoint for testing. In production, implement an authorization layer in the handler or switch the auth mode.
 export default {
-  fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
+  fetch: withSupabase({ auth: 'none' }, async (req, ctx) => {
     try {
       const redis = new Redis({
         url: Deno.env.get('UPSTASH_REDIS_REST_URL')!,
@@ -72,7 +73,7 @@ export default {
 
       return Response.json({ counters })
     } catch (error) {
-      return Response.json({ error: error.message })
+      return Response.json({ error: error.message }, { status: 500 })
     }
   }),
 }
