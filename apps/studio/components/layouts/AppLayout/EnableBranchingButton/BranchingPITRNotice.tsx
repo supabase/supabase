@@ -1,12 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { Clock } from 'lucide-react'
 import Link from 'next/link'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useAppStateSnapshot } from 'state/app-state'
 import { Button } from 'ui'
+
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 export const BranchingPITRNotice = () => {
   const { ref } = useParams()

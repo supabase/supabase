@@ -2,12 +2,11 @@ import { fireEvent, screen, waitFor } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
-import { addAPIMock } from 'tests/lib/msw'
-
-import { render } from 'tests/helpers'
-import { routerMock } from 'tests/lib/route-mock'
 import { CreateBucketModal } from '../CreateBucketModal'
+import { ProjectContextProvider } from '@/components/layouts/ProjectLayout/ProjectContext'
+import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock } from '@/tests/lib/msw'
+import { routerMock } from '@/tests/lib/route-mock'
 
 describe(`CreateBucketModal`, () => {
   beforeEach(() => {
@@ -41,14 +40,18 @@ describe(`CreateBucketModal`, () => {
   })
 
   it(`renders a dialog with a form`, async () => {
-    render(
+    customRender(
       <ProjectContextProvider projectRef="default">
-        <CreateBucketModal />
-      </ProjectContextProvider>
+        <CreateBucketModal open={true} onOpenChange={() => {}} />
+      </ProjectContextProvider>,
+      {
+        nuqs: {
+          searchParams: {
+            new: 'true',
+          },
+        },
+      }
     )
-
-    const dialogTrigger = screen.getByRole(`button`, { name: `New bucket` })
-    await userEvent.click(dialogTrigger)
 
     await waitFor(() => {
       expect(screen.getByRole(`dialog`)).toBeInTheDocument()

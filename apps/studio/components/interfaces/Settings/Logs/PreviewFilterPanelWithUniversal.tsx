@@ -1,14 +1,10 @@
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { Eye, EyeOff, RefreshCw, Terminal } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-
-import { useParams } from 'common'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
-import { IS_PLATFORM } from 'lib/constants'
-import { Button, Calendar, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+import { useMemo, useState } from 'react'
+import { Button, Calendar, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import type {
   CustomOptionProps,
   FilterCondition,
@@ -16,9 +12,13 @@ import type {
   FilterProperty,
 } from 'ui-patterns/FilterBar'
 import { FilterBar } from 'ui-patterns/FilterBar'
-import { DatePickerValue } from './Logs.DatePickers'
+
 import { FILTER_OPTIONS, LOG_ROUTES_WITH_REPLICA_SUPPORT, LogsTableName } from './Logs.constants'
+import { DatePickerValue } from './Logs.DatePickers'
 import type { Filters, LogSearchCallback, LogTemplate } from './Logs.types'
+import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
+import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
+import { IS_PLATFORM } from '@/lib/constants'
 
 function isBooleanMap(v: unknown): v is Record<string, boolean> {
   return typeof v === 'object' && v !== null && !Array.isArray(v)
@@ -83,31 +83,6 @@ interface PreviewFilterPanelProps {
   setSelectedDatePickerValue: (value: DatePickerValue) => void
 }
 
-function useDebounce<T extends (...args: any[]) => void>(callback: T, delay: number) {
-  const timeoutRef = useRef<NodeJS.Timeout>()
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-      }
-    }
-  }, [])
-
-  return useCallback(
-    (...args: Parameters<T>) => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-      }
-
-      timeoutRef.current = setTimeout(() => {
-        callback(...args)
-      }, delay)
-    },
-    [callback, delay]
-  ) as T
-}
-
 export const PreviewFilterPanelWithUniversal = ({
   isLoading,
   newCount,
@@ -121,19 +96,17 @@ export const PreviewFilterPanelWithUniversal = ({
   condensedLayout,
   isShowingEventChart,
   onToggleEventChart,
-  csvData,
+  csvData: _csvData,
   onFiltersChange,
   filters,
   table,
   onSelectedDatabaseChange,
   className,
-  selectedDatePickerValue,
-  setSelectedDatePickerValue,
+  selectedDatePickerValue: _selectedDatePickerValue,
+  setSelectedDatePickerValue: _setSelectedDatePickerValue,
 }: PreviewFilterPanelProps) => {
   const router = useRouter()
   const { ref } = useParams()
-
-  const logName = router.pathname.split('/').pop()
 
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: ref })
 
@@ -181,7 +154,7 @@ export const PreviewFilterPanelWithUniversal = ({
     })
 
     // Add table-specific filters
-    Object.entries(tableFilters).forEach(([key, filterSet]) => {
+    Object.entries(tableFilters).forEach(([_key, filterSet]) => {
       properties.push({
         label: filterSet.label,
         name: filterSet.key,
@@ -319,14 +292,11 @@ export const PreviewFilterPanelWithUniversal = ({
             icon={
               <div className="relative">
                 {newCount > 0 && (
-                  <div className="absolute -top-3 right-3 flex items-center justify-center">
-                    <div className="absolute z-20">
-                      <p style={{ fontSize: '0.6rem' }} className="text-white">
-                        {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
-                      </p>
+                  <div className="absolute -top-3 -right-3 flex items-center justify-center">
+                    <div className="absolute h-4 w-4 animate-ping rounded-full bg-brand opacity-60"></div>
+                    <div className="relative z-10 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-500 px-1 text-[10px] font-medium leading-none text-white">
+                      {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
                     </div>
-                    <div className="h-4 w-4 animate-ping rounded-full bg-green-800 opacity-60"></div>
-                    <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
                   </div>
                 )}
                 <RefreshCw />

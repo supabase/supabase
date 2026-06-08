@@ -1,19 +1,17 @@
-import { ProductMenu } from 'components/ui/ProductMenu'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Badge, Button } from 'ui'
+
 import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
-import { generateAdvisorsMenu } from './AdvisorsMenu.utils'
-import { useIsAdvisorRulesEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useGenerateAdvisorsMenu } from './AdvisorsMenu.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ProductMenu } from '@/components/ui/ProductMenu'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface AdvisorsSidebarMenuProps {
   page?: string
 }
 
 export function AdvisorsSidebarMenu({ page }: AdvisorsSidebarMenuProps) {
-  const { data: project } = useSelectedProjectQuery()
-  const advisorRules = useIsAdvisorRulesEnabled()
+  const menu = useGenerateAdvisorsMenu()
   const { toggleSidebar } = useSidebarManagerSnapshot()
 
   const handleOpenAdvisor = () => {
@@ -25,8 +23,8 @@ export function AdvisorsSidebarMenu({ page }: AdvisorsSidebarMenuProps) {
       <FeaturePreviewSidebarPanel
         className="mx-4 mt-4"
         title="Moving to the toolbar"
-        description="Advisors are now available in the top toolbar for quicker access across the dashboard"
-        illustration={<Badge variant="brand">New Location</Badge>}
+        description="Advisors are now available in the top toolbar for quicker access across the dashboard."
+        illustration={<Badge variant="success">New</Badge>}
         actions={
           <Button size="tiny" type="default" onClick={handleOpenAdvisor}>
             Try it now
@@ -34,7 +32,7 @@ export function AdvisorsSidebarMenu({ page }: AdvisorsSidebarMenuProps) {
         }
       />
 
-      <ProductMenu page={page} menu={generateAdvisorsMenu(project, { advisorRules })} />
+      <ProductMenu page={page} menu={menu} />
     </div>
   )
 }

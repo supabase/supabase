@@ -1,16 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useState } from 'react'
-
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useClientSecretCreateMutation } from 'data/oauth-secrets/client-secret-create-mutation'
-import { CreatedSecret, useClientSecretsQuery } from 'data/oauth-secrets/client-secrets-query'
-import { OAuthApp } from 'data/oauth/oauth-apps-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { DOCS_URL } from 'lib/constants'
-import { Alert_Shadcn_, AlertTitle_Shadcn_, InfoIcon } from 'ui'
+import { useState } from 'react'
+import { Alert, AlertTitle, InfoIcon } from 'ui'
+
 import { SecretRow } from './SecretRow'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useClientSecretCreateMutation } from '@/data/oauth-secrets/client-secret-create-mutation'
+import { CreatedSecret, useClientSecretsQuery } from '@/data/oauth-secrets/client-secrets-query'
+import { OAuthApp } from '@/data/oauth/oauth-apps-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { DOCS_URL } from '@/lib/constants'
 
 interface Props {
   selectedApp?: OAuthApp
@@ -26,7 +26,7 @@ export const OAuthSecrets = ({ selectedApp }: Props) => {
   const { data } = useClientSecretsQuery({ slug, appId })
   const secrets = data?.client_secrets ?? []
 
-  const { mutate: createSecret, isLoading: isCreatingSecret } = useClientSecretCreateMutation({
+  const { mutate: createSecret, isPending: isCreatingSecret } = useClientSecretCreateMutation({
     onSuccess: (data) => setCreatedSecret(data),
   })
 
@@ -71,12 +71,12 @@ export const OAuthSecrets = ({ selectedApp }: Props) => {
       </div>
 
       {createdSecret && (
-        <Alert_Shadcn_ variant="default">
+        <Alert variant="default">
           <InfoIcon />
-          <AlertTitle_Shadcn_>
+          <AlertTitle>
             Make sure to copy your new client secret now. You won't be able to see it again.
-          </AlertTitle_Shadcn_>
-        </Alert_Shadcn_>
+          </AlertTitle>
+        </Alert>
       )}
 
       <div className="-space-y-px">

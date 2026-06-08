@@ -1,14 +1,15 @@
+import { safeSql } from '@supabase/pg-meta'
 import { Query } from '@supabase/pg-meta/src/query'
 import { useQuery } from '@tanstack/react-query'
 
-import type { UseCustomQueryOptions, VaultSecret } from 'types'
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { vaultSecretsKeys } from './keys'
+import { executeSql, ExecuteSqlError } from '@/data/sql/execute-sql-query'
+import type { UseCustomQueryOptions, VaultSecret } from '@/types'
 
 export const getVaultSecretsSql = () => {
   const sql = new Query()
     .from('secrets', 'vault')
-    .select('id,name,description,secret,created_at,updated_at')
+    .select(safeSql`id,name,description,secret,created_at,updated_at`)
     .toSql()
 
   return sql

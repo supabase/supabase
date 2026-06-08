@@ -1,7 +1,5 @@
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
-import { useS3AccessKeyDeleteMutation } from 'data/storage/s3-access-key-delete-mutation'
+import { toast } from 'sonner'
 import {
   Button,
   Dialog,
@@ -13,6 +11,8 @@ import {
   DialogSectionSeparator,
   DialogTitle,
 } from 'ui'
+
+import { useS3AccessKeyDeleteMutation } from '@/data/storage/s3-access-key-delete-mutation'
 
 interface RevokeCredentialModalProps {
   visible: boolean
@@ -26,7 +26,7 @@ export const RevokeCredentialModal = ({
   onClose,
 }: RevokeCredentialModalProps) => {
   const { ref: projectRef } = useParams()
-  const { mutate: deleteS3AccessKey, isLoading: isDeleting } = useS3AccessKeyDeleteMutation({
+  const { mutate: deleteS3AccessKey, isPending: isDeleting } = useS3AccessKeyDeleteMutation({
     onSuccess: () => {
       toast.success('Successfully revoked S3 access key')
       onClose()

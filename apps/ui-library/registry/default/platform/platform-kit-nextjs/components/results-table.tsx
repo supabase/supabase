@@ -1,5 +1,6 @@
 'use client'
 
+import { cn } from '@/lib/utils'
 import {
   Table,
   TableBody,
@@ -8,7 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/registry/default/components/ui/table'
-import { cn } from '@/lib/utils'
 
 interface ResultsTableProps {
   data: any[]
@@ -43,7 +43,7 @@ export function ResultsTable({ data, onRowClick }: ResultsTableProps) {
             >
               {headers.map((header) => (
                 <TableCell
-                  className="first:pl-6 lg:first:pl-8 last:pr-6 lg:last:pr-8 text-xs text-muted-foreground group-hover:text-foreground min-w-[8rem]"
+                  className="first:pl-6 lg:first:pl-8 last:pr-6 lg:last:pr-8 text-xs text-muted-foreground group-hover:text-foreground min-w-32"
                   key={`${rowIndex}-${header}`}
                 >
                   <div className="text-xs font-mono w-fit max-w-96 truncate">

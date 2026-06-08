@@ -1,10 +1,5 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
-import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,22 +9,44 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
-  Badge,
   Button,
-  InfoIcon,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
+
 import { getIndexAdvisorExtensions } from './index-advisor.utils'
+import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
+import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const EnableIndexAdvisorButton = () => {
-  const { data: project } = useSelectedProjectQuery()
-
-  const { isIndexAdvisorAvailable, isIndexAdvisorEnabled } = useIndexAdvisorStatus()
-
+  const track = useTrack()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+
+  return (
+    <>
+      <Button
+        type="primary"
+        onClick={() => {
+          setIsDialogOpen(true)
+          track('index_advisor_enable_button_clicked', { origin: 'banner' })
+        }}
+      >
+        Enable
+      </Button>
+      <EnableIndexAdvisorDialog open={isDialogOpen} setOpen={setIsDialogOpen} />
+    </>
+  )
+}
+
+export const EnableIndexAdvisorDialog = ({
+  open,
+  setOpen,
+}: {
+  open: boolean
+  setOpen: (value: boolean) => void
+}) => {
+  const track = useTrack()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -37,7 +54,7 @@ export const EnableIndexAdvisorButton = () => {
   })
   const { hypopg, indexAdvisor } = getIndexAdvisorExtensions(extensions)
 
-  const { mutateAsync: enableExtension, isLoading: isEnablingExtension } =
+  const { mutateAsync: enableExtension, isPending: isEnablingExtension } =
     useDatabaseExtensionEnableMutation()
 
   const onEnableIndexAdvisor = async () => {
@@ -66,59 +83,41 @@ export const EnableIndexAdvisorButton = () => {
         })
       }
       toast.success('Successfully enabled Index Advisor!')
-      setIsDialogOpen(false)
+      setOpen(false)
     } catch (error: any) {
       toast.error(`Failed to enable Index Advisor: ${error.message}`)
+      throw error
     }
   }
 
-  // if index_advisor is already enabled or not available to install, show nothing
-  if (!isIndexAdvisorAvailable || isIndexAdvisorEnabled) return null
-
   return (
-    <AlertDialog open={isDialogOpen} onOpenChange={() => setIsDialogOpen(!isDialogOpen)}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <AlertDialogTrigger asChild>
-            <Button type="outline" className={`rounded-full`} icon={<InfoIcon />}>
-              Enable Index Advisor
-            </Button>
-          </AlertDialogTrigger>
-        </TooltipTrigger>
-        <TooltipContent side="top">Recommends indexes to improve query performance</TooltipContent>
-      </Tooltip>
-
-      <AlertDialogContent>
+    <AlertDialog open={open} onOpenChange={() => setOpen(!open)}>
+      <AlertDialogContent size="small">
         <AlertDialogHeader>
           <AlertDialogTitle>Enable Index Advisor</AlertDialogTitle>
-          <AlertDialogDescription>
-            Index Advisor is a tool that helps you identify and simulate indexes that can improve
-            query performance. To use Index Advisor, you need to enable the following Postgres
-            extensions:
-            <ul className="list-disc pl-6 py-4 flex flex-col gap-2">
-              <li>
-                <Badge className="font-mono text-foreground">index_advisor</Badge> - Recommends
-                database indexes
-              </li>
-              <li>
-                <Badge className="font-mono text-foreground">hypopg</Badge> - For hypothetical
-                indexes simulation
-              </li>
-            </ul>
-            These extensions help identify and simulate indexes that can improve query performance
-            without having to create actual indexes.
+          <AlertDialogDescription className="flex flex-col gap-y-2">
+            <p>
+              The Index Advisor recommends indexes to improve query performance on your tables based
+              on your actual query patterns.
+            </p>
+            <p>
+              This will install the{' '}
+              <code className="text-code-inline break-normal!">index_advisor</code> and{' '}
+              <code className="text-code-inline break-normal!">hypopg</code> Postgres extensions so
+              Index Advisor can analyse queries and suggest performance-improving indexes.
+            </p>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            onClick={(e) => {
-              e.preventDefault()
-              onEnableIndexAdvisor()
+            loading={isEnablingExtension}
+            onClick={() => {
+              track('index_advisor_enable_button_clicked', { origin: 'dialog' })
+              return onEnableIndexAdvisor()
             }}
-            disabled={isEnablingExtension}
           >
-            {isEnablingExtension ? 'Enabling...' : 'Enable Extensions'}
+            {isEnablingExtension ? 'Enabling...' : 'Enable'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

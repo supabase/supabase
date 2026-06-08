@@ -1,12 +1,12 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
 import { type PropsWithChildren } from 'react'
-
-import { ProfileImage as ProfileImageDisplay } from 'components/ui/ProfileImage'
-import { useProfileNameAndPicture } from 'lib/profile'
 import { cn } from 'ui'
+
 import { useMessageInfoContext } from './Message.Context'
-import { MessageMarkdown } from './MessageMarkdown'
 import { MessagePartSwitcher } from './Message.Parts'
+import { MessageMarkdown } from './MessageMarkdown'
+import { ProfileImage as ProfileImageDisplay } from '@/components/ui/ProfileImage'
+import { useProfileNameAndPicture } from '@/lib/profile'
 
 function MessageDisplayProfileImage() {
   const { username, avatarUrl } = useProfileNameAndPicture()
@@ -54,7 +54,7 @@ function MessageDisplayContent({ message }: { message: VercelMessage }) {
       {messageParts?.length > 0
         ? messageParts.map((part: NonNullable<VercelMessage['parts'][number]>, idx) => {
             const isLastPart = idx === messageParts.length - 1
-            return <MessagePartSwitcher part={part} isLastPart={isLastPart} />
+            return <MessagePartSwitcher key={idx} part={part} isLastPart={isLastPart} />
           })
         : content && (
             <MessageDisplayTextMessage id={id} isLoading={isLoading} readOnly={readOnly}>
@@ -76,7 +76,7 @@ function MessageDisplayTextMessage({
       id={id}
       isLoading={isLoading}
       readOnly={readOnly}
-      className="prose prose-sm max-w-none break-words prose-h2:font-medium"
+      className="prose prose-sm max-w-none wrap-break-word prose-h2:font-medium"
     >
       {children}
     </MessageMarkdown>

@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { replicationKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type ReplicationTablesParams = { projectRef?: string; sourceId?: number }
 
@@ -21,7 +21,7 @@ async function fetchReplicationTables(
     handleError(error)
   }
 
-  return data
+  return data.tables
 }
 
 export type ReplicationTablesData = Awaited<ReturnType<typeof fetchReplicationTables>>

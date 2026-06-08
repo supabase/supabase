@@ -1,13 +1,14 @@
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import { UseCustomInfiniteQueryOptions } from 'types'
 import { Content, ContentType } from './content-query'
+import { remapSqlContentFields } from './content-remap'
 import { contentKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { UseCustomInfiniteQueryOptions } from '@/types'
 
 interface GetContentVariables {
   projectRef?: string
-  cursor?: string
+  cursor?: string | undefined
   type: ContentType
   name?: string
   limit?: number
@@ -40,7 +41,7 @@ export async function getContent(
 
   return {
     cursor: data.cursor,
-    content: data.data as unknown as Content[],
+    content: remapSqlContentFields(data.data as unknown as Content[]),
   }
 }
 
@@ -52,13 +53,20 @@ export const useContentInfiniteQuery = <TData = ContentData>(
   {
     enabled = true,
     ...options
-  }: UseCustomInfiniteQueryOptions<ContentData, ContentError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<
+    ContentData,
+    ContentError,
+    InfiniteData<TData>,
+    readonly unknown[],
+    string | undefined
+  > = {}
 ) => {
-  return useInfiniteQuery<ContentData, ContentError, TData>({
+  return useInfiniteQuery({
     queryKey: contentKeys.infiniteList(projectRef, { type, name, limit, sort }),
     queryFn: ({ signal, pageParam }) =>
       getContent({ projectRef, type, name, limit, sort, cursor: pageParam }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
+    initialPageParam: undefined,
     getNextPageParam: (lastPage) => lastPage.cursor,
     ...options,
   })

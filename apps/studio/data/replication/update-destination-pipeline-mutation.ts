@@ -1,46 +1,25 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import type { components } from 'api-types'
 import { toast } from 'sonner'
 
-import type { components } from 'api-types'
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { BatchConfig, DestinationConfig } from './create-destination-pipeline-mutation'
 import { replicationKeys } from './keys'
-
-export type BigQueryDestinationConfig = {
-  projectId: string
-  datasetId: string
-  serviceAccountKey: string
-  maxStalenessMins?: number
-}
-
-export type IcebergDestinationConfig = {
-  projectRef: string
-  warehouseName: string
-  namespace: string
-  catalogToken: string
-  s3AccessKeyId: string
-  s3SecretAccessKey: string
-  s3Region: string
-}
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type UpdateDestinationPipelineParams = {
   destinationId: number
   pipelineId: number
   projectRef: string
   destinationName: string
-  destinationConfig:
-    | {
-        bigQuery: BigQueryDestinationConfig
-      }
-    | {
-        iceberg: IcebergDestinationConfig
-      }
+  destinationConfig: DestinationConfig
   sourceId: number
   pipelineConfig: {
     publicationName: string
-    batch?: {
-      maxFillMs: number
-    }
+    batch?: BatchConfig
+    maxTableSyncWorkers?: number
+    maxCopyConnectionsPerTable?: number
+    invalidatedSlotBehavior?: 'error' | 'recreate'
   }
 }
 
@@ -51,7 +30,13 @@ async function updateDestinationPipeline(
     projectRef,
     destinationName: destinationName,
     destinationConfig,
-    pipelineConfig: { publicationName, batch },
+    pipelineConfig: {
+      publicationName,
+      batch,
+      maxTableSyncWorkers,
+      maxCopyConnectionsPerTable,
+      invalidatedSlotBehavior,
+    },
     sourceId,
   }: UpdateDestinationPipelineParams,
   signal?: AbortSignal
@@ -62,15 +47,17 @@ async function updateDestinationPipeline(
   let destination_config: components['schemas']['UpdateReplicationDestinationPipelineBody']['destination_config']
 
   if ('bigQuery' in destinationConfig) {
-    const { projectId, datasetId, serviceAccountKey, maxStalenessMins } = destinationConfig.bigQuery
+    const { projectId, datasetId, serviceAccountKey, connectionPoolSize, maxStalenessMins } =
+      destinationConfig.bigQuery
     destination_config = {
       big_query: {
         project_id: projectId,
         dataset_id: datasetId,
         service_account_key: serviceAccountKey,
-        ...(maxStalenessMins !== null ? { max_staleness_mins: maxStalenessMins } : {}),
+        connection_pool_size: connectionPoolSize,
+        max_staleness_mins: maxStalenessMins,
       },
-    }
+    } as components['schemas']['UpdateReplicationDestinationPipelineBody']['destination_config']
   } else if ('iceberg' in destinationConfig) {
     const {
       projectRef: icebergProjectRef,
@@ -94,8 +81,43 @@ async function updateDestinationPipeline(
         },
       },
     }
+  } else if ('ducklake' in destinationConfig) {
+    const {
+      catalogUrl,
+      dataPath,
+      poolSize,
+      s3AccessKeyId,
+      s3SecretAccessKey,
+      s3Region,
+      s3Endpoint,
+      s3UrlStyle,
+      s3UseSsl,
+      metadataSchema,
+    } = destinationConfig.ducklake
+    destination_config = {
+      ducklake: {
+        catalog_url: catalogUrl,
+        data_path: dataPath,
+        pool_size: poolSize,
+        s3_access_key_id: s3AccessKeyId,
+        s3_secret_access_key: s3SecretAccessKey,
+        s3_region: s3Region,
+        s3_endpoint: s3Endpoint,
+        s3_url_style: s3UrlStyle,
+        s3_use_ssl: s3UseSsl,
+        metadata_schema: metadataSchema,
+      },
+    } as unknown as components['schemas']['UpdateReplicationDestinationPipelineBody']['destination_config']
   } else {
-    throw new Error('Invalid destination config: must specify either bigQuery or iceberg')
+    throw new Error('Invalid destination config: must specify bigQuery, iceberg, or ducklake')
+  }
+
+  const pipeline_config = {
+    publication_name: publicationName,
+    max_table_sync_workers: maxTableSyncWorkers,
+    max_copy_connections_per_table: maxCopyConnectionsPerTable,
+    invalidated_slot_behavior: invalidatedSlotBehavior,
+    batch: batch ? { max_fill_ms: batch.maxFillMs } : undefined,
   }
 
   const { data, error } = await post(
@@ -106,14 +128,13 @@ async function updateDestinationPipeline(
         destination_config,
         source_id: sourceId,
         destination_name: destinationName,
-        pipeline_config: {
-          publication_name: publicationName,
-          ...(!!batch ? { batch: { max_fill_ms: batch.maxFillMs } } : {}),
-        },
+        pipeline_config:
+          pipeline_config as components['schemas']['UpdateReplicationDestinationPipelineBody']['pipeline_config'],
       },
       signal,
     }
   )
+
   if (error) handleError(error)
   return data
 }

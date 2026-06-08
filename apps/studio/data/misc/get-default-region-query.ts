@@ -1,17 +1,17 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { useFlag } from 'common'
-import { COUNTRY_LAT_LON } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
+import type { CloudProvider } from 'shared-data'
+import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
+
+import { miscKeys } from './keys'
+import { COUNTRY_LAT_LON } from '@/components/interfaces/ProjectCreation/ProjectCreation.constants'
 import {
   AWS_REGIONS_COORDINATES,
   FLY_REGIONS_COORDINATES,
-} from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
-import { fetchHandler } from 'data/fetchers'
-import { getDistanceLatLonKM, tryParseJson } from 'lib/helpers'
-import type { CloudProvider } from 'shared-data'
-import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
-import { miscKeys } from './keys'
+} from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
+import { fetchHandler } from '@/data/fetchers'
+import { getDistanceLatLonKM, tryParseJson } from '@/lib/helpers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type DefaultRegionVariables = {
   cloudProvider?: CloudProvider

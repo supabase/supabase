@@ -3,14 +3,6 @@ import { includes, noop, sortBy } from 'lodash'
 import { Copy, Edit, Edit2, FileText, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   Button,
   DropdownMenu,
@@ -22,6 +14,15 @@ import {
   TableRow,
 } from 'ui'
 
+import { getDatabaseTriggersHref } from './FunctionList.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import type { DatabaseFunction } from '@/data/database-functions/database-functions-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+
 interface FunctionListProps {
   schema: string
   filterString: string
@@ -31,6 +32,7 @@ interface FunctionListProps {
   duplicateFunction: (fn: any) => void
   editFunction: (fn: any) => void
   deleteFunction: (fn: any) => void
+  functions: DatabaseFunction[]
 }
 
 const FunctionList = ({
@@ -42,16 +44,12 @@ const FunctionList = ({
   duplicateFunction = noop,
   editFunction = noop,
   deleteFunction = noop,
+  functions,
 }: FunctionListProps) => {
   const router = useRouter()
   const { data: selectedProject } = useSelectedProjectQuery()
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
-
-  const { data: functions } = useDatabaseFunctionsQuery({
-    projectRef: selectedProject?.ref,
-    connectionString: selectedProject?.connectionString,
-  })
 
   const filteredFunctions = (functions ?? []).filter((x) => {
     const matchesName = includes(x.name.toLowerCase(), filterString.toLowerCase())
@@ -109,7 +107,8 @@ const FunctionList = ({
             <TableCell className="truncate">
               <Button
                 type="text"
-                className="text-link-table-cell text-sm p-0 hover:bg-transparent title"
+                className="text-link-table-cell text-sm disabled:opacity-100 disabled:no-underline p-0 hover:bg-transparent title"
+                disabled={isLocked || !canUpdateFunctions}
                 onClick={() => editFunction(x)}
                 title={x.name}
               >
@@ -127,7 +126,7 @@ const FunctionList = ({
             <TableCell className="table-cell">
               {x.return_type === 'trigger' ? (
                 <Link
-                  href={`/project/${projectRef}/database/triggers?search=${x.name}`}
+                  href={getDatabaseTriggersHref(projectRef, x.name)}
                   className="truncate text-link"
                   title={x.return_type}
                 >

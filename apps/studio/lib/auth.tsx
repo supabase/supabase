@@ -1,15 +1,16 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { PropsWithChildren, useCallback, useEffect } from 'react'
-import { toast } from 'sonner'
-
 import {
   AuthProvider as AuthProviderInternal,
   clearLocalStorage,
   gotrueClient,
+  posthogClient,
   useAuthError,
 } from 'common'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { PropsWithChildren, useCallback, useEffect } from 'react'
+import { toast } from 'sonner'
+
 import { GOTRUE_ERRORS, IS_PLATFORM } from './constants'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 
 const AuthErrorToaster = ({ children }: PropsWithChildren) => {
   const error = useAuthError()
@@ -45,6 +46,7 @@ export function useSignOut() {
 
   return useCallback(async () => {
     const result = await gotrueClient.signOut()
+    posthogClient.reset()
     clearLocalStorage()
     // Clear Assistant IndexedDB
     await clearAssistantStorage()

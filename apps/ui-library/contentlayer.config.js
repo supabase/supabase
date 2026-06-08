@@ -1,6 +1,6 @@
+import path from 'path'
 import { getHighlighter, loadTheme } from '@shikijs/compat'
 import { defineDocumentType, defineNestedType, makeSource } from 'contentlayer2/source-files'
-import path from 'path'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import rehypePrettyCode from 'rehype-pretty-code'
 import rehypeSlug from 'rehype-slug'
@@ -104,6 +104,7 @@ export const Doc = defineDocumentType(() => ({
 
 export default makeSource({
   contentDirPath: './content',
+  disableImportAliasWarning: true,
   documentTypes: [Doc],
   mdx: {
     remarkPlugins: [remarkGfm, codeImport],

@@ -1,24 +1,26 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
-import * as Sentry from '@sentry/nextjs'
 import type { AuthError } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
+import { useAuthError } from 'common'
+import { Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import { type SubmitHandler, useForm } from 'react-hook-form'
+import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
+import { Button, Form, FormControl, FormField, Input } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
-import { useAddLoginEvent } from 'data/misc/audit-login-mutation'
-import { getMfaAuthenticatorAssuranceLevel } from 'data/profile/mfa-authenticator-assurance-level-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useLastSignIn } from 'hooks/misc/useLastSignIn'
-import { auth, buildPathWithParams, getReturnToPath } from 'lib/gotrue'
-import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { LastSignInWrapper } from './LastSignInWrapper'
-import { Eye, EyeOff } from 'lucide-react'
+import AlertError from '@/components/ui/AlertError'
+import { useAddLoginEvent } from '@/data/misc/audit-login-mutation'
+import { getMfaAuthenticatorAssuranceLevel } from '@/data/profile/mfa-authenticator-assurance-level-query'
+import { useLastSignIn } from '@/hooks/misc/useLastSignIn'
+import { captureCriticalError } from '@/lib/error-reporting'
+import { auth, buildPathWithParams, getReturnToPath } from '@/lib/gotrue'
+import { useTrack } from '@/lib/telemetry/track'
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Must be a valid email'),
@@ -48,7 +50,7 @@ export const SignInForm = () => {
     setReturnTo(getReturnToPath())
   }, [])
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { mutate: addLoginEvent } = useAddLoginEvent()
 
   let forgotPasswordUrl = `/forgot-password`
@@ -86,10 +88,7 @@ export const SignInForm = () => {
         }
 
         toast.success(`Signed in successfully!`, { id: toastId })
-        sendEvent({
-          action: 'sign_in',
-          properties: { category: 'account', method: 'email' },
-        })
+        track('sign_in', { category: 'account', method: 'email' })
         addLoginEvent({})
 
         await queryClient.resetQueries()
@@ -101,7 +100,7 @@ export const SignInForm = () => {
         router.push(redirectPath)
       } catch (error: any) {
         toast.error(`Failed to sign in: ${(error as AuthError).message}`, { id: toastId })
-        Sentry.captureMessage('[CRITICAL] Failed to sign in via EP: ' + error.message)
+        captureCriticalError(error, 'sign in via EP')
       }
     } else {
       setCaptchaToken(null)
@@ -118,17 +117,20 @@ export const SignInForm = () => {
     }
   }
 
+  const authError = useAuthError()
+
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField_Shadcn_
+        {authError && <AlertError error={authError} subject="Error while signing in" />}
+        <FormField
           key="email"
           name="email"
           control={form.control}
           render={({ field }) => (
             <FormItemLayout name="email" label="Email">
-              <FormControl_Shadcn_>
-                <Input_Shadcn_
+              <FormControl>
+                <Input
                   id="email"
                   type="email"
                   autoComplete="email"
@@ -136,21 +138,21 @@ export const SignInForm = () => {
                   placeholder="you@example.com"
                   disabled={isSubmitting}
                 />
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )}
         />
 
         <div className="relative">
-          <FormField_Shadcn_
+          <FormField
             key="password"
             name="password"
             control={form.control}
             render={({ field }) => (
               <FormItemLayout name="password" label="Password">
-                <FormControl_Shadcn_>
+                <FormControl>
                   <div className="relative">
-                    <Input_Shadcn_
+                    <Input
                       id="password"
                       type={passwordHidden ? 'password' : 'text'}
                       autoComplete="current-password"
@@ -169,7 +171,7 @@ export const SignInForm = () => {
                       onClick={() => setPasswordHidden((prev) => !prev)}
                     />
                   </div>
-                </FormControl_Shadcn_>
+                </FormControl>
               </FormItemLayout>
             )}
           />
@@ -179,7 +181,7 @@ export const SignInForm = () => {
             href={forgotPasswordUrl}
             className="absolute top-0 right-0 text-sm text-foreground-lighter"
           >
-            Forgot Password?
+            Forgot password?
           </Link>
         </div>
 
@@ -199,10 +201,10 @@ export const SignInForm = () => {
 
         <LastSignInWrapper type="email">
           <Button block form={formId} htmlType="submit" size="large" loading={isSubmitting}>
-            Sign In
+            Sign in
           </Button>
         </LastSignInWrapper>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

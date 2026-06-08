@@ -1,10 +1,10 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import type { components } from 'api-types'
 import { toast } from 'sonner'
 
-import type { components } from 'api-types'
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { storageKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError } from '@/types'
 
 type VectorBucketIndexCreateVariables = components['schemas']['CreateBucketIndexBody'] & {
   projectRef: string
@@ -52,7 +52,9 @@ export const useVectorBucketIndexCreateMutation = ({
     mutationFn: (vars) => createVectorBucketIndex(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, bucketName } = variables
-      await queryClient.invalidateQueries(storageKeys.vectorBucketsIndexes(projectRef, bucketName))
+      await queryClient.invalidateQueries({
+        queryKey: storageKeys.vectorBucketsIndexes(projectRef, bucketName),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

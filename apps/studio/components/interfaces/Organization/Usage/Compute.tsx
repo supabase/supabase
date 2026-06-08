@@ -1,20 +1,20 @@
 import { BarChart2 } from 'lucide-react'
 import { useMemo } from 'react'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import Panel from 'components/ui/Panel'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { DataPoint } from 'data/analytics/constants'
+import { SectionContent } from './SectionContent'
+import { Attribute, AttributeColor } from './Usage.constants'
+import { dailyUsageToDataPoints } from './Usage.utils'
+import UsageBarChart from './UsageBarChart'
+import Panel from '@/components/ui/Panel'
+import { DataPoint } from '@/data/analytics/constants'
 import {
   ComputeUsageMetric,
   computeUsageMetricLabel,
   type OrgDailyUsageResponse,
-} from 'data/analytics/org-daily-stats-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { DOCS_URL } from 'lib/constants'
-import { SectionContent } from './SectionContent'
-import { Attribute, AttributeColor } from './Usage.constants'
-import UsageBarChart from './UsageBarChart'
-import { dailyUsageToDataPoints } from './Usage.utils'
+} from '@/data/analytics/org-daily-stats-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from '@/lib/constants'
 
 export interface ComputeProps {
   orgDailyStats: OrgDailyUsageResponse | undefined

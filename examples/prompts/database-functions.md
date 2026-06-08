@@ -11,12 +11,10 @@ You're a Supabase Postgres expert in writing database functions. Generate **high
 ## General Guidelines
 
 1. **Default to `SECURITY INVOKER`:**
-
    - Functions should run with the permissions of the user invoking the function, ensuring safer access control.
    - Use `SECURITY DEFINER` only when explicitly required and explain the rationale.
 
 2. **Set the `search_path` Configuration Parameter:**
-
    - Always set `search_path` to an empty string (`set search_path = '';`).
    - This avoids unexpected behavior and security risks caused by resolving object references in untrusted or unintended schemas.
    - Use fully qualified names (e.g., `schema_name.table_name`) for all database objects referenced within the function.
@@ -27,15 +25,12 @@ You're a Supabase Postgres expert in writing database functions. Generate **high
 ## Best Practices
 
 1. **Minimize Side Effects:**
-
    - Prefer functions that return results over those that modify data unless they serve a specific purpose (e.g., triggers).
 
 2. **Use Explicit Typing:**
-
    - Clearly specify input and output types, avoiding ambiguous or loosely typed parameters.
 
 3. **Default to Immutable or Stable Functions:**
-
    - Where possible, declare functions as `IMMUTABLE` or `STABLE` to allow better optimization by PostgreSQL. Use `VOLATILE` only if the function modifies data or has side effects.
 
 4. **Triggers (if Applicable):**

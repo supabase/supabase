@@ -1,16 +1,16 @@
-import { ExternalLink } from 'lucide-react'
-import { type ReactNode } from 'react'
-import ReactMarkdown from 'react-markdown'
-
-import { cn } from 'ui'
-
 import Breadcrumbs from '~/components/Breadcrumbs'
-import GuidesTableOfContents from '~/components/GuidesTableOfContents'
+import GuidesSidebar from '~/components/GuidesSidebar'
 import { TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import type { WithRequired } from '~/features/helpers.types'
+import { resolveBreadcrumbs } from '~/lib/breadcrumbs'
 import { type GuideFrontmatter } from '~/lib/docs'
+import { breadcrumbListSchema, serializeJsonLd } from '~/lib/json-ld'
 import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
+import { ExternalLink } from 'lucide-react'
+import { type ReactNode } from 'react'
+import ReactMarkdown from 'react-markdown'
+import { cn } from 'ui'
 
 const EDIT_LINK_SYMBOL = Symbol('edit link')
 interface EditLink {
@@ -54,14 +54,25 @@ interface BaseGuideTemplateProps {
   children?: ReactNode
   editLink: EditLink
   mdxOptions?: SerializeOptions
+  pathname: `/${string}`
 }
 
 type GuideTemplateProps =
   | WithRequired<BaseGuideTemplateProps, 'children'>
   | WithRequired<BaseGuideTemplateProps, 'content'>
 
-const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideTemplateProps) => {
+const GuideTemplate = ({
+  meta,
+  content,
+  children,
+  editLink,
+  mdxOptions,
+  pathname,
+}: GuideTemplateProps) => {
   const hideToc = meta?.hideToc || meta?.hide_table_of_contents
+  const breadcrumbChain = resolveBreadcrumbs(pathname)
+  const breadcrumbSchema = breadcrumbListSchema({ pathname, chain: breadcrumbChain })
+  const breadcrumbJsonLd = breadcrumbSchema ? serializeJsonLd(breadcrumbSchema) : null
 
   return (
     <TocAnchorsProvider>
@@ -71,9 +82,15 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
             'relative',
             'transition-all ease-out',
             'duration-100',
-            hideToc ? 'col-span-12' : 'col-span-12 md:col-span-9'
+            'col-span-12 md:col-span-9'
           )}
         >
+          {breadcrumbJsonLd && (
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }}
+            />
+          )}
           <Breadcrumbs className="mb-2" />
           <article
             // Used to get headings for the table of contents
@@ -114,24 +131,23 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
             </footer>
           </article>
         </div>
-        {!hideToc && (
-          <GuidesTableOfContents
-            video={meta?.tocVideo}
-            className={cn(
-              'hidden md:flex',
-              'col-span-3 self-start',
-              'sticky',
-              /**
-               * --header-height: height of nav
-               * 1px: height of nav border
-               * 2rem: content padding
-               */
-              'top-[calc(var(--header-height)+1px+2rem)]',
-              // 3rem accounts for 2rem of top padding + 1rem of extra breathing room
-              'max-h-[calc(100vh-var(--header-height)-3rem)]'
-            )}
-          />
-        )}
+        <GuidesSidebar
+          video={meta?.tocVideo}
+          hideToc={hideToc}
+          className={cn(
+            'hidden md:flex',
+            'col-span-3 self-start',
+            'sticky',
+            /**
+             * --header-height: height of nav
+             * 1px: height of nav border
+             * 2rem: content padding
+             */
+            'top-[calc(var(--header-height)+1px+2rem)]',
+            // 3rem accounts for 2rem of top padding + 1rem of extra breathing room
+            'max-h-[calc(100vh-var(--header-height)-3rem)]'
+          )}
+        />
       </div>
     </TocAnchorsProvider>
   )

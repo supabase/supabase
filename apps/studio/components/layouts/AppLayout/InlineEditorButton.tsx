@@ -1,25 +1,26 @@
-import { LOCAL_STORAGE_KEYS } from 'common'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { SqlEditor } from 'icons'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { cn, KeyboardShortcut } from 'ui'
 
-const InlineEditorKeyboardTooltip = () => {
-  const [hotkeyEnabled] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.EDITOR_PANEL),
-    true
-  )
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useTrack } from '@/lib/telemetry/track'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
-  return hotkeyEnabled ? <KeyboardShortcut keys={['Meta', 'e']} /> : null
+const InlineEditorKeyboardTooltip = () => {
+  const hotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.INLINE_EDITOR_TOGGLE)
+
+  return hotkeyEnabled ? <KeyboardShortcut keys={['Meta', 'E']} /> : null
 }
 
 export const InlineEditorButton = () => {
   const { activeSidebar, toggleSidebar } = useSidebarManagerSnapshot()
   const isOpen = activeSidebar?.id === SIDEBAR_KEYS.EDITOR_PANEL
+  const track = useTrack()
 
   const handleClick = () => {
+    track('header_inline_editor_button_clicked')
     toggleSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
   }
 
@@ -35,8 +36,9 @@ export const InlineEditorButton = () => {
       onClick={handleClick}
       tooltip={{
         content: {
+          className: 'p-1 pl-2.5',
           text: (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2.5">
               <span>SQL Editor</span>
               <InlineEditorKeyboardTooltip />
             </div>
@@ -44,7 +46,8 @@ export const InlineEditorButton = () => {
         },
       }}
     >
-      <SqlEditor size={18} strokeWidth={1.5} />
+      <SqlEditor size={16} strokeWidth={1.5} />
+      <span className="sr-only">SQL Editor</span>
     </ButtonTooltip>
   )
 }

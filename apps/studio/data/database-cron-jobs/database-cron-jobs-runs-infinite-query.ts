@@ -1,9 +1,10 @@
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { literal, safeSql } from '@supabase/pg-meta/src/pg-format'
+import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import { last } from 'lodash'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 import { databaseCronJobsKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
 export type DatabaseCronJobRunsVariables = {
   projectRef?: string
@@ -31,17 +32,21 @@ export async function getDatabaseCronJobRuns({
   projectRef,
   connectionString,
   jobId,
-  afterTimestamp,
-}: DatabaseCronJobRunsVariables & { afterTimestamp: string }) {
+  afterRunId,
+}: DatabaseCronJobRunsVariables & { afterRunId: number | undefined }) {
   if (!projectRef) throw new Error('Project ref is required')
 
-  let query = `
+  // Use runid for ordering and pagination since it's the primary key (indexed)
+  // and preserves chronological order (auto-incrementing)
+  const afterRunIdClause =
+    typeof afterRunId === 'number' ? safeSql`AND runid < ${literal(afterRunId)}` : safeSql``
+  const query = safeSql`
     SELECT * FROM cron.job_run_details
     WHERE
-      jobid = '${jobId}'
-      ${afterTimestamp ? `AND start_time < '${afterTimestamp}'` : ''}
-    ORDER BY start_time DESC
-    LIMIT ${CRON_JOB_RUNS_PAGE_SIZE}`
+      jobid = ${literal(jobId)}
+      ${afterRunIdClause}
+    ORDER BY runid DESC
+    LIMIT ${literal(CRON_JOB_RUNS_PAGE_SIZE)}`
 
   const { result } = await executeSql({
     projectRef,
@@ -59,25 +64,30 @@ export const useCronJobRunsInfiniteQuery = <TData = DatabaseCronJobRunData>(
   {
     enabled = true,
     ...options
-  }: UseCustomInfiniteQueryOptions<DatabaseCronJobRunData, DatabaseCronJobError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<
+    DatabaseCronJobRunData,
+    DatabaseCronJobError,
+    InfiniteData<TData>,
+    readonly unknown[],
+    number | undefined
+  > = {}
 ) =>
-  useInfiniteQuery<DatabaseCronJobRunData, DatabaseCronJobError, TData>({
-    queryKey: databaseCronJobsKeys.runsInfinite(projectRef, jobId, { status }),
+  useInfiniteQuery({
+    queryKey: databaseCronJobsKeys.runsInfinite(projectRef, jobId),
     queryFn: ({ pageParam }) => {
       return getDatabaseCronJobRuns({
         projectRef,
         connectionString,
         jobId,
-        afterTimestamp: pageParam,
+        afterRunId: pageParam,
       })
     },
     staleTime: 0,
     enabled: enabled && typeof projectRef !== 'undefined',
-
+    initialPageParam: undefined,
     getNextPageParam(lastPage) {
-      const hasNextPage = lastPage.length <= CRON_JOB_RUNS_PAGE_SIZE
-      if (!hasNextPage) return undefined
-      return last(lastPage)?.start_time
+      if (lastPage.length < CRON_JOB_RUNS_PAGE_SIZE) return undefined
+      return last(lastPage)?.runid
     },
     ...options,
   })

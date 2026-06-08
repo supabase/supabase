@@ -1,7 +1,7 @@
 ---
 id: 'pg_net'
 title: 'pg_net: Async Networking'
-description: 'pg_net: an async networking extension for PostgreSQL.'
+description: 'pg_net: an async networking extension for Postgres.'
 ---
 
 <Admonition type="caution">
@@ -309,7 +309,7 @@ order by "created" desc;
 
 ## Configuration
 
-<Admonition type="note" label="Must be on pg_net v0.12.0 or above to reconfigure ">
+<Admonition type="note" title="Must be on pg_net v0.12.0 or above to reconfigure ">
 
 Supabase supports reconfiguring pg*net starting from v0.12.0+. For the latest release, initiate a Postgres upgrade in the [Infrastructure Settings](/dashboard/project/*/settings/infrastructure).
 
@@ -329,16 +329,22 @@ where "name" like 'pg_net%';
 
 ### Alter settings
 
-Change variables:
+You must change the `pg_net` settings at the system level.
+
+<Admonition type="note">
+
+Changing these settings requires superuser privileges. Contact Support to have the required permission granted for the parameter you want to change, e.g.:
 
 ```sql
-alter role "postgres" set pg_net.ttl to '24 hours';
-alter role "postgres" set pg_net.batch_size to 500;
+grant alter system on parameter pg_net.ttl to postgres;
 ```
 
-Then reload the settings and restart the `pg_net` background worker with:
+</Admonition>
+
+Once the privilege is assigned, apply the setting at the system level and restart the background worker:
 
 ```sql
+alter system set pg_net.ttl to '24 hours';
 select net.worker_restart();
 ```
 
@@ -352,7 +358,7 @@ Make a POST request to a Supabase Edge Function with auth header and JSON body p
 select
     net.http_post(
         url:='https://project-ref.supabase.co/functions/v1/function-name',
-        headers:='{"Content-Type": "application/json", "Authorization": "Bearer <YOUR_ANON_KEY>"}'::jsonb,
+        headers:='{"Content-Type": "application/json", "apikey": "<SUPABASE_PUBLISHABLE_KEY>"}'::jsonb,
         body:='{"name": "pg_net"}'::jsonb
     ) as request_id;
 ```
@@ -370,7 +376,7 @@ select cron.schedule(
 	    select "net"."http_post"(
             -- URL of Edge function
             url:='https://project-ref.supabase.co/functions/v1/function-name',
-            headers:='{"Authorization": "Bearer <YOUR_ANON_KEY>"}'::jsonb,
+            headers:='{"apikey": "<SUPABASE_PUBLISHABLE_KEY>"}'::jsonb,
             body:='{"name": "pg_net"}'::jsonb
 	    ) as "request_id";
 	$$

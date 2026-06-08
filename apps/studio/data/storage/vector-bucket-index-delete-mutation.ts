@@ -1,9 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { storageKeys } from './keys'
+import { del, handleError } from '@/data/fetchers'
+import type { ResponseError } from '@/types'
 
 type VectorBucketIndexDeleteVariables = {
   projectRef: string
@@ -49,7 +49,9 @@ export const useVectorBucketIndexDeleteMutation = ({
     mutationFn: (vars) => deleteVectorBucketIndex(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, bucketName } = variables
-      await queryClient.invalidateQueries(storageKeys.vectorBucketsIndexes(projectRef, bucketName))
+      await queryClient.invalidateQueries({
+        queryKey: storageKeys.vectorBucketsIndexes(projectRef, bucketName),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

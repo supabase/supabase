@@ -1,20 +1,19 @@
 import { BookOpenText } from 'lucide-react'
-import { useParams } from 'common'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useAppStateSnapshot } from 'state/app-state'
+
 import { ButtonTooltip } from './ButtonTooltip'
+import { useTrack } from '@/lib/telemetry/track'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 interface APIDocsButtonProps {
   section?: string[]
   source: string
+  label?: string
+  tooltip?: string
 }
 
-export const APIDocsButton = ({ section, source }: APIDocsButtonProps) => {
+export const APIDocsButton = ({ section, source, label, tooltip }: APIDocsButtonProps) => {
   const snap = useAppStateSnapshot()
-  const { ref } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   return (
     <ButtonTooltip
@@ -24,25 +23,18 @@ export const APIDocsButton = ({ section, source }: APIDocsButtonProps) => {
         if (section) snap.setActiveDocsSection(section)
         snap.setShowProjectApiDocs(true)
 
-        sendEvent({
-          action: 'api_docs_opened',
-          properties: {
-            source,
-          },
-          groups: {
-            project: ref ?? 'Unknown',
-            organization: org?.slug ?? 'Unknown',
-          },
-        })
+        track('api_docs_opened', { source })
       }}
       icon={<BookOpenText />}
-      className="h-7 w-7"
+      className={label ? undefined : 'w-7'}
       tooltip={{
         content: {
           side: 'bottom',
-          text: 'API Docs',
+          text: tooltip ?? 'API Docs',
         },
       }}
-    />
+    >
+      {label}
+    </ButtonTooltip>
   )
 }

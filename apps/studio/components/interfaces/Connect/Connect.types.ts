@@ -18,4 +18,6 @@ export interface ContentFileProps {
     ipv4SupportedForDedicatedPooler: boolean
     direct?: string
   }
+  connectionTab: 'App Frameworks' | 'Mobile Frameworks' | 'ORMs'
+  onCopy?: () => void
 }

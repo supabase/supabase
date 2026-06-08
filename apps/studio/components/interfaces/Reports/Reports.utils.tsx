@@ -1,14 +1,20 @@
 import dayjs from 'dayjs'
 
-import useDbQuery, { DbQueryHook } from 'hooks/analytics/useDbQuery'
-import useLogsQuery, { LogsQueryHook } from 'hooks/analytics/useLogsQuery'
-import type { BaseQueries, PresetConfig, ReportQuery } from './Reports.types'
+import {
+  type BaseQueries,
+  type PresetConfig,
+  type ReportFilterItem,
+  type ReportQuery,
+} from './Reports.types'
 import {
   isUnixMicro,
   unixMicroToIsoTimestamp,
-} from 'components/interfaces/Settings/Logs/Logs.utils'
-import { REPORT_STATUS_CODE_COLORS } from 'data/reports/report.utils'
-import { getHttpStatusCodeInfo } from 'lib/http-status-codes'
+} from '@/components/interfaces/Settings/Logs/Logs.utils'
+import type { SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
+import { REPORT_STATUS_CODE_COLORS } from '@/data/reports/report.utils'
+import useDbQuery, { DbQueryHook } from '@/hooks/analytics/useDbQuery'
+import useLogsQuery, { LogsQueryHook } from '@/hooks/analytics/useLogsQuery'
+import { getHttpStatusCodeInfo } from '@/lib/http-status-codes'
 
 /**
  * Converts a query params string to an object
@@ -28,23 +34,27 @@ export const queriesFactory = <T extends string>(
   queries: BaseQueries<T>,
   projectRef: string
 ): PresetHooks => {
-  const hooks: PresetHooks = Object.entries<ReportQuery>(queries).reduce(
-    (acc, [k, { sql, queryType }]) => {
-      if (queryType === 'db') {
-        return {
-          ...acc,
-          [k]: () => useDbQuery({ sql }),
-        }
-      } else {
-        return {
-          ...acc,
-          [k]: () => useLogsQuery(projectRef),
-        }
+  const hooks: PresetHooks = Object.entries<ReportQuery>(queries).reduce((acc, [k, query]) => {
+    if (query.queryType === 'db') {
+      return {
+        ...acc,
+        [k]: () => useDbQuery({ sql: query.safeSql }),
       }
-    },
-    {}
-  )
+    } else {
+      return {
+        ...acc,
+        [k]: () => useLogsQuery(projectRef),
+      }
+    }
+  }, {})
   return hooks
+}
+
+export function getLogsSql(query: ReportQuery, filters: ReportFilterItem[]): SafeLogSqlFragment {
+  if (query.queryType !== 'logs') {
+    throw new Error(`Expected logs query, got ${query.queryType}`)
+  }
+  return query.safeSql(filters)
 }
 
 /**

@@ -1,21 +1,22 @@
-import type { PostgresPolicy } from '@supabase/postgres-meta'
+import { useParams } from 'common'
 import { isEmpty } from 'lodash'
 import Link from 'next/link'
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
+import { Button, Card, CardContent } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import { useParams } from 'common'
 import {
   PolicyTableRow,
   PolicyTableRowProps,
-} from 'components/interfaces/Auth/Policies/PolicyTableRow'
-import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
-import { NoSearchResults } from 'components/ui/NoSearchResults'
-import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
-import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Button, Card, CardContent } from 'ui'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+} from '@/components/interfaces/Auth/Policies/PolicyTableRow'
+import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import { ProtectedSchemaWarning } from '@/components/interfaces/Database/ProtectedSchemaWarning'
+import { RLSToggleDialog } from '@/components/interfaces/Database/RLSToggleDialog'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { useDatabasePolicyDeleteMutation } from '@/data/database-policies/database-policy-delete-mutation'
+import { useTableUpdateMutation } from '@/data/tables/table-update-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface PoliciesProps {
   search?: string
@@ -25,7 +26,7 @@ interface PoliciesProps {
   isLocked: boolean
   visibleTableIds: Set<number>
   onSelectCreatePolicy: (table: string) => void
-  onSelectEditPolicy: (policy: PostgresPolicy) => void
+  onSelectEditPolicy: (policy: Policy) => void
   onResetSearch?: () => void
 }
 
@@ -51,22 +52,21 @@ export const Policies = ({
   }>()
   const [selectedPolicyToDelete, setSelectedPolicyToDelete] = useState<any>({})
 
-  const { mutate: updateTable } = useTableUpdateMutation({
+  const { mutateAsync: updateTable, isPending: isUpdatingTable } = useTableUpdateMutation({
     onError: (error) => {
       toast.error(`Failed to toggle RLS: ${error.message}`)
     },
-    onSettled: () => {
-      closeConfirmModal()
-    },
   })
-  const { mutate: deleteDatabasePolicy } = useDatabasePolicyDeleteMutation({
-    onSuccess: () => {
-      toast.success('Successfully deleted policy!')
-    },
-    onSettled: () => {
-      closeConfirmModal()
-    },
-  })
+
+  const { mutate: deleteDatabasePolicy, isPending: isDeletingPolicy } =
+    useDatabasePolicyDeleteMutation({
+      onSuccess: () => {
+        toast.success('Successfully deleted policy!')
+      },
+      onSettled: () => {
+        closeConfirmModal()
+      },
+    })
 
   const closeConfirmModal = useCallback(() => {
     setSelectedPolicyToDelete({})
@@ -81,13 +81,13 @@ export const Policies = ({
   )
 
   const onSelectEditPolicy = useCallback(
-    (policy: PostgresPolicy) => {
+    (policy: Policy) => {
       onSelectEditPolicyAI(policy)
     },
     [onSelectEditPolicyAI]
   )
 
-  const onSelectDeletePolicy = useCallback((policy: PostgresPolicy) => {
+  const onSelectDeletePolicy = useCallback((policy: Policy) => {
     setSelectedPolicyToDelete(policy)
   }, [])
 
@@ -100,7 +100,7 @@ export const Policies = ({
       rls_enabled: !selectedTableToToggleRLS.rls_enabled,
     }
 
-    updateTable({
+    return updateTable({
       projectRef: project?.ref!,
       connectionString: project?.connectionString,
       id: selectedTableToToggleRLS.id,
@@ -153,7 +153,12 @@ export const Policies = ({
             {tables.map((table) => {
               const isVisible = visibleTableIds.has(table.id)
               return (
-                <section key={table.id} hidden={!isVisible} aria-hidden={!isVisible}>
+                <section
+                  key={table.id}
+                  hidden={!isVisible}
+                  aria-hidden={!isVisible}
+                  data-testid={`policy-table-${table.name}`}
+                >
                   <PolicyTableRow
                     table={table}
                     isLocked={schema === 'realtime' ? true : isLocked}
@@ -174,30 +179,27 @@ export const Policies = ({
         ) : null}
       </div>
 
-      <ConfirmModal
-        danger
+      <ConfirmationModal
         visible={!isEmpty(selectedPolicyToDelete)}
-        title="Confirm to delete policy"
-        description={`This is permanent! Are you sure you want to delete the policy "${selectedPolicyToDelete.name}"`}
-        buttonLabel="Delete"
-        buttonLoadingLabel="Deleting"
-        onSelectCancel={closeConfirmModal}
-        onSelectConfirm={onDeletePolicy}
+        variant="destructive"
+        title="Delete policy"
+        description={`Are you sure you want to delete the policy “${selectedPolicyToDelete.name}”? This action cannot be undone.`}
+        confirmLabel="Delete"
+        confirmLabelLoading="Deleting"
+        loading={isDeletingPolicy}
+        onCancel={closeConfirmModal}
+        onConfirm={onDeletePolicy}
       />
 
-      <ConfirmModal
-        danger={selectedTableToToggleRLS?.rls_enabled}
-        visible={selectedTableToToggleRLS !== undefined}
-        title={`Confirm to ${
-          selectedTableToToggleRLS?.rls_enabled ? 'disable' : 'enable'
-        } Row Level Security`}
-        description={`Are you sure you want to ${
-          selectedTableToToggleRLS?.rls_enabled ? 'disable' : 'enable'
-        } Row Level Security for the table "${selectedTableToToggleRLS?.name}"?`}
-        buttonLabel="Confirm"
-        buttonLoadingLabel="Saving"
-        onSelectCancel={closeConfirmModal}
-        onSelectConfirm={onToggleRLS}
+      <RLSToggleDialog
+        open={selectedTableToToggleRLS !== undefined}
+        tableName={selectedTableToToggleRLS?.name}
+        isEnabled={selectedTableToToggleRLS?.rls_enabled ?? false}
+        isSubmitting={isUpdatingTable}
+        onOpenChange={(open) => {
+          if (!open) closeConfirmModal()
+        }}
+        onConfirm={onToggleRLS}
       />
     </>
   )

@@ -28,7 +28,7 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supab
         - [**postgrest-kt**](https://github.com/supabase-community/supabase-kt/tree/master/Postgrest)
         - Other plugins also available [here](https://github.com/supabase-community/supabase-kt/tree/master/plugins)
 
-        Checkout the different READMEs for information about supported Kotlin targets.
+        Check out the different READMEs for information about supported Kotlin targets.
 
         *Note that the minimum Android SDK version is 26. For lower versions, you need to enable [core library desugaring](https://developer.android.com/studio/write/java8-support#library-desugaring).*
 
@@ -96,7 +96,7 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supab
     <RefSubLayout.Details>
 
         You can find a list of engines [here](https://ktor.io/docs/http-client-engines.html)
-        - Note that not all Ktor engines support Websockets. So if you plan to use the Realtime module, make sure to use an engine that supports Websockets. Checkout the [engine limitations](https://ktor.io/docs/client-engines.html#limitations) for more information.
+        - Note that not all Ktor engines support WebSockets. So if you plan to use the Realtime module, make sure to use an engine that supports WebSockets. Check out the [engine limitations](https://ktor.io/docs/client-engines.html#limitations) for more information.
         - If using `supabase-kt` 3.0.0 and above, you need to use Ktor version 3.0.0-rc-1 or later.
 
     </RefSubLayout.Details>
@@ -392,6 +392,40 @@ By default, [KotlinX Serialization](https://github.com/Kotlin/kotlinx.serializat
         val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
             defaultSerializer = CustomSerializer()
         }
+        ```
+
+    </RefSubLayout.Examples>
+
+</RefSubLayout.EducationRow>
+
+### Enable Data API access
+
+<RefSubLayout.EducationRow>
+    <RefSubLayout.Details>
+
+        supabase-kt uses the Data API to query and mutate your Postgres data. You first need to grant Data API roles permissions to access your tables and functions.
+
+        In [Data API integrations settings](/dashboard/project/_/integrations/data_api/settings), expose the specific tables and functions you want to access. To automatically grant access for new tables and functions in `public`, enable **Default privileges for new entities**.
+
+        Alternatively, use SQL to grant the required permissions:
+
+    </RefSubLayout.Details>
+
+    <RefSubLayout.Examples>
+
+        ```sql
+        -- Before granting access to client roles, make sure RLS is enabled
+        -- and create the policies required for each role's allowed operations.
+        alter table public.your_table enable row level security;
+        -- create policy ... on public.your_table ...;
+
+        -- Grant least-privilege access to tables after RLS and policies are in place
+        grant select on public.your_table to anon;
+        grant select, insert, update, delete on public.your_table to authenticated;
+        grant all on public.your_table to service_role;
+
+        -- Grant execute on functions after verifying any table access they rely on
+        grant execute on function public.your_function to authenticated, service_role;
         ```
 
     </RefSubLayout.Examples>

@@ -1,10 +1,10 @@
-import * as Sentry from '@sentry/nextjs'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { BASE_PATH } from 'lib/constants'
-import { auth, buildPathWithParams } from 'lib/gotrue'
 import { Button } from 'ui'
+
+import { BASE_PATH } from '@/lib/constants'
+import { captureCriticalError } from '@/lib/error-reporting'
+import { auth, buildPathWithParams } from '@/lib/gotrue'
 
 interface SignInWithCustomProps {
   providerName: string
@@ -35,7 +35,7 @@ export const SignInWithCustom = ({ providerName }: SignInWithCustomProps) => {
       if (error) throw error
     } catch (error: any) {
       toast.error(`Failed to sign in via ${providerName}: ${error.message}`)
-      Sentry.captureMessage('[CRITICAL] Failed to sign in via GH: ' + error.message)
+      captureCriticalError(error, `sign in via ${providerName}`)
       setLoading(false)
     }
   }

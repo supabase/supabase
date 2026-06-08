@@ -6,10 +6,10 @@
   "description": "",
   "registryDependencies": [],
   "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
-  "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+  "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
   "envVars": {
     "VITE_SUPABASE_URL": "",
-    "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+    "VITE_SUPABASE_PUBLISHABLE_KEY": ""
   },
   "files": [
     {

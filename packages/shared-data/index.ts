@@ -1,6 +1,16 @@
+import {
+  COMPUTE_BASELINE_IOPS,
+  COMPUTE_BASELINE_THROUGHPUT,
+  COMPUTE_DISK,
+  COMPUTE_MAX_IOPS,
+  COMPUTE_MAX_THROUGHPUT,
+  computeInstanceAddonVariantIdSchema,
+} from './compute-disk-limits'
 import config from './config'
+import { ERROR_CODE_DOCS_URLS, ERROR_CODES, HTTP_ERROR_CODES } from './error-codes'
+import type { ErrorCodeDefinition, ErrorCodeService } from './error-codes'
 import extensions from './extensions.json'
-import logConstants from './logConstants'
+import logConstants from './log-constants'
 import { plans, PricingInformation } from './plans'
 import { pricing } from './pricing'
 import { PRODUCT_MODULES, products } from './products'
@@ -11,7 +21,16 @@ import tweets, { topTweets } from './tweets'
 
 export {
   AWS_REGIONS,
+  COMPUTE_BASELINE_IOPS,
+  COMPUTE_BASELINE_THROUGHPUT,
+  COMPUTE_DISK,
+  COMPUTE_MAX_IOPS,
+  COMPUTE_MAX_THROUGHPUT,
+  computeInstanceAddonVariantIdSchema,
   config,
+  ERROR_CODE_DOCS_URLS,
+  ERROR_CODES,
+  HTTP_ERROR_CODES,
   extensions,
   FLY_REGIONS,
   logConstants,
@@ -23,4 +42,11 @@ export {
   topTweets,
   tweets,
 }
-export type { AWS_REGIONS_KEYS, CloudProvider, PricingInformation, Region }
+export type {
+  AWS_REGIONS_KEYS,
+  CloudProvider,
+  ErrorCodeDefinition,
+  ErrorCodeService,
+  PricingInformation,
+  Region,
+}

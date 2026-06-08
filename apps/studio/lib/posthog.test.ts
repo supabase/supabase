@@ -1,10 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import * as fetchers from 'data/fetchers'
 import * as common from 'common'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import * as constants from './constants'
 import { trackFeatureFlag } from './posthog'
+import * as fetchers from '@/data/fetchers'
 
-vi.mock('data/fetchers', () => ({
+vi.mock('@/data/fetchers', () => ({
   post: vi.fn(),
   handleError: vi.fn(),
 }))

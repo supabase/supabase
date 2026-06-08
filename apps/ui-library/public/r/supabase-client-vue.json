@@ -11,13 +11,13 @@
   "files": [
     {
       "path": "registry/default/clients/vue/lib/supabase/client.ts",
-      "content": "/// <reference types=\"vite/types/importMeta.d.ts\" />\nimport { createClient as createSupabaseClient } from '@supabase/supabase-js'\n\nexport function createClient() {\n  return createSupabaseClient(\n    import.meta.env.VITE_SUPABASE_URL!,\n    import.meta.env.VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY!\n  )\n}\n",
+      "content": "/// <reference types=\"vite/types/importMeta.d.ts\" />\nimport { createClient as createSupabaseClient } from '@supabase/supabase-js'\n\nexport function createClient() {\n  return createSupabaseClient(\n    import.meta.env.VITE_SUPABASE_URL!,\n    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY!\n  )\n}\n",
       "type": "registry:lib"
     }
   ],
   "envVars": {
     "VITE_SUPABASE_URL": "",
-    "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+    "VITE_SUPABASE_PUBLISHABLE_KEY": ""
   },
-  "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`."
+  "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`."
 }

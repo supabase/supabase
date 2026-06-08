@@ -1,14 +1,16 @@
 import { useQuery } from '@tanstack/react-query'
-import { LOGS_TABLES } from 'components/interfaces/Settings/Logs/Logs.constants'
+
+import { LOGS_TABLES } from '@/components/interfaces/Settings/Logs/Logs.constants'
 import type {
   LogData,
   Logs,
   LogsEndpointParams,
   QueryType,
-} from 'components/interfaces/Settings/Logs/Logs.types'
-import { genSingleLogQuery } from 'components/interfaces/Settings/Logs/Logs.utils'
-import { get } from 'data/fetchers'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+} from '@/components/interfaces/Settings/Logs/Logs.types'
+import { genSingleLogQuery } from '@/components/interfaces/Settings/Logs/Logs.utils'
+import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
+import { safeSql } from '@/data/logs/safe-analytics-sql'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 interface SingleLogHook {
   data: LogData | undefined
@@ -30,9 +32,7 @@ function useSingleLog({
   paramsToMerge,
 }: SingleLogParams): SingleLogHook {
   const table = queryType ? LOGS_TABLES[queryType] : undefined
-  const sql = id && table ? genSingleLogQuery(table, id) : ''
-
-  const params: LogsEndpointParams = { ...paramsToMerge, sql }
+  const sql = id && table ? genSingleLogQuery(table, id) : safeSql``
 
   const enabled = Boolean(id && table)
 
@@ -41,23 +41,32 @@ function useSingleLog({
   const {
     data,
     error: rcError,
-    isLoading,
+    isPending,
     isRefetching,
     refetch,
   } = useQuery({
-    queryKey: ['projects', projectRef, 'single-log', id, queryType],
+    // id and queryType uniquely identify sql without having to stick the
+    // entire sql in the query key.
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: [
+      'projects',
+      projectRef,
+      'single-log',
+      id,
+      queryType,
+      paramsToMerge?.iso_timestamp_start,
+      paramsToMerge?.iso_timestamp_end,
+    ],
     queryFn: async ({ signal }) => {
-      const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-        params: {
-          path: { ref: projectRef },
-          query: params,
-        },
+      const data = await executeAnalyticsSql({
+        projectRef,
+        endpoint: '/platform/projects/{ref}/analytics/endpoints/logs.all',
+        sql,
+        iso_timestamp_start: paramsToMerge?.iso_timestamp_start ?? '',
+        iso_timestamp_end: paramsToMerge?.iso_timestamp_end ?? '',
+        method: 'get',
         signal,
       })
-      if (error) {
-        throw error
-      }
-
       return data as unknown as Logs
     },
     enabled,
@@ -73,7 +82,7 @@ function useSingleLog({
     data: !!result
       ? { ...result, metadata: logsMetadata ? result?.metadata : undefined }
       : undefined,
-    isLoading: (enabled && isLoading) || isRefetching,
+    isLoading: (enabled && isPending) || isRefetching,
     error,
     refresh: () => refetch(),
   }

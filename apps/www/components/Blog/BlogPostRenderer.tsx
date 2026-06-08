@@ -1,44 +1,64 @@
-'use client'
-
 import dayjs from 'dayjs'
-import { MDXRemote } from 'next-mdx-remote'
-import dynamic from 'next/dynamic'
+import { ChevronLeft } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, useMemo } from 'react'
-import { ChevronLeft } from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
+import type { PostReturnType, ProcessedBlogData, StaticAuthor, Tag } from 'types/post'
 import { Badge } from 'ui'
 
-import mdxComponents from 'lib/mdx/mdxComponents'
+import DraftModeBanner from '@/components/Blog/DraftModeBanner'
+import ShareArticleActions from '@/components/Blog/ShareArticleActions'
+import CTABanner from '@/components/CTABanner'
+import BlogLinks from '@/components/LaunchWeek/7/BlogLinks'
+import LW11Summary from '@/components/LaunchWeek/11/LW11Summary'
+import LW12Summary from '@/components/LaunchWeek/12/LWSummary'
+import LW13Summary from '@/components/LaunchWeek/13/Releases/LWSummary'
+import LW14Summary from '@/components/LaunchWeek/14/Releases/LWSummary'
+import LW15Summary from '@/components/LaunchWeek/15/LWSummary'
+import LWXSummary from '@/components/LaunchWeek/X/LWXSummary'
+import DefaultLayout from '@/components/Layouts/Default'
+import { BLOG_POST_HERO_IMAGE_SIZES, getBlogThumbnailImage } from '@/lib/blog-images'
+import { compileBlogMdx } from '@/lib/mdx/compileBlogMdx'
+import mdxComponents from '@/lib/mdx/mdxComponents'
 
-import type { CMSAuthor, PostReturnType, ProcessedBlogData, Tag } from 'types/post'
-import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
-import type { ComponentType } from 'react'
+type NextCardProps = {
+  post: { path: string; title: string; formattedDate: string }
+  label: string
+  className?: string
+}
 
-const ShareArticleActions = dynamic(() => import('components/Blog/ShareArticleActions'))
-const CTABanner = dynamic(() => import('components/CTABanner'))
-const LW11Summary = dynamic(() => import('components/LaunchWeek/11/LW11Summary'))
-const LW12Summary = dynamic(() => import('components/LaunchWeek/12/LWSummary'))
-const LW13Summary = dynamic(() => import('components/LaunchWeek/13/Releases/LWSummary'))
-const LW14Summary = dynamic(() => import('components/LaunchWeek/14/Releases/LWSummary'))
-const LW15Summary = dynamic(() => import('components/LaunchWeek/15/LWSummary'))
-const BlogLinks = dynamic(() => import('components/LaunchWeek/7/BlogLinks'))
-const LWXSummary = dynamic(() => import('components/LaunchWeek/X/LWXSummary'))
-const DefaultLayout = dynamic(() => import('components/Layouts/Default'))
-const DraftModeBanner = dynamic(() => import('components/Blog/DraftModeBanner'))
-const ReactMarkdown = dynamic<{ children: string }>(
-  () =>
-    import('react-markdown').then(
-      (m) => m.default as unknown as ComponentType<{ children: string }>
-    ),
-  { ssr: false }
-)
+const NextCard = (props: NextCardProps) => {
+  const { post, label, className } = props
 
-const BlogPostRenderer = ({
+  return (
+    <Link href={`${post.path}`} as={`${post.path}`}>
+      <div className={className ?? ''}>
+        <div className="hover:bg-control cursor-pointer rounded-sm border p-6 transition">
+          <div className="space-y-4">
+            <div>
+              <p className="text-foreground-lighter text-sm">{label}</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              {'title' in post && (
+                <h4 className="text-foreground text-lg text-balance">
+                  {(post as { title?: string }).title}
+                </h4>
+              )}
+              {'formattedDate' in post && (
+                <p className="small">{(post as { formattedDate?: string }).formattedDate}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </Link>
+  )
+}
+
+const BlogPostRenderer = async ({
   blog,
   blogMetaData,
   isDraftMode,
-  livePreviewData,
   prevPost,
   nextPost,
   authors,
@@ -46,63 +66,12 @@ const BlogPostRenderer = ({
   blog: ProcessedBlogData
   blogMetaData: ProcessedBlogData
   isDraftMode: boolean
-  livePreviewData?: ProcessedBlogData
-  isLivePreviewLoading?: boolean
   prevPost?: PostReturnType | null
   nextPost?: PostReturnType | null
-  authors: CMSAuthor[]
+  authors: Array<StaticAuthor>
 }) => {
-  const [previewData] = useState<ProcessedBlogData>(blog)
+  const mdxRendered = await compileBlogMdx(blog.content as string, mdxComponents('blog'))
 
-  const shouldUseLivePreview = isDraftMode && blog.isCMS
-
-  // For LivePreview, we'll use the raw content directly with ReactMarkdown
-  // instead of trying to use MDXRemote which requires specific serialization
-  const isLivePreview = isDraftMode && (livePreviewData !== undefined || previewData !== blog)
-
-  // Extract raw content from data if available
-  const livePreviewContent = useMemo(() => {
-    // Priority 1: Use data from LivePreview hook (only in draft mode)
-    if (
-      isDraftMode &&
-      shouldUseLivePreview &&
-      livePreviewData &&
-      typeof livePreviewData === 'object'
-    ) {
-      // If content is a string, use it directly
-      if (typeof (livePreviewData as unknown as { content?: unknown }).content === 'string') {
-        return (livePreviewData as unknown as { content?: string }).content as string
-      }
-
-      // If content is from source property
-      if (
-        (livePreviewData as unknown as { source?: unknown }).source &&
-        typeof (livePreviewData as unknown as { source?: unknown }).source === 'string'
-      ) {
-        return (livePreviewData as unknown as { source?: string }).source as string
-      }
-    }
-
-    // Priority 2: Use data from postMessage updates
-    if (isDraftMode && previewData !== blog) {
-      // If content is a string, use it directly
-      if (typeof (previewData as unknown as { content?: unknown }).content === 'string') {
-        return (previewData as unknown as { content?: string }).content as string
-      }
-
-      // If content is from source property
-      if (
-        (previewData as unknown as { source?: unknown }).source &&
-        typeof (previewData as unknown as { source?: unknown }).source === 'string'
-      ) {
-        return (previewData as unknown as { source?: string }).source as string
-      }
-    }
-
-    return blog.source || ''
-  }, [isDraftMode, shouldUseLivePreview, livePreviewData, previewData, blog])
-
-  const isCMS = blogMetaData.isCMS
   const isLaunchWeek7 = blogMetaData.launchweek === '7'
   const isLaunchWeekX = blogMetaData.launchweek?.toString().toLocaleLowerCase() === 'x'
   const isGAWeek = blogMetaData.launchweek?.toString().toLocaleLowerCase() === '11'
@@ -110,39 +79,6 @@ const BlogPostRenderer = ({
   const isLaunchWeek13 = blogMetaData.launchweek?.toString().toLocaleLowerCase() === '13'
   const isLaunchWeek14 = blogMetaData.launchweek?.toString().toLocaleLowerCase() === '14'
   const isLaunchWeek15 = blogMetaData.launchweek?.toString().toLocaleLowerCase() === '15'
-
-  type NextCardProps = {
-    post: { path: string; title: string; formattedDate: string }
-    label: string
-    className?: string
-  }
-  const NextCard = (props: NextCardProps) => {
-    const { post, label, className } = props
-
-    return (
-      <Link href={`${post.path}`} as={`${post.path}`}>
-        <div className={className ?? ''}>
-          <div className="hover:bg-control cursor-pointer rounded border p-6 transition">
-            <div className="space-y-4">
-              <div>
-                <p className="text-foreground-lighter text-sm">{label}</p>
-              </div>
-              <div className="flex flex-col gap-2">
-                {'title' in post && (
-                  <h4 className="text-foreground text-lg text-balance">
-                    {(post as { title?: string }).title}
-                  </h4>
-                )}
-                {'formattedDate' in post && (
-                  <p className="small">{(post as { formattedDate?: string }).formattedDate}</p>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </Link>
-    )
-  }
 
   const toc = blogMetaData.toc && (
     <div>
@@ -159,11 +95,9 @@ const BlogPostRenderer = ({
     </div>
   )
 
-  const imageUrl = isCMS
-    ? blogMetaData.thumb ?? ''
-    : blogMetaData.thumb
-      ? `/images/blog/${blogMetaData.thumb}`
-      : ''
+  const imageUrl = getBlogThumbnailImage(blogMetaData, {
+    fallbackToPlaceholder: false,
+  })
 
   return (
     <>
@@ -196,26 +130,23 @@ const BlogPostRenderer = ({
                   <h1 className="text-2xl sm:text-4xl">{blogMetaData.title}</h1>
                   <div className="text-light flex space-x-3 text-sm">
                     <p>{dayjs(blogMetaData.date).format('DD MMM YYYY')}</p>
-                    <p>•</p>
+                    <p>·</p>
                     <p>{(blogMetaData as any).readingTime}</p>
                   </div>
                   {authors.length > 0 && (
-                    <div className="hidden lg:flex justify-between">
-                      <div className="flex-1 flex flex-col gap-3 pt-2 md:flex-row md:gap-0 lg:gap-3">
+                    <div className="flex justify-between">
+                      <div className="flex-1 flex flex-wrap gap-3 pt-2 md:gap-0 lg:gap-3">
                         {authors.map((author, i: number) => {
-                          // Handle both static and CMS author image formats
-                          const authorImageUrl =
-                            typeof author.author_image_url === 'string'
-                              ? author.author_image_url
-                              : (author.author_image_url as { url: string })?.url || ''
+                          const authorImageUrl = author.author_image_url
+
+                          const authorId =
+                            (author as any).author_id ||
+                            (author as any).username ||
+                            author.author.toLowerCase().replace(/\s+/g, '_')
 
                           return (
                             <div className="mr-4 w-max" key={`author-${i}-${author.author}`}>
-                              <Link
-                                href={author.author_url}
-                                target="_blank"
-                                className="cursor-pointer"
-                              >
+                              <Link href={`/blog/authors/${authorId}`} className="cursor-pointer">
                                 <div className="flex items-center gap-3">
                                   {authorImageUrl && (
                                     <div className="w-10">
@@ -262,28 +193,19 @@ const BlogPostRenderer = ({
                           allowFullScreen={true}
                         />
                       ) : (
-                        blogMetaData.thumb && (
-                          <div className="hidden md:block relative mb-8 w-full aspect-video overflow-auto rounded-lg border">
+                        imageUrl && (
+                          <div className="hidden md:block relative mb-8 w-full aspect-[1.91/1] overflow-auto rounded-lg border">
                             <Image
                               src={imageUrl}
                               alt={blogMetaData.title}
                               fill
-                              quality={100}
-                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                              sizes={BLOG_POST_HERO_IMAGE_SIZES}
                               className="object-cover m-0"
                             />
                           </div>
                         )
                       )}
-                      {/* Use ReactMarkdown for LivePreview mode, MDXRemote for normal mode */}
-                      {isLivePreview ? (
-                        <ReactMarkdown>{livePreviewContent}</ReactMarkdown>
-                      ) : (
-                        <MDXRemote
-                          {...(blog.content as MDXRemoteSerializeResult)}
-                          components={mdxComponents('blog')}
-                        />
-                      )}
+                      {mdxRendered}
                     </div>
                   </article>
                   {isLaunchWeek7 && <BlogLinks />}
@@ -334,7 +256,7 @@ const BlogPostRenderer = ({
                   <div className="space-y-6">
                     <div className="hidden lg:block">
                       <div className="flex flex-wrap gap-2">
-                        {(blogMetaData.tags as Tag[])?.map((tag) => {
+                        {(blogMetaData.tags as Array<Tag>)?.map((tag) => {
                           const tagName = typeof tag === 'string' ? tag : tag.name
                           const tagId = typeof tag === 'string' ? tag : tag.id.toString()
                           return (

@@ -1,11 +1,13 @@
-import '@code-hike/mdx/styles'
-import 'config/code-hike.scss'
-import '../styles/index.css'
+import '@code-hike/mdx/styles.css'
+import 'config/code-hike.css'
+import '../styles/globals.css'
+import '../pages/launch-week/launchWeek.css'
 
 import { Metadata } from 'next'
-import { APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
-import Providers from './providers'
 import type { Viewport } from 'next'
+
+import Providers from './providers'
+import { APP_NAME, DEFAULT_META_DESCRIPTION } from '@/lib/constants'
 
 const site_title = `${APP_NAME} | The Open Source Firebase Alternative`
 
@@ -44,7 +46,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body>
         <Providers>{children}</Providers>
       </body>

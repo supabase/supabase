@@ -1,12 +1,12 @@
+import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
-import { Snippet } from 'data/content/sql-folders-query'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
+import { Snippet } from '@/data/content/sql-folders-query'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 export const DeleteSnippetsModal = ({
   snippets,
@@ -37,7 +37,7 @@ export const DeleteSnippetsModal = ({
     if (ids.length > 0) ids.forEach((id) => snapV2.removeSnippet(id))
   }
 
-  const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
+  const { mutate: deleteContent, isPending: isDeleting } = useContentDeleteMutation({
     onSuccess: (data) => {
       toast.success(
         `Successfully deleted ${snippets.length.toLocaleString()} quer${snippets.length > 1 ? 'ies' : 'y'}`

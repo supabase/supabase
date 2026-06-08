@@ -1,0 +1,144 @@
+---
+title: Data Fundamentals
+description: 'Learn how data is structured in Postgres: tables, rows, columns, and keys.'
+chapterNumber: 2
+
+explore:
+  - title: Supabase Docs
+    link: https://supabase.com/docs/guides/database/overview
+    itemType: doc
+  - title: Postgres for Beginners
+    link: https://www.postgresqltutorial.com/
+    itemType: reference
+---
+
+Before we store any information in Supabase, we need to understand how data is
+organized in Postgres. Supabase uses Postgres as its database, which means data
+is arranged in a structured and predictable way. This helps keep your app
+organized, consistent, and easy to query.
+
+The core ideas are simple: you create tables to hold related data, and each
+table has rows (records) and columns (fields). Once you understand that pattern,
+you can model almost anything.
+
+---
+
+## Tables, rows, and columns
+
+A table is like a spreadsheet. It has:
+
+- **Columns**: the fields that define what kind of data the table stores
+- **Rows**: the individual entries in the table
+
+Imagine a table for storing notes:
+
+```text
+| id | content          | created_at           |
+|----|------------------|----------------------|
+| 1  | Buy groceries    | 2025-01-10 14:22:11  |
+| 2  | Call the dentist | 2025-01-10 15:08:54  |
+```
+
+- Each **row** is a single note.
+- Each **column** represents one piece of information about the note.
+
+---
+
+## Data types
+
+Every column has a data type. This describes the kind of value that can be
+stored there.
+
+Some common data types:
+
+```text
+| Data type   | Example value    | Meaning                       |
+| ----------- | ---------------- | ----------------------------- |
+| text        | Hello world      | A string of characters        |
+| integer     | 42               | A number without decimals     |
+| boolean     | true             | Yes/no or on/off values       |
+| timestamptz | 2025-01-10 14:22 | Date and time (with timezone) |
+| json        | {"name": "John"} | A JSON object                 |
+```
+
+Choosing correct types makes your data easier to work with and protects you from
+unexpected values.
+
+---
+
+## Primary keys
+
+Most tables include a primary key. This is a column that uniquely identifies each
+row. In many Supabase projects, this column is named `id` and uses a type called
+`uuid`, which automatically generates a unique value.
+
+You create this column in the table definition like this:
+
+```text
+id uuid primary key default gen_random_uuid()
+```
+
+You generally don't need to think about it after setting it up. It simply gives
+each record a stable identity.
+
+---
+
+## Relationships between tables
+
+You can link tables together using foreign keys. This is how you express things
+like:
+
+- A user has many notes
+- A project has many tasks
+- A team has many members
+
+For example:
+
+```text
+| id | user_id                              | content          | created_at           |
+|----|--------------------------------------|------------------|----------------------|
+| 1  | 9f1b1c94-3e7b-4d6a-9fa7-1e2a3c4ba987 | Buy groceries    | 2025-01-10 14:22:11  |
+| 2  | 9f1b1c94-3e7b-4d6a-9fa7-1e2a3c4ba987 | Call the dentist | 2025-01-10 15:08:54  |
+```
+
+Here, `user_id` refers to a row in a `users` table. This means the note belongs
+to that user, and we can see that this user has two notes.
+
+Relationships let you organize data without repeating information.
+
+---
+
+## Why relational data is useful in practice
+
+Relational data is really useful in practice because it allows you to:
+
+- Keep data valid with constraints <br />
+  _Example: no duplicate emails._
+
+- Link records safely with foreign keys <br />
+  _Example: delete a user and their notes in one action._
+
+- Express real permissions with RLS <br />
+  _Example: users can read their own notes; admins can read all._
+
+- Query exactly what you need with table joins <br />
+  _Example: fetch notes with the author's email._
+
+---
+
+## What we learned
+
+A database in Supabase is made up of tables.
+Each table has:
+
+- columns (which describe the type of information stored)
+- rows (the individual pieces of data in that table)
+
+You can relate tables to each other using foreign keys.
+This lets you model real situations, such as:
+
+- a user has many notes
+- a team has many members
+- a project has many tasks
+
+Thinking in tables, rows, and relationships is the foundation of working with data in Supabase.

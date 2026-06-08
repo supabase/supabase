@@ -1,9 +1,22 @@
-import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
+import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
+import { isEqual } from 'lodash'
 import { HelpCircle } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import { getForeignKeyCascadeAction } from '../ColumnEditor/ColumnEditor.utils'
 import type { ForeignKey } from './ForeignKeySelector.types'
+import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
+
+export interface ForeignKeyDirtyState {
+  id?: number | string
+  name?: string
+  tableId?: number
+  schema: string
+  table: string
+  columns: { source: string; target: string }[]
+  deletionAction: string
+  updateAction: string
+}
 
 export const formatForeignKeys = (fks: ForeignKeyConstraint[]): ForeignKey[] => {
   return fks.map((x) => {
@@ -20,6 +33,28 @@ export const formatForeignKeys = (fks: ForeignKeyConstraint[]): ForeignKey[] => 
   })
 }
 
+export const normalizeForeignKeyForDirtyCheck = (foreignKey: ForeignKey): ForeignKeyDirtyState => {
+  return {
+    id: foreignKey.id,
+    name: foreignKey.name,
+    tableId: foreignKey.tableId,
+    schema: foreignKey.schema,
+    table: foreignKey.table,
+    columns: foreignKey.columns.map(({ source, target }) => ({ source, target })),
+    deletionAction: foreignKey.deletionAction,
+    updateAction: foreignKey.updateAction,
+  }
+}
+
+export const hasForeignKeySelectorChanges = (
+  initialState: ForeignKeyDirtyState | undefined,
+  foreignKey: ForeignKey
+) => {
+  if (initialState === undefined) return false
+
+  return !isEqual(initialState, normalizeForeignKeyForDirtyCheck(foreignKey))
+}
+
 export const generateCascadeActionDescription = (
   action: 'update' | 'delete',
   cascadeAction: string,
@@ -33,7 +68,7 @@ export const generateCascadeActionDescription = (
       return (
         <>
           <span className="text-foreground-light">{actionName}</span>: {actionVerb} a record from{' '}
-          <code className="text-xs text-foreground-light">{reference}</code> will{' '}
+          <code className="text-code-inline">{reference}</code> will{' '}
           <span className="text-amber-900 opacity-75">raise an error</span> if there are records
           existing in this table that reference it
         </>
@@ -42,7 +77,7 @@ export const generateCascadeActionDescription = (
       return (
         <>
           <span className="text-foreground-light">{actionName}</span>: {actionVerb} a record from{' '}
-          <code className="text-xs text-foreground-light">{reference}</code> will{' '}
+          <code className="text-code-inline">{reference}</code> will{' '}
           <span className="text-amber-900 opacity-75">also {action}</span> any records that
           reference it in this table
         </>
@@ -60,8 +95,7 @@ export const generateCascadeActionDescription = (
               the transaction
             </TooltipContent>
           </Tooltip>
-          : {actionVerb} a record from{' '}
-          <code className="text-xs text-foreground-light">{reference}</code> will{' '}
+          : {actionVerb} a record from <code className="text-code-inline">{reference}</code> will{' '}
           <span className="text-amber-900 opacity-75">prevent {actionVerb.toLowerCase()}</span>{' '}
           existing referencing rows from this table.
         </>
@@ -70,8 +104,8 @@ export const generateCascadeActionDescription = (
       return (
         <>
           <span className="text-foreground-light">{actionName}</span>: {actionVerb} a record from{' '}
-          <code className="text-xs text-foreground-light">{reference}</code> will set the value of
-          any existing records in this table referencing it to their{' '}
+          <code className="text-code-inline">{reference}</code> will set the value of any existing
+          records in this table referencing it to their{' '}
           <span className="text-amber-900 opacity-75">default value</span>
         </>
       )
@@ -79,8 +113,8 @@ export const generateCascadeActionDescription = (
       return (
         <>
           <span className="text-foreground-light">{actionName}</span>: {actionVerb} a record from{' '}
-          <code className="text-xs text-foreground-light">{reference}</code> will set the value of
-          any existing records in this table referencing it{' '}
+          <code className="text-code-inline">{reference}</code> will set the value of any existing
+          records in this table referencing it{' '}
           <span className="text-amber-900 opacity-75">to NULL</span>
         </>
       )

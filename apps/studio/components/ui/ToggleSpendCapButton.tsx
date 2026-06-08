@@ -1,10 +1,10 @@
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
-
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button } from 'ui'
+
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface ToggleSpendCapButtonProps {
   action?: 'disable' | 'enable'

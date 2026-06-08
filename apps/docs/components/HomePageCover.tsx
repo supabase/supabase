@@ -1,19 +1,21 @@
 'use client'
 
-import { ChevronRight, Play, Sparkles } from 'lucide-react'
-import Link from 'next/link'
 // End of third-party imports
-
 import { isFeatureEnabled, useBreakpoint } from 'common'
+import { ChevronRight, Play, Sparkles } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import Link from 'next/link'
 import { cn, IconBackground } from 'ui'
 import { IconPanel } from 'ui-patterns/IconPanel'
+
 import { getCustomContent } from '../lib/custom-content/getCustomContent'
 import DocsCoverLogo from './DocsCoverLogo'
 
-const { sdkDart: sdkDartEnabled, sdkKotlin: sdkKotlinEnabled } = isFeatureEnabled([
-  'sdk:dart',
-  'sdk:kotlin',
-])
+const {
+  sdkDart: sdkDartEnabled,
+  sdkKotlin: sdkKotlinEnabled,
+  sdkSwift: sdkSwiftEnabled,
+} = isFeatureEnabled(['sdk:dart', 'sdk:kotlin', 'sdk:swift'])
 
 function AiPrompt({ className }: { className?: string }) {
   return (
@@ -25,7 +27,7 @@ function AiPrompt({ className }: { className?: string }) {
         'transition-colors',
         className
       )}
-      href="/guides/getting-started/ai-prompts"
+      href="/guides/ai-tools/ai-prompts"
     >
       <Sparkles size={14} />
       Start with Supabase AI prompts
@@ -38,59 +40,78 @@ const HomePageCover = (props) => {
   const isXs = useBreakpoint(639)
   const iconSize = isXs ? 'sm' : 'lg'
   const { homepageHeading } = getCustomContent(['homepage:heading'])
+  const { resolvedTheme } = useTheme()
+  const isLightMode = !resolvedTheme?.includes('dark')
 
   const frameworks = [
     {
       tooltip: 'ReactJS',
       icon: '/docs/img/icons/react-icon',
       href: '/guides/getting-started/quickstarts/reactjs',
+      hasLightIcon: false,
     },
     {
       tooltip: 'Next.js',
       icon: '/docs/img/icons/nextjs-icon',
       href: '/guides/getting-started/quickstarts/nextjs',
+      hasLightIcon: false,
     },
     {
-      tooltip: 'RedwoodJS',
-      icon: '/docs/img/icons/redwoodjs-icon',
-      href: '/guides/getting-started/quickstarts/redwoodjs',
+      tooltip: 'TanStack Start',
+      icon: '/docs/img/icons/tanstack-icon',
+      href: '/guides/getting-started/quickstarts/tanstack',
+      hasLightIcon: true,
     },
     {
-      tooltip: 'Flutter',
-      icon: '/docs/img/icons/flutter-icon',
-      href: '/guides/getting-started/quickstarts/flutter',
-      enabled: sdkDartEnabled,
+      tooltip: 'Astro.js',
+      icon: '/docs/img/icons/astro-icon',
+      href: '/guides/getting-started/quickstarts/astrojs',
+      hasLightIcon: true,
+    },
+    {
+      tooltip: 'Vue',
+      icon: '/docs/img/icons/vuejs-icon',
+      href: '/guides/getting-started/quickstarts/vue',
+      hasLightIcon: false,
+    },
+    {
+      tooltip: 'Nuxt',
+      icon: '/docs/img/icons/nuxt-icon',
+      href: '/guides/getting-started/quickstarts/nuxtjs',
+      hasLightIcon: false,
+    },
+    {
+      tooltip: 'iOS Swift',
+      icon: '/docs/img/icons/swift-icon-orange',
+      href: '/guides/getting-started/quickstarts/ios-swiftui',
+      enabled: sdkSwiftEnabled,
+      hasLightIcon: false,
     },
     {
       tooltip: 'Android Kotlin',
       icon: '/docs/img/icons/kotlin-icon',
       href: '/guides/getting-started/quickstarts/kotlin',
       enabled: sdkKotlinEnabled,
+      hasLightIcon: false,
     },
     {
-      tooltip: 'SvelteKit',
-      icon: '/docs/img/icons/svelte-icon',
-      href: '/guides/getting-started/quickstarts/sveltekit',
+      tooltip: 'Expo React Native',
+      icon: '/docs/img/icons/expo-icon',
+      href: '/guides/getting-started/quickstarts/expo-react-native',
+      hasLightIcon: true,
     },
     {
-      tooltip: 'SolidJS',
-      icon: '/docs/img/icons/solidjs-icon',
-      href: '/guides/getting-started/quickstarts/solidjs',
+      tooltip: 'Flutter',
+      icon: '/docs/img/icons/flutter-icon',
+      href: '/guides/getting-started/quickstarts/flutter',
+      enabled: sdkDartEnabled,
+      hasLightIcon: false,
     },
     {
-      tooltip: 'Vue',
-      icon: '/docs/img/icons/vuejs-icon',
-      href: '/guides/getting-started/quickstarts/vue',
-    },
-    {
-      tooltip: 'Nuxt',
-      icon: '/docs/img/icons/nuxt-icon',
-      href: '/guides/getting-started/quickstarts/nuxtjs',
-    },
-    {
-      tooltip: 'refine',
-      icon: '/docs/img/icons/refine-icon',
-      href: '/guides/getting-started/quickstarts/refine',
+      tooltip: 'Python',
+      icon: '/docs/img/icons/python-icon',
+      href: '/guides/getting-started/quickstarts/flask',
+      hasLightIcon: false,
     },
   ]
 
@@ -120,16 +141,16 @@ const HomePageCover = (props) => {
           <div className="flex flex-wrap md:grid md:grid-cols-5 gap-2 sm:gap-3">
             {frameworks
               .filter((framework) => framework.enabled !== false)
-              .map((framework, i) => (
-                <Link key={i} href={framework.href} passHref className="no-underline">
-                  <IconPanel
-                    iconSize={iconSize}
-                    hideArrow
-                    tooltip={framework.tooltip}
-                    icon={framework.icon}
-                  />
-                </Link>
-              ))}
+              .map((framework, i) => {
+                const iconToUse =
+                  framework.hasLightIcon && isLightMode ? `${framework.icon}-light` : framework.icon
+
+                return (
+                  <Link key={i} href={framework.href} passHref className="no-underline">
+                    <IconPanel iconSize={iconSize} tooltip={framework.tooltip} icon={iconToUse} />
+                  </Link>
+                )
+              })}
           </div>
           <AiPrompt className="mt-6" />
         </div>
@@ -140,7 +161,7 @@ const HomePageCover = (props) => {
   return (
     <div className="relative z-10 w-full bg-alternative border-b max-w-none mb-16 md:mb-12 xl:mb-0">
       <div className="max-w-7xl px-5 mx-auto py-8 sm:pb-16 sm:pt-12 xl:pt-16 flex flex-col xl:flex-row justify-between gap-12 xl:gap-12">
-        <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 items-start sm:items-center w-full max-w-xl xl:max-w-[33rem]">
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 items-start sm:items-center w-full max-w-xl xl:max-w-132">
           <DocsCoverLogo aria-hidden="true" />
           <div className="flex flex-col">
             <h1 className="m-0 mb-3 text-2xl sm:text-3xl text-foreground">

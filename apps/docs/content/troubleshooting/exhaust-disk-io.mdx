@@ -7,9 +7,9 @@ database_id = "4844905d-1456-44a1-858e-7a4995e5054c"
 
 ## Understanding disk IO and disk IO budget
 
-Disk IO refers to two metrics: throughput in Megabits per Second and IOPS which are Input/Output Operations per Second. Depending on the compute add-on of your instance you will have [different baseline performances](/docs/guides/platform/compute-add-ons#compute-size).
+Disk IO refers to two metrics: throughput in Megabytes per second (MB/s) and IOPS which are Input/Output Operations per Second. Throughput measures how much data you can move each second, while IOPS measures how many read/write operations you can perform each second. Depending on the compute add-on of your instance you will have [different baseline performances](/docs/guides/platform/compute-add-ons#compute-size).
 
-Smaller compute instances can burst and exceed their baseline performance for a short quota of time every day. This is represented as your Disk IO Budget and once your Disk IO Budget is consumed, your instance reverts back to its baseline performance. Learn more about [choosing the right compute instance for consistent disk performance](/docs/guides/platform/compute-add-ons#choosing-the-right-compute-instance-for-consistent-disk-performance).
+Smaller compute instances can burst and exceed their baseline performance for a short period of time every day. This is represented as your Disk IO Budget and once your Disk IO Budget is consumed, your instance reverts back to its baseline performance. Learn more about [choosing the right compute instance for consistent disk performance](/docs/guides/platform/compute-add-ons#choosing-the-right-compute-instance-for-consistent-disk-performance).
 
 ## Depleting your disk IO budget
 
@@ -23,7 +23,7 @@ Running out of Disk IO Budget means that your instance is using more disk than i
 
 ## Monitor your disk IO budget
 
-To check your Disk IO Budget on the Supabase Platform, head over to [Database Health in the Reports section](/dashboard/project/_/reports/database).
+To check your Disk IO Budget on the Supabase Platform, head over to [Database Health in the Observability section](/dashboard/project/_/observability/database).
 
 It is also possible to monitor your resources and set up alerts using Prometheus/Grafana. With Grafana you will be able to pinpoint potential causes and see more fine-grained metrics like how much of your RAM is used for caching and your Swap usage. Read the [Metrics Guide](/docs/guides/platform/metrics) to learn more.
 

@@ -20,7 +20,7 @@ message = "invalid claim: missing sub"
 
 The missing sub claim error is returned when `supabase.auth.getUser()` is called with an invalid JWT in the session or when the user attempts to register/sign in but hasn't completed the sign in when the `getUser` call is made.
 
-A common pitfall, is inadvertently using a Supabase API key (such as the anon or service_role keys) instead of the Supabase Auth access token.
+A common pitfall, is inadvertently using a Supabase API key (such as the publishable or secret keys) instead of the Supabase Auth access token.
 
 **Why Does This Happen?**
 

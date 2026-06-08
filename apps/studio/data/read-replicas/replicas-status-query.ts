@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { replicaKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 // [Joshen] Is it possible to import this from the code gen?
-// https://github.com/supabase/infrastructure/blob/develop/api/src/routes/platform/projects/ref/databases-statuses.dto.ts#L7
+// https://github.com/supabase/platform/blob/develop/api/src/routes/platform/projects/ref/databases-statuses.dto.ts#L7
 export enum ReplicaInitializationStatus {
   'InProgress' = 'in_progress',
   'Completed' = 'completed',

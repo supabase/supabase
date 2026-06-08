@@ -1,10 +1,11 @@
 'use client'
 
-import { client } from '@/registry/default/platform/platform-kit-nextjs/lib/management-api'
-import type { components } from '@/registry/default/platform/platform-kit-nextjs/lib/management-api-schema'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { type AxiosError } from 'axios'
 import { toast } from 'sonner'
+
+import { client } from '@/registry/default/platform/platform-kit-nextjs/lib/management-api'
+import type { components } from '@/registry/default/platform/platform-kit-nextjs/lib/management-api-schema'
 
 const getAuthConfig = async (projectRef: string) => {
   const { data, error } = await client.GET('/v1/projects/{ref}/config/auth', {

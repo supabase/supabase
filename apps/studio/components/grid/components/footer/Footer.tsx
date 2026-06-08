@@ -1,41 +1,36 @@
 import { useParams } from 'common'
-import { GridFooter } from 'components/ui/GridFooter'
-import TwoOptionToggle from 'components/ui/TwoOptionToggle'
-import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
-import { isTableLike, isViewLike } from 'data/table-editor/table-editor-types'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useUrlState } from 'hooks/ui/useUrlState'
-import { Pagination } from './pagination/Pagination'
+import { parseAsString, useQueryState } from 'nuqs'
 
-export const Footer = () => {
+import { Pagination } from './pagination/Pagination'
+import { GridFooter } from '@/components/ui/GridFooter'
+import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
+import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
+import { isTableLike, isViewLike } from '@/data/table-editor/table-editor-types'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+
+type FooterProps = {
+  enableForeignRowsQuery?: boolean
+}
+
+export const Footer: React.FC<FooterProps> = ({ enableForeignRowsQuery = true }: FooterProps) => {
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
   const { data: project } = useSelectedProjectQuery()
+  const [selectedView, setSelectedView] = useQueryState('view', parseAsString.withDefault('data'))
 
   const { data: entity } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id,
   })
-
-  const [{ view: selectedView = 'data' }, setUrlState] = useUrlState()
-
-  const setSelectedView = (view: string) => {
-    if (view === 'data') {
-      setUrlState({ view: undefined })
-    } else {
-      setUrlState({ view })
-    }
-  }
-
   const isViewSelected = isViewLike(entity)
   const isTableSelected = isTableLike(entity)
 
   return (
     <GridFooter>
-      {selectedView === 'data' && <Pagination />}
+      {selectedView === 'data' && <Pagination enableForeignRowsQuery={enableForeignRowsQuery} />}
 
-      <div className="ml-auto flex items-center gap-x-2">
+      <div className="flex items-center gap-x-2">
         {(isViewSelected || isTableSelected) && (
           <TwoOptionToggle
             width={75}

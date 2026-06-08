@@ -1,37 +1,37 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowDown, ArrowUp, RefreshCw, User } from 'lucide-react'
 import Image from 'next/legacy/image'
 import { useEffect, useMemo, useState } from 'react'
+import { Alert, AlertDescription, AlertTitle, Button, WarningIcon } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { LogDetailsPanel } from 'components/interfaces/AuditLogs/LogDetailsPanel'
-import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import Table from 'components/to-be-cleaned/Table'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { FilterPopover } from 'components/ui/FilterPopover'
-import NoPermission from 'components/ui/NoPermission'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
-import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
+import { filterByProjects, filterByUsers, sortAuditLogs } from './AuditLogs.utils'
+import { LogDetailsPanel } from '@/components/interfaces/AuditLogs/LogDetailsPanel'
+import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import Table from '@/components/to-be-cleaned/Table'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { FilterPopover } from '@/components/ui/FilterPopover'
+import NoPermission from '@/components/ui/NoPermission'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
 import {
   AuditLog,
+  TIMESTAMP_MICROS_PER_MS,
   useOrganizationAuditLogsQuery,
-} from 'data/organizations/organization-audit-logs-query'
-import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  WarningIcon,
-} from 'ui'
+} from '@/data/organizations/organization-audit-logs-query'
+import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const logsUpgradeError = 'upgrade to Team or Enterprise Plan to access audit logs.'
 
@@ -64,22 +64,34 @@ export const AuditLogs = () => {
     'notifications'
   )
 
-  const { data, error, isLoading, isSuccess, isError, isRefetching, refetch } =
-    useOrganizationAuditLogsQuery(
-      {
-        slug,
-        iso_timestamp_start: dateRange.from,
-        iso_timestamp_end: dateRange.to,
+  const { hasAccess: hasAccessToAuditLogs, isLoading: isLoadingEntitlements } =
+    useCheckEntitlements('security.audit_logs_days')
+
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+    isRefetching,
+    fetchStatus,
+    refetch,
+  } = useOrganizationAuditLogsQuery(
+    {
+      slug,
+      iso_timestamp_start: dateRange.from,
+      iso_timestamp_end: dateRange.to,
+    },
+    {
+      enabled: canReadAuditLogs,
+      retry: false,
+      refetchOnWindowFocus: (query) => {
+        return !query.state.error?.message.endsWith(logsUpgradeError)
       },
-      {
-        enabled: canReadAuditLogs,
-        retry: false,
-        refetchOnWindowFocus: (query) => {
-          return !query.state.error?.message.endsWith(logsUpgradeError)
-        },
-      }
-    )
-  const isLogsNotAvailableBasedOnPlan = isError && error.message.endsWith(logsUpgradeError)
+    }
+  )
+
+  const isLogsNotAvailableBasedOnPlan = isError && !hasAccessToAuditLogs
   const isRangeExceededError = isError && error.message.includes('range exceeded')
   const showFilters = !isLoading && !isLogsNotAvailableBasedOnPlan
 
@@ -92,7 +104,7 @@ export const AuditLogs = () => {
     fetchNextPage,
   } = useOrgProjectsInfiniteQuery(
     { slug, search: search.length === 0 ? search : debouncedSearch },
-    { keepPreviousData: true, enabled: showFilters }
+    { placeholderData: keepPreviousData, enabled: showFilters }
   )
   const { data: organizations } = useOrganizationsQuery({
     enabled: showFilters,
@@ -106,31 +118,22 @@ export const AuditLogs = () => {
     useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
 
   const logs = data?.result ?? []
-  const sortedLogs = logs
-    ?.sort((a, b) =>
-      dateSortDesc
-        ? Number(new Date(b.occurred_at)) - Number(new Date(a.occurred_at))
-        : Number(new Date(a.occurred_at)) - Number(new Date(b.occurred_at))
-    )
-    ?.filter((log) => {
-      if (filters.users.length > 0) {
-        return filters.users.includes(log.actor.id)
-      } else {
-        return log
-      }
-    })
-    ?.filter((log) => {
-      if (filters.projects.length > 0) {
-        return filters.projects.includes(log.target.metadata.project_ref || '')
-      } else {
-        return log
-      }
-    })
+  const sortedLogs = filterByProjects(
+    filterByUsers(sortAuditLogs(logs, dateSortDesc), filters.users),
+    filters.projects
+  )
 
-  // This feature depends on the subscription tier of the user. Free user can view logs up to 1 day
-  // in the past. The API limits the logs to maximum of 1 day and 5 minutes so when the page is
+  const shouldShowLoadingState =
+    (isLoading && fetchStatus !== 'idle') || isLoadingPermissions || isLoadingEntitlements
+
+  useShortcut(SHORTCUT_IDS.ORG_AUDIT_LOGS_REFRESH, () => refetch(), {
+    enabled: !isLoading && !isRefetching && canReadAuditLogs,
+  })
+
+  // This feature depends on the subscription tier of the user.
+  // The API limits the logs to maximum of 62 days and 5 minutes so when the page is
   // viewed for more than 5 minutes, the call parameters needs to be updated. This also works with
-  // higher tiers (7 days of logs).The user will see a loading shimmer.
+  // higher tiers.The user will see a loading shimmer.
   useEffect(() => {
     const duration = dayjs(dateRange.from).diff(dayjs(dateRange.to))
     const interval = setInterval(() => {
@@ -146,33 +149,15 @@ export const AuditLogs = () => {
 
   if (isLogsNotAvailableBasedOnPlan) {
     return (
-      <ScaffoldContainer>
+      <ScaffoldContainer className="px-6 xl:px-10">
         <ScaffoldSection isFullWidth>
-          <Alert_Shadcn_
-            variant="default"
-            title="Organization Audit Logs are not available on Free or Pro plans"
-          >
-            <WarningIcon />
-            <div className="flex flex-col md:flex-row pt-1 gap-4">
-              <div className="grow">
-                <AlertTitle_Shadcn_>
-                  Organization Audit Logs are not available on Free or Pro plans
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_ className="flex flex-row justify-between gap-3">
-                  <p>
-                    Upgrade to Team or Enterprise to view up to 28 days of Audit Logs for your
-                    organization.
-                  </p>
-                </AlertDescription_Shadcn_>
-              </div>
-
-              <div className="flex items-center">
-                <UpgradePlanButton source="auditLogs" plan="Team" type="primary">
-                  Upgrade subscription
-                </UpgradePlanButton>
-              </div>
-            </div>
-          </Alert_Shadcn_>
+          <UpgradeToPro
+            plan="Team"
+            source="organizationAuditLogs"
+            primaryText="Organization Audit Logs are not available on Free or Pro plans"
+            secondaryText="Upgrade to Team or Enterprise to view up to 62 days of Audit Logs for your organization."
+            featureProposition="enable audit logs"
+          />
         </ScaffoldSection>
       </ScaffoldContainer>
     )
@@ -180,7 +165,7 @@ export const AuditLogs = () => {
 
   return (
     <>
-      <ScaffoldContainer>
+      <ScaffoldContainer className="px-6 xl:px-10">
         <ScaffoldSection isFullWidth>
           <div className="space-y-4 flex flex-col">
             {showFilters && (
@@ -245,7 +230,7 @@ export const AuditLogs = () => {
                   />
                   {isSuccess && (
                     <>
-                      <div className="h-[20px] border-r border-strong !ml-4 !mr-2" />
+                      <div className="h-[20px] border-r border-strong ml-4! mr-2!" />
                       <p className="prose text-xs">Viewing {sortedLogs.length} logs in total</p>
                     </>
                   )}
@@ -261,7 +246,7 @@ export const AuditLogs = () => {
               </div>
             )}
 
-            {isLoading || isLoadingPermissions ? (
+            {shouldShowLoadingState ? (
               <div className="space-y-2">
                 <ShimmeringLoader />
                 <ShimmeringLoader className="w-3/4" />
@@ -273,14 +258,14 @@ export const AuditLogs = () => {
 
             {isError &&
               (isRangeExceededError ? (
-                <Alert_Shadcn_ variant="destructive" title="Date range too large">
+                <Alert variant="destructive" title="Date range too large">
                   <WarningIcon />
-                  <AlertTitle_Shadcn_>Date range too large</AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
+                  <AlertTitle>Date range too large</AlertTitle>
+                  <AlertDescription>
                     The selected date range exceeds the maximum allowed period. Please select a
                     smaller time range.
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
+                  </AlertDescription>
+                </Alert>
               ) : (
                 <AlertError error={error} subject="Failed to retrieve audit logs" />
               ))}
@@ -288,13 +273,13 @@ export const AuditLogs = () => {
             {isSuccess && (
               <>
                 {logs.length === 0 ? (
-                  <div className="bg-surface-100 border rounded p-4 flex items-center justify-between">
+                  <div className="bg-surface-100 border rounded-sm p-4 flex items-center justify-between">
                     <p className="prose text-sm">
                       Your organization does not have any audit logs available yet
                     </p>
                   </div>
                 ) : logs.length > 0 && sortedLogs.length === 0 ? (
-                  <div className="bg-surface-100 border rounded p-4 flex items-center justify-between">
+                  <div className="bg-surface-100 border rounded-sm p-4 flex items-center justify-between">
                     <p className="prose text-sm">
                       No audit logs found based on the filters applied
                     </p>
@@ -340,17 +325,13 @@ export const AuditLogs = () => {
                     body={
                       sortedLogs?.map((log) => {
                         const user = (members ?? []).find(
-                          (member) => member.gotrue_id === log.actor.id
+                          (member) => member.gotrue_id === log.actor.user_id
                         )
                         const role = roles.find((role) => user?.role_ids?.[0] === role.id)
-                        const project = projects?.find(
-                          (project) => project.ref === log.target.metadata.project_ref
-                        )
+                        const project = projects?.find((p) => p.ref === log.project_ref)
                         const organization = organizations?.find(
-                          (org) => org.slug === log.target.metadata.org_slug
+                          (org) => org.slug === log.organization_slug
                         )
-
-                        const hasStatusCode = log.action.metadata[0]?.status !== undefined
                         const userIcon =
                           user === undefined ? (
                             <div className="flex h-[30px] w-[30px] items-center justify-center border-2 rounded-full border-strong">
@@ -372,15 +353,17 @@ export const AuditLogs = () => {
 
                         return (
                           <Table.tr
-                            key={log.occurred_at}
+                            key={log.request_id}
                             onClick={() => setSelectedLog(log)}
-                            className="cursor-pointer hover:!bg-alternative transition duration-100"
+                            className="cursor-pointer hover:bg-alternative! transition duration-100"
                           >
                             <Table.td>
                               <div className="flex items-center space-x-4">
                                 <div>{userIcon}</div>
                                 <div>
-                                  <p className="text-foreground-light">{user?.username ?? '-'}</p>
+                                  <p className="text-foreground-light">
+                                    {user?.username ?? log.actor.email ?? '-'}
+                                  </p>
                                   {role && (
                                     <p className="mt-0.5 text-xs text-foreground-light">
                                       {role?.name}
@@ -391,44 +374,43 @@ export const AuditLogs = () => {
                             </Table.td>
                             <Table.td className="max-w-[250px]">
                               <div className="flex items-center space-x-2">
-                                {hasStatusCode && (
-                                  <p className="bg-surface-200 rounded px-1 flex items-center justify-center text-xs font-mono border">
-                                    {log.action.metadata[0].status}
-                                  </p>
-                                )}
+                                <p className="bg-surface-200 rounded-sm px-1 flex items-center justify-center text-xs font-mono border">
+                                  {log.action.status}
+                                </p>
+                                <p className="text-foreground-light text-xs font-mono">
+                                  {log.action.method}
+                                </p>
                                 <p className="truncate" title={log.action.name}>
                                   {log.action.name}
                                 </p>
                               </div>
                             </Table.td>
                             <Table.td>
-                              <p
-                                className="text-foreground-light max-w-[230px] truncate"
-                                title={project?.name ?? organization?.name ?? '-'}
-                              >
-                                {project?.name
-                                  ? 'Project: '
-                                  : organization?.name
-                                    ? 'Organization: '
-                                    : null}
-                                {project?.name ?? organization?.name ?? 'Unknown'}
-                              </p>
-                              <p
-                                className="text-foreground-light text-xs mt-0.5 truncate"
-                                title={
-                                  log.target.metadata.project_ref ?? log.target.metadata.org_slug
-                                }
-                              >
-                                {log.target.metadata.project_ref
-                                  ? 'Ref: '
-                                  : log.target.metadata.org_slug
-                                    ? 'Slug: '
-                                    : null}
-                                {log.target.metadata.project_ref ?? log.target.metadata.org_slug}
-                              </p>
+                              {project || organization ? (
+                                <>
+                                  <p
+                                    className="text-foreground-light max-w-[230px] truncate"
+                                    title={project?.name ?? organization?.name}
+                                  >
+                                    {project ? 'Project: ' : 'Organization: '}
+                                    {project?.name ?? organization?.name}
+                                  </p>
+                                  <p className="text-foreground-light text-xs mt-0.5 truncate">
+                                    {log.project_ref
+                                      ? `Ref: ${log.project_ref}`
+                                      : `Slug: ${log.organization_slug}`}
+                                  </p>
+                                </>
+                              ) : (
+                                <p className="text-foreground-light text-sm">
+                                  {log.project_ref ?? log.organization_slug ?? '-'}
+                                </p>
+                              )}
                             </Table.td>
                             <Table.td>
-                              {dayjs(log.occurred_at).format('DD MMM YYYY, HH:mm:ss')}
+                              {dayjs(log.timestamp / TIMESTAMP_MICROS_PER_MS).format(
+                                'DD MMM YYYY, HH:mm:ss'
+                              )}
                             </Table.td>
                             <Table.td align="right">
                               <Button type="default">View details</Button>

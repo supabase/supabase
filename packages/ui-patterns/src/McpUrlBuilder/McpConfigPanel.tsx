@@ -1,22 +1,36 @@
 'use client'
 
 import React, { useMemo, useState } from 'react'
-import { cn, Separator, CodeBlock } from 'ui'
+import { cn, Separator } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
+import { InfoTooltip } from '../info-tooltip'
 import { ClientSelectDropdown } from './components/ClientSelectDropdown'
 import { McpConfigurationDisplay } from './components/McpConfigurationDisplay'
 import { McpConfigurationOptions } from './components/McpConfigurationOptions'
-import { FEATURE_GROUPS_NON_PLATFORM, FEATURE_GROUPS_PLATFORM, MCP_CLIENTS } from './constants'
-import type { McpClient } from './types'
+import {
+  FEATURE_GROUPS_NON_PLATFORM,
+  FEATURE_GROUPS_PLATFORM,
+  MCP_CLIENT_GROUPS,
+  MCP_CLIENTS,
+} from './constants'
+import type { McpClient, McpOnCopyCallback } from './types'
 import { getMcpUrl } from './utils/getMcpUrl'
-import { InfoTooltip } from '../info-tooltip'
+
+const CLIENT_GROUPS = MCP_CLIENT_GROUPS.map((group) => ({
+  heading: group.heading,
+  clients: group.keys
+    .map((key) => MCP_CLIENTS.find((c) => c.key === key))
+    .filter(Boolean) as (typeof MCP_CLIENTS)[number][],
+}))
 
 export interface McpConfigPanelProps {
-  basePath: string
   baseUrl?: string
   projectRef?: string
   initialSelectedClient?: McpClient
   onClientSelect?: (client: McpClient) => void
+  onCopyCallback: (type?: McpOnCopyCallback) => void
+  onInstallCallback?: () => void
   theme?: 'light' | 'dark'
   className?: string
   isPlatform: boolean // For docs this is controlled by state, for studio by environment variable
@@ -24,10 +38,11 @@ export interface McpConfigPanelProps {
 }
 
 export function McpConfigPanel({
-  basePath,
   projectRef,
   initialSelectedClient,
   onClientSelect,
+  onCopyCallback,
+  onInstallCallback,
   className,
   theme = 'dark',
   isPlatform,
@@ -72,7 +87,6 @@ export function McpConfigPanel({
         <Separator />
         <McpConfigurationOptions
           className={innerPanelSpacing}
-          isPlatform={isPlatform}
           readonly={readonly}
           onReadonlyChange={setReadonly}
           selectedFeatures={selectedFeaturesSupported}
@@ -93,6 +107,7 @@ export function McpConfigPanel({
             hideLineNumbers
             language="http"
             className="max-h-64 overflow-y-auto"
+            onCopyCallback={() => onCopyCallback?.('url')}
           >
             {mcpUrl}
           </CodeBlock>
@@ -102,9 +117,9 @@ export function McpConfigPanel({
         <ClientSelectDropdown
           label="Client"
           clients={MCP_CLIENTS}
+          groups={CLIENT_GROUPS}
           selectedClient={selectedClient}
           onClientChange={handleClientChange}
-          basePath={basePath}
           theme={theme}
         />
         <p className="text-xs text-foreground-lighter">
@@ -119,9 +134,11 @@ export function McpConfigPanel({
         <McpConfigurationDisplay
           className={innerPanelSpacing}
           theme={theme}
-          basePath={basePath}
           selectedClient={selectedClient}
           clientConfig={clientConfig}
+          onCopyCallback={onCopyCallback}
+          onInstallCallback={onInstallCallback}
+          isPlatform={isPlatform}
         />
       </div>
     </div>

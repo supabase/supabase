@@ -90,7 +90,7 @@ Use the [`domains reverify`](/docs/reference/cli/supabase-domains-reverify) comm
 supabase domains reverify --project-ref abcdefghijklmnopqrst
 ```
 
-In the background, Supabase will check your DNS records and use [Let's Encrypt](https://letsencrypt.org) to issue a SSL certificate for your domain. This process can take up to 30 minutes.
+In the background, Supabase will check your DNS records and issue an SSL certificate. Supabase uses multiple Certificate Authorities (including Let's Encrypt, Google Trust Services and SSL.com) to ensure high availability. The specific issuer is chosen based on availability and this process can take up to 30 minutes.
 
 ### Prepare to activate your domain
 
@@ -130,7 +130,7 @@ If you wish to use the new domain in client code, change the URL used in your Su
 import { createClient } from '@supabase/supabase-js'
 
 // Use a custom domain as the supabase URL
-const supabase = createClient('https://api.example.com', 'publishable-or-anon-key')
+const supabase = createClient('https://api.example.com', 'sb_publishable_...')
 ```
 
 Similarly, your Edge Functions will now be available at `https://api.example.com/functions/v1/your_function_name`, and your Storage objects at `https://api.example.com/storage/v1/object/public/your_file_path.ext`.
@@ -208,7 +208,7 @@ If you wish to use the new domain in client code, you can set it up like so:
 import { createClient } from '@supabase/supabase-js'
 
 // Use a custom domain as the supabase URL
-const supabase = createClient('https://my-example-brand.supabase.co', 'publishable-or-anon-key')
+const supabase = createClient('https://my-example-brand.supabase.co', 'sb_publishable_...')
 ```
 
 When using [Sign in with Twitter](/docs/guides/auth/social-login/auth-twitter) make sure your frontend code is using the subdomain only.

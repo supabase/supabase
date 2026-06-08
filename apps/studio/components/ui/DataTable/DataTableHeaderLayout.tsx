@@ -6,7 +6,7 @@ export const DataTableHeaderLayout = forwardRef<
   PropsWithChildren<{
     setTopBarHeight: (height: number) => void
   }>
->(({ setTopBarHeight, ...props }, ref) => {
+>(({ setTopBarHeight, ...props }, _ref) => {
   const topBarRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {

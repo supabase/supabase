@@ -1,15 +1,17 @@
-import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
-
 import { useParams } from 'common'
-import Panel from 'components/ui/Panel'
-import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { Auth, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
-import { DOCS_URL } from 'lib/constants'
+import { ExternalLink, Settings } from 'lucide-react'
+import Link from 'next/link'
 import { Button } from 'ui'
+
 import { APIKeys } from './APIKeys'
 import { GetStartedHero } from './GetStartedHero'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
+import Panel from '@/components/ui/Panel'
+import { EditorIndexPageLink } from '@/data/prefetchers/project.$ref.editor'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from '@/lib/constants'
 
 export const NewProjectPanel = () => {
   const { ref } = useParams()
@@ -37,7 +39,7 @@ export const NewProjectPanel = () => {
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12 flex flex-col justify-center space-y-8 lg:col-span-7">
               <div className="space-y-2">
-                <h2>Get started by building out your database</h2>
+                <h2>Build out your database</h2>
                 <p className="text-base text-foreground-light">
                   Start building your app by creating tables and inserting data. Our Table Editor
                   makes Postgres as easy to use as a spreadsheet, but there's also our SQL Editor if
@@ -76,12 +78,12 @@ export const NewProjectPanel = () => {
                 <Panel>
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-3">
-                      <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                      <div className="rounded-sm bg-surface-300 p-1.5 text-foreground-light shadow-xs">
                         <Auth size={16} strokeWidth={1.5} />
                       </div>
                       <h5>Authentication</h5>
                     </div>
-                    <div className="flex flex-grow md:min-h-[50px] xl:min-h-[75px]">
+                    <div className="flex grow md:min-h-[50px] xl:min-h-[75px]">
                       <p className="text-sm text-foreground-light">
                         A complete user management system that works without any additional tools.
                       </p>
@@ -92,7 +94,7 @@ export const NewProjectPanel = () => {
                       </Button>
 
                       <Button
-                        className="translate-y-[1px]"
+                        className="translate-y-px"
                         icon={<ExternalLink />}
                         type="default"
                         asChild
@@ -108,7 +110,7 @@ export const NewProjectPanel = () => {
                 <Panel>
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-3">
-                      <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                      <div className="rounded-sm bg-surface-300 p-1.5 text-foreground-light shadow-xs">
                         <Storage size={16} strokeWidth={1.5} />
                       </div>
                       <h5>Storage</h5>
@@ -124,7 +126,7 @@ export const NewProjectPanel = () => {
                       </Button>
 
                       <Button
-                        className="translate-y-[1px]"
+                        className="translate-y-px"
                         icon={<ExternalLink />}
                         type="default"
                         asChild
@@ -140,7 +142,7 @@ export const NewProjectPanel = () => {
                 <Panel>
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-3">
-                      <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                      <div className="rounded-sm bg-surface-300 p-1.5 text-foreground-light shadow-xs">
                         <EdgeFunctions size={16} strokeWidth={1.5} />
                       </div>
                       <h5>Edge Functions</h5>
@@ -156,7 +158,7 @@ export const NewProjectPanel = () => {
                         <Link href={`/project/${ref}/functions`}>Explore Functions</Link>
                       </Button>
                       <Button
-                        className="translate-y-[1px]"
+                        className="translate-y-px"
                         icon={<ExternalLink />}
                         type="default"
                         asChild
@@ -175,7 +177,7 @@ export const NewProjectPanel = () => {
                 <Panel>
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-4">
-                      <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                      <div className="rounded-sm bg-surface-300 p-1.5 text-foreground-light shadow-xs">
                         <Realtime size={16} strokeWidth={1.5} />
                       </div>
                       <h5>Realtime</h5>
@@ -190,7 +192,7 @@ export const NewProjectPanel = () => {
                         <Link href={`/project/${ref}/realtime/inspector`}>Explore Realtime</Link>
                       </Button>
                       <Button
-                        className="translate-y-[1px]"
+                        className="translate-y-px"
                         icon={<ExternalLink />}
                         type="default"
                         asChild
@@ -211,28 +213,18 @@ export const NewProjectPanel = () => {
       <div className="col-span-12 lg:col-span-4">
         <div className="space-y-6">
           <div className="space-y-2">
-            <h2>Connecting to your new project</h2>
-            <p className="text-base text-foreground-light lg:max-w-sm">
+            <h2>Connect to your project</h2>
+            <p className="text-base text-foreground-light text-balance">
               Interact with your database through the{' '}
-              <Link href={`${DOCS_URL}/reference`} className="text-brand">
-                Supabase client libraries
-              </Link>{' '}
-              with your API keys.
-            </p>
-            <p className="text-base text-foreground-light lg:max-w-sm">
-              More information about your project's keys can be found in your project's API
-              settings.
+              <InlineLink href={`${DOCS_URL}/reference`}>Supabase client libraries</InlineLink> and
+              your API keys.
             </p>
           </div>
           <div className="flex items-center space-x-2">
-            <Button asChild type="default">
-              <Link href={`/project/${ref}/settings/api`}>View API settings</Link>
+            <Button asChild type="default" icon={<Settings size={16} strokeWidth={1.5} />}>
+              <Link href={`/project/${ref}/settings/api-keys`}>API Keys settings</Link>
             </Button>
-            <Button asChild className="translate-y-[1px]" type="default" icon={<ExternalLink />}>
-              <Link href={`${DOCS_URL}/guides/database/api`} target="_blank" rel="noreferrer">
-                About APIs
-              </Link>
-            </Button>
+            <DocsButton href={`${DOCS_URL}/guides/database/api`} />
           </div>
         </div>
       </div>

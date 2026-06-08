@@ -1,7 +1,7 @@
-import React, { ReactNode } from 'react'
-import Link from 'next/link'
-import { Badge, cn } from 'ui'
 import { ChevronRightIcon } from 'lucide-react'
+import Link from 'next/link'
+import React, { ReactNode } from 'react'
+import { Badge, cn } from 'ui'
 
 interface Props {
   url: string
@@ -40,23 +40,21 @@ const AnnouncementBadge = ({
           p-1 pr-0.5
           text-sm
           w-auto
-          gap-2
+          gap-1.5
           text-left
           rounded-full
-          bg-opacity-20
           border
           border-background-surface-300
-          hover:border-foreground-muted
-          hover:border-opacity-30
+          hover:border-foreground-muted/30
           shadow-md
           overflow-hidden
-          focus-visible:outline-none focus-visible:ring-brand-600 focus-visible:ring-2 focus-visible:rounded-full
+          focus-visible:outline-hidden focus-visible:ring-brand-600 focus-visible:ring-2 focus-visible:rounded-full
           `,
-        !badge && 'pl-4'
+        !badge && 'pl-5'
       )}
     >
       {badge && (
-        <Badge variant="brand" size="large" className="py-1 announcement-badge">
+        <Badge variant="success" className="py-1 announcement-badge">
           {badge}
         </Badge>
       )}
@@ -78,7 +76,7 @@ const AnnouncementBadge = ({
         <ChevronRightIcon className="announcement-icon h-4 ml-2 -translate-x-1 text-foreground transition-transform group-hover/announcement:translate-x-0" />
       )}
       <div
-        className="announcement-overlay absolute inset-0 -z-10 bg-gradient-to-br
+        className="announcement-overlay absolute inset-0 -z-10 bg-linear-to-br
             opacity-70
             group-hover/announcement:opacity-100
             transition-opacity

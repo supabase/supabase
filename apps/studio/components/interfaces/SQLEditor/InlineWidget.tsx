@@ -1,4 +1,4 @@
-import { editor } from 'monaco-editor'
+import type { editor } from 'monaco-editor'
 import { PropsWithChildren, useEffect, useMemo, useRef } from 'react'
 import { createPortal } from 'react-dom'
 
@@ -46,7 +46,7 @@ const InlineWidget = ({
   const lineNumber = beforeLineNumber ?? afterLineNumber
   const key = `${id}-${lineNumber.toString()}`
   const containerElement = useMemo(() => document.createElement('div'), [])
-  const zoneIdRef = useRef<string>()
+  const zoneIdRef = useRef<string>(null)
   const viewZoneRef = useRef<{
     top: number
     height: number

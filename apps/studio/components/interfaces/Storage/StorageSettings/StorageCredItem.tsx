@@ -1,6 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { differenceInDays } from 'date-fns'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { MoreVertical, TrashIcon } from 'lucide-react'
 import {
   Button,
@@ -12,6 +11,8 @@ import {
   TableRow,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 export const StorageCredItem = ({
   description,
@@ -53,7 +54,9 @@ export const StorageCredItem = ({
       <TableCell>
         <Input readOnly copy value={access_key} className="font-mono" />
       </TableCell>
-      <TableCell className="text-foreground-lighter">{daysSince(created_at)}</TableCell>
+      <TableCell className="text-foreground-lighter whitespace-nowrap">
+        {daysSince(created_at)}
+      </TableCell>
       <TableCell className="text-right">
         {canRemoveAccessKey && (
           <DropdownMenu>

@@ -1,17 +1,10 @@
+import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { useRouter } from 'next/router'
 import { UseFormReturn } from 'react-hook-form'
-
-import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
-import { InlineLink } from 'components/ui/InlineLink'
-import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
-import { OrgProject } from 'data/projects/org-projects-infinite-query'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from 'lib/constants'
 import {
   Badge,
   Button,
-  PopoverSeparator_Shadcn_,
+  PopoverSeparator,
   Table,
   TableBody,
   TableCell,
@@ -20,8 +13,14 @@ import {
   TableRow,
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+
 import { CreateProjectForm } from './ProjectCreation.schema'
 import { instanceLabel, monthlyInstancePrice } from './ProjectCreation.utils'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { OrgProject } from '@/data/projects/org-projects-infinite-query'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from '@/lib/constants'
 
 interface ProjectCreationFooterProps {
   form: UseFormReturn<CreateProjectForm>
@@ -54,7 +53,7 @@ export const ProjectCreationFooter = ({
   const availableComputeCredits = organizationProjects.length === 0 ? 10 : 0
   const additionalMonthlySpend = isFreePlan
     ? 0
-    : instanceSizeSpecs[instanceSize as DesiredInstanceSize]!.priceMonthly - availableComputeCredits
+    : monthlyInstancePrice(instanceSize) - availableComputeCredits
 
   // [kevin] This will eventually all be provided by a new API endpoint to preview and validate project creation, this is just for kaizen now
   const monthlyComputeCosts =
@@ -124,11 +123,9 @@ export const ProjectCreationFooter = ({
                       <TableRow>
                         <TableCell className="w-[170px] flex gap-2">
                           <span className="truncate">
-                            {form.getValues('projectName') ?? 'New project'}
+                            {form.getValues('projectName') || 'New project'}
                           </span>
-                          <Badge size={'small'} variant={'default'}>
-                            NEW
-                          </Badge>
+                          <Badge variant="success">New</Badge>
                         </TableCell>
                         <TableCell className="text-center">{instanceLabel(instanceSize)}</TableCell>
                         <TableCell className="text-right">
@@ -137,7 +134,7 @@ export const ProjectCreationFooter = ({
                       </TableRow>
                     </TableBody>
                   </Table>
-                  <PopoverSeparator_Shadcn_ />
+                  <PopoverSeparator />
                   <Table>
                     <TableHeader className="[&_th]:h-7">
                       <TableRow>

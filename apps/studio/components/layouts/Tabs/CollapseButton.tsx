@@ -1,37 +1,53 @@
+import { useBreakpoint } from 'common'
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
-
-import { useAppStateSnapshot } from 'state/app-state'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
+import { useAppStateSnapshot } from '@/state/app-state'
+
 export function CollapseButton({ hideTabs }: { hideTabs: boolean }) {
-  const { showSidebar, setShowSidebar } = useAppStateSnapshot()
+  const { showSidebar, setShowSidebar, mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
+  const isMobile = useBreakpoint('md')
+
+  const handleToggle = () => {
+    if (isMobile) {
+      setMobileMenuOpen(!mobileMenuOpen)
+    } else {
+      setShowSidebar(!showSidebar)
+    }
+  }
 
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <button
           className={cn(
-            'flex items-center justify-center w-10 h-10 hover:bg-surface-100 shrink-0',
+            'hidden md:flex items-center justify-center w-10 h-(--header-height) hover:bg-surface-100 shrink-0',
             !hideTabs && 'border-b border-b-default'
           )}
-          onClick={() => setShowSidebar(!showSidebar)}
+          onClick={handleToggle}
         >
           {showSidebar ? (
-            <PanelLeftClose
-              size={16}
-              strokeWidth={1.5}
-              className="text-foreground-lighter hover:text-foreground-light"
-            />
+            <>
+              <PanelLeftClose
+                size={16}
+                strokeWidth={1.5}
+                className="text-foreground-lighter hover:text-foreground-light"
+              />
+              <span className="sr-only">Collapse sidebar</span>
+            </>
           ) : (
-            <PanelLeftOpen
-              size={16}
-              strokeWidth={1.5}
-              className="text-foreground-lighter hover:text-foreground-light"
-            />
+            <>
+              <PanelLeftOpen
+                size={16}
+                strokeWidth={1.5}
+                className="text-foreground-lighter hover:text-foreground-light"
+              />
+              <span className="sr-only">Expand sidebar</span>
+            </>
           )}
         </button>
       </TooltipTrigger>
-      <TooltipContent side="bottom">{true ? 'Collapse' : 'Expand'} sidebar</TooltipContent>
+      <TooltipContent side="bottom">{showSidebar ? 'Collapse' : 'Expand'} sidebar</TooltipContent>
     </Tooltip>
   )
 }

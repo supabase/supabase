@@ -1,0 +1,70 @@
+{
+  "name": "password-based-auth-nuxtjs",
+  "type": "registry:block",
+  "title": "Password Based Auth flow for Nuxt.js and Supabase",
+  "description": "Password Based Auth flow for Nuxt.js and Supabase",
+  "registryDependencies": ["button", "card", "input", "label"],
+  "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+  "files": [
+    {
+      "path": "registry/default/password-based-auth/nuxtjs/app/components/login-form.vue",
+      "type": "registry:file",
+      "target": "app/components/login-form.vue"
+    },
+    {
+      "path": "registry/default/password-based-auth/nuxtjs/app/components/sign-up-form.vue",
+      "type": "registry:file",
+      "target": "app/components/sign-up-form.vue"
+    },
+    {
+      "path": "registry/default/password-based-auth/nuxtjs/app/components/forgot-password-form.vue",
+      "type": "registry:file",
+      "target": "app/components/forgot-password-form.vue"
+    },
+    {
+      "path": "registry/default/password-based-auth/nuxtjs/app/components/update-password-form.vue",
+      "type": "registry:file",
+      "target": "app/components/update-password-form.vue"
+    },
+    {
+      "path": "registry/default/password-based-auth/nuxtjs/app/pages/auth/login.vue",
+      "type": "registry:file",
+      "target": "app/pages/auth/login.vue"
+    },
+    {
+      "path": "registry/default/password-based-auth/nuxtjs/app/pages/auth/sign-up.vue",
+      "type": "registry:file",
+      "target": "app/pages/auth/sign-up.vue"
+    },
+    {
+      "path": "registry/default/password-based-auth/nuxtjs/app/pages/auth/forgot-password.vue",
+      "type": "registry:file",
+      "target": "app/pages/auth/forgot-password.vue"
+    },
+    {
+      "path": "registry/default/password-based-auth/nuxtjs/app/pages/auth/update-password.vue",
+      "type": "registry:file",
+      "target": "app/pages/auth/update-password.vue"
+    },
+    {
+      "path": "registry/default/password-based-auth/nuxtjs/app/pages/auth/error.vue",
+      "type": "registry:file",
+      "target": "app/pages/auth/error.vue"
+    },
+    {
+      "path": "registry/default/password-based-auth/nuxtjs/app/pages/auth/sign-up-success.vue",
+      "type": "registry:file",
+      "target": "app/pages/auth/sign-up-success.vue"
+    },
+    {
+      "path": "registry/default/password-based-auth/nuxtjs/app/pages/protected/index.vue",
+      "type": "registry:file",
+      "target": "app/pages/protected/index.vue"
+    },
+    {
+      "path": "registry/default/password-based-auth/nuxtjs/server/routes/auth/confirm.get.ts",
+      "type": "registry:file",
+      "target": "server/routes/auth/confirm.get.ts"
+    }
+  ]
+}

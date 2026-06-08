@@ -1,29 +1,41 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronLeft, Search } from 'lucide-react'
-import Link from 'next/link'
-import { useMemo, useState } from 'react'
-
 import { useParams } from 'common'
-import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Card, LogoLoader, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { Search } from 'lucide-react'
+import { useMemo, useRef, useState } from 'react'
+import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
+import { PublicationTablesSkeleton } from './PublicationSkeleton'
 import { PublicationsTableItem } from './PublicationsTableItem'
+import { AlertError } from '@/components/ui/AlertError'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const PublicationsTables = () => {
-  const { ref, id } = useParams()
+  const { id } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [filterString, setFilterString] = useState<string>('')
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
   const { can: canUpdatePublications, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'publications'
+  )
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search publications' }
   )
 
   const { data: publications = [] } = useDatabasePublicationsQuery({
@@ -34,7 +46,7 @@ export const PublicationsTables = () => {
 
   const {
     data: tablesData = [],
-    isLoading,
+    isPending: isLoading,
     isSuccess,
     isError,
     error,
@@ -51,88 +63,90 @@ export const PublicationsTables = () => {
 
   return (
     <>
-      <div className="mb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <ButtonTooltip
-              asChild
-              type="outline"
-              icon={<ChevronLeft />}
-              style={{ padding: '5px' }}
-              tooltip={{ content: { side: 'bottom', text: 'Go back to publications list' } }}
-            >
-              <Link href={`/project/${ref}/database/publications`} />
-            </ButtonTooltip>
-            <div>
-              <Input
-                size="tiny"
-                placeholder="Search for a table"
-                value={filterString}
-                onChange={(e) => setFilterString(e.target.value)}
-                icon={<Search size={12} />}
-                className="w-48 pl-8"
-              />
-            </div>
-          </div>
-          {!isLoadingPermissions && !canUpdatePublications && (
-            <Admonition
-              type="note"
-              className="w-[500px] m-0"
-              title="You need additional permissions to update database replications"
-            />
-          )}
-        </div>
+      <div className="flex items-center justify-between mb-4">
+        <Input
+          size="tiny"
+          ref={searchInputRef}
+          icon={<Search />}
+          className="w-48"
+          placeholder="Search for a table"
+          value={filterString}
+          onChange={(e) => setFilterString(e.target.value)}
+          onKeyDown={onSearchInputEscape(filterString, setFilterString)}
+        />
       </div>
 
-      {(isLoading || isLoadingPermissions) && (
-        <div className="mt-8">
-          <LogoLoader />
-        </div>
+      {!isLoadingPermissions && !canUpdatePublications && (
+        <Admonition
+          type="warning"
+          className="mb-4 w-full"
+          description="You need additional permissions to update database replications."
+        />
       )}
 
-      {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
+      <Card>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Schema</TableHead>
+              <TableHead className="hidden lg:table-cell">Description</TableHead>
+              {/* 
+                    We've disabled All tables toggle for publications. 
+                    See https://github.com/supabase/supabase/pull/7233. 
+                  */}
+              <TableHead />
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {(isLoading || isLoadingPermissions) &&
+              Array.from({ length: 2 }).map((_, i) => (
+                <PublicationTablesSkeleton key={i} index={i} />
+              ))}
 
-      {isSuccess &&
-        (tables.length === 0 ? (
-          <NoSearchResults />
-        ) : (
-          <Card>
-            <Table>
-              <TableHeader>
+            {isError && (
+              <TableRow>
+                <TableCell colSpan={4}>
+                  <AlertError error={error} subject="Failed to retrieve tables" />
+                </TableCell>
+              </TableRow>
+            )}
+
+            {!isLoading && !isLoadingPermissions && tables.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={4}>
+                  <NoSearchResults
+                    className="border-none !p-0"
+                    searchString={filterString}
+                    onResetFilter={() => setFilterString('')}
+                  />
+                </TableCell>
+              </TableRow>
+            )}
+
+            {isSuccess ? (
+              !!selectedPublication ? (
+                tables.map((table) => (
+                  <PublicationsTableItem
+                    key={table.id}
+                    table={table}
+                    selectedPublication={selectedPublication}
+                  />
+                ))
+              ) : (
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Schema</TableHead>
-                  <TableHead>Description</TableHead>
-                  {/* 
-                      We've disabled All tables toggle for publications. 
-                      See https://github.com/supabase/supabase/pull/7233. 
-                    */}
-                  <TableHead />
+                  <TableCell colSpan={4}>
+                    <p>The selected publication with ID {id} cannot be found</p>
+                    <p className="text-foreground-light">
+                      Head back to the list of publications to select one from there
+                    </p>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {!!selectedPublication ? (
-                  tables.map((table) => (
-                    <PublicationsTableItem
-                      key={table.id}
-                      table={table}
-                      selectedPublication={selectedPublication}
-                    />
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={4}>
-                      <p>The selected publication with ID {id} cannot be found</p>
-                      <p className="text-foreground-light">
-                        Head back to the list of publications to select one from there
-                      </p>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </Card>
-        ))}
+              )
+            ) : null}
+          </TableBody>
+        </Table>
+      </Card>
     </>
   )
 }

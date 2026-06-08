@@ -1,45 +1,54 @@
-import { ArrowDown, ArrowRight, ArrowUp, ChevronDown, TextSearch } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
-
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { ArrowDown, ArrowRight, ArrowUp, ChevronDown, TextSearch } from 'lucide-react'
+import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
+import { UIEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import {
   Button,
-  CodeBlock,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetTitle,
+  Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
-  Tabs_Shadcn_,
-  cn,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
-import { hasIndexRecommendations } from './IndexAdvisor/index-advisor.utils'
+import {
+  hasIndexRecommendations,
+  queryInvolvesProtectedSchemas,
+} from './IndexAdvisor/index-advisor.utils'
 import { IndexSuggestionIcon } from './IndexAdvisor/IndexSuggestionIcon'
 import { QueryDetail } from './QueryDetail'
 import { QueryIndexes } from './QueryIndexes'
 import {
   QUERY_PERFORMANCE_COLUMNS,
-  QUERY_PERFORMANCE_REPORT_TYPES,
   QUERY_PERFORMANCE_ROLE_DESCRIPTION,
 } from './QueryPerformance.constants'
 import { QueryPerformanceRow } from './QueryPerformance.types'
 import { formatDuration } from './QueryPerformance.utils'
+import { NumericFilter } from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface QueryPerformanceGridProps {
   aggregatedData: QueryPerformanceRow[]
   isLoading: boolean
-  currentSelectedQuery?: string | null // Make optional
-  onCurrentSelectQuery?: (query: string) => void // Make optional
+  error?: string | null
+  currentSelectedQuery?: string | null
+  onCurrentSelectQuery?: (query: string) => void
+  onRetry?: () => void
+  onScroll?: (event: UIEvent<HTMLDivElement>) => void
 }
 
 const calculateTimeConsumedWidth = (data: QueryPerformanceRow[]) => {
@@ -67,17 +76,29 @@ const calculateTimeConsumedWidth = (data: QueryPerformanceRow[]) => {
 export const QueryPerformanceGrid = ({
   aggregatedData,
   isLoading,
+  error,
   currentSelectedQuery,
   onCurrentSelectQuery,
+  onRetry,
+  onScroll,
 }: QueryPerformanceGridProps) => {
   const { sort, setSortConfig } = useQueryPerformanceSort()
   const gridRef = useRef<DataGridHandle>(null)
-  const { sort: urlSort, order, roles, search, minCalls } = useParams()
+  const { sort: urlSort, order } = useParams()
+  const [{ search, roles, callsFilter }] = useQueryStates({
+    search: parseAsString.withDefault(''),
+    roles: parseAsArrayOf(parseAsString).withDefault([]),
+    callsFilter: parseAsJson<NumericFilter | null>(
+      (value) => value as NumericFilter | null
+    ).withDefault({
+      operator: '>=',
+      value: 0,
+    } as NumericFilter),
+  })
   const dataGridContainerRef = useRef<HTMLDivElement>(null)
 
   const [view, setView] = useState<'details' | 'suggestion'>('details')
   const [selectedRow, setSelectedRow] = useState<number>()
-  const reportType = QUERY_PERFORMANCE_REPORT_TYPES.UNIFIED
 
   const columns = QUERY_PERFORMANCE_COLUMNS.map((col) => {
     const nonSortableColumns = ['query']
@@ -90,7 +111,7 @@ export const QueryPerformanceGrid = ({
       minWidth:
         col.id === 'prop_total_time'
           ? calculateTimeConsumedWidth((aggregatedData as any) ?? [])
-          : col.minWidth ?? 120,
+          : (col.minWidth ?? 120),
       sortable: !nonSortableColumns.includes(col.id),
       headerCellClass: 'first:pl-6 cursor-pointer',
       renderHeaderCell: () => {
@@ -99,7 +120,7 @@ export const QueryPerformanceGrid = ({
         return (
           <div className="flex items-center justify-between text-xs w-full">
             <div className="flex items-center gap-x-2">
-              <p className="!text-foreground font-medium">{col.name}</p>
+              <p className="text-foreground! font-medium">{col.name}</p>
               {col.description && (
                 <p className="text-foreground-lighter font-normal">{col.description}</p>
               )}
@@ -111,7 +132,7 @@ export const QueryPerformanceGrid = ({
                   <Button
                     type="text"
                     size="tiny"
-                    className="p-1 h-5 w-5 flex-shrink-0"
+                    className="p-1 h-5 w-5 shrink-0"
                     icon={<ChevronDown size={14} className="text-foreground-muted" />}
                     onClick={(e) => e.stopPropagation()}
                   />
@@ -152,7 +173,7 @@ export const QueryPerformanceGrid = ({
         if (col.id === 'query') {
           return (
             <div className="w-full flex items-center gap-x-3 group">
-              <div className="flex-shrink-0 w-4">
+              <div className="shrink-0 w-4">
                 {hasIndexRecommendations(props.row.index_advisor_result, true) && (
                   <IndexSuggestionIcon
                     indexAdvisorResult={props.row.index_advisor_result}
@@ -166,11 +187,11 @@ export const QueryPerformanceGrid = ({
               </div>
               <CodeBlock
                 language="pgsql"
-                className="!bg-transparent !p-0 !m-0 !border-none !whitespace-nowrap [&>code]:!whitespace-nowrap [&>code]:break-words !overflow-visible !truncate !w-full !pr-20 pointer-events-none"
-                wrapperClassName="!max-w-full flex-1"
+                className="bg-transparent! p-0! m-0! border-none! truncate! whitespace-nowrap! w-full! pr-20! pointer-events-none"
+                wrapperClassName="flex-1 min-w-0 max-w-full overflow-hidden!"
                 hideLineNumbers
                 hideCopy
-                value={value.replace(/\s+/g, ' ').trim() as string}
+                value={typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() : ''}
                 wrapLines={false}
               />
               {onCurrentSelectQuery && (
@@ -185,7 +206,7 @@ export const QueryPerformanceGrid = ({
                     setView('details')
                     gridRef.current?.scrollToCell({ idx: 0, rowIdx: props.rowIdx })
                   }}
-                  className="p-1 flex-shrink-0 -translate-x-2 group-hover:flex hidden"
+                  className="p-1 shrink-0 -translate-x-2 group-hover:flex hidden"
                 />
               )}
             </div>
@@ -320,6 +341,18 @@ export const QueryPerformanceGrid = ({
           )
         }
 
+        if (col.id === 'application_name') {
+          return (
+            <div className="w-full flex flex-col justify-center">
+              {value ? (
+                <p className="font-mono text-xs">{value}</p>
+              ) : (
+                <p className="text-muted">&ndash;</p>
+              )}
+            </div>
+          )
+        }
+
         return (
           <div className="w-full flex flex-col gap-y-0.5 justify-center text-xs">
             <p>{formattedValue}</p>
@@ -341,9 +374,27 @@ export const QueryPerformanceGrid = ({
       data = data.filter((row) => row.rolname && roles.includes(row.rolname))
     }
 
-    const minCallsNum = Number(minCalls)
-    if (!Number.isNaN(minCallsNum) && minCallsNum > 0) {
-      data = data.filter((row) => (row.calls || 0) >= minCallsNum)
+    if (callsFilter) {
+      const { operator, value } = callsFilter
+      data = data.filter((row) => {
+        const calls = row.calls || 0
+        switch (operator) {
+          case '=':
+            return calls === value
+          case '>=':
+            return calls >= value
+          case '<=':
+            return calls <= value
+          case '>':
+            return calls > value
+          case '<':
+            return calls < value
+          case '!=':
+            return calls !== value
+          default:
+            return true
+        }
+      })
     }
 
     if (sort?.column === 'prop_total_time') {
@@ -365,19 +416,11 @@ export const QueryPerformanceGrid = ({
     }
 
     return data
-  }, [aggregatedData, sort, search, roles, minCalls])
-
-  const selectedQuery = selectedRow !== undefined ? reportData[selectedRow]?.query : undefined
-  const query = (selectedQuery ?? '').trim().toLowerCase()
-  const showIndexSuggestions =
-    (query.startsWith('select') ||
-      query.startsWith('with pgrst_source') ||
-      query.startsWith('with pgrst_payload')) &&
-    hasIndexRecommendations(reportData[selectedRow!]?.index_advisor_result, true)
+  }, [aggregatedData, sort, search, roles, callsFilter])
 
   useEffect(() => {
     setSelectedRow(undefined)
-  }, [search, roles, urlSort, order, minCalls])
+  }, [search, roles, urlSort, order, callsFilter])
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -415,28 +458,78 @@ export const QueryPerformanceGrid = ({
     }
   }, [handleKeyDown])
 
+  const isSelectQuery = (query: string | undefined): boolean => {
+    if (!query) return false
+    const formattedQuery = query.trim().toLowerCase()
+    return (
+      formattedQuery.startsWith('select') ||
+      formattedQuery.startsWith('with pgrst_source') ||
+      formattedQuery.startsWith('with pgrst_payload')
+    )
+  }
+
+  useEffect(() => {
+    if (selectedRow !== undefined && view === 'suggestion') {
+      const query = reportData[selectedRow]?.query
+      if (!isSelectQuery(query)) {
+        setView('details')
+      }
+    }
+  }, [selectedRow, view, reportData])
+
+  if (error) {
+    return (
+      <div className="relative flex grow bg-alternative min-h-0">
+        <div className="flex-1 min-w-0 p-6">
+          <Admonition
+            type="destructive"
+            title="Failed to load query performance data"
+            description={error}
+          >
+            {onRetry && (
+              <div className="mt-4">
+                <Button type="default" onClick={onRetry}>
+                  Try again
+                </Button>
+              </div>
+            )}
+          </Admonition>
+        </div>
+      </div>
+    )
+  }
+
+  const selectedQuery = selectedRow !== undefined ? reportData[selectedRow]?.query : undefined
+  const isProtectedSchemaQuery = queryInvolvesProtectedSchemas(selectedQuery)
+  const canShowIndexesTab = isSelectQuery(selectedQuery) && !isProtectedSchemaQuery
+
   return (
-    <div className="relative flex flex-grow bg-alternative min-h-0">
+    <div className="relative flex grow bg-alternative min-h-0">
       <div ref={dataGridContainerRef} className="flex-1 min-w-0 overflow-x-auto">
         <DataGrid
           ref={gridRef}
           style={{ height: '100%' }}
-          className={cn('flex-1 flex-grow h-full')}
+          className={cn('flex-1 grow h-full border-t-0! border-b-0!')}
           rowHeight={44}
           headerRowHeight={36}
           columns={columns}
           rows={reportData}
+          onScroll={onScroll}
           rowClass={(_, idx) => {
             const isSelected = idx === selectedRow
             const query = reportData[idx]?.query
             const isCharted = currentSelectedQuery ? currentSelectedQuery === query : false
+            const hasRecommendations = hasIndexRecommendations(
+              reportData[idx]?.index_advisor_result,
+              true
+            )
 
             return [
-              `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
-              `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:!border-l-foreground' : ''}`,
+              `${isSelected ? (hasRecommendations ? 'bg-warning/10 hover:bg-warning/20' : 'bg-surface-300 dark:bg-surface-300') : hasRecommendations ? 'bg-warning/10 hover:bg-warning/20' : 'bg-200 hover:bg-surface-200'} cursor-pointer`,
+              `${isSelected ? (hasRecommendations ? '[&>div:first-child]:border-l-4 border-l-warning [&>div]:border-l-warning' : '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground!') : ''}`,
               `${isCharted ? 'bg-surface-200 dark:bg-surface-200' : ''}`,
               `${isCharted ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-brand' : ''}`,
-              '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+              '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
               '[&>.rdg-cell.column-prop_total_time]:relative',
             ].join(' ')
           }}
@@ -450,16 +543,18 @@ export const QueryPerformanceGrid = ({
                     event.stopPropagation()
 
                     if (typeof idx === 'number' && idx >= 0) {
-                      // If onCurrentSelectQuery is provided, use the chart selection logic
                       if (onCurrentSelectQuery) {
                         const query = reportData[idx]?.query
                         if (query) {
                           onCurrentSelectQuery(query)
                         }
                       } else {
-                        // Otherwise, open the detail panel
                         setSelectedRow(idx)
-                        setView('details')
+                        const hasRecommendations = hasIndexRecommendations(
+                          reportData[idx]?.index_advisor_result,
+                          true
+                        )
+                        setView(hasRecommendations ? 'suggestion' : 'details')
                         gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
                       }
                     }
@@ -496,9 +591,12 @@ export const QueryPerformanceGrid = ({
         modal={false}
       >
         <SheetTitle className="sr-only">Query details</SheetTitle>
+        <SheetDescription className="sr-only">
+          Query Performance Details &amp; Indexes
+        </SheetDescription>
         <SheetContent
           side="right"
-          className="flex flex-col h-full bg-studio border-l lg:!w-[calc(100vw-802px)] max-w-[700px] w-full"
+          className="flex flex-col h-full bg-studio border-l lg:w-[calc(100vw-802px)]! max-w-[700px] w-full"
           hasOverlay={false}
           onInteractOutside={(event) => {
             if (dataGridContainerRef.current?.contains(event.target as Node)) {
@@ -515,14 +613,14 @@ export const QueryPerformanceGrid = ({
               <TabsList_Shadcn_ className="px-0 flex gap-x-4 min-h-[46px] border-b-0 [&>button]:h-[47px]">
                 <TabsTrigger_Shadcn_
                   value="details"
-                  className="px-0 pb-0 data-[state=active]:bg-transparent !shadow-none"
+                  className="px-0 pb-0 data-[state=active]:bg-transparent shadow-none!"
                 >
                   Query details
                 </TabsTrigger_Shadcn_>
-                {showIndexSuggestions && (
+                {selectedRow !== undefined && canShowIndexesTab && (
                   <TabsTrigger_Shadcn_
                     value="suggestion"
-                    className="px-0 pb-0 data-[state=active]:bg-transparent !shadow-none"
+                    className="px-0 pb-0 data-[state=active]:bg-transparent shadow-none!"
                   >
                     Indexes
                   </TabsTrigger_Shadcn_>
@@ -530,21 +628,20 @@ export const QueryPerformanceGrid = ({
               </TabsList_Shadcn_>
             </div>
 
-            <TabsContent_Shadcn_ value="details" className="mt-0 flex-grow min-h-0 overflow-y-auto">
+            <TabsContent_Shadcn_ value="details" className="mt-0 grow min-h-0 overflow-y-auto">
               {selectedRow !== undefined && (
                 <QueryDetail
-                  reportType={reportType}
                   selectedRow={reportData[selectedRow]}
                   onClickViewSuggestion={() => setView('suggestion')}
+                  onClose={() => setSelectedRow(undefined)}
                 />
               )}
             </TabsContent_Shadcn_>
-            <TabsContent_Shadcn_
-              value="suggestion"
-              className="mt-0 flex-grow min-h-0 overflow-y-auto"
-            >
-              {selectedRow !== undefined && <QueryIndexes selectedRow={reportData[selectedRow]} />}
-            </TabsContent_Shadcn_>
+            {selectedRow !== undefined && canShowIndexesTab && (
+              <TabsContent_Shadcn_ value="suggestion" className="mt-0 grow min-h-0 overflow-y-auto">
+                <QueryIndexes selectedRow={reportData[selectedRow]} />
+              </TabsContent_Shadcn_>
+            )}
           </Tabs_Shadcn_>
         </SheetContent>
       </Sheet>

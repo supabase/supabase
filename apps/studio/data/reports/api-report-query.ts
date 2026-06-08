@@ -1,12 +1,12 @@
+import { useParams } from 'common'
 import { isEqual } from 'lodash'
 import { useEffect, useState } from 'react'
 
-import { useParams } from 'common'
-import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
-import { ReportFilterItem } from 'components/interfaces/Reports/Reports.types'
-import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
-import type { LogsEndpointParams } from 'components/interfaces/Settings/Logs/Logs.types'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { PRESET_CONFIG } from '@/components/interfaces/Reports/Reports.constants'
+import { ReportFilterItem } from '@/components/interfaces/Reports/Reports.types'
+import { getLogsSql, queriesFactory } from '@/components/interfaces/Reports/Reports.utils'
+import type { LogsEndpointParams } from '@/components/interfaces/Settings/Logs/Logs.types'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 export const useApiReport = () => {
   const { ref: projectRef } = useParams()
@@ -26,6 +26,7 @@ export const useApiReport = () => {
   const responseSpeed = queryHooks.responseSpeed()
   const topSlowRoutes = queryHooks.topSlowRoutes()
   const networkTraffic = queryHooks.networkTraffic()
+  const requestsByCountry = queryHooks.requestsByCountry()
   const activeHooks = [
     totalRequests,
     topRoutes,
@@ -34,6 +35,7 @@ export const useApiReport = () => {
     responseSpeed,
     topSlowRoutes,
     networkTraffic,
+    requestsByCountry,
   ]
 
   const addFilter = (filter: ReportFilterItem) => {
@@ -64,35 +66,50 @@ export const useApiReport = () => {
   const formattedFilters: ReportFilterItem[] = [
     ...filters,
     ...(identifier !== undefined
-      ? [{ key: 'identifier', value: `'${identifier}'`, compare: 'is' } as ReportFilterItem]
+      ? [{ key: 'identifier', value: identifier, compare: 'is' } as ReportFilterItem]
       : []),
   ]
 
   useEffect(() => {
     // update sql for each query
     if (totalRequests.changeQuery) {
-      totalRequests.changeQuery(PRESET_CONFIG.api.queries.totalRequests.sql(formattedFilters))
+      totalRequests.changeQuery(
+        getLogsSql(PRESET_CONFIG.api.queries.totalRequests, formattedFilters)
+      )
     }
     if (topRoutes.changeQuery) {
-      topRoutes.changeQuery(PRESET_CONFIG.api.queries.topRoutes.sql(formattedFilters))
+      topRoutes.changeQuery(getLogsSql(PRESET_CONFIG.api.queries.topRoutes, formattedFilters))
     }
     if (errorCounts.changeQuery) {
-      errorCounts.changeQuery(PRESET_CONFIG.api.queries.errorCounts.sql(formattedFilters))
+      errorCounts.changeQuery(getLogsSql(PRESET_CONFIG.api.queries.errorCounts, formattedFilters))
     }
 
     if (topErrorRoutes.changeQuery) {
-      topErrorRoutes.changeQuery(PRESET_CONFIG.api.queries.topErrorRoutes.sql(formattedFilters))
+      topErrorRoutes.changeQuery(
+        getLogsSql(PRESET_CONFIG.api.queries.topErrorRoutes, formattedFilters)
+      )
     }
     if (responseSpeed.changeQuery) {
-      responseSpeed.changeQuery(PRESET_CONFIG.api.queries.responseSpeed.sql(formattedFilters))
+      responseSpeed.changeQuery(
+        getLogsSql(PRESET_CONFIG.api.queries.responseSpeed, formattedFilters)
+      )
     }
 
     if (topSlowRoutes.changeQuery) {
-      topSlowRoutes.changeQuery(PRESET_CONFIG.api.queries.topSlowRoutes.sql(formattedFilters))
+      topSlowRoutes.changeQuery(
+        getLogsSql(PRESET_CONFIG.api.queries.topSlowRoutes, formattedFilters)
+      )
     }
 
     if (networkTraffic.changeQuery) {
-      networkTraffic.changeQuery(PRESET_CONFIG.api.queries.networkTraffic.sql(formattedFilters))
+      networkTraffic.changeQuery(
+        getLogsSql(PRESET_CONFIG.api.queries.networkTraffic, formattedFilters)
+      )
+    }
+    if (requestsByCountry.changeQuery) {
+      requestsByCountry.changeQuery(
+        getLogsSql(PRESET_CONFIG.api.queries.requestsByCountry, formattedFilters)
+      )
     }
   }, [JSON.stringify(formattedFilters)])
 
@@ -117,6 +134,7 @@ export const useApiReport = () => {
       topErrorRoutes: topErrorRoutes.logData,
       topSlowRoutes: topSlowRoutes.logData,
       networkTraffic: networkTraffic.logData,
+      requestsByCountry: requestsByCountry.logData,
     },
     params: {
       totalRequests: totalRequests.params,
@@ -126,6 +144,7 @@ export const useApiReport = () => {
       topErrorRoutes: topErrorRoutes.params,
       topSlowRoutes: topSlowRoutes.params,
       networkTraffic: networkTraffic.params,
+      requestsByCountry: requestsByCountry.params,
     },
     error: {
       totalRequest: totalRequests.error,
@@ -135,6 +154,7 @@ export const useApiReport = () => {
       topErrorRoute: topErrorRoutes.error,
       topSlowRoutes: topSlowRoutes.error,
       networkTraffic: networkTraffic.error,
+      requestsByCountry: requestsByCountry.error,
     },
     mergeParams: handleSetParams,
     filters,

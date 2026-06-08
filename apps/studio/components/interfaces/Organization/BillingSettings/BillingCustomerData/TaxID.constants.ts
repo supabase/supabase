@@ -5,6 +5,8 @@ export interface TaxId {
   countryIso2: string
   placeholder: string
   vatPrefix?: string
+  /** Override the country code sent to Orb when it differs from countryIso2 */
+  taxCountryIso2?: string
 }
 
 // Commented out countries are not currently supported by Orb API
@@ -431,6 +433,16 @@ export const TAX_IDS: TaxId[] = [
     countryIso2: 'GB',
   },
   {
+    // Isle of Man uses GB VAT numbers, taxCountryIso2 must be GB for Orb validation
+    name: 'IM VAT',
+    type: 'gb_vat',
+    country: 'Isle of Man',
+    placeholder: 'GB123456789',
+    vatPrefix: 'GB',
+    countryIso2: 'IM',
+    taxCountryIso2: 'GB',
+  },
+  {
     name: 'GE VAT',
     type: 'ge_vat',
     country: 'Georgia',
@@ -720,13 +732,6 @@ export const TAX_IDS: TaxId[] = [
     country: 'North Macedonia',
     placeholder: 'MK1234567890123',
     countryIso2: 'MK',
-  },
-  {
-    name: 'nz_gst',
-    type: 'nz_gst',
-    country: 'New Zealand',
-    placeholder: '123456789',
-    countryIso2: 'NZ',
   },
   {
     name: 'NO VAT',

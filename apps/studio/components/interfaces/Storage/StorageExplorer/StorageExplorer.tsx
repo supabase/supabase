@@ -1,11 +1,9 @@
-import { compact, get, isEmpty, uniqBy } from 'lodash'
-import { useEffect, useRef, useState } from 'react'
-
+import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import type { Bucket } from 'data/storage/buckets-query'
-import { IS_PLATFORM } from 'lib/constants'
-import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+import { compact, get, isEmpty, uniqBy } from 'lodash'
+import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
+
+import { useSelectedBucket } from '../FilesBuckets/useSelectedBucket'
 import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
 import { ConfirmDeleteModal } from './ConfirmDeleteModal'
 import { CustomExpiryModal } from './CustomExpiryModal'
@@ -14,29 +12,27 @@ import { FileExplorerHeader } from './FileExplorerHeader'
 import { FileExplorerHeaderSelection } from './FileExplorerHeaderSelection'
 import { MoveItemsModal } from './MoveItemsModal'
 import { PreviewPane } from './PreviewPane'
+import { useStorageExplorerShortcuts } from './useStorageExplorerShortcuts'
+import { useStoragePreference } from './useStoragePreference'
+import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
+import type { Bucket } from '@/data/storage/buckets-query'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
-interface StorageExplorerProps {
-  bucket: Bucket
-}
-
-export const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
-  const { ref } = useParams()
+export const StorageExplorer = () => {
+  const { ref, bucketId } = useParams()
   const storageExplorerRef = useRef(null)
   const {
-    view,
+    projectRef,
     columns,
     selectedItems,
-    selectedItemsToDelete,
     openedFolders,
     selectedItemsToMove,
     selectedBucket,
-    openBucket,
     fetchFolderContents,
     fetchMoreFolderContents,
     fetchFoldersByPath,
-    deleteFolder,
     uploadFiles,
-    deleteFiles,
     moveFiles,
     popColumnAtIndex,
     popOpenedFoldersAtIndex,
@@ -44,54 +40,69 @@ export const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
     clearSelectedItems,
     setSelectedFilePreview,
     setSelectedItemsToMove,
-    setSelectedItemsToDelete,
+    setIsSearching,
   } = useStorageExplorerStateSnapshot()
+  const { view } = useStoragePreference(projectRef)
 
   useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
+  const { data: bucket, isLoading: isBucketQueryLoading } = useSelectedBucket()
+
+  // Detect when transitioning between buckets to avoid showing stale content from the previous bucket.
+  // This happens because the bucket query and effects that update the store run after the first render.
+  const isLoading = isBucketQueryLoading || (!!bucketId && bucketId !== selectedBucket.id)
 
   // This state exists outside of the header because FileExplorerColumn needs to listen to these as well
   // Things like showing results from a search filter is "temporary", hence we use react state to manage
   const [itemSearchString, setItemSearchString] = useState('')
+  const debouncedSearchString = useDebounce(itemSearchString, 500)
 
-  useEffect(() => {
-    const fetchContents = async () => {
-      if (view === STORAGE_VIEWS.LIST) {
-        const currentFolderIdx = openedFolders.length - 1
-        const currentFolder = openedFolders[currentFolderIdx]
+  const handleClearSearch = useCallback(() => {
+    setIsSearching(false)
+    setItemSearchString('')
+  }, [setIsSearching])
 
-        const folderId = !currentFolder ? bucket.id : currentFolder.id
-        const folderName = !currentFolder ? bucket.name : currentFolder.name
-        const index = !currentFolder ? -1 : currentFolderIdx
+  useStorageExplorerShortcuts({ onClearSearch: handleClearSearch })
 
+  const fetchContents = useEffectEvent(async (bucket: Bucket) => {
+    if (view === STORAGE_VIEWS.LIST) {
+      const currentFolderIdx = openedFolders.length - 1
+      const currentFolder = openedFolders[currentFolderIdx]
+
+      const folderId = !currentFolder ? bucket.id : currentFolder.id
+      const folderName = !currentFolder ? bucket.name : currentFolder.name
+      const index = !currentFolder ? -1 : currentFolderIdx
+
+      await fetchFolderContents({
+        bucketId: bucket.id,
+        folderId,
+        folderName,
+        index,
+        searchString: debouncedSearchString,
+      })
+    } else if (view === STORAGE_VIEWS.COLUMNS) {
+      if (openedFolders.length > 0) {
+        const paths = openedFolders.map((folder) => folder.name)
+        fetchFoldersByPath({
+          paths,
+          searchString: debouncedSearchString,
+          showLoading: true,
+        })
+      } else {
         await fetchFolderContents({
           bucketId: bucket.id,
-          folderId,
-          folderName,
-          index,
-          searchString: itemSearchString,
+          folderId: bucket.id,
+          folderName: bucket.name,
+          index: -1,
+          searchString: debouncedSearchString,
         })
-      } else if (view === STORAGE_VIEWS.COLUMNS) {
-        if (openedFolders.length > 0) {
-          const paths = openedFolders.map((folder) => folder.name)
-          fetchFoldersByPath({ paths, searchString: itemSearchString, showLoading: true })
-        } else {
-          await fetchFolderContents({
-            bucketId: bucket.id,
-            folderId: bucket.id,
-            folderName: bucket.name,
-            index: -1,
-            searchString: itemSearchString,
-          })
-        }
       }
     }
-
-    fetchContents()
-  }, [itemSearchString])
+  })
 
   useEffect(() => {
-    openBucket(bucket)
-  }, [bucket])
+    if (bucket && projectRef) fetchContents(bucket)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [bucket, projectRef, debouncedSearchString, selectedBucket.id])
 
   /** Checkbox selection methods */
   /** [Joshen] We'll only support checkbox selection for files ONLY */
@@ -134,24 +145,6 @@ export const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
     await moveFiles(newPath)
   }
 
-  const onDeleteSelectedFiles = async () => {
-    if (selectedItemsToDelete.length === 1) {
-      const [itemToDelete] = selectedItemsToDelete
-      if (!itemToDelete) return
-
-      switch (itemToDelete.type) {
-        case STORAGE_ROW_TYPES.FOLDER:
-          await deleteFolder(itemToDelete)
-          break
-        case STORAGE_ROW_TYPES.FILE:
-          await deleteFiles({ files: [itemToDelete] })
-          break
-      }
-    } else {
-      await deleteFiles({ files: selectedItemsToDelete })
-    }
-  }
-
   /** Misc UI methods */
   const onSelectColumnEmptySpace = (columnIndex: number) => {
     popColumnAtIndex(columnIndex)
@@ -161,10 +154,7 @@ export const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
   }
 
   return (
-    <div
-      ref={storageExplorerRef}
-      className="bg-studio border rounded-md border-overlay flex h-full w-full flex-col"
-    >
+    <div ref={storageExplorerRef} className="bg-studio flex h-full w-full flex-col">
       {selectedItems.length === 0 ? (
         <FileExplorerHeader
           itemSearchString={itemSearchString}
@@ -179,6 +169,7 @@ export const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
           columns={columns}
           selectedItems={selectedItems}
           itemSearchString={itemSearchString}
+          isLoading={isLoading}
           onFilesUpload={onFilesUpload}
           onSelectAllItemsInColumn={onSelectAllItemsInColumn}
           onSelectColumnEmptySpace={onSelectColumnEmptySpace}
@@ -188,12 +179,9 @@ export const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
         />
         <PreviewPane />
       </div>
-      <ConfirmDeleteModal
-        visible={selectedItemsToDelete.length > 0}
-        selectedItemsToDelete={selectedItemsToDelete}
-        onSelectCancel={() => setSelectedItemsToDelete([])}
-        onSelectDelete={onDeleteSelectedFiles}
-      />
+
+      <ConfirmDeleteModal />
+
       <MoveItemsModal
         bucketName={selectedBucket.name}
         visible={selectedItemsToMove.length > 0}
@@ -201,6 +189,7 @@ export const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
         onSelectCancel={() => setSelectedItemsToMove([])}
         onSelectMove={onMoveSelectedFiles}
       />
+
       <CustomExpiryModal />
     </div>
   )

@@ -1,17 +1,16 @@
-import { type DragEvent, useCallback, useState } from 'react'
+import { type ImportDataFileAddedEvent } from 'common/telemetry-constants'
+import { useCallback, useState, type DragEvent } from 'react'
 
-import { type ImportDataFileDroppedEvent } from 'common/telemetry-constants'
-import { flagInvalidFileImport } from 'components/interfaces/TableGridEditor/SidePanelEditor/SpreadsheetImport/SpreadsheetImport.utils'
+import { flagInvalidFileImport } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SpreadsheetImport/SpreadsheetImport.utils'
 
 interface UseCsvFileDropOptions {
   enabled: boolean
   onFileDropped: (file: File) => void
-  onTelemetryEvent?: (eventName: ImportDataFileDroppedEvent['action']) => void
+  onTelemetryEvent?: (eventName: ImportDataFileAddedEvent['action']) => void
 }
 
 interface UseCsvFileDropReturn {
   isDraggedOver: boolean
-  isValidFile: boolean
   onDragOver: (event: DragEvent<HTMLDivElement>) => void
   onFileDrop: (event: DragEvent<HTMLDivElement>) => void
 }
@@ -22,7 +21,6 @@ export function useCsvFileDrop({
   onTelemetryEvent,
 }: UseCsvFileDropOptions): UseCsvFileDropReturn {
   const [isDraggedOver, setIsDraggedOver] = useState(false)
-  const [isValidFile, setIsValidFile] = useState(false)
 
   const onDragOver = useCallback(
     (event: DragEvent<HTMLDivElement>) => {
@@ -35,15 +33,13 @@ export function useCsvFileDrop({
 
       if (event.type === 'dragover' && !isDraggedOver) {
         setIsDraggedOver(true)
-        setIsValidFile(item.type === 'text/csv')
       } else if (event.type === 'dragleave' || event.type === 'drop') {
         setIsDraggedOver(false)
-        setIsValidFile(false)
       }
       event.stopPropagation()
       event.preventDefault()
     },
-    [enabled, isDraggedOver, isValidFile]
+    [enabled, isDraggedOver]
   )
 
   const onFileDrop = useCallback(
@@ -68,7 +64,6 @@ export function useCsvFileDrop({
   )
 
   return {
-    isValidFile: isValidFile && isDraggedOver,
     isDraggedOver,
     onDragOver,
     onFileDrop,

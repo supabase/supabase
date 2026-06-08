@@ -1,13 +1,11 @@
-import * as Sentry from '@sentry/nextjs'
 import type { AuthMFAVerifyResponse, MFAChallengeAndVerifyParams } from '@supabase/supabase-js'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { auth } from 'lib/gotrue'
 import { profileKeys } from './keys'
-import { UseCustomMutationOptions } from 'types'
-
-const WHITELIST_ERRORS = ['Invalid TOTP code entered']
+import { captureCriticalError } from '@/lib/error-reporting'
+import { auth } from '@/lib/gotrue'
+import { UseCustomMutationOptions } from '@/types'
 
 interface MFAChallengeAndVerifyVariables extends MFAChallengeAndVerifyParams {
   refreshFactors?: boolean
@@ -42,7 +40,7 @@ export const useMfaChallengeAndVerifyMutation = ({
       return mfaChallengeAndVerify(params)
     },
     async onSuccess(data, variables, context) {
-      // when a MFA is added, the aaLevel is bumped up
+      // when an MFA is added, the aaLevel is bumped up
       const refreshFactors = variables.refreshFactors ?? true
 
       await Promise.all([
@@ -60,9 +58,7 @@ export const useMfaChallengeAndVerifyMutation = ({
       } else {
         onError(data, variables, context)
       }
-      if (!WHITELIST_ERRORS.some((error) => data.message.includes(error))) {
-        Sentry.captureMessage('[CRITICAL] Failed to sign in via MFA: ' + data.message)
-      }
+      captureCriticalError(data, 'sign in via MFA')
     },
     ...options,
   })

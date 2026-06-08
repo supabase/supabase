@@ -1,9 +1,9 @@
-import { QueryClient, onlineManager } from '@tanstack/react-query'
+import { onlineManager, QueryClient } from '@tanstack/react-query'
 import { match } from 'path-to-regexp'
 import { useState } from 'react'
 
-import { IS_PLATFORM } from 'lib/constants'
-import { ResponseError } from 'types'
+import { IS_PLATFORM } from '@/lib/constants'
+import { ResponseError } from '@/types'
 
 // When running locally we don't need the internet
 // so we can pretend we're online all the time
@@ -17,6 +17,8 @@ const SKIP_RETRY_PATHNAME_MATCHERS = [
   '/platform/pg-meta/:ref/query',
   '/v1/projects/:ref/analytics/endpoints/logs.all',
 ].map((pathname) => match(pathname))
+
+export const MAX_RETRY_FAILURE_COUNT = 3
 
 let queryClient: QueryClient | undefined
 
@@ -55,7 +57,7 @@ export function getQueryClient() {
               return false
             }
 
-            if (failureCount < 3) {
+            if (failureCount < MAX_RETRY_FAILURE_COUNT) {
               return true
             }
 

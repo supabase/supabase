@@ -1,37 +1,37 @@
 import { Check, ChevronDown, Plus, PlusIcon } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactNode, useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
-import ShimmerLine from 'components/ui/ShimmerLine'
-import {
-  IntegrationConnectionsCreateVariables,
-  IntegrationProjectConnection,
-} from 'data/integrations/integrations.types'
-import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH } from 'lib/constants'
-import { openInstallGitHubIntegrationWindow } from 'lib/github'
-import { EMPTY_ARR } from 'lib/void'
-import Link from 'next/link'
 import {
   Badge,
   Button,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
-  Command_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   cn,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
+
+import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
+import ShimmerLine from '@/components/ui/ShimmerLine'
+import {
+  IntegrationConnectionsCreateVariables,
+  IntegrationProjectConnection,
+} from '@/data/integrations/integrations.types'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { BASE_PATH } from '@/lib/constants'
+import { openInstallGitHubIntegrationWindow } from '@/lib/github'
+import { EMPTY_ARR } from '@/lib/void'
 
 export interface Project {
   name: string
@@ -94,7 +94,7 @@ const ProjectLinker = ({
   )
 
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
-  const { data: orgProjects, isLoading: loadingSupabaseProjects } = useOrgProjectsInfiniteQuery({
+  const { data: orgProjects, isPending: loadingSupabaseProjects } = useOrgProjectsInfiniteQuery({
     slug,
   })
   const numProjects = orgProjects?.pages[0].pagination.count ?? 0
@@ -170,10 +170,10 @@ const ProjectLinker = ({
   const oppositeMissingEntity = noSupabaseProjects ? mode : 'Supabase'
 
   return (
-    <div className="flex flex-col bg border shadow rounded-lg overflow-hidden">
+    <div className="flex flex-col bg border shadow-sm rounded-lg overflow-hidden">
       <div className="relative p-12 border-b border-muted">
         <div
-          className="absolute inset-0 bg-grid-black/5 [mask-image:linear-gradient(0deg,#fff,rgba(255,255,255,0.6))] dark:bg-grid-white/5 dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]"
+          className="absolute inset-0 bg-grid-black/5 mask-[linear-gradient(0deg,#fff,rgba(255,255,255,0.6))] dark:bg-grid-white/5 dark:mask-[linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]"
           style={{ backgroundPosition: '10px 10px' }}
         />
 
@@ -195,7 +195,7 @@ const ProjectLinker = ({
         ) : (
           <div className="flex justify-center gap-0 w-full relative">
             <Panel>
-              <div className="bg-white shadow border rounded p-1 w-12 h-12 flex justify-center items-center">
+              <div className="bg-white shadow-sm border rounded-sm p-1 w-12 h-12 flex justify-center items-center">
                 <img src={`${BASE_PATH}/img/supabase-logo.svg`} alt="Supabase" className="w-6" />
               </div>
 
@@ -213,7 +213,7 @@ const ProjectLinker = ({
                   return (
                     <div className={cn('w-full flex items-center justify-between')}>
                       <div className="flex items-center gap-x-2">
-                        <div className="bg-white shadow border rounded p-1 w-6 h-6 flex justify-center items-center">
+                        <div className="bg-white shadow-sm border rounded-sm p-1 w-6 h-6 flex justify-center items-center">
                           <img
                             src={`${BASE_PATH}/img/supabase-logo.svg`}
                             alt="Supabase"
@@ -245,7 +245,7 @@ const ProjectLinker = ({
                       }
                     >
                       <div className="flex items-center gap-x-2">
-                        <div className="bg-white shadow border rounded p-1 w-6 h-6 flex justify-center items-center">
+                        <div className="bg-white shadow-sm border rounded-sm p-1 w-6 h-6 flex justify-center items-center">
                           <img
                             src={`${BASE_PATH}/img/supabase-logo.svg`}
                             alt="Supabase"
@@ -262,8 +262,8 @@ const ProjectLinker = ({
                 renderActions={() => {
                   return (
                     projectCreationEnabled && (
-                      <CommandGroup_Shadcn_>
-                        <CommandItem_Shadcn_
+                      <CommandGroup>
+                        <CommandItem
                           className="cursor-pointer w-full"
                           onSelect={() => {
                             setOpenProjectsDropdown(false)
@@ -281,8 +281,8 @@ const ProjectLinker = ({
                             <Plus size={14} strokeWidth={1.5} />
                             <p>Create a new project</p>
                           </Link>
-                        </CommandItem_Shadcn_>
-                      </CommandGroup_Shadcn_>
+                        </CommandItem>
+                      </CommandGroup>
                     )
                   )
                 }}
@@ -292,15 +292,15 @@ const ProjectLinker = ({
             <div className="border border-foreground-lighter h-px w-8 border-dashed self-end mb-4" />
 
             <Panel>
-              <div className="bg-black shadow rounded p-1 w-12 h-12 flex justify-center items-center">
+              <div className="bg-black shadow-sm rounded-sm p-1 w-12 h-12 flex justify-center items-center">
                 {integrationIcon}
               </div>
 
-              <Popover_Shadcn_
+              <Popover
                 open={openForeignProjectsComboBox}
                 onOpenChange={setOpenForeignProjectsComboBox}
               >
-                <PopoverTrigger_Shadcn_ asChild>
+                <PopoverTrigger asChild>
                   <Button
                     type="default"
                     block
@@ -310,7 +310,7 @@ const ProjectLinker = ({
                     icon={
                       <div>
                         {selectedForeignProject
-                          ? getForeignProjectIcon?.(selectedForeignProject) ?? integrationIcon
+                          ? (getForeignProjectIcon?.(selectedForeignProject) ?? integrationIcon)
                           : integrationIcon}
                       </div>
                     }
@@ -322,21 +322,16 @@ const ProjectLinker = ({
                   >
                     {(selectedForeignProject && selectedForeignProject.name) ?? choosePrompt}
                   </Button>
-                </PopoverTrigger_Shadcn_>
-                <PopoverContent_Shadcn_
-                  className="p-0"
-                  side="bottom"
-                  align="center"
-                  sameWidthAsTrigger
-                >
-                  <Command_Shadcn_>
-                    <CommandInput_Shadcn_ placeholder="Search for a project" />
-                    <CommandList_Shadcn_ className="!max-h-[170px]">
-                      <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
-                      <CommandGroup_Shadcn_>
+                </PopoverTrigger>
+                <PopoverContent className="p-0" side="bottom" align="center" sameWidthAsTrigger>
+                  <Command>
+                    <CommandInput placeholder="Search for a project" />
+                    <CommandList className="max-h-[170px]!">
+                      <CommandEmpty>No results found.</CommandEmpty>
+                      <CommandGroup>
                         {foreignProjects.map((project, i) => {
                           return (
-                            <CommandItem_Shadcn_
+                            <CommandItem
                               key={project.id}
                               value={`${project.name.replaceAll('"', '')}-${i}`}
                               className="flex gap-2 items-center"
@@ -349,31 +344,31 @@ const ProjectLinker = ({
                               <span className="truncate" title={project.name}>
                                 {project.name}
                               </span>
-                            </CommandItem_Shadcn_>
+                            </CommandItem>
                           )
                         })}
                         {foreignProjects.length === 0 && (
-                          <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
+                          <CommandEmpty>No results found.</CommandEmpty>
                         )}
-                      </CommandGroup_Shadcn_>
+                      </CommandGroup>
                       {mode === 'GitHub' && (
                         <>
-                          <CommandSeparator_Shadcn_ />
-                          <CommandGroup_Shadcn_>
-                            <CommandItem_Shadcn_
+                          <CommandSeparator />
+                          <CommandGroup>
+                            <CommandItem
                               className="flex gap-2 items-center cursor-pointer"
                               onSelect={() => openInstallGitHubIntegrationWindow('install')}
                             >
                               <PlusIcon size={16} />
                               Add GitHub Repositories
-                            </CommandItem_Shadcn_>
-                          </CommandGroup_Shadcn_>
+                            </CommandItem>
+                          </CommandGroup>
                         </>
                       )}
-                    </CommandList_Shadcn_>
-                  </Command_Shadcn_>
-                </PopoverContent_Shadcn_>
-              </Popover_Shadcn_>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </Panel>
           </div>
         )}

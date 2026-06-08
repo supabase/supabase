@@ -1,5 +1,6 @@
 import type { VirtualItem, Virtualizer } from '@tanstack/react-virtual'
 import { useVirtualizer } from '@tanstack/react-virtual'
+import { mergeRefs } from 'common'
 import type { HTMLAttributes, ReactElement, ReactNode, Ref } from 'react'
 import {
   cloneElement,
@@ -11,8 +12,6 @@ import {
   useMemo,
   useRef,
 } from 'react'
-
-import { mergeRefs } from 'common'
 import {
   cn,
   Table,
@@ -29,6 +28,7 @@ type TableComponentProps = React.ComponentProps<typeof Table>
 
 interface VirtualizedTableProps<TItem> extends TableComponentProps {
   scrollContainerProps?: HTMLAttributes<HTMLDivElement>
+  scrollContainerRef: React.Ref<HTMLDivElement>
   data: TItem[]
   children: ReactNode
   overscan?: number
@@ -57,6 +57,7 @@ const useVirtualizedTableContext = <TItem,>() => {
 
 export const VirtualizedTable = <TItem,>({
   scrollContainerProps,
+  scrollContainerRef: externalScrollContainerRef,
   containerProps,
   data,
   children,
@@ -66,6 +67,7 @@ export const VirtualizedTable = <TItem,>({
   ...tableProps
 }: VirtualizedTableProps<TItem>) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const scrollContainerMergedRef = mergeRefs(scrollContainerRef, externalScrollContainerRef)
 
   const rowKeyGetter = useCallback(
     (item: TItem, index: number) => {
@@ -121,7 +123,7 @@ export const VirtualizedTable = <TItem,>({
 
   return (
     <div
-      ref={scrollContainerRef}
+      ref={scrollContainerMergedRef}
       className={cn('h-full overflow-auto', scrollClassName)}
       {...restScrollContainerProps}
     >
@@ -136,8 +138,10 @@ export const VirtualizedTable = <TItem,>({
   )
 }
 
-interface VirtualizedTableBodyProps<TItem>
-  extends Omit<React.ComponentProps<typeof TableBody>, 'children'> {
+interface VirtualizedTableBodyProps<TItem> extends Omit<
+  React.ComponentProps<typeof TableBody>,
+  'children'
+> {
   emptyContent?: ReactNode
   leadingContent?: ReactNode
   trailingContent?: ReactNode
@@ -164,7 +168,7 @@ export const VirtualizedTableBody = <TItem,>({
     <TableBody {...props}>
       {leadingContent}
       {data.length === 0 ? (
-        emptyContent ?? null
+        (emptyContent ?? null)
       ) : (
         <>
           {paddingTop > 0 && (

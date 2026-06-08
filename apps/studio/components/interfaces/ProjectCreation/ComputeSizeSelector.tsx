@@ -1,24 +1,24 @@
 import { UseFormReturn } from 'react-hook-form'
-
-import { InlineLink } from 'components/ui/InlineLink'
-import Panel from 'components/ui/Panel'
-import { instanceSizeSpecs } from 'data/projects/new-project.constants'
-import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
-import { DOCS_URL } from 'lib/constants'
 import { CloudProvider } from 'shared-data'
 import {
-  Badge,
-  FormField_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  FormField,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
+import { ComputeBadge } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { sizes } from './ProjectCreation.constants'
 import { CreateProjectForm } from './ProjectCreation.schema'
+import { InlineLink } from '@/components/ui/InlineLink'
+import Panel from '@/components/ui/Panel'
+import { instanceSizeSpecs } from '@/data/projects/new-project.constants'
+import { getCloudProviderArchitecture } from '@/lib/cloudprovider-utils'
+import { DOCS_URL } from '@/lib/constants'
 
 interface ComputeSizeSelectorProps {
   form: UseFormReturn<CreateProjectForm>
@@ -27,7 +27,7 @@ interface ComputeSizeSelectorProps {
 export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
   return (
     <Panel.Content>
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name="instanceSize"
         render={({ field }) => (
@@ -38,21 +38,11 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
               <>
                 <p>
                   The size for your dedicated database. You can change this later. Learn more about{' '}
-                  <InlineLink
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-inherit hover:text-foreground transition-colors"
-                    href={`${DOCS_URL}/guides/platform/compute-add-ons`}
-                  >
+                  <InlineLink href={`${DOCS_URL}/guides/platform/compute-add-ons`}>
                     compute add-ons
                   </InlineLink>{' '}
                   and{' '}
-                  <InlineLink
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-inherit hover:text-foreground transition-colors"
-                    href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
-                  >
+                  <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}>
                     compute billing
                   </InlineLink>
                   .
@@ -60,12 +50,12 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
               </>
             }
           >
-            <Select_Shadcn_ value={field.value} onValueChange={(value) => field.onChange(value)}>
-              <SelectTrigger_Shadcn_ className="[&>span>div>div>[data-field=instance-details]]:hidden">
-                <SelectValue_Shadcn_ placeholder="Select a compute size" />
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
-                <SelectGroup_Shadcn_>
+            <Select value={field.value} onValueChange={(value) => field.onChange(value)}>
+              <SelectTrigger className="[&>span>div>div>[data-field=instance-details]]:hidden">
+                <SelectValue placeholder="Select a compute size" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
                   {sizes
                     .filter((option) =>
                       instanceSizeSpecs[option].cloud_providers.includes(
@@ -74,16 +64,12 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
                     )
                     .map((option) => {
                       return (
-                        <SelectItem_Shadcn_ key={option} value={option}>
-                          <div className="flex flex-row gap-2">
-                            <div className="text-center w-[80px]">
-                              <Badge
-                                variant={option === 'micro' ? 'default' : 'brand'}
-                                className="rounded-md w-16 text-center flex justify-center font-mono uppercase"
-                              >
-                                {instanceSizeSpecs[option].label}
-                              </Badge>
+                        <SelectItem key={option} value={option}>
+                          <div className="flex flex-row gap-4 items-center">
+                            <div className="w-14 flex items-center">
+                              <ComputeBadge infraComputeSize={option} />
                             </div>
+
                             <div className="text-sm">
                               <span className="text-foreground">
                                 {instanceSizeSpecs[option].ram} RAM /{' '}
@@ -103,17 +89,17 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
                               </p>
                             </div>
                           </div>
-                        </SelectItem_Shadcn_>
+                        </SelectItem>
                       )
                     })}
-                  <SelectItem_Shadcn_ key={'disabled'} value={'disabled'} disabled>
+                  <SelectItem key={'disabled'} value={'disabled'} disabled>
                     <div className="flex items-center justify-center w-full">
                       <span>Larger instance sizes available after creation</span>
                     </div>
-                  </SelectItem_Shadcn_>
-                </SelectGroup_Shadcn_>
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
+                  </SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </FormItemLayout>
         )}
       />
