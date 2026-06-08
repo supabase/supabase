@@ -48,13 +48,20 @@
           },
           "queryVector": {
             "type": "object",
-            "properties": { "float32": { "type": "array", "items": { "type": "number" } } },
+            "properties": {
+              "float32": { "type": "array", "minItems": 1, "items": { "type": "number" } }
+            },
             "required": ["float32"],
             "additionalProperties": false
           },
           "returnDistance": { "type": "boolean" },
           "returnMetadata": { "type": "boolean" },
-          "topK": { "type": "number" },
+          "topK": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Number of nearest-neighbor results to return, from 1 to 100."
+          },
           "vectorBucketName": { "type": "string" }
         },
         "required": ["vectorBucketName", "indexName", "queryVector", "topK"],
@@ -3651,7 +3658,12 @@
                 "type": "object",
                 "properties": {
                   "dataType": { "type": "string", "enum": ["float32"] },
-                  "dimension": { "type": "number", "minimum": 1, "maximum": 4096 },
+                  "dimension": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 4096,
+                    "description": "Vector dimensionality. S3 Vectors supports up to 4096. The local pgvector backend supports up to 4000 and will reject larger values."
+                  },
                   "distanceMetric": { "type": "string", "enum": ["cosine", "euclidean"] },
                   "indexName": {
                     "type": "string",
@@ -3666,7 +3678,10 @@
                     "properties": {
                       "nonFilterableMetadataKeys": {
                         "type": "array",
-                        "items": { "type": "string" }
+                        "minItems": 1,
+                        "maxItems": 10,
+                        "uniqueItems": true,
+                        "items": { "type": "string", "minLength": 1, "maxLength": 63 }
                       }
                     }
                   },
@@ -3882,23 +3897,41 @@
                         "data": {
                           "type": "object",
                           "properties": {
-                            "float32": { "type": "array", "items": { "type": "number" } }
+                            "float32": {
+                              "type": "array",
+                              "minItems": 1,
+                              "items": { "type": "number" }
+                            }
                           },
                           "required": ["float32"]
                         },
                         "metadata": {
                           "type": "object",
                           "additionalProperties": {
-                            "oneOf": [
-                              { "type": "string" },
-                              { "type": "boolean" },
-                              { "type": "number" }
+                            "anyOf": [
+                              {
+                                "anyOf": [
+                                  { "type": "string" },
+                                  { "type": "boolean" },
+                                  { "type": "number" }
+                                ]
+                              },
+                              {
+                                "type": "array",
+                                "items": {
+                                  "anyOf": [
+                                    { "type": "string" },
+                                    { "type": "boolean" },
+                                    { "type": "number" }
+                                  ]
+                                }
+                              }
                             ]
                           }
                         },
-                        "key": { "type": "string" }
+                        "key": { "type": "string", "minLength": 1, "maxLength": 1024 }
                       },
-                      "required": ["data"]
+                      "required": ["data", "key"]
                     }
                   }
                 },
@@ -3936,7 +3969,12 @@
                 "properties": {
                   "vectorBucketName": { "type": "string" },
                   "indexName": { "type": "string" },
-                  "keys": { "type": "array", "items": { "type": "string" } }
+                  "keys": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 500,
+                    "items": { "type": "string", "minLength": 1, "maxLength": 1024 }
+                  }
                 },
                 "required": ["vectorBucketName", "indexName", "keys"]
               }
@@ -3967,12 +4005,12 @@
                     "pattern": "^[a-z0-9](?:[a-z0-9.-]{1,61})?[a-z0-9]$",
                     "description": "3-63 chars, lowercase letters, numbers, hyphens, dots; must start/end with letter or number. Must be unique within the vector bucket."
                   },
-                  "maxResults": { "type": "number", "minimum": 1, "maximum": 500 },
+                  "maxResults": { "type": "integer", "minimum": 1, "maximum": 1000 },
                   "nextToken": { "type": "string" },
                   "returnData": { "type": "boolean" },
                   "returnMetadata": { "type": "boolean" },
-                  "segmentCount": { "type": "number", "minimum": 1, "maximum": 16 },
-                  "segmentIndex": { "type": "number", "minimum": 0, "maximum": 15 }
+                  "segmentCount": { "type": "integer", "minimum": 1, "maximum": 16 },
+                  "segmentIndex": { "type": "integer", "minimum": 0, "maximum": 15 }
                 },
                 "required": ["vectorBucketName", "indexName"]
               }
@@ -3995,7 +4033,12 @@
                 "type": "object",
                 "properties": {
                   "indexName": { "type": "string" },
-                  "keys": { "type": "array", "items": { "type": "string" } },
+                  "keys": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 100,
+                    "items": { "type": "string", "minLength": 1, "maxLength": 1024 }
+                  },
                   "returnData": { "type": "boolean", "default": false },
                   "returnMetadata": { "type": "boolean", "default": false },
                   "vectorBucketName": { "type": "string" }

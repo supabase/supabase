@@ -6245,9 +6245,10 @@
                     "enum": ["float32"]
                   },
                   "dimension": {
-                    "type": "number",
+                    "type": "integer",
                     "minimum": 1,
-                    "maximum": 4096
+                    "maximum": 4096,
+                    "description": "Vector dimensionality. S3 Vectors supports up to 4096. The local pgvector backend supports up to 4000 and will reject larger values."
                   },
                   "distanceMetric": {
                     "type": "string",
@@ -6266,8 +6267,13 @@
                     "properties": {
                       "nonFilterableMetadataKeys": {
                         "type": "array",
+                        "minItems": 1,
+                        "maxItems": 10,
+                        "uniqueItems": true,
                         "items": {
-                          "type": "string"
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 63
                         }
                       }
                     }
@@ -6590,6 +6596,7 @@
                           "properties": {
                             "float32": {
                               "type": "array",
+                              "minItems": 1,
                               "items": {
                                 "type": "number"
                               }
@@ -6600,24 +6607,46 @@
                         "metadata": {
                           "type": "object",
                           "additionalProperties": {
-                            "oneOf": [
+                            "anyOf": [
                               {
-                                "type": "string"
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "number"
+                                  }
+                                ]
                               },
                               {
-                                "type": "boolean"
-                              },
-                              {
-                                "type": "number"
+                                "type": "array",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "number"
+                                    }
+                                  ]
+                                }
                               }
                             ]
                           }
                         },
                         "key": {
-                          "type": "string"
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 1024
                         }
                       },
-                      "required": ["data"]
+                      "required": ["data", "key"]
                     }
                   }
                 },
@@ -6668,6 +6697,7 @@
                     "properties": {
                       "float32": {
                         "type": "array",
+                        "minItems": 1,
                         "items": {
                           "type": "number"
                         }
@@ -6683,7 +6713,10 @@
                     "type": "boolean"
                   },
                   "topK": {
-                    "type": "number"
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100,
+                    "description": "Number of nearest-neighbor results to return, from 1 to 100."
                   },
                   "vectorBucketName": {
                     "type": "string"
@@ -6727,8 +6760,12 @@
                   },
                   "keys": {
                     "type": "array",
+                    "minItems": 1,
+                    "maxItems": 500,
                     "items": {
-                      "type": "string"
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
                     }
                   }
                 },
@@ -6774,9 +6811,9 @@
                     "description": "3-63 chars, lowercase letters, numbers, hyphens, dots; must start/end with letter or number. Must be unique within the vector bucket."
                   },
                   "maxResults": {
-                    "type": "number",
+                    "type": "integer",
                     "minimum": 1,
-                    "maximum": 500
+                    "maximum": 1000
                   },
                   "nextToken": {
                     "type": "string"
@@ -6788,12 +6825,12 @@
                     "type": "boolean"
                   },
                   "segmentCount": {
-                    "type": "number",
+                    "type": "integer",
                     "minimum": 1,
                     "maximum": 16
                   },
                   "segmentIndex": {
-                    "type": "number",
+                    "type": "integer",
                     "minimum": 0,
                     "maximum": 15
                   }
@@ -6831,8 +6868,12 @@
                   },
                   "keys": {
                     "type": "array",
+                    "minItems": 1,
+                    "maxItems": 100,
                     "items": {
-                      "type": "string"
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
                     }
                   },
                   "returnData": {
@@ -6923,6 +6964,7 @@
             "properties": {
               "float32": {
                 "type": "array",
+                "minItems": 1,
                 "items": {
                   "type": "number"
                 }
@@ -6938,7 +6980,10 @@
             "type": "boolean"
           },
           "topK": {
-            "type": "number"
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Number of nearest-neighbor results to return, from 1 to 100."
           },
           "vectorBucketName": {
             "type": "string"

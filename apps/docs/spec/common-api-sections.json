@@ -735,6 +735,18 @@
         "title": "List organization members",
         "slug": "v1-list-organization-members",
         "type": "operation"
+      },
+      {
+        "id": "v2-list-organization-members",
+        "title": "List organization members",
+        "slug": "v2-list-organization-members",
+        "type": "operation"
+      },
+      {
+        "id": "v2-list-organization-roles",
+        "title": "List organization roles",
+        "slug": "v2-list-organization-roles",
+        "type": "operation"
       }
     ]
   },
