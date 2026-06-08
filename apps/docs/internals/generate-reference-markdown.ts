@@ -178,17 +178,18 @@ function dedentBlock(text: string): string {
  * code fences, the body is dedented so the closing fence sits flush left.
  */
 function stripMdxJsx(content: string): string {
-  content = content.replace(/\{\/\*[\s\S]*?\*\/\}/g, '')
-  content = content.replace(/<[$A-Z][\w.]*(?:\s[^>]*)?\s*\/>/gs, '')
-  content = content.replace(/<[$A-Z][\w.]*(?:\s[^>]*)?\s*>/gs, '')
-  content = content.replace(/<\/[$A-Z][\w.]*>/g, '')
-  // Strip structural HTML wrappers that carry React-only props (className, etc).
-  content = content.replace(/<\/?(?:div|a|span|p|h[1-6])(?:\s[^>]*)?\s*>/g, '')
-
   const segments = content.split(/(```[\s\S]*?```)/g)
   return segments
     .map((seg, i) => {
-      if (i % 2 === 0) return seg.replace(/^[ \t]+/gm, '')
+      if (i % 2 === 0) {
+        let prose = seg
+        prose = prose.replace(/\{\/\*[\s\S]*?\*\/\}/g, '')
+        prose = prose.replace(/<[$A-Z][\w.]*(?:\s[^>]*)?\s*\/>/gs, '')
+        prose = prose.replace(/<[$A-Z][\w.]*(?:\s[^>]*)?\s*>/gs, '')
+        prose = prose.replace(/<\/[$A-Z][\w.]*>/g, '')
+        prose = prose.replace(/<\/?(?:div|a|span|p|h[1-6])(?:\s[^>]*)?\s*>/g, '')
+        return prose.replace(/^[ \t]+/gm, '')
+      }
       return seg.replace(
         /^(```[^\n]*\n)([\s\S]*?)(\n[ \t]*```)$/,
         (_, open, body) => open + dedentBlock(body) + '\n```'
