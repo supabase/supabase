@@ -14,6 +14,6 @@ export default bff({
         (data as any)?.error?.message ?? (data as any)?.message ?? 'Failed to verify custom hostname'
       return res.status(status && status >= 400 ? status : 502).json({ message })
     }
-    return res.status(200).json({ data, status: 200 })
+    return res.status(200).json({ data, status: (data as any)?.status ?? 200 })
   },
 })

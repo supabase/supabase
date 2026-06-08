@@ -30,6 +30,10 @@ const ProjectSettings: NextPageWithLayout = () => {
   const isBranch = !!project?.parent_project_ref
   const { projectsTransfer: projectTransferEnabled, projectSettingsCustomDomains } =
     useIsFeatureEnabled(['projects:transfer', 'project_settings:custom_domains'])
+  // [console fork] Custom domains are a dedicated/EC2-only feature on self-host (shared
+  // projects live on a local port and can't carry one). The global flag is off; surface
+  // the section for dedicated projects regardless.
+  const isDedicated = !!(project as any)?.infra_compute_size
 
   const { data: subscription } = useOrgSubscriptionQuery(
     { orgSlug: selectedOrganization?.slug },
@@ -56,7 +60,7 @@ const ProjectSettings: NextPageWithLayout = () => {
             <Project />
             {/* this is only settable on compliance orgs, currently that means HIPAA orgs */}
             {!isBranch && hasHipaaAddon && <ComplianceConfig />}
-            {projectSettingsCustomDomains && <CustomDomainConfig />}
+            {(projectSettingsCustomDomains || isDedicated) && <CustomDomainConfig />}
             {!isBranch && projectTransferEnabled && <TransferProjectPanel />}
             {!isBranch && <DeleteProjectPanel />}
           </>
