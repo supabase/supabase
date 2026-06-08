@@ -518,6 +518,14 @@ services:
     container_name: supabase-pooler
     image: supabase/supavisor:2.9.5
     restart: unless-stopped
+    # [console fork] supavisor's limits.sh raises RLIMIT_NOFILE to 100000; the docker
+    # default container hard limit is lower, so on hosts like EC2 (AL2023) it fails with
+    # "Operation not permitted" and the pooler crash-loops — port 5432 never binds.
+    # Grant the limit so the pooler starts. (Local Docker Desktop allowed it already.)
+    ulimits:
+      nofile:
+        soft: 100000
+        hard: 100000
     ports:
       - ${POSTGRES_PORT}:5432
       - ${POOLER_PROXY_PORT_TRANSACTION}:6543
