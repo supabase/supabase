@@ -365,7 +365,7 @@ const PreviewBranchActions = ({
             <>
               <DropdownMenuItemTooltip
                 className="gap-x-2"
-                disabled={!canUpdateBranches || !isBranchActiveHealthy || isUpdatingBranch}
+                disabled={!canUpdateBranches || isRetriggering}
                 onSelect={(e) => {
                   e.stopPropagation()
                   setShowConfirmRetriggersModal(true)
@@ -379,9 +379,7 @@ const PreviewBranchActions = ({
                     side: 'left',
                     text: !canUpdateBranches
                       ? `You need additional permissions to ${branch.git_branch ? 'resync' : 'rebase'} branches`
-                      : !isBranchActiveHealthy
-                        ? `Branch is still initializing. Please wait for it to become healthy before ${branch.git_branch ? 'resyncing' : 'rebasing'}.`
-                        : undefined,
+                      : undefined,
                   },
                 }}
               >
@@ -409,44 +407,41 @@ const PreviewBranchActions = ({
               >
                 <RefreshCw size={14} /> Reset branch
               </DropdownMenuItemTooltip>
+              <DropdownMenuItemTooltip
+                className="gap-x-2"
+                disabled={
+                  !isBranchActiveHealthy || (!branch.persistent && !hasAccessToPersistentBranching)
+                }
+                onSelect={(e) => {
+                  e.stopPropagation()
+                  setShowBranchModeSwitch(true)
+                }}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowBranchModeSwitch(true)
+                }}
+                tooltip={{
+                  content: {
+                    side: 'left',
+                    text: !isBranchActiveHealthy
+                      ? 'Branch is still initializing. Please wait for it to become healthy before switching.'
+                      : !branch.persistent && !hasAccessToPersistentBranching
+                        ? 'Upgrade your plan to access persistent branches'
+                        : undefined,
+                  },
+                }}
+              >
+                {branch.persistent ? (
+                  <>
+                    <Clock size={14} /> Switch to preview
+                  </>
+                ) : (
+                  <>
+                    <Infinity size={14} className="scale-110" /> Switch to persistent
+                  </>
+                )}
+              </DropdownMenuItemTooltip>
             </>
-          )}
-
-          {!branch.deletion_scheduled_at && (
-            <DropdownMenuItemTooltip
-              className="gap-x-2"
-              disabled={
-                !isBranchActiveHealthy || (!branch.persistent && !hasAccessToPersistentBranching)
-              }
-              onSelect={(e) => {
-                e.stopPropagation()
-                setShowBranchModeSwitch(true)
-              }}
-              onClick={(e) => {
-                e.stopPropagation()
-                setShowBranchModeSwitch(true)
-              }}
-              tooltip={{
-                content: {
-                  side: 'left',
-                  text: !isBranchActiveHealthy
-                    ? 'Branch is still initializing. Please wait for it to become healthy before switching.'
-                    : !branch.persistent && !hasAccessToPersistentBranching
-                      ? 'Upgrade your plan to access persistent branches'
-                      : undefined,
-                },
-              }}
-            >
-              {branch.persistent ? (
-                <>
-                  <Clock size={14} /> Switch to preview
-                </>
-              ) : (
-                <>
-                  <Infinity size={14} className="scale-110" /> Switch to persistent
-                </>
-              )}
-            </DropdownMenuItemTooltip>
           )}
 
           {/* Create PR if applicable */}
@@ -581,12 +576,27 @@ const PreviewBranchActions = ({
 
 // Actions for main (production) branch
 const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) => {
-  const { ref: projectRef } = useParams()
+  const { project_ref: branchRef, parent_project_ref: projectRef } = branch
+
   const { can: canUpdateBranches } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'preview_branches'
   )
+  const { mutate: branchPushMutate, isPending: isRetriggering } = useBranchPushMutation({
+    onSuccess() {
+      toast.success('Success! Please allow a few minutes for the branch to update.')
+      setShowConfirmRetriggersModal(false)
+    },
+    onError: (data) => {
+      toast.error(`Failed to trigger workflow: ${data.message}`)
+    },
+  })
   const [showEditBranchModal, setShowEditBranchModal] = useState(false)
+  const [showConfirmRetriggersModal, setShowConfirmRetriggersModal] = useState(false)
+
+  const onRetriggerBranch = () => {
+    branchPushMutate({ branchRef, projectRef })
+  }
 
   return (
     <>
@@ -611,6 +621,28 @@ const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) =
               <Pencil size={14} /> Edit Branch
             </DropdownMenuItem>
           )}
+          <DropdownMenuItemTooltip
+            className="gap-x-2"
+            disabled={!canUpdateBranches || isRetriggering}
+            onSelect={(e) => {
+              e.stopPropagation()
+              setShowConfirmRetriggersModal(true)
+            }}
+            onClick={(e) => {
+              e.stopPropagation()
+              setShowConfirmRetriggersModal(true)
+            }}
+            tooltip={{
+              content: {
+                side: 'left',
+                text: !canUpdateBranches
+                  ? `You need additional permissions to ${branch.git_branch ? 'resync' : 'rebase'} branches`
+                  : undefined,
+              },
+            }}
+          >
+            <Redo size={14} /> {branch.git_branch ? 'Resync branch' : 'Rebase branch'}
+          </DropdownMenuItemTooltip>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -619,6 +651,21 @@ const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) =
         visible={showEditBranchModal}
         onClose={() => setShowEditBranchModal(false)}
       />
+      <ConfirmationModal
+        variant="default"
+        visible={showConfirmRetriggersModal}
+        confirmLabel={branch.git_branch ? 'Resync' : 'Rebase'}
+        title={branch.git_branch ? 'Confirm branch resync' : 'Confirm branch rebase'}
+        loading={isRetriggering}
+        onCancel={() => setShowConfirmRetriggersModal(false)}
+        onConfirm={onRetriggerBranch}
+      >
+        <p className="text-sm text-foreground-light">
+          {branch.git_branch
+            ? 'This will re-run all steps of the workflow based on the latest git branch state.'
+            : 'This will re-run all steps of the workflow based on the latest dashboard state.'}
+        </p>
+      </ConfirmationModal>
     </>
   )
 }
