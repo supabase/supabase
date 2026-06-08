@@ -1,6 +1,6 @@
 import { safeSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Search, SearchCode } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { parseAsBoolean, parseAsJson, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'

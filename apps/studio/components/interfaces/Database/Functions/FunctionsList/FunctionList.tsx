@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { includes, noop, sortBy } from 'lodash'
+import { noop } from 'lodash'
 import { Copy, Edit, Edit2, FileText, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'

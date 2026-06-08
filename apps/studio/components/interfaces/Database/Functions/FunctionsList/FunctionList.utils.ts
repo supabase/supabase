@@ -38,7 +38,7 @@ export const getFilteredFunctions = ({
       (matchesName || matchesContent) &&
       matchesReturnType &&
       matchesSecurity &&
-      x.schema == schema
+      x.schema === schema
     ) {
       filteredFunctions.push({ ...x, rank: matchesName ? 0 : 1 })
     }
