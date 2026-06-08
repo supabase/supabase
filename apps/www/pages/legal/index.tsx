@@ -40,7 +40,7 @@ export default function LegalHubPage() {
       <SectionContainer className="prose">
         <div className="divide-y divide-border">
           {sections.map((section) => (
-            <section key={section.title} id={section.id}>
+            <section key={section.title} id={section.id} className="scroll-mt-24">
               <h2 className="mt-0">{section.title}</h2>
               <div className="divide-y divide-border lg:max-w-1/2">
                 {section.links.map((link) => {
