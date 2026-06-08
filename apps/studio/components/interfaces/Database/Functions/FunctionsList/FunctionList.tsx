@@ -14,7 +14,7 @@ import {
   TableRow,
 } from 'ui'
 
-import { getDatabaseTriggersHref } from './FunctionList.utils'
+import { getDatabaseTriggersHref, getFilteredFunctions } from './FunctionList.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type { DatabaseFunction } from '@/data/database-functions/database-functions-query'
@@ -51,21 +51,13 @@ const FunctionList = ({
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
 
-  const filteredFunctions = (functions ?? []).filter((x) => {
-    const matchesName = includes(x.name.toLowerCase(), filterString.toLowerCase())
-    const matchesContent = includes(x.complete_statement.toLowerCase(), filterString.toLowerCase())
-    const matchesReturnType =
-      returnTypeFilter.length === 0 || returnTypeFilter.includes(x.return_type)
-    const matchesSecurity =
-      securityFilter.length === 0 ||
-      (securityFilter.includes('definer') && x.security_definer) ||
-      (securityFilter.includes('invoker') && !x.security_definer)
-    return matchesName && matchesContent && matchesReturnType && matchesSecurity
+  const _functions = getFilteredFunctions({
+    functions,
+    schema,
+    filterString,
+    returnTypeFilter,
+    securityFilter,
   })
-  const _functions = sortBy(
-    filteredFunctions.filter((x) => x.schema == schema),
-    (func) => func.name.toLocaleLowerCase()
-  )
   const projectRef = selectedProject?.ref
   const { can: canUpdateFunctions } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
