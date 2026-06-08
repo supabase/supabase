@@ -82,8 +82,15 @@ const ResourceWarningsTab = IS_DEV_TOOLBAR_ENABLED
     )
   : () => null
 
+const OrgBannersTab = IS_DEV_TOOLBAR_ENABLED
+  ? dynamic(() => import('@/components/ui/DevToolbar/OrgBannersTab').then((m) => m.OrgBannersTab))
+  : () => null
+
 const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
-  ? [{ id: 'warnings', label: 'Warnings', content: <ResourceWarningsTab /> }]
+  ? [
+      { id: 'warnings', label: 'Warnings', content: <ResourceWarningsTab /> },
+      { id: 'org-banners', label: 'Org Banners', content: <OrgBannersTab /> },
+    ]
   : []
 
 const FeatureFlagProviderWithOrgContext = ({
