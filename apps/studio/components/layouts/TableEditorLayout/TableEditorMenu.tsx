@@ -22,6 +22,7 @@ import { ProtectedSchemaWarning } from '@/components/interfaces/Database/Protect
 import { ErrorMatcher } from '@/components/interfaces/ErrorHandling/ErrorMatcher'
 import { EditorMenuListSkeleton } from '@/components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { InfiniteListDefault, LoaderForIconMenuItems } from '@/components/ui/InfiniteList'
 import SchemaSelector from '@/components/ui/SchemaSelector'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
@@ -160,21 +161,27 @@ export const TableEditorMenu = () => {
     <>
       <div className="flex flex-col grow gap-5 pt-5 h-full">
         <div className="flex flex-col gap-y-1.5">
-          <SchemaSelector
-            className="mx-4"
-            selectedSchemaName={selectedSchema}
-            onSelectSchema={(name: string) => {
-              setSearchText('')
-              setSelectedSchema(name)
-              setIsSchemaDropdownOpen(false)
-            }}
-            onSelectCreateSchema={() => {
-              snap.onAddSchema()
-              setIsSchemaDropdownOpen(false)
-            }}
-            open={isSchemaDropdownOpen}
-            onOpenChange={setIsSchemaDropdownOpen}
-          />
+          <ShortcutTooltip
+            shortcutId={SHORTCUT_IDS.TABLE_EDITOR_FOCUS_SCHEMA}
+            label="Switch schema"
+            side="bottom"
+          >
+            <SchemaSelector
+              className="mx-4"
+              selectedSchemaName={selectedSchema}
+              onSelectSchema={(name: string) => {
+                setSearchText('')
+                setSelectedSchema(name)
+                setIsSchemaDropdownOpen(false)
+              }}
+              onSelectCreateSchema={() => {
+                snap.onAddSchema()
+                setIsSchemaDropdownOpen(false)
+              }}
+              open={isSchemaDropdownOpen}
+              onOpenChange={setIsSchemaDropdownOpen}
+            />
+          </ShortcutTooltip>
 
           <div className="grid gap-3 mx-4">
             {!isSchemaLocked ? (
