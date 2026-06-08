@@ -26,12 +26,7 @@ type LegacyFn = {
   examples?: Example[]
 }
 
-type LegacyTypeSpec = Array<{
-  name: string
-  methods: Record<string, { comment?: { shortText?: string; examples?: Example[] } }>
-}>
-
-type NewTypeSpec = {
+type TypeSpec = {
   methods: Record<string, { comment?: { shortText?: string; examples?: Example[] } }>
 }
 
@@ -226,18 +221,13 @@ async function renderMarkdownSection(mdxDir: string, section: Section): Promise<
   return heading ? `## ${heading}\n\n${body}` : body
 }
 
-async function renderSdkLegacy(ref: SdkLegacyRef, sharedTypeSpec: LegacyTypeSpec): Promise<string> {
+async function renderSdkLegacy(ref: SdkLegacyRef, sharedTypeSpec: TypeSpec): Promise<string> {
   const [sections, functions] = await Promise.all([
     readJson<Section[]>(ref.sectionsPath),
     readJson<LegacyFn[]>(ref.functionsPath),
   ])
   const fnsById = new Map(functions.map((fn) => [fn.id, fn]))
-  const methodsByRef = new Map<string, LegacyTypeSpec[number]['methods'][string]>()
-  for (const ns of sharedTypeSpec) {
-    for (const [refKey, method] of Object.entries(ns.methods ?? {})) {
-      methodsByRef.set(refKey, method)
-    }
-  }
+  const methodsByRef = new Map(Object.entries(sharedTypeSpec.methods ?? {}))
 
   const parts: string[] = [`# ${ref.title}`]
   for (const section of flatten(sections)) {
@@ -270,7 +260,7 @@ async function renderSdkNew(ref: SdkNewRef): Promise<string> {
   const [sections, functions, typeSpec] = await Promise.all([
     readJson<Section[]>(path.join(ref.contentDir, 'sections.json')),
     readJson<LegacyFn[]>(path.join(ref.contentDir, 'functions.json')),
-    readJson<NewTypeSpec>(path.join(ref.contentDir, 'typeSpec.json')),
+    readJson<TypeSpec>(path.join(ref.contentDir, 'typeSpec.json')),
   ])
   const fnsById = new Map(functions.map((fn) => [fn.id, fn]))
   const methods = typeSpec.methods ?? {}
@@ -392,7 +382,9 @@ async function renderCli(ref: CliRef): Promise<string> {
 
 async function generate() {
   await fs.mkdir(OUT_DIR, { recursive: true })
-  const sharedTypeSpec = await readJson<LegacyTypeSpec>(path.join(GENERATED, 'typeSpec.json'))
+  const sharedTypeSpec = await readJson<TypeSpec>(
+    path.join(process.cwd(), 'content/reference/javascript/v2/typeSpec.json')
+  )
 
   await Promise.all(
     REFERENCES.map(async (ref) => {
