@@ -11,7 +11,7 @@ message = "connection timeout errors"
 Intermittent `CONNECT_TIMEOUT` errors or queries that hang until reaching the execution limit may occur when using persistent clients, such as `postgres-js`, within Serverless Functions.
 
 **Why Does This Happen?**
-Serverless environments may freeze the function between requests. This causes TCP sockets to go stale because the connection pooler or NAT may drop inactive connections while the client-side keepalive timers are paused. Upon resuming the function, the client attempts to reuse the dead socket, leading to a hang.
+Serverless environments may freeze the function between requests. This causes TCP sockets to go stale because the connection pooler or NAT may drop inactive connections while the client-side `keepalive` timers are paused. Upon resuming the function, the client attempts to reuse the dead socket, leading to a hang.
 
 **How to Resolve This:**
 
