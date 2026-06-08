@@ -1,5 +1,6 @@
 import { ArrowUpRight, BookOpen } from 'lucide-react'
-import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { useRouter } from 'next/router'
+import { Button, cn } from 'ui'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
 
@@ -10,11 +11,13 @@ import { IntegrationDetailTabShortcuts } from '@/components/interfaces/Integrati
 import { InstallIntegrationSheet } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallIntegrationSheet'
 import { InstallOAuthIntegrationButton } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallOAuthIntegrationButton'
 import { useIntegrationDetail } from '@/components/interfaces/Integrations/Landing/useIntegrationDetail'
+import { AddWrapperButton } from '@/components/interfaces/Integrations/Wrappers/AddWrapperButton'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 
 export const centeredContentClass = 'mx-auto w-full max-w-6xl px-6 xl:px-10'
 
 export const MarketplaceDetail = () => {
+  const router = useRouter()
   const {
     ref,
     activeRoute,
@@ -78,20 +81,13 @@ export const MarketplaceDetail = () => {
       )
     }
     if (integration.type === 'wrapper' && areRequiredExtensionsInstalled) {
+      const wrappersTabHref = tabs.find((tab) => tab.href.endsWith('/wrappers'))?.href
       return (
-        <Tooltip>
-          <TooltipTrigger>
-            <Button type="outline" className="shrink-0" disabled>
-              Installed
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom" align="end" className="w-64 text-pretty">
-            <p>Required extensions are already installed</p>
-            <p className="text-foreground-lighter">
-              Visit the <i>Wrappers</i> tab to add a new {integration.name} instance.
-            </p>
-          </TooltipContent>
-        </Tooltip>
+        <AddWrapperButton
+          onClick={() => {
+            if (wrappersTabHref) router.push(`${wrappersTabHref}?action=new`)
+          }}
+        />
       )
     }
     return <InstallIntegrationSheet integration={integration} />
