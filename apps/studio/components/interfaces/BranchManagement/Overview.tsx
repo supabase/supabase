@@ -621,28 +621,30 @@ const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) =
               <Pencil size={14} /> Edit Branch
             </DropdownMenuItem>
           )}
-          <DropdownMenuItemTooltip
-            className="gap-x-2"
-            disabled={!canUpdateBranches || isRetriggering}
-            onSelect={(e) => {
-              e.stopPropagation()
-              setShowConfirmRetriggersModal(true)
-            }}
-            onClick={(e) => {
-              e.stopPropagation()
-              setShowConfirmRetriggersModal(true)
-            }}
-            tooltip={{
-              content: {
-                side: 'left',
-                text: !canUpdateBranches
-                  ? `You need additional permissions to ${branch.git_branch ? 'resync' : 'rebase'} branches`
-                  : undefined,
-              },
-            }}
-          >
-            <Redo size={14} /> {branch.git_branch ? 'Resync branch' : 'Rebase branch'}
-          </DropdownMenuItemTooltip>
+          {branch.git_branch ? (
+            <DropdownMenuItemTooltip
+              className="gap-x-2"
+              disabled={!canUpdateBranches || isRetriggering}
+              onSelect={(e) => {
+                e.stopPropagation()
+                setShowConfirmRetriggersModal(true)
+              }}
+              onClick={(e) => {
+                e.stopPropagation()
+                setShowConfirmRetriggersModal(true)
+              }}
+              tooltip={{
+                content: {
+                  side: 'left',
+                  text: !canUpdateBranches
+                    ? `You need additional permissions to resync branches`
+                    : undefined,
+                },
+              }}
+            >
+              <Redo size={14} /> Resync branch
+            </DropdownMenuItemTooltip>
+          ) : null}
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -654,16 +656,14 @@ const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) =
       <ConfirmationModal
         variant="default"
         visible={showConfirmRetriggersModal}
-        confirmLabel={branch.git_branch ? 'Resync' : 'Rebase'}
-        title={branch.git_branch ? 'Confirm branch resync' : 'Confirm branch rebase'}
+        confirmLabel="Resync"
+        title="Confirm branch resync"
         loading={isRetriggering}
         onCancel={() => setShowConfirmRetriggersModal(false)}
         onConfirm={onRetriggerBranch}
       >
         <p className="text-sm text-foreground-light">
-          {branch.git_branch
-            ? 'This will re-run all steps of the workflow based on the latest git branch state.'
-            : 'This will re-run all steps of the workflow based on the latest dashboard state.'}
+          This will re-run all steps of the workflow based on the latest git branch state.
         </p>
       </ConfirmationModal>
     </>
