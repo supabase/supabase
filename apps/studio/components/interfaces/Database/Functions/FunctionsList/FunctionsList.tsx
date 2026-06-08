@@ -1,6 +1,6 @@
 import { safeSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Search } from 'lucide-react'
+import { Search, SearchCode } from 'lucide-react'
 import { parseAsBoolean, parseAsJson, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -106,12 +106,16 @@ export const FunctionsList = () => {
     }
   }
 
-  const [filterString, setFilterString] = useQueryState(
+  const [nameFilterString, setNameFilterString] = useQueryState(
     'search',
     parseAsString.withDefault('').withOptions({ clearOnDefault: true })
   )
 
   // Filters
+  const [contentFilterString, setContentFilterString] = useQueryState(
+    'content',
+    parseAsString.withDefault('').withOptions({ clearOnDefault: true })
+  )
   const [returnTypeFilter, setReturnTypeFilter] = useQueryState(
     'return_type',
     parseAsJson(selectFilterSchema.parse)
@@ -143,7 +147,7 @@ export const FunctionsList = () => {
   )
 
   useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
-    setFilterString('')
+    setNameFilterString('')
     setReturnTypeFilter(null)
     setSecurityFilter(null)
   })
@@ -282,7 +286,7 @@ export const FunctionsList = () => {
                   showError={false}
                   selectedSchemaName={selectedSchema}
                   onSelectSchema={(schema) => {
-                    setFilterString('')
+                    setNameFilterString('')
                     setSelectedSchema(schema)
                   }}
                   open={schemaSelectorOpen}
@@ -291,13 +295,22 @@ export const FunctionsList = () => {
               </Shortcut>
               <Input
                 ref={searchInputRef}
-                placeholder="Search for a function"
+                placeholder="Search for a function by name"
                 size="tiny"
                 icon={<Search />}
-                value={filterString}
+                value={nameFilterString}
                 className="w-full lg:w-52"
-                onChange={(e) => setFilterString(e.target.value)}
-                onKeyDown={onSearchInputEscape(filterString, setFilterString)}
+                onChange={(e) => setNameFilterString(e.target.value)}
+                onKeyDown={onSearchInputEscape(nameFilterString, setNameFilterString)}
+              />
+              <Input
+                placeholder="Search for a function by content"
+                size="tiny"
+                icon={<SearchCode />}
+                value={contentFilterString}
+                className="w-full lg:w-52"
+                onChange={(e) => setContentFilterString(e.target.value)}
+                onKeyDown={onSearchInputEscape(contentFilterString, setContentFilterString)}
               />
               <ReportsSelectFilter
                 label="Return Type"
@@ -392,7 +405,8 @@ export const FunctionsList = () => {
               <TableBody>
                 <FunctionList
                   schema={selectedSchema}
-                  filterString={filterString}
+                  nameFilterString={nameFilterString}
+                  contentFilterString={contentFilterString}
                   isLocked={isSchemaLocked}
                   returnTypeFilter={returnTypeFilter ?? []}
                   securityFilter={securityFilter ?? []}

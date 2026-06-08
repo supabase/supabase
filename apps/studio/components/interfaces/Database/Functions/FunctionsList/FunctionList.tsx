@@ -25,7 +25,8 @@ import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface FunctionListProps {
   schema: string
-  filterString: string
+  nameFilterString: string
+  contentFilterString: string
   isLocked: boolean
   returnTypeFilter: string[]
   securityFilter: string[]
@@ -37,7 +38,8 @@ interface FunctionListProps {
 
 const FunctionList = ({
   schema,
-  filterString,
+  nameFilterString,
+  contentFilterString,
   isLocked,
   returnTypeFilter,
   securityFilter,
@@ -52,14 +54,18 @@ const FunctionList = ({
   const { openSidebar } = useSidebarManagerSnapshot()
 
   const filteredFunctions = (functions ?? []).filter((x) => {
-    const matchesName = includes(x.name.toLowerCase(), filterString.toLowerCase())
+    const matchesName = includes(x.name.toLowerCase(), nameFilterString.toLowerCase())
+    const matchesContent = includes(
+      x.complete_statement.toLowerCase(),
+      contentFilterString.toLowerCase()
+    )
     const matchesReturnType =
       returnTypeFilter.length === 0 || returnTypeFilter.includes(x.return_type)
     const matchesSecurity =
       securityFilter.length === 0 ||
       (securityFilter.includes('definer') && x.security_definer) ||
       (securityFilter.includes('invoker') && !x.security_definer)
-    return matchesName && matchesReturnType && matchesSecurity
+    return matchesName && matchesContent && matchesReturnType && matchesSecurity
   })
   const _functions = sortBy(
     filteredFunctions.filter((x) => x.schema == schema),
@@ -71,7 +77,7 @@ const FunctionList = ({
     'functions'
   )
 
-  if (_functions.length === 0 && filterString.length === 0) {
+  if (_functions.length === 0 && nameFilterString.length === 0) {
     return (
       <TableRow key={schema}>
         <TableCell colSpan={5}>
@@ -84,13 +90,13 @@ const FunctionList = ({
     )
   }
 
-  if (_functions.length === 0 && filterString.length > 0) {
+  if (_functions.length === 0 && nameFilterString.length > 0) {
     return (
       <TableRow key={schema}>
         <TableCell colSpan={5}>
           <p className="text-sm text-foreground">No results found</p>
           <p className="text-sm text-foreground-light">
-            Your search for "{filterString}" did not return any results
+            Your search for "{nameFilterString}" did not return any results
           </p>
         </TableCell>
       </TableRow>
