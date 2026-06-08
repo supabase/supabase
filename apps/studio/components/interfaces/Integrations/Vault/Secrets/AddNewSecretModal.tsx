@@ -15,8 +15,8 @@ import {
   FormControl,
   FormField,
   Input,
+  Textarea,
 } from 'ui'
-import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -116,7 +116,7 @@ export const AddNewSecretModal = () => {
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Secret value">
                     <FormControl className="col-span-6">
-                      <PasswordInput reveal copy {...field} />
+                      <Textarea {...field} />
                     </FormControl>
                   </FormItemLayout>
                 )}

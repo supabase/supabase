@@ -12,13 +12,13 @@ import {
   FormField,
   Input,
   Sheet,
+  Textarea,
   SheetContent,
   SheetFooter,
   SheetHeader,
   SheetSection,
   SheetTitle,
 } from 'ui'
-import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
@@ -117,25 +117,27 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
                     description="Secrets can’t be retrieved once saved. Enter a new value to overwrite the existing value."
                   >
                     <FormControl>
-                      <PasswordInput
-                        {...field}
-                        type={showSecretValue ? 'text' : 'password'}
-                        placeholder="my-secret-value"
-                        data-1p-ignore
-                        data-lpignore="true"
-                        data-form-type="other"
-                        data-bwignore
-                        actions={
-                          <div className="mr-1">
-                            <Button
-                              type="text"
-                              className="px-1"
-                              icon={showSecretValue ? <EyeOff /> : <Eye />}
-                              onClick={() => setShowSecretValue(!showSecretValue)}
-                            />
-                          </div>
-                        }
-                      />
+                      <div className="relative">
+                        <Textarea
+                          {...field}
+                          placeholder="my-secret-value"
+                          data-1p-ignore
+                          data-lpignore="true"
+                          data-form-type="other"
+                          data-bwignore
+                          style={
+                            showSecretValue
+                              ? {}
+                              : ({ WebkitTextSecurity: 'disc' } as React.CSSProperties)
+                          }
+                        />
+                        <Button
+                          type="text"
+                          className="absolute right-1 top-1 px-1"
+                          icon={showSecretValue ? <EyeOff /> : <Eye />}
+                          onClick={() => setShowSecretValue(!showSecretValue)}
+                        />
+                      </div>
                     </FormControl>
                   </FormItemLayout>
                 )}
