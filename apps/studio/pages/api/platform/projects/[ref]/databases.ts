@@ -25,7 +25,8 @@ export default bff({
         db_name: 'postgres',
         connectionString: `postgresql://postgres:[YOUR-PASSWORD]@${host}:${port}/postgres`,
         inserted_at: project?.createdAt ?? null,
-        size: 'micro',
+        // Real compute size for dedicated (EC2); shared infra has none.
+        size: project?.infrastructureType === 'shared' ? undefined : (project?.computeSize ?? 'medium'),
       },
     ])
   },

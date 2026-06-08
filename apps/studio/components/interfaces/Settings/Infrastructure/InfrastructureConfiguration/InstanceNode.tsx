@@ -146,7 +146,7 @@ export const PrimaryNode = ({ data }: NodeProps<Node<PrimaryNodeData>>) => {
                   </TooltipTrigger>
                   <TooltipContent side="bottom">Click to copy</TooltipContent>
                 </Tooltip>
-                {projectHomepageShowInstanceSize && (
+                {projectHomepageShowInstanceSize && !!computeSize && (
                   <>
                     <span className="text-sm text-foreground-lighter">·</span>
                     <span className="text-sm text-foreground-light">{computeSize}</span>
