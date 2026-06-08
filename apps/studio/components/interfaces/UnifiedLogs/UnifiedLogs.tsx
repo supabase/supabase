@@ -91,8 +91,6 @@ export const UnifiedLogs = () => {
 
   const defaultColumnSorting = search.sort ? [search.sort] : []
   const defaultColumnVisibility = { uuid: false }
-  // Column filters are seeded from the repeatable `filter` URL param so the sidebar
-  // checkboxes and top filter bar both render their state on load.
   const defaultColumnFilters = logsFiltersToColumnFilters(parseLogsFilterUrlParams(search.filter))
 
   const [topBarHeight, setTopBarHeight] = useState(0)
@@ -290,7 +288,6 @@ export const UnifiedLogs = () => {
     })
   }, [facets])
 
-  // Debounced to avoid too many API calls when the user clicks multiple filters quickly.
   const applyFilterSearch = () => {
     setSearch(buildFilterSearchUpdate(columnFilters, filterFields))
   }

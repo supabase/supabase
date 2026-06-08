@@ -81,10 +81,6 @@ export const groupLogsFiltersByColumn = (
   return grouped
 }
 
-// Seeds table column filters from URL-parsed logs filters. Equality groups (what
-// the sidebar checkboxes write) become a bare string[] so the checkboxes render
-// ticked on load; non-eq groups (top filter bar's neq/ilike) keep the wrapped
-// { operator, values } shape so the operator survives a round-trip.
 export const logsFiltersToColumnFilters = (
   filters: LogsFilter[]
 ): { id: string; value: string[] | LogsColumnFilterValue }[] => {
@@ -99,11 +95,8 @@ export const columnFiltersToLogsFilters = (
 ): LogsFilter[] => {
   const filters: LogsFilter[] = []
   for (const { id, value } of columnFilters) {
-    // `date` (timerange brush) round-trips through its own URL key, not `filter`.
     if (filterableNames && !filterableNames.has(id)) continue
     if (value === null || value === undefined) continue
-    // Filter bar writes a wrapped { operator, values }; sidebar checkboxes write a
-    // bare string[] — normalize the latter to an `=` filter so both serialize alike.
     const fallback: LogsColumnFilterValue = {
       operator: '=',
       values: (Array.isArray(value) ? value : [value]).map(String),
@@ -116,9 +109,6 @@ export const columnFiltersToLogsFilters = (
   return filters
 }
 
-// Builds the URL-state patch for a filter apply. Equality/pattern filters collapse
-// into the repeatable `filter` param; timerange fields keep their own per-column key
-// (their range semantics aren't expressible as eq/neq/like).
 export const buildFilterSearchUpdate = (
   columnFilters: { id: string; value: unknown }[],
   filterFields: { value: string; type: string }[]

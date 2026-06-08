@@ -58,8 +58,6 @@ describe('columnFiltersToLogsFilters', () => {
 
 describe('logsFiltersToColumnFilters', () => {
   it('seeds an `=` group as a bare string[] so sidebar checkboxes render ticked', () => {
-    // The shared checkbox only reads Array.isArray(value); a wrapped
-    // { operator, values } object leaves every box unticked on URL load.
     const columnFilters = logsFiltersToColumnFilters([
       { column: 'log_type', operator: '=', value: 'postgres' },
       { column: 'log_type', operator: '=', value: 'postgrest' },
@@ -97,8 +95,6 @@ describe('buildFilterSearchUpdate', () => {
   ]
 
   it('serializes a bare sidebar checkbox into the `filter` param (the regression)', () => {
-    // The reported bug: a sidebar click produced an empty `filter` so the query
-    // never re-ran. This guards the click-to-URL wiring, not just the transform.
     const update = buildFilterSearchUpdate([{ id: 'log_type', value: ['postgres'] }], fields)
     expect(update.filter).toEqual(['log_type:eq:postgres'])
   })
