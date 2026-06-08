@@ -7,6 +7,7 @@ import { Admonition } from 'ui-patterns/admonition'
 import { MarketplaceDetailBreadrumbs } from './MarketplaceDetailBreadcrumbs'
 import { MarketplaceDetailHero } from './MarketplaceDetailHero'
 import { OverviewTab } from './OverviewTab'
+import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { IntegrationDetailTabShortcuts } from '@/components/interfaces/Integrations/Integration/IntegrationDetailTabShortcuts'
 import { InstallIntegrationSheet } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallIntegrationSheet'
 import { InstallOAuthIntegrationButton } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallOAuthIntegrationButton'
@@ -18,6 +19,7 @@ export const centeredContentClass = 'mx-auto w-full max-w-6xl px-6 xl:px-10'
 
 export const MarketplaceDetail = () => {
   const router = useRouter()
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
   const {
     ref,
     activeRoute,
@@ -73,21 +75,25 @@ export const MarketplaceDetail = () => {
     if (integration.type === 'oauth') {
       return <InstallOAuthIntegrationButton integration={integration} />
     }
+    if (
+      integration.type === 'wrapper' &&
+      (isMarketplaceEnabled || areRequiredExtensionsInstalled)
+    ) {
+      const wrappersTabHref = tabs.find((tab) => tab.href.endsWith('/wrappers'))?.href
+      return (
+        <AddWrapperButton
+          type="primary"
+          onClick={() => {
+            if (wrappersTabHref) router.push(`${wrappersTabHref}?new=true`)
+          }}
+        />
+      )
+    }
     if (isInstalled) {
       return (
         <Button type="outline" disabled>
           Installed
         </Button>
-      )
-    }
-    if (integration.type === 'wrapper' && areRequiredExtensionsInstalled) {
-      const wrappersTabHref = tabs.find((tab) => tab.href.endsWith('/wrappers'))?.href
-      return (
-        <AddWrapperButton
-          onClick={() => {
-            if (wrappersTabHref) router.push(`${wrappersTabHref}?new=true`)
-          }}
-        />
       )
     }
     return <InstallIntegrationSheet integration={integration} />

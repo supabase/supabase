@@ -4,6 +4,7 @@ import { useEffect, useMemo } from 'react'
 
 import { useAvailableIntegrations } from './useAvailableIntegrations'
 import { useInstalledIntegrations } from './useInstalledIntegrations'
+import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -19,6 +20,7 @@ export const useIntegrationDetail = () => {
   const { ref, id, pageId, childId } = useParams()
 
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
   const { data: project } = useSelectedProjectQuery()
   const { data: extensions } = useDatabaseExtensionsQuery({
@@ -50,9 +52,12 @@ export const useIntegrationDetail = () => {
 
   const navItems = useMemo(() => {
     if (!integration?.navigation) return []
-    if (isInstalled || integration.type === 'wrapper') return integration.navigation
-    return integration.navigation.filter((nav) => nav.route === 'overview')
-  }, [integration, isInstalled])
+    if (isInstalled || integration.type !== 'wrapper') return integration.navigation
+    // For wrapper integrations, show the Wrappers tab only when the marketplace flag is on
+    // (the sheet handles implicit extension install) or when extensions are already installed.
+    if (isMarketplaceEnabled || areRequiredExtensionsInstalled) return integration.navigation
+    return integration.navigation.filter((nav) => nav.route !== 'wrappers')
+  }, [integration, isInstalled, isMarketplaceEnabled, areRequiredExtensionsInstalled])
 
   const activeRoute = pageId ?? 'overview'
 
