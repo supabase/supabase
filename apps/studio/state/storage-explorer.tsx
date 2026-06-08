@@ -1365,6 +1365,7 @@ function createStorageExplorerState({
           )
         }
       } catch (e) {
+        console.error('Failed to upload files', e)
         toast.error('Failed to upload files', {
           id: toastId,
           closeButton: true,
