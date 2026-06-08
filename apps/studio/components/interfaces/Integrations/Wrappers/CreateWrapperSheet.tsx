@@ -235,7 +235,9 @@ export const CreateWrapperSheet = ({
       if (hasNewSchema) invalidateSchemasQuery(queryClient, project?.ref)
 
       track('foreign_data_wrapper_created', { wrapperType: wrapperMeta.label })
-      toast.success(`Successfully created ${wrapperMeta.label} wrapper`, { id: toastId })
+      toast.success(`Successfully created ${wrapperMeta.label} foreign data wrapper`, {
+        id: toastId,
+      })
       onClose()
       form.reset()
     } catch (error) {
