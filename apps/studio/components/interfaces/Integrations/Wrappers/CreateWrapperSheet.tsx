@@ -24,7 +24,13 @@ import * as z from 'zod'
 
 import InputField from './InputField'
 import { WrapperMeta } from './Wrappers.types'
-import { FormattedWrapperTable, getWrapperCreationFormSchema, NewTable } from './Wrappers.utils'
+import {
+  FormattedWrapperTable,
+  getRequiredExtensionsToInstall,
+  getWrapperCreationFormSchema,
+  hasForeignSchemaSupport,
+  NewTable,
+} from './Wrappers.utils'
 import WrapperTableEditor from './WrapperTableEditor'
 import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { getExtensionDefaultSchema } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/IntegrationOverviewTabV2.utils'
@@ -66,28 +72,25 @@ export const CreateWrapperSheet = ({
   const { data: project } = useSelectedProjectQuery()
   const track = useTrack()
 
-  const { data: extensions, isLoading: isExtensionsLoading } = useDatabaseExtensionsQuery({
+  const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
   // null while the query is in flight — distinct from [] which means "all installed"
   const requiredExtensionsToInstall = useMemo(
-    () =>
-      extensions === undefined
-        ? null
-        : extensions.filter(
-            (ext) =>
-              (integration?.requiredExtensions ?? []).includes(ext.name) && !ext.installed_version
-          ),
+    () => getRequiredExtensionsToInstall(extensions, integration?.requiredExtensions ?? []),
     [extensions, integration?.requiredExtensions]
   )
 
   const wrappersExtension = extensions?.find((ext) => ext.name === 'wrappers')
   // The import foreign schema requires a minimum extension version of 0.5.0
-  const hasRequiredVersionForeignSchema = wrappersExtension?.installed_version
-    ? wrappersExtension?.installed_version >= '0.5.0'
-    : false
+  const hasRequiredVersionForeignSchema = hasForeignSchemaSupport(wrappersExtension)
+
+  // True when there are extensions that still need installing
+  const needsExtensions = isMarketplaceEnabled && (requiredExtensionsToInstall?.length ?? 0) > 0
+  // True while extension state is unresolved — blocks submit and disables the button
+  const isExtensionDataLoading = isMarketplaceEnabled && requiredExtensionsToInstall === null
 
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref!,
@@ -189,13 +192,11 @@ export const CreateWrapperSheet = ({
       }
     }
 
-    // Extension metadata not yet resolved — block rather than silently skip the install step
-    if (isMarketplaceEnabled && requiredExtensionsToInstall === null) return
+    if (isExtensionDataLoading) return
 
-    const needsExtensions = isMarketplaceEnabled && (requiredExtensionsToInstall?.length ?? 0) > 0
     const toastId = toast.loading(
       needsExtensions
-        ? `Installing extensions (${(requiredExtensionsToInstall ?? []).map((e) => e.name).join(', ')})…`
+        ? `Installing extensions ${(requiredExtensionsToInstall ?? []).map((e) => e.name).join(', ')}…`
         : `Creating ${wrapperMeta.label} wrapper…`
     )
 
@@ -266,7 +267,7 @@ export const CreateWrapperSheet = ({
             <div className="grow overflow-y-auto">
               {isMarketplaceEnabled && (
                 <div className="px-5 py-5 flex flex-col gap-y-4 border-b">
-                  {!!requiredExtensionsToInstall?.length && (
+                  {needsExtensions && (
                     <Admonition
                       type="warning"
                       title="Required extensions will be installed"
@@ -522,7 +523,7 @@ export const CreateWrapperSheet = ({
                 type="primary"
                 form={FORM_ID}
                 htmlType="submit"
-                disabled={isSubmitting || (isMarketplaceEnabled && isExtensionsLoading)}
+                disabled={isSubmitting || isExtensionDataLoading}
                 loading={isSubmitting}
               >
                 Create wrapper
