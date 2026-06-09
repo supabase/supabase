@@ -2,8 +2,22 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { globby } from 'globby'
 import matter from 'gray-matter'
+import * as sharedDataPkg from 'shared-data'
 
 import { getInternalLinkBaseUrl, prefixInternalLinks, withDocsBasePath } from './internal-links'
+import { resolveSharedData } from '../components/SharedData.utils'
+
+// Interop: tsx's ESM loader treats `shared-data` as CJS and exposes the
+// module under `.default`, while a webpack/Next build would expose the
+// named exports directly on the namespace. This script is only run by tsx,
+// but the fallback keeps it robust if that ever changes.
+const sharedDataModule = ((sharedDataPkg as any).default ??
+  sharedDataPkg) as typeof import('shared-data')
+const sharedData = {
+  config: sharedDataModule.config,
+  logConstants: sharedDataModule.logConstants,
+}
+type SharedDataKey = keyof typeof sharedData
 
 const PARTIALS_DIR = path.join(process.cwd(), 'content', '_partials')
 
@@ -95,6 +109,24 @@ function extractTitleAttr(attrs: string): string | null {
     .replace(/<[^>]+>/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
+}
+
+/**
+ * Inlines `<SharedData data="key">path</SharedData>` with the resolved value
+ * from the `shared-data` package. Only matches plain-text children (no `<` or
+ * `{`), so the render-function variant `<SharedData data="…">{(d) => …}</SharedData>`
+ * is left untouched and falls through to `stripJsxTags`.
+ */
+function convertSharedData(content: string): string {
+  return content.replace(
+    /<SharedData\s+data="([^"]+)">([^<{]+)<\/SharedData>/g,
+    (full, key, path) => {
+      const dataset = sharedData[key as SharedDataKey]
+      if (!dataset) return full
+      const value = resolveSharedData(dataset, path.trim())
+      return value === undefined ? full : String(value)
+    }
+  )
 }
 
 /**
@@ -266,7 +298,8 @@ async function generate() {
         const withPartials = await inlinePartials(rawContent)
         const withSteps = convertStepHike(withPartials)
         const withTooltips = convertInfoTooltip(withSteps)
-        const withLinks = convertLinkPanels(withTooltips)
+        const withSharedData = convertSharedData(withTooltips)
+        const withLinks = convertLinkPanels(withSharedData)
         const stripped = stripJsxTags(withLinks)
         const processed = prefixInternalLinks(stripped, linkBaseUrl)
 
