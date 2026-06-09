@@ -6,6 +6,7 @@
   "description": "Real-time Monaco editor for collaborative applications.",
   "dependencies": [
     "@monaco-editor/react@latest",
+    "@supabase-labs/y-supabase@latest",
     "y-monaco@latest",
     "yjs@latest",
     "@supabase/ssr@latest",
