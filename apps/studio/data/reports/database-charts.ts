@@ -208,6 +208,7 @@ export const getReportAttributesV2: (
           label: 'Idle',
           format: '%',
           omitFromTotal: true,
+          hideFromLegend: true,
           color: { light: '#6EA85F', dark: '#A3FFC2' },
           fill: { light: '#A6D8AE', dark: '#2A5C3F' },
           tooltip: 'CPU time spent idle and available for new work',
