@@ -3,6 +3,7 @@ import { UIMessage } from 'ai'
 import { expect, test, vi } from 'vitest'
 
 import generateV4 from '../../pages/api/ai/sql/generate-v4'
+import { getTools } from '@/lib/ai/tools'
 import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
 
 vi.mock('@/lib/ai/tools/tool-sanitizer', () => ({
@@ -34,6 +35,7 @@ test('generateV4 calls the tool sanitizer', async () => {
       projectRef: 'test-project',
       connectionString: 'test-connection',
       orgSlug: 'test-org',
+      supportMode: true,
     },
     on: vi.fn(),
   }
@@ -83,4 +85,9 @@ test('generateV4 calls the tool sanitizer', async () => {
   await generateV4(mockReq as any, mockRes as any)
 
   expect(sanitizeMessagePart).toHaveBeenCalled()
+  expect(getTools).toHaveBeenCalledWith(
+    expect.objectContaining({
+      supportMode: true,
+    })
+  )
 })

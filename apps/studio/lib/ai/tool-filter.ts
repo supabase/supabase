@@ -32,6 +32,8 @@ export const toolSetValidationSchema = z.record(
     'execute_sql',
     'deploy_edge_function',
     'rename_chat',
+    'escalate_to_human',
+    'resolve_support_conversation',
     'list_policies',
 
     // Fallback tools for self-hosted
@@ -70,6 +72,8 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   execute_sql: TOOL_CATEGORIES.UI,
   deploy_edge_function: TOOL_CATEGORIES.UI,
   rename_chat: TOOL_CATEGORIES.UI,
+  escalate_to_human: TOOL_CATEGORIES.UI,
+  resolve_support_conversation: TOOL_CATEGORIES.UI,
   search_docs: TOOL_CATEGORIES.UI,
   get_active_incidents: TOOL_CATEGORIES.UI,
   load_knowledge: TOOL_CATEGORIES.UI,
