@@ -347,19 +347,33 @@ const DatabaseUsage = () => {
           queryType={'db'}
           resolvedSql={largeObjectsSql}
           renderer={(props) => {
+            const diskUsedPercent =
+              currentDiskSize > 0
+                ? ((databaseSizeBytes / (currentDiskSize * 1024 * 1024 * 1024)) * 100).toFixed(1)
+                : null
+
             return (
               <div>
-                <div className="col-span-4 inline-grid grid-cols-12 gap-12 w-full mt-5">
-                  <div className="grid gap-2 col-span-4 xl:col-span-2">
-                    <h5>Space used</h5>
-                    <span className="text-lg">{formatBytes(databaseSizeBytes, 2, 'GB')}</span>
-                  </div>
-                  <div className="grid gap-2 col-span-4 xl:col-span-3">
-                    <h5>Provisioned disk size</h5>
-                    <span className="text-lg">{currentDiskSize} GB</span>
+                <div className="flex flex-wrap items-end justify-between gap-4 mt-2">
+                  <div className="flex flex-wrap gap-8">
+                    <div className="flex flex-col gap-1">
+                      <p className="text-sm text-foreground-light">Space used</p>
+                      <p className="text-2xl">
+                        {formatBytes(databaseSizeBytes, 2, 'GB')}
+                        {diskUsedPercent !== null && (
+                          <span className="ml-2 text-sm text-foreground-light">
+                            ({diskUsedPercent}%)
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <p className="text-sm text-foreground-light">Provisioned disk size</p>
+                      <p className="text-2xl">{currentDiskSize} GB</p>
+                    </div>
                   </div>
 
-                  <div className="col-span-full lg:col-span-4 xl:col-span-7 lg:text-right">
+                  <div>
                     {project?.cloud_provider === 'AWS' ? (
                       <Button asChild type="default">
                         <Link href={`/project/${ref}/settings/compute-and-disk`}>
@@ -386,7 +400,7 @@ const DatabaseUsage = () => {
                   </div>
                 </div>
 
-                <h3 className="mt-8 text-sm">Large Objects</h3>
+                <h3 className="mt-8 text-sm font-medium text-foreground-light">Large Objects</h3>
                 {!props.isLoading && props.data.length === 0 && <span>No large objects found</span>}
                 {!props.isLoading && props.data.length > 0 && (
                   <Table
