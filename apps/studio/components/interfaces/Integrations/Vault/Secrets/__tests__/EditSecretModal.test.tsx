@@ -81,11 +81,15 @@ describe(`EditSecretModal`, () => {
     const nameInput = await screen.findByLabelText(`Name`)
     const descriptionInput = screen.getByLabelText(`Description`)
     const valueInput = screen.getByLabelText(`Secret value`)
+    const togglePasswordButton = screen.getByRole(`button`, { name: `Show secret value` })
     const submitButton = screen.getByRole(`button`, { name: `Update secret` })
 
     expect(nameInput).toHaveValue(secret.name)
     expect(descriptionInput).toHaveValue(secret.description)
     expect(valueInput.tagName).toBe('TEXTAREA')
+    expect((valueInput as any).style.WebkitTextSecurity).toBe('disc')
+    await userEvent.click(togglePasswordButton)
+    expect((valueInput as any).style.WebkitTextSecurity).toBe('')
 
     await userEvent.type(nameInput, `updated-name`)
     await userEvent.clear(descriptionInput)
@@ -96,55 +100,5 @@ describe(`EditSecretModal`, () => {
     await waitFor(() => {
       expect(screen.queryByRole(`dialog`)).not.toBeInTheDocument()
     })
-  })
-
-  it(`preserves newlines when pasting multiline text into the secret value`, async () => {
-    const requests: Array<{ body: unknown }> = []
-    addAPIMock({
-      method: `post`,
-      path: `/platform/pg-meta/:ref/query`,
-      response: async ({ request }) => {
-        const body = (await request.json()) as { query: string }
-        const query = body.query
-
-        if (query.includes('decrypted_secrets')) {
-          return HttpResponse.json([{ decrypted_secret: '' }])
-        } else if (query.includes('update_secret')) {
-          requests.push({ body })
-          return HttpResponse.json([{ update_secret: '' }])
-        }
-        return HttpResponse.json([secret])
-      },
-    })
-
-    customRender(
-      <ProjectContextProvider projectRef="default">
-        <EditSecretModal />
-      </ProjectContextProvider>,
-      {
-        nuqs: {
-          searchParams: {
-            edit: secret.id,
-          },
-        },
-      }
-    )
-
-    await screen.findByRole(`dialog`)
-
-    const valueInput = await screen.findByLabelText(`Secret value`)
-    const submitButton = screen.getByRole(`button`, { name: `Update secret` })
-
-    const multilineValue = '-----BEGIN CERTIFICATE-----\nline2\nline3\n-----END CERTIFICATE-----'
-    await userEvent.type(valueInput, multilineValue)
-
-    fireEvent.click(submitButton)
-
-    await waitFor(() => {
-      expect(screen.queryByRole(`dialog`)).not.toBeInTheDocument()
-    })
-
-    const updateQuery = requests[0]?.body as { query: string } | undefined
-    expect(updateQuery?.query).toContain(multilineValue)
   })
 })

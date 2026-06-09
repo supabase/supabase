@@ -178,12 +178,27 @@ export const EditSecretModal = () => {
                             <Textarea
                               id="secret"
                               {...field}
+                              rows={1}
+                              ref={(el) => {
+                                field.ref(el)
+                                if (el) {
+                                  el.style.height = 'auto'
+                                  el.style.height = Math.max(40, el.scrollHeight) + 'px'
+                                }
+                              }}
                               data-lpignore="true"
+                              className="min-h-0 resize-none"
                               style={
-                                showSecretValue
-                                  ? {}
-                                  : ({ WebkitTextSecurity: 'disc' } as React.CSSProperties)
+                                {
+                                  WebkitTextSecurity: showSecretValue ? undefined : 'disc',
+                                } as React.CSSProperties
                               }
+                              onChange={(e) => {
+                                field.onChange(e)
+                                e.currentTarget.style.height = 'auto'
+                                e.currentTarget.style.height =
+                                  Math.max(40, e.currentTarget.scrollHeight) + 'px'
+                              }}
                             />
                             <Button
                               type="default"

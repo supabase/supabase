@@ -1,5 +1,11 @@
 import { Copy } from 'lucide-react'
-import React, { ComponentProps, ComponentPropsWithoutRef, forwardRef, useState } from 'react'
+import React, {
+  ComponentProps,
+  ComponentPropsWithoutRef,
+  ElementRef,
+  forwardRef,
+  useState,
+} from 'react'
 import {
   Input as BaseInput,
   cn,
@@ -8,7 +14,6 @@ import {
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
-  InputGroupTextarea,
 } from 'ui'
 
 export interface Props extends Omit<ComponentProps<typeof BaseInput>, 'onCopy'> {
@@ -20,11 +25,10 @@ export interface Props extends Omit<ComponentProps<typeof BaseInput>, 'onCopy'> 
   actions?: React.ReactNode
   iconContainerClassName?: string
   containerClassName?: string
-  textarea?: boolean
 }
 
 const Input = forwardRef<
-  HTMLInputElement | HTMLTextAreaElement,
+  ElementRef<typeof BaseInput>,
   ComponentPropsWithoutRef<typeof BaseInput> & Props
 >(
   (
@@ -37,9 +41,7 @@ const Input = forwardRef<
       onCopy,
       iconContainerClassName,
       containerClassName,
-      textarea,
       size = 'small',
-      type,
       ...props
     }: Props,
     ref
@@ -62,44 +64,22 @@ const Input = forwardRef<
       setHidden(false)
     }
 
-    const isPasswordHidden = reveal && hidden
-    const isTextareaMasked = textarea && (reveal ? hidden : type === 'password')
-
-    const inputControl = textarea ? (
-      <InputGroupTextarea
-        ref={ref as any}
-        {...(props as any)}
-        disabled={props.disabled}
-        className={props.className}
-        data-1p-ignore
-        data-lpignore="true"
-        data-form-type="other"
-        data-bwignore
-        style={{
-          ...((props.style ?? {}) as React.CSSProperties),
-          ...(isTextareaMasked ? ({ WebkitTextSecurity: 'disc' } as React.CSSProperties) : {}),
-        }}
-      />
-    ) : (
-      <InputGroupInput
-        ref={ref as any}
-        onFocus={(event) => event.target.select()}
-        {...props}
-        size={size}
-        onCopy={onCopy}
-        type={isPasswordHidden ? 'password' : type}
-        disabled={props.disabled}
-        className={props.className}
-        data-1p-ignore // 1Password
-        data-lpignore="true" // LastPass
-        data-form-type="other" // Dashlane
-        data-bwignore // Bitwarden
-      />
-    )
-
     return (
       <InputGroup className={containerClassName}>
-        {inputControl}
+        <InputGroupInput
+          ref={ref}
+          onFocus={(event) => event.target.select()}
+          {...props}
+          size={size}
+          onCopy={onCopy}
+          type={reveal && hidden ? 'password' : props.type}
+          disabled={props.disabled}
+          className={props.className}
+          data-1p-ignore // 1Password
+          data-lpignore="true" // LastPass
+          data-form-type="other" // Dashlane
+          data-bwignore // Bitwarden
+        />
         {icon && <InputGroupAddon align="inline-start">{icon}</InputGroupAddon>}
         {copy || actions ? (
           <InputGroupAddon
@@ -107,7 +87,7 @@ const Input = forwardRef<
             // Override defaults
             className="pr-1 has-[>button]:mr-0 has-[>kbd]:mr-0"
           >
-            {copy && !isPasswordHidden ? (
+            {copy && !(reveal && hidden) ? (
               <InputGroupButton
                 size="tiny"
                 type="default"

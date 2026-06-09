@@ -66,28 +66,4 @@ describe('EditSecretSheet', () => {
     await waitFor(() => expect(save).not.toBeDisabled())
     expect(onClose).not.toHaveBeenCalled()
   })
-
-  test('preserves newlines when submitting a multiline value', async () => {
-    const requests: Array<{ ref: string | undefined; body: unknown }> = []
-    addAPIMock({
-      method: 'post',
-      path: '/v1/projects/:ref/secrets',
-      response: async ({ request, params }) => {
-        requests.push({ ref: params.ref as string | undefined, body: await request.json() })
-        return HttpResponse.json({}, { status: 201 })
-      },
-    })
-
-    renderSheet()
-
-    const multilineValue = '-----BEGIN CERTIFICATE-----\nline2\nline3\n-----END CERTIFICATE-----'
-    await userEvent.type(screen.getByPlaceholderText('my-secret-value'), multilineValue)
-    fireEvent.click(await screen.findByRole('button', { name: 'Save' }))
-
-    await waitFor(() => {
-      expect(requests).toEqual([
-        { ref: 'default', body: [{ name: 'API_KEY', value: multilineValue }] },
-      ])
-    })
-  })
 })

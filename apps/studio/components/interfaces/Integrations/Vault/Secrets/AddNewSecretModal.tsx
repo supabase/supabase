@@ -15,8 +15,8 @@ import {
   FormControl,
   FormField,
   Input,
+  Textarea,
 } from 'ui'
-import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -116,7 +116,24 @@ export const AddNewSecretModal = () => {
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Secret value">
                     <FormControl className="col-span-6">
-                      <PasswordInput textarea reveal copy {...field} />
+                      <Textarea
+                        {...field}
+                        rows={1}
+                        ref={(el) => {
+                          field.ref(el)
+                          if (el) {
+                            el.style.height = 'auto'
+                            el.style.height = Math.max(40, el.scrollHeight) + 'px'
+                          }
+                        }}
+                        className="min-h-0 resize-none"
+                        onChange={(e) => {
+                          field.onChange(e)
+                          e.currentTarget.style.height = 'auto'
+                          e.currentTarget.style.height =
+                            Math.max(40, e.currentTarget.scrollHeight) + 'px'
+                        }}
+                      />
                     </FormControl>
                   </FormItemLayout>
                 )}

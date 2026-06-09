@@ -207,75 +207,85 @@ export const AddNewSecretForm = () => {
             </CardHeader>
             <CardContent>
               {fields.map((fieldItem, index) => (
-                <div key={fieldItem.id} className="mb-6">
-                  <div className="flex flex-col gap-4">
-                    <div className="flex items-center gap-2">
-                      <FormField
-                        control={form.control}
-                        name={`secrets.${index}.name`}
-                        render={({ field }) => (
-                          <FormItem className="flex-1">
-                            <FormLabel>Name</FormLabel>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                placeholder="e.g. CLIENT_KEY"
-                                data-1p-ignore
-                                data-lpignore="true"
-                                data-form-type="other"
-                                data-bwignore
-                                onPaste={(e) => handlePaste(e.nativeEvent)}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <Button
-                        type="default"
-                        className="mt-6"
-                        icon={<MinusCircle />}
-                        disabled={fields.length <= 1}
-                        onClick={() => handleRemoveSecret(fieldItem.id, index)}
-                      />
-                    </div>
-                    <FormField
-                      control={form.control}
-                      name={`secrets.${index}.value`}
-                      render={({ field }) => (
-                        <FormItem className="w-full relative">
-                          <FormLabel>Value</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <Textarea
-                                {...field}
-                                rows={1}
-                                data-1p-ignore
-                                data-lpignore="true"
-                                data-form-type="other"
-                                data-bwignore
-                                className="min-h-0 resize-none"
-                                style={
-                                  {
-                                    WebkitTextSecurity: isSecretVisible(fieldItem.id)
-                                      ? undefined
-                                      : 'disc',
-                                  } as React.CSSProperties
+                <div key={fieldItem.id} className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-4">
+                  <FormField
+                    control={form.control}
+                    name={`secrets.${index}.name`}
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="e.g. CLIENT_KEY"
+                            data-1p-ignore
+                            data-lpignore="true"
+                            data-form-type="other"
+                            data-bwignore
+                            onPaste={(e) => handlePaste(e.nativeEvent)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`secrets.${index}.value`}
+                    render={({ field }) => (
+                      <FormItem className="w-full relative">
+                        <FormLabel>Value</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Textarea
+                              {...field}
+                              rows={1}
+                              ref={(el) => {
+                                field.ref(el)
+                                if (el) {
+                                  el.style.height = 'auto'
+                                  el.style.height = Math.max(40, el.scrollHeight) + 'px'
                                 }
-                              />
-                              <Button
-                                type="text"
-                                className="absolute right-1 top-1 px-1"
-                                icon={isSecretVisible(fieldItem.id) ? <EyeOff /> : <Eye />}
-                                onClick={() => handleToggleSecretVisibility(fieldItem.id)}
-                              />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                              }}
+                              data-1p-ignore
+                              data-lpignore="true"
+                              data-form-type="other"
+                              data-bwignore
+                              className="min-h-0 resize-none"
+                              style={
+                                {
+                                  WebkitTextSecurity: isSecretVisible(fieldItem.id)
+                                    ? undefined
+                                    : 'disc',
+                                } as React.CSSProperties
+                              }
+                              onChange={(e) => {
+                                field.onChange(e)
+                                e.currentTarget.style.height = 'auto'
+                                e.currentTarget.style.height =
+                                  Math.max(40, e.currentTarget.scrollHeight) + 'px'
+                              }}
+                            />
+                            <Button
+                              type="text"
+                              className="absolute right-1 top-1 px-1"
+                              icon={isSecretVisible(fieldItem.id) ? <EyeOff /> : <Eye />}
+                              onClick={() => handleToggleSecretVisibility(fieldItem.id)}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button
+                    type="default"
+                    className="h-[34px] mt-6"
+                    icon={<MinusCircle />}
+                    disabled={fields.length <= 1}
+                    onClick={() => handleRemoveSecret(fieldItem.id, index)}
+                  />
                 </div>
               ))}
 
