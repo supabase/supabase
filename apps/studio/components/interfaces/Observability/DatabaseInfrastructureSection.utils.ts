@@ -64,7 +64,7 @@ export function parseInfrastructureMetrics(
 }
 
 type ConnectionsData = {
-  current: number
+  peak: number
   max: number
 }
 
@@ -79,24 +79,18 @@ export function parseConnectionsData(
   const max = maxConnectionsData?.maxConnections ?? 0
 
   if (!infraData || !('series' in infraData)) {
-    return { current: 0, max }
+    return { peak: 0, max }
   }
 
-  // Read the most recent data point rather than the window's totalAverage so the
-  // overview matches the details chart, which shows the latest value. Using the
-  // average makes the count vary with bucket granularity (e.g. 1h vs 1m) and
-  // skews towards older samples in the window.
-  const points = infraData.data ?? []
-  let currentVal: string | undefined
-  for (let i = points.length - 1; i >= 0; i--) {
-    const v = points[i]?.values?.pg_stat_database_num_backends
-    if (v !== undefined && v !== '') {
-      currentVal = v
-      break
-    }
+  // Show the highest connection count observed in the selected window rather
+  // than the window's totalAverage. The average varies with bucket granularity
+  // (e.g. 1h vs 1m) and is hard to reason about; peak is interval-stable and
+  // the more actionable signal for headroom against the connection limit.
+  let peak = 0
+  for (const point of infraData.data ?? []) {
+    const n = parseNumericValue(point?.values?.pg_stat_database_num_backends)
+    if (n > peak) peak = n
   }
 
-  const current = Math.round(parseNumericValue(currentVal))
-
-  return { current, max }
+  return { peak: Math.round(peak), max }
 }
