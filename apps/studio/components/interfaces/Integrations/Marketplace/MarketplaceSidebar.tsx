@@ -70,7 +70,7 @@ export const MarketplaceSidebar = () => {
         href={baseHref}
         active={isDiscoverActive}
         icon={<LayoutGrid size={13} />}
-        label="Marketplace"
+        label="Explore all"
       />
 
       {isLoading ? (
