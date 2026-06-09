@@ -35,14 +35,18 @@ export const useFilteredFunctions = ({
           securityFilter.length === 0 ||
           (securityFilter.includes('definer') && x.security_definer) ||
           (securityFilter.includes('invoker') && !x.security_definer)
-        return matchesReturnType && matchesSecurity && x.schema === schema
+        const matchesSchema = schema == null || x.schema === schema
+        return matchesReturnType && matchesSecurity && matchesSchema
       }),
     [functions, returnTypeFilter, securityFilter, schema]
   )
 
   const fuse = useMemo(() => {
     return new Fuse(filteredFunctions ?? [], {
-      keys: ['name', 'definition'],
+      keys: [
+        { name: 'name', weight: 2.0 },
+        { name: 'definition', weight: 1.0 },
+      ],
       threshold: 0.4,
     })
   }, [filteredFunctions])
