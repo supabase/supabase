@@ -7,6 +7,10 @@ Thank you for contributing to Supabase! We’re a big, exciting open source proj
 [3. Pull Requests](#pull-requests)
 
 ## Getting Started
+Read 3 Things:
+1. code of conduct - https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md
+2. DEVELOPERS.md - https://github.com/supabase/supabase/blob/master/DEVELOPERS.md
+3. CONTRIBUTING.m - https://github.com/supabase/supabase/blob/master/apps/docs/CONTRIBUTING.md
 
 To ensure a positive and inclusive environment, please read our [code of conduct](https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md) before contributing. For help setting up the code in this repo, please follow our [DEVELOPERS.md](https://github.com/supabase/supabase/blob/master/DEVELOPERS.md) file. For the [docs](https://supabase.com/docs) site, follow this [CONTRIBUTING.md](https://github.com/supabase/supabase/blob/master/apps/docs/CONTRIBUTING.md) guide.
 
