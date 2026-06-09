@@ -24,6 +24,7 @@ import { EditorMenuListSkeleton } from '@/components/layouts/TableEditorLayout/E
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InfiniteListDefault, LoaderForIconMenuItems } from '@/components/ui/InfiniteList'
 import SchemaSelector from '@/components/ui/SchemaSelector'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { useEntityTypesQuery } from '@/data/entity-types/entity-types-infinite-query'
 import { useTableApiAccessQuery } from '@/data/privileges/table-api-access-query'
@@ -33,6 +34,8 @@ import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 
 export const TableEditorMenu = () => {
@@ -42,6 +45,7 @@ export const TableEditorMenu = () => {
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
   const [searchText, setSearchText] = useState<string>('')
+  const [isSchemaDropdownOpen, setIsSchemaDropdownOpen] = useState(false)
   const [tableToExport, setTableToExport] = useState<SupaTable>()
   const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
   const [sort, setSort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
@@ -106,6 +110,10 @@ export const TableEditorMenu = () => {
     setSelectedSchema(selectedTable.schema)
   }
 
+  useShortcut(SHORTCUT_IDS.TABLE_EDITOR_FOCUS_SCHEMA, () => setIsSchemaDropdownOpen(true), {
+    registerInCommandMenu: true,
+  })
+
   const tableEditorTabsCleanUp = useTableEditorTabsCleanUp()
 
   const onSelectExportCLI = useCallback(
@@ -151,15 +159,28 @@ export const TableEditorMenu = () => {
     <>
       <div className="flex flex-col grow gap-5 pt-5 h-full">
         <div className="flex flex-col gap-y-1.5">
-          <SchemaSelector
-            className="mx-4"
-            selectedSchemaName={selectedSchema}
-            onSelectSchema={(name: string) => {
-              setSearchText('')
-              setSelectedSchema(name)
-            }}
-            onSelectCreateSchema={() => snap.onAddSchema()}
-          />
+          <ShortcutTooltip
+            shortcutId={SHORTCUT_IDS.TABLE_EDITOR_FOCUS_SCHEMA}
+            label="Switch schema"
+            side="bottom"
+            open={isSchemaDropdownOpen ? false : undefined}
+          >
+            <SchemaSelector
+              className="mx-4"
+              selectedSchemaName={selectedSchema}
+              onSelectSchema={(name: string) => {
+                setSearchText('')
+                setSelectedSchema(name)
+                setIsSchemaDropdownOpen(false)
+              }}
+              onSelectCreateSchema={() => {
+                snap.onAddSchema()
+                setIsSchemaDropdownOpen(false)
+              }}
+              open={isSchemaDropdownOpen}
+              onOpenChange={setIsSchemaDropdownOpen}
+            />
+          </ShortcutTooltip>
 
           <div className="grid gap-3 mx-4">
             {!isSchemaLocked ? (
