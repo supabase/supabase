@@ -302,7 +302,9 @@ export function ComposedChart({
   const maxAttribute = attributes.find((a) => a.isMaxValue)
   const maxAttributeData = {
     name: maxAttribute?.attribute,
-    color: CHART_COLORS.REFERENCE_LINE,
+    color:
+      (isDarkMode ? maxAttribute?.color?.dark : maxAttribute?.color?.light) ??
+      CHART_COLORS.REFERENCE_LINE,
   }
 
   const referenceLines = attributes.filter((attribute) => {
@@ -581,7 +583,10 @@ export function ComposedChart({
               key={maxAttribute.attribute}
               type="linear"
               dataKey={maxAttribute.attribute}
-              stroke={CHART_COLORS.REFERENCE_LINE}
+              stroke={
+                (isDarkMode ? maxAttribute.color?.dark : maxAttribute.color?.light) ??
+                CHART_COLORS.REFERENCE_LINE
+              }
               strokeWidth={2}
               strokeDasharray={maxAttribute.strokeDasharray ?? '3 3'}
               dot={false}
