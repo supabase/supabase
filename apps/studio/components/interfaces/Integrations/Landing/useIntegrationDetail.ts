@@ -4,6 +4,12 @@ import { useEffect, useMemo } from 'react'
 
 import { useAvailableIntegrations } from './useAvailableIntegrations'
 import { useInstalledIntegrations } from './useInstalledIntegrations'
+import {
+  areRequiredExtensionsInstalledFor,
+  getFilteredNavItems,
+  getInstallActionType,
+  type InstallActionType,
+} from './useIntegrationDetail.utils'
 import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -43,21 +49,23 @@ export const useIntegrationDetail = () => {
   // True when all pg extensions required by this integration are already enabled.
   // Used by wrappers to hide the "Install integration" button once the shared
   // extensions are in place — wrapper instances are managed via the Wrappers tab.
-  const areRequiredExtensionsInstalled = useMemo(() => {
-    if (!integration?.requiredExtensions?.length || !extensions) return false
-    return integration.requiredExtensions.every(
-      (name) => !!extensions.find((ext) => ext.name === name)?.installed_version
-    )
-  }, [integration, extensions])
+  const areRequiredExtensionsInstalled = useMemo(
+    () => areRequiredExtensionsInstalledFor(integration, extensions),
+    [integration, extensions]
+  )
 
-  const navItems = useMemo(() => {
-    if (!integration?.navigation) return []
-    if (isInstalled || integration.type !== 'wrapper') return integration.navigation
-    // For wrapper integrations, show the Wrappers tab only when the marketplace flag is on
-    // (the sheet handles implicit extension install) or when extensions are already installed.
-    if (isMarketplaceEnabled || areRequiredExtensionsInstalled) return integration.navigation
-    return integration.navigation.filter((nav) => nav.route !== 'wrappers')
-  }, [integration, isInstalled, isMarketplaceEnabled, areRequiredExtensionsInstalled])
+  // For wrapper integrations, show the Wrappers tab only when the marketplace flag is on
+  // (the sheet handles implicit extension install) or when extensions are already installed.
+  const navItems = useMemo(
+    () =>
+      getFilteredNavItems({
+        integration,
+        isInstalled,
+        isMarketplaceEnabled,
+        areRequiredExtensionsInstalled,
+      }),
+    [integration, isInstalled, isMarketplaceEnabled, areRequiredExtensionsInstalled]
+  )
 
   const activeRoute = pageId ?? 'overview'
 
@@ -82,6 +90,22 @@ export const useIntegrationDetail = () => {
   const Component = useMemo(
     () => integration?.navigate({ id, pageId, childId }),
     [integration, id, pageId, childId]
+  )
+
+  const wrappersTabHref = useMemo(
+    () => tabs.find((tab) => tab.href.endsWith('/wrappers'))?.href,
+    [tabs]
+  )
+
+  const installActionType: InstallActionType = useMemo(
+    () =>
+      getInstallActionType({
+        integration,
+        isMarketplaceEnabled,
+        areRequiredExtensionsInstalled,
+        isInstalled,
+      }),
+    [integration, isMarketplaceEnabled, areRequiredExtensionsInstalled, isInstalled]
   )
 
   const isReady = !!router?.isReady
@@ -123,6 +147,8 @@ export const useIntegrationDetail = () => {
     installation,
     isInstalled,
     areRequiredExtensionsInstalled,
+    installActionType,
+    wrappersTabHref,
     isAvailableLoading,
     isInstalledLoading,
     Component,
