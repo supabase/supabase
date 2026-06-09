@@ -46,16 +46,11 @@ export const useIntegrationDetail = () => {
 
   const isInstalled = !!integration && !!installation
 
-  // True when all pg extensions required by this integration are already enabled.
-  // Used by wrappers to hide the "Install integration" button once the shared
-  // extensions are in place — wrapper instances are managed via the Wrappers tab.
   const areRequiredExtensionsInstalled = useMemo(
     () => areRequiredExtensionsInstalledFor(integration, extensions),
     [integration, extensions]
   )
 
-  // For wrapper integrations, show the Wrappers tab only when the marketplace flag is on
-  // (the sheet handles implicit extension install) or when extensions are already installed.
   const navItems = useMemo(
     () =>
       getFilteredNavItems({

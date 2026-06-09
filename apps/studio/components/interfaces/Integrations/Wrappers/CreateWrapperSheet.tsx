@@ -84,12 +84,8 @@ export const CreateWrapperSheet = ({
   )
 
   const wrappersExtension = extensions?.find((ext) => ext.name === 'wrappers')
-  // The import foreign schema requires a minimum extension version of 0.5.0
   const hasRequiredVersionForeignSchema = hasForeignSchemaSupport(wrappersExtension)
-
-  // True when there are extensions that still need installing
   const needsExtensions = isMarketplaceEnabled && (requiredExtensionsToInstall?.length ?? 0) > 0
-  // True while extension state is unresolved — blocks submit and disables the button
   const isExtensionDataLoading = isMarketplaceEnabled && requiredExtensionsToInstall === null
 
   const { data: schemas } = useSchemasQuery({

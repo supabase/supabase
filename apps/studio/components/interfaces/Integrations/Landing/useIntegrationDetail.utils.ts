@@ -22,7 +22,7 @@ export function areRequiredExtensionsInstalledFor(
 
 /**
  * Returns the filtered navigation items for an integration based on install / feature-flag state.
- * Wrapper integrations only expose the Wrappers tab once extensions are installed (or marketplace flag is on).
+ * If the marketplace flag is off, only expose the Wrappers tab once extensions are installed
  */
 export function getFilteredNavItems({
   integration,
@@ -43,7 +43,6 @@ export function getFilteredNavItems({
 
 /**
  * Returns which install action type to render for an integration.
- * Keeps conditional logic out of the component and makes it unit-testable.
  */
 export function getInstallActionType({
   integration,
