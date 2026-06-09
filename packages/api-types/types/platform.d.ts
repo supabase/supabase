@@ -6197,7 +6197,8 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
-          idjag_issuer_url?: string
+          /** Format: uri */
+          idjag_issuer_url?: string | null
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -6213,7 +6214,8 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
-          idjag_issuer_url?: string
+          /** Format: uri */
+          idjag_issuer_url?: string | null
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -6229,7 +6231,8 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
-          idjag_issuer_url?: string
+          /** Format: uri */
+          idjag_issuer_url?: string | null
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -6245,7 +6248,8 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
-          idjag_issuer_url?: string
+          /** Format: uri */
+          idjag_issuer_url?: string | null
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -6743,6 +6747,7 @@ export interface components {
       expires_at: string
       icon?: string
       name: string
+      redirect_uri: string
       /** @enum {string} */
       registration_type: 'manual' | 'dynamic'
       scopes?: (
@@ -7081,7 +7086,8 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
-          idjag_issuer_url?: string
+          /** Format: uri */
+          idjag_issuer_url?: string | null
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -7097,7 +7103,8 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
-          idjag_issuer_url?: string
+          /** Format: uri */
+          idjag_issuer_url?: string | null
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -11772,7 +11779,8 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
-          idjag_issuer_url?: string
+          /** Format: uri */
+          idjag_issuer_url?: string | null
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -11788,7 +11796,8 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
-          idjag_issuer_url?: string
+          /** Format: uri */
+          idjag_issuer_url?: string | null
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -11804,7 +11813,8 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
-          idjag_issuer_url?: string
+          /** Format: uri */
+          idjag_issuer_url?: string | null
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -11820,7 +11830,8 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
-          idjag_issuer_url?: string
+          /** Format: uri */
+          idjag_issuer_url?: string | null
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -13571,6 +13582,13 @@ export interface operations {
         }
         content?: never
       }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Forbidden action */
       403: {
         headers: {
@@ -14388,6 +14406,13 @@ export interface operations {
         }
         content?: never
       }
+      /** @description This feature requires the Team, or Enterprise organization plan. */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Forbidden action */
       403: {
         headers: {
@@ -14436,6 +14461,13 @@ export interface operations {
       }
       /** @description Unauthorized */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description This feature requires the Team, or Enterprise organization plan. */
+      402: {
         headers: {
           [name: string]: unknown
         }
@@ -15094,6 +15126,13 @@ export interface operations {
       }
       /** @description Unauthorized */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description This feature requires the Team, or Enterprise organization plan. */
+      402: {
         headers: {
           [name: string]: unknown
         }
@@ -17178,6 +17217,13 @@ export interface operations {
           'application/json': components['schemas']['OrgDocumentUrlResponse']
         }
       }
+      /** @description Only organizations on Team, Enterprise or Platform Plan can access our ISO 27001 certificate. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Unauthorized */
       401: {
         headers: {
@@ -17221,6 +17267,13 @@ export interface operations {
           'application/json': components['schemas']['OrgDocumentUrlResponse']
         }
       }
+      /** @description Only organizations on Team, Enterprise or Platform Plan can access our SOC2 Type 2 report. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Unauthorized */
       401: {
         headers: {
@@ -17263,6 +17316,13 @@ export interface operations {
         content: {
           'application/json': components['schemas']['OrgDocumentUrlResponse']
         }
+      }
+      /** @description Only organizations on Team, Enterprise or Platform Plan can access our standard security questionnaire. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Unauthorized */
       401: {
@@ -17855,6 +17915,13 @@ export interface operations {
       }
       /** @description Unauthorized */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
         headers: {
           [name: string]: unknown
         }
@@ -18794,6 +18861,13 @@ export interface operations {
       }
       /** @description Unauthorized */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description This feature requires the Team, or Enterprise organization plan. */
+      402: {
         headers: {
           [name: string]: unknown
         }
@@ -21258,6 +21332,13 @@ export interface operations {
         }
         content?: never
       }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Forbidden action */
       403: {
         headers: {
@@ -23507,6 +23588,8 @@ export interface operations {
           | 'ram_usage_free'
           | 'ram_usage_cache_and_buffers'
           | 'ram_usage_swap'
+          | 'ram_commit_used'
+          | 'ram_commit_limit'
           | 'swap_usage'
           | 'client_connections_pgbouncer'
           | 'network_receive_bytes'
@@ -23563,6 +23646,8 @@ export interface operations {
           | 'ram_usage_free'
           | 'ram_usage_cache_and_buffers'
           | 'ram_usage_swap'
+          | 'ram_commit_used'
+          | 'ram_commit_limit'
           | 'swap_usage'
           | 'client_connections_pgbouncer'
           | 'network_receive_bytes'
@@ -24110,7 +24195,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description AWS PrivateLink is not available for the current billing plan. */
+      /** @description Invalid request format */
       400: {
         headers: {
           [name: string]: unknown
@@ -24119,6 +24204,13 @@ export interface operations {
       }
       /** @description Unauthorized */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description This feature requires the Team, or Enterprise organization plan. */
+      402: {
         headers: {
           [name: string]: unknown
         }
@@ -24228,6 +24320,13 @@ export interface operations {
       }
       /** @description Unauthorized */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
         headers: {
           [name: string]: unknown
         }
@@ -26295,6 +26394,13 @@ export interface operations {
         }
         content?: never
       }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Forbidden action */
       403: {
         headers: {
@@ -26682,6 +26788,13 @@ export interface operations {
       }
       /** @description Unauthorized */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
         headers: {
           [name: string]: unknown
         }
