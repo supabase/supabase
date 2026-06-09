@@ -11,6 +11,7 @@ export type AuthorizedAppsVariables = {
 export type AuthorizedApp = {
   id: string
   app_id: string
+  client_id: string | null
   icon: string | null
   name: string
   website: string

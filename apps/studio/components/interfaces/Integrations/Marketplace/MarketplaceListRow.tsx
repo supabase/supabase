@@ -67,7 +67,11 @@ export const MarketplaceListRow = ({ integration, isInstalled }: MarketplaceList
       </TableCell>
 
       <TableCell className="w-24">
-        {isInstalled ? <Badge variant="success">Installed</Badge> : null}
+        {isInstalled ? (
+          <Badge variant="success">
+            {integration.type === 'oauth' ? 'Connected' : 'Installed'}
+          </Badge>
+        ) : null}
       </TableCell>
     </TableRow>
   )

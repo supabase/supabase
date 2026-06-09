@@ -132,7 +132,7 @@ export const MarketplaceFeaturedHero = ({
               </div>
               {isActiveInstalled && (
                 <Badge variant="success" className="mt-2 @lg:mt-0 px-1.5 py-0 text-[10px]">
-                  Installed
+                  {active.type === 'oauth' ? 'Connected' : 'Installed'}
                 </Badge>
               )}
             </div>

@@ -117,6 +117,7 @@ export type IntegrationDefinition = {
   installIdentificationMethod?: InstallIdentificationMethod
   secretKeyPrefix?: string
   edgeFunctionSecretName?: string
+  oauthClientId?: string
   listingId?: string
 } & (
   | { type: 'wrapper'; meta: WrapperMeta }

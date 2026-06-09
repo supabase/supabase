@@ -23,7 +23,11 @@ export const MarketplaceCard = ({ integration, isInstalled }: MarketplaceCardPro
       <Card className="flex min-h-[168px] h-full flex-col gap-2.5 hover:border-stronger p-4">
         <div className="flex items-start justify-between">
           <IntegrationLogo integration={integration} size="h-9 w-9" />
-          {isInstalled && <Badge variant="success">Installed</Badge>}
+          {isInstalled && (
+            <Badge variant="success">
+              {integration.type === 'oauth' ? 'Connected' : 'Installed'}
+            </Badge>
+          )}
         </div>
         <div>
           <div className="mb-1 text-sm font-medium">{integration.name}</div>

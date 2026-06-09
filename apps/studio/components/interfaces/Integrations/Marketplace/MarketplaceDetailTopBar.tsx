@@ -14,11 +14,13 @@ interface MarketplaceDetailTopBarProps {
   title: string
   actions?: ReactNode
   isInstalled?: boolean
+  installedLabel?: string
 }
 
 export const MarketplaceDetailTopBar = ({
   title,
   isInstalled,
+  installedLabel = 'Installed',
   actions,
 }: MarketplaceDetailTopBarProps) => {
   const { ref } = useParams()
@@ -35,7 +37,7 @@ export const MarketplaceDetailTopBar = ({
           <BreadcrumbSeparator />
           <BreadcrumbItem className="min-w-0">
             <BreadcrumbPage className="block min-w-0 truncate">{title}</BreadcrumbPage>
-            {isInstalled && <Badge variant="success">Installed</Badge>}
+            {isInstalled && <Badge variant="success">{installedLabel}</Badge>}
           </BreadcrumbItem>
         </BreadcrumbList>
       </div>

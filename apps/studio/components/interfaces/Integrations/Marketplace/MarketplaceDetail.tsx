@@ -89,6 +89,7 @@ export const MarketplaceDetail = () => {
       <MarketplaceDetailTopBar
         title={integration.name}
         isInstalled={isInstalled}
+        installedLabel={integration.type === 'oauth' ? 'Connected' : 'Installed'}
         actions={
           <>
             {integration.docsUrl && (

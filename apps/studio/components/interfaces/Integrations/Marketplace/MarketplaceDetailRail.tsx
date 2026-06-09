@@ -79,7 +79,12 @@ export const MarketplaceDetailRail = ({ integration, isInstalled }: MarketplaceD
       <RailGroup title="About">
         <RailRow label="Type" value={typeLabel} />
         <RailRow label="Built by" value={integration.author?.name || 'Supabase'} />
-        {isInstalled && <RailRow label="Status" value="Installed" />}
+        {isInstalled && (
+          <RailRow
+            label="Status"
+            value={integration.type === 'oauth' ? 'Connected' : 'Installed'}
+          />
+        )}
       </RailGroup>
 
       {(docsUrl || siteUrl) && (
