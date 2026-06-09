@@ -35,26 +35,25 @@ Pricing depends on the [disk type](/docs/guides/platform/compute-and-disk#disk-t
 
 ### General purpose disks (gp3)
 
-<Price>$0.00003288</Price> per IOPS-Hr (<Price>$0.024</Price> per IOPS per month). gp3 disks
-come with a default IOPS of 3,000. You are only charged for provisioned IOPS exceeding these 3,000
-IOPS.
+<Price>$0.00003288</Price> per IOPS-Hr (<Price>$0.024</Price> per IOPS per month). gp3 disks come
+with a default IOPS of 3,000. You are only charged for provisioned IOPS exceeding these 3,000 IOPS.
 
-| Plan       | Included Disk IOPS | Over-Usage per IOPS per month | Over-Usage per IOPS-Hr       |
-| ---------- | ------------------ | ----------------------------- | ---------------------------- |
-| Pro        | 3,000              | <Price>$0.024</Price>       | <Price>$0.00003288</Price> |
-| Team       | 3,000              | <Price>$0.024</Price>       | <Price>$0.00003288</Price> |
-| Enterprise | Custom             | Custom                        | Custom                       |
+| Plan       | Included Disk IOPS | Over-Usage per IOPS per month | Over-Usage per IOPS-Hr     |
+| ---------- | ------------------ | ----------------------------- | -------------------------- |
+| Pro        | 3,000              | <Price>$0.024</Price>         | <Price>$0.00003288</Price> |
+| Team       | 3,000              | <Price>$0.024</Price>         | <Price>$0.00003288</Price> |
+| Enterprise | Custom             | Custom                        | Custom                     |
 
 ### High performance disks (io2)
 
 <Price>$0.000163</Price> per IOPS-Hr (<Price>$0.119</Price> per IOPS per month). Unlike general
 purpose disks, high performance disks are billed from the first provisioned IOPS.
 
-| Plan       | Included Disk IOPS | Usage per IOPS per month | Usage per IOPS-Hr          |
-| ---------- | ------------------ | ------------------------ | -------------------------- |
-| Pro        | 0                  | <Price>$0.119</Price>  | <Price>$0.000163</Price> |
-| Team       | 0                  | <Price>$0.119</Price>  | <Price>$0.000163</Price> |
-| Enterprise | Custom             | Custom                   | Custom                     |
+| Plan       | Included Disk IOPS | Usage per IOPS per month | Usage per IOPS-Hr        |
+| ---------- | ------------------ | ------------------------ | ------------------------ |
+| Pro        | 0                  | <Price>$0.119</Price>    | <Price>$0.000163</Price> |
+| Team       | 0                  | <Price>$0.119</Price>    | <Price>$0.000163</Price> |
+| Enterprise | Custom             | Custom                   | Custom                   |
 
 ## Billing examples
 
@@ -62,16 +61,16 @@ purpose disks, high performance disks are billed from the first provisioned IOPS
 
 Project 1 doesn't exceed the included IOPS, so no charges for IOPS apply. Project 2 exceeds the included IOPS by 600, incurring charges for this additional usage.
 
-| Line Item                     | Units      | Costs                        |
-| ----------------------------- | ---------- | ---------------------------- |
+| Line Item                     | Units      | Costs                      |
+| ----------------------------- | ---------- | -------------------------- |
 | Pro Plan                      | 1          | <Price>$25</Price>         |
-|                               |            |                              |
+|                               |            |                            |
 | Compute Hours Small Project 1 | 730 hours  | <Price>$15</Price>         |
 | Disk IOPS Project 1           | 3,000 IOPS | <Price>$0</Price>          |
-|                               |            |                              |
+|                               |            |                            |
 | Compute Hours Large Project 2 | 730 hours  | <Price>$111</Price>        |
 | Disk IOPS Project 2           | 3,600 IOPS | <Price>$14.40</Price>      |
-|                               |            |                              |
+|                               |            |                            |
 | **Subtotal**                  |            | **<Price>$165.40</Price>** |
 | Compute Credits               |            | -<Price>$10</Price>        |
 | **Total**                     |            | **<Price>$155.40</Price>** |
@@ -80,8 +79,8 @@ Project 1 doesn't exceed the included IOPS, so no charges for IOPS apply. Projec
 
 This disk type is billed from the first IOPS provisioned, meaning for 8000 IOPS.
 
-| Line Item                     | Units      | Costs                       |
-| ----------------------------- | ---------- | --------------------------- |
+| Line Item                     | Units      | Costs                     |
+| ----------------------------- | ---------- | ------------------------- |
 | Pro Plan                      | 1          | <Price>$25</Price>        |
 | Compute Hours Large Project 1 | 730 hours  | <Price>$111</Price>       |
 | Disk IOPS Project 1           | 8,000 IOPS | <Price>$952</Price>       |
