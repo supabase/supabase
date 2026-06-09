@@ -300,7 +300,7 @@ function PartnerDetails({
           {partner.type === 'technology' && (
             <div className="flex items-center justify-between py-2">
               <span className="text-foreground-lighter">Developer</span>
-              <span className="text-foreground">{partner.partnerName}</span>
+              <span className="text-foreground">{partner.builtBy}</span>
             </div>
           )}
 

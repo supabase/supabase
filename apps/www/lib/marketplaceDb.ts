@@ -78,8 +78,8 @@ function aggregateCategories(listings: Listing[]): Category[] {
  */
 function selectPrimaryListing(listings: Listing[]): Listing | undefined {
   return (
-    listings.find((l) => l.publish_marketplace) ??
-    listings.find((l) => l.publish_dashboard) ??
+    listings.find((l) => !!l.published_in_catalog_at) ??
+    listings.find((l) => !!l.published_in_marketplace_at) ??
     listings[0]
   )
 }
@@ -98,7 +98,7 @@ function buildPartner(row: MarketplacePartnerRow, listings: Listing[]): Partner 
   return {
     slug: row.slug,
     title: row.name ?? primary?.partner_name ?? '',
-    partnerName: row.name ?? primary?.partner_name ?? '',
+    builtBy: row.name ?? primary?.built_by ?? '',
     description: row.description ?? primary?.description ?? '',
     content: primary?.content ?? '',
     websiteUrl: row.website ?? primary?.website_url ?? '',
@@ -111,9 +111,11 @@ function buildPartner(row: MarketplacePartnerRow, listings: Listing[]): Partner 
     type: row.type ?? 'technology',
     categories: aggregateCategories(listings),
     featured: listings.some((l) => l.featured),
-    publishedInCatalog: listings.some((l) => !!l.publish_marketplace),
+    publishedInCatalog: listings.some((l) => !!l.published_in_catalog_at),
     // FDW listings count as "Available in Marketplace" even without publish_dashboard.
-    publishedInMarketplace: listings.some((l) => !!l.publish_dashboard || isMarketplaceListing(l)),
+    publishedInMarketplace: listings.some(
+      (l) => !!l.published_in_marketplace_at || isMarketplaceListing(l)
+    ),
   }
 }
 
@@ -190,7 +192,7 @@ async function getPartnersFromMarketplace(): Promise<Partner[]> {
  * Priority: one-click install → Foreign Data Wrapper → plain integration → guide/overview.
  */
 function getLabelForListing(listing: Listing): string {
-  if (listing.publish_dashboard) return 'Marketplace Integration'
+  if (!!listing.published_in_marketplace_at) return 'Marketplace Integration'
   if (isFdwListing(listing)) return 'Foreign Data Wrapper'
   if (listing.marketplace_url) return 'Integration'
   return 'Guide'
@@ -235,10 +237,11 @@ async function getPartnerFromMarketplace(slug: string): Promise<Partner | null> 
           slug: listing.slug,
           label: getLabelForListing(listing),
           content: listing.content,
-          publishedInMarketplace: listing.publish_dashboard || isMarketplaceListing(listing),
+          publishedInMarketplace:
+            !!listing.published_in_marketplace_at || isMarketplaceListing(listing),
           installUrl: listing.marketplace_url ?? null,
           dashboardUrl:
-            listing.publish_dashboard || isMarketplaceListing(listing)
+            !!listing.published_in_marketplace_at || isMarketplaceListing(listing)
               ? `https://supabase.com/dashboard/project/_/integrations/${isFdwListing(listing) ? listing.slug.replaceAll('-', '_') : listing.slug}/overview`
               : null,
           docsUrl: listing.documentation_url || null,
@@ -263,10 +266,10 @@ async function getPartnerFromMarketplace(slug: string): Promise<Partner | null> 
     slug: listing.slug,
     label: getLabelForListing(listing),
     content: listing.content,
-    publishedInMarketplace: listing.publish_dashboard || isMarketplaceListing(listing),
+    publishedInMarketplace: !!listing.published_in_marketplace_at || isMarketplaceListing(listing),
     installUrl: listing.marketplace_url ?? null,
     dashboardUrl:
-      listing.publish_dashboard || isMarketplaceListing(listing)
+      !!listing.published_in_marketplace_at || isMarketplaceListing(listing)
         ? `https://supabase.com/dashboard/project/_/integrations/${isFdwListing(listing) ? listing.slug.replaceAll('-', '_') : listing.slug}/overview`
         : null,
     docsUrl: listing.documentation_url || null,
@@ -323,7 +326,10 @@ async function getPartnerSlugsFromMarketplace(): Promise<string[]> {
  */
 async function searchPartnersFromMarketplace(search: string): Promise<Partner[] | null> {
   const searchTerm = search.trim()
-  let query = marketplaceClient.from('listings').select('*')
+  let query = marketplaceClient
+    .from('listings')
+    .select('*')
+    .not('published_in_catalog_at', 'is', null)
 
   if (searchTerm) {
     const searchPattern = `%${searchTerm}%`

@@ -1,11 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { noop } from 'lodash'
 import { Check, Copy, Edit, Eye, Filter, MoreVertical, Plus, Search, Trash, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Button,
   Card,
@@ -47,7 +48,7 @@ import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { useForeignTablesQuery } from '@/data/foreign-tables/foreign-tables-query'
 import { useMaterializedViewsQuery } from '@/data/materialized-views/materialized-views-query'
 import { usePrefetchEditorTablePage } from '@/data/prefetchers/project.$ref.editor.$id'
-import { useTablesQuery } from '@/data/tables/tables-query'
+import { useInfiniteTablesQuery } from '@/data/tables/tables-query'
 import { useViewsQuery } from '@/data/views/views-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
@@ -80,6 +81,7 @@ export const TableList = ({
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
   const [filterString, setFilterString] = useQueryState('search', parseAsString.withDefault(''))
+  const debouncedFilterString = useDebounce(filterString, 300)
   const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
   const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -90,27 +92,40 @@ export const TableList = ({
   )
 
   const {
-    data: tables,
+    data: tablesData,
     error: tablesError,
     isError: isErrorTables,
     isPending: isLoadingTables,
     isSuccess: isSuccessTables,
-  } = useTablesQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      schema: selectedSchema,
-      sortByProperty: 'name',
-      includeColumns: true,
-    },
-    {
-      select(tables) {
-        return filterString.length === 0
-          ? tables
-          : tables.filter((table) => table.name.toLowerCase().includes(filterString.toLowerCase()))
-      },
+    hasNextPage: hasNextTablesPage,
+    isFetchingNextPage: isFetchingNextTablesPage,
+    fetchNextPage: fetchNextTablesPage,
+  } = useInfiniteTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: selectedSchema,
+    includeColumns: true,
+    pageSize: 50,
+    nameFilter: debouncedFilterString,
+  })
+
+  const tables = tablesData?.pages.flat() ?? []
+
+  const [sentinelRef, sentinelEntry] = useIntersectionObserver({
+    threshold: 0,
+    rootMargin: '200px 0px 200px 0px',
+  })
+
+  useEffect(() => {
+    if (sentinelEntry?.isIntersecting && hasNextTablesPage && !isFetchingNextTablesPage) {
+      fetchNextTablesPage()
     }
-  )
+  }, [
+    sentinelEntry?.isIntersecting,
+    hasNextTablesPage,
+    isFetchingNextTablesPage,
+    fetchNextTablesPage,
+  ])
 
   const {
     data: views,
@@ -190,6 +205,7 @@ export const TableList = ({
   const entities = formatAllEntities({ tables, views, materializedViews, foreignTables }).filter(
     (x) => visibleTypes.includes(x.type)
   )
+  const footerCount = hasNextTablesPage ? tables.length : entities.length
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
@@ -589,9 +605,13 @@ export const TableList = ({
                 </>
               </TableBody>
               <TableFooter className="font-normal">
-                <TableRow className="border-b-0 [&>td]:hover:bg-inherit">
-                  <TableCell colSpan={7} className="text-foreground-muted">
-                    {entities.length} {entities.length === 1 ? 'table' : 'tables'}
+                <TableRow ref={sentinelRef} className="border-b-0">
+                  <TableCell colSpan={7} className="text-foreground-muted hover:bg-inherit">
+                    {isFetchingNextTablesPage
+                      ? 'Loading more tables…'
+                      : `${footerCount} ${footerCount === 1 ? 'table' : 'tables'}${
+                          hasNextTablesPage ? ' loaded' : ''
+                        }`}
                   </TableCell>
                 </TableRow>
               </TableFooter>

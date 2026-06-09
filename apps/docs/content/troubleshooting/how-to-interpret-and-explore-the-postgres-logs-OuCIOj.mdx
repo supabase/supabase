@@ -136,7 +136,7 @@ When exploring the logs for atypical behavior, it's often strategic to filter ou
 ...query
 where
   -- Excluding routine events related to cron, PgBouncer, checkpoints, and successful connections
-  not regexp_contains(event_message, '^cron|PgBouncer|checkpoint|connection received|authenticated|authorized';
+  not regexp_contains(event_message, '^cron|PgBouncer|checkpoint|connection received|authenticated|authorized');
 ```
 
 ### By timeframe

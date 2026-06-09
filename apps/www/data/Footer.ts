@@ -50,6 +50,10 @@ const footerData = [
   {
     title: 'Solutions',
     links: [
+      {
+        text: 'Hosted Postgres',
+        url: '/solutions/hosted-postgres',
+      },
       ...skillBasedSolutions.solutions.map((solution) => ({
         text: solution.text,
         url: solution.url,

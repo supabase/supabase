@@ -1,6 +1,6 @@
 import { Chat, type UIMessage as MessageType } from '@ai-sdk/react'
 import { DefaultChatTransport, lastAssistantMessageIsCompleteWithApprovalResponses } from 'ai'
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { DBSchema, IDBPDatabase, openDB } from 'idb'
 import { debounce } from 'lodash'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
@@ -161,7 +161,7 @@ async function loadFromIndexedDB(projectRef: string): Promise<StoredAiAssistantS
 async function tryMigrateFromLocalStorage(
   projectRef: string
 ): Promise<StoredAiAssistantState | null> {
-  const stored = localStorage.getItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
+  const stored = safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
   if (!stored) {
     return null
   }
@@ -185,18 +185,18 @@ async function tryMigrateFromLocalStorage(
     } else {
       console.warn('Data in localStorage is not in the expected format, ignoring.')
       // Clean up invalid data
-      localStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
+      safeLocalStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
     }
   } catch (error) {
     console.error('Failed to parse state from localStorage:', error)
     // Clear potentially corrupted data
-    localStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
+    safeLocalStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
   }
 
   if (migratedState) {
     try {
       await saveAiState(migratedState)
-      localStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
+      safeLocalStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
       return migratedState
     } catch (saveError) {
       console.error('Failed to save migrated state to IndexedDB:', saveError)

@@ -38,6 +38,7 @@ const SonnerToaster = ({ toastOptions, ...props }: ToasterProps) => {
             'items-start',
             'font-normal',
             'text-sm',
+            'data-[expanded=false]:overflow-hidden',
             'group-[.toaster]:bg-overlay group-[.toaster]:text-foreground group-[.toaster]:border group-[.toaster]:border-overlay group-[.toaster]:shadow-lg'
           ),
           icon: 'mt-0.5',
