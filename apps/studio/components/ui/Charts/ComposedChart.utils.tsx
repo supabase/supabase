@@ -62,7 +62,6 @@ export type MultiAttribute = {
   isMaxValue?: boolean
   type?: 'line' | 'area-bar'
   omitFromTotal?: boolean
-  hideFromLegend?: boolean
   tooltip?: string
   customValue?: number
   [key: string]: any
@@ -365,7 +364,6 @@ export const CustomLabel = ({
     )
 
     if (!showMaxValue && isMax) return null
-    if (attribute?.hideFromLegend) return null
 
     return (
       <button
