@@ -98,6 +98,58 @@ function extractTitleAttr(attrs: string): string | null {
 }
 
 /**
+ * Replaces `<InfoTooltip ...>children</InfoTooltip>` with just its children,
+ * discarding the `tooltipContent` prop. Walks the opening tag with brace
+ * awareness so JSX expression props like `tooltipContent={<>…</>}` don't
+ * terminate parsing on a stray `>` (e.g. from `<br />` inside the prop).
+ */
+function convertInfoTooltip(content: string): string {
+  const openTagName = '<InfoTooltip'
+  const closeTag = '</InfoTooltip>'
+  let result = ''
+  let cursor = 0
+  while (cursor < content.length) {
+    const start = content.indexOf(openTagName, cursor)
+    if (start === -1) {
+      result += content.slice(cursor)
+      break
+    }
+    const after = content[start + openTagName.length]
+    if (after && !/[\s>]/.test(after)) {
+      // Different component starting with "InfoTooltip" — skip this match
+      result += content.slice(cursor, start + openTagName.length)
+      cursor = start + openTagName.length
+      continue
+    }
+    result += content.slice(cursor, start)
+
+    let i = start + openTagName.length
+    let depth = 0
+    while (i < content.length) {
+      const ch = content[i]
+      if (ch === '{') depth++
+      else if (ch === '}') depth--
+      else if (ch === '>' && depth === 0) break
+      i++
+    }
+    if (i >= content.length) {
+      result += content.slice(start)
+      break
+    }
+    const openEnd = i + 1
+    const closeIdx = content.indexOf(closeTag, openEnd)
+    if (closeIdx === -1) {
+      result += content.slice(start, openEnd)
+      cursor = openEnd
+      continue
+    }
+    result += content.slice(openEnd, closeIdx)
+    cursor = closeIdx + closeTag.length
+  }
+  return result
+}
+
+/**
  * Converts `<Link href="..."><GlassPanel|IconPanel title="...">desc</...></Link>`
  * blocks into markdown bullet lines: `- [title](href). description`. Without
  * this, the rendered output keeps prop syntax (className, passHref, etc.) since
@@ -213,7 +265,8 @@ async function generate() {
 
         const withPartials = await inlinePartials(rawContent)
         const withSteps = convertStepHike(withPartials)
-        const withLinks = convertLinkPanels(withSteps)
+        const withTooltips = convertInfoTooltip(withSteps)
+        const withLinks = convertLinkPanels(withTooltips)
         const stripped = stripJsxTags(withLinks)
         const processed = prefixInternalLinks(stripped, linkBaseUrl)
 
