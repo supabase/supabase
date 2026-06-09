@@ -681,13 +681,6 @@
         "type": "function"
       },
       {
-        "id": "auth-dispose",
-        "title": "Dispose auth client",
-        "slug": "auth-dispose",
-        "product": "auth",
-        "type": "function"
-      },
-      {
         "id": "auth-js-gotrueclient-initialize",
         "title": "Initialize client session",
         "slug": "auth-initialize",
@@ -1150,13 +1143,6 @@
         "id": "broadcast-message",
         "title": "Broadcast a message",
         "slug": "broadcastmessage",
-        "product": "realtime",
-        "type": "function"
-      },
-      {
-        "id": "realtime-httpsend",
-        "title": "Broadcast via REST",
-        "slug": "realtime-httpsend",
         "product": "realtime",
         "type": "function"
       },
