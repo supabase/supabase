@@ -15,7 +15,7 @@ import {
 
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import { orderCommandSectionsByPriority } from './ordering'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
@@ -31,15 +31,12 @@ export function useApiKeysCommands() {
 
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
 
-  const { data: apiKeys } = useAPIKeysQuery(
+  const { data: apiKeysData } = useAPIKeys(
     { projectRef: project?.ref, reveal: true },
     { enabled: canReadAPIKeys }
   )
   const commands = useMemo(() => {
-    const { anonKey, serviceKey, publishableKey, allSecretKeys } = canReadAPIKeys
-      ? getKeys(apiKeys)
-      : {}
-
+    const { anonKey, serviceKey, publishableKey, allSecretKeys } = apiKeysData ?? {}
     return [
       project &&
         publishableKey && {
@@ -127,7 +124,7 @@ export function useApiKeysCommands() {
         icon: () => <Key />,
       },
     ].filter(Boolean) as ICommand[]
-  }, [apiKeys, canReadAPIKeys, project, ref, resetCommandMenu, setIsOpen])
+  }, [apiKeysData, project, ref, resetCommandMenu, setIsOpen])
 
   useRegisterPage(
     API_KEYS_PAGE_NAME,

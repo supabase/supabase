@@ -78,7 +78,18 @@ export const useAPIKeysQuery = <TData = APIKeysData>(
   })
 }
 
+const EmptyKey = {
+  anonKey: undefined,
+  serviceKey: undefined,
+  publishableKey: undefined,
+  secretKey: undefined,
+  allSecretKeys: [],
+}
+
 export const getKeys = (apiKeys: APIKey[] = []) => {
+  if (!Array.isArray(apiKeys)) {
+    return EmptyKey
+  }
   const anonKey = apiKeys.find((x) => x.name === 'anon')
   const serviceKey = apiKeys.find((x) => x.name === 'service_role')
 
@@ -89,4 +100,17 @@ export const getKeys = (apiKeys: APIKey[] = []) => {
   const allSecretKeys = apiKeys.filter((x) => x.type === 'secret')
 
   return { anonKey, serviceKey, publishableKey, secretKey, allSecretKeys }
+}
+
+const PlaceholderData: APIKeysData = []
+
+export const useAPIKeys = (
+  variables: APIKeysVariables,
+  options: UseCustomQueryOptions<APIKeysData, ResponseError, APIKeysData> = {}
+) => {
+  return useAPIKeysQuery(variables, {
+    ...options,
+    placeholderData: PlaceholderData,
+    select: getKeys,
+  })
 }
