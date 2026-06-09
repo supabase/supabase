@@ -318,7 +318,7 @@ function PartnerDetails({
             <div key={category.slug} className="flex items-center justify-between py-2">
               <span className="text-lighter">Category</span>
               <Link
-                href={`/partners/catalog#${category.slug}`}
+                href={`/partners/catalog?cat=${encodeURIComponent(category.slug)}`}
                 className="text-brand-link hover:underline transition-colors"
               >
                 {category.name}
