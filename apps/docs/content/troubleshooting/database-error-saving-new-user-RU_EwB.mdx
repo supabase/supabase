@@ -50,11 +50,11 @@ If the Auth logs point to a database-level issue, open the [Postgres logs explor
 error finding user: sql: Scan error on column index 8, name "confirmation_token": converting NULL to string is unsupported
 ```
 
-**Cause:** 
+**Cause:**
 
 The `auth` schema is managed by Supabase and expects specific column formats. This error typically happens when users are inserted directly via SQL or using an AI tool that uses a direct SQL `INSERT`, rather than through the [Auth API](/docs/reference/javascript/auth-api). A direct insert can leave required columns as `NULL` when the Auth service expects an empty string.
 
-**Fix:** 
+**Fix:**
 
 Run the following in the [SQL editor](/dashboard/project/_/sql), replacing `confirmation_token` with whichever column appears in your error message:
 
@@ -83,7 +83,7 @@ event_message: "relation "profiles" does not exist"
 context: "PL/pgSQL function public.handle_new_user() line 3 at SQL statement"
 ```
 
-**Cause:** 
+**Cause:**
 
 A trigger on `auth.users` is calling a function (in this case `handle_new_user`) that tries to insert into a table that does not exist. This is common when a `profiles` table is referenced in a trigger function but was never created, or was accidentally dropped.
 
