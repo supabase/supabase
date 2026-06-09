@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   buildDestinationConfig,
   buildDestinationConfigForValidation,
+  getClickHouseValidationIssues,
   getDucklakeValidationIssues,
   getSnowflakeValidationIssues,
 } from './DestinationForm.utils'
@@ -268,5 +269,183 @@ describe('DestinationForm.utils Snowflake', () => {
       { path: 'snowflakeDatabase', message: 'Database is required' },
       { path: 'snowflakeSchema', message: 'Schema is required' },
     ])
+  })
+})
+
+const baseClickHouseFormData = {
+  name: 'ClickHouse Destination',
+  publicationName: 'pub',
+  maxFillMs: undefined,
+  maxTableSyncWorkers: undefined,
+  maxCopyConnectionsPerTable: undefined,
+  invalidatedSlotBehavior: undefined,
+  projectId: undefined,
+  datasetId: undefined,
+  serviceAccountKey: undefined,
+  connectionPoolSize: undefined,
+  maxStalenessMins: undefined,
+  warehouseName: undefined,
+  namespace: undefined,
+  newNamespaceName: undefined,
+  catalogToken: undefined,
+  s3AccessKeyId: undefined,
+  s3SecretAccessKey: undefined,
+  s3Region: undefined,
+  ducklakeCatalogUrl: undefined,
+  ducklakeDataPath: undefined,
+  ducklakePoolSize: undefined,
+  ducklakeS3AccessKeyId: undefined,
+  ducklakeS3SecretAccessKey: undefined,
+  ducklakeS3Region: undefined,
+  ducklakeS3Endpoint: undefined,
+  ducklakeS3UrlStyle: undefined,
+  ducklakeS3UseSsl: undefined,
+  ducklakeMetadataSchema: undefined,
+  clickhouseUrl: ' https://cluster.clickhouse.cloud:8443 ',
+  clickhouseUser: ' default ',
+  clickhousePassword: ' secret ',
+  clickhouseDatabase: ' analytics ',
+  clickhouseEngine: 'replacing_merge_tree' as const,
+}
+
+describe('DestinationForm.utils ClickHouse', () => {
+  it('builds ClickHouse validation config with required fields trimmed and blank optionals removed', () => {
+    const config = buildDestinationConfigForValidation({
+      projectRef: 'project-ref',
+      selectedType: 'ClickHouse',
+      data: {
+        ...baseClickHouseFormData,
+        clickhousePassword: '   ',
+      },
+    })
+
+    expect(config).toEqual({
+      clickHouse: {
+        url: 'https://cluster.clickhouse.cloud:8443',
+        user: 'default',
+        password: undefined,
+        database: 'analytics',
+        engine: 'replacing_merge_tree',
+      },
+    })
+  })
+
+  it('builds ClickHouse submit config with normalized values', async () => {
+    const createS3AccessKey = vi.fn()
+    const resolveNamespace = vi.fn()
+
+    const config = await buildDestinationConfig({
+      projectRef: 'project-ref',
+      selectedType: 'ClickHouse',
+      data: baseClickHouseFormData,
+      createS3AccessKey,
+      resolveNamespace,
+    })
+
+    expect(config).toEqual({
+      clickHouse: {
+        url: 'https://cluster.clickhouse.cloud:8443',
+        user: 'default',
+        password: 'secret',
+        database: 'analytics',
+        engine: 'replacing_merge_tree',
+      },
+    })
+    expect(createS3AccessKey).not.toHaveBeenCalled()
+    expect(resolveNamespace).not.toHaveBeenCalled()
+  })
+
+  it('returns required-field errors for missing ClickHouse settings', () => {
+    const issues = getClickHouseValidationIssues({
+      clickhouseUrl: '',
+      clickhouseUser: '',
+      clickhouseDatabase: '',
+    })
+
+    expect(issues).toEqual([
+      { path: 'clickhouseUrl', message: 'URL is required' },
+      { path: 'clickhouseUser', message: 'User is required' },
+      { path: 'clickhouseDatabase', message: 'Database is required' },
+    ])
+  })
+
+  it('rejects non-HTTPS and internal-address ClickHouse URLs', () => {
+    expect(
+      getClickHouseValidationIssues({
+        clickhouseUrl: 'http://example.com',
+        clickhouseUser: 'default',
+        clickhouseDatabase: 'analytics',
+      })
+    ).toEqual([{ path: 'clickhouseUrl', message: 'ClickHouse URL must use https://' }])
+
+    expect(
+      getClickHouseValidationIssues({
+        clickhouseUrl: 'https://127.0.0.1:8443',
+        clickhouseUser: 'default',
+        clickhouseDatabase: 'analytics',
+      })
+    ).toEqual([
+      { path: 'clickhouseUrl', message: 'ClickHouse URL must not target an internal address' },
+    ])
+
+    expect(
+      getClickHouseValidationIssues({
+        clickhouseUrl: 'https://192.168.1.1:8443',
+        clickhouseUser: 'default',
+        clickhouseDatabase: 'analytics',
+      })
+    ).toEqual([
+      { path: 'clickhouseUrl', message: 'ClickHouse URL must not target an internal address' },
+    ])
+
+    expect(
+      getClickHouseValidationIssues({
+        clickhouseUrl: 'https://[::1]:8443',
+        clickhouseUser: 'default',
+        clickhouseDatabase: 'analytics',
+      })
+    ).toEqual([
+      { path: 'clickhouseUrl', message: 'ClickHouse URL must not target an internal address' },
+    ])
+
+    expect(
+      getClickHouseValidationIssues({
+        clickhouseUrl: 'https://100.64.0.1:8443',
+        clickhouseUser: 'default',
+        clickhouseDatabase: 'analytics',
+      })
+    ).toEqual([
+      { path: 'clickhouseUrl', message: 'ClickHouse URL must not target an internal address' },
+    ])
+
+    expect(
+      getClickHouseValidationIssues({
+        clickhouseUrl: 'https://198.18.0.1:8443',
+        clickhouseUser: 'default',
+        clickhouseDatabase: 'analytics',
+      })
+    ).toEqual([
+      { path: 'clickhouseUrl', message: 'ClickHouse URL must not target an internal address' },
+    ])
+
+    expect(
+      getClickHouseValidationIssues({
+        clickhouseUrl: 'https://[64:ff9b::a9fe:a9fe]:8443',
+        clickhouseUser: 'default',
+        clickhouseDatabase: 'analytics',
+      })
+    ).toEqual([
+      { path: 'clickhouseUrl', message: 'ClickHouse URL must not target an internal address' },
+    ])
+  })
+
+  it('accepts a valid public ClickHouse URL', () => {
+    expect(
+      getClickHouseValidationIssues({
+        clickhouseUrl: 'https://cluster.clickhouse.cloud:8443',
+        clickhouseUser: 'default',
+        clickhouseDatabase: 'analytics',
+      })
+    ).toEqual([])
   })
 })
