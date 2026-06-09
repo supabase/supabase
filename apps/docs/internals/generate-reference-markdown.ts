@@ -3,6 +3,8 @@ import path from 'node:path'
 import matter from 'gray-matter'
 import yaml from 'js-yaml'
 
+import { getInternalLinkBaseUrl, prefixInternalLinks } from './internal-links'
+
 const GENERATED = path.join(process.cwd(), 'features/docs/generated')
 const OUT_DIR = path.join(process.cwd(), 'public/markdown/reference')
 const MDX_ROOT = path.join(process.cwd(), 'docs/ref')
@@ -386,6 +388,7 @@ async function generate() {
   const sharedTypeSpec = await readJson<TypeSpec>(
     path.join(process.cwd(), 'content/reference/javascript/v2/typeSpec.json')
   )
+  const linkBaseUrl = getInternalLinkBaseUrl()
 
   await Promise.all(
     REFERENCES.map(async (ref) => {
@@ -404,7 +407,7 @@ async function generate() {
           output = await renderCli(ref)
           break
       }
-      await fs.writeFile(path.join(OUT_DIR, ref.outFile), output)
+      await fs.writeFile(path.join(OUT_DIR, ref.outFile), prefixInternalLinks(output, linkBaseUrl))
     })
   )
 
