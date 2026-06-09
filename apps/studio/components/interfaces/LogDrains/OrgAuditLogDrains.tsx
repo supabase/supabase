@@ -210,7 +210,7 @@ export function OrgAuditLogDrains() {
         isLoading={isLoading}
         existingDrainNames={(logDrains ?? []).map((drain) => drain.name)}
         onSaveClick={(type) => {
-          track('log_drain_save_button_clicked', { destination: type })
+          track('audit_log_drain_save_button_clicked', { destination: type })
         }}
         onSubmit={({ name, description, type, ...values }) => {
           const logDrainValues = {
@@ -245,7 +245,7 @@ export function OrgAuditLogDrains() {
         onNewDrainClick={handleNewClick}
         onDeleteDrain={(drain) => {
           deleteLogDrain({ token: drain.token, slug })
-          track('log_drain_removed', { destination: drain.type })
+          track('audit_log_drain_removed', { destination: drain.type })
         }}
         onTestDrain={(drain) => testLogDrain({ token: drain.token, slug })}
       />
