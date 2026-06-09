@@ -36,7 +36,10 @@ export function useApiKeysCommands() {
     { enabled: canReadAPIKeys }
   )
   const commands = useMemo(() => {
-    const { anonKey, serviceKey, publishableKey, allSecretKeys } = apiKeysData ?? {}
+    const { anonKey, serviceKey, publishableKey, allSecretKeys } = canReadAPIKeys
+      ? (apiKeysData ?? {})
+      : {}
+
     return [
       project &&
         publishableKey && {
@@ -124,7 +127,7 @@ export function useApiKeysCommands() {
         icon: () => <Key />,
       },
     ].filter(Boolean) as ICommand[]
-  }, [apiKeysData, project, ref, resetCommandMenu, setIsOpen])
+  }, [canReadAPIKeys, apiKeysData, project, ref, resetCommandMenu, setIsOpen])
 
   useRegisterPage(
     API_KEYS_PAGE_NAME,
