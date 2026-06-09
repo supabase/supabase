@@ -325,15 +325,14 @@ export const ChartBlock = ({
                   tickFormatter={effectiveLogScale ? formatLogTick : formatYAxisTick}
                 />
                 <ChartTooltip
-                  content={(props) => (
+                  content={
                     <PortalChartTooltip
-                      {...props}
                       chartRef={chartRef}
                       className="min-w-[200px]"
                       labelSuffix={isPercentage ? '%' : ''}
                       labelFormatter={(x) => formatTooltipDate(x as string | number, 'DD MMM YYYY')}
                     />
-                  )}
+                  }
                 />
                 <Bar dataKey={metricLabel} radius={[2, 2, 1, 1]} />
               </BarChart>
@@ -355,14 +354,13 @@ export const ChartBlock = ({
                   tickFormatter={effectiveLogScale ? formatLogTick : formatYAxisTick}
                 />
                 <ChartTooltip
-                  content={(props) => (
+                  content={
                     <PortalChartTooltip
-                      {...props}
                       chartRef={chartRef}
                       labelSuffix={chartData?.format === '%' ? '%' : ''}
                       labelFormatter={(x) => formatTooltipDate(x as string | number, 'DD MMM YYYY')}
                     />
-                  )}
+                  }
                 />
                 <Line dataKey={metricLabel} stroke="hsl(var(--chart-1))" radius={4} />
               </LineChart>

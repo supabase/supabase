@@ -325,18 +325,15 @@ export const QueryBlock = ({
                   <Tooltip
                     content={
                       portalTooltip ? (
-                        (props) => (
-                          <PortalChartTooltip
-                            {...props}
-                            chartRef={chartContainerRef}
-                            className="min-w-[200px]"
-                            labelFormatter={(value) =>
-                              xKeyDateFormat === 'date'
-                                ? dayjs(value).format('MMM D YYYY HH:mm')
-                                : String(value)
-                            }
-                          />
-                        )
+                        <PortalChartTooltip
+                          chartRef={chartContainerRef}
+                          className="min-w-[200px]"
+                          labelFormatter={(value) =>
+                            xKeyDateFormat === 'date'
+                              ? dayjs(value).format('MMM D YYYY HH:mm')
+                              : String(value)
+                          }
+                        />
                       ) : (
                         <ChartTooltipContent
                           className="min-w-[200px]"
