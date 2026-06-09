@@ -25,8 +25,8 @@ import {
 import { AdvisorRulesPreview } from './AdvisorRulesPreview'
 import { CLSPreview } from './CLSPreview'
 import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
+import { IntegrationsLayoutPreview } from './IntegrationsLayoutPreview'
 import { JitDbAccessPreview } from './JitDbAccessPreview'
-import { MarketplacePreview } from './MarketplacePreview'
 import { PgDeltaDiffPreview } from './PgDeltaDiffPreview'
 import { PlatformWebhooksPreview } from './PlatformWebhooksPreview'
 import { RLSTesterPreview } from './RLSTesterPreview'
@@ -47,7 +47,7 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS]: <PlatformWebhooksPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]: <JitDbAccessPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER]: <RLSTesterPreview />,
-  [LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]: <MarketplacePreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]: <IntegrationsLayoutPreview />,
 }
 
 export const FeaturePreviewModal = () => {
@@ -152,7 +152,7 @@ export const FeaturePreviewModal = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="h-auto min-h-0 max-h-auto md:max-h-[550px] p-4 pb-0 flex flex-col">
+              <div className="w-full h-auto min-h-0 max-h-auto md:max-h-[550px] p-4 pb-0 flex flex-col">
                 <div className="flex items-center justify-between border-b gap-2 pb-3">
                   <p>{selectedFeature?.name}</p>
                   <div className="flex items-center gap-x-2">
