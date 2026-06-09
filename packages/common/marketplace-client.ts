@@ -39,6 +39,7 @@ export type Database = MergeDeep<
 >
 
 export type Listing = Database['public']['Views']['listings']['Row']
+export type Partner = Database['public']['Views']['partners']['Row']
 
 export const createMarketplaceClient = () => {
   const API_URL = process.env.NEXT_PUBLIC_MARKETPLACE_API_URL || ''

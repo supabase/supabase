@@ -168,6 +168,17 @@ export const checkboxFieldSchema = formFieldBase.extend({
   type: z.literal('checkbox'),
 })
 
+/**
+ * Multi-select rendered as a list of checkboxes. Values are stored as a
+ * semicolon-separated string of the selected option `value`s — the format
+ * HubSpot expects for multi-select properties. Notion's multi_select type
+ * splits on the same delimiter when received.
+ */
+export const checkboxGroupFieldSchema = formFieldBase.extend({
+  type: z.literal('checkbox-group'),
+  options: z.array(z.object({ label: z.string(), value: z.string() })).min(1),
+})
+
 export const formFieldSchema = z.discriminatedUnion('type', [
   textFieldSchema,
   urlFieldSchema,
@@ -175,6 +186,7 @@ export const formFieldSchema = z.discriminatedUnion('type', [
   textareaFieldSchema,
   selectFieldSchema,
   checkboxFieldSchema,
+  checkboxGroupFieldSchema,
 ])
 
 // ----- Form CRM config schemas -----
@@ -203,6 +215,12 @@ export const hubspotFormConfigSchema = z.object({
   fieldMap: z.record(z.string(), z.string()).optional(),
   /** Legal consent text for GDPR. */
   consent: z.string().optional(),
+  /**
+   * Conditional fan-out — only send to this provider when the rule passes.
+   * Evaluated against the submitted form values using the same semantics as
+   * field-level `showWhen`. Omit to always send.
+   */
+  sendWhen: showWhenSchema.optional(),
 })
 
 export const customerioFormConfigSchema = z.object({
@@ -223,6 +241,12 @@ export const customerioFormConfigSchema = z.object({
    * Example: { event_name: 'Stripe Sessions 2026 Exec Dinner' }
    */
   staticProperties: z.record(z.string(), z.unknown()).optional(),
+  /**
+   * Conditional fan-out — only send to this provider when the rule passes.
+   * Evaluated against the submitted form values using the same semantics as
+   * field-level `showWhen`. Omit to always send.
+   */
+  sendWhen: showWhenSchema.optional(),
 })
 
 export const notionFormConfigSchema = z.object({
@@ -244,6 +268,15 @@ export const notionFormConfigSchema = z.object({
    * Example: { source: 'Website Go Page' }
    */
   staticProperties: z.record(z.string(), z.unknown()).optional(),
+  /**
+   * Conditional fan-out — only send to this provider when the rule passes.
+   * Evaluated against the submitted form values using the same semantics as
+   * field-level `showWhen`. Omit to always send.
+   *
+   * Example: only sync Technology partner submissions to a specialised Notion
+   * database — `{ field: 'partner_type', equals: 'technology' }`.
+   */
+  sendWhen: showWhenSchema.optional(),
 })
 
 export const formCrmConfigSchema = z

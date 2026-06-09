@@ -16,7 +16,12 @@ import {
 import type { z } from 'zod'
 
 import { submitFormAction } from '../go/actions/submitForm'
-import { formFieldSchema, type GoFormFieldShowWhen } from '../go/schemas'
+import { formFieldSchema, type GoFormCrmConfig } from '../go/schemas'
+import { evaluateShowWhen } from '../go/showWhen'
+
+/** CRM fan-out config used by components that define their CRM inline (e.g. PartnerIntakeForm).
+ *  Once a form's `formRef` is registered on the server, prefer that pattern for security. */
+export type MarketingFormCrmConfig = GoFormCrmConfig
 
 /** Input-shape field type — fields with Zod defaults (`half`, `required`) are optional here. */
 export type MarketingFormField = z.input<typeof formFieldSchema>
@@ -29,21 +34,6 @@ export type MarketingFormField = z.input<typeof formFieldSchema>
 export interface MarketingFormRef {
   slug: string
   formId: string
-}
-
-/**
- * Evaluate a `showWhen` rule against the current form values. All supplied
- * criteria must pass (AND). Missing values are treated as the empty string.
- */
-function evaluateShowWhen(showWhen: GoFormFieldShowWhen, values: Record<string, string>): boolean {
-  const value = values[showWhen.field] ?? ''
-  if (showWhen.equals !== undefined && value !== showWhen.equals) return false
-  if (showWhen.notEquals !== undefined && value === showWhen.notEquals) return false
-  if (showWhen.in !== undefined && !showWhen.in.includes(value)) return false
-  if (showWhen.notIn !== undefined && showWhen.notIn.includes(value)) return false
-  if (showWhen.truthy === true && value === '') return false
-  if (showWhen.truthy === false && value !== '') return false
-  return true
 }
 
 export interface MarketingFormProps {
@@ -72,6 +62,13 @@ export interface MarketingFormProps {
   card?: boolean
   /** Extra class names applied to the outer wrapper. */
   className?: string
+  /** Pre-populate specific fields by name. Values are applied on first render only. */
+  initialValues?: Record<string, string>
+  /**
+   * Inline CRM config. Accepted for type compatibility; actual fan-out requires
+   * a registered `formRef`. Wire up `formRef` once the form GUIDs are confirmed.
+   */
+  crm?: MarketingFormCrmConfig
 }
 
 type SubmitState = 'idle' | 'loading' | 'success' | 'error'
@@ -130,12 +127,24 @@ function FieldInput({
         </Select>
       )
     case 'checkbox':
+    case 'checkbox-group':
       return null
     default: {
       const _exhaustive: never = field
       return null
     }
   }
+}
+
+/** Selected `checkbox-group` values are stored as a semicolon-separated string. */
+const CHECKBOX_GROUP_DELIMITER = ';'
+
+function parseCheckboxGroup(value: string): string[] {
+  return value ? value.split(CHECKBOX_GROUP_DELIMITER).filter(Boolean) : []
+}
+
+function serializeCheckboxGroup(selected: string[]): string {
+  return selected.join(CHECKBOX_GROUP_DELIMITER)
 }
 
 function Field({
@@ -157,6 +166,39 @@ function Field({
         />
         <span>{field.label}</span>
       </label>
+    )
+  }
+
+  if (field.type === 'checkbox-group') {
+    const selected = parseCheckboxGroup(value)
+    const toggle = (optValue: string, checked: boolean) => {
+      const next = checked ? [...selected, optValue] : selected.filter((v) => v !== optValue)
+      // Preserve option order so submitted values are deterministic.
+      const ordered = field.options.map((o) => o.value).filter((v) => next.includes(v))
+      onChange(serializeCheckboxGroup(ordered))
+    }
+    return (
+      <div className="flex flex-col gap-2">
+        <label className="text-sm text-foreground font-medium">{field.label}</label>
+        <div className="flex flex-col gap-2">
+          {field.options.map((opt) => (
+            <label
+              key={opt.value}
+              className="flex items-start gap-3 cursor-pointer text-sm text-foreground-light leading-relaxed"
+            >
+              <Checkbox
+                className="mt-0.5"
+                checked={selected.includes(opt.value)}
+                onCheckedChange={(checked) => toggle(opt.value, checked === true)}
+              />
+              <span>{opt.label}</span>
+            </label>
+          ))}
+        </div>
+        {field.description && (
+          <p className="text-xs text-foreground-lighter leading-relaxed">{field.description}</p>
+        )}
+      </div>
     )
   }
 
@@ -182,9 +224,10 @@ export default function MarketingForm({
   formRef,
   card = true,
   className,
+  initialValues,
 }: MarketingFormProps) {
   const [values, setValues] = useState<Record<string, string>>(() =>
-    Object.fromEntries(fields.map((f) => [f.name, '']))
+    Object.fromEntries(fields.map((f) => [f.name, initialValues?.[f.name] ?? '']))
   )
   const [submitState, setSubmitState] = useState<SubmitState>('idle')
   const [errorMessages, setErrorMessages] = useState<string[]>([])
@@ -206,15 +249,23 @@ export default function MarketingForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Required checkboxes aren't covered by HTML5 validation; check them manually.
-    const uncheckedRequired = visibleFields.filter(
-      (f) => f.type === 'checkbox' && f.required && values[f.name] !== 'true'
-    )
-    if (uncheckedRequired.length > 0) {
+    // Required checkboxes / checkbox-groups aren't covered by HTML5 validation;
+    // check them manually.
+    const validationErrors: string[] = []
+    for (const f of visibleFields) {
+      if (!f.required) continue
+      if (f.type === 'checkbox' && values[f.name] !== 'true') {
+        validationErrors.push(`Please confirm: ${f.label.replace(/\*$/, '').trim()}`)
+      } else if (
+        f.type === 'checkbox-group' &&
+        parseCheckboxGroup(values[f.name] ?? '').length === 0
+      ) {
+        validationErrors.push(`Please select at least one: ${f.label.replace(/\*$/, '').trim()}`)
+      }
+    }
+    if (validationErrors.length > 0) {
       setSubmitState('error')
-      setErrorMessages(
-        uncheckedRequired.map((f) => `Please confirm: ${f.label.replace(/\*$/, '').trim()}`)
-      )
+      setErrorMessages(validationErrors)
       return
     }
 
@@ -295,12 +346,12 @@ export default function MarketingForm({
   }
 
   // Group fields into rows: half-width fields pair up, full-width fields get their own row.
-  // Checkbox fields always take a full row regardless of their `half` flag.
+  // Checkbox + checkbox-group fields always take a full row regardless of their `half` flag.
   const rows: MarketingFormField[][] = []
   let pendingHalf: MarketingFormField | null = null
 
   for (const field of visibleFields) {
-    const isHalf = field.half && field.type !== 'checkbox'
+    const isHalf = field.half && field.type !== 'checkbox' && field.type !== 'checkbox-group'
     if (isHalf) {
       if (pendingHalf) {
         rows.push([pendingHalf, field])
@@ -355,7 +406,7 @@ export default function MarketingForm({
         onSubmit={handleSubmit}
         className={
           card
-            ? 'border border-muted rounded-2xl p-6 sm:p-8 flex flex-col gap-6'
+            ? 'border bg-surface-75 rounded-2xl shadow-xl p-6 sm:p-8 flex flex-col gap-6'
             : 'flex flex-col gap-6'
         }
       >
@@ -366,7 +417,7 @@ export default function MarketingForm({
         */}
         <div
           aria-hidden="true"
-          className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden"
+          className="absolute left-[-9999px] top-auto h-px w-px overflow-hidden"
         >
           <label>
             Website

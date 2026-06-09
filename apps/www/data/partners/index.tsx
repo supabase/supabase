@@ -1,140 +1,242 @@
-import { Compass, DollarSign, Globe, TrendingUp } from 'lucide-react'
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Database,
+  FileText,
+  Globe,
+  Key,
+  Plug,
+  Puzzle,
+  Webhook,
+} from 'lucide-react'
 
-export default {
+import { PARTNER_TYPES } from '../../components/Partners/PartnerIntakeForm'
+
+export const PARTNER_FORM_ANCHOR = '#become-a-partner'
+
+const partnersPageData = {
   metaTitle: 'Partner with Supabase',
-  metaDescription: 'Become a Supabase Partner and enable new business opportunities.',
+  metaDescription:
+    'Reach 9 million developers. Ship integrations and offer services that help businesses build on Supabase.',
   heroSection: {
     title: 'Partners',
-    h1: <span className="heading-gradient">Partner with Supabase</span>,
-    subheader: (
-      <>
-        Apply to the Partners program to list your integration <br className="hidden md:block" /> in
-        our marketplace and grow your business.
-      </>
-    ),
-    image: (
-      <div className="relative z-10 flex items-center justify-center mb-4">
-        <div
-          className="w-12 h-12 rounded-xl bg-brand border border-brand-900 flex items-center justify-center"
-          style={{
-            boxShadow: '0 0 20px hsl(var(--brand-300)), 0 0 30px hsl(var(--brand-200))',
-          }}
-        >
-          <svg
-            className="text-background-alternative h-8 w-8 shrink-0"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="1.5"
-              d="M12.0003 6.1488L10.5812 4.76334C8.68921 2.91613 5.62161 2.91613 3.72957 4.76334C1.98628 6.46532 1.84923 9.14165 3.31842 10.9968C3.44378 11.1551 3.77166 11.514 3.92041 11.6592M12.0003 6.1488L13.4193 4.76334C15.3113 2.91613 18.3789 2.91613 20.271 4.76334C22.163 6.61054 22.163 9.60546 20.271 11.4527L19.2017 12.5186M12.0003 6.1488L10.7542 7.39725C10.0214 8.13141 10.0219 9.32043 10.7554 10.0539C11.4894 10.7879 12.6793 10.7879 13.4133 10.0539L16.0693 7.39787M14.9131 13.4531L17.4954 16.1809M17.4954 16.1809C18.2089 16.9347 18.1764 18.1242 17.4226 18.8378C16.6693 19.5509 15.4807 19.5189 14.7669 18.7663L13.3188 17.2217M17.4954 16.1809C18.2086 16.9344 19.3982 16.9676 20.1516 16.2543C20.9051 15.5411 20.9376 14.3521 20.2244 13.5987L17.6415 10.8703M6.13555 14.7589L7.46387 13.4306M6.13555 14.7589C5.40193 15.4925 4.21251 15.4925 3.47889 14.7589C2.74528 14.0253 2.74528 12.8358 3.47889 12.1022L4.80722 10.7739C5.54084 10.0403 6.73026 10.0403 7.46388 10.7739C8.19749 11.5075 8.19749 12.6969 7.46387 13.4306M6.13555 14.7589C5.40193 15.4925 5.40193 16.6819 6.13555 17.4155C6.86916 18.1492 8.05859 18.1492 8.7922 17.4155M7.46387 13.4306C8.19749 12.6969 9.38691 12.6969 10.1205 13.4306C10.8541 14.1642 10.8541 15.3536 10.1205 16.0872M8.7922 17.4155L10.1205 16.0872M8.7922 17.4155C8.05859 18.1492 8.05859 19.3386 8.7922 20.0722C9.52582 20.8058 10.7152 20.8058 11.4489 20.0722L12.7772 18.7439C13.5108 18.0102 13.5108 16.8208 12.7772 16.0872C12.0436 15.3536 10.8541 15.3536 10.1205 16.0872"
-            />
-          </svg>
-        </div>
-      </div>
-    ),
+    h1: <>Build with Supabase. Reach 9 million developers.</>,
+    subheader: <>Ship integrations and offer services that help businesses build on Supabase.</>,
     cta: {
-      label: 'Become a Partner',
-      link: 'https://forms.supabase.com/partner',
+      label: 'Apply as a Partner',
+      link: PARTNER_FORM_ANCHOR,
+    },
+    secondaryCta: {
+      label: 'Browse the Partner Catalog',
+      link: '/partners/catalog',
+      icon: <ArrowRight strokeWidth={1.5} />,
     },
   },
-  oAuthApp: {
-    steps: [
+  reasonsSection: {
+    eyebrow: 'Why partner',
+    title: 'Three reasons to partner with Supabase',
+    description:
+      'A growing developer audience, the deep extensibility of Postgres, and a partner program our customers trust.',
+  },
+  reasons: [
+    {
+      title: 'Distribution',
+      description:
+        '9 million developers and growing. Your product, in front of the ones already shipping.',
+    },
+    {
+      title: 'Technical fit',
+      description:
+        'Every Supabase project is real Postgres. Standard interfaces, no proprietary glue, no rewrite every six months.',
+    },
+    {
+      title: 'Trust',
+      description:
+        'We list partners we use and partners that actually ship. The catalog is curated, which is why developers read it.',
+    },
+  ],
+  waysToPartner: {
+    title: 'Ways to partner',
+    tiers: [
       {
-        title: 'Register App',
-        text: 'An OAuth app first needs to be registered with Supabase',
+        title: 'Integration Partner',
+        description: (
+          <>
+            You've built something that works with Supabase: a tool, extension, connector, or
+            service. We list it, co-market it, and put it in front of developers who are actively
+            composing their stack.
+          </>
+        ),
+        cta: {
+          label: 'Apply as Integration Partner',
+          link: `?partner_type=${PARTNER_TYPES.technology}${PARTNER_FORM_ANCHOR}`,
+        },
+        bestFor:
+          'developer tools, SaaS products, hosting, observability, auth, billing, and anything else developers add to a Postgres project.',
       },
       {
-        title: 'Add OAuth2 Support',
-        text: "Use the OAuth2 protocol to access a user's organization or project",
-      },
-      {
-        title: 'Receive Tokens',
-        text: "You'll receive a new access and refresh token",
-      },
-      {
-        title: 'Control Projects',
-        text: 'Use Supabase REST API to control projects and other settings',
+        title: 'Solution Partner',
+        description: 'You build on Supabase on behalf of clients.',
+        cta: {
+          label: 'Apply as Solution Partner',
+          link: `?partner_type=${PARTNER_TYPES.solutions}${PARTNER_FORM_ANCHOR}`,
+        },
+        bestFor: 'agencies, consultancies, and service providers.',
       },
     ],
   },
-  featureBlocks: [
-    {
-      title: 'Technical support',
-      description: 'Access technical support to back your integrations and customer projects.',
-      icon: <Compass strokeWidth={1.5} />,
+  benefits: {
+    title: 'What your Supabase partnership gets you',
+    description: 'Distribution to developers already shipping on Postgres, and much more.',
+    items: [
+      <>
+        <strong className="block text-foreground font-normal">
+          A listing in the Partner Catalog:
+        </strong>{' '}
+        Searchable by category, visible to developers actively evaluating tools
+      </>,
+      <>
+        <strong className="block text-foreground font-normal">Co-marketing:</strong> Supabase's
+        highest-traffic moments like Launch Weeks, with blog, social, and Discord reach
+      </>,
+      <>
+        <strong className="block text-foreground font-normal">
+          A direct line to the product team:
+        </strong>{' '}
+        Actual engineers who know the integration surface, not a support queue
+      </>,
+      <>
+        <strong className="block text-foreground font-normal">
+          Something your sales team can use:
+        </strong>{' '}
+        A Supabase-verified listing is a trust signal with developers who already know us
+      </>,
+    ],
+  },
+  howToApply: {
+    title: 'Ways to apply',
+    steps: [
+      {
+        title: 'Apply',
+        description:
+          "This takes five minutes. Tell us what you build, who it's for, and how it connects to Supabase.",
+      },
+      {
+        title: 'Review',
+        description: 'This takes a week. It’s faster if the integration is already live.',
+      },
+      {
+        title: 'Launch',
+        description: 'We help with the listing, the integration, and the launch moment.',
+      },
+    ],
+    cta: {
+      label: 'Apply to partner with Supabase',
+      link: PARTNER_FORM_ANCHOR,
     },
-    {
-      title: 'Expand your ecosystem',
-      description: 'Offer your own products and services to Supabase customers.',
-      icon: <Globe strokeWidth={1.5} />,
+  },
+  featuredPartners: {
+    title: 'In good company',
+    description: 'Companies building with Supabase, integrating with Supabase, or both.',
+    // Order to lead the logo wall with at launch.
+    leadSlugs: ['grafana', 'stripe', 'resend', 'doppler', 'aikido', 'vanta', 'cipherstash'],
+  },
+  integrationOptions: {
+    title: 'Ways you can integrate with Supabase',
+    options: [
+      {
+        title: 'OAuth App',
+        description: 'Control organizations and projects programmatically.',
+        href: 'https://supabase.com/docs/guides/integrations/build-a-supabase-integration',
+        icon: <Key size={18} strokeWidth={1.5} />,
+      },
+      {
+        title: 'Management API',
+        description: 'Manage projects, branches, secrets, and deployments.',
+        href: 'https://supabase.com/docs/reference/api/introduction',
+        icon: <Globe size={18} strokeWidth={1.5} />,
+      },
+      {
+        title: 'Foreign Data Wrapper',
+        description: 'Expose your data as Postgres tables developers can query with SQL.',
+        href: 'https://supabase.com/docs/guides/database/extensions/wrappers/overview',
+        icon: <Database size={18} strokeWidth={1.5} />,
+      },
+      {
+        title: 'Postgres extension',
+        description: 'Add types, functions, or operators to every Supabase project.',
+        href: 'https://supabase.com/docs/guides/database/extensions',
+        icon: <Puzzle size={18} strokeWidth={1.5} />,
+      },
+      {
+        title: 'Log drains',
+        description: 'Receive project logs from Pro, Team, and Enterprise projects.',
+        href: 'https://supabase.com/docs/guides/platform/log-drains',
+        icon: <FileText size={18} strokeWidth={1.5} />,
+      },
+      {
+        title: 'Auth provider',
+        description: 'Act as a third-party identity provider over OIDC or SAML.',
+        href: 'https://supabase.com/docs/guides/auth/sso',
+        icon: <Plug size={18} strokeWidth={1.5} />,
+      },
+      {
+        title: 'Postgres connection',
+        description: 'Anything that speaks Postgres works as-is.',
+        href: 'https://supabase.com/docs/guides/database/connecting-to-postgres',
+        icon: <Webhook size={18} strokeWidth={1.5} />,
+      },
+    ],
+  },
+  faq: {
+    title: 'Frequently asked questions',
+    items: [
+      {
+        question: 'Is there a fee to be listed?',
+        answer: 'No. The partner catalog is free.',
+      },
+      {
+        question: 'Can I apply before my integration is built?',
+        answer:
+          "Yes, though your application moves faster if the integration is already live. Tell us what you're building and where you are, and we’ll go from there.",
+      },
+      {
+        question: 'How long is review?',
+        answer: 'Usually a week. We get back to you either way.',
+      },
+      {
+        question: 'What’s the difference between an Integration Partner and a Solution Partner?',
+        answer:
+          'Integration partners build technical products that connect to Supabase. Solution partners are agencies or consultancies that build on Supabase for clients.',
+      },
+      {
+        question: 'Do I need to be a Supabase customer?',
+        answer:
+          'No, but your integration should work with Supabase projects. Most partners build on a free plan to start.',
+      },
+    ],
+  },
+  finalCta: {
+    title: 'Partner with Supabase.',
+    cta: {
+      label: 'Become a partner',
+      link: PARTNER_FORM_ANCHOR,
     },
-    {
-      title: 'Business growth',
-      description: 'Explore new revenue streams and growth potential.',
-      icon: <DollarSign strokeWidth={1.5} />,
-    },
-    {
-      title: 'Scale with us',
-      description: 'Scale automatically with the power of open-source Postgres technology.',
-      icon: <TrendingUp strokeWidth={1.5} />,
-    },
-  ],
-  featuredApps: [
-    {
-      name: 'Arengu',
-      type: 'integration',
-      logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/integrations/arengu/arengu_logo.jpeg',
-    },
-    {
-      name: 'Auth0',
-      type: 'integration',
-      logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/integrations/auth0/auth0_dark.png?t=2023-07-19T19%3A13%3A04.189Z',
-    },
-    {
-      name: 'Appsmith',
-      type: 'integration',
-      logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/integrations/appsmith/appsmith-logo.png',
-    },
-    {
-      name: 'CALDA',
-      type: 'experts',
-      logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/experts/calda/calda_logo.jpeg',
-    },
-    {
-      name: 'Morrow',
-      type: 'experts',
-      logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/experts/morrow/morrow-logo.png',
-    },
-    {
-      name: 'Voypost',
-      type: 'experts',
-      logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/experts/voypost/33024474.png',
-    },
-    {
-      name: 'Vercel',
-      type: 'integration',
-      logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/integrations/vercel/vercel-icon.jpeg',
-    },
-    {
-      name: 'Prisma',
-      type: 'integration',
-      logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/integrations/prisma/prisma-icon.png',
-    },
-    {
-      name: 'Cloudflare-workers',
-      type: 'integration',
-      logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/integrations/cloudflare-integration/cloudflare_workers_logo.png?t=2023-07-21T11%3A07%3A47.005Z',
-    },
-    {
-      name: 'Codesandbox',
-      type: 'integration',
-      logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/integrations/codesandbox/codesandbox_logo.jpeg',
-    },
-  ],
+    icon: <ArrowUpRight strokeWidth={1.5} />,
+  },
 }
+
+export type PARTNER_TIER = {
+  title: string
+  description: React.ReactNode
+  bestFor: string
+  whatYouGet?: string
+  timeToLaunch?: string
+  cta?: {
+    label: string
+    link: string
+    icon?: React.ReactNode
+  }
+}
+
+export default partnersPageData

@@ -1,4 +1,4 @@
-import { Calendar, Pencil, ScrollText } from 'lucide-react'
+import { Calendar, Pencil, ScrollText, Store } from 'lucide-react'
 import {
   IconBriefcase2,
   IconDocumentation,
@@ -19,9 +19,10 @@ export const data = {
           icon: IconDocumentation,
         },
         {
-          text: 'Integrations',
-          url: '/partners/integrations',
-          icon: IconIntegrations,
+          text: 'Contribute',
+          description: 'How to contribute to Supabase.',
+          url: '/contribute',
+          icon: () => <Pencil className="w-4 h-4" />,
         },
         {
           text: 'Supabase UI',
@@ -76,15 +77,14 @@ export const data = {
           icon: IconGitHubSolid,
         },
         {
-          text: 'Contribute',
-          description: 'How to contribute to Supabase.',
-          url: '/contribute',
-          icon: () => <Pencil className="w-4 h-4" />,
-        },
-        {
           text: 'Become a Partner',
           url: '/partners',
           icon: IconPartners,
+        },
+        {
+          text: 'Partner Catalog',
+          url: '/partners/catalog',
+          icon: IconIntegrations,
         },
         {
           text: 'Careers',
