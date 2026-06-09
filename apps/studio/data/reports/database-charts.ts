@@ -193,16 +193,6 @@ export const getReportAttributesV2: (
             'CPU time spent on other tasks (e.g., background processes, software interrupts)',
         },
         {
-          attribute: 'cpu_usage_busy_idle',
-          provider: 'infra-monitoring',
-          label: 'Idle',
-          format: '%',
-          omitFromTotal: true,
-          color: { light: '#6EA85F', dark: '#A3FFC2' },
-          fill: { light: '#A6D8AE', dark: '#2A5C3F' },
-          tooltip: 'CPU time spent idle and available for new work',
-        },
-        {
           attribute: 'cpu_usage_max',
           provider: 'reference-line',
           label: 'Max',
