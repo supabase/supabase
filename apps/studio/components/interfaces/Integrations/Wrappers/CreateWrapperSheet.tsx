@@ -136,6 +136,13 @@ export const CreateWrapperSheet = ({
       onClose()
       form.reset()
     },
+    onError: (error) => {
+      if (error.message.includes('permission denied to create foreign-data wrapper')) {
+        toast.error(`Your project permissions need to be re-initialized. This can happen after a project restore. Please contact Supabase support.`)
+      } else {
+        toast.error(`Failed to create wrapper: ${error.message}`)
+      }      
+    }
   })
 
   const onSubmit: SubmitHandler<FormSchema> = async (values) => {
