@@ -42,7 +42,7 @@ import z from 'zod'
 import CommandRender from '../CommandRender'
 import { INVOCATION_TABS } from './EdgeFunctionDetails.constants'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from '@/data/edge-functions/edge-functions-delete-mutation'
@@ -79,7 +79,8 @@ export const EdgeFunctionDetails = () => {
   const canUpdateEdgeFunction = IS_PLATFORM && canUpdateEdgeFunctionPermission
 
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
+  const { data: apiKeyData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
+  const { anonKey, publishableKey } = apiKeyData ?? {}
 
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
 
@@ -99,7 +100,6 @@ export const EdgeFunctionDetails = () => {
     defaultValues: { name: '', verify_jwt: false },
   })
 
-  const { anonKey, publishableKey } = getKeys(apiKeys)
   const apiKey = publishableKey?.api_key ?? anonKey?.api_key ?? '[YOUR ANON KEY]'
 
   const { managementCommands } = generateCLICommands({

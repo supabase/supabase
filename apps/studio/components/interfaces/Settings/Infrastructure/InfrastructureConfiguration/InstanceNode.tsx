@@ -201,7 +201,7 @@ export const PrimaryNode = ({ data }: NodeProps<Node<PrimaryNodeData>>) => {
                     <>
                       <span className="text-foreground-lighter">·</span>
                       <span className="text-foreground-light">
-                        {connections.current}/{connections.max} conns
+                        {connections.peak}/{connections.max} conns
                       </span>
                     </>
                   )}

@@ -86,7 +86,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
     },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE,
-      name: 'Marketplace',
+      name: 'Integrations layout',
       discussionsUrl: undefined,
       enabled: true,
       isNew: true,
