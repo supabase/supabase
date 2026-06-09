@@ -95,6 +95,9 @@ export function formatServiceTypeForDisplay(serviceType: string): string {
     postgres: 'Postgres',
     auth: 'Auth',
     storage: 'Storage',
+    realtime: 'Realtime',
+    supavisor: 'Supavisor',
+    pgbouncer: 'PgBouncer',
   }
 
   return specialCases[serviceType.toLowerCase()] || serviceType

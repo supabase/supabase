@@ -1,5 +1,5 @@
-import { Auth, EdgeFunctions, Storage } from 'icons'
-import { Box, Code2, Database } from 'lucide-react'
+import { Auth, EdgeFunctions, Realtime, Storage } from 'icons'
+import { Box, Cable, Code2, Database } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { type LOG_TYPES } from '../UnifiedLogs.constants'
@@ -26,14 +26,10 @@ export const LogTypeIcon = ({
       <EdgeFunctions size={size} strokeWidth={strokeWidth} className={className} />
     ),
     postgres: () => <Database size={size} strokeWidth={strokeWidth} className={className} />,
-    // function_events: () => (
-    //   <EdgeFunctions size={size} strokeWidth={strokeWidth} className={className} />
-    // ),
-    // supavisor: () => <Cpu size={size} strokeWidth={strokeWidth} className={className} />,
-    // postgres_upgrade: () => <Cpu size={size} strokeWidth={strokeWidth} className={className} />,
     storage: () => <Storage size={size} strokeWidth={strokeWidth} className={className} />,
-
-    // cron: () => <Clock size={size} strokeWidth={strokeWidth} className={className} />,
+    realtime: () => <Realtime size={size} strokeWidth={strokeWidth} className={className} />,
+    supavisor: () => <Cable size={size} strokeWidth={strokeWidth} className={className} />,
+    pgbouncer: () => <Cable size={size} strokeWidth={strokeWidth} className={className} />,
   }
 
   const IconComponent =
