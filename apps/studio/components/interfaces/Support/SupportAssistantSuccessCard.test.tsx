@@ -7,15 +7,15 @@ import type { SubmittedSupportRequest } from './SupportForm.state'
 import { NO_PROJECT_MARKER } from './SupportForm.utils'
 import { SupportAssistantSuccessCardContent as SupportAssistantSuccessCard } from '@/components/ui/AIAssistantPanel/SupportAssistantSuccessCardContent'
 
-const { chatInstances, mockNewChat, mockOpenSidebar, mockSelectChat, mockTrack } = vi.hoisted(
-  () => ({
+const { chatInstances, chats, mockNewChat, mockOpenSidebar, mockSelectChat, mockTrack } =
+  vi.hoisted(() => ({
     chatInstances: {} as Record<string, MockChat>,
+    chats: {} as Record<string, { messages: unknown[]; supportMetadata?: unknown }>,
     mockNewChat: vi.fn(),
     mockOpenSidebar: vi.fn(),
     mockSelectChat: vi.fn(),
     mockTrack: vi.fn(),
-  })
-)
+  }))
 
 type MockChat = {
   messages: Array<{ id: string; role: string; parts: Array<{ type: string; text: string }> }>
@@ -40,6 +40,14 @@ vi.mock('@/state/ai-assistant-state', () => ({
     newChat: mockNewChat,
     selectChat: mockSelectChat,
   }),
+  useAiAssistantState: () => ({
+    chats,
+    selectChat: mockSelectChat,
+  }),
+}))
+
+vi.mock('@/state/ai-chat-front-sync', () => ({
+  syncSupportChatToFront: vi.fn(),
 }))
 
 vi.mock('@/state/sidebar-manager-state', () => ({
@@ -81,6 +89,7 @@ describe('SupportAssistantSuccessCard', () => {
 
   beforeEach(() => {
     Object.keys(chatInstances).forEach((key) => delete chatInstances[key])
+    Object.keys(chats).forEach((key) => delete chats[key])
     mockNewChat.mockReset()
     mockOpenSidebar.mockReset()
     mockSelectChat.mockReset()
@@ -90,6 +99,7 @@ describe('SupportAssistantSuccessCard', () => {
 
     mockNewChat.mockImplementation(() => {
       chatInstances['chat-1'] = createMockChat(nextChatMessages)
+      chats['chat-1'] = { messages: nextChatMessages }
       return 'chat-1'
     })
   })

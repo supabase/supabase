@@ -10311,10 +10311,12 @@ export interface components {
       siteUrl?: string
       subject?: string
       tags: string[]
+      threadRef?: string
       urlToAirTable?: string
       verified?: boolean
     }
     SendFeedbackResponse: {
+      conversationId?: string
       result: string
     }
     SendUpgradeSurveyBody: {
