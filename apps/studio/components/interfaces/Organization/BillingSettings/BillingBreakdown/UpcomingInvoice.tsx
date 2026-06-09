@@ -277,7 +277,7 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                                     docs
                                   </InlineLink>{' '}
                                   on how billing for {item.description} works and{' '}
-                                  <InlineLink href={`/organization/${slug}/usage`}>
+                                  <InlineLink href={`/org/${slug}/usage`}>
                                     usage page
                                   </InlineLink>{' '}
                                   for a detailed breakdown.
