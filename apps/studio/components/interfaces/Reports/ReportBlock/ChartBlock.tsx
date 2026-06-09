@@ -1,9 +1,9 @@
 import dayjs from 'dayjs'
 import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts'
-import { ChartContainer, ChartTooltip, ChartTooltipContent, WarningIcon } from 'ui'
+import { ChartContainer, ChartTooltip, WarningIcon } from 'ui'
 
 import { METRIC_THRESHOLDS } from './ReportBlock.constants'
 import { ReportBlockContainer } from './ReportBlockContainer'
@@ -11,6 +11,7 @@ import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/Char
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { timestampFormatter } from '@/components/ui/Charts/Charts.utils'
 import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
+import { PortalChartTooltip } from '@/components/ui/Charts/PortalChartTooltip'
 import {
   checkHasNonPositiveValues,
   computeYAxisWidth,
@@ -71,6 +72,7 @@ export const ChartBlock = ({
   const { ref } = router.query
 
   const state = useDatabaseSelectorStateSnapshot()
+  const chartRef = useRef<HTMLDivElement>(null)
   const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
   const logScale = useMemo(() => defaultLogScale, [defaultLogScale])
   const [latestValue, setLatestValue] = useState<string | undefined>()
@@ -298,6 +300,7 @@ export const ChartBlock = ({
             </p>
           )}
           <ChartContainer
+            ref={chartRef}
             className="w-full aspect-auto px-3 py-2"
             style={{
               height: maxHeight ? `${maxHeight}px` : undefined,
@@ -322,13 +325,15 @@ export const ChartBlock = ({
                   tickFormatter={effectiveLogScale ? formatLogTick : formatYAxisTick}
                 />
                 <ChartTooltip
-                  content={
-                    <ChartTooltipContent
+                  content={(props) => (
+                    <PortalChartTooltip
+                      {...props}
+                      chartRef={chartRef}
                       className="min-w-[200px]"
                       labelSuffix={isPercentage ? '%' : ''}
                       labelFormatter={(x) => formatTooltipDate(x as string | number, 'DD MMM YYYY')}
                     />
-                  }
+                  )}
                 />
                 <Bar dataKey={metricLabel} radius={[2, 2, 1, 1]} />
               </BarChart>
@@ -350,12 +355,14 @@ export const ChartBlock = ({
                   tickFormatter={effectiveLogScale ? formatLogTick : formatYAxisTick}
                 />
                 <ChartTooltip
-                  content={
-                    <ChartTooltipContent
+                  content={(props) => (
+                    <PortalChartTooltip
+                      {...props}
+                      chartRef={chartRef}
                       labelSuffix={chartData?.format === '%' ? '%' : ''}
                       labelFormatter={(x) => formatTooltipDate(x as string | number, 'DD MMM YYYY')}
                     />
-                  }
+                  )}
                 />
                 <Line dataKey={metricLabel} stroke="hsl(var(--chart-1))" radius={4} />
               </LineChart>
