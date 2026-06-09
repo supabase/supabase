@@ -1,4 +1,4 @@
-import { safeLocalStorage, useFeatureFlags, useParams } from 'common'
+import { IS_PLATFORM, safeLocalStorage, useFeatureFlags, useParams } from 'common'
 import { useEffect, useMemo } from 'react'
 
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -69,7 +69,10 @@ export const useUpgradeCtaExperiment = () => {
   }, [seedKey])
 
   let variant: UpgradeCtaPlacement | undefined
-  if (flagsLoaded && planKnown) {
+  if (!IS_PLATFORM) {
+    // No billing/plans on self-hosted, so there is nothing to upgrade to — never show.
+    variant = undefined
+  } else if (flagsLoaded && planKnown) {
     // Fully resolved — source of truth.
     variant = liveVariant
   } else if (planKnown && !isFreePlan) {
@@ -84,7 +87,7 @@ export const useUpgradeCtaExperiment = () => {
   // to this org can seed from it. Only matters before the live value resolves, so we don't
   // need it in component state.
   useEffect(() => {
-    if (!flagsLoaded || !planKnown) return
+    if (!IS_PLATFORM || !flagsLoaded || !planKnown) return
     safeLocalStorage.setItem(seedKey, JSON.stringify(liveVariant ?? null))
   }, [flagsLoaded, planKnown, liveVariant, seedKey])
 
