@@ -67,12 +67,12 @@ export const FormSchema = z
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ['highAvailability'],
-          message: 'High availability is only supported with OrioleDB images',
+          message: 'High availability is not supported with OrioleDB images',
         })
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ['useOrioleDb'],
-          message: 'High availability is only supported with OrioleDB images',
+          message: 'High availability is not supported with OrioleDB images',
         })
       }
     }
