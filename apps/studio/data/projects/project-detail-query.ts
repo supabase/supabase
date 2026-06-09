@@ -26,6 +26,7 @@ export async function getProjectDetail(
 ) {
   if (!ref) throw new Error('Project ref is required')
 
+  await new Promise((resolve) => setTimeout(resolve, 5000)) // simulate network delay
   const { data, error } = await get('/platform/projects/{ref}', {
     params: { path: { ref } },
     signal,
