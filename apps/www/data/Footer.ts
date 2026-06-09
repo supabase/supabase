@@ -84,7 +84,7 @@ const footerData = [
         url: '/partners',
       },
       {
-        text: 'Integrations',
+        text: 'Partner Catalog',
         url: '/partners/catalog',
       },
       {
