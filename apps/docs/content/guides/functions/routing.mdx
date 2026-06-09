@@ -39,16 +39,20 @@ Here's a simple hello world example using some popular web frameworks:
 <TabPanel id="deno" label="Deno">
 
 ```ts
-Deno.serve(async (req) => {
-  if (req.method === 'GET') {
+import { withSupabase } from 'npm:@supabase/server@^1'
+
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
+    if (req.method === 'GET') {
+      return new Response('Hello World!')
+    }
+    const { name } = await req.json()
+    if (name) {
+      return new Response(`Hello ${name}!`)
+    }
     return new Response('Hello World!')
-  }
-  const { name } = await req.json()
-  if (name) {
-    return new Response(`Hello ${name}!`)
-  }
-  return new Response('Hello World!')
-})
+  }),
+}
 ```
 
 </TabPanel>
@@ -123,8 +127,10 @@ app.get('/hello-world', (c) => {
   return new Response('Hello World!')
 })
 
-Deno.serve(app.fetch)
+export default { fetch: app.fetch }
 ```
+
+To add Supabase auth per route, use the Hono adapter from `npm:@supabase/server@^1/adapters/hono`. See [Securing Edge Functions](/docs/guides/functions/auth).
 
 </TabPanel>
 
@@ -155,6 +161,8 @@ Keep in mind paths must be prefixed by function name. Route parameters can only 
 <TabPanel id="deno" label="Deno">
 
 ```ts
+import { withSupabase } from 'npm:@supabase/server@^1'
+
 interface Task {
   id: string
   name: string
@@ -204,42 +212,44 @@ async function deleteTask(id: string): Promise<Response> {
   }
 }
 
-Deno.serve(async (req) => {
-  const url = new URL(req.url)
-  const method = req.method
-  // Extract the last part of the path as the command
-  const command = url.pathname.split('/').pop()
-  // Assuming the last part of the path is the task ID
-  const id = command
-  try {
-    switch (method) {
-      case 'GET':
-        if (id) {
-          return getTask(id)
-        } else {
-          return getAllTasks()
-        }
-      case 'POST':
-        return createTask(req)
-      case 'PUT':
-        if (id) {
-          return updateTask(id, req)
-        } else {
-          return new Response('Bad Request', { status: 400 })
-        }
-      case 'DELETE':
-        if (id) {
-          return deleteTask(id)
-        } else {
-          return new Response('Bad Request', { status: 400 })
-        }
-      default:
-        return new Response('Method Not Allowed', { status: 405 })
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
+    const url = new URL(req.url)
+    const method = req.method
+    // Extract the last part of the path as the command
+    const command = url.pathname.split('/').pop()
+    // Assuming the last part of the path is the task ID
+    const id = command
+    try {
+      switch (method) {
+        case 'GET':
+          if (id) {
+            return getTask(id)
+          } else {
+            return getAllTasks()
+          }
+        case 'POST':
+          return createTask(req)
+        case 'PUT':
+          if (id) {
+            return updateTask(id, req)
+          } else {
+            return new Response('Bad Request', { status: 400 })
+          }
+        case 'DELETE':
+          if (id) {
+            return deleteTask(id)
+          } else {
+            return new Response('Bad Request', { status: 400 })
+          }
+        default:
+          return new Response('Method Not Allowed', { status: 405 })
+      }
+    } catch (error) {
+      return new Response(`Internal Server Error: ${error}`, { status: 500 })
     }
-  } catch (error) {
-    return new Response(`Internal Server Error: ${error}`, { status: 500 })
-  }
-})
+  }),
+}
 ```
 
 </TabPanel>
@@ -388,8 +398,10 @@ app.delete('/:id', async (c) => {
   }
 })
 
-Deno.serve(app.fetch)
+export default { fetch: app.fetch }
 ```
+
+To add Supabase auth per route, use the Hono adapter from `npm:@supabase/server@^1/adapters/hono`. See [Securing Edge Functions](/docs/guides/functions/auth).
 
 </TabPanel>
 
@@ -407,6 +419,6 @@ This works well for small apps with only a couple of routes:
 
 <$CodeSample
 path="/edge-functions/supabase/functions/restful-tasks/index.ts"
-lines={[[92, 116]]}
+lines={[[48, -1]]}
 meta="restful-tasks/index.ts"
 />
