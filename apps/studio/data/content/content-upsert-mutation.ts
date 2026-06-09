@@ -24,15 +24,24 @@ export async function upsertContent(
   { projectRef, payload }: UpsertContentVariables,
   signal?: AbortSignal
 ) {
-  const { data, error } = await put('/platform/projects/{ref}/content', {
-    params: { path: { ref: projectRef } },
-    body: unmapSqlContentField(payload),
-    headers: { Version: '2' },
-    signal,
-  })
-  if (error) handleError(error)
+  try {
+    const { data, error } = await put('/platform/projects/{ref}/content', {
+      params: { path: { ref: projectRef } },
+      body: unmapSqlContentField(payload),
+      headers: { Version: '2' },
+      signal,
+    })
+    if (error) handleError(error)
 
-  return data as Snippet | null
+    return data as Snippet | null
+  } catch (error) {
+    // Some environments (e.g. staging) return a successful response with an empty
+    // body but without a `Content-Length: 0` header. openapi-fetch then tries to parse the
+    // empty body as JSON and throws a SyntaxError, even though the content was saved
+    // successfully. Treat this case as a success with no returned data.
+    if (error instanceof SyntaxError) return null
+    throw error
+  }
 }
 
 export type UpsertContentData = Awaited<ReturnType<typeof upsertContent>>
