@@ -6747,7 +6747,6 @@ export interface components {
       expires_at: string
       icon?: string
       name: string
-      redirect_uri: string
       /** @enum {string} */
       registration_type: 'manual' | 'dynamic'
       scopes?: (
