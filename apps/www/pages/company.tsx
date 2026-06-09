@@ -15,7 +15,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Button, Card, CardContent, CardHeader, CardTitle, Space } from 'ui'
+import { Button } from 'ui'
 
 type Props = {}
 

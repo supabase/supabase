@@ -16,12 +16,20 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
   ref ||= '_'
   const hasOrgSlug = typeof slug === 'string' && slug.length > 0 && slug !== '_'
 
-  const { projectSettingsLogDrains, projectSettingsCustomDomains, authenticationSignInProviders } =
-    useIsFeatureEnabled([
-      'project_settings:log_drains',
-      'project_settings:custom_domains',
-      'authentication:sign_in_providers',
-    ])
+  const {
+    logsAll,
+    projectSettingsLogDrains,
+    projectSettingsCustomDomains,
+    authenticationSignInProviders,
+  } = useIsFeatureEnabled([
+    'logs:all',
+    'project_settings:log_drains',
+    'project_settings:custom_domains',
+    'authentication:sign_in_providers',
+  ])
+
+  // Log drains depend on the analytics backend, gated by logs:all (see SettingsMenu.utils).
+  const showLogDrains = logsAll && projectSettingsLogDrains
 
   useRegisterCommands(
     COMMAND_MENU_SECTIONS.NAVIGATE,
@@ -166,7 +174,7 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
         route: `/project/${ref}/database/settings#banned-ips`,
         defaultHidden: true,
       },
-      ...(projectSettingsLogDrains
+      ...(showLogDrains
         ? [
             {
               id: 'nav-project-settings-log-drains',
@@ -177,6 +185,6 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
           ]
         : []),
     ],
-    { ...options, deps: [platformWebhooksEnabled, ref, slug] }
+    { ...options, deps: [platformWebhooksEnabled, showLogDrains, ref, slug] }
   )
 }

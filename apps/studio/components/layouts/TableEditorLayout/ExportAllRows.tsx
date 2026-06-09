@@ -259,6 +259,7 @@ type UseExportAllRowsParams =
           type: 'provided_rows'
           table: SupaTable
           rows: Record<string, unknown>[]
+          roleImpersonationState?: RoleImpersonationState
         }
     ))
 
@@ -297,6 +298,7 @@ export const useExportAllRowsGeneric = (
                 table: params.table,
                 projectRef,
                 connectionString,
+                roleImpersonationState: params.roleImpersonationState,
               })
               if (hydrated.status === 'no_primary_key') {
                 return {

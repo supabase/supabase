@@ -137,6 +137,7 @@ const DatabaseUsage = () => {
     project?.cloud_provider !== 'FLY'
 
   const showDiskIOBurstBalanceChart = useFlag('showDiskIOBurstBalanceChart')
+  const showMemoryCommitmentChart = useFlag('showMemoryCommitmentChart')
 
   const REPORT_ATTRIBUTES = getReportAttributesV2(
     entitledFeatures,
@@ -145,7 +146,8 @@ const DatabaseUsage = () => {
     maxConnections,
     defaultMaxClientConn,
     isSpendCapEnabled,
-    showDiskIOBurstBalanceChart
+    showDiskIOBurstBalanceChart,
+    showMemoryCommitmentChart
   )
 
   const { isPending: isUpdatingDiskSize } = useProjectDiskResizeMutation({

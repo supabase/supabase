@@ -77,7 +77,7 @@ jobs:
 
           git add apps/studio/.github/eslint-rule-baselines.json
           git commit --message "chore: decrease ESLint ratchet baselines"
-          git push --force origin "$BRANCH"
+          git -c credential.helper= push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${BRANCH}"
 
           pr_url=$(gh pr list --state open --head "$BRANCH" --json url --jq '.[0].url // ""' 2>/dev/null || echo "")
           if [ -z "$pr_url" ]; then

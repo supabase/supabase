@@ -9,7 +9,6 @@ Adam Mokan
 AJ Matias
 Akash Manimaran
 Alaister Young
-Alan De Los Santos
 Aleksi Immonen
 Alex Hall
 Alex Hsu
@@ -23,7 +22,6 @@ Ana Mogul
 Andrew Valleteau
 Andrey A
 Angelico de los Reyes
-Anna Weihl
 Ant Evans
 Ant Wilson
 Ariuna K
@@ -93,7 +91,6 @@ Emmett Folger
 Eric Kharitonashvili
 Etienne Stalmans
 Eyal Ehrlich
-Fabrizio Cataldo
 Fabrizio Fenoglio
 Fady A
 Fatuma Abdullahi
@@ -196,12 +193,15 @@ Mats Kindahl
 Mert Yerekapan
 Michal Kleczek
 Michelle Jubrey
+Miranda Limonczenko
 Monica Khoury
+Mrinal Paliwal
 Mykhailo Mischa Lieibenson
 Natalie Roberge
 Nick B
 Nick Littman
 Nick Nowlan
+Nicola Ferraro
 Nicolas Nosenzo
 Noah Moss
 Nyannyacha

@@ -239,3 +239,30 @@ export function wrapperMetaComparator(
 export function getWrapperMetaForWrapper(wrapper: FDW | undefined) {
   return WRAPPERS.find((w) => wrapperMetaComparator(w, wrapper))
 }
+
+/**
+ * Returns the subset of extensions that are required but not yet installed.
+ * Returns `null` when the extensions list is still loading (undefined),
+ * so callers can distinguish "loading" from "nothing to install".
+ * Generic so the full extension type (including `default_version`) is preserved.
+ */
+export function getRequiredExtensionsToInstall<
+  T extends { name: string; installed_version: string | null },
+>(extensions: T[] | undefined, requiredExtensionNames: string[]): T[] | null {
+  if (extensions === undefined) return null
+  return extensions.filter(
+    (ext) => requiredExtensionNames.includes(ext.name) && !ext.installed_version
+  )
+}
+
+/**
+ * Returns true when the wrappers extension is installed at >= 0.5.0,
+ * which is the minimum version required for IMPORT FOREIGN SCHEMA support.
+ */
+export function hasForeignSchemaSupport(
+  wrappersExtension: { installed_version: string | null } | undefined
+): boolean {
+  return wrappersExtension?.installed_version
+    ? wrappersExtension.installed_version >= '0.5.0'
+    : false
+}
