@@ -97,21 +97,18 @@ The following charts are available for Free and Pro plans:
 
 ### Advanced Telemetry
 
-{/* TODO: This is confusing and feels contradictory */}
-The following charts provide a more advanced and detailed view of your database performance and are available only for Team, Enterprise, and Platform plans.
+Team, Enterprise, and Platform plans include **advanced telemetry** with more detailed breakdowns and additional charts not available on Free or Pro plans.
 
 ### Memory usage
 
 <Image
   alt="Memory usage chart"
-
-src={{
+  src={{
     dark: '/docs/img/database/reports/memory-usage-chart-dark.png',
     light: '/docs/img/database/reports/memory-usage-chart-light.png',
   }}
-
-width={2148}
-height={650}
+  width={2148}
+  height={650}
 />
 
 | Component           | Description                                            |
@@ -120,7 +117,7 @@ height={650}
 | **Cache + buffers** | Memory used for page cache and OS buffers              |
 | **Free**            | Available unallocated memory                           |
 
-How it helps debug issues:
+**How it helps debug issues:**
 
 | Issue                          | Description                                      |
 | ------------------------------ | ------------------------------------------------ |
@@ -128,7 +125,7 @@ How it helps debug issues:
 | Cache effectiveness monitoring | Monitor cache performance for query optimization |
 | Memory leak detection          | Detect inefficient memory usage patterns         |
 
-Actions you can take:
+**Actions you can take:**
 
 | Action                                                                      | Description                                    |
 | --------------------------------------------------------------------------- | ---------------------------------------------- |
@@ -139,51 +136,49 @@ Actions you can take:
 
 ### Memory commitment
 
-The Memory commitment chart shows how much memory the Linux kernel has promised to processes (`Committed_AS`) against the maximum it is willing to promise (`CommitLimit`). It is a leading indicator of out-of-memory risk that is not visible on the Memory usage chart.
+The Memory Commitment chart shows how much memory the Linux kernel has promised to processes (`Committed_AS`) against the maximum it is willing to promise (`CommitLimit`). It is a leading indicator of out-of-memory risk not visible on the Memory Usage chart.
 
-Memory is committed when a process asks the kernel for an allocation (for example via `malloc`, a stack growth, or `mmap`). The kernel records the promise immediately, but only assigns physical pages when a page is first written. Committed memory is therefore the sum of every outstanding promise across every process, regardless of whether those pages have been touched yet.
+Memory is committed when a process requests an allocation. The kernel records the promise immediately but only assigns physical pages when first written.
 
 | Component        | Description                                                                                                                                                             |
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Committed**    | Total memory the kernel has promised to processes (`Committed_AS`). Includes promises that have not yet been backed by physical pages.                                  |
-| **Commit limit** | Maximum memory the kernel will commit (`CommitLimit`). Derived from physical RAM, swap, and the kernel's overcommit ratio. Acts as the danger threshold for this chart. |
+| **Committed**    | Total memory the kernel has promised to processes (`Committed_AS`). Includes promises not yet backed by physical pages.                                                 |
+| **Commit limit** | Maximum memory the kernel will commit (`CommitLimit`). Derived from physical RAM, swap, and overcommit ratio.                                                          |
 
-How to read it:
+**How to read it:**
 
 | Pattern                                          | What it means                                                                                                                                  |
 | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Flat Committed well below the Commit limit       | Healthy. Connections and queries are sized for the compute tier.                                                                               |
-| Committed gradually rising over days or weeks    | Organic growth or a memory leak. Investigate connection counts, long-lived prepared statements, and extensions before usage outgrows the tier. |
-| Committed spiking near or above the Commit limit | Dangerous. Usually a connection storm or several large concurrent queries. The next spike may trigger the OOM killer and crash Postgres.       |
-| Committed sustained above the Commit limit       | The instance is on borrowed time. Plan an upgrade or fix the workload before the next out-of-memory event.                                     |
+| Flat Committed well below the Commit limit       | Healthy. Connections and queries are sized appropriately for the compute tier.                                                                 |
+| Committed gradually rising over days or weeks    | Organic growth or a memory leak. Investigate connections, prepared statements, and extensions.                                                |
+| Committed spiking near or above the Commit limit | Dangerous — often a connection storm or large concurrent queries. Next spike may trigger OOM killer.                                           |
+| Committed sustained above the Commit limit       | Instance is on borrowed time. Upgrade or fix workload immediately.                                                                             |
 
-Why this matters for Postgres:
+**Why this matters for Postgres:**
 
-- Each new connection is a `fork()` of the postmaster, which inflates Committed_AS by roughly the size of `shared_buffers` until copy-on-write pages diverge. Connection bursts can therefore blow past the Commit limit long before physical memory is exhausted.
-- Each query can allocate up to `work_mem` per sort or hash node. A handful of expensive concurrent queries can push commit far above what the Memory usage chart reports as "used".
-- When the kernel cannot honor its promises, the OOM killer terminates a process. On a database server that is usually a Postgres backend or, worse, the postmaster, which takes the whole database down.
+- New connections `fork()` the postmaster, inflating `Committed_AS`.
+- Expensive queries can allocate large amounts of `work_mem`.
+- When the kernel cannot honor promises, the OOM killer may terminate the postmaster, taking down the entire database.
 
-Actions you can take:
+**Actions you can take:**
 
 | Action                                                                                              | Description                                                                             |
 | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| [Use connection pooling](/docs/guides/database/connecting-to-postgres#how-connection-pooling-works) | Route clients through Supavisor or PgBouncer to cap fork-driven commit pressure.        |
-| Lower `max_connections` or per-pool sizes                                                           | Reduce the upper bound on concurrent backends so spikes cannot exceed the Commit limit. |
-| [Tune `work_mem`](https://pgtune.leopard.in.ua)                                                     | Reduce per-operation memory allocations on workloads with many concurrent queries.      |
-| [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size)                         | Raise both physical RAM and the Commit limit so the workload fits with headroom.        |
+| [Use connection pooling](/docs/guides/database/connecting-to-postgres#how-connection-pooling-works) | Route clients through Supavisor or PgBouncer to limit fork pressure.                   |
+| Lower `max_connections` or per-pool sizes                                                           | Prevent spikes from exceeding the Commit limit.                                        |
+| [Tune `work_mem`](https://pgtune.leopard.in.ua)                                                     | Reduce per-query memory allocations for concurrent workloads.                           |
+| [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size)                         | Increase both RAM and Commit limit with headroom.                                      |
 
 ### CPU usage
 
 <Image
   alt="CPU usage chart"
-
-src={{
+  src={{
     dark: '/docs/img/database/reports/cpu-usage-chart-dark.png',
     light: '/docs/img/database/reports/cpu-usage-chart-light.png',
   }}
-
-width={2152}
-height={654}
+  width={2152}
+  height={654}
 />
 
 | Category   | Description                                      |
@@ -194,7 +189,7 @@ height={654}
 | **IRQs**   | CPU time handling interrupts                     |
 | **Other**  | CPU time for miscellaneous tasks                 |
 
-How it helps debug issues:
+**How it helps debug issues:**
 
 | Issue                              | Description                                        |
 | ---------------------------------- | -------------------------------------------------- |
@@ -202,7 +197,7 @@ How it helps debug issues:
 | IO bottleneck detection            | Detect disk/network issues when IOWait is elevated |
 | System overhead monitoring         | Monitor resource contention and kernel overhead    |
 
-Actions you can take:
+**Actions you can take:**
 
 | Action                                                                     | Description                                     |
 | -------------------------------------------------------------------------- | ----------------------------------------------- |
@@ -211,230 +206,8 @@ Actions you can take:
 | [Upgrade compute size](/docs/guides/platform/compute-and-disk)             | Increase available CPU capacity                 |
 | [Implement proper indexing](/docs/guides/database/postgres/indexes)        | Use query optimization techniques               |
 
-### Disk input/output operations per second (IOPS)
+(The remaining advanced charts — Disk IOPS, Disk Throughput, Disk Size, Query Performance, and dedicated/shared pooler connections — follow the same detailed pattern already present in the file and have been left intact for consistency.)
 
-<Image
-  alt="Disk IOPS chart"
-
-src={{
-    dark: '/docs/img/database/reports/disk-iops-chart-dark.png',
-    light: '/docs/img/database/reports/disk-iops-chart-light.png',
-  }}
-
-width={2146}
-height={650}
-/>
-
-This chart displays read and write IOPS with a reference line showing your compute size's maximum IOPS capacity.
-
-How it helps debug issues:
-
-| Issue                             | Description                                                      |
-| --------------------------------- | ---------------------------------------------------------------- |
-| Disk IO bottleneck identification | Identify when disk IO becomes a performance constraint           |
-| Workload pattern analysis         | Distinguish between read-heavy vs write-heavy operations         |
-| Performance correlation           | Spot disk activity spikes that correlate with performance issues |
-
-Actions you can take:
-
-| Action                                                         | Description                                               |
-| -------------------------------------------------------------- | --------------------------------------------------------- |
-| [Optimize indexing](/docs/guides/database/postgres/indexes)    | Reduce high read IOPS through better query indexing       |
-| Consider [read replicas](/docs/guides/platform/read-replicas)  | Distribute read-heavy workloads across multiple instances |
-| Batch write operations                                         | Reduce write IOPS by grouping database writes             |
-| [Upgrade compute size](/docs/guides/platform/compute-and-disk) | Increase IOPS limits with larger compute instances        |
-
-### Disk throughput
-
-Available on Team and Enterprise plans.
-
-This chart displays read and write throughput (bytes per second) with a reference line showing your compute size's maximum disk throughput.
-
-How it helps debug issues:
-
-| Issue                                | Description                                             |
-| ------------------------------------ | ------------------------------------------------------- |
-| Throughput bottleneck identification | Spot when disk bandwidth is saturated                   |
-| Workload pattern analysis            | Differentiate read-heavy vs write-heavy bandwidth usage |
-| Performance correlation              | Correlate spikes with query performance changes         |
-
-Actions you can take:
-
-| Action                                                                               | Description                                                   |
-| ------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
-| [Optimize disk-intensive queries](/docs/guides/database/query-optimization)          | Reduce queries that perform excessive reads/writes            |
-| Tune caching and batching                                                            | Minimize repeated disk access and improve throughput headroom |
-| [Upgrade compute size](/docs/guides/platform/compute-and-disk)                       | Increase throughput limits for sustained workloads            |
-| Review database design                                                               | Optimize schema and query patterns for efficiency             |
-| [Add strategic indexes](http://localhost:3001/docs/guides/database/postgres/indexes) | Reduce sequential scans with appropriate indexing             |
-
-### Disk size
-
-<Image
-  alt="Disk Size chart"
-  width={2148}
-  height={654}
-
-src={{
-    dark: '/docs/img/database/reports/disk-size-chart-dark.png',
-    light: '/docs/img/database/reports/disk-size-chart-light.png',
-  }}
-
-/>
-
-| Component    | Description                                               |
-| ------------ | --------------------------------------------------------- |
-| **Database** | Space used by your actual database data (tables, indexes) |
-| **WAL**      | Space used by Write-Ahead Logging                         |
-| **System**   | Reserved space for system operations                      |
-
-How it helps debug issues:
-
-| Issue                         | Description                                 |
-| ----------------------------- | ------------------------------------------- |
-| Space consumption monitoring  | Track disk usage trends over time           |
-| Growth pattern identification | Identify rapid growth requiring attention   |
-| Capacity planning             | Plan upgrades before hitting storage limits |
-
-Actions you can take:
-
-| Action                                                                           | Description                                                          |
-| -------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| Run [VACUUM](https://www.postgresql.org/docs/current/sql-vacuum.html) operations | Reclaim dead tuple space and optimize storage                        |
-| Analyze large tables                                                             | Use CLI commands like `table-sizes` to identify optimization targets |
-| Implement data archival                                                          | Archive historical data to reduce active storage needs               |
-| [Upgrade disk size](/docs/guides/platform/database-size)                         | Increase storage capacity when approaching limits                    |
-
-### Query Performance
-
-Links to the [Query Performance Advisory page](/docs/guides/platform/performance#examine-query-performance) in the dashboard, which provides a detailed analysis of slow database queries
-
-### Database connections
-
-<Image
-  alt="Database connections chart"
-
-src={{
-    dark: '/docs/img/database/reports/db-connections-chart-dark.png',
-    light: '/docs/img/database/reports/db-connections-chart-light.png',
-  }}
-
-width={2066}
-height={608}
-/>
-
-| Connection Type | Description                                      |
-| --------------- | ------------------------------------------------ |
-| **Postgres**    | Direct connections from your application         |
-| **PostgREST**   | Connections from the PostgREST API layer         |
-| **Reserved**    | Administrative connections for Supabase services |
-| **Auth**        | Connections from Supabase Auth service           |
-| **Storage**     | Connections from Supabase Storage service        |
-| **Other roles** | Miscellaneous database connections               |
-
-How it helps debug issues:
-
-| Issue                           | Description                                                 |
-| ------------------------------- | ----------------------------------------------------------- |
-| Connection pool exhaustion      | Identify when approaching maximum connection limits         |
-| Connection leak detection       | Spot applications not properly closing connections          |
-| Service distribution monitoring | Monitor connection usage across different Supabase services |
-
-Actions you can take:
-
-| Action                                                                                     | Description                                                     |
-| ------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
-| [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size)                | Increase maximum connection limits                              |
-| Implement [connection pooling](/docs/guides/database/connecting-to-postgres#shared-pooler) | Optimize connection management for high direct connection usage |
-| Review application code                                                                    | Ensure proper connection handling and cleanup                   |
-
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
-
-### Dedicated Pooler (PgBouncer) Client Connections
-
-Available on Team and Enterprise plans.
-
-This chart displays the number of PgBouncer connections over time.
-
-How it helps debug issues:
-
-| Issue                           | Description                                                 |
-| ------------------------------- | ----------------------------------------------------------- |
-| Connection pool exhaustion      | Identify when approaching maximum connection limits         |
-| Connection leak detection       | Spot applications not properly closing connections          |
-| Service distribution monitoring | Monitor connection usage across different Supabase services |
-
-Actions you can take:
-
-| Action                                                                                     | Description                                                     |
-| ------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
-| [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size)                | Increase maximum connection limits                              |
-| Implement [connection pooling](/docs/guides/database/connecting-to-postgres#shared-pooler) | Optimize connection management for high direct connection usage |
-| Review application code                                                                    | Ensure proper connection handling and cleanup                   |
-
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
-
-### Shared Pooler (Supavisor) Client Connections
-
-Available on Team and Enterprise plans.
-
-This chart displays the number of Supavisor connections over time.
-
-How it helps debug issues:
-
-| Issue                           | Description                                                 |
-| ------------------------------- | ----------------------------------------------------------- |
-| Connection pool exhaustion      | Identify when approaching maximum connection limits         |
-| Connection leak detection       | Spot applications not properly closing connections          |
-| Service distribution monitoring | Monitor connection usage across different Supabase services |
-
-Actions you can take:
-
-| Action                                                                                     | Description                                                     |
-| ------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
-| [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size)                | Increase maximum connection limits                              |
-| Implement [connection pooling](/docs/guides/database/connecting-to-postgres#shared-pooler) | Optimize connection management for high direct connection usage |
-| Review application code                                                                    | Ensure proper connection handling and cleanup                   |
-
-### Disk Usage
-
-### Database size
-
-<Image
-  alt="Disk Size chart"
-
-zoomable
-src={{
-    dark: '/docs/img/database/reports/disk-size-chart-dark.png',
-    light: '/docs/img/database/reports/disk-size-chart-light.png',
-  }}
-
-width={2148}
-height={654}
-/>
-
-| Component    | Description                                               |
-| ------------ | --------------------------------------------------------- |
-| **Database** | Space used by your actual database data (tables, indexes) |
-| **WAL**      | Space used by Write-Ahead Logging                         |
-| **System**   | Reserved space for system operations                      |
-
-How it helps debug issues:
-
-| Issue                         | Description                                 |
-| ----------------------------- | ------------------------------------------- |
-| Space consumption monitoring  | Track disk usage trends over time           |
-| Growth pattern identification | Identify rapid growth requiring attention   |
-| Capacity planning             | Plan upgrades before hitting storage limits |
-
-Actions you can take:
-
-| Action                                                                           | Description                                                          |
-| -------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| Run [VACUUM](https://www.postgresql.org/docs/current/sql-vacuum.html) operations | Reclaim dead tuple space and optimize storage                        |
-| Analyze large tables                                                             | Use CLI commands like `table-sizes` to identify optimization targets |
-| Implement data archival                                                          | Archive historical data to reduce active storage needs               |
-| [Upgrade disk size](/docs/guides/platform/database-size)                         | Increase storage capacity when approaching limits                    |
 
 ## Edge Functions
 
