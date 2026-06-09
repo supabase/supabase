@@ -84,6 +84,7 @@ The following charts are available for Free and Pro plans:
 | Chart                        | Available Plans | Description                                  | Key Insights                                                   |
 | ---------------------------- | --------------- | -------------------------------------------- | -------------------------------------------------------------- |
 | Memory usage                 | Free, Pro       | RAM usage percentage by the database         | Memory pressure and resource utilization                       |
+| Swap usage                   | Free, Pro       | Swap space used when RAM is exhausted        | Memory pressure and risk of disk paging                        |
 | CPU usage                    | Free, Pro       | Average CPU usage percentage                 | CPU-intensive query identification                             |
 | Disk IOPS                    | Free, Pro       | Read/write operations per second with limits | IO bottleneck detection and workload analysis                  |
 | Database connections         | Free, Pro       | Number of pooler connections to the database | Connection pool monitoring                                     |
@@ -171,6 +172,30 @@ Actions you can take:
 | Lower `max_connections` or per-pool sizes                                                           | Reduce the upper bound on concurrent backends so spikes cannot exceed the Commit limit. |
 | [Tune `work_mem`](https://pgtune.leopard.in.ua)                                                     | Reduce per-operation memory allocations on workloads with many concurrent queries.      |
 | [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size)                         | Raise both physical RAM and the Commit limit so the workload fits with headroom.        |
+
+### Swap usage
+
+Swap usage shows how much swap space the system is using. Swap is disk space the operating system uses as an overflow when physical RAM is full. Because disk is much slower than RAM, sustained swap activity indicates memory pressure and can significantly degrade database performance.
+
+| Component    | Description                                          |
+| ------------ | ---------------------------------------------------- |
+| **Used**     | Swap space currently in use                          |
+| **Free**     | Available swap space                                 |
+
+How it helps debug issues:
+
+| Issue                              | Description                                                              |
+| ---------------------------------- | ------------------------------------------------------------------------ |
+| Memory pressure detection          | Persistent swap usage signals that RAM is exhausted and paging is active |
+| Performance degradation root cause | Elevated swap correlates with slow queries caused by disk IO instead of RAM access |
+
+Actions you can take:
+
+| Action                                                                      | Description                                      |
+| --------------------------------------------------------------------------- | ------------------------------------------------ |
+| [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size) | Add more RAM to eliminate swap usage             |
+| [Optimize queries](/docs/guides/database/query-optimization)                | Reduce memory-intensive operations               |
+| [Tune Postgres configuration](https://pgtune.leopard.in.ua)                 | Lower `work_mem` or `shared_buffers` if over-allocated |
 
 ### CPU usage
 
