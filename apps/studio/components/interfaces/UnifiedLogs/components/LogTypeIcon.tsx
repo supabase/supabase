@@ -11,34 +11,37 @@ interface LogTypeIconProps {
   className?: string
 }
 
+type IconComponent = React.ComponentType<{
+  size?: number
+  strokeWidth?: number
+  className?: string
+}>
+
+// [Alaister]: commented out types coming in the future
+// edge: Globe,
+const ICON_MAP: Partial<Record<(typeof LOG_TYPES)[number], IconComponent>> = {
+  postgrest: Code2,
+  auth: Auth,
+  'edge function': EdgeFunctions,
+  postgres: Database,
+  storage: Storage,
+  realtime: Realtime,
+  supavisor: Cable,
+  pgbouncer: Cable,
+}
+
 export const LogTypeIcon = ({
   type,
   size = 16,
   strokeWidth = 1.5,
   className,
 }: LogTypeIconProps) => {
-  // [Alaister]: commented out types coming in the future
-  const iconMap: Record<(typeof LOG_TYPES)[number], () => React.ReactNode> = {
-    // edge: () => <Globe size={size} strokeWidth={strokeWidth} className={className} />,
-    postgrest: () => <Code2 size={size} strokeWidth={strokeWidth} className={className} />,
-    auth: () => <Auth size={size} strokeWidth={strokeWidth} className={className} />,
-    'edge function': () => (
-      <EdgeFunctions size={size} strokeWidth={strokeWidth} className={className} />
-    ),
-    postgres: () => <Database size={size} strokeWidth={strokeWidth} className={className} />,
-    storage: () => <Storage size={size} strokeWidth={strokeWidth} className={className} />,
-    realtime: () => <Realtime size={size} strokeWidth={strokeWidth} className={className} />,
-    supavisor: () => <Cable size={size} strokeWidth={strokeWidth} className={className} />,
-    pgbouncer: () => <Cable size={size} strokeWidth={strokeWidth} className={className} />,
-  }
-
-  const IconComponent =
-    iconMap[type] || (() => <Box size={size} strokeWidth={strokeWidth} className={className} />)
+  const Icon = ICON_MAP[type] ?? Box
 
   return (
     <Tooltip>
       <TooltipTrigger>
-        <IconComponent />
+        <Icon size={size} strokeWidth={strokeWidth} className={className} />
       </TooltipTrigger>
       <TooltipContent side="left">
         <div className="text-xs">{type}</div>
