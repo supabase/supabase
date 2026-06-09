@@ -2509,6 +2509,66 @@ export interface LogDrainRemovedEvent {
   groups: TelemetryGroups
 }
 
+/**
+ * User clicked the save destination button in the add audit log drain sheet.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/org/{slug}/audit-log-drains (LogDrainDestinationSheetForm)
+ */
+export interface AuditLogDrainSaveButtonClickedEvent {
+  action: 'audit_log_drain_save_button_clicked'
+  properties: {
+    /**
+     * Type of the destination saved
+     */
+    destination:
+      | 'postgres'
+      | 'bigquery'
+      | 'clickhouse'
+      | 'webhook'
+      | 'datadog'
+      | 'loki'
+      | 'sentry'
+      | 's3'
+      | 'axiom'
+      | 'last9'
+      | 'otlp'
+      | 'syslog'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User confirmed removal of an audit log drain destination in the delete-confirm modal.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/org/{slug}/audit-log-drains
+ */
+export interface AuditLogDrainRemovedEvent {
+  action: 'audit_log_drain_removed'
+  properties: {
+    /**
+     * Type of the destination removed
+     */
+    destination:
+      | 'postgres'
+      | 'bigquery'
+      | 'clickhouse'
+      | 'webhook'
+      | 'datadog'
+      | 'loki'
+      | 'sentry'
+      | 's3'
+      | 'axiom'
+      | 'last9'
+      | 'otlp'
+      | 'syslog'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
 type AdvisorCategory = 'PERFORMANCE' | 'SECURITY'
 type AdvisorLevel = 'ERROR' | 'WARN' | 'INFO'
 
@@ -3425,6 +3485,8 @@ export type TelemetryEvent =
   | SidebarOpenedEvent
   | LogDrainSaveButtonClickedEvent
   | LogDrainRemovedEvent
+  | AuditLogDrainSaveButtonClickedEvent
+  | AuditLogDrainRemovedEvent
   | AdvisorDetailOpenedEvent
   | AdvisorAssistantButtonClickedEvent
   | QueryPerformanceAIExplanationButtonClickedEvent

@@ -437,6 +437,11 @@ services:
     depends_on:
       kong:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 1 bash -c '</dev/tcp/127.0.0.1/9000'"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
     environment:
       # Legacy symmetric HS256 key
       JWT_SECRET: ${JWT_SECRET}

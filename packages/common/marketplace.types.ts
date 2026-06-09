@@ -125,22 +125,7 @@ export type Database = {
       }
     }
     Functions: {
-      get_redirect_url: {
-        Args: {
-          p_listing_id: string
-          p_organization_slug: string
-          p_project_id: string
-        }
-        Returns: Json
-      }
-      get_redirect_url_by_slug: {
-        Args: {
-          p_listing_slug: string
-          p_organization_slug: string
-          p_project_id: string
-        }
-        Returns: Json
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
