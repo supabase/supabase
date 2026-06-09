@@ -13,14 +13,14 @@ Edge Function Invocations are billed using Package pricing, with each package re
 
 ### Example
 
-For simplicity, let's assume a package size of 1 million and a charge of <Price price="2" /> per package without a free quota.
+For simplicity, let's assume a package size of 1 million and a charge of <Price>$2</Price> per package without a free quota.
 
 | Invocations | Packages Billed | Costs               |
 | ----------- | --------------- | ------------------- |
-| 999,999     | 1               | <Price price="2" /> |
-| 1,000,000   | 1               | <Price price="2" /> |
-| 1,000,001   | 2               | <Price price="4" /> |
-| 1,500,000   | 2               | <Price price="4" /> |
+| 999,999     | 1               | <Price>$2</Price> |
+| 1,000,000   | 1               | <Price>$2</Price> |
+| 1,000,001   | 2               | <Price>$4</Price> |
+| 1,500,000   | 2               | <Price>$4</Price> |
 
 ### Usage on your invoice
 
@@ -38,12 +38,12 @@ The organization's function invocations are within the quota, so no charges appl
 
 | Line Item            | Units                 | Costs                    |
 | -------------------- | --------------------- | ------------------------ |
-| Pro Plan             | 1                     | <Price price="25" />     |
-| Compute Hours Small  | 730 hours             | <Price price="15" />     |
-| Function Invocations | 1,800,000 invocations | <Price price="0" />      |
-| **Subtotal**         |                       | **<Price price="40" />** |
-| Compute Credits      |                       | -<Price price="10" />    |
-| **Total**            |                       | **<Price price="30" />** |
+| Pro Plan             | 1                     | <Price>$25</Price>     |
+| Compute Hours Small  | 730 hours             | <Price>$15</Price>     |
+| Function Invocations | 1,800,000 invocations | <Price>$0</Price>      |
+| **Subtotal**         |                       | **<Price>$40</Price>** |
+| Compute Credits      |                       | -<Price>$10</Price>    |
+| **Total**            |                       | **<Price>$30</Price>** |
 
 ### Exceeding quota
 
@@ -51,12 +51,12 @@ The organization's function invocations exceed the quota by 1.4 million, incurri
 
 | Line Item            | Units                 | Costs                    |
 | -------------------- | --------------------- | ------------------------ |
-| Pro Plan             | 1                     | <Price price="25" />     |
-| Compute Hours Small  | 730 hours             | <Price price="15" />     |
-| Function Invocations | 3,400,000 invocations | <Price price="4" />      |
-| **Subtotal**         |                       | **<Price price="44" />** |
-| Compute Credits      |                       | -<Price price="10" />    |
-| **Total**            |                       | **<Price price="34" />** |
+| Pro Plan             | 1                     | <Price>$25</Price>     |
+| Compute Hours Small  | 730 hours             | <Price>$15</Price>     |
+| Function Invocations | 3,400,000 invocations | <Price>$4</Price>      |
+| **Subtotal**         |                       | **<Price>$44</Price>** |
+| Compute Credits      |                       | -<Price>$10</Price>    |
+| **Total**            |                       | **<Price>$34</Price>** |
 
 ## View usage
 
