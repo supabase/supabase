@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { useCallback } from 'react'
 
 import { apiKeysKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
@@ -108,9 +109,14 @@ export const useAPIKeys = (
   variables: APIKeysVariables,
   options: UseCustomQueryOptions<APIKeysData, ResponseError, APIKeysData> = {}
 ) => {
+  const select = useCallback(
+    (data: APIKeysData) => getKeys(options.enabled ? data : []),
+    [options.enabled]
+  )
+
   return useAPIKeysQuery(variables, {
     ...options,
     placeholderData: PlaceholderData,
-    select: getKeys,
+    select,
   })
 }
