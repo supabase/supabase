@@ -192,8 +192,8 @@ async function getPartnersFromMarketplace(): Promise<Partner[]> {
  * Priority: one-click install → Foreign Data Wrapper → plain integration → guide/overview.
  */
 function getLabelForListing(listing: Listing): string {
-  if (!!listing.published_in_marketplace_at) return 'Marketplace Integration'
   if (isFdwListing(listing)) return 'Foreign Data Wrapper'
+  if (!!listing.published_in_marketplace_at) return 'Dashboard Integration'
   if (listing.marketplace_url) return 'Integration'
   return 'Guide'
 }
