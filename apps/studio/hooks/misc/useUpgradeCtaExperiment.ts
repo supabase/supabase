@@ -9,18 +9,9 @@ export const UPGRADE_CTA_FLAG_NAME = 'upgradeCtaPlacement'
 // `[experiment_id]_experiment_exposed` typed event registered in telemetry-constants.ts.
 const UPGRADE_CTA_EXPERIMENT_ID = 'upgrade_cta_placement'
 
-export type UpgradeCtaPlacement =
-  | 'control'
-  | 'user_dropdown'
-  | 'home_usage_card'
-  | 'org_projects_list'
+export type UpgradeCtaPlacement = 'control' | 'user_dropdown' | 'org_projects_list'
 
-const VALID_VARIANTS: UpgradeCtaPlacement[] = [
-  'control',
-  'user_dropdown',
-  'home_usage_card',
-  'org_projects_list',
-]
+const VALID_VARIANTS: UpgradeCtaPlacement[] = ['control', 'user_dropdown', 'org_projects_list']
 
 /**
  * Shared experiment state for the upgrade CTA placement test.

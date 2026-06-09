@@ -23,14 +23,12 @@ export const generateNodes = ({
   loadBalancers,
   onSelectRestartReplica,
   onSelectDropReplica,
-  showPlanUsage,
 }: {
   primary: Database
   replicas: Database[]
   loadBalancers: LoadBalancer[]
   onSelectRestartReplica: (database: Database) => void
   onSelectDropReplica: (database: Database) => void
-  showPlanUsage?: boolean
 }): Node[] => {
   const position = { x: 0, y: 0 }
   const regions = groupBy(replicas, (d) => {
@@ -91,7 +89,6 @@ export const generateNodes = ({
       numReplicas: replicas.length,
       numRegions: Object.keys(regions).length,
       hasLoadBalancer: loadBalancer !== undefined,
-      showPlanUsage,
     },
   }
 

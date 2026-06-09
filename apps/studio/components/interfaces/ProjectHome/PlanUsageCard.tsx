@@ -121,33 +121,18 @@ const ProgressRing = ({
   )
 }
 
-type PlanUsageCardPlacement = 'home_usage_card' | 'org_projects_list'
-
-interface PlanUsageCardProps {
-  /** Identifies the surface where the card is rendered. Drives telemetry + the `source`
-   * tracking parameter routed through `UpgradePlanButton`. */
-  placement: PlanUsageCardPlacement
-  /**
-   * When true, renders the card with the same shape as a `ProjectCard` so it can be
-   * slotted into the org project list grid as the first `<li>` and visually read like
-   * another project tile. Defaults to false (bare fragment for embedding inside another
-   * card container, e.g. the Primary Database React Flow node).
-   */
-  asProjectCard?: boolean
-}
+// The upgrade CTA placement experiment variant this card represents. Used as the telemetry
+// `source` + `placement` value. Kept as a constant so the tracking stays explicit.
+const PLACEMENT = 'org_projects_list'
 
 const CompactMetricRow = ({
   usageItem,
   config,
   orgSlug,
-  paddingClassName = 'px-4',
 }: {
   usageItem: OrgMetricsUsage
   config: MetricConfig
   orgSlug: string
-  /** Horizontal padding for the row. Defaults to `px-4` (project list card); the embedded
-   * Primary Database node passes `px-3` to align with the node's other rows. */
-  paddingClassName?: string
 }) => {
   const current = usageItem.usage ?? 0
   const limit = usageItem.pricing_free_units ?? 0
@@ -158,7 +143,7 @@ const CompactMetricRow = ({
   return (
     <Link
       href={`/org/${orgSlug}/usage#${config.anchor}`}
-      className={cn('group/row block hover:bg-surface-200 transition-colors', paddingClassName)}
+      className="group/row block px-4 hover:bg-surface-200 transition-colors"
     >
       <div className="flex items-center justify-between gap-2 py-2 border-t border-dashed">
         <div className="flex items-center gap-2 min-w-0">
@@ -202,11 +187,12 @@ const SkeletonMetricRow = ({ label }: { label: string }) => (
 )
 
 /**
- * Renders the upgrade CTA's plan-usage sections. The parent is responsible for gating
- * on the experiment variant + free plan — this component only renders the visual
- * sections once usage data is available.
+ * Renders the upgrade CTA's plan-usage card as the first tile in the org project list
+ * (the `org_projects_list` experiment variant). The parent is responsible for gating on
+ * the experiment variant + free plan — this component only renders the visual sections
+ * once usage data is available. Shaped like a `ProjectCard` so it reads as another tile.
  */
-export const PlanUsageCard = ({ placement, asProjectCard = false }: PlanUsageCardProps) => {
+export const PlanUsageCard = () => {
   const track = useTrack()
   const { data: organization } = useSelectedOrganizationQuery()
   const { data: usage, isSuccess, isError } = useOrgUsageQuery({ orgSlug: organization?.slug })
@@ -221,82 +207,46 @@ export const PlanUsageCard = ({ placement, asProjectCard = false }: PlanUsageCar
       }).filter((row): row is { config: MetricConfig; usageItem: OrgMetricsUsage } => row !== null)
     : []
 
-  if (asProjectCard) {
-    // Hide entirely on hard error or when the org has zero applicable metrics — both
-    // are extreme edge cases. Otherwise always render the card shell so the layout is
-    // reserved from first paint and the usage rows fade in once the query resolves.
-    if (isError) return null
-    if (isSuccess && visibleRows.length === 0) return null
-
-    return (
-      <li className="list-none h-min">
-        <div
-          className={cn(
-            'group relative bg-surface-100 border border-surface rounded-md',
-            'flex flex-col gap-y-2'
-          )}
-        >
-          <div className="flex items-center justify-between gap-4 p-4 pb-2">
-            <div className="flex flex-col min-w-0">
-              <h5 className="text-sm text-foreground truncate">Free plan usage</h5>
-              <p className="text-xs text-foreground-lighter truncate">Current billing cycle</p>
-            </div>
-            <div className="flex flex-col items-end gap-1 shrink-0">
-              <UpgradePlanButton
-                source={placement}
-                plan="Pro"
-                onClick={() => track('upgrade_cta_clicked', { placement })}
-              />
-            </div>
-          </div>
-          <div className="flex flex-col justify-end pb-2 [&>:first-child>*]:border-t-0">
-            {isSuccess
-              ? visibleRows.map(({ config, usageItem }) => (
-                  <CompactMetricRow
-                    key={config.key}
-                    usageItem={usageItem}
-                    config={config}
-                    orgSlug={organization?.slug ?? '_'}
-                  />
-                ))
-              : METRICS.map((config) => (
-                  <SkeletonMetricRow key={config.key} label={config.label} />
-                ))}
-          </div>
-        </div>
-      </li>
-    )
-  }
-
-  // Embedded fragment (Primary Database card on project home). Caller decides when to mount.
-  if (!isSuccess) return null
-  if (visibleRows.length === 0) return null
+  // Hide entirely on hard error or when the org has zero applicable metrics — both
+  // are extreme edge cases. Otherwise always render the card shell so the layout is
+  // reserved from first paint and the usage rows fade in once the query resolves.
+  if (isError) return null
+  if (isSuccess && visibleRows.length === 0) return null
 
   return (
-    <>
-      <div className="px-3 py-2 border-t">
-        <span className="text-[11px] uppercase tracking-wider text-foreground-lighter">
-          Free plan &middot; Current billing cycle
-        </span>
+    <li className="list-none h-min">
+      <div
+        className={cn(
+          'group relative bg-surface-100 border border-surface rounded-md',
+          'flex flex-col gap-y-2'
+        )}
+      >
+        <div className="flex items-center justify-between gap-4 p-4 pb-2">
+          <div className="flex flex-col min-w-0">
+            <h5 className="text-sm text-foreground truncate">Free plan usage</h5>
+            <p className="text-xs text-foreground-lighter truncate">Current billing cycle</p>
+          </div>
+          <div className="flex flex-col items-end gap-1 shrink-0">
+            <UpgradePlanButton
+              source={PLACEMENT}
+              plan="Pro"
+              onClick={() => track('upgrade_cta_clicked', { placement: PLACEMENT })}
+            />
+          </div>
+        </div>
+        <div className="flex flex-col justify-end pb-2 [&>:first-child>*]:border-t-0">
+          {isSuccess
+            ? visibleRows.map(({ config, usageItem }) => (
+                <CompactMetricRow
+                  key={config.key}
+                  usageItem={usageItem}
+                  config={config}
+                  orgSlug={organization?.slug ?? '_'}
+                />
+              ))
+            : METRICS.map((config) => <SkeletonMetricRow key={config.key} label={config.label} />)}
+        </div>
       </div>
-      <div className="flex flex-col border-t [&>:first-child>*]:border-t-0">
-        {visibleRows.map(({ config, usageItem }) => (
-          <CompactMetricRow
-            key={config.key}
-            usageItem={usageItem}
-            config={config}
-            orgSlug={organization?.slug ?? '_'}
-            paddingClassName="px-3"
-          />
-        ))}
-      </div>
-      <div className="flex items-center justify-end gap-2 px-3 py-2 border-t">
-        <UpgradePlanButton
-          source={placement}
-          plan="Pro"
-          onClick={() => track('upgrade_cta_clicked', { placement })}
-        />
-      </div>
-    </>
+    </li>
   )
 }

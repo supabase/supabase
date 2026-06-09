@@ -11,15 +11,12 @@ import { ProjectUpgradeFailedBanner } from '@/components/ui/ProjectUpgradeFailed
 import { useBranchesQuery } from '@/data/branches/branches-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useUpgradeCtaExperiment } from '@/hooks/misc/useUpgradeCtaExperiment'
 import { DOCS_URL, IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
 
 export const TopSection = () => {
   const isOrioleDb = useIsOrioleDb()
   const { data: project } = useSelectedProjectQuery()
   const { data: parentProject } = useProjectDetailQuery({ ref: project?.parent_project_ref })
-  const { variant: upgradeCtaVariant } = useUpgradeCtaExperiment()
-  const showUsageCard = upgradeCtaVariant === 'home_usage_card'
 
   const { data: branches } = useBranchesQuery({
     projectRef: project?.parent_project_ref ?? project?.ref,
@@ -91,12 +88,11 @@ export const TopSection = () => {
           <div>
             <div
               className={cn(
-                'w-full border border-muted rounded-md overflow-hidden flex flex-col relative',
-                showUsageCard ? 'h-[600px] md:h-[680px]' : 'h-[400px] md:h-[500px]'
+                'w-full h-[400px] md:h-[500px] border border-muted rounded-md overflow-hidden flex flex-col relative'
               )}
             >
               <ReactFlowProvider>
-                <InstanceConfiguration diagramOnly showPlanUsage={showUsageCard} />
+                <InstanceConfiguration diagramOnly />
               </ReactFlowProvider>
             </div>
           </div>

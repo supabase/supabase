@@ -47,7 +47,7 @@ const ProjectsPage: NextPageWithLayout = () => {
             {showOrgProjectsListUsageCard && (
               <aside className="xl:w-80 xl:shrink-0">
                 <ul className="list-none p-0 m-0">
-                  <PlanUsageCard placement="org_projects_list" asProjectCard />
+                  <PlanUsageCard />
                 </ul>
               </aside>
             )}
