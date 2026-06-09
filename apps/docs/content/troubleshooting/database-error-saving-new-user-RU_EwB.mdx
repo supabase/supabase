@@ -52,11 +52,11 @@ error finding user: sql: Scan error on column index 8, name "confirmation_token"
 
 **Cause:** 
 
-The `auth` schema is managed by Supabase and expects specific column formats. This error typically happens when users are inserted directly via SQL or using an AI tool that uses a direct SQL `INSERT`, rather than through the [Auth API](https://supabase.com/docs/reference/javascript/auth-api). A direct insert can leave required columns as `NULL` when the Auth service expects an empty string.
+The `auth` schema is managed by Supabase and expects specific column formats. This error typically happens when users are inserted directly via SQL or using an AI tool that uses a direct SQL `INSERT`, rather than through the [Auth API](/docs/reference/javascript/auth-api). A direct insert can leave required columns as `NULL` when the Auth service expects an empty string.
 
 **Fix:** 
 
-Run the following in the [SQL editor](https://supabase.com/dashboard/project/_/sql), replacing `confirmation_token` with whichever column appears in your error message:
+Run the following in the [SQL editor](/dashboard/project/_/sql), replacing `confirmation_token` with whichever column appears in your error message:
 
 ```sql
 update auth.users
@@ -91,4 +91,4 @@ A trigger on `auth.users` is calling a function (in this case `handle_new_user`)
 
 1. Check whether the missing table should exist in your `public` schema. If it should, create the table for the trigger to succeed and the error should resolve.
 
-2. If the table is not needed, review the function definition and update or remove the reference. You can view and edit your database functions from the [Database Functions](https://supabase.com/dashboard/project/_/database/functions) page in the dashboard.
+2. If the table is not needed, review the function definition and update or remove the reference. You can view and edit your database functions from the [Database Functions](/dashboard/project/_/database/functions) page in the dashboard.
