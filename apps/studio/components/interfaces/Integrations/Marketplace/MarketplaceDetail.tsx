@@ -1,4 +1,5 @@
 import { ArrowUpRight, BookOpen } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { Button, cn } from 'ui'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
@@ -10,11 +11,13 @@ import { IntegrationDetailTabShortcuts } from '@/components/interfaces/Integrati
 import { InstallIntegrationSheet } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallIntegrationSheet'
 import { InstallOAuthIntegrationButton } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallOAuthIntegrationButton'
 import { useIntegrationDetail } from '@/components/interfaces/Integrations/Landing/useIntegrationDetail'
+import { AddWrapperButton } from '@/components/interfaces/Integrations/Wrappers/AddWrapperButton'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 
 export const centeredContentClass = 'mx-auto w-full max-w-6xl px-6 xl:px-10'
 
 export const MarketplaceDetail = () => {
+  const router = useRouter()
   const {
     ref,
     activeRoute,
@@ -27,6 +30,8 @@ export const MarketplaceDetail = () => {
     pageSubTitle,
     integration,
     isInstalled,
+    installActionType,
+    wrappersTabHref,
     isAvailableLoading,
     isInstalledLoading,
     Component,
@@ -66,17 +71,27 @@ export const MarketplaceDetail = () => {
   }
 
   const renderInstallAction = () => {
-    if (integration.type === 'oauth') {
-      return <InstallOAuthIntegrationButton integration={integration} />
+    switch (installActionType) {
+      case 'oauth':
+        return <InstallOAuthIntegrationButton integration={integration} />
+      case 'add-wrapper':
+        return (
+          <AddWrapperButton
+            type="primary"
+            onClick={() => {
+              if (wrappersTabHref) router.push(`${wrappersTabHref}?new=true`)
+            }}
+          />
+        )
+      case 'installed':
+        return (
+          <Button type="outline" disabled>
+            Installed
+          </Button>
+        )
+      default:
+        return <InstallIntegrationSheet integration={integration} />
     }
-    if (isInstalled) {
-      return (
-        <Button type="outline" disabled>
-          Installed
-        </Button>
-      )
-    }
-    return <InstallIntegrationSheet integration={integration} />
   }
 
   // For overview route, get the integration-specific overview component if available
