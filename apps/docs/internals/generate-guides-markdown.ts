@@ -200,7 +200,7 @@ async function generate() {
   await Promise.all(
     files.map(async (filePath) => {
       const outPath = filePath
-        .replace(/^content\/guides\//, 'public/docs/guides/')
+        .replace(/^content\/guides\//, 'public/markdown/guides/')
         .replace(/\.mdx$/, '.md')
 
       let output: string
@@ -234,8 +234,8 @@ async function generate() {
         }
       }
 
-      // content/guides/ai/vector-columns.mdx → public/docs/guides/ai/vector-columns.md
-      // Placing under public/docs/ ensures the file is served at /docs/guides/...
+      // content/guides/ai/vector-columns.mdx → public/markdown/guides/ai/vector-columns.md
+      // Placing under public/markdown/ ensures the file is served at /docs/guides/...
       // matching the exact URL of the rendered page.
       await fs.promises.mkdir(path.dirname(outPath), { recursive: true })
       await fs.promises.writeFile(outPath, output)
@@ -243,7 +243,7 @@ async function generate() {
   )
 
   const summary = warnings ? ` (${warnings} with warnings)` : ''
-  console.log(`Generated ${files.length} markdown files under public/docs/guides/${summary}`)
+  console.log(`Generated ${files.length} markdown files under public/markdown/guides/${summary}`)
 }
 
 generate()
