@@ -28,7 +28,7 @@ const normalizeOptionalString = (value?: string) => {
 
 const normalizeRequiredString = (value?: string) => value?.trim() ?? ''
 
-const normalizeOptionalSecretString = (value?: string) => {
+const normalizeOptionalUntrimmedString = (value?: string) => {
   return value && value.length > 0 ? value : undefined
 }
 
@@ -236,7 +236,7 @@ export const buildDestinationConfigForValidation = ({
         accountId: normalizeRequiredString(data.snowflakeAccountId),
         user: normalizeRequiredString(data.snowflakeUser),
         privateKey: data.snowflakePrivateKey ?? '',
-        privateKeyPassphrase: normalizeOptionalSecretString(data.snowflakePrivateKeyPassphrase),
+        privateKeyPassphrase: normalizeOptionalUntrimmedString(data.snowflakePrivateKeyPassphrase),
         database: normalizeRequiredString(data.snowflakeDatabase),
         schema: normalizeRequiredString(data.snowflakeSchema),
         role: normalizeOptionalString(data.snowflakeRole),
@@ -325,7 +325,7 @@ export const buildDestinationConfig = async ({
       accountId: normalizeRequiredString(data.snowflakeAccountId),
       user: normalizeRequiredString(data.snowflakeUser),
       privateKey: data.snowflakePrivateKey ?? '',
-      privateKeyPassphrase: normalizeOptionalSecretString(data.snowflakePrivateKeyPassphrase),
+      privateKeyPassphrase: normalizeOptionalUntrimmedString(data.snowflakePrivateKeyPassphrase),
       database: normalizeRequiredString(data.snowflakeDatabase),
       schema: normalizeRequiredString(data.snowflakeSchema),
       role: normalizeOptionalString(data.snowflakeRole),
