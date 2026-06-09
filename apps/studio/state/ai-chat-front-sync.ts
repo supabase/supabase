@@ -1,10 +1,10 @@
+import { parseSupportAssistantPrompt } from '@/components/interfaces/Support/SupportAssistant.utils'
 import {
   escalateConversationInFront,
   resolveConversationInFront,
   syncConversationMessagesToFront,
 } from '@/data/feedback/ai-chat-front-sync'
 import type { AiSupportStatus } from '@/data/feedback/ai-chat-front-sync'
-import { parseSupportAssistantPrompt } from '@/components/interfaces/Support/SupportAssistant.utils'
 import type { AiAssistantState } from '@/state/ai-assistant-state'
 
 /**
@@ -81,8 +81,7 @@ export async function syncSupportChatToFront(
         // When frontConversationId exists the user message was already sent via /feedback/send
         return {
           ...msg,
-          content:
-            isInitial && !supportMetadata.frontConversationId ? (parsed.message ?? '') : '',
+          content: isInitial && !supportMetadata.frontConversationId ? (parsed.message ?? '') : '',
         }
       })
       .filter((msg) => msg.content.length > 0)

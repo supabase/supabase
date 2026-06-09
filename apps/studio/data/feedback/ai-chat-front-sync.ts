@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/nextjs'
+
 import { fetchPost } from '@/data/fetchers'
 import { API_URL } from '@/lib/constants'
 
