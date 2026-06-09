@@ -30,6 +30,7 @@ import { QuerySearchParamsType } from './UnifiedLogs.types'
 import { getRowTimestampMs } from './UnifiedLogs.utils'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
 import {
+  SERVICE_FLOW_TYPES,
   ServiceFlowType,
   useUnifiedLogInspectionQuery,
 } from '@/data/logs/unified-log-inspection-query'
@@ -63,8 +64,12 @@ export function ServiceFlowPanel({
   }, [selectedRowKey])
 
   const logType = selectedRow?.log_type
-  const serviceFlowType: ServiceFlowType | undefined =
-    logType === 'edge function' ? 'edge-function' : (logType as ServiceFlowType)
+  const normalizedLogType = logType === 'edge function' ? 'edge-function' : logType
+  const serviceFlowType: ServiceFlowType | undefined = SERVICE_FLOW_TYPES.includes(
+    normalizedLogType as ServiceFlowType
+  )
+    ? (normalizedLogType as ServiceFlowType)
+    : undefined
   const shouldShowServiceFlow = !!serviceFlowType
 
   useEffect(() => {
