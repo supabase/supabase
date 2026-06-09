@@ -84,6 +84,8 @@ functions:
     $ref: '@supabase/auth-js.GoTrueClient.startAutoRefresh'
   - id: stop-auto-refresh
     $ref: '@supabase/auth-js.GoTrueClient.stopAutoRefresh'
+  - id: auth-dispose
+    $ref: '@supabase/auth-js.GoTrueClient.dispose'
   - id: get-user
     $ref: '@supabase/auth-js.GoTrueClient.getUser'
   - id: update-user
@@ -510,6 +512,8 @@ functions:
     $ref: '@supabase/realtime-js.RealtimeChannel.on'
   - id: broadcast-message
     $ref: '@supabase/realtime-js.RealtimeChannel.send'
+  - id: realtime-httpsend
+    $ref: '@supabase/realtime-js.RealtimeChannel.httpSend'
   - id: get-channels
     $ref: '@supabase/supabase-js.SupabaseClient.getChannels'
   - id: remove-channel

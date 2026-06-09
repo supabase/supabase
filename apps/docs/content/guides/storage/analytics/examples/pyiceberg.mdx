@@ -12,8 +12,16 @@ PyIceberg is a Python client for Apache Iceberg that enables programmatic intera
 
 ## Installation
 
+Install PyIceberg and PyArrow directly:
+
 ```bash
 pip install pyiceberg pyarrow
+```
+
+If you are using the [Supabase Python SDK](https://supabase.com/docs/reference/python/introduction), `pyiceberg` is an optional dependency. Install it with the `iceberg` extras:
+
+```bash
+pip install "supabase[iceberg]" pyarrow
 ```
 
 ## Basic setup
