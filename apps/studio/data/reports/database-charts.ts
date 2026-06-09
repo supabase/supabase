@@ -92,6 +92,14 @@ export const getReportAttributesV2: (
           omitFromTotal: true,
           tooltip: 'Total RAM available on this instance',
         },
+        {
+          attribute: 'swap_usage',
+          provider: 'infra-monitoring',
+          label: 'Swap',
+          omitFromTotal: true,
+          tooltip:
+            'Swap space in use by the operating system. Sustained swap usage indicates memory pressure and may degrade database performance',
+        },
       ],
     },
     {
