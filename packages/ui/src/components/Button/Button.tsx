@@ -13,8 +13,6 @@ const buttonVariants = cva(
   `relative
   flex items-center justify-center
   cursor-pointer
-  inline-flex
-  items-center
   space-x-2
   text-center
   font-regular
@@ -24,8 +22,9 @@ const buttonVariants = cva(
   outline-hidden
   transition-all
   outline-0
+  focus-visible:outline-solid
   focus-visible:outline-4
-  focus-visible:outline-offset-1
+  focus-visible:outline-offset-0
   border
   `,
   {
@@ -45,9 +44,9 @@ const buttonVariants = cva(
           text-foreground
           bg-alternative dark:bg-muted  hover:bg-selection
           border-strong hover:border-stronger
-          focus-visible:outline-brand-600
+          focus-visible:outline-border-stronger focus-visible:border-stronger
           data-[state=open]:bg-selection
-          data-[state=open]:outline-brand-600
+          data-[state=open]:outline-border-stronger
           data-[state=open]:border-button-hover
           `,
         secondary: `
@@ -127,6 +126,15 @@ const buttonVariants = cva(
           data-[state=open]:bg-warning-400 dark:data-[state=open]:bg-warning-/50
           data-[state=open]:outline-warning
         `,
+        input: `
+          text-foreground
+          bg-alternative dark:bg-muted  hover:bg-selection
+          border-strong hover:border-stronger
+          focus-visible:outline-border-stronger focus-visible:border-stronger
+          data-[state=open]:bg-selection
+          data-[state=open]:outline-border-stronger
+          data-[state=open]:border-button-hover
+        `,
       },
       block: {
         true: 'w-full flex items-center justify-center',
@@ -152,6 +160,18 @@ const buttonVariants = cva(
         },
       },
     },
+    compoundVariants: [
+      {
+        type: 'input',
+        size: 'tiny',
+        class: 'px-3 py-4 font-normal',
+      },
+      {
+        type: 'input',
+        block: true,
+        class: 'justify-start text-left',
+      },
+    ],
   }
 )
 

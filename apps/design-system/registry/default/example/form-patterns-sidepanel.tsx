@@ -316,7 +316,7 @@ export default function FormPatternsSidePanel() {
                           <button
                             type="button"
                             onClick={() => uploadButtonRef.current?.click()}
-                            className="flex items-center justify-center h-10 w-10 shrink-0 text-foreground-lighter hover:text-foreground-light overflow-hidden rounded-full bg-cover border hover:border-strong"
+                            className="flex items-center justify-center h-10 w-10 shrink-0 text-foreground-lighter hover:text-foreground-light overflow-hidden rounded-full bg-cover border hover:border-strong focus-visible:outline-brand-600"
                             style={{
                               backgroundImage: logoUrl ? `url("${logoUrl}")` : 'none',
                             }}
@@ -675,11 +675,7 @@ export default function FormPatternsSidePanel() {
                       <FormControl className="col-span-6">
                         <Popover>
                           <PopoverTrigger asChild>
-                            <Button
-                              type="outline"
-                              className="bg-control w-full justify-start text-left font-normal px-3 py-4"
-                              icon={<CalendarIcon className="h-4 w-4" />}
-                            >
+                            <Button type="input" block icon={<CalendarIcon className="h-4 w-4" />}>
                               {field.value ? format(field.value, 'PPP') : 'Pick a date'}
                             </Button>
                           </PopoverTrigger>
