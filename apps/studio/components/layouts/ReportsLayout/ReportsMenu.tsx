@@ -239,6 +239,7 @@ const ReportsMenu = () => {
             title="Delete custom report"
             confirmLabel="Delete report"
             size="medium"
+            loading={false}
             visible={deleteModalOpen}
             onCancel={() => setDeleteModalOpen(false)}
             onConfirm={onConfirmDeleteReport}
