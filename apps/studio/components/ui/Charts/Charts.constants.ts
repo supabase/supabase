@@ -77,12 +77,12 @@ export const CHART_ROLE_COLORS = {
     fill: { light: '#9FE8C7', dark: '#2A5C3F' },
   },
   overhead: {
-    color: { light: '#15945F', dark: '#1FB87C' },
-    fill: { light: '#7CCFAC', dark: '#1C4D38' },
+    color: { light: '#1F9D66', dark: '#28A974' },
+    fill: { light: '#86CFAE', dark: '#163D2C' },
   },
   'overhead-2': {
-    color: { light: '#8FD9B8', dark: '#5FC79B' },
-    fill: { light: '#C7ECDB', dark: '#244A3A' },
+    color: { light: '#0E6B45', dark: '#18774F' },
+    fill: { light: '#5BA984', dark: '#0F2C1F' },
   },
   headroom: {
     color: { light: '#C4C7CB', dark: '#3A3D41' },
