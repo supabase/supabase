@@ -16,6 +16,7 @@ interface MetricsStackOption {
   title: string
   description: ReactNode
   href: string
+  external?: boolean
   icon: IconName
   iconStrokeWidth?: number
   iconColor: string
@@ -51,6 +52,7 @@ const metricsStackOptions: MetricsStackOption[] = [
     title: 'Datadog',
     description: `Scrape the Metrics API with the Datadog Agent or Prometheus remote write and monitor
         Supabase alongside your app telemetry.`,
+    external: false,
     href: 'https://docs.datadoghq.com/integrations/supabase/',
     icon: 'datadog',
     iconColor: '#632CA6',
@@ -112,6 +114,6 @@ export function MetricsStackCards() {
 
 MetricsStackCards.__markdown__ = `
   ${metricsStackOptions
-    .map((option) => ` - [${option.title}](${option.href}). ${option.description}`)
+    .map((option) => ` - [${option.title}](${option.external ? '' : '/docs'}${option.href}). ${option.description}`)
     .join('\n')}
 `
