@@ -515,6 +515,8 @@ services:
         "-c",
         "config_file=/etc/postgresql/postgresql.conf",
         "-c",
+        "cron.database_name=${POSTGRES_DB}", # pg_cron must run in the configured database, not the hard-coded "postgres"
+        "-c",
         "log_min_messages=fatal" # prevents Realtime polling queries from appearing in logs
       ]
 
