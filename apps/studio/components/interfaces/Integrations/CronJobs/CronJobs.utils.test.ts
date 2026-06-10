@@ -211,6 +211,61 @@ describe('parseCronJobCommand', () => {
     })
   })
 
+  it('should keep a jsonb_build_object header value that contains a comma intact', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('Accept', 'application/json, text/plain'), timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [{ name: 'Accept', value: 'application/json, text/plain' }],
+      httpBody: '',
+      timeoutMs: 5000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should not shift later jsonb_build_object headers when an earlier value contains a comma', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('Accept', 'application/json, text/plain', 'Authorization', 'Bearer abc'), timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [
+        { name: 'Accept', value: 'application/json, text/plain' },
+        { name: 'Authorization', value: 'Bearer abc' },
+      ],
+      httpBody: '',
+      timeoutMs: 5000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should keep a jsonb_build_object header value that contains parentheses intact', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('User-Agent', 'Mozilla/5.0 (compatible)'), timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [{ name: 'User-Agent', value: 'Mozilla/5.0 (compatible)' }],
+      httpBody: '',
+      timeoutMs: 5000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should keep an escaped quote inside a comma-containing jsonb_build_object value', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('X-Company', 'O''Reilly, Inc'), timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [{ name: 'X-Company', value: "O'Reilly, Inc" }],
+      httpBody: '',
+      timeoutMs: 5000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
   it('should return an HTTP request config with GET method and empty body', () => {
     const command = `select net.http_get( url:='https://example.com/api/endpoint', headers:=jsonb_build_object(), timeout_milliseconds:=5000 );`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
