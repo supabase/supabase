@@ -85,7 +85,7 @@ Deno.serve(async (req) => {
     // Upload the generated image to Supabase Storage
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') || '',
-      Deno.env.get(SUPABASE_SECRET_KEYS['default']) || ''
+      SUPABASE_SECRET_KEYS['default'] || ''
     )
 
     // Create a unique identifier for this generation

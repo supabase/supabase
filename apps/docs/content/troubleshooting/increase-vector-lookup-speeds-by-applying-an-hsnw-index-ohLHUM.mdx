@@ -58,7 +58,7 @@ If an address is returned, you should use your direct connection string found on
 
 **3. Increase memory for index creation (optional)**
 
-The `maintance_work_mem` variable limits the maximum amount of memory that can be used by maintenance operations, such as vacuuming, altering, and indexing tables. In your session you should try to set it to a reasonably high value:
+The `maintenance_work_mem` variable limits the maximum amount of memory that can be used by maintenance operations, such as vacuuming, altering, and indexing tables. In your session you should try to set it to a reasonably high value:
 
 ```sql
 set maintenance_work_mem to <several Gb's>; -- '#GB'

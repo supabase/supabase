@@ -34,6 +34,7 @@ import { useContentQuery } from '@/data/content/content-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
 
 export function SidebarCollapsible({
   children,
@@ -100,6 +101,7 @@ export function LogsSidebarMenuV2() {
   const showETLLogs = enablePgReplicate && (etlData?.sources?.length ?? 0) > 0 && !isETLLoading
 
   const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
+  const showMultigresLogs = useShowMultigresLogs()
 
   const { data: savedQueriesRes, isPending: savedQueriesLoading } = useContentQuery({
     projectRef: ref,
@@ -190,6 +192,14 @@ export function LogsSidebarMenuV2() {
           name: 'Replication',
           key: 'replication_logs',
           url: `/project/${ref}/logs/replication-logs`,
+          items: [],
+        }
+      : null,
+    showMultigresLogs
+      ? {
+          name: 'Multigres',
+          key: 'multigres-logs',
+          url: `/project/${ref}/logs/multigres-logs`,
           items: [],
         }
       : null,

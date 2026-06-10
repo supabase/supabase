@@ -42,6 +42,22 @@ const AdmonitionWithMargin = (props: AdmonitionProps) => {
   return <Admonition {...props} className="mb-8" />
 }
 
+/**
+ * Route fenced ```mermaid blocks through the Mermaid component; everything else
+ * continues through `CodeBlock` for syntax highlighting.
+ */
+const Pre = (props: any) => {
+  const child = Array.isArray(props.children) ? props.children[0] : props.children
+  const className: unknown = child?.props?.className
+  if (typeof className === 'string' && className.split(' ').includes('language-mermaid')) {
+    const code = child.props.children
+    if (typeof code === 'string') {
+      return <Mermaid chart={code.trim()} />
+    }
+  }
+  return <CodeBlock {...props} />
+}
+
 const components = {
   Accordion,
   AccordionItem,
@@ -99,7 +115,7 @@ const components = {
       {props.children}
     </Heading>
   ),
-  pre: CodeBlock,
+  pre: Pre,
   /**
    * Force inline code tags to go sync, this prevents Heading anchor resolution fail due to
    * our CodeBlock component being async. We need to find a better solution for more future
