@@ -631,8 +631,8 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           format: 'bytes',
           label: 'System',
-          color: CHART_OVERHEAD_RAMP[1].color,
-          fill: CHART_OVERHEAD_RAMP[1].fill,
+          color: CHART_ROLE_COLORS['overhead-2'].color,
+          fill: CHART_ROLE_COLORS['overhead-2'].fill,
           tooltip: 'Reserved space for the system to ensure your database runs smoothly',
         },
         {
