@@ -43,7 +43,6 @@ export const DestinationPanelFormSchema = z.object({
   ducklakeS3UrlStyle: z.enum(['path', 'vhost']).optional(),
   ducklakeS3UseSsl: z.boolean().optional(),
   ducklakeMetadataSchema: z.string().optional(),
-  ducklakeExpireSnapshotsOlderThan: z.string().optional(),
 })
 
 export type DestinationPanelSchemaType = z.infer<typeof DestinationPanelFormSchema>

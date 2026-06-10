@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useFlag, useParams } from 'common'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef } from 'react'
@@ -130,7 +130,7 @@ export const SecretAPIKeys = () => {
       <FormHeader
         title="Secret keys"
         description="These API keys allow privileged access to your project's APIs. Use in servers, functions, workers or other backend components of your application."
-        actions={<CreateSecretAPIKeyDialog />}
+        actions={IS_PLATFORM ? <CreateSecretAPIKeyDialog /> : null}
       />
 
       {!canReadAPIKeys && !isLoadingPermissions ? (
@@ -159,7 +159,7 @@ export const SecretAPIKeys = () => {
                 {showApiKeysLastUsed && (
                   <TableHead className="hidden lg:table-cell">Last Used</TableHead>
                 )}
-                <TableHead />
+                {IS_PLATFORM && <TableHead />}
               </TableRow>
             </TableHeader>
             <TableBody>

@@ -5,7 +5,6 @@ import { Search, TextSearch, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-// eslint-disable-next-line no-restricted-imports
 import DataGrid, { DataGridHandle, Row } from 'react-data-grid'
 import { Button, cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -453,7 +452,7 @@ export const QueryInsightsTable = ({
             <DataGrid
               ref={triageGridRef}
               style={{ height: '100%' }}
-              className="flex-1 grow h-full"
+              className="flex-1 grow h-full border-t-0! border-b-0!"
               rowHeight={60}
               headerRowHeight={36}
               columns={triageColumns}
@@ -509,7 +508,7 @@ export const QueryInsightsTable = ({
             <DataGrid
               ref={gridRef}
               style={{ height: '100%' }}
-              className={cn('flex-1 grow h-full')}
+              className={cn('flex-1 grow h-full border-t-0! border-b-0!')}
               rowHeight={44}
               headerRowHeight={36}
               columns={columns}
