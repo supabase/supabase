@@ -9,7 +9,7 @@ const DebuggerPage: NextPageWithLayout = () => {
 
 DebuggerPage.getLayout = (page) => (
   <DefaultLayout>
-    <AdvisorsLayout title="Debugger">{page}</AdvisorsLayout>
+    <AdvisorsLayout title="Database Scan">{page}</AdvisorsLayout>
   </DefaultLayout>
 )
 

@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ArrowUpRight, Bug } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 
 import { useIsAdvisorRulesEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import type { ProductMenuGroup } from '@/components/ui/ProductMenu/ProductMenu.types'
@@ -29,12 +29,11 @@ export const useGenerateAdvisorsMenu = (): ProductMenuGroup[] => {
           shortcutId: SHORTCUT_IDS.NAV_ADVISORS_PERFORMANCE,
         },
         {
-          name: 'Database Debugger',
+          name: 'Database Scan',
           key: 'debugger',
           url: `/project/${ref}/advisors/debugger`,
           items: [],
           shortcutId: SHORTCUT_IDS.NAV_ADVISORS_DEBUGGER,
-          icon: <Bug size={14} strokeWidth={1.5} />,
         },
         {
           name: 'Query Performance',

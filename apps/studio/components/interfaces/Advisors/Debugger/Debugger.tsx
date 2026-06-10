@@ -139,7 +139,7 @@ export function Debugger() {
     <div className="h-full flex flex-col">
       <FormHeader
         className="py-4 px-6 mb-0!"
-        title="Database Debugger"
+        title="Database Scan"
         description="Run a health scan to diagnose issues with locks, storage, performance, and connections."
         actions={
           <Button
@@ -198,16 +198,24 @@ export function Debugger() {
           <Tabs
             value={activeTab}
             onValueChange={(v) => setActiveTab(v as DebuggerTab)}
-            className="space-y-4"
+            className="w-full"
           >
-            <TabsList>
-              <TabsTrigger value="locks">Locks &amp; Activity</TabsTrigger>
-              <TabsTrigger value="storage">Storage</TabsTrigger>
-              <TabsTrigger value="performance">Performance</TabsTrigger>
-              <TabsTrigger value="connections">Connections</TabsTrigger>
+            <TabsList className="flex gap-x-6 border-b rounded-none px-0 mb-4">
+              <TabsTrigger value="locks" className="text-xs py-2">
+                Locks &amp; Activity
+              </TabsTrigger>
+              <TabsTrigger value="storage" className="text-xs py-2">
+                Storage
+              </TabsTrigger>
+              <TabsTrigger value="performance" className="text-xs py-2">
+                Performance
+              </TabsTrigger>
+              <TabsTrigger value="connections" className="text-xs py-2">
+                Connections
+              </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="locks">
+            <TabsContent value="locks" className="mt-0">
               <LocksActivitySection
                 locksData={locksQuery.data}
                 blockingData={blockingQuery.data}
@@ -221,7 +229,7 @@ export function Debugger() {
               />
             </TabsContent>
 
-            <TabsContent value="storage">
+            <TabsContent value="storage" className="mt-0">
               <StorageHealthSection
                 bloatData={bloatQuery.data}
                 vacuumStatsData={vacuumStatsQuery.data}
@@ -236,7 +244,7 @@ export function Debugger() {
               />
             </TabsContent>
 
-            <TabsContent value="performance">
+            <TabsContent value="performance" className="mt-0">
               <PerformanceSection
                 cacheHitData={cacheHitQuery.data}
                 indexUsageData={indexUsageQuery.data}
@@ -252,7 +260,7 @@ export function Debugger() {
               />
             </TabsContent>
 
-            <TabsContent value="connections">
+            <TabsContent value="connections" className="mt-0">
               <ConnectionsReplicationSection
                 roleStatsData={roleStatsQuery.data}
                 replicationSlotsData={replicationSlotsQuery.data}
