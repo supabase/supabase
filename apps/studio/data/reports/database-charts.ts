@@ -201,14 +201,6 @@ export const getReportAttributesV2: (
           tooltip:
             'CPU time spent on other tasks (e.g., background processes, software interrupts)',
         },
-        {
-          attribute: 'cpu_usage_max',
-          provider: 'reference-line',
-          label: 'Max',
-          value: 100,
-          tooltip: 'Max CPU usage',
-          isMaxValue: true,
-        },
       ],
     },
     {
