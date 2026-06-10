@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { useParams } from 'common'
 import { Undo2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -6,7 +6,6 @@ import React, { useEffect, type ReactNode } from 'react'
 import { Button, cn, ResizablePanel, usePanelRef } from 'ui'
 
 import { ButtonTooltip } from '../ButtonTooltip'
-import { FeaturePreviewBadge } from '../FeaturePreviewBadge'
 import { FeaturePreviewSidebarPanel } from '../FeaturePreviewSidebarPanel'
 import { DateRangeDisabled } from './DataTable.types'
 import { DataTableFilterControls } from './DataTableFilters/DataTableFilterControls'
@@ -32,11 +31,7 @@ export function FilterSideBar({
   const { ref } = useParams()
   const { table } = useDataTable()
 
-  const {
-    disable: disableUnifiedLogs,
-    isEligible: isUnifiedLogsEligible,
-    isEnabled: isUnifiedLogsEnabled,
-  } = useUnifiedLogsPreview()
+  const { disable: disableUnifiedLogs, isEligible: isUnifiedLogsEligible } = useUnifiedLogsPreview()
 
   const handleGoBackToOldLogs = () => {
     disableUnifiedLogs()
@@ -81,9 +76,6 @@ export function FilterSideBar({
         {isUnifiedLogsEligible && (
           <div className="flex items-center justify-between gap-3 border-b border-border px-2 py-3">
             <div className="space-y-0.5">
-              {isUnifiedLogsEnabled && (
-                <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS} />
-              )}
               <p className="text-xs font-medium text-foreground">Go back to old logs</p>
               <p className="text-xs text-foreground-light">Use the traditional interface</p>
             </div>
