@@ -331,6 +331,17 @@ export const UnifiedLogs = () => {
     registerInCommandMenu: true,
   })
 
+  // When no log is open yet, ArrowDown selects the first log. Once a log is open,
+  // ServiceFlowPanelControls owns prev/next navigation, so this is disabled.
+  useShortcut(
+    SHORTCUT_IDS.UNIFIED_LOGS_NEXT_ROW,
+    () => {
+      const firstRowId = table.getCoreRowModel().flatRows[0]?.id
+      if (firstRowId) setOpenRowId(firstRowId)
+    },
+    { enabled: !openRowId }
+  )
+
   useEffect(() => {
     if (isMobile) {
       setIsFilterBarOpen(false)

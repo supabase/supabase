@@ -78,6 +78,7 @@ export function FilterSideBar({
       <div className="flex-1 p-2 sm:overflow-y-scroll">
         {isUnifiedLogsEligible && (
           <FeaturePreviewSidebarPanel
+            compact
             className="mx-2 mt-2 mb-3"
             title="Go back to old logs"
             description="Use the traditional interface"
