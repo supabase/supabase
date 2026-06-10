@@ -93,7 +93,7 @@ export const getReportAttributesV2: (
           tooltip: 'Total RAM available on this instance',
         },
         {
-          attribute: 'swap_usage',
+          attribute: 'ram_usage_swap',
           provider: 'infra-monitoring',
           label: 'Swap',
           omitFromTotal: true,
