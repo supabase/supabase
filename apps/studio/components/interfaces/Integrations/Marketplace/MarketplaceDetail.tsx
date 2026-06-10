@@ -108,7 +108,7 @@ export const MarketplaceDetail = () => {
         isInstalled={isInstalled}
         actions={
           <>
-            {integrationStatus?.partner_links?.dashboard && (
+            {isInstalled && integrationStatus?.partner_links?.dashboard && (
               <Button
                 type="text"
                 size="tiny"
@@ -125,7 +125,7 @@ export const MarketplaceDetail = () => {
                 </a>
               </Button>
             )}
-            {integrationStatus?.partner_links?.manage && (
+            {isInstalled && integrationStatus?.partner_links?.manage && (
               <Button
                 type="text"
                 size="tiny"
