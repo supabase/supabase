@@ -1,4 +1,5 @@
 import fs from 'node:fs'
+import { createRequire } from 'node:module'
 import path from 'node:path'
 import { globby } from 'globby'
 import matter from 'gray-matter'
@@ -109,6 +110,55 @@ function extractTitleAttr(attrs: string): string | null {
     .replace(/<[^>]+>/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
+}
+
+/**
+ * Discovers components that expose a `__markdown__` string property and
+ * returns a `{ name → markdown }` map. Globs `components/**` for files that
+ * mention `__markdown__`, then loads each via `createRequire` so tsx's CJS
+ * interop handles `shared-data` named imports. Files that fail to load
+ * (e.g. heavy Next.js deps) are skipped silently — the feature degrades
+ * gracefully rather than crashing the build.
+ */
+const scriptRequire = createRequire(import.meta.url)
+async function loadMarkdownOverrides(): Promise<Record<string, string>> {
+  const overrides: Record<string, string> = {}
+  const files = await globby(['components/**/*.{ts,tsx}'])
+  await Promise.all(
+    files.map(async (file) => {
+      const src = await fs.promises.readFile(file, 'utf8')
+      if (!/\.__markdown__\s*=/.test(src)) return
+      try {
+        const mod = scriptRequire(path.resolve(file))
+        for (const [name, value] of Object.entries(mod ?? {})) {
+          if (typeof (value as any)?.__markdown__ === 'string') {
+            overrides[name] = (value as any).__markdown__
+          }
+        }
+      } catch {
+        // Heavy deps or non-CJS-friendly modules — skip this file
+      }
+    })
+  )
+  return overrides
+}
+
+/**
+ * Replaces any JSX tag whose name matches a `__markdown__` override with the
+ * override string. Handles both self-closing (`<Foo />`) and paired
+ * (`<Foo>…</Foo>`) forms. Done before `stripJsxTags` so the markdown content
+ * survives subsequent indent normalization.
+ */
+function convertMarkdownComponents(content: string, overrides: Record<string, string>): string {
+  const names = Object.keys(overrides)
+  if (names.length === 0) return content
+  const alt = names.map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')
+  content = content.replace(
+    new RegExp(`<(${alt})\\b[^>]*>[\\s\\S]*?<\\/\\1>`, 'g'),
+    (_, name) => overrides[name]
+  )
+  content = content.replace(new RegExp(`<(${alt})\\b[^>]*\\/>`, 'g'), (_, name) => overrides[name])
+  return content
 }
 
 /**
@@ -282,6 +332,7 @@ function stripJsxTags(content: string): string {
 async function generate() {
   const files = await globby(['content/guides/**/!(_)*.mdx'])
   const linkBaseUrl = getInternalLinkBaseUrl()
+  const markdownOverrides = await loadMarkdownOverrides()
   let warnings = 0
 
   await Promise.all(
@@ -299,7 +350,8 @@ async function generate() {
         const withSteps = convertStepHike(withPartials)
         const withTooltips = convertInfoTooltip(withSteps)
         const withSharedData = convertSharedData(withTooltips)
-        const withLinks = convertLinkPanels(withSharedData)
+        const withOverrides = convertMarkdownComponents(withSharedData, markdownOverrides)
+        const withLinks = convertLinkPanels(withOverrides)
         const stripped = stripJsxTags(withLinks)
         const processed = prefixInternalLinks(stripped, linkBaseUrl)
 
