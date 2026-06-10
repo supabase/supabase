@@ -1,9 +1,11 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { Undo2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useEffect, type ReactNode } from 'react'
 import { Button, cn, ResizablePanel, usePanelRef } from 'ui'
 
+import { ButtonTooltip } from '../ButtonTooltip'
 import { FeaturePreviewBadge } from '../FeaturePreviewBadge'
 import { FeaturePreviewSidebarPanel } from '../FeaturePreviewSidebarPanel'
 import { DateRangeDisabled } from './DataTable.types'
@@ -77,22 +79,22 @@ export function FilterSideBar({
 
       <div className="flex-1 p-2 sm:overflow-y-scroll">
         {isUnifiedLogsEligible && (
-          <FeaturePreviewSidebarPanel
-            compact
-            className="mx-2 mt-2 mb-3"
-            title="Go back to old logs"
-            description="Use the traditional interface"
-            illustration={
-              isUnifiedLogsEnabled ? (
+          <div className="flex items-center justify-between gap-3 border-b border-border px-2 py-3">
+            <div className="space-y-0.5">
+              {isUnifiedLogsEnabled && (
                 <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS} />
-              ) : undefined
-            }
-            actions={
-              <Button type="default" size="tiny" onClick={handleGoBackToOldLogs}>
-                Switch back
-              </Button>
-            }
-          />
+              )}
+              <p className="text-xs font-medium text-foreground">Go back to old logs</p>
+              <p className="text-xs text-foreground-light">Use the traditional interface</p>
+            </div>
+            <ButtonTooltip
+              type="default"
+              className="px-1.5"
+              icon={<Undo2 />}
+              onClick={handleGoBackToOldLogs}
+              tooltip={{ content: { side: 'bottom', text: 'Switch back' } }}
+            />
+          </div>
         )}
         <DataTableFilterControls dateRangeDisabled={dateRangeDisabled} />
         {afterFilters}
