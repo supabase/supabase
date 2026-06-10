@@ -53,7 +53,8 @@ export const JsonEditor = ({
   // sometimes the value is a JSON object if it was truncated, then fully loaded from the grid.
   const value = row?.[column as keyof typeof row] as unknown
   const jsonString = typeof value === 'object' ? JSON.stringify(value) : (value as string)
-  const isTruncated = isValueTruncated(jsonString)
+  const columnFormat = selectedTable?.columns?.find((candidate) => candidate.name === column)?.format
+  const isTruncated = isValueTruncated(jsonString, columnFormat)
 
   const { mutate: getCellValue, isPending, isSuccess, reset } = useGetCellValueMutation()
 
