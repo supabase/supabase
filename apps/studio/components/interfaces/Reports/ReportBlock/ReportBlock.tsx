@@ -149,6 +149,7 @@ export const ReportBlock = ({
       {isSnippet ? (
         <QueryBlock
           blockWriteQueries
+          portalTooltip
           id={item.id}
           label={item.label}
           chartConfig={chartConfig}
