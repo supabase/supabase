@@ -240,14 +240,6 @@ export const getReportAttributesV2: (
           fill: { light: '#A6D8AE', dark: '#2A5C3F' },
           tooltip: 'CPU time spent idle and available for new work',
         },
-        {
-          attribute: 'cpu_usage_max',
-          provider: 'reference-line',
-          label: 'Max',
-          value: 100,
-          tooltip: 'Max CPU usage',
-          isMaxValue: true,
-        },
       ],
     },
     {
