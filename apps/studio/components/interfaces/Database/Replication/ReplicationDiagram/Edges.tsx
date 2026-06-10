@@ -89,7 +89,7 @@ export const SmoothstepEdge = ({
   markerEnd,
   data,
 }: EdgeProps) => {
-  const { ref: projectRef } = useParams()
+  const { ref: projectRef = 'default' } = useParams()
   const { type, identifier, shiftEdgeEnd } = (data || {}) as EdgeData
   const isReplica = type === 'replica'
 

@@ -204,13 +204,17 @@ export const getSlotBudgetSeverity = (
     typeof retainedBytes !== 'number' ||
     typeof safeWalSizeBytes !== 'number' ||
     !Number.isFinite(retainedBytes) ||
-    !Number.isFinite(safeWalSizeBytes) ||
-    safeWalSizeBytes <= 0
+    !Number.isFinite(safeWalSizeBytes)
   ) {
     return 'normal'
   }
 
-  const consumedRatio = retainedBytes / (retainedBytes + safeWalSizeBytes)
+  const total = retainedBytes + safeWalSizeBytes
+  // Nothing retained and no headroom left: nothing to flag (also avoids a 0/0 division). When the
+  // headroom is 0 but WAL is still retained, the ratio is 1 and the slot is correctly critical.
+  if (total <= 0) return 'normal'
+
+  const consumedRatio = retainedBytes / total
   if (consumedRatio >= SLOT_LOSS_CRITICAL_RATIO) return 'critical'
   if (consumedRatio >= SLOT_LOSS_WARNING_RATIO) return 'warning'
   return 'normal'

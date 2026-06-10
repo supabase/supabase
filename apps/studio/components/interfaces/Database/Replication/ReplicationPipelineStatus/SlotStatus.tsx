@@ -23,7 +23,7 @@ export const SlotStatusBadge = ({ status }: { status?: SlotWalStatus }) => {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Badge variant={meta.variant} className="cursor-help">
+        <Badge variant={meta.variant} className="cursor-default">
           {meta.label}
         </Badge>
       </TooltipTrigger>
@@ -88,7 +88,7 @@ export const SlotConnectionIndicator = ({ isActive }: { isActive?: boolean }) =>
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <span className="flex items-center gap-x-1.5 text-xs text-foreground-light cursor-help">
+        <span className="flex items-center gap-x-1.5 text-xs text-foreground-light cursor-default">
           <span
             className={cn(
               'h-1.5 w-1.5 rounded-full shrink-0',

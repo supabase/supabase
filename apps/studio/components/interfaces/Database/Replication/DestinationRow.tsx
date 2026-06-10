@@ -1,11 +1,10 @@
 import { useParams } from 'common'
 import { AnalyticsBucket, BigQuery, Database } from 'icons'
-import { Minus, TriangleAlert } from 'lucide-react'
+import { Minus } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
-  Badge,
   Button,
   TableCell,
   TableRow,
@@ -19,10 +18,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteDestination } from './DeleteDestination'
 import { PipelineStatus } from './PipelineStatus'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
-import {
-  getFormattedLagValue,
-  getSlotHealthSeverity,
-} from './ReplicationPipelineStatus/ReplicationPipelineStatus.utils'
+import { getFormattedLagValue } from './ReplicationPipelineStatus/ReplicationPipelineStatus.utils'
 import { RowMenu } from './RowMenu'
 import { UpdateVersionModal } from './UpdateVersionModal'
 import { useDestinationInformation } from './useDestinationInformation'
@@ -98,13 +94,6 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
   const lagBytes = applyLag?.confirmed_flush_lsn_bytes
   const lag = getFormattedLagValue('bytes', lagBytes)
   const isCaughtUp = lagBytes === 0
-  // Severity reflects the slot's health: the reported WAL status plus how close the retained WAL is
-  // to exhausting the slot's safe headroom, not the lag size itself.
-  const lagSeverity = getSlotHealthSeverity(applyLag)
-  const isLost = applyLag?.wal_status === 'lost'
-  // safe_wal_size_bytes is null when retention is unlimited; only show a headroom number when finite.
-  const hasFiniteHeadroom = typeof applyLag?.safe_wal_size_bytes === 'number'
-  const safeWalSize = getFormattedLagValue('bytes', applyLag?.safe_wal_size_bytes ?? undefined)
   // Only show errors when pipeline is running (not when stopped or restarting)
   const isPipelineStopped = statusName === PipelineStatusName.STOPPED
   const isRestarting = requestStatus === PipelineStatusRequestStatus.RestartRequested
@@ -208,46 +197,10 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
               <ShimmeringLoader />
             ) : isReplicationStatusError || !applyLag ? (
               <Minus size={18} className="text-foreground-lighter" />
-            ) : isCaughtUp && lagSeverity === 'normal' ? (
+            ) : isCaughtUp ? (
               <span className="text-foreground-light whitespace-nowrap">Caught up</span>
             ) : (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  {lagSeverity === 'normal' ? (
-                    <span className="w-fit cursor-help whitespace-nowrap text-foreground">
-                      {lag.display}
-                    </span>
-                  ) : (
-                    <Badge
-                      variant={lagSeverity === 'critical' ? 'destructive' : 'warning'}
-                      className="w-fit cursor-help gap-1 whitespace-nowrap"
-                    >
-                      <TriangleAlert size={12} className="shrink-0" />
-                      {lag.display}
-                    </Badge>
-                  )}
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="flex flex-col gap-y-1 max-w-[260px]">
-                  <span>{lag.display} waiting to sync.</span>
-                  {isLost ? (
-                    <span className="text-foreground-light">
-                      Replication has broken. The pipeline has to be set up again.
-                    </span>
-                  ) : lagSeverity === 'critical' ? (
-                    <span className="text-foreground-light">
-                      The pipeline is far behind. If it doesn't catch up soon, it has to be set up
-                      again.
-                    </span>
-                  ) : lagSeverity === 'warning' ? (
-                    <span className="text-foreground-light">
-                      The pipeline is falling behind.
-                      {hasFiniteHeadroom
-                        ? ` About ${safeWalSize.display} of room left before it has to be set up again.`
-                        : ''}
-                    </span>
-                  ) : null}
-                </TooltipContent>
-              </Tooltip>
+              <span className="text-foreground whitespace-nowrap">{lag.display}</span>
             )}
           </TableCell>
 
