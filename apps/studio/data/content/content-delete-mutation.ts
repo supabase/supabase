@@ -2,8 +2,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { QueryKey } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { contentKeys } from './keys'
 import type { ContentData } from './content-query'
+import { contentKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -34,7 +34,7 @@ export const useContentDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<DeleteContentData, ResponseError, DeleteContentVariables>,
+  UseCustomMutationOptions<DeleteContentData, ResponseError, DeleteContentVariables, DeleteContext>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
