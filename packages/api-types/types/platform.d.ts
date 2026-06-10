@@ -469,6 +469,57 @@ export interface paths {
     patch: operations['LinkConversationController_updateConversationCustomFields']
     trace?: never
   }
+  '/platform/feedback/conversations/escalation': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Escalate an AI support conversation in Front */
+    post: operations['ConversationSyncController_escalateConversation']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/feedback/conversations/messages': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Sync AI support chat messages to Front */
+    post: operations['ConversationSyncController_syncConversationMessages']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/feedback/conversations/resolve': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Resolve an AI support conversation in Front */
+    post: operations['ConversationSyncController_resolveConversation']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/feedback/docs': {
     parameters: {
       query?: never
@@ -3502,6 +3553,24 @@ export interface paths {
     options?: never
     head?: never
     patch?: never
+    trace?: never
+  }
+  '/platform/projects/{ref}/settings/ex-pg-meta': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get project's ex_pg_meta opt-in status */
+    get: operations['ExPgMetaController_getExPgMetaOptIn']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Update project's ex_pg_meta opt-in status */
+    patch: operations['ExPgMetaController_updateExPgMetaOptIn']
     trace?: never
   }
   '/platform/projects/{ref}/settings/sensitivity': {
@@ -6662,6 +6731,16 @@ export interface components {
       scope?: string
       token_endpoint_auth_method?: string
     }
+    EscalateConversationBody: {
+      chatId: string
+      conversationId: string
+    }
+    ExPgMetaOptInBody: {
+      enabled: boolean
+    }
+    ExPgMetaOptInResponse: {
+      enabled: boolean
+    }
     GetArchiveResponse: {
       archive_empty: boolean
       file_url: string
@@ -6747,6 +6826,7 @@ export interface components {
       expires_at: string
       icon?: string
       name: string
+      redirect_uri: string
       /** @enum {string} */
       registration_type: 'manual' | 'dynamic'
       scopes?: (
@@ -10109,6 +10189,12 @@ export interface components {
     ResizeBody: {
       volume_size_gb: number
     }
+    ResolveConversationBody: {
+      /** @enum {string} */
+      aiSupportStatus: 'user_resolved' | 'bot_resolved'
+      chatId: string
+      conversationId: string
+    }
     RestartProjectBody: {
       database_identifier?: string
     }
@@ -10325,10 +10411,12 @@ export interface components {
       siteUrl?: string
       subject?: string
       tags: string[]
+      threadRef?: string
       urlToAirTable?: string
       verified?: boolean
     }
     SendFeedbackResponse: {
+      conversationId?: string
       result: string
     }
     SendUpgradeSurveyBody: {
@@ -10517,6 +10605,32 @@ export interface components {
       max_client_conn: number | null
       /** @enum {string} */
       pool_mode: 'transaction' | 'session'
+    }
+    SyncConversationMessagesBody: {
+      affectedServices?: string
+      allowSupportAccess?: boolean
+      browserInformation?: string
+      category?: string
+      chatId: string
+      conversationId?: string
+      /** @default false */
+      isInitial?: boolean
+      library?: string
+      messages: {
+        content: string
+        id: string
+        /** @enum {string} */
+        role: 'user' | 'assistant'
+      }[]
+      organizationSlug?: string
+      projectRef?: string
+      severity?: string
+      subject: string
+    }
+    SyncConversationMessagesResponse: {
+      conversationId?: string
+      /** @enum {string} */
+      result: 'success'
     }
     TaxIdResponse: {
       tax_id: {
@@ -10866,6 +10980,13 @@ export interface components {
       project_ref?: string
     }
     UpdateConversationCustomFieldsResponse: {
+      /** @enum {string} */
+      result: 'success'
+    }
+    UpdateConversationLifecycleResponse: {
+      /** @enum {string} */
+      aiSupportStatus: 'bot_active' | 'escalated' | 'user_resolved' | 'bot_resolved'
+      conversationId: string
       /** @enum {string} */
       result: 'success'
     }
@@ -13733,6 +13854,117 @@ export interface operations {
         }
       }
       /** @description Failed to update conversation custom fields */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ConversationSyncController_escalateConversation: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['EscalateConversationBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['UpdateConversationLifecycleResponse']
+        }
+      }
+      /** @description User is not a participant in the conversation */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update conversation status */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ConversationSyncController_syncConversationMessages: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SyncConversationMessagesBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SyncConversationMessagesResponse']
+        }
+      }
+      /** @description Supplied conversationId does not match the imported messages */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to sync messages */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ConversationSyncController_resolveConversation: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ResolveConversationBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['UpdateConversationLifecycleResponse']
+        }
+      }
+      /** @description User is not a participant in the conversation */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update conversation status */
       500: {
         headers: {
           [name: string]: unknown
@@ -24849,6 +25081,110 @@ export interface operations {
         content?: never
       }
       /** @description Failed to retrieve project's settings */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ExPgMetaController_getExPgMetaOptIn: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ExPgMetaOptInResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to retrieve project's ex_pg_meta opt-in status */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ExPgMetaController_updateExPgMetaOptIn: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ExPgMetaOptInBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ExPgMetaOptInResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update project's ex_pg_meta opt-in status */
       500: {
         headers: {
           [name: string]: unknown

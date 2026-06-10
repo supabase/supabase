@@ -2,6 +2,7 @@ import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode } from 'react'
+import { toast } from 'sonner'
 import {
   Badge,
   Button,
@@ -27,12 +28,15 @@ import { CLSPreview } from './CLSPreview'
 import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
 import { IntegrationsLayoutPreview } from './IntegrationsLayoutPreview'
 import { JitDbAccessPreview } from './JitDbAccessPreview'
+import { NextPostgresMetaPreview } from './NextPostgresMetaPreview'
 import { PgDeltaDiffPreview } from './PgDeltaDiffPreview'
 import { PlatformWebhooksPreview } from './PlatformWebhooksPreview'
 import { RLSTesterPreview } from './RLSTesterPreview'
 import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 import { FeaturePreview, useFeaturePreviews } from './useFeaturePreviews'
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
+import { useExPgMetaOptInUpdateMutation } from '@/data/ex-pg-meta/ex-pg-meta-opt-in-mutation'
+import { useExPgMetaOptInQuery } from '@/data/ex-pg-meta/ex-pg-meta-opt-in-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
@@ -46,6 +50,7 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]: <UnifiedLogsPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS]: <PlatformWebhooksPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]: <JitDbAccessPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_NEXT_POSTGRES_META]: <NextPostgresMetaPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER]: <RLSTesterPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]: <IntegrationsLayoutPreview />,
 }
@@ -69,6 +74,17 @@ export const FeaturePreviewModal = () => {
   )
 
   const { flags, onUpdateFlag } = featurePreviewContext
+  const { data: exPgMetaOptIn } = useExPgMetaOptInQuery({ projectRef: ref })
+  const { mutate: updateExPgMetaOptIn, isPending: isUpdatingExPgMetaOptIn } =
+    useExPgMetaOptInUpdateMutation()
+
+  const isFeatureEnabled = (featureKey: string) => {
+    if (featureKey === LOCAL_STORAGE_KEYS.UI_PREVIEW_NEXT_POSTGRES_META) {
+      return exPgMetaOptIn?.enabled ?? false
+    }
+    return flags[featureKey] ?? false
+  }
+
   const allFeaturePreviews = (
     IS_PLATFORM ? featurePreviews : featurePreviews.filter((x) => !x.isPlatformOnly)
   ).filter((x) => x.enabled)
@@ -76,7 +92,10 @@ export const FeaturePreviewModal = () => {
   const selectedFeature =
     allFeaturePreviews.find((preview) => preview.key === selectedFeatureKey) ??
     allFeaturePreviews[0]
-  const isSelectedFeatureEnabled = flags[selectedFeature?.key]
+  const isSelectedFeatureEnabled = selectedFeature ? isFeatureEnabled(selectedFeature.key) : false
+  const isTogglePending =
+    selectedFeature?.key === LOCAL_STORAGE_KEYS.UI_PREVIEW_NEXT_POSTGRES_META &&
+    isUpdatingExPgMetaOptIn
 
   const toggleFeature = () => {
     if (!selectedFeature) return
@@ -86,7 +105,25 @@ export const FeaturePreviewModal = () => {
       setIsDismissedRlsTesterBanner(true)
     }
 
-    onUpdateFlag(selectedFeature.key, !isSelectedFeatureEnabled)
+    if (selectedFeature.key === LOCAL_STORAGE_KEYS.UI_PREVIEW_NEXT_POSTGRES_META) {
+      if (!ref) return
+
+      updateExPgMetaOptIn(
+        { projectRef: ref, enabled: !isSelectedFeatureEnabled },
+        {
+          onSuccess: ({ enabled }) => {
+            toast.success(
+              enabled
+                ? 'Next Postgres Meta enabled for this project'
+                : 'Next Postgres Meta disabled for this project'
+            )
+          },
+        }
+      )
+    } else {
+      onUpdateFlag(selectedFeature.key, !isSelectedFeatureEnabled)
+    }
+
     track(isSelectedFeatureEnabled ? 'feature_preview_disabled' : 'feature_preview_enabled', {
       feature: selectedFeature.key,
     })
@@ -113,6 +150,7 @@ export const FeaturePreviewModal = () => {
                       feature={feature}
                       selectedFeature={selectedFeature}
                       selectFeaturePreview={selectFeaturePreview}
+                      isFeatureEnabled={isFeatureEnabled(feature.key)}
                     />
                   ))}
                 </ScrollArea>
@@ -125,7 +163,7 @@ export const FeaturePreviewModal = () => {
                 >
                   <SelectTrigger id="feature-preview-select">
                     <div className="flex items-center gap-x-2">
-                      {(flags[selectedFeature.key] ?? false) ? (
+                      {(isFeatureEnabled(selectedFeature.key) ?? false) ? (
                         <Eye size={14} strokeWidth={2} className="text-brand" />
                       ) : (
                         <EyeOff size={14} strokeWidth={1.5} className="text-foreground-light" />
@@ -146,6 +184,7 @@ export const FeaturePreviewModal = () => {
                           selectedFeature={selectedFeature}
                           selectFeaturePreview={selectFeaturePreview}
                           className="pl-10 py-3 bg-transparent"
+                          isFeatureEnabled={isFeatureEnabled(feature.key)}
                         />
                       </SelectItem>
                     ))}
@@ -167,7 +206,11 @@ export const FeaturePreviewModal = () => {
                         </Link>
                       </Button>
                     )}
-                    <Button type="default" onClick={() => toggleFeature()}>
+                    <Button
+                      type="default"
+                      disabled={isTogglePending}
+                      onClick={() => toggleFeature()}
+                    >
                       {isSelectedFeatureEnabled ? 'Disable' : 'Enable'} feature
                     </Button>
                   </div>
@@ -207,17 +250,15 @@ const FeaturePreviewItem = ({
   feature,
   selectedFeature,
   selectFeaturePreview,
+  isFeatureEnabled,
   className,
 }: {
   feature: FeaturePreview
   selectedFeature: FeaturePreview
   selectFeaturePreview: (key: string) => void
+  isFeatureEnabled: boolean
   className?: string
 }) => {
-  const featurePreviewContext = useFeaturePreviewContext()
-  const { flags } = featurePreviewContext
-  const isEnabled = flags[feature.key] ?? false
-
   return (
     <button
       type="button"
@@ -230,7 +271,7 @@ const FeaturePreviewItem = ({
       )}
     >
       <div className="flex items-center gap-x-3">
-        {isEnabled ? (
+        {isFeatureEnabled ? (
           <Eye size={14} strokeWidth={2} className="text-brand" />
         ) : (
           <EyeOff size={14} strokeWidth={1.5} className="text-foreground-light" />

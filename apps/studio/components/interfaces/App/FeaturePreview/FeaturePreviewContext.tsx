@@ -12,8 +12,10 @@ import {
   type PropsWithChildren,
 } from 'react'
 
-import { useFeaturePreviews } from './useFeaturePreviews'
+import { useFeaturePreviews, useNextPostgresMetaPreviewAvailable } from './useFeaturePreviews'
+import { useExPgMetaOptInQuery } from '@/data/ex-pg-meta/ex-pg-meta-opt-in-query'
 import { EMPTY_OBJ } from '@/lib/void'
+import { useParams } from 'common'
 
 type FeaturePreviewContextType = {
   flags: { [key: string]: boolean }
@@ -109,6 +111,13 @@ export const useIsJitDbAccessEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   const jitDbAccessEnabled = useFlag('jitDbAccess')
   return jitDbAccessEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]
+}
+
+export const useIsNextPostgresMetaEnabled = () => {
+  const { ref } = useParams()
+  const nextPostgresMetaEnabled = useNextPostgresMetaPreviewAvailable()
+  const { data: exPgMetaOptIn } = useExPgMetaOptInQuery({ projectRef: ref })
+  return nextPostgresMetaEnabled && (exPgMetaOptIn?.enabled ?? false)
 }
 
 export const useIsRLSTesterEnabled = () => {

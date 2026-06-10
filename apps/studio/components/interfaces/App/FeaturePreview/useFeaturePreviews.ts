@@ -1,4 +1,5 @@
-import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
+import { FeatureFlagContext, LOCAL_STORAGE_KEYS, useFlag } from 'common'
+import { useContext } from 'react'
 
 export type FeaturePreview = {
   key: string
@@ -13,11 +14,22 @@ export type FeaturePreview = {
   enabled: boolean
 }
 
+/** ConfigCat gate for the Next Postgres Meta feature preview. Falls back to visible in local when the flag is not registered yet. */
+export const useNextPostgresMetaPreviewAvailable = () => {
+  const { configcat, hasLoaded } = useContext(FeatureFlagContext)
+  const isLocal = process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
+
+  if (!hasLoaded) return false
+  if (configcat.nextPostgresMeta === true) return true
+  return isLocal && !('nextPostgresMeta' in configcat)
+}
+
 export const useFeaturePreviews = (): FeaturePreview[] => {
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
   const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
   const platformWebhooksEnabled = useFlag('platformWebhooks')
   const jitDbAccessEnabled = useFlag('jitDbAccess')
+  const nextPostgresMetaEnabled = useNextPostgresMetaPreviewAvailable()
 
   return [
     {
@@ -74,6 +86,15 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isPlatformOnly: true,
       isDefaultOptIn: false,
       enabled: jitDbAccessEnabled,
+    },
+    {
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_NEXT_POSTGRES_META,
+      name: 'Next Postgres Meta',
+      discussionsUrl: undefined,
+      isNew: true,
+      isPlatformOnly: true,
+      isDefaultOptIn: false,
+      enabled: nextPostgresMetaEnabled,
     },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
