@@ -64,6 +64,42 @@ export const databaseKeys = {
   ) => ['projects', projectRef, 'table-index-advisor', schema, table] as const,
   supamonitorEnabled: (projectRef: string | undefined) =>
     ['projects', projectRef, 'supamonitor-enabled'] as const,
+
+  // Debugger (inspect db) keys
+  debuggerPreconditions: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'debugger', 'preconditions'] as const,
+  debuggerLocks: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'debugger', 'locks'] as const,
+  debuggerBlocking: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'debugger', 'blocking'] as const,
+  debuggerLongRunningQueries: (projectRef: string | undefined, threshold?: string) =>
+    ['projects', projectRef, 'debugger', 'long-running-queries', threshold ?? '5 minutes'] as const,
+  debuggerBloat: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'debugger', 'bloat'] as const,
+  debuggerVacuumStats: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'debugger', 'vacuum-stats'] as const,
+  debuggerTableStats: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'debugger', 'table-stats'] as const,
+  debuggerTableRecordCounts: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'debugger', 'table-record-counts'] as const,
+  debuggerTrafficProfile: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'debugger', 'traffic-profile'] as const,
+  debuggerCacheHit: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'debugger', 'cache-hit'] as const,
+  debuggerIndexUsage: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'debugger', 'index-usage'] as const,
+  debuggerIndexStats: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'debugger', 'index-stats'] as const,
+  debuggerSeqScans: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'debugger', 'seq-scans'] as const,
+  debuggerUnusedIndexes: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'debugger', 'unused-indexes'] as const,
+  debuggerRoleStats: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'debugger', 'role-stats'] as const,
+  debuggerReplicationSlots: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'debugger', 'replication-slots'] as const,
+  debuggerDbStats: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'debugger', 'db-stats'] as const,
 }
 
 export const getLiveTupleEstimateKey = (
