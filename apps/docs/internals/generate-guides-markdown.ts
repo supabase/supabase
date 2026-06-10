@@ -135,8 +135,13 @@ async function loadMarkdownOverrides(): Promise<Record<string, string>> {
             overrides[name] = (value as any).__markdown__
           }
         }
-      } catch {
-        // Heavy deps or non-CJS-friendly modules — skip this file
+      } catch (err) {
+        // File matched the __markdown__ prefilter but failed to load (heavy
+        // deps, ESM/CJS interop, etc.). Surface so the override gap is
+        // visible instead of silently swallowed.
+        console.warn(
+          `[markdown-overrides] failed to load ${file}: ${err instanceof Error ? err.message : err}`
+        )
       }
     })
   )
