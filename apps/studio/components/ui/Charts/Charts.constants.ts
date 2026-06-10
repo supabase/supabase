@@ -66,23 +66,6 @@ export const updateStackedChartColors = (isDarkMode: boolean) => {
   STACKED_CHART_FILLS = isDarkMode ? DARK_STACKED_CHART_FILLS : LIGHT_STACKED_CHART_FILLS
 }
 
-/**
- * Semantic chart colour roles — the single source of truth for what a colour *means*
- * in the database observability report. Colour encodes meaning, not series position,
- * so the same concept reads the same across every chart (FE-3578).
- *
- *  used      primary consumed quantity        green   (brand)
- *  overhead  consumed, secondary              violet
- *  headroom  free / idle / unused             grey    (recedes)
- *  limit     a ceiling, not a value           grey    (rendered as a dashed line)
- *  in        directional flow in / read       blue
- *  out       directional flow out / write     amber
- *  alert     a value breaching its limit       red     (reserved — wire up later)
- *
- * Each role carries a `color` (the solid line/bar) and a `fill` (the translucent
- * area / focus-dot tint). Dark-mode shades are tuned lighter/more saturated so they
- * read on the dark canvas, mirroring how the existing CPU series were authored.
- */
 export type ChartColorRole = {
   color: { light: string; dark: string }
   fill: { light: string; dark: string }
