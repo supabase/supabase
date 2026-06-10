@@ -16,10 +16,8 @@ export function RegionsList() {
 
 RegionsList.__markdown__ = `
   ${Object.keys(AWS_REGIONS)
-    .map((region) => (
-      ' - ' + AWS_REGIONS[region].displayName + ', ' + AWS_REGIONS[region].code
-  ))
-.join(`\n`)}
+    .map((region) => ' - ' + AWS_REGIONS[region].displayName + ', ' + AWS_REGIONS[region].code)
+    .join(`\n`)}
 `
 
 export function SmartRegionsList() {
@@ -37,8 +35,6 @@ export function SmartRegionsList() {
 
 SmartRegionsList.__markdown__ = `
   ${[...SMART_REGION_TO_EXACT_REGION_MAP.entries()]
-    .map(([smartRegion, exactRegion]) => (
-      ' - ' + smartRegion + ', ' + exactRegion
-  ))
-.join(`\n`)}
+    .map(([smartRegion, exactRegion]) => ' - ' + smartRegion + ', ' + exactRegion)
+    .join(`\n`)}
 `
