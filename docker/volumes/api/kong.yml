@@ -14,12 +14,6 @@ consumers:
     keyauth_credentials:
       - key: $SUPABASE_SERVICE_KEY
       - key: $SUPABASE_SECRET_KEY
-  # Credential-less consumer used as the key-auth `anonymous` fallback on the
-  # Functions route, so unauthenticated invocations (and verify_jwt:false
-  # functions) pass through while invalid keys are still rejected with 401.
-  # Referenced by UUID (key-auth `anonymous` requires a consumer id).
-  - username: anonymous
-    id: 00000000-0000-0000-0000-000000000001
 
 ###
 ### Access Control List
@@ -294,15 +288,16 @@ services:
   ## `Bearer` prefix), while `Authorization` is left untouched so user-session
   ## JWTs and legacy bearers flow through to the runtime.
   ##
-  ## key-auth validates the apikey against the same registered keys as the other
-  ## routes (invalid keys -> 401), but an `anonymous` consumer fallback lets
-  ## unauthenticated requests through (verify_jwt:false functions and no-auth
-  ## invocations must still work). No `acl` — Functions isn't group-gated.
+  ## No `key-auth`: Functions is a passthrough that does NOT validate keys. Kong
+  ## cannot reject an invalid key while still letting unauthenticated requests
+  ## through (key-auth's `anonymous` fallback accepts missing AND invalid keys
+  ## alike), so unknown/invalid keys simply pass to the runtime, which handles
+  ## verify_jwt itself. Envoy is the stricter gateway and rejects unknown keys
+  ## with 401; this divergence is intentional (Kong is being deprecated).
   ##
   ## The request-transformer strips any client-supplied `sb-api-key` (anti-spoof)
   ## and re-adds the translated value; on no match the Lua expression yields nil
-  ## (an empty header) which the post-function then removes. Conflict detection
-  ## and bearer-only sb_ validation are intentionally not implemented here.
+  ## (an empty header) which the post-function then removes.
   - name: functions-v1
     _comment: 'Edge Functions: /functions/v1/* -> http://functions:9000/*'
     url: http://functions:9000/
@@ -314,10 +309,6 @@ services:
           - /functions/v1/
     plugins:
       - name: cors
-      - name: key-auth
-        config:
-          hide_credentials: false
-          anonymous: 00000000-0000-0000-0000-000000000001
       - name: request-transformer
         config:
           remove:

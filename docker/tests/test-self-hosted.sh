@@ -75,6 +75,20 @@ http_body() {
     curl -s "$@" "$url"
 }
 
+# Detect which gateway is running so gateway-specific assertions can be gated.
+detect_gateway() {
+    command -v docker >/dev/null 2>&1 || { echo unknown; return; }
+    running=$(docker ps --format '{{.Names}}' 2>/dev/null)
+    if printf '%s\n' "$running" | grep -q '^supabase-envoy$'; then
+        echo envoy
+    elif printf '%s\n' "$running" | grep -q '^supabase-kong$'; then
+        echo kong
+    else
+        echo unknown
+    fi
+}
+GATEWAY=$(detect_gateway)
+
 echo ""
 echo "=== Self-hosted smoke test against $BASE_URL ==="
 echo ""
@@ -425,13 +439,18 @@ fn_noauth_resp=$(http_body "$BASE_URL/functions/v1/hello" \
     -d '{}')
 check "Call hello function (no auth)" '"Hello from Edge Functions!"' "$fn_noauth_resp"
 
-# Invalid apikey is rejected at the gateway by key-auth (before the worker).
-check "Functions reject invalid apikey" "401" \
-    "$(http_status "$BASE_URL/functions/v1/hello" \
-        -X POST \
-        -H "apikey: invalid-key" \
-        -H "Content-Type: application/json" \
-        -d '{}')"
+# Invalid apikey: only Envoy enforces rejection at the gateway. Kong config is
+# permissive on Functions (no key-auth), so it passes invalid keys through.
+if [ "$GATEWAY" = "envoy" ]; then
+    check "Functions reject invalid apikey (Envoy enforces)" "401" \
+        "$(http_status "$BASE_URL/functions/v1/hello" \
+            -X POST \
+            -H "apikey: invalid-key" \
+            -H "Content-Type: application/json" \
+            -d '{}')"
+else
+    echo "  SKIP: invalid-apikey rejection not enforced on Kong (gateway=$GATEWAY)"
+fi
 
 # ---------------------------------------------
 # 8. pg-meta (Studio backend)
