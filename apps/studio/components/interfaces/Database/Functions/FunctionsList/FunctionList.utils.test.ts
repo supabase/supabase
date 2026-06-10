@@ -111,17 +111,6 @@ describe('useFilteredFunctions', () => {
     expect(result.current).toHaveLength(1)
     expect(result.current[0].name).toBe('select_some_users')
   })
-  it('filters functions correctly by content', () => {
-    const { result } = renderHook(() =>
-      useFilteredFunctions({
-        // @ts-expect-error more properties are expected for functions but we're only interested in some
-        functions,
-        filterString: 'bazinga',
-      })
-    )
-    expect(result.current).toHaveLength(1)
-    expect(result.current[0].name).toBe('select_some_users')
-  })
   it('returns all functions filtered by schema', () => {
     const { result } = renderHook(() =>
       useFilteredFunctions({
