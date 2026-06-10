@@ -77,12 +77,8 @@ export const CHART_ROLE_COLORS = {
     fill: { light: '#9FE8C7', dark: '#2A5C3F' },
   },
   overhead: {
-    color: { light: '#1F9D66', dark: '#28A974' },
-    fill: { light: '#86CFAE', dark: '#163D2C' },
-  },
-  'overhead-2': {
-    color: { light: '#0E6B45', dark: '#18774F' },
-    fill: { light: '#5BA984', dark: '#0F2C1F' },
+    color: { light: '#7C3AED', dark: '#9F7AEA' },
+    fill: { light: '#DDD6FE', dark: '#3C2E63' },
   },
   headroom: {
     color: { light: '#C4C7CB', dark: '#3A3D41' },
@@ -107,10 +103,7 @@ export const CHART_ROLE_COLORS = {
 } as const satisfies Record<string, ChartColorRole>
 
 export const CHART_OVERHEAD_RAMP: ChartColorRole[] = [
-  {
-    color: { light: '#7C3AED', dark: '#9F7AEA' },
-    fill: { light: '#DDD6FE', dark: '#3C2E63' },
-  },
+  CHART_ROLE_COLORS.overhead,
   {
     color: { light: '#F59E0B', dark: '#FBBF24' },
     fill: { light: '#FDE68A', dark: '#5C4218' },
