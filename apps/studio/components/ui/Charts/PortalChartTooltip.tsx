@@ -1,4 +1,5 @@
-import { ComponentProps, RefObject, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useIsomorphicLayoutEffect } from 'common'
+import { ComponentProps, RefObject, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import type { TooltipProps } from 'recharts'
 import type { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent'
@@ -6,8 +7,6 @@ import { ChartTooltipContent, cn } from 'ui'
 
 const TOOLTIP_OFFSET = 16
 const VIEWPORT_MARGIN = 8
-
-const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect
 
 type PortalChartTooltipProps = Omit<ComponentProps<typeof ChartTooltipContent>, 'content'> &
   Pick<TooltipProps<ValueType, NameType>, 'active' | 'coordinate' | 'payload'> & {
