@@ -5,8 +5,8 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
+  Badge,
   Button,
-  cn,
   TableCell,
   TableRow,
   Tooltip,
@@ -21,7 +21,7 @@ import { PipelineStatus } from './PipelineStatus'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 import {
   getFormattedLagValue,
-  getSlotLossSeverity,
+  getSlotHealthSeverity,
 } from './ReplicationPipelineStatus/ReplicationPipelineStatus.utils'
 import { RowMenu } from './RowMenu'
 import { UpdateVersionModal } from './UpdateVersionModal'
@@ -98,17 +98,13 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
   const lagBytes = applyLag?.confirmed_flush_lsn_bytes
   const lag = getFormattedLagValue('bytes', lagBytes)
   const isCaughtUp = lagBytes === 0
-  // Severity is the slot-loss risk: how close the retained WAL is to exhausting the slot's safe
-  // headroom, not the lag size itself. safe_wal_size_bytes of 0 means "no limit / unknown".
-  const lagSeverity = getSlotLossSeverity(
-    applyLag?.restart_lsn_bytes,
-    applyLag?.safe_wal_size_bytes
-  )
-  const safeWalSize = getFormattedLagValue('bytes', applyLag?.safe_wal_size_bytes)
-  // The time-based lag is a nice-to-have shown alongside the bytes when Postgres reports it.
-  const flushLagMs = applyLag?.flush_lag
-  const hasTimeLag = typeof flushLagMs === 'number' && !Number.isNaN(flushLagMs)
-  const timeLag = getFormattedLagValue('duration', flushLagMs)
+  // Severity reflects the slot's health: the reported WAL status plus how close the retained WAL is
+  // to exhausting the slot's safe headroom, not the lag size itself.
+  const lagSeverity = getSlotHealthSeverity(applyLag)
+  const isLost = applyLag?.wal_status === 'lost'
+  // safe_wal_size_bytes is null when retention is unlimited; only show a headroom number when finite.
+  const hasFiniteHeadroom = typeof applyLag?.safe_wal_size_bytes === 'number'
+  const safeWalSize = getFormattedLagValue('bytes', applyLag?.safe_wal_size_bytes ?? undefined)
   // Only show errors when pipeline is running (not when stopped or restarting)
   const isPipelineStopped = statusName === PipelineStatusName.STOPPED
   const isRestarting = requestStatus === PipelineStatusRequestStatus.RestartRequested
@@ -156,7 +152,11 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
   return (
     <>
       {isPipelineError && (
-        <AlertError error={pipelineError} subject="Failed to retrieve pipeline information" />
+        <TableRow>
+          <TableCell colSpan={6}>
+            <AlertError error={pipelineError} subject="Failed to retrieve pipeline information" />
+          </TableCell>
+        </TableRow>
       )}
       {isPipelineSuccess && (
         <TableRow>
@@ -208,41 +208,44 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
               <ShimmeringLoader />
             ) : isReplicationStatusError || !applyLag ? (
               <Minus size={18} className="text-foreground-lighter" />
-            ) : isCaughtUp ? (
-              <p className="text-foreground-light">Caught up</p>
+            ) : isCaughtUp && lagSeverity === 'normal' ? (
+              <span className="text-foreground-light whitespace-nowrap">Caught up</span>
             ) : (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <p
-                    className={cn(
-                      'w-fit cursor-help flex items-center gap-x-1.5',
-                      lagSeverity === 'critical'
-                        ? 'text-destructive'
-                        : lagSeverity === 'warning'
-                          ? 'text-warning'
-                          : ''
-                    )}
-                  >
-                    {lagSeverity !== 'normal' && <TriangleAlert size={14} className="shrink-0" />}
-                    {lag.display}
-                  </p>
+                  {lagSeverity === 'normal' ? (
+                    <span className="w-fit cursor-help whitespace-nowrap text-foreground">
+                      {lag.display}
+                    </span>
+                  ) : (
+                    <Badge
+                      variant={lagSeverity === 'critical' ? 'destructive' : 'warning'}
+                      className="w-fit cursor-help gap-1 whitespace-nowrap"
+                    >
+                      <TriangleAlert size={12} className="shrink-0" />
+                      {lag.display}
+                    </Badge>
+                  )}
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="flex flex-col gap-y-1 max-w-[260px]">
-                  <span>
-                    {lag.display} waiting to sync{hasTimeLag ? `, ${timeLag.display} behind` : ''}.
-                  </span>
-                  {lagSeverity === 'warning' && (
+                  <span>{lag.display} waiting to sync.</span>
+                  {isLost ? (
                     <span className="text-foreground-light">
-                      It's falling behind — about {safeWalSize.display} of room left before syncing
-                      pauses.
+                      Replication has broken. The pipeline has to be set up again.
                     </span>
-                  )}
-                  {lagSeverity === 'critical' && (
+                  ) : lagSeverity === 'critical' ? (
                     <span className="text-foreground-light">
-                      It's far behind. If it doesn't catch up soon, syncing pauses and this
-                      destination has to be set up again.
+                      The pipeline is far behind. If it doesn't catch up soon, it has to be set up
+                      again.
                     </span>
-                  )}
+                  ) : lagSeverity === 'warning' ? (
+                    <span className="text-foreground-light">
+                      The pipeline is falling behind.
+                      {hasFiniteHeadroom
+                        ? ` About ${safeWalSize.display} of room left before it has to be set up again.`
+                        : ''}
+                    </span>
+                  ) : null}
                 </TooltipContent>
               </Tooltip>
             )}

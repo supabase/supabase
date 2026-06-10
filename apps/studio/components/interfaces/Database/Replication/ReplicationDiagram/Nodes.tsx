@@ -103,25 +103,23 @@ export const ReplicationNode = ({ id }: { id: string }) => {
       <div className="text-sm flex flex-col gap-y-0.5">
         <div className="flex items-center">
           <p>{type}</p>
-          <Tooltip>
-            <TooltipTrigger>
-              <div className="w-6 h-full flex items-center justify-center">
-                <div
-                  className={cn(
-                    'w-2 h-2 rounded-full',
-                    statusName === 'started'
-                      ? 'bg-brand'
-                      : statusName === 'failed'
-                        ? 'bg-destructive'
-                        : 'bg-selection'
-                  )}
-                />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="bottom" className="capitalize">
-              {statusName}
-            </TooltipContent>
-          </Tooltip>
+          {(statusName === 'started' || statusName === 'failed') && (
+            <Tooltip>
+              <TooltipTrigger>
+                <div className="w-6 h-full flex items-center justify-center">
+                  <div
+                    className={cn(
+                      'w-2 h-2 rounded-full',
+                      statusName === 'started' ? 'bg-brand' : 'bg-destructive'
+                    )}
+                  />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="capitalize">
+                {statusName}
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
         <p className="text-foreground-light">{destination?.name}</p>
         <p className="text-foreground-light">ID: {destination?.id}</p>

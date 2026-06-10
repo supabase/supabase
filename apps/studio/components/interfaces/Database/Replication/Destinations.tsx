@@ -280,7 +280,7 @@ export const Destinations = () => {
                     <TableHead key="status" className="w-[150px]">
                       Status
                     </TableHead>
-                    <TableHead key="lag" className="w-[80px]">
+                    <TableHead key="lag" className="w-[150px]">
                       Lag
                     </TableHead>
                     <TableHead key="publication">Publication</TableHead>
