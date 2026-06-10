@@ -280,7 +280,7 @@ export const NewOrgForm = ({
       : 'My Project'
 
     if (searchParams.returnTo) {
-      const url = new URL(validateReturnTo(searchParams.returnTo, window.location.origin))
+      const url = new URL(validateReturnTo(searchParams.returnTo, '/'), window.location.origin)
       if (searchParams.auth_id) {
         url.searchParams.set('auth_id', searchParams.auth_id)
       }
