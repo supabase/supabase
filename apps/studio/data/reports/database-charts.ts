@@ -171,7 +171,6 @@ export const getReportAttributesV2: (
       showLegend: true,
       showMaxValue: false,
       showGrid: true,
-      normalizeVisibleStackToPercent: true,
       YAxisProps: {
         width: 55,
         domain: [0, 100] as [number, number],
@@ -229,24 +228,6 @@ export const getReportAttributesV2: (
           fill: { light: '#DB8BD3', dark: '#4A3D5C' },
           tooltip:
             'CPU time spent on other tasks (e.g., background processes, software interrupts)',
-        },
-        {
-          attribute: 'cpu_usage_busy_idle',
-          provider: 'infra-monitoring',
-          label: 'Idle',
-          format: '%',
-          omitFromTotal: true,
-          color: { light: '#6EA85F', dark: '#A3FFC2' },
-          fill: { light: '#A6D8AE', dark: '#2A5C3F' },
-          tooltip: 'CPU time spent idle and available for new work',
-        },
-        {
-          attribute: 'cpu_usage_max',
-          provider: 'reference-line',
-          label: 'Max',
-          value: 100,
-          tooltip: 'Max CPU usage',
-          isMaxValue: true,
         },
       ],
     },
