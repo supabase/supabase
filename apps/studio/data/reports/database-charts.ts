@@ -182,7 +182,6 @@ export const getReportAttributesV2: (
       showLegend: true,
       showMaxValue: false,
       showGrid: true,
-      normalizeVisibleStackToPercent: true,
       YAxisProps: {
         width: 55,
         domain: [0, 100] as [number, number],
