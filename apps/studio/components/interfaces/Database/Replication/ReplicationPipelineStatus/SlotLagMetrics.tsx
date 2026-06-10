@@ -9,6 +9,8 @@ const SLOT_LAG_FIELDS: {
   label: string
   type: 'bytes' | 'duration'
   description: string
+  // Friendly label to show in place of a literal "0 bytes" when there's nothing to report.
+  zeroLabel?: string
 }[] = [
   {
     key: 'confirmed_flush_lsn_bytes',
@@ -16,6 +18,7 @@ const SLOT_LAG_FIELDS: {
     type: 'bytes',
     description:
       "Database changes that haven't reached this destination yet. 0 means it's fully up to date.",
+    zeroLabel: 'Caught up',
   },
   {
     key: 'safe_wal_size_bytes',
@@ -47,14 +50,17 @@ export const SlotLagMetricsInline = ({
       </span>
       <span className="text-foreground-lighter">•</span>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] text-foreground-light">
-        {SLOT_LAG_FIELDS.map(({ key, label, type }) => {
-          const { display } = getFormattedLagValue(type, metrics[key])
+        {SLOT_LAG_FIELDS.map(({ key, label, type, zeroLabel }) => {
+          const value = metrics[key]
+          const { display } = getFormattedLagValue(type, value)
           return (
             <span key={`${tableName}-${key}`} className="flex items-center gap-1">
               <span className="uppercase tracking-wide text-[10px] text-foreground-lighter">
                 {label}
               </span>
-              <span className="text-foreground">{display}</span>
+              <span className="text-foreground">
+                {zeroLabel && value === 0 ? zeroLabel : display}
+              </span>
             </span>
           )
         })}
@@ -87,7 +93,7 @@ export const SlotLagMetricsList = ({
 
   return (
     <dl className={`grid ${gridClasses}`}>
-      {SLOT_LAG_FIELDS.map(({ key, label, type, description }) => (
+      {SLOT_LAG_FIELDS.map(({ key, label, type, description, zeroLabel }) => (
         <div key={key} className="flex flex-col gap-0.5">
           <dt className={labelClasses}>
             <span className="inline-flex items-center gap-1">
@@ -111,11 +117,15 @@ export const SlotLagMetricsList = ({
             </span>
           </dt>
           {(() => {
-            const { display, detail } = getFormattedLagValue(type, metrics[key])
+            const value = metrics[key]
+            const isZeroLabel = Boolean(zeroLabel) && value === 0
+            const { display, detail } = getFormattedLagValue(type, value)
             return (
               <dd className={`flex flex-col ${valueClasses}`}>
-                <span>{display}</span>
-                {detail && <span className="text-[11px] text-foreground-lighter">{detail}</span>}
+                <span>{isZeroLabel ? zeroLabel : display}</span>
+                {!isZeroLabel && detail && (
+                  <span className="text-[11px] text-foreground-lighter">{detail}</span>
+                )}
               </dd>
             )
           })()}

@@ -229,8 +229,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="flex flex-col gap-y-1 max-w-[260px]">
                   <span>
-                    {lag.display} of changes haven't reached this destination yet
-                    {hasTimeLag ? ` (about ${timeLag.display} behind)` : ''}.
+                    {lag.display} waiting to sync{hasTimeLag ? `, ${timeLag.display} behind` : ''}.
                   </span>
                   {lagSeverity === 'warning' && (
                     <span className="text-foreground-light">
@@ -240,7 +239,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
                   )}
                   {lagSeverity === 'critical' && (
                     <span className="text-foreground-light">
-                      It's far behind. If it doesn't catch up soon, syncing stops and this
+                      It's far behind. If it doesn't catch up soon, syncing pauses and this
                       destination has to be set up again.
                     </span>
                   )}

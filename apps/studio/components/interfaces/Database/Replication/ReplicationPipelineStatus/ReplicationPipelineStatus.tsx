@@ -348,7 +348,7 @@ export const ReplicationPipelineStatus = () => {
               <div>
                 <h4 className="text-sm font-semibold text-foreground">Replication lag</h4>
                 <p className="text-xs text-foreground-light">
-                  Snapshot of how far this pipeline is trailing behind right now.
+                  How far this destination is behind right now.
                 </p>
               </div>
               <p className="text-xs text-foreground-lighter">
