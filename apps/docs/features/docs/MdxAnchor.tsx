@@ -33,11 +33,7 @@ export function MdxAnchor({ href, children, ...rest }: ComponentPropsWithoutRef<
   }
   const label = flattenChildrenToText(children).trim()
   return (
-    <a
-      href={href}
-      aria-label={label ? `External Source: ${label}` : undefined}
-      {...rest}
-    >
+    <a href={href} aria-label={label ? `External Source: ${label}` : undefined} {...rest}>
       {children}
       <ExternalLinkIcon
         size={14}
