@@ -17,19 +17,74 @@ permissions:
 jobs:
   build:
     runs-on: blacksmith-4vcpu-ubuntu-2404
+    strategy:
+      fail-fast: false
+      matrix:
+        config: [default, logs, envoy, rustfs, envoy-rustfs]
 
     steps:
-      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
           sparse-checkout: |
             docker/
-      - name: Run docker-compose up
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Generate keys
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd docker
+          cp .env.example .env
+          sh utils/generate-keys.sh --update-env
+          sh utils/add-new-auth-keys.sh --update-env
+
+      - name: Start self-hosted Supabase
         shell: bash
         # Ensure all services can be started and healthy with default config
         run: |
           set -euo pipefail
           cd docker
-          cp .env.example .env
           yq -i '.services.supavisor.environment.RLIMIT_NOFILE=1024' docker-compose.yml
-          docker compose up --quiet-pull --wait --wait-timeout 180
+          if [ "${{ matrix.config }}" = "logs" ]; then
+            docker compose -f docker-compose.yml -f docker-compose.logs.yml up --quiet-pull --wait --wait-timeout 180
+          elif [ "${{ matrix.config }}" = "envoy" ]; then
+            docker compose -f docker-compose.yml -f docker-compose.envoy.yml up --quiet-pull --wait --wait-timeout 180
+          elif [ "${{ matrix.config }}" = "rustfs" ]; then
+            docker compose -f docker-compose.yml -f docker-compose.rustfs.yml up --quiet-pull --wait --wait-timeout 180
+          elif [ "${{ matrix.config }}" = "envoy-rustfs" ]; then
+            docker compose -f docker-compose.yml -f docker-compose.envoy.yml -f docker-compose.rustfs.yml up --quiet-pull --wait --wait-timeout 180
+          else
+            docker compose up --quiet-pull --wait --wait-timeout 180
+          fi
+
+      - name: Run container log tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd docker
+          sh tests/test-container-logs.sh
+
+      - name: Run smoke tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd docker
+          sh tests/test-self-hosted.sh
+
+      - name: Run API keys and asymmetric auth tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd docker
+          sh tests/test-auth-keys.sh
+
+      - name: Run S3 protocol tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd docker
+          sh tests/test-s3.sh

@@ -109,7 +109,7 @@ export const FRAMEWORKS: ConnectionType[] = [
   },
   {
     key: 'remix',
-    label: 'Remix',
+    label: 'React Router',
     icon: 'remix',
     guideLink: `${DOCS_URL}/guides/auth/server-side/creating-a-client?framework=remix&environment=remix-loader`,
     children: [

@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -32,18 +32,18 @@ import { useProfile } from '@/lib/profile'
 const setDeletionRequestFlag = () => {
   const expiryDate = new Date()
   expiryDate.setDate(expiryDate.getDate() + 30)
-  localStorage.setItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST, expiryDate.toString())
+  safeLocalStorage.setItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST, expiryDate.toString())
 }
 
 const hasActiveDeletionRequest = () => {
-  const expiryDateStr = localStorage.getItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST)
+  const expiryDateStr = safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST)
   if (!expiryDateStr) return false
 
   const expiryDate = new Date(expiryDateStr)
   const now = new Date()
 
   if (now > expiryDate) {
-    localStorage.removeItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST)
+    safeLocalStorage.removeItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST)
     return false
   }
 

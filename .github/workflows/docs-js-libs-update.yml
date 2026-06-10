@@ -50,11 +50,12 @@ jobs:
           echo "Regenerating tsdoc files for JS client libraries..."
           echo "Source: ${SOURCE}"
           echo "Version: ${VERSION}"
-          make
+          make download.tsdoc.v2
 
       - name: Refresh reference-content snapshot
         working-directory: apps/docs
-        run: npx vitest run --update scripts/build-reference-content.test.ts
+        # Using --dir (not a file path) so Vitest 4 doesn't run unrelated tests.
+        run: npx vitest run --update --dir scripts
 
       - name: Generate token
         id: app-token
@@ -65,7 +66,6 @@ jobs:
           permission-contents: write
           permission-pull-requests: write
 
-
       - name: Create pull request
         uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6.1.0
         with:
@@ -74,7 +74,7 @@ jobs:
           title: 'docs: update js sdk docs (${{ github.event.inputs.version }})'
           body: |
             Updates JS sdk documentation following stable release.
-            Ran `make` in apps/docs/spec to regenerate tsdoc files.
+            Ran `make download.tsdoc.v2` in apps/docs/spec and refreshed the reference-content snapshot.
 
             **Details:**
             - **Version:** `${{ github.event.inputs.version }}`
