@@ -2,12 +2,15 @@
  * Builds the live setup guide steps from the current config.
  * Ported from the prototype's `manualSteps()` and its step builders.
  *
- * Per-feature steps are sourced from the `templates` package (see `features.ts`),
- * so the feature content stays in sync with the www composer.
+ * Template output steps are sourced from the same resolved composition that
+ * powers the visualizer and export flow.
  */
+import type { CompositionResource } from './composition/resources'
+import { selectedPrimitives, type StartComposition } from './composition/start-composition'
 import {
   AGENTS,
   FRAMEWORKS,
+  listEnglish,
   ORMS,
   PRIMITIVES,
   SHADCN_BLOCKS,
@@ -15,8 +18,8 @@ import {
   type PrimitiveId,
   type StartConfig,
 } from './config'
-import { selectedFeatures, selectedPrims, type StartFeature } from './features'
-import { buildFileTree, type FileTreeNode } from './file-tree'
+import type { FileTreeNode } from './file-tree'
+import { buildProjectCodePlan, formatProjectCodeFileGroups } from './project-code-plan'
 
 export type StepBlock =
   | { type: 'code'; lang: string; code: string }
@@ -27,8 +30,6 @@ export interface SetupStep {
   id: string
   /** Brand-highlighted step number (a "key" setup action). */
   key?: boolean
-  /** Renders the "feature" pill — a composed additional feature. */
-  feature?: boolean
   title: string
   desc?: string
   blocks: StepBlock[]
@@ -36,10 +37,10 @@ export interface SetupStep {
 
 const lines = (arr: string[]) => arr.join('\n')
 
-export function buildSteps(cfg: StartConfig, features: StartFeature[]): SetupStep[] {
+export function buildSteps(cfg: StartConfig, composition: StartComposition): SetupStep[] {
   const fw = FRAMEWORKS[cfg.framework]
   const frontend = fw.id !== 'none'
-  const prims = selectedPrims(cfg, features)
+  const prims = selectedPrimitives(cfg, composition)
   const newProj = cfg.project === 'new'
   const newNext = newProj && fw.id === 'nextjs'
   const remote = cfg.connection === 'remote'
@@ -54,52 +55,45 @@ export function buildSteps(cfg: StartConfig, features: StartFeature[]): SetupSte
   // C) install the CLI (always — code-first migrations run through it)
   steps.push(cliStep(cfg))
 
-  // D) existing: add Supabase (file tree OR shadcn blocks)
-  if (!newProj) steps.push(cfg.shadcn ? shadcnAddStep(fw, prims) : fileTreeStep(cfg, features))
-
-  // E) keys / project / link
+  // D) keys / project / link
   steps.push(keysStep(cfg, fw, newNext, remote))
 
-  // F) install + client (front-end only; the Next.js starter already ships them)
-  if (frontend && !newNext) {
-    steps.push(installStep(fw))
-    steps.push(clientStep(fw))
-  }
-
-  // G) ORM packages
+  // E) ORM packages
   if (cfg.orm !== 'none') steps.push(ormInstallStep(cfg))
 
-  // H) shadcn init (new projects only — existing handled in step D)
-  if (cfg.shadcn && newProj) {
-    steps.push({
-      id: 'shadcn',
-      title: 'Set up shadcn/ui',
-      desc: "Initialise shadcn so you can drop in Supabase's prebuilt UI blocks.",
-      blocks: [{ type: 'code', lang: 'terminal', code: 'npx shadcn@latest init' }],
-    })
+  const supabaseCode = supabaseCodeStep(cfg, composition)
+  if (supabaseCode) steps.push(supabaseCode)
+
+  const appConnection = connectAppStep(cfg, fw, prims, newNext, composition)
+  if (appConnection) steps.push(appConnection)
+
+  if (
+    prims.includes('functions') &&
+    !composition.resources.some((resource) => resource.kind === 'edge-function')
+  ) {
+    steps.push(functionsStep(cfg, composition))
   }
 
-  // I) per primitive
-  for (const p of prims) steps.push(primStep(p, cfg, fw, newNext))
-
-  // J) composite features — one multi-file step each, from the templates package
-  for (const feature of selectedFeatures(cfg, features)) steps.push(featureStep(feature))
+  if (composition.mergeResult?.warnings.length || composition.resolution.missingDeps.length) {
+    steps.push(compositionWarningsStep(composition))
+  }
 
   return steps
 }
 
-/** Builds a step from a templates-package feature (renders all its files). */
-function featureStep(feature: StartFeature): SetupStep {
+function compositionWarningsStep(composition: StartComposition): SetupStep {
+  const warnings = [
+    ...composition.resolution.missingDeps.map(
+      (dependencyId) => `Could not find required template "${dependencyId}".`
+    ),
+    ...(composition.mergeResult?.warnings ?? []),
+  ]
+
   return {
-    id: `f-${feature.id}`,
-    feature: true,
-    title: `Add ${feature.name}`,
-    desc: feature.description,
-    blocks: feature.template.files.map((file) => ({
-      type: 'code',
-      lang: file.path,
-      code: file.content,
-    })),
+    id: 'composition-warnings',
+    title: 'Check composition warnings',
+    desc: 'Resolve these before applying the generated files.',
+    blocks: warnings.map((text) => ({ type: 'note', text })),
   }
 }
 
@@ -163,49 +157,6 @@ function cliStep(cfg: StartConfig): SetupStep {
   }
 }
 
-function shadcnAddStep(fw: FrameworkMeta, prims: PrimitiveId[]): SetupStep {
-  const blocks: StepBlock[] = [
-    {
-      type: 'code',
-      lang: 'terminal',
-      code: "npx shadcn@latest init   # if shadcn isn't set up yet",
-    },
-  ]
-  const cmds = prims
-    .filter((p) => SHADCN_BLOCKS[p])
-    .map((p) => `npx shadcn@latest add @supabase/${SHADCN_BLOCKS[p]}-${fw.shadcnTag}`)
-  if (cmds.length) blocks.push({ type: 'code', lang: 'terminal', code: lines(cmds) })
-
-  const missing = prims.filter((p) => !SHADCN_BLOCKS[p])
-  if (missing.length) {
-    blocks.push({
-      type: 'note',
-      text:
-        missing.map((p) => PRIMITIVES[p].label).join(', ') +
-        (missing.length > 1
-          ? " have no prebuilt blocks — they're added in code in the steps below."
-          : " has no prebuilt block — it's added in code in the steps below."),
-    })
-  }
-  return {
-    id: 'add',
-    key: true,
-    title: 'Add Supabase UI blocks',
-    desc: 'Drop ready-made, fully styled blocks straight into your existing app — wired to Supabase and restylable like any shadcn component.',
-    blocks,
-  }
-}
-
-function fileTreeStep(cfg: StartConfig, features: StartFeature[]): SetupStep {
-  return {
-    id: 'add',
-    key: true,
-    title: 'Add Supabase to your project',
-    desc: "Here's exactly what lands in your repo for this setup. Create the new files and add your keys to the existing one.",
-    blocks: [{ type: 'filetree', tree: buildFileTree(cfg, features) }],
-  }
-}
-
 function keysStep(
   cfg: StartConfig,
   fw: FrameworkMeta,
@@ -247,26 +198,6 @@ function keysStep(
     title: 'Add your local keys',
     desc: `Copy the API URL and anon key that supabase start printed into ${fw.envFile}.`,
     blocks: [envBlock],
-  }
-}
-
-function installStep(fw: FrameworkMeta): SetupStep {
-  return {
-    id: 'install',
-    title: 'Install the client library',
-    desc:
-      'Add the JavaScript client' +
-      (fw.ssr ? ` and the SSR helpers for ${fw.label}.` : ` for ${fw.label}.`),
-    blocks: [{ type: 'code', lang: 'terminal', code: `npm install ${fw.clientPkg}` }],
-  }
-}
-
-function clientStep(fw: FrameworkMeta): SetupStep {
-  return {
-    id: 'client',
-    title: 'Create the Supabase client',
-    desc: 'A single helper you import wherever you talk to Supabase.',
-    blocks: [clientBlock(fw)],
   }
 }
 
@@ -342,281 +273,293 @@ function ormInstallStep(cfg: StartConfig): SetupStep {
   }
 }
 
-function primStep(
-  p: PrimitiveId,
+function appPrimitiveBlocks(
   cfg: StartConfig,
-  fw: FrameworkMeta,
-  newNext: boolean
-): SetupStep {
-  switch (p) {
-    case 'database':
-      return databaseStep(cfg)
-    case 'auth':
-      if (newNext) {
-        return {
-          id: 'auth',
-          title: 'Customise authentication',
-          desc: 'Email sign-in already works out of the box. Tweak it or add providers.',
-          blocks: [
-            {
-              type: 'note',
-              text: 'Dashboard → Authentication → Providers to add Google, GitHub, etc. The login UI lives in app/login.',
-            },
-          ],
+  newNext: boolean,
+  composition: StartComposition
+): StepBlock[] {
+  const blocks: StepBlock[] = []
+  const prims = selectedPrimitives(cfg, composition)
+
+  for (const p of prims) {
+    switch (p) {
+      case 'database':
+      case 'functions':
+        break
+      case 'auth':
+        if (newNext) {
+          blocks.push({
+            type: 'note',
+            text: 'Email sign-in already works in the with-supabase starter. Tweak providers in Dashboard -> Authentication -> Providers; the login UI lives in app/login.',
+          })
+          break
         }
-      }
-      if (cfg.shadcn) {
-        return {
-          id: 'auth',
-          title: 'Add authentication',
-          desc: 'Drop in the password-based auth block — sign-in, sign-up and reset, wired to your client.',
-          blocks: [
-            {
-              type: 'code',
-              lang: 'terminal',
-              code: `npx shadcn@latest add @supabase/${SHADCN_BLOCKS.auth}-${fw.shadcnTag}`,
-            },
-            {
-              type: 'note',
-              text: 'Generates the login form and route handlers. Restyle them like any shadcn component.',
-            },
-          ],
+        if (cfg.shadcn) {
+          blocks.push({
+            type: 'note',
+            text: 'Use the password-based auth block for sign-in, sign-up and reset flows. Restyle it like any shadcn component.',
+          })
+          break
         }
-      }
-      return {
-        id: 'auth',
-        title: 'Add authentication',
-        desc: 'Sign users in with email + password using the client.',
-        blocks: [
-          {
-            type: 'code',
-            lang: 'tsx',
-            code: lines([
-              'const { data, error } = await supabase.auth.signInWithPassword({',
-              '  email, password,',
-              '})',
-            ]),
-          },
-        ],
-      }
-    case 'storage':
-      if (cfg.shadcn) {
-        return {
-          id: 'storage',
-          title: 'Set up file storage',
-          desc: 'Use the Dropzone block for uploads, backed by a Storage bucket.',
-          blocks: [
-            {
-              type: 'code',
-              lang: 'terminal',
-              code: `npx shadcn@latest add @supabase/${SHADCN_BLOCKS.storage}-${fw.shadcnTag}`,
-            },
-            {
-              type: 'note',
-              text: 'Create an avatars bucket in Studio (or via migration), then point the Dropzone at it.',
-            },
-          ],
+        blocks.push({
+          type: 'code',
+          lang: 'tsx',
+          code: lines([
+            'const { data, error } = await supabase.auth.signInWithPassword({',
+            '  email, password,',
+            '})',
+          ]),
+        })
+        break
+      case 'storage':
+        if (cfg.shadcn) {
+          blocks.push({
+            type: 'note',
+            text: 'Use the Dropzone block for uploads, backed by the Storage bucket added in your Supabase code.',
+          })
+          break
         }
-      }
-      return {
-        id: 'storage',
-        title: 'Set up file storage',
-        desc: 'Create a bucket in a migration, then upload from the client.',
-        blocks: [
-          {
-            type: 'code',
-            lang: 'sql',
-            code: "insert into storage.buckets (id, name) values ('avatars', 'avatars');",
-          },
-          {
-            type: 'code',
-            lang: 'tsx',
-            code: "await supabase.storage.from('avatars').upload(path, file)",
-          },
-        ],
-      }
-    case 'functions':
-      return {
-        id: 'functions',
-        title: 'Add an Edge Function',
-        desc:
-          "Deno functions run close to your users. They're managed from the CLI" +
-          (cfg.connection === 'remote' ? ' or by your agent.' : '.'),
-        blocks: [
-          {
-            type: 'code',
-            lang: 'terminal',
-            code: lines([
-              'npx supabase functions new hello',
-              'npx supabase functions deploy hello',
-            ]),
-          },
-          {
-            type: 'code',
-            lang: 'supabase/functions/hello/index.ts',
-            code: lines([
-              'Deno.serve(async (req) => {',
-              '  const { name } = await req.json()',
-              '  return new Response(`Hello ${name}!`)',
-              '})',
-            ]),
-          },
-        ],
-      }
-    case 'dataapi': {
-      const blocks: StepBlock[] = [
-        {
+        blocks.push({
+          type: 'code',
+          lang: 'tsx',
+          code: "await supabase.storage.from('avatars').upload(path, file)",
+        })
+        break
+      case 'dataapi': {
+        const table = exampleTable(composition)
+        blocks.push({
           type: 'code',
           lang: 'tsx',
           code: lines([
             'const { data, error } = await supabase',
-            "  .from('todos')",
-            "  .select('id, task, is_complete')",
-            "  .order('inserted_at', { ascending: false })",
+            `  .from('${table.name}')`,
+            "  .select('*')",
           ]),
-        },
-      ]
-      if (cfg.orm !== 'none') {
-        blocks.push({
-          type: 'note',
-          text: `Prefer typed queries? Run the same read through ${ORMS[cfg.orm].label} — the Data API and your ORM share the one Postgres database.`,
         })
-      }
-      return {
-        id: 'dataapi',
-        title: 'Query over the Data API',
-        desc: 'Every table is instantly available over an auto-generated, secured REST endpoint — no API code to write.',
-        blocks,
-      }
-    }
-    case 'realtime':
-      if (cfg.shadcn) {
-        return {
-          id: 'realtime',
-          title: 'Add realtime',
-          desc: 'Drop in live presence with the Realtime Cursor block, or subscribe directly.',
-          blocks: [
-            {
-              type: 'code',
-              lang: 'terminal',
-              code: `npx shadcn@latest add @supabase/${SHADCN_BLOCKS.realtime}-${fw.shadcnTag}`,
-            },
-          ],
+        if (cfg.orm !== 'none') {
+          blocks.push({
+            type: 'note',
+            text: `Prefer typed queries? Run the same read through ${ORMS[cfg.orm].label} - the Data API and your ORM share the one Postgres database.`,
+          })
         }
+        break
       }
-      return {
-        id: 'realtime',
-        title: 'Subscribe to realtime changes',
-        desc: 'Stream inserts, updates and deletes straight to the client.',
-        blocks: [
-          {
-            type: 'code',
-            lang: 'tsx',
-            code: lines([
-              'supabase',
-              "  .channel('todos')",
-              "  .on('postgres_changes',",
-              "    { event: '*', schema: 'public', table: 'todos' },",
-              '    (payload) => console.log(payload))',
-              '  .subscribe()',
-            ]),
-          },
-        ],
-      }
+      case 'realtime':
+        if (cfg.shadcn) {
+          blocks.push({
+            type: 'note',
+            text: 'Use the Realtime Cursor block for live presence, or subscribe directly with the client.',
+          })
+          break
+        }
+        const table = exampleTable(composition)
+
+        blocks.push({
+          type: 'code',
+          lang: 'tsx',
+          code: lines([
+            'supabase',
+            `  .channel('${table.name}')`,
+            "  .on('postgres_changes',",
+            `    { event: '*', schema: '${table.schema}', table: '${table.name}' },`,
+            '    (payload) => console.log(payload))',
+            '  .subscribe()',
+          ]),
+        })
+        break
+    }
+  }
+
+  return blocks
+}
+
+function connectAppStep(
+  cfg: StartConfig,
+  fw: FrameworkMeta,
+  prims: PrimitiveId[],
+  newNext: boolean,
+  composition: StartComposition
+): SetupStep | null {
+  if (fw.id === 'none') return null
+
+  const blocks: StepBlock[] = []
+
+  if (!newNext) {
+    blocks.push({
+      type: 'code',
+      lang: 'terminal',
+      code: `npm install ${fw.clientPkg}`,
+    })
+    blocks.push(clientBlock(fw))
+  }
+
+  const blockPrims = prims.filter((p) => SHADCN_BLOCKS[p])
+
+  if (cfg.shadcn) {
+    blocks.push({
+      type: 'code',
+      lang: 'terminal',
+      code: lines([
+        "npx shadcn@latest init -d   # if shadcn isn't set up yet",
+        ...blockPrims.map(
+          (p) => `npx shadcn@latest add @supabase/${SHADCN_BLOCKS[p]}-${fw.shadcnTag}`
+        ),
+      ]),
+    })
+
+    const missing = prims.filter((p) => !SHADCN_BLOCKS[p] && !['database', 'functions'].includes(p))
+    if (missing.length) {
+      blocks.push({
+        type: 'note',
+        text:
+          missing.map((p) => PRIMITIVES[p].label).join(', ') +
+          (missing.length > 1
+            ? ' do not have prebuilt UI blocks, so connect them with the client snippets below.'
+            : ' does not have a prebuilt UI block, so connect it with the client snippets below.'),
+      })
+    }
+  }
+
+  blocks.push(...appPrimitiveBlocks(cfg, newNext, composition))
+
+  if (blocks.length === 0) return null
+
+  return {
+    id: 'connect-app',
+    key: true,
+    title: 'Connect to your app',
+    desc: `Wire the installed Supabase code into your ${fw.label} app.`,
+    blocks,
   }
 }
 
-/** Database step: declarative schema, ORM-aware (always code-first). */
-function databaseStep(cfg: StartConfig): SetupStep {
-  if (cfg.orm === 'drizzle') {
+function functionsStep(cfg: StartConfig, composition: StartComposition): SetupStep {
+  const edgeFunctions = composition.resources
+    .filter((resource) => resource.kind === 'edge-function')
+    .sort((a, b) => a.label.localeCompare(b.label))
+
+  if (edgeFunctions.length === 0) {
     return {
-      id: 'database',
-      title: 'Declare your schema with Drizzle',
-      desc: 'Your TypeScript schema is the source of truth — Drizzle generates the SQL migration from it.',
+      id: 'functions',
+      title: 'Enable Edge Functions runtime',
+      desc: "Deno functions run close to your users. This setup enables the runtime, but doesn't add placeholder business logic.",
       blocks: [
         {
-          type: 'code',
-          lang: 'src/db/schema.ts',
-          code: lines([
-            "import { pgTable, bigserial, text, boolean, timestamp } from 'drizzle-orm/pg-core'",
-            '',
-            "export const todos = pgTable('todos', {",
-            "  id: bigserial('id', { mode: 'number' }).primaryKey(),",
-            "  task: text('task').notNull(),",
-            "  isComplete: boolean('is_complete').default(false),",
-            "  insertedAt: timestamp('inserted_at').defaultNow(),",
-            '})',
-          ]),
-        },
-        {
-          type: 'code',
-          lang: 'terminal',
-          code: lines([
-            'npx drizzle-kit generate   # SQL migration from your schema',
-            'npx drizzle-kit migrate    # apply it',
-          ]),
+          type: 'note',
+          text:
+            'No Edge Function template is selected yet. Add a feature template, or create a named function only when you have real product logic for it' +
+            (cfg.connection === 'remote' ? ' — your agent can do that through the plugin.' : '.'),
         },
       ],
     }
   }
-  if (cfg.orm === 'prisma') {
-    return {
-      id: 'database',
-      title: 'Declare your schema with Prisma',
-      desc: 'Edit your Prisma schema, then let Prisma Migrate diff it and write the migration.',
-      blocks: [
-        {
-          type: 'code',
-          lang: 'prisma/schema.prisma',
-          code: lines([
-            'model Todo {',
-            '  id          BigInt   @id @default(autoincrement())',
-            '  task        String',
-            '  isComplete  Boolean  @default(false) @map("is_complete")',
-            '  insertedAt  DateTime @default(now()) @map("inserted_at")',
-            '',
-            '  @@map("todos")',
-            '}',
-          ]),
-        },
-        { type: 'code', lang: 'terminal', code: 'npx prisma migrate dev --name create_todos' },
-      ],
-    }
+
+  const functionNames = edgeFunctions.map((resource) => resource.label)
+
+  return {
+    id: 'functions',
+    title: 'Deploy selected Edge Functions',
+    desc: `Your selected templates include ${listEnglish(functionNames)}.`,
+    blocks: [
+      {
+        type: 'code',
+        lang: 'terminal',
+        code: lines(functionNames.map((name) => `npx supabase functions deploy ${name}`)),
+      },
+    ],
   }
-  // supabase-js → Supabase declarative schemas
+}
+
+function supabaseCodeStep(cfg: StartConfig, composition: StartComposition): SetupStep | null {
+  const plan = buildProjectCodePlan(cfg, composition)
+
+  if (!plan.hasProjectCode) return null
+
   const blocks: StepBlock[] = []
+
+  blocks.push({
+    type: 'code',
+    lang: 'text',
+    code: formatProjectCodeFileGroups(plan.fileGroups),
+  })
+
+  if (plan.dependencyTemplates.length > 0) {
+    blocks.push({
+      type: 'note',
+      text: `The registry pulls required dependencies automatically: ${listEnglish(
+        plan.dependencyTemplates.map((template) => template.name)
+      )}.`,
+    })
+  }
+
+  if (plan.addCommands.length > 0) {
+    blocks.push({
+      type: 'code',
+      lang: 'terminal',
+      code: lines(plan.addCommands.map(({ command, name }) => `${command}   # ${name}`)),
+    })
+  }
+
   if (cfg.project === 'existing') {
     blocks.push({
       type: 'note',
       text: 'Bootstrapping declarative schemas on an existing DB? Pull production first: npx supabase db dump > supabase/schemas/prod.sql',
     })
   }
-  blocks.push(
-    {
-      type: 'code',
-      lang: 'supabase/schemas/todos.sql',
-      code: lines([
-        'create table "todos" (',
-        '  "id"          bigint generated always as identity primary key,',
-        '  "task"        text not null,',
-        '  "is_complete" boolean default false,',
-        '  "inserted_at" timestamptz default now()',
-        ');',
-      ]),
-    },
-    {
+
+  if (plan.configFiles.length > 0) {
+    blocks.push({
+      type: 'note',
+      text: 'After editing supabase/config.toml locally, restart Supabase: npx supabase stop && npx supabase start',
+    })
+  }
+
+  if (plan.ormConversionNote) {
+    blocks.push({
+      type: 'note',
+      text: plan.ormConversionNote,
+    })
+  }
+
+  if (plan.migrationCommands.length > 0) {
+    blocks.push({
       type: 'code',
       lang: 'terminal',
-      code: lines([
-        'npx supabase db diff -f create_todos   # generate the migration',
-        'npx supabase migration up              # apply locally',
-      ]),
-    }
-  )
+      code: lines(plan.migrationCommands),
+    })
+  }
+
+  if (plan.deployCommands.length > 0) {
+    blocks.push({
+      type: 'code',
+      lang: 'terminal',
+      code: lines(plan.deployCommands),
+    })
+  }
+
   return {
-    id: 'database',
-    title: 'Declare your schema',
-    desc: 'Describe the state you want in a schema file — Supabase diffs it and writes a versioned migration for you.',
+    id: 'supabase-code',
+    key: true,
+    title: 'Add your Supabase code',
+    desc: 'Install the selected Supabase templates from the shadcn registry, then apply the generated schema and function changes.',
     blocks,
   }
+}
+
+function exampleTable(composition: StartComposition): { schema: string; name: string } {
+  const tables = composition.resources.filter(isTableResource).sort((a, b) => {
+    if (a.schema === 'public' && b.schema !== 'public') return -1
+    if (a.schema !== 'public' && b.schema === 'public') return 1
+    return a.label.localeCompare(b.label)
+  })
+
+  const table = tables[0]
+  return { schema: table?.schema ?? 'public', name: table?.label ?? 'todos' }
+}
+
+function isTableResource(resource: CompositionResource): resource is CompositionResource & {
+  kind: 'table'
+  schema: string
+} {
+  return resource.kind === 'table' && Boolean(resource.schema)
 }

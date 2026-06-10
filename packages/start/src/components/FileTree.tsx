@@ -16,7 +16,7 @@ function TreeRow({ node, depth }: { node: FileTreeNode; depth: number }) {
         <span
           className={cn(
             'grid flex-none place-items-center',
-            node.status === 'new' ? 'text-brand' : 'text-foreground-muted'
+            node.status === 'new' ? 'text-brand' : 'text-foreground-light'
           )}
         >
           {isDir ? <Folder size={15} /> : <File size={14} />}
@@ -26,7 +26,7 @@ function TreeRow({ node, depth }: { node: FileTreeNode; depth: number }) {
           {isDir ? '/' : ''}
         </span>
         {node.note && (
-          <span className="font-sans text-[11.5px] text-foreground-muted">{node.note}</span>
+          <span className="font-sans text-[11.5px] text-foreground-light">{node.note}</span>
         )}
         {node.status && (
           <span
@@ -54,7 +54,7 @@ export function FileTree({ tree }: { tree: FileTreeNode }) {
         <span className="h-2.5 w-2.5 rounded-full bg-surface-300" />
         <span className="h-2.5 w-2.5 rounded-full bg-surface-300" />
         <span className="h-2.5 w-2.5 rounded-full bg-surface-300" />
-        <span className="ml-2 font-mono text-[11.5px] text-foreground-muted">
+        <span className="ml-2 font-mono text-[11.5px] text-foreground-light">
           files this setup touches
         </span>
       </div>

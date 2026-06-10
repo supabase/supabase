@@ -47,7 +47,10 @@ export { filterTemplates, queryTemplates, type SearchQuery } from './src/operati
 // Compose — combine many templates
 export { generateCompositionId, createCompositionManifest } from './src/compose/composition-id'
 export { mergeTemplates } from './src/compose/merge'
-export { extractComposerResources } from './src/compose/resources'
+export {
+  extractComposerResources,
+  extractComposerResources as extractCompositionResources,
+} from './src/compose/resources'
 export { buildFilePathTree, type FileTreeNode } from './src/compose/file-tree'
 export type { CompositionManifest, MergedFile, MergeResult } from './src/compose/types'
 
@@ -59,6 +62,14 @@ export {
   sortTemplates,
   type CategoriesManifest,
 } from './src/categories'
+
+// Registry CLI — shadcn GitHub registry install/search commands
+export {
+  getRegistryAddCommand,
+  getRegistrySearchCommand,
+  getRegistryViewCommand,
+  SHADCN_CLI,
+} from './src/registry/cli'
 
 // Render helpers
 export { inferLanguage, resolveFileHandler } from './src/render/language'
@@ -87,6 +98,8 @@ export {
   type QualifiedIdentifier,
 } from './src/composer/sql'
 export type {
+  ComposerResource as CompositionResource,
+  ComposerResourceKind as CompositionResourceKind,
   ComposerResource,
   ComposerResourceKind,
   MergeStrategy,

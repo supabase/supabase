@@ -3,7 +3,7 @@
  * Ported from the prototype's `fileTree()`.
  */
 import { FRAMEWORKS, type StartConfig } from './config'
-import { selectedPrims, type StartFeature } from './features'
+import { selectedPrimitives, type StartComposition } from './composition/start-composition'
 
 export interface FileTreeNode {
   name: string
@@ -13,9 +13,10 @@ export interface FileTreeNode {
   children?: FileTreeNode[]
 }
 
-export function buildFileTree(cfg: StartConfig, features: StartFeature[]): FileTreeNode {
+export function buildFileTree(cfg: StartConfig, composition: StartComposition): FileTreeNode {
   const fw = FRAMEWORKS[cfg.framework]
-  const prims = selectedPrims(cfg, features)
+  const prims = selectedPrimitives(cfg, composition)
+  const schemaFileNames = getSchemaFileNames(composition)
   const root: FileTreeNode = { name: 'your-app', dir: true, children: [] }
   const children = root.children!
 
@@ -36,7 +37,7 @@ export function buildFileTree(cfg: StartConfig, features: StartFeature[]): FileT
       children.push({
         name: 'supabase/schemas',
         dir: true,
-        children: [{ name: 'todos.sql', status: 'new' }],
+        children: schemaFileNames.map((name) => ({ name, status: 'new' })),
       })
     }
     return root
@@ -101,11 +102,20 @@ export function buildFileTree(cfg: StartConfig, features: StartFeature[]): FileT
     children.push({
       name: 'supabase/schemas',
       dir: true,
-      children: [{ name: 'todos.sql', status: 'new' }],
+      children: schemaFileNames.map((name) => ({ name, status: 'new' })),
     })
   }
 
   return root
+}
+
+function getSchemaFileNames(composition: StartComposition): string[] {
+  const schemaFiles =
+    composition.mergeResult?.files
+      .map((file) => file.path.match(/^supabase\/schemas\/([^/]+\.sql)$/)?.[1])
+      .filter((fileName): fileName is string => Boolean(fileName)) ?? []
+
+  return schemaFiles.length > 0 ? schemaFiles : ['todos.sql']
 }
 
 /** Renders a file tree as indented text (used in the agent plan). */

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "feature-flags",
+  "type": "registry:item",
+  "title": "Feature Flags",
+  "description": "Projects, environments, rollout rules, variants, overrides, and SQL flag evaluation",
+  "categories": [
+    "Database"
+  ],
+  "registryDependencies": [
+    "supabase/supabase/database",
+    "supabase/supabase/api",
+    "supabase/supabase/auth"
+  ],
+  "files": [
+    {
+      "path": "supabase/schemas/feature-flags.sql",
+      "type": "registry:file",
+      "target": "~/supabase/schemas/feature-flags.sql"
+    }
+  ],
+  "docs": "# Feature flags template\n\nAdds a Postgres-backed feature flag model with environments, variants, JSONB audience rules, subject overrides, audit events, and an evaluation RPC.\n\n## Includes\n\n- Projects and environments\n- Flags with global enablement and rollout percentage\n- Optional variants with weights\n- Audience rules using JSONB containment against caller attributes\n- Per-subject overrides\n- `public.evaluate_feature_flag(...)` RPC\n\n## Example\n\n```sql\nselect *\nfrom public.evaluate_feature_flag(\n  project_slug => 'app',\n  environment_key => 'production',\n  flag_key => 'new_onboarding',\n  subject_key => auth.uid()::text,\n  attributes => '{\"plan\": \"pro\"}'\n);\n```\n\nAudience rules match when `attributes @> conditions`, so a rule with `{\"plan\": \"pro\"}` matches callers whose attributes include that key/value pair.",
+  "meta": {
+    "version": "1.0.0",
+    "tags": [
+      "feature-flags",
+      "experiments",
+      "rollouts",
+      "targeting",
+      "database"
+    ],
+    "category": "Database",
+    "dependencies": {
+      "required": [
+        "database",
+        "api",
+        "auth"
+      ]
+    }
+  }
+}

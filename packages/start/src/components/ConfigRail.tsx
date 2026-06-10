@@ -1,148 +1,190 @@
 'use client'
 
-import { useMemo } from 'react'
-import { Switch } from 'ui'
+import { Plus } from 'lucide-react'
+import { Button, CheckboxGroupStacked } from 'ui'
 
-import {
-  FRAMEWORKS,
-  ORMS,
-  PRIM_ORDER,
-  PRIMITIVES,
-  type FrameworkId,
-  type OrmId,
-  type PrimitiveId,
-  type StartConfig,
-} from '../lib/config'
-import { groupFeaturesByCategory } from '../lib/feature-grouping'
-import { type StartFeature } from '../lib/features'
-import { Chips, Field, RadioList, SegmentedControl } from './railControls'
+import { canRemoveTemplate, type DependencyResolution } from '../lib/composition/composition'
+import { FRAMEWORKS, ORMS, type FrameworkId, type OrmId, type StartConfig } from '../lib/config'
+import type { Template } from '../lib/template-catalog'
+import { ConfigRailOutcomeFooter } from './ConfigRailOutcomeFooter'
+import { CoreTemplateCheckbox } from './CoreTemplateCheckbox'
+import { RailFormField, RailRadioField } from './railControls'
 
 interface ConfigRailProps {
   cfg: StartConfig
-  features: StartFeature[]
+  templates: Template[]
+  coreTemplates: Template[]
+  selectedIds: Set<string>
+  resolution: DependencyResolution
+  featureCount: number
+  hasComposition: boolean
+  plan: string
   setValue: <K extends keyof StartConfig>(key: K, value: StartConfig[K]) => void
-  togglePrimitive: (id: PrimitiveId) => void
-  toggleFeature: (id: string) => void
+  onAddTemplate: (id: string) => void
+  onRemoveTemplate: (id: string) => void
+  onHoverTemplate: (id: string | null) => void
+  onOpenFeatures: () => void
+  onDownload: () => void
+  onOpenManual: () => void
+  onOpenAgentPlan: () => void
 }
 
 export function ConfigRail({
   cfg,
-  features,
+  templates,
+  coreTemplates,
+  selectedIds,
+  resolution,
+  featureCount,
+  hasComposition,
+  plan,
   setValue,
-  togglePrimitive,
-  toggleFeature,
+  onAddTemplate,
+  onRemoveTemplate,
+  onHoverTemplate,
+  onOpenFeatures,
+  onDownload,
+  onOpenManual,
+  onOpenAgentPlan,
 }: ConfigRailProps) {
   const frameworkOptions = Object.values(FRAMEWORKS).map((f) => ({
     id: f.id,
     label: f.label,
     meta: f.meta,
   }))
-  const primitiveOptions = PRIM_ORDER.map((p) => ({ id: p, label: PRIMITIVES[p].label }))
-  const featureGroups = useMemo(() => groupFeaturesByCategory(features), [features])
+  const resolvedIds = new Set(resolution.resolved.map((template) => template.id))
+  const selectedCoreCount = coreTemplates.filter(
+    (template) => selectedIds.has(template.id) || resolvedIds.has(template.id)
+  ).length
 
   return (
     <aside
       className={[
-        'w-full shrink-0 border-b border-default px-6 py-6',
-        'lg:sticky lg:top-(--header-height) lg:w-[296px] lg:self-start lg:border-b-0 lg:border-r',
-        'lg:h-[calc(100vh-var(--header-height))] lg:overflow-y-auto',
+        'flex h-full w-full shrink-0 flex-col overflow-hidden border-b border-default',
+        'lg:border-b',
       ].join(' ')}
     >
-      <p className="mb-6 text-[13px] leading-relaxed text-foreground-light">
-        Tell us what you&apos;re building. Everything on the right — your{' '}
-        <span className="font-medium text-foreground">agent plan</span> and the{' '}
-        <span className="font-medium text-foreground">setup guide</span> — updates as you choose.
-      </p>
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
+        <p className="mb-5 text-[13px] leading-relaxed text-foreground-light">
+          Tell us what you&apos;re building. The guide and composition preview update as you choose.
+        </p>
 
-      <Field label="Project">
-        <SegmentedControl
+        <RailRadioField
+          label="Project"
           options={[
-            { id: 'new', label: 'New project', sub: 'scaffold it' },
-            { id: 'existing', label: 'Existing', sub: 'add to it' },
+            { id: 'new', label: 'New project', meta: 'Scaffold it' },
+            { id: 'existing', label: 'Existing', meta: 'Add to it' },
           ]}
           value={cfg.project}
           onChange={(v) => setValue('project', v)}
         />
-      </Field>
 
-      <Field label="Framework">
-        <RadioList
+        <RailRadioField
+          label="Framework"
           options={frameworkOptions}
           value={cfg.framework}
           onChange={(v) => setValue('framework', v as FrameworkId)}
         />
-      </Field>
 
-      {/* shadcn blocks require a front-end framework. */}
-      {cfg.framework !== 'none' && (
-        <Field label="Components">
-          <label className="flex cursor-pointer items-center gap-3 select-none">
-            <Switch checked={cfg.shadcn} onCheckedChange={(v) => setValue('shadcn', v)} />
-            <span className="text-sm text-foreground-light">
-              shadcn/ui <span className="text-foreground-muted">prebuilt blocks</span>
-            </span>
-          </label>
-        </Field>
-      )}
+        {cfg.framework !== 'none' && (
+          <RailRadioField
+            label="Component library"
+            options={[
+              {
+                id: 'shadcn',
+                label: 'shadcn/ui',
+                meta: 'Prebuilt UI blocks for your framework',
+              },
+              {
+                id: 'none',
+                label: 'None',
+                meta: 'Use your own components',
+              },
+            ]}
+            value={cfg.shadcn ? 'shadcn' : 'none'}
+            onChange={(v) => setValue('shadcn', v === 'shadcn')}
+            idPrefix="component-library"
+          />
+        )}
 
-      <Field label="Add the pieces you need" count={`${cfg.primitives.length}/6`}>
-        <Chips
-          options={primitiveOptions}
-          value={cfg.primitives}
-          onToggle={(id) => togglePrimitive(id as PrimitiveId)}
-        />
-      </Field>
+        <RailFormField
+          label="Add the pieces you need"
+          labelOptional={`${selectedCoreCount}/${coreTemplates.length}`}
+        >
+          <CheckboxGroupStacked>
+            {coreTemplates.map((template) => {
+              const isSelected = selectedIds.has(template.id)
+              const isAutoIncluded = !isSelected && resolvedIds.has(template.id)
+              const isRemovalBlocked =
+                isSelected && !canRemoveTemplate(template.id, selectedIds, templates)
 
-      <Field label="Data layer">
-        <RadioList
+              return (
+                <CoreTemplateCheckbox
+                  key={template.id}
+                  template={template}
+                  templates={templates}
+                  selectedIds={selectedIds}
+                  isSelected={isSelected}
+                  isAutoIncluded={isAutoIncluded}
+                  isRemovalBlocked={isRemovalBlocked}
+                  onAdd={() => onAddTemplate(template.id)}
+                  onRemove={() => onRemoveTemplate(template.id)}
+                  onHoverChange={(isHovered) => onHoverTemplate(isHovered ? template.id : null)}
+                />
+              )
+            })}
+          </CheckboxGroupStacked>
+        </RailFormField>
+
+        <RailRadioField
+          label="Data layer"
           options={Object.values(ORMS).map((o) => ({ id: o.id, label: o.label, meta: o.meta }))}
           value={cfg.orm}
           onChange={(v) => setValue('orm', v as OrmId)}
         />
-      </Field>
 
-      <Field label="Where it runs">
-        <SegmentedControl
+        <RailRadioField
+          label="Where it runs"
           options={[
-            { id: 'remote', label: 'Remote', sub: 'hosted' },
-            { id: 'local', label: 'Local', sub: 'Docker' },
+            { id: 'remote', label: 'Remote', meta: 'Hosted' },
+            { id: 'local', label: 'Local', meta: 'Docker' },
           ]}
           value={cfg.connection}
           onChange={(v) => setValue('connection', v)}
         />
-      </Field>
 
-      <Field label="Agent">
-        <SegmentedControl
+        <RailRadioField
+          label="Agent"
           options={[
-            { id: 'claude', label: 'Claude Code', sub: 'plugin' },
-            { id: 'codex', label: 'Codex', sub: 'plugin' },
+            { id: 'claude', label: 'Claude Code', meta: 'Plugin' },
+            { id: 'codex', label: 'Codex', meta: 'Plugin' },
           ]}
           value={cfg.agent}
           onChange={(v) => setValue('agent', v)}
         />
-      </Field>
 
-      <Field
-        label="Additional features"
-        count={cfg.features.length ? `${cfg.features.length} on` : undefined}
-      >
-        <div className="flex flex-col gap-3.5">
-          {featureGroups.map((group) => (
-            <div key={group.category}>
-              <p className="mb-1.5 text-[11px] text-foreground-muted">{group.category}</p>
-              <Chips
-                options={group.features.map((f) => ({ id: f.id, label: f.name }))}
-                value={cfg.features}
-                onToggle={toggleFeature}
-              />
-            </div>
-          ))}
-        </div>
-        <p className="mt-2.5 text-[11.5px] leading-snug text-foreground-muted">
-          Each one switches on the services it needs.
-        </p>
-      </Field>
+        <RailFormField
+          label="Add features"
+          labelOptional={featureCount ? `${featureCount} on` : undefined}
+        >
+          <Button
+            type="default"
+            block
+            iconRight={<Plus className="h-4 w-4" />}
+            onClick={onOpenFeatures}
+          >
+            Select feature templates
+          </Button>
+        </RailFormField>
+      </div>
+
+      <ConfigRailOutcomeFooter
+        plan={plan}
+        hasComposition={hasComposition}
+        onDownload={onDownload}
+        onOpenManual={onOpenManual}
+        onOpenAgentPlan={onOpenAgentPlan}
+      />
     </aside>
   )
 }

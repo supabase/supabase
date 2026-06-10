@@ -48,9 +48,8 @@ export function AgentPlanSheet({ open, plan, onOpenChange }: AgentPlanSheetProps
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" size="lg" className="flex w-full flex-col gap-0 p-0 sm:max-w-xl">
-        <SheetHeader className="flex items-baseline gap-2">
+        <SheetHeader>
           <SheetTitle className="text-[15px] font-semibold">Agent plan</SheetTitle>
-          <span className="text-[13px] text-foreground-light">generated from your setup</span>
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto px-5 py-5">
@@ -68,9 +67,6 @@ export function AgentPlanSheet({ open, plan, onOpenChange }: AgentPlanSheetProps
           >
             {copied ? 'Copied' : 'Copy prompt'}
           </Button>
-          <span className="text-[12.5px] text-foreground-muted">
-            Paste into Claude Code, Codex, or any MCP-aware agent.
-          </span>
         </SheetFooter>
       </SheetContent>
     </Sheet>

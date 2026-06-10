@@ -1,3 +1,0 @@
-[api]
-schemas = ["public", "graphql_public"]
-extra_search_path = ["public", "extensions"]

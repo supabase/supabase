@@ -1,0 +1,41 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "functions-stripe-webhook",
+  "type": "registry:item",
+  "title": "Stripe Webhook",
+  "description": "Edge Function scaffold for receiving Stripe webhooks",
+  "categories": [
+    "Ecommerce"
+  ],
+  "registryDependencies": [
+    "supabase/supabase/functions",
+    "supabase/supabase/database"
+  ],
+  "files": [
+    {
+      "path": "supabase/functions/stripe-webhook/index.ts",
+      "type": "registry:file",
+      "target": "~/supabase/functions/stripe-webhook/index.ts"
+    },
+    {
+      "path": "supabase/schemas/billing.sql",
+      "type": "registry:file",
+      "target": "~/supabase/schemas/billing.sql"
+    }
+  ],
+  "meta": {
+    "version": "1.0.0",
+    "tags": [
+      "stripe",
+      "webhook",
+      "functions"
+    ],
+    "category": "Ecommerce",
+    "dependencies": {
+      "required": [
+        "functions",
+        "database"
+      ]
+    }
+  }
+}

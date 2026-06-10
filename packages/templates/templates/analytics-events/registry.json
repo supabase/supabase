@@ -1,0 +1,34 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "analytics-events",
+  "type": "registry:item",
+  "title": "Product Analytics",
+  "description": "Event table and indexes for lightweight product analytics",
+  "categories": [
+    "Analytics"
+  ],
+  "registryDependencies": [
+    "supabase/supabase/database"
+  ],
+  "files": [
+    {
+      "path": "supabase/schemas/analytics.sql",
+      "type": "registry:file",
+      "target": "~/supabase/schemas/analytics.sql"
+    }
+  ],
+  "meta": {
+    "version": "1.0.0",
+    "tags": [
+      "analytics",
+      "events",
+      "database"
+    ],
+    "category": "Analytics",
+    "dependencies": {
+      "required": [
+        "database"
+      ]
+    }
+  }
+}

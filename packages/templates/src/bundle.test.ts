@@ -8,7 +8,7 @@ import { parseTemplateRegistry, parseTemplateSummary } from './schema'
 const packageRoot = fileURLToPath(new URL('..', import.meta.url))
 
 describe('templates package bundle', () => {
-  it('bundles the registry-driven template folders into the runtime template shape', async () => {
+  it('bundles the shadcn registry into the runtime template shape', async () => {
     const result = await bundleTemplateRepository({ rootDir: packageRoot })
     expect(result.templates).toEqual(templates)
   })
@@ -32,7 +32,7 @@ describe('templates package bundle', () => {
     ])
   })
 
-  it('rejects duplicate registry entries', () => {
+  it('rejects duplicate legacy registry entries', () => {
     expect(() => parseTemplateRegistry({ templates: ['auth', 'auth'] })).toThrow(
       'Template registry contains duplicate "auth"'
     )

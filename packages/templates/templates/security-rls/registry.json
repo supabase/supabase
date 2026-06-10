@@ -1,0 +1,35 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "security-rls",
+  "type": "registry:item",
+  "title": "Auto-enable RLS",
+  "description": "Event trigger that automatically enables Row Level Security on new public tables",
+  "categories": [
+    "Security"
+  ],
+  "registryDependencies": [
+    "supabase/supabase/database"
+  ],
+  "files": [
+    {
+      "path": "supabase/schemas/security.sql",
+      "type": "registry:file",
+      "target": "~/supabase/schemas/security.sql"
+    }
+  ],
+  "docs": "# Security RLS template\n\nBaseline row level security patterns for common Supabase tables and auth-aware policies.\n\n## Includes\n\n- Example secured tables\n- Reusable RLS policy templates\n\n## Dependencies\n\nRequires **database** and **auth**.",
+  "meta": {
+    "version": "1.0.0",
+    "tags": [
+      "security",
+      "rls",
+      "event-trigger"
+    ],
+    "category": "Security",
+    "dependencies": {
+      "required": [
+        "database"
+      ]
+    }
+  }
+}

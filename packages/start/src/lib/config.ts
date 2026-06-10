@@ -21,8 +21,8 @@ export interface StartConfig {
   orm: OrmId
   connection: ConnectionId
   agent: AgentId
-  /** Template IDs from the `templates` package selected as additional features. */
-  features: string[]
+  /** Explicit template IDs selected from the template catalog. */
+  templateIds: string[]
 }
 
 export interface FrameworkMeta {
@@ -180,7 +180,7 @@ export const DEFAULT_CONFIG: StartConfig = {
   orm: 'none',
   connection: 'remote',
   agent: 'claude',
-  features: [],
+  templateIds: ['todos'],
 }
 
 /** Join a list into a natural-language English string ("a, b and c"). */

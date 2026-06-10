@@ -1,0 +1,65 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "mcp-server",
+  "type": "registry:item",
+  "title": "MCP Server",
+  "description": "Edge Function MCP server with a tool registry for exposing project capabilities to MCP clients",
+  "categories": [
+    "AI"
+  ],
+  "registryDependencies": [
+    "supabase/supabase/database",
+    "supabase/supabase/api",
+    "supabase/supabase/functions"
+  ],
+  "files": [
+    {
+      "path": "supabase/functions/mcp-server/index.ts",
+      "type": "registry:file",
+      "target": "~/supabase/functions/mcp-server/index.ts"
+    },
+    {
+      "path": "supabase/functions/mcp-server/registry.ts",
+      "type": "registry:file",
+      "target": "~/supabase/functions/mcp-server/registry.ts"
+    },
+    {
+      "path": "supabase/functions/mcp-server/tools/echo.ts",
+      "type": "registry:file",
+      "target": "~/supabase/functions/mcp-server/tools/echo.ts"
+    },
+    {
+      "path": "supabase/functions/mcp-server/tools/index.ts",
+      "type": "registry:file",
+      "target": "~/supabase/functions/mcp-server/tools/index.ts"
+    },
+    {
+      "path": "supabase/functions/mcp-server/tools/list-tables.ts",
+      "type": "registry:file",
+      "target": "~/supabase/functions/mcp-server/tools/list-tables.ts"
+    },
+    {
+      "path": "supabase/seed.sql",
+      "type": "registry:file",
+      "target": "~/supabase/seed.sql"
+    }
+  ],
+  "docs": "# MCP server template\n\nScaffolds a Model Context Protocol server as a Supabase Edge Function. The function speaks JSON-RPC over HTTP and exposes tools that are declared through a small registry.\n\nThis composes with the **Agent** template: `agent-chat` can connect to this Edge Function and expose its tools to the model. By default, the agent looks for a local MCP server at `${SUPABASE_URL}/functions/v1/mcp-server`; you can also register additional servers in `public.agent_mcp_servers`.\n\n## Includes\n\n- `supabase/functions/mcp-server/index.ts` — JSON-RPC entrypoint handling `initialize`, `tools/list`, and `tools/call`\n- `supabase/functions/mcp-server/registry.ts` — `registerTool` API and tool typings\n- `supabase/functions/mcp-server/tools/` — one file per tool, imported from `tools/index.ts`\n\n## Adding a tool\n\n1. Create a new file under `supabase/functions/mcp-server/tools/`, e.g. `tools/my-tool.ts`.\n2. Call `registerTool({ name, description, inputSchema, handler })` at module scope.\n3. Import the new file from `tools/index.ts` so it self-registers at boot.\n\n## Dependencies\n\nRequires **database**, **api**, and **functions**.",
+  "meta": {
+    "version": "1.0.0",
+    "tags": [
+      "mcp",
+      "ai",
+      "tools",
+      "functions"
+    ],
+    "category": "AI",
+    "dependencies": {
+      "required": [
+        "database",
+        "api",
+        "functions"
+      ]
+    }
+  }
+}

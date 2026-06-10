@@ -13,5 +13,5 @@
     "Analytics",
     "Observability"
   ],
-  "featuredTemplates": ["database", "functions", "storage", "auth", "api", "graphql"]
+  "featuredTemplates": ["database", "functions", "storage", "auth", "api"]
 }

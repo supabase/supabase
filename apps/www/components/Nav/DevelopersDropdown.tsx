@@ -76,14 +76,14 @@ export const DevelopersDropdown = () => {
         </div>
         <div className="flex-col gap-2 py-8 px-10 border-t">
           <Link
-            href="/composer"
+            href="/docs/start"
             className="group flex items-center gap-1 text-foreground-lighter hover:text-foreground text-xs uppercase tracking-widest font-mono mb-5 focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-xs focus-visible:text-foreground"
           >
-            <span>Composer</span>
+            <span>Start</span>
             <ChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
           </Link>
           <Link
-            href="/composer"
+            href="/docs/start"
             className="group flex flex-col focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
           >
             <p className="text-foreground-light mb-0 line-clamp-2 group-hover:text-foreground group-focus-visible:text-foreground">

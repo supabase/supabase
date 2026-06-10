@@ -1,70 +1,124 @@
 import { describe, expect, it } from 'vitest'
 
 import { buildAgentPlan } from './agent-plan'
+import {
+  buildStartComposition,
+  getSelectedTemplateIds,
+  selectedPrimitives,
+} from './composition/start-composition'
 import { DEFAULT_CONFIG, type StartConfig } from './config'
-import { getStartFeatures, selectedPrims } from './features'
 import { buildSteps } from './steps'
+import { getStartTemplates } from './template-catalog'
 
-const features = getStartFeatures()
+const templates = getStartTemplates()
 
 function config(overrides: Partial<StartConfig> = {}): StartConfig {
   return { ...DEFAULT_CONFIG, ...overrides }
 }
 
-function stepIds(cfg: StartConfig): string[] {
-  return buildSteps(cfg, features).map((s) => s.id)
+function composition(cfg: StartConfig) {
+  return buildStartComposition(cfg, templates)
 }
 
-describe('getStartFeatures', () => {
-  it('excludes the core primitive templates', () => {
-    const ids = features.map((f) => f.id)
-    for (const core of ['database', 'functions', 'storage', 'auth', 'api', 'graphql']) {
-      expect(ids).not.toContain(core)
-    }
+function stepIds(cfg: StartConfig): string[] {
+  return buildSteps(cfg, composition(cfg)).map((s) => s.id)
+}
+
+function stepText(step: ReturnType<typeof buildSteps>[number]): string {
+  return step.blocks
+    .map((block) => {
+      if (block.type === 'code') return block.code
+      if (block.type === 'note') return block.text
+      return ''
+    })
+    .join('\n')
+}
+
+describe('getStartTemplates', () => {
+  it('exposes the full embedded template list', () => {
+    expect(templates.length).toBeGreaterThan(0)
+    expect(templates.map((template) => template.id)).toEqual(
+      expect.arrayContaining(['database', 'todos', 'auth', 'storage', 'functions'])
+    )
   })
 
-  it('exposes a non-empty feature list from the templates package', () => {
-    expect(features.length).toBeGreaterThan(0)
+  it('maps selected primitives onto core template IDs', () => {
+    expect(getSelectedTemplateIds(config(), templates)).toEqual(
+      expect.arrayContaining(['database', 'todos', 'auth'])
+    )
+  })
+})
+
+describe('buildStartComposition', () => {
+  it('resolves dependencies and merges selected template files', () => {
+    const built = composition(config({ templateIds: ['multi-tenant-rbac'] }))
+
+    expect(built.resolution.resolved.map((template) => template.id)).toEqual(
+      expect.arrayContaining(['database', 'auth', 'multi-tenant-rbac'])
+    )
+    expect(built.mergeResult?.files.length).toBeGreaterThan(0)
   })
 
-  it('maps template dependencies onto rail primitives', () => {
-    const rbac = features.find((f) => f.id === 'multi-tenant-rbac')
-    expect(rbac).toBeDefined()
-    expect(rbac!.neededPrimitives).toEqual(expect.arrayContaining(['auth', 'database']))
+  it('selected templates auto-imply the primitives their dependencies require', () => {
+    const built = composition(config({ primitives: [], templateIds: ['multi-tenant-rbac'] }))
+
+    expect(
+      selectedPrimitives(config({ primitives: [], templateIds: ['multi-tenant-rbac'] }), built)
+    ).toEqual(expect.arrayContaining(['auth', 'database']))
   })
 })
 
 describe('buildSteps', () => {
   it('produces the expected default order (new + Next.js)', () => {
     const ids = stepIds(config())
-    // New Next.js project (shadcn on) skips the install + client steps —
-    // the with-supabase starter ships them.
-    expect(ids).toEqual(['bootstrap', 'plugin', 'cli', 'keys', 'shadcn', 'database', 'auth'])
+    expect(ids).toEqual([
+      'bootstrap',
+      'plugin',
+      'cli',
+      'keys',
+      'supabase-code',
+      'connect-app',
+    ])
     expect(ids).not.toContain('install')
     expect(ids).not.toContain('client')
   })
 
-  it('adds install + client steps for a non-Next.js new project', () => {
-    const ids = stepIds(config({ framework: 'vite' }))
-    expect(ids).toContain('install')
-    expect(ids).toContain('client')
+  it('adds enabled shadcn blocks in the app connection step', () => {
+    const cfg = config()
+    const connect = buildSteps(cfg, composition(cfg)).find((s) => s.id === 'connect-app')!
+
+    expect(connect.title).toBe('Connect to your app')
+    expect(stepText(connect)).toContain('npx shadcn@latest init -d')
+    expect(stepText(connect)).toContain('npx shadcn@latest add @supabase/password-based-auth-nextjs')
   })
 
-  it('always includes the CLI step (code-first)', () => {
+  it('adds the dropzone shadcn block when storage is enabled', () => {
+    const cfg = config({ primitives: ['database', 'storage'] })
+    const connect = buildSteps(cfg, composition(cfg)).find((s) => s.id === 'connect-app')!
+
+    expect(stepText(connect)).toContain('npx shadcn@latest add @supabase/dropzone-nextjs')
+  })
+
+  it('adds install + client blocks for a non-Next.js new project', () => {
+    const cfg = config({ framework: 'vite' })
+    const ids = stepIds(cfg)
+    const connect = buildSteps(cfg, composition(cfg)).find((s) => s.id === 'connect-app')!
+
+    expect(ids).not.toContain('install')
+    expect(ids).not.toContain('client')
+    expect(stepText(connect)).toContain('npm install @supabase/supabase-js')
+    expect(connect.blocks).toContainEqual(
+      expect.objectContaining({ type: 'code', lang: 'src/lib/supabase.ts' })
+    )
+  })
+
+  it('always includes the CLI step', () => {
     expect(stepIds(config({ connection: 'remote' }))).toContain('cli')
     expect(stepIds(config({ connection: 'local' }))).toContain('cli')
   })
 
-  it('the database step is always the declarative-schema flow', () => {
-    const steps = buildSteps(config(), features)
-    const db = steps.find((s) => s.id === 'database')!
-    const text = JSON.stringify(db)
-    expect(text).toContain('db diff')
-    expect(db.title).toBe('Declare your schema')
-  })
-
   it('backend-only skips bootstrap, install and client steps', () => {
-    const ids = stepIds(config({ framework: 'none' }))
+    const ids = stepIds(config({ framework: 'none', shadcn: false }))
     expect(ids).not.toContain('bootstrap')
     expect(ids).not.toContain('install')
     expect(ids).not.toContain('client')
@@ -72,35 +126,114 @@ describe('buildSteps', () => {
     expect(ids).toContain('cli')
   })
 
-  it('existing + shadcn yields the shadcn-add step, not a file tree', () => {
-    const steps = buildSteps(config({ project: 'existing', shadcn: true }), features)
-    const add = steps.find((s) => s.id === 'add')!
-    expect(add.title).toBe('Add Supabase UI blocks')
-    expect(add.blocks.some((b) => b.type === 'filetree')).toBe(false)
+  it('existing + shadcn uses the app connection step instead of a separate shadcn-add step', () => {
+    const cfg = config({ project: 'existing', shadcn: true })
+    const steps = buildSteps(cfg, composition(cfg))
+    const connect = steps.find((s) => s.id === 'connect-app')!
+    expect(steps.some((s) => s.id === 'add')).toBe(false)
+    expect(connect.title).toBe('Connect to your app')
+    expect(stepText(connect)).toContain('npx shadcn@latest init -d')
   })
 
-  it('existing + no shadcn yields a file tree step', () => {
-    const steps = buildSteps(config({ project: 'existing', shadcn: false }), features)
-    const add = steps.find((s) => s.id === 'add')!
-    expect(add.blocks.some((b) => b.type === 'filetree')).toBe(true)
+  it('existing + no shadcn uses the Supabase code step instead of a file tree step', () => {
+    const cfg = config({ project: 'existing', shadcn: false })
+    const steps = buildSteps(cfg, composition(cfg))
+    expect(steps.some((s) => s.id === 'add')).toBe(false)
+    expect(steps.find((s) => s.id === 'supabase-code')?.title).toBe('Add your Supabase code')
   })
 
-  it('selecting a feature auto-implies its primitives and appends a feature step', () => {
-    const cfg = config({ features: ['multi-tenant-rbac'] })
-    expect(selectedPrims(cfg, features)).toEqual(expect.arrayContaining(['auth', 'database']))
-    const steps = buildSteps(cfg, features)
-    const featureStep = steps.find((s) => s.id === 'f-multi-tenant-rbac')
-    expect(featureStep).toBeDefined()
-    expect(featureStep!.feature).toBe(true)
-    expect(featureStep!.blocks.length).toBeGreaterThan(0)
+  it('lists config.toml in the Supabase code step', () => {
+    const cfg = config()
+    const supabaseCode = buildSteps(cfg, composition(cfg)).find((s) => s.id === 'supabase-code')!
+
+    expect(supabaseCode.title).toBe('Add your Supabase code')
+    expect(supabaseCode.blocks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'code',
+          code: expect.stringContaining('supabase/config.toml'),
+        }),
+      ])
+    )
+  })
+
+  it('lists schema files in the Supabase code step without embedding their contents', () => {
+    const cfg = config()
+    const supabaseCode = buildSteps(cfg, composition(cfg)).find((s) => s.id === 'supabase-code')!
+    const text = stepText(supabaseCode)
+
+    expect(supabaseCode.title).toBe('Add your Supabase code')
+    expect(supabaseCode.blocks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'code',
+          code: expect.stringContaining('supabase/schemas/todos.sql'),
+        }),
+      ])
+    )
+    expect(text).not.toContain('create table')
+    expect(stepIds(cfg)).not.toContain('composition-files')
+  })
+
+  it('includes Data API queries in the app connection step', () => {
+    const cfg = config({ primitives: ['database', 'dataapi'] })
+    const connect = buildSteps(cfg, composition(cfg)).find((s) => s.id === 'connect-app')!
+    const text = stepText(connect)
+
+    expect(connect.title).toBe('Connect to your app')
+    expect(text).toContain(".from('todos')")
+    expect(text).toContain(".select('*')")
+  })
+
+  it('does not scaffold a placeholder function when only Edge Functions is enabled', () => {
+    const cfg = config({ primitives: ['functions'], templateIds: [] })
+    const functions = buildSteps(cfg, composition(cfg)).find((s) => s.id === 'functions')!
+
+    expect(functions.title).toBe('Enable Edge Functions runtime')
+    expect(stepText(functions)).not.toContain('hello')
+  })
+
+  it('lists and deploys selected Edge Function templates from the Supabase code step', () => {
+    const cfg = config({ primitives: ['functions'], templateIds: ['functions-stripe-webhook'] })
+    const supabaseCode = buildSteps(cfg, composition(cfg)).find((s) => s.id === 'supabase-code')!
+    const text = stepText(supabaseCode)
+
+    expect(supabaseCode.title).toBe('Add your Supabase code')
+    expect(supabaseCode.blocks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'code',
+          code: expect.stringContaining('supabase/functions/stripe-webhook/index.ts'),
+        }),
+        expect.objectContaining({
+          type: 'code',
+          lang: 'terminal',
+          code: expect.stringContaining('npx supabase functions deploy stripe-webhook'),
+        }),
+      ])
+    )
+    expect(text).not.toContain('Deno.serve')
+    expect(text).not.toContain('functions new hello')
+    expect(stepIds(cfg)).not.toContain('functions')
+  })
+
+  it('includes top-level selected registry commands in the Supabase code step', () => {
+    const cfg = config()
+    const supabaseCode = buildSteps(cfg, composition(cfg)).find((s) => s.id === 'supabase-code')!
+    const text = stepText(supabaseCode)
+
+    expect(text).toContain('npx shadcn@latest add supabase/supabase/database')
+    expect(text).toContain('npx shadcn@latest add supabase/supabase/todos')
+    expect(text).toContain('npx shadcn@latest add supabase/supabase/auth')
   })
 })
 
 describe('buildAgentPlan', () => {
-  it('contains every step title and the reference docs section', () => {
+  it('contains setup step titles and the reference docs section', () => {
     const cfg = config()
-    const plan = buildAgentPlan(cfg, features)
-    for (const step of buildSteps(cfg, features)) {
+    const built = composition(cfg)
+    const plan = buildAgentPlan(cfg, built)
+    for (const step of buildSteps(cfg, built)) {
       expect(plan).toContain(step.title)
     }
     expect(plan).toContain('## Reference docs')
@@ -108,20 +241,61 @@ describe('buildAgentPlan', () => {
     expect(plan).toContain('## Rules')
   })
 
-  it('lists selected features in the stack section', () => {
-    const plan = buildAgentPlan(config({ features: ['multi-tenant-rbac'] }), features)
-    const rbacName = features.find((f) => f.id === 'multi-tenant-rbac')!.name
-    expect(plan).toContain(`- Features: ${rbacName}`)
+  it('lists selected templates in the stack section', () => {
+    const cfg = config({ templateIds: ['multi-tenant-rbac'] })
+    const plan = buildAgentPlan(cfg, composition(cfg))
+    expect(plan).toContain('Multi-tenant RBAC')
+  })
+
+  it('includes only top-level shadcn registry install commands', () => {
+    const cfg = config({ primitives: [], templateIds: ['multi-tenant-rbac'] })
+    const plan = buildAgentPlan(cfg, composition(cfg))
+
+    expect(plan).toContain('Add your Supabase code')
+    expect(plan).toContain('Connect to your app')
+    expect(plan).not.toContain('## Registry workflow')
+    expect(plan).not.toContain('npx shadcn@latest list supabase/supabase')
+    expect(plan).not.toContain('npx shadcn@latest view supabase/supabase/multi-tenant-rbac')
+    expect(plan).toContain('npx shadcn@latest add supabase/supabase/multi-tenant-rbac')
+    expect(plan).not.toContain('npx shadcn@latest add supabase/supabase/auth')
+    expect(plan).not.toContain('npx shadcn@latest add supabase/supabase/database')
+    expect(plan).toContain('The registry pulls required dependencies automatically')
+    expect(plan).toContain('Auth')
+    expect(plan).toContain('Database')
   })
 
   it('always uses the code-first declarative schema rule', () => {
-    const plan = buildAgentPlan(config(), features)
+    const cfg = config()
+    const plan = buildAgentPlan(cfg, composition(cfg))
     expect(plan).toContain('Manage schema declaratively')
+    expect(plan).toContain('supabase/schemas/todos.sql')
+    expect(plan).not.toContain('create table "todos"')
     expect(plan).not.toContain('Build all tables, columns and policies in Supabase Studio')
   })
 
+  it('does not ask the agent to scaffold hello when a function template is selected', () => {
+    const cfg = config({ primitives: ['functions'], templateIds: ['functions-stripe-webhook'] })
+    const plan = buildAgentPlan(cfg, composition(cfg))
+
+    expect(plan).toContain('npx supabase functions deploy stripe-webhook')
+    expect(plan).toContain('supabase/functions/stripe-webhook/index.ts')
+    expect(plan).not.toContain('Deno.serve')
+    expect(plan).not.toContain('supabase functions new hello')
+  })
+
+  it('includes dynamic ORM conversion guidance when an ORM is selected', () => {
+    const cfg = config({ orm: 'drizzle' })
+    const plan = buildAgentPlan(cfg, composition(cfg))
+
+    expect(plan).toContain('Use the installed SQL files as source material for Drizzle')
+    expect(plan).toContain('supabase/schemas/todos.sql')
+    expect(plan).toContain('src/db/schema.ts')
+    expect(plan).toContain('npx drizzle-kit generate')
+  })
+
   it('frames the plan as a backend setup when there is no front-end', () => {
-    const plan = buildAgentPlan(config({ framework: 'none', shadcn: false }), features)
+    const cfg = config({ framework: 'none', shadcn: false })
+    const plan = buildAgentPlan(cfg, composition(cfg))
     expect(plan).toContain('# Set up my Supabase backend')
     expect(plan).toContain('- Framework: no front-end — backend only')
     expect(plan).not.toContain('- UI:')

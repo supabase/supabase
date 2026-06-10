@@ -4,7 +4,7 @@ import { Info } from 'lucide-react'
 import { cn } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
-import { toCodeBlockLang } from '../lib/features'
+import { toCodeBlockLang } from '../lib/code-language'
 import { type SetupStep, type StepBlock } from '../lib/steps'
 import { FileTree } from './FileTree'
 
@@ -43,12 +43,13 @@ export function SetupGuide({
 }) {
   return (
     <section>
-      <div className="mb-1.5 flex items-center justify-between">
+      <div className="mb-4 flex items-center justify-between gap-4">
         <h2 className="m-0 text-xl font-semibold tracking-tight">Setup guide</h2>
-        <span className="text-[13px] text-foreground-muted">
+        <span className="shrink-0 text-[13px] text-foreground-light">
           {steps.length} steps · {frameworkLabel}
         </span>
       </div>
+
       <p className="mb-7 text-sm text-foreground-light">
         Each step reflects exactly what you picked. Swap any toggle on the left and these update
         live.
@@ -73,11 +74,6 @@ export function SetupGuide({
             </span>
             <h3 className="mb-1.5 mt-0.5 text-[15.5px] font-semibold tracking-tight">
               {step.title}
-              {step.feature && (
-                <span className="ml-2 rounded-full bg-brand-200 px-2 py-px align-middle text-[10.5px] font-medium text-brand-600">
-                  feature
-                </span>
-              )}
             </h3>
             {step.desc && <p className="mb-3 text-sm text-foreground-light">{step.desc}</p>}
             {step.blocks.map((block, j) => (

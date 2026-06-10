@@ -21,6 +21,30 @@ export const templates: Template[] = [
     ]
   },
   {
+    "id": "todos",
+    "name": "Todos",
+    "description": "Starter todos table with owner-scoped row level security",
+    "category": "Database",
+    "version": "1.0.0",
+    "tags": [
+      "todos",
+      "starter",
+      "schema"
+    ],
+    "dependencies": {
+      "required": [
+        "auth"
+      ]
+    },
+    "defaultEnabled": true,
+    "files": [
+      {
+        "path": "supabase/schemas/todos.sql",
+        "content": "create table public.todos (\n  id bigint generated always as identity primary key,\n  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,\n  task text not null,\n  is_complete boolean not null default false,\n  inserted_at timestamptz not null default now()\n);\n\nalter table public.todos enable row level security;\n\ncreate policy \"Users can read their own todos\"\non public.todos for select\nto authenticated\nusing ((select auth.uid()) = user_id);\n\ncreate policy \"Users can create their own todos\"\non public.todos for insert\nto authenticated\nwith check ((select auth.uid()) = user_id);\n\ncreate policy \"Users can update their own todos\"\non public.todos for update\nto authenticated\nusing ((select auth.uid()) = user_id)\nwith check ((select auth.uid()) = user_id);\n\ncreate policy \"Users can delete their own todos\"\non public.todos for delete\nto authenticated\nusing ((select auth.uid()) = user_id);\n"
+      }
+    ]
+  },
+  {
     "id": "functions",
     "name": "Edge Functions",
     "description": "Deno-based serverless functions at the edge",
@@ -105,33 +129,6 @@ export const templates: Template[] = [
       {
         "path": "supabase/config.toml",
         "content": "[api]\nenabled = true\nport = 54321\nschemas = [\"public\"]\nmax_rows = 1000\nextra_search_path = [\"public\", \"extensions\"]\n"
-      }
-    ]
-  },
-  {
-    "id": "graphql",
-    "name": "GraphQL",
-    "description": "Auto-generated GraphQL API via pg_graphql over Postgres",
-    "category": "API",
-    "version": "1.0.0",
-    "tags": [
-      "api",
-      "graphql",
-      "pg_graphql"
-    ],
-    "dependencies": {
-      "required": [
-        "api"
-      ]
-    },
-    "files": [
-      {
-        "path": "supabase/config.toml",
-        "content": "[api]\nschemas = [\"public\", \"graphql_public\"]\nextra_search_path = [\"public\", \"extensions\"]\n"
-      },
-      {
-        "path": "supabase/schemas/graphql.sql",
-        "content": "create extension if not exists pg_graphql with schema graphql;\n"
       }
     ]
   },
@@ -933,7 +930,6 @@ export const categories: CategoriesManifest = {
     "functions",
     "storage",
     "auth",
-    "api",
-    "graphql"
+    "api"
   ]
 }

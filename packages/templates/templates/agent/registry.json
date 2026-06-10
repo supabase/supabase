@@ -1,0 +1,57 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "agent",
+  "type": "registry:item",
+  "title": "Agent",
+  "description": "Streaming AI SDK agent endpoint with session persistence, memory, and MCP tool access",
+  "categories": [
+    "AI"
+  ],
+  "registryDependencies": [
+    "supabase/supabase/database",
+    "supabase/supabase/api",
+    "supabase/supabase/auth",
+    "supabase/supabase/functions"
+  ],
+  "files": [
+    {
+      "path": "supabase/functions/agent-chat/index.ts",
+      "type": "registry:file",
+      "target": "~/supabase/functions/agent-chat/index.ts"
+    },
+    {
+      "path": "supabase/schemas/agent.sql",
+      "type": "registry:file",
+      "target": "~/supabase/schemas/agent.sql"
+    }
+  ],
+  "docs": "# Agent template\n\nBuild persistent AI agents on Supabase with a streaming chat endpoint, session history, long-term memory, and MCP tool access. The generated `agent-chat` Edge Function uses the AI SDK to stream model responses back to clients while persisting user and assistant messages in Postgres.\n\nThe agent can call tools from connected MCP servers. If you also add the **mcp-server** template, the agent can use that local Edge Function MCP server as one of its tool sources.\n\n## What's included\n\n| Asset         | Path                                      | Purpose                                      |\n| ------------- | ----------------------------------------- | -------------------------------------------- |\n| Schema        | `supabase/schemas/agent.sql`              | Sessions, messages, memory, MCP servers, RLS |\n| Edge Function | `supabase/functions/agent-chat/index.ts`  | Streaming AI SDK chat endpoint               |\n\n### Sessions and messages\n\nEach session belongs to a user. `agent-chat` creates a session when `sessionId` is omitted, appends the user message, streams the model response, then persists the assistant response.\n\n### Memory and recall\n\nMemory rows can store arbitrary JSON payloads. When combined with **ai-vector-search** or **ai-automatic-embeddings**, embeddings enable similarity search over past context before the model runs.\n\n### MCP tools\n\n`agent-chat` discovers tools from MCP servers and exposes them to the AI SDK model call. By default, it attempts to connect to the local `mcp-server` Edge Function at:\n\n```text\n${SUPABASE_URL}/functions/v1/mcp-server\n```\n\nYou can also add rows to `public.agent_mcp_servers`:\n\n```sql\ninsert into public.agent_mcp_servers (name, url)\nvalues ('project', 'https://<project-ref>.supabase.co/functions/v1/mcp-server');\n```\n\nor pass request-scoped MCP servers:\n\n```ts\nconst response = await fetch(`${supabaseUrl}/functions/v1/agent-chat`, {\n  method: 'POST',\n  headers: {\n    Authorization: `Bearer ${session.access_token}`,\n    'Content-Type': 'application/json',\n  },\n  body: JSON.stringify({\n    sessionId,\n    message: 'List the public tables in my project',\n    mcpServers: [\n      {\n        name: 'project',\n        url: `${supabaseUrl}/functions/v1/mcp-server`,\n      },\n    ],\n  }),\n})\n```\n\nTool names are namespaced as `<server>_<tool>`, so a `list_tables` tool from the local MCP server is exposed to the model as `project_list_tables`.\n\n## Dependencies\n\n**Required**\n\n- `database` — base Supabase project config\n- `api` — REST/GraphQL surface for client access\n- `auth` — user-scoped sessions and RLS\n- `functions` — Edge Functions runtime\n\n**Optional**\n\n- `ai-vector-search` — pgvector similarity over memory embeddings\n- `ai-automatic-embeddings` — keep embeddings in sync via triggers\n- `mcp-server` — local Edge Function MCP server the agent can call for project tools\n\n## Getting started\n\n1. Add this template (and its required dependencies) to your composition.\n2. Run `supabase db reset` or apply migrations locally to create agent tables.\n3. Set model provider secrets, for example `supabase secrets set OPENAI_API_KEY=...`.\n4. Deploy Edge Functions: `supabase functions deploy agent-chat`.\n5. From your app, POST `{ message, sessionId? }` to `agent-chat` and read the streamed text response.\n\nFor production, review RLS policies in `agent.sql`, restrict service-role usage to server-side agent loops, and avoid storing long-lived third-party MCP secrets directly in `agent_mcp_servers.headers`.",
+  "meta": {
+    "version": "1.0.0",
+    "tags": [
+      "ai",
+      "agents",
+      "memory",
+      "sessions",
+      "pgvector",
+      "tools",
+      "mcp",
+      "streaming",
+      "functions"
+    ],
+    "category": "AI",
+    "dependencies": {
+      "required": [
+        "database",
+        "api",
+        "auth",
+        "functions"
+      ],
+      "optional": [
+        "ai-vector-search",
+        "ai-automatic-embeddings",
+        "mcp-server"
+      ]
+    }
+  }
+}

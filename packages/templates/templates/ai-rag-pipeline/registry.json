@@ -1,0 +1,66 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ai-rag-pipeline",
+  "type": "registry:item",
+  "title": "RAG Pipeline",
+  "description": "Turn-key retrieval-augmented generation: ingest text via an Edge Function, auto-chunk and embed, then query for similar passages",
+  "categories": [
+    "AI"
+  ],
+  "registryDependencies": [
+    "supabase/supabase/database",
+    "supabase/supabase/api",
+    "supabase/supabase/functions"
+  ],
+  "files": [
+    {
+      "path": "supabase/functions/rag-embed/index.ts",
+      "type": "registry:file",
+      "target": "~/supabase/functions/rag-embed/index.ts"
+    },
+    {
+      "path": "supabase/functions/rag-ingest/index.ts",
+      "type": "registry:file",
+      "target": "~/supabase/functions/rag-ingest/index.ts"
+    },
+    {
+      "path": "supabase/functions/rag-query/index.ts",
+      "type": "registry:file",
+      "target": "~/supabase/functions/rag-query/index.ts"
+    },
+    {
+      "path": "supabase/schemas/rag.sql",
+      "type": "registry:file",
+      "target": "~/supabase/schemas/rag.sql"
+    },
+    {
+      "path": "supabase/seed.sql",
+      "type": "registry:file",
+      "target": "~/supabase/seed.sql"
+    }
+  ],
+  "docs": "# RAG pipeline template\n\nA turn-key retrieval-augmented generation setup. POST text to `rag-ingest` and it is chunked, embedded, and stored. POST a question to `rag-query` and the top matching chunks come back, ready to drop into a model prompt.\n\n## How it works\n\n1. Client calls `rag-ingest` with `{ source, content, metadata? }`.\n2. The function inserts a `public.rag_documents` row and splits the content into ~1,000-character chunks in `public.rag_chunks`.\n3. A trigger enqueues each chunk on the `rag_embedding_jobs` `pgmq` queue.\n4. A `pg_cron` job drains the queue every 10 seconds and invokes the `rag-embed` worker.\n5. The worker calls OpenAI's embedding API and writes the vectors back to `rag_chunks`.\n6. Clients call `rag-query` with a question — the function embeds the query and returns the closest chunks via the `match_rag_chunks` SQL helper.\n\n## Includes\n\n- `supabase/schemas/rag.sql` — documents, chunks, HNSW index, queue, cron, and trigger\n- `supabase/functions/rag-ingest/index.ts` — accepts text, splits into chunks\n- `supabase/functions/rag-embed/index.ts` — batch worker invoked by `pg_cron`\n- `supabase/functions/rag-query/index.ts` — embeds a query and returns matches\n- `supabase/seed.sql` — local `project_url` secret used by `pg_net`\n\n## Configuration\n\nSet `OPENAI_API_KEY` on the project (`supabase secrets set OPENAI_API_KEY=...`). The pipeline uses `text-embedding-3-small` (1536 dimensions); change `embedding_dim` in `rag.sql` and the model name in the worker if you switch.\n\n## Dependencies\n\nRequires **database**, **api**, and **functions**. Optional: **queues** (the schema enables `pgmq` itself) and **ai-vector-search** if you want the generic `documents` table side by side.",
+  "meta": {
+    "version": "1.0.0",
+    "tags": [
+      "ai",
+      "rag",
+      "embeddings",
+      "pgvector",
+      "pgmq",
+      "openai"
+    ],
+    "category": "AI",
+    "dependencies": {
+      "required": [
+        "database",
+        "api",
+        "functions"
+      ],
+      "optional": [
+        "queues",
+        "ai-vector-search"
+      ]
+    }
+  }
+}

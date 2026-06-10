@@ -1,7 +1,7 @@
 {
   "name": "templates",
   "version": "0.0.0",
-  "description": "Supabase project composer templates",
+  "description": "Supabase project composer templates and shadcn-compatible GitHub registry",
   "private": true,
   "main": "./index.ts",
   "types": "./index.ts",
@@ -14,6 +14,7 @@
     "preinstall": "npx only-allow pnpm",
     "clean": "rimraf node_modules",
     "generate": "tsx scripts/generate.ts",
+    "sync-registry": "tsx scripts/sync-registry.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest --run"
   },

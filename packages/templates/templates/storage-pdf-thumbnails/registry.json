@@ -1,0 +1,52 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "storage-pdf-thumbnails",
+  "type": "registry:item",
+  "title": "PDF Thumbnails",
+  "description": "Generate thumbnail images for uploaded PDFs via storage trigger and an Edge Function",
+  "categories": [
+    "Storage"
+  ],
+  "registryDependencies": [
+    "supabase/supabase/storage",
+    "supabase/supabase/database",
+    "supabase/supabase/functions"
+  ],
+  "files": [
+    {
+      "path": "supabase/functions/pdf-thumbnail/index.ts",
+      "type": "registry:file",
+      "target": "~/supabase/functions/pdf-thumbnail/index.ts"
+    },
+    {
+      "path": "supabase/schemas/pdf-thumbnails.sql",
+      "type": "registry:file",
+      "target": "~/supabase/schemas/pdf-thumbnails.sql"
+    },
+    {
+      "path": "supabase/seed.sql",
+      "type": "registry:file",
+      "target": "~/supabase/seed.sql"
+    }
+  ],
+  "docs": "# PDF thumbnails template\n\nGenerates a preview image of the first page of every PDF uploaded to the `pdfs` bucket and stores it in the public `pdf-thumbnails` bucket. A row in `public.pdf_thumbnails` tracks status so clients can poll or subscribe over Realtime.\n\n## How it works\n\n1. A user uploads a PDF to the `pdfs` bucket.\n2. A trigger on `storage.objects` inserts a row in `public.pdf_thumbnails` and invokes the `pdf-thumbnail` Edge Function via `pg_net`.\n3. The function downloads the PDF, renders the first page to PNG, and uploads it to `pdf-thumbnails/<object_id>.png`.\n4. The tracking row is updated to `ready` (or `failed` with an error message).\n\n## Includes\n\n- `supabase/schemas/pdf-thumbnails.sql` — buckets, tracking table, RLS, and trigger\n- `supabase/functions/pdf-thumbnail/index.ts` — render-and-upload worker\n- `supabase/seed.sql` — local `project_url` secret used by `pg_net`\n\n## Configuration\n\nThe Edge Function uses `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` which are injected automatically in hosted projects. For local development, run `supabase functions serve pdf-thumbnail --no-verify-jwt` and set the `project_url` secret in `seed.sql` to your local Functions URL.\n\n## Dependencies\n\nRequires **storage**, **database**, and **functions**.",
+  "meta": {
+    "version": "1.0.0",
+    "tags": [
+      "storage",
+      "pdf",
+      "thumbnails",
+      "media",
+      "triggers",
+      "functions"
+    ],
+    "category": "Storage",
+    "dependencies": {
+      "required": [
+        "storage",
+        "database",
+        "functions"
+      ]
+    }
+  }
+}

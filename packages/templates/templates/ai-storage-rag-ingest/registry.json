@@ -1,0 +1,49 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ai-storage-rag-ingest",
+  "type": "registry:item",
+  "title": "Storage RAG Ingest",
+  "description": "Ingest text and markdown files from Storage into the existing RAG pipeline",
+  "categories": [
+    "AI"
+  ],
+  "registryDependencies": [
+    "supabase/supabase/database",
+    "supabase/supabase/storage",
+    "supabase/supabase/functions",
+    "supabase/supabase/ai-rag-pipeline"
+  ],
+  "files": [
+    {
+      "path": "supabase/functions/rag-file-ingest/index.ts",
+      "type": "registry:file",
+      "target": "~/supabase/functions/rag-file-ingest/index.ts"
+    },
+    {
+      "path": "supabase/schemas/storage-rag-ingest.sql",
+      "type": "registry:file",
+      "target": "~/supabase/schemas/storage-rag-ingest.sql"
+    }
+  ],
+  "docs": "# Storage RAG ingest template\n\nExtends **RAG Pipeline** with file uploads. Files uploaded to the private `rag-files` bucket are downloaded by an Edge Function, converted to text, and inserted into the existing `rag_documents` and `rag_chunks` tables.\n\n## How it works\n\n1. A user uploads a `.txt`, `.md`, or `.markdown` file to `rag-files/<user_id>/...`.\n2. A trigger on `storage.objects` creates a `public.rag_file_ingestions` row.\n3. The trigger invokes `rag-file-ingest` through `pg_net`.\n4. The function downloads the file, extracts UTF-8 text, chunks it, and inserts rows into the existing RAG tables.\n5. The ingestion row is updated to `ready` or `failed`.\n\n## Includes\n\n- `supabase/schemas/storage-rag-ingest.sql` - bucket, policies, tracking table, and upload trigger\n- `supabase/functions/rag-file-ingest/index.ts` - Storage download and RAG insert worker\n\n## Configuration\n\nRequires **RAG Pipeline**. The Edge Function uses `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`, which are injected automatically in hosted projects. For local development, set the `project_url` Vault secret to the local Functions URL.",
+  "meta": {
+    "version": "1.0.0",
+    "tags": [
+      "ai",
+      "rag",
+      "storage",
+      "embeddings",
+      "files",
+      "functions"
+    ],
+    "category": "AI",
+    "dependencies": {
+      "required": [
+        "database",
+        "storage",
+        "functions",
+        "ai-rag-pipeline"
+      ]
+    }
+  }
+}

@@ -3,9 +3,13 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { bundleTemplateRepository } from '../src/bundle'
+import { syncRegistry } from './sync-registry'
 
 async function main() {
   const packageRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
+
+  await syncRegistry(packageRoot)
+
   const { templates, categories } = await bundleTemplateRepository({ rootDir: packageRoot })
 
   const output = `import type { CategoriesManifest } from './categories'

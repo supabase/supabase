@@ -1,14 +1,14 @@
 {
   "name": "start",
   "version": "0.0.0",
-  "description": "Supabase docs get-started composer",
+  "description": "Supabase docs start experience",
   "private": true,
   "main": "./index.ts",
   "types": "./index.ts",
   "exports": {
     ".": "./index.ts"
   },
-  "sideEffects": false,
+  "sideEffects": ["**/*.css"],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "clean": "rimraf node_modules .turbo tsconfig.tsbuildinfo",
@@ -16,8 +16,14 @@
     "test": "vitest --run"
   },
   "dependencies": {
+    "@xyflow/react": "^12.10.1",
+    "framer-motion": "^11.18.2",
+    "jszip": "^3.10.1",
     "lucide-react": "*",
     "react": "catalog:",
+    "react-markdown": "^10.1.0",
+    "react-syntax-highlighter": "^15.6.6",
+    "remark-gfm": "^4.0.1",
     "templates": "workspace:*",
     "ui": "workspace:*",
     "ui-patterns": "workspace:*"
@@ -25,6 +31,7 @@
   "devDependencies": {
     "@types/node": "catalog:",
     "@types/react": "catalog:",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "tsconfig": "workspace:*",
     "typescript": "catalog:",
     "vitest": "catalog:"

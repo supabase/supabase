@@ -1,0 +1,6 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "supabase",
+  "homepage": "https://github.com/supabase/supabase",
+  "include": ["packages/templates/registry.json"]
+}

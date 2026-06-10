@@ -1,19 +1,10 @@
-/**
- * Generates the "agent plan" — a markdown prompt that mirrors the setup guide
- * exactly (same steps, code and context) then appends documentation links for
- * the current selection. Ported from the prototype's `agentPrompt()` + `docLinks()`.
- */
-import { AGENTS, FRAMEWORKS, hasFrontend, ORMS, type StartConfig } from './config'
-import { primLabels, selectedFeatures, selectedPrims, type StartFeature } from './features'
-import { treeToText } from './file-tree'
-import { buildSteps, type StepBlock } from './steps'
-
-function promptBlock(b: StepBlock): string[] {
-  if (b.type === 'note') return [`> Note: ${b.text}`]
-  if (b.type === 'filetree') return ['```', treeToText(b.tree, 0).replace(/\n$/, ''), '```']
-  const lang = b.lang === 'terminal' ? 'bash' : b.lang
-  return ['```' + lang, b.code, '```']
-}
+import {
+  selectedPrimitives,
+  selectedTemplateNames,
+  type StartComposition,
+} from './composition/start-composition'
+import { AGENTS, FRAMEWORKS, hasFrontend, ORMS, PRIMITIVES, type StartConfig } from './config'
+import { buildSteps } from './steps'
 
 function schemaRule(cfg: StartConfig): string {
   if (cfg.orm === 'drizzle')
@@ -23,7 +14,7 @@ function schemaRule(cfg: StartConfig): string {
 }
 
 /** Static documentation links keyed to the current selection. */
-function docLinks(cfg: StartConfig, features: StartFeature[]): string[] {
+function docLinks(cfg: StartConfig, composition: StartComposition): string[] {
   const fw = FRAMEWORKS[cfg.framework]
   const seen = new Set<string>()
   const links: string[] = []
@@ -77,7 +68,7 @@ function docLinks(cfg: StartConfig, features: StartFeature[]): string[] {
     dataapi: ['Data API (auto REST)', 'https://supabase.com/docs/guides/api'],
     realtime: ['Realtime', 'https://supabase.com/docs/guides/realtime'],
   }
-  for (const p of selectedPrims(cfg, features)) {
+  for (const p of selectedPrimitives(cfg, composition)) {
     if (primDocs[p]) add(primDocs[p][0], primDocs[p][1])
   }
   add('Row Level Security', 'https://supabase.com/docs/guides/database/postgres/row-level-security')
@@ -85,15 +76,27 @@ function docLinks(cfg: StartConfig, features: StartFeature[]): string[] {
   return links
 }
 
-export function buildAgentPlan(cfg: StartConfig, features: StartFeature[]): string {
+function codeBlock(lang: string, code: string): string[] {
+  return ['```' + lang, code, '```']
+}
+
+function setupStepBlockLines(block: ReturnType<typeof buildSteps>[number]['blocks'][number]) {
+  if (block.type === 'note') return [`> Note: ${block.text}`]
+  if (block.type === 'filetree') return []
+
+  const lang = block.lang === 'terminal' ? 'bash' : block.lang
+  return codeBlock(lang, block.code)
+}
+
+export function buildAgentPlan(cfg: StartConfig, composition: StartComposition): string {
   const fw = FRAMEWORKS[cfg.framework]
   const frontend = hasFrontend(cfg)
-  const prims = primLabels(cfg, features)
+  const prims = selectedPrimitives(cfg, composition).map((p) => PRIMITIVES[p].label)
   const remote = cfg.connection === 'remote'
   const newProj = cfg.project === 'new'
   const orm = ORMS[cfg.orm]
   const agent = AGENTS[cfg.agent]
-  const feats = selectedFeatures(cfg, features)
+  const templateNames = selectedTemplateNames(composition)
 
   const out: string[] = []
   out.push(frontend ? `# Set up Supabase in my ${fw.label} app` : '# Set up my Supabase backend')
@@ -112,23 +115,26 @@ export function buildAgentPlan(cfg: StartConfig, features: StartFeature[]): stri
   out.push(
     `- Data layer: ${cfg.orm === 'none' ? 'supabase-js over the Data API' : `${orm.label} on top of Postgres`}`
   )
-  if (feats.length) out.push(`- Features: ${feats.map((f) => f.name).join(', ')}`)
+  if (templateNames.length) out.push(`- Templates: ${templateNames.join(', ')}`)
   out.push('- Workflow: code-first — declarative schema + migrations in the repo')
   out.push(`- Tooling: ${agent.label} plugin (MCP + skills), Supabase CLI`)
   out.push(`- Environment: ${remote ? 'hosted Supabase project' : 'local Supabase stack (Docker)'}`)
   out.push('')
+
   out.push('## Build steps')
   out.push(
-    "Implement these in order. Each step gives the exact files, code and commands for my setup — create the new files, run the commands, and adapt to my existing conventions. Don't overwrite files I already have."
+    "Implement these in order. Create or edit only what is needed, inspect files installed by shadcn before changing them, and adapt to my existing conventions. Don't overwrite files I already have."
   )
   out.push('')
 
-  buildSteps(cfg, features).forEach((s, i) => {
-    out.push(`### ${i + 1}. ${s.title}${s.feature ? ' (feature)' : ''}`)
+  const steps = buildSteps(cfg, composition)
+
+  steps.forEach((s, i) => {
+    out.push(`### ${i + 1}. ${s.title}`)
     if (s.desc) out.push(s.desc)
     s.blocks.forEach((b) => {
       out.push('')
-      promptBlock(b).forEach((l) => out.push(l))
+      setupStepBlockLines(b).forEach((l) => out.push(l))
     })
     out.push('')
   })
@@ -151,6 +157,6 @@ export function buildAgentPlan(cfg: StartConfig, features: StartFeature[]): stri
   out.push('')
   out.push('## Reference docs')
   out.push("Consult these for anything you're unsure about:")
-  docLinks(cfg, features).forEach((d) => out.push(`- ${d}`))
+  docLinks(cfg, composition).forEach((d) => out.push(`- ${d}`))
   return out.join('\n')
 }

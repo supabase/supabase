@@ -1,0 +1,48 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "durable-workflows",
+  "type": "registry:item",
+  "title": "Durable Workflows",
+  "description": "Workflow runs, retryable steps, attempts, queues, and an Edge Function worker scaffold",
+  "categories": [
+    "Database"
+  ],
+  "registryDependencies": [
+    "supabase/supabase/database",
+    "supabase/supabase/functions"
+  ],
+  "files": [
+    {
+      "path": "supabase/functions/workflow-worker/index.ts",
+      "type": "registry:file",
+      "target": "~/supabase/functions/workflow-worker/index.ts"
+    },
+    {
+      "path": "supabase/schemas/workflows.sql",
+      "type": "registry:file",
+      "target": "~/supabase/schemas/workflows.sql"
+    }
+  ],
+  "docs": "# Durable workflows template\n\nAdds a Postgres-backed workflow runner for long-running or retryable product work. Use it for imports, exports, document processing, billing reconciliation, AI batch work, or any task that should survive request timeouts.\n\n## How it works\n\n1. Call `public.enqueue_workflow(...)` to create a workflow run and enqueue it in `pgmq`.\n2. A `pg_cron` job drains the queue and invokes the `workflow-worker` Edge Function.\n3. The worker marks the run `running`, records an attempt, and dispatches by `workflow_type`.\n4. Successful runs are marked `succeeded`; failures are retried until `max_attempts`, then moved to `dead_letter`.\n\n## Includes\n\n- `supabase/schemas/workflows.sql` - workflow tables, enqueue helper, queue dispatcher, and cron job\n- `supabase/functions/workflow-worker/index.ts` - Edge Function worker scaffold with retry handling\n\n## Configuration\n\nThe generated worker intentionally includes a small dispatch registry. Add your workflow handlers inside `handlers` in `workflow-worker/index.ts`.",
+  "meta": {
+    "version": "1.0.0",
+    "tags": [
+      "workflows",
+      "background-jobs",
+      "pgmq",
+      "pg_cron",
+      "functions",
+      "retries"
+    ],
+    "category": "Database",
+    "dependencies": {
+      "required": [
+        "database",
+        "functions"
+      ],
+      "optional": [
+        "queues"
+      ]
+    }
+  }
+}

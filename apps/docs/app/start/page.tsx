@@ -1,6 +1,6 @@
 import { BASE_PATH } from '~/lib/constants'
 import { type Metadata } from 'next'
-import { getStartFeatures, StartClient } from 'start'
+import { getStartTemplates, StartClient } from 'start'
 
 export const metadata: Metadata = {
   title: 'Get started | Supabase Docs',
@@ -12,9 +12,11 @@ export const metadata: Metadata = {
 }
 
 export default function StartPage() {
-  // Derived from the embedded `templates` package — the same data the www
-  // composer consumes. Resolving it here keeps StartClient fully data-driven.
-  const features = getStartFeatures()
+  const templates = getStartTemplates()
 
-  return <StartClient features={features} />
+  return (
+    <div className="h-[calc(100dvh-var(--header-height))] min-h-0 overflow-hidden">
+      <StartClient templates={templates} />
+    </div>
+  )
 }

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "functions-resend-email",
+  "type": "registry:item",
+  "title": "Resend Email",
+  "description": "Queued transactional email delivery with Resend, Edge Functions, and delivery status tracking",
+  "categories": [
+    "Integrations"
+  ],
+  "registryDependencies": [
+    "supabase/supabase/database",
+    "supabase/supabase/functions"
+  ],
+  "files": [
+    {
+      "path": "supabase/functions/resend-webhook/index.ts",
+      "type": "registry:file",
+      "target": "~/supabase/functions/resend-webhook/index.ts"
+    },
+    {
+      "path": "supabase/functions/send-email/index.ts",
+      "type": "registry:file",
+      "target": "~/supabase/functions/send-email/index.ts"
+    },
+    {
+      "path": "supabase/schemas/resend-email.sql",
+      "type": "registry:file",
+      "target": "~/supabase/schemas/resend-email.sql"
+    }
+  ],
+  "docs": "# Resend email template\n\nAdds a queued transactional email pipeline using Resend. Application code enqueues an email in Postgres, `pg_cron` invokes an Edge Function worker, and delivery status is tracked in `public.email_messages`.\n\n## How it works\n\n1. Call `public.enqueue_email(...)`.\n2. The email row is inserted with `queued` status and a message is sent to the `email_jobs` queue.\n3. A cron job invokes the `send-email` worker with queued jobs.\n4. The worker calls Resend and updates the row to `sent` or `failed`.\n5. The `resend-webhook` function provides a small status update placeholder for Resend webhooks.\n\n## Configuration\n\nSet these secrets:\n\n```sh\nsupabase secrets set RESEND_API_KEY=...\nsupabase secrets set RESEND_FROM_EMAIL=\"Acme <hello@example.com>\"\n```\n\n## Includes\n\n- `supabase/schemas/resend-email.sql` - email table, queue helpers, and cron dispatcher\n- `supabase/functions/send-email/index.ts` - Resend worker\n- `supabase/functions/resend-webhook/index.ts` - delivery webhook placeholder",
+  "meta": {
+    "version": "1.0.0",
+    "tags": [
+      "email",
+      "resend",
+      "functions",
+      "pgmq",
+      "transactional"
+    ],
+    "category": "Integrations",
+    "dependencies": {
+      "required": [
+        "database",
+        "functions"
+      ],
+      "optional": [
+        "queues"
+      ]
+    }
+  }
+}

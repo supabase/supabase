@@ -1,82 +1,58 @@
 'use client'
 
 /**
- * Small, presentational rail controls for the get-started configurator.
- * These map the prototype's bespoke segmented / radio / chip controls onto
- * Tailwind + semantic tokens. They are intentionally local to /start — the
- * design variants (two-line segments, animated pill chips) don't map cleanly
- * onto the shared form primitives.
+ * Presentational rail controls for the get-started configurator.
+ * Uses FormLayout vertical (label above control) outside react-hook-form.
  */
-import { Check } from 'lucide-react'
 import { type ReactNode } from 'react'
-import { cn } from 'ui'
+import { cn, RadioGroupStacked, RadioGroupStackedItem } from 'ui'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 
-export function Field({
+const railFormLayoutDefaults = {
+  size: 'small' as const,
+  nonBoxInput: true,
+}
+
+export function RailFormField({
   label,
-  count,
+  labelOptional,
+  description,
+  layout = 'vertical',
+  align,
   children,
+  className,
 }: {
   label: string
-  count?: ReactNode
+  labelOptional?: ReactNode
+  description?: ReactNode
+  layout?: 'vertical' | 'flex-row-reverse'
+  align?: 'left' | 'right'
   children: ReactNode
+  className?: string
 }) {
-  return (
-    <div className="mb-7">
-      <div className="mb-2.5 flex items-baseline justify-between text-xs text-foreground-muted">
-        <span>{label}</span>
-        {count != null && <span className="tabular-nums">{count}</span>}
-      </div>
-      {children}
-    </div>
-  )
-}
+  const isFlexRowReverse = layout === 'flex-row-reverse'
 
-export interface SegOption<T extends string> {
-  id: T
-  label: string
-  sub?: string
-}
-
-export function SegmentedControl<T extends string>({
-  options,
-  value,
-  onChange,
-}: {
-  options: SegOption<T>[]
-  value: T
-  onChange: (value: T) => void
-}) {
   return (
-    <div className="flex gap-1 rounded-lg bg-surface-100 p-1">
-      {options.map((o) => {
-        const on = value === o.id
-        return (
-          <button
-            key={o.id}
-            type="button"
-            onClick={() => onChange(o.id)}
-            className={cn(
-              'flex flex-1 flex-col items-center gap-0.5 rounded-md px-1.5 py-1.5 text-[13px] leading-tight transition-colors',
-              on
-                ? 'bg-surface-300 text-foreground shadow-sm'
-                : 'text-foreground-light hover:text-foreground'
-            )}
-          >
-            <span>{o.label}</span>
-            {o.sub && (
-              <span
-                className={cn(
-                  'text-[11px]',
-                  on ? 'text-foreground-light' : 'text-foreground-muted'
-                )}
-              >
-                {o.sub}
-              </span>
-            )}
-          </button>
-        )
-      })}
-    </div>
+    <FormLayout
+      {...railFormLayoutDefaults}
+      layout={layout}
+      align={align}
+      label={label}
+      labelOptional={labelOptional}
+      description={description}
+      className={cn(
+        'mb-7',
+        isFlexRowReverse &&
+          'flex-row! flex-row-reverse! items-start! justify-between! gap-4 max-md:gap-4',
+        className
+      )}
+    >
+      {isFlexRowReverse ? (
+        <div className="ml-auto flex shrink-0 justify-end">{children}</div>
+      ) : (
+        <div className="w-full min-w-0">{children}</div>
+      )}
+    </FormLayout>
   )
 }
 
@@ -86,84 +62,57 @@ export interface RadioOption<T extends string> {
   meta?: string
 }
 
-export function RadioList<T extends string>({
+export function RailRadioOptions<T extends string>({
   options,
   value,
   onChange,
+  idPrefix = 'rail-radio',
 }: {
   options: RadioOption<T>[]
   value: T
   onChange: (value: T) => void
+  idPrefix?: string
 }) {
   return (
-    <div className="flex flex-col gap-0.5">
-      {options.map((o) => {
-        const on = value === o.id
-        return (
-          <button
-            key={o.id}
-            type="button"
-            onClick={() => onChange(o.id)}
-            className={cn(
-              '-mx-2 flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-left text-sm transition-colors',
-              on ? 'text-foreground' : 'text-foreground-light hover:bg-surface-100'
-            )}
-          >
-            <span
-              className={cn(
-                'grid h-3.5 w-3.5 flex-none place-items-center rounded-full border transition-colors',
-                on ? 'border-brand' : 'border-strong'
-              )}
-            >
-              {on && <span className="h-[7px] w-[7px] rounded-full bg-brand" />}
-            </span>
-            <span>{o.label}</span>
-            {o.meta && <span className="ml-auto text-xs text-foreground-muted">{o.meta}</span>}
-          </button>
-        )
-      })}
-    </div>
+    <RadioGroupStacked value={value} onValueChange={(next) => onChange(next as T)}>
+      {options.map((o) => (
+        <RadioGroupStackedItem
+          key={o.id}
+          value={o.id}
+          id={`${idPrefix}-${o.id}`}
+          label={o.label}
+          description={o.meta}
+        />
+      ))}
+    </RadioGroupStacked>
   )
 }
 
-export interface ChipOption {
-  id: string
-  label: string
-}
-
-export function Chips({
+export function RailRadioField<T extends string>({
+  label,
+  labelOptional,
+  description,
   options,
   value,
-  onToggle,
+  onChange,
+  idPrefix,
 }: {
-  options: ChipOption[]
-  value: string[]
-  onToggle: (id: string) => void
+  label: string
+  labelOptional?: ReactNode
+  description?: ReactNode
+  options: RadioOption<T>[]
+  value: T
+  onChange: (value: T) => void
+  idPrefix?: string
 }) {
   return (
-    <div className="flex flex-wrap gap-1.5">
-      {options.map((o) => {
-        const on = value.includes(o.id)
-        return (
-          <button
-            key={o.id}
-            type="button"
-            onClick={() => onToggle(o.id)}
-            className={cn(
-              'inline-flex items-center gap-1.5 rounded-full py-1.5 pl-2 pr-3 text-[13px] transition-colors',
-              on
-                ? 'bg-brand-200 text-brand-600'
-                : 'bg-surface-200 text-foreground-light hover:bg-surface-300 hover:text-foreground'
-            )}
-          >
-            <Check
-              size={13}
-              className={cn('transition-all', on ? 'scale-100 opacity-100' : 'scale-50 opacity-0')}
-            />
-            {o.label}
-          </button>
-        )
-      })}
-    </div>
+    <RailFormField label={label} labelOptional={labelOptional} description={description}>
+      <RailRadioOptions
+        options={options}
+        value={value}
+        onChange={onChange}
+        idPrefix={idPrefix ?? label.toLowerCase().replace(/\s+/g, '-')}
+      />
+    </RailFormField>
   )
 }

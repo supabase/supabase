@@ -132,6 +132,7 @@ export * from './src/components/shadcn/ui/separator'
 export * from './src/components/shadcn/ui/resizable'
 
 export * from './src/components/radio-group-stacked'
+export * from './src/components/checkbox-group-stacked'
 export * from './src/components/radio-group-card'
 
 export * from './src/components/TreeView'

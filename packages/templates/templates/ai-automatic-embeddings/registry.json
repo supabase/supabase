@@ -1,0 +1,54 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ai-automatic-embeddings",
+  "type": "registry:item",
+  "title": "Automatic Embeddings",
+  "description": "Queue, triggers, and Edge Function scaffold to generate and sync embeddings automatically",
+  "categories": [
+    "AI"
+  ],
+  "registryDependencies": [
+    "supabase/supabase/database",
+    "supabase/supabase/functions",
+    "supabase/supabase/ai-vector-search"
+  ],
+  "files": [
+    {
+      "path": "supabase/functions/embed/index.ts",
+      "type": "registry:file",
+      "target": "~/supabase/functions/embed/index.ts"
+    },
+    {
+      "path": "supabase/schemas/embeddings.sql",
+      "type": "registry:file",
+      "target": "~/supabase/schemas/embeddings.sql"
+    },
+    {
+      "path": "supabase/seed.sql",
+      "type": "registry:file",
+      "target": "~/supabase/seed.sql"
+    }
+  ],
+  "docs": "# Automatic embeddings template\n\nKeeps document embeddings in sync using database triggers and an Edge Function embed worker.\n\n## Includes\n\n- Embeddings schema and queue tables\n- `embed` Edge Function for batch embedding\n- Seed data for local development\n\n## Dependencies\n\nRequires **database**, **api**, and **functions**. Works best with **ai-vector-search** for similarity queries.",
+  "meta": {
+    "version": "1.0.0",
+    "tags": [
+      "ai",
+      "embeddings",
+      "pgmq",
+      "pg_cron",
+      "openai"
+    ],
+    "category": "AI",
+    "dependencies": {
+      "required": [
+        "database",
+        "functions",
+        "ai-vector-search"
+      ],
+      "optional": [
+        "queues"
+      ]
+    }
+  }
+}
