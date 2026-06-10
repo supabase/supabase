@@ -1,6 +1,6 @@
 import { safeLocalStorage } from 'common'
 
-export const FALLBACK_LONG_RUNNING_STATE_THRESHOLD_MINUTES = 10
+export const FALLBACK_LONG_RUNNING_STATE_THRESHOLD_MINUTES = 20
 // Persist long enough for same-browser reloads, but not so long that a later transition reuses stale state.
 export const MAX_PERSISTED_TRANSITION_AGE_HOURS = 24
 

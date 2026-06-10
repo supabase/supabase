@@ -15,7 +15,7 @@ import {
 import { ShimmeringLoader } from 'ui-patterns'
 
 import { getConnectionStrings } from '@/components/interfaces/Connect/DatabaseSettings.utils'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -47,11 +47,11 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
 
   const { data: projectUrl, isPending: isLoadingApiUrl } = useProjectApiUrl({ projectRef })
 
-  const { data: apiKeys, isLoading: isLoadingKeys } = useAPIKeysQuery(
+  const { data, isLoading: isLoadingKeys } = useAPIKeys(
     { projectRef },
     { enabled: open && canReadAPIKeys }
   )
-  const { publishableKey } = canReadAPIKeys ? getKeys(apiKeys) : { publishableKey: null }
+  const { publishableKey } = data ?? {}
 
   const { data: databases, isLoading: isLoadingDatabases } = useReadReplicasQuery(
     { projectRef },

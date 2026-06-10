@@ -3154,7 +3154,15 @@ export interface UnifiedLogsRowClickedEvent {
      * Server values are validated against this set by zod (UnifiedLogs.schema.ts) before
      * reaching the table; anything else is rejected upstream so the union here is exhaustive.
      */
-    logType: 'postgres' | 'postgrest' | 'auth' | 'storage' | 'edge function'
+    logType:
+      | 'postgres'
+      | 'postgrest'
+      | 'auth'
+      | 'storage'
+      | 'edge function'
+      | 'realtime'
+      | 'supavisor'
+      | 'pgbouncer'
   }
   groups: TelemetryGroups
 }
