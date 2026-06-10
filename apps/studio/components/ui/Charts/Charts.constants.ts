@@ -94,8 +94,8 @@ export const CHART_ROLE_COLORS = {
     fill: { light: '#9FE8C7', dark: '#2A5C3F' },
   },
   overhead: {
-    color: { light: '#A78BFA', dark: '#C4B5FD' },
-    fill: { light: '#DDD6FE', dark: '#4C3F6B' },
+    color: { light: '#7C3AED', dark: '#9F7AEA' },
+    fill: { light: '#DDD6FE', dark: '#3C2E63' },
   },
   headroom: {
     color: { light: '#C4C7CB', dark: '#3A3D41' },
@@ -106,44 +106,36 @@ export const CHART_ROLE_COLORS = {
     fill: { light: '#D5D9DF', dark: '#444A54' },
   },
   in: {
-    color: { light: '#4F9CF9', dark: '#6BB0FF' },
-    fill: { light: '#B9D6FD', dark: '#1E3A5F' },
+    color: { light: '#2563EB', dark: '#60A5FA' },
+    fill: { light: '#BFDBFE', dark: '#1E3A5F' },
   },
   out: {
-    color: { light: '#F2B05E', dark: '#F5BE7A' },
-    fill: { light: '#FBE0BD', dark: '#5C4424' },
+    color: { light: '#F59E0B', dark: '#FBBF24' },
+    fill: { light: '#FDE68A', dark: '#5C4218' },
   },
   alert: {
-    color: { light: '#F87171', dark: '#FB8C8C' },
+    color: { light: '#EF4444', dark: '#F87171' },
     fill: { light: '#FECACA', dark: '#5C2A2A' },
   },
 } as const satisfies Record<string, ChartColorRole>
 
-/**
- * Ordered "overhead" ramp for charts that break a consumed quantity into several
- * secondary categories (CPU busy states, disk-usage buckets, connection pools).
- * Step 0 is the `overhead` role so the ramp stays anchored to the role palette;
- * later steps stay distinct from one another and from the primary roles.
- *
- *   0 violet (= overhead)   1 amber   2 pink   3 teal   4 indigo
- */
 export const CHART_OVERHEAD_RAMP: ChartColorRole[] = [
   CHART_ROLE_COLORS.overhead,
   {
-    color: { light: '#F2B05E', dark: '#F5BE7A' },
-    fill: { light: '#FBE0BD', dark: '#5C4424' },
+    color: { light: '#F59E0B', dark: '#FBBF24' },
+    fill: { light: '#FDE68A', dark: '#5C4218' },
   },
   {
-    color: { light: '#F472B6', dark: '#F9A8D4' },
-    fill: { light: '#FBCFE8', dark: '#5C2A47' },
-  },
-  {
-    color: { light: '#2DD4BF', dark: '#5EEAD4' },
+    color: { light: '#14B8A6', dark: '#2DD4BF' },
     fill: { light: '#99F6E4', dark: '#134E4A' },
   },
   {
-    color: { light: '#818CF8', dark: '#A5B4FC' },
-    fill: { light: '#C7D2FE', dark: '#312E5C' },
+    color: { light: '#EC4899', dark: '#F472B6' },
+    fill: { light: '#FBCFE8', dark: '#5C2A47' },
+  },
+  {
+    color: { light: '#3B82F6', dark: '#60A5FA' },
+    fill: { light: '#BFDBFE', dark: '#1E3A5F' },
   },
 ]
 
