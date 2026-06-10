@@ -2,7 +2,6 @@ import { renderHook } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import { getDatabaseTriggersHref, useFilteredFunctions } from './FunctionList.utils'
-import { DatabaseFunction } from '@/data/database-functions/database-functions-query'
 
 describe('FunctionList.utils: getDatabaseTriggersHref', () => {
   it('builds the triggers href with a plain function name', () => {
