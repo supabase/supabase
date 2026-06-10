@@ -9,6 +9,8 @@ export const SignInPartner = () => {
   const router = useRouter()
 
   useEffect(() => {
+    let isMounted = true
+
     ;(async () => {
       const params = new URLSearchParams(window.location.hash.substring(1))
 
@@ -17,16 +19,28 @@ export const SignInPartner = () => {
 
       const { data } = await auth.getSession()
 
+      if (!isMounted) return
+
       if (!data.session && partner && token) {
         try {
           await auth.signInWithIdToken({ provider: partner, token })
         } finally {
-          router.replace({ pathname: '/sign-in-mfa' })
+          if (isMounted) {
+            router.replace({ pathname: '/sign-in-mfa' })
+          }
         }
       } else {
-        router.replace({ pathname: '/sign-in' })
+        if (isMounted) {
+          router.replace({ pathname: '/sign-in' })
+        }
       }
     })()
+
+    return () => {
+      isMounted = false
+    }
+    // Intentionally omitting `router` so the auth flow runs once on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
