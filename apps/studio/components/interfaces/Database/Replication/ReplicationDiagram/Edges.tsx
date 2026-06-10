@@ -10,6 +10,10 @@ import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
+import {
+  PipelineStatusRequestStatus,
+  usePipelineRequestStatus,
+} from '@/state/replication-pipeline-request-status'
 
 type EdgeData = {
   type: string
@@ -111,6 +115,10 @@ export const SmoothstepEdge = ({
     { projectRef, pipelineId: pipeline?.id },
     { enabled: !isReplica && !!pipeline?.id, refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
   )
+  const { getRequestStatus } = usePipelineRequestStatus()
+  const requestStatus = pipeline?.id
+    ? getRequestStatus(pipeline.id)
+    : PipelineStatusRequestStatus.None
 
   const replicationState = useMemo<ReplicationState>(() => {
     if (isReplica) {
@@ -129,13 +137,14 @@ export const SmoothstepEdge = ({
           [REPLICA_STATUS.ACTIVE_UNHEALTHY, REPLICA_STATUS.INIT_FAILED].includes(status),
       }
     }
+    const isTransitioning = requestStatus !== PipelineStatusRequestStatus.None
     const statusName = getStatusName(pipelineStatusData?.status)
     return {
-      isReplicating: statusName === 'started',
-      isComingUp: statusName === 'starting',
+      isReplicating: statusName === 'started' && !isTransitioning,
+      isComingUp: isTransitioning || statusName === 'starting' || statusName === 'stopping',
       isFailed: statusName === 'failed',
     }
-  }, [isReplica, replica?.status, pipelineStatusData?.status])
+  }, [isReplica, replica?.status, pipelineStatusData?.status, requestStatus])
 
   const [edgePath, labelX, labelY] = getSmoothStepPath({
     sourceX,
