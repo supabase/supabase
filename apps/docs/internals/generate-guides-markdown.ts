@@ -3,6 +3,8 @@ import path from 'node:path'
 import { globby } from 'globby'
 import matter from 'gray-matter'
 
+import { getInternalLinkBaseUrl, prefixInternalLinks } from './internal-links'
+
 const PARTIALS_DIR = path.join(process.cwd(), 'content', '_partials')
 
 /**
@@ -195,6 +197,7 @@ function stripJsxTags(content: string): string {
 
 async function generate() {
   const files = await globby(['content/guides/**/!(_)*.mdx'])
+  const linkBaseUrl = getInternalLinkBaseUrl()
   let warnings = 0
 
   await Promise.all(
@@ -211,7 +214,8 @@ async function generate() {
         const withPartials = await inlinePartials(rawContent)
         const withSteps = convertStepHike(withPartials)
         const withLinks = convertLinkPanels(withSteps)
-        const processed = stripJsxTags(withLinks)
+        const stripped = stripJsxTags(withLinks)
+        const processed = prefixInternalLinks(stripped, linkBaseUrl)
 
         const header = [
           data.title ? `# ${data.title}` : '',
