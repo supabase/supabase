@@ -10,6 +10,7 @@
 @source '../pages/**/*.{tsx,mdx}';
 @source './../../../packages/ui/src/**/*.{tsx,ts,js}';
 @source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
+@source './../../../packages/start/src/**/*.{tsx,ts,js}';
 
 @layer utilities {
   .prose--remove-p-margin p {

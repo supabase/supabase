@@ -58,6 +58,8 @@ const nextConfig = {
     'api-types',
     'icons',
     'next-mdx-remote',
+    'start',
+    'templates',
   ],
   outputFileTracingIncludes: {
     '/api/crawlers': ['./features/docs/generated/**/*', './docs/ref/**/*'],

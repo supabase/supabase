@@ -529,6 +529,12 @@ importers:
       shared-data:
         specifier: workspace:*
         version: link:../../packages/shared-data
+      start:
+        specifier: workspace:*
+        version: link:../../packages/start
+      templates:
+        specifier: workspace:*
+        version: link:../../packages/templates
       ui:
         specifier: workspace:*
         version: link:../../packages/ui
@@ -2390,6 +2396,40 @@ importers:
       tsconfig:
         specifier: 'workspace:'
         version: link:../tsconfig
+
+  packages/start:
+    dependencies:
+      lucide-react:
+        specifier: '*'
+        version: 0.436.0(react@19.2.6)
+      react:
+        specifier: 'catalog:'
+        version: 19.2.6
+      templates:
+        specifier: workspace:*
+        version: link:../templates
+      ui:
+        specifier: workspace:*
+        version: link:../ui
+      ui-patterns:
+        specifier: workspace:*
+        version: link:../ui-patterns
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.13.14
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.14
+      tsconfig:
+        specifier: workspace:*
+        version: link:../tsconfig
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.2
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.4(@opentelemetry/api@1.9.0)(@types/node@22.13.14)(@vitest/coverage-v8@4.1.4)(@vitest/ui@4.1.4)(jsdom@28.1.0(@noble/hashes@1.8.0)(supports-color@8.1.1))(msw@2.11.3(@types/node@22.13.14)(typescript@6.0.2))(vite@8.0.14(@types/node@22.13.14)(esbuild@0.25.2)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.9.0))
 
   packages/templates:
     dependencies:

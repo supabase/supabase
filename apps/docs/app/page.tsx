@@ -1,7 +1,8 @@
 import { isFeatureEnabled } from 'common'
+import { ArrowRight, Sparkles } from 'lucide-react'
 import { type Metadata, type ResolvingMetadata } from 'next'
 import Link from 'next/link'
-import { cn, IconBackground } from 'ui'
+import { Button, cn, IconBackground } from 'ui'
 import { IconPanel } from 'ui-patterns/IconPanel'
 import { TextLink } from 'ui-patterns/TextLink'
 
@@ -227,6 +228,35 @@ const additionalResources = [
 const HomePage = () => (
   <HomeLayout>
     <div className="flex flex-col">
+      <Link
+        href="/start"
+        className="not-prose group mb-6 flex flex-col gap-4 rounded-xl border border-brand-500/40 bg-gradient-to-br from-brand-200/40 to-transparent p-6 transition-colors hover:border-brand-500/70 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2 text-brand-600">
+            <Sparkles size={16} />
+            <span className="text-sm font-medium">Get started</span>
+          </div>
+          <h3 className="m-0 text-xl font-semibold tracking-tight text-foreground">
+            Build your Supabase setup
+          </h3>
+          <p className="m-0 max-w-xl text-sm text-foreground-light">
+            Tell us what you’re building and get a tailored setup guide plus a copyable agent plan
+            for Claude Code, Codex, or any MCP-aware agent.
+          </p>
+        </div>
+        <Button
+          type="primary"
+          size="medium"
+          iconRight={
+            <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
+          }
+          asChild
+        >
+          <span>Get started</span>
+        </Button>
+      </Link>
+
       <h2 id="products">Products</h2>
       <ul className="grid grid-cols-12 gap-6 not-prose [&_svg]:text-brand-600">
         {products.map((product) => {
