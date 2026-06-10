@@ -416,6 +416,23 @@ fn_resp=$(http_body "$BASE_URL/functions/v1/hello" \
     -d '{}')
 check "Call hello function" '"Hello from Edge Functions!"' "$fn_resp"
 
+# Anonymous fallback: an unauthenticated invocation must still reach the
+# function (verify_jwt:false) — the Functions key-auth must not 401 a request
+# with no apikey.
+fn_noauth_resp=$(http_body "$BASE_URL/functions/v1/hello" \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d '{}')
+check "Call hello function (no auth)" '"Hello from Edge Functions!"' "$fn_noauth_resp"
+
+# Invalid apikey is rejected at the gateway by key-auth (before the worker).
+check "Functions reject invalid apikey" "401" \
+    "$(http_status "$BASE_URL/functions/v1/hello" \
+        -X POST \
+        -H "apikey: invalid-key" \
+        -H "Content-Type: application/json" \
+        -d '{}')"
+
 # ---------------------------------------------
 # 8. pg-meta (Studio backend)
 # ---------------------------------------------

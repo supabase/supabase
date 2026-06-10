@@ -157,6 +157,39 @@ check "No key -> 401" "401" \
     "$(http_status "$BASE_URL/realtime/v1/api/tenants")"
 
 echo ""
+echo "--- Edge Functions (/functions/v1/) ---"
+
+# key-auth validates the apikey (invalid -> 401), but an `anonymous` consumer
+# fallback lets unauthenticated requests through (verify_jwt:false functions
+# and no-auth invocations must still work), and opaque sb_ keys are translated
+# into a raw `sb-api-key` header. These are status-level checks; verifying the
+# injected `sb-api-key` value and the stripping of a client-supplied one
+# requires a function that echoes headers.
+
+# No auth at all must pass (anonymous fallback; hello is verify_jwt:false).
+check "No auth -> hello reachable" "200" \
+    "$(http_status "$BASE_URL/functions/v1/hello" -X POST -d '{}')"
+
+# Legacy keys remain valid.
+check "Legacy ANON_KEY -> hello reachable" "200" \
+    "$(http_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: $ANON_KEY" -d '{}')"
+
+# Invalid apikey is rejected by key-auth at the gateway (before the worker).
+check "Invalid apikey -> 401" "401" \
+    "$(http_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: invalid-key" -d '{}')"
+
+if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
+    check "PUBLISHABLE_KEY -> hello reachable" "200" \
+        "$(http_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: $SUPABASE_PUBLISHABLE_KEY" -d '{}')"
+    check "SECRET_KEY -> hello reachable" "200" \
+        "$(http_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: $SUPABASE_SECRET_KEY" -d '{}')"
+    # Unlike /rest/ (which 401s sb_-in-Authorization-only because it has no
+    # anonymous fallback), Functions lets it through and translates the bearer.
+    check "sb_ in Authorization only -> not 401 (anonymous fallback)" "true" \
+        "$([ "$(http_status "$BASE_URL/functions/v1/hello" -X POST -H "Authorization: Bearer $SUPABASE_PUBLISHABLE_KEY" -d '{}')" != "401" ] && echo true || echo false)"
+fi
+
+echo ""
 echo "--- supabase-js style requests (apikey + Authorization) ---"
 # supabase-js sends both apikey header AND Authorization: Bearer <apikey>
 if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
@@ -294,6 +327,13 @@ if [ -n "$access_token" ]; then
             "$(http_status "$BASE_URL/auth/v1/user" \
                 -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
                 -H "Authorization: Bearer $access_token")"
+        # Functions leaves Authorization (the user JWT) untouched and adds the
+        # translated sb-api-key alongside it; the request must reach the worker.
+        check "Opaque apikey + user JWT -> Functions reachable" "200" \
+            "$(http_status "$BASE_URL/functions/v1/hello" -X POST \
+                -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
+                -H "Authorization: Bearer $access_token" \
+                -d '{}')"
     fi
 else
     check "Sign in test user" "true" "false"

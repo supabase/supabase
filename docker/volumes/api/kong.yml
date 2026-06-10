@@ -14,6 +14,12 @@ consumers:
     keyauth_credentials:
       - key: $SUPABASE_SERVICE_KEY
       - key: $SUPABASE_SECRET_KEY
+  # Credential-less consumer used as the key-auth `anonymous` fallback on the
+  # Functions route, so unauthenticated invocations (and verify_jwt:false
+  # functions) pass through while invalid keys are still rejected with 401.
+  # Referenced by UUID (key-auth `anonymous` requires a consumer id).
+  - username: anonymous
+    id: 00000000-0000-0000-0000-000000000001
 
 ###
 ### Access Control List
@@ -87,7 +93,7 @@ services:
         - /sso/saml/acs
     plugins:
       - name: cors
-      
+
   - name: auth-v1-open-sso-metadata
     url: "http://auth:9999/sso/saml/metadata"
     routes:
@@ -282,6 +288,21 @@ services:
               end
 
   ## Edge Functions routes
+  ##
+  ## Functions header handling: opaque sb_ keys are translated to the pre-signed
+  ## internal asymmetric JWT and injected as a raw `sb-api-key` header (no
+  ## `Bearer` prefix), while `Authorization` is left untouched so user-session
+  ## JWTs and legacy bearers flow through to the runtime.
+  ##
+  ## key-auth validates the apikey against the same registered keys as the other
+  ## routes (invalid keys -> 401), but an `anonymous` consumer fallback lets
+  ## unauthenticated requests through (verify_jwt:false functions and no-auth
+  ## invocations must still work). No `acl` — Functions isn't group-gated.
+  ##
+  ## The request-transformer strips any client-supplied `sb-api-key` (anti-spoof)
+  ## and re-adds the translated value; on no match the Lua expression yields nil
+  ## (an empty header) which the post-function then removes. Conflict detection
+  ## and bearer-only sb_ validation are intentionally not implemented here.
   - name: functions-v1
     _comment: 'Edge Functions: /functions/v1/* -> http://functions:9000/*'
     url: http://functions:9000/
@@ -293,6 +314,26 @@ services:
           - /functions/v1/
     plugins:
       - name: cors
+      - name: key-auth
+        config:
+          hide_credentials: false
+          anonymous: 00000000-0000-0000-0000-000000000001
+      - name: request-transformer
+        config:
+          remove:
+            headers:
+              - "sb-api-key"
+          add:
+            headers:
+              - "sb-api-key:$LUA_FUNCTIONS_EXPR"
+      - name: post-function
+        config:
+          access:
+            - |
+              local v = kong.request.get_header("sb-api-key")
+              if v == nil or v == "" or v:find("^%s*$") then
+                kong.service.request.clear_header("sb-api-key")
+              end
 
   ## OAuth 2.0 Authorization Server Metadata (RFC 8414)
   - name: well-known-oauth
