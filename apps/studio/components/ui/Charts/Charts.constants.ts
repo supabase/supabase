@@ -98,8 +98,8 @@ export const CHART_ROLE_COLORS = {
     fill: { light: '#DDD6FE', dark: '#4C3F6B' },
   },
   headroom: {
-    color: { light: '#D2D4D7', dark: '#2E3033' },
-    fill: { light: '#E4E5E7', dark: '#26282A' },
+    color: { light: '#C4C7CB', dark: '#3A3D41' },
+    fill: { light: '#DBDCDF', dark: '#303336' },
   },
   limit: {
     color: { light: '#8B94A3', dark: '#9CA3B0' },
