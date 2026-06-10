@@ -1,11 +1,12 @@
 import { useParams } from 'common'
 import { AnalyticsBucket, BigQuery, Database } from 'icons'
-import { Minus } from 'lucide-react'
+import { Minus, TriangleAlert } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
+  cn,
   TableCell,
   TableRow,
   Tooltip,
@@ -18,7 +19,10 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteDestination } from './DeleteDestination'
 import { PipelineStatus } from './PipelineStatus'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
-import { getFormattedLagValue } from './ReplicationPipelineStatus/ReplicationPipelineStatus.utils'
+import {
+  getFormattedLagValue,
+  getSlotLossSeverity,
+} from './ReplicationPipelineStatus/ReplicationPipelineStatus.utils'
 import { RowMenu } from './RowMenu'
 import { UpdateVersionModal } from './UpdateVersionModal'
 import { useDestinationInformation } from './useDestinationInformation'
@@ -88,7 +92,23 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
   const tableStatuses = replicationStatusData?.table_statuses ?? []
   const errorCount = tableStatuses.filter((t) => t.state?.name === 'error').length
   const applyLag = replicationStatusData?.apply_lag
-  const flushLag = getFormattedLagValue('duration', applyLag?.flush_lag)
+  // Show the byte-based slot lag (WAL the destination hasn't confirmed flushing yet). The
+  // time-based flush_lag from pg_stat_replication is routinely NULL for logical slots that are
+  // idle or don't report timed feedback, whereas confirmed_flush_lsn_bytes is always populated.
+  const lagBytes = applyLag?.confirmed_flush_lsn_bytes
+  const lag = getFormattedLagValue('bytes', lagBytes)
+  const isCaughtUp = lagBytes === 0
+  // Severity is the slot-loss risk: how close the retained WAL is to exhausting the slot's safe
+  // headroom, not the lag size itself. safe_wal_size_bytes of 0 means "no limit / unknown".
+  const lagSeverity = getSlotLossSeverity(
+    applyLag?.restart_lsn_bytes,
+    applyLag?.safe_wal_size_bytes
+  )
+  const safeWalSize = getFormattedLagValue('bytes', applyLag?.safe_wal_size_bytes)
+  // The time-based lag is a nice-to-have shown alongside the bytes when Postgres reports it.
+  const flushLagMs = applyLag?.flush_lag
+  const hasTimeLag = typeof flushLagMs === 'number' && !Number.isNaN(flushLagMs)
+  const timeLag = getFormattedLagValue('duration', flushLagMs)
   // Only show errors when pipeline is running (not when stopped or restarting)
   const isPipelineStopped = statusName === PipelineStatusName.STOPPED
   const isRestarting = requestStatus === PipelineStatusRequestStatus.RestartRequested
@@ -188,15 +208,44 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
               <ShimmeringLoader />
             ) : isReplicationStatusError || !applyLag ? (
               <Minus size={18} className="text-foreground-lighter" />
-            ) : flushLag.detail ? (
+            ) : isCaughtUp ? (
+              <p className="text-foreground-light">Caught up</p>
+            ) : (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <p className="w-fit cursor-help">{flushLag.display}</p>
+                  <p
+                    className={cn(
+                      'w-fit cursor-help flex items-center gap-x-1.5',
+                      lagSeverity === 'critical'
+                        ? 'text-destructive'
+                        : lagSeverity === 'warning'
+                          ? 'text-warning'
+                          : ''
+                    )}
+                  >
+                    {lagSeverity !== 'normal' && <TriangleAlert size={14} className="shrink-0" />}
+                    {lag.display}
+                  </p>
                 </TooltipTrigger>
-                <TooltipContent side="bottom">WAL flush lag: {flushLag.detail}</TooltipContent>
+                <TooltipContent side="bottom" className="flex flex-col gap-y-1 max-w-[260px]">
+                  <span>
+                    {lag.display} of changes haven't reached this destination yet
+                    {hasTimeLag ? ` (about ${timeLag.display} behind)` : ''}.
+                  </span>
+                  {lagSeverity === 'warning' && (
+                    <span className="text-foreground-light">
+                      It's falling behind — about {safeWalSize.display} of room left before syncing
+                      pauses.
+                    </span>
+                  )}
+                  {lagSeverity === 'critical' && (
+                    <span className="text-foreground-light">
+                      It's far behind. If it doesn't catch up soon, syncing stops and this
+                      destination has to be set up again.
+                    </span>
+                  )}
+                </TooltipContent>
               </Tooltip>
-            ) : (
-              <p>{flushLag.display}</p>
             )}
           </TableCell>
 

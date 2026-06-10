@@ -12,24 +12,24 @@ const SLOT_LAG_FIELDS: {
 }[] = [
   {
     key: 'confirmed_flush_lsn_bytes',
-    label: 'WAL Flush lag (size)',
+    label: 'Waiting to sync',
     type: 'bytes',
     description:
-      'Bytes between the newest WAL record applied locally and the latest flushed WAL record acknowledged by ETL.',
-  },
-  {
-    key: 'flush_lag',
-    label: 'WAL Flush lag (time)',
-    type: 'duration',
-    description:
-      'Time between flushing recent WAL locally and receiving notification that ETL has written and flushed it.',
+      "Database changes that haven't reached this destination yet. 0 means it's fully up to date.",
   },
   {
     key: 'safe_wal_size_bytes',
-    label: 'Remaining WAL size',
+    label: 'Room before pausing',
     type: 'bytes',
     description:
-      'Bytes still available to write to WAL before this slot risks entering the "lost" state.',
+      'How much more can pile up before syncing pauses and this destination has to be set up again.',
+  },
+  {
+    key: 'flush_lag',
+    label: 'Time behind',
+    type: 'duration',
+    description:
+      "How far behind in time the destination is. Only available while it's actively syncing, so it's often blank when idle or caught up.",
   },
 ]
 

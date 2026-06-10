@@ -137,3 +137,34 @@ const formatLagDurationValue = (value?: number) => {
 
 export const getFormattedLagValue = (type: 'bytes' | 'duration', value?: number) =>
   type === 'bytes' ? formatLagBytesValue(value) : formatLagDurationValue(value)
+
+// Slot-loss risk based on how much of the slot's WAL budget has been consumed, rather than fixed
+// byte thresholds: max_slot_wal_keep_size ≈ retained WAL (restart_lsn_bytes) + remaining headroom
+// (safe_wal_size_bytes), so the consumed fraction is how close the slot is to the "lost" state.
+// A safe_wal_size_bytes of 0 is treated as "no limit / unknown": the backend coalesces NULL
+// (unlimited max_slot_wal_keep_size, or a lost slot) to 0, so the two can't be told apart and we
+// avoid raising a false alarm.
+export const SLOT_LOSS_WARNING_RATIO = 0.75
+export const SLOT_LOSS_CRITICAL_RATIO = 0.9
+
+export type LagSeverity = 'normal' | 'warning' | 'critical'
+
+export const getSlotLossSeverity = (
+  retainedBytes?: number,
+  safeWalSizeBytes?: number
+): LagSeverity => {
+  if (
+    typeof retainedBytes !== 'number' ||
+    typeof safeWalSizeBytes !== 'number' ||
+    !Number.isFinite(retainedBytes) ||
+    !Number.isFinite(safeWalSizeBytes) ||
+    safeWalSizeBytes <= 0
+  ) {
+    return 'normal'
+  }
+
+  const consumedRatio = retainedBytes / (retainedBytes + safeWalSizeBytes)
+  if (consumedRatio >= SLOT_LOSS_CRITICAL_RATIO) return 'critical'
+  if (consumedRatio >= SLOT_LOSS_WARNING_RATIO) return 'warning'
+  return 'normal'
+}
