@@ -85,7 +85,6 @@ const components = {
   Image: (props: ImageProps) => <Image className="rounded-md w-full" {...props} />,
   Link,
   McpConfigPanel,
-  Mermaid,
   MetricsStackCards,
   NamedCodeBlock,
   ProjectConfigVariables,
