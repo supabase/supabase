@@ -176,6 +176,51 @@ describe('generateRowObjectFromFields', () => {
     const result = generateRowObjectFromFields({ fields: sampleRowFields })
     expect(result).toEqual({ name: '' })
   })
+  it('should omit cleared identity and default fields for new rows', () => {
+    const sampleRowFields: RowField[] = [
+      {
+        id: '1',
+        name: 'id',
+        value: '',
+        comment: '',
+        defaultValue: null,
+        format: 'int8',
+        enums: [],
+        isNullable: false,
+        isIdentity: true,
+        isPrimaryKey: true,
+      },
+      {
+        id: '2',
+        name: 'created_at',
+        value: '',
+        comment: '',
+        defaultValue: 'now()',
+        format: 'timestamptz',
+        enums: [],
+        isNullable: false,
+        isIdentity: false,
+        isPrimaryKey: false,
+      },
+      {
+        id: '3',
+        name: 'name',
+        value: '',
+        comment: '',
+        defaultValue: null,
+        format: 'text',
+        enums: [],
+        isNullable: false,
+        isIdentity: false,
+        isPrimaryKey: false,
+      },
+    ]
+    const result = generateRowObjectFromFields({
+      fields: sampleRowFields,
+      useDefaultForEmptyValues: true,
+    })
+    expect(result).toEqual({ name: '' })
+  })
   it('should discern NULL values for text', () => {
     const sampleRowFields: RowField[] = [
       {
