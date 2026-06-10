@@ -13,8 +13,10 @@ const unescapeSqlLiteral = (value = '', isEscapeString = false) => {
   return isEscapeString ? unescaped.replaceAll('\\\\', '\\') : unescaped
 }
 
-// Strips the surrounding quotes from a single SQL string literal and unescapes its
-// contents, handling the optional `E''` escape-string prefix.
+/**
+ * Strips the surrounding quotes from a single SQL string literal and unescapes its
+ * contents, handling the optional `E''` escape-string prefix.
+ */
 const unwrapSqlLiteral = (token: string) => {
   const trimmed = token.trim()
   const isEscapeString = /^e'/i.test(trimmed)
@@ -23,11 +25,13 @@ const unwrapSqlLiteral = (token: string) => {
   return unescapeSqlLiteral(withoutQuotes, isEscapeString)
 }
 
-// Splits the argument list of a `jsonb_build_object(...)` call into its individual
-// values, honoring single-quoted SQL string literals (with '' escapes) and nested
-// parentheses. A naive split on ',' corrupts a header name or value that legitimately
-// contains a comma or parenthesis, which then gets persisted on save and no longer
-// matches what the user entered.
+/**
+ * Splits the argument list of a `jsonb_build_object(...)` call into its individual
+ * values, honoring single-quoted SQL string literals (with '' escapes) and nested
+ * parentheses. A naive split on ',' corrupts a header name or value that legitimately
+ * contains a comma or parenthesis, which then gets persisted on save and no longer
+ * matches what the user entered.
+ */
 const parseJsonBuildObjectArgs = (command: string) => {
   const match = command.match(/headers:=jsonb_build_object\s*\(/i)
   if (!match || match.index === undefined) return []
