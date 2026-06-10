@@ -114,6 +114,9 @@ export function MetricsStackCards() {
 
 MetricsStackCards.__markdown__ = `
   ${metricsStackOptions
-    .map((option) => ` - [${option.title}](${option.external ? '' : '/docs'}${option.href}). ${option.description}`)
+    .map(
+      (option) =>
+        ` - [${option.title}](${option.external ? '' : '/docs'}${option.href}). ${option.description}`
+    )
     .join('\n')}
 `
