@@ -103,7 +103,7 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
               <SheetDescription>
                 {editMode
                   ? 'Update the configuration for this destination'
-                  : 'A destination can be a read replica or an external platform that receives your database changes in real time.'}
+                  : 'A destination can be a read replica or an external destination that receives your database changes in real time.'}
               </SheetDescription>
             </SheetHeader>
 
@@ -117,11 +117,11 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
               <SheetSection>
                 <div className={cn('border rounded-md p-6 flex flex-col gap-y-4')}>
                   <div className="flex flex-col gap-y-1">
-                    <h4>Replicate data to external destinations in real-time</h4>
+                    <h4>Replicate data to external destinations in real time</h4>
                     <p className="text-sm text-foreground-light">
-                      We are currently in <span className="text-foreground">private alpha</span> and
-                      slowly onboarding new customers to ensure stable data pipelines. Request
-                      access below to join the waitlist. Read replicas are available now.
+                      External destinations are in <span className="text-foreground">alpha</span>{' '}
+                      and are being rolled out gradually. Request access below to join the waitlist.
+                      Read replicas are available now.
                     </p>
                   </div>
                   <div className="flex gap-x-2">

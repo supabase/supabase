@@ -18,6 +18,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteDestination } from './DeleteDestination'
 import { PipelineStatus } from './PipelineStatus'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
+import { getFormattedLagValue } from './ReplicationPipelineStatus/ReplicationPipelineStatus.utils'
 import { RowMenu } from './RowMenu'
 import { UpdateVersionModal } from './UpdateVersionModal'
 import { useDestinationInformation } from './useDestinationInformation'
@@ -76,12 +77,18 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
   const { mutateAsync: deleteDestinationPipeline } = useDeleteDestinationPipelineMutation({})
 
   // Fetch table-level replication status to surface errors in list view
-  const { data: replicationStatusData } = useReplicationPipelineReplicationStatusQuery(
+  const {
+    data: replicationStatusData,
+    isPending: isReplicationStatusLoading,
+    isError: isReplicationStatusError,
+  } = useReplicationPipelineReplicationStatusQuery(
     { projectRef, pipelineId: pipeline?.id },
     { refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
   )
   const tableStatuses = replicationStatusData?.table_statuses ?? []
   const errorCount = tableStatuses.filter((t) => t.state?.name === 'error').length
+  const applyLag = replicationStatusData?.apply_lag
+  const flushLag = getFormattedLagValue('duration', applyLag?.flush_lag)
   // Only show errors when pipeline is running (not when stopped or restarting)
   const isPipelineStopped = statusName === PipelineStatusName.STOPPED
   const isRestarting = requestStatus === PipelineStatusRequestStatus.RestartRequested
@@ -175,7 +182,22 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
           </TableCell>
 
           <TableCell>
-            <Minus size={18} className="text-foreground-lighter" />
+            {!pipeline ? (
+              <Minus size={18} className="text-foreground-lighter" />
+            ) : isReplicationStatusLoading ? (
+              <ShimmeringLoader />
+            ) : isReplicationStatusError || !applyLag ? (
+              <Minus size={18} className="text-foreground-lighter" />
+            ) : flushLag.detail ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <p className="w-fit cursor-help">{flushLag.display}</p>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">WAL flush lag: {flushLag.detail}</TooltipContent>
+              </Tooltip>
+            ) : (
+              <p>{flushLag.display}</p>
+            )}
           </TableCell>
 
           <TableCell>

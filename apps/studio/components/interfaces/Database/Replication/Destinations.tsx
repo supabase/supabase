@@ -307,7 +307,7 @@ export const Destinations = () => {
                     filteredReplicas.length === 0 &&
                     (hasReplicas || hasDestinations) && (
                       <TableRow>
-                        <TableCell colSpan={5}>
+                        <TableCell colSpan={6}>
                           <p>No results found</p>
                           <p className="text-foreground-light">
                             Your search for "{filterString}" did not return any results
@@ -332,7 +332,7 @@ export const Destinations = () => {
               <h4>Replication keeps your data in sync across systems</h4>
               <p className="text-foreground-light text-sm text-balance text-center mt-1">
                 Deploy read replicas for lower latency and better resource management, or capture
-                database changes to external platforms for real-time data pipelines.
+                database changes to external destinations for real-time data pipelines.
               </p>
               <Button
                 icon={<Plus />}
