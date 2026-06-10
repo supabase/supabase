@@ -10,7 +10,6 @@ import { Extensions } from '~/components/Extensions'
 import Image, { type ImageProps } from '~/components/Image'
 import { Mermaid } from '~/components/Mermaid'
 import { MetricsStackCards } from '~/components/MetricsStackCards'
-import { NavData } from '~/components/NavData'
 import { Price } from '~/components/Price'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
 import { RealtimeLimitsEstimator } from '~/components/RealtimeLimitsEstimator'
@@ -89,7 +88,6 @@ const components = {
   Mermaid,
   MetricsStackCards,
   NamedCodeBlock,
-  NavData,
   ProjectConfigVariables,
   RealtimeLimitsEstimator,
   RegionsList,

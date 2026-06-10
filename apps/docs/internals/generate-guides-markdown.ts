@@ -245,40 +245,55 @@ function convertLinkPanels(content: string): string {
     if (!hrefMatch) return full
     const href = withDocsBasePath(hrefMatch[1])
 
-    const panelOpen = body.match(/<(GlassPanel|IconPanel)\b/)
-    if (!panelOpen) return full
-    const panelName = panelOpen[1]
-    const panelStart = panelOpen.index ?? 0
+      const panelOpen = body.match(/<(GlassPanel|IconPanel)\b/)
+      if (!panelOpen) return full
+      const panelName = panelOpen[1]
+      const panelStart = panelOpen.index ?? 0
 
-    // Walk past the opening tag, respecting JSX expression braces so attribute
-    // values like `title={<span>...</span>}` don't terminate parsing early.
-    let i = panelStart + panelOpen[0].length
-    let depth = 0
-    while (i < body.length) {
-      const ch = body[i]
-      if (ch === '{') depth++
-      else if (ch === '}') depth--
-      else if (ch === '>' && depth === 0) break
-      i++
+      // Walk past the opening tag, respecting both JSX `{}` expression depth
+      // (so `title={<span>...</span>}` doesn't terminate early) and quoted
+      // attribute values (so `>` inside `className="[&>div]..."` is ignored).
+      let i = panelStart + panelOpen[0].length
+      let depth = 0
+      let quote: string | null = null
+      while (i < body.length) {
+        const ch = body[i]
+        if (quote) {
+          if (ch === quote) quote = null
+        } else if (ch === '"' || ch === "'") {
+          quote = ch
+        } else if (ch === '{') {
+          depth++
+        } else if (ch === '}') {
+          depth--
+        } else if (ch === '>' && depth === 0) {
+          break
+        }
+        i++
+      }
+      if (i >= body.length) return full
+
+      const panelAttrs = body.slice(panelStart + panelOpen[0].length, i)
+      const title = extractTitleAttr(panelAttrs)
+      if (!title) return full
+
+      // Self-closing panels (`<GlassPanel ... />`) carry no description.
+      const isSelfClosing = panelAttrs.trimEnd().endsWith('/')
+      let description = ''
+      if (!isSelfClosing) {
+        const closingTag = `</${panelName}>`
+        const closeIdx = body.indexOf(closingTag, i)
+        if (closeIdx === -1) return full
+        description = body
+          .slice(i + 1, closeIdx)
+          .replace(/<[^>]+>/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim()
+      }
+
+      return `- [${title}](${href})${description ? `. ${description}` : ''}`
     }
-    if (i >= body.length) return full
-
-    const panelAttrs = body.slice(panelStart + panelOpen[0].length, i)
-    const closingTag = `</${panelName}>`
-    const closeIdx = body.indexOf(closingTag, i)
-    if (closeIdx === -1) return full
-
-    const title = extractTitleAttr(panelAttrs)
-    if (!title) return full
-
-    const description = body
-      .slice(i + 1, closeIdx)
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim()
-
-    return `- [${title}](${href})${description ? `. ${description}` : ''}`
-  })
+  )
 }
 
 /**
