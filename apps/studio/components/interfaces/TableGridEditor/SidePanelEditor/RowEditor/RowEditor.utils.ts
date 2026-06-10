@@ -263,10 +263,7 @@ export const generateUpdateRowPayload = (originalRow: any, fields: RowField[]) =
 /**
  * Checks if the value is truncated. The JSON types are usually truncated if they're too big to show in the editor.
  */
-export const isValueTruncated = (
-  value: string | null | undefined,
-  format?: string | null
-) => {
+export const isValueTruncated = (value: string | null | undefined, format?: string | null) => {
   const isArrayColumn = typeof format === 'string' && format.startsWith('_')
 
   return (
