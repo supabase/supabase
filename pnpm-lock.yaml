@@ -61,7 +61,7 @@ catalogs:
       specifier: ^2.15.4
       version: 2.15.4
     tailwindcss:
-      specifier: 4.3.0
+      specifier: ^4.2.4
       version: 4.3.0
     tsx:
       specifier: 4.20.3
