@@ -45,11 +45,13 @@ Schema change support is currently in beta and limited to the BigQuery destinati
 
 Supported schema changes:
 
-- Adding a column
+- Adding a nullable column
 - Removing a column
 - Renaming a column
+- Dropping a `NOT NULL` constraint
+- Setting or dropping supported column default metadata
 
-External replication does not currently support changing column data types or replicating column default values. See [BigQuery schema change support](/docs/guides/database/replication/bigquery#schema-change-support) for details.
+External replication does not currently support changing column data types, adding `NOT NULL` with `SET NOT NULL`, or filling existing destination rows for `ADD COLUMN ... DEFAULT`. Supported defaults are applied as destination metadata for future rows where BigQuery can represent them. See [BigQuery schema change support](/docs/guides/database/replication/bigquery#schema-change-support) for details.
 
 ## What happens when you disable external replication?
 
@@ -68,6 +70,14 @@ Common reasons:
 - **Unsupported data types**: Tables with custom data types are not supported
 
 Check your publication settings and verify your table meets the requirements.
+
+## Why are partitioned tables replicated as separate tables?
+
+Postgres controls this with the publication's `publish_via_partition_root` setting. If the setting is `false`, or if you created the publication manually with SQL and did not set it, Postgres publishes changes from the leaf partitions. External replication then creates destination tables for those leaf partitions. If `publish_via_partition_root = true`, Postgres publishes changes as the partition root, so external replication treats the partition hierarchy as the published partition root.
+
+Publications created from the Dashboard replication flow use `publish_via_partition_root = true`.
+
+See [Partitioned tables](/docs/guides/database/replication/external-replication-setup#partitioned-tables) for examples and the full behavior.
 
 ## How does replica identity affect updates and deletes?
 
@@ -131,6 +141,18 @@ Pipeline failures occur during the streaming phase when an error happens while r
 4. Restart the pipeline
 
 See [Handling errors](/docs/guides/database/replication/external-replication-monitoring#handling-errors) for more details.
+
+## Why is replication lag increasing?
+
+Lag increases when Postgres produces WAL faster than the pipeline can confirm it has processed. Common causes include a slow or rate-limited destination, a pipeline issue, heavy source database activity, long transactions, network latency between the pipeline and source database, or a stopped/disconnected pipeline.
+
+Open [**Database > Replication**](/dashboard/project/_/database/replication), click **View status**, and check **Waiting to sync**, **Room before pausing**, **Last check-in**, **Connected**, and **Slot status**. See [Dealing with replication lag](/docs/guides/database/replication/external-replication-monitoring#dealing-with-replication-lag) for the full investigation and response flow.
+
+## What does a `Lost` slot status mean?
+
+`Lost` means Postgres has already removed WAL files that the pipeline's replication slot needed. The pipeline cannot continue from that slot. Recreate the pipeline, or set **Invalidated slot behavior** to **Recreate** and restart it.
+
+See [Slot statuses](/docs/guides/database/replication/external-replication-monitoring#slot-statuses) for all slot states and what to do next.
 
 ## Why is a table in error state?
 
