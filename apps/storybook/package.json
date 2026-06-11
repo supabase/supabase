@@ -20,8 +20,6 @@
     "@storybook/addon-mcp": "^0.6.0",
     "@storybook/addon-vitest": "10.4.2",
     "@storybook/react-vite": "10.4.2",
-    "@tailwindcss/postcss": "^4.2.4",
-    "@tailwindcss/vite": "^4.3.0",
     "@types/node": "^22",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
