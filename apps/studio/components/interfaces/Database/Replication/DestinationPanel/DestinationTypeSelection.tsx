@@ -113,6 +113,15 @@ export const DestinationTypeSelection = () => {
           isAlpha: true,
           enabled: isOptionVisible('DuckLake', etlEnableDucklake),
         },
+        {
+          value: 'Snowflake',
+          label: 'Snowflake',
+          description:
+            'Stream changes to Snowflake for warehouse analytics and downstream data workflows',
+          icon: Snowflake,
+          isAlpha: true,
+          enabled: isOptionVisible('Snowflake', etlEnableSnowflake),
+        },
       ],
     },
   ]
