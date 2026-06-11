@@ -227,20 +227,22 @@ describe('Logs.utils', () => {
       expect(getAuthLogSeverity('info', 503)).toBe('error')
     })
 
-    test('reports client errors (4xx) as error', () => {
-      expect(getAuthLogSeverity('info', 400)).toBe('error')
-      expect(getAuthLogSeverity('info', 401)).toBe('error')
-      expect(getAuthLogSeverity('info', 429)).toBe('error')
+    test('reports client errors (4xx) as warning', () => {
+      expect(getAuthLogSeverity('info', 400)).toBe('warning')
+      expect(getAuthLogSeverity('info', 401)).toBe('warning')
+      expect(getAuthLogSeverity('info', 429)).toBe('warning')
+      expect(getAuthLogSeverity('info', 499)).toBe('warning')
     })
 
     test('handles status passed as a string', () => {
-      expect(getAuthLogSeverity('info', '404')).toBe('error')
+      expect(getAuthLogSeverity('info', '500')).toBe('error')
+      expect(getAuthLogSeverity('info', '404')).toBe('warning')
       expect(getAuthLogSeverity('info', '200')).toBe('info')
     })
 
     test('preserves the original level for non-error statuses', () => {
       expect(getAuthLogSeverity('info', 200)).toBe('info')
-      expect(getAuthLogSeverity('warning', 302)).toBe('warning')
+      expect(getAuthLogSeverity('info', 302)).toBe('info')
       expect(getAuthLogSeverity('info', 399)).toBe('info')
     })
 
@@ -250,9 +252,11 @@ describe('Logs.utils', () => {
       expect(getAuthLogSeverity('info', 'not-a-number')).toBe('info')
     })
 
-    test('keeps explicit error levels even without a status', () => {
+    test('keeps explicit error levels even with a non-error status', () => {
       expect(getAuthLogSeverity('error')).toBe('error')
       expect(getAuthLogSeverity('fatal')).toBe('fatal')
+      expect(getAuthLogSeverity('error', 200)).toBe('error')
+      expect(getAuthLogSeverity('fatal', 404)).toBe('fatal')
     })
 
     test('returns an empty string when level is missing', () => {

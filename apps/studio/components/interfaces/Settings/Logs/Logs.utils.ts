@@ -713,7 +713,7 @@ function getErrorCondition(table: LogsTableName): SafeLogSqlFragment {
     case 'postgres_logs':
       return safeSql`parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')`
     case 'auth_logs':
-      return safeSql`metadata.level = 'error' OR SAFE_CAST(metadata.status AS INT64) >= 400`
+      return safeSql`metadata.level = 'error' OR SAFE_CAST(metadata.status AS INT64) >= 500`
     case 'function_edge_logs':
       return safeSql`response.status_code >= 500`
     case 'function_logs':
@@ -734,7 +734,7 @@ function getWarningCondition(table: LogsTableName): SafeLogSqlFragment {
     case 'postgres_logs':
       return safeSql`parsed.error_severity IN ('WARNING')`
     case 'auth_logs':
-      return safeSql`metadata.level = 'warning'`
+      return safeSql`metadata.level = 'warning' OR SAFE_CAST(metadata.status AS INT64) BETWEEN 400 AND 499`
     case 'function_edge_logs':
       return safeSql`response.status_code >= 400 AND response.status_code < 500`
     case 'function_logs':
@@ -746,27 +746,40 @@ function getWarningCondition(table: LogsTableName): SafeLogSqlFragment {
   }
 }
 
+// HTTP status code boundaries used to classify auth log severity. Kept
+// consistent with the other log services (e.g. edge logs): a 5xx is an error,
+// a 4xx is a warning.
+export const HTTP_SERVER_ERROR_STATUS = 500
+export const HTTP_CLIENT_ERROR_STATUS = 400
+
 /**
  * Auth logs are emitted at `level: info` even when they represent a failed
- * request (e.g. a 400/401/429 from a failed login). The auth logs chart treats
- * any response with an HTTP status >= 400 as an error (see `getErrorCondition`),
- * so when a user filters by status code the chart turns red while the table
- * still shows "INFO" badges, making the filter look like it was never applied.
+ * request (e.g. a 400/401/429 from a failed login). The auth logs chart derives
+ * severity from the HTTP status (see `getErrorCondition`/`getWarningCondition`),
+ * so when a user filters by status code the chart shows errors/warnings while
+ * the table still shows "INFO" badges, making the filter look like it was never
+ * applied.
  *
  * This helper derives the severity shown in the table from both the log level
- * and the HTTP status so the table stays consistent with the chart.
+ * and the HTTP status so the table stays consistent with the chart and with the
+ * other log services: 5xx is an error, 4xx is a warning, everything else falls
+ * back to the log level.
  */
-export const AUTH_LOG_ERROR_STATUS_THRESHOLD = 400
-
 export function getAuthLogSeverity(level?: string | null, status?: string | number | null): string {
-  const statusCode = typeof status === 'string' ? Number(status) : status
-  const hasErrorStatus =
-    typeof statusCode === 'number' &&
-    Number.isFinite(statusCode) &&
-    statusCode >= AUTH_LOG_ERROR_STATUS_THRESHOLD
+  const normalizedLevel = level ?? ''
 
-  if (hasErrorStatus) return 'error'
-  return level ?? ''
+  // Preserve explicit error-class levels so we never downgrade them and so the
+  // original label (e.g. "fatal") is kept.
+  if (normalizedLevel === 'error' || normalizedLevel === 'fatal') return normalizedLevel
+
+  const statusCode = typeof status === 'string' ? Number(status) : status
+  const hasStatus = typeof statusCode === 'number' && Number.isFinite(statusCode)
+
+  if (hasStatus && statusCode >= HTTP_SERVER_ERROR_STATUS) return 'error'
+  if (normalizedLevel === 'warning') return 'warning'
+  if (hasStatus && statusCode >= HTTP_CLIENT_ERROR_STATUS) return 'warning'
+
+  return normalizedLevel
 }
 
 export function jwtAPIKey(metadata: any) {
