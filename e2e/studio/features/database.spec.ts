@@ -52,9 +52,7 @@ test.describe('Database', () => {
       // copies schema definition to clipboard
       await page.getByRole('button', { name: 'Copy as SQL' }).click()
       await expect(page.getByTestId('copy-sql-ready')).toBeVisible()
-      // "Copy as SQL" copies the entire public schema (which, in CI, also contains
-      // tables from other tests running in parallel), and pg-meta does not guarantee
-      // column order within a table. So isolate this table's CREATE TABLE block and
+      //pg-meta does not guarantee column order within a table. So isolate this table's CREATE TABLE block and
       // assert each line is present regardless of column order.
       const expectedTableLines = [
         `CREATE TABLE public.${databaseTableName} (`,
