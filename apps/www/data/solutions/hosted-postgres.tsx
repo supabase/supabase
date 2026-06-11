@@ -433,7 +433,18 @@ const data: () => {
           id: 'multigres',
           title: 'Multigres is coming',
           description: (
-            <>Learn more about Multigres and the performance benefits you'll get when it ships.</>
+            <>
+              Learn more about{' '}
+              <a
+                href="https://www.multigres.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-foreground underline hover:text-brand transition-colors"
+              >
+                Multigres
+              </a>{' '}
+              and the performance benefits you&apos;ll get when it ships.
+            </>
           ),
           icon: Sparkles,
         },

@@ -53,6 +53,9 @@ const LOG_TYPE_PREDICATE: Record<string, SafeLogSqlFragment> = {
   postgres: safeSql`source = 'postgres_logs'`,
   'edge function': safeSql`source = 'function_edge_logs'`,
   auth: safeSql`source = 'auth_logs'`,
+  realtime: safeSql`source = 'realtime_logs'`,
+  supavisor: safeSql`source = 'supavisor_logs'`,
+  pgbouncer: safeSql`source = 'pgbouncer_logs'`,
 }
 
 // Derived `log_type` column for SELECT / GROUP BY / countIf use.
@@ -63,6 +66,9 @@ const LOG_TYPE_EXPR: SafeLogSqlFragment = safeSql`CASE
       WHEN source = 'postgres_logs' THEN 'postgres'
       WHEN source = 'function_edge_logs' THEN 'edge function'
       WHEN source = 'auth_logs' THEN 'auth'
+      WHEN source = 'realtime_logs' THEN 'realtime'
+      WHEN source = 'supavisor_logs' THEN 'supavisor'
+      WHEN source = 'pgbouncer_logs' THEN 'pgbouncer'
       ELSE source
     END`
 

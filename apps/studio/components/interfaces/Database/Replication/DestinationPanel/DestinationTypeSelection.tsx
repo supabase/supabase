@@ -1,4 +1,5 @@
 import { AnalyticsBucket, BigQuery, Database } from 'icons'
+import { Snowflake } from 'lucide-react'
 import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
 import { Badge, cn, RadioGroupStacked, RadioGroupStackedItem } from 'ui'
 
@@ -7,6 +8,7 @@ import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLDucklakePrivateAlpha,
   useIsETLIcebergPrivateAlpha,
+  useIsETLSnowflakePrivateAlpha,
 } from '../useIsETLPrivateAlpha'
 import { DestinationType } from './DestinationPanel.types'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -16,6 +18,7 @@ export const DestinationTypeSelection = () => {
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
+  const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 
   const numberOfTypes = [
@@ -23,6 +26,7 @@ export const DestinationTypeSelection = () => {
     etlEnableBigQuery,
     etlEnableIceberg,
     etlEnableDucklake,
+    etlEnableSnowflake,
   ].filter(Boolean).length
 
   const [urlDestinationType, setDestinationType] = useQueryState(
@@ -32,6 +36,7 @@ export const DestinationTypeSelection = () => {
       'BigQuery',
       'Analytics Bucket',
       'DuckLake',
+      'Snowflake',
     ]).withOptions({
       history: 'push',
       clearOnDefault: true,
@@ -61,11 +66,13 @@ export const DestinationTypeSelection = () => {
         onValueChange={(value) => setDestinationType(value as DestinationType)}
         className={cn(
           'grid [&>button>div]:py-4',
-          !editMode && numberOfTypes >= 4
-            ? 'grid-cols-4'
-            : !editMode && numberOfTypes === 3
-              ? 'grid-cols-3'
-              : 'grid-cols-2',
+          !editMode && numberOfTypes >= 5
+            ? 'grid-cols-5'
+            : !editMode && numberOfTypes === 4
+              ? 'grid-cols-4'
+              : !editMode && numberOfTypes === 3
+                ? 'grid-cols-3'
+                : 'grid-cols-2',
           '[&>button:first-of-type]:rounded-none [&>button:last-of-type]:rounded-none',
           '[&>button:first-of-type]:rounded-l-lg! [&>button:last-of-type]:rounded-r-lg!'
         )}
@@ -144,6 +151,23 @@ export const DestinationTypeSelection = () => {
                 <p className="text-foreground-lighter">
                   Send data to a DuckLake catalog backed by S3-compatible object storage for
                   flexible lakehouse workflows
+                </p>
+              </div>
+            </div>
+          </RadioGroupStackedItem>
+        )}
+
+        {((!editMode && etlEnableSnowflake) || (editMode && destinationType === 'Snowflake')) && (
+          <RadioGroupStackedItem label="" showIndicator={false} id="Snowflake" value="Snowflake">
+            <div className="flex flex-col gap-y-2">
+              <Snowflake size={20} />
+              <div className="flex flex-col gap-y-0.5 text-sm text-left">
+                <div className="flex items-center gap-x-2">
+                  <p>Snowflake</p>
+                  <Badge>Alpha</Badge>
+                </div>
+                <p className="text-foreground-lighter">
+                  Send data to Snowflake for warehouse analytics and downstream data workflows
                 </p>
               </div>
             </div>
