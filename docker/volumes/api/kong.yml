@@ -216,6 +216,72 @@ services:
             - admin
             - anon
 
+  # /realtime/v1/api/tenants/{id}/health stays open to anon (client SDKs probe
+  # it). Declared before realtime-v1-rest-tenants so this more specific regex
+  # route wins. The lookahead matches only '/realtime/v1', leaving
+  # '/api/tenants/{id}/health' to be proxied untouched to the realtime service.
+  - name: realtime-v1-rest-tenants-health
+    _comment: 'Realtime tenant health: /realtime/v1/api/tenants/{id}/health -> http://realtime:4000/api/tenants/{id}/health'
+    url: http://realtime-dev.supabase-realtime:4000
+    protocol: http
+    routes:
+      - name: realtime-v1-rest-tenants-health
+        strip_path: true
+        regex_priority: 100
+        paths:
+          - ~/realtime/v1(?=/api/tenants/[^/]+/health$)
+    plugins:
+      - name: cors
+      - name: key-auth
+        config:
+          hide_credentials: false
+      - name: request-transformer
+        config:
+          add:
+            headers:
+              - "Authorization: $LUA_AUTH_EXPR"
+          replace:
+            headers:
+              - "Authorization: $LUA_AUTH_EXPR"
+      - name: acl
+        config:
+          hide_groups_header: true
+          allow:
+            - admin
+            - anon
+
+  # /realtime/v1/api/tenants is service-role-only: the ACL allows only the
+  # admin group, and the Authorization header is built from $LUA_AUTH_SECRET_EXPR
+  # which won't synthesize an anon JWT. Declared before realtime-v1-rest so the
+  # more specific path wins. The health subpath is carved out above.
+  - name: realtime-v1-rest-tenants
+    _comment: 'Realtime tenants admin: /realtime/v1/api/tenants -> http://realtime:4000/api/tenants (service_role only)'
+    url: http://realtime-dev.supabase-realtime:4000/api/tenants
+    protocol: http
+    routes:
+      - name: realtime-v1-rest-tenants
+        strip_path: true
+        paths:
+          - /realtime/v1/api/tenants
+    plugins:
+      - name: cors
+      - name: key-auth
+        config:
+          hide_credentials: false
+      - name: request-transformer
+        config:
+          add:
+            headers:
+              - "Authorization: $LUA_AUTH_SECRET_EXPR"
+          replace:
+            headers:
+              - "Authorization: $LUA_AUTH_SECRET_EXPR"
+      - name: acl
+        config:
+          hide_groups_header: true
+          allow:
+            - admin
+
   - name: realtime-v1-rest
     _comment: 'Realtime: /realtime/v1/api/* -> http://realtime:4000/api/*'
     url: http://realtime-dev.supabase-realtime:4000/api
