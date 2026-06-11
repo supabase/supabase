@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { Eye, EyeOff, MinusCircle } from 'lucide-react'
+import { Eye, EyeOff, Trash } from 'lucide-react'
 import { useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -15,12 +15,13 @@ import {
   Form,
   FormControl,
   FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
   Textarea,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
 import { DuplicateSecretWarningModal } from './DuplicateSecretWarningModal'
@@ -59,7 +60,7 @@ const removeWrappingQuotes = (str: string): string => {
 
 export const AddNewSecretForm = () => {
   const { ref: projectRef } = useParams()
-  const [hiddenSecrets, setHiddenSecrets] = useState<Set<string>>(new Set())
+  const [visibleSecrets, setVisibleSecrets] = useState<Set<string>>(new Set())
   const [duplicateSecretName, setDuplicateSecretName] = useState<string>('')
   const [pendingSecrets, setPendingSecrets] = useState<z.infer<typeof FormSchema> | null>(null)
 
@@ -134,7 +135,7 @@ export const AddNewSecretForm = () => {
       // RHF recommends using setTimeout/useEffect to reset the form
       setTimeout(() => {
         form.reset()
-        setHiddenSecrets(new Set())
+        setVisibleSecrets(new Set())
       }, 0)
     },
   })
@@ -167,28 +168,28 @@ export const AddNewSecretForm = () => {
   }
 
   const handleToggleSecretVisibility = (fieldId: string) => {
-    setHiddenSecrets((prev) => {
-      const hiddenSet = new Set(prev)
-      if (hiddenSet.has(fieldId)) {
-        hiddenSet.delete(fieldId)
+    setVisibleSecrets((prev) => {
+      const visibleSet = new Set(prev)
+      if (visibleSet.has(fieldId)) {
+        visibleSet.delete(fieldId)
       } else {
-        hiddenSet.add(fieldId)
+        visibleSet.add(fieldId)
       }
-      return hiddenSet
+      return visibleSet
     })
   }
 
   const handleRemoveSecret = (fieldId: string, index: number) => {
     if (fields.length > 1) {
-      setHiddenSecrets((prev) => {
-        const hiddenSet = new Set(prev)
-        hiddenSet.delete(fieldId)
-        return hiddenSet
+      setVisibleSecrets((prev) => {
+        const visibleSet = new Set(prev)
+        visibleSet.delete(fieldId)
+        return visibleSet
       })
       remove(index)
     } else {
       form.reset(defaultValues)
-      setHiddenSecrets(new Set())
+      setVisibleSecrets(new Set())
     }
   }
 
@@ -196,7 +197,7 @@ export const AddNewSecretForm = () => {
     append({ name: '', value: '' })
   }
 
-  const isSecretVisible = (fieldId: string) => !hiddenSecrets.has(fieldId)
+  const isSecretVisible = (fieldId: string) => visibleSecrets.has(fieldId)
 
   return (
     <>
@@ -211,7 +212,7 @@ export const AddNewSecretForm = () => {
                 <div
                   key={fieldItem.id}
                   className={cn(
-                    'flex flex-col gap-4 mb-4',
+                    'flex flex-col gap-4 last:mb-0 mb-4',
                     index > 0 &&
                       'border-t border-default pt-4 -mx-(--card-padding-x) px-(--card-padding-x)'
                   )}
@@ -220,99 +221,110 @@ export const AddNewSecretForm = () => {
                     control={form.control}
                     name={`secrets.${index}.name`}
                     render={({ field }) => (
-                      <FormItem className="w-full">
-                        <div className="flex items-center justify-between">
-                          <FormLabel>Name</FormLabel>
+                      <FormItemLayout
+                        label="Name"
+                        layout="flex-row-reverse"
+                        description="A unique name for your secret."
+                      >
+                        <div className="flex w-full items-center gap-2">
+                          <FormControl className="flex-1">
+                            <Input
+                              {...field}
+                              className="w-full font-mono"
+                              containerClassName="w-full"
+                              placeholder="e.g. CLIENT_KEY"
+                              data-1p-ignore
+                              data-lpignore="true"
+                              data-form-type="other"
+                              data-bwignore
+                              onPaste={(e) => handlePaste(e.nativeEvent)}
+                            />
+                          </FormControl>
                           <Button
-                            type="text"
-                            className="px-1"
-                            icon={<MinusCircle />}
+                            type="default"
+                            className="w-[34px] h-[34px] shrink-0 p-0"
+                            icon={<Trash size={12} />}
                             disabled={fields.length <= 1}
                             onClick={() => handleRemoveSecret(fieldItem.id, index)}
                           />
                         </div>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            className="w-full font-mono"
-                            placeholder="e.g. CLIENT_KEY"
-                            data-1p-ignore
-                            data-lpignore="true"
-                            data-form-type="other"
-                            data-bwignore
-                            onPaste={(e) => handlePaste(e.nativeEvent)}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+                      </FormItemLayout>
                     )}
                   />
                   <FormField
                     control={form.control}
                     name={`secrets.${index}.value`}
                     render={({ field }) => (
-                      <FormItem className="w-full">
-                        <div className="flex items-center justify-between">
-                          <FormLabel>Value</FormLabel>
-                          <Button
-                            type="text"
-                            className="px-1"
-                            icon={isSecretVisible(fieldItem.id) ? <EyeOff /> : <Eye />}
-                            onClick={() => handleToggleSecretVisibility(fieldItem.id)}
-                          >
-                            {isSecretVisible(fieldItem.id) ? 'Hide' : 'Show'}
-                          </Button>
-                        </div>
+                      <FormItemLayout
+                        label="Value"
+                        layout="flex-row-reverse"
+                        description="Supports multi-line values such as PEM keys, JSON, or functions."
+                      >
                         <FormControl>
-                          <Textarea
-                            {...field}
-                            rows={1}
-                            ref={(el) => {
-                              field.ref(el)
-                              if (el) {
-                                el.style.height = 'auto'
-                                el.style.height = Math.max(72, el.scrollHeight) + 'px'
+                          <div className="relative w-full">
+                            <Textarea
+                              {...field}
+                              rows={1}
+                              ref={(el) => {
+                                field.ref(el)
+                                if (el) {
+                                  el.style.height = 'auto'
+                                  el.style.height = Math.max(72, el.scrollHeight) + 'px'
+                                }
+                              }}
+                              data-1p-ignore
+                              data-lpignore="true"
+                              data-form-type="other"
+                              data-bwignore
+                              className="min-h-[72px] resize-none font-mono"
+                              style={
+                                {
+                                  WebkitTextSecurity: isSecretVisible(fieldItem.id)
+                                    ? undefined
+                                    : 'disc',
+                                } as React.CSSProperties
                               }
-                            }}
-                            data-1p-ignore
-                            data-lpignore="true"
-                            data-form-type="other"
-                            data-bwignore
-                            className="min-h-[72px] resize-none font-mono"
-                            style={
-                              {
-                                WebkitTextSecurity: isSecretVisible(fieldItem.id)
-                                  ? undefined
-                                  : 'disc',
-                              } as React.CSSProperties
-                            }
-                            onChange={(e) => {
-                              field.onChange(e)
-                              e.currentTarget.style.height = 'auto'
-                              e.currentTarget.style.height =
-                                Math.max(72, e.currentTarget.scrollHeight) + 'px'
-                            }}
-                          />
+                              onChange={(e) => {
+                                field.onChange(e)
+                                e.currentTarget.style.height = 'auto'
+                                e.currentTarget.style.height =
+                                  Math.max(72, e.currentTarget.scrollHeight) + 'px'
+                              }}
+                            />
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  type="text"
+                                  className="absolute right-1 top-1 px-1"
+                                  icon={isSecretVisible(fieldItem.id) ? <EyeOff /> : <Eye />}
+                                  onClick={() => handleToggleSecretVisibility(fieldItem.id)}
+                                />
+                              </TooltipTrigger>
+                              <TooltipContent side="bottom">
+                                {isSecretVisible(fieldItem.id) ? 'Hide value' : 'Show value'}
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>
+                      </FormItemLayout>
                     )}
                   />
                 </div>
               ))}
-
-              <Button type="default" onClick={handleAddAnotherSecret}>
-                Add another
-              </Button>
             </CardContent>
             <CardFooter className="justify-between space-x-2">
               <p className="text-sm text-foreground-muted">
                 Insert or update multiple secrets at once by pasting key-value pairs
               </p>
 
-              <Button type="primary" htmlType="submit" disabled={isCreating} loading={isCreating}>
-                {isCreating ? 'Saving...' : fields.length > 1 ? 'Bulk save' : 'Save'}
-              </Button>
+              <div className="flex items-center space-x-2">
+                <Button type="default" onClick={handleAddAnotherSecret}>
+                  Add another
+                </Button>
+                <Button type="primary" htmlType="submit" disabled={isCreating} loading={isCreating}>
+                  {isCreating ? 'Saving...' : fields.length > 1 ? 'Bulk save' : 'Save'}
+                </Button>
+              </div>
             </CardFooter>
           </Card>
         </form>
