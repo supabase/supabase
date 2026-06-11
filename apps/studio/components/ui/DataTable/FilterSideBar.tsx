@@ -1,7 +1,7 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { useEffect } from 'react'
+import React, { useEffect, type ReactNode } from 'react'
 import { Button, cn, ResizablePanel, usePanelRef } from 'ui'
 
 import { FeaturePreviewBadge } from '../FeaturePreviewBadge'
@@ -17,12 +17,14 @@ interface FilterSideBarProps {
   isFilterBarOpen: boolean
   setIsFilterBarOpen: React.Dispatch<React.SetStateAction<boolean>>
   dateRangeDisabled?: DateRangeDisabled
+  afterFilters?: ReactNode
 }
 
 export function FilterSideBar({
   isFilterBarOpen,
   setIsFilterBarOpen,
   dateRangeDisabled,
+  afterFilters,
 }: FilterSideBarProps) {
   const router = useRouter()
   const { ref } = useParams()
@@ -92,6 +94,7 @@ export function FilterSideBar({
           />
         )}
         <DataTableFilterControls dateRangeDisabled={dateRangeDisabled} />
+        {afterFilters}
         <FeaturePreviewSidebarPanel
           className="mx-2 my-4"
           title="Capture your logs"

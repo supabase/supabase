@@ -4,6 +4,7 @@ import {
   buildDestinationConfig,
   buildDestinationConfigForValidation,
   getDucklakeValidationIssues,
+  getSnowflakeValidationIssues,
 } from './DestinationForm.utils'
 
 const baseDucklakeFormData = {
@@ -35,6 +36,44 @@ const baseDucklakeFormData = {
   ducklakeS3UrlStyle: 'path' as const,
   ducklakeS3UseSsl: true,
   ducklakeMetadataSchema: ' ducklake_metadata ',
+}
+
+const baseSnowflakeFormData = {
+  name: 'Snowflake Destination',
+  publicationName: 'pub',
+  maxFillMs: undefined,
+  maxTableSyncWorkers: undefined,
+  maxCopyConnectionsPerTable: undefined,
+  invalidatedSlotBehavior: undefined,
+  projectId: undefined,
+  datasetId: undefined,
+  serviceAccountKey: undefined,
+  connectionPoolSize: undefined,
+  maxStalenessMins: undefined,
+  warehouseName: undefined,
+  namespace: undefined,
+  newNamespaceName: undefined,
+  catalogToken: undefined,
+  s3AccessKeyId: undefined,
+  s3SecretAccessKey: undefined,
+  s3Region: undefined,
+  ducklakeCatalogUrl: undefined,
+  ducklakeDataPath: undefined,
+  ducklakePoolSize: undefined,
+  ducklakeS3AccessKeyId: undefined,
+  ducklakeS3SecretAccessKey: undefined,
+  ducklakeS3Region: undefined,
+  ducklakeS3Endpoint: undefined,
+  ducklakeS3UrlStyle: undefined,
+  ducklakeS3UseSsl: undefined,
+  ducklakeMetadataSchema: undefined,
+  snowflakeAccountId: ' MYORG-MYACCOUNT ',
+  snowflakeUser: ' ETL_USER ',
+  snowflakePrivateKey: '-----BEGIN PRIVATE KEY-----\nabc\n-----END PRIVATE KEY-----',
+  snowflakePrivateKeyPassphrase: ' secret passphrase ',
+  snowflakeDatabase: ' ANALYTICS ',
+  snowflakeSchema: ' PUBLIC ',
+  snowflakeRole: ' ETL_ROLE ',
 }
 
 describe('DestinationForm.utils DuckLake', () => {
@@ -158,5 +197,76 @@ describe('DestinationForm.utils DuckLake', () => {
         ducklakeMetadataSchema: 'ducklake_schema_1',
       })
     ).toEqual([])
+  })
+})
+
+describe('DestinationForm.utils Snowflake', () => {
+  it('builds Snowflake validation config with identifiers trimmed and secrets preserved', () => {
+    const config = buildDestinationConfigForValidation({
+      projectRef: 'project-ref',
+      selectedType: 'Snowflake',
+      data: {
+        ...baseSnowflakeFormData,
+        snowflakePrivateKeyPassphrase: '',
+        snowflakeRole: '   ',
+      },
+    })
+
+    expect(config).toEqual({
+      snowflake: {
+        accountId: 'MYORG-MYACCOUNT',
+        user: 'ETL_USER',
+        privateKey: '-----BEGIN PRIVATE KEY-----\nabc\n-----END PRIVATE KEY-----',
+        privateKeyPassphrase: undefined,
+        database: 'ANALYTICS',
+        schema: 'PUBLIC',
+        role: undefined,
+      },
+    })
+  })
+
+  it('builds Snowflake submit config with normalized values', async () => {
+    const createS3AccessKey = vi.fn()
+    const resolveNamespace = vi.fn()
+
+    const config = await buildDestinationConfig({
+      projectRef: 'project-ref',
+      selectedType: 'Snowflake',
+      data: baseSnowflakeFormData,
+      createS3AccessKey,
+      resolveNamespace,
+    })
+
+    expect(config).toEqual({
+      snowflake: {
+        accountId: 'MYORG-MYACCOUNT',
+        user: 'ETL_USER',
+        privateKey: '-----BEGIN PRIVATE KEY-----\nabc\n-----END PRIVATE KEY-----',
+        privateKeyPassphrase: ' secret passphrase ',
+        database: 'ANALYTICS',
+        schema: 'PUBLIC',
+        role: 'ETL_ROLE',
+      },
+    })
+    expect(createS3AccessKey).not.toHaveBeenCalled()
+    expect(resolveNamespace).not.toHaveBeenCalled()
+  })
+
+  it('returns required-field errors for missing Snowflake settings', () => {
+    const issues = getSnowflakeValidationIssues({
+      snowflakeAccountId: '',
+      snowflakeUser: '',
+      snowflakePrivateKey: '',
+      snowflakeDatabase: '',
+      snowflakeSchema: '',
+    })
+
+    expect(issues).toEqual([
+      { path: 'snowflakeAccountId', message: 'Account ID is required' },
+      { path: 'snowflakeUser', message: 'User is required' },
+      { path: 'snowflakePrivateKey', message: 'Private key is required' },
+      { path: 'snowflakeDatabase', message: 'Database is required' },
+      { path: 'snowflakeSchema', message: 'Schema is required' },
+    ])
   })
 })

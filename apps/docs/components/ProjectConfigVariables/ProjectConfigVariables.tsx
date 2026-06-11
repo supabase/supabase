@@ -138,10 +138,14 @@ function OrgProjectSelector() {
         : (projects!
             .map((project) => {
               const organization = organizations!.find((org) => org.id === project.organization_id)!
+              const paused = isProjectPaused(project)
               return {
                 id: project.ref,
                 value: toOrgProjectValue(organization, project),
-                displayName: toDisplayNameOrgProject(organization, project),
+                displayName: paused
+                  ? `${toDisplayNameOrgProject(organization, project)} (paused)`
+                  : toDisplayNameOrgProject(organization, project),
+                disabled: paused,
               }
             })
             .filter(Boolean) as ComboBoxOption[]),
@@ -162,10 +166,14 @@ function OrgProjectSelector() {
 
       if (storedOrg && storedProject && storedProject.organization_id === storedOrg.id) {
         setSelectedOrgProject(storedOrg, storedProject)
-      } else if (projects!.length > 0) {
-        const firstProject = projects![0]
-        const matchingOrg = organizations!.find((org) => org.id === firstProject.organization_id)
-        if (matchingOrg) setSelectedOrgProject(matchingOrg, firstProject)
+      } else {
+        const firstActiveProject = projects!.find((project) => !isProjectPaused(project))
+        if (firstActiveProject) {
+          const matchingOrg = organizations!.find(
+            (org) => org.id === firstActiveProject.organization_id
+          )
+          if (matchingOrg) setSelectedOrgProject(matchingOrg, firstActiveProject)
+        }
       }
     }
   }, [organizations, projects, selectedOrg, selectedProject, setSelectedOrgProject, stateSummary])
