@@ -88,6 +88,10 @@ catalogs:
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3
   '@mapbox/node-pre-gyp>tar': ^7.5.11
+  '@sentry/webpack-plugin>uuid': ^11.1.1
+  '@usercentrics/cmp-browser-sdk>uuid': ^11.1.1
+  braintrust>uuid: ^11.1.1
+  mdx-bundler>uuid: ^11.1.1
   cacache>tar: ^7.5.11
   dompurify: ^3.3.2
   esbuild: ^0.25.2
@@ -17151,13 +17155,12 @@ packages:
     resolution: {integrity: sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==}
     engines: {node: '>= 0.4.0'}
 
-  uuid@14.0.0:
-    resolution: {integrity: sha512-Qo+uWgilfSmAhXCMav1uYFynlQO7fMFiMVZsQqZRMIXp0O7rR7qjkj+cPvBHLgBqi960QCoo/PH2/6ZtVqKvrg==}
+  uuid@11.1.1:
+    resolution: {integrity: sha512-vIYxrBCC/N/K+Js3qSN88go7kIfNPssr/hHCesKCQNAjmgvYS2oqr69kIufEG+O4+PfezOH4EbIeHCfFov8ZgQ==}
     hasBin: true
 
-  uuid@9.0.1:
-    resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
-    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
+  uuid@14.0.0:
+    resolution: {integrity: sha512-Qo+uWgilfSmAhXCMav1uYFynlQO7fMFiMVZsQqZRMIXp0O7rR7qjkj+cPvBHLgBqi960QCoo/PH2/6ZtVqKvrg==}
     hasBin: true
 
   uvu@0.5.6:
@@ -23509,7 +23512,7 @@ snapshots:
     dependencies:
       '@sentry/bundler-plugin-core': 4.6.1(encoding@0.1.13)(supports-color@8.1.1)
       unplugin: 1.0.1
-      uuid: 9.0.1
+      uuid: 11.1.1
       webpack: 5.105.4(esbuild@0.25.2)
     transitivePeerDependencies:
       - encoding
@@ -25072,7 +25075,7 @@ snapshots:
       crypto-js: 4.2.0
       dynamic-import-polyfill: 0.1.1
       lz-string: 1.5.0
-      uuid: 9.0.1
+      uuid: 11.1.1
 
   '@vercel/functions@1.6.0(@aws-sdk/credential-provider-web-identity@3.972.38)':
     optionalDependencies:
@@ -26072,7 +26075,7 @@ snapshots:
       source-map: 0.7.6
       termi-link: 1.1.0
       unplugin: 2.3.11
-      uuid: 9.0.1
+      uuid: 11.1.1
       zod: 3.25.76
       zod-to-json-schema: 3.25.1(zod@3.25.76)
     transitivePeerDependencies:
@@ -30480,7 +30483,7 @@ snapshots:
       gray-matter: 4.0.3
       remark-frontmatter: 5.0.0(supports-color@8.1.1)
       remark-mdx-frontmatter: 4.0.0
-      uuid: 9.0.1
+      uuid: 11.1.1
       vfile: 6.0.3
     transitivePeerDependencies:
       - supports-color
@@ -35409,9 +35412,9 @@ snapshots:
 
   utils-merge@1.0.1: {}
 
-  uuid@14.0.0: {}
+  uuid@11.1.1: {}
 
-  uuid@9.0.1: {}
+  uuid@14.0.0: {}
 
   uvu@0.5.6:
     dependencies:
