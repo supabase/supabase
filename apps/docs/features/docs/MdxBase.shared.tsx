@@ -1,7 +1,7 @@
 import { AiPromptsIndex } from '~/app/guides/getting-started/ai-prompts/[slug]/AiPromptsIndex'
 import { AiSkillsIndex } from '~/app/guides/getting-started/ai-skills/AiSkillsIndex'
 import { AppleSecretGenerator } from '~/components/AppleSecretGenerator'
-import AuthProviders from '~/components/AuthProviders'
+import { PhoneAuthProviders, SocialAuthProviders } from '~/components/AuthProviders'
 import { AuthSmsProviderConfig } from '~/components/AuthSmsProviderConfig'
 import { CostWarning } from '~/components/AuthSmsProviderConfig/AuthSmsProviderConfig.Warnings'
 import ButtonCard from '~/components/ButtonCard'
@@ -67,7 +67,8 @@ const components = {
   AiSkillsIndex,
   AuthSmsProviderConfig,
   AppleSecretGenerator,
-  AuthProviders,
+  PhoneAuthProviders,
+  SocialAuthProviders,
   Badge,
   Button,
   ButtonCard,
