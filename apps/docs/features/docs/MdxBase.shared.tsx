@@ -19,6 +19,7 @@ import { SharedData } from '~/components/SharedData'
 import StepHikeCompact from '~/components/StepHikeCompact'
 import { CodeSampleDummy, CodeSampleWrapper } from '~/features/directives/CodeSample.client'
 import { NamedCodeBlock } from '~/features/directives/CodeTabs.components'
+import { MdxAnchor } from '~/features/docs/MdxAnchor'
 import { Accordion, AccordionItem } from '~/features/ui/Accordion'
 import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
 import InfoTooltip from '~/features/ui/InfoTooltip'
@@ -100,6 +101,7 @@ const components = {
   Tabs,
   TabPanel,
   InfoTooltip,
+  a: MdxAnchor,
   h2: (props: any) => (
     <Heading tag="h2" {...props}>
       {props.children}
