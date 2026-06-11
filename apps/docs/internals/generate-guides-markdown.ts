@@ -32,20 +32,6 @@ type SharedDataKey = keyof typeof sharedData
 
 const PARTIALS_DIR = path.join(process.cwd(), 'content', '_partials')
 
-/**
- * Reads <$Partial path="..." /> tags and replaces them with the file contents.
- * Recurses to handle nested partials.
- */
-/** Drop top-level ESM `import` / `export` lines so partials that pull in their
- * own components (e.g. `import { Admonition } from '...'`) don't leak the
- * import statement into the host markdown as literal text. */
-function stripTopLevelEsm(body: string): string {
-  return body
-    .split('\n')
-    .filter((line) => !/^\s*(?:import|export)\b/.test(line))
-    .join('\n')
-}
-
 async function inlinePartials(content: string): Promise<string> {
   const partialRegex = /<\$Partial\s+path="([^"]+)"[^/]*\/>/g
   const matches = [...content.matchAll(partialRegex)]
@@ -53,7 +39,7 @@ async function inlinePartials(content: string): Promise<string> {
     try {
       const raw = await fs.promises.readFile(path.join(PARTIALS_DIR, partialPath), 'utf8')
       const { content: partialBody } = matter(raw)
-      const inlined = await inlinePartials(stripTopLevelEsm(partialBody))
+      const inlined = await inlinePartials(partialBody)
       content = content.replace(fullMatch, inlined)
     } catch {
       content = content.replace(fullMatch, '')
