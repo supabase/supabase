@@ -1,6 +1,7 @@
 import { Handle, Position } from '@xyflow/react'
 import { useParams } from 'common'
 import { AnalyticsBucket, BigQuery, Database } from 'icons'
+import { Snowflake } from 'lucide-react'
 import { ComponentType, PropsWithChildren, useMemo } from 'react'
 import { AWS_REGIONS } from 'shared-data'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -26,6 +27,7 @@ const destinationIconByType: Record<
   BigQuery,
   'Analytics Bucket': AnalyticsBucket,
   DuckLake: Database,
+  Snowflake,
 }
 
 const NodeContainer = ({ className, children }: PropsWithChildren<{ className?: string }>) => {

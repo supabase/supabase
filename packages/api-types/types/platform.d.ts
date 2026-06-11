@@ -5858,6 +5858,39 @@ export interface components {
               s3_use_ssl?: boolean
             }
           }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id: string
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database: string
+              /** @description Snowflake RSA private key PEM contents */
+              private_key: string
+              /** @description Optional passphrase for encrypted private keys */
+              private_key_passphrase?: string
+              /**
+               * @description Optional Snowflake role
+               * @example ETL_ROLE
+               */
+              role?: string
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema: string
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example ETL_USER
+               */
+              user: string
+            }
+          }
       /**
        * @description Destination name
        * @example bq-analytics
@@ -5989,6 +6022,39 @@ export interface components {
                * @example false
                */
               s3_use_ssl?: boolean
+            }
+          }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id: string
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database: string
+              /** @description Snowflake RSA private key PEM contents */
+              private_key: string
+              /** @description Optional passphrase for encrypted private keys */
+              private_key_passphrase?: string
+              /**
+               * @description Optional Snowflake role
+               * @example ETL_ROLE
+               */
+              role?: string
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema: string
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example ETL_USER
+               */
+              user: string
             }
           }
       /**
@@ -9553,6 +9619,39 @@ export interface components {
               s3_use_ssl?: boolean
             }
           }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id: string
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database: string
+              /** @description Snowflake RSA private key PEM contents */
+              private_key: string
+              /** @description Optional passphrase for encrypted private keys */
+              private_key_passphrase?: string
+              /**
+               * @description Optional Snowflake role
+               * @example ETL_ROLE
+               */
+              role?: string
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema: string
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example ETL_USER
+               */
+              user: string
+            }
+          }
       /**
        * @description Destination id
        * @example 2001
@@ -9696,6 +9795,39 @@ export interface components {
                  * @example false
                  */
                 s3_use_ssl?: boolean
+              }
+            }
+          | {
+              snowflake: {
+                /**
+                 * @description Snowflake account identifier
+                 * @example MYORG-MYACCOUNT
+                 */
+                account_id: string
+                /**
+                 * @description Snowflake target database
+                 * @example ANALYTICS
+                 */
+                database: string
+                /** @description Snowflake RSA private key PEM contents */
+                private_key: string
+                /** @description Optional passphrase for encrypted private keys */
+                private_key_passphrase?: string
+                /**
+                 * @description Optional Snowflake role
+                 * @example ETL_ROLE
+                 */
+                role?: string
+                /**
+                 * @description Snowflake target schema
+                 * @example PUBLIC
+                 */
+                schema: string
+                /**
+                 * @description Snowflake user configured for key-pair authentication
+                 * @example ETL_USER
+                 */
+                user: string
               }
             }
         /**
@@ -11566,6 +11698,39 @@ export interface components {
               s3_use_ssl?: boolean
             }
           }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id: string
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database: string
+              /** @description Snowflake RSA private key PEM contents */
+              private_key: string
+              /** @description Optional passphrase for encrypted private keys */
+              private_key_passphrase?: string
+              /**
+               * @description Optional Snowflake role
+               * @example ETL_ROLE
+               */
+              role?: string
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema: string
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example ETL_USER
+               */
+              user: string
+            }
+          }
       /**
        * @description Destination name
        * @example bq-analytics
@@ -11697,6 +11862,39 @@ export interface components {
                * @example false
                */
               s3_use_ssl?: boolean
+            }
+          }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id: string
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database: string
+              /** @description Snowflake RSA private key PEM contents */
+              private_key: string
+              /** @description Optional passphrase for encrypted private keys */
+              private_key_passphrase?: string
+              /**
+               * @description Optional Snowflake role
+               * @example ETL_ROLE
+               */
+              role?: string
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema: string
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example ETL_USER
+               */
+              user: string
             }
           }
       /**
@@ -12249,6 +12447,39 @@ export interface components {
                * @example false
                */
               s3_use_ssl?: boolean
+            }
+          }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id: string
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database: string
+              /** @description Snowflake RSA private key PEM contents */
+              private_key: string
+              /** @description Optional passphrase for encrypted private keys */
+              private_key_passphrase?: string
+              /**
+               * @description Optional Snowflake role
+               * @example ETL_ROLE
+               */
+              role?: string
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema: string
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example ETL_USER
+               */
+              user: string
             }
           }
     }
