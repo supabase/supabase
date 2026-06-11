@@ -252,7 +252,6 @@ export function ConfigRail({
         plan={plan}
         hasComposition={hasComposition}
         onOpenManual={onOpenManual}
-        onOpenAgentPlan={onOpenAgentPlan}
       />
     </aside>
   )

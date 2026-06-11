@@ -2,17 +2,34 @@ import { isbot } from 'isbot'
 import { NextResponse, type NextRequest } from 'next/server'
 
 import { clientSdkIds } from '~/content/navigation.references'
+import { START_AGENT_FORMAT_PARAM } from '~/features/start/StartAgent.constants'
 import { BASE_PATH } from '~/lib/constants'
 
 const REFERENCE_PATH = `${BASE_PATH ?? ''}/reference`
 
 const GUIDES_PATH = `${BASE_PATH ?? ''}/guides`
 
+const START_PATH = `${BASE_PATH ?? ''}/start`
+
+const START_MARKDOWN_PATH = `${START_PATH}.md`
+
 export function middleware(request: NextRequest) {
   const url = new URL(request.url)
+  const isBotRequest = isbot(request.headers.get('user-agent'))
 
   const requestsMarkdown =
     request.headers.get('Accept')?.includes('text/markdown') || url.pathname.endsWith('.md')
+
+  if (url.pathname === START_PATH || url.pathname === START_MARKDOWN_PATH) {
+    const wantsMarkdown = requestsMarkdown || url.pathname === START_MARKDOWN_PATH
+
+    if (wantsMarkdown || isBotRequest) {
+      const rewriteUrl = new URL(url)
+      rewriteUrl.pathname = `${BASE_PATH ?? ''}/api/start`
+      rewriteUrl.searchParams.set(START_AGENT_FORMAT_PARAM, wantsMarkdown ? 'markdown' : 'html')
+      return NextResponse.rewrite(rewriteUrl)
+    }
+  }
 
   // Serve pre-generated .md files before the [[...slug]] page route can intercept them
   if (url.pathname.startsWith(GUIDES_PATH + '/') && requestsMarkdown) {
@@ -26,7 +43,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  if (isbot(request.headers.get('user-agent'))) {
+  if (isBotRequest) {
     let [, lib, maybeVersion, ...slug] = url.pathname.replace(REFERENCE_PATH, '').split('/')
 
     if (clientSdkIds.includes(lib)) {
@@ -70,5 +87,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/reference/:path*', '/guides/:path*'],
+  matcher: ['/reference/:path*', '/guides/:path*', '/start', '/start.md'],
 }

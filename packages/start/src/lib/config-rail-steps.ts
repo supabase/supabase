@@ -21,54 +21,54 @@ export interface ConfigRailStepMeta {
 
 const STEP_META: Record<ConfigRailStepId, Omit<ConfigRailStepMeta, 'id'>> = {
   intro: {
-    title: 'What is Supabase?',
+    title: 'This is your Supabase backend',
     description:
-      'Supabase is a back-end built from composable primitives — database, auth, storage, edge functions, and more. Pick the pieces you need and the diagram to the right maps out your back-end as you go. Connect to it however you want: any framework, any ORM, local or hosted.',
+      'A set of Postgres-first primitives that can be combined into the backend you need — database, auth, storage, edge functions, and more. Pick what fits and skip the rest. Connect however you want: any framework, any ORM, local or hosted.',
   },
   code: {
-    title: 'Everything is code',
+    title: 'See your backend as code',
     description:
       'Every part of your Supabase back-end has a code counterpart — SQL schemas, edge functions, config, and more. Your agent can read, act on, and deploy these files directly.',
   },
   project: {
-    title: 'Project',
+    title: 'Choose a project type',
     description: 'Are you starting fresh or adding Supabase to something you already have?',
   },
   framework: {
-    title: 'Framework',
+    title: 'Choose a framework',
     description: 'Choose the front-end you want to connect — or skip it for a backend-only setup.',
   },
   'component-library': {
-    title: 'Component library',
+    title: 'Choose a component library',
     description:
       'Add prebuilt Supabase UI blocks for your framework, or bring your own components.',
   },
   primitives: {
-    title: 'Back-end pieces',
+    title: 'Choose backend pieces',
     description:
       'Select the Supabase primitives your project needs. You can always add more later.',
   },
   'data-layer': {
-    title: 'Data layer',
+    title: 'Choose a data layer',
     description: 'How you want to query and model data — the Supabase client, Drizzle, or Prisma.',
   },
   connection: {
-    title: 'Where it runs',
+    title: 'Choose where it runs',
     description: 'Develop against a hosted Supabase project or run everything locally with Docker.',
   },
   agent: {
-    title: 'Agent',
+    title: 'Choose an agent',
     description: 'Pick the coding agent plugin that will help you scaffold and iterate.',
   },
   features: {
-    title: 'Features',
+    title: 'Choose features',
     description:
       'Optional starter patterns layered on your primitives — pick any that fit your app.',
   },
   ready: {
-    title: "You're ready",
+    title: 'Review your plan',
     description:
-      'Copy a prompt for your agent, download the code, or follow the setup guide — then start building.',
+      'Copy a plan for your agent, download the code, or follow the setup guide — then start building.',
   },
 }
 

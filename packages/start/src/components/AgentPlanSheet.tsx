@@ -1,7 +1,7 @@
 'use client'
 
 import { Check, Copy } from 'lucide-react'
-import { Fragment, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Button,
   copyToClipboard,
@@ -12,23 +12,12 @@ import {
   SheetTitle,
 } from 'ui'
 
+import { renderPlan } from '../lib/plan-render'
+
 interface AgentPlanSheetProps {
   open: boolean
   plan: string
   onOpenChange: (open: boolean) => void
-}
-
-/** Renders the plan, tinting markdown heading lines with the brand color. */
-function renderPlan(plan: string) {
-  return plan.split('\n').map((line, i) => {
-    const isHeading = line.startsWith('#')
-    return (
-      <Fragment key={i}>
-        <span className={isHeading ? 'font-semibold text-brand-600' : undefined}>{line}</span>
-        {'\n'}
-      </Fragment>
-    )
-  })
 }
 
 export function AgentPlanSheet({ open, plan, onOpenChange }: AgentPlanSheetProps) {
@@ -65,7 +54,7 @@ export function AgentPlanSheet({ open, plan, onOpenChange }: AgentPlanSheetProps
             icon={copied ? <Check size={15} /> : <Copy size={15} />}
             onClick={copy}
           >
-            {copied ? 'Copied' : 'Copy prompt'}
+            {copied ? 'Copied' : 'Copy plan'}
           </Button>
         </SheetFooter>
       </SheetContent>

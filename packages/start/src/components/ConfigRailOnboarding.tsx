@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeft, Pencil } from 'lucide-react'
 import { Button, CheckboxGroupStacked } from 'ui'
 
 import { canRemoveTemplate, type DependencyResolution } from '../lib/composition/composition'
@@ -9,8 +9,8 @@ import type { ConfigRailStepMeta } from '../lib/config-rail-steps'
 import { groupTemplatesByCategory, sortCategories, type Template } from '../lib/template-catalog'
 import { ConfigRailOutcomeActions, ConfigRailStickyFooter } from './ConfigRailOutcomeActions'
 import { CoreTemplateCheckbox } from './CoreTemplateCheckbox'
+import { PlanPreview } from './PlanPreview'
 import { RailRadioOptions } from './railControls'
-import { ReadyStepIllustration } from './ReadyStepIllustration'
 import { TemplateItem } from './templates/TemplateBrowser'
 
 interface ConfigRailOnboardingProps {
@@ -78,12 +78,9 @@ export function ConfigRailOnboarding({
       <div className="min-h-0 flex-1 overflow-y-auto px-8 py-8">
         <div className="flex min-h-full flex-col justify-end">
           <div className="space-y-6">
-            <div>
-              {isReadyStep && <ReadyStepIllustration />}
-              <div className="prose prose-docs max-w-none text-base text-foreground-light">
-                <h2 className="mb-0 text-base text-foreground">{step.title}</h2>
-                <p className="!mt-1">{step.description}</p>
-              </div>
+            <div className="prose prose-docs max-w-none text-base text-foreground-light">
+              <h2 className="mb-0 text-lg text-foreground">{step.title}</h2>
+              <p className="!mt-1">{step.description}</p>
             </div>
 
             {step.id === 'project' && (
@@ -243,16 +240,18 @@ export function ConfigRailOnboarding({
       </div>
 
       {isReadyStep ? (
-        <ConfigRailStickyFooter>
-          <ConfigRailOutcomeActions
-            plan={plan}
-            hasComposition={hasComposition}
-            onOpenManual={onOpenManual}
-            onOpenAgentPlan={onOpenAgentPlan}
-          />
-          <Button type="text" block onClick={onKeepEditing}>
-            Keep editing
-          </Button>
+        <ConfigRailStickyFooter className="space-y-0 pt-2">
+          <PlanPreview plan={plan} onOpen={onOpenAgentPlan} />
+          <div className="mt-5 space-y-2">
+            <ConfigRailOutcomeActions
+              plan={plan}
+              hasComposition={hasComposition}
+              onOpenManual={onOpenManual}
+            />
+            <Button type="outline" block icon={<Pencil />} onClick={onKeepEditing}>
+              Keep editing
+            </Button>
+          </div>
         </ConfigRailStickyFooter>
       ) : (
         <ConfigRailStickyFooter>

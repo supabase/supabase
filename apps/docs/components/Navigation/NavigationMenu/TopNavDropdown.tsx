@@ -1,10 +1,13 @@
 'use client'
 
-import React, { Fragment } from 'react'
-import Link from 'next/link'
-import { useTheme } from 'next-themes'
+import { isFeatureEnabled } from 'common'
 import { Menu } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import Link from 'next/link'
+import React, { Fragment, useEffect, useState } from 'react'
 import {
+  buttonVariants,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -15,12 +18,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   Theme,
-  buttonVariants,
-  cn,
   themes,
 } from 'ui'
+
 import MenuIconPicker from './MenuIconPicker'
-import { isFeatureEnabled } from 'common'
 
 const menu = [
   [
@@ -62,6 +63,11 @@ const menu = [
 
 const TopNavDropdown = () => {
   const { theme, setTheme } = useTheme()
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   return (
     <DropdownMenu modal={false}>
@@ -100,7 +106,7 @@ const TopNavDropdown = () => {
         <DropdownMenuGroup>
           <DropdownMenuLabel>Theme</DropdownMenuLabel>
           <DropdownMenuRadioGroup
-            value={theme}
+            value={isMounted ? theme : 'system'}
             onValueChange={(value) => {
               setTheme(value)
             }}

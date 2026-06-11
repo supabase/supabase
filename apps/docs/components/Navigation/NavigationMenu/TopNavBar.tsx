@@ -8,23 +8,28 @@ import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { FC } from 'react'
-import { memo, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { Button, buttonVariants, cn } from 'ui'
 import { AuthenticatedDropdownMenu, CommandMenuTriggerInput } from 'ui-patterns'
 
 import { getCustomContent } from '../../../lib/custom-content/getCustomContent'
 import GlobalNavigationMenu from './GlobalNavigationMenu'
+import TopNavDropdown from './TopNavDropdown'
 import useDropdownMenu from './useDropdownMenu'
 
 const GlobalMobileMenu = dynamic(() => import('./GlobalMobileMenu'))
-const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
 
 const largeLogo = isFeatureEnabled('branding:large_logo')
 
 const TopNavBar: FC = () => {
+  const [isMounted, setIsMounted] = useState(false)
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
   const user = useUser()
   const menu = useDropdownMenu(user)
 
@@ -67,7 +72,7 @@ const TopNavBar: FC = () => {
             </div>
           </div>
           <div className="hidden lg:flex items-center justify-end gap-3">
-            {!isUserLoading && (
+            {isMounted && !isUserLoading && (
               <Button asChild>
                 <a href="/dashboard" className="h-[30px]" target="_blank" rel="noreferrer noopener">
                   {isLoggedIn ? 'Dashboard' : 'Sign up'}
@@ -79,7 +84,7 @@ const TopNavBar: FC = () => {
                 <Link href="/dev-secret-auth">Dev-only secret sign-in</Link>
               </Button>
             )}
-            {isLoggedIn ? (
+            {isMounted && isLoggedIn ? (
               <AuthenticatedDropdownMenu menu={menu} user={user} site="docs" />
             ) : (
               <TopNavDropdown />

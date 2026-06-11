@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { ChevronUp, Download } from 'lucide-react'
+import { ChevronUp, Code, Download } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button, cn } from 'ui'
 
@@ -53,31 +53,35 @@ export function CollapsibleCompositionCodePanel({
         <div className="flex items-center gap-2">
           <button
             type="button"
-            className="text-sm font-medium text-foreground"
+            className="flex items-center gap-1.5 text-sm font-medium text-foreground"
             onClick={() => setIsExpanded((expanded) => !expanded)}
           >
+            <Code className="h-3.5 w-3.5 text-foreground-light" aria-hidden="true" />
             Backend Code
           </button>
-          <Button
-            type="text"
-            size="tiny"
-            className="px-1 text-foreground-light"
-            icon={<Download className="h-3.5 w-3.5" />}
-            disabled={!mergeResult}
-            aria-label="Download backend code"
-            onClick={onDownload}
-          />
+          <button
+            type="button"
+            className="flex items-center text-foreground-light"
+            aria-label={isExpanded ? 'Collapse backend code' : 'Expand backend code'}
+            onClick={() => setIsExpanded((expanded) => !expanded)}
+          >
+            <ChevronUp
+              className={cn(
+                'h-4 w-4 transition-transform duration-200',
+                !isExpanded && 'rotate-180'
+              )}
+            />
+          </button>
         </div>
-        <button
-          type="button"
-          className="flex items-center text-foreground-light"
-          aria-label={isExpanded ? 'Collapse backend code' : 'Expand backend code'}
-          onClick={() => setIsExpanded((expanded) => !expanded)}
-        >
-          <ChevronUp
-            className={cn('h-4 w-4 transition-transform duration-200', !isExpanded && 'rotate-180')}
-          />
-        </button>
+        <Button
+          type="text"
+          size="tiny"
+          className="px-1 text-foreground-light"
+          icon={<Download className="h-3.5 w-3.5" />}
+          disabled={!mergeResult}
+          aria-label="Download backend code"
+          onClick={onDownload}
+        />
       </div>
       <div className="min-h-0 flex-1 overflow-hidden border-t border-default">
         <CompositionCodePanel

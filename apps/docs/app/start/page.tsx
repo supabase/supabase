@@ -11,6 +11,9 @@ export const metadata: Metadata = {
     'Tell us what you’re building and get a tailored Supabase setup guide and a copyable agent plan.',
   alternates: {
     canonical: `${BASE_PATH}/start`,
+    types: {
+      'text/markdown': `${BASE_PATH}/start.md`,
+    },
   },
 }
 
