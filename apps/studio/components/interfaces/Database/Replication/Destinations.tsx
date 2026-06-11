@@ -32,6 +32,7 @@ import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLDucklakePrivateAlpha,
   useIsETLIcebergPrivateAlpha,
+  useIsETLSnowflakePrivateAlpha,
 } from './useIsETLPrivateAlpha'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -54,6 +55,7 @@ export const Destinations = () => {
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
+  const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 
   const newDestinationDefaultType = infrastructureReadReplicas
@@ -64,7 +66,9 @@ export const Destinations = () => {
         ? 'Analytics Bucket'
         : etlEnableDucklake
           ? 'DuckLake'
-          : null
+          : etlEnableSnowflake
+            ? 'Snowflake'
+            : null
 
   const prefetchedRef = useRef(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -80,6 +84,7 @@ export const Destinations = () => {
       'BigQuery',
       'Analytics Bucket',
       'DuckLake',
+      'Snowflake',
     ]).withOptions({
       history: 'push',
       clearOnDefault: true,
