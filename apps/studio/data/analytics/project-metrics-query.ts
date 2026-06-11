@@ -33,7 +33,7 @@ export async function getProjectMetrics(
   if (!interval) throw new Error('interval is required')
 
   const { data, error } = await get(
-    '/platform/projects/{ref}/analytics/endpoints/project.metrics',
+    '/platform/projects/{ref}/analytics/endpoints/project.metrics.otel',
     {
       params: {
         path: { ref: projectRef },
