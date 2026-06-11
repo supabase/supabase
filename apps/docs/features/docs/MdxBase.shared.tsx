@@ -3,7 +3,6 @@ import { AiSkillsIndex } from '~/app/guides/getting-started/ai-skills/AiSkillsIn
 import { AppleSecretGenerator } from '~/components/AppleSecretGenerator'
 import { PhoneAuthProviders, SocialAuthProviders } from '~/components/AuthProviders'
 import { AuthSmsProviderConfig } from '~/components/AuthSmsProviderConfig'
-import { CostWarning } from '~/components/AuthSmsProviderConfig/AuthSmsProviderConfig.Warnings'
 import ButtonCard from '~/components/ButtonCard'
 import { ComputeDiskLimitsTable } from '~/components/ComputeDiskLimitsTable'
 import { Extensions } from '~/components/Extensions'
@@ -76,7 +75,6 @@ const components = {
   CodeSampleWrapper,
   AuthErrorCodes,
   ComputeDiskLimitsTable,
-  CostWarning,
   Extensions,
   RealtimeErrorCodes,
   GlassPanel,
