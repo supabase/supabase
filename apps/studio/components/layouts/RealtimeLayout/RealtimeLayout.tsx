@@ -7,7 +7,6 @@ import { Button } from 'ui'
 
 import { ProjectLayout } from '../ProjectLayout'
 import { generateRealtimeMenu } from './RealtimeMenu.utils'
-import { Head } from '@/components/ui/Head'
 import { ProductMenu } from '@/components/ui/ProductMenu'
 import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
