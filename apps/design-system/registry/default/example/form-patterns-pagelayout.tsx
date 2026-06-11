@@ -678,7 +678,7 @@ export default function FormPatternsPageLayout() {
                       >
                         <FormControl>
                           <DatePicker>
-                            <DatePickerTrigger>
+                            <DatePickerTrigger asChild>
                               <DatePickerButton type="default">
                                 {field.value ? format(field.value, 'PPP') : 'Pick a date'}
                               </DatePickerButton>
