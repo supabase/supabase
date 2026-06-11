@@ -165,14 +165,13 @@ export const WAL_STATUS_META: Record<SlotWalStatus, WalStatusMeta> = {
     variant: 'destructive',
     severity: 'critical',
     description:
-      'Broken. Some WAL files this pipeline needs have already been removed. The pipeline can no longer continue from this slot and must be set up again.',
+      'Broken. Some WAL files this pipeline needs have already been removed. The pipeline can no longer continue from this slot. You can recreate a new pipeline, or set the invalidation behavior to recreate and restart the pipeline.',
   },
   unknown: {
     label: 'Unknown',
     variant: 'default',
     severity: 'normal',
-    description:
-      'Unknown. Your database did not report a WAL status for this replication slot, so the pipeline cannot determine whether the needed WAL is safe.',
+    description: 'Unknown. Your database reported an unknown state for this replication slot.',
   },
 }
 
