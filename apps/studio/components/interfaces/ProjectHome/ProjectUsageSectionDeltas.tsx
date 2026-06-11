@@ -21,10 +21,10 @@ import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
 import { ChartIntervalDropdown } from '@/components/ui/Logs/ChartIntervalDropdown'
 import { CHART_INTERVALS } from '@/components/ui/Logs/logs.utils'
 import type { ProjectMetricsInterval } from '@/data/analytics/project-metrics-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 
 const INTERVAL_VALUES: readonly ProjectMetricsInterval[] = [
   '15min',
@@ -60,7 +60,7 @@ export const ProjectUsageSectionDeltas = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { projectAuthAll: authEnabled, projectStorageAll: storageEnabled } = useIsFeatureEnabled([
     'project_auth:all',
     'project_storage:all',
@@ -160,19 +160,10 @@ export const ProjectUsageSectionDeltas = () => {
 
       router.push(`/project/${projectRef}${logRoute}?${queryParams.toString()}`)
 
-      if (projectRef && organization?.slug) {
-        sendEvent({
-          action: 'home_project_usage_chart_clicked',
-          properties: {
-            service_type: serviceKey,
-            bar_timestamp: datum.timestamp,
-          },
-          groups: {
-            project: projectRef,
-            organization: organization.slug,
-          },
-        })
-      }
+      track('home_project_usage_chart_clicked', {
+        service_type: serviceKey,
+        bar_timestamp: datum.timestamp,
+      })
     }
 
   const enabledServices = services.filter((s) => s.enabled)
@@ -228,20 +219,11 @@ export const ProjectUsageSectionDeltas = () => {
                       <Link
                         href={s.href}
                         onClick={() => {
-                          if (projectRef && organization?.slug) {
-                            sendEvent({
-                              action: 'home_project_usage_service_clicked',
-                              properties: {
-                                service_type: s.key,
-                                total_requests: s.total,
-                                error_count: s.err,
-                              },
-                              groups: {
-                                project: projectRef,
-                                organization: organization.slug,
-                              },
-                            })
-                          }
+                          track('home_project_usage_service_clicked', {
+                            service_type: s.key,
+                            total_requests: s.total,
+                            error_count: s.err,
+                          })
                         }}
                       >
                         {s.title}
