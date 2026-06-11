@@ -170,14 +170,16 @@ Follow these steps to configure your destination. Each destination has its own s
 
 5. Optionally expand **Advanced settings** to tune pipeline behavior. These settings apply to the pipeline rather than the destination:
 
-   | Setting                        | Default              | Description                                                                                                                                                                                |
-   | ------------------------------ | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-   | **Batch wait time**            | `10000` milliseconds | Maximum time the pipeline waits to collect additional changes before flushing them. Lower values reduce replication latency. Higher values can improve batching efficiency.                |
-   | **Table sync workers**         | `4` workers          | Number of tables copied in parallel during the initial snapshot phase. Each worker uses one replication slot, up to `N + 1` total replication slots while syncing.                         |
-   | **Copy connections per table** | `2` connections      | Number of parallel database connections each table copy can use during the initial sync. Increasing this can speed up large table copies, but uses more database connections.              |
-   | **Invalidated slot behavior**  | `Error`              | What the pipeline does when its replication slot is invalidated. **Error** blocks startup so you can recover manually. **Recreate** rebuilds the slot and starts replication from scratch. |
+   | Setting                        | Default              | Description                                                                                                                                                                                                                            |
+   | ------------------------------ | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+   | **Batch wait time**            | `10000` milliseconds | Maximum time the pipeline waits to collect additional changes before flushing them. Lower values reduce replication latency. Higher values can improve batching efficiency.                                                            |
+   | **Table sync workers**         | `4` workers          | Number of tables copied in parallel during the initial snapshot phase. Each worker uses one replication slot, up to `N + 1` total replication slots while syncing.                                                                     |
+   | **Copy connections per table** | `2` connections      | Number of parallel database connections each table copy can use during the initial sync. Increasing this can speed up large table copies, but uses more database connections.                                                          |
+   | **Invalidated slot behavior**  | `Error`              | What the pipeline does when its replication slot is invalidated. **Error** blocks startup so you can recover manually. **Recreate** rebuilds the slot on the next pipeline restart and starts replication from scratch for all tables. |
 
    Leave these settings at their defaults unless you need to tune initial copy speed, latency, or recovery behavior.
+
+   Use **Invalidated slot behavior** carefully. If **Recreate** is selected and the pipeline restarts after Postgres has invalidated the main replication slot, the pipeline creates a new slot and copies all replicated tables again. This full restart is required for consistency because the old slot can no longer provide every change the pipeline missed.
 
 6. Click **Create and start** to begin replication
 

@@ -150,7 +150,9 @@ Open [**Database > Replication**](/dashboard/project/_/database/replication), cl
 
 ## What does a `Lost` slot status mean?
 
-`Lost` means Postgres has already removed WAL files that the pipeline's replication slot needed. The pipeline cannot continue from that slot. Recreate the pipeline, or set **Invalidated slot behavior** to **Recreate** and restart it.
+`Lost` means Postgres has already removed WAL files that the pipeline's replication slot needed. The pipeline cannot continue from that slot.
+
+You can recreate the pipeline, or open the pipeline's **Advanced settings**, set **Invalidated slot behavior** to **Recreate**, and restart the pipeline. On restart, the pipeline creates a new replication slot and starts replication from scratch for all tables. This is required for consistency because the old slot can no longer provide every change the pipeline missed.
 
 See [Slot statuses](/docs/guides/database/replication/external-replication-monitoring#slot-statuses) for all slot states and what to do next.
 

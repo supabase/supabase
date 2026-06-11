@@ -77,13 +77,13 @@ Temporary table-sync slots show the same kind of lag and slot health metrics whi
 
 Replication slot status tells you whether Postgres is still retaining the WAL that the pipeline needs to continue from its current position.
 
-| Status         | Meaning                                                                                                                                                                                                                       |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Reserved**   | Healthy. Postgres is keeping the WAL files this pipeline's replication slot needs, and they are within the normal WAL size limit.                                                                                             |
-| **Extended**   | Healthy, but growing. The slot is holding on to more WAL than usual, but Postgres is still keeping everything the pipeline needs.                                                                                             |
-| **Unreserved** | At risk. Postgres is no longer reserving all WAL files this pipeline's replication slot needs. If the pipeline does not catch up soon, those files may be removed.                                                            |
-| **Lost**       | Broken. Some WAL files this pipeline's replication slot needs have already been removed. The pipeline can no longer continue from this slot. Recreate the pipeline, or use the recreate invalidation behavior and restart it. |
-| **Unknown**    | Postgres reported an unknown or unavailable state for this pipeline's replication slot.                                                                                                                                       |
+| Status         | Meaning                                                                                                                                                                                                                                                                      |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Reserved**   | Healthy. Postgres is keeping the WAL files this pipeline's replication slot needs, and they are within the normal WAL size limit.                                                                                                                                            |
+| **Extended**   | Healthy, but growing. The slot is holding on to more WAL than usual, but Postgres is still keeping everything the pipeline needs.                                                                                                                                            |
+| **Unreserved** | At risk. Postgres is no longer reserving all WAL files this pipeline's replication slot needs. If the pipeline does not catch up soon, those files may be removed.                                                                                                           |
+| **Lost**       | Broken. Some WAL files this pipeline's replication slot needs have already been removed. The pipeline can no longer continue from this slot. Recreate the pipeline, or set **Invalidated slot behavior** to **Recreate** in the pipeline's advanced settings and restart it. |
+| **Unknown**    | Postgres reported an unknown or unavailable state for this pipeline's replication slot.                                                                                                                                                                                      |
 
 #### Table states
 
@@ -132,13 +132,13 @@ After the affected table finishes copying and catches up, the temporary slot is 
 
 #### Respond based on the slot status
 
-| Slot status    | What to do                                                                                                                                                                                                                                |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Reserved**   | If **Waiting to sync** is stable or decreasing, continue monitoring. If it keeps increasing, check destination write performance, logs, and whether the publication includes more tables or write volume than expected.                   |
-| **Extended**   | Treat it as an early warning. Confirm the pipeline is connected, check logs for retries or destination slowness, and reduce avoidable write bursts if possible until the pipeline catches up.                                             |
-| **Unreserved** | Act quickly. The slot is at risk of losing required WAL. Check whether the pipeline is connected and making progress, fix destination or pipeline errors, and contact support if the lag continues to grow.                               |
-| **Lost**       | The pipeline cannot continue from the existing slot because required WAL has been removed. Recreate the pipeline, or set **Invalidated slot behavior** to **Recreate** and restart the pipeline. This starts replication from a new slot. |
-| **Unknown**    | Refresh the status page and check logs. If the status remains unknown while the pipeline should be running, contact support with the pipeline ID and recent log details.                                                                  |
+| Slot status    | What to do                                                                                                                                                                                                                                                                                                       |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Reserved**   | If **Waiting to sync** is stable or decreasing, continue monitoring. If it keeps increasing, check destination write performance, logs, and whether the publication includes more tables or write volume than expected.                                                                                          |
+| **Extended**   | Treat it as an early warning. Confirm the pipeline is connected, check logs for retries or destination slowness, and reduce avoidable write bursts if possible until the pipeline catches up.                                                                                                                    |
+| **Unreserved** | Act quickly. The slot is at risk of losing required WAL. Check whether the pipeline is connected and making progress, fix destination or pipeline errors, and contact support if the lag continues to grow.                                                                                                      |
+| **Lost**       | The pipeline cannot continue from the existing slot because required WAL has been removed. Recreate the pipeline, or set **Invalidated slot behavior** to **Recreate** in the pipeline's advanced settings and restart the pipeline. This creates a new slot and starts replication from scratch for all tables. |
+| **Unknown**    | Check replication logs for errors or missing slot details. If the status remains unknown while the pipeline should be running, contact support with the pipeline ID and recent log details.                                                                                                                      |
 
 #### Reduce future lag risk
 
