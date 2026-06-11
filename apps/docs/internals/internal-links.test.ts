@@ -1,6 +1,53 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
-import { getInternalLinkBaseUrl, prefixInternalLinks } from './internal-links'
+import { getInternalLinkBaseUrl, prefixInternalLinks, withDocsBasePath } from './internal-links'
+
+describe('withDocsBasePath', () => {
+  it('prepends /docs to a root-relative href', () => {
+    expect(withDocsBasePath('/guides/self-hosting/docker')).toBe('/docs/guides/self-hosting/docker')
+  })
+
+  it('prepends /docs to a single-segment href', () => {
+    expect(withDocsBasePath('/contribute')).toBe('/docs/contribute')
+  })
+
+  it('leaves hrefs that already start with /docs/ alone', () => {
+    expect(withDocsBasePath('/docs/guides/foo')).toBe('/docs/guides/foo')
+  })
+
+  it('leaves the exact /docs href alone', () => {
+    expect(withDocsBasePath('/docs')).toBe('/docs')
+  })
+
+  it('does not match prefixes like /docsx that only share leading chars', () => {
+    expect(withDocsBasePath('/docsx/foo')).toBe('/docs/docsx/foo')
+  })
+
+  it('leaves absolute http(s) URLs alone', () => {
+    expect(withDocsBasePath('https://example.com/foo')).toBe('https://example.com/foo')
+  })
+
+  it('leaves protocol-relative URLs alone', () => {
+    expect(withDocsBasePath('//cdn.example.com/foo')).toBe('//cdn.example.com/foo')
+  })
+
+  it('leaves anchor-only hrefs alone', () => {
+    expect(withDocsBasePath('#section')).toBe('#section')
+  })
+
+  it('leaves mailto: hrefs alone', () => {
+    expect(withDocsBasePath('mailto:team@example.com')).toBe('mailto:team@example.com')
+  })
+
+  it('leaves relative ./ and ../ hrefs alone', () => {
+    expect(withDocsBasePath('./sibling')).toBe('./sibling')
+    expect(withDocsBasePath('../parent')).toBe('../parent')
+  })
+
+  it('preserves query strings and fragments', () => {
+    expect(withDocsBasePath('/guides/foo?x=1#bar')).toBe('/docs/guides/foo?x=1#bar')
+  })
+})
 
 describe('getInternalLinkBaseUrl', () => {
   const ORIGINAL_ENV = process.env

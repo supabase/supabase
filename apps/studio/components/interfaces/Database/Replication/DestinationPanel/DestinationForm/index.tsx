@@ -31,7 +31,7 @@ import { PublicationSelection } from './PublicationSelection'
 import { ReplicationDisclaimerDialog } from './ReplicationDisclaimerDialog'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
 import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import {
   BatchConfig,
@@ -149,11 +149,12 @@ export const DestinationForm = ({
     pipelineId: existingDestination?.pipelineId,
   })
 
-  const { data: apiKeys } = useAPIKeysQuery(
+  const { data: apiKeysData } = useAPIKeys(
     { projectRef, reveal: true },
     { enabled: canReadAPIKeys }
   )
-  const { serviceKey } = getKeys(apiKeys)
+  const { serviceKey } = apiKeysData ?? {}
+
   const catalogToken = serviceKey?.api_key ?? ''
 
   const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
