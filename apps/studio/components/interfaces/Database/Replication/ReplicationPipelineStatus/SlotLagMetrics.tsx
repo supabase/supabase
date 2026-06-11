@@ -1,37 +1,63 @@
+import dayjs from 'dayjs'
 import { Info } from 'lucide-react'
+import { type ReactNode } from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { SlotLagMetricKey, SlotLagMetrics } from './ReplicationPipelineStatus.types'
 import { getFormattedLagValue } from './ReplicationPipelineStatus.utils'
+import { SlotConnectionIndicator, SlotStatusBadge } from './SlotStatus'
 
-const SLOT_LAG_FIELDS: {
+interface SlotLagField {
   key: SlotLagMetricKey
   label: string
   type: 'bytes' | 'duration'
-  description: string
-}[] = [
+  description: ReactNode
+  // Friendly label to show in place of a literal "0 bytes" when there's nothing to report.
+  zeroLabel?: string
+  // Friendly label to show when the value is null/absent (e.g. unlimited WAL retention).
+  nullLabel?: string
+  // Optional hover text for the value, derived from the raw value (e.g. an absolute timestamp).
+  getValueTooltip?: (value: number) => string
+}
+
+const SLOT_LAG_FIELDS: SlotLagField[] = [
   {
     key: 'confirmed_flush_lsn_bytes',
-    label: 'WAL Flush lag (size)',
+    label: 'Waiting to sync',
     type: 'bytes',
-    description:
-      'Bytes between the newest WAL record applied locally and the latest flushed WAL record acknowledged by ETL.',
-  },
-  {
-    key: 'flush_lag',
-    label: 'WAL Flush lag (time)',
-    type: 'duration',
-    description:
-      'Time between flushing recent WAL locally and receiving notification that ETL has written and flushed it.',
+    description: "Changes in your database the pipeline hasn't synced yet.",
+    zeroLabel: 'Caught up',
   },
   {
     key: 'safe_wal_size_bytes',
-    label: 'Remaining WAL size',
+    label: 'Room before pausing',
     type: 'bytes',
-    description:
-      'Bytes still available to write to WAL before this slot risks entering the "lost" state.',
+    description: (
+      <>
+        How much more can pile up before the pipeline has to be set up again. Controlled by the{' '}
+        <code className="text-code-inline">max_slot_wal_keep_size</code> setting.
+      </>
+    ),
+    nullLabel: 'Unlimited',
+  },
+  {
+    key: 'reply_time_lag',
+    label: 'Last check-in',
+    type: 'duration',
+    description: 'Time since the pipeline last reported back to your database.',
+    zeroLabel: 'Just now',
+    // reply_time_lag is "milliseconds ago", so the absolute time is now minus that, in local time.
+    getValueTooltip: (ms) => dayjs().subtract(ms, 'millisecond').format('MMM D, YYYY, h:mm:ss A'),
   },
 ]
+
+// Resolves a field's value into a display string (+ optional precise detail), honoring the
+// friendly zero/null labels before falling back to the formatted byte/duration value.
+const getFieldDisplay = (field: SlotLagField, value: number | null | undefined) => {
+  if (value == null) return { display: field.nullLabel ?? 'n/a', detail: undefined }
+  if (field.zeroLabel && value === 0) return { display: field.zeroLabel, detail: undefined }
+  return getFormattedLagValue(field.type, value)
+}
 
 export const SlotLagMetricsInline = ({
   tableName,
@@ -45,14 +71,17 @@ export const SlotLagMetricsInline = ({
       <span className="truncate font-medium" title={tableName}>
         {tableName}
       </span>
-      <span className="text-foreground-lighter">•</span>
+      <SlotConnectionIndicator isActive={metrics.active} context="table" />
+      <span className="h-3.5 w-px bg-border" />
+      {metrics.wal_status && <SlotStatusBadge status={metrics.wal_status} context="table" />}
+      <span className="h-3.5 w-px bg-border" />
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] text-foreground-light">
-        {SLOT_LAG_FIELDS.map(({ key, label, type }) => {
-          const { display } = getFormattedLagValue(type, metrics[key])
+        {SLOT_LAG_FIELDS.map((field) => {
+          const { display } = getFieldDisplay(field, metrics[field.key])
           return (
-            <span key={`${tableName}-${key}`} className="flex items-center gap-1">
+            <span key={`${tableName}-${field.key}`} className="flex items-baseline gap-1">
               <span className="uppercase tracking-wide text-[10px] text-foreground-lighter">
-                {label}
+                {field.label}
               </span>
               <span className="text-foreground">{display}</span>
             </span>
@@ -87,40 +116,54 @@ export const SlotLagMetricsList = ({
 
   return (
     <dl className={`grid ${gridClasses}`}>
-      {SLOT_LAG_FIELDS.map(({ key, label, type, description }) => (
-        <div key={key} className="flex flex-col gap-0.5">
-          <dt className={labelClasses}>
-            <span className="inline-flex items-center gap-1">
-              {label}
-              {showMetricInfo && (
+      {SLOT_LAG_FIELDS.map((field) => {
+        const rawValue = metrics[field.key]
+        const { display, detail } = getFieldDisplay(field, rawValue)
+        const valueTooltip =
+          field.getValueTooltip && typeof rawValue === 'number'
+            ? field.getValueTooltip(rawValue)
+            : undefined
+        return (
+          <div key={field.key} className="flex flex-col gap-0.5">
+            <dt className={labelClasses}>
+              <span className="inline-flex items-center gap-1">
+                {field.label}
+                {showMetricInfo && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        aria-label={`What is ${field.label}`}
+                        className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-200 text-foreground-lighter transition-colors hover:bg-surface-300 hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-foreground-lighter"
+                      >
+                        <Info size={12} />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" align="start" className="max-w-xs text-xs">
+                      {field.description}
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+              </span>
+            </dt>
+            <dd className={`flex flex-col ${valueClasses}`}>
+              {valueTooltip ? (
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <button
-                      type="button"
-                      aria-label={`What is ${label}`}
-                      className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-200 text-foreground-lighter transition-colors hover:bg-surface-300 hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-foreground-lighter"
-                    >
-                      <Info size={12} />
-                    </button>
+                    <span className="w-fit cursor-default">{display}</span>
                   </TooltipTrigger>
-                  <TooltipContent side="top" align="start" className="max-w-xs text-xs">
-                    {description}
+                  <TooltipContent side="bottom" className="text-xs">
+                    {valueTooltip}
                   </TooltipContent>
                 </Tooltip>
-              )}
-            </span>
-          </dt>
-          {(() => {
-            const { display, detail } = getFormattedLagValue(type, metrics[key])
-            return (
-              <dd className={`flex flex-col ${valueClasses}`}>
+              ) : (
                 <span>{display}</span>
-                {detail && <span className="text-[11px] text-foreground-lighter">{detail}</span>}
-              </dd>
-            )
-          })()}
-        </div>
-      ))}
+              )}
+              {detail && <span className="text-[11px] text-foreground-lighter">{detail}</span>}
+            </dd>
+          </div>
+        )
+      })}
     </dl>
   )
 }
