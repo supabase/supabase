@@ -1,12 +1,22 @@
 import fs from 'node:fs'
-import { createRequire } from 'node:module'
+import Module, { createRequire } from 'node:module'
 import path from 'node:path'
 import { globby } from 'globby'
 import matter from 'gray-matter'
 import * as sharedDataPkg from 'shared-data'
+import { parse as parseToml } from 'smol-toml'
 
 import { getInternalLinkBaseUrl, prefixInternalLinks, withDocsBasePath } from './internal-links'
 import { resolveSharedData } from '../components/SharedData.utils'
+
+// Register a CJS loader for `.toml` so component files that import error-code
+// definitions (e.g. AuthErrorCodes / RealtimeErrorCodes) can be evaluated by
+// the markdown override loader. Next.js handles `.toml` via webpack; tsx does
+// not, so we wire it up here for the script's own `createRequire`.
+;(Module as any)._extensions['.toml'] = (mod: any, filename: string) => {
+  const content = fs.readFileSync(filename, 'utf8')
+  mod.exports = parseToml(content)
+}
 
 // Interop: tsx's ESM loader treats `shared-data` as CJS and exposes the
 // module under `.default`, while a webpack/Next build would expose the
@@ -123,7 +133,7 @@ function extractTitleAttr(attrs: string): string | null {
 const scriptRequire = createRequire(import.meta.url)
 async function loadMarkdownOverrides(): Promise<Record<string, string>> {
   const overrides: Record<string, string> = {}
-  const files = await globby(['components/**/*.{ts,tsx}'])
+  const files = await globby(['components/**/*.{ts,tsx}', 'features/**/*.{ts,tsx}'])
   await Promise.all(
     files.map(async (file) => {
       const src = await fs.promises.readFile(file, 'utf8')

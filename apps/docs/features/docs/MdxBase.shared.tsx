@@ -34,7 +34,7 @@ import SqlToRest from 'ui-patterns/SqlToRest'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
 
 import { AgentPluginsPanel } from '../ui/AgentPluginsPanel'
-import { ErrorCodes } from '../ui/ErrorCodes'
+import { AuthErrorCodes, RealtimeErrorCodes } from '../ui/ErrorCodes'
 import { McpConfigPanel } from '../ui/McpConfigPanel'
 
 // Wrap Admonition for Docs-specific styling (within MDX prose, requires a margin-bottom)
@@ -73,10 +73,11 @@ const components = {
   ButtonCard,
   CodeSampleDummy,
   CodeSampleWrapper,
+  AuthErrorCodes,
   ComputeDiskLimitsTable,
   CostWarning,
-  ErrorCodes,
   Extensions,
+  RealtimeErrorCodes,
   GlassPanel,
   IconArrowDown: ArrowDown,
   IconCheck: Check,
