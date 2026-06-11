@@ -24,10 +24,12 @@ export const BannerStack = () => {
   const transition = reduceMotion ? { duration: 0 } : SPRING
 
   return (
-    <div
+    <motion.div
       className="fixed bottom-4 right-4 z-50 flex flex-col-reverse items-end gap-2"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      animate={{ y: isHovered ? -8 : 0 }}
+      transition={transition}
     >
       <div className="relative w-full max-w-72">
         <AnimatePresence>
@@ -71,6 +73,6 @@ export const BannerStack = () => {
             </motion.div>
           ))}
       </AnimatePresence>
-    </div>
+    </motion.div>
   )
 }
