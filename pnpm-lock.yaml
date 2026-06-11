@@ -822,6 +822,9 @@ importers:
       '@react-router/dev':
         specifier: ^7.13.2
         version: 7.13.2(@react-router/serve@7.13.2(react-router@7.17.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(supports-color@8.1.1)(typescript@6.0.2))(@types/node@22.13.14)(babel-plugin-macros@3.1.0)(jiti@2.7.0)(lightningcss@1.32.0)(react-router@7.17.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.20.3)(typescript@6.0.2)(vite@7.3.3(@types/node@22.13.14)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.9.0))(yaml@2.9.0)
+      '@tailwindcss/vite':
+        specifier: 4.2.4
+        version: 4.2.4(vite@7.3.3(@types/node@22.13.14)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.9.0))
       '@types/node':
         specifier: ^22
         version: 22.13.14
@@ -7966,6 +7969,11 @@ packages:
     resolution: {integrity: sha512-w31dd8HOx3k9vPtcQh5QHP9GwKcgbMp87j58qi6xgiBnFFtKEAgCWnDw4qUT8aHwkCp8bKvb/KGKWWHedP0AAg==}
     peerDependencies:
       tailwindcss: '>=3.0.0 || insiders || >=4.0.0-alpha.20 || >=4.0.0-beta.1'
+
+  '@tailwindcss/vite@4.2.4':
+    resolution: {integrity: sha512-pCvohwOCspk3ZFn6eJzrrX3g4n2JY73H6MmYC87XfGPyTty4YsCjYTMArRZm/zOI8dIt3+EcrLHAFPe5A4bgtw==}
+    peerDependencies:
+      vite: ^5.2.0 || ^6 || ^7 || ^8
 
   '@tanstack/eslint-plugin-query@5.91.2':
     resolution: {integrity: sha512-UPeWKl/Acu1IuuHJlsN+eITUHqAaa9/04geHHPedY8siVarSaWprY0SVMKrkpKfk5ehRT7+/MZ5QwWuEtkWrFw==}
@@ -24114,7 +24122,7 @@ snapshots:
     dependencies:
       '@jridgewell/remapping': 2.3.5
       enhanced-resolve: 5.20.1
-      jiti: 2.6.1
+      jiti: 2.7.0
       lightningcss: 1.32.0
       magic-string: 0.30.21
       source-map-js: 1.2.1
@@ -24183,6 +24191,13 @@ snapshots:
     dependencies:
       postcss-selector-parser: 6.0.10
       tailwindcss: 4.2.4
+
+  '@tailwindcss/vite@4.2.4(vite@7.3.3(@types/node@22.13.14)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.9.0))':
+    dependencies:
+      '@tailwindcss/node': 4.2.4
+      '@tailwindcss/oxide': 4.2.4
+      tailwindcss: 4.2.4
+      vite: 7.3.3(@types/node@22.13.14)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.9.0)
 
   '@tanstack/eslint-plugin-query@5.91.2(eslint@9.37.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.2)':
     dependencies:
