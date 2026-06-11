@@ -56,6 +56,7 @@ minimumReleaseAgeExclude:
   - '@supabase/*'
   - '@supabase-labs/*'
   # The following are excluded to fix vulnerablities.
+  - react-use
 
 onlyBuiltDependencies:
   - node-pty
