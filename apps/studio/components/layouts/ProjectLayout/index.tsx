@@ -44,6 +44,7 @@ import { UpgradingState } from './UpgradingState'
 import { CreateBranchModal } from '@/components/interfaces/BranchManagement/CreateBranchModal'
 import { ProjectAPIDocs } from '@/components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { BannerFreeMicroUpgrade } from '@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade'
+import { BannerUnifiedLogs } from '@/components/ui/BannerStack/Banners/BannerUnifiedLogs'
 import { BANNER_ID, useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import PartnerIcon from '@/components/ui/PartnerIcon'
@@ -155,6 +156,13 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       LOCAL_STORAGE_KEYS.FREE_MICRO_UPGRADE_BANNER_DISMISSED(selectedProject?.ref ?? ''),
       false
     )
+    const [isUnifiedLogsBannerDismissed] = useLocalStorageQuery(
+      LOCAL_STORAGE_KEYS.UNIFIED_LOGS_BANNER_DISMISSED(selectedOrganization?.slug ?? ''),
+      false
+    )
+    const showUnifiedLogsBanner = ['pro', 'team', 'enterprise'].includes(
+      selectedOrganization?.plan?.id ?? ''
+    )
     const [isProjectIntegrationBannerDismissed, setIsProjectIntegrationBannerDismissed] =
       useLocalStorageQuery(
         getProjectIntegrationBannerDismissKey({
@@ -228,6 +236,26 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       selectedProject?.ref,
       showUpgradeBanner,
       isFreeMicroUpgradeBannerDismissed,
+      addBanner,
+      dismissBanner,
+    ])
+
+    useEffect(() => {
+      if (!selectedProject?.ref) return
+      if (showUnifiedLogsBanner && !isUnifiedLogsBannerDismissed) {
+        addBanner({
+          id: BANNER_ID.UNIFIED_LOGS,
+          isDismissed: false,
+          content: <BannerUnifiedLogs />,
+          priority: 1,
+        })
+      } else {
+        dismissBanner(BANNER_ID.UNIFIED_LOGS)
+      }
+    }, [
+      selectedProject?.ref,
+      showUnifiedLogsBanner,
+      isUnifiedLogsBannerDismissed,
       addBanner,
       dismissBanner,
     ])
