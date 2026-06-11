@@ -14,10 +14,10 @@ import { fromMarkdown } from 'mdast-util-from-markdown'
 import { gfmFromMarkdown } from 'mdast-util-gfm'
 import { gfm } from 'micromark-extension-gfm'
 import { type Metadata, type ResolvingMetadata } from 'next'
-import { notFound } from 'next/navigation'
 
 import { newEditLink } from './GuidesMdx.template'
 import { checkGuidePageEnabled } from './NavigationPageStatus.utils'
+import { notFoundWithPathname } from './notFound.utils'
 
 const { metadataTitle } = getCustomContent(['metadata:title'])
 
@@ -56,8 +56,7 @@ const getGuidesMarkdownInternal = async (slug: string[]) => {
     !fullPath.startsWith(GUIDES_DIRECTORY) ||
     !PUBLISHED_SECTIONS.some((section) => relPath.startsWith(section))
   ) {
-    Sentry.setTag('404.pathname', guidesPath)
-    notFound()
+    notFoundWithPathname(guidesPath)
   }
 
   /**
@@ -66,8 +65,7 @@ const getGuidesMarkdownInternal = async (slug: string[]) => {
    */
   if (!checkGuidePageEnabled(guidesPath)) {
     console.log('Page is disabled: %s', guidesPath)
-    Sentry.setTag('404.pathname', guidesPath)
-    notFound()
+    notFoundWithPathname(guidesPath)
   }
 
   try {
@@ -102,8 +100,7 @@ const getGuidesMarkdownInternal = async (slug: string[]) => {
       )
       Sentry.captureException(error)
     }
-    Sentry.setTag('404.pathname', guidesPath)
-    notFound()
+    notFoundWithPathname(guidesPath)
   }
 }
 
