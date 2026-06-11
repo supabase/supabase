@@ -294,6 +294,20 @@ const _SQL_FILTER_COMMON: Record<string, SqlFilterEntry> = {
     safeSql`regexp_contains(event_message, ${analyticsLiteral(value)})`,
 }
 
+// Auth logs are emitted at `level: info` even for failed requests (e.g. a
+// 422 from a duplicate signup), so the HTTP status code is the only reliable
+// signal of severity. These conditions derive severity from the status as well
+// as the log level so the severity filter, the chart, and the table badge all
+// agree: a 5xx (or an explicit error/fatal level) is an error, a 4xx (or an
+// explicit warning level) is a warning, everything else is info.
+//
+// `IFNULL` keeps each condition strictly boolean (never NULL) so the info
+// condition can safely negate the other two without three-valued-logic
+// surprises when a row has no status or no level.
+export const AUTH_LOG_ERROR_CONDITION: SafeLogSqlFragment = safeSql`IFNULL(metadata.level, '') IN ('error', 'fatal') OR IFNULL(SAFE_CAST(metadata.status AS INT64), 0) >= 500`
+export const AUTH_LOG_WARNING_CONDITION: SafeLogSqlFragment = safeSql`IFNULL(metadata.level, '') = 'warning' OR IFNULL(SAFE_CAST(metadata.status AS INT64), 0) BETWEEN 400 AND 499`
+export const AUTH_LOG_INFO_CONDITION: SafeLogSqlFragment = safeSql`NOT (${AUTH_LOG_ERROR_CONDITION}) AND NOT (${AUTH_LOG_WARNING_CONDITION})`
+
 export const SQL_FILTER_TEMPLATES: Record<string, Record<string, SqlFilterEntry>> = {
   postgres_logs: {
     ..._SQL_FILTER_COMMON,
@@ -338,9 +352,9 @@ export const SQL_FILTER_TEMPLATES: Record<string, Record<string, SqlFilterEntry>
   },
   auth_logs: {
     ..._SQL_FILTER_COMMON,
-    'severity.error': safeSql`metadata.level = 'error' or metadata.level = 'fatal'`,
-    'severity.warning': safeSql`metadata.level = 'warning'`,
-    'severity.info': safeSql`metadata.level = 'info'`,
+    'severity.error': AUTH_LOG_ERROR_CONDITION,
+    'severity.warning': AUTH_LOG_WARNING_CONDITION,
+    'severity.info': AUTH_LOG_INFO_CONDITION,
     'status_code.server_error': safeSql`cast(metadata.status as int64) between 500 and 599`,
     'status_code.client_error': safeSql`cast(metadata.status as int64) between 400 and 499`,
     'status_code.redirection': safeSql`cast(metadata.status as int64) between 300 and 399`,

@@ -1,12 +1,14 @@
 import { describe, expect, test } from 'vitest'
 
-import type { LogData } from './Logs.types'
+import { LogsTableName } from './Logs.constants'
+import type { Filters, LogData } from './Logs.types'
 import {
   buildLogsPrompt,
   extractEdgeFunctionName,
   formatLogsAsCsv,
   formatLogsAsJson,
   formatLogsAsMarkdown,
+  genDefaultQuery,
   getAuthLogSeverity,
   parseMultigresEventMessage,
 } from './Logs.utils'
@@ -269,6 +271,28 @@ describe('Logs.utils', () => {
       expect(getAuthLogSeverity(42, 500)).toBe('error')
       expect(getAuthLogSeverity('info', {})).toBe('info')
       expect(getAuthLogSeverity('info', [500])).toBe('info')
+    })
+  })
+
+  describe('auth_logs severity filter query', () => {
+    const queryFor = (severity: Filters['severity']) =>
+      genDefaultQuery(LogsTableName.AUTH, { severity } as Filters, 100)
+
+    test('error severity filter matches 5xx status as well as the log level', () => {
+      const sql = queryFor({ error: true })
+      expect(sql).toContain("IFNULL(metadata.level, '') IN ('error', 'fatal')")
+      expect(sql).toContain('IFNULL(SAFE_CAST(metadata.status AS INT64), 0) >= 500')
+    })
+
+    test('warning severity filter matches 4xx status as well as the log level', () => {
+      const sql = queryFor({ warning: true })
+      expect(sql).toContain("IFNULL(metadata.level, '') = 'warning'")
+      expect(sql).toContain('IFNULL(SAFE_CAST(metadata.status AS INT64), 0) BETWEEN 400 AND 499')
+    })
+
+    test('info severity filter excludes error and warning rows', () => {
+      const sql = queryFor({ info: true })
+      expect(sql).toContain('NOT (')
     })
   })
 })

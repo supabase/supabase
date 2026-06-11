@@ -6,7 +6,12 @@ import uniqBy from 'lodash/uniqBy'
 import { useEffect } from 'react'
 import logConstants from 'shared-data/log-constants'
 
-import { LogsTableName, SQL_FILTER_TEMPLATES } from './Logs.constants'
+import {
+  AUTH_LOG_ERROR_CONDITION,
+  AUTH_LOG_WARNING_CONDITION,
+  LogsTableName,
+  SQL_FILTER_TEMPLATES,
+} from './Logs.constants'
 import type { Filters, LogData, LogsEndpointParams, QueryType } from './Logs.types'
 import { convertResultsToCSV } from '@/components/interfaces/SQLEditor/UtilityPanel/Results.utils'
 import BackwardIterator from '@/components/ui/CodeEditor/Providers/BackwardIterator'
@@ -713,7 +718,7 @@ function getErrorCondition(table: LogsTableName): SafeLogSqlFragment {
     case 'postgres_logs':
       return safeSql`parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')`
     case 'auth_logs':
-      return safeSql`metadata.level = 'error' OR SAFE_CAST(metadata.status AS INT64) >= 500`
+      return AUTH_LOG_ERROR_CONDITION
     case 'function_edge_logs':
       return safeSql`response.status_code >= 500`
     case 'function_logs':
@@ -734,7 +739,7 @@ function getWarningCondition(table: LogsTableName): SafeLogSqlFragment {
     case 'postgres_logs':
       return safeSql`parsed.error_severity IN ('WARNING')`
     case 'auth_logs':
-      return safeSql`metadata.level = 'warning' OR SAFE_CAST(metadata.status AS INT64) BETWEEN 400 AND 499`
+      return AUTH_LOG_WARNING_CONDITION
     case 'function_edge_logs':
       return safeSql`response.status_code >= 400 AND response.status_code < 500`
     case 'function_logs':
