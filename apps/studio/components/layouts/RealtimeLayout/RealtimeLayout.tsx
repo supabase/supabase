@@ -30,7 +30,7 @@ export interface RealtimeLayoutProps {
 }
 
 export const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutProps>) => {
-  const { data: project } = useSelectedProjectQuery()
+  const { data: project, isPending } = useSelectedProjectQuery()
   const router = useRouter()
   const page = router.pathname.split('/')[4]
   const menu = generateRealtimeMenu(project)
@@ -76,7 +76,7 @@ export const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLa
       product="Realtime"
       browserTitle={{ section: title }}
       productMenu={<ProductMenu page={page} menu={menu} />}
-      isBlocking={false}
+      isBlocking={isPending}
     >
       <ProductMenuShortcuts menu={menu} />
       {children}
