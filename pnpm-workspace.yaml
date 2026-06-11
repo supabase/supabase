@@ -55,6 +55,7 @@ minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
   - '@supabase-labs/*'
+  # The following are excluded to fix vulnerablities.
 
 onlyBuiltDependencies:
   - node-pty
