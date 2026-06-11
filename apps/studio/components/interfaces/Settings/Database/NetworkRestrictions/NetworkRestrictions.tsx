@@ -84,7 +84,10 @@ export const NetworkRestrictions = () => {
   const [isDisallowingAll, setIsDisallowingAll] = useState(false)
   const [selectedRestrictionToRemove, setSelectedRestrictionToRemove] = useState<string>()
 
-  const { data, isPending: isLoading } = useNetworkRestrictionsQuery({ projectRef: ref })
+  const { data, isPending: isLoading } = useNetworkRestrictionsQuery(
+    { projectRef: ref },
+    { enabled: Boolean(project) }
+  )
   const { can: canUpdateNetworkRestrictions } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'projects',

@@ -12188,7 +12188,7 @@ export interface operations {
       }
     }
     responses: {
-      201: {
+      204: {
         headers: {
           [name: string]: unknown
         }
@@ -12240,7 +12240,7 @@ export interface operations {
       }
     }
     responses: {
-      201: {
+      204: {
         headers: {
           [name: string]: unknown
         }
