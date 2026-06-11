@@ -751,27 +751,14 @@ function getWarningCondition(table: LogsTableName): SafeLogSqlFragment {
   }
 }
 
-// HTTP status code boundaries used to classify auth log severity. Kept
-// consistent with the other log services (e.g. edge logs): a 5xx is an error,
-// a 4xx is a warning.
 export const HTTP_SERVER_ERROR_STATUS = 500
 export const HTTP_CLIENT_ERROR_STATUS = 400
 
 /**
- * Auth logs are emitted at `level: info` even when they represent a failed
- * request (e.g. a 400/401/429 from a failed login). The auth logs chart derives
- * severity from the HTTP status (see `getErrorCondition`/`getWarningCondition`),
- * so when a user filters by status code the chart shows errors/warnings while
- * the table still shows "INFO" badges, making the filter look like it was never
- * applied.
- *
- * This helper derives the severity shown in the table from both the log level
- * and the HTTP status so the table stays consistent with the chart and with the
- * other log services: 5xx is an error, 4xx is a warning, everything else falls
- * back to the log level.
- *
- * `level` and `status` are untyped log row values, so they are validated rather
- * than cast: anything that is not a usable string/number is ignored.
+ * Derives the severity badge shown in the auth log table from the log level and
+ * HTTP status, matching the chart: 5xx → error, 4xx → warning, otherwise the
+ * log level. See the AUTH_LOG_*_CONDITION constants in Logs.constants.ts for the
+ * matching SQL and the reason auth logs need this.
  */
 export function getAuthLogSeverity(level?: unknown, status?: unknown): string {
   const normalizedLevel = typeof level === 'string' ? level : ''
