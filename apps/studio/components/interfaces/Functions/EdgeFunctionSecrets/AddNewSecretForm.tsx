@@ -269,14 +269,15 @@ export const AddNewSecretForm = () => {
                                 field.ref(el)
                                 if (el) {
                                   el.style.height = 'auto'
-                                  el.style.height = Math.max(72, el.scrollHeight) + 'px'
+                                  el.style.height =
+                                    Math.min(320, Math.max(72, el.scrollHeight)) + 'px'
                                 }
                               }}
                               data-1p-ignore
                               data-lpignore="true"
                               data-form-type="other"
                               data-bwignore
-                              className="min-h-[72px] resize-none font-mono"
+                              className="min-h-[72px] max-h-[320px] resize-none font-mono"
                               style={
                                 {
                                   WebkitTextSecurity: isSecretVisible(fieldItem.id)
@@ -288,7 +289,7 @@ export const AddNewSecretForm = () => {
                                 field.onChange(e)
                                 e.currentTarget.style.height = 'auto'
                                 e.currentTarget.style.height =
-                                  Math.max(72, e.currentTarget.scrollHeight) + 'px'
+                                  Math.min(320, Math.max(72, e.currentTarget.scrollHeight)) + 'px'
                               }}
                             />
                             <Tooltip>
