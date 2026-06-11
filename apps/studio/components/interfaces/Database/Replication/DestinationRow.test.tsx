@@ -14,6 +14,8 @@ type ReplicationSourcesResponse = components['schemas']['ReplicationSourcesRespo
 type ReplicationPipelineStatusResponse = components['schemas']['ReplicationPipelineStatusResponse']
 type ReplicationPipelineReplicationStatusResponse =
   components['schemas']['ReplicationPipelineReplicationStatusResponse']
+type ReplicationPipelineVersionResponse =
+  components['schemas']['ReplicationPipelineVersionResponse']
 
 // Tooltip/Popover descendants use Web Animations
 mockAnimationsApi()
@@ -133,7 +135,10 @@ const addVersionMock = () =>
     method: 'get',
     path: '/platform/replication/:ref/pipelines/:pipeline_id/version',
     response: () =>
-      HttpResponse.json({ pipeline_id: PIPELINE_ID, version: { id: 1, name: 'v0.3.0' } }),
+      HttpResponse.json<ReplicationPipelineVersionResponse>({
+        pipeline_id: PIPELINE_ID,
+        version: { id: 1, name: 'v0.3.0' },
+      }),
   })
 
 describe('DestinationRow', () => {
