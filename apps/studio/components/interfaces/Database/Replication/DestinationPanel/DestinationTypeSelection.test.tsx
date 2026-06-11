@@ -1,17 +1,25 @@
 import { fireEvent, screen } from '@testing-library/react'
+import { platformComponents as components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import { DestinationTypeSelection } from './DestinationTypeSelection'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
+type ReplicationSourcesResponse = components['schemas']['ReplicationSourcesResponse']
+type ReplicationPipelinesResponse = components['schemas']['ReplicationPipelinesResponse']
+type ReplicationDestinationResponse = components['schemas']['ReplicationDestinationResponse']
+
 mockAnimationsApi()
 
-// Same reason as DestinationRow — the background queries this component triggers
-// via useDestinationInformation use checkReplicationFeatureFlagRetry, which retries
-// on non-503 errors and would block test teardown.
+// Feature flags are not API calls — mock at the module level so tests can
+// control per-destination-type visibility without hitting PostHog.
+const mockBigQueryEnabled = vi.fn()
+const mockIcebergEnabled = vi.fn()
+const mockDucklakeEnabled = vi.fn()
+
 vi.mock('../useIsETLPrivateAlpha', () => ({
   useIsETLBigQueryPrivateAlpha: () => mockBigQueryEnabled(),
   useIsETLIcebergPrivateAlpha: () => mockIcebergEnabled(),
@@ -22,45 +30,43 @@ vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
   useIsFeatureEnabled: () => ({ infrastructureReadReplicas: true }),
 }))
 
+// Background queries from useDestinationInformation (sources + pipelines fire
+// even in create mode). Prevent retries so unmatched handlers fail fast.
 vi.mock('@/data/replication/utils', () => ({
   checkReplicationFeatureFlagRetry: () => false,
 }))
 
-// Declared after vi.mock hoisting — factory closures can reference these because
-// vi.mock is hoisted to the top of the file at runtime, but the variables are
-// accessible via closure by the time the factory executes.
-const mockBigQueryEnabled = vi.fn()
-const mockIcebergEnabled = vi.fn()
-const mockDucklakeEnabled = vi.fn()
-
-beforeEach(() => {
-  // Default: all external-destination flags off, read replicas on (via useIsFeatureEnabled mock)
-  mockBigQueryEnabled.mockReturnValue(false)
-  mockIcebergEnabled.mockReturnValue(false)
-  mockDucklakeEnabled.mockReturnValue(false)
-
-  // Background queries fired by useDestinationInformation (edit === null → id is null,
-  // so destination query is disabled; sources and pipelines still fire)
+const addBackgroundMocks = () => {
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/sources',
-    response: () => HttpResponse.json({ sources: [] }),
+    response: () => HttpResponse.json<ReplicationSourcesResponse>({ sources: [] }),
   })
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/pipelines',
-    response: () => HttpResponse.json({ pipelines: [] }),
+    response: () => HttpResponse.json<ReplicationPipelinesResponse>({ pipelines: [] }),
   })
-})
+}
 
 describe('DestinationTypeSelection', () => {
   test('shows placeholder when no type is selected', async () => {
+    mockBigQueryEnabled.mockReturnValue(false)
+    mockIcebergEnabled.mockReturnValue(false)
+    mockDucklakeEnabled.mockReturnValue(false)
+    addBackgroundMocks()
+
     customRender(<DestinationTypeSelection />)
 
     expect(await screen.findByText('Select a destination type')).toBeInTheDocument()
   })
 
   test('renders the Within Supabase group with Read Replica when dropdown is opened', async () => {
+    mockBigQueryEnabled.mockReturnValue(false)
+    mockIcebergEnabled.mockReturnValue(false)
+    mockDucklakeEnabled.mockReturnValue(false)
+    addBackgroundMocks()
+
     customRender(<DestinationTypeSelection />)
 
     fireEvent.click(await screen.findByRole('combobox'))
@@ -71,6 +77,10 @@ describe('DestinationTypeSelection', () => {
 
   test('renders the Outside Supabase group with BigQuery when the flag is enabled', async () => {
     mockBigQueryEnabled.mockReturnValue(true)
+    mockIcebergEnabled.mockReturnValue(false)
+    mockDucklakeEnabled.mockReturnValue(false)
+    addBackgroundMocks()
+
     customRender(<DestinationTypeSelection />)
 
     fireEvent.click(await screen.findByRole('combobox'))
@@ -80,7 +90,11 @@ describe('DestinationTypeSelection', () => {
   })
 
   test('hides destinations behind disabled feature flags', async () => {
-    // All ETL flags off — only Read Replica should appear
+    mockBigQueryEnabled.mockReturnValue(false)
+    mockIcebergEnabled.mockReturnValue(false)
+    mockDucklakeEnabled.mockReturnValue(false)
+    addBackgroundMocks()
+
     customRender(<DestinationTypeSelection />)
 
     fireEvent.click(await screen.findByRole('combobox'))
@@ -94,6 +108,10 @@ describe('DestinationTypeSelection', () => {
 
   test('shows alpha warning when an alpha destination type is selected', async () => {
     mockBigQueryEnabled.mockReturnValue(true)
+    mockIcebergEnabled.mockReturnValue(false)
+    mockDucklakeEnabled.mockReturnValue(false)
+    addBackgroundMocks()
+
     customRender(<DestinationTypeSelection />)
 
     fireEvent.click(await screen.findByRole('combobox'))
@@ -104,13 +122,15 @@ describe('DestinationTypeSelection', () => {
 
   test('disables the selector in edit mode so the destination type cannot be changed', async () => {
     mockBigQueryEnabled.mockReturnValue(true)
-
-    // Edit mode triggers useDestinationInformation({ id: 1 }) which fires the destination-by-id query
+    mockIcebergEnabled.mockReturnValue(false)
+    mockDucklakeEnabled.mockReturnValue(false)
+    addBackgroundMocks()
+    // Edit mode triggers useDestinationInformation({ id: 1 }) which fires destination-by-id
     addAPIMock({
       method: 'get',
       path: '/platform/replication/:ref/destinations/:destination_id',
       response: () =>
-        HttpResponse.json({
+        HttpResponse.json<ReplicationDestinationResponse>({
           tenant_id: 't',
           id: 1,
           name: 'My BigQuery Destination',
@@ -124,7 +144,7 @@ describe('DestinationTypeSelection', () => {
         }),
     })
 
-    // ?edit=1 puts the component into edit mode — type is locked to the existing destination
+    // ?edit=1 locks the type to the existing destination
     customRender(<DestinationTypeSelection />, { nuqs: { searchParams: { edit: '1' } } })
 
     expect(await screen.findByRole('combobox')).toBeDisabled()
