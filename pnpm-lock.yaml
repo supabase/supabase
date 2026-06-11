@@ -837,9 +837,6 @@ importers:
       config:
         specifier: workspace:*
         version: link:../../packages/config
-      postcss:
-        specifier: ^8.5.10
-        version: 8.5.10
       tailwindcss:
         specifier: 'catalog:'
         version: 4.2.4
