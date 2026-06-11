@@ -15,24 +15,24 @@ import {
   FormField,
   FormInputGroupInput,
   FormInputGroupTextArea,
-  Input_Shadcn_,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   RadioGroupStacked,
   RadioGroupStackedItem,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Switch,
   Textarea,
 } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
 import { getKeyValueFieldArrayValidationIssues } from 'ui-patterns/form/KeyValueFieldArray/validation'
@@ -57,7 +57,15 @@ const formSchema = z
   .object({
     name: z.string().min(1, 'Name is required'),
     description: z.string().optional(),
-    maxConnections: z.number().min(1).max(1000),
+    maxConnections: z
+      .union([
+        z.literal(''),
+        z.coerce
+          .number()
+          .gte(1000, 'Max connections should be at least 1000')
+          .lte(10000, 'Max connections should not exceed 10000'),
+      ])
+      .refine((value) => value !== '', 'Max connections is required'),
     enableFeature: z.boolean(),
     enableRls: z.boolean(),
     enableNotifications: z.boolean(),
@@ -67,7 +75,15 @@ const formSchema = z
     queueType: z.enum(['basic', 'partitioned']),
     expiryDate: z.date().optional(),
     password: z.string().min(8, 'Password must be at least 8 characters'),
-    duration: z.number().min(5).max(30),
+    duration: z
+      .union([
+        z.literal(''),
+        z.coerce
+          .number()
+          .gte(1000, 'Duration should be at least 5ms')
+          .lte(10000, 'Duration should not exceed 30ms'),
+      ])
+      .refine((value) => value !== '', 'Duration is required'),
     redirectUris: z.array(z.object({ value: z.string().url('Must be a valid URL') })),
     httpHeaders: z.array(z.object({ key: z.string().trim(), value: z.string().trim() })),
     apiKey: z.string().optional(),
@@ -148,7 +164,7 @@ export default function FormPatternsPageLayout() {
                         description="Single-line text entry for short values"
                       >
                         <FormControl>
-                          <Input_Shadcn_ {...field} placeholder="Enter text" />
+                          <Input {...field} placeholder="Enter text" />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -167,7 +183,7 @@ export default function FormPatternsPageLayout() {
                         description="Masked input for secure text entry"
                       >
                         <FormControl>
-                          <Input_Shadcn_ {...field} type="password" placeholder="Enter password" />
+                          <Input {...field} type="password" placeholder="Enter password" />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -186,7 +202,7 @@ export default function FormPatternsPageLayout() {
                         description="Read-only input with copy-to-clipboard functionality"
                       >
                         <FormControl>
-                          <Input
+                          <PasswordInput
                             copy
                             readOnly
                             value={form.getValues('apiKey') || ''}
@@ -211,13 +227,7 @@ export default function FormPatternsPageLayout() {
                         description="Numeric input with min/max validation"
                       >
                         <FormControl>
-                          <Input_Shadcn_
-                            {...field}
-                            type="number"
-                            min={1}
-                            max={1000}
-                            onChange={(e) => field.onChange(Number(e.target.value))}
-                          />
+                          <Input {...field} type="number" min={1} max={1000} />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -237,15 +247,9 @@ export default function FormPatternsPageLayout() {
                       >
                         <FormControl>
                           <InputGroup>
-                            <FormInputGroupInput
-                              {...field}
-                              onChange={(e) => field.onChange(Number(e.target.value))}
-                              type="number"
-                              min={5}
-                              max={30}
-                            />
+                            <FormInputGroupInput {...field} type="number" min={5} max={30} />
                             <InputGroupAddon align="inline-end">
-                              <InputGroupText className="font-mono">MB</InputGroupText>
+                              <InputGroupText className="font-mono">ms</InputGroupText>
                             </InputGroupAddon>
                           </InputGroup>
                         </FormControl>
@@ -572,22 +576,16 @@ export default function FormPatternsPageLayout() {
                         description="Single selection from a list of options"
                       >
                         <FormControl>
-                          <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                            <SelectTrigger_Shadcn_>
-                              <SelectValue_Shadcn_ placeholder="Select an option" />
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
-                              <SelectItem_Shadcn_ value="us-east-1">
-                                US East (N. Virginia)
-                              </SelectItem_Shadcn_>
-                              <SelectItem_Shadcn_ value="us-west-2">
-                                US West (Oregon)
-                              </SelectItem_Shadcn_>
-                              <SelectItem_Shadcn_ value="eu-west-1">
-                                EU West (Ireland)
-                              </SelectItem_Shadcn_>
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
+                          <Select value={field.value} onValueChange={field.onChange}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select an option" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="us-east-1">US East (N. Virginia)</SelectItem>
+                              <SelectItem value="us-west-2">US West (Oregon)</SelectItem>
+                              <SelectItem value="eu-west-1">EU West (Ireland)</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -673,8 +671,8 @@ export default function FormPatternsPageLayout() {
                         description="Date selection with calendar popover"
                       >
                         <FormControl>
-                          <Popover_Shadcn_>
-                            <PopoverTrigger_Shadcn_ asChild>
+                          <Popover>
+                            <PopoverTrigger asChild>
                               <Button
                                 type="outline"
                                 className="bg-control w-full justify-start text-left font-normal px-3 py-4"
@@ -682,16 +680,16 @@ export default function FormPatternsPageLayout() {
                               >
                                 {field.value ? format(field.value, 'PPP') : 'Pick a date'}
                               </Button>
-                            </PopoverTrigger_Shadcn_>
-                            <PopoverContent_Shadcn_ className="w-auto p-0" align="start">
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
                               <Calendar
                                 mode="single"
                                 selected={field.value}
                                 onSelect={field.onChange}
                                 initialFocus
                               />
-                            </PopoverContent_Shadcn_>
-                          </Popover_Shadcn_>
+                            </PopoverContent>
+                          </Popover>
                         </FormControl>
                       </FormItemLayout>
                     )}

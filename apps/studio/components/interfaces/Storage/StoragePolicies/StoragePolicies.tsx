@@ -19,6 +19,10 @@ import { formatPoliciesForStorage, UNGROUPED_POLICY_SYMBOL } from '../Storage.ut
 import { StoragePoliciesBucketRow } from './StoragePoliciesBucketRow'
 import { BucketsPolicies, type SelectBucketPolicyForAction } from './StoragePoliciesBucketsSection'
 import { StoragePoliciesEditPolicyModal } from './StoragePoliciesEditPolicyModal'
+import type {
+  PostgresPolicyCreatePayload,
+  PostgresPolicyUpdatePayload,
+} from '@/components/interfaces/Auth/Policies/Policies.types'
 import { PolicyEditorModal } from '@/components/interfaces/Auth/Policies/PolicyEditorModal'
 import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
@@ -155,7 +159,7 @@ export const StoragePolicies = () => {
     Functions that involve the CRUD for policies
     For each API call within the Promise.all, return true if an error occurred, else return false
   */
-  const onCreatePolicies = async (payloads: any[]) => {
+  const onCreatePolicies = async (payloads: PostgresPolicyCreatePayload[]) => {
     if (!project) {
       console.error('Project is required')
       return true
@@ -181,7 +185,7 @@ export const StoragePolicies = () => {
     }
   }
 
-  const onCreatePolicy = async (payload: any) => {
+  const onCreatePolicy = async (payload: PostgresPolicyCreatePayload) => {
     if (!project) {
       console.error('Project is required')
       return true
@@ -200,7 +204,7 @@ export const StoragePolicies = () => {
     }
   }
 
-  const onUpdatePolicy = async (payload: any) => {
+  const onUpdatePolicy = async (payload: PostgresPolicyUpdatePayload) => {
     if (!project) {
       console.error('Project is required')
       return true

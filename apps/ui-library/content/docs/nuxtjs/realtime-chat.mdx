@@ -1,0 +1,128 @@
+---
+title: Realtime Chat
+description: Real-time chat component for collaborative applications
+---
+
+<DualRealtimeChat />
+
+## Installation
+
+<BlockItem
+  name="realtime-chat-nuxtjs"
+  description="Renders a real-time chat interface for users in a shared room."
+/>
+
+## Folder structure
+
+This block assumes that you have already installed a Supabase client for Vue from the previous step.
+
+<RegistryBlock itemName="realtime-chat-nuxtjs" />
+
+## Introduction
+
+The Realtime Chat component provides a complete chat interface that enables users to exchange messages in real-time within a shared room.
+
+## How it works under the hood
+
+This chat component uses **Supabase Realtime Broadcast** to send and receive messages between connected clients.
+
+Messages sent through Broadcast are:
+
+- delivered in real time to other connected clients
+- **not stored** unless you handle persistence yourself
+- **not guaranteed** to arrive if the client disconnects
+- scoped to a specific `roomName`, which corresponds to a broadcast channel
+
+This design keeps latency extremely low, but it means you should use the `onMessage` callback if you want to store messages permanently or show chat history on page load.
+
+## Usage
+
+### Basic usage
+
+```html
+<script setup lang="ts">
+  import RealtimeChat from '@/components/realtime-chat.vue'
+</script>
+
+<template>
+  <RealtimeChat roomName="my-chat-room" username="john_doe" />
+</template>
+```
+
+### With initial messages
+
+```html
+<script setup lang="ts">
+  import RealtimeChat from '@/components/realtime-chat.vue'
+  import { useMessagesQuery } from '@/composables/use-messages-query'
+
+  const { data } = useMessagesQuery()
+</script>
+
+<template>
+  <RealtimeChat roomName="my-chat-room" username="john_doe" :messages="data ?? []" />
+</template>
+```
+
+### Storing messages
+
+```html
+<script setup lang="ts">
+  import RealtimeChat from '@/components/realtime-chat.vue'
+  import { useMessagesQuery } from '@/composables/use-messages-query'
+  import { storeMessages } from '@/lib/store-messages'
+  import type { ChatMessage } from '@/types'
+
+  const { data } = useMessagesQuery()
+
+  // Callback function for new messages
+  const handleMessage = async (messages: ChatMessage[]) => {
+    await storeMessages(messages)
+  }
+</script>
+
+<template>
+  <RealtimeChat
+    roomName="my-chat-room"
+    username="john_doe"
+    :messages="data ?? []"
+    :onMessage="handleMessage"
+  />
+</template>
+```
+
+## Features
+
+- Real-time message synchronization
+- Message persistence support with `onMessage` and `messages` props
+- Customizable message appearance
+- Automatic scroll-to-bottom on new messages
+- Room-based isolation for scoped conversations
+- Low-latency updates using Supabase Realtime
+
+## Props
+
+| Prop         | Type                                | Description                                                   |
+| ------------ | ----------------------------------- | ------------------------------------------------------------- |
+| `roomName`   | `string`                            | Unique identifier for the shared chat room.                   |
+| `username`   | `string`                            | Name of the current user; used to identify message senders.   |
+| `onMessage?` | `(messages: ChatMessage[]) => void` | Optional callback to handle messages, useful for persistence. |
+| `messages?`  | `ChatMessage[]`                     | Optional initial messages to display in the chat.             |
+
+### ChatMessage type
+
+```typescript
+interface ChatMessage {
+  id: string
+  content: string
+  user: {
+    name: string
+  }
+  createdAt: string
+}
+```
+
+## Further reading
+
+- [Realtime Broadcast](https://supabase.com/docs/guides/realtime/broadcast)
+- [Realtime authorization](https://supabase.com/docs/guides/realtime/authorization)

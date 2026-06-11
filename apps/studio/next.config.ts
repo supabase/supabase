@@ -323,8 +323,8 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/project/:ref/sql/templates',
-        destination: '/project/:ref/sql',
+        source: '/project/:ref/sql/quickstarts',
+        destination: '/project/:ref/sql/examples',
         permanent: true,
       },
       {

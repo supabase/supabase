@@ -1,38 +1,15 @@
-import { useHotkeySequence, type HotkeyMeta } from '@tanstack/react-hotkeys'
+import { useHotkeySequence } from '@tanstack/react-hotkeys'
 import { Fragment, useCallback, useMemo } from 'react'
 import { KeyboardShortcut } from 'ui'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
-import type { ICommand } from 'ui-patterns/CommandMenu/api/types'
 
-import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS, type ShortcutId } from './registry'
-import type { ShortcutOptions } from './types'
+import { hotkeyToKeys } from './formatShortcut'
+import { SHORTCUT_DEFINITIONS, type ShortcutId } from './registry'
+import type { ShortcutHotkeyMeta, ShortcutOptions } from './types'
 import { useIsShortcutEnabled } from './useIsShortcutEnabled'
+import { orderShortcutCommands } from './utils'
 import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
 import useLatest from '@/hooks/misc/useLatest'
-
-/**
- * Shape we store on each registration's `options.meta` so the Keyboard
- * shortcuts reference sheet can read it back via `useHotkeyRegistrations()`.
- * The library's `HotkeyMeta` is open for declaration merging, but we don't
- * own a direct dep on `@tanstack/hotkeys`, so we keep the extension local.
- */
-export interface ShortcutHotkeyMeta extends HotkeyMeta {
-  id: ShortcutId
-  referenceGroup?: string
-}
-
-const hotkeyToKeys = (hotkey: string): string[] =>
-  hotkey.split('+').map((part) => (part === 'Mod' ? 'Meta' : part))
-
-const orderShortcutCommands = (commands: ICommand[], commandsToInsert: ICommand[]): ICommand[] => {
-  const mergedCommands = [...commands, ...commandsToInsert]
-
-  return mergedCommands.sort((a, b) => {
-    if (a.id === SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE) return 1
-    if (b.id === SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE) return -1
-    return 0
-  })
-}
 
 /**
  * Subscribe to a registered keyboard shortcut.
@@ -84,6 +61,7 @@ export function useShortcut(id: ShortcutId, callback: () => void, options?: Shor
   const registerInCommandMenu =
     options?.registerInCommandMenu ?? def.options?.registerInCommandMenu ?? false
   const label = options?.label ?? def.label
+  const conflictBehavior = options?.conflictBehavior ?? def.options?.conflictBehavior
 
   // Stable identity so we don't churn the registration store on every render.
   // setOptions in @tanstack/hotkeys notifies subscribers each call, which
@@ -103,6 +81,7 @@ export function useShortcut(id: ShortcutId, callback: () => void, options?: Shor
     timeout,
     meta,
     ...(ignoreInputs !== undefined && { ignoreInputs }),
+    ...(conflictBehavior !== undefined && { conflictBehavior }),
   })
 
   // Handle overrides for command menu

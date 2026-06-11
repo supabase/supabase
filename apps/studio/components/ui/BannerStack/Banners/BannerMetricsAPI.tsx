@@ -1,12 +1,11 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useParams } from 'common/hooks'
 import Link from 'next/link'
-import React from 'react'
 import { Badge, Button } from 'ui'
 
 import { BannerCard } from '../BannerCard'
 import { useBannerStack } from '../BannerStackProvider'
-import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
+import { AnimatedLogos } from '@/components/interfaces/LogDrains/AnimatedLogos'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
@@ -32,13 +31,7 @@ export const BannerMetricsAPI = () => {
           <Badge variant="success" className="-ml-0.5 uppercase inline-flex items-center mb-2">
             Beta
           </Badge>
-          <div className="flex items-center gap-4">
-            {LOG_DRAIN_TYPES.filter((type) => type.value !== 'sentry').map((type) => (
-              <React.Fragment key={type.value}>
-                {React.cloneElement(type.icon, { height: 20, width: 20 })}
-              </React.Fragment>
-            ))}
-          </div>
+          <AnimatedLogos iconSize={20} className="h-[22px]!" />
         </div>
         <div className="flex flex-col gap-y-1 mb-2">
           <p className="text-sm font-medium">Export Metrics to your dashboards</p>

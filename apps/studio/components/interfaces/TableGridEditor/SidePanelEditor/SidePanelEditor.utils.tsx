@@ -11,8 +11,9 @@ import pgMeta, {
   getUpdateIdentitySequenceSQL,
   type ForeignKey,
 } from '@supabase/pg-meta'
+import type { PGTablePrimaryKey } from '@supabase/pg-meta'
+import { joinSqlFragments, safeSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
 import { Query } from '@supabase/pg-meta/src/query'
-import type { PostgresPrimaryKey } from '@supabase/postgres-meta'
 import { chunk, find, isEmpty, isEqual } from 'lodash'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
@@ -25,7 +26,7 @@ import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './Si
 import { checkIfRelationChanged } from './TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
 import type { ImportContent } from './TableEditor/TableEditor.types'
 import type { SupaRow } from '@/components/grid/types'
-import { GeneratedPolicy } from '@/components/interfaces/Auth/Policies/Policies.utils'
+import { type AcceptedGeneratedPolicy } from '@/components/interfaces/Auth/Policies/Policies.utils'
 import SparkBar from '@/components/ui/SparkBar'
 import { createDatabaseColumn } from '@/data/database-columns/database-column-create-mutation'
 import { deleteDatabaseColumn } from '@/data/database-columns/database-column-delete-mutation'
@@ -44,24 +45,22 @@ import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
 import { tableRowKeys } from '@/data/table-rows/keys'
 import { executeWithRetry } from '@/data/table-rows/table-rows-query'
 import { tableKeys } from '@/data/tables/keys'
-import {
-  getTable,
-  getTableQuery,
-  RetrievedTableColumn,
-  RetrieveTableResult,
-} from '@/data/tables/table-retrieve-query'
+import { getTable, getTableQuery, RetrieveTableResult } from '@/data/tables/table-retrieve-query'
 import {
   UpdateTableBody,
   updateTable as updateTableMutation,
 } from '@/data/tables/table-update-mutation'
 import { getTables } from '@/data/tables/tables-query'
-import { sendEvent } from '@/data/telemetry/send-event-mutation'
 import { isObject, isObjectContainingKeys, timeout, tryParseJson } from '@/lib/helpers'
+import type { SafePostgresColumn } from '@/lib/postgres-types'
+import type { useTrack } from '@/lib/telemetry/track'
 import type { DeepReadonly } from '@/lib/type-helpers'
 import type { SidePanel } from '@/state/table-editor'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
+
+type Track = ReturnType<typeof useTrack>
 
 /**
  * Extracts the row data from the current side panel state.
@@ -173,12 +172,7 @@ const updateForeignKey = async ({
   table: { schema: string; name: string }
   foreignKeys: ForeignKey[]
 }) => {
-  const query = `
-  ${getRemoveForeignKeySQL({ table, foreignKeys })}
-  ${getAddForeignKeySQL({ table, foreignKeys })}
-  `
-    .replace(/\s+/g, ' ')
-    .trim()
+  const query = safeSql`${getRemoveForeignKeySQL({ table, foreignKeys })} ${getAddForeignKeySQL({ table, foreignKeys })}`
   return await executeSql({
     projectRef: projectRef,
     connectionString: connectionString,
@@ -283,7 +277,7 @@ export const updateColumn = async ({
 }: {
   projectRef: string
   connectionString?: string | null
-  originalColumn: RetrievedTableColumn
+  originalColumn: DeepReadonly<SafePostgresColumn>
   payload: UpdateColumnPayload
   selectedTable: RetrieveTableResult
   primaryKey?: Constraint
@@ -449,9 +443,9 @@ export const createTable = async ({
   foreignKeyRelations,
   isRLSEnabled,
   importContent,
-  organizationSlug,
   generatedPolicies = [],
   onCreatePoliciesSuccess,
+  track,
 }: {
   projectRef: string
   connectionString?: string | null
@@ -465,15 +459,15 @@ export const createTable = async ({
   foreignKeyRelations: ForeignKey[]
   isRLSEnabled: boolean
   importContent?: ImportContent
-  organizationSlug?: string
-  generatedPolicies?: GeneratedPolicy[]
+  generatedPolicies?: AcceptedGeneratedPolicy[]
   onCreatePoliciesSuccess?: () => void
+  track: Track
 }) => {
   const queryClient = getQueryClient()
 
   // Build all SQL statements for table creation, columns, and constraints
   // to execute in a single transaction for better performance and atomicity
-  const sqlStatements: string[] = []
+  const sqlStatements: Array<SafeSqlFragment> = []
 
   // 1. Create table SQL
   const { sql: createTableSql } = pgMeta.tables.create({ ...payload, no_transaction: true })
@@ -531,8 +525,8 @@ export const createTable = async ({
       table: { schema: payload.schema, name: payload.name },
       foreignKeys: foreignKeyRelations,
     })
-    // Remove trailing semicolon since we join with semicolons
-    sqlStatements.push(fkSql.replace(/;+$/, ''))
+    const fkSqlWithoutTrailingSemicolon = fkSql.replace(/;+$/, '') as SafeSqlFragment
+    sqlStatements.push(fkSqlWithoutTrailingSemicolon)
   }
 
   // Execute all table creation SQL in a single transaction
@@ -545,7 +539,7 @@ export const createTable = async ({
       await executeSql({
         projectRef,
         connectionString,
-        sql: `BEGIN; ${sqlStatements.join(';\n')}; COMMIT;`,
+        sql: safeSql`BEGIN; ${joinSqlFragments(sqlStatements, ';\n')}; COMMIT;`,
         queryKey: ['table', 'create-with-columns'],
       })
     }
@@ -555,7 +549,7 @@ export const createTable = async ({
   // [Joshen] Possible area for optimization to create all policies in a single query call
   // Can be subsequently added to the table creation SQL as well for a single transaction
 
-  const failedPolicies: GeneratedPolicy[] = []
+  const failedPolicies: AcceptedGeneratedPolicy[] = []
   if (generatedPolicies.length > 0 && isRLSEnabled) {
     await Sentry.startSpan(
       { name: 'create_table.create_policies', op: 'db.policies.create' },
@@ -591,42 +585,18 @@ export const createTable = async ({
     )
   }
 
-  // Track table creation event (fire-and-forget to avoid blocking)
-  sendEvent({
-    event: {
-      action: 'table_created',
-      properties: {
-        method: 'table_editor',
-        schema_name: payload.schema,
-        table_name: payload.name,
-        has_generated_policies: generatedPolicies.length > 0 && isRLSEnabled,
-      },
-      groups: {
-        project: projectRef,
-        ...(organizationSlug && { organization: organizationSlug }),
-      },
-    },
-  }).catch((error) => {
-    console.error('Failed to track table creation event:', error)
+  track('table_created', {
+    method: 'table_editor',
+    schema_name: payload.schema,
+    table_name: payload.name,
+    has_generated_policies: generatedPolicies.length > 0 && isRLSEnabled,
   })
 
-  // Track RLS enablement event if enabled (fire-and-forget)
   if (isRLSEnabled) {
-    sendEvent({
-      event: {
-        action: 'table_rls_enabled',
-        properties: {
-          method: 'table_editor',
-          schema_name: payload.schema,
-          table_name: payload.name,
-        },
-        groups: {
-          project: projectRef,
-          ...(organizationSlug && { organization: organizationSlug }),
-        },
-      },
-    }).catch((error) => {
-      console.error('Failed to track RLS enablement event:', error)
+    track('table_rls_enabled', {
+      method: 'table_editor',
+      schema_name: payload.schema,
+      table_name: payload.name,
     })
   }
 
@@ -722,15 +692,16 @@ export const createTable = async ({
         // For identity columns, manually raise the sequences (batched for performance)
         const identityColumns = columns.filter((column) => column.isIdentity)
         if (identityColumns.length > 0) {
-          const updateSequenceSQL = identityColumns
-            .map((column) =>
+          const updateSequenceSQL = joinSqlFragments(
+            identityColumns.map((column) =>
               getUpdateIdentitySequenceSQL({
                 schema: table.schema,
                 table: table.name,
                 column: column.name,
               })
-            )
-            .join(';\n')
+            ),
+            ';\n'
+          )
           await executeSql({
             projectRef,
             connectionString,
@@ -769,7 +740,7 @@ export const updateTable = async ({
   foreignKeyRelations,
   existingForeignKeyRelations,
   primaryKey,
-  organizationSlug,
+  track,
 }: {
   projectRef: string
   connectionString?: string | null
@@ -780,7 +751,7 @@ export const updateTable = async ({
   foreignKeyRelations: ForeignKey[]
   existingForeignKeyRelations: ForeignKeyConstraint[]
   primaryKey?: Constraint
-  organizationSlug?: string
+  track: Track
 }) => {
   const queryClient = getQueryClient()
 
@@ -788,7 +759,7 @@ export const updateTable = async ({
   const primaryKeyColumns = columns
     .filter((column) => column.isPrimaryKey)
     .map((column) => column.name)
-  const existingPrimaryKeyColumns = table.primary_keys.map((pk: PostgresPrimaryKey) => pk.name)
+  const existingPrimaryKeyColumns = table.primary_keys.map((pk: PGTablePrimaryKey) => pk.name)
   const isPrimaryKeyUpdated = !isEqual(primaryKeyColumns, existingPrimaryKeyColumns)
 
   if (isPrimaryKeyUpdated) {
@@ -810,28 +781,22 @@ export const updateTable = async ({
       schema: table.schema,
       payload,
     })
+    await queryClient.invalidateQueries({
+      queryKey: tableKeys.infiniteListPrefix(projectRef, table.schema),
+    })
+    if (payload.schema && payload.schema !== table.schema) {
+      await queryClient.invalidateQueries({
+        queryKey: tableKeys.infiniteListPrefix(projectRef, payload.schema),
+      })
+    }
   }
 
-  // Track RLS enablement if it's being turned on
   if (payload.rls_enabled === true) {
-    try {
-      await sendEvent({
-        event: {
-          action: 'table_rls_enabled',
-          properties: {
-            method: 'table_editor',
-            schema_name: table.schema,
-            table_name: payload.name ?? table.name,
-          },
-          groups: {
-            project: projectRef,
-            ...(organizationSlug && { organization: organizationSlug }),
-          },
-        },
-      })
-    } catch (error) {
-      console.error('Failed to track RLS enablement event:', error)
-    }
+    track('table_rls_enabled', {
+      method: 'table_editor',
+      schema_name: table.schema,
+      table_name: payload.name ?? table.name,
+    })
   }
 
   const updatedTable = await queryClient.fetchQuery({
@@ -1085,15 +1050,16 @@ export async function insertRowsViaSpreadsheet({
             return
           }
 
-          const updateSequenceSQL = sequenceColumns
-            .map((column) =>
+          const updateSequenceSQL = joinSqlFragments(
+            sequenceColumns.map((column) =>
               getUpdateIdentitySequenceSQL({
                 schema: table.schema,
                 table: table.name,
                 column: column.name,
               })
-            )
-            .join(';\n')
+            ),
+            ';\n'
+          )
 
           executeSql({
             projectRef,
@@ -1185,15 +1151,16 @@ export async function insertTableRows({
     return { error: insertError }
   }
 
-  const updateSequenceSQL = sequenceColumns
-    .map((column) =>
+  const updateSequenceSQL = joinSqlFragments(
+    sequenceColumns.map((column) =>
       getUpdateIdentitySequenceSQL({
         schema: table.schema,
         table: table.name,
         column: column.name,
       })
-    )
-    .join(';\n')
+    ),
+    ';\n'
+  )
 
   try {
     await executeSql({

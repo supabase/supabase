@@ -52,7 +52,9 @@ export function useSupportForm(
   const providedInitialParamsRef = useRef(initialParams)
   const [initialError, setInitialError] = useState<string | null>(null)
 
-  // Load initial values from URL params
+  // Load initial values from URL params after mount so SSR/SSG render with
+  // bare defaults (no `window` access) and the client hydrates against the
+  // same HTML. URL-derived values are applied here, post-hydration.
   useEffect(() => {
     const params =
       providedInitialParamsRef.current !== undefined

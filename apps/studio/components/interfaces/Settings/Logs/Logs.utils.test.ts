@@ -4,8 +4,10 @@ import type { LogData } from './Logs.types'
 import {
   buildLogsPrompt,
   extractEdgeFunctionName,
+  formatLogsAsCsv,
   formatLogsAsJson,
   formatLogsAsMarkdown,
+  parseMultigresEventMessage,
 } from './Logs.utils'
 
 const createLog = (overrides: Partial<LogData> = {}): LogData => ({
@@ -32,6 +34,72 @@ describe('Logs.utils', () => {
       const result = formatLogsAsJson(rows)
       expect(result).toContain('"id": "1"')
       expect(result).toContain('"id": "2"')
+    })
+  })
+
+  describe('formatLogsAsCsv', () => {
+    test('returns empty string for empty list', () => {
+      expect(formatLogsAsCsv([])).toBe('')
+    })
+
+    test('formats single row with header line', () => {
+      const rows: LogData[] = [createLog({ id: '1', event_message: 'hello' })]
+      const result = formatLogsAsCsv(rows)
+      const [header, row] = result.split('\r\n')
+      expect(header.split(',').sort()).toEqual(['event_message', 'id', 'timestamp'].sort())
+      expect(row).toContain('1')
+      expect(row).toContain('hello')
+    })
+
+    test('formats multiple rows', () => {
+      const rows: LogData[] = [
+        createLog({ id: '1', event_message: 'first' }),
+        createLog({ id: '2', event_message: 'second' }),
+      ]
+      const lines = formatLogsAsCsv(rows).split('\r\n')
+      expect(lines).toHaveLength(3)
+      expect(lines[1]).toContain('first')
+      expect(lines[2]).toContain('second')
+    })
+
+    test('escapes commas, quotes, and newlines per RFC 4180', () => {
+      const rows: LogData[] = [
+        createLog({
+          id: 'a,b',
+          event_message: 'line1\nline2',
+        }),
+        createLog({
+          id: 'c"d',
+          event_message: 'has "quotes"',
+        }),
+      ]
+      const result = formatLogsAsCsv(rows)
+      expect(result).toContain('"a,b"')
+      expect(result).toContain('"line1\nline2"')
+      expect(result).toContain('"c""d"')
+      expect(result).toContain('"has ""quotes"""')
+    })
+
+    test('emits columns based on the first row', () => {
+      const rows: LogData[] = [
+        { id: '1', event_message: 'first', timestamp: 1 },
+        // Extra `status` key on later rows is dropped because headers
+        // come from the first row.
+        { id: '2', event_message: 'second', timestamp: 2, status: '500' } as LogData,
+      ]
+      const result = formatLogsAsCsv(rows)
+      expect(result).not.toContain('500')
+      expect(result.split('\r\n')[0]).toBe('id,event_message,timestamp')
+    })
+
+    test('renders null as the string "null" and undefined as empty', () => {
+      const rows: LogData[] = [
+        { id: '1', event_message: null as unknown as string, timestamp: undefined as any },
+      ]
+      const result = formatLogsAsCsv(rows)
+      const dataRow = result.split('\r\n')[1]
+      // Order matches first-row keys: id, event_message, timestamp
+      expect(dataRow).toBe('1,null,')
     })
   })
 
@@ -113,6 +181,42 @@ describe('Logs.utils', () => {
 
     test('handles trailing slash', () => {
       expect(extractEdgeFunctionName('/functions/v1/hello-world-1/')).toBe('hello-world-1')
+    })
+  })
+
+  describe('parseMultigresEventMessage', () => {
+    test('parses a JSON object event_message into a plain object', () => {
+      const eventMessage = JSON.stringify({
+        time: '2026-06-02T15:44:52.84043038Z',
+        level: 'ERROR',
+        msg: 'Failed to write heartbeat',
+        error: 'context deadline exceeded',
+      })
+      expect(parseMultigresEventMessage(eventMessage)).toEqual({
+        time: '2026-06-02T15:44:52.84043038Z',
+        level: 'ERROR',
+        msg: 'Failed to write heartbeat',
+        error: 'context deadline exceeded',
+      })
+    })
+
+    test('returns null when event_message is not valid JSON', () => {
+      expect(parseMultigresEventMessage('connection closed')).toBeNull()
+    })
+
+    test('returns null when event_message parses to an array', () => {
+      expect(parseMultigresEventMessage('[1, 2, 3]')).toBeNull()
+    })
+
+    test('returns null when event_message parses to a primitive', () => {
+      expect(parseMultigresEventMessage('42')).toBeNull()
+      expect(parseMultigresEventMessage('"a string"')).toBeNull()
+    })
+
+    test('returns null for non-string input', () => {
+      expect(parseMultigresEventMessage(undefined)).toBeNull()
+      expect(parseMultigresEventMessage(null)).toBeNull()
+      expect(parseMultigresEventMessage(42)).toBeNull()
     })
   })
 })

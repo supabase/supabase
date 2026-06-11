@@ -47,7 +47,6 @@ describe(`EditSecretModal`, () => {
     addAPIMock({
       method: `post`,
       path: `/platform/pg-meta/:ref/query`,
-      // @ts-expect-error this path erroneously has a `never` return type when it should be `unknown` since it executes a SQL query
       response: async ({ request }) => {
         const body = (await request.json()) as { query: string }
         const query = body.query
@@ -79,7 +78,7 @@ describe(`EditSecretModal`, () => {
 
     await screen.findByRole(`dialog`)
 
-    const nameInput = screen.getByLabelText(`Name`)
+    const nameInput = await screen.findByLabelText(`Name`)
     const descriptionInput = screen.getByLabelText(`Description`)
     const valueInput = screen.getByLabelText(`Secret value`)
     const togglePasswordButton = screen.getByRole(`button`, { name: `Show secret value` })

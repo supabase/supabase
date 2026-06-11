@@ -1,12 +1,6 @@
 import { useMDXComponent } from 'next-contentlayer2/hooks'
 import Link from 'next/link'
-import {
-  Accordion_Shadcn_ as Accordion,
-  AccordionContent_Shadcn_ as AccordionContent,
-  AccordionItem_Shadcn_ as AccordionItem,
-  AccordionTrigger_Shadcn_ as AccordionTrigger,
-  cn,
-} from 'ui'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, cn } from 'ui'
 
 import { BlockItem } from './block-item'
 import { BlockPreview } from './block-preview'
@@ -14,6 +8,7 @@ import { Callout } from './callout'
 import { ComponentPreview } from './component-preview'
 import { CopyButton } from './copy-button'
 import { DualRealtimeChat } from './dual-realtime-chat'
+import { DualRealtimeFlow } from './dual-realtime-flow'
 import { DualRealtimeMonaco } from './dual-realtime-monaco'
 import { RegistryBlock } from './registry-block'
 import { StyleWrapper } from './style-wrapper'
@@ -180,6 +175,7 @@ const components = {
   BlockItem,
   BlockPreview,
   DualRealtimeChat,
+  DualRealtimeFlow,
   DualRealtimeMonaco,
   TanstackDBGenerator,
 }

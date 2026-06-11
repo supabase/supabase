@@ -1,6 +1,6 @@
 import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable'
-import type { PostgresColumn } from '@supabase/postgres-meta'
+import type { PGColumn } from '@supabase/pg-meta'
 import { forwardRef, memo, Ref, useCallback, useMemo, useRef, useState } from 'react'
 import DataGrid, {
   CalculatedColumn,
@@ -25,10 +25,9 @@ import { formatForeignKeys } from '@/components/interfaces/TableGridEditor/SideP
 import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useCsvFileDrop } from '@/hooks/ui/useCsvFileDrop'
+import { useTrack } from '@/lib/telemetry/track'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 import { ResponseError } from '@/types'
@@ -69,7 +68,6 @@ export const Grid = memo(
       const snap = useTableEditorTableStateSnapshot()
       const { filters, clearFilters } = useTableFilter()
 
-      const { data: org } = useSelectedOrganizationQuery()
       const { data: project } = useSelectedProjectQuery()
 
       const onRowsChange = useOnRowsChange(rows)
@@ -92,20 +90,12 @@ export const Grid = memo(
       const isForeignTable = tableEntityType === ENTITY_TYPE.FOREIGN_TABLE
       const isTableEmpty = (rows ?? []).length === 0
 
-      const { mutate: sendEvent } = useSendEventMutation()
+      const track = useTrack()
 
       const { isDraggedOver, onDragOver, onFileDrop } = useCsvFileDrop({
         enabled: isTableEmpty && !isForeignTable,
         onFileDropped: (file) => tableEditorSnap.onImportData(valtioRef(file)),
-        onTelemetryEvent: (eventName) => {
-          sendEvent({
-            action: eventName,
-            groups: {
-              project: project?.ref ?? 'Unknown',
-              organization: org?.slug ?? 'Unknown',
-            },
-          })
-        },
+        onTelemetryEvent: (eventName) => track(eventName),
       })
 
       const { data } = useForeignKeyConstraintsQuery({
@@ -137,7 +127,7 @@ export const Grid = memo(
           tableEditorSnap.onEditForeignKeyColumnValue({
             foreignKey,
             row,
-            column: column as unknown as PostgresColumn,
+            column: column as unknown as PGColumn,
           })
         }
       }
@@ -339,14 +329,7 @@ export const Grid = memo(
                             className="pointer-events-auto"
                             onClick={() => {
                               tableEditorSnap.onImportData()
-                              sendEvent({
-                                action: 'import_data_button_clicked',
-                                properties: { tableType: 'Existing Table' },
-                                groups: {
-                                  project: project?.ref ?? 'Unknown',
-                                  organization: org?.slug ?? 'Unknown',
-                                },
-                              })
+                              track('import_data_button_clicked', { tableType: 'Existing Table' })
                             }}
                           >
                             Import data from CSV
@@ -418,7 +401,11 @@ export const Grid = memo(
                 )}
                 <DataGrid
                   ref={ref}
-                  className={cn(gridClass, 'grow', isContextMenuOpen && 'rdg-context-menu-open')}
+                  className={cn(
+                    gridClass,
+                    'grow border-t-default! border-b-0!',
+                    isContextMenuOpen && 'rdg-context-menu-open'
+                  )}
                   rowClass={computedRowClass}
                   columns={columnsWithDirtyCellClass}
                   rows={rows ?? []}

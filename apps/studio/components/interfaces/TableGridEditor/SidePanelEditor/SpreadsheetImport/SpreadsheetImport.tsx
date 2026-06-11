@@ -1,5 +1,4 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
-import { useParams } from 'common'
+import type { PGTable } from '@supabase/pg-meta'
 import { noop } from 'lodash'
 import { useCallback, type ChangeEvent, type DragEvent } from 'react'
 import { toast } from 'sonner'
@@ -20,12 +19,11 @@ import {
   isParsingState,
   useSpreadsheetImport,
 } from './useSpreadsheetImport'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface SpreadsheetImportProps {
   visible: boolean
-  selectedTable?: PostgresTable
+  selectedTable?: PGTable
   saveContent: (prefillData: ImportContent) => void
   closePanel: () => void
   updateEditorDirty?: (value: boolean) => void
@@ -38,8 +36,7 @@ export const SpreadsheetImport = ({
   closePanel,
   updateEditorDirty = noop,
 }: SpreadsheetImportProps) => {
-  const { ref: projectRef } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
   const {
     state,
     handleSwitchTab,
@@ -59,7 +56,6 @@ export const SpreadsheetImport = ({
   )
   const isCompatible = !selectedTable || incompatibleHeaders.length === 0
 
-  const { mutate: sendEvent } = useSendEventMutation()
   const onConfirm = (resolve: () => void) => {
     if (state._tag === 'no_selected_file') {
       toast.error('Please upload a file to import your data with')
@@ -86,10 +82,7 @@ export const SpreadsheetImport = ({
         emptyStringAsNullHeaders: state.emptyStringAsNullHeaders,
         resolve,
       })
-      sendEvent({
-        action: 'import_data_added',
-        groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-      })
+      track('import_data_added')
     }
   }
 

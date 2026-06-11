@@ -1,0 +1,39 @@
+---
+title: Page Nav
+description: Full-width sub-navigation row for page chrome, placed below breadcrumbs and outside PageHeader.
+fragment: true
+---
+
+<ComponentPreview
+  name="page-nav-demo"
+  description="Sub-navigation with NavMenu tabs"
+  align="start"
+  className="p-0"
+  padded={false}
+  peekCode
+  wide
+/>
+
+## Usage
+
+```tsx
+import { NavMenu, NavMenuItem } from 'ui'
+import { PageNav } from 'ui-patterns/PageNav'
+```
+
+```tsx
+<PageNav>
+  <NavMenu>
+    <NavMenuItem active>Overview</NavMenuItem>
+    <NavMenuItem>Logs</NavMenuItem>
+  </NavMenu>
+</PageNav>
+```
+
+## Sub-components
+
+- `PageNav` — bordered, full-width container for `NavMenu` tab navigation
+
+`PageNav` uses `PageContainer` with `size="full"` for width and padding. It does not depend on `PageHeader`.
+
+Place it directly below `PageBreadcrumbs` and outside `PageHeader`. For legacy pages, `PageHeaderNavigationTabs` remains available on `PageHeader`.

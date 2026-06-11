@@ -6,9 +6,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   Card,
   CardContent,
@@ -42,7 +42,7 @@ import z from 'zod'
 import CommandRender from '../CommandRender'
 import { INVOCATION_TABS } from './EdgeFunctionDetails.constants'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from '@/data/edge-functions/edge-functions-delete-mutation'
@@ -79,7 +79,8 @@ export const EdgeFunctionDetails = () => {
   const canUpdateEdgeFunction = IS_PLATFORM && canUpdateEdgeFunctionPermission
 
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
+  const { data: apiKeyData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
+  const { anonKey, publishableKey } = apiKeyData ?? {}
 
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
 
@@ -99,7 +100,6 @@ export const EdgeFunctionDetails = () => {
     defaultValues: { name: '', verify_jwt: false },
   })
 
-  const { anonKey, publishableKey } = getKeys(apiKeys)
   const apiKey = publishableKey?.api_key ?? anonKey?.api_key ?? '[YOUR ANON KEY]'
 
   const { managementCommands } = generateCLICommands({
@@ -346,15 +346,13 @@ export const EdgeFunctionDetails = () => {
               </PageSectionSummary>
             </PageSectionMeta>
             <PageSectionContent>
-              <Alert_Shadcn_ variant="destructive">
+              <Alert variant="destructive">
                 <CriticalIcon />
-                <AlertTitle_Shadcn_>
-                  Once your function is deleted, it can no longer be restored
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
+                <AlertTitle>Once your function is deleted, it can no longer be restored</AlertTitle>
+                <AlertDescription>
                   Make sure you have made a backup if you want to restore your edge function
-                </AlertDescription_Shadcn_>
-                <AlertDescription_Shadcn_ className="mt-3">
+                </AlertDescription>
+                <AlertDescription className="mt-3">
                   <Button
                     type="danger"
                     disabled={!canUpdateEdgeFunction}
@@ -363,8 +361,8 @@ export const EdgeFunctionDetails = () => {
                   >
                     Delete edge function
                   </Button>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                </AlertDescription>
+              </Alert>
             </PageSectionContent>
           </PageSection>
           <ConfirmationModal

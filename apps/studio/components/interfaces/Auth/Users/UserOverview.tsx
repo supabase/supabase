@@ -181,7 +181,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         {isBanned ? (
           <Admonition
             type="warning"
-            label={`User banned until ${dayjs(user.banned_until).format(DATE_FORMAT)}`}
+            description={`User banned until ${dayjs(user.banned_until).format(DATE_FORMAT)}`}
             className="border-r-0 border-l-0 rounded-none -mt-px [&_svg]:ml-0.5"
           />
         ) : (
@@ -316,10 +316,10 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 }
               />
               <RowAction
-                title={isVerified ? 'Send Magic Link' : 'Send confirmation email'}
+                title={isVerified ? 'Send magic link' : 'Send confirmation email'}
                 description={
                   isVerified
-                    ? 'Passwordless login via email for the user'
+                    ? 'Send a passwordless magic link to the user'
                     : 'Send a confirmation email to the user'
                 }
                 button={{

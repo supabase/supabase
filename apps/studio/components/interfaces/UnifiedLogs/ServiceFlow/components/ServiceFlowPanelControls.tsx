@@ -1,18 +1,34 @@
-import { ChevronDown, ChevronUp, X } from 'lucide-react'
-import { useCallback, useEffect, useMemo } from 'react'
-import { Button, KeyboardShortcut, Separator, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Check, ChevronDown, ChevronUp, PanelBottom, PanelRight, X } from 'lucide-react'
+import { useCallback, useMemo } from 'react'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Separator,
+} from 'ui'
 
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
-export const ServiceFlowPanelControls = () => {
-  const { table, rowSelection, isLoading } = useDataTable()
+interface ServiceFlowPanelControlsProps {
+  dock: 'bottom' | 'right'
+  setDock: (value: 'bottom' | 'right') => void
+}
 
-  const selectedRowKey = Object.keys(rowSelection)?.[0]
+export const ServiceFlowPanelControls = ({
+  dock = 'bottom',
+  setDock,
+}: ServiceFlowPanelControlsProps) => {
+  const { table, openRowId, setOpenRowId, isLoading } = useDataTable()
 
   const selectedRowData = useMemo(() => {
-    if (isLoading && !selectedRowKey) return
-    return table.getCoreRowModel().flatRows.find((row) => row.id === selectedRowKey)
-  }, [selectedRowKey, isLoading, table])
+    if (isLoading && !openRowId) return
+    return table.getCoreRowModel().flatRows.find((row) => row.id === openRowId)
+  }, [openRowId, isLoading, table])
 
   const index = table.getCoreRowModel().flatRows.findIndex((row) => row.id === selectedRowData?.id)
 
@@ -29,89 +45,88 @@ export const ServiceFlowPanelControls = () => {
   )
 
   const onPrev = useCallback(() => {
-    if (prevId) table.setRowSelection({ [prevId]: true })
-  }, [prevId, table])
+    if (prevId) setOpenRowId(prevId)
+  }, [prevId, setOpenRowId])
 
   const onNext = useCallback(() => {
-    if (nextId) table.setRowSelection({ [nextId]: true })
-  }, [nextId, table])
+    if (nextId) setOpenRowId(nextId)
+  }, [nextId, setOpenRowId])
 
   const onClose = useCallback(() => {
-    table.resetRowSelection()
-  }, [table])
-
-  useEffect(() => {
-    const down = (e: KeyboardEvent) => {
-      if (!selectedRowKey) return
-
-      const activeElement = document.activeElement
-      if (activeElement?.closest('[role="menu"]')) return
-
-      const tag = activeElement?.tagName
-      const isEditable =
-        tag === 'INPUT' ||
-        tag === 'TEXTAREA' ||
-        (activeElement as HTMLElement | null)?.isContentEditable ||
-        activeElement?.getAttribute('role') === 'textbox'
-      if (isEditable) return
-
-      if (e.key === 'ArrowUp') {
-        e.preventDefault()
-        onPrev()
-      }
-      if (e.key === 'ArrowDown') {
-        e.preventDefault()
-        onNext()
-      }
-    }
-
-    document.addEventListener('keydown', down)
-    return () => document.removeEventListener('keydown', down)
-  }, [selectedRowKey, onNext, onPrev])
+    setOpenRowId(undefined)
+  }, [setOpenRowId])
 
   return (
     <div className="flex h-7 items-center gap-1">
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            size="tiny"
-            type="text"
-            disabled={!prevId}
-            onClick={onPrev}
-            className="px-1"
-            icon={<ChevronUp />}
-          />
-        </TooltipTrigger>
-        <TooltipContent side="top" className="flex items-center gap-2">
-          <span>Previous</span>
-          <KeyboardShortcut keys={['ArrowUp']} />
-        </TooltipContent>
-      </Tooltip>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            size="tiny"
-            type="text"
-            disabled={!nextId}
-            onClick={onNext}
-            className="px-1"
-            icon={<ChevronDown />}
-          />
-        </TooltipTrigger>
-        <TooltipContent side="top" className="flex items-center gap-2">
-          <span>Next</span>
-          <KeyboardShortcut keys={['ArrowDown']} />
-        </TooltipContent>
-      </Tooltip>
+      <Shortcut
+        id={SHORTCUT_IDS.UNIFIED_LOGS_PREV_ROW}
+        onTrigger={onPrev}
+        options={{ enabled: !!prevId }}
+        side="top"
+      >
+        <Button
+          size="tiny"
+          type="text"
+          disabled={!prevId}
+          onClick={onPrev}
+          className="px-1"
+          icon={<ChevronUp />}
+        />
+      </Shortcut>
+
+      <Shortcut
+        id={SHORTCUT_IDS.UNIFIED_LOGS_NEXT_ROW}
+        onTrigger={onNext}
+        options={{ enabled: !!nextId }}
+        side="top"
+      >
+        <Button
+          size="tiny"
+          type="text"
+          disabled={!nextId}
+          onClick={onNext}
+          className="px-1"
+          icon={<ChevronDown />}
+        />
+      </Shortcut>
+
       <Separator orientation="vertical" className="mx-1 h-4" />
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button size="tiny" type="text" onClick={onClose} className="px-1" icon={<X />} />
-        </TooltipTrigger>
-        <TooltipContent side="top">
-          <span>Close</span>
-        </TooltipContent>
-      </Tooltip>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <ButtonTooltip
+            type="text"
+            className="px-1"
+            icon={dock === 'bottom' ? <PanelBottom /> : <PanelRight />}
+            tooltip={{ content: { side: 'top', text: 'Dock side' } }}
+          />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-40" align="end">
+          <DropdownMenuItem className="justify-between" onClick={() => setDock('bottom')}>
+            <div className="flex items-center gap-x-2">
+              <PanelBottom size={14} />
+              <span>Dock to bottom</span>
+            </div>
+            {dock === 'bottom' && <Check size={14} className="text-brand" />}
+          </DropdownMenuItem>
+          <DropdownMenuItem className="justify-between" onClick={() => setDock('right')}>
+            <div className="flex items-center gap-x-2">
+              <PanelRight size={14} />
+              <span>Dock to right</span>
+            </div>
+            {dock === 'right' && <Check size={14} className="text-brand" />}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <Shortcut
+        id={SHORTCUT_IDS.UNIFIED_LOGS_CLOSE_PANEL}
+        onTrigger={onClose}
+        options={{ conflictBehavior: 'allow' }}
+        side="top"
+      >
+        <Button size="tiny" type="text" onClick={onClose} className="px-1" icon={<X />} />
+      </Shortcut>
     </div>
   )
 }

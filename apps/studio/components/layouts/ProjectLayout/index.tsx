@@ -12,9 +12,9 @@ import {
   type ReactNode,
 } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   cn,
   LogoLoader,
   ResizableHandle,
@@ -25,7 +25,7 @@ import {
 } from 'ui'
 
 import { useEditorType } from '../editors/EditorsLayout.hooks'
-import { useSetMainScrollContainer } from '../MainScrollContainerContext'
+import { useMainScrollContainer, useSetMainScrollContainer } from '../MainScrollContainerContext'
 import { useMobileSheet } from '../Navigation/NavigationBar/MobileSheetContext'
 import ProductMenuBar from '../Navigation/ProductMenuBar'
 import BuildingState from './BuildingState'
@@ -169,6 +169,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const pathname = getPathnameWithoutQuery(router.asPath, router.pathname)
     const currentSectionKey = getSectionKeyFromPathname(pathname)
 
+    const mainScrollContainer = useMainScrollContainer()
     const setMainScrollContainer = useSetMainScrollContainer()
     const combinedRef = mergeRefs(ref, setMainScrollContainer)
 
@@ -245,6 +246,10 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       return unregister
     }, [registerOpenMenu, productMenu, product, currentSectionKey, setMobileSheetContent])
 
+    useLayoutEffect(() => {
+      mainScrollContainer?.scrollTo({ top: 0, left: 0 })
+    }, [pathname, mainScrollContainer])
+
     return (
       <>
         <Head>
@@ -299,7 +304,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                 ref={combinedRef}
               >
                 {showStripeProjectBanner && (
-                  <Alert_Shadcn_
+                  <Alert
                     variant="default"
                     className="flex items-center gap-4 border-t-0 border-x-0 rounded-none"
                   >
@@ -309,10 +314,10 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                       size="medium"
                     />
                     <div className="flex-1">
-                      <AlertTitle_Shadcn_>This project is connected to Stripe</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
+                      <AlertTitle>This project is connected to Stripe</AlertTitle>
+                      <AlertDescription>
                         Changes made here may affect your connected Stripe project.
-                      </AlertDescription_Shadcn_>
+                      </AlertDescription>
                     </div>
                     <ButtonTooltip
                       type="text"
@@ -322,7 +327,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                       aria-label="Dismiss project integration banner"
                       tooltip={{ content: { text: 'Dismiss' } }}
                     />
-                  </Alert_Shadcn_>
+                  </Alert>
                 )}
                 {showPausedState ? (
                   <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center px-4">

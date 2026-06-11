@@ -88,7 +88,7 @@ export const UserManagement = ({ selectedLang, showApiKey }: UserManagementProps
       />
 
       <DocSection
-        title="Log in with Magic Link via Email"
+        title="Sign in with magic link"
         content={
           <>
             <p>Send a user a passwordless link which they can use to redeem an access_token.</p>

@@ -1,13 +1,6 @@
-import { useStaticEffectEvent } from '~/hooks/useStaticEffectEvent'
 import { useRouter } from 'next/router'
-import { ComponentType, useEffect, useState } from 'react'
-import {
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-} from 'ui'
+import { ComponentType, useEffect, useEffectEvent, useState } from 'react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'ui'
 
 export type LegalDocVersion = {
   id: string
@@ -25,7 +18,7 @@ const LegalDocVersions = ({ versions }: Props) => {
   const latest = versions[0]
   const [activeId, setActiveId] = useState<string>(latest.id)
 
-  const syncActiveVersion = useStaticEffectEvent(() => {
+  const syncActiveVersion = useEffectEvent(() => {
     const fromQuery = typeof router.query.version === 'string' ? router.query.version : undefined
     if (fromQuery && versions.some((v) => v.id === fromQuery)) {
       setActiveId(fromQuery)
@@ -37,7 +30,8 @@ const LegalDocVersions = ({ versions }: Props) => {
   useEffect(() => {
     if (!router.isReady) return
     syncActiveVersion()
-  }, [router.isReady, router.query.version, syncActiveVersion])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [router.isReady, router.query.version])
 
   const active = versions.find((v) => v.id === activeId) ?? latest
   const ActiveComponent = active.Component
@@ -51,23 +45,29 @@ const LegalDocVersions = ({ versions }: Props) => {
 
   return (
     <>
-      <div className="not-prose mb-8 flex items-center gap-3">
-        <label htmlFor="legal-doc-version" className="text-foreground-lighter text-sm">
-          Version
-        </label>
-        <Select_Shadcn_ value={activeId} onValueChange={handleChange}>
-          <SelectTrigger_Shadcn_ id="legal-doc-version" className="w-auto min-w-[260px]">
-            <SelectValue_Shadcn_ />
-          </SelectTrigger_Shadcn_>
-          <SelectContent_Shadcn_>
-            {versions.map((v) => (
-              <SelectItem_Shadcn_ key={v.id} value={v.id}>
-                {v.label} — {v.effectiveDate}
-              </SelectItem_Shadcn_>
-            ))}
-          </SelectContent_Shadcn_>
-        </Select_Shadcn_>
-      </div>
+      {versions.length > 1 ? (
+        <div className="not-prose mb-8 flex items-center gap-3">
+          <label htmlFor="legal-doc-version" className="text-foreground-lighter text-sm">
+            Version
+          </label>
+          <Select value={activeId} onValueChange={handleChange}>
+            <SelectTrigger id="legal-doc-version" className="w-auto min-w-[260px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {versions.map((v) => (
+                <SelectItem key={v.id} value={v.id}>
+                  {v.label} — {v.effectiveDate}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      ) : (
+        <p className="not-prose mb-8 text-sm text-foreground-lighter">
+          {versions[0].label} — {versions[0].effectiveDate}
+        </p>
+      )}
       <ActiveComponent />
     </>
   )

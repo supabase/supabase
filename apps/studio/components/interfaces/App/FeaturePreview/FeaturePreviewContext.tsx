@@ -1,4 +1,4 @@
-import { FeatureFlagContext, LOCAL_STORAGE_KEYS, useFlag } from 'common'
+import { FeatureFlagContext, LOCAL_STORAGE_KEYS, safeLocalStorage, useFlag } from 'common'
 import { noop } from 'lodash'
 import { useQueryState } from 'nuqs'
 import {
@@ -6,14 +6,13 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useEffectEvent,
   useMemo,
   useState,
   type PropsWithChildren,
 } from 'react'
 
 import { useFeaturePreviews } from './useFeaturePreviews'
-import { useIsEnterpriseOrSupabaseOrg } from './useIsEnterpriseOrSupabaseOrg'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { EMPTY_OBJ } from '@/lib/void'
 
 type FeaturePreviewContextType = {
@@ -28,7 +27,7 @@ const FeaturePreviewContext = createContext<FeaturePreviewContextType>({
 
 export const useFeaturePreviewContext = () => useContext(FeaturePreviewContext)
 
-export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}>) => {
+export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) => {
   const { hasLoaded } = useContext(FeatureFlagContext)
   const featurePreviews = useFeaturePreviews()
 
@@ -36,18 +35,14 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
     featurePreviews.reduce((a, b) => ({ ...a, [b.key]: false }), {})
   )
 
-  const initializeFlags = useStaticEffectEvent(() => {
+  const initializeFlags = useEffectEvent(() => {
     setFlags(
       featurePreviews.reduce((a, b) => {
         const defaultOptIn = b.isDefaultOptIn
-        try {
-          const localStorageValue = window.localStorage.getItem(b.key)
-          return {
-            ...a,
-            [b.key]: !localStorageValue ? defaultOptIn : localStorageValue === 'true',
-          }
-        } catch {
-          return { ...a, [b.key]: defaultOptIn }
+        const localStorageValue = safeLocalStorage.getItem(b.key)
+        return {
+          ...a,
+          [b.key]: !localStorageValue ? defaultOptIn : localStorageValue === 'true',
         }
       }, {})
     )
@@ -57,18 +52,13 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
     if (typeof window !== 'undefined') {
       initializeFlags()
     }
-  }, [hasLoaded, initializeFlags])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [hasLoaded])
 
   const value = {
     flags,
     onUpdateFlag: (key: string, value: boolean) => {
-      try {
-        if (typeof window !== 'undefined' && window.localStorage) {
-          window.localStorage.setItem(key, value ? 'true' : 'false')
-        }
-      } catch {
-        // Silently fail in restricted storage modes (e.g. Safari private browsing)
-      }
+      safeLocalStorage.setItem(key, value ? 'true' : 'false')
       const updatedFlags = { ...flags, [key]: value }
       setFlags(updatedFlags)
     },
@@ -89,17 +79,13 @@ export const useUnifiedLogsPreview = () => {
   const { hasLoaded: flagsHaveLoaded } = useContext(FeatureFlagContext)
   const unifiedLogsEnabled = useFlag('unifiedLogs')
 
-  const { isEligible: isEnterpriseOrSupabaseOrg, isLoading: isOrgLoading } =
-    useIsEnterpriseOrSupabaseOrg()
-
-  const isLoading = !flagsHaveLoaded || isOrgLoading
-  const isEligible = unifiedLogsEnabled && isEnterpriseOrSupabaseOrg
+  const isLoading = !flagsHaveLoaded
   const isEnabled = unifiedLogsEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
 
-  return { isEnabled, isEligible, isLoading, enable, disable }
+  return { isEnabled, isEligible: unifiedLogsEnabled, isLoading, enable, disable }
 }
 
 export const useIsPgDeltaDiffEnabled = () => {
@@ -128,6 +114,12 @@ export const useIsJitDbAccessEnabled = () => {
 export const useIsRLSTesterEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER]
+}
+
+export const useIsMarketplaceEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+  return isMarketplaceEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]
 }
 
 export const useFeaturePreviewModal = () => {

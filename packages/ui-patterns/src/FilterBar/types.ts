@@ -99,6 +99,9 @@ export type MenuItem = {
   operatorSymbol?: string
   isDefaultOperator?: boolean
   defaultValue?: string
+  isFreeformSearch?: boolean
+  freeformPropertyName?: string
+  freeformValue?: string
 }
 
 export type GroupedMenuItem = {
@@ -139,7 +142,7 @@ export type KeyboardNavigationConfig = {
   activeInput: ActiveInputState
   setActiveInput: (input: ActiveInputState) => void
   activeFilters: FilterGroup
-  onFilterChange: (filters: FilterGroup) => void
+  commitFilters: (filters: FilterGroup) => void
   highlightedConditionPath: ConditionPath | null
   setHighlightedConditionPath: (path: ConditionPath | null) => void
 }

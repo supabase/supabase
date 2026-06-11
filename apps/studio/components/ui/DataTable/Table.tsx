@@ -20,7 +20,7 @@ export const Table = forwardRef<HTMLTableElement, ComponentPropsWithRef<typeof S
       className={cn(className)}
       containerProps={{
         onScroll,
-        className: 'h-full w-full overflow-auto table-fixed min-w-max caption-bottom text-sm',
+        className: 'h-full w-full overflow-auto caption-bottom text-sm [&>table]:table-fixed',
       }}
     />
   )
@@ -79,7 +79,7 @@ export const TableHead = forwardRef<
     className={cn(
       'text-xs! font-normal! text-foreground-lighter font-mono',
       'relative select-none truncate [&>.cursor-col-resize]:last:opacity-0',
-      'text-muted-foreground h-8 px-2 text-left align-middle [&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-[2px]',
+      'text-muted-foreground h-9 px-2 text-left align-middle [&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-[2px]',
       className
     )}
     {...props}

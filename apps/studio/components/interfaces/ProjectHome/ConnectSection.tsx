@@ -1,4 +1,3 @@
-import { IS_PLATFORM } from 'common'
 import { ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
@@ -8,7 +7,7 @@ import { Card, CardContent, cn } from 'ui'
 import { useAvailableConnectModes } from '../ConnectSheet/useAvailableConnectModes'
 import { CONNECT_ACTIONS } from './ConnectSection.config'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { BASE_PATH, PROJECT_STATUS } from '@/lib/constants'
+import { BASE_PATH, IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 

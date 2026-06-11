@@ -3706,6 +3706,8 @@ functions:
 
   - id: insert
     title: 'Create data: insert()'
+    notes: |
+      - Chain `.select()` after `insert()` to return specific columns from the inserted row(s).
     params:
       - name: json
         isOptional: false
@@ -3796,10 +3798,41 @@ functions:
           A bulk create operation is handled in a single transaction.
           If any of the inserts fail, none of the rows are inserted.
         hideCodeBlock: true
+      - id: insert-with-select
+        name: Insert and return selected columns
+        code: |
+          ```python
+          response = (
+              supabase.table("planets")
+              .insert({"id": 1, "name": "Pluto"})
+              .select("id, name")
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              planets (id int8 primary key, name text);
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Pluto"
+              }
+            ],
+            "count": null
+          }
+          ```
+        hideCodeBlock: true
   - id: update
     title: 'Modify data: update()'
     notes: |
       - `update()` should always be combined with [Filters](/docs/reference/python/using-filters) to target the item(s) you wish to update.
+      - Chain `.select()` after `update()` to return specific columns from the updated row(s).
     params:
       - name: json
         isOptional: false
@@ -3891,10 +3924,47 @@ functions:
         description: |
           Postgres offers some [operators](/docs/guides/database/json#query-the-jsonb-data) for working with JSON data. Currently, it is only possible to update the entire JSON document.
         hideCodeBlock: true
+      - id: update-with-select
+        name: Update and return selected columns
+        code: |
+          ```python
+          response = (
+              supabase.table("instruments")
+              .update({"name": "piano"})
+              .eq("id", 1)
+              .select("id, name")
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              instruments (id int8 primary key, name text);
+
+            insert into
+              instruments (id, name)
+            values
+              (1, 'harpsichord');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "piano"
+              }
+            ],
+            "count": null
+          }
+          ```
+        hideCodeBlock: true
   - id: upsert
     title: 'Upsert data: upsert()'
     notes: |
       - Primary keys must be included in the `values` dict to use upsert.
+      - Chain `.select()` after `upsert()` to return specific columns from the upserted row(s).
     params:
       - name: json
         isOptional: false
@@ -4041,6 +4111,41 @@ functions:
           In the following query, `upsert()` implicitly uses the `id`(primary key) column to determine conflicts. If there is no existing row with the same `id`, `upsert()` inserts a new row, which will fail in this case as there is already a row with `handle` `"saoirse"`.
           Using the `on_conflict` option, you can instruct `upsert()` to use another column with a unique constraint to determine conflicts.
         hideCodeBlock: true
+      - id: upsert-with-select
+        name: Upsert and return selected columns
+        code: |
+          ```python
+          response = (
+              supabase.table("instruments")
+              .upsert({"id": 1, "name": "piano"})
+              .select("id, name")
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              instruments (id int8 primary key, name text);
+
+            insert into
+              instruments (id, name)
+            values
+              (1, 'harpsichord');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "piano"
+              }
+            ],
+            "count": null
+          }
+          ```
+        hideCodeBlock: true
 
   - id: delete
     title: 'Delete data: delete()'
@@ -4052,6 +4157,7 @@ functions:
         no rows are visible, so you need at least one `SELECT`/`ALL` policy that
         makes the rows visible.
       - When using `delete().in_()`, specify an array of values to target multiple rows with a single query. This is particularly useful for batch deleting entries that share common criteria, such as deleting users by their IDs. Ensure that the array you provide accurately represents all records you intend to delete to avoid unintended data removal.
+      - Chain `.select()` after `delete()` to return specific columns from the deleted row(s).
     params:
       - name: count
         isOptional: true
@@ -4142,6 +4248,42 @@ functions:
           ```
         hideCodeBlock: false
         isSpotlight: false
+      - id: delete-with-select
+        name: Delete and return selected columns
+        code: |
+          ```python
+          response = (
+              supabase.table("countries")
+              .delete()
+              .eq("id", 1)
+              .select("id, name")
+              .execute()
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Mordor');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Mordor"
+              }
+            ],
+            "count": null
+          }
+          ```
+        hideCodeBlock: true
 
   - id: rpc
     title: 'Postgres functions: rpc()'

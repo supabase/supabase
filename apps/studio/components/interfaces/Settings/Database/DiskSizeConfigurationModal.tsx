@@ -8,10 +8,17 @@ import { SetStateAction, useEffect, useMemo } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
   Form,
   FormControl,
   FormField,
@@ -20,7 +27,6 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Modal,
   WarningIcon,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -92,11 +98,19 @@ const DiskSizeConfigurationModal = ({
   const diskSizeValidationSchema = useMemo(
     () =>
       z.object({
-        'new-disk-size': z.coerce
-          .number({ required_error: 'Please enter a GB amount you want to resize the disk up to.' })
-          .min(Number(currentDiskSize ?? 0), `Must be at least ${currentDiskSize} GB`)
-          // to do, update with max_disk_volume_size_gb
-          .max(Number(maxDiskSize), `Must not be more than ${maxDiskSize} GB`),
+        'new-disk-size': z
+          .union([
+            z.literal(''),
+            z.coerce
+              .number()
+              .min(Number(currentDiskSize ?? 0), `Must be at least ${currentDiskSize} GB`)
+              // to do, update with max_disk_volume_size_gb
+              .max(Number(maxDiskSize), `Must not be more than ${maxDiskSize} GB`),
+          ])
+          .refine(
+            (value) => value !== '',
+            'Please enter a GB amount you want to resize the disk up to'
+          ),
       }),
     [currentDiskSize]
   )
@@ -120,154 +134,145 @@ const DiskSizeConfigurationModal = ({
   }, [INITIAL_VALUES, isDirty, reset])
 
   return (
-    <Modal
-      header="Increase Disk Storage Size"
-      size="medium"
-      visible={visible}
-      loading={loading}
-      onCancel={() => hideModal(false)}
-      hideFooter
-    >
-      {isLoading ? (
-        <div className="flex flex-col gap-4 p-4">
-          <ShimmeringLoader />
-          <ShimmeringLoader />
-        </div>
-      ) : projectSubscriptionData?.usage_billing_enabled === true &&
-        hasAccessToDiskModifications ? (
-        <>
-          {currentDiskSize >= maxDiskSize ? (
-            <Alert_Shadcn_ variant="warning" className="rounded-t-none border-0">
-              <WarningIcon />
-              <AlertTitle_Shadcn_>Maximum manual disk size increase reached</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
-                <p>
-                  You cannot manually expand the disk size any more than {maxDiskSize}GB. If you
-                  need more than this, contact us via support for help.
-                </p>
-                <Button asChild type="default" className="mt-3">
-                  <SupportLink
-                    queryParams={{
-                      projectRef,
-                      category: SupportCategories.PERFORMANCE_ISSUES,
-                      subject: 'Increase disk size beyond 200GB',
-                    }}
-                  >
-                    Contact support
-                  </SupportLink>
-                </Button>
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-          ) : (
-            <>
-              <Modal.Content className="w-full space-y-4">
-                <Alert_Shadcn_ variant={isAbleToResizeDatabase ? 'default' : 'warning'}>
-                  <Info size={16} />
-                  <AlertTitle_Shadcn_>
-                    This operation is only possible every 4 hours
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
-                    <div className="mb-4">
-                      {isAbleToResizeDatabase
-                        ? `Upon updating your disk size, the next disk size update will only be available from ${dayjs().format(
-                            'DD MMM YYYY, HH:mm (ZZ)'
-                          )}`
-                        : `Your database was last resized at ${dayjs(lastDatabaseResizeAt).format(
-                            'DD MMM YYYY, HH:mm (ZZ)'
-                          )}. You can resize your database again in approximately ${formattedTimeTillNextAvailableResize}`}
-                    </div>
-                    <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
-                      <Link href={`${DOCS_URL}/guides/platform/database-size#disk-management`}>
-                        Read more about disk management
-                      </Link>
-                    </Button>
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
-                <Form {...form}>
-                  <form id={formId} onSubmit={form.handleSubmit(handleSubmit)} noValidate>
-                    <FormField
-                      control={form.control}
-                      name="new-disk-size"
-                      disabled={!isAbleToResizeDatabase}
-                      render={({ field }) => (
-                        <FormItemLayout
-                          name="new-disk-size"
-                          layout="vertical"
-                          label="New disk size"
-                        >
-                          <FormControl>
-                            <InputGroup>
-                              <FormInputGroupInput
-                                {...field}
-                                id="new-disk-size"
-                                type="number"
-                                onChange={(e) => field.onChange(Number(e.target.value))}
-                              />
-                              <InputGroupAddon align="inline-end">
-                                <InputGroupText>GB</InputGroupText>
-                              </InputGroupAddon>
-                            </InputGroup>
-                          </FormControl>
-                        </FormItemLayout>
-                      )}
-                    />
-                  </form>
-                </Form>
-              </Modal.Content>
-              <Modal.Separator />
-              <Modal.Content className="flex space-x-2 justify-end">
-                <Button type="default" onClick={() => hideModal(false)}>
-                  Cancel
-                </Button>
-                <Button
-                  form={formId}
-                  htmlType="submit"
-                  type="primary"
-                  disabled={!isAbleToResizeDatabase || isUpdatingDiskSize || !isDirty}
-                  loading={isUpdatingDiskSize}
-                >
-                  Update disk size
-                </Button>
-              </Modal.Content>
-            </>
-          )}
-        </>
-      ) : (
-        <Alert_Shadcn_ className="border-none">
-          <InfoIcon />
-          <AlertTitle_Shadcn_>
-            {hasAccessToDiskModifications === false
-              ? 'Disk size configuration is not available for projects on the Free Plan'
-              : 'Disk size configuration is only available when the spend cap has been disabled'}
-          </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
-            {hasAccessToDiskModifications === false ? (
-              <p>
-                If you are intending to use more than 500MB of disk space, then you will need to
-                upgrade to at least the Pro Plan.
-              </p>
+    <Dialog open={visible} onOpenChange={(open) => hideModal(open)}>
+      <DialogContent size="medium">
+        <DialogHeader>
+          <DialogTitle>Increase Disk Storage Size</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        {isLoading ? (
+          <div className="flex flex-col gap-4 p-4">
+            <ShimmeringLoader />
+            <ShimmeringLoader />
+          </div>
+        ) : projectSubscriptionData?.usage_billing_enabled === true &&
+          hasAccessToDiskModifications ? (
+          <>
+            {currentDiskSize >= maxDiskSize ? (
+              <Alert variant="warning" className="rounded-t-none border-0">
+                <WarningIcon />
+                <AlertTitle>Maximum manual disk size increase reached</AlertTitle>
+                <AlertDescription>
+                  <p>
+                    You cannot manually expand the disk size any more than {maxDiskSize}GB. If you
+                    need more than this, contact us via support for help.
+                  </p>
+                  <Button asChild type="default" className="mt-3">
+                    <SupportLink
+                      queryParams={{
+                        projectRef,
+                        category: SupportCategories.PERFORMANCE_ISSUES,
+                        subject: 'Increase disk size beyond 200GB',
+                      }}
+                    >
+                      Contact support
+                    </SupportLink>
+                  </Button>
+                </AlertDescription>
+              </Alert>
             ) : (
-              <p>
-                If you are intending to use more than 8GB of disk space, then you will need to
-                disable your spend cap.
-              </p>
+              <>
+                <DialogSection className="w-full space-y-4">
+                  <Alert variant={isAbleToResizeDatabase ? 'default' : 'warning'}>
+                    <Info size={16} />
+                    <AlertTitle>This operation is only possible every 4 hours</AlertTitle>
+                    <AlertDescription>
+                      <div className="mb-4">
+                        {isAbleToResizeDatabase
+                          ? `Upon updating your disk size, the next disk size update will only be available from ${dayjs().format(
+                              'DD MMM YYYY, HH:mm (ZZ)'
+                            )}`
+                          : `Your database was last resized at ${dayjs(lastDatabaseResizeAt).format(
+                              'DD MMM YYYY, HH:mm (ZZ)'
+                            )}. You can resize your database again in approximately ${formattedTimeTillNextAvailableResize}`}
+                      </div>
+                      <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
+                        <Link href={`${DOCS_URL}/guides/platform/database-size#disk-management`}>
+                          Read more about disk management
+                        </Link>
+                      </Button>
+                    </AlertDescription>
+                  </Alert>
+                  <Form {...form}>
+                    <form id={formId} onSubmit={form.handleSubmit(handleSubmit)} noValidate>
+                      <FormField
+                        control={form.control}
+                        name="new-disk-size"
+                        disabled={!isAbleToResizeDatabase}
+                        render={({ field }) => (
+                          <FormItemLayout
+                            name="new-disk-size"
+                            layout="vertical"
+                            label="New disk size"
+                          >
+                            <FormControl>
+                              <InputGroup>
+                                <FormInputGroupInput {...field} id="new-disk-size" type="number" />
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>GB</InputGroupText>
+                                </InputGroupAddon>
+                              </InputGroup>
+                            </FormControl>
+                          </FormItemLayout>
+                        )}
+                      />
+                    </form>
+                  </Form>
+                </DialogSection>
+                <DialogFooter>
+                  <Button type="default" onClick={() => hideModal(false)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    form={formId}
+                    htmlType="submit"
+                    type="primary"
+                    disabled={!isAbleToResizeDatabase || isUpdatingDiskSize || !isDirty || loading}
+                    loading={isUpdatingDiskSize || loading}
+                  >
+                    Update disk size
+                  </Button>
+                </DialogFooter>
+              </>
             )}
-            <Button asChild type="default" className="mt-3">
-              <Link
-                href={`/org/${organization?.slug}/billing?panel=${
-                  hasAccessToDiskModifications === false ? 'subscriptionPlan' : 'costControl'
-                }`}
-                target="_blank"
-              >
-                {hasAccessToDiskModifications === false
-                  ? 'Upgrade subscription'
-                  : 'Disable spend cap'}
-              </Link>
-            </Button>
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
-      )}
-    </Modal>
+          </>
+        ) : (
+          <Alert className="border-none">
+            <InfoIcon />
+            <AlertTitle>
+              {hasAccessToDiskModifications === false
+                ? 'Disk size configuration is not available for projects on the Free Plan'
+                : 'Disk size configuration is only available when the spend cap has been disabled'}
+            </AlertTitle>
+            <AlertDescription>
+              {hasAccessToDiskModifications === false ? (
+                <p>
+                  If you are intending to use more than 500MB of disk space, then you will need to
+                  upgrade to at least the Pro Plan.
+                </p>
+              ) : (
+                <p>
+                  If you are intending to use more than 8GB of disk space, then you will need to
+                  disable your spend cap.
+                </p>
+              )}
+              <Button asChild type="default" className="mt-3">
+                <Link
+                  href={`/org/${organization?.slug}/billing?panel=${
+                    hasAccessToDiskModifications === false ? 'subscriptionPlan' : 'costControl'
+                  }`}
+                  target="_blank"
+                >
+                  {hasAccessToDiskModifications === false
+                    ? 'Upgrade subscription'
+                    : 'Disable spend cap'}
+                </Link>
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+      </DialogContent>
+    </Dialog>
   )
 }
 

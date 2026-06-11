@@ -1,7 +1,28 @@
 import { describe, expect, it } from 'vitest'
 
 import { cronPattern, secondsPattern } from './CronJobs.constants'
-import { formatCronJobColumns, parseCronJobCommand } from './CronJobs.utils'
+import {
+  buildCronCreateQuery,
+  buildCronUpdateQuery,
+  formatCronJobColumns,
+  parseCronJobCommand,
+} from './CronJobs.utils'
+
+describe('buildCronQuery', () => {
+  it('uses cron.schedule to create a job by name', () => {
+    expect(buildCronCreateQuery('my-job', '*/5 * * * *', 'select 1')).toBe(
+      "select cron.schedule('my-job', '*/5 * * * *', 'select 1');"
+    )
+  })
+})
+
+describe('buildCronUpdateQuery', () => {
+  it('uses cron.alter_job to update a job by id', () => {
+    expect(buildCronUpdateQuery(42, '*/10 * * * *', 'select 2')).toBe(
+      "select cron.alter_job(job_id := 42, schedule := '*/10 * * * *', command := 'select 2');"
+    )
+  })
+})
 
 describe('parseCronJobCommand', () => {
   it('should return a default object when the command is null', () => {
@@ -48,6 +69,16 @@ describe('parseCronJobCommand', () => {
       type: 'sql_function',
       schema: 'random_schema',
       functionName: 'function_1',
+      snippet: command,
+    })
+  })
+
+  it('should return a sql function command for lowercase select', () => {
+    const command = 'select lowercase.issue ()'
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      type: 'sql_function',
+      schema: 'lowercase',
+      functionName: 'issue',
       snippet: command,
     })
   })

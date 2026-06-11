@@ -1,3 +1,4 @@
+import { safeSql } from '@supabase/pg-meta/src/pg-format'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { RefreshCw, RotateCcw, X } from 'lucide-react'
 import { parseAsString, useQueryStates } from 'nuqs'
@@ -15,8 +16,8 @@ import { QueryPerformanceMetrics } from '../QueryPerformanceMetrics'
 import { QueryPerformanceInfiniteHook } from '../useQueryPerformanceQuery'
 import { transformStatementDataToRows } from './WithStatements.utils'
 import { PresetHookResult } from '@/components/interfaces/Reports/Reports.utils'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 import { executeSql } from '@/data/sql/execute-sql-query'
@@ -26,6 +27,8 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 import { getErrorMessage } from '@/lib/get-error-message'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface WithStatementsProps {
   queryHitRate: PresetHookResult
@@ -74,6 +77,13 @@ export const WithStatements = ({
     queryHitRate.runQuery()
     queryMetrics.runQuery()
   }
+
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_REFRESH, handleRefresh, {
+    enabled: !isRefetching,
+  })
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_RESET_REPORT, () => {
+    setShowResetgPgStatStatements(true)
+  })
 
   const processedData = useMemo(() => {
     return transformStatementDataToRows(data || [], indexAdvisor === 'true')
@@ -194,22 +204,32 @@ export const WithStatements = ({
         showSourceFilter
         actions={
           <>
-            <ButtonTooltip
-              type="default"
-              size="tiny"
-              icon={<RefreshCw />}
-              onClick={handleRefresh}
-              tooltip={{ content: { side: 'top', text: 'Refresh' } }}
-              className="w-[26px]"
-            />
-            <ButtonTooltip
-              type="default"
-              size="tiny"
-              icon={<RotateCcw />}
-              onClick={() => setShowResetgPgStatStatements(true)}
-              tooltip={{ content: { side: 'top', text: 'Reset report' } }}
-              className="w-[26px]"
-            />
+            <ShortcutTooltip
+              shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
+              label="Refresh"
+              side="top"
+            >
+              <Button
+                type="default"
+                size="tiny"
+                icon={<RefreshCw />}
+                onClick={handleRefresh}
+                className="w-[26px]"
+              />
+            </ShortcutTooltip>
+            <ShortcutTooltip
+              shortcutId={SHORTCUT_IDS.OBSERVABILITY_RESET_REPORT}
+              label="Reset report"
+              side="top"
+            >
+              <Button
+                type="default"
+                size="tiny"
+                icon={<RotateCcw />}
+                onClick={() => setShowResetgPgStatStatements(true)}
+                className="w-[26px]"
+              />
+            </ShortcutTooltip>
 
             <DownloadResultsButton
               results={processedData}
@@ -297,7 +317,7 @@ export const WithStatements = ({
             await executeSql({
               projectRef: project?.ref,
               connectionString,
-              sql: `SELECT pg_stat_statements_reset();`,
+              sql: safeSql`SELECT pg_stat_statements_reset();`,
             })
             handleRefresh()
             setShowResetgPgStatStatements(false)

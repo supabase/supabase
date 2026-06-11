@@ -31,7 +31,7 @@ import { PublicationSelection } from './PublicationSelection'
 import { ReplicationDisclaimerDialog } from './ReplicationDisclaimerDialog'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
 import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import {
   BatchConfig,
@@ -56,6 +56,7 @@ import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from '@/state/replication-pipeline-request-status'
+import { type ResponseError } from '@/types'
 
 const formId = 'destination-editor'
 
@@ -83,7 +84,6 @@ type DucklakeApiConfig = {
   s3_url_style?: 'path' | 'vhost'
   s3_use_ssl?: boolean
   metadata_schema?: string
-  expire_snapshots_older_than?: string
 }
 
 export const DestinationForm = ({
@@ -149,11 +149,12 @@ export const DestinationForm = ({
     pipelineId: existingDestination?.pipelineId,
   })
 
-  const { data: apiKeys } = useAPIKeysQuery(
+  const { data: apiKeysData } = useAPIKeys(
     { projectRef, reveal: true },
     { enabled: canReadAPIKeys }
   )
-  const { serviceKey } = getKeys(apiKeys)
+  const { serviceKey } = apiKeysData ?? {}
+
   const catalogToken = serviceKey?.api_key ?? ''
 
   const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
@@ -236,7 +237,6 @@ export const DestinationForm = ({
       ducklakeS3UrlStyle: ducklakeConfig?.s3_url_style ?? 'path',
       ducklakeS3UseSsl: ducklakeConfig?.s3_use_ssl ?? true,
       ducklakeMetadataSchema: ducklakeConfig?.metadata_schema ?? 'ducklake',
-      ducklakeExpireSnapshotsOlderThan: ducklakeConfig?.expire_snapshots_older_than ?? '',
     }
   }, [destinationData, pipelineData, catalogToken, projectSettings])
 
@@ -368,8 +368,11 @@ export const DestinationForm = ({
     const hasRequestError = results.some((r) => r.status === 'rejected')
 
     if (hasRequestError) {
-      // If any request failed, show a generic error and stop
-      toast.error('Failed to validate configuration. Please try again.')
+      // If any request failed, surface the upstream message so users see why
+      const rejected = results.find((r): r is PromiseRejectedResult => r.status === 'rejected')
+      const reason =
+        rejected?.reason instanceof Error ? rejected.reason.message : 'Please try again.'
+      toast.error(`Failed to validate configuration: ${reason}`)
       setHasRunValidation(false)
       return false
     }
@@ -481,7 +484,7 @@ export const DestinationForm = ({
       }
     } catch (error) {
       const action = editMode ? 'apply and run' : 'create and start'
-      toast.error(`Failed to ${action} destination`)
+      toast.error(`Failed to ${action} destination: ${(error as ResponseError).message}`)
     }
   }
 

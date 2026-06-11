@@ -2,12 +2,12 @@ import { UseFormReturn } from 'react-hook-form'
 import { CloudProvider } from 'shared-data'
 import {
   FormField,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { ComputeBadge } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -50,12 +50,12 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
               </>
             }
           >
-            <Select_Shadcn_ value={field.value} onValueChange={(value) => field.onChange(value)}>
-              <SelectTrigger_Shadcn_ className="[&>span>div>div>[data-field=instance-details]]:hidden">
-                <SelectValue_Shadcn_ placeholder="Select a compute size" />
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
-                <SelectGroup_Shadcn_>
+            <Select value={field.value} onValueChange={(value) => field.onChange(value)}>
+              <SelectTrigger className="[&>span>div>div>[data-field=instance-details]]:hidden">
+                <SelectValue placeholder="Select a compute size" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
                   {sizes
                     .filter((option) =>
                       instanceSizeSpecs[option].cloud_providers.includes(
@@ -64,7 +64,7 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
                     )
                     .map((option) => {
                       return (
-                        <SelectItem_Shadcn_ key={option} value={option}>
+                        <SelectItem key={option} value={option}>
                           <div className="flex flex-row gap-4 items-center">
                             <div className="w-14 flex items-center">
                               <ComputeBadge infraComputeSize={option} />
@@ -89,17 +89,17 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
                               </p>
                             </div>
                           </div>
-                        </SelectItem_Shadcn_>
+                        </SelectItem>
                       )
                     })}
-                  <SelectItem_Shadcn_ key={'disabled'} value={'disabled'} disabled>
+                  <SelectItem key={'disabled'} value={'disabled'} disabled>
                     <div className="flex items-center justify-center w-full">
                       <span>Larger instance sizes available after creation</span>
                     </div>
-                  </SelectItem_Shadcn_>
-                </SelectGroup_Shadcn_>
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
+                  </SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </FormItemLayout>
         )}
       />

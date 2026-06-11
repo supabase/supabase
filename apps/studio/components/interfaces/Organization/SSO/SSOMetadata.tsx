@@ -7,7 +7,7 @@ import {
   FormField,
   FormItem,
   FormMessage,
-  Input_Shadcn_,
+  Input,
   Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
@@ -61,7 +61,7 @@ export const SSOMetadata = ({
     <FormItemLayout
       label="Metadata"
       layout="flex-row-reverse"
-      description="Provide a link to your metadata .xml file or upload one"
+      description="Provide a link to your metadata .xml file or upload one."
       className="gap-1"
     >
       <div className=" w-96">
@@ -84,7 +84,7 @@ export const SSOMetadata = ({
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input_Shadcn_
+                    <Input
                       {...field}
                       placeholder="https://example.com/metadata.xml"
                       autoComplete="off"

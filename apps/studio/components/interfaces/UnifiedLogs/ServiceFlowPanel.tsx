@@ -14,7 +14,7 @@ import {
 } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
-import { PostgresFlowDetail } from './ServiceFlow/components/blocks/PostgresFlowDetail'
+import { PostgresFlowDetail } from './ServiceFlow/components/PostgresFlowDetail'
 import {
   MemoizedEdgeFunctionBlock,
   MemoizedGoTrueBlock,
@@ -27,20 +27,26 @@ import { ServiceFlowPanelControls } from './ServiceFlow/components/ServiceFlowPa
 import { DetailSectionHeader } from './ServiceFlow/components/shared/DetailSection'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
+import { getRowTimestampMs } from './UnifiedLogs.utils'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
 import {
+  SERVICE_FLOW_TYPES,
   ServiceFlowType,
   useUnifiedLogInspectionQuery,
 } from '@/data/logs/unified-log-inspection-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 interface ServiceFlowPanelProps {
+  dock: 'bottom' | 'right'
+  setDock: (value: 'bottom' | 'right') => void
   selectedRow?: ColumnSchema
   selectedRowKey: string
   searchParameters: QuerySearchParamsType
 }
 
 export function ServiceFlowPanel({
+  dock,
+  setDock,
   selectedRow,
   selectedRowKey,
   searchParameters,
@@ -58,8 +64,12 @@ export function ServiceFlowPanel({
   }, [selectedRowKey])
 
   const logType = selectedRow?.log_type
-  const serviceFlowType: ServiceFlowType | undefined =
-    logType === 'edge function' ? 'edge-function' : (logType as ServiceFlowType)
+  const normalizedLogType = logType === 'edge function' ? 'edge-function' : logType
+  const serviceFlowType: ServiceFlowType | undefined = SERVICE_FLOW_TYPES.includes(
+    normalizedLogType as ServiceFlowType
+  )
+    ? (normalizedLogType as ServiceFlowType)
+    : undefined
   const shouldShowServiceFlow = !!serviceFlowType
 
   useEffect(() => {
@@ -82,18 +92,12 @@ export function ServiceFlowPanel({
       type: serviceFlowType,
       search: searchParameters,
     },
-    {
-      enabled: Boolean(projectRef) && Boolean(selectedRow?.id) && Boolean(serviceFlowType),
-    }
+    { enabled: Boolean(selectedRow?.id) && Boolean(serviceFlowType) }
   )
 
   if (!selectedRowKey || !selectedRow) return null
 
-  const timestampMs = selectedRow.timestamp
-    ? selectedRow.timestamp / 1000
-    : selectedRow.date
-      ? selectedRow.date.getTime()
-      : null
+  const timestampMs = getRowTimestampMs(selectedRow)
   const formattedTime = timestampMs ? new Date(timestampMs).toLocaleString() : null
 
   // Prepare JSON data for Raw JSON tab
@@ -114,7 +118,7 @@ export function ServiceFlowPanel({
       <ResizablePanel
         id="log-sidepanel"
         defaultSize={400}
-        minSize={300}
+        minSize={dock === 'bottom' ? 300 : 400}
         className="bg-dash-sidebar"
       >
         <div className="flex h-full flex-col overflow-hidden">
@@ -138,7 +142,8 @@ export function ServiceFlowPanel({
                   Raw JSON
                 </TabsTrigger>
               </TabsList>
-              <ServiceFlowPanelControls />
+
+              <ServiceFlowPanelControls dock={dock} setDock={setDock} />
             </div>
 
             {shouldShowServiceFlow && (
@@ -158,13 +163,12 @@ export function ServiceFlowPanel({
                     table={table}
                   />
                 ) : (
-                  <div className="[&>*:nth-child(even)]:bg-surface-100/50">
+                  <div>
                     <DetailSectionHeader
                       title="Request started"
                       icon={Clock}
                       summary={formattedTime ?? undefined}
                     />
-
                     <MemoizedNetworkBlock
                       data={selectedRow}
                       enrichedData={serviceFlowData?.result?.[0]}
@@ -172,7 +176,6 @@ export function ServiceFlowPanel({
                       filterFields={filterFields}
                       table={table}
                     />
-
                     {serviceFlowType === 'auth' ? (
                       <MemoizedGoTrueBlock
                         data={selectedRow}

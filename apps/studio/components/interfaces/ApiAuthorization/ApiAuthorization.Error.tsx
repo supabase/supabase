@@ -1,14 +1,9 @@
+import Link from 'next/link'
 import type { ReactNode } from 'react'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Card,
-  CardContent,
-  CardHeader,
-  WarningIcon,
-} from 'ui'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns'
 
+import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
 import type { ResourceError } from '@/data/api-authorization/api-authorization-query'
 
 export interface ApiAuthorizationErrorScreenProps {
@@ -19,20 +14,23 @@ export function ApiAuthorizationErrorScreen({
   error,
 }: ApiAuthorizationErrorScreenProps): ReactNode {
   return (
-    <Card>
-      <CardHeader>Authorize API access</CardHeader>
-      <CardContent className="p-0">
-        <Alert_Shadcn_ variant="warning" className="border-0 rounded-t-none">
-          <WarningIcon />
-          <AlertTitle_Shadcn_>
-            Failed to fetch details for API authorization request
-          </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
-            <p>Please retry your authorization request from the requesting app</p>
-            {error && <p className="mt-2">Error: {error?.message}</p>}
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
-      </CardContent>
-    </Card>
+    <InterstitialLayout logo={<SupabaseLogo />} title="Unable to load authorization">
+      <div className="flex flex-col gap-3 px-6 pb-6">
+        <Admonition
+          type="warning"
+          description={
+            <>
+              Retry the authorization request from the requesting app.
+              {error && (
+                <span className="mt-1 block text-foreground-lighter">Error: {error.message}</span>
+              )}
+            </>
+          }
+        />
+        <Button type="default" block asChild>
+          <Link href="/">Back to dashboard</Link>
+        </Button>
+      </div>
+    </InterstitialLayout>
   )
 }

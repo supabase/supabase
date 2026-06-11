@@ -1,7 +1,7 @@
 import { ChevronsUpDown, Lightbulb } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button, cn } from 'ui'
 
 import { QueryPanelContainer, QueryPanelSection } from './QueryPanel'
 import { buildQueryExplanationPrompt } from './QueryPerformance.ai'
@@ -104,21 +104,21 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
             wrapperClassName={cn('pl-3 bg-surface-100', !isExpanded && 'pointer-events-none')}
           />
           {isLinterWarning && (
-            <Alert_Shadcn_
+            <Alert
               variant="default"
               className="mt-2 border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-brand"
             >
               <Lightbulb />
-              <AlertTitle_Shadcn_>Suggested optimization: Add an index</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+              <AlertTitle>Suggested optimization: Add an index</AlertTitle>
+              <AlertDescription>
                 Adding an index will help this query execute faster
-              </AlertDescription_Shadcn_>
-              <AlertDescription_Shadcn_>
+              </AlertDescription>
+              <AlertDescription>
                 <Button className="mt-3" onClick={() => onClickViewSuggestion()}>
                   View suggestion
                 </Button>
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
+              </AlertDescription>
+            </Alert>
           )}
         </div>
         <div
