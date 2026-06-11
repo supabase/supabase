@@ -8,12 +8,11 @@
     "build": "storybook build"
   },
   "dependencies": {
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6"
+    "react": "catalog:",
+    "react-dom": "catalog:"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^5.2.1",
-    "@eslint/js": "^10.0.1",
     "@storybook/addon-a11y": "10.4.2",
     "@storybook/addon-docs": "10.4.2",
     "@storybook/addon-mcp": "^0.6.0",
@@ -26,17 +25,17 @@
     "@vitejs/plugin-react": "^6.0.1",
     "@vitest/browser-playwright": "4.1.4",
     "config": "workspace:*",
-    "eslint": "^10.3.0",
-    "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-react-refresh": "^0.5.2",
-    "eslint-plugin-storybook": "10.4.2",
+    "eslint-config-supabase": "workspace:*",
+    "eslint-plugin-barrel-files": "^2.0.7",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
     "globals": "^17.6.0",
     "playwright": "^1.60.0",
     "storybook": "10.4.2",
     "tailwindcss": "catalog:",
-    "typescript": "~6.0.2",
-    "typescript-eslint": "^8.59.2",
-    "vite": "^8.0.12",
-    "vitest": "4.1.4"
+    "tsconfig": "workspace:*",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-tsconfig-paths": "catalog:",
+    "vitest": "catalog:"
   }
 }
