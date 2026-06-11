@@ -31,3 +31,25 @@ export function toCodeBlockLang(langOrPath: string): string {
       return raw
   }
 }
+
+/** Maps guide block languages onto Prism identifiers used by react-syntax-highlighter. */
+export function toPrismLanguage(langOrPath: string): string {
+  const mapped = toCodeBlockLang(langOrPath)
+
+  switch (mapped) {
+    case 'ts':
+      return 'typescript'
+    case 'js':
+      return 'javascript'
+    case 'bash':
+      return 'bash'
+    case 'sql':
+      return 'sql'
+    case 'json':
+      return 'json'
+    case 'toml':
+      return 'toml'
+    default:
+      return mapped
+  }
+}
