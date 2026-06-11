@@ -764,16 +764,20 @@ export const HTTP_CLIENT_ERROR_STATUS = 400
  * and the HTTP status so the table stays consistent with the chart and with the
  * other log services: 5xx is an error, 4xx is a warning, everything else falls
  * back to the log level.
+ *
+ * `level` and `status` are untyped log row values, so they are validated rather
+ * than cast: anything that is not a usable string/number is ignored.
  */
-export function getAuthLogSeverity(level?: string | null, status?: string | number | null): string {
-  const normalizedLevel = level ?? ''
+export function getAuthLogSeverity(level?: unknown, status?: unknown): string {
+  const normalizedLevel = typeof level === 'string' ? level : ''
 
   // Preserve explicit error-class levels so we never downgrade them and so the
   // original label (e.g. "fatal") is kept.
   if (normalizedLevel === 'error' || normalizedLevel === 'fatal') return normalizedLevel
 
-  const statusCode = typeof status === 'string' ? Number(status) : status
-  const hasStatus = typeof statusCode === 'number' && Number.isFinite(statusCode)
+  const statusCode =
+    typeof status === 'number' ? status : typeof status === 'string' ? Number(status) : NaN
+  const hasStatus = Number.isFinite(statusCode)
 
   if (hasStatus && statusCode >= HTTP_SERVER_ERROR_STATUS) return 'error'
   if (normalizedLevel === 'warning') return 'warning'

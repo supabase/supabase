@@ -263,5 +263,12 @@ describe('Logs.utils', () => {
       expect(getAuthLogSeverity()).toBe('')
       expect(getAuthLogSeverity(null, 200)).toBe('')
     })
+
+    test('ignores non-string levels and non-numeric statuses', () => {
+      expect(getAuthLogSeverity({}, {})).toBe('')
+      expect(getAuthLogSeverity(42, 500)).toBe('error')
+      expect(getAuthLogSeverity('info', {})).toBe('info')
+      expect(getAuthLogSeverity('info', [500])).toBe('info')
+    })
   })
 })

@@ -21,12 +21,7 @@ const columns: Column<LogData>[] = [
         <RowLayout>
           <TimestampInfo utcTimestamp={props.row.timestamp!} />
           {props.row.level && (
-            <SeverityFormatter
-              value={getAuthLogSeverity(
-                props.row.level as string,
-                props.row.status as string | number | undefined
-              )}
-            />
+            <SeverityFormatter value={getAuthLogSeverity(props.row.level, props.row.status)} />
           )}
           <TextFormatter
             className="w-full"
