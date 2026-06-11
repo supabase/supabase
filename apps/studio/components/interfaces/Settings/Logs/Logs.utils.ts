@@ -746,6 +746,29 @@ function getWarningCondition(table: LogsTableName): SafeLogSqlFragment {
   }
 }
 
+/**
+ * Auth logs are emitted at `level: info` even when they represent a failed
+ * request (e.g. a 400/401/429 from a failed login). The auth logs chart treats
+ * any response with an HTTP status >= 400 as an error (see `getErrorCondition`),
+ * so when a user filters by status code the chart turns red while the table
+ * still shows "INFO" badges, making the filter look like it was never applied.
+ *
+ * This helper derives the severity shown in the table from both the log level
+ * and the HTTP status so the table stays consistent with the chart.
+ */
+export const AUTH_LOG_ERROR_STATUS_THRESHOLD = 400
+
+export function getAuthLogSeverity(level?: string | null, status?: string | number | null): string {
+  const statusCode = typeof status === 'string' ? Number(status) : status
+  const hasErrorStatus =
+    typeof statusCode === 'number' &&
+    Number.isFinite(statusCode) &&
+    statusCode >= AUTH_LOG_ERROR_STATUS_THRESHOLD
+
+  if (hasErrorStatus) return 'error'
+  return level ?? ''
+}
+
 export function jwtAPIKey(metadata: any) {
   const apikeyHeader = metadata?.[0]?.request?.[0]?.sb?.[0]?.jwt?.[0]?.apikey?.[0]
   if (!apikeyHeader) {

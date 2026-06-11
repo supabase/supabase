@@ -7,6 +7,7 @@ import {
   formatLogsAsCsv,
   formatLogsAsJson,
   formatLogsAsMarkdown,
+  getAuthLogSeverity,
   parseMultigresEventMessage,
 } from './Logs.utils'
 
@@ -217,6 +218,46 @@ describe('Logs.utils', () => {
       expect(parseMultigresEventMessage(undefined)).toBeNull()
       expect(parseMultigresEventMessage(null)).toBeNull()
       expect(parseMultigresEventMessage(42)).toBeNull()
+    })
+  })
+
+  describe('getAuthLogSeverity', () => {
+    test('reports server errors (5xx) as error', () => {
+      expect(getAuthLogSeverity('info', 500)).toBe('error')
+      expect(getAuthLogSeverity('info', 503)).toBe('error')
+    })
+
+    test('reports client errors (4xx) as error', () => {
+      expect(getAuthLogSeverity('info', 400)).toBe('error')
+      expect(getAuthLogSeverity('info', 401)).toBe('error')
+      expect(getAuthLogSeverity('info', 429)).toBe('error')
+    })
+
+    test('handles status passed as a string', () => {
+      expect(getAuthLogSeverity('info', '404')).toBe('error')
+      expect(getAuthLogSeverity('info', '200')).toBe('info')
+    })
+
+    test('preserves the original level for non-error statuses', () => {
+      expect(getAuthLogSeverity('info', 200)).toBe('info')
+      expect(getAuthLogSeverity('warning', 302)).toBe('warning')
+      expect(getAuthLogSeverity('info', 399)).toBe('info')
+    })
+
+    test('falls back to the level when status is missing or invalid', () => {
+      expect(getAuthLogSeverity('info')).toBe('info')
+      expect(getAuthLogSeverity('warning', null)).toBe('warning')
+      expect(getAuthLogSeverity('info', 'not-a-number')).toBe('info')
+    })
+
+    test('keeps explicit error levels even without a status', () => {
+      expect(getAuthLogSeverity('error')).toBe('error')
+      expect(getAuthLogSeverity('fatal')).toBe('fatal')
+    })
+
+    test('returns an empty string when level is missing', () => {
+      expect(getAuthLogSeverity()).toBe('')
+      expect(getAuthLogSeverity(null, 200)).toBe('')
     })
   })
 })
