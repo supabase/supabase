@@ -1,4 +1,4 @@
-import { createSerializer, parseAsArrayOf, parseAsString } from 'nuqs'
+import { createSerializer, parseAsArrayOf, parseAsString } from 'nuqs/server'
 
 import { ITroubleshootingEntry } from './Troubleshooting.utils'
 
