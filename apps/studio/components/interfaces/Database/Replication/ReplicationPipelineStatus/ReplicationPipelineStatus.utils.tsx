@@ -143,33 +143,36 @@ export const WAL_STATUS_META: Record<SlotWalStatus, WalStatusMeta> = {
     label: 'Reserved',
     variant: 'success',
     severity: 'normal',
-    description: 'Healthy. Your database is safely keeping every change the pipeline still needs.',
+    description:
+      'Healthy. Your database is keeping the WAL files this pipeline needs, and they are within the normal WAL size limit.',
   },
   extended: {
     label: 'Extended',
     variant: 'warning',
     severity: 'normal',
-    description: "Keeping more changes than usual, but they're still safe.",
+    description:
+      'Healthy, but growing. This pipeline is holding on to more WAL than usual, but your database is still keeping everything it needs.',
   },
   unreserved: {
     label: 'Unreserved',
     variant: 'warning',
     severity: 'warning',
     description:
-      'At risk. The changes the pipeline needs may be cleaned up soon, which would break it.',
+      'At risk. Your database is no longer reserving all WAL files this pipeline needs. If the pipeline does not catch up soon, those files may be removed.',
   },
   lost: {
     label: 'Lost',
     variant: 'destructive',
     severity: 'critical',
     description:
-      'Broken. The changes were already removed, so the pipeline has to be set up again.',
+      'Broken. Some WAL files this pipeline needs have already been removed. The pipeline can no longer continue from this slot and must be set up again.',
   },
   unknown: {
     label: 'Unknown',
     variant: 'default',
     severity: 'normal',
-    description: "The replication slot's status is unknown.",
+    description:
+      'Unknown. Your database did not report a WAL status for this replication slot, so the pipeline cannot determine whether the needed WAL is safe.',
   },
 }
 

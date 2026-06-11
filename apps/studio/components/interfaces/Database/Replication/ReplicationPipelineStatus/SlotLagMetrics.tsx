@@ -5,7 +5,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { SlotLagMetricKey, SlotLagMetrics } from './ReplicationPipelineStatus.types'
 import { getFormattedLagValue } from './ReplicationPipelineStatus.utils'
-import { SlotStatusBadge } from './SlotStatus'
+import { SlotConnectionIndicator, SlotStatusBadge } from './SlotStatus'
 
 interface SlotLagField {
   key: SlotLagMetricKey
@@ -71,6 +71,8 @@ export const SlotLagMetricsInline = ({
       <span className="truncate font-medium" title={tableName}>
         {tableName}
       </span>
+      <SlotConnectionIndicator isActive={metrics.active} />
+      <span className="h-3.5 w-px bg-border" />
       {metrics.wal_status && <SlotStatusBadge status={metrics.wal_status} />}
       <span className="text-foreground-lighter">•</span>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] text-foreground-light">
