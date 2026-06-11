@@ -5,7 +5,7 @@ import { isFeatureEnabled, useBreakpoint } from 'common'
 import { ChevronRight, Play, Sparkles } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { cn, IconBackground } from 'ui'
+import { Button, cn, IconBackground } from 'ui'
 import { IconPanel } from 'ui-patterns/IconPanel'
 
 import { getCustomContent } from '../lib/custom-content/getCustomContent'
@@ -171,6 +171,19 @@ const HomePageCover = (props) => {
               Learn how to get up and running with Supabase through tutorials, APIs and platform
               resources.
             </p>
+            <div className="flex flex-wrap gap-3 mt-5">
+              <Button type="primary" asChild>
+                <Link href="/start">Build Your Backend</Link>
+              </Button>
+              <Button
+                type="default"
+                onClick={() =>
+                  document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })
+                }
+              >
+                Read Docs
+              </Button>
+            </div>
           </div>
         </div>
         {isFeatureEnabled('docs:full_getting_started') && (

@@ -69,10 +69,10 @@ export function SetupGuide({
 }) {
   return (
     <section className="prose prose-docs max-w-none">
-      <h1 className="mb-0">Setup guide</h1>
+      <h1 className="mb-0">Implement your backend</h1>
       <h2 className="mt-3 text-xl text-foreground-light">
-        Each step reflects exactly what you picked. Swap any toggle on the left and these update
-        live.
+        Follow the steps below to create and deploy your Supabase backend, then connect it to your
+        app.
       </h2>
       <p className="not-prose mb-0 mt-3 text-sm text-foreground-lighter">
         {steps.length} steps · {frameworkLabel}
