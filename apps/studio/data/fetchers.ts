@@ -84,6 +84,17 @@ function pgMetaGuard(request: Request) {
   return request
 }
 
+/**
+ * Determines whether a response has an empty body. Reads from a clone so the original
+ * response stays intact for openapi-fetch (or a streaming consumer) to read afterwards.
+ */
+export async function isEmptyResponseBody(response: Response) {
+  if (response.body === null) return true
+
+  const buffer = await response.clone().arrayBuffer()
+  return buffer.byteLength === 0
+}
+
 // Middleware
 client.use(
   {
@@ -98,6 +109,25 @@ client.use(
     // Middleware to format errors
     async onResponse({ request, response }) {
       if (response.ok) {
+        // openapi-fetch only skips JSON parsing when the response is a 204 or carries a
+        // `Content-Length: 0` header. Over HTTP/2 and HTTP/3 the `Content-Length` header is
+        // optional, so a successful-but-empty response (endpoints that return no content) can
+        // arrive without it. openapi-fetch then calls `response.json()` on the empty body and
+        // throws "Unexpected end of JSON input", which surfaces as an error toast even though
+        // the request succeeded. Normalize empty success bodies so openapi-fetch treats them as
+        // empty content instead of trying to parse them.
+        if (response.status !== 204 && !response.headers.has('Content-Length')) {
+          const isEmpty = await isEmptyResponseBody(response)
+          if (isEmpty) {
+            const headers = new Headers(response.headers)
+            headers.set('Content-Length', '0')
+            return new Response(null, {
+              headers,
+              status: response.status,
+              statusText: response.statusText,
+            })
+          }
+        }
         return response
       }
 
