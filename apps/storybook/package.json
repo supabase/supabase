@@ -9,7 +9,9 @@
   },
   "dependencies": {
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "ui": "workspace:*",
+    "ui-patterns": "workspace:*"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^5.2.1",
@@ -18,10 +20,11 @@
     "@storybook/addon-mcp": "^0.6.0",
     "@storybook/addon-vitest": "10.4.2",
     "@storybook/react-vite": "10.4.2",
+    "@tailwindcss/postcss": "^4.2.4",
     "@tailwindcss/vite": "^4.3.0",
-    "@types/node": "^24.12.3",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
+    "@types/node": "^22",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "^6.0.1",
     "@vitest/browser-playwright": "4.1.4",
     "config": "workspace:*",
@@ -30,6 +33,7 @@
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "globals": "^17.6.0",
     "playwright": "^1.60.0",
+    "postcss": "catalog:",
     "storybook": "10.4.2",
     "tailwindcss": "catalog:",
     "tsconfig": "workspace:*",
