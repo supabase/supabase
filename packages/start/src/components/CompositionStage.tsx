@@ -5,8 +5,9 @@ import { useState } from 'react'
 import type { DependencyResolution, MergeResult } from '../lib/composition/composition'
 import type { CompositionResource } from '../lib/composition/resources'
 import type { StartConfig } from '../lib/config'
+import type { ConfigRailStepId } from '../lib/config-rail-steps'
 import type { Template } from '../lib/template-catalog'
-import { CompositionCodePanel } from './files/CompositionCodePanel'
+import { CollapsibleCompositionCodePanel } from './files/CollapsibleCompositionCodePanel'
 import { CompositionVisualizer } from './visualizer/CompositionVisualizer'
 
 interface CompositionStageProps {
@@ -16,6 +17,8 @@ interface CompositionStageProps {
   mergeResult: MergeResult | null
   resources: CompositionResource[]
   hoveredTemplateId: string | null
+  onboardingStepId: ConfigRailStepId | null
+  onDownload: () => void
 }
 
 export function CompositionStage({
@@ -25,6 +28,8 @@ export function CompositionStage({
   mergeResult,
   resources,
   hoveredTemplateId,
+  onboardingStepId,
+  onDownload,
 }: CompositionStageProps) {
   const [activeFilePath, setActiveFilePath] = useState<string | null>(null)
 
@@ -42,13 +47,13 @@ export function CompositionStage({
         />
       </div>
 
-      <div className="h-[320px] shrink-0">
-        <CompositionCodePanel
-          mergeResult={mergeResult}
-          activeFilePath={activeFilePath}
-          onActiveFilePathChange={setActiveFilePath}
-        />
-      </div>
+      <CollapsibleCompositionCodePanel
+        mergeResult={mergeResult}
+        activeFilePath={activeFilePath}
+        onActiveFilePathChange={setActiveFilePath}
+        onboardingStepId={onboardingStepId}
+        onDownload={onDownload}
+      />
     </div>
   )
 }

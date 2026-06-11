@@ -12,6 +12,7 @@ import { buildAgentPlan } from './lib/agent-plan'
 import { canRemoveTemplate, createZipBlob, downloadBlob } from './lib/composition/composition'
 import { buildStartComposition, CORE_TEMPLATE_IDS } from './lib/composition/start-composition'
 import { FRAMEWORKS } from './lib/config'
+import { getConfigRailSteps } from './lib/config-rail-steps'
 import type { StartConfigState } from './lib/start-config-state'
 import { buildSteps } from './lib/steps'
 import type { Template } from './lib/template-catalog'
@@ -26,6 +27,8 @@ interface StartClientProps {
 export default function StartClient({ templates, configState }: StartClientProps) {
   const { cfg, setValue, addTemplate, removeTemplate } = configState
   const [sidebarView, setSidebarView] = useState<SidebarView>('config')
+  const [onboardingComplete, setOnboardingComplete] = useState(false)
+  const [onboardingStepIndex, setOnboardingStepIndex] = useState(0)
   const [search, setSearch] = useState('')
   const [guideOpen, setGuideOpen] = useState(false)
   const [planOpen, setPlanOpen] = useState(false)
@@ -57,6 +60,10 @@ export default function StartClient({ templates, configState }: StartClientProps
     () => new Set(composition.resolution.resolved.map((template) => template.id)),
     [composition.resolution.resolved]
   )
+  const onboardingSteps = useMemo(() => getConfigRailSteps(cfg), [cfg])
+  const onboardingStepId = onboardingComplete
+    ? null
+    : (onboardingSteps[onboardingStepIndex]?.id ?? null)
 
   const downloadComposition = async () => {
     if (!composition.mergeResult) return
@@ -67,25 +74,31 @@ export default function StartClient({ templates, configState }: StartClientProps
 
   return (
     <div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-muted/10 lg:flex-row">
-      <aside className="min-h-0 w-full shrink-0 overflow-hidden border-b bg-background lg:w-[440px] lg:border-b-0 lg:border-r">
+      <aside className="min-h-0 w-full shrink-0 overflow-hidden border-b bg-background lg:w-[520px] lg:border-b-0 lg:border-r">
         {sidebarView === 'config' ? (
           <ConfigRail
             cfg={cfg}
             templates={templates}
             coreTemplates={coreTemplates}
+            featureTemplates={featureTemplates}
             selectedIds={composition.selectedIds}
             resolution={composition.resolution}
             featureCount={featureCount}
             hasComposition={Boolean(composition.mergeResult)}
             plan={plan}
+            onboardingComplete={onboardingComplete}
+            onboardingStepIndex={onboardingStepIndex}
             setValue={setValue}
             onAddTemplate={addTemplate}
             onRemoveTemplate={removeTemplate}
             onHoverTemplate={setHoveredTemplateId}
+            activeDetailTemplateId={detailTemplateId}
+            onOpenTemplate={setDetailTemplateId}
             onOpenFeatures={() => setSidebarView('features')}
-            onDownload={downloadComposition}
             onOpenManual={() => setGuideOpen(true)}
             onOpenAgentPlan={() => setPlanOpen(true)}
+            onOnboardingStepChange={setOnboardingStepIndex}
+            onOnboardingComplete={() => setOnboardingComplete(true)}
           />
         ) : (
           <TemplateBrowser
@@ -113,6 +126,8 @@ export default function StartClient({ templates, configState }: StartClientProps
           mergeResult={composition.mergeResult}
           resources={composition.resources}
           hoveredTemplateId={hoveredTemplateId}
+          onboardingStepId={onboardingStepId}
+          onDownload={downloadComposition}
         />
       </main>
 

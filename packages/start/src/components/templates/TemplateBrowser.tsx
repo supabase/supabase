@@ -50,7 +50,7 @@ export function TemplateBrowser({
   return (
     <section className="flex h-full flex-col overflow-hidden">
       <div className="relative z-10 shrink-0 bg-background">
-        <div className="px-4 pt-4 pb-0">
+        <div className="px-8 pt-8 pb-0">
           <div className="flex items-center gap-2">
             <Button_Shadcn_
               type="button"
@@ -86,7 +86,7 @@ export function TemplateBrowser({
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="px-4 pb-4 pt-4">
+        <div className="px-8 pb-8 pt-6">
           {categories.length === 0 ? (
             <div className="rounded-lg border border-dashed p-6 text-center text-sm text-foreground-light">
               No templates match your search.

@@ -1,11 +1,14 @@
 'use client'
 
 import { Plus } from 'lucide-react'
+import { useEffect } from 'react'
 import { Button, CheckboxGroupStacked } from 'ui'
 
 import { canRemoveTemplate, type DependencyResolution } from '../lib/composition/composition'
 import { FRAMEWORKS, ORMS, type FrameworkId, type OrmId, type StartConfig } from '../lib/config'
+import { getConfigRailSteps } from '../lib/config-rail-steps'
 import type { Template } from '../lib/template-catalog'
+import { ConfigRailOnboarding } from './ConfigRailOnboarding'
 import { ConfigRailOutcomeFooter } from './ConfigRailOutcomeFooter'
 import { CoreTemplateCheckbox } from './CoreTemplateCheckbox'
 import { RailFormField, RailRadioField } from './railControls'
@@ -14,39 +17,60 @@ interface ConfigRailProps {
   cfg: StartConfig
   templates: Template[]
   coreTemplates: Template[]
+  featureTemplates: Template[]
   selectedIds: Set<string>
   resolution: DependencyResolution
   featureCount: number
   hasComposition: boolean
   plan: string
+  onboardingComplete: boolean
+  onboardingStepIndex: number
   setValue: <K extends keyof StartConfig>(key: K, value: StartConfig[K]) => void
   onAddTemplate: (id: string) => void
   onRemoveTemplate: (id: string) => void
   onHoverTemplate: (id: string | null) => void
+  activeDetailTemplateId: string | null
+  onOpenTemplate: (id: string) => void
   onOpenFeatures: () => void
-  onDownload: () => void
   onOpenManual: () => void
   onOpenAgentPlan: () => void
+  onOnboardingStepChange: (index: number) => void
+  onOnboardingComplete: () => void
 }
 
 export function ConfigRail({
   cfg,
   templates,
   coreTemplates,
+  featureTemplates,
   selectedIds,
   resolution,
   featureCount,
   hasComposition,
   plan,
+  onboardingComplete,
+  onboardingStepIndex,
   setValue,
   onAddTemplate,
   onRemoveTemplate,
   onHoverTemplate,
+  activeDetailTemplateId,
+  onOpenTemplate,
   onOpenFeatures,
-  onDownload,
   onOpenManual,
   onOpenAgentPlan,
+  onOnboardingStepChange,
+  onOnboardingComplete,
 }: ConfigRailProps) {
+  const onboardingSteps = getConfigRailSteps(cfg)
+  const clampedStepIndex = Math.min(onboardingStepIndex, onboardingSteps.length - 1)
+
+  useEffect(() => {
+    if (onboardingStepIndex !== clampedStepIndex) {
+      onOnboardingStepChange(clampedStepIndex)
+    }
+  }, [clampedStepIndex, onboardingStepIndex, onOnboardingStepChange])
+
   const frameworkOptions = Object.values(FRAMEWORKS).map((f) => ({
     id: f.id,
     label: f.label,
@@ -57,6 +81,51 @@ export function ConfigRail({
     (template) => selectedIds.has(template.id) || resolvedIds.has(template.id)
   ).length
 
+  const handleOnboardingContinue = () => {
+    onOnboardingStepChange(clampedStepIndex + 1)
+  }
+
+  const handleOnboardingBack = () => {
+    if (clampedStepIndex > 0) {
+      onOnboardingStepChange(clampedStepIndex - 1)
+    }
+  }
+
+  if (!onboardingComplete) {
+    return (
+      <aside
+        className={[
+          'flex h-full w-full shrink-0 flex-col overflow-hidden border-b border-default',
+          'lg:border-b',
+        ].join(' ')}
+      >
+        <ConfigRailOnboarding
+          step={onboardingSteps[clampedStepIndex]}
+          stepIndex={clampedStepIndex}
+          cfg={cfg}
+          templates={templates}
+          coreTemplates={coreTemplates}
+          featureTemplates={featureTemplates}
+          selectedIds={selectedIds}
+          resolution={resolution}
+          setValue={setValue}
+          onAddTemplate={onAddTemplate}
+          onRemoveTemplate={onRemoveTemplate}
+          onHoverTemplate={onHoverTemplate}
+          activeDetailTemplateId={activeDetailTemplateId}
+          onOpenTemplate={onOpenTemplate}
+          plan={plan}
+          hasComposition={hasComposition}
+          onOpenManual={onOpenManual}
+          onOpenAgentPlan={onOpenAgentPlan}
+          onBack={handleOnboardingBack}
+          onContinue={handleOnboardingContinue}
+          onKeepEditing={onOnboardingComplete}
+        />
+      </aside>
+    )
+  }
+
   return (
     <aside
       className={[
@@ -64,7 +133,7 @@ export function ConfigRail({
         'lg:border-b',
       ].join(' ')}
     >
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
+      <div className="min-h-0 flex-1 overflow-y-auto px-8 py-8">
         <div className="prose prose-docs mb-5 max-w-none text-base text-foreground-light">
           <h2 className="mb-0 text-base text-foreground">Compose your project</h2>
           <p className="!mt-1">Pick your back-end pieces and connect them to your front-end.</p>
@@ -182,7 +251,6 @@ export function ConfigRail({
       <ConfigRailOutcomeFooter
         plan={plan}
         hasComposition={hasComposition}
-        onDownload={onDownload}
         onOpenManual={onOpenManual}
         onOpenAgentPlan={onOpenAgentPlan}
       />

@@ -1,0 +1,149 @@
+export function CreateProjectFolderIllustration({ className }: { className?: string }) {
+  return (
+    <svg
+      width={191}
+      height={186}
+      viewBox="31 6 191 186"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      className={className}
+    >
+      <defs>
+        <linearGradient
+          id="start-folder-back"
+          x1="44"
+          y1="35"
+          x2="222"
+          y2="180"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="#1A7A52" />
+          <stop offset="1" stopColor="#249361" />
+        </linearGradient>
+        <linearGradient
+          id="start-folder-body"
+          x1="31"
+          y1="64"
+          x2="214"
+          y2="184"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="#3ECF8E" />
+          <stop offset="0.55" stopColor="#2BB67D" />
+          <stop offset="1" stopColor="#249361" />
+        </linearGradient>
+        <linearGradient
+          id="start-folder-logo-top"
+          x1="45"
+          y1="2"
+          x2="102"
+          y2="88"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="#FFFFFF" />
+          <stop offset="0.72" stopColor="#D1FAE5" />
+          <stop offset="1" stopColor="#A7F3D0" />
+        </linearGradient>
+        <linearGradient
+          id="start-folder-logo-bottom"
+          x1="10"
+          y1="38"
+          x2="70"
+          y2="112"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="#ECFDF5" />
+          <stop offset="0.58" stopColor="#C7F9DD" />
+          <stop offset="1" stopColor="#6EE7B7" />
+        </linearGradient>
+        <linearGradient
+          id="start-glow-line"
+          x1="0"
+          y1="4"
+          x2="0"
+          y2="68"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="#3ECF8E" stopOpacity="0" />
+          <stop offset="0.55" stopColor="#3ECF8E" stopOpacity="0.75" />
+          <stop offset="1" stopColor="#6EE7B7" stopOpacity="0" />
+        </linearGradient>
+        <filter id="start-folder-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="8" stdDeviation="10" floodColor="#249361" floodOpacity="0.22" />
+        </filter>
+      </defs>
+
+      <g filter="url(#start-folder-shadow)">
+        <circle cx="101" cy="28" r="1" fill="#A7F3D0" fillOpacity="0.75" />
+        <circle cx="120" cy="15" r="1" fill="#6EE7B7" fillOpacity="0.82" />
+        <circle cx="139" cy="28" r="1" fill="#D1FAE5" fillOpacity="0.72" />
+        <circle cx="154" cy="40" r="1" fill="#3ECF8E" fillOpacity="0.62" />
+        <circle cx="86" cy="42" r="1" fill="#6EE7B7" fillOpacity="0.58" />
+
+        <path
+          d="M88 24V68"
+          stroke="url(#start-glow-line)"
+          strokeWidth="1"
+          strokeLinecap="round"
+          opacity="0.5"
+        />
+        <path
+          d="M104 14V68"
+          stroke="url(#start-glow-line)"
+          strokeWidth="1"
+          strokeLinecap="round"
+          opacity="0.72"
+        />
+        <path
+          d="M120 6V68"
+          stroke="url(#start-glow-line)"
+          strokeWidth="1"
+          strokeLinecap="round"
+          opacity="0.92"
+        />
+        <path
+          d="M136 14V68"
+          stroke="url(#start-glow-line)"
+          strokeWidth="1"
+          strokeLinecap="round"
+          opacity="0.72"
+        />
+        <path
+          d="M152 24V68"
+          stroke="url(#start-glow-line)"
+          strokeWidth="1"
+          strokeLinecap="round"
+          opacity="0.5"
+        />
+
+        <path
+          d="M44 64V44C44 39.029 48.029 35 53 35H110C114.61 35 118.61 38.183 119.646 42.586L122.688 55H209C216.18 55 222 60.82 222 68V166C222 173.18 216.18 180 209 180H55C47.82 180 42 173.18 42 166V64H44Z"
+          fill="url(#start-folder-back)"
+        />
+
+        <path
+          d="M31 76C31 69.373 36.373 64 43 64H204C210.627 64 216 69.373 216 76V172C216 178.627 210.627 184 204 184H43C36.373 184 31 178.627 31 172V76Z"
+          fill="url(#start-folder-body)"
+        />
+
+        <g transform="translate(98 96) scale(0.47)">
+          <path
+            fill="url(#start-folder-logo-bottom)"
+            d="M45.317 2.071c2.86-3.601 8.657-1.628 8.726 2.97l.442 67.251H9.83c-8.19 0-12.759-9.46-7.665-15.875z"
+          />
+          <path
+            fill="url(#start-folder-logo-top)"
+            fillOpacity="0.95"
+            d="M63.708 110.284c-2.86 3.601-8.658 1.628-8.727-2.97l-1.007-67.251h45.22c8.19 0 12.758 9.46 7.665 15.874z"
+          />
+          <path
+            fill="#059669"
+            fillOpacity="0.1"
+            d="M63.708 110.284c-2.86 3.601-8.658 1.628-8.727-2.97l-1.007-67.251h45.22c8.19 0 12.758 9.46 7.665 15.874z"
+          />
+        </g>
+      </g>
+    </svg>
+  )
+}
