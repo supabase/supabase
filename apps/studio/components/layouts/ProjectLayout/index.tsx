@@ -41,6 +41,7 @@ import { RestoreFailedState } from './RestoreFailedState'
 import { RestoringState } from './RestoringState'
 import { UnhealthyState } from './UnhealthyState'
 import { UpgradingState } from './UpgradingState'
+import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { CreateBranchModal } from '@/components/interfaces/BranchManagement/CreateBranchModal'
 import { ProjectAPIDocs } from '@/components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { BannerFreeMicroUpgrade } from '@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade'
@@ -157,12 +158,12 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       false
     )
     const [isUnifiedLogsBannerDismissed] = useLocalStorageQuery(
-      LOCAL_STORAGE_KEYS.UNIFIED_LOGS_BANNER_DISMISSED(selectedOrganization?.slug ?? ''),
+      LOCAL_STORAGE_KEYS.UNIFIED_LOGS_BANNER_DISMISSED,
       false
     )
-    const showUnifiedLogsBanner = ['pro', 'team', 'enterprise'].includes(
-      selectedOrganization?.plan?.id ?? ''
-    )
+    const { isEligible: isUnifiedLogsEligible } = useUnifiedLogsPreview()
+    const isPaidPlan = ['pro', 'team', 'enterprise'].includes(selectedOrganization?.plan?.id ?? '')
+    const showUnifiedLogsBanner = isPaidPlan && isUnifiedLogsEligible
     const [isProjectIntegrationBannerDismissed, setIsProjectIntegrationBannerDismissed] =
       useLocalStorageQuery(
         getProjectIntegrationBannerDismissKey({

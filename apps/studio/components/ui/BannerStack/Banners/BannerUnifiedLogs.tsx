@@ -5,17 +5,21 @@ import { Badge, Button } from 'ui'
 
 import { BannerCard } from '../BannerCard'
 import { useBannerStack } from '../BannerStackProvider'
+import {
+  useFeaturePreviewModal,
+  useUnifiedLogsPreview,
+} from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useTrack } from '@/lib/telemetry/track'
 
 export const BannerUnifiedLogs = () => {
   const { ref } = useParams()
   const track = useTrack()
   const { dismissBanner } = useBannerStack()
-  const { data: organization } = useSelectedOrganizationQuery()
+  const { isEnabled } = useUnifiedLogsPreview()
+  const { selectFeaturePreview } = useFeaturePreviewModal()
   const [, setIsDismissed] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.UNIFIED_LOGS_BANNER_DISMISSED(organization?.slug ?? ''),
+    LOCAL_STORAGE_KEYS.UNIFIED_LOGS_BANNER_DISMISSED,
     false
   )
 
@@ -40,14 +44,27 @@ export const BannerUnifiedLogs = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button type="default" size="tiny" asChild>
-            <Link
-              href={`/project/${ref}/logs`}
-              onClick={() => track('unified_logs_banner_cta_button_clicked')}
+          {isEnabled ? (
+            <Button type="default" size="tiny" asChild>
+              <Link
+                href={`/project/${ref}/logs`}
+                onClick={() => track('unified_logs_banner_cta_button_clicked')}
+              >
+                Explore Unified Logs
+              </Link>
+            </Button>
+          ) : (
+            <Button
+              type="default"
+              size="tiny"
+              onClick={() => {
+                track('unified_logs_banner_cta_button_clicked')
+                selectFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS)
+              }}
             >
-              Explore Unified Logs
-            </Link>
-          </Button>
+              Enable Unified Logs
+            </Button>
+          )}
         </div>
       </div>
     </BannerCard>

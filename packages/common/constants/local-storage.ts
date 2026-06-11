@@ -116,7 +116,7 @@ export const LOCAL_STORAGE_KEYS = {
     `table-editor-queue-operations-banner-dismissed-${ref}`,
   FREE_MICRO_UPGRADE_BANNER_DISMISSED: (ref: string) =>
     `free-micro-upgrade-banner-dismissed-${ref}`,
-  UNIFIED_LOGS_BANNER_DISMISSED: (slug: string) => `unified-logs-banner-dismissed-${slug}`,
+  UNIFIED_LOGS_BANNER_DISMISSED: 'unified-logs-banner-dismissed',
   STORAGE_PUBLIC_BUCKET_SELECT_POLICY_WARNING_DISMISSED: (ref: string, bucketId: string) =>
     `storage-public-bucket-select-policy-warning-dismissed-${ref}-${bucketId}`,
 
