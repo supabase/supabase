@@ -894,6 +894,9 @@ importers:
       '@vitest/browser-playwright':
         specifier: 4.1.4
         version: 4.1.4(msw@2.11.3(@types/node@24.13.1)(typescript@6.0.2))(playwright@1.60.0)(vite@8.0.14(@types/node@24.13.1)(esbuild@0.25.2)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.9.0))(vitest@4.1.4)
+      config:
+        specifier: workspace:*
+        version: link:../../packages/config
       eslint:
         specifier: ^10.3.0
         version: 10.4.1(jiti@2.7.0)(supports-color@8.1.1)
