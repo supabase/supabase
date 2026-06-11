@@ -56,6 +56,7 @@ const getGuidesMarkdownInternal = async (slug: string[]) => {
     !fullPath.startsWith(GUIDES_DIRECTORY) ||
     !PUBLISHED_SECTIONS.some((section) => relPath.startsWith(section))
   ) {
+    Sentry.setTag('404.pathname', guidesPath)
     notFound()
   }
 
@@ -65,6 +66,7 @@ const getGuidesMarkdownInternal = async (slug: string[]) => {
    */
   if (!checkGuidePageEnabled(guidesPath)) {
     console.log('Page is disabled: %s', guidesPath)
+    Sentry.setTag('404.pathname', guidesPath)
     notFound()
   }
 
@@ -100,6 +102,7 @@ const getGuidesMarkdownInternal = async (slug: string[]) => {
       )
       Sentry.captureException(error)
     }
+    Sentry.setTag('404.pathname', guidesPath)
     notFound()
   }
 }
