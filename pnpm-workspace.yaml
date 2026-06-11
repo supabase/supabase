@@ -28,7 +28,7 @@ catalog:
   react: ^19.2.6
   react-dom: ^19.2.6
   recharts: ^2.15.4
-  tailwindcss: 4.2.4
+  tailwindcss: 4.3.0
   tsx: 4.20.3
   typescript: ~6.0.0
   valtio: ^1.12.0
