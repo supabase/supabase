@@ -1,5 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Eye, EyeOff } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -16,6 +18,9 @@ import {
   FormField,
   Input,
   Textarea,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
@@ -37,6 +42,8 @@ export const AddNewSecretModal = () => {
 
   const { mutateAsync: addSecret } = useVaultSecretCreateMutation()
 
+  const [isSecretVisible, setIsSecretVisible] = useState(false)
+
   const [showAddSecretModal, setShowAddSecretModal] = useQueryState(
     'new',
     parseAsBoolean.withDefault(false)
@@ -44,6 +51,7 @@ export const AddNewSecretModal = () => {
 
   const handleClose = () => {
     setShowAddSecretModal(null)
+    setIsSecretVisible(false)
     form.reset()
   }
 
@@ -116,24 +124,47 @@ export const AddNewSecretModal = () => {
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Secret value">
                     <FormControl className="col-span-6">
-                      <Textarea
-                        {...field}
-                        rows={1}
-                        ref={(el) => {
-                          field.ref(el)
-                          if (el) {
-                            el.style.height = 'auto'
-                            el.style.height = Math.max(40, el.scrollHeight) + 'px'
+                      <div className="relative">
+                        <Textarea
+                          {...field}
+                          rows={1}
+                          ref={(el) => {
+                            field.ref(el)
+                            if (el) {
+                              el.style.height = 'auto'
+                              el.style.height = Math.max(40, el.scrollHeight) + 'px'
+                            }
+                          }}
+                          className="min-h-0 resize-none"
+                          style={
+                            {
+                              WebkitTextSecurity: isSecretVisible ? undefined : 'disc',
+                            } as React.CSSProperties
                           }
-                        }}
-                        className="min-h-0 resize-none"
-                        onChange={(e) => {
-                          field.onChange(e)
-                          e.currentTarget.style.height = 'auto'
-                          e.currentTarget.style.height =
-                            Math.max(40, e.currentTarget.scrollHeight) + 'px'
-                        }}
-                      />
+                          onChange={(e) => {
+                            field.onChange(e)
+                            e.currentTarget.style.height = 'auto'
+                            e.currentTarget.style.height =
+                              Math.max(40, e.currentTarget.scrollHeight) + 'px'
+                          }}
+                        />
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              type="text"
+                              className="absolute right-1 top-1 px-1"
+                              aria-label={
+                                isSecretVisible ? 'Hide secret value' : 'Show secret value'
+                              }
+                              icon={isSecretVisible ? <EyeOff /> : <Eye />}
+                              onClick={() => setIsSecretVisible((prev) => !prev)}
+                            />
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom">
+                            {isSecretVisible ? 'Hide value' : 'Show value'}
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
                     </FormControl>
                   </FormItemLayout>
                 )}

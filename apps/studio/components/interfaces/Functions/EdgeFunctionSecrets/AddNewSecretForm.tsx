@@ -243,6 +243,7 @@ export const AddNewSecretForm = () => {
                           <Button
                             type="default"
                             className="w-[34px] h-[34px] shrink-0 p-0"
+                            aria-label="Remove secret"
                             icon={<Trash size={12} />}
                             disabled={fields.length <= 1}
                             onClick={() => handleRemoveSecret(fieldItem.id, index)}
@@ -297,6 +298,11 @@ export const AddNewSecretForm = () => {
                                 <Button
                                   type="text"
                                   className="absolute right-1 top-1 px-1"
+                                  aria-label={
+                                    isSecretVisible(fieldItem.id)
+                                      ? 'Hide secret value'
+                                      : 'Show secret value'
+                                  }
                                   icon={isSecretVisible(fieldItem.id) ? <EyeOff /> : <Eye />}
                                   onClick={() => handleToggleSecretVisibility(fieldItem.id)}
                                 />
