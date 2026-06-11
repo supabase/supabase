@@ -1,0 +1,4 @@
+{
+  "Imagine": "mcr.microsoft.com/devcontainers/universal:2",
+  "dev": {}
+}
