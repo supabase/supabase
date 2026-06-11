@@ -161,9 +161,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       LOCAL_STORAGE_KEYS.UNIFIED_LOGS_BANNER_DISMISSED,
       false
     )
-    const { isEligible: isUnifiedLogsEligible } = useUnifiedLogsPreview()
-    const isPaidPlan = ['pro', 'team', 'enterprise'].includes(selectedOrganization?.plan?.id ?? '')
-    const showUnifiedLogsBanner = isPaidPlan && isUnifiedLogsEligible
+    const { isEligible: showUnifiedLogsBanner } = useUnifiedLogsPreview()
     const [isProjectIntegrationBannerDismissed, setIsProjectIntegrationBannerDismissed] =
       useLocalStorageQuery(
         getProjectIntegrationBannerDismissKey({
