@@ -42,7 +42,7 @@ export const PublicationSelection = ({
         <FormItemLayout
           layout="horizontal"
           label="Publication"
-          description="Tables in the selected publication will be replicated to this destination"
+          description="Tables in the selected publication will be replicated to this destination."
         >
           <FormControl>
             <PublicationsComboBox

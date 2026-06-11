@@ -5858,6 +5858,39 @@ export interface components {
               s3_use_ssl?: boolean
             }
           }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id: string
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database: string
+              /** @description Snowflake RSA private key PEM contents */
+              private_key: string
+              /** @description Optional passphrase for encrypted private keys */
+              private_key_passphrase?: string
+              /**
+               * @description Optional Snowflake role
+               * @example ETL_ROLE
+               */
+              role?: string
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema: string
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example ETL_USER
+               */
+              user: string
+            }
+          }
       /**
        * @description Destination name
        * @example bq-analytics
@@ -5989,6 +6022,39 @@ export interface components {
                * @example false
                */
               s3_use_ssl?: boolean
+            }
+          }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id: string
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database: string
+              /** @description Snowflake RSA private key PEM contents */
+              private_key: string
+              /** @description Optional passphrase for encrypted private keys */
+              private_key_passphrase?: string
+              /**
+               * @description Optional Snowflake role
+               * @example ETL_ROLE
+               */
+              role?: string
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema: string
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example ETL_USER
+               */
+              user: string
             }
           }
       /**
@@ -9553,6 +9619,39 @@ export interface components {
               s3_use_ssl?: boolean
             }
           }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id: string
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database: string
+              /** @description Snowflake RSA private key PEM contents */
+              private_key: string
+              /** @description Optional passphrase for encrypted private keys */
+              private_key_passphrase?: string
+              /**
+               * @description Optional Snowflake role
+               * @example ETL_ROLE
+               */
+              role?: string
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema: string
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example ETL_USER
+               */
+              user: string
+            }
+          }
       /**
        * @description Destination id
        * @example 2001
@@ -9698,6 +9797,39 @@ export interface components {
                 s3_use_ssl?: boolean
               }
             }
+          | {
+              snowflake: {
+                /**
+                 * @description Snowflake account identifier
+                 * @example MYORG-MYACCOUNT
+                 */
+                account_id: string
+                /**
+                 * @description Snowflake target database
+                 * @example ANALYTICS
+                 */
+                database: string
+                /** @description Snowflake RSA private key PEM contents */
+                private_key: string
+                /** @description Optional passphrase for encrypted private keys */
+                private_key_passphrase?: string
+                /**
+                 * @description Optional Snowflake role
+                 * @example ETL_ROLE
+                 */
+                role?: string
+                /**
+                 * @description Snowflake target schema
+                 * @example PUBLIC
+                 */
+                schema: string
+                /**
+                 * @description Snowflake user configured for key-pair authentication
+                 * @example ETL_USER
+                 */
+                user: string
+              }
+            }
         /**
          * @description Destination id
          * @example 2001
@@ -9719,6 +9851,11 @@ export interface components {
       /** @description Stats about apply worker lag */
       apply_lag?: {
         /**
+         * @description Whether the slot currently has an active replication connection.
+         * @example true
+         */
+        active: boolean
+        /**
          * @description Bytes between the current WAL location and the confirmed flush LSN.
          * @example 2048
          */
@@ -9729,15 +9866,26 @@ export interface components {
          */
         flush_lag?: number
         /**
+         * @description Milliseconds elapsed since the walsender last received client feedback. This can be present even when write and flush lag are unavailable.
+         * @example 5000
+         */
+        reply_time_lag?: number
+        /**
          * @description Bytes between the current WAL location and the slot restart LSN.
          * @example 1024
          */
         restart_lsn_bytes: number
         /**
-         * @description How many bytes of WAL are still safe to build up before the limit of the slot is reached.
+         * @description How many bytes of WAL are still safe to build up before the limit of the slot is reached. `null` means Postgres reports unlimited slot WAL retention.
          * @example 8192
          */
-        safe_wal_size_bytes: number
+        safe_wal_size_bytes: number | null
+        /**
+         * @description WAL availability status reported by Postgres for the slot.
+         * @example reserved
+         * @enum {string}
+         */
+        wal_status?: 'reserved' | 'extended' | 'unreserved' | 'lost' | 'unknown'
         /**
          * @description Write lag expressed in milliseconds.
          * @example 1500
@@ -9806,6 +9954,11 @@ export interface components {
         /** @description Stats about table sync worker lag */
         table_sync_lag?: {
           /**
+           * @description Whether the slot currently has an active replication connection.
+           * @example true
+           */
+          active: boolean
+          /**
            * @description Bytes between the current WAL location and the confirmed flush LSN.
            * @example 2048
            */
@@ -9816,15 +9969,26 @@ export interface components {
            */
           flush_lag?: number
           /**
+           * @description Milliseconds elapsed since the walsender last received client feedback. This can be present even when write and flush lag are unavailable.
+           * @example 5000
+           */
+          reply_time_lag?: number
+          /**
            * @description Bytes between the current WAL location and the slot restart LSN.
            * @example 1024
            */
           restart_lsn_bytes: number
           /**
-           * @description How many bytes of WAL are still safe to build up before the limit of the slot is reached.
+           * @description How many bytes of WAL are still safe to build up before the limit of the slot is reached. `null` means Postgres reports unlimited slot WAL retention.
            * @example 8192
            */
-          safe_wal_size_bytes: number
+          safe_wal_size_bytes: number | null
+          /**
+           * @description WAL availability status reported by Postgres for the slot.
+           * @example reserved
+           * @enum {string}
+           */
+          wal_status?: 'reserved' | 'extended' | 'unreserved' | 'lost' | 'unknown'
           /**
            * @description Write lag expressed in milliseconds.
            * @example 1500
@@ -11534,6 +11698,39 @@ export interface components {
               s3_use_ssl?: boolean
             }
           }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id: string
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database: string
+              /** @description Snowflake RSA private key PEM contents */
+              private_key: string
+              /** @description Optional passphrase for encrypted private keys */
+              private_key_passphrase?: string
+              /**
+               * @description Optional Snowflake role
+               * @example ETL_ROLE
+               */
+              role?: string
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema: string
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example ETL_USER
+               */
+              user: string
+            }
+          }
       /**
        * @description Destination name
        * @example bq-analytics
@@ -11665,6 +11862,39 @@ export interface components {
                * @example false
                */
               s3_use_ssl?: boolean
+            }
+          }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id: string
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database: string
+              /** @description Snowflake RSA private key PEM contents */
+              private_key: string
+              /** @description Optional passphrase for encrypted private keys */
+              private_key_passphrase?: string
+              /**
+               * @description Optional Snowflake role
+               * @example ETL_ROLE
+               */
+              role?: string
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema: string
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example ETL_USER
+               */
+              user: string
             }
           }
       /**
@@ -12217,6 +12447,39 @@ export interface components {
                * @example false
                */
               s3_use_ssl?: boolean
+            }
+          }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id: string
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database: string
+              /** @description Snowflake RSA private key PEM contents */
+              private_key: string
+              /** @description Optional passphrase for encrypted private keys */
+              private_key_passphrase?: string
+              /**
+               * @description Optional Snowflake role
+               * @example ETL_ROLE
+               */
+              role?: string
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema: string
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example ETL_USER
+               */
+              user: string
             }
           }
     }
