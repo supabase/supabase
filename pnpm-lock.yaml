@@ -15935,11 +15935,8 @@ packages:
     resolution: {integrity: sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==}
     engines: {node: '>=8'}
 
-  shell-quote@1.8.1:
-    resolution: {integrity: sha512-6j1W9l1iAs/4xYBI1SYOVZyFcCis9b4KCLQ8fgAGG07QvzaRLVVRQvAy85yNmmZSjYjg4MWh4gNvlPujU/5LpA==}
-
-  shell-quote@1.8.3:
-    resolution: {integrity: sha512-ObmnIF4hXNg1BqhnHmgbDETF8dLPCggZWBjkQfhZpbszZnYur5DUljTcCHii5LC3J5E0yeO/1LIMyH+UvHQgyw==}
+  shell-quote@1.8.4:
+    resolution: {integrity: sha512-VsC6n6vz1ihYYyZZwX7YZSF5l5x36ca17OC+a69h94YqB7X6XLwf+5MOgynYir2SLFUbl8gIYvBo8K8RoNQ6bQ==}
     engines: {node: '>= 0.4'}
 
   shelljs@0.9.2:
@@ -19559,7 +19556,7 @@ snapshots:
       listr2: 4.0.5
       log-symbols: 4.1.0
       micromatch: 4.0.8
-      shell-quote: 1.8.1
+      shell-quote: 1.8.4
       string-env-interpolation: 1.0.1
       ts-log: 2.2.7
       tslib: 2.8.1
@@ -26567,7 +26564,7 @@ snapshots:
       date-fns: 2.30.0
       lodash: 4.18.1
       rxjs: 7.8.1
-      shell-quote: 1.8.3
+      shell-quote: 1.8.4
       spawn-command: 0.0.2
       supports-color: 8.1.1
       tree-kill: 1.2.2
@@ -26578,7 +26575,7 @@ snapshots:
       chalk: 4.1.2
       lodash: 4.18.1
       rxjs: 7.8.1
-      shell-quote: 1.8.1
+      shell-quote: 1.8.4
       supports-color: 8.1.1
       tree-kill: 1.2.2
       yargs: 17.7.2
@@ -29721,7 +29718,7 @@ snapshots:
   launch-editor@2.13.1:
     dependencies:
       picocolors: 1.1.1
-      shell-quote: 1.8.3
+      shell-quote: 1.8.4
 
   layout-base@1.0.2: {}
 
@@ -31713,7 +31710,7 @@ snapshots:
       minimatch: 3.1.4
       pidtree: 0.3.1
       read-pkg: 3.0.0
-      shell-quote: 1.8.1
+      shell-quote: 1.8.4
       string.prototype.padend: 3.1.5
 
   npm-run-path@2.0.2:
@@ -34118,9 +34115,7 @@ snapshots:
 
   shebang-regex@3.0.0: {}
 
-  shell-quote@1.8.1: {}
-
-  shell-quote@1.8.3: {}
+  shell-quote@1.8.4: {}
 
   shelljs@0.9.2:
     dependencies:
