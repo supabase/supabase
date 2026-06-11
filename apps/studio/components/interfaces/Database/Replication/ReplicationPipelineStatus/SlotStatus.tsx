@@ -15,11 +15,32 @@ import { getWalStatusMeta, WAL_STATUS_LEGEND } from './ReplicationPipelineStatus
 import { InlineLink } from '@/components/ui/InlineLink'
 import { DOCS_URL } from '@/lib/constants'
 
+export type SlotStatusContext = 'pipeline' | 'table'
+
+const CONNECTION_TEXT: Record<SlotStatusContext, { active: string; inactive: string }> = {
+  pipeline: {
+    active: "This pipeline's replication slot is active and being used right now.",
+    inactive: "This pipeline's replication slot is not active right now.",
+  },
+  table: {
+    active: "This table's replication slot is active and being used right now.",
+    inactive: "This table's replication slot is not active right now.",
+  },
+}
+
 /**
  * Colored badge for a slot's WAL status, with the plain-language meaning on hover.
+ * Pass `context="table"` in the per-table inline view to show table-specific descriptions.
  */
-export const SlotStatusBadge = ({ status }: { status?: SlotWalStatus }) => {
+export const SlotStatusBadge = ({
+  status,
+  context = 'pipeline',
+}: {
+  status?: SlotWalStatus
+  context?: SlotStatusContext
+}) => {
   const meta = getWalStatusMeta(status)
+  const description = context === 'table' ? meta.tableDescription : meta.description
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -28,7 +49,7 @@ export const SlotStatusBadge = ({ status }: { status?: SlotWalStatus }) => {
         </Badge>
       </TooltipTrigger>
       <TooltipContent side="bottom" className="max-w-[260px]">
-        {meta.description}
+        {description}
       </TooltipContent>
     </Tooltip>
   )
@@ -83,8 +104,16 @@ export const SlotStatusLegend = () => {
 
 /**
  * Small dot + label indicating whether the slot has a live replication connection.
+ * Pass `context="table"` in the per-table inline view to show table-specific descriptions.
  */
-export const SlotConnectionIndicator = ({ isActive }: { isActive?: boolean }) => {
+export const SlotConnectionIndicator = ({
+  isActive,
+  context = 'pipeline',
+}: {
+  isActive?: boolean
+  context?: SlotStatusContext
+}) => {
+  const text = CONNECTION_TEXT[context]
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -99,9 +128,7 @@ export const SlotConnectionIndicator = ({ isActive }: { isActive?: boolean }) =>
         </span>
       </TooltipTrigger>
       <TooltipContent side="bottom" className="max-w-[260px]">
-        {isActive
-          ? 'The pipeline is connected to your database and reading changes right now.'
-          : "The pipeline isn't connected to your database right now."}
+        {isActive ? text.active : text.inactive}
       </TooltipContent>
     </Tooltip>
   )

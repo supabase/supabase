@@ -71,15 +71,15 @@ export const SlotLagMetricsInline = ({
       <span className="truncate font-medium" title={tableName}>
         {tableName}
       </span>
-      <SlotConnectionIndicator isActive={metrics.active} />
+      <SlotConnectionIndicator isActive={metrics.active} context="table" />
       <span className="h-3.5 w-px bg-border" />
-      {metrics.wal_status && <SlotStatusBadge status={metrics.wal_status} />}
-      <span className="text-foreground-lighter">•</span>
+      {metrics.wal_status && <SlotStatusBadge status={metrics.wal_status} context="table" />}
+      <span className="h-3.5 w-px bg-border" />
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] text-foreground-light">
         {SLOT_LAG_FIELDS.map((field) => {
           const { display } = getFieldDisplay(field, metrics[field.key])
           return (
-            <span key={`${tableName}-${field.key}`} className="flex items-center gap-1">
+            <span key={`${tableName}-${field.key}`} className="flex items-baseline gap-1">
               <span className="uppercase tracking-wide text-[10px] text-foreground-lighter">
                 {field.label}
               </span>

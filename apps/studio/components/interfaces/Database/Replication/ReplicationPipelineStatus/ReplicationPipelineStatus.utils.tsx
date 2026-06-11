@@ -132,7 +132,10 @@ interface WalStatusMeta {
   label: string
   variant: SlotStatusBadgeVariant
   severity: LagSeverity
+  // Shown in the pipeline-level metrics panel.
   description: string
+  // Shown in the per-table inline sync view where the slot belongs to a single table.
+  tableDescription: string
 }
 
 // Plain-language meaning, color, and severity for each WAL status Postgres can report for a slot.
@@ -144,34 +147,45 @@ export const WAL_STATUS_META: Record<SlotWalStatus, WalStatusMeta> = {
     variant: 'success',
     severity: 'normal',
     description:
-      'Healthy. Your database is keeping the WAL files this pipeline needs, and they are within the normal WAL size limit.',
+      "Healthy. Your database is keeping the WAL files this pipeline's replication slot needs, and they are within the normal WAL size limit.",
+    tableDescription:
+      "Healthy. Your database is keeping the WAL files this table's replication slot needs, and they are within the normal WAL size limit.",
   },
   extended: {
     label: 'Extended',
     variant: 'warning',
     severity: 'normal',
     description:
-      'Healthy, but growing. This pipeline is holding on to more WAL than usual, but your database is still keeping everything it needs.',
+      "Healthy, but growing. This pipeline's replication slot is holding on to more WAL than usual, but your database is still keeping everything it needs.",
+    tableDescription:
+      "Healthy, but growing. This table's replication slot is holding on to more WAL than usual, but your database is still keeping everything it needs.",
   },
   unreserved: {
     label: 'Unreserved',
     variant: 'warning',
     severity: 'warning',
     description:
-      'At risk. Your database is no longer reserving all WAL files this pipeline needs. If the pipeline does not catch up soon, those files may be removed.',
+      "At risk. Your database is no longer reserving all WAL files this pipeline's replication slot needs. If the pipeline does not catch up soon, those files may be removed.",
+    tableDescription:
+      "At risk. Your database is no longer reserving all WAL files this table's replication slot needs. If the pipeline does not catch up soon, those files may be removed.",
   },
   lost: {
     label: 'Lost',
     variant: 'destructive',
     severity: 'critical',
     description:
-      'Broken. Some WAL files this pipeline needs have already been removed. The pipeline can no longer continue from this slot. You can recreate a new pipeline, or set the invalidation behavior to recreate and restart the pipeline.',
+      "Broken. Some WAL files this pipeline's replication slot needs have already been removed. The pipeline can no longer continue from this slot. You can recreate a new pipeline, or set the invalidation behavior to recreate and restart the pipeline.",
+    tableDescription:
+      "Broken. Some WAL files this table's replication slot needs have already been removed. The pipeline can no longer continue from this slot. You can recreate a new pipeline, or set the invalidation behavior to recreate and restart the pipeline.",
   },
   unknown: {
     label: 'Unknown',
     variant: 'default',
     severity: 'normal',
-    description: 'Unknown. Your database reported an unknown state for this replication slot.',
+    description:
+      "Unknown. Your database reported an unknown state for this pipeline's replication slot.",
+    tableDescription:
+      "Unknown. Your database reported an unknown state for this table's replication slot.",
   },
 }
 
