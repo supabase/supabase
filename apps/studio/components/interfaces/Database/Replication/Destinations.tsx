@@ -315,7 +315,7 @@ export const Destinations = () => {
                         <TableCell colSpan={6}>
                           <p>No results found</p>
                           <p className="text-foreground-light">
-                            Your search for "{filterString}" did not return any results
+                            Your search for "{filterString}" did not return any results.
                           </p>
                         </TableCell>
                       </TableRow>

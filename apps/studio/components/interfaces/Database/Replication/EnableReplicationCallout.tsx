@@ -97,7 +97,7 @@ export const EnableReplicationCallout = ({
         <h4>Replicate data to external destinations in real time</h4>
         <p className="text-sm text-foreground-light">
           {hasAccess ? 'Enable external replication' : 'Upgrade to the Pro plan'} to start
-          replicating your database changes to {type ?? 'data warehouses and analytics platforms'}
+          replicating your database changes to {type ?? 'data warehouses and analytics platforms'}.
         </p>
       </div>
       <div className="flex gap-x-2">

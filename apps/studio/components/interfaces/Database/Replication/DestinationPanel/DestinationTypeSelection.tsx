@@ -139,7 +139,7 @@ export const DestinationTypeSelection = () => {
       <div className="flex flex-col gap-y-1">
         <p className="text-sm font-medium text-foreground">Type</p>
         <p className="text-sm text-foreground-light">
-          The destination type cannot be changed after creation
+          The destination type cannot be changed after creation.
         </p>
       </div>
 

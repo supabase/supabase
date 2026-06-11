@@ -222,7 +222,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
                     <WarningIcon />
                   </TooltipTrigger>
                   <TooltipContent side="bottom">
-                    {errorCount} table{errorCount === 1 ? '' : 's'} encountered replication errors
+                    {errorCount} table{errorCount === 1 ? '' : 's'} encountered replication errors.
                   </TooltipContent>
                 </Tooltip>
               )}
