@@ -10,13 +10,9 @@ import { TemplateBrowser } from './components/templates/TemplateBrowser'
 import { TemplateDetailSheet } from './components/templates/TemplateDetailSheet'
 import { buildAgentPlan } from './lib/agent-plan'
 import { canRemoveTemplate, createZipBlob, downloadBlob } from './lib/composition/composition'
-import {
-  buildStartComposition,
-  CORE_TEMPLATE_IDS,
-  getPrimitiveForTemplate,
-  getTemplateIdForPrimitive,
-} from './lib/composition/start-composition'
-import { DEFAULT_CONFIG, FRAMEWORKS, type PrimitiveId, type StartConfig } from './lib/config'
+import { buildStartComposition, CORE_TEMPLATE_IDS } from './lib/composition/start-composition'
+import { FRAMEWORKS } from './lib/config'
+import type { StartConfigState } from './lib/start-config-state'
 import { buildSteps } from './lib/steps'
 import type { Template } from './lib/template-catalog'
 
@@ -24,10 +20,11 @@ type SidebarView = 'config' | 'features'
 
 interface StartClientProps {
   templates: Template[]
+  configState: StartConfigState
 }
 
-export default function StartClient({ templates }: StartClientProps) {
-  const [cfg, setCfg] = useState<StartConfig>(DEFAULT_CONFIG)
+export default function StartClient({ templates, configState }: StartClientProps) {
+  const { cfg, setValue, addTemplate, removeTemplate } = configState
   const [sidebarView, setSidebarView] = useState<SidebarView>('config')
   const [search, setSearch] = useState('')
   const [guideOpen, setGuideOpen] = useState(false)
@@ -46,19 +43,6 @@ export default function StartClient({ templates }: StartClientProps) {
     () => templates.filter((template) => CORE_TEMPLATE_IDS.has(template.id)),
     [templates]
   )
-  const defaultSchemaTemplateIds = useMemo(
-    () =>
-      new Set(
-        templates
-          .filter(
-            (template) =>
-              template.defaultEnabled &&
-              template.files.some((file) => file.path.startsWith('supabase/schemas/'))
-          )
-          .map((template) => template.id)
-      ),
-    [templates]
-  )
   const featureCount = useMemo(
     () =>
       cfg.templateIds.filter((id) => featureTemplates.some((template) => template.id === id))
@@ -73,54 +57,6 @@ export default function StartClient({ templates }: StartClientProps) {
     () => new Set(composition.resolution.resolved.map((template) => template.id)),
     [composition.resolution.resolved]
   )
-
-  const setValue = <K extends keyof StartConfig>(key: K, value: StartConfig[K]) =>
-    setCfg((current) => {
-      const next = { ...current, [key]: value }
-      if (key === 'framework' && value === 'none') next.shadcn = false
-      if (key === 'orm' && value !== 'none') {
-        next.templateIds = next.templateIds.filter(
-          (templateId) => !defaultSchemaTemplateIds.has(templateId)
-        )
-      }
-      return next
-    })
-
-  const addTemplate = (id: string) => {
-    const primitive = getCanonicalPrimitiveForTemplate(id)
-
-    setCfg((current) => {
-      if (primitive) {
-        return current.primitives.includes(primitive)
-          ? current
-          : { ...current, primitives: [...current.primitives, primitive] }
-      }
-
-      return current.templateIds.includes(id)
-        ? current
-        : { ...current, templateIds: [...current.templateIds, id] }
-    })
-  }
-
-  const removeTemplate = (id: string) => {
-    if (!canRemoveTemplate(id, composition.selectedIds, templates)) return
-
-    const primitive = getCanonicalPrimitiveForTemplate(id)
-
-    setCfg((current) => {
-      if (primitive) {
-        return {
-          ...current,
-          primitives: current.primitives.filter((candidate) => candidate !== primitive),
-        }
-      }
-
-      return {
-        ...current,
-        templateIds: current.templateIds.filter((templateId) => templateId !== id),
-      }
-    })
-  }
 
   const downloadComposition = async () => {
     if (!composition.mergeResult) return
@@ -202,9 +138,4 @@ export default function StartClient({ templates }: StartClientProps) {
       />
     </div>
   )
-}
-
-function getCanonicalPrimitiveForTemplate(templateId: string): PrimitiveId | undefined {
-  const primitive = getPrimitiveForTemplate(templateId)
-  return primitive && getTemplateIdForPrimitive(primitive) === templateId ? primitive : undefined
 }

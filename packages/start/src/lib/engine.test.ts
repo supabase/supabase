@@ -71,14 +71,7 @@ describe('buildStartComposition', () => {
 describe('buildSteps', () => {
   it('produces the expected default order (new + Next.js)', () => {
     const ids = stepIds(config())
-    expect(ids).toEqual([
-      'bootstrap',
-      'plugin',
-      'cli',
-      'keys',
-      'supabase-code',
-      'connect-app',
-    ])
+    expect(ids).toEqual(['bootstrap', 'plugin', 'cli', 'keys', 'supabase-code', 'connect-app'])
     expect(ids).not.toContain('install')
     expect(ids).not.toContain('client')
   })
@@ -89,7 +82,9 @@ describe('buildSteps', () => {
 
     expect(connect.title).toBe('Connect to your app')
     expect(stepText(connect)).toContain('npx shadcn@latest init -d')
-    expect(stepText(connect)).toContain('npx shadcn@latest add @supabase/password-based-auth-nextjs')
+    expect(stepText(connect)).toContain(
+      'npx shadcn@latest add @supabase/password-based-auth-nextjs'
+    )
   })
 
   it('adds the dropzone shadcn block when storage is enabled', () => {
@@ -97,6 +92,39 @@ describe('buildSteps', () => {
     const connect = buildSteps(cfg, composition(cfg)).find((s) => s.id === 'connect-app')!
 
     expect(stepText(connect)).toContain('npx shadcn@latest add @supabase/dropzone-nextjs')
+  })
+
+  it('guides bucket creation when core Storage is selected without a bucket template', () => {
+    const cfg = config({ primitives: ['database', 'storage'], shadcn: false, templateIds: [] })
+    const steps = buildSteps(cfg, composition(cfg))
+    const supabaseCode = steps.find((s) => s.id === 'supabase-code')!
+    const connect = steps.find((s) => s.id === 'connect-app')!
+
+    expect(stepText(supabaseCode)).toContain('does not create an application bucket')
+    expect(stepText(connect)).toContain('Add Auth, a Storage bucket')
+    expect(stepText(connect)).not.toContain(".from('avatars')")
+  })
+
+  it('adds an authenticated bucket recipe when Storage and Auth are selected', () => {
+    const cfg = config({
+      primitives: ['database', 'auth', 'storage'],
+      shadcn: false,
+      templateIds: [],
+    })
+    const steps = buildSteps(cfg, composition(cfg))
+    const supabaseCode = steps.find((s) => s.id === 'supabase-code')!
+    const connect = steps.find((s) => s.id === 'connect-app')!
+
+    expect(stepText(supabaseCode)).toContain("values ('uploads', 'uploads', false)")
+    expect(stepText(supabaseCode)).toContain('Users can upload their own files')
+    expect(stepText(connect)).toContain("supabase.storage.from('uploads').upload")
+  })
+
+  it('uses the composed bucket name in storage upload snippets', () => {
+    const cfg = config({ primitives: ['storage'], shadcn: false, templateIds: ['storage-avatars'] })
+    const connect = buildSteps(cfg, composition(cfg)).find((s) => s.id === 'connect-app')!
+
+    expect(stepText(connect)).toContain("supabase.storage.from('avatars').upload")
   })
 
   it('adds install + client blocks for a non-Next.js new project', () => {
@@ -183,6 +211,18 @@ describe('buildSteps', () => {
     expect(connect.title).toBe('Connect to your app')
     expect(text).toContain(".from('todos')")
     expect(text).toContain(".select('*')")
+  })
+
+  it('guides table creation when Data API is selected without table resources', () => {
+    const cfg = config({ primitives: ['database', 'dataapi'], templateIds: [] })
+    const steps = buildSteps(cfg, composition(cfg))
+    const supabaseCode = steps.find((s) => s.id === 'supabase-code')!
+    const connect = steps.find((s) => s.id === 'connect-app')!
+    const text = stepText(connect)
+
+    expect(stepText(supabaseCode)).toContain('does not create tables')
+    expect(text).toContain('Create an RLS-protected table')
+    expect(text).not.toContain(".from('todos')")
   })
 
   it('does not scaffold a placeholder function when only Edge Functions is enabled', () => {
@@ -299,5 +339,13 @@ describe('buildAgentPlan', () => {
     expect(plan).toContain('# Set up my Supabase backend')
     expect(plan).toContain('- Framework: no front-end — backend only')
     expect(plan).not.toContain('- UI:')
+  })
+
+  it('adds option-specific storage rules to the agent prompt', () => {
+    const cfg = config({ primitives: ['storage'], templateIds: ['storage-avatars'] })
+    const plan = buildAgentPlan(cfg, composition(cfg))
+
+    expect(plan).toContain('Use the composed Storage bucket')
+    expect(plan).toContain('avatars')
   })
 })

@@ -1,6 +1,9 @@
 import { BASE_PATH } from '~/lib/constants'
 import { type Metadata } from 'next'
-import { getStartTemplates, StartClient } from 'start'
+import { Suspense } from 'react'
+import { getStartTemplates } from 'start'
+
+import { StartPageClient } from './StartPageClient'
 
 export const metadata: Metadata = {
   title: 'Get started | Supabase Docs',
@@ -16,7 +19,9 @@ export default function StartPage() {
 
   return (
     <div className="h-[calc(100dvh-var(--header-height))] min-h-0 overflow-hidden">
-      <StartClient templates={templates} />
+      <Suspense>
+        <StartPageClient templates={templates} />
+      </Suspense>
     </div>
   )
 }

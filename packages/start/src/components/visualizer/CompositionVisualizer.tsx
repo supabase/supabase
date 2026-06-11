@@ -41,10 +41,22 @@ interface CompositionFlow {
   edges: Edge[]
 }
 
+interface BackendNodeBounds {
+  position: { x: number; y: number }
+  width: number
+  height: number
+}
+
 const NODE_WIDTH = 170
 const NODE_GAP = 40
 const NODE_ESTIMATED_HEIGHT = 44
+const DATABASE_NODE_ESTIMATED_HEIGHT = 88
 const VERTICAL_SIBLING_GAP = 4
+const BACKEND_GROUP_ID = 'backend'
+const BACKEND_GROUP_HORIZONTAL_PADDING = 28
+const BACKEND_GROUP_TOP_PADDING = 44
+const BACKEND_GROUP_BOTTOM_PADDING = 24
+const FRONTEND_GROUP_GAP = 40
 const LAYOUT = {
   topRowY: 30,
   secondRowY: 150,
@@ -60,6 +72,7 @@ const ROW_LAYOUT_CONFIG = {
 }
 
 const nodeTypes = {
+  backendGroup: BackendGroupNode,
   database: DatabaseNode,
   feature: FeatureNode,
 }
@@ -217,61 +230,43 @@ export function buildCompositionFlow({
   const topLevelResources = getTopLevelResources(resources, resourceIds)
   const childrenByParentId = groupChildrenByParent(resources, resourceIds)
 
-  const nodes: Node[] = [
-    {
-      id: 'database',
-      type: 'database',
-      position: { x: 0, y: LAYOUT.topRowY },
-      data: {
-        label: 'Database',
-        sublabel: 'Postgres',
-      },
-    },
-  ]
+  const nodes: Node[] = []
   const edges: Edge[] = []
+  const backendNodeBounds: BackendNodeBounds[] = []
   const topLevelIds = topLevelResources.map((resource) => resource.id)
   const topLevelLayout = buildRowLayout(topLevelIds, 0, ROW_LAYOUT_CONFIG)
   const highlightedTemplateIds = hoveredTemplateId
     ? getHighlightedTemplateIds(hoveredTemplateId, templates)
     : null
 
-  if (showFrontend) {
-    nodes.push({
-      id: 'frontend',
-      type: 'feature',
-      position: {
-        x: -(NODE_WIDTH + LAYOUT.columnGap + 120),
-        y: LAYOUT.topRowY,
-      },
-      data: {
-        label: FRAMEWORKS[cfg.framework].label,
-        sublabel: 'Front-end',
-        icon: Monitor,
-        templateIds: [],
-        isFrontend: true,
-      },
-    })
-
-    edges.push({
-      id: 'frontend-database',
-      source: 'frontend',
-      target: 'database',
-      sourceHandle: 'source-right',
-      targetHandle: 'target-left',
-      animated: true,
-      style: { stroke: '#555', strokeWidth: 1.5 },
-    })
-  }
+  const databasePosition = { x: 0, y: LAYOUT.topRowY }
+  nodes.push({
+    id: 'database',
+    type: 'database',
+    position: databasePosition,
+    zIndex: 1,
+    data: {
+      label: 'Database',
+      sublabel: 'Postgres',
+    },
+  })
+  backendNodeBounds.push({
+    position: databasePosition,
+    width: NODE_WIDTH,
+    height: DATABASE_NODE_ESTIMATED_HEIGHT,
+  })
 
   for (const resource of topLevelResources) {
     const nodeId = `resource:${resource.id}`
     const layout = topLevelLayout.get(resource.id) ?? { x: 0 }
     const Icon = getResourceIcon(resource)
+    const position = { x: layout.x, y: LAYOUT.secondRowY }
 
     nodes.push({
       id: nodeId,
       type: 'feature',
-      position: { x: layout.x, y: LAYOUT.secondRowY },
+      position,
+      zIndex: 1,
       data: {
         label: resource.label,
         sublabel: getResourceTypeLabel(resource),
@@ -280,6 +275,7 @@ export function buildCompositionFlow({
         templateIds: resource.sourceTemplateIds,
       },
     })
+    backendNodeBounds.push({ position, width: NODE_WIDTH, height: NODE_ESTIMATED_HEIGHT })
 
     if (resource.connectsToDatabase) {
       edges.push({
@@ -301,11 +297,16 @@ export function buildCompositionFlow({
     childResources.forEach((resource, index) => {
       const nodeId = `resource:${resource.id}`
       const Icon = getResourceIcon(resource)
+      const position = {
+        x: layout.x,
+        y: LAYOUT.groupStartY + index * LAYOUT.groupNodeSpacing,
+      }
 
       nodes.push({
         id: nodeId,
         type: 'feature',
-        position: { x: layout.x, y: LAYOUT.groupStartY + index * LAYOUT.groupNodeSpacing },
+        position,
+        zIndex: 1,
         data: {
           label: resource.label,
           sublabel: getResourceTypeLabel(resource),
@@ -314,6 +315,7 @@ export function buildCompositionFlow({
           templateIds: resource.sourceTemplateIds,
         },
       })
+      backendNodeBounds.push({ position, width: NODE_WIDTH, height: NODE_ESTIMATED_HEIGHT })
       edges.push({
         id: `resource:${topLevelResource.id}-${nodeId}`,
         source: `resource:${topLevelResource.id}`,
@@ -337,6 +339,7 @@ export function buildCompositionFlow({
         x: getWarningColumnX(topLevelLayout) + LAYOUT.columnWidth + LAYOUT.columnGap,
         y: LAYOUT.groupStartY + index * LAYOUT.groupNodeSpacing,
       },
+      zIndex: 1,
       data: {
         label: warning,
         sublabel: 'Warning',
@@ -347,10 +350,55 @@ export function buildCompositionFlow({
     })
   }
 
+  if (showFrontend) {
+    const backendGroup = getBackendGroupBounds(backendNodeBounds)
+    const frontendPosition = {
+      x: backendGroup.x + backendGroup.width / 2 - NODE_WIDTH / 2,
+      y: backendGroup.y - NODE_ESTIMATED_HEIGHT - FRONTEND_GROUP_GAP,
+    }
+
+    nodes.unshift({
+      id: BACKEND_GROUP_ID,
+      type: 'backendGroup',
+      position: { x: backendGroup.x, y: backendGroup.y },
+      zIndex: 0,
+      data: {
+        label: 'Back-end',
+        width: backendGroup.width,
+        height: backendGroup.height,
+      },
+    })
+
+    nodes.push({
+      id: 'frontend',
+      type: 'feature',
+      position: frontendPosition,
+      zIndex: 2,
+      data: {
+        label: FRAMEWORKS[cfg.framework].label,
+        sublabel: 'Front-end',
+        icon: Monitor,
+        templateIds: [],
+        isFrontend: true,
+      },
+    })
+
+    edges.push({
+      id: 'frontend-backend',
+      source: 'frontend',
+      target: BACKEND_GROUP_ID,
+      sourceHandle: 'source-bottom',
+      targetHandle: 'target-top',
+      animated: true,
+      style: { stroke: '#555', strokeWidth: 1.5 },
+    })
+  }
+
   if (highlightedTemplateIds) {
     for (const node of nodes) {
       const templateIds = (node.data as { templateIds?: string[] }).templateIds ?? []
       const isRelated =
+        node.id === BACKEND_GROUP_ID ||
         node.id === 'database' ||
         node.id === 'frontend' ||
         templateIds.some((templateId) => highlightedTemplateIds.has(templateId))
@@ -359,6 +407,23 @@ export function buildCompositionFlow({
   }
 
   return { nodes, edges }
+}
+
+function BackendGroupNode({ data }: NodeProps) {
+  const width = Number(data.width)
+  const height = Number(data.height)
+
+  return (
+    <div
+      className="pointer-events-none relative rounded-md border border-default/50 bg-transparent"
+      style={{ width, height }}
+    >
+      <Handle type="target" position={Position.Top} id="target-top" className="opacity-0" />
+      <span className="absolute left-3 top-2 font-mono text-[10px] font-medium uppercase text-foreground-lighter">
+        {String(data.label)}
+      </span>
+    </div>
+  )
 }
 
 function NodeIcon({ icon: Icon, accent }: { icon: LucideIcon; accent?: 'frontend' }) {
@@ -463,6 +528,22 @@ function groupChildrenByParent(resources: CompositionResource[], resourceIds: Se
   }
 
   return grouped
+}
+
+function getBackendGroupBounds(nodes: BackendNodeBounds[]) {
+  const left = Math.min(...nodes.map((node) => node.position.x))
+  const right = Math.max(...nodes.map((node) => node.position.x + node.width))
+  const top = Math.min(...nodes.map((node) => node.position.y))
+  const bottom = Math.max(...nodes.map((node) => node.position.y + node.height))
+  const x = left - BACKEND_GROUP_HORIZONTAL_PADDING
+  const y = top - BACKEND_GROUP_TOP_PADDING
+
+  return {
+    x,
+    y,
+    width: right - left + BACKEND_GROUP_HORIZONTAL_PADDING * 2,
+    height: bottom - top + BACKEND_GROUP_TOP_PADDING + BACKEND_GROUP_BOTTOM_PADDING,
+  }
 }
 
 function getWarningColumnX(layout: Map<string, ColumnPosition>) {

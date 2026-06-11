@@ -5,26 +5,21 @@
  * Template output steps are sourced from the same resolved composition that
  * powers the visualizer and export flow.
  */
-import type { CompositionResource } from './composition/resources'
-import { selectedPrimitives, type StartComposition } from './composition/start-composition'
+import type { StartComposition } from './composition/start-composition'
+import { AGENTS, listEnglish, ORMS, type FrameworkMeta, type StartConfig } from './config'
 import {
-  AGENTS,
-  FRAMEWORKS,
-  listEnglish,
-  ORMS,
-  PRIMITIVES,
-  SHADCN_BLOCKS,
-  type FrameworkMeta,
-  type PrimitiveId,
-  type StartConfig,
-} from './config'
-import type { FileTreeNode } from './file-tree'
+  buildAppPrimitiveBlocks,
+  buildProjectCodeGuidanceBlocks,
+  createGuideContext,
+  getMissingShadcnPrimitiveLabels,
+  getShadcnBlockName,
+  getShadcnBlockPrimitives,
+  type GuideBlock,
+  type GuideContext,
+} from './guide-content'
 import { buildProjectCodePlan, formatProjectCodeFileGroups } from './project-code-plan'
 
-export type StepBlock =
-  | { type: 'code'; lang: string; code: string }
-  | { type: 'note'; text: string }
-  | { type: 'filetree'; tree: FileTreeNode }
+export type StepBlock = GuideBlock
 
 export interface SetupStep {
   id: string
@@ -38,12 +33,8 @@ export interface SetupStep {
 const lines = (arr: string[]) => arr.join('\n')
 
 export function buildSteps(cfg: StartConfig, composition: StartComposition): SetupStep[] {
-  const fw = FRAMEWORKS[cfg.framework]
-  const frontend = fw.id !== 'none'
-  const prims = selectedPrimitives(cfg, composition)
-  const newProj = cfg.project === 'new'
-  const newNext = newProj && fw.id === 'nextjs'
-  const remote = cfg.connection === 'remote'
+  const ctx = createGuideContext(cfg, composition)
+  const { fw, frontend, newProj, newNext, remote, prims } = ctx
   const steps: SetupStep[] = []
 
   // A) create app (new project with a front-end framework)
@@ -61,10 +52,10 @@ export function buildSteps(cfg: StartConfig, composition: StartComposition): Set
   // E) ORM packages
   if (cfg.orm !== 'none') steps.push(ormInstallStep(cfg))
 
-  const supabaseCode = supabaseCodeStep(cfg, composition)
+  const supabaseCode = supabaseCodeStep(ctx)
   if (supabaseCode) steps.push(supabaseCode)
 
-  const appConnection = connectAppStep(cfg, fw, prims, newNext, composition)
+  const appConnection = connectAppStep(ctx)
   if (appConnection) steps.push(appConnection)
 
   if (
@@ -273,113 +264,8 @@ function ormInstallStep(cfg: StartConfig): SetupStep {
   }
 }
 
-function appPrimitiveBlocks(
-  cfg: StartConfig,
-  newNext: boolean,
-  composition: StartComposition
-): StepBlock[] {
-  const blocks: StepBlock[] = []
-  const prims = selectedPrimitives(cfg, composition)
-
-  for (const p of prims) {
-    switch (p) {
-      case 'database':
-      case 'functions':
-        break
-      case 'auth':
-        if (newNext) {
-          blocks.push({
-            type: 'note',
-            text: 'Email sign-in already works in the with-supabase starter. Tweak providers in Dashboard -> Authentication -> Providers; the login UI lives in app/login.',
-          })
-          break
-        }
-        if (cfg.shadcn) {
-          blocks.push({
-            type: 'note',
-            text: 'Use the password-based auth block for sign-in, sign-up and reset flows. Restyle it like any shadcn component.',
-          })
-          break
-        }
-        blocks.push({
-          type: 'code',
-          lang: 'tsx',
-          code: lines([
-            'const { data, error } = await supabase.auth.signInWithPassword({',
-            '  email, password,',
-            '})',
-          ]),
-        })
-        break
-      case 'storage':
-        if (cfg.shadcn) {
-          blocks.push({
-            type: 'note',
-            text: 'Use the Dropzone block for uploads, backed by the Storage bucket added in your Supabase code.',
-          })
-          break
-        }
-        blocks.push({
-          type: 'code',
-          lang: 'tsx',
-          code: "await supabase.storage.from('avatars').upload(path, file)",
-        })
-        break
-      case 'dataapi': {
-        const table = exampleTable(composition)
-        blocks.push({
-          type: 'code',
-          lang: 'tsx',
-          code: lines([
-            'const { data, error } = await supabase',
-            `  .from('${table.name}')`,
-            "  .select('*')",
-          ]),
-        })
-        if (cfg.orm !== 'none') {
-          blocks.push({
-            type: 'note',
-            text: `Prefer typed queries? Run the same read through ${ORMS[cfg.orm].label} - the Data API and your ORM share the one Postgres database.`,
-          })
-        }
-        break
-      }
-      case 'realtime':
-        if (cfg.shadcn) {
-          blocks.push({
-            type: 'note',
-            text: 'Use the Realtime Cursor block for live presence, or subscribe directly with the client.',
-          })
-          break
-        }
-        const table = exampleTable(composition)
-
-        blocks.push({
-          type: 'code',
-          lang: 'tsx',
-          code: lines([
-            'supabase',
-            `  .channel('${table.name}')`,
-            "  .on('postgres_changes',",
-            `    { event: '*', schema: '${table.schema}', table: '${table.name}' },`,
-            '    (payload) => console.log(payload))',
-            '  .subscribe()',
-          ]),
-        })
-        break
-    }
-  }
-
-  return blocks
-}
-
-function connectAppStep(
-  cfg: StartConfig,
-  fw: FrameworkMeta,
-  prims: PrimitiveId[],
-  newNext: boolean,
-  composition: StartComposition
-): SetupStep | null {
+function connectAppStep(ctx: GuideContext): SetupStep | null {
+  const { cfg, fw, newNext } = ctx
   if (fw.id === 'none') return null
 
   const blocks: StepBlock[] = []
@@ -393,7 +279,7 @@ function connectAppStep(
     blocks.push(clientBlock(fw))
   }
 
-  const blockPrims = prims.filter((p) => SHADCN_BLOCKS[p])
+  const blockPrims = getShadcnBlockPrimitives(ctx)
 
   if (cfg.shadcn) {
     blocks.push({
@@ -402,17 +288,17 @@ function connectAppStep(
       code: lines([
         "npx shadcn@latest init -d   # if shadcn isn't set up yet",
         ...blockPrims.map(
-          (p) => `npx shadcn@latest add @supabase/${SHADCN_BLOCKS[p]}-${fw.shadcnTag}`
+          (p) => `npx shadcn@latest add @supabase/${getShadcnBlockName(p)}-${fw.shadcnTag}`
         ),
       ]),
     })
 
-    const missing = prims.filter((p) => !SHADCN_BLOCKS[p] && !['database', 'functions'].includes(p))
+    const missing = getMissingShadcnPrimitiveLabels(ctx)
     if (missing.length) {
       blocks.push({
         type: 'note',
         text:
-          missing.map((p) => PRIMITIVES[p].label).join(', ') +
+          missing.join(', ') +
           (missing.length > 1
             ? ' do not have prebuilt UI blocks, so connect them with the client snippets below.'
             : ' does not have a prebuilt UI block, so connect it with the client snippets below.'),
@@ -420,7 +306,7 @@ function connectAppStep(
     }
   }
 
-  blocks.push(...appPrimitiveBlocks(cfg, newNext, composition))
+  blocks.push(...buildAppPrimitiveBlocks(ctx))
 
   if (blocks.length === 0) return null
 
@@ -470,7 +356,8 @@ function functionsStep(cfg: StartConfig, composition: StartComposition): SetupSt
   }
 }
 
-function supabaseCodeStep(cfg: StartConfig, composition: StartComposition): SetupStep | null {
+function supabaseCodeStep(ctx: GuideContext): SetupStep | null {
+  const { cfg, composition } = ctx
   const plan = buildProjectCodePlan(cfg, composition)
 
   if (!plan.hasProjectCode) return null
@@ -514,6 +401,8 @@ function supabaseCodeStep(cfg: StartConfig, composition: StartComposition): Setu
     })
   }
 
+  blocks.push(...buildProjectCodeGuidanceBlocks(ctx))
+
   if (plan.ormConversionNote) {
     blocks.push({
       type: 'note',
@@ -544,22 +433,4 @@ function supabaseCodeStep(cfg: StartConfig, composition: StartComposition): Setu
     desc: 'Install the selected Supabase templates from the shadcn registry, then apply the generated schema and function changes.',
     blocks,
   }
-}
-
-function exampleTable(composition: StartComposition): { schema: string; name: string } {
-  const tables = composition.resources.filter(isTableResource).sort((a, b) => {
-    if (a.schema === 'public' && b.schema !== 'public') return -1
-    if (a.schema !== 'public' && b.schema === 'public') return 1
-    return a.label.localeCompare(b.label)
-  })
-
-  const table = tables[0]
-  return { schema: table?.schema ?? 'public', name: table?.label ?? 'todos' }
-}
-
-function isTableResource(resource: CompositionResource): resource is CompositionResource & {
-  kind: 'table'
-  schema: string
-} {
-  return resource.kind === 'table' && Boolean(resource.schema)
 }

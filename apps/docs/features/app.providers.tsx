@@ -2,6 +2,7 @@ import SiteLayout from '~/layouts/SiteLayout'
 import { API_URL } from '~/lib/constants'
 import { FeatureFlagProvider, IS_PLATFORM, ThemeProvider } from 'common'
 import { DevToolbar, DevToolbarProvider } from 'dev-tools'
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import type { PropsWithChildren } from 'react'
 import { TooltipProvider } from 'ui'
 
@@ -18,31 +19,33 @@ import { ThemeSandbox } from './ui/theme.client'
  */
 function GlobalProviders({ children }: PropsWithChildren) {
   return (
-    <QueryClientProvider>
-      <AuthContainer>
-        <FeatureFlagProvider API_URL={API_URL} enabled={IS_PLATFORM}>
-          <DevToolbarProvider apiUrl={API_URL}>
-            <PageTelemetry />
-            <ScrollRestoration />
-            <ThemeProvider>
-              <TooltipProvider delayDuration={0}>
-                <DocsCommandProvider>
-                  <div className="flex flex-col">
-                    <SiteLayout>
-                      {children}
-                      <DocsCommandMenu />
-                    </SiteLayout>
-                    <ThemeSandbox />
-                  </div>
-                </DocsCommandProvider>
-                <Toaster />
-                <DevToolbar />
-              </TooltipProvider>
-            </ThemeProvider>
-          </DevToolbarProvider>
-        </FeatureFlagProvider>
-      </AuthContainer>
-    </QueryClientProvider>
+    <NuqsAdapter>
+      <QueryClientProvider>
+        <AuthContainer>
+          <FeatureFlagProvider API_URL={API_URL} enabled={IS_PLATFORM}>
+            <DevToolbarProvider apiUrl={API_URL}>
+              <PageTelemetry />
+              <ScrollRestoration />
+              <ThemeProvider>
+                <TooltipProvider delayDuration={0}>
+                  <DocsCommandProvider>
+                    <div className="flex flex-col">
+                      <SiteLayout>
+                        {children}
+                        <DocsCommandMenu />
+                      </SiteLayout>
+                      <ThemeSandbox />
+                    </div>
+                  </DocsCommandProvider>
+                  <Toaster />
+                  <DevToolbar />
+                </TooltipProvider>
+              </ThemeProvider>
+            </DevToolbarProvider>
+          </FeatureFlagProvider>
+        </AuthContainer>
+      </QueryClientProvider>
+    </NuqsAdapter>
   )
 }
 
