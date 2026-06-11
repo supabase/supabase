@@ -195,7 +195,10 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Exchange auth code for user's access and refresh token */
+    /**
+     * [Beta] Exchange auth code for user's access and refresh token
+     * @description Supports `authorization_code`, `refresh_token`, and `urn:ietf:params:oauth:grant-type:jwt-bearer` grant types. The `jwt-bearer` grant type (IDJAG — identity-directed JWT assertion) is in beta and available on Team and Enterprise plans only.
+     */
     post: operations['v1-exchange-oauth-token']
     delete?: never
     options?: never
@@ -3485,13 +3488,18 @@ export interface components {
      *       "scope": "projects:read projects:write"
      *     } */
     OAuthTokenBody: {
+      /** @description IDJAG assertion JWT for grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer. Beta - available on Team and Enterprise plans only. */
+      assertion?: string
       /** Format: uuid */
       client_id?: string
       client_secret?: string
       code?: string
       code_verifier?: string
       /** @enum {string} */
-      grant_type?: 'authorization_code' | 'refresh_token'
+      grant_type?:
+        | 'authorization_code'
+        | 'refresh_token'
+        | 'urn:ietf:params:oauth:grant-type:jwt-bearer'
       redirect_uri?: string
       refresh_token?: string
       /**
@@ -3504,7 +3512,8 @@ export interface components {
     OAuthTokenResponse: {
       access_token: string
       expires_in: number
-      refresh_token: string
+      /** @description The `urn:ietf:params:oauth:grant-type:jwt-bearer` grant type issues access tokens only, no refresh token is returned and the token cannot be revoked via `/v1/oauth/revoke`. */
+      refresh_token?: string
       /** @enum {string} */
       token_type: 'Bearer'
     }
@@ -3643,8 +3652,21 @@ export interface components {
     PostgresConfigResponse: {
       /** @description Default unit: s */
       checkpoint_timeout?: string
+      'cron.log_statement'?: boolean
       effective_cache_size?: string
       hot_standby_feedback?: boolean
+      /** @description Default unit: ms */
+      log_autovacuum_min_duration?: string
+      log_checkpoints?: boolean
+      log_connections?: boolean
+      log_disconnections?: boolean
+      log_duration?: boolean
+      log_lock_waits?: boolean
+      log_recovery_conflict_waits?: boolean
+      log_replication_commands?: boolean
+      /** @description Default unit: ms */
+      log_startup_progress_interval?: string
+      log_temp_files?: string
       logical_decoding_work_mem?: string
       maintenance_work_mem?: string
       max_connections?: number
@@ -4511,8 +4533,21 @@ export interface components {
     UpdatePostgresConfigBody: {
       /** @description Default unit: s */
       checkpoint_timeout?: string
+      'cron.log_statement'?: boolean
       effective_cache_size?: string
       hot_standby_feedback?: boolean
+      /** @description Default unit: ms */
+      log_autovacuum_min_duration?: string
+      log_checkpoints?: boolean
+      log_connections?: boolean
+      log_disconnections?: boolean
+      log_duration?: boolean
+      log_lock_waits?: boolean
+      log_recovery_conflict_waits?: boolean
+      log_replication_commands?: boolean
+      /** @description Default unit: ms */
+      log_startup_progress_interval?: string
+      log_temp_files?: string
       logical_decoding_work_mem?: string
       maintenance_work_mem?: string
       max_connections?: number
@@ -5789,7 +5824,7 @@ export interface operations {
       }
     }
     responses: {
-      201: {
+      200: {
         headers: {
           [name: string]: unknown
         }
@@ -9912,7 +9947,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Feature requires a higher plan */
+      /** @description This feature requires the Enterprise organization plan. */
       402: {
         headers: {
           [name: string]: unknown
@@ -9987,7 +10022,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Feature requires a higher plan */
+      /** @description This feature requires the Enterprise organization plan. */
       402: {
         headers: {
           [name: string]: unknown
@@ -12218,6 +12253,13 @@ export interface operations {
         }
         content?: never
       }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Forbidden action */
       403: {
         headers: {
@@ -13000,6 +13042,13 @@ export interface operations {
           'application/json': components['schemas']['VanitySubdomainConfigResponse']
         }
       }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Unauthorized */
       401: {
         headers: {
@@ -13102,6 +13151,13 @@ export interface operations {
           'application/json': components['schemas']['ActivateVanitySubdomainResponse']
         }
       }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Unauthorized */
       401: {
         headers: {
@@ -13155,6 +13211,13 @@ export interface operations {
         content: {
           'application/json': components['schemas']['SubdomainAvailabilityResponse']
         }
+      }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Unauthorized */
       401: {

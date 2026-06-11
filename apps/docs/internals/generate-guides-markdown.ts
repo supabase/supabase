@@ -3,6 +3,8 @@ import path from 'node:path'
 import { globby } from 'globby'
 import matter from 'gray-matter'
 
+import { getInternalLinkBaseUrl, prefixInternalLinks, withDocsBasePath } from './internal-links'
+
 const PARTIALS_DIR = path.join(process.cwd(), 'content', '_partials')
 
 /**
@@ -107,7 +109,7 @@ function convertLinkPanels(content: string): string {
   return content.replace(/<Link\b([\s\S]*?)>([\s\S]*?)<\/Link>/g, (full, linkAttrs, body) => {
     const hrefMatch = linkAttrs.match(/\bhref="([^"]+)"/)
     if (!hrefMatch) return full
-    const href = hrefMatch[1]
+    const href = withDocsBasePath(hrefMatch[1])
 
     const panelOpen = body.match(/<(GlassPanel|IconPanel)\b/)
     if (!panelOpen) return full
@@ -195,12 +197,13 @@ function stripJsxTags(content: string): string {
 
 async function generate() {
   const files = await globby(['content/guides/**/!(_)*.mdx'])
+  const linkBaseUrl = getInternalLinkBaseUrl()
   let warnings = 0
 
   await Promise.all(
     files.map(async (filePath) => {
       const outPath = filePath
-        .replace(/^content\/guides\//, 'public/docs/guides/')
+        .replace(/^content\/guides\//, 'public/markdown/guides/')
         .replace(/\.mdx$/, '.md')
 
       let output: string
@@ -211,7 +214,8 @@ async function generate() {
         const withPartials = await inlinePartials(rawContent)
         const withSteps = convertStepHike(withPartials)
         const withLinks = convertLinkPanels(withSteps)
-        const processed = stripJsxTags(withLinks)
+        const stripped = stripJsxTags(withLinks)
+        const processed = prefixInternalLinks(stripped, linkBaseUrl)
 
         const header = [
           data.title ? `# ${data.title}` : '',
@@ -234,8 +238,8 @@ async function generate() {
         }
       }
 
-      // content/guides/ai/vector-columns.mdx → public/docs/guides/ai/vector-columns.md
-      // Placing under public/docs/ ensures the file is served at /docs/guides/...
+      // content/guides/ai/vector-columns.mdx → public/markdown/guides/ai/vector-columns.md
+      // Placing under public/markdown/ ensures the file is served at /docs/guides/...
       // matching the exact URL of the rendered page.
       await fs.promises.mkdir(path.dirname(outPath), { recursive: true })
       await fs.promises.writeFile(outPath, output)
@@ -243,7 +247,7 @@ async function generate() {
   )
 
   const summary = warnings ? ` (${warnings} with warnings)` : ''
-  console.log(`Generated ${files.length} markdown files under public/docs/guides/${summary}`)
+  console.log(`Generated ${files.length} markdown files under public/markdown/guides/${summary}`)
 }
 
 generate()

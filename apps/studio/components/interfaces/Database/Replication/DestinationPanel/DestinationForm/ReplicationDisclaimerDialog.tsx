@@ -32,8 +32,8 @@ export const ReplicationDisclaimerDialog = ({
         <DialogSection className="space-y-4 text-sm">
           <p className="text-foreground">
             Creating this replication pipeline will immediately start syncing data from your
-            publication into the destination. Make sure you understand the limitations of the system
-            before proceeding.
+            publication into an external destination. Review the current limitations before
+            proceeding.
           </p>
 
           <div className="text-foreground-light">
@@ -52,10 +52,6 @@ export const ReplicationDisclaimerDialog = ({
                 </strong>{' '}
                 With FULL replica identity deletes and updates include the payload that is needed to
                 correctly apply those changes.
-              </li>
-              <li>
-                <strong className="text-foreground">Schema changes aren’t supported yet.</strong>{' '}
-                Plan for manual adjustments if you need to alter replicated tables.
               </li>
             </ul>
           </div>

@@ -4,12 +4,12 @@ import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useCallback, useState } from 'react'
 import { Sheet, SheetContent } from 'ui'
 
+import { AddWrapperButton } from './AddWrapperButton'
 import { CreateWrapperSheet } from './CreateWrapperSheet'
 import { WRAPPERS } from './Wrappers.constants'
 import { wrapperMetaComparator } from './Wrappers.utils'
 import { WrapperTable } from './WrapperTable'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useFDWsQuery } from '@/data/fdw/fdws-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -70,43 +70,18 @@ export const WrappersTab = () => {
             <p className="text-sm text-foreground-light">
               No {wrapperMeta.label} wrappers have been installed
             </p>
-            <ButtonTooltip
-              type="default"
-              onClick={() => setIsCreating(true)}
-              disabled={!canCreateWrapper}
-              tooltip={{
-                content: {
-                  text: !canCreateWrapper
-                    ? 'You need additional permissions to create a foreign data wrapper'
-                    : undefined,
-                },
-              }}
-            >
-              Add new wrapper
-            </ButtonTooltip>
+            <AddWrapperButton onClick={() => setIsCreating(true)} />
           </div>
         </div>
       ) : (
-        <div className="max-w-5xl flex items-center gap-x-2 justify-end mb-4">
-          <DocsButton href={wrapperMeta.docsUrl} />
-          <ButtonTooltip
-            type="primary"
-            onClick={() => setIsCreating(true)}
-            disabled={!canCreateWrapper}
-            tooltip={{
-              content: {
-                text: !canCreateWrapper
-                  ? 'You need additional permissions to create a foreign data wrapper'
-                  : undefined,
-              },
-            }}
-          >
-            Add new wrapper
-          </ButtonTooltip>
-        </div>
+        <>
+          <div className="max-w-5xl flex items-center gap-x-2 justify-end mb-4">
+            <DocsButton href={wrapperMeta.docsUrl} />
+            <AddWrapperButton type="primary" onClick={() => setIsCreating(true)} />
+          </div>
+          <WrapperTable />
+        </>
       )}
-
-      {createdWrappers.length > 0 && <WrapperTable />}
 
       <Sheet open={!!isCreating} onOpenChange={handleOpenChange}>
         <SheetContent size="lg" tabIndex={undefined}>
