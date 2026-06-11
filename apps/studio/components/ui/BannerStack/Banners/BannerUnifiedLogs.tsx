@@ -35,7 +35,7 @@ export const BannerUnifiedLogs = () => {
       <div className="flex flex-col gap-y-4">
         <div className="flex flex-col gap-y-2 items-start">
           <Badge variant="success" className="-ml-0.5 uppercase inline-flex items-center">
-            New
+            Beta
           </Badge>
           <div className="-mx-6 w-[calc(100%+3rem)] bg-linear-to-t from-background to-transparent px-6 py-2 border-b">
             <UnifiedLogsCarousel />
