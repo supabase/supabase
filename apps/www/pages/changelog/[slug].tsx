@@ -36,6 +36,7 @@ const ChangelogDetailPage = ({ title, url, created_at, slug, source, labels }: P
     <NextSeo
       title={`${title} · Changelog`}
       description={title}
+      canonical={`https://supabase.com/changelog/${slug}`}
       openGraph={{
         title,
         url: `https://supabase.com/changelog/${slug}`,
