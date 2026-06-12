@@ -16,7 +16,6 @@ const cliArguments = getArgumentOptions(process.argv.slice(2))
 
 const ICONS_DIR = path.resolve(process.cwd(), 'src/raw-icons')
 const OUTPUT_DIR = path.resolve(process.cwd(), cliArguments.output || 'src')
-const REGISTRY_DIR = path.resolve(process.cwd(), cliArguments.registryOutput || '__registry__')
 
 if (!fs.existsSync(OUTPUT_DIR)) {
   fs.mkdirSync(OUTPUT_DIR)
@@ -60,7 +59,6 @@ async function buildIcons() {
     pretty: JSON.parse(pretty),
     iconsDir: ICONS_DIR,
     iconMetaData,
-    registryDir: REGISTRY_DIR,
   })
 
   if (withAliases) {
