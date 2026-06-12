@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   description:
     'Explore Supabase fees and pricing information. Find our competitive pricing Plans, with no hidden pricing. We have a generous Free Plan for those getting started, and Pay As You Go for those scaling up.',
   alternates: {
+    canonical: 'https://supabase.com/pricing',
     types: {
       'text/markdown': '/pricing.md',
     },
