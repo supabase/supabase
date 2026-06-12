@@ -69,6 +69,7 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
       <NextSeo
         title={meta.title}
         description={meta.description}
+        canonical={meta.url}
         openGraph={{
           title: meta.title,
           description: meta.description,
