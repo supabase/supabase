@@ -1,0 +1,8 @@
+description = "Rewrite without '%s'. Use an imperative verb that states what happens (for example, 'creates tables' instead of 'enables you to create tables')."
+level = "WARNING"
+words = [
+    "allow you to",
+    "allows you to",
+    "enable you to",
+    "enables you to",
+]
