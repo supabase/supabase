@@ -1,0 +1,25 @@
+# OTel Collector config for receiving Storage metrics.
+#
+# - Storage pushes metrics via OTLP gRPC every 60s
+# - Collector forwards them to VictoriaMetrics via Prometheus remote write
+# - debug exporter logs received metrics (useful for verification)
+#
+# See docs/monitoring/otel-push.md for the full setup guide.
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+
+exporters:
+  debug:
+    verbosity: detailed
+  prometheusremotewrite:
+    endpoint: http://supabase-victoriametrics:8428/api/v1/write
+
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      exporters: [debug, prometheusremotewrite]

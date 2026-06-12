@@ -1,0 +1,65 @@
+# docker-compose.override.yml
+#
+# Enables Prometheus metrics on Auth, Kong, PostgREST, imgproxy, and Vector,
+# and OTel push on Storage. These services do not expose metrics in the default
+# self-hosted configuration.
+#
+# Usage:
+#   Copy this file to docker/ alongside docker-compose.yml.
+#   Docker Compose automatically merges override files.
+#
+#     cp docs/monitoring/examples/docker-compose.override.yml .
+#     docker compose up -d auth kong vector storage
+#
+# See docs/monitoring/README.md for the full setup guide.
+
+services:
+  auth:
+    environment:
+      # OTel SDK with Prometheus exporter — exposes /metrics on :9100
+      # See: internal/conf/metrics.go in supabase/auth
+      GOTRUE_METRICS_ENABLED: "true"
+      GOTRUE_METRICS_EXPORTER: "prometheus"
+      OTEL_EXPORTER_PROMETHEUS_HOST: "0.0.0.0"
+      OTEL_EXPORTER_PROMETHEUS_PORT: "9100"
+
+  kong:
+    environment:
+      # Add prometheus plugin to the default Supabase plugin list
+      KONG_PLUGINS: >-
+        request-transformer,cors,key-auth,acl,basic-auth,
+        request-termination,ip-restriction,post-function,prometheus
+      # Kong Admin API binds to 127.0.0.1 by default; this opens it to the Docker network
+      KONG_ADMIN_LISTEN: "0.0.0.0:8001"
+
+  rest:
+    environment:
+      # Enables the PostgREST admin server — exposes /metrics on :3001
+      # See: https://docs.postgrest.org/en/v14/references/admin_server.html
+      PGRST_ADMIN_SERVER_PORT: "3001"
+
+  imgproxy:
+    environment:
+      # Enables the imgproxy Prometheus metrics server on :8081
+      # Must differ from the main imgproxy port (8080)
+      # See: https://docs.imgproxy.net/monitoring/prometheus
+      IMGPROXY_PROMETHEUS_BIND: ":8081"
+
+  vector:
+    # Mount the metrics config alongside the original vector.yml without modifying it
+    volumes:
+      - ./volumes/logs/vector.yml:/etc/vector/vector.yml:ro,z
+      - ./volumes/logs/vector.metrics.yml:/etc/vector/vector.metrics.yml:ro,z
+      - ${DOCKER_SOCKET_LOCATION}:/var/run/docker.sock:ro,z
+    command:
+      - "--config"
+      - "/etc/vector/vector.yml"
+      - "--config"
+      - "/etc/vector/vector.metrics.yml"
+
+  storage:
+    environment:
+      # Storage uses OTel push (not Prometheus pull) for metrics in self-hosted mode.
+      # The OTel Collector is defined in docker-compose.metrics.yml.
+      OTEL_METRICS_ENABLED: "true"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
