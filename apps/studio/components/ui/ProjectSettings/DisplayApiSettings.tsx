@@ -202,11 +202,11 @@ export const DisplayApiSettings = ({
                         ? 'Updating JWT secret...'
                         : (x?.api_key ?? 'You need additional permissions to view API keys')
                 }
-                onChange={() => {}}
+                onChange={() => { }}
               />
             </FormLayout>
 
-            {showApiKeyLastUsed && (
+            {showApiKeyLastUsed ? (
               <div
                 className="pt-2 text-foreground-lighter w-full text-sm data-[invisible=true]:invisible"
                 data-invisible={isLoadingLastUsed}
@@ -214,6 +214,12 @@ export const DisplayApiSettings = ({
                 {lastUsedAPIKeys[x.api_key]
                   ? `Last request was ${lastUsedAPIKeys[x.api_key]} ago.`
                   : 'No requests in the past 24 hours.'}
+              </div>
+            ) : (
+              <div className="pt-2 text-foreground-lighter w-full text-sm">
+                <span title="Usage tracking for legacy keys is currently unavailable">
+                  Last used: unavailable
+                </span>
               </div>
             )}
           </Panel.Content>
