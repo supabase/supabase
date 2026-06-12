@@ -3,7 +3,7 @@ import { Undo2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useEffect, type ReactNode } from 'react'
-import { Button, cn, ResizablePanel, usePanelRef } from 'ui'
+import { Badge, Button, cn, ResizablePanel, usePanelRef } from 'ui'
 
 import { ButtonTooltip } from '../ButtonTooltip'
 import { FeaturePreviewSidebarPanel } from '../FeaturePreviewSidebarPanel'
@@ -67,27 +67,31 @@ export function FilterSideBar({
     >
       <div className="border-b border-border px-4 md:top-0">
         <div className="flex h-[48px] items-center justify-between gap-3">
-          <p className="text-foreground text-lg">Logs</p>
+          <div className="flex items-center gap-2">
+            <p className="text-foreground text-lg">Logs</p>
+            {isUnifiedLogsEligible && <Badge variant="default">Beta</Badge>}
+          </div>
           {table.getState().columnFilters.length ? <DataTableResetButton /> : null}
         </div>
       </div>
 
-      <div className="flex-1 p-2 sm:overflow-y-scroll">
-        {isUnifiedLogsEligible && (
-          <div className="flex items-center justify-between gap-3 border-b border-border px-2 py-3">
-            <div className="space-y-0.5">
-              <p className="text-xs font-medium text-foreground">Go back to old logs</p>
-              <p className="text-xs text-foreground-light">Use the traditional interface</p>
-            </div>
-            <ButtonTooltip
-              type="default"
-              className="px-1.5"
-              icon={<Undo2 />}
-              onClick={handleGoBackToOldLogs}
-              tooltip={{ content: { side: 'bottom', text: 'Switch back' } }}
-            />
+      {isUnifiedLogsEligible && (
+        <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
+          <div className="space-y-0.5">
+            <p className="text-xs font-medium text-foreground">Go back to old logs</p>
+            <p className="text-xs text-foreground-light">Use the traditional interface</p>
           </div>
-        )}
+          <ButtonTooltip
+            type="default"
+            className="px-1.5"
+            icon={<Undo2 />}
+            onClick={handleGoBackToOldLogs}
+            tooltip={{ content: { side: 'bottom', text: 'Switch back' } }}
+          />
+        </div>
+      )}
+
+      <div className="flex-1 p-2 sm:overflow-y-scroll">
         <DataTableFilterControls dateRangeDisabled={dateRangeDisabled} />
         {afterFilters}
         <FeaturePreviewSidebarPanel

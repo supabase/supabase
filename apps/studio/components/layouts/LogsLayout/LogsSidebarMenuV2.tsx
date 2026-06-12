@@ -241,33 +241,33 @@ export function LogsSidebarMenuV2() {
         />
       )}
       {isUnifiedLogsEligible && (
-        <FeaturePreviewSidebarPanel
-          className="mx-4 mt-4"
-          title="Introducing unified logs"
-          description="A unified view across all services with improved filtering and real-time updates."
-          illustration={<Badge variant="success">New</Badge>}
-          actions={
-            <>
-              <Button
-                size="tiny"
-                type="default"
-                onClick={() => {
-                  enableUnifiedLogs()
-                  router.push(`/project/${ref}/logs`)
-                }}
-              >
-                Enable preview
-              </Button>
-              <ButtonTooltip
-                type="default"
-                className="px-1.5"
-                icon={<CircleHelpIcon />}
-                onClick={() => selectFeaturePreview('supabase-ui-preview-unified-logs')}
-                tooltip={{ content: { side: 'bottom', text: 'More information' } }}
-              />
-            </>
-          }
-        />
+        <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
+          <div className="space-y-0.5">
+            <p className="text-xs font-medium text-foreground">Introducing unified logs</p>
+            <p className="text-xs text-foreground-light">
+              A unified view across all services with improved filtering and real-time updates.
+            </p>
+          </div>
+          <div className="flex shrink-0 items-center gap-x-2">
+            <Button
+              size="tiny"
+              type="default"
+              onClick={() => {
+                enableUnifiedLogs()
+                router.push(`/project/${ref}/logs`)
+              }}
+            >
+              Enable preview
+            </Button>
+            <ButtonTooltip
+              type="default"
+              className="px-1.5"
+              icon={<CircleHelpIcon />}
+              onClick={() => selectFeaturePreview('supabase-ui-preview-unified-logs')}
+              tooltip={{ content: { side: 'bottom', text: 'More information' } }}
+            />
+          </div>
+        </div>
       )}
 
       <div
