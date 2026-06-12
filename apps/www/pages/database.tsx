@@ -62,7 +62,7 @@ function Database() {
   return (
     <>
       <NextSeo
-              canonical="https://supabase.com/database"
+        canonical="https://supabase.com/database"
         title={meta_title}
         description={meta_description}
         openGraph={{
