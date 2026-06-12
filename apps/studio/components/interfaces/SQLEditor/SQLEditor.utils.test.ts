@@ -415,11 +415,15 @@ describe('SQLEditor.utils:updateWithoutWhere', () => {
   })
 
   it('should not flag EXECUTE with INSERT', () => {
-    expect(checkDestructiveQuery(`EXECUTE 'INSERT INTO users (name) VALUES (''test'')';`)).toBe(false)
+    expect(checkDestructiveQuery(`EXECUTE 'INSERT INTO users (name) VALUES (''test'')';`)).toBe(
+      false
+    )
   })
 
   it('should not flag EXECUTE with UPDATE and WHERE', () => {
-    expect(checkDestructiveQuery(`EXECUTE 'UPDATE users SET name = ''test'' WHERE id = 1';`)).toBe(false)
+    expect(checkDestructiveQuery(`EXECUTE 'UPDATE users SET name = ''test'' WHERE id = 1';`)).toBe(
+      false
+    )
   })
 
   it('should catch EXECUTE IMMEDIATE with DROP', () => {
@@ -479,27 +483,39 @@ describe('SQLEditor.utils:updateWithoutWhere', () => {
   })
 
   it('should catch EXECUTE format with ALTER TABLE DROP COLUMN', () => {
-    expect(checkDestructiveQuery(`EXECUTE format('ALTER TABLE %I DROP COLUMN %I', 'users', 'email');`)).toBe(true)
+    expect(
+      checkDestructiveQuery(`EXECUTE format('ALTER TABLE %I DROP COLUMN %I', 'users', 'email');`)
+    ).toBe(true)
   })
 
   it('should catch EXECUTE IMMEDIATE with ALTER TABLE DROP COLUMN', () => {
-    expect(checkDestructiveQuery(`EXECUTE IMMEDIATE 'ALTER TABLE users DROP COLUMN email';`)).toBe(true)
+    expect(checkDestructiveQuery(`EXECUTE IMMEDIATE 'ALTER TABLE users DROP COLUMN email';`)).toBe(
+      true
+    )
   })
 
   it('should catch OPEN cursor FOR EXECUTE with ALTER TABLE DROP COLUMN', () => {
-    expect(checkDestructiveQuery(`OPEN ref FOR EXECUTE 'ALTER TABLE users DROP COLUMN email';`)).toBe(true)
+    expect(
+      checkDestructiveQuery(`OPEN ref FOR EXECUTE 'ALTER TABLE users DROP COLUMN email';`)
+    ).toBe(true)
   })
 
   it('should catch RETURN QUERY EXECUTE with ALTER TABLE DROP COLUMN', () => {
-    expect(checkDestructiveQuery(`RETURN QUERY EXECUTE 'ALTER TABLE users DROP COLUMN email';`)).toBe(true)
+    expect(
+      checkDestructiveQuery(`RETURN QUERY EXECUTE 'ALTER TABLE users DROP COLUMN email';`)
+    ).toBe(true)
   })
 
   it('should catch EXECUTE dollar-quoted with ALTER TABLE DROP COLUMN', () => {
-    expect(checkDestructiveQuery(`EXECUTE $sql$ALTER TABLE users DROP COLUMN email$sql$;`)).toBe(true)
+    expect(checkDestructiveQuery(`EXECUTE $sql$ALTER TABLE users DROP COLUMN email$sql$;`)).toBe(
+      true
+    )
   })
 
   it('should catch EXECUTE concat with ALTER TABLE DROP COLUMN', () => {
-    expect(checkDestructiveQuery(`EXECUTE concat('ALTER TABLE ', 'users DROP COLUMN email');`)).toBe(true)
+    expect(
+      checkDestructiveQuery(`EXECUTE concat('ALTER TABLE ', 'users DROP COLUMN email');`)
+    ).toBe(true)
   })
 
   it('should catch DO block with EXECUTE ALTER TABLE DROP COLUMN', () => {
