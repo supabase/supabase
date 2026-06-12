@@ -474,6 +474,50 @@ describe('SQLEditor.utils:updateWithoutWhere', () => {
     expect(checkDestructiveQuery(`EXECUTE E'DROP TABLE users';`)).toBe(true)
   })
 
+  it('should catch EXECUTE with ALTER TABLE DROP COLUMN', () => {
+    expect(checkDestructiveQuery(`EXECUTE 'ALTER TABLE users DROP COLUMN email';`)).toBe(true)
+  })
+
+  it('should catch EXECUTE format with ALTER TABLE DROP COLUMN', () => {
+    expect(checkDestructiveQuery(`EXECUTE format('ALTER TABLE %I DROP COLUMN %I', 'users', 'email');`)).toBe(true)
+  })
+
+  it('should catch EXECUTE IMMEDIATE with ALTER TABLE DROP COLUMN', () => {
+    expect(checkDestructiveQuery(`EXECUTE IMMEDIATE 'ALTER TABLE users DROP COLUMN email';`)).toBe(true)
+  })
+
+  it('should catch OPEN cursor FOR EXECUTE with ALTER TABLE DROP COLUMN', () => {
+    expect(checkDestructiveQuery(`OPEN ref FOR EXECUTE 'ALTER TABLE users DROP COLUMN email';`)).toBe(true)
+  })
+
+  it('should catch RETURN QUERY EXECUTE with ALTER TABLE DROP COLUMN', () => {
+    expect(checkDestructiveQuery(`RETURN QUERY EXECUTE 'ALTER TABLE users DROP COLUMN email';`)).toBe(true)
+  })
+
+  it('should catch EXECUTE dollar-quoted with ALTER TABLE DROP COLUMN', () => {
+    expect(checkDestructiveQuery(`EXECUTE $sql$ALTER TABLE users DROP COLUMN email$sql$;`)).toBe(true)
+  })
+
+  it('should catch EXECUTE concat with ALTER TABLE DROP COLUMN', () => {
+    expect(checkDestructiveQuery(`EXECUTE concat('ALTER TABLE ', 'users DROP COLUMN email');`)).toBe(true)
+  })
+
+  it('should catch DO block with EXECUTE ALTER TABLE DROP COLUMN', () => {
+    expect(
+      checkDestructiveQuery(stripIndent`
+        DO $$
+        BEGIN
+          EXECUTE 'ALTER TABLE users DROP COLUMN email';
+        END
+        $$;
+      `)
+    ).toBe(true)
+  })
+
+  it('should not flag ALTER TABLE without DROP COLUMN', () => {
+    expect(checkDestructiveQuery(`EXECUTE 'ALTER TABLE users ADD COLUMN email text';`)).toBe(false)
+  })
+
   it('should not flag variable assignment with safe SQL', () => {
     expect(checkDestructiveQuery(`sql := 'SELECT * FROM users';`)).toBe(false)
   })
