@@ -190,6 +190,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
         <link rel="alternate" type="text/markdown" href="/changelog.md" />
       </Head>
       <NextSeo
+              canonical="https://supabase.com/changelog"
         title={TITLE}
         description={DESCRIPTION}
         openGraph={{
