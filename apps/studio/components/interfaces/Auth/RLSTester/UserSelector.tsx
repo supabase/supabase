@@ -71,7 +71,7 @@ export const UserSelector = () => {
         <PopoverTrigger asChild>
           <Button
             block
-            type="default"
+            variant="default"
             role="combobox"
             size="small"
             aria-expanded={open}

@@ -343,7 +343,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
                   searchString ? (
                     <Button
                       size="tiny"
-                      type="text"
+                      variant="text"
                       className="p-0 h-5 w-5"
                       icon={<X />}
                       onClick={() => setSearchString('')}

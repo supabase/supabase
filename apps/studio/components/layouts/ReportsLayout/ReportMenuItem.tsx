@@ -63,7 +63,7 @@ export const ReportMenuItem = ({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                type="text"
+                variant="text"
                 className="px-1 opacity-50 hover:opacity-100"
                 icon={<ChevronDown size={12} strokeWidth={2} />}
                 onClick={(e) => {

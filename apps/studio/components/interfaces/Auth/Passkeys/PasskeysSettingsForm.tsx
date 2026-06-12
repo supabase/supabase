@@ -379,15 +379,15 @@ export const PasskeysSettingsForm = () => {
 
           <CardFooter className="justify-end space-x-2">
             <Button
-              type="default"
+              variant="default"
               onClick={() => form.reset(buildPasskeysFormValues(authConfig, project))}
               disabled={isPending}
             >
               Cancel
             </Button>
             <Button
-              type="primary"
-              htmlType="submit"
+              variant="primary"
+              type="submit"
               disabled={!canUpdateConfig || !form.formState.isDirty}
               loading={isPending}
             >

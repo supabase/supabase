@@ -217,7 +217,7 @@ export const PublicationsList = () => {
                     ))}
                     <TableCell>
                       <div className="flex justify-end">
-                        <Button asChild type="default" style={{ paddingTop: 3, paddingBottom: 3 }}>
+                        <Button asChild variant="default" style={{ paddingTop: 3, paddingBottom: 3 }}>
                           <Link href={`/project/${ref}/database/publications/${x.id}`}>
                             {x.tables === null
                               ? 'All tables'

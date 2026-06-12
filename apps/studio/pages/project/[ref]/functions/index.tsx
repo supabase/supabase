@@ -147,7 +147,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                                   <Button
                                     key="clear"
                                     size="tiny"
-                                    type="text"
+                                    variant="text"
                                     icon={<X />}
                                     onClick={() => setSearch('')}
                                     className="p-0 h-5 w-5"
@@ -166,7 +166,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                         side="bottom"
                       >
                         <Button
-                          type="default"
+                          variant="default"
                           icon={<RefreshCw />}
                           loading={isFetching}
                           onClick={() => refetch()}
@@ -246,7 +246,7 @@ EdgeFunctionsPage.getLayout = (page: React.ReactElement) => {
               </PageHeaderSummary>
               <PageHeaderAside>
                 <DocsButton href={`${DOCS_URL}/guides/functions`} />
-                <Button asChild type="default" icon={<ExternalLink />}>
+                <Button asChild variant="default" icon={<ExternalLink />}>
                   <a
                     target="_blank"
                     rel="noreferrer"

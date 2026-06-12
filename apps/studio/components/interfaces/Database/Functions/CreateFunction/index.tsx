@@ -394,12 +394,12 @@ export const CreateFunction = ({
             </form>
           </Form>
           <SheetFooter>
-            <Button disabled={isCreating || isUpdating} type="default" onClick={confirmOnClose}>
+            <Button disabled={isCreating || isUpdating} variant="default" onClick={confirmOnClose}>
               Cancel
             </Button>
             <Button
               form={FORM_ID}
-              htmlType="submit"
+              type="submit"
               disabled={isCreating || isUpdating}
               loading={isCreating || isUpdating}
             >
@@ -485,7 +485,7 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
 
               {!readonly && (
                 <Button
-                  type="danger"
+                  variant="danger"
                   icon={<Trash size={12} />}
                   onClick={() => remove(index)}
                   className="h-[38px] w-[38px]"
@@ -497,7 +497,7 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
 
         {!readonly && (
           <Button
-            type="default"
+            variant="default"
             icon={<Plus size={12} />}
             onClick={() => append({ name: '', type: 'integer' })}
             disabled={readonly}

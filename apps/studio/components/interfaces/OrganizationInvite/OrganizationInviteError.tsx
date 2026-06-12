@@ -64,7 +64,7 @@ export const OrganizationInviteError = ({
             )
           }
         />
-        <Button type="default" block onClick={handleSignOut}>
+        <Button variant="default" block onClick={handleSignOut}>
           Sign out
         </Button>
       </div>

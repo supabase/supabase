@@ -245,7 +245,7 @@ export const AddNewSecretForm = () => {
                             actions={
                               <div className="mr-1">
                                 <Button
-                                  type="text"
+                                  variant="text"
                                   className="px-1"
                                   icon={isSecretVisible(fieldItem.id) ? <EyeOff /> : <Eye />}
                                   onClick={() => handleToggleSecretVisibility(fieldItem.id)}
@@ -260,7 +260,7 @@ export const AddNewSecretForm = () => {
                   />
 
                   <Button
-                    type="default"
+                    variant="default"
                     className="h-[34px] mt-6"
                     icon={<MinusCircle />}
                     disabled={fields.length <= 1}
@@ -269,7 +269,7 @@ export const AddNewSecretForm = () => {
                 </div>
               ))}
 
-              <Button type="default" onClick={handleAddAnotherSecret}>
+              <Button variant="default" onClick={handleAddAnotherSecret}>
                 Add another
               </Button>
             </CardContent>
@@ -278,7 +278,7 @@ export const AddNewSecretForm = () => {
                 Insert or update multiple secrets at once by pasting key-value pairs
               </p>
 
-              <Button type="primary" htmlType="submit" disabled={isCreating} loading={isCreating}>
+              <Button variant="primary" type="submit" disabled={isCreating} loading={isCreating}>
                 {isCreating ? 'Saving...' : fields.length > 1 ? 'Bulk save' : 'Save'}
               </Button>
             </CardFooter>

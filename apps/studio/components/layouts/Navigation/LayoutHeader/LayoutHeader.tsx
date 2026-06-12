@@ -216,7 +216,7 @@ export const LayoutHeader = ({
                   }}
                 >
                   {IS_PLATFORM && <MergeRequestButton />}
-                  <ConnectButton buttonType={connectButtonType} />
+                  <ConnectButton buttonVariant={connectButtonType} />
                 </motion.div>
               )}
             </AnimatePresence>

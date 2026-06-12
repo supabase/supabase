@@ -52,7 +52,7 @@ export const ProductMenuItem = ({
   if (url) {
     if (isExternal) {
       const externalLink = (
-        <Button asChild block className="justify-start!" type="text" size="small" icon={icon}>
+        <Button asChild block className="justify-start!" variant="text" size="small" icon={icon}>
           <Link href={url} target="_blank" rel="noreferrer">
             {name}
           </Link>

@@ -128,7 +128,7 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
                         actions={
                           <div className="mr-1">
                             <Button
-                              type="text"
+                              variant="text"
                               className="px-1"
                               icon={showSecretValue ? <EyeOff /> : <Eye />}
                               onClick={() => setShowSecretValue(!showSecretValue)}
@@ -145,10 +145,10 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
         </SheetSection>
 
         <SheetFooter>
-          <Button disabled={isUpdating} type="default" onClick={confirmOnClose}>
+          <Button disabled={isUpdating} variant="default" onClick={confirmOnClose}>
             Cancel
           </Button>
-          <Button form={FORM_ID} htmlType="submit" disabled={!isValid} loading={isUpdating}>
+          <Button form={FORM_ID} type="submit" disabled={!isValid} loading={isUpdating}>
             Save
           </Button>
         </SheetFooter>

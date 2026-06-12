@@ -253,7 +253,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                     You will need to manually apply these changes to your database.
                   </AlertDescription>
                   <Button
-                    type="outline"
+                    variant="outline"
                     aria-label="Dismiss"
                     className="absolute top-2 right-2 p-1 pl-1!"
                     onClick={() => {
@@ -281,7 +281,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                     <code className="text-code-inline">delete</code>) will fail.
                   </AlertDescription>
                   <Button
-                    type="outline"
+                    variant="outline"
                     aria-label="Dismiss"
                     className="absolute top-2 right-2 p-1 pl-1!"
                     onClick={() => {
@@ -353,7 +353,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                 You may access this feature by enabling it under dashboard feature previews.
               </AlertDescription>
               <div className="mt-4">
-                <Button type="default" onClick={() => toggleFeaturePreviewModal(true)}>
+                <Button variant="default" onClick={() => toggleFeaturePreviewModal(true)}>
                   View feature previews
                 </Button>
               </div>

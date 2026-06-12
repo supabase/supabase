@@ -127,7 +127,7 @@ const ResetDbPassword = ({ disabled = false }) => {
               <Dialog open={showResetDbPass} onOpenChange={(open) => setShowResetDbPass(open)}>
                 <DialogTrigger asChild>
                   <ButtonTooltip
-                    type="default"
+                    variant="default"
                     disabled={!canResetDbPassword || !isProjectActive || disabled}
                     tooltip={{
                       content: {
@@ -175,14 +175,14 @@ const ResetDbPassword = ({ disabled = false }) => {
                   </DialogSection>
                   <DialogFooter>
                     <Button
-                      type="default"
+                      variant="default"
                       disabled={isUpdatingPassword}
                       onClick={() => setShowResetDbPass(false)}
                     >
                       Cancel
                     </Button>
                     <Button
-                      type="primary"
+                      variant="primary"
                       loading={isUpdatingPassword}
                       disabled={isUpdatingPassword}
                       onClick={() => confirmResetDbPass()}

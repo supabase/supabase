@@ -78,7 +78,7 @@ export const AutoEnableRLSNotice = ({ iconOnly }: { iconOnly?: boolean }) => {
           <CreateEnsureRLSTriggerDialog />
           <ButtonTooltip
             icon={<X />}
-            type="text"
+            variant="text"
             className="w-7"
             tooltip={{ content: { side: 'bottom', text: 'Minimize' } }}
             onClick={() => setIsMinimized(true)}
@@ -125,13 +125,13 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
       <DialogTrigger asChild>
         {iconOnly ? (
           <ButtonTooltip
-            type="default"
+            variant="default"
             icon={<ShieldCheck />}
             className="w-7"
             tooltip={{ content: { side: 'bottom', text: 'Auto-enable RLS for new tables' } }}
           />
         ) : (
-          <Button type="primary">Learn more</Button>
+          <Button variant="primary">Learn more</Button>
         )}
       </DialogTrigger>
       <DialogContent size="large">
@@ -159,7 +159,7 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
         </CodeBlock>
 
         <DialogFooter>
-          <Button type="default" disabled={isCreating} onClick={() => setOpen(false)}>
+          <Button variant="default" disabled={isCreating} onClick={() => setOpen(false)}>
             Close
           </Button>
           <ButtonTooltip

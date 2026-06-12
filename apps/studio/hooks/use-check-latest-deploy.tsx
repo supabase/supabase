@@ -21,7 +21,7 @@ const DeployCheckToast = ({ id }: { id: string | number }) => {
       </div>
 
       <div className="flex gap-5 justify-end">
-        <Button type="outline" onClick={() => toast.dismiss(id)}>
+        <Button variant="outline" onClick={() => toast.dismiss(id)}>
           Not now
         </Button>
         <Button onClick={() => router.reload()}>Refresh</Button>

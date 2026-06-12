@@ -1,6 +1,6 @@
-import { Button } from 'ui'
-import { useSendTelemetryEvent } from '~/lib/telemetry'
 import staticContent from '.generated/staticContent/_index.json'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { Button } from 'ui'
 
 const GitHubButton = () => {
   const sendTelemetryEvent = useSendTelemetryEvent()
@@ -26,7 +26,7 @@ const GitHubButton = () => {
   return (
     <Button
       className="hidden group lg:flex text-foreground-light hover:text-foreground in-data-nav-transparent:text-foreground"
-      type="text"
+      variant="text"
       asChild
       onClick={() => sendTelemetryEvent({ action: 'homepage_github_button_clicked' })}
     >

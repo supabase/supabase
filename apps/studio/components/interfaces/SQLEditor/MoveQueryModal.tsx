@@ -235,7 +235,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                     <Button
                       block
                       size="small"
-                      type="default"
+                      variant="default"
                       className="pr-2 justify-between"
                       iconRight={
                         <Code
@@ -353,15 +353,15 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
 
             <DialogFooter>
               <Button
-                type="default"
+                variant="default"
                 disabled={isMovingSnippet || isCreatingFolder}
                 onClick={() => onClose()}
               >
                 Cancel
               </Button>
               <Button
-                type="primary"
-                htmlType="submit"
+                variant="primary"
+                type="submit"
                 disabled={isMovingToSameFolder}
                 loading={isMovingSnippet || isCreatingFolder}
               >

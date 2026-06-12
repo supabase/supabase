@@ -372,7 +372,7 @@ export const NewOrgForm = ({
           footer={
             <div key="panel-footer" className="flex w-full items-center justify-between">
               <Button
-                type="default"
+                variant="default"
                 disabled={newOrgLoading || paymentConfirmationLoading}
                 onClick={() => {
                   if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
@@ -384,8 +384,8 @@ export const NewOrgForm = ({
 
               <Button
                 form={FORM_ID}
-                htmlType="submit"
-                type="primary"
+                type="submit"
+                variant="primary"
                 loading={newOrgLoading}
                 disabled={newOrgLoading || creationPreviewIsFetching}
               >

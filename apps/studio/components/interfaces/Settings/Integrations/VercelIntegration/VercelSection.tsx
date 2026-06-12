@@ -223,7 +223,7 @@ export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean })
                     <Button
                       icon={<ExternalLink />}
                       asChild={!isBranch}
-                      type="default"
+                      variant="default"
                       disabled={isBranch}
                     >
                       {isBranch ? (

@@ -30,7 +30,7 @@ export const LogsListPanel = ({ selectedRow }: { selectedRow?: Row<ColumnSchema>
               </span>
             </div>
             <Button
-              type="default"
+              variant="default"
               onClick={() => setOpenState(!open)}
               icon={<ChevronDown className={cn('w-4 h-4', !open ? 'rotate-180' : 'rotate-0')} />}
             >

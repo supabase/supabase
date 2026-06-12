@@ -38,11 +38,11 @@ function CustomDateRangePicker({ onChange, onCancel }: CustomOptionProps) {
         numberOfMonths={2}
       />
       <div className="flex justify-end gap-2 py-3 px-4 border-t">
-        <Button type="default" onClick={onCancel}>
+        <Button variant="default" onClick={onCancel}>
           Cancel
         </Button>
         <Button
-          type="primary"
+          variant="primary"
           onClick={() => {
             if (dateRange?.from) {
               const from = dayjs(dateRange.from).toISOString()
@@ -287,7 +287,7 @@ export const PreviewFilterPanelWithUniversal = ({
         <div className="flex items-center gap-x-2">
           <Button
             title="refresh"
-            type="default"
+            variant="default"
             className="px-1.5"
             icon={
               <div className="relative">
@@ -308,7 +308,7 @@ export const PreviewFilterPanelWithUniversal = ({
           />
 
           <Button
-            type="default"
+            variant="default"
             onClick={() => onToggleEventChart()}
             icon={isShowingEventChart ? <Eye /> : <EyeOff />}
           >
@@ -321,7 +321,7 @@ export const PreviewFilterPanelWithUniversal = ({
             <>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button asChild className="px-1.5" type="default" icon={<Terminal />}>
+                  <Button asChild className="px-1.5" variant="default" icon={<Terminal />}>
                     <Link href={queryUrl} />
                   </Button>
                 </TooltipTrigger>
@@ -341,7 +341,7 @@ export const PreviewFilterPanelWithUniversal = ({
               />
             </>
           ) : (
-            <Button asChild type="default" onClick={onExploreClick}>
+            <Button asChild variant="default" onClick={onExploreClick}>
               <Link href={queryUrl}>Explore via query</Link>
             </Button>
           )}
