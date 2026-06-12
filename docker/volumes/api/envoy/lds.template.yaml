@@ -373,6 +373,64 @@ resources:
                               type.googleapis.com/envoy.config.route.v3.FilterConfig
                             disabled: true
 
+                      - name: realtime-v1-api-openapi-blocked
+                        match:
+                          prefix: /realtime/v1/api/openapi
+                        route:
+                          cluster: realtime
+                          timeout: 30s
+                        request_headers_to_add:
+                          - header:
+                              key: X-Forwarded-Prefix
+                              value: /realtime/v1/api/openapi
+                            append_action: ADD_IF_ABSENT
+                        typed_per_filter_config:
+                          envoy.filters.http.basic_auth:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
+                          envoy.filters.http.rbac:
+                            '@type': >-
+                              type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+                            rbac:
+                              rules:
+                                action: DENY
+                                policies:
+                                  deny_all:
+                                    permissions:
+                                      - any: true
+                                    principals:
+                                      - any: true
+
+                      - name: realtime-v1-api-tenants-blocked
+                        match:
+                          prefix: /realtime/v1/api/tenants
+                        route:
+                          cluster: realtime
+                          timeout: 30s
+                        request_headers_to_add:
+                          - header:
+                              key: X-Forwarded-Prefix
+                              value: /realtime/v1/api/tenants
+                            append_action: ADD_IF_ABSENT
+                        typed_per_filter_config:
+                          envoy.filters.http.basic_auth:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
+                          envoy.filters.http.rbac:
+                            '@type': >-
+                              type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+                            rbac:
+                              rules:
+                                action: DENY
+                                policies:
+                                  deny_all:
+                                    permissions:
+                                      - any: true
+                                    principals:
+                                      - any: true
+
                       - name: realtime-v1-api-protected
                         match:
                           prefix: /realtime/v1/api

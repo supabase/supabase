@@ -30,12 +30,12 @@ const ProjectDowngradeListItem = ({ projectAddon }: { projectAddon: ProjectAddon
   const needsRestart = projectAddon.addons.find((addon) => addon.type === 'compute_instance')
 
   /**
-   * We do not include Log Drains and Advanced MFA Phone for the following reasons:
+   * We do not include Log Drains, Advanced MFA Phone, and ETL Pipeline for the following reasons:
    * 1. These addons are not removed automatically. Instead, users have to remove the respective configuration themselves
-   * 2. It's not obvious to users that Log Drains and MFA Phone are addons
+   * 2. It's not obvious to users that Log Drains, MFA Phone, and ETL Pipeline are addons
    */
   const relevantAddonsToList = projectAddon.addons.filter(
-    (addon) => !['log_drain', 'auth_mfa_phone'].includes(addon.type)
+    (addon) => !['log_drain', 'auth_mfa_phone', 'etl_pipeline'].includes(addon.type)
   )
 
   const addonNames = relevantAddonsToList.map((addon) => {

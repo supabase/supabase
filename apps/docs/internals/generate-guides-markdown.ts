@@ -3,7 +3,7 @@ import path from 'node:path'
 import { globby } from 'globby'
 import matter from 'gray-matter'
 
-import { getInternalLinkBaseUrl, prefixInternalLinks } from './internal-links'
+import { getInternalLinkBaseUrl, prefixInternalLinks, withDocsBasePath } from './internal-links'
 
 const PARTIALS_DIR = path.join(process.cwd(), 'content', '_partials')
 
@@ -109,7 +109,7 @@ function convertLinkPanels(content: string): string {
   return content.replace(/<Link\b([\s\S]*?)>([\s\S]*?)<\/Link>/g, (full, linkAttrs, body) => {
     const hrefMatch = linkAttrs.match(/\bhref="([^"]+)"/)
     if (!hrefMatch) return full
-    const href = hrefMatch[1]
+    const href = withDocsBasePath(hrefMatch[1])
 
     const panelOpen = body.match(/<(GlassPanel|IconPanel)\b/)
     if (!panelOpen) return full
