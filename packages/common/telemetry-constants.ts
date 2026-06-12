@@ -1151,6 +1151,24 @@ export interface SqlEditorQueryRunButtonClickedEvent {
 }
 
 /**
+ * User clicked on the "Cancel Subscription" Button on the billing settings page.
+ *
+ * @group Events
+ * @source studio
+ * @page /billing
+ */
+export interface StudioBillingCancelSubscriptionClickedEvent {
+  action: 'studio_billing_cancel_subscription_clicked'
+  properties: {
+    /**
+     * The plan type the org is currently on.
+     */
+    currentPlan: string
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * User clicked on the CTA button on a plan in the pricing side panel in studio.
  *
  * @group Events
@@ -1224,6 +1242,30 @@ export interface MetricsAPIBannerCtaButtonClickedEvent {
  */
 export interface MetricsAPIBannerDismissButtonClickedEvent {
   action: 'metrics_api_banner_dismiss_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicks on the Unified Logs banner CTA button in studio project pages.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/*
+ */
+export interface UnifiedLogsBannerCtaButtonClickedEvent {
+  action: 'unified_logs_banner_cta_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the dismiss button on the Unified Logs banner in studio project pages.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/*
+ */
+export interface UnifiedLogsBannerDismissButtonClickedEvent {
+  action: 'unified_logs_banner_dismiss_button_clicked'
   groups: TelemetryGroups
 }
 
@@ -2491,6 +2533,66 @@ export interface LogDrainRemovedEvent {
   groups: TelemetryGroups
 }
 
+/**
+ * User clicked the save destination button in the add audit log drain sheet.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/org/{slug}/audit-log-drains (LogDrainDestinationSheetForm)
+ */
+export interface AuditLogDrainSaveButtonClickedEvent {
+  action: 'audit_log_drain_save_button_clicked'
+  properties: {
+    /**
+     * Type of the destination saved
+     */
+    destination:
+      | 'postgres'
+      | 'bigquery'
+      | 'clickhouse'
+      | 'webhook'
+      | 'datadog'
+      | 'loki'
+      | 'sentry'
+      | 's3'
+      | 'axiom'
+      | 'last9'
+      | 'otlp'
+      | 'syslog'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User confirmed removal of an audit log drain destination in the delete-confirm modal.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/org/{slug}/audit-log-drains
+ */
+export interface AuditLogDrainRemovedEvent {
+  action: 'audit_log_drain_removed'
+  properties: {
+    /**
+     * Type of the destination removed
+     */
+    destination:
+      | 'postgres'
+      | 'bigquery'
+      | 'clickhouse'
+      | 'webhook'
+      | 'datadog'
+      | 'loki'
+      | 'sentry'
+      | 's3'
+      | 'axiom'
+      | 'last9'
+      | 'otlp'
+      | 'syslog'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
 type AdvisorCategory = 'PERFORMANCE' | 'SECURITY'
 type AdvisorLevel = 'ERROR' | 'WARN' | 'INFO'
 
@@ -3034,6 +3136,40 @@ export interface AccessTokenRemovedEvent {
 }
 
 /**
+ * User clicked the "Upgrade to Pro" CTA in one of the experiment placement surfaces.
+ * GROWTH experiment: `upgradeCtaPlacement` (user_dropdown / org_projects_list).
+ *
+ * @group Events
+ * @source studio
+ */
+export interface UpgradeCtaClickedEvent {
+  action: 'upgrade_cta_clicked'
+  properties: {
+    placement: 'user_dropdown' | 'org_projects_list'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User was exposed to the upgrade CTA placement experiment.
+ * Fires once per session per free-plan user enrolled in any variant (including control),
+ * so the conversion analysis has a baseline cohort.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface UpgradeCtaPlacementExperimentExposedEvent {
+  action: 'upgrade_cta_placement_experiment_exposed'
+  properties: {
+    /**
+     * The experiment variant shown to the user
+     */
+    variant: 'control' | 'user_dropdown' | 'org_projects_list'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * User clicked the primary CTA on a resource exhaustion warning banner.
  *
  * @group Events
@@ -3076,7 +3212,15 @@ export interface UnifiedLogsRowClickedEvent {
      * Server values are validated against this set by zod (UnifiedLogs.schema.ts) before
      * reaching the table; anything else is rejected upstream so the union here is exhaustive.
      */
-    logType: 'postgres' | 'postgrest' | 'auth' | 'storage' | 'edge function'
+    logType:
+      | 'postgres'
+      | 'postgrest'
+      | 'auth'
+      | 'storage'
+      | 'edge function'
+      | 'realtime'
+      | 'supavisor'
+      | 'pgbouncer'
   }
   groups: TelemetryGroups
 }
@@ -3341,10 +3485,13 @@ export type TelemetryEvent =
   | StoragePublicBucketSelectPolicyRemovedEvent
   | StoragePublicBucketSelectPolicyWarningDismissButtonClickedEvent
   | StudioPricingPlanCtaClickedEvent
+  | StudioBillingCancelSubscriptionClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
   | MetricsAPIBannerCtaButtonClickedEvent
   | MetricsAPIBannerDismissButtonClickedEvent
+  | UnifiedLogsBannerCtaButtonClickedEvent
+  | UnifiedLogsBannerDismissButtonClickedEvent
   | IndexAdvisorEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
   | IndexAdvisorTabClickedEvent
@@ -3406,6 +3553,8 @@ export type TelemetryEvent =
   | SidebarOpenedEvent
   | LogDrainSaveButtonClickedEvent
   | LogDrainRemovedEvent
+  | AuditLogDrainSaveButtonClickedEvent
+  | AuditLogDrainRemovedEvent
   | AdvisorDetailOpenedEvent
   | AdvisorAssistantButtonClickedEvent
   | QueryPerformanceAIExplanationButtonClickedEvent
@@ -3431,6 +3580,8 @@ export type TelemetryEvent =
   | ComputeBadgeUpgradeClickedEvent
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
+  | UpgradeCtaClickedEvent
+  | UpgradeCtaPlacementExperimentExposedEvent
   | AccessTokenCreatedEvent
   | AccessTokenRemovedEvent
   | ResourceExhaustionBannerUpgradeClickedEvent

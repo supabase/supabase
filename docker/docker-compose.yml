@@ -109,7 +109,7 @@ services:
       SERVICE_ROLE_KEY_ASYMMETRIC: ${SERVICE_ROLE_KEY_ASYMMETRIC:-}
       DASHBOARD_USERNAME: ${DASHBOARD_USERNAME}
       DASHBOARD_PASSWORD: ${DASHBOARD_PASSWORD}
-    entrypoint: /home/kong/kong-entrypoint.sh
+    entrypoint: ["/bin/sh", "/home/kong/kong-entrypoint.sh"]
 
   auth:
     container_name: supabase-auth
@@ -445,6 +445,11 @@ services:
     depends_on:
       kong:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 1 bash -c '</dev/tcp/127.0.0.1/9000'"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
     environment:
       # Legacy symmetric HS256 key
       JWT_SECRET: ${JWT_SECRET}
