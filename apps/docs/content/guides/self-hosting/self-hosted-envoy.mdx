@@ -60,11 +60,11 @@ HTTP filter chain
   ├─ CORS
   ├─ Basic Auth  (dashboard only)
   ├─ Lua: copy ?apikey query to header
+  ├─ Lua: 401 for missing/invalid API key
   ├─ Lua: translate opaque keys in query
   ├─ Lua: translate opaque keys in header
   ├─ Lua: mirror apikey to x-api-key (Realtime WS)
   ├─ Lua: synthesize Authorization header
-  ├─ Lua: 401 for missing/invalid API key
   ├─ RBAC  (global: service_role → /pg/, apikey → other API routes;
   │         per-route DENY override on /mcp and Realtime
   │         /api/tenants, /api/openapi)

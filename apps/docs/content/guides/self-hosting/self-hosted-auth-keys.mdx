@@ -226,8 +226,6 @@ To assist with the authorization flows a specialized configuration in `kong.yml`
 | `/storage/v1/*`            | Storage              | No               | `Authorization`     |
 | `/functions/v1/*`          | Edge Functions       | No               | -                   |
 
-The Realtime `/realtime/v1/api/tenants` and `/realtime/v1/api/openapi` routes are blocked, only the Realtime WebSocket and the data-plane REST endpoints (broadcast, channels, ping) are reachable.
-
 ### Request flows
 
 The API gateway (Kong) configuration has the logic to decide what `Authorization` header the upstream service, such as Auth, receives. The logic handles two cases: requests that only carry an API key (no user session), and requests that carry a user session JWT.
