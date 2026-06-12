@@ -65,11 +65,9 @@ const ObservabilityMenu = () => {
     projectRef: ref,
     type: 'report',
   })
-  const { mutate: deleteReport, isPending: isDeleting } = useContentDeleteMutation({
+  const { mutate: deleteReport } = useContentDeleteMutation({
     onSuccess: () => {
-      setDeleteModalOpen(false)
-      toast.success('Successfully deleted report')
-      router.push(`/project/${ref}/observability`)
+      toast.success('Report deleted')
     },
     onError: (error) => {
       toast.error(`Failed to delete report: ${error.message}`)
@@ -87,6 +85,8 @@ const ObservabilityMenu = () => {
   const onConfirmDeleteReport = () => {
     if (ref === undefined) return console.error('Project ref is required')
     if (selectedReportToDelete?.id === undefined) return console.error('Report ID is required')
+    setDeleteModalOpen(false)
+    router.push(`/project/${ref}/observability`)
     deleteReport({ projectRef: ref, ids: [selectedReportToDelete.id] })
   }
 
@@ -255,9 +255,8 @@ const ObservabilityMenu = () => {
           <ConfirmationModal
             title="Delete custom report"
             confirmLabel="Delete report"
-            confirmLabelLoading="Deleting report"
             size="medium"
-            loading={isDeleting}
+            loading={false}
             visible={deleteModalOpen}
             onCancel={() => setDeleteModalOpen(false)}
             onConfirm={onConfirmDeleteReport}
