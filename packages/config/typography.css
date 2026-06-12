@@ -4,7 +4,7 @@
 }
 
 @utility heading-section {
-  @apply scroll-m-20 text-xl;
+  @apply scroll-m-20 text-lg font-medium tracking-tight;
 }
 
 @utility heading-subSection {
