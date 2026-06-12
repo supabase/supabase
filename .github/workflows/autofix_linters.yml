@@ -15,6 +15,7 @@ concurrency:
 
 jobs:
   format:
+    timeout-minutes: 15
     name: Format PR without write credentials
     runs-on: blacksmith-2vcpu-ubuntu-2404
     if: ${{ github.event_name == 'pull_request' && (github.event.label.name == 'autofix') }}
@@ -69,6 +70,7 @@ jobs:
           path: autofix.patch
           retention-days: 1
 
+    timeout-minutes: 15
   push:
     name: Commit autofix updates
     needs: format

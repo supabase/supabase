@@ -13,6 +13,7 @@ permissions:
 
 jobs:
   misspell:
+    timeout-minutes: 15
     name: runner / misspell
     runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:

@@ -15,11 +15,18 @@ on:
     types:
       - completed
 
+
+# Prevent concurrent runs of the same workflow
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   pull-requests: write
 
 jobs:
   comment_on_pr:
+    timeout-minutes: 15
     runs-on: blacksmith-4vcpu-ubuntu-2404
     if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'failure'
     steps:

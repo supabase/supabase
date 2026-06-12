@@ -4,11 +4,18 @@ on:
   pull_request_target:
     types: [opened]
 
+
+# Prevent concurrent runs of the same workflow
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   pull-requests: write
 
 jobs:
   comment-on-external-pr:
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     if: github.event.pull_request.head.repo.full_name != github.repository
     steps:

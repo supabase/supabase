@@ -16,6 +16,7 @@ permissions:
 
 jobs:
   typecheck:
+    timeout-minutes: 15
     runs-on: blacksmith-2vcpu-ubuntu-2404
     env:
       NODE_OPTIONS: --max-old-space-size=4096

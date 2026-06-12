@@ -2,8 +2,18 @@ name: Auto Label Issues
 on:
   issues:
     types: [opened, reopened]
+
+
+# Prevent concurrent runs of the same workflow
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
 jobs:
   check-external:
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -29,6 +39,7 @@ jobs:
             echo "User is within the organization, labeling internal"
             gh issue edit "$NUMBER" --add-label "internal-issue"
           fi
+    timeout-minutes: 15
   triage-new:
     runs-on: ubuntu-latest
     permissions:
@@ -42,6 +53,7 @@ jobs:
           LABELS: to-triage
         run: |
           echo "Applying triage label for new issue"
+    timeout-minutes: 15
           gh issue edit "$NUMBER" --add-label "$LABELS"
   spam-detection:
     runs-on: ubuntu-latest
