@@ -43,6 +43,7 @@ function StoragePage() {
   return (
     <>
       <NextSeo
+              canonical="https://supabase.com/storage"
         title={meta_title}
         description={meta_description}
         openGraph={{
