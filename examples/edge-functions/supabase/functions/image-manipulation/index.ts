@@ -16,7 +16,11 @@ await initializeImageMagick(wasmBytes)
 export default {
   fetch: withSupabase({ auth: 'none' }, async (req, _ctx) => {
     const formData = await req.formData()
-    const content = await formData.get('file').bytes()
+    const file = formData.get('file')
+    if (!(file instanceof Blob)) {
+      return new Response('file is required', { status: 400 })
+    }
+    const content = await file.bytes()
 
     let result = ImageMagick.read(content, (img): Uint8Array => {
       // resize the image

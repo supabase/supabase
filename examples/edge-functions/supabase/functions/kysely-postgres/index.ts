@@ -71,7 +71,9 @@ export default {
         .execute()
 
       // Neat, it's properly typed \o/
-      console.log(animals[0].created_at.getFullYear())
+      if (animals[0]) {
+        console.log(animals[0].created_at.getFullYear())
+      }
 
       // Encode the result as pretty printed JSON
       const body = JSON.stringify(
