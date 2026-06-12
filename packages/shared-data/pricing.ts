@@ -197,7 +197,7 @@ export const pricing: Pricing = {
       },
       {
         key: 'database.replication',
-        title: 'Replication (ETL)',
+        title: 'External Replication (ETL)',
         plans: {
           free: false,
           pro: [
