@@ -93,7 +93,7 @@ const startMessage = `Welcome to the ElevenLabs Scribe Bot\\! I can transcribe s
 
 // Deploy with verify_jwt = false.
 export default {
-  fetch: withSupabase({ auth: 'secret' }, async (req, ctx) => {
+  fetch: withSupabase({ auth: 'none' }, async (req, ctx) => {
     const bot = new Bot(telegramBotToken || '')
     const supabaseAdmin = ctx.supabaseAdmin
 

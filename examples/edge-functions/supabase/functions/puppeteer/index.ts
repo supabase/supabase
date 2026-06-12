@@ -3,16 +3,14 @@ import { withSupabase } from 'npm:@supabase/server@^1'
 
 // Public endpoint, so deploy with verify_jwt = false.
 export default {
-  fetch: withSupabase({ auth: 'none' }, async (req, ctx) => {
+  fetch: withSupabase({ auth: 'none' }, async (req) => {
     try {
-      console.log(
-        `wss://chrome.browserless.io?token=${Deno.env.get('PUPPETEER_BROWSERLESS_IO_KEY')}`
-      )
+      const browserWSEndpoint = `wss://chrome.browserless.io?token=${Deno.env.get(
+        'PUPPETEER_BROWSERLESS_IO_KEY'
+      )}`
       // Visit browserless.io to get your free API token
       const browser = await puppeteer.connect({
-        browserWSEndpoint: `wss://chrome.browserless.io?token=${Deno.env.get(
-          'PUPPETEER_BROWSERLESS_IO_KEY'
-        )}`,
+        browserWSEndpoint,
       })
       const page = await browser.newPage()
 

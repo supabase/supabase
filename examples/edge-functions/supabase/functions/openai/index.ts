@@ -5,7 +5,7 @@ import { withSupabase } from 'npm:@supabase/server@^1'
 
 // Public endpoint, so deploy with verify_jwt = false.
 export default {
-  fetch: withSupabase({ auth: 'none' }, async (req, ctx) => {
+  fetch: withSupabase({ auth: 'none' }, async (req) => {
     const { query } = await req.json()
 
     const completionConfig: CreateCompletionRequest = {
