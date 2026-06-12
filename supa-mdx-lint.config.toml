@@ -23,6 +23,7 @@ rules.inclusive_wording = "include('supa-mdx-lint/Rule004ExcludeWords/inclusive_
 rules.human_language = "include('supa-mdx-lint/Rule004ExcludeWords/human_language.toml')"
 rules.latin_phrases = "include('supa-mdx-lint/Rule004ExcludeWords/latin_phrases.toml')"
 rules.preferred_usage = "include('supa-mdx-lint/Rule004ExcludeWords/preferred_usage.toml')"
+rules.formal_corporate = "include('supa-mdx-lint/Rule004ExcludeWords/formal_corporate.toml')"
 rules.slang = "include('supa-mdx-lint/Rule004ExcludeWords/slang.toml')"
 
 [Rule006NoAbsoluteUrls]

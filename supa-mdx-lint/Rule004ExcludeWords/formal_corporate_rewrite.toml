@@ -1,8 +1,0 @@
-description = "Use a direct, simpler phrase instead of '%s'."
-level = "WARNING"
-words = [
-    "aforementioned",
-    "endeavor",
-    "endeavour",
-    "facilitate",
-]

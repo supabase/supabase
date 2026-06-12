@@ -1,4 +1,4 @@
-description = "Prefer '%r' to '%s'."
+description = "Use a direct, simpler phrase instead of '%s'."
 level = "WARNING"
 words = [
     [
@@ -29,4 +29,17 @@ words = [
         "amongst",
         "among",
     ],
+    [
+        "facilitate",
+        "help",
+    ],
+    [
+        "endeavor",
+        "try",
+    ],
+    [
+        "endeavour",
+        "try",
+    ],
+    "aforementioned",
 ]
