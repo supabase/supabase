@@ -28,6 +28,9 @@ export async function generateMetadata({
   return {
     title: `Blog | ${capitalizedTag}`,
     description: 'Latest news from the Supabase team.',
+    alternates: {
+      canonical: `https://supabase.com/blog/tags/${params.tag}`,
+    },
   }
 }
 
