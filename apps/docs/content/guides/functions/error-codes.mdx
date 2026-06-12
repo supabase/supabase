@@ -7,13 +7,23 @@ subtitle: 'Understand the error codes returned by Edge Functions to properly deb
 
 {/* supa-mdx-lint-disable Rule001HeadingCase */}
 
-## Client Errors
+When an Edge Function request fails, the response includes a `sb-error-code` header that identifies the specific error.
+You can inspect this header in your HTTP client or application code to detect and handle errors programmatically.
 
-These errors indicate issues with the request itself, which typically require changing how the function is called.
+```js
+const response = await fetch('<your-function-url>')
 
-### Bad Implementation Errors
+if (!response.ok) {
+  const errorCode = response.headers.get('sb-error-code')
+  console.error('Edge Function error:', errorCode)
+}
+```
 
-#### EDGE_FUNCTION_ERROR
+## Bad Implementation Errors
+
+These errors are caused by issues in your function's code or logic which requires updating your function's implementation.
+
+### EDGE_FUNCTION_ERROR
 
 **Cause:** Your Edge Function is throwing an unhandled error.
 
@@ -21,7 +31,7 @@ These errors indicate issues with the request itself, which typically require ch
 
 - Ensure you are catching errors in your code logic with try-catch blocks.
 
-#### IDLE_TIMEOUT
+### IDLE_TIMEOUT
 
 **Cause:** Your Edge Function did not respond within the [request timeout limit](/docs/guides/functions/limits).
 
@@ -37,7 +47,7 @@ These errors indicate issues with the request itself, which typically require ch
 - Add timeout handling to external requests
 - Consider breaking large operations into smaller chunks
 
-#### WORKER_RESOURCE_LIMIT, WORKER_LIMIT
+### WORKER_RESOURCE_LIMIT, WORKER_LIMIT
 
 **Cause:** Your Edge Function execution was stopped due to exceeding resource limits. Edge Function logs should indicate which [resource limit](/docs/guides/functions/limits) was exceeded.
 
@@ -49,7 +59,7 @@ These errors indicate issues with the request itself, which typically require ch
 
 **Solution:** Check your Edge Function logs to see which resource limit was exceeded, then optimize your function accordingly.
 
-#### WORKER_ERROR
+### WORKER_ERROR
 
 **Cause:** Your Edge Function threw an uncaught exception.
 
@@ -61,7 +71,7 @@ These errors indicate issues with the request itself, which typically require ch
 
 **Solution:** Check your Edge Function logs to identify the specific error and add proper error handling to your code.
 
-#### INVALID_RESPONSE_STATUS_CODE
+### INVALID_RESPONSE_STATUS_CODE
 
 **Cause:** Your Edge Function is returning an invalid HTTP status code — not equal to `101` and outside the range `[200, 599]`.
 
@@ -74,9 +84,11 @@ These errors indicate issues with the request itself, which typically require ch
 - Ensure you are returning a valid HTTP status code
 - For proxy endpoints, do not return the `fetch()` result directly; instead return a new `Response` wrapped in a try-catch block
 
-### Authentication Errors
+## Authentication Errors
 
-#### UNAUTHORIZED_NO_AUTH_HEADER
+These errors occur when the request contains a missing, malformed, or unsupported JWT token. Fixing them requires ensuring your requests include a valid authorization header, or disabling JWT verification for public endpoints.
+
+### UNAUTHORIZED_NO_AUTH_HEADER
 
 **Cause:** The Edge Function has JWT verification enabled, but the request is missing the `Authorization` or `apikey` header.
 
@@ -86,7 +98,7 @@ These errors indicate issues with the request itself, which typically require ch
 - Check that you are sending an API key in the `apikey` header
 - For webhooks or public endpoints, consider disabling JWT verification
 
-#### UNAUTHORIZED_ASYMMETRIC_JWT
+### UNAUTHORIZED_ASYMMETRIC_JWT
 
 **Cause:** The Edge Function has JWT verification enabled, but the `Authorization` header contains an invalid asymmetric `ES256 | RS256` token.
 
@@ -95,7 +107,7 @@ These errors indicate issues with the request itself, which typically require ch
 - Ensure you are passing a valid user JWT token in the `Authorization` header
 - Check that your token has not expired
 
-#### UNAUTHORIZED_LEGACY_JWT
+### UNAUTHORIZED_LEGACY_JWT
 
 **Cause:** The Edge Function has JWT verification enabled, but the `Authorization` header contains an invalid legacy `HS256` token.
 
@@ -105,7 +117,7 @@ These errors indicate issues with the request itself, which typically require ch
 - Check that your token has not expired
 - Verify that the legacy JWT secret has not been revoked or disabled
 
-#### UNAUTHORIZED_UNSUPPORTED_TOKEN_ALGORITHM
+### UNAUTHORIZED_UNSUPPORTED_TOKEN_ALGORITHM
 
 **Cause:** The Edge Function has JWT verification enabled, but the `Authorization` header does not contain an `ES256 | RS256 | HS256` token.
 
@@ -113,7 +125,7 @@ These errors indicate issues with the request itself, which typically require ch
 
 - Ensure you are passing a valid Supabase-issued JWT token in the `Authorization` header
 
-#### UNAUTHORIZED_INVALID_JWT_FORMAT
+### UNAUTHORIZED_INVALID_JWT_FORMAT
 
 **Cause:** The Edge Function has JWT verification enabled, but the `Authorization` header does not follow the `Bearer <JWT Token>` format.
 
@@ -123,9 +135,11 @@ These errors indicate issues with the request itself, which typically require ch
 - Ensure you are sending an API key in the `apikey` header instead of `Authorization`
 - For webhooks or public endpoints, consider disabling JWT verification
 
-### Request Errors
+## Request Errors
 
-#### RATE_LIMIT_EXCEEDED
+These errors indicate issues with the request itself, which typically require changing how the function is called.
+
+### RATE_LIMIT_EXCEEDED
 
 **Cause:** The platform detected [recursive or nested function call](/docs/guides/functions/recursive-functions) behavior.
 
@@ -140,7 +154,7 @@ These errors indicate issues with the request itself, which typically require ch
 - Ensure you are not performing unnecessary individual calls; use batch operations where possible
 - Delegate large workloads to queues instead of recursively calling other Edge Functions
 
-#### INVALID_URL
+### INVALID_URL
 
 **Cause:** The platform rejected a malformed URL.
 
@@ -154,15 +168,13 @@ These errors indicate issues with the request itself, which typically require ch
 
 These errors indicate issues with function loading, execution, or the underlying platform.
 
-### Function Loading Errors
-
-#### NOT_FOUND
+### NOT_FOUND
 
 **Cause:** The Edge Function metadata or files were not found or are missing in the specific region.
 
 **Solution:** Try redeploying your function and wait a few minutes to make sure all regions have been updated.
 
-#### BOOT_ERROR
+### BOOT_ERROR
 
 **Cause:** Your Edge Function failed to start.
 
@@ -174,7 +186,7 @@ These errors indicate issues with function loading, execution, or the underlying
 
 **Solution:** Check your Edge Function logs and also verify that your function code can be executed locally with `supabase functions serve`.
 
-#### LOAD_FUNCTION_ERROR
+### LOAD_FUNCTION_ERROR
 
 **Cause:** The platform was unable to load your function metadata or files.
 
@@ -183,7 +195,7 @@ These errors indicate issues with function loading, execution, or the underlying
 - Try calling your function again after a short delay
 - If the problem persists, contact support
 
-#### LOAD_FUNCTION_METADATA_ERROR
+### LOAD_FUNCTION_METADATA_ERROR
 
 **Cause:** The platform could not fetch your function metadata, possibly due to external cache issues.
 
@@ -192,7 +204,7 @@ These errors indicate issues with function loading, execution, or the underlying
 - Wait a few minutes before calling your function again
 - If the problem persists, contact support
 
-#### LOAD_FUNCTION_INVALID_ENTRYPOINT_PATH_ERROR
+### LOAD_FUNCTION_INVALID_ENTRYPOINT_PATH_ERROR
 
 **Cause:** Your Edge Function metadata is broken or contains an invalid entrypoint.
 
