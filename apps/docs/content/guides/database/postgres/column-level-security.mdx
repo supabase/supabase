@@ -134,7 +134,7 @@ supabase migration new create_posts_table
       user_id text,
       title text,
       content text,
-      created_at timestamptz default now()
+      created_at timestamptz default now(),
       updated_at timestamptz default now()
       );
 
