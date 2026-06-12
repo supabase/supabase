@@ -130,7 +130,12 @@ const UpgradeSurveyModal = ({
           <Button variant="default" disabled={isSubmitting} onClick={() => onClose()}>
             Skip
           </Button>
-          <Button variant="primary" disabled={isSubmitting} loading={isSubmitting} onClick={onSubmit}>
+          <Button
+            variant="primary"
+            disabled={isSubmitting}
+            loading={isSubmitting}
+            onClick={onSubmit}
+          >
             Confirm
           </Button>
         </DialogFooter>

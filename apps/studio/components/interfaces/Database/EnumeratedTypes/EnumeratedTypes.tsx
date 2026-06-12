@@ -236,7 +236,11 @@ export const EnumeratedTypes = () => {
                           <div className="flex justify-end items-center space-x-2">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="default" className="px-1" icon={<MoreVertical />} />
+                                <Button
+                                  variant="default"
+                                  className="px-1"
+                                  icon={<MoreVertical />}
+                                />
                               </DropdownMenuTrigger>
                               <DropdownMenuContent side="bottom" align="end" className="w-32">
                                 <DropdownMenuItem

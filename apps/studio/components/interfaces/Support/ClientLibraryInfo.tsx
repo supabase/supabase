@@ -96,7 +96,11 @@ const LibrarySuggestions = ({ library }: LibrarySuggestionsProps) => {
                 </p>
               </div>
               <div>
-                <Button asChild variant="default" icon={<ExternalLink size={14} strokeWidth={1.5} />}>
+                <Button
+                  asChild
+                  variant="default"
+                  icon={<ExternalLink size={14} strokeWidth={1.5} />}
+                >
                   <Link href={lib.url} target="_blank" rel="noreferrer">
                     View GitHub issues
                   </Link>

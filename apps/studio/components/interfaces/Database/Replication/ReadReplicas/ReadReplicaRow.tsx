@@ -111,7 +111,12 @@ export const ReadReplicaRow = ({ replica, onUpdateReplica }: ReadReplicaRow) => 
 
         <TableCell>
           <div className="flex items-center justify-end gap-x-2">
-            <Button asChild variant="default" className="relative" disabled={status === 'GOING_DOWN'}>
+            <Button
+              asChild
+              variant="default"
+              className="relative"
+              disabled={status === 'GOING_DOWN'}
+            >
               <Link href={`/project/${ref}/database/replication/replica/${replica.identifier}`}>
                 View replication
               </Link>

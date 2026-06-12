@@ -259,7 +259,13 @@ function AuthPage() {
               </p>
               <p className="p">Policies can be written in SQL or using the dashboard online.</p>
 
-              <Button asChild size="small" variant="default" className="mt-4" icon={<ArrowUpRight />}>
+              <Button
+                asChild
+                size="small"
+                variant="default"
+                className="mt-4"
+                icon={<ArrowUpRight />}
+              >
                 <Link href="/docs/guides/database/postgres/row-level-security">
                   Explore documentation
                 </Link>
