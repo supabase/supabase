@@ -190,6 +190,8 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
     !ipv4Addon &&
     (state.connectionMethod === 'direct' ||
       (state.connectionMethod === 'transaction' && !state.useSharedPooler))
+  const showSessionPoolerNotice =
+    deploymentMode.isPlatform && state.mode === 'direct' && state.connectionMethod === 'session'
 
   const showSelfHostedMcpNotice = deploymentMode.isSelfHosted && state.mode === 'mcp'
 
@@ -199,8 +201,6 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
     <div className="bg-muted/50 flex-1">
       <div className="p-8 flex flex-col gap-y-6">
         <h3>Connect your app</h3>
-
-        <CopyPromptAdmonition stepsContainerRef={stepsContainerRef} />
 
         {showIpv4AddonNotice && (
           <Admonition
@@ -213,6 +213,14 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
               </Button>,
               <DocsButton key="docs" href={`${DOCS_URL}/guides/platform/ipv4-address`} />,
             ]}
+          />
+        )}
+
+        {showSessionPoolerNotice && (
+          <Admonition
+            type="default"
+            title="Only use Session Pooler on an IPv4 network"
+            description="Session pooler connections are IPv4 proxied for free. Use Direct Connection if connecting via an IPv6 network."
           />
         )}
 
@@ -229,6 +237,8 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
             ]}
           />
         )}
+
+        <CopyPromptAdmonition stepsContainerRef={stepsContainerRef} />
 
         <div className="mt-6" ref={stepsContainerRef}>
           {steps.map((step, index) => (
