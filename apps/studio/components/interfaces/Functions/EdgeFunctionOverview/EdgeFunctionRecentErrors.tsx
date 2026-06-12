@@ -317,25 +317,23 @@ export const EdgeFunctionRecentErrors = ({
                                   <div
                                     key={log.key}
                                     className={cn(
-                                      'flex items-start gap-3 px-4 py-2',
+                                      'grid grid-cols-[4rem_4.5rem_3rem_minmax(0,1fr)] items-start gap-3 px-4 py-2',
                                       index !== 0 && 'border-t border-default',
                                       isError && 'bg-destructive-200/40'
                                     )}
                                   >
-                                    <span className="shrink-0 tabular-nums text-foreground-muted">
+                                    <span className="tabular-nums text-foreground-muted">
                                       {formatLogTimestamp(log.lastSeen, 'time')}
                                     </span>
                                     <Badge
                                       variant={isError ? 'destructive' : 'default'}
-                                      className="shrink-0"
+                                      className="w-full justify-center"
                                     >
                                       {log.level}
                                     </Badge>
-                                    {log.count > 1 && (
-                                      <span className="shrink-0 text-foreground-muted tabular-nums">
-                                        ×{log.count}
-                                      </span>
-                                    )}
+                                    <span className="text-right text-foreground-muted tabular-nums">
+                                      {log.count > 1 ? `×${log.count}` : null}
+                                    </span>
                                     <span
                                       className={cn(
                                         'flex-1 wrap-break-word whitespace-pre-wrap',
