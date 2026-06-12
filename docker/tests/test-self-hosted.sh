@@ -75,20 +75,6 @@ http_body() {
     curl -s "$@" "$url"
 }
 
-# Detect which gateway is running so gateway-specific assertions can be gated.
-detect_gateway() {
-    command -v docker >/dev/null 2>&1 || { echo unknown; return; }
-    running=$(docker ps --format '{{.Names}}' 2>/dev/null)
-    if printf '%s\n' "$running" | grep -q '^supabase-envoy$'; then
-        echo envoy
-    elif printf '%s\n' "$running" | grep -q '^supabase-kong$'; then
-        echo kong
-    else
-        echo unknown
-    fi
-}
-GATEWAY=$(detect_gateway)
-
 echo ""
 echo "=== Self-hosted smoke test against $BASE_URL ==="
 echo ""
@@ -181,7 +167,7 @@ else
     check "Create user (admin)" "true" "false"
 fi
 
-# Public signup (optional — depends on email autoconfirm setting)
+# Public signup (optional - depends on email autoconfirm setting)
 signup_email="smoke-signup-$$@example.com"
 signup_resp=$(http_body "$BASE_URL/auth/v1/signup" \
     -H "apikey: $ANON_KEY" \
@@ -430,27 +416,23 @@ fn_resp=$(http_body "$BASE_URL/functions/v1/hello" \
     -d '{}')
 check "Call hello function" '"Hello from Edge Functions!"' "$fn_resp"
 
-# Anonymous fallback: an unauthenticated invocation must still reach the
-# function (verify_jwt:false) — the Functions key-auth must not 401 a request
-# with no apikey.
+# Unauthenticated invocation must still reach the function (verify_jwt:false) -
+# Functions has no key-auth gate, so a request with no apikey passes through.
 fn_noauth_resp=$(http_body "$BASE_URL/functions/v1/hello" \
     -X POST \
     -H "Content-Type: application/json" \
     -d '{}')
 check "Call hello function (no auth)" '"Hello from Edge Functions!"' "$fn_noauth_resp"
 
-# Invalid apikey: only Envoy enforces rejection at the gateway. Kong config is
-# permissive on Functions (no key-auth), so it passes invalid keys through.
-if [ "$GATEWAY" = "envoy" ]; then
-    check "Functions reject invalid apikey (Envoy enforces)" "401" \
-        "$(http_status "$BASE_URL/functions/v1/hello" \
-            -X POST \
-            -H "apikey: invalid-key" \
-            -H "Content-Type: application/json" \
-            -d '{}')"
-else
-    echo "  SKIP: invalid-apikey rejection not enforced on Kong (gateway=$GATEWAY)"
-fi
+# A non-sb_ value (typo / legacy / third-party JWT) is not rejected at the
+# gateway - it passes to the runtime.
+# (Detailed sb_-key translation/rejection is covered in test-auth-keys.sh.)
+check "Functions pass non-sb_ apikey" "200" \
+    "$(http_status "$BASE_URL/functions/v1/hello" \
+        -X POST \
+        -H "apikey: invalid-key" \
+        -H "Content-Type: application/json" \
+        -d '{}')"
 
 # ---------------------------------------------
 # 8. pg-meta (Studio backend)

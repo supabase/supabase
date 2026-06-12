@@ -179,32 +179,38 @@ check "/api/openapi blocked -> 403" "403" \
 echo ""
 echo "--- Edge Functions (/functions/v1/) ---"
 
-# No auth at all must pass (anonymous fallback; hello is verify_jwt:false).
+# No auth at all must pass (no key-auth gate; hello is verify_jwt:false).
 check "No auth -> hello reachable" "200" \
     "$(http_status "$BASE_URL/functions/v1/hello" -X POST -d '{}')"
 
-# Legacy keys remain valid.
+# Legacy keys remain valid (non-sb_ keys are passed through, not validated).
 check "Legacy ANON_KEY -> hello reachable" "200" \
     "$(http_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: $ANON_KEY" -d '{}')"
 
-# Invalid apikey: only Envoy enforces rejection at the gateway. Kong config is
-# permissive on Functions (no key-auth), so it passes invalid keys through.
-if [ "$GATEWAY" = "envoy" ]; then
-    check "Invalid apikey -> 401 (Envoy enforces)" "401" \
-        "$(http_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: invalid-key" -d '{}')"
-else
-    echo "  SKIP: invalid-apikey rejection not enforced on Kong (gateway=$GATEWAY)"
-fi
+# A non-sb_ value (typo, legacy/third-party JWT) is NOT rejected at the gateway.
+check "Non-sb_ invalid apikey -> passes (canonical)" "200" \
+    "$(http_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: invalid-key" -d '{}')"
 
 if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
     check "PUBLISHABLE_KEY -> hello reachable" "200" \
         "$(http_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: $SUPABASE_PUBLISHABLE_KEY" -d '{}')"
     check "SECRET_KEY -> hello reachable" "200" \
         "$(http_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: $SUPABASE_SECRET_KEY" -d '{}')"
-    # Unlike /rest/ (which 401s sb_-in-Authorization-only because it has no
-    # anonymous fallback), Functions lets it through and translates the bearer.
-    check "sb_ in Authorization only -> not 401 (anonymous fallback)" "true" \
+    # sb_ in Authorization only (no apikey header): the bearer sb_ is translated
+    # and the request passes through.
+    check "sb_ in Authorization only -> not 401" "true" \
         "$([ "$(http_status "$BASE_URL/functions/v1/hello" -X POST -H "Authorization: Bearer $SUPABASE_PUBLISHABLE_KEY" -d '{}')" != "401" ] && echo true || echo false)"
+
+    # Invalid sb_-prefixed key and apikey/bearer sb_ conflict are rejected with
+    # 401 - but only by Envoy. Kong is permissive on Functions and passes through.
+    if [ "$GATEWAY" = "envoy" ]; then
+        check "Invalid sb_ apikey -> 401 (Envoy enforces)" "401" \
+            "$(http_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: sb_publishable_0000000000000000000000_00000000" -d '{}')"
+        check "Conflicting sb_ keys -> 401 (Envoy enforces)" "401" \
+            "$(http_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: $SUPABASE_SECRET_KEY" -H "Authorization: Bearer $SUPABASE_PUBLISHABLE_KEY" -d '{}')"
+    else
+        echo "  SKIP: sb_-invalid / conflict rejection not enforced on Kong (gateway=$GATEWAY)"
+    fi
 fi
 
 echo ""

@@ -3,7 +3,7 @@
 # Test S3 protocol endpoint for self-hosted Supabase Storage.
 #
 # Verifies that the S3-compatible endpoint at /storage/v1/s3 works with
-# standard S3 clients — the same way end users interact with it via
+# standard S3 clients - the same way end users interact with it via
 # aws cli, rclone, or other S3-compatible tools.
 #
 # Usage:

@@ -278,7 +278,7 @@ services:
             - anon
 
   ## Storage API endpoint (with Authorization header transformation).
-  ## No key-auth — S3 protocol requests don't carry an apikey header.
+  ## No key-auth - S3 protocol requests don't carry an apikey header.
   ##
   ## The request-transformer translates opaque API keys to asymmetric JWTs
   ## and passes through existing Authorization headers (user JWTs, AWS SigV4).
@@ -324,8 +324,7 @@ services:
   ## cannot reject an invalid key while still letting unauthenticated requests
   ## through (key-auth's `anonymous` fallback accepts missing AND invalid keys
   ## alike), so unknown/invalid keys simply pass to the runtime, which handles
-  ## verify_jwt itself. Envoy is the stricter gateway and rejects unknown keys
-  ## with 401; this divergence is intentional (Kong is being deprecated).
+  ## verify_jwt itself.
   ##
   ## The request-transformer strips any client-supplied `sb-api-key` (anti-spoof)
   ## and re-adds the translated value; on no match the Lua expression yields nil
