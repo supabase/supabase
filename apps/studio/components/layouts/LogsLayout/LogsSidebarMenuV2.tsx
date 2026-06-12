@@ -1,5 +1,5 @@
 import { IS_PLATFORM, useFlag, useParams } from 'common'
-import { ChevronRight, CircleHelpIcon, Plus } from 'lucide-react'
+import { ChevronRight, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
@@ -29,7 +29,7 @@ import { useIsETLPrivateAlpha } from '@/components/interfaces/Database/Replicati
 import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
 import SavedQueriesItem from '@/components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
 import { LogsSidebarItem } from '@/components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { UnifiedLogsBanner } from '@/components/interfaces/UnifiedLogs/UnifiedLogsBanner'
 import { useContentQuery } from '@/data/content/content-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
@@ -241,28 +241,15 @@ export function LogsSidebarMenuV2() {
         />
       )}
       {isUnifiedLogsEligible && (
-        <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
-          <p className="text-xs font-medium text-foreground">Try Unified Logs</p>
-          <div className="flex shrink-0 items-center gap-x-2">
-            <Button
-              size="tiny"
-              type="default"
-              onClick={() => {
-                enableUnifiedLogs()
-                router.push(`/project/${ref}/logs`)
-              }}
-            >
-              Enable
-            </Button>
-            <ButtonTooltip
-              type="default"
-              className="px-1.5"
-              icon={<CircleHelpIcon />}
-              onClick={() => selectFeaturePreview('supabase-ui-preview-unified-logs')}
-              tooltip={{ content: { side: 'bottom', text: 'More information' } }}
-            />
-          </div>
-        </div>
+        <UnifiedLogsBanner
+          variant="promo"
+          className="mx-4 mt-4"
+          onEnable={() => {
+            enableUnifiedLogs()
+            router.push(`/project/${ref}/logs`)
+          }}
+          onMoreInfo={() => selectFeaturePreview('supabase-ui-preview-unified-logs')}
+        />
       )}
 
       <div

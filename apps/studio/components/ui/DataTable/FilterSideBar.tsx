@@ -1,11 +1,9 @@
 import { useParams } from 'common'
-import { Undo2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useEffect, type ReactNode } from 'react'
 import { Badge, Button, cn, ResizablePanel, usePanelRef } from 'ui'
 
-import { ButtonTooltip } from '../ButtonTooltip'
 import { FeaturePreviewSidebarPanel } from '../FeaturePreviewSidebarPanel'
 import { DateRangeDisabled } from './DataTable.types'
 import { DataTableFilterControls } from './DataTableFilters/DataTableFilterControls'
@@ -13,6 +11,7 @@ import { DataTableResetButton } from './DataTableResetButton'
 import { useDataTable } from './providers/DataTableProvider'
 import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
+import { UnifiedLogsBanner } from '@/components/interfaces/UnifiedLogs/UnifiedLogsBanner'
 
 interface FilterSideBarProps {
   isFilterBarOpen: boolean
@@ -76,19 +75,11 @@ export function FilterSideBar({
       </div>
 
       {isUnifiedLogsEligible && (
-        <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
-          <div className="space-y-0.5">
-            <p className="text-xs font-medium text-foreground">Go back to old logs</p>
-            <p className="text-xs text-foreground-light">Use the traditional interface</p>
-          </div>
-          <ButtonTooltip
-            type="default"
-            className="px-1.5"
-            icon={<Undo2 />}
-            onClick={handleGoBackToOldLogs}
-            tooltip={{ content: { side: 'bottom', text: 'Switch back' } }}
-          />
-        </div>
+        <UnifiedLogsBanner
+          variant="utility"
+          className="mx-4 mt-4"
+          onSwitchBack={handleGoBackToOldLogs}
+        />
       )}
 
       <div className="flex-1 p-2 sm:overflow-y-scroll">
