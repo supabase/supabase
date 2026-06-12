@@ -17,6 +17,7 @@ import {
   FormControl,
   FormField,
   Input,
+  Textarea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -174,11 +175,30 @@ export const EditSecretModal = () => {
                       <FormItemLayout name="secret" label="Secret value">
                         <FormControl>
                           <div className="relative">
-                            <Input
+                            <Textarea
                               id="secret"
-                              type={showSecretValue ? 'text' : 'password'}
                               {...field}
+                              rows={1}
+                              ref={(el) => {
+                                field.ref(el)
+                                if (el) {
+                                  el.style.height = 'auto'
+                                  el.style.height = Math.max(40, el.scrollHeight) + 'px'
+                                }
+                              }}
                               data-lpignore="true"
+                              className="min-h-0 resize-none"
+                              style={
+                                {
+                                  WebkitTextSecurity: showSecretValue ? undefined : 'disc',
+                                } as React.CSSProperties
+                              }
+                              onChange={(e) => {
+                                field.onChange(e)
+                                e.currentTarget.style.height = 'auto'
+                                e.currentTarget.style.height =
+                                  Math.max(40, e.currentTarget.scrollHeight) + 'px'
+                              }}
                             />
                             <Button
                               variant="default"
