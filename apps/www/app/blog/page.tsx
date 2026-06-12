@@ -13,6 +13,9 @@ export const revalidate = 30
 export const metadata: Metadata = {
   title: 'Supabase Blog: the Postgres development platform',
   description: 'Get all your Supabase News on the Supabase blog.',
+  alternates: {
+    canonical: 'https://supabase.com/blog',
+  },
   openGraph: {
     title: 'Supabase Blog: the Postgres development platform',
     description: 'Get all your Supabase News on the Supabase blog.',
