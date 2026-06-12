@@ -1,0 +1,32 @@
+description = "Prefer '%r' to '%s'."
+level = "WARNING"
+words = [
+    [
+        "in order to",
+        "to",
+    ],
+    [
+        "prior to",
+        "before",
+    ],
+    [
+        "subsequent to",
+        "after",
+    ],
+    [
+        "for the purpose of",
+        "to",
+    ],
+    [
+        "leverage",
+        "use",
+    ],
+    [
+        "whilst",
+        "while",
+    ],
+    [
+        "amongst",
+        "among",
+    ],
+]
