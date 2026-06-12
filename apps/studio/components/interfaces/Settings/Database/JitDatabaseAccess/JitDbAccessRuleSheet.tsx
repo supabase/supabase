@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -9,6 +9,7 @@ import {
   Form,
   FormControl,
   FormField,
+  Input,
   ScrollArea,
   Select,
   SelectContent,
@@ -45,6 +46,7 @@ import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialo
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useJitDbAccessGrantMutation } from '@/data/jit-db-access/jit-db-access-grant-mutation'
+import { useJitDbAccessInviteMutation } from '@/data/jit-db-access/jit-db-access-invite-mutation'
 import { useJitDbAccessMembersQuery } from '@/data/jit-db-access/jit-db-access-members-query'
 import { useProjectMembersQuery } from '@/data/projects/project-members-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -62,13 +64,38 @@ const grantSchema = z.object({
 })
 
 function createJitRuleSchema(mode: SheetMode, membersWithRules: Set<string>) {
+  // memberId / inviteEmail use .default('') because the JSX renders only one
+  // of the two FormFields at a time — RHF unregisters the unmounted one, so
+  // its value can arrive as `undefined` at validation time.
   return z
     .object({
-      memberId: z.string().min(1, 'Select a member for this temporary access rule.'),
+      memberId: z.string().default(''),
+      inviteEmail: z.string().default(''),
       grants: z.array(grantSchema),
     })
     .superRefine((data, ctx) => {
-      if (mode === 'add' && membersWithRules.has(data.memberId)) {
+      // Derive the mode from the data itself: invite when an email is present,
+      // member-select otherwise. Avoids stale-closure issues with a captured
+      // `isInvite` flag in the resolver (useForm only takes the resolver once).
+      const trimmedEmail = data.inviteEmail.trim()
+      const hasMember = data.memberId.length > 0
+
+      if (trimmedEmail.length > 0) {
+        const parsed = z.string().email().safeParse(trimmedEmail)
+        if (!parsed.success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['inviteEmail'],
+            message: 'Enter a valid email address.',
+          })
+        }
+      } else if (!hasMember) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['memberId'],
+          message: 'Select a member for this temporary access rule.',
+        })
+      } else if (mode === 'add' && membersWithRules.has(data.memberId)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ['memberId'],
@@ -128,6 +155,7 @@ export function JitDbAccessRuleSheet({
 
   const [isNewRule, setIsNewRule] = useQueryState('jit_new', parseAsBoolean.withDefault(false))
   const [ruleIdToEdit, setRuleIdToEdit] = useQueryState('jit_edit', parseAsString)
+  const [isInvite, setIsInvite] = useState(false)
 
   const { data: databaseRoles, isSuccess: isSuccessDatabaseRoles } = useDatabaseRolesQuery({
     projectRef,
@@ -146,7 +174,10 @@ export function JitDbAccessRuleSheet({
     () => mapJitMembersToUserRules(jitMembers, projectMembers, roleOptions),
     [jitMembers, projectMembers, roleOptions]
   )
-  const user = users.find((x) => x.id === ruleIdToEdit)
+  // When the add sheet is open we deliberately ignore any stale `ruleIdToEdit`
+  // in the URL — otherwise an invite row's id (or a leftover query param) can
+  // pull the sheet into edit mode while the user just clicked "Add rule".
+  const user = isNewRule ? undefined : users.find((x) => x.id === ruleIdToEdit)
   const mode: SheetMode = !!user ? 'edit' : 'add'
 
   const isDataReady = isSuccessDatabaseRoles && isSuccessJitMembers && isSuccessProjectMembers
@@ -166,6 +197,7 @@ export function JitDbAccessRuleSheet({
   const onCloseSheet = () => {
     setIsNewRule(false)
     setRuleIdToEdit(null)
+    setIsInvite(false)
   }
 
   const {
@@ -177,7 +209,7 @@ export function JitDbAccessRuleSheet({
     onClose: onCloseSheet,
   })
 
-  const { mutate: grantUserAccess, isPending: isSubmitting } = useJitDbAccessGrantMutation({
+  const { mutate: grantUserAccess, isPending: isGranting } = useJitDbAccessGrantMutation({
     onSuccess: () => {
       toast.success(
         mode === 'edit' ? 'Successfully updated user access' : 'Successfully granted user access'
@@ -188,6 +220,18 @@ export function JitDbAccessRuleSheet({
       toast.error(`Failed to ${mode === 'edit' ? 'update' : 'grant'} user access: ${error.message}`)
     },
   })
+
+  const { mutate: inviteUserAccess, isPending: isInviting } = useJitDbAccessInviteMutation({
+    onSuccess: (_, variables) => {
+      toast.success(`Invitation sent to ${variables.email}`)
+      onCloseSheet()
+    },
+    onError: (error) => {
+      toast.error(`Failed to invite user: ${error.message}`)
+    },
+  })
+
+  const isSubmitting = isGranting || isInviting
 
   const updateGrant = (
     roleId: string,
@@ -203,15 +247,19 @@ export function JitDbAccessRuleSheet({
     const roles = serializeDraftRolesForGrantMutation(data)
     if (roles.length === 0) return
 
-    grantUserAccess({ projectRef, userId: data.memberId, roles })
+    if (isInvite) {
+      inviteUserAccess({ projectRef, email: data.inviteEmail.trim(), roles })
+    } else {
+      grantUserAccess({ projectRef, userId: data.memberId, roles })
+    }
   }
 
   useEffect(() => {
-    if (!!ruleIdToEdit && isDataReady && !user) {
+    if (!isNewRule && !!ruleIdToEdit && isDataReady && !user) {
       toast('Access rule cannot be found')
       setRuleIdToEdit(null)
     }
-  }, [isDataReady, ruleIdToEdit, setRuleIdToEdit, user])
+  }, [isDataReady, isNewRule, ruleIdToEdit, setRuleIdToEdit, user])
 
   useEffect(() => {
     if (open && isDataReady) form.reset(defaultValues)
@@ -238,50 +286,116 @@ export function JitDbAccessRuleSheet({
           <Form {...form}>
             <ScrollArea className="flex-1 max-h-[calc(100vh-116px)]">
               <div className="space-y-8 px-5 py-6 sm:px-6">
-                <FormField
-                  control={form.control}
-                  name="memberId"
-                  render={({ field }) => (
-                    <FormItemLayout layout="vertical" label="Member">
-                      <FormControl>
-                        <Select
-                          value={field.value}
-                          disabled={
-                            mode === 'edit' || (mode === 'add' && availableMembersForAddCount === 0)
-                          }
-                          onValueChange={field.onChange}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a member" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {memberOptions.map((member) => (
-                              <SelectItem key={member.id} value={member.id}>
-                                {member.name ? (
-                                  <>
-                                    {member.name}{' '}
-                                    <span className="text-foreground-lighter">
-                                      ({member.email})
-                                    </span>
-                                  </>
-                                ) : (
-                                  member.email
-                                )}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
+                {isInvite ? (
+                  <FormField
+                    control={form.control}
+                    name="inviteEmail"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="vertical"
+                        label="Email"
+                        description={
+                          mode === 'add' ? (
+                            <button
+                              type="button"
+                              className="text-foreground underline underline-offset-2"
+                              onClick={() => {
+                                setIsInvite(false)
+                                form.setValue('inviteEmail', '')
+                                form.clearErrors('inviteEmail')
+                              }}
+                            >
+                              Choose from project members instead
+                            </button>
+                          ) : undefined
+                        }
+                      >
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="email"
+                            autoComplete="off"
+                            placeholder="person@example.com"
+                            disabled={mode === 'edit'}
+                          />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                ) : (
+                  <FormField
+                    control={form.control}
+                    name="memberId"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="vertical"
+                        label="Member"
+                        description={
+                          mode === 'add' ? (
+                            <button
+                              type="button"
+                              className="text-foreground underline underline-offset-2"
+                              onClick={() => {
+                                setIsInvite(true)
+                                form.setValue('memberId', '')
+                                form.clearErrors('memberId')
+                              }}
+                            >
+                              Invite a new user by email instead
+                            </button>
+                          ) : undefined
+                        }
+                      >
+                        <FormControl>
+                          <Select
+                            value={field.value}
+                            disabled={
+                              mode === 'edit' ||
+                              (mode === 'add' && availableMembersForAddCount === 0)
+                            }
+                            onValueChange={field.onChange}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a member" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {memberOptions.map((member) => (
+                                <SelectItem key={member.id} value={member.id}>
+                                  {member.name ? (
+                                    <>
+                                      {member.name}{' '}
+                                      <span className="text-foreground-lighter">
+                                        ({member.email})
+                                      </span>
+                                    </>
+                                  ) : (
+                                    member.email
+                                  )}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
 
-                      {mode === 'add' && availableMembersForAddCount === 0 && (
-                        <p className="mt-2 text-foreground-lighter">
-                          All project members already have temporary access rules. Edit an existing
-                          rule from the table above.
-                        </p>
-                      )}
-                    </FormItemLayout>
-                  )}
-                />
+                        {mode === 'add' && availableMembersForAddCount === 0 && (
+                          <p className="mt-2 text-foreground-lighter">
+                            All project members already have temporary access rules. Edit an
+                            existing rule from the table above.
+                          </p>
+                        )}
+                      </FormItemLayout>
+                    )}
+                  />
+                )}
+
+                {isInvite && (
+                  <Admonition
+                    type="default"
+                    title="This person will be invited to the project"
+                    description="They'll receive an email invitation and gain temporary database access only after accepting it."
+                    className="m-0"
+                  />
+                )}
 
                 <FormField
                   control={form.control}
@@ -337,7 +451,9 @@ export function JitDbAccessRuleSheet({
             </Button>
             <Button
               type="primary"
-              onClick={form.handleSubmit(handleSaveRule)}
+              onClick={form.handleSubmit(handleSaveRule, (errors) => {
+                console.warn('JIT rule form invalid', errors)
+              })}
               loading={isSubmitting}
             >
               {mode === 'edit' ? 'Save rule' : 'Create rule'}

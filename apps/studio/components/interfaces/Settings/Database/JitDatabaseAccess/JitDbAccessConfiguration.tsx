@@ -48,6 +48,7 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
+import { useJitDbAccessInviteDeleteMutation } from '@/data/jit-db-access/jit-db-access-invite-delete-mutation'
 import { useJitDbAccessMembersQuery } from '@/data/jit-db-access/jit-db-access-members-query'
 import { useJitDbAccessQuery } from '@/data/jit-db-access/jit-db-access-query'
 import { useJitDbAccessRevokeMutation } from '@/data/jit-db-access/jit-db-access-revoke-mutation'
@@ -135,7 +136,16 @@ export const JitDbAccessConfiguration = () => {
       onError: () => {},
     })
 
-  const isMutating = isUpdatingJitDbAccess || isRevokingAccess
+  const { mutateAsync: deleteInvitation, isPending: isDeletingInvitation } =
+    useJitDbAccessInviteDeleteMutation({
+      onSuccess: () => {
+        toast.success('Successfully deleted invitation')
+        setSelectedUserToDelete(null)
+      },
+      onError: () => {},
+    })
+
+  const isMutating = isUpdatingJitDbAccess || isRevokingAccess || isDeletingInvitation
   const disableRuleActions = isMutating || isLoadingDatabaseRoles || isLoadingOrganizationMembers
   const isRulesLoading = isLoadingJitMembers || isLoadingProjectMembers
 
@@ -275,7 +285,15 @@ export const JitDbAccessConfiguration = () => {
       if (!ref) throw new Error('Project ref is required')
       if (!selectedUserToDelete) throw new Error('User is required')
 
-      await revokeUserAccess({ projectRef: ref, userId: selectedUserToDelete.memberId })
+      if (selectedUserToDelete.inviteState) {
+        if (!selectedUserToDelete.inviteId) throw new Error('Invitation ID is required')
+        await deleteInvitation({
+          projectRef: ref,
+          inviteId: selectedUserToDelete.inviteId,
+        })
+      } else {
+        await revokeUserAccess({ projectRef: ref, userId: selectedUserToDelete.memberId })
+      }
     } catch (error) {
       setDeleteRuleError(getErrorMessage(error))
       throw error
@@ -471,7 +489,6 @@ export const JitDbAccessConfiguration = () => {
                 isLoading={isRulesLoading}
                 canUpdate={!!canUpdateJitDbAccess}
                 disableActions={disableRuleActions}
-                allProjectMembersHaveRules={availableMembersForAdd.length === 0}
                 onAddRule={openAddRuleSheet}
                 onEditRule={openEditRuleSheet}
                 onDeleteRule={openDeleteDialog}
@@ -489,7 +506,7 @@ export const JitDbAccessConfiguration = () => {
 
       <JitDbAccessDeleteDialog
         user={selectedUserToDelete}
-        isDeleting={isRevokingAccess}
+        isDeleting={isRevokingAccess || isDeletingInvitation}
         error={deleteRuleError}
         onClose={() => {
           setDeleteRuleError(null)
