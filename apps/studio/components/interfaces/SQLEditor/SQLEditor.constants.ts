@@ -38,7 +38,28 @@ export const generateSnippetTitle = () => {
 }
 
 export const destructiveSqlRegex = [
+  // Direct destructive statements at top level or after semicolon
   /^(.*;)?\s*(drop|delete|truncate|alter\s+table\s+.*\s+drop\s+column)\s/is,
+  // EXECUTE with string literal: EXECUTE 'DROP TABLE ...'
+  /execute\s+(?:format\s*\([^)]*\)\s*\|\||[^;]*['"])\s*(drop|delete|truncate)\s/is,
+  // EXECUTE format(): EXECUTE format('DROP TABLE %I', ...)
+  /execute\s+format\s*\([^)]*['"]\s*(drop|delete|truncate)\s/is,
+  // EXECUTE IMMEDIATE (Oracle compatibility via orafce)
+  /execute\s+immediate\s+['"]\s*(drop|delete|truncate)\s/is,
+  // OPEN cursor FOR EXECUTE
+  /open\s+\w+\s+for\s+execute\s+(?:format\s*\([^)]*\)\s*\|\||[^;]*['"])\s*(drop|delete|truncate)\s/is,
+  // OPEN cursor FOR EXECUTE format()
+  /open\s+\w+\s+for\s+execute\s+format\s*\([^)]*['"]\s*(drop|delete|truncate)\s/is,
+  // RETURN QUERY EXECUTE
+  /return\s+query\s+execute\s+(?:format\s*\([^)]*\)\s*\|\||[^;]*['"])\s*(drop|delete|truncate)\s/is,
+  // RETURN QUERY EXECUTE format()
+  /return\s+query\s+execute\s+format\s*\([^)]*['"]\s*(drop|delete|truncate)\s/is,
+  // EXECUTE with dollar-quoted string: EXECUTE $tag$DROP TABLE$tag$
+  /execute\s+\$\w*\$\s*(drop|delete|truncate)\s/is,
+  // EXECUTE concat() / concat_ws()
+  /execute\s+concat(?:_ws)?\s*\([^)]*\b(drop|delete|truncate)\b/i,
+  // EXECUTE with E'' escape strings: EXECUTE E'DROP TABLE ...'
+  /execute\s+e['"]\s*(drop|delete|truncate)\s/is,
 ]
 
 // Matches `UPDATE <table> SET ...` where <table> is any combination of bareword
