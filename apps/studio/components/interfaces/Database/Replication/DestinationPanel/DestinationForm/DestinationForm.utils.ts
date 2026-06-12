@@ -10,6 +10,7 @@ import {
 } from './DestinationForm.schema'
 import {
   BigQueryDestinationConfig,
+  ClickHouseDestinationConfig,
   DestinationConfig,
   DucklakeDestinationConfig,
   IcebergDestinationConfig,
@@ -168,6 +169,99 @@ export const getSnowflakeValidationIssues = (
   return issues
 }
 
+type ClickHouseFieldPath = 'clickhouseUrl' | 'clickhouseUser' | 'clickhouseDatabase'
+
+export type ClickHouseValidationIssue = {
+  path: ClickHouseFieldPath
+  message: string
+}
+
+/**
+ * Client-side check that the URL does not target an obviously internal address.
+ * This is a UX-level guard to surface mistakes before the validate round-trip;
+ * server-side validation remains authoritative.
+ */
+const isClickHouseHostInternal = (host: string): boolean => {
+  if (host === '' || host === 'localhost' || host.endsWith('.localhost')) return true
+
+  const ipv4 = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/)
+
+  if (ipv4) {
+    const a = Number(ipv4[1])
+    const b = Number(ipv4[2])
+
+    return (
+      a === 10 ||
+      a === 127 ||
+      a === 0 ||
+      (a === 100 && b >= 64 && b <= 127) || // CGNAT (RFC 6598)
+      (a === 169 && b === 254) ||
+      (a === 172 && b >= 16 && b <= 31) ||
+      (a === 192 && b === 168) ||
+      (a === 198 && (b === 18 || b === 19)) || // benchmarking (RFC 2544)
+      a >= 224
+    )
+  }
+
+  if (host.includes(':')) {
+    const lower = host.toLowerCase()
+
+    return (
+      lower === '::1' ||
+      lower === '::' ||
+      /^fe[89ab][0-9a-f]?:/.test(lower) ||
+      /^f[cd][0-9a-f]{2}:/.test(lower) ||
+      lower.startsWith('::ffff:') ||
+      lower.startsWith('64:ff9b:') // NAT64 (RFC 6052 well-known + RFC 8215 local-use)
+    )
+  }
+
+  return false
+}
+
+export const getClickHouseValidationIssues = (
+  data: Pick<DestinationPanelSchemaType, 'clickhouseUrl' | 'clickhouseUser' | 'clickhouseDatabase'>
+): ClickHouseValidationIssue[] => {
+  const issues: ClickHouseValidationIssue[] = []
+
+  if (!data.clickhouseUrl?.length) {
+    issues.push({ path: 'clickhouseUrl', message: 'URL is required' })
+  } else {
+    let parsed: URL | undefined
+
+    try {
+      parsed = new URL(data.clickhouseUrl)
+    } catch {
+      issues.push({ path: 'clickhouseUrl', message: 'ClickHouse URL must be a valid URL' })
+    }
+
+    if (parsed) {
+      if (parsed.protocol !== 'https:') {
+        issues.push({ path: 'clickhouseUrl', message: 'ClickHouse URL must use https://' })
+      } else {
+        const host = parsed.hostname.replace(/^\[|\]$/g, '')
+
+        if (isClickHouseHostInternal(host)) {
+          issues.push({
+            path: 'clickhouseUrl',
+            message: 'ClickHouse URL must not target an internal address',
+          })
+        }
+      }
+    }
+  }
+
+  if (!data.clickhouseUser?.length) {
+    issues.push({ path: 'clickhouseUser', message: 'User is required' })
+  }
+
+  if (!data.clickhouseDatabase?.length) {
+    issues.push({ path: 'clickhouseDatabase', message: 'Database is required' })
+  }
+
+  return issues
+}
+
 // Helper function to build destination config for validation
 export const buildDestinationConfigForValidation = ({
   projectRef,
@@ -240,6 +334,16 @@ export const buildDestinationConfigForValidation = ({
         database: normalizeRequiredString(data.snowflakeDatabase),
         schema: normalizeRequiredString(data.snowflakeSchema),
         role: normalizeOptionalString(data.snowflakeRole),
+      },
+    }
+  } else if (selectedType === 'ClickHouse') {
+    return {
+      clickHouse: {
+        url: normalizeRequiredString(data.clickhouseUrl),
+        user: normalizeRequiredString(data.clickhouseUser),
+        password: normalizeOptionalString(data.clickhousePassword),
+        database: normalizeRequiredString(data.clickhouseDatabase),
+        engine: data.clickhouseEngine,
       },
     }
   } else {
@@ -331,6 +435,15 @@ export const buildDestinationConfig = async ({
       role: normalizeOptionalString(data.snowflakeRole),
     }
     destinationConfig = { snowflake: snowflakeConfig }
+  } else if (selectedType === 'ClickHouse') {
+    const clickHouseConfig: ClickHouseDestinationConfig = {
+      url: normalizeRequiredString(data.clickhouseUrl),
+      user: normalizeRequiredString(data.clickhouseUser),
+      password: normalizeOptionalString(data.clickhousePassword),
+      database: normalizeRequiredString(data.clickhouseDatabase),
+      engine: data.clickhouseEngine,
+    }
+    destinationConfig = { clickHouse: clickHouseConfig }
   }
 
   return destinationConfig

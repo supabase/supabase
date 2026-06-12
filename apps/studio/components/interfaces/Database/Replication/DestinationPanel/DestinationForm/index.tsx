@@ -11,6 +11,7 @@ import * as z from 'zod'
 
 import {
   useIsETLBigQueryPrivateAlpha,
+  useIsETLClickHousePrivateAlpha,
   useIsETLDucklakePrivateAlpha,
   useIsETLIcebergPrivateAlpha,
   useIsETLSnowflakePrivateAlpha,
@@ -22,6 +23,7 @@ import { DestinationPanelFormSchema as FormSchema } from './DestinationForm.sche
 import {
   buildDestinationConfig,
   buildDestinationConfigForValidation,
+  getClickHouseValidationIssues,
   getDucklakeValidationIssues,
   getSnowflakeValidationIssues,
 } from './DestinationForm.utils'
@@ -29,6 +31,7 @@ import { DestinationNameInput } from './DestinationNameInput'
 import {
   AnalyticsBucketFields,
   BigQueryFields,
+  ClickHouseFields,
   DuckLakeFields,
   SnowflakeFields,
 } from './DestinationPanelFields'
@@ -103,6 +106,14 @@ type SnowflakeApiConfig = {
   role?: string
 }
 
+type ClickHouseApiConfig = {
+  url: string
+  user: string
+  password?: string
+  database: string
+  engine?: 'merge_tree' | 'replacing_merge_tree'
+}
+
 export const DestinationForm = ({
   selectedType,
   visible,
@@ -116,6 +127,7 @@ export const DestinationForm = ({
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
   const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
+  const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
 
   const [isFormInteracting, setIsFormInteracting] = useState(false)
@@ -145,8 +157,15 @@ export const DestinationForm = ({
       destinations.push({ value: 'Analytics Bucket', label: 'Analytics Bucket' })
     if (etlEnableDucklake) destinations.push({ value: 'DuckLake', label: 'DuckLake' })
     if (etlEnableSnowflake) destinations.push({ value: 'Snowflake', label: 'Snowflake' })
+    if (etlEnableClickHouse) destinations.push({ value: 'ClickHouse', label: 'ClickHouse' })
     return destinations
-  }, [etlEnableBigQuery, etlEnableDucklake, etlEnableIceberg, etlEnableSnowflake])
+  }, [
+    etlEnableBigQuery,
+    etlEnableClickHouse,
+    etlEnableDucklake,
+    etlEnableIceberg,
+    etlEnableSnowflake,
+  ])
   const hasNoAvailableDestinations = availableDestinations.length === 0
 
   const { data: sourcesData } = useReplicationSourcesQuery({ projectRef })
@@ -225,6 +244,14 @@ export const DestinationForm = ({
       snowflakeConfigValue && typeof snowflakeConfigValue === 'object'
         ? (snowflakeConfigValue as SnowflakeApiConfig)
         : undefined
+    const clickhouseConfigValue =
+      config && 'clickhouse' in (config as Record<string, unknown>)
+        ? (config as Record<string, unknown>).clickhouse
+        : undefined
+    const clickhouseConfig =
+      clickhouseConfigValue && typeof clickhouseConfigValue === 'object'
+        ? (clickhouseConfigValue as ClickHouseApiConfig)
+        : undefined
 
     return {
       // Common fields
@@ -272,6 +299,12 @@ export const DestinationForm = ({
       snowflakeDatabase: snowflakeConfig?.database ?? '',
       snowflakeSchema: snowflakeConfig?.schema ?? '',
       snowflakeRole: snowflakeConfig?.role ?? '',
+      // ClickHouse fields
+      clickhouseUrl: clickhouseConfig?.url ?? '',
+      clickhouseUser: clickhouseConfig?.user ?? '',
+      clickhousePassword: clickhouseConfig?.password ?? '',
+      clickhouseDatabase: clickhouseConfig?.database ?? '',
+      clickhouseEngine: clickhouseConfig?.engine ?? 'replacing_merge_tree',
     }
   }, [destinationData, pipelineData, catalogToken, projectSettings])
 
@@ -323,6 +356,10 @@ export const DestinationForm = ({
           })
         } else if (selectedType === 'Snowflake') {
           getSnowflakeValidationIssues(data).forEach(({ path, message }) => {
+            addRequiredFieldError(path, message)
+          })
+        } else if (selectedType === 'ClickHouse') {
+          getClickHouseValidationIssues(data).forEach(({ path, message }) => {
             addRequiredFieldError(path, message)
           })
         }
@@ -624,6 +661,8 @@ export const DestinationForm = ({
                 <DuckLakeFields form={form} />
               ) : selectedType === 'Snowflake' && etlEnableSnowflake ? (
                 <SnowflakeFields form={form} />
+              ) : selectedType === 'ClickHouse' && etlEnableClickHouse ? (
+                <ClickHouseFields form={form} />
               ) : null}
 
               <DialogSectionSeparator />

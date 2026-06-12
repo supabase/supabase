@@ -4,3 +4,4 @@ export type DestinationType =
   | 'Analytics Bucket'
   | 'DuckLake'
   | 'Snowflake'
+  | 'ClickHouse'

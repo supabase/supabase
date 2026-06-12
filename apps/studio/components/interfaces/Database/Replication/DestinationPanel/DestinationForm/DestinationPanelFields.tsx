@@ -507,6 +507,122 @@ export const SnowflakeFields = ({ form }: { form: UseFormReturn<DestinationPanel
   )
 }
 
+export const ClickHouseFields = ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => {
+  const [showPassword, setShowPassword] = useState(false)
+
+  return (
+    <div className="flex flex-col gap-y-6 p-5">
+      <p className="text-sm font-medium text-foreground">ClickHouse settings</p>
+      <div className="flex flex-col gap-y-4">
+        <FormField
+          control={form.control}
+          name="clickhouseUrl"
+          render={({ field }) => (
+            <FormItemLayout
+              layout="horizontal"
+              label="URL"
+              description="HTTPS endpoint for your ClickHouse server, including port"
+            >
+              <FormControl>
+                <Input
+                  {...field}
+                  value={field.value ?? ''}
+                  placeholder="https://your-cluster.clickhouse.cloud:8443"
+                />
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="clickhouseUser"
+          render={({ field }) => (
+            <FormItemLayout
+              layout="horizontal"
+              label="User"
+              description="ClickHouse user with permission to write to the target database"
+            >
+              <FormControl>
+                <Input {...field} value={field.value ?? ''} placeholder="default" />
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="clickhousePassword"
+          render={({ field }) => (
+            <FormItemLayout
+              layout="horizontal"
+              label="Password"
+              className="relative"
+              description="Omit for passwordless access"
+            >
+              <FormControl>
+                <Input
+                  {...field}
+                  type={showPassword ? 'text' : 'password'}
+                  value={field.value ?? ''}
+                  placeholder="Optional"
+                />
+              </FormControl>
+              <Button
+                type="default"
+                icon={showPassword ? <Eye /> : <EyeOff />}
+                className="w-7 absolute right-6 top-[4px]"
+                onClick={() => setShowPassword(!showPassword)}
+              />
+            </FormItemLayout>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="clickhouseDatabase"
+          render={({ field }) => (
+            <FormItemLayout
+              layout="horizontal"
+              label="Database"
+              description="The ClickHouse database where replicated tables will be created"
+            >
+              <FormControl>
+                <Input {...field} value={field.value ?? ''} placeholder="default" />
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="clickhouseEngine"
+          render={({ field }) => (
+            <FormItemLayout
+              layout="horizontal"
+              label="Table engine"
+              description="Server defaults to replacing_merge_tree when unset"
+            >
+              <FormControl>
+                <Select
+                  value={field.value ?? 'replacing_merge_tree'}
+                  onValueChange={field.onChange}
+                >
+                  <SelectTrigger>{field.value ?? 'replacing_merge_tree'}</SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="replacing_merge_tree">replacing_merge_tree</SelectItem>
+                    <SelectItem value="merge_tree">merge_tree</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+      </div>
+    </div>
+  )
+}
+
 /**
  * [Joshen] JFYI I'd foresee a possible UX friction point here regarding S3 access key IDs and secret access keys
  * - We'd allow users to select access key IDs via a dropdown here, but require a text input for secret access keys

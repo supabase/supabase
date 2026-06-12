@@ -30,6 +30,7 @@ import { DisableExternalReplicationDialog } from './DisableExternalReplicationDi
 import { ReadReplicaRow } from './ReadReplicas/ReadReplicaRow'
 import {
   useIsETLBigQueryPrivateAlpha,
+  useIsETLClickHousePrivateAlpha,
   useIsETLDucklakePrivateAlpha,
   useIsETLIcebergPrivateAlpha,
   useIsETLSnowflakePrivateAlpha,
@@ -56,6 +57,7 @@ export const Destinations = () => {
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
   const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
+  const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 
   const newDestinationDefaultType = infrastructureReadReplicas
@@ -68,7 +70,9 @@ export const Destinations = () => {
           ? 'DuckLake'
           : etlEnableSnowflake
             ? 'Snowflake'
-            : null
+            : etlEnableClickHouse
+              ? 'ClickHouse'
+              : null
 
   const prefetchedRef = useRef(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -85,6 +89,7 @@ export const Destinations = () => {
       'Analytics Bucket',
       'DuckLake',
       'Snowflake',
+      'ClickHouse',
     ]).withOptions({
       history: 'push',
       clearOnDefault: true,
