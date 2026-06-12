@@ -946,6 +946,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 |---|---|---|---|---|
 | `ADMIN_API_KEYS` | string |  | Comma-separated API keys accepted on the admin port. Legacy alias for `SERVER_ADMIN_API_KEYS`. | Default: empty |
 | `ADMIN_PORT` | integer |  | Port the admin HTTP server listens on. Legacy alias for `SERVER_ADMIN_PORT`. | Default: `5001` |
+| `ADMIN_RETURN_TENANT_SENSITIVE_DATA` | boolean | | Controls whether admin tenant endpoints return decrypted, sensitive tenant configuration values (e.g., anonKey, DB URLs, jwtSecret, jwks, serviceKey). | Default: `true` |
 | `EXPOSE_DOCS` | boolean |  | Expose `/docs` Swagger UI. | Default: `true` |
 | `HOST` | string |  | Host the public server binds to. Legacy alias for `SERVER_HOST`. | Default: `0.0.0.0` |
 | `NODE_ENV` | enum |  | Node.js runtime mode. When `production`, sets `isProduction` and forces HTTPS in TUS link generation. | Default: unset |
