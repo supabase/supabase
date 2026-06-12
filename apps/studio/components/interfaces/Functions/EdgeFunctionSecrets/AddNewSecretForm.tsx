@@ -12,10 +12,10 @@ import {
   CardHeader,
   CardTitle,
   cn,
+  ExpandingTextArea,
   Form,
   FormControl,
   FormField,
-  Textarea,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -263,22 +263,13 @@ export const AddNewSecretForm = () => {
                       >
                         <FormControl>
                           <div className="relative w-full">
-                            <Textarea
+                            <ExpandingTextArea
                               {...field}
-                              rows={1}
-                              ref={(el) => {
-                                field.ref(el)
-                                if (el) {
-                                  el.style.height = 'auto'
-                                  el.style.height =
-                                    Math.min(320, Math.max(72, el.scrollHeight)) + 'px'
-                                }
-                              }}
                               data-1p-ignore
                               data-lpignore="true"
                               data-form-type="other"
                               data-bwignore
-                              className="min-h-[72px] max-h-[320px] resize-none font-mono"
+                              className="font-mono max-h-[320px]"
                               style={
                                 {
                                   WebkitTextSecurity: isSecretVisible(fieldItem.id)
@@ -286,18 +277,12 @@ export const AddNewSecretForm = () => {
                                     : 'disc',
                                 } as React.CSSProperties
                               }
-                              onChange={(e) => {
-                                field.onChange(e)
-                                e.currentTarget.style.height = 'auto'
-                                e.currentTarget.style.height =
-                                  Math.min(320, Math.max(72, e.currentTarget.scrollHeight)) + 'px'
-                              }}
                             />
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button
                                   type="text"
-                                  className="absolute right-1 top-1 px-1"
+                                  className="absolute right-3 top-2 px-1"
                                   aria-label={
                                     isSecretVisible(fieldItem.id)
                                       ? 'Hide secret value'
