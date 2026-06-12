@@ -113,7 +113,7 @@ function FeaturesPage() {
   return (
     <>
       <NextSeo
-              canonical="https://supabase.com/features"
+        canonical="https://supabase.com/features"
         title={meta.title}
         description={meta.description}
         openGraph={{
