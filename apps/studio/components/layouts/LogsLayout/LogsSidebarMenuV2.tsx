@@ -242,12 +242,7 @@ export function LogsSidebarMenuV2() {
       )}
       {isUnifiedLogsEligible && (
         <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
-          <div className="space-y-0.5">
-            <p className="text-xs font-medium text-foreground">Introducing unified logs</p>
-            <p className="text-xs text-foreground-light">
-              A unified view across all services with improved filtering and real-time updates.
-            </p>
-          </div>
+          <p className="text-xs font-medium text-foreground">Try Unified Logs</p>
           <div className="flex shrink-0 items-center gap-x-2">
             <Button
               size="tiny"
@@ -257,7 +252,7 @@ export function LogsSidebarMenuV2() {
                 router.push(`/project/${ref}/logs`)
               }}
             >
-              Enable preview
+              Enable
             </Button>
             <ButtonTooltip
               type="default"
