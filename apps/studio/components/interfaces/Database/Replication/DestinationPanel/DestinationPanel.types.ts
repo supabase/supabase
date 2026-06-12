@@ -1,1 +1,6 @@
-export type DestinationType = 'Read Replica' | 'BigQuery' | 'Analytics Bucket' | 'DuckLake'
+export type DestinationType =
+  | 'Read Replica'
+  | 'BigQuery'
+  | 'Analytics Bucket'
+  | 'DuckLake'
+  | 'Snowflake'

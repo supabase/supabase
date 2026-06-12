@@ -39,7 +39,7 @@ import { HTTP_METHODS } from './EdgeFunctionDetails.constants'
 import { ErrorWithStatus, ResponseData } from './EdgeFunctionDetails.types'
 import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useSessionAccessTokenQuery } from '@/data/auth/session-access-token-query'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
@@ -102,11 +102,11 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
   const [error, setError] = useState<string | null>(null)
 
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
+  const { data: apiKeysData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
+  const { serviceKey } = apiKeysData ?? {}
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: accessToken } = useSessionAccessTokenQuery({ enabled: IS_PLATFORM })
-  const { serviceKey } = getKeys(apiKeys)
 
   const track = useTrack()
   const { mutate: testEdgeFunction, isPending } = useEdgeFunctionTestMutation({

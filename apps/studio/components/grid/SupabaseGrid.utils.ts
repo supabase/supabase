@@ -24,14 +24,20 @@ import { BASE_PATH } from '@/lib/constants'
 import { eventMatchesAnyShortcut } from '@/state/shortcuts/matchEvent'
 import { tableEditorRegistry } from '@/state/shortcuts/registry/table-editor'
 
-export function formatSortURLParams(tableName: string, sort?: string[]): Sort[] {
+export function formatSortURLParams(
+  // Should match the Entity type.
+  table: { name: string; columns: { name: string }[] },
+  sort?: string[]
+): Sort[] {
   if (Array.isArray(sort)) {
     return compact(
       sort.map((s) => {
         const [column, order] = s.split(':')
         // Reject any possible malformed sort param
         if (!column || !order) return undefined
-        else return { table: tableName, column, ascending: order === 'asc' }
+        // if the sort column name doesn't exist in the table, reject it as well to avoid confusion
+        if (table.columns.find((c) => c.name === column) === undefined) return undefined
+        else return { table: table.name, column, ascending: order === 'asc' }
       })
     )
   }
