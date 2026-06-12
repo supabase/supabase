@@ -37,17 +37,8 @@ You can use the Supabase client libraries to receive Broadcast messages.
 
 Get the Project URL and key from [the project's **Connect** dialog](/dashboard/project/_?showConnect=true).
 
-<Admonition type="note" title="Changes to API keys">
-
-Supabase is changing the way keys work to improve project security and developer experience. You can [read the full announcement](https://github.com/orgs/supabase/discussions/29260), but in the transition period, you can use both the current `anon` and `service_role` keys and the new publishable key with the form `sb_publishable_xxx` which will replace the older keys.
-
-**The legacy keys will be deprecated shortly, so we strongly encourage switching to and using the new publishable and secret API keys**.
-
-In most cases, you can get the correct key from [the Project's **Connect** dialog](/dashboard/project/_?showConnect=true), but if you want a specific key, you can find all keys in [the API Keys section of a Project's Settings page](/dashboard/project/_/settings/api-keys/):
-
-**For new keys**, open the **API Keys** tab, if you don't have a publishable key already, click **Create new API Keys**, and copy the value from the **Publishable key** section.
-
-</Admonition>
+<$Partial path="api_keys_deprecation.mdx" variables={{ "framework": "{{ .framework }}", "tab": "{{ .tab }}" }}
+/>
 
 <Tabs
   scrollable
@@ -136,6 +127,12 @@ In most cases, you can get the correct key from [the Project's **Connect** dialo
 ### Receive Broadcast messages
 
 You can receive Broadcast messages by providing a callback to the channel.
+
+<Admonition type="note">
+
+Binary payloads (`ArrayBuffer` / `ArrayBufferView`) are received automatically from **supabase-js 2.91.0** and **supabase-swift 2.44.0**. On older SDK versions, binary messages are silently dropped and never reach the callback.
+
+</Admonition>
 
 <Tabs
   scrollable
@@ -264,6 +261,12 @@ You can receive Broadcast messages by providing a callback to the channel.
 
 You can use the Supabase client libraries to send Broadcast messages.
 
+<Admonition type="note">
+
+Broadcast payloads can be binary (`ArrayBuffer` or `ArrayBufferView`, e.g. `Uint8Array`) over WebSocket from **supabase-js 2.91.0** and **supabase-swift 2.44.0**. Binary payloads sent to clients running older SDK versions are **silently dropped** and never arrive over the WebSocket. The Dart, Kotlin, and Python clients don't support binary payloads yet.
+
+</Admonition>
+
 <Tabs
   scrollable
   size="small"
@@ -307,6 +310,16 @@ You can use the Supabase client libraries to send Broadcast messages.
         payload: { message: 'Hi' },
       })
     })
+
+    /**
+     * The payload can be binary (ArrayBuffer / ArrayBufferView) from supabase-js 2.91.0.
+     * Receivers on older SDK versions will not get the message.
+     */
+    myChannel.send({
+      type: 'broadcast',
+      event: 'cursor-pos',
+      payload: new Uint8Array([1, 2, 3]).buffer,
+    })
     ```
 
   </TabPanel>
@@ -343,6 +356,12 @@ You can use the Supabase client libraries to send Broadcast messages.
   </$Show>
   <$Show if="sdk:swift">
   <TabPanel id="swift" label="Swift">
+
+    <Admonition type="note">
+
+    Binary payloads over WebSocket are supported from supabase-swift 2.44.0. Receivers on older SDK versions will not get binary messages.
+
+    </Admonition>
 
     {/* prettier-ignore */}
     ```swift
@@ -449,11 +468,31 @@ By default, all database broadcasts are private, meaning clients must authentica
 
 </Admonition>
 
+To broadcast a binary payload from your database, use the `realtime.send_binary()` function with a `bytea` payload:
+
+{/* prettier-ignore */}
+```sql
+select
+  realtime.send_binary(
+    '\x012345'::bytea, -- bytea payload
+    'event',           -- Event name
+    'topic',           -- Topic
+    true               -- Private / Public flag (defaults to true)
+  );
+```
+
+The same public/private matching rule applies: a binary broadcast only reaches channels with the same private setting. Binary messages only reach clients on **supabase-js 2.91.0** and **supabase-swift 2.44.0** or later; older clients silently drop them.
+
 You can use the `realtime.broadcast_changes()` helper function to broadcast messages when a record is created, updated, or deleted. For more details, read [Subscribing to Database Changes](/docs/guides/realtime/subscribing-to-database-changes).
 
 ### Broadcast using the REST API
 
-You can send a Broadcast message by making an HTTP request to Realtime servers.
+You can send a single Broadcast message by making an HTTP request to Realtime servers. The endpoint embeds the topic and event in the path, and the `Content-Type` header determines the payload type:
+
+- `application/json` — JSON payload
+- `application/octet-stream` — binary payload
+
+Add `?private=true` to broadcast to a private channel.
 
 <Tabs
   scrollable
@@ -466,19 +505,19 @@ You can send a Broadcast message by making an HTTP request to Realtime servers.
 
     {/* prettier-ignore */}
     ```bash
+    # JSON payload
     curl -v \
     -H 'apikey: <SUPABASE_TOKEN>' \
     -H 'Content-Type: application/json' \
-    --data-raw '{
-      "messages": [
-        {
-          "topic": "test",
-          "event": "event",
-          "payload": { "test": "test" }
-        }
-      ]
-    }' \
-    'https://<PROJECT_REF>.supabase.co/realtime/v1/api/broadcast'
+    --data-raw '{ "test": "test" }' \
+    'https://<PROJECT_REF>.supabase.co/realtime/v1/api/broadcast/test/events/event'
+
+    # Binary payload
+    curl -v \
+    -H 'apikey: <SUPABASE_TOKEN>' \
+    -H 'Content-Type: application/octet-stream' \
+    --data-binary @payload.bin \
+    'https://<PROJECT_REF>.supabase.co/realtime/v1/api/broadcast/test/events/event?private=true'
     ```
 
   </TabPanel>
@@ -486,25 +525,38 @@ You can send a Broadcast message by making an HTTP request to Realtime servers.
 
     {/* prettier-ignore */}
     ```bash
-    POST /realtime/v1/api/broadcast HTTP/1.1
+    POST /realtime/v1/api/broadcast/test/events/event HTTP/1.1
     Host: {PROJECT_REF}.supabase.co
     Content-Type: application/json
     apikey: {SUPABASE_TOKEN}
-    {
-      "messages": [
-        {
-          "topic": "test",
-          "event": "event",
-          "payload": {
-            "test": "test"
-          }
-        }
-      ]
-    }
+    { "test": "test" }
     ```
 
   </TabPanel>
 </Tabs>
+
+<Admonition type="note">
+
+To send multiple messages in a single request, the batch endpoint `POST /realtime/v1/api/broadcast` is still available. It accepts a JSON body with a `messages` array (JSON payloads only):
+
+{/* prettier-ignore */}
+```bash
+curl -v \
+-H 'apikey: <SUPABASE_TOKEN>' \
+-H 'Content-Type: application/json' \
+--data-raw '{
+  "messages": [
+    {
+      "topic": "test",
+      "event": "event",
+      "payload": { "test": "test" }
+    }
+  ]
+}' \
+'https://<PROJECT_REF>.supabase.co/realtime/v1/api/broadcast'
+```
+
+</Admonition>
 
 ## Broadcast options
 
@@ -792,7 +844,7 @@ You can also send a Broadcast message by making an HTTP request to Realtime serv
   <TabPanel id="js" label="JavaScript">
     <Admonition type="note">
 
-    This is currently available only in the Supabase JavaScript client version 2.37.0 and later.
+    `channel.httpSend()` always uses the REST API regardless of WebSocket connection state, and is available from the Supabase JavaScript client version 2.107.0 and later. `ArrayBuffer` and `ArrayBufferView` (e.g. `Uint8Array`) payloads are sent as `application/octet-stream`; all other payloads are JSON-encoded.
 
     </Admonition>
 
@@ -801,13 +853,11 @@ You can also send a Broadcast message by making an HTTP request to Realtime serv
 
     // No need to subscribe to channel
 
-    channel
-      .send({
-        type: 'broadcast',
-        event: 'test',
-        payload: { message: 'Hi' },
-      })
-      .then((resp) => console.log(resp))
+    // JSON payload
+    await channel.httpSend('cursor-pos', { x: Math.random(), y: Math.random() })
+
+    // Binary payload (ArrayBuffer / ArrayBufferView) — sent as application/octet-stream
+    await channel.httpSend('cursor-pos', new Uint8Array([1, 2, 3]).buffer)
 
     // Remember to clean up the channel
 

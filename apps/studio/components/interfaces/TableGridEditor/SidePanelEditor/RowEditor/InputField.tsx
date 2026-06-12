@@ -173,7 +173,7 @@ export const InputField = ({
   }
 
   if (includes(TEXT_TYPES, field.format)) {
-    const isTruncated = isValueTruncated(field.value)
+    const isTruncated = isValueTruncated(field.value, field.format)
 
     /**
      * Handle `undefined` as the default value of the input field
@@ -250,7 +250,7 @@ export const InputField = ({
   }
 
   if (includes(JSON_TYPES, field.format)) {
-    const isTruncated = isValueTruncated(field.value)
+    const isTruncated = isValueTruncated(field.value, field.format)
 
     return (
       <FormItemLayout
@@ -373,7 +373,7 @@ export const InputField = ({
     )
   }
 
-  const isTruncated = isValueTruncated(field.value)
+  const isTruncated = isValueTruncated(field.value, field.format)
 
   return (
     <FormItemLayout

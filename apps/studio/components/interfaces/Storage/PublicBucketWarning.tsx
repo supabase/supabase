@@ -1,6 +1,6 @@
 import { ident, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { useEffect, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
@@ -19,7 +19,7 @@ const DISMISS_DURATION_MS = 14 * 24 * 60 * 60 * 1000 // 14 days
 
 function isDismissed(projectRef: string, bucketId: string): boolean {
   try {
-    const raw = localStorage.getItem(
+    const raw = safeLocalStorage.getItem(
       LOCAL_STORAGE_KEYS.STORAGE_PUBLIC_BUCKET_SELECT_POLICY_WARNING_DISMISSED(projectRef, bucketId)
     )
     if (!raw) return false
@@ -31,7 +31,7 @@ function isDismissed(projectRef: string, bucketId: string): boolean {
 }
 
 function persistDismiss(projectRef: string, bucketId: string): void {
-  localStorage.setItem(
+  safeLocalStorage.setItem(
     LOCAL_STORAGE_KEYS.STORAGE_PUBLIC_BUCKET_SELECT_POLICY_WARNING_DISMISSED(projectRef, bucketId),
     JSON.stringify({ dismissedAt: new Date().toISOString() })
   )

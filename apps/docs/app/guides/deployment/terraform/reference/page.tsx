@@ -22,7 +22,7 @@ const meta = {
 }
 
 const generateMetadata = genGuideMeta(() => ({
-  pathname: '/guides/platform/terraform/reference',
+  pathname: '/guides/deployment/terraform/reference',
   meta,
 }))
 

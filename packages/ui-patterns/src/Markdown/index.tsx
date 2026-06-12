@@ -7,31 +7,15 @@ import { cn } from 'ui'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
 
 import {
-  Anchor,
   Avatar,
   Blockquote,
   Code,
   CodeBlockPre,
   DefaultPre,
-  H1,
-  H2,
-  H3,
-  H4,
-  H5,
-  H6,
-  Hr,
   Img,
   InlineCode,
-  ListItem,
-  OrderedList,
-  Paragraph,
   Quote,
   SimplePre,
-  Table,
-  Td,
-  Th,
-  Tr,
-  UnorderedList,
 } from './components'
 
 const defaultComponents: Components = {
@@ -41,20 +25,10 @@ const defaultComponents: Components = {
   h4: (props) => <Heading tag="h4" {...props} />,
   h5: (props) => <Heading tag="h5" {...props} />,
   h6: (props) => <Heading tag="h6" {...props} />,
-  p: Paragraph,
-  a: Anchor,
   code: Code,
   img: Img,
-  ul: UnorderedList,
-  ol: OrderedList,
-  li: ListItem,
   blockquote: Blockquote,
-  hr: Hr,
   pre: DefaultPre,
-  table: Table,
-  tr: Tr,
-  th: Th,
-  td: Td,
 }
 
 interface MarkdownProps extends Omit<Options, 'children' | 'node' | 'components'> {
@@ -83,7 +57,7 @@ export function Markdown({
   }
 
   return (
-    <div className={cn('text-sm', className)}>
+    <div className={cn('prose max-w-none', className)}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm, ...(remarkPlugins ?? [])]}
         components={mergedComponents}
@@ -101,30 +75,4 @@ export const markdownComponents = {
   img: Img,
 }
 
-export {
-  Anchor,
-  Avatar,
-  Blockquote,
-  Code,
-  CodeBlockPre,
-  DefaultPre,
-  H1,
-  H2,
-  H3,
-  H4,
-  H5,
-  H6,
-  Hr,
-  Img,
-  InlineCode,
-  ListItem,
-  OrderedList,
-  Paragraph,
-  Quote,
-  SimplePre,
-  Table,
-  Td,
-  Th,
-  Tr,
-  UnorderedList,
-}
+export { Avatar, Blockquote, Code, CodeBlockPre, DefaultPre, Img, InlineCode, Quote, SimplePre }

@@ -13,6 +13,76 @@ const unescapeSqlLiteral = (value = '', isEscapeString = false) => {
   return isEscapeString ? unescaped.replaceAll('\\\\', '\\') : unescaped
 }
 
+/**
+ * Strips the surrounding quotes from a single SQL string literal and unescapes its
+ * contents, handling the optional `E''` escape-string prefix.
+ */
+const unwrapSqlLiteral = (token: string) => {
+  const trimmed = token.trim()
+  const isEscapeString = /^e'/i.test(trimmed)
+  const withoutPrefix = isEscapeString ? trimmed.slice(1) : trimmed
+  const withoutQuotes = withoutPrefix.replace(/^'|'$/g, '')
+  return unescapeSqlLiteral(withoutQuotes, isEscapeString)
+}
+
+/**
+ * Splits the argument list of a `jsonb_build_object(...)` call into its individual
+ * values, honoring single-quoted SQL string literals (with '' escapes) and nested
+ * parentheses. A naive split on ',' corrupts a header name or value that legitimately
+ * contains a comma or parenthesis, which then gets persisted on save and no longer
+ * matches what the user entered.
+ */
+const parseJsonBuildObjectArgs = (command: string) => {
+  const match = command.match(/headers:=jsonb_build_object\s*\(/i)
+  if (!match || match.index === undefined) return []
+
+  const args: string[] = []
+  let current = ''
+  let depth = 1
+  let inQuote = false
+  let hasContent = false
+
+  for (let i = match.index + match[0].length; i < command.length && depth > 0; i++) {
+    const char = command[i]
+
+    if (inQuote) {
+      if (char === "'" && command[i + 1] === "'") {
+        current += "''"
+        i++
+        continue
+      }
+      if (char === "'") inQuote = false
+      current += char
+      continue
+    }
+
+    if (char === "'") {
+      inQuote = true
+      current += char
+      hasContent = true
+    } else if (char === '(') {
+      depth++
+      current += char
+    } else if (char === ')') {
+      depth--
+      if (depth > 0) current += char
+    } else if (char === ',' && depth === 1) {
+      args.push(current)
+      current = ''
+    } else {
+      current += char
+      if (char.trim().length > 0) hasContent = true
+    }
+  }
+
+  // Unbalanced parentheses: bail rather than emit mangled fragments.
+  if (depth !== 0) return []
+
+  if (hasContent || args.length > 0) args.push(current)
+
+  return args.map(unwrapSqlLiteral)
+}
+
 export function buildCronCreateQuery(
   name: string,
   schedule: string,
@@ -75,18 +145,14 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
     const timeoutMatch = command.match(/timeout_milliseconds:=(\d+)/i)
     const timeout = timeoutMatch?.[1] || ''
 
-    const headersJsonBuildObjectMatch = command.match(/headers:=jsonb_build_object\(([^)]*)/i)
-    const headersJsonBuildObject = headersJsonBuildObjectMatch?.[1] || ''
-
     let headersObjs: { name: string; value: string }[] = []
-    if (headersJsonBuildObject) {
-      const headers = headersJsonBuildObject
-        .split(',')
-        .map((s) => unescapeSqlLiteral(s.trim().replace(/^'|'$/g, '')))
+    if (/headers:=jsonb_build_object\s*\(/i.test(command)) {
+      const args = parseJsonBuildObjectArgs(command)
 
-      for (let i = 0; i < headers.length; i += 2) {
-        if (headers[i] && headers[i].length > 0) {
-          headersObjs.push({ name: headers[i], value: headers[i + 1] })
+      for (let i = 0; i < args.length; i += 2) {
+        const name = args[i]
+        if (name && name.length > 0) {
+          headersObjs.push({ name, value: args[i + 1] ?? '' })
         }
       }
     } else {

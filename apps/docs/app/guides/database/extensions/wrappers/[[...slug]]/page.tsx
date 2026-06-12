@@ -32,48 +32,36 @@ const repo = 'wrappers'
 const docsDir = 'docs/catalog'
 const externalSite = 'https://supabase.github.io/wrappers'
 
-type TagQueryResponse = {
+type DocsTagsQueryResponse = {
   repository: {
     refs: {
-      nodes:
-        | {
-            name: string
-          }[]
-        | null
-      pageInfo: {
-        hasNextPage: boolean
-        endCursor: string | null
-      }
+      nodes: { name: string }[] | null
+      pageInfo: { hasNextPage: boolean; endCursor: string | null }
     }
   }
 }
 
-const tagQuery = `
-    query TagQuery($owner: String!, $name: String!, $after: String) {
-      repository(owner: $owner, name: $name) {
-        refs(
-          refPrefix: "refs/tags/",
-          orderBy: {
-            field: TAG_COMMIT_DATE,
-            direction: DESC
-          },
-          first: 5,
-          after: $after
-        ) {
-          nodes {
-            name
-          }
-          pageInfo {
-            hasNextPage
-            endCursor
-          }
-        }
+const docsTagsQuery = `
+  query DocsTagsQuery($owner: String!, $name: String!, $after: String) {
+    repository(owner: $owner, name: $name) {
+      refs(
+        refPrefix: "refs/tags/",
+        orderBy: { field: TAG_COMMIT_DATE, direction: DESC },
+        first: 5,
+        after: $after
+      ) {
+        nodes { name }
+        pageInfo { hasNextPage endCursor }
       }
     }
-  `
+  }
+`
 
-async function getLatestRelease(after: string | null = null) {
+async function getLatestDocsTag(after: string | null = null): Promise<string | null> {
   try {
+    /**
+     * We use GraphQL as it's the only way to use `orderBy` on Github API.
+     */
     const {
       repository: {
         refs: {
@@ -81,18 +69,18 @@ async function getLatestRelease(after: string | null = null) {
           pageInfo: { hasNextPage, endCursor },
         },
       },
-    } = await octokit().graphql<TagQueryResponse>(tagQuery, {
+    } = await octokit().graphql<DocsTagsQueryResponse>(docsTagsQuery, {
       owner: org,
       name: repo,
       after,
     })
 
     return (
-      nodes?.find((node) => node?.name?.match(/^docs_v\d+\.\d+\.\d+/))?.name ??
-      (hasNextPage && endCursor ? await getLatestRelease(endCursor) : null)
+      nodes?.find(({ name }) => /^docs_v\d+\.\d+\.\d+/.test(name))?.name ??
+      (hasNextPage && endCursor ? await getLatestDocsTag(endCursor) : null)
     )
   } catch (error) {
-    console.error(`Error fetching release tags for wrappers federated pages: ${error}`)
+    console.error(`Error fetching docs tags for wrappers federated pages: ${error}`)
     return null
   }
 }
@@ -442,9 +430,10 @@ const getContent = async (params: Params) => {
     let remoteFile: string
     ;({ remoteFile, meta } = federatedPage)
 
-    const tag = await getLatestRelease()
+    const tag = await getLatestDocsTag()
+
     if (!tag) {
-      throw new Error('No latest release found for federated wrappers pages')
+      throw new Error('No latest docs tag found for federated wrappers pages')
     }
 
     editLink = `${org}/${repo}/blob/${tag}/${docsDir}/${remoteFile}`
@@ -522,7 +511,7 @@ const urlTransform: UrlTransformFunction = (url) => {
 }
 
 const generateStaticParams = async () => {
-  if (!IS_DEV) {
+  if (IS_DEV) {
     return []
   }
 
