@@ -29,6 +29,11 @@ export async function deleteContents(
 
 type DeleteContentData = Awaited<ReturnType<typeof deleteContents>>
 
+/** Returns a copy of a cached content list with the given ids removed. Exported for testing. */
+export function removeContentFromList(data: ContentData, ids: string[]): ContentData {
+  return { ...data, content: data.content.filter((item) => !ids.includes(item.id)) }
+}
+
 export const useContentDeleteMutation = ({
   onSuccess,
   onError,
@@ -48,12 +53,11 @@ export const useContentDeleteMutation = ({
         queryKey: contentKeys.allContentLists(projectRef),
       })
 
+      // allContentLists is a prefix of sibling caches (sql snippets, folders, counts) that
+      // don't share the { content: [...] } shape, so only optimistically update entries that do.
       for (const [queryKey, data] of snapshots) {
-        if (data?.content) {
-          queryClient.setQueryData<ContentData>(queryKey, {
-            ...data,
-            content: data.content.filter((item) => !ids.includes(item.id)),
-          })
+        if (data && Array.isArray(data.content)) {
+          queryClient.setQueryData<ContentData>(queryKey, removeContentFromList(data, ids))
         }
       }
 
@@ -69,6 +73,7 @@ export const useContentDeleteMutation = ({
       await onSuccess?.(data, variables, context)
     },
     async onError(error, variables, context) {
+      // Restore the snapshots captured in onMutate before surfacing the error.
       if (context?.snapshots) {
         for (const [queryKey, data] of context.snapshots) {
           queryClient.setQueryData(queryKey, data)
