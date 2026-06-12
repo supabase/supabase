@@ -180,6 +180,10 @@ const footerData = [
         url: '/ga',
       },
       {
+        text: 'Legal',
+        url: '/legal',
+      },
+      {
         text: 'Terms of Service',
         url: '/terms',
       },

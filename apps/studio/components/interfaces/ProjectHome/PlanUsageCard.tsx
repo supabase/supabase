@@ -51,23 +51,15 @@ const formatGigabyteLimit = (limit: number) => {
   return `${limit} GB`
 }
 
-const formatCount = (value: number) => {
-  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`
-  if (value >= 1_000) return `${(value / 1_000).toFixed(1)}k`
-  return value.toLocaleString()
-}
-
-const formatCountLimit = (limit: number) => {
-  if (limit >= 1_000_000) return `${(limit / 1_000_000).toFixed(0)}M`
-  if (limit >= 1_000) return `${(limit / 1_000).toFixed(0)}k`
-  return limit.toLocaleString()
-}
+// Show counts in full with thousands separators (e.g. `50,000`) rather than abbreviated
+// (`50k`), to match the pricing page and avoid ambiguity around plan limits.
+const formatCount = (value: number) => value.toLocaleString()
 
 const formatValue = (value: number, unit: MetricUnit) =>
   unit === 'gigabytes' ? formatGigabytes(value) : formatCount(value)
 
 const formatLimit = (limit: number, unit: MetricUnit) =>
-  unit === 'gigabytes' ? formatGigabyteLimit(limit) : formatCountLimit(limit)
+  unit === 'gigabytes' ? formatGigabyteLimit(limit) : formatCount(limit)
 
 const RING_RADIUS = 7
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS

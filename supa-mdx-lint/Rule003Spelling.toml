@@ -313,6 +313,7 @@ allow_list = [
     "Ollama",
     "OneLogin",
     "OpenAI",
+    "[Oo]pen[Aa][Pp][Ii]",
     "OpenID",
     "OpenMetrics",
     "[Oo]pen[Ss]l",

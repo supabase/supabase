@@ -43,6 +43,14 @@ export const DestinationPanelFormSchema = z.object({
   ducklakeS3UrlStyle: z.enum(['path', 'vhost']).optional(),
   ducklakeS3UseSsl: z.boolean().optional(),
   ducklakeMetadataSchema: z.string().optional(),
+  // Snowflake fields
+  snowflakeAccountId: z.string().optional(),
+  snowflakeUser: z.string().optional(),
+  snowflakePrivateKey: z.string().optional(),
+  snowflakePrivateKeyPassphrase: z.string().optional(),
+  snowflakeDatabase: z.string().optional(),
+  snowflakeSchema: z.string().optional(),
+  snowflakeRole: z.string().optional(),
 })
 
 export type DestinationPanelSchemaType = z.infer<typeof DestinationPanelFormSchema>
