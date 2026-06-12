@@ -202,11 +202,11 @@ export const DisplayApiSettings = ({
                         ? 'Updating JWT secret...'
                         : (x?.api_key ?? 'You need additional permissions to view API keys')
                 }
-                onChange={() => {}}
+                onChange={() => { }}
               />
             </FormLayout>
 
-            {showApiKeyLastUsed && (
+            {showApiKeyLastUsed ? (
               <div
                 className="pt-2 text-foreground-lighter w-full text-sm data-[invisible=true]:invisible"
                 data-invisible={isLoadingLastUsed}
@@ -215,22 +215,31 @@ export const DisplayApiSettings = ({
                   ? `Last request was ${lastUsedAPIKeys[x.api_key]} ago.`
                   : 'No requests in the past 24 hours.'}
               </div>
+            ) : (
+              <div className="pt-2 text-foreground-lighter w-full text-sm">
+                <span title="Usage tracking for legacy keys is currently unavailable">
+                  Last used: unavailable
+                </span>
+              </div>
             )}
+          </div>
           </Panel.Content>
-        ))
+  ))
       )}
-      {showNotice ? (
-        <Panel.Notice
-          className="border-t"
-          title="API keys have moved"
-          badgeLabel="Changelog"
-          description={`
+{
+  showNotice ? (
+    <Panel.Notice
+      className="border-t"
+      title="API keys have moved"
+      badgeLabel="Changelog"
+      description={`
   \`anon\` and \`service_role\` API keys can now be replaced with \`publishable\` and \`secret\` API keys.
   `}
-          href="https://github.com/orgs/supabase/discussions/29260"
-          buttonText="Read the announcement"
-        />
-      ) : null}
-    </Panel>
+      href="https://github.com/orgs/supabase/discussions/29260"
+      buttonText="Read the announcement"
+    />
+  ) : null
+}
+    </Panel >
   )
 }
