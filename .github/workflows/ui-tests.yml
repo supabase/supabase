@@ -14,6 +14,7 @@ permissions:
 
 jobs:
   test:
+    timeout-minutes: 15
     runs-on: blacksmith-4vcpu-ubuntu-2404
     strategy:
       matrix:
@@ -65,6 +66,7 @@ jobs:
           path: ./packages/ui/coverage/lcov.info
           retention-days: 1
 
+    timeout-minutes: 15
   coveralls:
     needs: test
     if: ${{ always() && needs.test.result == 'success' && needs.test.outputs.tests_ran == 'true' }}

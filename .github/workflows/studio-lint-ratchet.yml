@@ -16,6 +16,7 @@ permissions:
 
 jobs:
   ratchet:
+    timeout-minutes: 15
     # Uses larger hosted runner as it significantly decreases build times
     runs-on: blacksmith-4vcpu-ubuntu-2404
 

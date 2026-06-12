@@ -5,10 +5,17 @@ on:
   pull_request:
     types: [opened, labeled, unlabeled, synchronize, ready_for_review]
 
+
+# Prevent concurrent runs of the same workflow
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions: {}
 
 jobs:
   validate-pr:
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
       - name: Tagged with 'do not merge'

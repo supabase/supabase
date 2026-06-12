@@ -4,6 +4,9 @@ on:
     branches: [master]
   pull_request:
 
+
+permissions: {}
+
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -123,6 +126,7 @@ jobs:
           exit 1
 
   merge-reports:
+    timeout-minutes: 15
     name: 'E2E reports'
     # Merge reports after playwright-tests, even if some shards have failed
     if: ${{ !cancelled() && needs.test.outputs.tests_ran == 'true' }}
@@ -165,6 +169,7 @@ jobs:
           report-file: e2e/studio/test-results/test-results.json
           comment-title: '🎭 Playwright Test Results'
 
+    timeout-minutes: 15
   merge-results:
     name: 'E2E results'
     runs-on: ubuntu-latest

@@ -18,6 +18,7 @@ permissions:
 
 jobs:
   authorize-vercel-deploys:
+    timeout-minutes: 15
     runs-on: blacksmith-4vcpu-ubuntu-2404
 
     steps:

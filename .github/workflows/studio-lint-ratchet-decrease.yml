@@ -5,12 +5,19 @@ on:
     - cron: '0 0 * * SUN'
   workflow_dispatch:
 
+
+# Prevent concurrent runs of the same workflow
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: write
   pull-requests: write
 
 jobs:
   decrease-baselines:
+    timeout-minutes: 15
     runs-on: blacksmith-4vcpu-ubuntu-2404
 
     steps:

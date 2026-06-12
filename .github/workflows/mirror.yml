@@ -16,8 +16,18 @@ on:
         required: true
         type: string
 
+
+
+# Prevent concurrent runs of the same workflow
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
 jobs:
   mirror:
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     permissions:
       contents: read

@@ -8,6 +8,12 @@ on:
       - "apps/studio/evals/scorer-online.ts"
       - "apps/studio/evals/scorer-online-manifest.json"
 
+
+# Prevent concurrent runs of the same workflow
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 

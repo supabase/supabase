@@ -14,11 +14,18 @@ on:
       - 'apps/docs/resources/**'
   workflow_dispatch:
 
+
+# Prevent concurrent runs of the same workflow
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
 jobs:
   sync:
+    timeout-minutes: 15
     runs-on: blacksmith-4vcpu-ubuntu-2404
 
     env:

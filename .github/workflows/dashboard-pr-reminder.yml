@@ -8,12 +8,19 @@ on:
     - cron: '0 14 * * *'
   workflow_dispatch: # Allow manual trigger for testing
 
+
+# Prevent concurrent runs of the same workflow
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   pull-requests: read
   contents: read
 
 jobs:
   check-dashboard-prs:
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

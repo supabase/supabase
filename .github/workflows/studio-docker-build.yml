@@ -15,6 +15,7 @@ permissions:
 
 jobs:
   build:
+    timeout-minutes: 15
     name: 'Studio Docker Build'
     runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:

@@ -6,6 +6,12 @@ on:
     - cron: '0 4 * * 1'
   workflow_dispatch:
 
+
+# Prevent concurrent runs of the same workflow
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   packages: write
@@ -13,6 +19,7 @@ permissions:
 
 jobs:
   settings:
+    timeout-minutes: 15
     runs-on: blacksmith-4vcpu-ubuntu-2404
     outputs:
       image_version: ${{ steps.meta.outputs.version }}
@@ -108,6 +115,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           no-cache: true
 
+    timeout-minutes: 15
   merge_manifest:
     needs:
       - settings
@@ -140,6 +148,7 @@ jobs:
           echo "|-------|------|" >> $GITHUB_STEP_SUMMARY
           echo "| \`supabase/studio:${IMAGE_VERSION}\` | [View on Docker Hub](https://hub.docker.com/r/supabase/studio/tags?name=${IMAGE_VERSION}) |" >> $GITHUB_STEP_SUMMARY
           echo "| \`supabase/studio:latest\` | [View on Docker Hub](https://hub.docker.com/r/supabase/studio/tags?name=latest) |" >> $GITHUB_STEP_SUMMARY
+    timeout-minutes: 15
 
   publish:
     needs:

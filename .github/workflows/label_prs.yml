@@ -3,8 +3,18 @@ name: 'Pull Request Labeler'
 on:
   pull_request_target:
 
+
+
+# Prevent concurrent runs of the same workflow
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
 jobs:
   labeler:
+    timeout-minutes: 15
     permissions:
       contents: read
       pull-requests: write

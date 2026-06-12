@@ -20,11 +20,18 @@ on:
 env:
   CARGO_NET_GIT_FETCH_WITH_CLI: true
 
+
+# Prevent concurrent runs of the same workflow
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   pull-requests: write
 
 jobs:
   supa-mdx-lint:
+    timeout-minutes: 15
     name: supa-mdx-lint
     runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:

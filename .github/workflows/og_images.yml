@@ -8,11 +8,18 @@ on:
       - 'supabase/functions/og-images/**'
   workflow_dispatch:
 
+
+# Prevent concurrent runs of the same workflow
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
 jobs:
   deploy:
+    timeout-minutes: 15
     runs-on: ubuntu-latest
 
     env:
