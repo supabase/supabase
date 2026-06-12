@@ -269,7 +269,7 @@ export const AddNewSecretForm = () => {
                               data-lpignore="true"
                               data-form-type="other"
                               data-bwignore
-                              className="font-mono max-h-[320px]"
+                              className="font-mono max-h-[320px] pr-10"
                               style={
                                 {
                                   WebkitTextSecurity: isSecretVisible(fieldItem.id)
