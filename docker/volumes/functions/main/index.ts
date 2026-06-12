@@ -43,7 +43,7 @@ function getAuthToken(req: Request) {
     ? sbApiKeyCompatibilityToken
     : bearerToken;
 
-  if (token) {
+  if (!token) {
     throw new Error(`Auth header is not 'Bearer {token}'`)
   }
 
