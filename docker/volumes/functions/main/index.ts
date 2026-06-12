@@ -19,24 +19,34 @@ if (SUPABASE_URL) {
 }
 
 /**
- * Extract JWT token from Authorization header
- * 
+ * Extract JWT token from 'Authorization' header or fallback to 'sb-api-key' compatibility
+ *
  * Parses the Authorization header to extract the Bearer token.
  * Expects format: "Bearer <token>"
- * 
+ *
  * @param req - The HTTP request object
  * @returns The JWT token string
  * @throws Error if Authorization header is missing or malformed
  */
 function getAuthToken(req: Request) {
-  const authHeader = req.headers.get('authorization')
-  if (!authHeader) {
+  const bearerToken = req.headers.get("authorization")?.slice("Bearer ".length);
+  const sbApiKeyCompatibilityToken = req.headers.get("sb-api-key")?.replace("Bearer", "")?.trim();
+
+  if (!bearerToken && !sbApiKeyCompatibilityToken) {
     throw new Error('Missing authorization header')
   }
-  const [bearer, token] = authHeader.split(' ')
-  if (bearer !== 'Bearer') {
+
+  // NOTE:(kallebysantos) Compatibility mode is triggered when all conditions match:
+  // - API proxy mints a temp token
+  // - Original bearer is not present or is ApiKey
+  const token = !bearerToken || bearerToken.startsWith("sb_")
+    ? sbApiKeyCompatibilityToken
+    : bearerToken;
+
+  if (token) {
     throw new Error(`Auth header is not 'Bearer {token}'`)
   }
+
   return token
 }
 
