@@ -65,13 +65,10 @@ const ObservabilityMenu = () => {
     projectRef: ref,
     type: 'report',
   })
-  const { mutate: deleteReport } = useContentDeleteMutation({
-    onSuccess: () => {
-      toast.success('Report deleted')
-    },
-    onError: (error) => {
-      toast.error(`Failed to delete report: ${error.message}`)
-    },
+  const { mutateAsync: deleteReport } = useContentDeleteMutation({
+    // Toasts are driven by toast.promise in onConfirmDeleteReport. This no-op keeps the hook
+    // from showing its own default error toast, while its optimistic rollback still runs.
+    onError: () => {},
   })
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
@@ -87,7 +84,11 @@ const ObservabilityMenu = () => {
     if (selectedReportToDelete?.id === undefined) return console.error('Report ID is required')
     setDeleteModalOpen(false)
     router.push(`/project/${ref}/observability`)
-    deleteReport({ projectRef: ref, ids: [selectedReportToDelete.id] })
+    toast.promise(deleteReport({ projectRef: ref, ids: [selectedReportToDelete.id] }), {
+      loading: 'Deleting report...',
+      success: 'Report deleted',
+      error: (err) => `Failed to delete report: ${err?.message ?? 'Unknown error'}`,
+    })
   }
 
   function isReportContent(c: Content): c is ContentBase & {
