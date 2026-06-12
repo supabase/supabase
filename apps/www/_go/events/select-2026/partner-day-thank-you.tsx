@@ -13,7 +13,7 @@ const page: GoPageInput = {
   hero: {
     title: "You're confirmed",
     description:
-      "We'll see you at Supabase Partner Day in San Francisco on October 1, 2026. We look forward to seeing you.",
+      "We'll see you at Supabase Partner Day in San Francisco on October 1, 2026. We're looking forward to it.",
   },
   sections: [
     {
