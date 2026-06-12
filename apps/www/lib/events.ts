@@ -79,6 +79,12 @@ function getSelect(page: any, name: string): string {
   return prop.select?.name ?? ''
 }
 
+function getFormulaString(page: any, name: string): string {
+  const prop = page.properties[name]
+  if (!prop || prop.type !== 'formula' || prop.formula?.type !== 'string') return ''
+  return prop.formula.string ?? ''
+}
+
 // ─── Main fetch ─────────────────────────────────────────────────────────────
 
 /**
@@ -104,7 +110,7 @@ export const getNotionEvents = async (): Promise<SupabaseEvent[]> => {
 
     return pages
       .map((page): SupabaseEvent | null => {
-        const title = getTitle(page)
+        const title = getFormulaString(page, 'Publish to Web Title') || getTitle(page)
         const startDate = getDate(page, 'Start Date')
         if (!title || !startDate) return null
 
