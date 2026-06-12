@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import type { ChangeEvent, ComponentProps, ReactNode } from 'react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -63,6 +63,8 @@ export const ResetDbPasswordDialog = ({
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState<string>('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState<string>('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
+  const latestPasswordStrengthValueRef = useRef('')
+  const passwordStrengthResultValueRef = useRef('')
 
   const { mutate: resetDatabasePassword, isPending: isUpdatingPassword } =
     useDatabasePasswordResetMutation({
@@ -79,11 +81,18 @@ export const ResetDbPasswordDialog = ({
       setPasswordStrengthMessage('')
       setPasswordStrengthWarning('')
       setPasswordStrengthScore(0)
+      latestPasswordStrengthValueRef.current = ''
+      passwordStrengthResultValueRef.current = ''
     }
   }, [showResetDbPass])
 
   async function checkPasswordStrength(value: string) {
+    latestPasswordStrengthValueRef.current = value
     const { message, warning, strength } = await passwordStrength(value)
+
+    if (latestPasswordStrengthValueRef.current !== value) return
+
+    passwordStrengthResultValueRef.current = value
     setPasswordStrengthScore(strength)
     setPasswordStrengthWarning(warning)
     setPasswordStrengthMessage(message)
@@ -93,15 +102,21 @@ export const ResetDbPasswordDialog = ({
     const value = e.target.value
     setPassword(value)
     if (value == '') {
+      latestPasswordStrengthValueRef.current = value
+      passwordStrengthResultValueRef.current = value
       setPasswordStrengthScore(-1)
       setPasswordStrengthMessage('')
+      setPasswordStrengthWarning('')
     } else checkPasswordStrength(value)
   }
 
   const confirmResetDbPass = async () => {
     if (!ref) return console.error('Project ref is required')
 
-    if (passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
+    if (
+      passwordStrengthResultValueRef.current === password &&
+      passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH
+    ) {
       resetDatabasePassword({ ref, password })
     }
   }
