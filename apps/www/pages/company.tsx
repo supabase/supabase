@@ -29,7 +29,7 @@ const Index = ({}: Props) => {
   return (
     <>
       <NextSeo
-              canonical="https://supabase.com/company"
+        canonical="https://supabase.com/company"
         title={meta_title}
         description={meta_description}
         openGraph={{
