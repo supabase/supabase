@@ -56,6 +56,7 @@ function RealtimePage() {
   return (
     <>
       <NextSeo
+              canonical="https://supabase.com/realtime"
         title={meta_title}
         description={meta_description}
         openGraph={{
