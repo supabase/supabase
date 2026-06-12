@@ -9,7 +9,7 @@ const paul = authors.find((a) => a.author_id === 'paul_copplestone')
 const ant = authors.find((a) => a.author_id === 'ant_wilson')
 const deepthi = authors.find((a) => a.author_id === 'deepthi_sigireddi')
 
-const hosts = [sugu, paul, ant, deepthi]
+const hosts = [paul, ant, sugu, deepthi]
 
 const page: GoPageInput = {
   template: 'lead-gen',
