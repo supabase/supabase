@@ -15,7 +15,7 @@ interface WebhookPayload {
 
 const model = new Supabase.ai.Session('gte-small')
 
-// Deploy with verify_jwt = false.
+// Called with a secret key on the `apikey` header. Deploy with verify_jwt = false.
 export default {
   fetch: withSupabase({ auth: 'secret' }, async (req, ctx) => {
     const payload: WebhookPayload = await req.json()
@@ -23,7 +23,7 @@ export default {
 
     // Check if content has changed.
     if (content === payload?.old_record?.content) {
-      return new Response('ok - no change')
+      return Response.json({ status: 'ok - no change' })
     }
 
     // Generate embedding
@@ -41,6 +41,6 @@ export default {
       .eq('id', id)
     if (error) console.warn(error.message)
 
-    return new Response('ok - updated')
+    return Response.json({ status: 'ok - updated' })
   }),
 }

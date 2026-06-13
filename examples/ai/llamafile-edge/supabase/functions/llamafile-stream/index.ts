@@ -5,9 +5,9 @@ import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 
 const session = new Supabase.ai.Session('LLaMA_CPP')
 
-// Called with a publishable key on the `apikey` header. Deploy with verify_jwt = false.
+// Public endpoint, so deploy with verify_jwt = false.
 export default {
-  fetch: withSupabase({ auth: 'publishable' }, async (req) => {
+  fetch: withSupabase({ auth: 'none' }, async (req) => {
     const params = new URL(req.url).searchParams
     const prompt = params.get('prompt') ?? ''
 
@@ -68,6 +68,5 @@ supabase functions serve --env-file supabase/functions/.env
 
 curl --get "http://localhost:54321/functions/v1/llamafile-stream" \
 --data-urlencode "prompt=Who are you?" \
--H "apikey: <SUPABASE_PUBLISHABLE_KEY>"
 
  */
