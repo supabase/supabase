@@ -140,3 +140,16 @@ withTestDatabase('retrieve, create, update, delete policies', async ({ executeQu
   const result = await executeQuery(verifyRemoveSql)
   expect(result).toHaveLength(0)
 })
+
+test('retrieve by name/schema/table quotes the reserved "table" keyword', () => {
+  const { sql } = pgMeta.policies.retrieve({
+    name: 'my_policy',
+    schema: 'public',
+    table: 'memes',
+  })
+
+  // `table` is a reserved keyword, so it must be quoted to be a valid column
+  // reference. An unquoted `AND table = '...'` is a syntax error in Postgres.
+  expect(sql).toContain(`"table" = 'memes'`)
+  expect(sql).not.toContain(`AND table = 'memes'`)
+})
