@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  computeChangePercent,
   computeSuccessAndNonSuccessRates,
+  formatDelta,
   sumErrors,
   sumTotal,
   sumWarnings,
@@ -42,5 +44,41 @@ describe('ProjectUsage.metrics', () => {
     // success = 160 - (15 + 5) = 140 → 87.5%
     expect(successRate).toBeCloseTo(87.5)
     expect(nonSuccessRate).toBeCloseTo(12.5)
+  })
+
+  describe('computeChangePercent', () => {
+    it('returns 0 when both current and previous are 0', () => {
+      expect(computeChangePercent(0, 0)).toBe(0)
+    })
+
+    it('returns 100 when previous is 0 and current is positive', () => {
+      expect(computeChangePercent(50, 0)).toBe(100)
+    })
+
+    it('returns positive percent for growth', () => {
+      expect(computeChangePercent(150, 100)).toBe(50)
+    })
+
+    it('returns negative percent for decline', () => {
+      expect(computeChangePercent(80, 100)).toBe(-20)
+    })
+
+    it('returns 0 when current equals previous', () => {
+      expect(computeChangePercent(100, 100)).toBe(0)
+    })
+  })
+
+  describe('formatDelta', () => {
+    it('prefixes positive values with +', () => {
+      expect(formatDelta(12.345)).toBe('+12.3%')
+    })
+
+    it('keeps the minus sign for negative values', () => {
+      expect(formatDelta(-4.2)).toBe('-4.2%')
+    })
+
+    it('treats 0 as positive (with + sign)', () => {
+      expect(formatDelta(0)).toBe('+0.0%')
+    })
   })
 })
