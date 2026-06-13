@@ -15,6 +15,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface SortDropdownProps {
   specificFilterColumn: string
+  filterKeywords: string
   sortColumn: string
   sortOrder: string
   sortByValue: string
@@ -27,6 +28,7 @@ interface SortDropdownProps {
 /** [Joshen] To refactor to use the SortDropdown component in components/ui */
 export const SortDropdown = ({
   specificFilterColumn,
+  filterKeywords,
   sortColumn,
   sortOrder,
   sortByValue,
@@ -35,7 +37,7 @@ export const SortDropdown = ({
   setSortByValue,
   improvedSearchEnabled = false,
 }: SortDropdownProps) => {
-  if (specificFilterColumn !== 'freeform' && !improvedSearchEnabled) {
+  if (specificFilterColumn !== 'freeform' && !improvedSearchEnabled && !!filterKeywords) {
     return (
       <ButtonTooltip
         disabled
