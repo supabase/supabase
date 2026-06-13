@@ -59,6 +59,20 @@ http_status() {
     curl -s -o /dev/null -w "%{http_code}" "$@" "$url"
 }
 
+# Detect which gateway is running so gateway-specific assertions can be gated.
+detect_gateway() {
+    command -v docker >/dev/null 2>&1 || { echo unknown; return; }
+    running=$(docker ps --format '{{.Names}}' 2>/dev/null)
+    if printf '%s\n' "$running" | grep -q '^supabase-envoy$'; then
+        echo envoy
+    elif printf '%s\n' "$running" | grep -q '^supabase-kong$'; then
+        echo kong
+    else
+        echo unknown
+    fi
+}
+GATEWAY=$(detect_gateway)
+
 echo ""
 echo "=== Testing against $BASE_URL ==="
 echo ""
@@ -161,6 +175,43 @@ check "/api/tenants blocked -> 403" "403" \
     "$(http_status "$BASE_URL/realtime/v1/api/tenants" -H "apikey: $ANON_KEY")"
 check "/api/openapi blocked -> 403" "403" \
     "$(http_status "$BASE_URL/realtime/v1/api/openapi" -H "apikey: $ANON_KEY")"
+
+echo ""
+echo "--- Edge Functions (/functions/v1/) ---"
+
+# No auth at all must pass (no key-auth gate; hello is verify_jwt:false).
+check "No auth -> hello reachable" "200" \
+    "$(http_status "$BASE_URL/functions/v1/hello" -X POST -d '{}')"
+
+# Legacy keys remain valid (non-sb_ keys are passed through, not validated).
+check "Legacy ANON_KEY -> hello reachable" "200" \
+    "$(http_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: $ANON_KEY" -d '{}')"
+
+# A non-sb_ value (typo, legacy/third-party JWT) is NOT rejected at the gateway.
+check "Non-sb_ invalid apikey -> passes (canonical)" "200" \
+    "$(http_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: invalid-key" -d '{}')"
+
+if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
+    check "PUBLISHABLE_KEY -> hello reachable" "200" \
+        "$(http_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: $SUPABASE_PUBLISHABLE_KEY" -d '{}')"
+    check "SECRET_KEY -> hello reachable" "200" \
+        "$(http_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: $SUPABASE_SECRET_KEY" -d '{}')"
+    # sb_ in Authorization only (no apikey header): the bearer sb_ is translated
+    # and the request passes through.
+    check "sb_ in Authorization only -> not 401" "true" \
+        "$([ "$(http_status "$BASE_URL/functions/v1/hello" -X POST -H "Authorization: Bearer $SUPABASE_PUBLISHABLE_KEY" -d '{}')" != "401" ] && echo true || echo false)"
+
+    # Invalid sb_-prefixed key and apikey/bearer sb_ conflict are rejected with
+    # 401 - but only by Envoy. Kong is permissive on Functions and passes through.
+    if [ "$GATEWAY" = "envoy" ]; then
+        check "Invalid sb_ apikey -> 401 (Envoy enforces)" "401" \
+            "$(http_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: sb_publishable_0000000000000000000000_00000000" -d '{}')"
+        check "Conflicting sb_ keys -> 401 (Envoy enforces)" "401" \
+            "$(http_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: $SUPABASE_SECRET_KEY" -H "Authorization: Bearer $SUPABASE_PUBLISHABLE_KEY" -d '{}')"
+    else
+        echo "  SKIP: sb_-invalid / conflict rejection not enforced on Kong (gateway=$GATEWAY)"
+    fi
+fi
 
 echo ""
 echo "--- supabase-js style requests (apikey + Authorization) ---"
@@ -300,6 +351,13 @@ if [ -n "$access_token" ]; then
             "$(http_status "$BASE_URL/auth/v1/user" \
                 -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
                 -H "Authorization: Bearer $access_token")"
+        # Functions leaves Authorization (the user JWT) untouched and adds the
+        # translated sb-api-key alongside it; the request must reach the worker.
+        check "Opaque apikey + user JWT -> Functions reachable" "200" \
+            "$(http_status "$BASE_URL/functions/v1/hello" -X POST \
+                -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
+                -H "Authorization: Bearer $access_token" \
+                -d '{}')"
     fi
 else
     check "Sign in test user" "true" "false"
