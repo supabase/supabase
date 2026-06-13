@@ -99,8 +99,6 @@ hideToc: true
       export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
         auth: {
           storage: localStorage,
-          autoRefreshToken: true,
-          persistSession: true,
           detectSessionInUrl: false,
         },
       })
