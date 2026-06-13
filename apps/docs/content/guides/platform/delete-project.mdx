@@ -53,6 +53,37 @@ curl -X DELETE https://api.supabase.com/v1/projects/<project-ref> \
 
 For more information, see the [Management API documentation](/docs/reference/api/v1-delete-a-project).
 
+## After deletion
+
+Once a project is deleted:
+
+- Your project URL will no longer be accessible
+- DNS records will be cleaned up (may take up to 24 hours to fully propagate)
+- Billing for this project will stop immediately
+- You cannot recover or restore the project 
+
+<Admonition type="note">
+
+Deleting projects stops new usage from accumulating, but does not remove usage that already occurred during the current billing cycle. For quota-based limits, that usage still counts until the billing period resets.
+See our [Fair Use Policy](/docs/guides/platform/billing-faq#fair-use-policy) for further details.
+</Admonition>
+
+## Alternative: Pause your project
+
+If you're unsure about deletion, consider pausing your project instead:
+
+<Admonition type="note">
+
+Note: Only Free Projects can be paused at this time. 
+
+</Admonition>
+
+- **Paused projects** stop incurring compute charges
+- **Data is preserved** and can be accessed when you resume
+- **Quick recovery** — Resume the project at any time without data loss
+
+To pause a project, navigate to [**Settings** > **General** > **Project availability**](/dashboard/project/qiuwhyoiycwkuobqirkr/settings/general) and click **Pause Project**.
+
 ## Protective measures to consider
 
 To safeguard against accidental deletion, consider the following:
@@ -105,37 +136,6 @@ See [Access Controls](/docs/guides/platform/access-control)
 - Enable audit logging to track who has access to your project
 - Review and revoke unnecessary API keys before deletion
 - Check for any scheduled jobs or integrations that depend on the project
-
-## After deletion
-
-Once a project is deleted:
-
-- Your project URL will no longer be accessible
-- DNS records will be cleaned up (may take up to 24 hours to fully propagate)
-- Billing for this project will stop immediately
-- You cannot recover or restore the project 
-
-<Admonition type="note">
-
-Deleted projects do not free up your account's project quota immediately. Contact Supabase support if you need your quota limit adjusted.
-
-</Admonition>
-
-## Alternative: Pause your project
-
-If you're unsure about deletion, consider pausing your project instead:
-
-- **Paused projects** stop incurring compute charges
-- **Data is preserved** and can be accessed when you resume
-- **Quick recovery** — Resume the project at any time without data loss
-
-To pause a project, navigate to [**Settings** > **General** > **Project availability**](/dashboard/project/qiuwhyoiycwkuobqirkr/settings/general) and click **Pause Project**.
-
-<Admonition type="note">
-
-Note: Only Free Projects can be paused at this time. 
-
-</Admonition>
 
 ## Need help?
 
