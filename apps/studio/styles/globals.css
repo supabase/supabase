@@ -8,6 +8,9 @@
 @source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
 
 @theme {
+  --font-sans: var(--font-inter, Inter, Helvetica Neue, Helvetica, Arial, sans-serif);
+  --font-mono: var(--font-source-code-pro, Source Code Pro, Office Code Pro, Menlo, monospace);
+
   --text-grid: 13px;
 
   --color-typography-body-light: hsl(var(--foreground-light));
