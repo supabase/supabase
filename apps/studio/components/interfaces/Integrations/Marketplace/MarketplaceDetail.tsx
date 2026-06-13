@@ -1,19 +1,23 @@
-import { ArrowUpRight, BookOpen } from 'lucide-react'
+import { ArrowUpRight, BookOpen, Gauge, Settings } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { Button, cn } from 'ui'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
 
+import { MarketplaceDetailBreadrumbs } from './MarketplaceDetailBreadcrumbs'
 import { MarketplaceDetailHero } from './MarketplaceDetailHero'
-import { MarketplaceDetailTopBar } from './MarketplaceDetailTopBar'
 import { OverviewTab } from './OverviewTab'
+import { IntegrationDetailTabShortcuts } from '@/components/interfaces/Integrations/Integration/IntegrationDetailTabShortcuts'
 import { InstallIntegrationSheet } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallIntegrationSheet'
 import { InstallOAuthIntegrationButton } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallOAuthIntegrationButton'
 import { useIntegrationDetail } from '@/components/interfaces/Integrations/Landing/useIntegrationDetail'
+import { AddWrapperButton } from '@/components/interfaces/Integrations/Wrappers/AddWrapperButton'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 
 export const centeredContentClass = 'mx-auto w-full max-w-6xl px-6 xl:px-10'
 
 export const MarketplaceDetail = () => {
+  const router = useRouter()
   const {
     ref,
     activeRoute,
@@ -25,21 +29,25 @@ export const MarketplaceDetail = () => {
     pageTitle,
     pageSubTitle,
     integration,
+    integrationStatus,
     isInstalled,
+    installActionType,
+    wrappersTabHref,
     isAvailableLoading,
     isInstalledLoading,
+    isIntegrationStatusLoading,
     Component,
   } = useIntegrationDetail()
 
   if (!isReady) return null
   if (isWrapperBlocked) return <UnknownInterface urlBack={`/project/${ref}/integrations`} />
 
-  if (isAvailableLoading || isInstalledLoading) {
+  if (isAvailableLoading || isInstalledLoading || isIntegrationStatusLoading) {
     return (
       <>
-        <MarketplaceDetailTopBar title="" />
-        <div className={cn(centeredContentClass, 'border-b bg-surface-75 pt-10')}>
-          <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 pb-6">
+        <MarketplaceDetailBreadrumbs isLoading />
+        <div className={cn(centeredContentClass, 'max-w-none border-b bg-surface-75 pt-10')}>
+          <div className="mx-auto flex w-full flex-col gap-3 pb-6">
             <ShimmeringLoader className="h-9 w-64" />
             <ShimmeringLoader className="h-4 w-96" />
           </div>
@@ -54,7 +62,7 @@ export const MarketplaceDetail = () => {
   if (!integration) {
     return (
       <>
-        <MarketplaceDetailTopBar title="Integration not found" />
+        <MarketplaceDetailBreadrumbs title="Integration not found" />
         <div className={cn(centeredContentClass, 'py-8')}>
           <Admonition type="warning" title="This integration is not currently available">
             Please try again later or contact support if the problem persists.
@@ -65,17 +73,27 @@ export const MarketplaceDetail = () => {
   }
 
   const renderInstallAction = () => {
-    if (integration.type === 'oauth') {
-      return <InstallOAuthIntegrationButton integration={integration} />
+    switch (installActionType) {
+      case 'oauth':
+        return <InstallOAuthIntegrationButton integration={integration} />
+      case 'add-wrapper':
+        return (
+          <AddWrapperButton
+            type="primary"
+            onClick={() => {
+              if (wrappersTabHref) router.push(`${wrappersTabHref}?new=true`)
+            }}
+          />
+        )
+      case 'installed':
+        return (
+          <Button type="outline" disabled>
+            Installed
+          </Button>
+        )
+      default:
+        return <InstallIntegrationSheet integration={integration} />
     }
-    if (isInstalled) {
-      return (
-        <Button type="outline" disabled>
-          Installed
-        </Button>
-      )
-    }
-    return <InstallIntegrationSheet integration={integration} />
   }
 
   // For overview route, get the integration-specific overview component if available
@@ -84,11 +102,42 @@ export const MarketplaceDetail = () => {
 
   return (
     <>
-      <MarketplaceDetailTopBar
+      <IntegrationDetailTabShortcuts tabs={tabs} />
+      <MarketplaceDetailBreadrumbs
         title={integration.name}
         isInstalled={isInstalled}
         actions={
           <>
+            {isInstalled && integrationStatus?.partner_links?.dashboard && (
+              <Button
+                type="text"
+                size="tiny"
+                icon={<Gauge size={13} />}
+                iconRight={<ArrowUpRight size={13} />}
+                asChild
+              >
+                <a
+                  href={integrationStatus.partner_links.dashboard}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Dashboard
+                </a>
+              </Button>
+            )}
+            {isInstalled && integrationStatus?.partner_links?.manage && (
+              <Button
+                type="text"
+                size="tiny"
+                icon={<Settings size={13} />}
+                iconRight={<ArrowUpRight size={13} />}
+                asChild
+              >
+                <a href={integrationStatus.partner_links.manage} target="_blank" rel="noreferrer">
+                  Manage
+                </a>
+              </Button>
+            )}
             {integration.docsUrl && (
               <Button
                 type="text"

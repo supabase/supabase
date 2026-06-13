@@ -252,7 +252,7 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
                         label=""
                         showIndicator={false}
                       >
-                        <div className="flex items-center space-x-5">
+                        <div className="flex items-center gap-5">
                           <Image
                             alt={webhook.label}
                             src={webhook.icon}

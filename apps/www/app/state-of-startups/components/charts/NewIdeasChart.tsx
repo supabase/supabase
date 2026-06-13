@@ -1,4 +1,4 @@
-import { SurveyChart, buildWhereClause } from '../SurveyChart'
+import { buildWhereClause, SurveyChart } from '../SurveyChart'
 
 function generateNewIdeasSQL(activeFilters: Record<string, string>) {
   const whereClause = buildWhereClause(activeFilters)
@@ -23,7 +23,7 @@ function generateNewIdeasSQL(activeFilters: Record<string, string>) {
       END AS avenue_clean
     FROM (
       SELECT id, unnest(new_ideas) AS avenue
-      FROM responses_2025
+      FROM responses_2026
       ${whereClause}
     ) sub
   )

@@ -184,7 +184,10 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
     {
       accessorKey: 'method',
       header: 'Method',
-      filterFn: 'arrIncludesSome',
+      // Filtering is server-side via the `filter` URL param, like every other
+      // column in this table. The built-in `arrIncludesSome` would receive the
+      // wrapped { operator, values } shape and reject it.
+      filterFn: (_row, _columnId, _filterValue) => true,
       cell: ({ row }) => {
         const value = row.getValue<ColumnSchema['method']>('method')
         return <span className="text-foreground-lighter">{value}</span>
@@ -221,6 +224,11 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
     {
       accessorKey: 'event_message',
       header: 'Event message',
+      // No client-side filterFn — event_message uses server-side LIKE/ILIKE via
+      // the `filter` URL param (see translateFilter in UnifiedLogs.queries.ts).
+      // We still need a no-op so TanStack's default `includesString` doesn't run
+      // against the wrapped { operator, values } shape we write.
+      filterFn: () => true,
       cell: ({ row }) => {
         const value = row.getValue<ColumnSchema['event_message']>('event_message')
         const logType = row.original.log_type
