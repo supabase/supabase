@@ -1,5 +1,5 @@
 import { Auth, Database, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
-import { Blocks, Lightbulb, List, Settings, Telescope } from 'lucide-react'
+import { Blocks, Lightbulb, Logs, Settings, Telescope } from 'lucide-react'
 
 import { ICON_SIZE, ICON_STROKE_WIDTH } from '@/components/interfaces/Sidebar'
 import type { Route } from '@/components/ui/ui.types'
@@ -175,7 +175,7 @@ export const generateOtherRoutes = (
             key: 'observability',
             label: 'Observability',
             disabled: !isProjectActive,
-            icon: <Telescope size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            icon: <Telescope size={ICON_SIZE} strokeWidth={1.45} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/observability`),
             shortcutId: SHORTCUT_IDS.NAV_OBSERVABILITY,
           },
@@ -187,7 +187,13 @@ export const generateOtherRoutes = (
             key: 'logs',
             label: 'Logs',
             disabled: false,
-            icon: <List size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            icon: (
+              <Logs
+                size={ICON_SIZE}
+                strokeWidth={ICON_STROKE_WIDTH}
+                className="dark:text-foreground/70"
+              />
+            ),
             link:
               ref &&
               (unifiedLogsEnabled ? `/project/${ref}/logs` : `/project/${ref}/logs/explorer`),
