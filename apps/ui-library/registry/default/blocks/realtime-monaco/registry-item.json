@@ -5,7 +5,7 @@
   "title": "Realtime Monaco",
   "description": "Real-time Monaco editor for collaborative applications.",
   "registryDependencies": [],
-  "dependencies": ["@monaco-editor/react@latest", "y-monaco@latest", "yjs@latest"],
+  "dependencies": ["@monaco-editor/react@latest", "@supabase-labs/y-supabase@latest", "y-monaco@latest", "yjs@latest"],
   "files": [
     {
       "path": "registry/default/blocks/realtime-monaco/hooks/use-connect-on-mount.ts",
