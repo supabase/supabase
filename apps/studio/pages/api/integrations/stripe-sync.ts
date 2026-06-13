@@ -15,21 +15,139 @@ const UninstallBodySchema = z.object({
   startTime: z.number().positive().optional(),
 })
 
+export const config = {
+  maxDuration: 300, // 5 minutes, since the installation process can take a while even if happening in background
+}
+
 async function isStripeSyncEnabled() {
   // The ConfigClient doesn't seem to work properly so we'll just gate access from the frontend
   // for now
   return true
 }
 
-function getBearerToken(req: NextApiRequest) {
+// Extract the bearer token from the request. Returns an empty string
+// if bearer token can't be extracted
+function getBearerToken(req: NextApiRequest): string {
   const authHeader = req.headers.authorization
-  if (!authHeader || Array.isArray(authHeader)) return null
+  if (!authHeader || Array.isArray(authHeader)) return ''
   const match = authHeader.match(/^Bearer\s+(.+)$/i)
-  return match?.[1]?.trim() ?? null
+  return match?.[1]?.trim() ?? ''
 }
 
-export const config = {
-  maxDuration: 300, // 5 minutes, since the installation process can take a while even if happening in background
+// Returns true if the projectRef passed is a non-branch project, false otherwise
+async function canAccessProject(projectRef: string, accessToken: string): Promise<boolean> {
+  const url = `${process.env.NEXT_PUBLIC_API_DOMAIN}/v1/projects/${projectRef}`
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+  })
+  return response.ok
+}
+
+// Returns all projects refs
+async function getAllProjects(accessToken: string): Promise<string[]> {
+  const url = `${process.env.NEXT_PUBLIC_API_DOMAIN}/v1/projects`
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+  })
+  if (response.ok) {
+    const projects = (await response.json()) as Array<{ ref?: string }>
+    return Array.isArray(projects)
+      ? projects
+          .map((project) => project.ref)
+          .filter((projectRef): projectRef is string => Boolean(projectRef))
+      : []
+  } else {
+    return []
+  }
+}
+
+// Returns all branch project refs of a give projectRef
+async function getAllBranches(projectRef: string, accessToken: string): Promise<string[]> {
+  const url = `${process.env.NEXT_PUBLIC_API_DOMAIN}/v1/projects/${projectRef}/branches`
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+  })
+  if (response.ok) {
+    const branches = (await response.json()) as Array<{ project_ref?: string }>
+    return Array.isArray(branches)
+      ? branches
+          .map((branch) => branch.project_ref)
+          .filter((projectRef): projectRef is string => Boolean(projectRef))
+      : []
+  } else {
+    return []
+  }
+}
+
+// Authenticates with Supabase management API. Returns null if the accessToken has
+// access to the projectRef project, other returns an error string
+async function authenticateWithSupabase(
+  projectRef: string,
+  accessToken: string | null
+): Promise<string | null> {
+  if (!accessToken) {
+    return 'Unauthorized: Invalid credentials'
+  }
+
+  // First we check if the token can return the project directly
+  // If it does then the token is valid for this project and
+  // we authenticate the request
+  const tokenCanAccesProject = await canAccessProject(projectRef, accessToken)
+  if (tokenCanAccesProject) {
+    return null
+  }
+
+  // If the token does not return a project then projectRef could be a branch
+  // project, in which case we enumerate branch projects of all projects
+  const allProjectRefs = await getAllProjects(accessToken)
+  for (const ref of allProjectRefs) {
+    const branches = await getAllBranches(ref, accessToken)
+    if (branches.includes(projectRef)) {
+      return null
+    }
+  }
+
+  // It's not even a branch project
+  return 'Unauthorized: Invalid credentials'
+}
+
+// Authenticates withe stripe using the stripeApiKey. Return null if the authentication
+// succeeded, otherwise returns an error string
+async function authenticateWithStripe(stripeApiKey: string): Promise<string | null> {
+  try {
+    const stripeResponse = await fetch('https://api.stripe.com/v1/account', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${stripeApiKey}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    })
+
+    if (!stripeResponse.ok) {
+      const errorData = await stripeResponse.json()
+      const errorMessage =
+        errorData.error?.message || `Invalid Stripe API key (HTTP ${stripeResponse.status})`
+      return errorMessage
+    }
+  } catch (error) {
+    const normalizedErrorMessage = error instanceof Error ? error.message : String(error)
+    const errorMessage = `Failed to validate Stripe API key: ${normalizedErrorMessage}`
+    return errorMessage
+  }
+
+  return null
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -52,13 +170,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 
 async function handleDeleteStripeSyncInstall(req: NextApiRequest, res: NextApiResponse) {
-  const supabaseToken = getBearerToken(req)
-  if (!supabaseToken) {
-    return res
-      .status(401)
-      .json({ data: null, error: { message: 'Unauthorized: Invalid Authorization header' } })
-  }
-
   const parsed = UninstallBodySchema.safeParse(req.body)
   if (!parsed.success) {
     return res
@@ -66,6 +177,12 @@ async function handleDeleteStripeSyncInstall(req: NextApiRequest, res: NextApiRe
       .json({ data: null, error: { message: 'Bad Request: Invalid request body' } })
   }
   const { projectRef, startTime } = parsed.data
+
+  const supabaseToken = getBearerToken(req)
+  const supabaseAuthError = await authenticateWithSupabase(projectRef, supabaseToken)
+  if (supabaseAuthError) {
+    return res.status(401).json({ data: null, error: { message: supabaseAuthError } })
+  }
 
   waitUntil(
     uninstall({
@@ -86,13 +203,6 @@ async function handleDeleteStripeSyncInstall(req: NextApiRequest, res: NextApiRe
 }
 
 async function handleSetupStripeSyncInstall(req: NextApiRequest, res: NextApiResponse) {
-  const supabaseToken = getBearerToken(req)
-  if (!supabaseToken) {
-    return res
-      .status(401)
-      .json({ data: null, error: { message: 'Unauthorized: Invalid Authorization header' } })
-  }
-
   const parsed = InstallBodySchema.safeParse(req.body)
   if (!parsed.success) {
     return res
@@ -101,33 +211,20 @@ async function handleSetupStripeSyncInstall(req: NextApiRequest, res: NextApiRes
   }
   const { projectRef, stripeSecretKey, startTime } = parsed.data
 
-  // Validate the Stripe API key before proceeding with installation
-  try {
-    const stripeResponse = await fetch('https://api.stripe.com/v1/account', {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${stripeSecretKey}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    })
+  const supabaseToken = getBearerToken(req)
+  const supabaseAuthError = await authenticateWithSupabase(projectRef, supabaseToken)
+  if (supabaseAuthError) {
+    return res.status(401).json({ data: null, error: { message: supabaseAuthError } })
+  }
 
-    if (!stripeResponse.ok) {
-      const errorData = await stripeResponse.json()
-      const errorMessage =
-        errorData.error?.message || `Invalid Stripe API key (HTTP ${stripeResponse.status})`
-      return res.status(400).json({
-        data: null,
-        error: { message: errorMessage },
-      })
-    }
-  } catch (error) {
-    const normalizedErrorMessage = error instanceof Error ? error.message : String(error)
-
-    return res.status(400).json({
+  const stripeAuthError = await authenticateWithStripe(stripeSecretKey)
+  if (stripeAuthError) {
+    return res.status(401).json({
       data: null,
-      error: { message: `Failed to validate Stripe API key: ${normalizedErrorMessage}` },
+      error: { message: stripeAuthError },
     })
   }
+
   waitUntil(
     install({
       supabaseAccessToken: supabaseToken,
