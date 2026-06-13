@@ -93,6 +93,14 @@ describe('CustomHTMLElementsUtils', () => {
         // Original implementation didn't trim the resulting string - not sure if it really matters
         expect(result).toStrictEqual('My (Very) Awesome Heading ')
       })
+
+      it('strips out a custom anchor at the start of the string', () => {
+        const value = '[#my-custom-heading]'
+
+        const result = removeAnchor(value)
+
+        expect(result).toStrictEqual('')
+      })
     })
   })
 })
