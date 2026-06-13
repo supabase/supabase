@@ -1,5 +1,6 @@
 import { InfrastructureActivity } from '@/components/interfaces/Settings/Infrastructure/InfrastructureActivity'
 import { InfrastructureInfo } from '@/components/interfaces/Settings/Infrastructure/InfrastructureInfo'
+import { PostgrestHealth } from '@/components/interfaces/Settings/Infrastructure/PostgrestHealth/PostgrestHealth'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
 import {
@@ -23,6 +24,8 @@ const ProjectInfrastructure: NextPageWithLayout = () => {
         </ScaffoldHeader>
       </ScaffoldContainer>
       <InfrastructureInfo />
+      <ScaffoldDivider />
+      <PostgrestHealth />
       <ScaffoldDivider />
       <InfrastructureActivity />
     </>
