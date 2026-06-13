@@ -21,15 +21,47 @@ if (!response.ok) {
 
 ## Bad Implementation Errors
 
-These errors are caused by issues in your function's code or logic which requires updating your function's implementation.
+These errors are caused by issues in your function's code or logic which requires updating its implementation.
 
 ### EDGE_FUNCTION_ERROR
 
-**Cause:** Your Edge Function is throwing an unhandled error.
+**Cause:** Your Edge Function is throwing an unhandled error or resulting a 5XX code.
+
+```ts
+// ...
+
+function process() {
+  throw new Error('Some unhandled error')
+}
+
+export default {
+  fetch: withSupabase({ auth: 'none' }, async () => {
+    process()
+
+    return new Response()
+  }),
+}
+```
 
 **Solution:**
 
 - Ensure you are catching errors in your code logic with try-catch blocks.
+
+```ts
+function process() {
+  throw new Error('Some unhandled error')
+}
+
+// ...
+
+try {
+  process()
+  return new Response()
+} catch (e) {
+  console.error('Process fail:', e)
+  return new Response(null, { status: 500 })
+}
+```
 
 ### IDLE_TIMEOUT
 
