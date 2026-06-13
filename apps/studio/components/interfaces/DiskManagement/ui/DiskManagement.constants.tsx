@@ -30,11 +30,11 @@ export const DISK_PRICING = {
 export const DISK_LIMITS = {
   [DiskType.GP3]: {
     minStorage: 1,
-    maxStorage: 16384,
+    maxStorage: 61440,
     minIops: 3000,
-    maxIops: 16000,
+    maxIops: 80000,
     minThroughput: 125,
-    maxThroughput: 1000,
+    maxThroughput: 2000,
     includedIops: 3000,
     includedThroughput: 125,
   },
