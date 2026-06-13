@@ -11,7 +11,7 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { PRODUCT_NAMES } from 'shared-data/products'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { Badge, Button, Tabs } from 'ui'
+import { Badge, Button, cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import { Image } from 'ui-patterns/Image'
 import { TweetCard } from 'ui-patterns/TweetCard'
 
@@ -216,24 +216,19 @@ function Database() {
         </SectionContainer>
         <div className="grid">
           <div className={'dashboard-tabs sbui-tabs--underline-alt'}>
-            <Tabs
-              size="xlarge"
-              activeId={dashboardSwiperActiveIndex.toString()}
-              onChange={(e: string) => handleDashboardSwiperNav(Number(e))}
-              type="underlined"
-              tabBarStyle={{
-                marginBottom: 0,
-                // borderBottom: '1px solid #dedede',
-              }}
-              // block
+            <Tabs_Shadcn_
+              defaultValue="0"
+              onValueChange={(id) => handleDashboardSwiperNav(Number(id))}
             >
-              <Tabs.Panel id="0" label="Table editor">
-                <span></span>
-              </Tabs.Panel>
-              <Tabs.Panel id="1" label="SQL editor">
-                <span></span>
-              </Tabs.Panel>
-            </Tabs>
+              <TabsList_Shadcn_ className="w-full gap-4">
+                <TabsTrigger_Shadcn_ value="0" className="max-w-sm px-4 text-[16px]">
+                  Table editor
+                </TabsTrigger_Shadcn_>
+                <TabsTrigger_Shadcn_ value="1" className="max-w-sm px-4 text-[16px]">
+                  SQL editor
+                </TabsTrigger_Shadcn_>
+              </TabsList_Shadcn_>
+            </Tabs_Shadcn_>
           </div>
         </div>
 

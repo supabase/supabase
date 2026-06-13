@@ -4,7 +4,7 @@ import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Bar, BarChart, Legend, ResponsiveContainer, XAxis, YAxis } from 'recharts'
 import remarkGfm from 'remark-gfm'
-import { Tabs } from 'ui'
+import { Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 
 import * as data from '@/data/blog/PostgresFTSComparison'
 
@@ -53,18 +53,14 @@ const Chart = () => {
   const [selection, setSelection] = useState('latency')
   return (
     <div className={'my-16 flex flex-col'}>
-      <Tabs
-        defaultActiveId={'latency'}
-        type="underlined"
-        size="medium"
-        block
-        onChange={(value: string) => setSelection(value)}
-      >
-        <Tabs.Panel id="latency" label="Latency"></Tabs.Panel>
-        <Tabs.Panel id="results" label="Number of results"></Tabs.Panel>
-        <Tabs.Panel id="avg_latency" label="Average latency"></Tabs.Panel>
-        <Tabs.Panel id="raw_data" label="Raw data"></Tabs.Panel>
-      </Tabs>
+      <Tabs_Shadcn_ defaultValue={'latency'} onValueChange={(value: string) => setSelection(value)}>
+        <TabsList_Shadcn_ className="grid w-full grid-cols-4">
+          <TabsTrigger_Shadcn_ value="latency">Latency</TabsTrigger_Shadcn_>
+          <TabsTrigger_Shadcn_ value="results">Number of results</TabsTrigger_Shadcn_>
+          <TabsTrigger_Shadcn_ value="avg_latency">Average latency</TabsTrigger_Shadcn_>
+          <TabsTrigger_Shadcn_ value="raw_data">Raw data</TabsTrigger_Shadcn_>
+        </TabsList_Shadcn_>
+      </Tabs_Shadcn_>
 
       {selection !== 'raw_data' ? (
         <ResponsiveContainer height={720} minHeight={720} width="100%">

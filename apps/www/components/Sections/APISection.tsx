@@ -1,12 +1,13 @@
 // Import Swiper styles if swiper used on page
 import 'swiper/css'
 
+import { ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import { Button, Tabs } from 'ui'
+import { Swiper, SwiperClass, SwiperSlide } from 'swiper/react'
+import { Button, cn } from 'ui'
+
 import CodeBlock, { LANG } from '../CodeBlock/CodeBlock'
-import { ArrowUpRight } from 'lucide-react'
 
 export interface APIExample {
   lang: LANG
@@ -28,12 +29,12 @@ interface Props {
 
 function APISection(props: Props) {
   // store API swiper instance
-  const [apiSwiper, setApiSwiper] = useState(undefined)
+  const [apiSwiper, setApiSwiper] = useState<SwiperClass | undefined>(undefined)
   const [apiSwiperActiveIndex, setApiSwiperActiveIndex] = useState(0)
 
   function handleApiSwiperNavChange(e: number) {
     setApiSwiperActiveIndex(e)
-    // @ts-ignore
+    if (!apiSwiper) return
     apiSwiper.slideTo(e)
   }
 
@@ -52,21 +53,23 @@ function APISection(props: Props) {
         {props.footer && <div className="py-8">{props.footer}</div>}
       </div>
       <div className="sbui-tabs--alt col-span-12 lg:col-span-7 xl:col-span-6 xl:col-start-7">
-        <Tabs
-          scrollable
-          activeId={apiSwiperActiveIndex.toString()}
-          onChange={(id: string) => handleApiSwiperNavChange(Number(id))}
-        >
-          {props.content &&
-            props.content.map((content: APIExample, i) => (
-              <Tabs.Panel label={content.title} id={i.toString()} key={i}>
-                <span key={i}></span>
-              </Tabs.Panel>
-            ))}
-        </Tabs>
+        <div className="flex gap-2 mb-2 flex-nowrap overflow-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {props.content.map((extension, i) => {
+            return (
+              <Button
+                type="default"
+                className={cn('shrink-0', { 'opacity-50': i !== apiSwiperActiveIndex })}
+                onClick={() => handleApiSwiperNavChange(i)}
+                key={i}
+                disabled={!apiSwiper}
+              >
+                {extension.title}
+              </Button>
+            )
+          })}
+        </div>
         <div className="overflow-hidden">
           <Swiper
-            // @ts-ignore
             onSwiper={setApiSwiper}
             style={{ zIndex: 0, marginRight: '1px' }}
             initialSlide={apiSwiperActiveIndex}

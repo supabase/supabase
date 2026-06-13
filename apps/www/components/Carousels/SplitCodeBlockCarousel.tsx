@@ -1,7 +1,7 @@
 import { useState } from 'react'
 // Import Swiper React components
-import { Swiper, SwiperSlide } from 'swiper/react'
-import { Button, Tabs } from 'ui'
+import { Swiper, SwiperClass, SwiperSlide } from 'swiper/react'
+import { Button, cn } from 'ui'
 
 import CodeBlock from '../CodeBlock/CodeBlock'
 // Import Swiper styles
@@ -29,57 +29,37 @@ interface SplitCodeBlockCarousel {
 
 function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
   // store API swiper instance
-  const [apiSwiper, setApiSwiper] = useState(undefined)
-  const [swiperDetails, setSwiperDetails] = useState(undefined)
+  const [apiSwiper, setApiSwiper] = useState<SwiperClass | undefined>(undefined)
+  const [swiperDetails, setSwiperDetails] = useState<SwiperClass | undefined>(undefined)
 
   const [apiSwiperActiveIndex, setApiSwiperActiveIndex] = useState(0)
 
   function handleApiSwiperNavChange(e: number) {
     setApiSwiperActiveIndex(e)
-    // @ts-ignore
+    if (!apiSwiper || !swiperDetails) return
     apiSwiper.slideTo(e)
-    // @ts-ignore
     swiperDetails.slideTo(e)
   }
 
-  const details = (
-    <div>
-      <p>
-        <span className="mb-8 block text-white">Allow fetch something</span>
-      </p>
-      <p>
-        <p>
-          This would only allow the authenticated user access to a folder that is named after their
-          own account UID. This is useful for things like profile images.
-        </p>
-      </p>
-      <p>
-        <Button type="outline">View documentation</Button>
-      </p>
-    </div>
-  )
-
   return (
     <div className="sbui-tabs--alt col-span-12 space-y-2 lg:col-span-6 lg:col-start-7">
-      <Tabs
-        scrollable
-        // @ts-ignore
-        activeId={apiSwiperActiveIndex.toString()}
-        // @ts-ignore
-        onChange={(id: string) => handleApiSwiperNavChange(Number(id))}
-        type="pills"
-      >
+      <div className="flex gap-2 mb-2 flex-nowrap overflow-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {props.content.map((extension, i) => {
           return (
-            <Tabs.Panel label={extension.title} id={i.toString()} key={i}>
-              <span></span>
-            </Tabs.Panel>
+            <Button
+              type="default"
+              className={cn('shrink-0', { 'opacity-50': i !== apiSwiperActiveIndex })}
+              onClick={() => handleApiSwiperNavChange(i)}
+              key={i}
+              disabled={!apiSwiper || !swiperDetails}
+            >
+              {extension.title}
+            </Button>
           )
         })}
-      </Tabs>
+      </div>
 
       <Swiper
-        // @ts-ignore
         onSwiper={setApiSwiper}
         style={{ zIndex: 0 }}
         initialSlide={apiSwiperActiveIndex}
@@ -102,7 +82,6 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
 
       <div className="bg-surface-100 border-default overflow-hidden rounded-md border p-8">
         <Swiper
-          // @ts-ignore
           onSwiper={setSwiperDetails}
           style={{ zIndex: 0 }}
           initialSlide={0}
