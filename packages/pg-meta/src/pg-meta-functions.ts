@@ -2,14 +2,7 @@ import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
-import {
-  ident,
-  joinSqlFragments,
-  keyword,
-  literal,
-  safeSql,
-  type SafeSqlFragment,
-} from './pg-format'
+import { ident, joinSqlFragments, literal, safeSql, type SafeSqlFragment } from './pg-format'
 import { FUNCTIONS_SQL } from './sql/functions'
 
 export const pgFunctionZod = z.object({
@@ -183,53 +176,7 @@ export const pgFunctionCreateZod = z.object({
   security_definer: z.boolean().optional(),
 })
 
-// Zod validates `args`, `return_type`, and `config_params` values as runtime
-// strings; the SafeSqlFragment brand is a separate compile-time trust check.
-// `args` items are `"name type"` fragments, `return_type` is a type
-// expression (e.g. "integer", "SETOF users"), and each `config_params` value
-// is interpolated raw after `SET <param> TO` — all three drop into the
-// CREATE FUNCTION statement uninspected, so callers must promote untrusted
-// input via acceptUntrustedSql (and ensure the promotion satisfies safety
-// requirements) before calling create(). `'FROM CURRENT'` is a sentinel for
-// the `SET <param> FROM CURRENT` grammar and is detected by string equality.
-export type PGFunctionCreate = Omit<
-  z.infer<typeof pgFunctionCreateZod>,
-  'args' | 'return_type' | 'config_params'
-> & {
-  args?: Array<SafeSqlFragment>
-  return_type?: SafeSqlFragment
-  config_params?: Record<string, SafeSqlFragment | 'FROM CURRENT'>
-}
-
-// `update()` and `remove()` reuse signature pieces from a previously-fetched
-// function. Callers must pass a value whose raw-SQL fields (`argument_types`,
-// `identity_argument_types`, `return_type`, and `config_params` values)
-// have been branded at the API/database boundary.
-export type PGSavedFunction = Omit<
-  PGFunction,
-  'argument_types' | 'identity_argument_types' | 'return_type' | 'config_params'
-> & {
-  argument_types: SafeSqlFragment
-  identity_argument_types: SafeSqlFragment
-  return_type: SafeSqlFragment
-  config_params: Record<string, SafeSqlFragment> | null
-}
-
-// PostgreSQL configuration parameters can be namespaced custom GUCs
-// (e.g. `app.jwt_secret`, `pgaudit.log`). Neither `keyword` nor `ident`
-// fits: `keyword`'s regex rejects `.`, and `ident` would quote the whole
-// value as a single identifier (`"app.jwt_secret"`), which Postgres reads
-// as one literal name rather than a qualified reference. Split on `.`,
-// `ident` each segment, and rejoin with a literal `.`.
-function qualifiedIdent(value: string): SafeSqlFragment {
-  return value
-    .split('.')
-    .map(ident)
-    .reduce<SafeSqlFragment>(
-      (acc, part, i) => (i === 0 ? part : safeSql`${acc}.${part}`),
-      safeSql``
-    )
-}
+export type PGFunctionCreate = z.infer<typeof pgFunctionCreateZod>
 
 function _generateCreateFunctionSql(
   {
@@ -245,28 +192,30 @@ function _generateCreateFunctionSql(
   }: PGFunctionCreate,
   { replace = false } = {}
 ): SafeSqlFragment {
-  const argsFragment = args && args.length > 0 ? joinSqlFragments(args, ', ') : safeSql``
-  const configParamsFragment =
-    config_params && Object.keys(config_params).length > 0
-      ? joinSqlFragments(
-          Object.entries(config_params).map(([param, value]) =>
+  const params = config_params
+    ? safeSql`${joinSqlFragments(
+        Object.entries(config_params).map(([param, value]) =>
+          safeSql`SET ${ident(param)} ${
             value === 'FROM CURRENT'
-              ? safeSql`SET ${qualifiedIdent(param)} FROM CURRENT`
-              : safeSql`SET ${qualifiedIdent(param)} TO ${value}`
-          ),
-          '\n'
-        )
-      : safeSql``
+              ? safeSql`FROM CURRENT`
+              : safeSql`TO ${value === '""' ? literal("''") : literal(value)}`
+          }`
+        ),
+        '\n'
+      )}`
+    : safeSql``
 
   return safeSql`
-    CREATE ${replace ? safeSql`OR REPLACE` : safeSql``} FUNCTION ${ident(schema!)}.${ident(name!)}(${argsFragment})
-    RETURNS ${return_type!}
+    CREATE ${replace ? safeSql`OR REPLACE` : safeSql``} FUNCTION ${ident(schema!)}.${ident(name!)}(${
+      args?.join(', ') || ''
+    })
+    RETURNS ${ident(return_type ?? 'void')}
     AS ${literal(definition)}
-    LANGUAGE ${keyword(language!)}
-    ${keyword(behavior!)}
+    LANGUAGE ${ident(language ?? 'sql')}
+    ${ident(behavior ?? 'VOLATILE')}
     CALLED ON NULL INPUT
     ${security_definer ? safeSql`SECURITY DEFINER` : safeSql`SECURITY INVOKER`}
-    ${configParamsFragment};
+    ${params}
   `
 }
 
@@ -275,12 +224,12 @@ export function create({
   schema = 'public',
   args = [],
   definition,
-  return_type = safeSql`void`,
+  return_type = 'void',
   language = 'sql',
   behavior = 'VOLATILE',
   security_definer = false,
   config_params = {},
-}: PGFunctionCreate) {
+}: PGFunctionCreate): { sql: SafeSqlFragment; zod: typeof z.void } {
   const sql = _generateCreateFunctionSql({
     name,
     schema,
@@ -307,38 +256,34 @@ export const pgFunctionUpdateZod = z.object({
 
 export type PGFunctionUpdate = z.infer<typeof pgFunctionUpdateZod>
 
-function splitArgumentTypes(argumentTypes: SafeSqlFragment): Array<SafeSqlFragment> {
-  return argumentTypes.split(', ') as Array<SafeSqlFragment>
-}
-
-export function update(
-  currentFunc: PGSavedFunction,
-  { name, schema, definition }: PGFunctionUpdate
-): { sql: SafeSqlFragment; zod: z.ZodType<void> } {
-  const args = splitArgumentTypes(currentFunc.argument_types)
+export function update(currentFunc: PGFunction, { name, schema, definition }: PGFunctionUpdate) {
   const identityArgs = currentFunc.identity_argument_types
 
-  const updateDefinitionSql =
+  const updateDefinitionSql: SafeSqlFragment =
     typeof definition === 'string'
       ? _generateCreateFunctionSql(
           {
             ...currentFunc,
             definition,
-            args,
+            args: currentFunc.argument_types.split(', '),
             config_params: currentFunc.config_params ?? {},
           },
           { replace: true }
         )
       : safeSql``
 
-  const updateNameSql =
+  const updateNameSql: SafeSqlFragment =
     name && name !== currentFunc.name
-      ? safeSql`ALTER FUNCTION ${ident(currentFunc.schema)}.${ident(currentFunc.name)}(${identityArgs}) RENAME TO ${ident(name)};`
+      ? safeSql`ALTER FUNCTION ${ident(currentFunc.schema)}.${ident(
+          currentFunc.name
+        )}(${identityArgs}) RENAME TO ${ident(name)}`
       : safeSql``
 
-  const updateSchemaSql =
+  const updateSchemaSql: SafeSqlFragment =
     schema && schema !== currentFunc.schema
-      ? safeSql`ALTER FUNCTION ${ident(currentFunc.schema)}.${ident(name || currentFunc.name)}(${identityArgs}) SET SCHEMA ${ident(schema)};`
+      ? safeSql`ALTER FUNCTION ${ident(currentFunc.schema)}.${ident(
+          name || currentFunc.name
+        )}(${identityArgs}) SET SCHEMA ${ident(schema)}`
       : safeSql``
 
   const sql = safeSql`
@@ -354,7 +299,10 @@ export function update(
           AND f.name = ${literal(currentFunc.name)}
           AND f.identity_argument_types = ${literal(identityArgs)}
         ) != ${literal(currentFunc.id)} THEN
-          RAISE EXCEPTION ${literal(`Cannot find function "${currentFunc.schema}"."${currentFunc.name}"(${identityArgs})`)};
+          RAISE EXCEPTION 'Cannot find function "%s"."%s"(%s)',
+            ${literal(currentFunc.schema)},
+            ${literal(currentFunc.name)},
+            ${literal(identityArgs)};
         END IF;
       END IF;
 
@@ -362,7 +310,7 @@ export function update(
 
       ${updateSchemaSql}
     END;
-    $$;
+    $$
   `
 
   return {
@@ -377,11 +325,10 @@ export const pgFunctionDeleteZod = z.object({
 
 export type PGFunctionDelete = z.infer<typeof pgFunctionDeleteZod>
 
-export function remove(
-  func: PGSavedFunction,
-  { cascade = false }: PGFunctionDelete = {}
-): { sql: SafeSqlFragment; zod: z.ZodType<void> } {
-  const sql = safeSql`DROP FUNCTION ${ident(func.schema)}.${ident(func.name)}(${func.identity_argument_types}) ${cascade ? safeSql`CASCADE` : safeSql`RESTRICT`};`
+export function remove(func: PGFunction, { cascade = false }: PGFunctionDelete = {}) {
+  const sql = safeSql`DROP FUNCTION ${ident(func.schema)}.${ident(func.name)}
+  (${func.identity_argument_types})
+  ${cascade ? safeSql`CASCADE` : safeSql`RESTRICT`}`
 
   return {
     sql,
