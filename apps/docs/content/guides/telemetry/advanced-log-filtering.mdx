@@ -184,7 +184,7 @@ regexp_contains(event_message, '^connection')
 
 ```sql
 -- find only messages that ends with port=12345
-regexp_contains(event_message, '$port=12345')
+regexp_contains(event_message, 'port=12345$')
 ```
 
 ### Ignore case sensitivity:
