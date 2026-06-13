@@ -23,6 +23,9 @@ export type sendSupportTicketVariables = {
   dashboardSentryIssueId?: string
   dashboardLogs?: string
   dashboardStudioVersion?: string
+  // Stable Front thread_ref so the AI support chat can later be appended to the
+  // same Front conversation that this submission creates.
+  threadRef?: string
 }
 
 export async function sendSupportTicket({
@@ -41,6 +44,7 @@ export async function sendSupportTicket({
   dashboardSentryIssueId,
   dashboardLogs,
   dashboardStudioVersion,
+  threadRef,
 }: sendSupportTicketVariables) {
   const { data, error } = await post('/platform/feedback/send', {
     body: {
@@ -61,6 +65,7 @@ export async function sendSupportTicket({
       dashboardSentryIssueId,
       dashboardLogs,
       dashboardStudioVersion,
+      threadRef,
     },
   })
 
