@@ -40,24 +40,24 @@ Usage is shown as "Compute Hours" on your invoice.
 
 ## Compute Credits
 
-Paid plans include <Price price="10" /> in Compute Credits, which cover one project running on the Micro/Nano Compute size or portions of other Compute sizes. Compute Credits are applied to your Compute costs and are provided to an organization each month. They reset monthly and do not accumulate.
+Paid plans include <Price>$10</Price> in Compute Credits, which cover one project running on the Micro/Nano Compute size or portions of other Compute sizes. Compute Credits are applied to your Compute costs and are provided to an organization each month. They reset monthly and do not accumulate.
 
 ## Pricing
 
-| Compute Size | Hourly Price USD          | Monthly Price USD                                                                                       |
-| ------------ | ------------------------- | ------------------------------------------------------------------------------------------------------- |
-| Nano[^1]     | <Price price="0" />       | <Price price="0" />                                                                                     |
-| Micro        | <Price price="0.01344" /> | ~<Price price="10" />                                                                                   |
-| Small        | <Price price="0.0206" />  | ~<Price price="15" />                                                                                   |
-| Medium       | <Price price="0.0822" />  | ~<Price price="60" />                                                                                   |
-| Large        | <Price price="0.1517" />  | ~<Price price="111" />                                                                                  |
-| XL           | <Price price="0.2877" />  | ~<Price price="210" />                                                                                  |
-| 2XL          | <Price price="0.562" />   | ~<Price price="410" />                                                                                  |
-| 4XL          | <Price price="1.32" />    | ~<Price price="960" />                                                                                  |
-| 8XL          | <Price price="2.562" />   | ~<Price price="1,870" />                                                                                |
-| 12XL         | <Price price="3.836" />   | ~<Price price="2,800"/>                                                                                 |
-| 16XL         | <Price price="5.12" />    | ~<Price price="3,730"/>                                                                                 |
-| >16XL        | -                         | [Contact Us](/dashboard/support/new?category=sales&subject=Enquiry%20about%20larger%20instance%20sizes) |
+| Compute Size | Hourly Price USD        | Monthly Price USD                                                                                       |
+| ------------ | ----------------------- | ------------------------------------------------------------------------------------------------------- |
+| Nano[^1]     | <Price>$0</Price>       | <Price>$0</Price>                                                                                       |
+| Micro        | <Price>$0.01344</Price> | ~<Price>$10</Price>                                                                                     |
+| Small        | <Price>$0.0206</Price>  | ~<Price>$15</Price>                                                                                     |
+| Medium       | <Price>$0.0822</Price>  | ~<Price>$60</Price>                                                                                     |
+| Large        | <Price>$0.1517</Price>  | ~<Price>$111</Price>                                                                                    |
+| XL           | <Price>$0.2877</Price>  | ~<Price>$210</Price>                                                                                    |
+| 2XL          | <Price>$0.562</Price>   | ~<Price>$410</Price>                                                                                    |
+| 4XL          | <Price>$1.32</Price>    | ~<Price>$960</Price>                                                                                    |
+| 8XL          | <Price>$2.562</Price>   | ~<Price>$1,870</Price>                                                                                  |
+| 12XL         | <Price>$3.836</Price>   | ~<Price>$2,800</Price>                                                                                  |
+| 16XL         | <Price>$5.12</Price>    | ~<Price>$3,730</Price>                                                                                  |
+| >16XL        | -                       | [Contact Us](/dashboard/support/new?category=sales&subject=Enquiry%20about%20larger%20instance%20sizes) |
 
 [^1]: Compute resources on the Free Plan are subject to change.
 
@@ -73,40 +73,40 @@ In paid organizations, Nano Compute are billed at the same price as Micro Comput
 
 The project runs on the same Compute size throughout the entire billing cycle.
 
-| Line Item                     | Hours | Costs                    |
-| ----------------------------- | ----- | ------------------------ |
-| Pro Plan                      | -     | <Price price="25"/>      |
-| Compute Hours Small Project 1 | 730   | <Price price="15" />     |
-| **Subtotal**                  |       | **<Price price="40" />** |
-| Compute Credits               |       | -<Price price="10" />    |
-| **Total**                     |       | **<Price price="30" />** |
+| Line Item                     | Hours | Costs                  |
+| ----------------------------- | ----- | ---------------------- |
+| Pro Plan                      | -     | <Price>$25</Price>     |
+| Compute Hours Small Project 1 | 730   | <Price>$15</Price>     |
+| **Subtotal**                  |       | **<Price>$40</Price>** |
+| Compute Credits               |       | -<Price>$10</Price>    |
+| **Total**                     |       | **<Price>$30</Price>** |
 
 ### Multiple projects
 
 All projects run on the same Compute size throughout the entire billing cycle.
 
-| Line Item                     | Hours | Costs                    |
-| ----------------------------- | ----- | ------------------------ |
-| Pro Plan                      | -     | <Price price="25" />     |
-| Compute Hours Small Project 1 | 730   | <Price price="15" />     |
-| Compute Hours Small Project 2 | 730   | <Price price="15" />     |
-| Compute Hours Small Project 3 | 730   | <Price price="15" />     |
-| **Subtotal**                  |       | **<Price price="70" />** |
-| Compute Credits               |       | -<Price price="10" />    |
-| **Total**                     |       | **<Price price="60" />** |
+| Line Item                     | Hours | Costs                  |
+| ----------------------------- | ----- | ---------------------- |
+| Pro Plan                      | -     | <Price>$25</Price>     |
+| Compute Hours Small Project 1 | 730   | <Price>$15</Price>     |
+| Compute Hours Small Project 2 | 730   | <Price>$15</Price>     |
+| Compute Hours Small Project 3 | 730   | <Price>$15</Price>     |
+| **Subtotal**                  |       | **<Price>$70</Price>** |
+| Compute Credits               |       | -<Price>$10</Price>    |
+| **Total**                     |       | **<Price>$60</Price>** |
 
 ### One project on different Compute sizes
 
 The project's Compute size changes throughout the billing cycle.
 
-| Line Item                     | Hours | Costs                       |
-| ----------------------------- | ----- | --------------------------- |
-| Pro Plan                      | -     | <Price price="25" />        |
-| Compute Hours Micro Project 1 | 230   | <Price price="3.09" />      |
-| Compute Hours Small Project 1 | 500   | <Price price="10.30" />     |
-| **Subtotal**                  |       | **<Price price="38.39" />** |
-| Compute Credits               |       | -<Price price="10" />       |
-| **Total**                     |       | **<Price price="28.39" />** |
+| Line Item                     | Hours | Costs                     |
+| ----------------------------- | ----- | ------------------------- |
+| Pro Plan                      | -     | <Price>$25</Price>        |
+| Compute Hours Micro Project 1 | 230   | <Price>$3.09</Price>      |
+| Compute Hours Small Project 1 | 500   | <Price>$10.30</Price>     |
+| **Subtotal**                  |       | **<Price>$38.39</Price>** |
+| Compute Credits               |       | -<Price>$10</Price>       |
+| **Total**                     |       | **<Price>$28.39</Price>** |
 
 ### Projects not running for full month
 
@@ -114,15 +114,15 @@ One project is running for the entire month, two other projects were launched an
 We only bill for the hours while the project was running and billing stops once a project is deleted.
 Compute is always billed in arrears when your billing cycle resets.
 
-| Line Item                     | Hours | Costs                       |
-| ----------------------------- | ----- | --------------------------- |
-| Pro Plan                      | -     | <Price price="25" />        |
-| Compute Hours Small Project 1 | 730   | <Price price="15" />        |
-| Compute Hours Micro Project 2 | 20    | <Price price="0.27" />      |
-| Compute Hours Micro Project 3 | 70    | <Price price="0.94" />      |
-| **Subtotal**                  |       | **<Price price="41.21" />** |
-| Compute Credits               |       | -<Price price="10" />       |
-| **Total**                     |       | **<Price price="31.21" />** |
+| Line Item                     | Hours | Costs                     |
+| ----------------------------- | ----- | ------------------------- |
+| Pro Plan                      | -     | <Price>$25</Price>        |
+| Compute Hours Small Project 1 | 730   | <Price>$15</Price>        |
+| Compute Hours Micro Project 2 | 20    | <Price>$0.27</Price>      |
+| Compute Hours Micro Project 3 | 70    | <Price>$0.94</Price>      |
+| **Subtotal**                  |       | **<Price>$41.21</Price>** |
+| Compute Credits               |       | -<Price>$10</Price>       |
+| **Total**                     |       | **<Price>$31.21</Price>** |
 
 ## View usage
 

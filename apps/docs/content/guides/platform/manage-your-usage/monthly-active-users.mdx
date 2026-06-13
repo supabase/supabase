@@ -67,12 +67,12 @@ The count resets at the start of each billing cycle.
 
 </Admonition>
 
-| Plan       | Quota   | Over-Usage                        |
-| ---------- | ------- | --------------------------------- |
-| Free       | 50,000  | -                                 |
-| Pro        | 100,000 | <Price price="0.00325" /> per MAU |
-| Team       | 100,000 | <Price price="0.00325" /> per MAU |
-| Enterprise | Custom  | Custom                            |
+| Plan       | Quota   | Over-Usage                      |
+| ---------- | ------- | ------------------------------- |
+| Free       | 50,000  | -                               |
+| Pro        | 100,000 | <Price>$0.00325</Price> per MAU |
+| Team       | 100,000 | <Price>$0.00325</Price> per MAU |
+| Enterprise | Custom  | Custom                          |
 
 ## Billing examples
 
@@ -80,27 +80,27 @@ The count resets at the start of each billing cycle.
 
 The organization's MAU usage for the billing cycle is within the quota, so no charges apply.
 
-| Line Item            | Units      | Costs                    |
-| -------------------- | ---------- | ------------------------ |
-| Pro Plan             | 1          | <Price price="25" />     |
-| Compute Hours Small  | 730 hours  | <Price price="15" />     |
-| Monthly Active Users | 23,000 MAU | <Price price="0" />      |
-| **Subtotal**         |            | **<Price price="40" />** |
-| Compute Credits      |            | -<Price price="10" />    |
-| **Total**            |            | **<Price price="30" />** |
+| Line Item            | Units      | Costs                  |
+| -------------------- | ---------- | ---------------------- |
+| Pro Plan             | 1          | <Price>$25</Price>     |
+| Compute Hours Small  | 730 hours  | <Price>$15</Price>     |
+| Monthly Active Users | 23,000 MAU | <Price>$0</Price>      |
+| **Subtotal**         |            | **<Price>$40</Price>** |
+| Compute Credits      |            | -<Price>$10</Price>    |
+| **Total**            |            | **<Price>$30</Price>** |
 
 ### Exceeding quota
 
 The organization's MAU usage for the billing cycle exceeds the quota by 60,000, incurring charges for this additional usage.
 
-| Line Item            | Units       | Costs                     |
-| -------------------- | ----------- | ------------------------- |
-| Pro Plan             | 1           | <Price price="25" />      |
-| Compute Hours Small  | 730 hours   | <Price price="15" />      |
-| Monthly Active Users | 160,000 MAU | <Price price="195" />     |
-| **Subtotal**         |             | **<Price price="235" />** |
-| Compute Credits      |             | -<Price price="10" />     |
-| **Total**            |             | **<Price price="225" />** |
+| Line Item            | Units       | Costs                   |
+| -------------------- | ----------- | ----------------------- |
+| Pro Plan             | 1           | <Price>$25</Price>      |
+| Compute Hours Small  | 730 hours   | <Price>$15</Price>      |
+| Monthly Active Users | 160,000 MAU | <Price>$195</Price>     |
+| **Subtotal**         |             | **<Price>$235</Price>** |
+| Compute Credits      |             | -<Price>$10</Price>     |
+| **Total**            |             | **<Price>$225</Price>** |
 
 ## View usage
 

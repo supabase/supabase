@@ -1,16 +1,37 @@
 import fs from 'node:fs'
+import Module, { createRequire } from 'node:module'
 import path from 'node:path'
 import { globby } from 'globby'
 import matter from 'gray-matter'
+import * as sharedDataPkg from 'shared-data'
+import { parse as parseToml } from 'smol-toml'
 
 import { getInternalLinkBaseUrl, prefixInternalLinks, withDocsBasePath } from './internal-links'
+import { resolveSharedData } from '../components/SharedData.utils'
+
+// Register a CJS loader for `.toml` so component files that import error-code
+// definitions (e.g. AuthErrorCodes / RealtimeErrorCodes) can be evaluated by
+// the markdown override loader. Next.js handles `.toml` via webpack; tsx does
+// not, so we wire it up here for the script's own `createRequire`.
+;(Module as any)._extensions['.toml'] = (mod: any, filename: string) => {
+  const content = fs.readFileSync(filename, 'utf8')
+  mod.exports = parseToml(content)
+}
+
+// Interop: tsx's ESM loader treats `shared-data` as CJS and exposes the
+// module under `.default`, while a webpack/Next build would expose the
+// named exports directly on the namespace. This script is only run by tsx,
+// but the fallback keeps it robust if that ever changes.
+const sharedDataModule = ((sharedDataPkg as any).default ??
+  sharedDataPkg) as typeof import('shared-data')
+const sharedData = {
+  config: sharedDataModule.config,
+  logConstants: sharedDataModule.logConstants,
+}
+type SharedDataKey = keyof typeof sharedData
 
 const PARTIALS_DIR = path.join(process.cwd(), 'content', '_partials')
 
-/**
- * Reads <$Partial path="..." /> tags and replaces them with the file contents.
- * Recurses to handle nested partials.
- */
 async function inlinePartials(content: string): Promise<string> {
   const partialRegex = /<\$Partial\s+path="([^"]+)"[^/]*\/>/g
   const matches = [...content.matchAll(partialRegex)]
@@ -98,6 +119,130 @@ function extractTitleAttr(attrs: string): string | null {
 }
 
 /**
+ * Discovers components that expose a `__markdown__` string property and
+ * returns a `{ name → markdown }` map. Globs `components/**` for files that
+ * mention `__markdown__`, then loads each via `createRequire` so tsx's CJS
+ * interop handles `shared-data` named imports. Files that fail to load
+ * (e.g. heavy Next.js deps) are skipped silently — the feature degrades
+ * gracefully rather than crashing the build.
+ */
+const scriptRequire = createRequire(import.meta.url)
+async function loadMarkdownOverrides(): Promise<Record<string, string>> {
+  const overrides: Record<string, string> = {}
+  const files = await globby(['components/**/*.{ts,tsx}', 'features/**/*.{ts,tsx}'])
+  await Promise.all(
+    files.map(async (file) => {
+      const src = await fs.promises.readFile(file, 'utf8')
+      if (!/\.__markdown__\s*=/.test(src)) return
+      try {
+        const mod = scriptRequire(path.resolve(file))
+        for (const [name, value] of Object.entries(mod ?? {})) {
+          if (typeof (value as any)?.__markdown__ === 'string') {
+            overrides[name] = (value as any).__markdown__
+          }
+        }
+      } catch (err) {
+        // File matched the __markdown__ prefilter but failed to load (heavy
+        // deps, ESM/CJS interop, etc.). Surface so the override gap is
+        // visible instead of silently swallowed.
+        console.warn(
+          `[markdown-overrides] failed to load ${file}: ${err instanceof Error ? err.message : err}`
+        )
+      }
+    })
+  )
+  return overrides
+}
+
+/**
+ * Replaces any JSX tag whose name matches a `__markdown__` override with the
+ * override string. Handles both self-closing (`<Foo />`) and paired
+ * (`<Foo>…</Foo>`) forms. Done before `stripJsxTags` so the markdown content
+ * survives subsequent indent normalization.
+ */
+function convertMarkdownComponents(content: string, overrides: Record<string, string>): string {
+  const names = Object.keys(overrides)
+  if (names.length === 0) return content
+  const alt = names.map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')
+  content = content.replace(
+    new RegExp(`<(${alt})\\b[^>]*>[\\s\\S]*?<\\/\\1>`, 'g'),
+    (_, name) => overrides[name]
+  )
+  content = content.replace(new RegExp(`<(${alt})\\b[^>]*\\/>`, 'g'), (_, name) => overrides[name])
+  return content
+}
+
+/**
+ * Inlines `<SharedData data="key">path</SharedData>` with the resolved value
+ * from the `shared-data` package. Only matches plain-text children (no `<` or
+ * `{`), so the render-function variant `<SharedData data="…">{(d) => …}</SharedData>`
+ * is left untouched and falls through to `stripJsxTags`.
+ */
+function convertSharedData(content: string): string {
+  return content.replace(
+    /<SharedData\s+data="([^"]+)">([^<{]+)<\/SharedData>/g,
+    (full, key, path) => {
+      const dataset = sharedData[key as SharedDataKey]
+      if (!dataset) return full
+      const value = resolveSharedData(dataset, path.trim())
+      return value === undefined ? full : String(value)
+    }
+  )
+}
+
+/**
+ * Replaces `<InfoTooltip ...>children</InfoTooltip>` with just its children,
+ * discarding the `tooltipContent` prop. Walks the opening tag with brace
+ * awareness so JSX expression props like `tooltipContent={<>…</>}` don't
+ * terminate parsing on a stray `>` (e.g. from `<br />` inside the prop).
+ */
+function convertInfoTooltip(content: string): string {
+  const openTagName = '<InfoTooltip'
+  const closeTag = '</InfoTooltip>'
+  let result = ''
+  let cursor = 0
+  while (cursor < content.length) {
+    const start = content.indexOf(openTagName, cursor)
+    if (start === -1) {
+      result += content.slice(cursor)
+      break
+    }
+    const after = content[start + openTagName.length]
+    if (after && !/[\s>]/.test(after)) {
+      // Different component starting with "InfoTooltip" — skip this match
+      result += content.slice(cursor, start + openTagName.length)
+      cursor = start + openTagName.length
+      continue
+    }
+    result += content.slice(cursor, start)
+
+    let i = start + openTagName.length
+    let depth = 0
+    while (i < content.length) {
+      const ch = content[i]
+      if (ch === '{') depth++
+      else if (ch === '}') depth--
+      else if (ch === '>' && depth === 0) break
+      i++
+    }
+    if (i >= content.length) {
+      result += content.slice(start)
+      break
+    }
+    const openEnd = i + 1
+    const closeIdx = content.indexOf(closeTag, openEnd)
+    if (closeIdx === -1) {
+      result += content.slice(start, openEnd)
+      cursor = openEnd
+      continue
+    }
+    result += content.slice(openEnd, closeIdx)
+    cursor = closeIdx + closeTag.length
+  }
+  return result
+}
+
+/**
  * Converts `<Link href="..."><GlassPanel|IconPanel title="...">desc</...></Link>`
  * blocks into markdown bullet lines: `- [title](href). description`. Without
  * this, the rendered output keeps prop syntax (className, passHref, etc.) since
@@ -116,32 +261,46 @@ function convertLinkPanels(content: string): string {
     const panelName = panelOpen[1]
     const panelStart = panelOpen.index ?? 0
 
-    // Walk past the opening tag, respecting JSX expression braces so attribute
-    // values like `title={<span>...</span>}` don't terminate parsing early.
+    // Walk past the opening tag, respecting both JSX `{}` expression depth
+    // (so `title={<span>...</span>}` doesn't terminate early) and quoted
+    // attribute values (so `>` inside `className="[&>div]..."` is ignored).
     let i = panelStart + panelOpen[0].length
     let depth = 0
+    let quote: string | null = null
     while (i < body.length) {
       const ch = body[i]
-      if (ch === '{') depth++
-      else if (ch === '}') depth--
-      else if (ch === '>' && depth === 0) break
+      if (quote) {
+        if (ch === quote) quote = null
+      } else if (ch === '"' || ch === "'") {
+        quote = ch
+      } else if (ch === '{') {
+        depth++
+      } else if (ch === '}') {
+        depth--
+      } else if (ch === '>' && depth === 0) {
+        break
+      }
       i++
     }
     if (i >= body.length) return full
 
     const panelAttrs = body.slice(panelStart + panelOpen[0].length, i)
-    const closingTag = `</${panelName}>`
-    const closeIdx = body.indexOf(closingTag, i)
-    if (closeIdx === -1) return full
-
     const title = extractTitleAttr(panelAttrs)
     if (!title) return full
 
-    const description = body
-      .slice(i + 1, closeIdx)
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim()
+    // Self-closing panels (`<GlassPanel ... />`) carry no description.
+    const isSelfClosing = panelAttrs.trimEnd().endsWith('/')
+    let description = ''
+    if (!isSelfClosing) {
+      const closingTag = `</${panelName}>`
+      const closeIdx = body.indexOf(closingTag, i)
+      if (closeIdx === -1) return full
+      description = body
+        .slice(i + 1, closeIdx)
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+    }
 
     return `- [${title}](${href})${description ? `. ${description}` : ''}`
   })
@@ -198,6 +357,7 @@ function stripJsxTags(content: string): string {
 async function generate() {
   const files = await globby(['content/guides/**/!(_)*.mdx'])
   const linkBaseUrl = getInternalLinkBaseUrl()
+  const markdownOverrides = await loadMarkdownOverrides()
   let warnings = 0
 
   await Promise.all(
@@ -213,7 +373,10 @@ async function generate() {
 
         const withPartials = await inlinePartials(rawContent)
         const withSteps = convertStepHike(withPartials)
-        const withLinks = convertLinkPanels(withSteps)
+        const withTooltips = convertInfoTooltip(withSteps)
+        const withSharedData = convertSharedData(withTooltips)
+        const withOverrides = convertMarkdownComponents(withSharedData, markdownOverrides)
+        const withLinks = convertLinkPanels(withOverrides)
         const stripped = stripJsxTags(withLinks)
         const processed = prefixInternalLinks(stripped, linkBaseUrl)
 

@@ -1,8 +1,8 @@
-import Link from 'next/link'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import _authErrorCodes from '~/content/errorCodes/authErrorCodes.toml'
 import _realtimeErrorCodes from '~/content/errorCodes/realtimeErrorCodes.toml'
 import { type ErrorCodeDefinition } from '~/resources/error/errorTypes'
+import Link from 'next/link'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 const errorCodesByService = {
   auth: _authErrorCodes as Record<string, ErrorCodeDefinition>,
@@ -13,7 +13,7 @@ interface ErrorCodesProps {
   service: keyof typeof errorCodesByService
 }
 
-export function ErrorCodes({ service }: ErrorCodesProps) {
+export default function ErrorCodes({ service }: ErrorCodesProps) {
   const errorCodes = errorCodesByService[service]
   const hasResolutions = Object.values(errorCodes).some((code) => code.resolution)
   return (

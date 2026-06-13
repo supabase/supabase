@@ -32,3 +32,14 @@ export function ComputeDiskLimitsTable() {
     </table>
   )
 }
+
+ComputeDiskLimitsTable.__markdown__ = `
+| Compute Instance | Baseline Throughput (MB/s) | Max Throughput (MB/s) | Baseline IOPS | Max IOPS |
+| --- | --- | --- | --- | --- |
+${Object.entries(COMPUTE_DISK)
+  .map(
+    ([key, value]) =>
+      `| ${value.name} | ${COMPUTE_BASELINE_THROUGHPUT[key]?.toLocaleString()} MB/s | ${COMPUTE_MAX_THROUGHPUT[key]?.toLocaleString()} MB/s | ${COMPUTE_BASELINE_IOPS[key]?.toLocaleString()} IOPS | ${COMPUTE_MAX_IOPS[key]?.toLocaleString()} IOPS |`
+  )
+  .join('\n')}
+`

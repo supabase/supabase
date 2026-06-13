@@ -1,7 +1,7 @@
 interface PriceProps {
-  price: string
+  children: React.ReactNode
 }
 
-export const Price: React.FC<PriceProps> = ({ price }) => {
-  return <span translate="no">${price}</span>
+export const Price: React.FC<PriceProps> = ({ children }) => {
+  return <span translate="no">{children}</span>
 }

@@ -80,11 +80,11 @@ The count resets at the start of each billing cycle.
 
 </Admonition>
 
-| Plan       | Quota  | Over-Usage                          |
-| ---------- | ------ | ----------------------------------- |
-| Pro        | 50     | <Price price="0.015" /> per SSO MAU |
-| Team       | 50     | <Price price="0.015" /> per SSO MAU |
-| Enterprise | Custom | Custom                              |
+| Plan       | Quota  | Over-Usage                        |
+| ---------- | ------ | --------------------------------- |
+| Pro        | 50     | <Price>$0.015</Price> per SSO MAU |
+| Team       | 50     | <Price>$0.015</Price> per SSO MAU |
+| Enterprise | Custom | Custom                            |
 
 ## Billing examples
 
@@ -92,27 +92,27 @@ The count resets at the start of each billing cycle.
 
 The organization's SSO MAU usage for the billing cycle is within the quota, so no charges apply.
 
-| Line Item                | Units      | Costs                    |
-| ------------------------ | ---------- | ------------------------ |
-| Pro Plan                 | 1          | <Price price="25" />     |
-| Compute Hours Small      | 730 hours  | <Price price="15" />     |
-| Monthly Active SSO Users | 37 SSO MAU | <Price price="0" />      |
-| **Subtotal**             |            | **<Price price="40" />** |
-| Compute Credits          |            | -<Price price="10" />    |
-| **Total**                |            | **<Price price="30" />** |
+| Line Item                | Units      | Costs                  |
+| ------------------------ | ---------- | ---------------------- |
+| Pro Plan                 | 1          | <Price>$25</Price>     |
+| Compute Hours Small      | 730 hours  | <Price>$15</Price>     |
+| Monthly Active SSO Users | 37 SSO MAU | <Price>$0</Price>      |
+| **Subtotal**             |            | **<Price>$40</Price>** |
+| Compute Credits          |            | -<Price>$10</Price>    |
+| **Total**                |            | **<Price>$30</Price>** |
 
 ### Exceeding quota
 
 The organization's SSO MAU usage for the billing cycle exceeds the quota by 10, incurring charges for this additional usage.
 
-| Line Item                | Units      | Costs                       |
-| ------------------------ | ---------- | --------------------------- |
-| Pro Plan                 | 1          | <Price price="25" />        |
-| Compute Hours Small      | 730 hours  | <Price price="15" />        |
-| Monthly Active SSO Users | 60 SSO MAU | <Price price="0.15" />      |
-| **Subtotal**             |            | **<Price price="40.15" />** |
-| Compute Credits          |            | -<Price price="10" />       |
-| **Total**                |            | **<Price price="30.15" />** |
+| Line Item                | Units      | Costs                     |
+| ------------------------ | ---------- | ------------------------- |
+| Pro Plan                 | 1          | <Price>$25</Price>        |
+| Compute Hours Small      | 730 hours  | <Price>$15</Price>        |
+| Monthly Active SSO Users | 60 SSO MAU | <Price>$0.15</Price>      |
+| **Subtotal**             |            | **<Price>$40.15</Price>** |
+| Compute Credits          |            | -<Price>$10</Price>       |
+| **Total**                |            | **<Price>$30.15</Price>** |
 
 ## View usage
 

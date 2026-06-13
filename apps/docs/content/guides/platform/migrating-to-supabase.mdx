@@ -6,20 +6,104 @@ Learn how to migrate to Supabase from another database service.
 
 ## Migration guides
 
-<NavData data="migrationPages">
-  {(migrationPages) => (
-    <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-6 mb-6 not-prose">
-      {migrationPages.map((page) => (
-        <Link href={`${page.url}`} key={page.url} passHref>
-          <GlassPanel
-            icon={page.icon}
-            title={page.name}
-            hasLightIcon={page.hasLightIcon}
-            background={false}
-            className="[&>div]:p-4"
-          />
-        </Link>
-      ))}
-    </div>
-  )}
-</NavData>
+<div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-6 mb-6 not-prose">
+  <Link href="/guides/platform/migrating-to-supabase/auth0" passHref>
+    <GlassPanel
+      icon="/docs/img/icons/auth0-icon"
+      title="Auth0"
+      hasLightIcon
+      background={false}
+      className="[&>div]:p-4"
+    />
+  </Link>
+  <Link href="/guides/platform/migrating-to-supabase/firebase-auth" passHref>
+    <GlassPanel
+      icon="/docs/img/icons/firebase-icon"
+      title="Firebase Auth"
+      background={false}
+      className="[&>div]:p-4"
+    />
+  </Link>
+  <Link href="/guides/platform/migrating-to-supabase/firestore-data" passHref>
+    <GlassPanel
+      icon="/docs/img/icons/firebase-icon"
+      title="Firestore Data"
+      background={false}
+      className="[&>div]:p-4"
+    />
+  </Link>
+  <Link href="/guides/platform/migrating-to-supabase/firebase-storage" passHref>
+    <GlassPanel
+      icon="/docs/img/icons/firebase-icon"
+      title="Firebase Storage"
+      background={false}
+      className="[&>div]:p-4"
+    />
+  </Link>
+  <Link href="/guides/platform/migrating-to-supabase/heroku" passHref>
+    <GlassPanel
+      icon="/docs/img/icons/heroku-icon"
+      title="Heroku"
+      background={false}
+      className="[&>div]:p-4"
+    />
+  </Link>
+  <Link href="/guides/platform/migrating-to-supabase/render" passHref>
+    <GlassPanel
+      icon="/docs/img/icons/render-icon"
+      title="Render"
+      background={false}
+      className="[&>div]:p-4"
+    />
+  </Link>
+  <Link href="/guides/platform/migrating-to-supabase/amazon-rds" passHref>
+    <GlassPanel
+      icon="/docs/img/icons/aws-rds-icon"
+      title="Amazon RDS"
+      background={false}
+      className="[&>div]:p-4"
+    />
+  </Link>
+  <Link href="/guides/platform/migrating-to-supabase/postgres" passHref>
+    <GlassPanel
+      icon="/docs/img/icons/postgres-icon"
+      title="Postgres"
+      background={false}
+      className="[&>div]:p-4"
+    />
+  </Link>
+  <Link href="/guides/platform/migrating-to-supabase/vercel-postgres" passHref>
+    <GlassPanel
+      icon="/docs/img/icons/vercel-icon"
+      title="Vercel Postgres"
+      hasLightIcon
+      background={false}
+      className="[&>div]:p-4"
+    />
+  </Link>
+  <Link href="/guides/platform/migrating-to-supabase/neon" passHref>
+    <GlassPanel
+      icon="/docs/img/icons/neon-icon"
+      title="Neon"
+      hasLightIcon
+      background={false}
+      className="[&>div]:p-4"
+    />
+  </Link>
+  <Link href="/guides/platform/migrating-to-supabase/mysql" passHref>
+    <GlassPanel
+      icon="/docs/img/icons/mysql-icon"
+      title="MySQL"
+      background={false}
+      className="[&>div]:p-4"
+    />
+  </Link>
+  <Link href="/guides/platform/migrating-to-supabase/mssql" passHref>
+    <GlassPanel
+      icon="/docs/img/icons/mssql-icon"
+      title="MSSQL"
+      background={false}
+      className="[&>div]:p-4"
+    />
+  </Link>
+</div>

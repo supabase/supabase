@@ -1,16 +1,14 @@
 import { AiPromptsIndex } from '~/app/guides/getting-started/ai-prompts/[slug]/AiPromptsIndex'
 import { AiSkillsIndex } from '~/app/guides/getting-started/ai-skills/AiSkillsIndex'
 import { AppleSecretGenerator } from '~/components/AppleSecretGenerator'
-import AuthProviders from '~/components/AuthProviders'
+import { PhoneAuthProviders, SocialAuthProviders } from '~/components/AuthProviders'
 import { AuthSmsProviderConfig } from '~/components/AuthSmsProviderConfig'
-import { CostWarning } from '~/components/AuthSmsProviderConfig/AuthSmsProviderConfig.Warnings'
 import ButtonCard from '~/components/ButtonCard'
 import { ComputeDiskLimitsTable } from '~/components/ComputeDiskLimitsTable'
 import { Extensions } from '~/components/Extensions'
 import Image, { type ImageProps } from '~/components/Image'
 import { Mermaid } from '~/components/Mermaid'
 import { MetricsStackCards } from '~/components/MetricsStackCards'
-import { NavData } from '~/components/NavData'
 import { Price } from '~/components/Price'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
 import { RealtimeLimitsEstimator } from '~/components/RealtimeLimitsEstimator'
@@ -35,7 +33,7 @@ import SqlToRest from 'ui-patterns/SqlToRest'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
 
 import { AgentPluginsPanel } from '../ui/AgentPluginsPanel'
-import { ErrorCodes } from '../ui/ErrorCodes'
+import { AuthErrorCodes, RealtimeErrorCodes } from '../ui/ErrorCodes'
 import { McpConfigPanel } from '../ui/McpConfigPanel'
 
 // Wrap Admonition for Docs-specific styling (within MDX prose, requires a margin-bottom)
@@ -68,16 +66,17 @@ const components = {
   AiSkillsIndex,
   AuthSmsProviderConfig,
   AppleSecretGenerator,
-  AuthProviders,
+  PhoneAuthProviders,
+  SocialAuthProviders,
   Badge,
   Button,
   ButtonCard,
   CodeSampleDummy,
   CodeSampleWrapper,
+  AuthErrorCodes,
   ComputeDiskLimitsTable,
-  CostWarning,
-  ErrorCodes,
   Extensions,
+  RealtimeErrorCodes,
   GlassPanel,
   IconArrowDown: ArrowDown,
   IconCheck: Check,
@@ -86,10 +85,8 @@ const components = {
   Image: (props: ImageProps) => <Image className="rounded-md w-full" {...props} />,
   Link,
   McpConfigPanel,
-  Mermaid,
   MetricsStackCards,
   NamedCodeBlock,
-  NavData,
   ProjectConfigVariables,
   RealtimeLimitsEstimator,
   RegionsList,

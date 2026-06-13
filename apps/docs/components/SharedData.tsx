@@ -1,11 +1,14 @@
-import { at } from 'lodash-es'
 import { ReactNode } from 'react'
 import { config, logConstants } from 'shared-data'
+
+import { resolveSharedData } from './SharedData.utils'
 
 const sharedData = {
   config,
   logConstants,
 }
+
+type SharedDataKey = keyof typeof sharedData
 
 /**
  * A wrapper component to access data from the `shared-data` package within MDX
@@ -22,15 +25,14 @@ function SharedData({
   data,
   children,
 }: {
-  data: keyof typeof sharedData
-  children: ((selectedData: (typeof sharedData)[keyof typeof sharedData]) => ReactNode) | string
+  data: SharedDataKey
+  children: ((selectedData: (typeof sharedData)[SharedDataKey]) => ReactNode) | string
 }) {
-  let selectedData = sharedData[data] as any
-  return typeof children === 'string'
-    ? ((typeof (selectedData = at(selectedData, [children])[0]) === 'object'
-        ? `${selectedData.value ?? ''} ${selectedData.unit ?? ''}`.trim()
-        : selectedData) as unknown as ReactNode)
-    : children(selectedData)
+  if (typeof children === 'string') {
+    return resolveSharedData(sharedData[data], children) as ReactNode
+  }
+  return children(sharedData[data])
 }
 
-export { SharedData }
+export { SharedData, resolveSharedData }
+export type { SharedDataKey }

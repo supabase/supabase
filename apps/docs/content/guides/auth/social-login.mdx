@@ -21,28 +21,145 @@ There are several reasons why you might want to add social login to your applica
 Supabase supports a suite of social providers. Follow these guides to configure a social provider for your platform.
 
 <div className="grid grid-cols-12 xs:gap-x-10 gap-y-10 not-prose py-8">
-  <NavData data="socialLoginItems">
-    {(data) =>
-      data.map((item) => (
-        <Link
-          href={`${item.url}`}
-          key={item.name}
-          passHref
-          className="col-span-12 xs:col-span-6 lg:col-span-4 xl:col-span-3"
-        >
-          <IconPanel
-            title={item.name}
-            span="col-span-6"
-            icon={item.icon}
-            isDarkMode={item.isDarkMode}
-            hasLightIcon={item.hasLightIcon}
-          >
-            {item.description}
-          </IconPanel>
-        </Link>
-      ))
-    }
-  </NavData>
+  <Link
+    href="/guides/auth/social-login/auth-google"
+    passHref
+    className="col-span-12 xs:col-span-6 lg:col-span-4 xl:col-span-3"
+  >
+    <IconPanel title="Google" span="col-span-6" icon="/docs/img/icons/google-icon" />
+  </Link>
+  <Link
+    href="/guides/auth/social-login/auth-facebook"
+    passHref
+    className="col-span-12 xs:col-span-6 lg:col-span-4 xl:col-span-3"
+  >
+    <IconPanel title="Facebook" span="col-span-6" icon="/docs/img/icons/facebook-icon" />
+  </Link>
+  <Link
+    href="/guides/auth/social-login/auth-apple"
+    passHref
+    className="col-span-12 xs:col-span-6 lg:col-span-4 xl:col-span-3"
+  >
+    <IconPanel title="Apple" span="col-span-6" icon="/docs/img/icons/apple-icon" />
+  </Link>
+  <Link
+    href="/guides/auth/social-login/auth-azure"
+    passHref
+    className="col-span-12 xs:col-span-6 lg:col-span-4 xl:col-span-3"
+  >
+    <IconPanel title="Azure (Microsoft)" span="col-span-6" icon="/docs/img/icons/microsoft-icon" />
+  </Link>
+  <Link
+    href="/guides/auth/social-login/auth-twitter"
+    passHref
+    className="col-span-12 xs:col-span-6 lg:col-span-4 xl:col-span-3"
+  >
+    <IconPanel title="Twitter" span="col-span-6" icon="/docs/img/icons/twitter-icon" hasLightIcon />
+  </Link>
+  <Link
+    href="/guides/auth/social-login/auth-github"
+    passHref
+    className="col-span-12 xs:col-span-6 lg:col-span-4 xl:col-span-3"
+  >
+    <IconPanel
+      title="GitHub"
+      span="col-span-6"
+      icon="/docs/img/icons/github-icon"
+      isDarkMode
+      hasLightIcon
+    />
+  </Link>
+  <Link
+    href="/guides/auth/social-login/auth-gitlab"
+    passHref
+    className="col-span-12 xs:col-span-6 lg:col-span-4 xl:col-span-3"
+  >
+    <IconPanel title="Gitlab" span="col-span-6" icon="/docs/img/icons/gitlab-icon" />
+  </Link>
+  <Link
+    href="/guides/auth/social-login/auth-bitbucket"
+    passHref
+    className="col-span-12 xs:col-span-6 lg:col-span-4 xl:col-span-3"
+  >
+    <IconPanel title="Bitbucket" span="col-span-6" icon="/docs/img/icons/bitbucket-icon" />
+  </Link>
+  <Link
+    href="/guides/auth/social-login/auth-discord"
+    passHref
+    className="col-span-12 xs:col-span-6 lg:col-span-4 xl:col-span-3"
+  >
+    <IconPanel title="Discord" span="col-span-6" icon="/docs/img/icons/discord-icon" />
+  </Link>
+  <Link
+    href="/guides/auth/social-login/auth-figma"
+    passHref
+    className="col-span-12 xs:col-span-6 lg:col-span-4 xl:col-span-3"
+  >
+    <IconPanel title="Figma" span="col-span-6" icon="/docs/img/icons/figma-icon" />
+  </Link>
+  <Link
+    href="/guides/auth/social-login/auth-kakao"
+    passHref
+    className="col-span-12 xs:col-span-6 lg:col-span-4 xl:col-span-3"
+  >
+    <IconPanel title="Kakao" span="col-span-6" icon="/docs/img/icons/kakao-icon" />
+  </Link>
+  <Link
+    href="/guides/auth/social-login/auth-keycloak"
+    passHref
+    className="col-span-12 xs:col-span-6 lg:col-span-4 xl:col-span-3"
+  >
+    <IconPanel title="Keycloak" span="col-span-6" icon="/docs/img/icons/keycloak-icon" />
+  </Link>
+  <Link
+    href="/guides/auth/social-login/auth-linkedin"
+    passHref
+    className="col-span-12 xs:col-span-6 lg:col-span-4 xl:col-span-3"
+  >
+    <IconPanel title="LinkedIn" span="col-span-6" icon="/docs/img/icons/linkedin-icon" />
+  </Link>
+  <Link
+    href="/guides/auth/social-login/auth-notion"
+    passHref
+    className="col-span-12 xs:col-span-6 lg:col-span-4 xl:col-span-3"
+  >
+    <IconPanel title="Notion" span="col-span-6" icon="/docs/img/icons/notion-icon" />
+  </Link>
+  <Link
+    href="/guides/auth/social-login/auth-slack"
+    passHref
+    className="col-span-12 xs:col-span-6 lg:col-span-4 xl:col-span-3"
+  >
+    <IconPanel title="Slack" span="col-span-6" icon="/docs/img/icons/slack-icon" />
+  </Link>
+  <Link
+    href="/guides/auth/social-login/auth-spotify"
+    passHref
+    className="col-span-12 xs:col-span-6 lg:col-span-4 xl:col-span-3"
+  >
+    <IconPanel title="Spotify" span="col-span-6" icon="/docs/img/icons/spotify-icon" />
+  </Link>
+  <Link
+    href="/guides/auth/social-login/auth-twitch"
+    passHref
+    className="col-span-12 xs:col-span-6 lg:col-span-4 xl:col-span-3"
+  >
+    <IconPanel title="Twitch" span="col-span-6" icon="/docs/img/icons/twitch-icon" />
+  </Link>
+  <Link
+    href="/guides/auth/social-login/auth-workos"
+    passHref
+    className="col-span-12 xs:col-span-6 lg:col-span-4 xl:col-span-3"
+  >
+    <IconPanel title="WorkOS" span="col-span-6" icon="/docs/img/icons/workos-icon" />
+  </Link>
+  <Link
+    href="/guides/auth/social-login/auth-zoom"
+    passHref
+    className="col-span-12 xs:col-span-6 lg:col-span-4 xl:col-span-3"
+  >
+    <IconPanel title="Zoom" span="col-span-6" icon="/docs/img/icons/zoom-icon" />
+  </Link>
 </div>
 
 <Admonition type="tip">
