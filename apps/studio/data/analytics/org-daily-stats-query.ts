@@ -130,7 +130,7 @@ export async function getOrgDailyStats(
 ) {
   if (!orgSlug) throw new Error('Org slug is required')
   if (!startDate) throw new Error('Start date is required')
-  if (!endDate) throw new Error('Start date is required')
+  if (!endDate) throw new Error('End date is required')
 
   const { data, error } = await get('/platform/organizations/{slug}/usage/daily', {
     params: {

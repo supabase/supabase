@@ -42,7 +42,7 @@ describe('org-daily-stats-query', () => {
           startDate: '2025-01-01',
           endDate: undefined,
         })
-      ).rejects.toThrow('Start date is required')
+      ).rejects.toThrow('End date is required')
     })
 
     it('calls API with correct parameters including project_ref', async () => {
