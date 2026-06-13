@@ -7,6 +7,9 @@
 
 import { z } from 'zod'
 
+const DEFAULT_TIMEOUT_MS = 30_000
+const MAX_RETRIES = 3
+
 interface GitHubStatus {
   url: string
   avatar_url: string
@@ -26,19 +29,60 @@ const jobInfoSchema = z.object({
       sha: z.string().min(1, 'SHA is required'),
     }),
     id: z.string().min(1, 'ID is required'),
-    org: z.literal('supabase'),
+    org: z.string().min(1, 'Org is required'),
     prId: z.number().int().positive('PR ID must be a positive integer'),
-    repo: z.literal('supabase'),
+    repo: z.string().min(1, 'Repo is required'),
   }),
 })
 
 type JobInfo = z.infer<typeof jobInfoSchema>
 
-async function fetchGitHubStatuses(sha: string): Promise<GitHubStatus[]> {
-  const url = `https://api.github.com/repos/supabase/supabase/statuses/${sha}`
+async function fetchWithTimeoutAndRetry(
+  url: string,
+  options: RequestInit & { timeout?: number } = {},
+  retries: number = MAX_RETRIES,
+): Promise<Response> {
+  const timeout = options.timeout ?? DEFAULT_TIMEOUT_MS
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), timeout)
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    })
+    return response
+  } catch (error) {
+    if (retries > 0 && error instanceof TypeError) {
+      console.warn(`Request failed, retrying... (${MAX_RETRIES - retries + 1}/${MAX_RETRIES})`)
+      await new Promise((resolve) => setTimeout(resolve, 1000 * (MAX_RETRIES - retries + 1)))
+      return fetchWithTimeoutAndRetry(url, options, retries - 1)
+    }
+    throw error
+  } finally {
+    clearTimeout(timeoutId)
+  }
+}
+
+async function fetchGitHubStatuses(
+  sha: string,
+  token: string,
+  repo: string,
+): Promise<GitHubStatus[]> {
+  const url = `https://api.github.com/repos/${repo}/statuses/${sha}`
   console.log(`Fetching GitHub statuses for SHA: ${sha}`)
 
-  const response = await fetch(url)
+  const headers: Record<string, string> = {
+    Accept: 'application/vnd.github+json',
+  }
+  if (token) {
+    headers.Authorization = `Bearer ${token}`
+  }
+
+  const response = await fetchWithTimeoutAndRetry(url, {
+    headers,
+  })
+
   if (!response.ok) {
     throw new Error(`Failed to fetch GitHub statuses: ${response.status} ${response.statusText}`)
   }
@@ -46,12 +90,25 @@ async function fetchGitHubStatuses(sha: string): Promise<GitHubStatus[]> {
   return response.json()
 }
 
-function extractJobInfoFromTargetUrl(targetUrl: string): JobInfo {
-  const url = new URL(targetUrl)
+function extractJobInfoFromTargetUrl(targetUrl: string): JobInfo | null {
+  if (!targetUrl) {
+    console.warn('Status has no target_url, skipping')
+    return null
+  }
+
+  let url: URL
+  try {
+    url = new URL(targetUrl)
+  } catch {
+    console.warn(`Invalid target_url: ${targetUrl}, skipping`)
+    return null
+  }
+
   const jobParam = url.searchParams.get('job')
 
   if (!jobParam) {
-    throw new Error('No job parameter found in target URL')
+    console.warn('No job parameter found in target URL, skipping')
+    return null
   }
 
   try {
@@ -61,7 +118,7 @@ function extractJobInfoFromTargetUrl(targetUrl: string): JobInfo {
   } catch (e) {
     if (e instanceof z.ZodError) {
       throw new Error(
-        `Invalid job info structure: ${e.errors.map((err) => `${err.path.join('.')}: ${err.message}`).join(', ')}`
+        `Invalid job info structure: ${e.errors.map((err) => `${err.path.join('.')}: ${err.message}`).join(', ')}`,
       )
     }
     throw new Error(`Failed to parse job parameter as JSON: ${e}`)
@@ -71,7 +128,7 @@ function extractJobInfoFromTargetUrl(targetUrl: string): JobInfo {
 async function authorizeVercelJob(jobInfo: JobInfo, vercelToken: string): Promise<void> {
   const url = 'https://vercel.com/api/v1/integrations/authorize-job'
 
-  const response = await fetch(url, {
+  const response = await fetchWithTimeoutAndRetry(url, {
     method: 'POST',
     headers: {
       Accept: '*/*',
@@ -84,7 +141,7 @@ async function authorizeVercelJob(jobInfo: JobInfo, vercelToken: string): Promis
   if (!response.ok) {
     const errorText = await response.text()
     throw new Error(
-      `Failed to authorize Vercel job: ${response.status} ${response.statusText}\n${errorText}`
+      `Failed to authorize Vercel job: ${response.status} ${response.statusText}\n${errorText}`,
     )
   }
 
@@ -102,15 +159,18 @@ async function main() {
     throw new Error('VERCEL_TOKEN environment variable is required')
   }
 
-  console.log(`Starting authorization process for SHA: ${sha}`)
+  const githubToken = process.env.GITHUB_TOKEN || ''
+  const repo = process.env.GITHUB_REPO || 'supabase/supabase'
+
+  console.log(`Starting authorization process for SHA: ${sha} on repo: ${repo}`)
 
   // Fetch GitHub statuses
-  const statuses = await fetchGitHubStatuses(sha)
+  const statuses = await fetchGitHubStatuses(sha, githubToken, repo)
   console.log(`Found ${statuses.length} statuses`)
 
   // Filter for authorization-required statuses
   const authRequiredStatuses = statuses.filter(
-    (status) => status.description === 'Authorization required to deploy.'
+    (status) => status.description === 'Authorization required to deploy.',
   )
 
   if (authRequiredStatuses.length === 0) {
@@ -119,6 +179,8 @@ async function main() {
   }
 
   console.log(`Found ${authRequiredStatuses.length} authorization-required status(es)`)
+
+  let hasFailure = false
 
   // Process each authorization-required status
   for (const status of authRequiredStatuses) {
@@ -134,12 +196,21 @@ async function main() {
       // Extract job info from target URL
       const jobInfo = extractJobInfoFromTargetUrl(status.target_url)
 
+      if (!jobInfo) {
+        console.warn(`Skipping status ${status.context} due to missing or invalid job info`)
+        continue
+      }
+
       // Authorize the job
       await authorizeVercelJob(jobInfo, vercelToken)
     } catch (error) {
       console.error(`Failed to process status ${status.context}:`, error)
-      // Continue with other statuses even if one fails
+      hasFailure = true
     }
+  }
+
+  if (hasFailure) {
+    throw new Error('One or more Vercel job authorizations failed')
   }
 
   console.log('\n✓ Authorization process completed!')
