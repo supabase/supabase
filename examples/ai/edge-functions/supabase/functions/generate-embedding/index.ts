@@ -39,7 +39,10 @@ export default {
         embedding: JSON.stringify(embedding),
       })
       .eq('id', id)
-    if (error) console.warn(error.message)
+    if (error) {
+      console.warn(error.message)
+      return Response.json({ error: error.message }, { status: 500 })
+    }
 
     return Response.json({ status: 'ok - updated' })
   }),
