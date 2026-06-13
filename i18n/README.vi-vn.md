@@ -23,7 +23,7 @@
 
 ![Bảng điều khiển của Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
-## Tài liệu tham khảo
+## Tài liệu than khảo
 
 Để có tài liệu đầy đủ, hãy truy cập [supabase.com/docs](https://supabase.com/docs)
 

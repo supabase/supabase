@@ -40,7 +40,7 @@ using (true);
 
 - Run `npm install` to install the dependencies.
 - Run `cp .env.example .env`.
-- Set the required environment vairables in your `.env` file.
+- Set the required environment variables in your `.env` file.
 
 ## Commands
 

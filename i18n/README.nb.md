@@ -7,7 +7,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) er et alternativ til Firebase med åpen kildekode. Vi bygger funksjonene i Firebase ved hjelp av åpen kildekode-verktøy for bedrifter.
+[Supabase](https://supabase.com) er et alternative til Firebase med åpen kildekode. Vi bygger funksjonene i Firebase ved hjelp av åpen kildekode-verktøy for bedrifter.
 
 - [x] Hostet Postgres-database. [Dokumenter](https://supabase.com/docs/guides/database)
 - [x] Autentisering og autorisasjon. [Dokumenter](https://supabase.com/docs/guides/auth)
@@ -19,7 +19,7 @@
   - [x] Databasefunksjoner. [Dokumenter](https://supabase.com/docs/guides/database/functions)
   - [x] Edge-funksjoner [Dokumenter](https://supabase.com/docs/guides/functions)
 - [x] Lagring av filer. [Dokumenter](https://supabase.com/docs/guides/storage)
-- [x] Dashbord
+- [x] Dashboard
 
 supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png) [x] [x] [x] [x][Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
@@ -40,8 +40,8 @@ For å se hvordan du kan bidra, gå til [Getting Started](../DEVELOPERS.md)
 
 - [x] Alpha: Vi tester Supabase med en lukket gruppe kunder
 - [x] Offentlig Alpha: Alle kan registrere seg på [supabase.com/dashboard](https://supabase.com/dashboard). Men vær snill med oss, det er noen små problemer
-- [x] Offentlig beta: Stabilt nok for de fleste brukstilfeller som ikke er for bedrifter
-- [ ] Offentlig: Generell tilgjengelighet [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [x] Offentlig beta: Stabilt nok for de fleste brukstilfeller some ikke er for bedrifter
+- [ ] Offentlig: General tilgjengelighet [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
 Vi er for tiden i offentlig betaversjon. Følg med på "utgivelser" av denne repoen for å bli varslet om større oppdateringer.
 
@@ -51,20 +51,20 @@ Vi er for tiden i offentlig betaversjon. Følg med på "utgivelser" av denne rep
 
 ## Slik fungerer det
 
-Supabase er en kombinasjon av verktøy med åpen kildekode. Vi bygger funksjonene i Firebase ved hjelp av åpen kildekode-produkter på bedriftsnivå. Hvis verktøyene og fellesskapene finnes, med en MIT, Apache 2 eller tilsvarende åpen lisens, vil vi bruke og støtte det verktøyet. Hvis verktøyet ikke finnes, bygger vi det selv med åpen kildekode. Supabase er ikke en 1-til-1-kartlegging av Firebase. Målet vårt er å gi utviklere en Firebase-lignende utvikleropplevelse ved hjelp av verktøy med åpen kildekode.
+Supabase er en kombinasjon av verktøy med åpen kildekode. Vi bygger funksjonene i Firebase ved hjelp av åpen kildekode-produkter på bedriftsnivå. Hvis verktøyene og fellesskapene finnes, med en MIT, Apache 2 eller tilsvarende åpen lisens, vil vi bruke og støtte det verktøyet. Hvis verktøyet ikke finnes, bygger vi det self med åpen kildekode. Supabase er ikke en 1-til-1-kartlegging av Firebase. Målet vårt er å gi utviklere en Firebase-lignende utvikleropplevelse ved hjelp av verktøy med åpen kildekode.
 
 \*\*Arkitektur
 
 Supabase er en [vertsplattform](https://supabase.com/dashboard). Du kan registrere deg og begynne å bruke Supabase uten å installere noe.
-Du kan også [selv være vert](https://supabase.com/docs/guides/hosting/overview) og [utvikle lokalt](https://supabase.com/docs/guides/local-development).
+Du kan også [self være vert](https://supabase.com/docs/guides/hosting/overview) og [utvikle lokalt](https://supabase.com/docs/guides/local-development).
 
 ![arkitektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
-- [PostgreSQL](https://www.postgresql.org/) er et objektrelasjonsdatabasesystem med over 30 års aktiv utvikling som har gitt det et sterkt rykte for pålitelighet, robusthet og ytelse.
-- [Realtime](https://github.com/supabase/realtime) er en Elixir-server som lar deg lytte til PostgreSQL-innlegg, oppdateringer og slettinger ved hjelp av websockets. Realtime polls Postgres' innebygde replikeringsfunksjonalitet for databaseendringer, konverterer endringer til JSON og sender deretter JSON over websockets til autoriserte klienter.
-- [PostgREST](http://postgrest.org/) er en webserver som gjør PostgreSQL-databasen din direkte om til et RESTful API
-- [pg_graphql](http://github.com/supabase/pg_graphql/) en PostgreSQL-utvidelse som eksponerer et GraphQL API
-- [Storage](https://github.com/supabase/storage-api) gir et RESTful-grensesnitt for å administrere filer som er lagret i S3, ved hjelp av Postgres for å administrere tillatelser.
+- [PostgreSQL](https://www.postgresql.org/) er et objektrelasjonsdatabasesystem med over 30 års aktiv utvikling some har gitt det et sterkt rykte for pålitelighet, robusthet og ytelse.
+- [Realtime](https://github.com/supabase/realtime) er en Elixir-server some lar deg lytte til PostgreSQL-innlegg, oppdateringer og slettinger ved hjelp av websockets. Realtime polls Postgres' innebygde replikeringsfunksjonalitet for databaseendringer, konverterer endringer til JSON og sender deretter JSON over websockets til autoriserte klienter.
+- [PostgREST](http://postgrest.org/) er en webserver some gjør PostgreSQL-databasen din direkte om til et RESTful API
+- [pg_graphql](http://github.com/supabase/pg_graphql/) en PostgreSQL-utvidelse some eksponerer et GraphQL API
+- [Storage](https://github.com/supabase/storage-api) git et RESTful-grensesnitt for å administrere filer some er lagret i S3, ved hjelp av Postgres for å administrere tillatelser.
 - [postgres-meta](https://github.com/supabase/postgres-meta) er et RESTful API for å administrere Postgres, slik at du kan hente tabeller, legge til roller og kjøre spørringer osv.
 - [GoTrue](https://github.com/netlify/gotrue) er et SWT-basert API for administrasjon av brukere og utstedelse av SWT-tokens.
 - [Kong](https://github.com/Kong/kong) er en skybasert API-gateway.

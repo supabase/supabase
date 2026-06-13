@@ -49,12 +49,12 @@ Supabase adalah gabungan alat sumber terbuka. Kami membina ciri Firebase menggun
 **Seni bina semasa**
 
 Supabase ialah [platform yang dihoskan](https://supabase.com/dashboard). Anda boleh mendaftar dan mula menggunakan Supabase tanpa memasang apa-apa.
-Anda juga boleh [host sendiri](https://supabase.com/docs/guides/hosting/overview) dan [lokal](https://supabase.com/docs/guides/local-development).
+Anda juga boleh [host sendiri](https://supabase.com/docs/guides/hosting/overview) dan [local](https://supabase.com/docs/guides/local-development).
 
 ![Seni bina](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
-- [PostgreSQL](https://www.postgresql.org/) adalah sistem pangkalan data objek-relasional dengan pengembangan aktif lebih dari 30 tahun yang menjadikannya reputasi yang kuat untuk kebolehpercayaan, ketahanan ciri, dan prestasi.
-- [Realtime](https://github.com/supabase/realtime) adalah pelayan Elixir yang membolehkan anda mendengar sisipan, kemas kini dan pemadaman PostgreSQL menggunakan soket web. Supabase mendengar fungsi replikasi terbina dalam Postgres, menukar aliran bait(byte) replikasi menjadi JSON, kemudian menyiarkan JSON melalui soket web.
+- [PostgreSQL](https://www.postgresql.org/) adalah system pangkalan data objek-relasional dengan pengembangan aktif lebih dari 30 tahun yang menjadikannya reputasi yang kuat untuk kebolehpercayaan, ketahanan ciri, dan prestasi.
+- [Realtime](https://github.com/supabase/realtime) adalah pelayan Elixir yang membolehkan anda mendengar sisipan, kemas kini dan pemadaman PostgreSQL menggunakan socket web. Supabase mendengar fungsi replikasi terbina dalam Postgres, menukar aliran bait(byte) replikasi menjadi JSON, kemudian menyiarkan JSON melalui socket web.
 - [PostgREST](http://postgrest.org/) adalah pelayan web yang mengubah pangkalan data PostgreSQL anda secara langsung menjadi API RESTful
 - [Storage](https://github.com/supabase/storage-api) menyediakan antara muka RESTful untuk menguruskan Fail yang disimpan di S3, menggunakan Postgres untuk menguruskan kebenaran akses.
 - [postgres-meta](https://github.com/supabase/postgres-meta) adalah API RESTful untuk menguruskan Postgres anda, yang membolehkan anda mengambil jadual, menambah peranan, dan menjalankan query dan lain-lain.
@@ -63,7 +63,7 @@ Anda juga boleh [host sendiri](https://supabase.com/docs/guides/hosting/overview
 
 #### Librari Klien
 
-Librari klien kami adalah modular. Setiap sub-librari adalah pelaksanaan standalone untuk satu sistem luaran. Ini adalah salah satu cara kami menyokong alat yang ada.
+Librari klien kami adalah modular. Setiap sub-librari adalah pelaksanaan standalone untuk satu system luaran. Ini adalah salah satu cara kami menyokong alat yang ada.
 
 - **`supabase-{lang}`**: Menggabungkan librari dan menambahkan pengayaan.
   - `postgrest-{lang}`: Librari klien untuk bekerjasama [PostgREST](https://github.com/postgrest/postgrest)

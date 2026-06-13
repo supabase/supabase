@@ -29,7 +29,7 @@ Vitest is a next-generation testing framework powered by Vite. It provides a Jes
 | Test API | test/it function, modifiers like skip, only, concurrent | [core-test-api](references/core-test-api.md) |
 | Describe API | describe/suite for grouping tests and nested suites | [core-describe](references/core-describe.md) |
 | Expect API | Assertions with toBe, toEqual, matchers and asymmetric matchers | [core-expect](references/core-expect.md) |
-| Hooks | beforeEach, afterEach, beforeAll, afterAll, aroundEach | [core-hooks](references/core-hooks.md) |
+| Hooks | beforeEach, afterEach, beforeAll, after all, aroundEach | [core-hooks](references/core-hooks.md) |
 
 ## Features
 
