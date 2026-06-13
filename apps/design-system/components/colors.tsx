@@ -3,6 +3,7 @@ import { cn } from 'ui'
 import color from 'ui/src/lib/tailwind-demo-classes'
 
 import { Grid, GridItem } from './grid'
+import { textColorVariables } from '@/lib/text-color-variables'
 
 const Colors = ({
   definition,
@@ -63,6 +64,8 @@ const Colors = ({
     <>
       <Grid>
         {color[definition].map((x: string, i) => {
+          const textVariable = definition === 'text' ? textColorVariables[x] : undefined
+
           return (
             <GridItem
               key={i}
@@ -70,9 +73,16 @@ const Colors = ({
               onClick={() => handleCopy(x, i)}
             >
               <Example x={x} />
-              <span className="bg-surface-100 rounded-full border px-2 font-mono text-xs text-foreground-lighter group-data-open:text-foreground text-center">
-                {copiedIndex === i ? 'Copied!' : x}
-              </span>
+              <div className="flex flex-col items-center gap-0.5">
+                <span className="bg-surface-100 rounded-full border px-2 font-mono text-xs text-foreground-lighter group-data-open:text-foreground text-center">
+                  {copiedIndex === i ? 'Copied!' : x}
+                </span>
+                {textVariable ? (
+                  <span className="font-mono text-[10px] text-foreground-muted">
+                    {textVariable}
+                  </span>
+                ) : null}
+              </div>
             </GridItem>
           )
         })}

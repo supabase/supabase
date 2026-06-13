@@ -9,6 +9,8 @@ The shorthand utility classes below simplify our full color palette by providing
 
 Use accent text colors (e.g. text-destructive, text-warning) sparingly to avoid visual overload.
 
+Each swatch shows the Tailwind class and the theme variable it resolves to. Foreground utilities map directly to `--foreground-*`. Accent text utilities (`text-brand`, `text-destructive`, `text-warning`) map to dedicated `--*-text` variables so they can meet contrast requirements in light mode without changing fill colors like `bg-brand`, which still use `--*-default`.
+
 <Colors definition={'text'} />
 
 ## Background

@@ -40,6 +40,7 @@ export default {
     'text-destructive',
     'text-warning',
     'text-brand',
+    'text-brand-link',
   ],
   colors: [
     'bg-destructive-200',
@@ -53,6 +54,7 @@ export default {
     'bg-warning-400',
     'bg-warning-500',
     'bg-warning-600',
+    'bg-warning-700',
     'bg-warning',
     'bg-brand-200',
     'bg-brand-300',
