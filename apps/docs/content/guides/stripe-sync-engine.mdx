@@ -1,0 +1,270 @@
+---
+title: 'Stripe Sync Engine'
+subtitle: 'Sync your Stripe data into Postgres with one click from the Supabase Dashboard.'
+---
+
+The Stripe Sync Engine syncs your Stripe data into a dedicated `stripe` schema in your Supabase database. New events are captured in real time through Stripe webhooks, and historical data is backfilled incrementally using Supabase Queues, so you can join Stripe data with your application data directly in SQL.
+
+The engine is open source under the Apache 2.0 license and is maintained jointly by Supabase and Stripe at [github.com/stripe/sync-engine](https://github.com/stripe/sync-engine).
+
+<Admonition type="note">
+
+The Stripe Sync Engine may surface an **Alpha** label in some Supabase Dashboard views. This labeling reflects the rollout and support lifecycle of the integration surface and does not change the install, upgrade, and uninstall behavior documented below.
+
+</Admonition>
+
+## Quickstart
+
+Get from a fresh Supabase project to queryable Stripe data in roughly five minutes.
+
+### 1. Create a restricted Stripe API key
+
+Open [API keys](https://dashboard.stripe.com/apikeys) in the Stripe Dashboard and create a **restricted key** with:
+
+- **Write access** to **Webhook Endpoints**. The Sync Engine registers its own webhook endpoint with Stripe during install.
+- **Read-only access** to every other resource you want to sync (Customers, Subscriptions, Invoices, Charges, Prices, Products, and so on).
+
+Copy the key value. You will paste it into Supabase in the next step.
+
+### 2. Install the integration in Supabase
+
+In your project, open [Integrations → Stripe Sync Engine](/dashboard/project/_/integrations/stripe_sync_engine/overview) and click **Install integration**. Paste the restricted key into the **Stripe API secret key** field and submit.
+
+The install requires the project Admin or Owner role. It provisions the `stripe` schema, deploys the Edge Functions that receive Stripe webhooks, and schedules the backfill jobs.
+
+### 3. Webhooks are configured automatically
+
+Because the restricted key from step 1 has write access to Webhook Endpoints, the Sync Engine registers its webhook endpoint with Stripe directly. No manual webhook setup is required, and new events flow into Postgres as soon as the endpoint is registered.
+
+### 4. Wait for the initial backfill
+
+Backfill begins immediately after install. Progress is reported on the **Settings** tab of the integration page. Depending on the size of your Stripe account, the first full pass takes from a few minutes to a few hours.
+
+### 5. Verify with SQL
+
+Once the Overview tab reports the integration as installed, run a couple of sanity queries from the [SQL Editor](/dashboard/project/_/sql/new):
+
+```sql
+select count(*) as total_customers from stripe.customers;
+```
+
+```sql
+select id, status, current_period_end
+from stripe.subscriptions
+order by current_period_end desc nulls last
+limit 10;
+```
+
+A non-zero customer count and recent subscription rows confirm that both the backfill and the webhook path are working.
+
+## How it works
+
+When you install the integration, Supabase provisions everything the Sync Engine needs and starts syncing your account immediately.
+
+- **Webhooks** capture new events (customer created, subscription updated, invoice paid, and so on) as they happen in Stripe.
+- **Incremental backfill** runs in the background using cursor-based pagination, fanned out across Edge Functions via Supabase Queues. This is how historical data is brought into Postgres after install.
+- **All synced data lands in the `stripe` schema** as regular Postgres tables. You query it with SQL like any other table — joins, aggregates, and indexes all work the way you expect.
+
+## Architecture overview
+
+The Sync Engine sits between your Stripe account and your Postgres database. Data flows in one direction — from Stripe into the `stripe` schema — through two complementary paths:
+
+```
+Stripe (webhooks + REST API)
+            │
+            ▼
+Stripe Sync Engine (Supabase Edge Functions)
+            │
+            ▼
+Supabase Postgres `stripe` schema
+            │
+            ▼
+SQL queries · dashboards · analytics
+```
+
+- **Webhook path (real time).** Stripe delivers events to a Supabase Edge Function deployed by the integration. The function verifies the Stripe signature and writes the event into the `stripe` schema. New customers, subscription updates, invoice changes, and similar events land in Postgres within seconds.
+- **Backfill path (historical and recovery).** A scheduled `pg_cron` job enqueues backfill tasks onto a `pgmq` queue. A second Edge Function pulls tasks from the queue, calls the Stripe REST API with cursor-based pagination, and writes results into the `stripe` schema. Failed batches are retried automatically, which is how the engine respects Stripe rate limits and recovers from transient errors.
+
+Secrets — the Stripe API key and the webhook signing secret — are stored in `supabase_vault` and read at runtime by the Edge Functions. Schema changes between Sync Engine versions are applied through database migrations that run as part of install and upgrade.
+
+## Installing the integration
+
+The Sync Engine installs from the Supabase Dashboard at [Integrations → Stripe Sync Engine](/dashboard/project/_/integrations/stripe_sync_engine/overview).
+
+### Requirements
+
+- A Postgres version of at least `15.6.1.143`. Older projects will see an upgrade prompt during install.
+- The following Postgres extensions, which Supabase enables for you as part of the install: `pgmq`, `supabase_vault`, `pg_cron`, `pg_net`.
+- A Stripe API key with **write access to Webhook Endpoints** and **read-only access to all other categories**. Use a [restricted key](https://dashboard.stripe.com/apikeys) rather than your account secret key.
+- Project Admin or Owner role. Install and uninstall actions require permission to manage Edge Function secrets and are restricted to prevent partial installs.
+
+### What gets created
+
+The install creates the following resources in your project:
+
+- A new database schema named `stripe`.
+- Tables and views in the `stripe` schema for each supported Stripe object.
+- Edge Functions that receive Stripe webhooks and write into the `stripe` schema.
+- Scheduled jobs that run incremental backfills using Supabase Queues.
+
+<Admonition type="note">
+
+If your project already has a schema named `stripe`, the install is blocked to avoid clobbering existing data. Rename or drop that schema and retry.
+
+</Admonition>
+
+### Branching
+
+You can install the Sync Engine on a [branch](/docs/guides/deployment/branching) for safer development and review workflows. Each branch installs its own copy of the engine against the branch database.
+
+### Using the Stripe App Marketplace listing
+
+The Stripe Sync Engine is listed in the Stripe App Marketplace as an entry point for Stripe users who want to start syncing data into Postgres. The listing is informational — the install is always performed from the Supabase Dashboard.
+
+If you arrive at the Sync Engine from a Stripe-side surface:
+
+- The actual install is performed by the integration on the Supabase side and provisions the `stripe` schema, Edge Functions, and scheduled jobs described above.
+- Configuration (the Stripe API key, upgrades, and uninstall) is managed from the Supabase Dashboard, not from any Stripe-side dashboard.
+- Sync status, errors, and synced data are surfaced inside your Supabase project — there is no separate Stripe-side monitoring surface for the engine.
+
+## Querying your Stripe data
+
+Once syncing has started, the `stripe` schema is available in the [Table Editor](/dashboard/project/_/editor?schema=stripe) and in any SQL surface.
+
+Three common patterns:
+
+```sql
+-- Calculate MRR by plan
+select
+  products.name as plan,
+  count(*) as subscribers,
+  sum(prices.unit_amount) / 100.0 as mrr
+from stripe.subscriptions as subscriptions
+join stripe.prices as prices
+  on prices.id = (subscriptions.plan::json->>'id')::text
+join stripe.products as products
+  on products.id = prices.product
+where subscriptions.status = 'active'
+group by products.name
+order by mrr desc;
+```
+
+```sql
+-- Find users who signed up but never converted
+select
+  users.email,
+  users.created_at as signed_up
+from auth.users as users
+left join stripe.customers as customers
+  on customers.email = users.email
+left join stripe.subscriptions as subscriptions
+  on subscriptions.customer = customers.id
+where subscriptions.id is null
+  and users.created_at < now() - interval '7 days';
+```
+
+```sql
+-- Identify active subscriptions that have gone quiet
+select
+  customers.email,
+  subscriptions.current_period_end as renewal_date,
+  max(user_events.created_at) as last_active
+from stripe.customers as customers
+join stripe.subscriptions as subscriptions
+  on subscriptions.customer = customers.id
+join public.user_events as user_events
+  on user_events.user_id = customers.metadata->>'user_id'
+where subscriptions.status = 'active'
+group by customers.email, subscriptions.current_period_end
+having max(user_events.created_at) < now() - interval '30 days';
+```
+
+## Upgrades
+
+When a new version of the Sync Engine is available, an **Upgrade integration** button appears on the integration's Overview tab. Upgrades reuse the existing Stripe API key and run the same install pipeline against your project; no data loss occurs.
+
+## Uninstalling
+
+Uninstalling is destructive and is performed from the integration's Overview tab. It removes:
+
+- The `stripe` schema and all tables it contains
+- All synced Stripe data
+- The Edge Functions that handle Stripe webhooks
+- The scheduled sync jobs
+
+It does not revoke or modify your Stripe API keys. The uninstall action requires Admin or Owner permissions.
+
+## Troubleshooting
+
+### Install fails because a `stripe` schema already exists
+
+**Likely cause.** A schema named `stripe` is already present in the database, for example from a previous install or from the Stripe Foreign Data Wrapper.
+
+**Resolution.** Rename or drop the existing schema, then retry the install. Until the conflict is cleared, the Install button is disabled and its tooltip surfaces the same reason.
+
+### Install button is disabled
+
+**Likely cause.** The current user lacks permission to write Edge Function secrets, which is required to provision the Sync Engine.
+
+**Resolution.** Ask a project Admin or Owner to perform the install. The same permission is required for upgrade and uninstall.
+
+### Install fails with a missing extension error
+
+**Likely cause.** The Sync Engine requires the `pgmq`, `supabase_vault`, `pg_cron`, and `pg_net` extensions. They cannot be enabled on Postgres images older than `15.6.1.143`.
+
+**Resolution.** Upgrade the database from **Settings → Infrastructure** and retry. The Install screen surfaces an upgrade prompt when the required extensions are not available on the current image.
+
+### Install or uninstall appears stuck
+
+**Likely cause.** A transient provisioning failure left the install or uninstall flow in a loading state.
+
+**Resolution.** The Sync Engine auto-resets stuck install and uninstall buttons. If the state does not clear within a few minutes, refresh the page; the integration recomputes its status from the database. If a permanent error occurred, the Overview tab displays the underlying error message with a **Retry installation** or **Retry uninstallation** action.
+
+### Historical data appears slowly
+
+**Likely cause.** Backfill is intentionally incremental. It uses cursor-based pagination against the Stripe REST API and is fanned out across Edge Function invocations via Supabase Queues so it respects Stripe rate limits.
+
+**Resolution.** Monitor progress on the integration's **Settings** tab — the `Sync in progress` indicator and the `Last synced` timestamp update as batches complete. For large Stripe accounts, the first full backfill can take several hours.
+
+### Webhook events are not appearing in `stripe.*` tables
+
+**Likely cause.** Either the integration has been uninstalled, or the stored Stripe API key has lost its write permission on Webhook Endpoints, which prevents the Sync Engine from keeping its webhook endpoint registered.
+
+**Resolution.** Confirm the integration is installed from the [Overview tab](/dashboard/project/_/integrations/stripe_sync_engine/overview). If the Stripe key has been rotated or its scopes have changed, run the upgrade flow from the same tab to refresh the stored credential. If the integration is healthy but a specific event type is missing, check the webhook delivery history in the Stripe Dashboard for failed attempts.
+
+### Integration shows an error after a recent upgrade
+
+**Likely cause.** The upgrade pipeline encountered an issue while applying the new schema migration.
+
+**Resolution.** The Overview tab displays a **Retry upgrade** action together with the underlying error message returned by the database. Most upgrade errors are safe to retry. If the error persists, copy the message and contact Supabase support.
+
+## Stripe Sync Engine vs. Stripe Wrapper
+
+Supabase offers two ways to access Stripe data from Postgres:
+
+- **[Stripe Wrapper](/docs/guides/database/extensions/wrappers/stripe)** is a foreign data wrapper. Queries against `stripe.*` tables translate into Stripe API calls at query time. Best for occasional lookups and small, simple queries.
+- **Stripe Sync Engine** copies your Stripe data into local Postgres tables. Joins, aggregates, and indexes run against local data without hitting the Stripe API. Best for applications that treat billing data as a first-class part of their database.
+
+The two are independent — you can use either one, or both, depending on your access patterns.
+
+## Self-hosting
+
+The Sync Engine can also be embedded into your own backend. It is published as a Docker image and as the `@supabase/stripe-sync-engine` npm package, and runs anywhere you can host a Node.js service or a Supabase Edge Function. See the [upstream repository](https://github.com/stripe/sync-engine) for configuration options, environment variables, and deployment guides.
+
+## See also
+
+- [Integrations overview](/docs/guides/integrations)
+- [Stripe Wrapper (foreign data wrapper)](/docs/guides/database/extensions/wrappers/stripe)
+- [Edge Functions](/docs/guides/functions)
+- [Function secrets](/docs/guides/functions/secrets)
+- [Supabase Queues](/docs/guides/queues)
+- [Supabase Cron](/docs/guides/cron)
+- [Branching](/docs/guides/deployment/branching)
+
+## Resources
+
+- [Sync Engine repository on GitHub](https://github.com/stripe/sync-engine) — source, release notes, CLI, and self-hosting docs
+- [Announcing official support for the Stripe Sync Engine](/blog/stripe-sync-engine-integration) — launch blog with worked SQL examples
+- [Transferring the Stripe Sync Engine to Stripe](/blog/stripe-sync-engine-transfer) — repository transfer announcement (April 2026)
+- [Stripe API keys](https://dashboard.stripe.com/apikeys) — create the restricted key used during install
+- [What are Stripe API keys?](https://support.stripe.com/questions/what-are-stripe-api-keys-and-how-to-find-them) — Stripe's own guidance on key scopes
