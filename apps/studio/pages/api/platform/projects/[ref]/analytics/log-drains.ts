@@ -75,14 +75,25 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       const sourcesGetUrl = new URL(baseUrl)
       sourcesGetUrl.pathname = '/api/sources'
-      const sources = await fetch(sourcesGetUrl, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN}`,
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-      }).then((r) => r.json())
+      let sources: unknown
+      try {
+        sources = await fetch(sourcesGetUrl, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+        }).then((r) => r.json())
+      } catch {
+        return res.status(500).json({ error: { message: 'Failed to fetch sources from upstream' } })
+      }
+
+      if (!Array.isArray(sources)) {
+        return res
+          .status(500)
+          .json({ error: { message: 'Unexpected response format from upstream' } })
+      }
 
       const params = sources
         .filter((source: { name: string; metadata: { type: string } }) =>
