@@ -66,6 +66,62 @@ export const updateStackedChartColors = (isDarkMode: boolean) => {
   STACKED_CHART_FILLS = isDarkMode ? DARK_STACKED_CHART_FILLS : LIGHT_STACKED_CHART_FILLS
 }
 
+export type ChartColorRole = {
+  color: { light: string; dark: string }
+  fill: { light: string; dark: string }
+}
+
+export const CHART_ROLE_COLORS = {
+  used: {
+    color: { light: '#3ECF8E', dark: '#3ECF8E' },
+    fill: { light: '#9FE8C7', dark: '#2A5C3F' },
+  },
+  overhead: {
+    color: { light: '#7C3AED', dark: '#9F7AEA' },
+    fill: { light: '#DDD6FE', dark: '#3C2E63' },
+  },
+  headroom: {
+    color: { light: '#C4C7CB', dark: '#3A3D41' },
+    fill: { light: '#DBDCDF', dark: '#303336' },
+  },
+  limit: {
+    color: { light: '#8B94A3', dark: '#9CA3B0' },
+    fill: { light: '#D5D9DF', dark: '#444A54' },
+  },
+  in: {
+    color: { light: '#2563EB', dark: '#60A5FA' },
+    fill: { light: '#BFDBFE', dark: '#1E3A5F' },
+  },
+  out: {
+    color: { light: '#F59E0B', dark: '#FBBF24' },
+    fill: { light: '#FDE68A', dark: '#5C4218' },
+  },
+  alert: {
+    color: { light: '#EF4444', dark: '#F87171' },
+    fill: { light: '#FECACA', dark: '#5C2A2A' },
+  },
+} as const satisfies Record<string, ChartColorRole>
+
+export const CHART_OVERHEAD_RAMP: ChartColorRole[] = [
+  CHART_ROLE_COLORS.overhead,
+  {
+    color: { light: '#F59E0B', dark: '#FBBF24' },
+    fill: { light: '#FDE68A', dark: '#5C4218' },
+  },
+  {
+    color: { light: '#14B8A6', dark: '#2DD4BF' },
+    fill: { light: '#99F6E4', dark: '#134E4A' },
+  },
+  {
+    color: { light: '#EC4899', dark: '#F472B6' },
+    fill: { light: '#FBCFE8', dark: '#5C2A47' },
+  },
+  {
+    color: { light: '#3B82F6', dark: '#60A5FA' },
+    fill: { light: '#BFDBFE', dark: '#1E3A5F' },
+  },
+]
+
 export type ValidStackColor =
   | 'brand'
   | 'blue'
