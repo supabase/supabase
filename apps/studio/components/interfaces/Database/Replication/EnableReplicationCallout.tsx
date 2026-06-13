@@ -57,14 +57,14 @@ const EnableReplicationModal = () => {
           <Admonition
             type="warning"
             className="rounded-none border-0"
-            title="Replication is currently in Alpha"
+            title="Replication is currently in alpha"
           >
             <p className="text-sm leading-normal!">
-              This feature is in active development and may change as we gather feedback.
-              Availability and behavior can evolve while in Alpha.
+              External replication streams database changes to destinations outside your Supabase
+              project. The feature is in active development and may change as we gather feedback.
             </p>
             <p className="text-sm leading-normal!">
-              Pricing has not been finalized yet. You can enable replication now; we'll announce
+              Pricing is not finalized. You can enable external replication now; we'll announce
               pricing later and notify you before any charges apply.
             </p>
           </Admonition>
@@ -97,7 +97,7 @@ export const EnableReplicationCallout = ({
         <h4>Replicate data to external destinations in real time</h4>
         <p className="text-sm text-foreground-light">
           {hasAccess ? 'Enable external replication' : 'Upgrade to the Pro plan'} to start
-          replicating your database changes to {type ?? 'data warehouses and analytics platforms'}
+          replicating your database changes to {type ?? 'data warehouses and analytics platforms'}.
         </p>
       </div>
       <div className="flex gap-x-2">

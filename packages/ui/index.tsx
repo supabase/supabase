@@ -14,7 +14,6 @@ export * from './src/components/NavMenu'
 
 // OVERLAYS
 
-export * from './src/components/Modal'
 export * from './src/components/SidePanel'
 
 // HTML
@@ -23,7 +22,6 @@ export { Heading } from './src/components/CustomHTMLElements'
 
 // UTILITIES
 
-export * from './src/components/Space'
 export * from './src/components/Loading'
 export * from './src/components/LogoLoader'
 export * from './src/components/AnimatedCounter'

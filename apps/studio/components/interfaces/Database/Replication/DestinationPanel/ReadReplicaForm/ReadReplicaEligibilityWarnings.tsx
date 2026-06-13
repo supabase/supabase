@@ -65,7 +65,7 @@ export const ReadReplicaEligibilityWarnings = () => {
   if (hasOverdueInvoices) {
     return (
       <Admonition type="warning" title="Your organization has overdue invoices">
-        <p>Please resolve all outstanding invoices first before deploying a new read replica</p>
+        <p>Please resolve all outstanding invoices first before deploying a new read replica.</p>
         <Button asChild type="default" className="mt-2">
           <Link href={`/org/${org?.slug}/billing#invoices`}>View invoices</Link>
         </Button>
@@ -81,7 +81,7 @@ export const ReadReplicaEligibilityWarnings = () => {
       >
         <p>
           Projects provisioned by other cloud providers currently will not be able to use read
-          replicas
+          replicas.
         </p>
         <DocsButton
           abbrev={false}
@@ -97,7 +97,7 @@ export const ReadReplicaEligibilityWarnings = () => {
       <Admonition
         type="warning"
         title="Read replicas are not supported for AWS (Revamped) projects"
-        description="Projects provisioned by other cloud providers currently will not be able to use read replicas"
+        description="Projects provisioned by other cloud providers currently will not be able to use read replicas."
       />
     )
   }
@@ -108,7 +108,7 @@ export const ReadReplicaEligibilityWarnings = () => {
         type="warning"
         title="Read replicas can only be deployed with projects on Postgres version 15 and above"
       >
-        <p>If you'd like to use read replicas, please contact us via support</p>
+        <p>If you'd like to use read replicas, please contact us via support.</p>
         <Button asChild type="default" className="mt-2">
           <SupportLink
             queryParams={{

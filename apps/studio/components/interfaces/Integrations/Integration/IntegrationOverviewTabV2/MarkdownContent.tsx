@@ -33,5 +33,5 @@ export const MarkdownContent = ({
 
   const content = remoteContent || localContent
 
-  return <Markdown>{content}</Markdown>
+  return <Markdown className="text-sm">{content}</Markdown>
 }

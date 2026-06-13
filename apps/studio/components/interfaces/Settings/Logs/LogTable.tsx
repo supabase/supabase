@@ -24,6 +24,7 @@ import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresC
 import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewColumnRenderer'
 import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
 import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
+import MultigresColumnRender from './LogColumnRenderers/MultigresColumnRender'
 import type { LogData, LogQueryError, QueryType } from './Logs.types'
 import {
   formatLogsAsCsv,
@@ -265,6 +266,9 @@ export const LogTable = ({
       case 'pg_cron':
         columns = DatabasePostgresColumnRender
         break
+      case 'multigres':
+        columns = MultigresColumnRender
+        break
       default:
         if (firstRow && isDefaultLogPreviewFormat(firstRow)) {
           columns = DefaultPreviewColumnRenderer
@@ -487,7 +491,7 @@ export const LogTable = ({
         </div>
       )}
 
-      <div className="space-x-2">
+      <div className="gap-x-2 flex items-center">
         {IS_PLATFORM && (
           <ButtonTooltip
             type="default"

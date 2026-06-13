@@ -338,8 +338,12 @@ export const gettingstarted: NavMenuConstant = {
   items: [
     { name: 'Build with AI tools', url: '/guides/ai-tools' },
     { name: 'API Keys', url: '/guides/getting-started/api-keys' },
-    { name: 'Local Development', url: '/guides/cli/getting-started' },
+    { name: 'Local Development', url: '/guides/local-development/cli/getting-started' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
+    {
+      name: 'Migrating to new API keys',
+      url: '/guides/getting-started/migrating-to-new-api-keys',
+    },
     {
       name: 'Framework Quickstarts',
       enabled: frameworkQuickstartsEnabled,
@@ -1611,6 +1615,16 @@ export const api: NavMenuConstant = {
         },
       ],
     },
+    {
+      name: 'Debugging',
+      url: undefined,
+      items: [
+        {
+          name: 'Handling Errors in supabase-js',
+          url: '/guides/api/handling-errors-in-supabase-js',
+        },
+      ],
+    },
   ],
 }
 
@@ -2174,6 +2188,11 @@ export const storage: NavMenuConstant = {
         {
           name: 'Querying Vectors',
           url: '/guides/storage/vector/querying-vectors' as `/${string}`,
+        },
+        {
+          name: 'Local Development',
+          url: '/guides/storage/vector/local-development' as `/${string}`,
+          enabled: billingEnabled,
         },
         {
           name: 'Limits',
