@@ -121,16 +121,57 @@ export default {
 
 ### INVALID_RESPONSE_STATUS_CODE
 
-**Cause:** Your Edge Function is returning an invalid HTTP status code — not equal to `101` and outside the range `[200, 599]`.
+**Cause:** Your Edge Function is returning an invalid HTTP status code — not equal to `101` and outside the range `[200, 599]`
 
 **Common causes:**
 
-- Proxying a `fetch()` response from an external service that returns an invalid HTTP status code
+- Proxying an external service that returns an invalid HTTP status code
+
+```ts
+// ...
+
+export default {
+  fetch: withSupabase({ auth: 'none' }, async (req) => {
+    // Fails in case this proxied server return a status >599
+    return fetch('https://some-server-to-proxy', {
+      method: req.method,
+      headers: req.headers,
+      body: req.body,
+    })
+  }),
+}
+```
 
 **Solution:**
 
 - Ensure you are returning a valid HTTP status code
 - For proxy endpoints, do not return the `fetch()` result directly; instead return a new `Response` wrapped in a try-catch block
+
+```ts
+// ...
+
+export default {
+  fetch: withSupabase({ auth: 'none' }, async (req) => {
+    try {
+      const res = await fetch('https://some-server-to-proxy', {
+        method: req.method,
+        headers: req.headers,
+        body: req.body,
+      })
+
+      // Creating a 'new Response()' ensures contructor checks
+      return new Response(await res.body, {
+        headers: res.headers,
+        status: res.status,
+        statusText: res.statusText,
+      })
+    } catch (e) {
+      console.error('Proxy Error', e)
+      return new Response(null, { status: 502 })
+    }
+  }),
+}
+```
 
 ## Authentication Errors
 
@@ -260,3 +301,7 @@ These errors indicate issues with function loading, execution, or the underlying
 
 - Try redeploying your function
 - If the problem persists, contact support
+
+```
+
+```
