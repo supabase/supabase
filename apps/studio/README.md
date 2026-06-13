@@ -57,28 +57,43 @@ pnpm run test -- --watch # run tests in watch mode
 
 Follow the [self-hosting guide](https://supabase.com/docs/guides/hosting/docker) to get started.
 
-```
+```bash
 cd ..
 cd docker
 docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up
 ```
 
-Once you've got that set up, update `.env` in the studio folder with the corresponding values.
+The Docker command also starts a Studio container on port `8082`. If you want to run the Studio frontend from your local checkout with Next.js, stop the Docker Studio container from another terminal:
+
+```bash
+docker stop supabase-studio
+```
+
+Once you've got that set up, update `.env` in the studio folder, or `.env.local` for local-only overrides, with the corresponding values from `docker/.env`.
 
 ```
 POSTGRES_PASSWORD=
+PG_META_CRYPTO_KEY=
 SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_KEY=
 ```
 
+When running the local Studio frontend against Docker services, use the postgres-meta port exposed by `docker-compose.dev.yml`:
+
+```
+STUDIO_PG_META_URL=http://localhost:5555
+```
+
+`PG_META_CRYPTO_KEY` must match the value in `docker/.env`. Studio uses this key to encrypt the connection string sent to postgres-meta, and postgres-meta must use the same key to decrypt it.
+
 Then run the following commands to install dependencies and start the dashboard.
 
-```
-npm install
-npm run dev
+```bash
+pnpm install
+pnpm run dev
 ```
 
-If you would like to configure different defaults for "Default Organization" and "Default Project", you will need to update the `.env` in the studio folder with the corresponding values.
+If you would like to configure different defaults for "Default Organization" and "Default Project", you will need to update `.env` in the studio folder, or `.env.local` for local-only overrides, with the corresponding values.
 
 ```
 DEFAULT_ORGANIZATION_NAME=
