@@ -6,6 +6,14 @@ description: 'Convert TimescaleDB hypertables to Postgres native partitions mana
 
 Starting from Postgres 17, Supabase projects do not have the `timescaledb` extension available. If your project relies on TimescaleDB hypertables, you will need to migrate to standard Postgres tables before upgrading.
 
+## Which migration do I need?
+
+If you're looking for database or project migration guidance, choose the guide that matches your use case:
+
+- [**Database Migrations**](/docs/guides/deployment/database-migrations) — Manage versioned schema changes for your Supabase project using the CLI
+- [**Migrating to Supabase**](/docs/guides/platform/migrating-to-supabase) — Migrate data from another database service to Supabase
+- [**Migrating within Supabase**](/docs/guides/platform/migrating-within-supabase) — Migrate data between two Supabase projects
+
 This guide shows one approach to migrate a hypertable to a native Postgres partitioned table and optionally configure `pg_partman` to automate ongoing partition maintenance.
 The approach outlined in this guide can also be used for traditional partitioned tables.
 
