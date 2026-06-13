@@ -12,6 +12,7 @@ import { RegistryDefinations } from '../types'
 export const ADVISORS_NAV_SHORTCUT_IDS = {
   NAV_ADVISORS_SECURITY: 'nav.advisors-security',
   NAV_ADVISORS_PERFORMANCE: 'nav.advisors-performance',
+  NAV_ADVISORS_DEBUGGER: 'nav.advisors-debugger',
   NAV_ADVISORS_RULES: 'nav.advisors-rules',
 }
 
@@ -30,6 +31,13 @@ export const advisorsNavRegistry: RegistryDefinations<AdvisorsNavShortcutId> = {
     id: ADVISORS_NAV_SHORTCUT_IDS.NAV_ADVISORS_PERFORMANCE,
     label: 'Go to Performance Advisor',
     sequence: ['V', 'P'],
+    showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_ADVISORS,
+  },
+  [ADVISORS_NAV_SHORTCUT_IDS.NAV_ADVISORS_DEBUGGER]: {
+    id: ADVISORS_NAV_SHORTCUT_IDS.NAV_ADVISORS_DEBUGGER,
+    label: 'Go to Database Debugger',
+    sequence: ['V', 'D'],
     showInSettings: false,
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_ADVISORS,
   },

@@ -3409,6 +3409,17 @@ export interface RLSTesterRunQueryClickedEvent {
 }
 
 /**
+ * User clicked the "Run scan" button in the Database Debugger.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface DebuggerScanButtonClickedEvent {
+  action: 'debugger_scan_button_clicked'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -3603,3 +3614,4 @@ export type TelemetryEvent =
   | HeaderLocalDropdownOpenedEvent
   | HeaderLocalVersionPopoverOpenedEvent
   | RLSTesterRunQueryClickedEvent
+  | DebuggerScanButtonClickedEvent
