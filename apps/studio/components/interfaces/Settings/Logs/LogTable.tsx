@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ContextMenuContent } from '@ui/components/shadcn/ui/context-menu'
 import { IS_PLATFORM, useParams } from 'common'
+import { isEqual } from 'lodash'
 import { Copy, Eye, EyeOff, Play } from 'lucide-react'
 import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
@@ -9,9 +10,9 @@ import {
   Button,
   Checkbox,
   cn,
-  ContextMenu,
-  ContextMenuItem,
-  ContextMenuTrigger,
+  ContextMenu_Shadcn_,
+  ContextMenuItem_Shadcn_,
+  ContextMenuTrigger_Shadcn_,
   copyToClipboard,
   ResizableHandle,
   ResizablePanel,
@@ -26,24 +27,17 @@ import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnR
 import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
 import MultigresColumnRender from './LogColumnRenderers/MultigresColumnRender'
 import type { LogData, LogQueryError, QueryType } from './Logs.types'
-import {
-  formatLogsAsCsv,
-  formatLogsAsJson,
-  formatLogsAsMarkdown,
-  isDefaultLogPreviewFormat,
-} from './Logs.utils'
+import { formatLogsAsJson, formatLogsAsMarkdown, isDefaultLogPreviewFormat } from './Logs.utils'
 import LogSelection from './LogSelection'
 import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 import { LogsTableEmptyState } from './LogsTableEmptyState'
-import { MultiSelectActionBar, type LogCopyFormat } from './MultiSelectActionBar'
+import { MultiSelectActionBar } from './MultiSelectActionBar'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
 import { useSelectedLog } from '@/hooks/analytics/useSelectedLog'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useProfile } from '@/lib/profile'
-import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
-import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { ResponseError } from '@/types'
 
 interface Props {
@@ -103,7 +97,7 @@ export const LogTable = ({
   const [selectedLogId] = useSelectedLog()
   const [selectedRow, setSelectedRow] = useState<LogData | null>(null)
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
-  const [copiedFormat, setCopiedFormat] = useState<LogCopyFormat | null>(null)
+  const [copiedFormat, setCopiedFormat] = useState<'json' | 'markdown' | null>(null)
   const triggerRef = useRef<HTMLDivElement>(null)
   const [activeRow, setActiveRow] = useState<LogData | null>(null)
   const [contextMenuKey, setContextMenuKey] = useState(0)
@@ -323,86 +317,58 @@ export const LogTable = ({
         : String(value)
   }
 
-  // Arrow-key navigation. Unlike mouse-click (`onRowClick`), keyboard nav must
-  // preserve any existing multi-select checkmarks — clearing `selectedRows`
-  // here would wipe the user's checked rows the moment they press an arrow.
-  const navigate = (direction: 'down' | 'up') => {
-    if (logDataRows.length === 0) return
-    const focusRow = (row: LogData) => {
-      setSelectedRow(row)
-      onSelectedLogChange?.(row)
-    }
-    if (!selectedRow) {
-      focusRow(logDataRows[0])
-      return
-    }
+const getRowKey = useCallback(
+    (row: LogData) => row.id ?? row.timestamp ?? JSON.stringify(row),
+    []
+  )
+
+  const getSelectedRowIndex = useCallback(() => {
+    if (!selectedRow) return -1
     const selectedKey = getRowKey(selectedRow)
-    const currentIdx = logDataRows.findIndex((row) => getRowKey(row) === selectedKey)
-    if (currentIdx === -1) {
-      focusRow(logDataRows[0])
-      return
-    }
-    if (direction === 'down' && currentIdx < logDataRows.length - 1) {
-      focusRow(logDataRows[currentIdx + 1])
-    } else if (direction === 'up' && currentIdx > 0) {
-      focusRow(logDataRows[currentIdx - 1])
-    }
-  }
+    return logDataRows.findIndex((row) => getRowKey(row) === selectedKey)
+  }, [logDataRows, selectedRow, getRowKey])
 
-  useShortcut(SHORTCUT_IDS.LOGS_PREVIEW_START_NAV_DOWN, () => navigate('down'), {
-    enabled: logDataRows.length > 0,
-  })
+  const navigate = useCallback(
+    (direction: 'down' | 'up') => {
+      if (logDataRows.length === 0) return
 
-  useShortcut(SHORTCUT_IDS.LOGS_PREVIEW_START_NAV_UP, () => navigate('up'), {
-    enabled: logDataRows.length > 0,
-  })
+      const currentIndex = getSelectedRowIndex()
 
-  useShortcut(
-    SHORTCUT_IDS.LOGS_PREVIEW_TOGGLE_ALL_SELECTION,
-    () => {
-      if (selectedRows.size === logDataRows.length) {
-        setSelectedRows(new Set())
+      if (direction === 'down') {
+        const nextIndex = currentIndex < 0 ? 0 : Math.min(currentIndex + 1, logDataRows.length - 1)
+        const nextRow = logDataRows[nextIndex]
+        setSelectedRow(nextRow)
+        onSelectedLogChange?.(nextRow)
       } else {
-        setSelectedRows(new Set(logDataRows.map((row) => getRowKey(row))))
+        const nextIndex = currentIndex <= 0 ? 0 : currentIndex - 1
+        const nextRow = logDataRows[nextIndex]
+        setSelectedRow(nextRow)
+        onSelectedLogChange?.(nextRow)
+      }
+    },
+    [logDataRows, getSelectedRowIndex, onSelectedLogChange]
+  )
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setSelectedRows(new Set())
         setSelectedRow(null)
         onSelectedLogChange?.(null)
+        return
+      }
+
+      if (!logDataRows.length || selectedRows.size > 0) return
+
+      if (event.key === 'ArrowUp') {
+        event.preventDefault()
+        navigate('up')
+      } else if (event.key === 'ArrowDown') {
+        event.preventDefault()
+        navigate('down')
       }
     },
-    { enabled: logDataRows.length > 0 }
-  )
-
-  useShortcut(
-    SHORTCUT_IDS.LOGS_PREVIEW_TOGGLE_ROW_SELECTION,
-    () => {
-      if (!selectedRow) return
-      const key = getRowKey(selectedRow)
-      const next = new Set(selectedRows)
-      if (next.has(key)) {
-        next.delete(key)
-      } else {
-        next.add(key)
-      }
-      setSelectedRows(next)
-    },
-    { enabled: selectedRow !== null }
-  )
-
-  useShortcut(
-    SHORTCUT_IDS.LOGS_PREVIEW_CLOSE_PANEL,
-    () => {
-      onSelectedLogChange?.(null)
-      setSelectedRow(null)
-    },
-    { enabled: selectionOpen }
-  )
-
-  useShortcut(
-    SHORTCUT_IDS.LOGS_PREVIEW_EXIT_SELECTION,
-    () => {
-      setSelectedRows(new Set())
-      ;(document.activeElement as HTMLElement | null)?.blur()
-    },
-    { enabled: !selectionOpen && selectedRows.size > 0 }
+    [logDataRows, selectedRows, navigate, onSelectedLogChange]
   )
 
   useEffect(() => {
@@ -410,6 +376,13 @@ export const LogTable = ({
       setSelectedRow(null)
     }
   }, [selectedLog, isSelectedLogLoading])
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [handleKeyDown])
 
   useEffect(() => {
     if (!isLoading && !selectedRow) {
@@ -432,12 +405,11 @@ export const LogTable = ({
     return () => clearTimeout(timer)
   }, [copiedFormat])
 
-  function handleCopySelectedRows(format: LogCopyFormat) {
-    let text = ''
-    if (format === 'json') text = formatLogsAsJson(selectedRowsData)
-    if (format === 'markdown') text = formatLogsAsMarkdown(selectedRowsData)
-    if (format === 'csv') text = formatLogsAsCsv(selectedRowsData)
-
+  function handleCopySelectedRows(format: 'json' | 'markdown') {
+    const text =
+      format === 'json'
+        ? formatLogsAsJson(selectedRowsData)
+        : formatLogsAsMarkdown(selectedRowsData)
     copyToClipboard(text, () => {
       setCopiedFormat(format)
       toast.success(
@@ -446,22 +418,7 @@ export const LogTable = ({
     })
   }
 
-  useShortcut(SHORTCUT_IDS.RESULTS_COPY_JSON, () => handleCopySelectedRows('json'), {
-    enabled: selectedRowsData.length > 0,
-    conflictBehavior: 'allow',
-  })
-
-  useShortcut(SHORTCUT_IDS.RESULTS_COPY_MARKDOWN, () => handleCopySelectedRows('markdown'), {
-    enabled: selectedRowsData.length > 0,
-    conflictBehavior: 'allow',
-  })
-
-  useShortcut(SHORTCUT_IDS.RESULTS_COPY_CSV, () => handleCopySelectedRows('csv'), {
-    enabled: selectedRowsData.length > 0,
-    conflictBehavior: 'allow',
-  })
-
-  const logsExplorerTableHeader = (
+  const LogsExplorerTableHeader = () => (
     <div
       className={cn(
         'flex w-full items-center justify-between border-t bg-surface-100 px-5 py-2',
@@ -475,7 +432,6 @@ export const LogTable = ({
           text={`Results ${data && data.length ? `(${data.length})` : ''}`}
           results={data}
           fileName={`supabase-logs-${ref}.csv`}
-          enableCopyShortcuts={selectedRowsData.length === 0}
         />
       </div>
 
@@ -524,7 +480,7 @@ export const LogTable = ({
     </div>
   )
 
-  const renderErrorAlert = () => {
+  const RenderErrorAlert = () => {
     if (!error) return null
     const childProps = {
       isCustomQuery: queryType ? false : true,
@@ -543,16 +499,16 @@ export const LogTable = ({
     )
   }
 
-  const renderNoResultAlert = () => {
+  const RenderNoResultAlert = () => {
     if (EmptyState) return EmptyState
-    return <LogsTableEmptyState />
+    else return <LogsTableEmptyState />
   }
 
   if (!data) return null
 
   return (
     <section className={'h-full flex w-full flex-col flex-1'}>
-      {!queryType && logsExplorerTableHeader}
+      {!queryType && <LogsExplorerTableHeader />}
       <ResizablePanelGroup orientation="horizontal">
         <ResizablePanel
           id="log-table-content"
@@ -580,12 +536,12 @@ export const LogTable = ({
                 }}
               />
             </div>
-            <ContextMenu modal={false}>
-              <ContextMenuTrigger asChild>
+            <ContextMenu_Shadcn_ modal={false}>
+              <ContextMenuTrigger_Shadcn_ asChild>
                 <div ref={triggerRef} className="fixed pointer-events-none w-0 h-0" />
-              </ContextMenuTrigger>
+              </ContextMenuTrigger_Shadcn_>
               <ContextMenuContent key={contextMenuKey}>
-                <ContextMenuItem
+                <ContextMenuItem_Shadcn_
                   className="gap-x-2"
                   onSelect={() => {
                     const eventMessage = activeRow?.event_message
@@ -598,13 +554,13 @@ export const LogTable = ({
                 >
                   <Copy size={14} />
                   <span className="text-xs">Copy event message</span>
-                </ContextMenuItem>
+                </ContextMenuItem_Shadcn_>
               </ContextMenuContent>
-            </ContextMenu>
+            </ContextMenu_Shadcn_>
             <DataGrid
               role="table"
               style={{ flex: '1 1 0%', minHeight: 0 }}
-              className={cn('border-t-0! border-b-0!', {
+              className={cn('border-0', {
                 'data-grid--simple-logs': queryType,
                 'data-grid--logs-explorer': !queryType,
               })}
@@ -614,7 +570,7 @@ export const LogTable = ({
               rowClass={(row: LogData) => {
                 const key = getRowKey(row)
                 const isMultiSelected = selectedRows.has(key)
-                const isSingleSelected = selectedRow !== null && getRowKey(selectedRow) === key
+                const isSingleSelected = isEqual(row, selectedRow)
                 return cn(
                   'font-mono tracking-tight bg-studio! hover:bg-surface-100! cursor-pointer',
                   {
@@ -634,8 +590,8 @@ export const LogTable = ({
                   // gridColumn: '1 / -1' makes the fallback span all CSS grid columns,
                   // including the checkbox column we prepend, so it fills the full width.
                   <div style={{ gridColumn: '1 / -1' }}>
-                    {logDataRows.length === 0 && !error && renderNoResultAlert()}
-                    {error && renderErrorAlert()}
+                    {logDataRows.length === 0 && !error && <RenderNoResultAlert />}
+                    {error && <RenderErrorAlert />}
                   </div>
                 ) : null,
               }}
