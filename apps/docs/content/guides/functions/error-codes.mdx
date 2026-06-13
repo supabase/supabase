@@ -95,9 +95,25 @@ try {
 
 **Cause:** Your Edge Function threw an uncaught exception.
 
+```ts
+// ...
+
+function initSomething() {
+  throw new Error('Some unhandled error')
+}
+
+initSomething() // Error threw outsite request handler
+
+export default {
+  fetch: withSupabase({ auth: 'none' }, async () => {
+    return new Response()
+  }),
+}
+```
+
 **Common causes:**
 
-- Unhandled JavaScript errors in your function code
+- Unhandled JavaScript errors in your function code, outsite request handler
 - Missing error handling for async operations
 - Invalid JSON parsing
 
