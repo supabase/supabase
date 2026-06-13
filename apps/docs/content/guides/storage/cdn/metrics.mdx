@@ -5,7 +5,7 @@ description: 'Learn how Supabase Storage caches objects with a CDN.'
 sidebar_label: 'CDN'
 ---
 
-Cache hits can be determined via the `metadata.response.headers.cf_cache_status` key in our [Logs Explorer](/docs/guides/platform/logs#logs-explorer). Any value that corresponds to either `HIT`, `STALE`, `REVALIDATED`, or `UPDATING` is categorized as a cache hit.
+Cache hits can be determined via the `metadata.response.headers.cf_cache_status` key in our [Logs Explorer](/docs/guides/telemetry/logs#logs-explorer). Any value that corresponds to either `HIT`, `STALE`, `REVALIDATED`, or `UPDATING` is categorized as a cache hit.
 The following example query will show the top cache misses from the `edge_logs`:
 
 ```sql
