@@ -52,10 +52,9 @@ function MessageDisplayContent({ message }: { message: VercelMessage }) {
   return (
     <div className="flex-1 min-w-0">
       {messageParts?.length > 0
-        ? messageParts.map((part: NonNullable<VercelMessage['parts'][number]>, idx) => {
-            const isLastPart = idx === messageParts.length - 1
-            return <MessagePartSwitcher key={idx} part={part} isLastPart={isLastPart} />
-          })
+        ? messageParts.map((part: NonNullable<VercelMessage['parts'][number]>, idx) => (
+            <MessagePartSwitcher key={idx} part={part} />
+          ))
         : content && (
             <MessageDisplayTextMessage id={id} isLoading={isLoading} readOnly={readOnly}>
               {content}
