@@ -21,7 +21,7 @@ Supabase provides a logging interface specific to each product. You can use simp
 >
 <TabPanel id="api" label="API">
 
-[API logs](/dashboard/project/_/logs/edge-logs) show all network requests and response for the REST and GraphQL [APIs](../../guides/database/api). If [Read Replicas](/docs/guides/platform/read-replicas) are enabled, logs are automatically filtered between databases as well as the [API Load Balancer](/docs/guides/platform/read-replicas#api-load-balancer) endpoint. Logs for a specific endpoint can be toggled with the `Source` button on the upper-right section of the dashboard.
+[API logs](/dashboard/project/_/logs/edge-logs) show all network requests and response for the REST and GraphQL [APIs](../../guides/api). If [Read Replicas](/docs/guides/platform/read-replicas) are enabled, logs are automatically filtered between databases as well as the [API Load Balancer](/docs/guides/platform/read-replicas#api-load-balancer) endpoint. Logs for a specific endpoint can be toggled with the `Source` button on the upper-right section of the dashboard.
 
 When viewing logs originating from the API Load Balancer endpoint, the upstream database or the one that eventually handles the request can be found under the `Redirect Identifier` field. This is equivalent to `metadata.load_balancer_redirect_identifier` when querying the underlying logs.
 
@@ -171,7 +171,7 @@ alter role postgres set pgaudit.log to 'function, write, ddl';
 
 To help with debugging, we recommend adjusting the log scope to only relevant statements as having too wide of a scope would result in a lot of noise in your Postgres logs.
 
-Note that in the above example, the role is set to `postgres`. To log user-traffic flowing through the [HTTP APIs](../../guides/database/api#rest-api-overview) powered by PostgREST, set your configuration values for the `authenticator`.
+Note that in the above example, the role is set to `postgres`. To log user-traffic flowing through the [HTTP APIs](../../guides/api#rest-api-overview) powered by PostgREST, set your configuration values for the `authenticator`.
 
 ```sql
 -- for API-related logs
