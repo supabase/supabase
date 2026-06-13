@@ -20,6 +20,7 @@ const CTAForm = dynamic(() => import('components/Enterprise/CTAForm'))
 const Enterprise: NextPage = () => (
   <>
     <NextSeo
+      canonical="https://supabase.com/enterprise"
       title={content.metadata.metaTitle}
       description={content.metadata.metaDescription}
       openGraph={{
