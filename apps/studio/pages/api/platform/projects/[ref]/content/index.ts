@@ -131,4 +131,12 @@ const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 }
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '5mb',
+    },
+  },
+}
+
 export default wrappedHandler
