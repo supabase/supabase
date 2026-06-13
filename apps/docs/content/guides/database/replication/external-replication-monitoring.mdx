@@ -1,18 +1,18 @@
 ---
 id: 'external-replication-monitoring'
-title: 'External replication monitoring'
-description: 'Monitor the status and health of your external replication pipelines.'
+title: 'External replication (ETL) monitoring'
+description: 'Monitor the status and health of your external replication (ETL) pipelines.'
 subtitle: 'Track replication status, view logs, and troubleshoot issues.'
 sidebar_label: 'Monitoring'
 ---
 
 <Admonition type="caution" title="Private Alpha">
 
-External replication is currently in private alpha. Access is limited and features may change.
+External replication (ETL) is currently in private alpha. Access is limited and features may change.
 
 </Admonition>
 
-After setting up external replication, you can monitor the status and health of your replication pipelines directly from the Dashboard. The pipeline is the active Postgres replication process that continuously streams changes from your database to your destination.
+After setting up external replication (ETL), you can monitor the status and health of your replication pipelines directly from the Dashboard. The pipeline is the active Postgres replication process that continuously streams changes from your database to your destination.
 
 ### Viewing pipeline status
 
@@ -69,7 +69,7 @@ The detailed status page shows:
 | **Connected**           | Whether the pipeline's replication slot is active and currently being used.                                                                                         | `Not connected` while the pipeline should be running usually means you should check pipeline status and logs.                                             |
 | **Slot status**         | How safely Postgres is keeping the WAL files the pipeline still needs.                                                                                              | `Unreserved` and `Lost` require action. See [Slot statuses](#slot-statuses).                                                                              |
 
-External replication uses one main pipeline replication slot for ongoing changes. During the initial copy phase, it can also create temporary table-sync replication slots. These temporary slots let multiple tables copy in parallel, make large table copies faster, and allow individual tables to be retried or copied again without restarting the whole pipeline.
+External replication (ETL) uses one main pipeline replication slot for ongoing changes. During the initial copy phase, it can also create temporary table-sync replication slots. These temporary slots let multiple tables copy in parallel, make large table copies faster, and allow individual tables to be retried or copied again without restarting the whole pipeline.
 
 Temporary table-sync slots show the same kind of lag and slot health metrics while they are active. After a table finishes copying and catches up, its temporary slot is removed and ongoing changes continue through the main pipeline slot. For overall replication health, focus first on the main pipeline slot.
 
@@ -265,9 +265,9 @@ If you notice issues with your replication:
 4. **Verify publication**: Ensure your Postgres publication is properly configured
 5. **Monitor replication lag**: High lag may indicate performance issues
 
-For more troubleshooting tips, see the [external replication FAQ](/docs/guides/database/replication/external-replication-faq).
+For more troubleshooting tips, see the [external replication (ETL) FAQ](/docs/guides/database/replication/external-replication-faq).
 
 ### Next steps
 
-- [Set up external replication](/docs/guides/database/replication/external-replication-setup)
-- [View external replication FAQ](/docs/guides/database/replication/external-replication-faq)
+- [Set up external replication (ETL)](/docs/guides/database/replication/external-replication-setup)
+- [View external replication (ETL) FAQ](/docs/guides/database/replication/external-replication-faq)

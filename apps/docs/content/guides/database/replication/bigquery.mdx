@@ -1,14 +1,14 @@
 ---
 id: 'bigquery-destination'
 title: 'BigQuery destination'
-description: 'Configure BigQuery as an external replication destination.'
+description: 'Configure BigQuery as an external replication (ETL) destination.'
 subtitle: 'Replicate Supabase Postgres tables to BigQuery.'
 sidebar_label: 'BigQuery'
 ---
 
 <Admonition type="caution" title="Private Alpha">
 
-External replication is currently in private alpha. Access is limited and features may change.
+External replication (ETL) is currently in private alpha. Access is limited and features may change.
 
 </Admonition>
 
@@ -90,7 +90,7 @@ Once configured, replication to BigQuery:
 
 ## Source table requirements
 
-BigQuery replication requires each source table to have a primary key, and the publication must include the primary-key columns. External replication declares those columns as the BigQuery destination primary key so BigQuery CDC can apply `UPSERT` and `DELETE` rows.
+BigQuery replication requires each source table to have a primary key, and the publication must include the primary-key columns. External replication (ETL) declares those columns as the BigQuery destination primary key so BigQuery CDC can apply `UPSERT` and `DELETE` rows.
 
 BigQuery primary keys are `NOT ENFORCED`, and BigQuery CDC supports composite primary keys with up to 16 columns. Your source primary key must stay unique and non-null because BigQuery uses it to match CDC rows.
 
@@ -145,7 +145,7 @@ This structure handles table truncations while maintaining query compatibility.
 
 ## Schema change support
 
-Schema change support for BigQuery is currently in beta. External replication supports a limited set of schema changes while the feature is developed further.
+Schema change support for BigQuery is currently in beta. External replication (ETL) supports a limited set of schema changes while the feature is developed further.
 
 Supported schema changes:
 
@@ -162,7 +162,7 @@ Unsupported or limited schema changes:
 - Filling existing rows for `ADD COLUMN ... DEFAULT`
 - Unsupported default expressions
 
-BigQuery requires added columns to be nullable. When a replicated `ADD COLUMN` includes a default, external replication can apply supported default metadata for future rows, but BigQuery does not backfill existing rows through that DDL. Existing destination rows remain `NULL` unless you run a separate backfill.
+BigQuery requires added columns to be nullable. When a replicated `ADD COLUMN` includes a default, external replication (ETL) can apply supported default metadata for future rows, but BigQuery does not backfill existing rows through that DDL. Existing destination rows remain `NULL` unless you run a separate backfill.
 
 Supported defaults are best-effort translations to BigQuery SQL. Unsupported defaults are skipped with a warning instead of failing replication.
 
