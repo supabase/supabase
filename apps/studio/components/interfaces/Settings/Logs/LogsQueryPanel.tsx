@@ -38,6 +38,7 @@ import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
 import { LogsWarning, LogTemplate } from './Logs.types'
 import Table from '@/components/to-be-cleaned/Table'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
 import { DOCS_URL } from '@/lib/constants'
 
 export interface LogsQueryPanelProps {
@@ -98,7 +99,13 @@ const LogsQueryPanel = ({
   }, [value.from, value.to, value.text, value.isHelper])
 
   const [open, setOpen] = useState(false)
-  const [selectedSchema, setSelectedSchema] = useState(logConstants.schemas[0])
+
+  const showMultigresLogs = useShowMultigresLogs()
+  const schemas = logConstants.schemas.filter(
+    (schema) => schema.reference !== 'multigres_logs' || showMultigresLogs
+  )
+
+  const [selectedSchema, setSelectedSchema] = useState(schemas[0])
 
   return (
     <div className="flex items-center border-b bg-surface-100 h-(--header-height)">
@@ -285,7 +292,7 @@ const LogsQueryPanel = ({
                     <CommandList>
                       <CommandEmpty>No source found.</CommandEmpty>
                       <CommandGroup>
-                        {logConstants.schemas.map((schema) => (
+                        {schemas.map((schema) => (
                           <CommandItem
                             key={schema.reference}
                             value={schema.reference}

@@ -10,7 +10,7 @@ import { DeployEdgeFunctionWarningModal } from '@/components/interfaces/EdgeFunc
 import { formatFunctionBodyToFiles } from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
-import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FileExplorerAndEditor } from '@/components/ui/FileExplorerAndEditor'
 import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
@@ -18,18 +18,19 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { useEdgeFunctionBodyQuery } from '@/data/edge-functions/edge-function-body-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeployMutation } from '@/data/edge-functions/edge-functions-deploy-mutation'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePreventNavigationOnUnsavedChanges } from '@/hooks/ui/usePreventNavigationOnUnsavedChanges'
 import { BASE_PATH } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 const CodePage = () => {
   const { ref, functionSlug } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const [showDeployWarning, setShowDeployWarning] = useState(false)
 
   const { can: canDeployFunction } = useAsyncCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
@@ -122,23 +123,11 @@ const CodePage = () => {
   const handleDeployClick = () => {
     if (files.length === 0 || isLoadingFiles) return
     setShowDeployWarning(true)
-    sendEvent({
-      action: 'edge_function_deploy_updates_button_clicked',
-      groups: {
-        project: ref ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
-    })
+    track('edge_function_deploy_updates_button_clicked')
   }
 
   const handleDeployConfirm = () => {
-    sendEvent({
-      action: 'edge_function_deploy_updates_confirm_clicked',
-      groups: {
-        project: ref ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
-    })
+    track('edge_function_deploy_updates_confirm_clicked')
     onUpdate()
   }
 
@@ -152,6 +141,11 @@ const CodePage = () => {
       list.map(({ id, name, content }) => ({ id, name, content }))
     return !isEqual(normalizeFiles(initialFiles), normalizeFiles(files))
   }, [initialFiles, files])
+
+  const { handleCancelNavigation, handleConfirmNavigation, shouldConfirmNavigation } =
+    usePreventNavigationOnUnsavedChanges({
+      hasChanges: hasUnsavedChanges,
+    })
 
   return (
     <div className="flex flex-col h-full">
@@ -255,7 +249,11 @@ const CodePage = () => {
         onConfirm={handleDeployConfirm}
         isDeploying={isDeploying}
       />
-      <PreventNavigationOnUnsavedChanges hasChanges={hasUnsavedChanges} />
+      <DiscardChangesConfirmationDialog
+        visible={shouldConfirmNavigation}
+        onCancel={handleCancelNavigation}
+        onClose={handleConfirmNavigation}
+      />
     </div>
   )
 }

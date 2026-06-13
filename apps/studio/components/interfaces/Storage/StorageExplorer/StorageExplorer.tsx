@@ -1,7 +1,7 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { compact, get, isEmpty, uniqBy } from 'lodash'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
 
 import { useSelectedBucket } from '../FilesBuckets/useSelectedBucket'
 import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
@@ -16,7 +16,6 @@ import { useStorageExplorerShortcuts } from './useStorageExplorerShortcuts'
 import { useStoragePreference } from './useStoragePreference'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import type { Bucket } from '@/data/storage/buckets-query'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
@@ -64,7 +63,7 @@ export const StorageExplorer = () => {
 
   useStorageExplorerShortcuts({ onClearSearch: handleClearSearch })
 
-  const fetchContents = useStaticEffectEvent(async (bucket: Bucket) => {
+  const fetchContents = useEffectEvent(async (bucket: Bucket) => {
     if (view === STORAGE_VIEWS.LIST) {
       const currentFolderIdx = openedFolders.length - 1
       const currentFolder = openedFolders[currentFolderIdx]
@@ -102,7 +101,8 @@ export const StorageExplorer = () => {
 
   useEffect(() => {
     if (bucket && projectRef) fetchContents(bucket)
-  }, [bucket, projectRef, debouncedSearchString, selectedBucket.id, fetchContents])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [bucket, projectRef, debouncedSearchString, selectedBucket.id])
 
   /** Checkbox selection methods */
   /** [Joshen] We'll only support checkbox selection for files ONLY */

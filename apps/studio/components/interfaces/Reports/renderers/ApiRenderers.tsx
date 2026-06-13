@@ -16,7 +16,7 @@ import {
 } from 'ui'
 import * as z from 'zod'
 
-import { queryParamsToObject } from '../Reports.utils'
+import { queryParamsToObject, safeDecodeURIComponent } from '../Reports.utils'
 import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
 import { COUNTRY_LAT_LON } from '@/components/interfaces/ProjectCreation/ProjectCreation.constants'
 import {
@@ -372,7 +372,7 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
           <TextFormatter className="text-foreground-light" value={datum.path} />
           <TextFormatter
             className="max-w-sm text-foreground-lighter truncate "
-            value={decodeURIComponent(datum.search || '')}
+            value={safeDecodeURIComponent(datum.search || '')}
           />
         </div>
       </div>

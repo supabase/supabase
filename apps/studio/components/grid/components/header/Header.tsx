@@ -235,6 +235,7 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
         table: snap.table,
         projectRef: project.ref,
         connectionString: project.connectionString ?? null,
+        roleImpersonationState: roleImpersonationState as RoleImpersonationState,
       })
       if (hydrated.status !== 'ok') {
         throw new Error('Failed to fetch full values for truncated cells')
@@ -258,11 +259,17 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
   }
 
   const exportParams = snap.allRowsSelected
-    ? ({ type: 'fetch_all', filters, sorts } as const)
+    ? ({
+        type: 'fetch_all',
+        filters,
+        sorts,
+        roleImpersonationState: roleImpersonationState as RoleImpersonationState,
+      } as const)
     : ({
         type: 'provided_rows',
         table: snap.table,
         rows: allRows.filter((x) => snap.selectedRows.has(x.idx)),
+        roleImpersonationState: roleImpersonationState as RoleImpersonationState,
       } as const)
 
   const { exportCsv, confirmationModal: exportCsvConfirmationModal } = useExportAllRowsAsCsv(

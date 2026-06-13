@@ -19,7 +19,8 @@ export const getReportAttributesV2: (
   maxConnections?: MaxConnectionsData,
   pgBouncerMaxConnections?: number,
   isSpendCapEnabled?: boolean,
-  showDiskIOBurstBalanceChart?: boolean
+  showDiskIOBurstBalanceChart?: boolean,
+  showMemoryCommitmentChart?: boolean
 ) => ReportAttributes[] = (
   entitledFeatures,
   project,
@@ -27,7 +28,8 @@ export const getReportAttributesV2: (
   maxConnections,
   pgBouncerMaxConnections,
   isSpendCapEnabled,
-  showDiskIOBurstBalanceChart
+  showDiskIOBurstBalanceChart,
+  showMemoryCommitmentChart
 ) => {
   const computeVariantId = mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
   const provisionedDiskIops = diskConfig?.attributes?.iops
@@ -90,13 +92,57 @@ export const getReportAttributesV2: (
           omitFromTotal: true,
           tooltip: 'Total RAM available on this instance',
         },
+        {
+          attribute: 'ram_usage_swap',
+          provider: 'infra-monitoring',
+          label: 'Swap',
+          omitFromTotal: true,
+          tooltip:
+            'Swap space in use by the operating system. Sustained swap usage indicates memory pressure and may degrade database performance',
+        },
+      ],
+    },
+    {
+      id: 'memory-commitment',
+      label: 'Memory commitment',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-commitment`,
+      hide: !showMemoryCommitmentChart,
+      showTooltip: true,
+      showLegend: true,
+      hideChartType: false,
+      defaultChartStyle: 'bar',
+      showMaxValue: true,
+      showGrid: true,
+      syncId: 'database-reports',
+      valuePrecision: 2,
+      YAxisProps: {
+        width: 75,
+        tickFormatter: (value: number) => formatBytesMinMB(value, 2),
+      },
+      attributes: [
+        {
+          attribute: 'ram_commit_used',
+          provider: 'infra-monitoring',
+          label: 'Committed',
+          tooltip:
+            'Total memory the kernel has promised to processes (RAM plus swap). Sustained values near or above the commit limit indicate overcommitment and a high risk of out-of-memory failures',
+        },
+        {
+          attribute: 'ram_commit_limit',
+          provider: 'infra-monitoring',
+          label: 'Commit limit',
+          isMaxValue: true,
+          omitFromTotal: true,
+          tooltip:
+            'Maximum memory the kernel will commit (RAM plus swap, adjusted by the overcommit ratio). Committed memory approaching this limit puts the database at risk of being killed when the system runs out of memory',
+        },
       ],
     },
     {
       id: 'swap-usage',
       label: 'Swap usage',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-usage`,
-      hide: false,
+      hide: true,
       showTooltip: true,
       showLegend: false,
       hideChartType: false,
@@ -133,7 +179,6 @@ export const getReportAttributesV2: (
       showLegend: true,
       showMaxValue: false,
       showGrid: true,
-      normalizeVisibleStackToPercent: true,
       YAxisProps: {
         width: 55,
         domain: [0, 100] as [number, number],
@@ -191,24 +236,6 @@ export const getReportAttributesV2: (
           fill: { light: '#DB8BD3', dark: '#4A3D5C' },
           tooltip:
             'CPU time spent on other tasks (e.g., background processes, software interrupts)',
-        },
-        {
-          attribute: 'cpu_usage_busy_idle',
-          provider: 'infra-monitoring',
-          label: 'Idle',
-          format: '%',
-          omitFromTotal: true,
-          color: { light: '#6EA85F', dark: '#A3FFC2' },
-          fill: { light: '#A6D8AE', dark: '#2A5C3F' },
-          tooltip: 'CPU time spent idle and available for new work',
-        },
-        {
-          attribute: 'cpu_usage_max',
-          provider: 'reference-line',
-          label: 'Max',
-          value: 100,
-          tooltip: 'Max CPU usage',
-          isMaxValue: true,
         },
       ],
     },
