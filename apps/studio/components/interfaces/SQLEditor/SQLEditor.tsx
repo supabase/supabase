@@ -1059,7 +1059,7 @@ export const SQLEditor = () => {
                 {results.autoLimit !== undefined && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button type="default" iconRight={<ChevronUp size={14} />}>
+                      <Button variant="default" iconRight={<ChevronUp size={14} />}>
                         Limit results to:{' '}
                         {ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === snapV2.limit)?.label}
                       </Button>

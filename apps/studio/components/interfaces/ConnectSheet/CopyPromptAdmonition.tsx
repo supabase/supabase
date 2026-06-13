@@ -133,7 +133,9 @@ export function CopyPromptAdmonition({ stepsContainerRef }: CopyPromptAdmonition
       type="tip"
       showIcon={false}
       layout="horizontal"
-      actions={<CopyButton type="default" copyLabel="Copy prompt" asyncText={handleCopyPrompt} />}
+      actions={
+        <CopyButton variant="default" copyLabel="Copy prompt" asyncText={handleCopyPrompt} />
+      }
     >
       <div className="absolute -inset-16 z-0 opacity-50">
         <img

@@ -60,7 +60,7 @@ export const PublicationsComboBox = ({
     >
       <PopoverTrigger asChild>
         <Button
-          type="default"
+          variant="default"
           size="medium"
           className={cn(
             'w-full [&>span]:w-full text-left',

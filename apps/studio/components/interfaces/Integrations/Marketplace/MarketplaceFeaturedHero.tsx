@@ -85,7 +85,7 @@ export const MarketplaceFeaturedHero = ({
         </div>
         <Button
           aria-label={isPaused ? 'Resume auto-rotation' : 'Pause auto-rotation'}
-          type="default"
+          variant="default"
           size="tiny"
           className="px-1.5"
           icon={isPaused ? <Play size={10} /> : <Pause size={10} />}

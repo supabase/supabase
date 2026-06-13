@@ -187,7 +187,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                             last viewed
                           </div>
                           <Button
-                            type="primary"
+                            variant="primary"
                             size="tiny"
                             loading={currentBranch && isUpdating}
                             onClick={() =>
@@ -252,7 +252,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                       <Button
-                                        type="text"
+                                        variant="text"
                                         icon={<MoreVertical />}
                                         className="px-1"
                                         onClick={(e) => e.stopPropagation()}
@@ -366,7 +366,7 @@ const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
         <div className="flex items-center gap-x-2">
           <Button
             asChild
-            type="text"
+            variant="text"
             icon={<MessageCircle className="text-muted" strokeWidth={1} />}
           >
             <a

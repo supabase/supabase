@@ -147,15 +147,15 @@ export const CustomExpiryModal = () => {
             )}
           </DialogSection>
           <DialogFooter>
-            <Button type="default" onClick={handleClose}>
+            <Button variant="default" onClick={handleClose}>
               Cancel
             </Button>
             <Button
               form={formId}
               disabled={!isDirty || isSubmitting}
               loading={isSubmitting}
-              htmlType="submit"
-              type="primary"
+              type="submit"
+              variant="primary"
             >
               Get signed URL
             </Button>

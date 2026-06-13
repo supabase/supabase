@@ -10,7 +10,7 @@ export default function EmptyStatePresentationalIcon() {
       title="Create a vector bucket"
       description="Store, index, and query your vector embeddings at scale."
     >
-      <Button size="tiny" type="primary" icon={<Plus size={14} />}>
+      <Button size="tiny" variant="primary" icon={<Plus size={14} />}>
         Create bucket
       </Button>
     </EmptyStatePresentational>

@@ -419,8 +419,8 @@ export const Page = () => {
               />
             </SheetSection>
             <SheetFooter>
-              <Button type="default">Cancel</Button>
-              <Button htmlType="submit">Submit</Button>
+              <Button variant="default">Cancel</Button>
+              <Button type="submit">Submit</Button>
             </SheetFooter>
           </form>
         </Form>

@@ -87,7 +87,7 @@ export function FilterSideBar({
               ) : undefined
             }
             actions={
-              <Button type="default" size="tiny" onClick={handleGoBackToOldLogs}>
+              <Button variant="default" size="tiny" onClick={handleGoBackToOldLogs}>
                 Switch back
               </Button>
             }
@@ -109,7 +109,7 @@ export function FilterSideBar({
             </div>
           }
           actions={
-            <Button asChild type="default">
+            <Button asChild variant="default">
               <Link href={`/project/${ref}/settings/log-drains`}>Go to Log Drains</Link>
             </Button>
           }

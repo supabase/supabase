@@ -46,7 +46,7 @@ interface AccessButtonProps {
 const AllowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
   <Tooltip>
     <TooltipTrigger asChild>
-      <Button type="default" disabled={disabled} onClick={() => onClick(true)}>
+      <Button variant="default" disabled={disabled} onClick={() => onClick(true)}>
         Allow all access
       </Button>
     </TooltipTrigger>
@@ -61,7 +61,7 @@ const AllowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
 const DisallowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
   <ButtonTooltip
     disabled={disabled}
-    type="default"
+    variant="default"
     onClick={() => onClick(true)}
     tooltip={{
       content: {
@@ -121,7 +121,7 @@ export const NetworkRestrictions = () => {
             {!canUpdateNetworkRestrictions ? (
               <ButtonTooltip
                 disabled
-                type="primary"
+                variant="primary"
                 tooltip={{
                   content: {
                     side: 'bottom',
@@ -135,7 +135,7 @@ export const NetworkRestrictions = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    type="primary"
+                    variant="primary"
                     disabled={!canUpdateNetworkRestrictions}
                     iconRight={<ChevronDown size={14} />}
                   >
@@ -283,7 +283,7 @@ export const NetworkRestrictions = () => {
                               <p className="text-sm font-mono">{ip}</p>
                             </div>
                             <Button
-                              type="default"
+                              variant="default"
                               onClick={() => setSelectedRestrictionToRemove(ip)}
                             >
                               Remove

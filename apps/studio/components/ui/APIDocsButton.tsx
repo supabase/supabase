@@ -18,7 +18,7 @@ export const APIDocsButton = ({ section, source, label, tooltip }: APIDocsButton
   return (
     <ButtonTooltip
       size="tiny"
-      type="default"
+      variant="default"
       onClick={() => {
         if (section) snap.setActiveDocsSection(section)
         snap.setShowProjectApiDocs(true)

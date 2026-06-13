@@ -176,7 +176,7 @@ const ReportsMenu = () => {
           <div className="px-2">
             <ButtonTooltip
               block
-              type="default"
+              variant="default"
               icon={<Plus />}
               disabled={!canCreateCustomReport}
               className="justify-start grow"

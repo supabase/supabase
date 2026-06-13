@@ -163,7 +163,7 @@ const ChartHandler = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
-                type="default"
+                variant="default"
                 className="px-1.5"
                 icon={chartStyle === 'bar' ? <Activity /> : <BarChartIcon />}
                 onClick={() => setChartStyle(chartStyle === 'bar' ? 'line' : 'bar')}

@@ -106,7 +106,7 @@ const FunctionList = ({
           <TableRow key={x.id}>
             <TableCell className="truncate">
               <Button
-                type="text"
+                variant="text"
                 className="text-link-table-cell text-sm disabled:opacity-100 disabled:no-underline p-0 hover:bg-transparent title"
                 disabled={isLocked || !canUpdateFunctions}
                 onClick={() => editFunction(x)}
@@ -151,7 +151,7 @@ const FunctionList = ({
                       <DropdownMenuTrigger asChild>
                         <Button
                           aria-label="More options"
-                          type="default"
+                          variant="default"
                           className="px-1"
                           icon={<MoreVertical />}
                         />
@@ -221,7 +221,7 @@ const FunctionList = ({
                   ) : (
                     <ButtonTooltip
                       disabled
-                      type="default"
+                      variant="default"
                       icon={<MoreVertical />}
                       className="px-1"
                       tooltip={{

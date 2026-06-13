@@ -60,7 +60,7 @@ export const ReplicationDisclaimerDialog = ({
         <DialogSectionSeparator />
 
         <DialogFooter>
-          <Button type="default" disabled={isLoading} onClick={() => onOpenChange(false)}>
+          <Button variant="default" disabled={isLoading} onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button loading={isLoading} onClick={onConfirm}>

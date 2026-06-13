@@ -450,7 +450,7 @@ export const TriggerSheet = ({
                                   </p>
                                 </div>
                                 <Button
-                                  type="default"
+                                  variant="default"
                                   onClick={() => setShowFunctionSelector(true)}
                                 >
                                   Change function
@@ -469,14 +469,14 @@ export const TriggerSheet = ({
 
           <SheetFooter className="shrink-0">
             <Button
-              type="default"
-              htmlType="reset"
+              variant="default"
+              type="reset"
               disabled={isCreating || isUpdating}
               onClick={confirmOnClose}
             >
               Cancel
             </Button>
-            <Button form={formId} htmlType="submit" loading={isCreating || isUpdating}>
+            <Button form={formId} type="submit" loading={isCreating || isUpdating}>
               {isEditing ? 'Save' : 'Create'} trigger
             </Button>
           </SheetFooter>

@@ -128,7 +128,7 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
                   actions={
                     <div className="flex items-center justify-center">
                       <Button
-                        type="default"
+                        variant="default"
                         className="w-7"
                         icon={showCatalogUrl ? <Eye /> : <EyeOff />}
                         onClick={() => setShowCatalogUrl(!showCatalogUrl)}
@@ -228,7 +228,7 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
                 />
               </FormControl>
               <Button
-                type="default"
+                variant="default"
                 icon={showSecretAccessKey ? <Eye /> : <EyeOff />}
                 className="w-7 absolute right-6 top-[4px]"
                 onClick={() => setShowSecretAccessKey(!showSecretAccessKey)}
@@ -490,7 +490,7 @@ export const SnowflakeFields = ({ form }: { form: UseFormReturn<DestinationPanel
                   actions={
                     <div className="flex items-center justify-center">
                       <Button
-                        type="default"
+                        variant="default"
                         className="w-7"
                         icon={showPrivateKeyPassphrase ? <Eye /> : <EyeOff />}
                         onClick={() => setShowPrivateKeyPassphrase(!showPrivateKeyPassphrase)}
@@ -585,7 +585,7 @@ export const AnalyticsBucketFields = ({
               {isLoadingBuckets ? (
                 <Button
                   disabled
-                  type="default"
+                  variant="default"
                   className="w-full justify-between"
                   size="small"
                   iconRight={<Loader2 className="animate-spin" />}
@@ -595,7 +595,7 @@ export const AnalyticsBucketFields = ({
               ) : isErrorBuckets ? (
                 <Button
                   disabled
-                  type="default"
+                  variant="default"
                   className="w-full justify-start"
                   size="small"
                   icon={<WarningIcon />}
@@ -654,7 +654,7 @@ export const AnalyticsBucketFields = ({
               {isLoadingNamespaces && canSelectNamespace ? (
                 <Button
                   disabled
-                  type="default"
+                  variant="default"
                   className="w-full justify-between"
                   size="small"
                   iconRight={<Loader2 className="animate-spin" />}
@@ -664,7 +664,7 @@ export const AnalyticsBucketFields = ({
               ) : isErrorNamespaces ? (
                 <Button
                   disabled
-                  type="default"
+                  variant="default"
                   className="w-full justify-start"
                   size="small"
                   icon={<WarningIcon />}
@@ -757,7 +757,7 @@ export const AnalyticsBucketFields = ({
                   serviceApiKey ? (
                     <div className="flex items-center justify-center">
                       <Button
-                        type="default"
+                        variant="default"
                         className="w-7"
                         icon={showCatalogToken ? <Eye /> : <EyeOff />}
                         onClick={() => setShowCatalogToken(!showCatalogToken)}
@@ -813,7 +813,7 @@ export const AnalyticsBucketFields = ({
               {isLoadingKeys ? (
                 <Button
                   disabled
-                  type="default"
+                  variant="default"
                   className="w-full justify-between"
                   size="small"
                   iconRight={<Loader2 className="animate-spin" />}
@@ -823,7 +823,7 @@ export const AnalyticsBucketFields = ({
               ) : isErrorKeys ? (
                 <Button
                   disabled
-                  type="default"
+                  variant="default"
                   className="w-full justify-start"
                   size="small"
                   icon={<WarningIcon />}
@@ -881,7 +881,7 @@ export const AnalyticsBucketFields = ({
                   />
                 </FormControl>
                 <Button
-                  type="default"
+                  variant="default"
                   icon={showSecretAccessKey ? <Eye /> : <EyeOff />}
                   className="w-7 absolute right-6 top-[4px]"
                   onClick={() => setShowSecretAccessKey(!showSecretAccessKey)}

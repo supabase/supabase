@@ -183,7 +183,7 @@ const ChartActions = React.forwardRef<HTMLDivElement, ChartActionsProps>(
               <Tooltip key={index}>
                 <TooltipTrigger asChild>
                   <Button
-                    type="default"
+                    variant="default"
                     size="tiny"
                     className={cn('px-1.5 text-foreground-lighter', action.className)}
                     onClick={action.onClick}
@@ -465,7 +465,7 @@ const ChartDisabledState = ({ icon, label, description, actions }: ChartDisabled
             {actions.map((action, index) => (
               <Button
                 key={index}
-                type="primary"
+                variant="primary"
                 size="tiny"
                 className={cn(action.className)}
                 onClick={action.onClick}

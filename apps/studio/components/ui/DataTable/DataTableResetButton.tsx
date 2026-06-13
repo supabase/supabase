@@ -18,7 +18,7 @@ export function DataTableResetButton() {
       label="Reset filters"
       side="left"
     >
-      <Button type="default" size="tiny" onClick={() => table.resetColumnFilters()} icon={<X />}>
+      <Button variant="default" size="tiny" onClick={() => table.resetColumnFilters()} icon={<X />}>
         Reset
       </Button>
     </ShortcutTooltip>

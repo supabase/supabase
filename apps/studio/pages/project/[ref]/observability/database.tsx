@@ -237,7 +237,7 @@ const DatabaseUsage = () => {
               side="bottom"
             >
               <Button
-                type="default"
+                variant="default"
                 disabled={isRefreshing}
                 icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
                 className="w-7"
@@ -363,14 +363,14 @@ const DatabaseUsage = () => {
 
                   <div className="col-span-full lg:col-span-4 xl:col-span-7 lg:text-right">
                     {project?.cloud_provider === 'AWS' ? (
-                      <Button asChild type="default">
+                      <Button asChild variant="default">
                         <Link href={`/project/${ref}/settings/compute-and-disk`}>
                           Increase disk size
                         </Link>
                       </Button>
                     ) : (
                       <ButtonTooltip
-                        type="default"
+                        variant="default"
                         disabled={!canUpdateDiskSizeConfig}
                         onClick={() => setshowIncreaseDiskSizeModal(true)}
                         tooltip={{
@@ -435,7 +435,7 @@ const DatabaseUsage = () => {
                       inactive.
                     </p>
 
-                    <Button asChild type="default" icon={<ExternalLink />}>
+                    <Button asChild variant="default" icon={<ExternalLink />}>
                       <Link
                         href={`${DOCS_URL}/guides/platform/database-size#disk-space-usage`}
                         target="_blank"

@@ -45,8 +45,8 @@ const SonnerToaster = ({ toastOptions, ...props }: ToasterProps) => {
           title: 'font-normal!',
           description:
             'text-xs group-[.toast]:text-foreground-lighter transition-opacity group-data-[expanded=false]:opacity-0 group-data-[front=true]:opacity-100!',
-          actionButton: cn('block', buttonVariants({ type: 'primary', size: 'tiny' })),
-          cancelButton: cn('block', buttonVariants({ type: 'default', size: 'tiny' })),
+          actionButton: cn('block', buttonVariants({ variant: 'primary', size: 'tiny' })),
+          cancelButton: cn('block', buttonVariants({ variant: 'default', size: 'tiny' })),
           // success: 'group toast group-[.toaster]:!bg-brand-200 group-[.toaster]:border-brand-500',
           warning:
             'group toast group-[.toaster]:!bg-warning-200 group-[.toaster]:!border-warning-500',

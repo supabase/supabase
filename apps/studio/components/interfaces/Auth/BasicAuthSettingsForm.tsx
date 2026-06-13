@@ -276,7 +276,12 @@ export const BasicAuthSettingsForm = () => {
                             </Link>{' '}
                             to ensure that access to your data is restricted where required.
                           </p>
-                          <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
+                          <Button
+                            asChild
+                            variant="default"
+                            className="w-min"
+                            icon={<ExternalLink />}
+                          >
                             <Link href={`${DOCS_URL}/guides/auth/auth-anonymous#access-control`}>
                               View access control docs
                             </Link>
@@ -327,13 +332,13 @@ export const BasicAuthSettingsForm = () => {
                 </CardContent>
                 <CardFooter className="justify-end space-x-2">
                   {isDirty && (
-                    <Button type="default" onClick={() => form.reset()}>
+                    <Button variant="default" onClick={() => form.reset()}>
                       Cancel
                     </Button>
                   )}
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     disabled={!canUpdateConfig || isUpdatingConfig || !isDirty}
                     loading={isUpdatingConfig}
                   >

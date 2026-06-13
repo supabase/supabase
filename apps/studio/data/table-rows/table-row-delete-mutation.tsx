@@ -105,7 +105,7 @@ export const useTableRowDeleteMutation = ({
             action: (
               <div className="w-full flex gap-x-2 mx-0! mt-3">
                 {/* [Joshen] Ideally we also are able to add this CTA but we can't guarantee this info without an on-demand fetch */}
-                {/* <Button asChild key="cta-1" type="default">
+                {/* <Button asChild key="cta-1" variant="default">
                     <Link href={`/project/${projectRef}/editor`}>
                       View "{referencingTable}" table
                     </Link>

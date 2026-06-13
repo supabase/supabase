@@ -128,7 +128,7 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
                   <div className="flex gap-x-2">
                     <Button
                       asChild
-                      type="secondary"
+                      variant="secondary"
                       iconRight={<ArrowUpRight size={16} strokeWidth={1.5} />}
                     >
                       <Link
