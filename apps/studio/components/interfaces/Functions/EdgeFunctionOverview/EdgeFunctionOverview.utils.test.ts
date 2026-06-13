@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import {
   EDGE_FUNCTION_CHART_INTERVALS,
@@ -7,6 +7,7 @@ import {
   formatMetric,
   formatRate,
   formatReferenceDelta,
+  formatShortFromNow,
   getBucketedTimeRange,
   getChartEmptyStateCopy,
   getChartTimeRangeLabels,
@@ -194,6 +195,17 @@ describe('EdgeFunctionOverview.utils', () => {
     expect(bucketedEnd.toISOString()).toBe('2026-03-20T10:00:00.000Z')
     expect(rollingStart.toISOString()).toBe('2026-03-20T09:37:00.000Z')
     expect(rollingEnd.toISOString()).toBe('2026-03-20T10:37:00.000Z')
+  })
+
+  it('formats short relative timestamps', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-03-20T10:00:00.000Z'))
+
+    expect(formatShortFromNow('2026-03-20T09:28:00.000Z')).toBe('32m ago')
+    expect(formatShortFromNow('2026-03-20T09:59:30.000Z')).toBe('30s ago')
+    expect(formatShortFromNow('2026-03-19T10:00:00.000Z')).toBe('1d ago')
+
+    vi.useRealTimers()
   })
 
   it('formats metric, rate, and reference deltas consistently', () => {

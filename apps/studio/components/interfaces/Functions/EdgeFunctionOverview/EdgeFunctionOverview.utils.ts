@@ -52,28 +52,28 @@ export type InvocationUpdateAnnotation = {
 export const EDGE_FUNCTION_CHART_INTERVALS: ChartIntervals[] = [
   {
     key: '15min',
-    label: '15 min',
+    label: 'Last 15 minutes',
     startValue: 15,
     startUnit: 'minute',
     format: 'MMM D, h:mm:ssa',
   },
   {
     key: '1hr',
-    label: '1 hour',
+    label: 'Last 60 minutes',
     startValue: 1,
     startUnit: 'hour',
     format: 'MMM D, h:mma',
   },
   {
     key: '3hr',
-    label: '3 hours',
+    label: 'Last 3 hours',
     startValue: 3,
     startUnit: 'hour',
     format: 'MMM D, h:mma',
   },
   {
     key: '1day',
-    label: '1 day',
+    label: 'Last 24 hours',
     startValue: 1,
     startUnit: 'day',
     format: 'MMM D, h:mma',
@@ -276,6 +276,32 @@ export const formatMetric = (value?: number, unit?: string) => {
 
   const formatted = unit === 'MB' ? value.toFixed(1) : Math.round(value).toLocaleString('en-US')
   return unit ? `${formatted}${unit}` : formatted
+}
+
+export const formatShortFromNow = (input: string | number | Date): string => {
+  const then = dayjs(input)
+  if (!then.isValid()) return ''
+
+  const seconds = Math.max(0, dayjs().diff(then, 'second'))
+  if (seconds < 60) return `${seconds}s ago`
+
+  const minutes = Math.floor(seconds / 60)
+  if (minutes < 60) return `${minutes}m ago`
+
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `${hours}h ago`
+
+  const days = Math.floor(hours / 24)
+  if (days < 7) return `${days}d ago`
+
+  const weeks = Math.floor(days / 7)
+  if (weeks < 5) return `${weeks}w ago`
+
+  const months = Math.floor(days / 30)
+  if (months < 12) return `${months}mo ago`
+
+  const years = Math.floor(days / 365)
+  return `${years}y ago`
 }
 
 export const formatRate = (count: number, total: number) =>
