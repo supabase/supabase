@@ -37,6 +37,12 @@ import {
   Textarea,
 } from 'ui'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
+import {
+  DatePicker,
+  DatePickerButton,
+  DatePickerContent,
+  DatePickerTrigger,
+} from 'ui-patterns/DatePicker'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
 import { getKeyValueFieldArrayValidationIssues } from 'ui-patterns/form/KeyValueFieldArray/validation'
@@ -70,7 +76,7 @@ const formSchema = z
     region: z.string().min(1, 'Region is required'),
     schemas: z.array(z.string()).min(1, 'At least one schema is required'),
     queueType: z.enum(['basic', 'partitioned']),
-    expiryDate: z.date().optional(),
+    expiryDate: z.date(),
     password: z.string().min(8, 'Password must be at least 8 characters'),
     duration: z
       .union([
@@ -673,25 +679,21 @@ export default function FormPatternsSidePanel() {
                       description="Date selection with calendar popover"
                     >
                       <FormControl className="col-span-6">
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              type="outline"
-                              className="bg-control w-full justify-start text-left font-normal px-3 py-4"
-                              icon={<CalendarIcon className="h-4 w-4" />}
-                            >
+                        <DatePicker>
+                          <DatePickerTrigger asChild>
+                            <DatePickerButton type="default">
                               {field.value ? format(field.value, 'PPP') : 'Pick a date'}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
+                            </DatePickerButton>
+                          </DatePickerTrigger>
+                          <DatePickerContent>
                             <Calendar
                               mode="single"
                               selected={field.value}
                               onSelect={field.onChange}
                               initialFocus
                             />
-                          </PopoverContent>
-                        </Popover>
+                          </DatePickerContent>
+                        </DatePicker>
                       </FormControl>
                     </FormItemLayout>
                   )}
