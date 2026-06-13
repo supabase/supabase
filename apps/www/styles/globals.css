@@ -113,6 +113,10 @@
   }
 }
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @layer utilities {
   .run {
     animation-play-state: running;
