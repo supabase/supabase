@@ -30,6 +30,8 @@ export * from './src/lib/utils'
 // DATA ENTRY
 export * from './src/components/ExpandingTextArea'
 
+export * from './src/components/PrePostTab'
+
 // layout
 export * from './src/components/LoadingLine'
 
