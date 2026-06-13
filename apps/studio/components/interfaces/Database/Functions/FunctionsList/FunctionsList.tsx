@@ -19,6 +19,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
 import FunctionList from './FunctionList'
+import { useFilteredFunctions } from './FunctionList.utils'
 import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { CreateFunction } from '@/components/interfaces/Database/Functions/CreateFunction'
 import {
@@ -243,6 +244,14 @@ export const FunctionsList = () => {
     setSelectedFunctionToDelete,
   ])
 
+  const filteredFunctions = useFilteredFunctions({
+    functions,
+    filterString,
+    returnTypeFilter,
+    securityFilter,
+    schema: selectedSchema,
+  })
+
   if (isLoading) return <GenericSkeletonLoader />
   if (isError) return <AlertError error={error} subject="Failed to retrieve database functions" />
 
@@ -291,7 +300,7 @@ export const FunctionsList = () => {
               </Shortcut>
               <Input
                 ref={searchInputRef}
-                placeholder="Search for a function"
+                placeholder="Search for a function by name"
                 size="tiny"
                 icon={<Search />}
                 value={filterString}
@@ -394,12 +403,10 @@ export const FunctionsList = () => {
                   schema={selectedSchema}
                   filterString={filterString}
                   isLocked={isSchemaLocked}
-                  returnTypeFilter={returnTypeFilter ?? []}
-                  securityFilter={securityFilter ?? []}
                   duplicateFunction={duplicateFunction}
                   editFunction={editFunction}
                   deleteFunction={(fn) => setSelectedFunctionToDelete(fn.id.toString())}
-                  functions={functions ?? []}
+                  functions={filteredFunctions}
                 />
               </TableBody>
             </Table>

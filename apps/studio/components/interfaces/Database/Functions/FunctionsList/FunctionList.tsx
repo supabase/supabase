@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { includes, noop, sortBy } from 'lodash'
+import { noop } from 'lodash'
 import { Copy, Edit, Edit2, FileText, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -27,8 +27,6 @@ interface FunctionListProps {
   schema: string
   filterString: string
   isLocked: boolean
-  returnTypeFilter: string[]
-  securityFilter: string[]
   duplicateFunction: (fn: any) => void
   editFunction: (fn: any) => void
   deleteFunction: (fn: any) => void
@@ -39,8 +37,6 @@ const FunctionList = ({
   schema,
   filterString,
   isLocked,
-  returnTypeFilter,
-  securityFilter,
   duplicateFunction = noop,
   editFunction = noop,
   deleteFunction = noop,
@@ -51,27 +47,13 @@ const FunctionList = ({
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
 
-  const filteredFunctions = (functions ?? []).filter((x) => {
-    const matchesName = includes(x.name.toLowerCase(), filterString.toLowerCase())
-    const matchesReturnType =
-      returnTypeFilter.length === 0 || returnTypeFilter.includes(x.return_type)
-    const matchesSecurity =
-      securityFilter.length === 0 ||
-      (securityFilter.includes('definer') && x.security_definer) ||
-      (securityFilter.includes('invoker') && !x.security_definer)
-    return matchesName && matchesReturnType && matchesSecurity
-  })
-  const _functions = sortBy(
-    filteredFunctions.filter((x) => x.schema == schema),
-    (func) => func.name.toLocaleLowerCase()
-  )
   const projectRef = selectedProject?.ref
   const { can: canUpdateFunctions } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'functions'
   )
 
-  if (_functions.length === 0 && filterString.length === 0) {
+  if (functions.length === 0 && filterString.length === 0) {
     return (
       <TableRow key={schema}>
         <TableCell colSpan={5}>
@@ -84,7 +66,7 @@ const FunctionList = ({
     )
   }
 
-  if (_functions.length === 0 && filterString.length > 0) {
+  if (functions.length === 0 && filterString.length > 0) {
     return (
       <TableRow key={schema}>
         <TableCell colSpan={5}>
@@ -99,7 +81,7 @@ const FunctionList = ({
 
   return (
     <>
-      {_functions.map((x) => {
+      {functions.map((x) => {
         const isApiDocumentAvailable = schema == 'public' && x.return_type !== 'trigger'
 
         return (
