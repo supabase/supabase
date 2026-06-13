@@ -206,13 +206,12 @@ export interface ButtonProps
   // omit `type` as we use it to change type of button
   // replaced with `htmlType`
   extends
-    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type'>,
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
     // omit 'disabled' as it is included in HTMLButtonElement
     Omit<ButtonVariantProps, 'disabled'>,
     Omit<LoadingVariantProps, 'type'> {
   asChild?: boolean
   variant?: ButtonVariantProps['variant']
-  type?: React.ButtonHTMLAttributes<HTMLButtonElement>['type']
   icon?: React.ReactNode
   iconLeft?: React.ReactNode
   iconRight?: React.ReactNode
