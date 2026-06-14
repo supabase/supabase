@@ -2,14 +2,6 @@ import { expect, Page } from '@playwright/test'
 
 import { createApiResponseWaiter, waitForTableToLoad } from './wait-for-response.js'
 
-const FILTER_BAR_KEY = 'supabase-ui-table-filter-bar'
-
-export async function enableFilterBar(page: Page) {
-  await page.evaluate((key) => {
-    localStorage.setItem(key, 'true')
-  }, FILTER_BAR_KEY)
-}
-
 export function getFilterBarInput(page: Page) {
   return page.getByTestId('filter-bar-freeform-input')
 }
@@ -95,8 +87,4 @@ export async function setupFilterBarPage(page: Page, ref: string, editorUrl: str
   const loadPromise = waitForTableToLoad(page, ref)
   await page.goto(editorUrl)
   await loadPromise
-  await enableFilterBar(page)
-  const reloadPromise = waitForTableToLoad(page, ref)
-  await page.reload({ waitUntil: 'networkidle' })
-  await reloadPromise
 }

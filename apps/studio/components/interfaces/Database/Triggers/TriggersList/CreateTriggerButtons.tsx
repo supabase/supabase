@@ -32,7 +32,7 @@ export const CreateTriggerButtons = ({
         type={buttonType}
         disabled={!hasTables || !canCreateTriggers}
         onClick={onCreateTrigger}
-        className="flex-grow"
+        className="grow"
         icon={showPlusIcon ? <Plus /> : undefined}
         tooltip={{
           content: {

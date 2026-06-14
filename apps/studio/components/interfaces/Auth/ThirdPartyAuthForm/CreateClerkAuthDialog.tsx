@@ -11,10 +11,10 @@ import {
   DialogHeader,
   DialogSection,
   DialogTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  Input,
   Separator,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -56,7 +56,6 @@ const FormSchema = z
 export const CreateClerkAuthIntegrationDialog = ({
   visible,
   onClose,
-  onDelete,
 }: CreateClerkAuthIntegrationProps) => {
   const { ref: projectRef } = useParams()
   const { mutate: createAuthIntegration, isPending } = useCreateThirdPartyAuthIntegrationMutation({
@@ -103,7 +102,7 @@ export const CreateClerkAuthIntegrationDialog = ({
 
         <Separator />
         <DialogSection>
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <p className="text-sm text-foreground-light">
                 Register your Clerk domain. Visit{' '}
@@ -116,25 +115,25 @@ export const CreateClerkAuthIntegrationDialog = ({
                 </InlineLink>{' '}
                 to configure your Clerk instance.
               </p>
-              <FormField_Shadcn_
+              <FormField
                 key="domain"
                 control={form.control}
                 name="domain"
                 render={({ field }) => (
                   <FormItemLayout label="Clerk Domain">
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
+                    <FormControl>
+                      <Input
                         {...field}
                         placeholder={
                           'https://clerk.example.com or https://example.clerk.accounts.dev'
                         }
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </form>
-          </Form_Shadcn_>
+          </Form>
         </DialogSection>
         <DialogFooter>
           <Button disabled={isPending} type="default" onClick={() => onClose()}>

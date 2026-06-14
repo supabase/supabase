@@ -36,6 +36,9 @@ create table document_sections (
 Notice how we record the `owner_id` on each document. Let's create an RLS policy that restricts access to `document_sections` based on whether or not they own the linked document:
 
 ```sql
+-- Grant the privileges the roles need
+GRANT SELECT ON public.document_sections TO authenticated;
+
 -- enable row level security
 alter table document_sections enable row level security;
 

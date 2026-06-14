@@ -16,8 +16,20 @@ import {
   type Snippet,
 } from './snippets.utils'
 
-// Mock fs/promises
-vi.mock('fs/promises')
+// Mock fs/promises — explicit factory required since Vitest 4 automocking
+// doesn't create mock functions for getter-based exports on Node built-ins.
+vi.mock('fs/promises', () => ({
+  default: {
+    access: vi.fn(),
+    mkdir: vi.fn(),
+    readdir: vi.fn(),
+    readFile: vi.fn(),
+    writeFile: vi.fn(),
+    unlink: vi.fn(),
+    rm: vi.fn(),
+    stat: vi.fn(),
+  },
+}))
 const mockedFS = vi.mocked(fs)
 
 // Mock SNIPPETS_DIR from constants

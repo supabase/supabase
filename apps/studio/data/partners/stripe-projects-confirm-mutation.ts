@@ -13,10 +13,7 @@ async function confirmAccountRequest({ arId }: ConfirmAccountRequestVariables) {
 
   const { data, error } = await post(
     '/platform/stripe/projects/provisioning/account_requests/{id}/confirm',
-    {
-      params: { path: { id: arId } },
-      body: {},
-    }
+    { params: { path: { id: arId } } }
   )
 
   if (error) handleError(error)

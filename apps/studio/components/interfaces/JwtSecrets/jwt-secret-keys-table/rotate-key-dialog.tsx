@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import {
   Badge,
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
   DialogDescription,
   DialogFooter,
@@ -12,7 +12,7 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Label_Shadcn_,
+  Label,
   Skeleton,
 } from 'ui'
 
@@ -138,11 +138,11 @@ export function RotateKeyDialog({
           <>
             <div className="text-sm">To proceed please confirm:</div>
 
-            <Label_Shadcn_
+            <Label
               htmlFor="understands-standby"
               className="flex items-top gap-4 text-sm leading-none"
             >
-              <Checkbox_Shadcn_
+              <Checkbox
                 id="understands-standby"
                 className="mt-0.5"
                 checked={isStandbyUnderstood}
@@ -172,13 +172,13 @@ export function RotateKeyDialog({
                   },
                 }}
               />
-            </Label_Shadcn_>
+            </Label>
 
-            <Label_Shadcn_
+            <Label
               htmlFor="understands-previously-used"
               className="flex items-top gap-4 text-sm leading-none"
             >
-              <Checkbox_Shadcn_
+              <Checkbox
                 className="mt-0.5"
                 id="understands-previously-used"
                 checked={isPreviouslyUsedUnderstood}
@@ -211,11 +211,11 @@ export function RotateKeyDialog({
                   },
                 }}
               />
-            </Label_Shadcn_>
+            </Label>
 
             {verifyJWTEdgeFunctions.length > 0 && (
-              <Label_Shadcn_ htmlFor="edge-functions-verify-jwt" className="flex gap-4 text-sm">
-                <Checkbox_Shadcn_
+              <Label htmlFor="edge-functions-verify-jwt" className="flex gap-4 text-sm">
+                <Checkbox
                   id="edge-functions-verify-jwt"
                   className="mt-0.5"
                   checked={isEdgeFunctionsVerifyJWTUnderstood}
@@ -268,7 +268,7 @@ export function RotateKeyDialog({
                     },
                   }}
                 />
-              </Label_Shadcn_>
+              </Label>
             )}
           </>
         )}

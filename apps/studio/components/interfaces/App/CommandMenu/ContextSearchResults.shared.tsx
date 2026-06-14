@@ -1,10 +1,10 @@
 'use client'
 
-import { cn, CommandList_Shadcn_ } from 'ui'
+import { cn, CommandList } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
 import { TextHighlighter } from 'ui-patterns/CommandMenu'
-import { CommandItem } from 'ui-patterns/CommandMenu/internal/Command'
-import { CommandGroup } from 'ui-patterns/CommandMenu/internal/CommandGroup'
+import { CommandMenuGroup } from 'ui-patterns/CommandMenu/internal/CommandMenuGroup'
+import { CommandMenuItem } from 'ui-patterns/CommandMenu/internal/CommandMenuItem'
 import type { IActionCommand, IRouteCommand } from 'ui-patterns/CommandMenu/internal/types'
 
 export interface SearchResult {
@@ -18,10 +18,10 @@ export function SkeletonResults() {
     <div className="p-2 space-y-1">
       {[0, 1, 2, 3].map((i) => (
         <div key={i} className="flex items-center gap-3 px-2 py-2">
-          <ShimmeringLoader className="!w-4 !h-4 !py-0 rounded" delayIndex={i} />
+          <ShimmeringLoader className="w-4! h-4! py-0! rounded-sm" delayIndex={i} />
           <div className="flex-1 space-y-1">
-            <ShimmeringLoader className="!w-32 !py-1.5" delayIndex={i} />
-            <ShimmeringLoader className="!w-48 !py-1" delayIndex={i + 1} />
+            <ShimmeringLoader className="w-32! py-1.5!" delayIndex={i} />
+            <ShimmeringLoader className="w-48! py-1!" delayIndex={i + 1} />
           </div>
         </div>
       ))}
@@ -86,15 +86,15 @@ export function ResultsList({
   })
 
   return (
-    <CommandList_Shadcn_
+    <CommandList
       className={cn(
-        '!max-h-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden bg-transparent',
+        'max-h-full! flex-1 min-h-0 overflow-y-auto overflow-x-hidden bg-transparent',
         className
       )}
     >
-      <CommandGroup>
+      <CommandMenuGroup>
         {commands.map((command) => (
-          <CommandItem key={command.id} command={command}>
+          <CommandMenuItem key={command.id} command={command}>
             <div className="flex flex-col min-w-0 text-foreground-light">
               <TextHighlighter>{command.name}</TextHighlighter>
               {command.value && command.value !== command.name && (
@@ -103,9 +103,9 @@ export function ResultsList({
                 </p>
               )}
             </div>
-          </CommandItem>
+          </CommandMenuItem>
         ))}
-      </CommandGroup>
-    </CommandList_Shadcn_>
+      </CommandMenuGroup>
+    </CommandList>
   )
 }

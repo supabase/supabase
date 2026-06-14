@@ -1,12 +1,18 @@
 import { InfiniteData, keepPreviousData, useInfiniteQuery } from '@tanstack/react-query'
+import { useFlag } from 'common'
 
+import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
+import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
+import { analyticsLiteral, safeSql } from './safe-analytics-sql'
+import { extractLogMetadata } from './unified-logs.utils'
 import { getUnifiedLogsQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
+import { getUnifiedLogsQuery as getUnifiedLogsQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import {
   PageParam,
   QuerySearchParamsType,
 } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
-import { handleError, post } from '@/data/fetchers'
+import { handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
 const LOGS_PAGE_LIMIT = 50
@@ -47,7 +53,12 @@ export const getUnifiedLogsISOStartEnd = (
 }
 
 export async function getUnifiedLogs(
-  { projectRef, search, pageParam }: UnifiedLogsVariables & { pageParam: PageParam | null },
+  {
+    projectRef,
+    search,
+    pageParam,
+    useOtel = false,
+  }: UnifiedLogsVariables & { pageParam: PageParam | null; useOtel?: boolean },
   signal?: AbortSignal,
   headersInit?: HeadersInit
 ) {
@@ -74,57 +85,67 @@ export async function getUnifiedLogs(
    */
 
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
-  const sql = `${getUnifiedLogsQuery(search)} ORDER BY timestamp DESC, id DESC LIMIT ${LOGS_PAGE_LIMIT}`
+  const buildQuery = pickLogsQueryBuilder(useOtel, getUnifiedLogsQuery, getUnifiedLogsQueryBq)
+  const sql = safeSql`${buildQuery(search)} ORDER BY timestamp DESC, id DESC LIMIT ${analyticsLiteral(LOGS_PAGE_LIMIT)}`
 
   const cursorValue = pageParam?.cursor
   const cursorDirection = pageParam?.direction
 
-  let timestampStart: string
   let timestampEnd: string
 
   if (cursorDirection === 'prev') {
     // Live mode: fetch logs newer than the cursor
-    timestampStart = cursorValue
-      ? new Date(Number(cursorValue) / 1000).toISOString()
-      : isoTimestampStart
     timestampEnd = new Date().toISOString()
   } else if (cursorDirection === 'next') {
-    // Regular pagination: fetch logs older than the cursor
-    timestampStart = isoTimestampStart
-    timestampEnd = cursorValue
-      ? new Date(Number(cursorValue) / 1000).toISOString()
-      : isoTimestampEnd
+    // Regular pagination: fetch logs older than the cursor.
+    // The cursor is stored as milliseconds (set below from `date.getTime()`),
+    // so we can convert it directly without worrying about the wire format.
+    timestampEnd =
+      cursorValue !== null && cursorValue !== undefined
+        ? new Date(Number(cursorValue)).toISOString()
+        : isoTimestampEnd
   } else {
-    timestampStart = isoTimestampStart
     timestampEnd = isoTimestampEnd
   }
 
-  let headers = new Headers(headersInit)
-
-  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-    params: { path: { ref: projectRef } },
-    body: { iso_timestamp_start: isoTimestampStart, iso_timestamp_end: timestampEnd, sql },
+  const endpoint = logsAllEndpointUrl(useOtel)
+  const data = await executeAnalyticsSql({
+    projectRef,
+    endpoint,
+    sql,
+    iso_timestamp_start: isoTimestampStart,
+    iso_timestamp_end: timestampEnd,
     signal,
-    headers,
+    headers: headersInit,
   })
 
-  if (error) handleError(error)
+  if (data.error) handleError(new Error(data.error as string))
 
   const resultData = data?.result ?? []
 
   const result = resultData.map((row: any) => {
-    // Create a date object for display purposes
-    const date = new Date(Number(row.timestamp) / 1000)
+    // Disambiguate timestamp shape by format, not by Number.isFinite — a
+    // numeric string of microseconds is always finite, so checking finite-
+    // ness can't tell us whether the value is microseconds or already-ms.
+    // ISO-like strings contain `T` or `-` and are parsed via Date; anything
+    // else is treated as numeric microseconds-since-epoch.
+    const ts = String(row.timestamp ?? '')
+    const looksLikeIso = /[T-]/.test(ts)
+    const date = looksLikeIso
+      ? new Date(/Z$|[+-]\d{2}:?\d{2}$/.test(ts) ? ts : `${ts}Z`)
+      : new Date(Number(ts) / 1000)
+
+    const { status, method, pathname } = extractLogMetadata(row)
 
     return {
       id: row.id,
       date,
+      method,
+      pathname,
+      status,
       timestamp: row.timestamp,
       level: row.level as LogLevel,
-      status: row.status || 200,
-      method: row.method,
       host: row.host,
-      pathname: (row.url || '').replace(/^https?:\/\/[^\/]+/, '') || row.pathname || '',
       event_message: row.event_message || row.body || '',
       headers:
         typeof row.headers === 'string' ? JSON.parse(row.headers || '{}') : row.headers || {},
@@ -141,11 +162,10 @@ export async function getUnifiedLogs(
   const lastRow = result.length > 0 ? result[result.length - 1] : null
   const hasMore = result.length >= LOGS_PAGE_LIMIT - 1
 
-  const nextCursor = lastRow ? lastRow.timestamp : null
-  // FIXED: Always provide prevCursor like DataTableDemo does
-  // This ensures live mode never breaks the infinite query chain
-  // DataTableDemo uses milliseconds, but our timestamps are in microseconds
-  const prevCursor = result.length > 0 ? firstRow!.timestamp : new Date().getTime() * 1000
+  // Cursors are stored as milliseconds (Date.getTime()) so the OTEL endpoint's
+  // wire format (ISO string vs numeric microseconds) doesn't bleed into pagination.
+  const nextCursor = lastRow ? lastRow.date.getTime() : null
+  const prevCursor = firstRow ? firstRow.date.getTime() : new Date().getTime()
 
   return {
     data: result,
@@ -167,10 +187,11 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
     PageParam | null
   > = {}
 ) => {
+  const useOtel = useFlag('otelUnifiedLogs')
   return useInfiniteQuery({
-    queryKey: logsKeys.unifiedLogsInfinite(projectRef, search),
+    queryKey: [...logsKeys.unifiedLogsInfinite(projectRef, search), { otel: useOtel }],
     queryFn: ({ signal, pageParam }) => {
-      return getUnifiedLogs({ projectRef, search, pageParam }, signal)
+      return getUnifiedLogs({ projectRef, search, pageParam, useOtel }, signal)
     },
     enabled: enabled && typeof projectRef !== 'undefined',
     placeholderData: keepPreviousData,

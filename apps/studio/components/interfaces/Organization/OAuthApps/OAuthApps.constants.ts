@@ -1,5 +1,6 @@
 export const PERMISSIONS_DESCRIPTIONS = {
   ANALYTICS: 'access to analytics logs.',
+  ANALYTICS_CONFIG: 'access to analytics logs configurations.',
   AUTH: 'access to auth configurations and SSO providers.',
   DATABASE:
     'access to Postgres configurations, SQL snippets, SSL enforcement configurations and Typescript schema types.',

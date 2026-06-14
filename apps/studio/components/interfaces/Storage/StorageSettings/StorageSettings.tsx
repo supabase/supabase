@@ -9,16 +9,16 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormMessage_Shadcn_,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  FormMessage,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -261,7 +261,7 @@ export const StorageSettings = () => {
     <PageContainer>
       <PageSection>
         <PageSectionContent className="flex flex-col gap-y-8">
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             {!IS_PLATFORM ? (
               <Admonition
                 type="default"
@@ -292,7 +292,7 @@ export const StorageSettings = () => {
                     <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
                       <Card>
                         <CardContent>
-                          <FormField_Shadcn_
+                          <FormField
                             control={form.control}
                             name="imageTransformationEnabled"
                             render={({ field }) => (
@@ -311,23 +311,23 @@ export const StorageSettings = () => {
                                   </>
                                 }
                               >
-                                <FormControl_Shadcn_>
+                                <FormControl>
                                   <Switch
                                     size="large"
                                     disabled={
                                       !hasAccessToImageTransformations || !canUpdateStorageSettings
                                     }
-                                    checked={field.value}
+                                    checked={hasAccessToImageTransformations && field.value}
                                     onCheckedChange={field.onChange}
                                   />
-                                </FormControl_Shadcn_>
+                                </FormControl>
                               </FormItemLayout>
                             )}
                           />
                         </CardContent>
 
                         <CardContent>
-                          <FormField_Shadcn_
+                          <FormField
                             control={form.control}
                             name="fileSizeLimit"
                             render={({ field }) => (
@@ -354,9 +354,9 @@ export const StorageSettings = () => {
                                   </>
                                 }
                               >
-                                <FormControl_Shadcn_>
+                                <FormControl>
                                   <div className="flex items-center justify-end">
-                                    <Input_Shadcn_
+                                    <Input
                                       type="number"
                                       {...field}
                                       onChange={(e) => {
@@ -369,11 +369,11 @@ export const StorageSettings = () => {
                                         !canUpdateStorageSettings
                                       }
                                     />
-                                    <FormField_Shadcn_
+                                    <FormField
                                       control={form.control}
                                       name="unit"
                                       render={({ field: unitField }) => (
-                                        <Select_Shadcn_
+                                        <Select
                                           value={unitField.value}
                                           onValueChange={(val) => {
                                             unitField.onChange(val)
@@ -384,27 +384,27 @@ export const StorageSettings = () => {
                                             !canUpdateStorageSettings
                                           }
                                         >
-                                          <SelectTrigger_Shadcn_ className="w-[90px] text-xs font-mono rounded-l-none bg-surface-300">
-                                            <SelectValue_Shadcn_ placeholder="Choose a prefix">
+                                          <SelectTrigger className="w-[90px] text-xs font-mono rounded-l-none bg-surface-300">
+                                            <SelectValue placeholder="Choose a prefix">
                                               {storageUnit}
-                                            </SelectValue_Shadcn_>
-                                          </SelectTrigger_Shadcn_>
-                                          <SelectContent_Shadcn_>
+                                            </SelectValue>
+                                          </SelectTrigger>
+                                          <SelectContent>
                                             {Object.values(StorageSizeUnits).map((unit: string) => (
-                                              <SelectItem_Shadcn_
+                                              <SelectItem
                                                 key={unit}
                                                 disabled={!hasAccessToFileSizeConfiguration}
                                                 value={unit}
                                               >
                                                 {unit}
-                                              </SelectItem_Shadcn_>
+                                              </SelectItem>
                                             ))}
-                                          </SelectContent_Shadcn_>
-                                        </Select_Shadcn_>
+                                          </SelectContent>
+                                        </Select>
                                       )}
                                     />
                                   </div>
-                                </FormControl_Shadcn_>
+                                </FormControl>
                                 {sizeLimitCheckCondition === 'confirm' && (
                                   <ValidateSizeLimit
                                     onValidate={sizeLimitCheckQuery}
@@ -416,12 +416,12 @@ export const StorageSettings = () => {
                             )}
                           />
                           {fileSizeLimitError && (
-                            <FormMessage_Shadcn_ className="ml-auto mt-2 text-right w-1/2">
+                            <FormMessage className="ml-auto mt-2 text-right w-1/2">
                               <StorageFileSizeLimitErrorMessage
                                 error={fileSizeLimitError}
                                 projectRef={projectRef}
                               />
-                            </FormMessage_Shadcn_>
+                            </FormMessage>
                           )}
                         </CardContent>
                         {hasLimitedStorageAccess && (
@@ -489,7 +489,7 @@ export const StorageSettings = () => {
                 )}
               </>
             )}
-          </Form_Shadcn_>
+          </Form>
         </PageSectionContent>
       </PageSection>
     </PageContainer>

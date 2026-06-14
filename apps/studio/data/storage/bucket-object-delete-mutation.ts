@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { del, handleError } from '@/data/fetchers'
@@ -42,7 +42,6 @@ export const useBucketObjectDeleteMutation = ({
   UseCustomMutationOptions<BucketObjectDeleteData, ResponseError, DeleteBucketObjectParams>,
   'mutationFn'
 > = {}) => {
-  const queryClient = useQueryClient()
   return useMutation<BucketObjectDeleteData, ResponseError, DeleteBucketObjectParams>({
     mutationFn: (vars) => deleteBucketObject(vars),
     async onSuccess(data, variables, context) {

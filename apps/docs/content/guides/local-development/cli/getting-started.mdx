@@ -72,34 +72,76 @@ The Supabase CLI requires **Node.js 20 or later** when run via `npx` or `npm`. O
 
 </Admonition>
 
-<Admonition type="note">
-
-Installing the Supabase CLI globally using `npm install -g supabase` is **not supported**.
-
-For global usage, install the CLI via Homebrew, Scoop, or the standalone binary.
-
-Alternatively, you can run the CLI using `npx supabase` or install it locally as a dev dependency.
-
-</Admonition>
-
 You can also install the CLI as dev dependency via [npm](https://www.npmjs.com/package/supabase):
 
 ```sh
 npm install supabase --save-dev
 ```
 
-<Admonition type="note">
+</TabPanel>
+</Tabs>
 
-Global installation using `npm install -g supabase` is not supported. For global CLI usage, install via [Homebrew](/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=macos), [Scoop](/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=windows), or the [standalone binary](/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=linux).
+## Beta channel
 
-</Admonition>
+Pre-release CLI builds ship from the development branch (`X.Y.Z-beta.N` versions). Use the npm `beta` dist-tag, or install `supabase-beta` via Homebrew / Scoop (separate packages from stable).
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="npm"
+  queryGroup="platform"
+>
+<TabPanel id="macos" label="macOS">
+
+```sh
+brew install supabase/tap/supabase-beta
+brew link --overwrite supabase-beta
+```
+
+</TabPanel>
+<TabPanel id="windows" label="Windows">
+
+```powershell
+scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+scoop install supabase-beta
+```
+
+</TabPanel>
+<TabPanel id="linux" label="Linux">
+
+#### Homebrew
+
+```sh
+brew install supabase/tap/supabase-beta
+brew link --overwrite supabase-beta
+```
+
+#### Linux packages
+
+Beta builds are attached to [GitHub pre-releases](https://github.com/supabase/cli/releases). Download the `.apk`, `.deb`, or `.rpm` for your platform and install with the same commands as [Linux packages](#linux-packages) above.
+
+</TabPanel>
+<TabPanel id="npm" label="nodejs">
+
+Install as a dev dependency:
+
+```sh
+npm install supabase@beta --save-dev
+```
+
+Or run without installing:
+
+```sh
+npx supabase@beta --help
+```
 
 </TabPanel>
 </Tabs>
 
 ## Updating the Supabase CLI
 
-When a new [version](https://github.com/supabase/cli/releases) is released, you can update the CLI using the same methods.
+When a new [version](https://github.com/supabase/cli/releases) is released, you can update the CLI using the same channels.
 
 <Tabs
   scrollable
@@ -114,11 +156,23 @@ When a new [version](https://github.com/supabase/cli/releases) is released, you 
 brew upgrade supabase
 ```
 
+Beta channel:
+
+```sh
+brew upgrade supabase-beta
+```
+
 </TabPanel>
 <TabPanel id="windows" label="Windows">
 
 ```powershell
 scoop update supabase
+```
+
+Beta channel:
+
+```powershell
+scoop update supabase-beta
 ```
 
 </TabPanel>
@@ -128,6 +182,12 @@ scoop update supabase
 
 ```sh
 brew upgrade supabase
+```
+
+Beta channel:
+
+```sh
+brew upgrade supabase-beta
 ```
 
 #### Linux package manager
@@ -147,12 +207,18 @@ If you have installed the CLI as dev dependency via [npm](https://www.npmjs.com/
 npm update supabase --save-dev
 ```
 
+Beta channel (`supabase@beta`):
+
+```sh
+npm update supabase@beta --save-dev
+```
+
 </TabPanel>
 </Tabs>
 
 If you have any Supabase containers running locally, stop them and delete their data volumes before proceeding with the upgrade. This ensures that Supabase managed services can apply new migrations on a clean state of the local database.
 
-<Admonition type="tip" label="Backup and stop running containers">
+<Admonition type="tip" title="Backup and stop running containers">
 
 Remember to save any local schema and data changes before stopping because the `--no-backup` flag will delete them.
 
@@ -164,54 +230,9 @@ supabase stop --no-backup
 
 </Admonition>
 
-<$Show if="!docs:hide_cli_profiles">
-
-<$Partial path="cli_profiles.mdx" />
-
-</$Show>
-
 ## Running Supabase locally
 
-The Supabase CLI uses Docker containers to manage the local development stack. Follow the official guide to install and configure [Docker Desktop](https://docs.docker.com/desktop):
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="macos"
-  queryGroup="platform"
->
-<TabPanel id="macos" label="macOS">
-
-<Image
-  alt="Docker settings on Mac: Select Integrated, Virtualization Framework, and osxfs"
-  src={{
-    dark: '/docs/img/guides/cli/docker-mac.png',
-    light: '/docs/img/guides/cli/docker-mac-light.png',
-  }}
-
-width={2880}
-height={1800}
-/>
-
-</TabPanel>
-<TabPanel id="windows" label="Windows">
-
-<Image
-  alt="Docker settings on Windows: Select Integrated, Expose Daemon, WSL2, and Add to /etc/hosts file."
-  src={{
-    dark: '/docs/img/guides/cli/docker-win.png',
-    light: '/docs/img/guides/cli/docker-win-light.png',
-  }}
-
-width={2560}
-height={1520}
-/>
-
-</TabPanel>
-</Tabs>
-
-<Admonition type="note">
+The Supabase CLI uses Docker containers to manage the local development stack. Follow the official guide to install and configure [Docker Desktop](https://docs.docker.com/desktop) on your machine.
 
 Alternately, you can use a different container tool that offers Docker compatible APIs.
 
@@ -220,15 +241,13 @@ Alternately, you can use a different container tool that offers Docker compatibl
 - [OrbStack](https://orbstack.dev/) (macOS)
 - [colima](https://github.com/abiosoft/colima) (macOS)
 
-</Admonition>
-
 Inside the folder where you want to create your project, run:
 
 ```bash
 supabase init
 ```
 
-This will create a new `supabase` folder. It's safe to commit this folder to your version control system.
+This creates a new `supabase` folder. It's safe to commit this folder to version control.
 
 Now, to start the Supabase stack, run:
 
@@ -236,23 +255,44 @@ Now, to start the Supabase stack, run:
 supabase start
 ```
 
-This takes time on your first run because the CLI needs to download the Docker images to your local machine. The CLI includes the entire Supabase toolset, and a few additional images that are useful for local development (like a local SMTP server and a database diff tool).
+This takes time on your first run because the CLI needs to download the Docker images to your local machine. The CLI includes the entire Supabase stack, and a few additional images useful for local development (like a local SMTP server and a database diff tool).
 
 ## Access your project's services
 
-Once all of the Supabase services are running, you'll see output containing your local Supabase credentials. It should look like this, with urls and keys that you'll use in your local project:
+Once all the Supabase services are running, you'll see output containing your local Supabase credentials. It should look like the below, with urls and keys that you use in your local project:
 
 ```
-
 Started supabase local development setup.
 
-         API URL: http://localhost:54321
-          DB URL: postgresql://postgres:postgres@localhost:54322/postgres
-      Studio URL: http://localhost:54323
-     Mailpit URL: http://localhost:54324
-        anon key: eyJh......
-service_role key: eyJh......
+╭──────────────────────────────────────╮
+│ 🔧 Development Tools                 │
+├─────────┬────────────────────────────┤
+│ Studio  │ http://127.0.0.1:54323     │
+│ Mailpit │ http://127.0.0.1:54324     │
+│ MCP     │ http://127.0.0.1:54321/mcp │
+╰─────────┴────────────────────────────╯
 
+╭──────────────────────────────────────────────────────╮
+│ 🌐 APIs                                              │
+├────────────────┬─────────────────────────────────────┤
+│ Project URL    │ http://127.0.0.1:54321              │
+│ REST           │ http://127.0.0.1:54321/rest/v1      │
+│ GraphQL        │ http://127.0.0.1:54321/graphql/v1   │
+│ Edge Functions │ http://127.0.0.1:54321/functions/v1 │
+╰────────────────┴─────────────────────────────────────╯
+
+╭───────────────────────────────────────────────────────────────╮
+│ ⛁ Database                                                    │
+├─────┬─────────────────────────────────────────────────────────┤
+│ URL │ postgresql://postgres:postgres@127.0.0.1:54322/postgres │
+╰─────┴─────────────────────────────────────────────────────────╯
+
+╭──────────────────────────────────────────────────────────────╮
+│ 🔑 Authentication Keys                                       │
+├─────────────┬────────────────────────────────────────────────┤
+│ Publishable │ sb_publishable_...                             │
+│ Secret      │ sb_secret_...                                  │
+╰─────────────┴────────────────────────────────────────────────╯
 ```
 
 <Tabs
@@ -305,8 +345,7 @@ If you are accessing these services without the client libraries, you may need t
 
 ```sh
 curl 'http://localhost:54321/rest/v1/' \
-    -H "apikey: <anon key>" \
-    -H "Authorization: Bearer <anon key>"
+    -H "apikey: sb_publishable_..."
 
 http://localhost:54321/rest/v1/           # REST (PostgREST)
 http://localhost:54321/realtime/v1/       # Realtime
@@ -316,7 +355,7 @@ http://localhost:54321/auth/v1/           # Auth (GoTrue)
 
 <Admonition type="note">
 
-`<anon key>` is provided when you run the command `supabase start`.
+`sb_publishable_...` is the publishable key output when you run the command `supabase start`.
 
 </Admonition>
 
@@ -331,7 +370,7 @@ For advanced logs analysis using the Logs Explorer, it is advised to use the Big
 
 </Admonition>
 
-All logs will be stored in the local database under the `_analytics` schema.
+All logs are stored in the local database under the `_analytics` schema.
 
 </TabPanel>
 </Tabs>

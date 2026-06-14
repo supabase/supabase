@@ -1,46 +1,40 @@
-import type { FieldValues, Path, UseFormReturn } from 'react-hook-form'
-import { CardContent, FormControl_Shadcn_, FormField_Shadcn_, KeyboardShortcut, Switch } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { Fragment } from 'react'
+import { CardContent, KeyboardShortcut, Switch } from 'ui'
 
-interface HotkeyToggleProps<T extends FieldValues> {
-  form: UseFormReturn<T>
-  name: Path<T>
-  keys: string[]
-  label: string
-  onToggle: (value: boolean) => void
+import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
+import type { ShortcutId } from '@/state/shortcuts/registry'
+import { useShortcutPreferences } from '@/state/shortcuts/state'
+import type { ShortcutDefinition } from '@/state/shortcuts/types'
+import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
+
+interface HotkeyToggleProps {
+  definition: ShortcutDefinition
   isLast?: boolean
 }
 
-export function HotkeyToggle<T extends FieldValues>({
-  form,
-  name,
-  keys,
-  label,
-  onToggle,
-  isLast,
-}: HotkeyToggleProps<T>) {
+export function HotkeyToggle({ definition, isLast }: HotkeyToggleProps) {
+  const enabled = useIsShortcutEnabled(definition.id as ShortcutId)
+  const { setShortcutEnabled } = useShortcutPreferences()
+
   return (
     <CardContent className={isLast ? undefined : 'border-b'}>
-      <FormField_Shadcn_
-        control={form.control}
-        name={name}
-        render={({ field }) => (
-          <FormItemLayout layout="flex-row-reverse" label={label}>
-            <div className="flex w-full items-center justify-end gap-x-3">
-              <KeyboardShortcut keys={keys} />
-              <FormControl_Shadcn_>
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={(value) => {
-                    field.onChange(value)
-                    onToggle(value)
-                  }}
-                />
-              </FormControl_Shadcn_>
-            </div>
-          </FormItemLayout>
-        )}
-      />
+      <div className="flex items-center justify-between gap-x-3">
+        <label className="text-sm text-foreground">{definition.label}</label>
+        <div className="flex items-center gap-x-3">
+          <div className="flex items-center gap-1">
+            {definition.sequence.map((step, i) => (
+              <Fragment key={i}>
+                {i > 0 && <span className="text-foreground-lighter text-[11px]">then</span>}
+                <KeyboardShortcut keys={hotkeyToKeys(step)} />
+              </Fragment>
+            ))}
+          </div>
+          <Switch
+            checked={enabled}
+            onCheckedChange={(checked) => setShortcutEnabled(definition.id as ShortcutId, checked)}
+          />
+        </div>
+      </div>
     </CardContent>
   )
 }

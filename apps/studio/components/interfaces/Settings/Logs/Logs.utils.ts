@@ -6,10 +6,22 @@ import uniqBy from 'lodash/uniqBy'
 import { useEffect } from 'react'
 import logConstants from 'shared-data/log-constants'
 
-import { LogsTableName, SQL_FILTER_TEMPLATES } from './Logs.constants'
+import {
+  AUTH_LOG_ERROR_CONDITION,
+  AUTH_LOG_WARNING_CONDITION,
+  LogsTableName,
+  SQL_FILTER_TEMPLATES,
+} from './Logs.constants'
 import type { Filters, LogData, LogsEndpointParams, QueryType } from './Logs.types'
+import { convertResultsToCSV } from '@/components/interfaces/SQLEditor/UtilityPanel/Results.utils'
 import BackwardIterator from '@/components/ui/CodeEditor/Providers/BackwardIterator'
-import type { PlanId } from '@/data/subscriptions/types'
+import {
+  analyticsLiteral,
+  joinSqlFragments,
+  quotedIdent,
+  safeSql,
+  type SafeLogSqlFragment,
+} from '@/data/logs/safe-analytics-sql'
 
 /**
  * Convert a micro timestamp from number/string to iso timestamp
@@ -74,35 +86,36 @@ const getDotKeys = (obj: { [k: string]: unknown }, parent?: string): string[] =>
  *
  * @returns a where statement with WHERE clause.
  */
-const genWhereStatement = (table: LogsTableName, filters: Filters) => {
+const buildWhereClauses = (table: LogsTableName, filters: Filters): SafeLogSqlFragment[] => {
   const keys = Object.keys(filters)
   const filterTemplates = SQL_FILTER_TEMPLATES[table]
-
-  const _resolveTemplateToStatement = (dotKey: string): string | null => {
+  const _resolveTemplateToStatement = (dotKey: string): SafeLogSqlFragment | null => {
     const template = filterTemplates[dotKey]
     const value = get(filters, dotKey)
-    if (value !== undefined && typeof template === 'function') {
-      return template(value)
-    } else if (template === undefined) {
-      // resolve unknown filters (possibly from filter overrides)
-      // no template, set a default
-      if (typeof value === 'string') {
-        return `${dotKey} = '${value}'`
-      } else {
-        return `${dotKey} = ${value}`
+
+    if (template === undefined) {
+      // Unknown filter from a filter override — generic equality predicate; drop on bad input.
+      if (typeof value !== 'string' && typeof value !== 'number' && typeof value !== 'boolean') {
+        return null
       }
-    } else if (value === undefined && typeof template === 'function') {
-      return null
-    } else if (template && value === false) {
-      // template present, but value is false
-      return null
-    } else {
-      return template
+      try {
+        return safeSql`${quotedIdent(dotKey)} = ${analyticsLiteral(value)}`
+      } catch {
+        return null
+      }
     }
+
+    if (typeof template === 'function') {
+      return value !== undefined ? template(value) : null
+    }
+
+    // template is SafeLogSqlFragment — emit unless the filter is explicitly disabled
+    if (!template || value === false) return null
+    return template
   }
 
-  const statement = keys
-    .map((rootKey) => {
+  return keys
+    .map((rootKey): SafeLogSqlFragment | null => {
       if (
         filters[rootKey] === undefined ||
         (typeof filters[rootKey] === 'string' && (filters[rootKey] as string).length === 0)
@@ -112,128 +125,135 @@ const genWhereStatement = (table: LogsTableName, filters: Filters) => {
         // join all statements with an OR
         const nestedStatements = getDotKeys(filters[rootKey] as Filters, rootKey)
           .map(_resolveTemplateToStatement)
-          .filter(Boolean)
+          .filter((s) => s !== null)
 
         if (nestedStatements.length > 0) {
-          return `(${nestedStatements.join(' or ')})`
+          return safeSql`(${joinSqlFragments(nestedStatements, ' or ')})`
         } else {
           return null
         }
       } else {
         const nestedStatement = _resolveTemplateToStatement(rootKey)
         if (nestedStatement === null) return null
-        return `(${nestedStatement})`
+        return safeSql`(${nestedStatement})`
       }
     })
-    .filter(Boolean)
-    // join all root statements with AND
-    .join(' and ')
-
-  if (statement) {
-    return 'where ' + statement
-  } else {
-    return ''
-  }
+    .filter((s) => s !== null)
 }
 
-export const genDefaultQuery = (table: LogsTableName, filters: Filters, limit: number = 100) => {
+const genWhereStatement = (table: LogsTableName, filters: Filters): SafeLogSqlFragment => {
+  const clauses = buildWhereClauses(table, filters)
+  return clauses.length > 0 ? safeSql`where ${joinSqlFragments(clauses, ' and ')}` : safeSql``
+}
+
+export const genDefaultQuery = (
+  table: LogsTableName,
+  filters: Filters,
+  limit: number = 100
+): SafeLogSqlFragment => {
   const where = genWhereStatement(table, filters)
   const joins = genCrossJoinUnnests(table)
-  const orderBy = 'order by timestamp desc'
+  const orderBy = safeSql`order by timestamp desc`
+  const limitLit = analyticsLiteral(limit)
 
   switch (table) {
     case 'edge_logs':
       if (!IS_PLATFORM) {
-        return `
+        return safeSql`
 -- local dev edge_logs query
 select id, edge_logs.timestamp, event_message, request.method, request.path, request.search, response.status_code
 from edge_logs
 ${joins}
 ${where}
 ${orderBy}
-limit ${limit};
+limit ${limitLit};
 `
       }
-      return `select id, identifier, timestamp, event_message, request.method, request.path, request.search, response.status_code
-  from ${table}
+      return safeSql`select id, identifier, timestamp, event_message, request.method, request.path, request.search, response.status_code
+  from ${LOG_TABLE_SQL[table]}
   ${joins}
   ${where}
   ${orderBy}
-  limit ${limit}
+  limit ${limitLit}
   `
 
     case 'postgres_logs':
       if (!IS_PLATFORM) {
-        return `
+        return safeSql`
 select postgres_logs.timestamp, id, event_message, parsed.error_severity, parsed.detail, parsed.hint
 from postgres_logs
 ${joins}
 ${where}
 ${orderBy}
-limit ${limit}
+limit ${limitLit}
   `
       }
-      return `select identifier, postgres_logs.timestamp, id, event_message, parsed.error_severity, parsed.detail, parsed.hint from ${table}
+      return safeSql`select identifier, postgres_logs.timestamp, id, event_message, parsed.error_severity, parsed.detail, parsed.hint from ${LOG_TABLE_SQL[table]}
   ${joins}
   ${where}
   ${orderBy}
-  limit ${limit}
+  limit ${limitLit}
   `
 
     case 'function_logs':
-      return `select id, ${table}.timestamp, event_message, metadata.event_type, metadata.function_id, metadata.execution_id, metadata.level from ${table}
+      return safeSql`select id, ${LOG_TABLE_SQL[table]}.timestamp, event_message, metadata.event_type, metadata.function_id, metadata.execution_id, metadata.level from ${LOG_TABLE_SQL[table]}
   ${joins}
   ${where}
   ${orderBy}
-  limit ${limit}
+  limit ${limitLit}
     `
 
     case 'auth_logs':
-      return `select id, ${table}.timestamp, event_message, metadata.level, metadata.status, metadata.path, metadata.msg as msg, metadata.error from ${table}
+      return safeSql`select id, ${LOG_TABLE_SQL[table]}.timestamp, event_message, metadata.level, metadata.status, metadata.path, metadata.msg as msg, metadata.error from ${LOG_TABLE_SQL[table]}
   ${joins}
   ${where}
   ${orderBy}
-  limit ${limit}
+  limit ${limitLit}
     `
 
     case 'function_edge_logs':
       if (!IS_PLATFORM) {
-        return `
+        return safeSql`
 select id, function_edge_logs.timestamp, event_message
 from function_edge_logs
 ${orderBy}
-limit ${limit}
+limit ${limitLit}
 `
       }
-      return `select id, ${table}.timestamp, event_message, response.status_code, request.method, request.pathname, m.function_id, m.execution_id, m.execution_time_ms, m.deployment_id, m.version from ${table}
+      return safeSql`select id, ${LOG_TABLE_SQL[table]}.timestamp, event_message, response.status_code, request.method, request.pathname, m.function_id, m.execution_id, m.execution_time_ms, m.deployment_id, m.version from ${LOG_TABLE_SQL[table]}
   ${joins}
   ${where}
   ${orderBy}
-  limit ${limit}
+  limit ${limitLit}
   `
+
     case 'supavisor_logs':
-      return `select id, ${table}.timestamp, event_message from ${table} ${joins} ${where} ${orderBy} limit ${limit}`
+      return safeSql`select id, ${LOG_TABLE_SQL[table]}.timestamp, event_message from ${LOG_TABLE_SQL[table]} ${joins} ${where} ${orderBy} limit ${limitLit}`
 
     case 'pg_upgrade_logs':
-      return `select id, ${table}.timestamp, event_message from ${table} ${joins} ${where} ${orderBy} limit 100`
+      return safeSql`select id, ${LOG_TABLE_SQL[table]}.timestamp, event_message from ${LOG_TABLE_SQL[table]} ${joins} ${where} ${orderBy} limit ${analyticsLiteral(100)}`
 
-    default:
-      return `select id, ${table}.timestamp, event_message from ${table}
-  ${where}
-  ${orderBy}
-  limit ${limit}
-  `
-
-    case 'pg_cron_logs':
-      const pgCronWhere = where ? `${basePgCronWhere} AND ${where.substring(6)}` : basePgCronWhere
-
-      return `select id, postgres_logs.timestamp, event_message, parsed.error_severity, parsed.query
+    case 'pg_cron_logs': {
+      const userClauses = buildWhereClauses(table, filters)
+      const pgCronWhere =
+        userClauses.length > 0
+          ? safeSql`where ${basePgCronConditions} AND ${joinSqlFragments(userClauses, ' and ')}`
+          : basePgCronWhere
+      return safeSql`select id, postgres_logs.timestamp, event_message, parsed.error_severity, parsed.query
 from postgres_logs
 ${joins}
 ${pgCronWhere}
 ${orderBy}
-limit ${limit}
+limit ${limitLit}
 `
+    }
+
+    default:
+      return safeSql`select id, ${LOG_TABLE_SQL[table]}.timestamp, event_message from ${LOG_TABLE_SQL[table]}
+  ${where}
+  ${orderBy}
+  limit ${limitLit}
+  `
   }
 }
 
@@ -241,42 +261,81 @@ limit ${limit}
  * Hardcoded cross join unnests and aliases for each table.
  * Should be used together with the getWhereStatements to allow for filtering on aliases
  */
-const genCrossJoinUnnests = (table: LogsTableName) => {
+const genCrossJoinUnnests = (table: LogsTableName): SafeLogSqlFragment => {
   switch (table) {
     case 'edge_logs':
-      return `cross join unnest(metadata) as m
+      return safeSql`cross join unnest(metadata) as m
   cross join unnest(m.request) as request
   cross join unnest(m.response) as response`
 
     case 'pg_cron_logs':
     case 'postgres_logs':
-      return `cross join unnest(metadata) as m
+      return safeSql`cross join unnest(metadata) as m
   cross join unnest(m.parsed) as parsed`
 
     case 'function_logs':
-      return `cross join unnest(metadata) as metadata`
+      return safeSql`cross join unnest(metadata) as metadata`
 
     case 'auth_logs':
-      return `cross join unnest(metadata) as metadata`
+      return safeSql`cross join unnest(metadata) as metadata`
 
     case 'function_edge_logs':
-      return `cross join unnest(metadata) as m
+      return safeSql`cross join unnest(metadata) as m
   cross join unnest(m.response) as response
   cross join unnest(m.request) as request`
 
     case 'supavisor_logs':
-      return `cross join unnest(metadata) as m`
+      return safeSql`cross join unnest(metadata) as m`
 
     default:
-      return ''
+      return safeSql``
   }
+}
+
+/** Brand-safe table name literals for analytics SQL. */
+export const LOG_TABLE_SQL: Record<LogsTableName, SafeLogSqlFragment> = {
+  [LogsTableName.EDGE]: safeSql`edge_logs`,
+  [LogsTableName.POSTGRES]: safeSql`postgres_logs`,
+  [LogsTableName.FUNCTIONS]: safeSql`function_logs`,
+  [LogsTableName.FN_EDGE]: safeSql`function_edge_logs`,
+  [LogsTableName.AUTH]: safeSql`auth_logs`,
+  [LogsTableName.AUTH_AUDIT]: safeSql`auth_audit_logs`,
+  [LogsTableName.REALTIME]: safeSql`realtime_logs`,
+  [LogsTableName.STORAGE]: safeSql`storage_logs`,
+  [LogsTableName.POSTGREST]: safeSql`postgrest_logs`,
+  [LogsTableName.SUPAVISOR]: safeSql`supavisor_logs`,
+  [LogsTableName.PGBOUNCER]: safeSql`pgbouncer_logs`,
+  [LogsTableName.PG_UPGRADE]: safeSql`pg_upgrade_logs`,
+  [LogsTableName.PG_CRON]: safeSql`pg_cron_logs`,
+  [LogsTableName.ETL]: safeSql`etl_replication_logs`,
+  [LogsTableName.MULTIGRES]: safeSql`multigres_logs`,
 }
 
 /**
  * SQL query to retrieve only one log
  */
-export const genSingleLogQuery = (table: LogsTableName, id: string) =>
-  `select id, timestamp, event_message, metadata from ${table} where id = '${id}' limit 1`
+export const genSingleLogQuery = (table: LogsTableName, id: string): SafeLogSqlFragment => {
+  // multigres logs have no metadata column
+  const metadataColumn = table === LogsTableName.MULTIGRES ? safeSql`` : safeSql`, metadata`
+  return safeSql`select id, timestamp, event_message${metadataColumn} from ${LOG_TABLE_SQL[table]} where id = ${analyticsLiteral(id)} limit 1`
+}
+
+/**
+ * Multigres logs store their structured payload as a JSON string in
+ * `event_message`. Parse it into a plain object, returning `null` when the
+ * value is missing, not valid JSON, or not a plain object (e.g. an array).
+ */
+export const parseMultigresEventMessage = (
+  eventMessage: unknown
+): Record<string, unknown> | null => {
+  if (typeof eventMessage !== 'string') return null
+  try {
+    const parsed = JSON.parse(eventMessage)
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : null
+  } catch {
+    return null
+  }
+}
 
 /**
  * Determine if we should show the user an upgrade prompt while browsing logs
@@ -290,16 +349,14 @@ export const maybeShowUpgradePromptIfNotEntitled = (
   return day > entitledToDays
 }
 
-export const genCountQuery = (table: LogsTableName, filters: Filters): string => {
+export const genCountQuery = (table: LogsTableName, filters: Filters): SafeLogSqlFragment => {
   let where = genWhereStatement(table, filters)
-  // pg_cron logs are a subset of postgres logs
-  // to calculate the chart, we need to query postgres logs
   if (table === LogsTableName.PG_CRON) {
     table = LogsTableName.POSTGRES
     where = basePgCronWhere
   }
   const joins = genCrossJoinUnnests(table)
-  return `SELECT count(*) as count FROM ${table} ${joins} ${where}`
+  return safeSql`SELECT count(*) as count FROM ${LOG_TABLE_SQL[table]} ${joins} ${where}`
 }
 
 /** calculates how much the chart start datetime should be offset given the current datetime filter params */
@@ -325,9 +382,16 @@ const calcChartStart = (
 }
 
 // TODO(qiao): workaround for self-hosted cron logs error until logflare is fixed
-const basePgCronWhere = IS_PLATFORM
-  ? `where ( parsed.application_name = 'pg_cron' or regexp_contains(event_message, 'cron job') )`
-  : `where ( parsed.application_name = 'pg_cron' or event_message::text LIKE '%cron job%' )`
+const basePgCronConditions: SafeLogSqlFragment = IS_PLATFORM
+  ? safeSql`( parsed.application_name = 'pg_cron' or regexp_contains(event_message, 'cron job') )`
+  : safeSql`( parsed.application_name = 'pg_cron' or event_message::text LIKE '%cron job%' )`
+const basePgCronWhere: SafeLogSqlFragment = safeSql`where ${basePgCronConditions}`
+
+const TRUNC_SQL: Record<'minute' | 'hour' | 'day', SafeLogSqlFragment> = {
+  minute: safeSql`minute`,
+  hour: safeSql`hour`,
+  day: safeSql`day`,
+}
 /**
  *
  * generates log event chart query
@@ -336,7 +400,7 @@ export const genChartQuery = (
   table: LogsTableName,
   params: LogsEndpointParams,
   filters: Filters
-) => {
+): SafeLogSqlFragment => {
   const [startOffset, trunc] = calcChartStart(params)
   let where = genWhereStatement(table, filters)
   const errorCondition = getErrorCondition(table)
@@ -349,29 +413,28 @@ export const genChartQuery = (
     where = basePgCronWhere
   }
 
-  let joins = genCrossJoinUnnests(table)
+  const joins = genCrossJoinUnnests(table)
+  const tsLit = analyticsLiteral(startOffset.toISOString())
+  const whereFragment: SafeLogSqlFragment = where
+    ? safeSql`${where} and t.timestamp > ${tsLit}`
+    : safeSql`where t.timestamp > ${tsLit}`
 
-  const q = `
+  return safeSql`
 SELECT
 -- log-event-chart
-  timestamp_trunc(t.timestamp, ${trunc}) as timestamp,
+  timestamp_trunc(t.timestamp, ${TRUNC_SQL[trunc]}) as timestamp,
   count(CASE WHEN NOT (${errorCondition} OR ${warningCondition}) THEN 1 END) as ok_count,
   count(CASE WHEN ${errorCondition} THEN 1 END) as error_count,
   count(CASE WHEN ${warningCondition} THEN 1 END) as warning_count,
 FROM
-  ${table} t
+  ${LOG_TABLE_SQL[table]} t
   ${joins}
-  ${
-    where
-      ? where + ` and t.timestamp > '${startOffset.toISOString()}'`
-      : `where t.timestamp > '${startOffset.toISOString()}'`
-  }
+  ${whereFragment}
 GROUP BY
 timestamp
 ORDER BY
   timestamp ASC
   `
-  return q
 }
 
 type TsPair = [string | '', string | '']
@@ -648,40 +711,71 @@ export function checkForWildcard(query: string) {
   return wildcardRegex.test(queryWithoutCount)
 }
 
-function getErrorCondition(table: LogsTableName): string {
+function getErrorCondition(table: LogsTableName): SafeLogSqlFragment {
   switch (table) {
     case 'edge_logs':
-      return 'response.status_code >= 500'
+      return safeSql`response.status_code >= 500`
     case 'postgres_logs':
-      return "parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')"
+      return safeSql`parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')`
     case 'auth_logs':
-      return "metadata.level = 'error' OR SAFE_CAST(metadata.status AS INT64) >= 400"
+      return AUTH_LOG_ERROR_CONDITION
     case 'function_edge_logs':
-      return 'response.status_code >= 500'
+      return safeSql`response.status_code >= 500`
     case 'function_logs':
-      return "metadata.level IN ('error', 'fatal')"
+      return safeSql`metadata.level IN ('error', 'fatal')`
     case 'pg_cron_logs':
-      return "parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')"
+      return safeSql`parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')`
+    case 'multigres_logs':
+      return safeSql`JSON_VALUE(event_message, '$.level') IN ('ERROR', 'FATAL', 'PANIC')`
     default:
-      return 'false'
+      return safeSql`false`
   }
 }
 
-function getWarningCondition(table: LogsTableName): string {
+function getWarningCondition(table: LogsTableName): SafeLogSqlFragment {
   switch (table) {
     case 'edge_logs':
-      return 'response.status_code >= 400 AND response.status_code < 500'
+      return safeSql`response.status_code >= 400 AND response.status_code < 500`
     case 'postgres_logs':
-      return "parsed.error_severity IN ('WARNING')"
+      return safeSql`parsed.error_severity IN ('WARNING')`
     case 'auth_logs':
-      return "metadata.level = 'warning'"
+      return AUTH_LOG_WARNING_CONDITION
     case 'function_edge_logs':
-      return 'response.status_code >= 400 AND response.status_code < 500'
+      return safeSql`response.status_code >= 400 AND response.status_code < 500`
     case 'function_logs':
-      return "metadata.level IN ('warning')"
+      return safeSql`metadata.level IN ('warning')`
+    case 'multigres_logs':
+      return safeSql`JSON_VALUE(event_message, '$.level') IN ('WARN', 'WARNING')`
     default:
-      return 'false'
+      return safeSql`false`
   }
+}
+
+export const HTTP_SERVER_ERROR_STATUS = 500
+export const HTTP_CLIENT_ERROR_STATUS = 400
+
+/**
+ * Derives the severity badge shown in the auth log table from the log level and
+ * HTTP status, matching the chart: 5xx → error, 4xx → warning, otherwise the
+ * log level. See the AUTH_LOG_*_CONDITION constants in Logs.constants.ts for the
+ * matching SQL and the reason auth logs need this.
+ */
+export function getAuthLogSeverity(level?: unknown, status?: unknown): string {
+  const normalizedLevel = typeof level === 'string' ? level : ''
+
+  // Preserve explicit error-class levels so we never downgrade them and so the
+  // original label (e.g. "fatal") is kept.
+  if (normalizedLevel === 'error' || normalizedLevel === 'fatal') return normalizedLevel
+
+  const statusCode =
+    typeof status === 'number' ? status : typeof status === 'string' ? Number(status) : NaN
+  const hasStatus = Number.isFinite(statusCode)
+
+  if (hasStatus && statusCode >= HTTP_SERVER_ERROR_STATUS) return 'error'
+  if (normalizedLevel === 'warning') return 'warning'
+  if (hasStatus && statusCode >= HTTP_CLIENT_ERROR_STATUS) return 'warning'
+
+  return normalizedLevel
 }
 
 export function jwtAPIKey(metadata: any) {
@@ -746,6 +840,10 @@ export function formatLogsAsJson(rows: LogData[]): string {
   return JSON.stringify(rows, null, 2)
 }
 
+export function formatLogsAsCsv(rows: LogData[]): string {
+  return convertResultsToCSV(rows as unknown as Record<string, unknown>[]) ?? ''
+}
+
 export function formatLogsAsMarkdown(rows: LogData[]): string {
   return rows
     .map((row, i) => {
@@ -789,6 +887,7 @@ const QUERY_TYPE_LABELS: Record<QueryType, string> = {
   pg_cron: 'pg_cron',
   pgbouncer: 'PgBouncer',
   etl: 'ETL',
+  multigres: 'Multigres',
 }
 
 const LOG_TABLE_TO_SERVICE_LABEL: Record<LogsTableName, string> = {
@@ -806,6 +905,7 @@ const LOG_TABLE_TO_SERVICE_LABEL: Record<LogsTableName, string> = {
   pg_upgrade_logs: 'Postgres upgrade',
   pg_cron_logs: 'pg_cron',
   etl_replication_logs: 'ETL',
+  multigres_logs: 'Multigres',
 }
 
 const isLogsTableName = (value: string): value is LogsTableName =>

@@ -1,8 +1,8 @@
 import { UseFormReturn } from 'react-hook-form'
 import {
   Badge,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
+  FormField,
   RadioGroupStacked,
   RadioGroupStackedItem,
   SheetSection,
@@ -18,12 +18,12 @@ export function QueueTypeSelector({ form }: { form: UseFormReturn<CreateQueueFor
 
   return (
     <SheetSection>
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name="values.type"
         render={({ field }) => (
           <FormItemLayout label="Type" layout="vertical" className="gap-1">
-            <FormControl_Shadcn_>
+            <FormControl>
               <RadioGroupStacked
                 id="queue_type"
                 name="queue_type"
@@ -62,7 +62,7 @@ export function QueueTypeSelector({ form }: { form: UseFormReturn<CreateQueueFor
                   )
                 })}
               </RadioGroupStacked>
-            </FormControl_Shadcn_>
+            </FormControl>
           </FormItemLayout>
         )}
       />

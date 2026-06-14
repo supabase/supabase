@@ -1,9 +1,9 @@
 'use client'
 
-import { Slot } from '@radix-ui/react-slot'
 import { cva, VariantProps } from 'class-variance-authority'
 import { Loader2 } from 'lucide-react'
-import { cloneElement, forwardRef, isValidElement } from 'react'
+import { Slot } from 'radix-ui'
+import { cloneElement, forwardRef, isValidElement, ReactNode } from 'react'
 
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from '../../lib/constants'
 import { cn } from '../../lib/utils/cn'
@@ -13,17 +13,16 @@ const buttonVariants = cva(
   `relative
   flex items-center justify-center
   cursor-pointer
-  inline-flex
-  items-center
   space-x-2
   text-center
   font-regular
   ease-out
   duration-200
   rounded-md
-  outline-none
+  outline-hidden
   transition-all
   outline-0
+  focus-visible:outline-solid
   focus-visible:outline-4
   focus-visible:outline-offset-1
   border
@@ -45,7 +44,7 @@ const buttonVariants = cva(
           text-foreground
           bg-alternative dark:bg-muted  hover:bg-selection
           border-strong hover:border-stronger
-          focus-visible:outline-brand-600
+          focus-visible:outline-border-strong
           data-[state=open]:bg-selection
           data-[state=open]:outline-brand-600
           data-[state=open]:border-button-hover
@@ -91,10 +90,8 @@ const buttonVariants = cva(
         link: `
           text-brand-600
           border
-          border-transparent
+          border-transparent/0
           hover:bg-brand-400
-          border-opacity-0
-          bg-opacity-0
           shadow-none
           focus-visible:outline-border-strong
           data-[state=open]:bg-brand-400
@@ -240,7 +237,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const Comp = asChild ? Slot : 'button'
+    const Comp = asChild ? Slot.Slot : 'button'
     const { className, tabIndex } = props
     const showIcon = loading || icon
     // decrecating 'showIcon' for rightIcon
@@ -270,7 +267,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         }}
       >
         {asChild ? (
-          isValidElement(children) ? (
+          isValidElement<{ children: ReactNode }>(children) ? (
             cloneElement(
               children,
               undefined,

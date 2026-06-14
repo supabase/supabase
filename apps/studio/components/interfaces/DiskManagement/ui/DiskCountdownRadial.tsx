@@ -46,7 +46,7 @@ export function DiskCountdownRadial() {
           exit={{ opacity: 0, height: 0 }}
           transition={{ duration: 0.2 }}
         >
-          <Card className="px-2 rounded bg-surface-100">
+          <Card className="px-2 rounded-sm bg-surface-100">
             <CardContent className="py-3 flex gap-3 px-3 items-start">
               <CountdownTimerRadial progress={progressPercentage} />
               <div className="flex flex-col gap-2">

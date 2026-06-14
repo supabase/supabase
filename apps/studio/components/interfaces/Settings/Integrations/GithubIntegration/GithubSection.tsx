@@ -1,30 +1,22 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IS_PLATFORM, useParams } from 'common'
+import { useParams } from 'common'
 import { useMemo } from 'react'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { IntegrationSectionIcon } from '../IntegrationsSettings'
 import { GitHubIntegrationConnectionForm } from './GitHubIntegrationConnectionForm'
-import {
-  ScaffoldContainer,
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from '@/components/layouts/Scaffold'
 import NoPermission from '@/components/ui/NoPermission'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { BASE_PATH } from '@/lib/constants'
-
-const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
-  return (
-    <img
-      className="border rounded-lg shadow w-full sm:w-48 mt-6 border-body"
-      src={`${BASE_PATH}/img/integrations/covers/${title}-cover.png`}
-      alt={`${title} cover`}
-    />
-  )
-}
 
 export const GitHubSection = () => {
   const { ref: projectRef } = useParams()
@@ -43,33 +35,30 @@ export const GitHubSection = () => {
     [connections, projectRef]
   )
 
-  const GitHubTitle = `GitHub Integration`
-
   return (
-    <ScaffoldContainer>
-      <ScaffoldSection className="py-12">
-        <ScaffoldSectionDetail title={GitHubTitle}>
-          <p>Connect any of your GitHub repositories to a project.</p>
-          <IntegrationImageHandler title="github" />
-        </ScaffoldSectionDetail>
-        <ScaffoldSectionContent>
-          {isLoadingPermissions ? (
-            <GenericSkeletonLoader />
-          ) : !canReadGitHubConnection ? (
-            <NoPermission resourceText="view this organization's GitHub connections" />
-          ) : (
-            <div className="space-y-6">
-              <h5 className="text-foreground mb-2">How does the GitHub integration work?</h5>
-              <p className="text-foreground-light text-sm mb-6">
-                Connecting to GitHub allows you to sync preview branches with a chosen GitHub
-                branch, keep your production branch in sync, and automatically create preview
-                branches for every pull request.
-              </p>
-              <GitHubIntegrationConnectionForm connection={existingConnection} />
-            </div>
-          )}
-        </ScaffoldSectionContent>
-      </ScaffoldSection>
-    </ScaffoldContainer>
+    <PageSection>
+      <PageSectionMeta>
+        <div className="flex flex-1 items-start gap-6">
+          <IntegrationSectionIcon title="github" />
+          <PageSectionSummary>
+            <PageSectionTitle>GitHub Integration</PageSectionTitle>
+            <PageSectionDescription>
+              Connect any of your GitHub repositories to a project. Supabase applies database
+              changes when you merge into your production branch. If branching is enabled, each pull
+              request gets its own preview database.
+            </PageSectionDescription>
+          </PageSectionSummary>
+        </div>
+      </PageSectionMeta>
+      <PageSectionContent>
+        {isLoadingPermissions ? (
+          <GenericSkeletonLoader />
+        ) : !canReadGitHubConnection ? (
+          <NoPermission resourceText="view this organization's GitHub connections" />
+        ) : (
+          <GitHubIntegrationConnectionForm connection={existingConnection} />
+        )}
+      </PageSectionContent>
+    </PageSection>
   )
 }

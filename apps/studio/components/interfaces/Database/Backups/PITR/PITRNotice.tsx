@@ -48,7 +48,7 @@ export const PITRNotice = () => {
       }
     >
       <div className="flex p-6 space-x-6">
-        <div className="flex items-center justify-center w-10 h-10 rounded bg-border-strong">
+        <div className="flex items-center justify-center w-10 h-10 rounded-sm bg-border-strong">
           <Calendar strokeWidth={2} />
         </div>
         <div className="space-y-2">

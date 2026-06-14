@@ -1,5 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Eye, EyeOff } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -11,12 +13,15 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+  Textarea,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -37,6 +42,8 @@ export const AddNewSecretModal = () => {
 
   const { mutateAsync: addSecret } = useVaultSecretCreateMutation()
 
+  const [isSecretVisible, setIsSecretVisible] = useState(false)
+
   const [showAddSecretModal, setShowAddSecretModal] = useQueryState(
     'new',
     parseAsBoolean.withDefault(false)
@@ -44,6 +51,7 @@ export const AddNewSecretModal = () => {
 
   const handleClose = () => {
     setShowAddSecretModal(null)
+    setIsSecretVisible(false)
     form.reset()
   }
 
@@ -81,48 +89,88 @@ export const AddNewSecretModal = () => {
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection className="space-y-4">
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form
               id={formId}
               noValidate
               onSubmit={form.handleSubmit(onAddNewSecret)}
               className="space-y-4"
             >
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Name">
-                    <FormControl_Shadcn_ className="col-span-6">
-                      <Input_Shadcn_ {...field} />
-                    </FormControl_Shadcn_>
+                    <FormControl className="col-span-6">
+                      <Input {...field} />
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="description"
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Description" labelOptional="Optional">
-                    <FormControl_Shadcn_ className="col-span-6">
-                      <Input_Shadcn_ {...field} />
-                    </FormControl_Shadcn_>
+                    <FormControl className="col-span-6">
+                      <Input {...field} />
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="secret"
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Secret value">
-                    <FormControl_Shadcn_ className="col-span-6">
-                      <Input reveal copy {...field} />
-                    </FormControl_Shadcn_>
+                    <FormControl className="col-span-6">
+                      <div className="relative">
+                        <Textarea
+                          {...field}
+                          rows={1}
+                          ref={(el) => {
+                            field.ref(el)
+                            if (el) {
+                              el.style.height = 'auto'
+                              el.style.height = Math.max(40, el.scrollHeight) + 'px'
+                            }
+                          }}
+                          className="min-h-0 resize-none"
+                          style={
+                            {
+                              WebkitTextSecurity: isSecretVisible ? undefined : 'disc',
+                            } as React.CSSProperties
+                          }
+                          onChange={(e) => {
+                            field.onChange(e)
+                            e.currentTarget.style.height = 'auto'
+                            e.currentTarget.style.height =
+                              Math.max(40, e.currentTarget.scrollHeight) + 'px'
+                          }}
+                        />
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              type="text"
+                              className="absolute right-1 top-1 px-1"
+                              aria-label={
+                                isSecretVisible ? 'Hide secret value' : 'Show secret value'
+                              }
+                              icon={isSecretVisible ? <EyeOff /> : <Eye />}
+                              onClick={() => setIsSecretVisible((prev) => !prev)}
+                            />
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom">
+                            {isSecretVisible ? 'Hide value' : 'Show value'}
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </form>
-          </Form_Shadcn_>
+          </Form>
         </DialogSection>
         <DialogFooter>
           <Button type="default" disabled={isSubmitting} onClick={handleClose}>

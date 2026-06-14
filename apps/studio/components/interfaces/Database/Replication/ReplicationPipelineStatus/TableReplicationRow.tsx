@@ -1,29 +1,33 @@
 import { useParams } from 'common'
 import { ExternalLink, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
-import { Badge, Button, cn, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Badge, Button, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { ErroredTableDetails } from '../ErroredTableDetails'
 import { TableState } from './ReplicationPipelineStatus.types'
-import { getDisabledStateConfig, getStatusConfig } from './ReplicationPipelineStatus.utils'
+import { getStatusConfig } from './ReplicationPipelineStatus.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
 
 interface TableReplicationRowProps {
   table: ReplicationPipelineTableStatus
-  config: ReturnType<typeof getDisabledStateConfig>
   isRestarting: boolean
   showDisabledState: boolean
+  disabledStateMessage: string
+  isAnyRestartInProgress: boolean
+  isPipelineStopped: boolean
   onSelectRestart: () => void
   onSelectShowError: () => void
 }
 
 export const TableReplicationRow = ({
   table,
-  config,
   isRestarting,
   showDisabledState,
+  disabledStateMessage,
+  isAnyRestartInProgress,
+  isPipelineStopped,
   onSelectRestart,
   onSelectShowError,
 }: TableReplicationRowProps) => {
@@ -35,7 +39,7 @@ export const TableReplicationRow = ({
     <TableRow>
       <TableCell className="align-top">
         <div className="flex items-center gap-x-2">
-          <p className={cn(isRestarting && 'text-foreground-light')}>{table.table_name}</p>
+          <p>{table.table_name}</p>
 
           <ButtonTooltip
             asChild
@@ -71,9 +75,7 @@ export const TableReplicationRow = ({
             Replication is being restarted for this table. The pipeline will restart automatically.
           </p>
         ) : showDisabledState ? (
-          <p className="text-sm text-foreground-lighter">
-            Status unavailable while pipeline is {config.badge.toLowerCase()}
-          </p>
+          <p className="text-sm text-foreground-lighter">{disabledStateMessage}</p>
         ) : (
           <div className="flex flex-col gap-y-3">
             <div className="text-sm text-foreground">
@@ -97,13 +99,13 @@ export const TableReplicationRow = ({
                 type="default"
                 className="w-7"
                 icon={<RotateCcw />}
-                disabled={showDisabledState || isRestarting}
+                disabled={showDisabledState || isRestarting || isAnyRestartInProgress}
                 aria-label={`Restart replication for ${table.table_name}`}
                 onClick={onSelectRestart}
               />
             </TooltipTrigger>
             <TooltipContent side="bottom" align="center">
-              Restart table replication
+              {isPipelineStopped ? 'Reset table and start pipeline' : 'Reset and restart pipeline'}
             </TooltipContent>
           </Tooltip>
         </div>

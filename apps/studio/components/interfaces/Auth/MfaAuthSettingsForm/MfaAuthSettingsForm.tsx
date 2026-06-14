@@ -5,25 +5,25 @@ import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertTitle,
   Button,
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   FormInputGroupInput,
-  Input_Shadcn_,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Switch,
   WarningIcon,
 } from 'ui'
@@ -39,6 +39,7 @@ import {
 } from 'ui-patterns/PageSection'
 import * as z from 'zod'
 
+import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import AlertError from '@/components/ui/AlertError'
 import NoPermission from '@/components/ui/NoPermission'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
@@ -350,11 +351,11 @@ export const MfaAuthSettingsForm = () => {
           </PageSectionSummary>
         </PageSectionMeta>
         <PageSectionContent>
-          <Form_Shadcn_ {...totpForm}>
+          <Form {...totpForm}>
             <form onSubmit={totpForm.handleSubmit(onSubmitTotpForm)} className="space-y-4">
               <Card>
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={totpForm.control}
                     name="MFA_TOTP"
                     render={({ field }) => (
@@ -363,31 +364,31 @@ export const MfaAuthSettingsForm = () => {
                         label="TOTP (App Authenticator)"
                         description="Control use of TOTP (App Authenticator) factors"
                       >
-                        <FormControl_Shadcn_>
-                          <Select_Shadcn_
+                        <FormControl>
+                          <Select
                             value={field.value}
                             onValueChange={field.onChange}
                             disabled={!canUpdateConfig}
                           >
-                            <SelectTrigger_Shadcn_>
-                              <SelectValue_Shadcn_ placeholder="Select status" />
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                            <SelectContent>
                               {MFAFactorSelectionOptions.map((option) => (
-                                <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                                <SelectItem key={option.value} value={option.value}>
                                   {option.label}
-                                </SelectItem_Shadcn_>
+                                </SelectItem>
                               ))}
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
-                        </FormControl_Shadcn_>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
                 </CardContent>
 
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={totpForm.control}
                     name="MFA_MAX_ENROLLED_FACTORS"
                     render={({ field }) => (
@@ -396,7 +397,7 @@ export const MfaAuthSettingsForm = () => {
                         label="Maximum number of per-user MFA factors"
                         description="How many MFA factors can be enrolled at once per user."
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <InputGroup>
                             <FormInputGroupInput
                               type="number"
@@ -413,7 +414,7 @@ export const MfaAuthSettingsForm = () => {
                               <InputGroupText>factors</InputGroupText>
                             </InputGroupAddon>
                           </InputGroup>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -436,7 +437,7 @@ export const MfaAuthSettingsForm = () => {
                 </CardFooter>
               </Card>
             </form>
-          </Form_Shadcn_>
+          </Form>
         </PageSectionContent>
       </PageSection>
 
@@ -447,7 +448,7 @@ export const MfaAuthSettingsForm = () => {
           </PageSectionSummary>
         </PageSectionMeta>
         <PageSectionContent>
-          <Form_Shadcn_ {...phoneForm}>
+          <Form {...phoneForm}>
             <form
               onSubmit={(e) => {
                 e.preventDefault()
@@ -456,7 +457,7 @@ export const MfaAuthSettingsForm = () => {
             >
               <Card>
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={phoneForm.control}
                     name="MFA_PHONE"
                     render={({ field }) => (
@@ -465,40 +466,40 @@ export const MfaAuthSettingsForm = () => {
                         label="Phone"
                         description="Control use of phone factors"
                       >
-                        <FormControl_Shadcn_>
-                          <Select_Shadcn_
+                        <FormControl>
+                          <Select
                             value={field.value}
                             onValueChange={field.onChange}
                             disabled={!canUpdateConfig || !hasAccessToMFA}
                           >
-                            <SelectTrigger_Shadcn_>
-                              <SelectValue_Shadcn_ placeholder="Select status" />
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                            <SelectContent>
                               {MFAFactorSelectionOptions.map((option) => (
-                                <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                                <SelectItem key={option.value} value={option.value}>
                                   {option.label}
-                                </SelectItem_Shadcn_>
+                                </SelectItem>
                               ))}
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
-                        </FormControl_Shadcn_>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
 
                   {!hasValidMFAProvider && phoneMFAIsEnabled && (
-                    <Alert_Shadcn_ variant="warning" className="mt-3">
+                    <Alert variant="warning" className="mt-3">
                       <WarningIcon />
-                      <AlertTitle_Shadcn_>
+                      <AlertTitle>
                         To use MFA with Phone you should set up a Phone provider or Send SMS Hook.
-                      </AlertTitle_Shadcn_>
-                    </Alert_Shadcn_>
+                      </AlertTitle>
+                    </Alert>
                   )}
                 </CardContent>
 
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={phoneForm.control}
                     name="MFA_PHONE_OTP_LENGTH"
                     render={({ field }) => (
@@ -507,7 +508,7 @@ export const MfaAuthSettingsForm = () => {
                         label="Phone OTP Length"
                         description="Number of digits in OTP"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <InputGroup>
                             <FormInputGroupInput
                               type="number"
@@ -524,14 +525,14 @@ export const MfaAuthSettingsForm = () => {
                               <InputGroupText>digits</InputGroupText>
                             </InputGroupAddon>
                           </InputGroup>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
                 </CardContent>
 
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={phoneForm.control}
                     name="MFA_PHONE_TEMPLATE"
                     render={({ field }) => (
@@ -540,8 +541,8 @@ export const MfaAuthSettingsForm = () => {
                         label="Phone verification message"
                         description="To format the OTP code use `{{ .Code }}`"
                       >
-                        <FormControl_Shadcn_>
-                          <Input_Shadcn_
+                        <FormControl>
+                          <Input
                             type="text"
                             {...field}
                             disabled={!canUpdateConfig || !hasAccessToMFA}
@@ -550,7 +551,7 @@ export const MfaAuthSettingsForm = () => {
                             data-form-type="other" // Dashlane
                             data-bwignore // Bitwarden
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -588,7 +589,7 @@ export const MfaAuthSettingsForm = () => {
                 </CardFooter>
               </Card>
             </form>
-          </Form_Shadcn_>
+          </Form>
         </PageSectionContent>
       </PageSection>
 
@@ -610,6 +611,7 @@ export const MfaAuthSettingsForm = () => {
           Billing will start immediately upon enabling this add-on, regardless of whether your
           customers are using SMS MFA.
         </p>
+        <TaxDisclaimer className="mt-2" />
       </ConfirmationModal>
 
       <PageSection>
@@ -619,11 +621,11 @@ export const MfaAuthSettingsForm = () => {
           </PageSectionSummary>
         </PageSectionMeta>
         <PageSectionContent>
-          <Form_Shadcn_ {...securityForm}>
+          <Form {...securityForm}>
             <form onSubmit={securityForm.handleSubmit(onSubmitSecurityForm)}>
               <Card>
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={securityForm.control}
                     name="MFA_ALLOW_LOW_AAL"
                     render={({ field }) => (
@@ -632,13 +634,13 @@ export const MfaAuthSettingsForm = () => {
                         label="Limit duration of AAL1 sessions"
                         description="A user's session will be terminated unless they verify one of their factors within 15 minutes of initial sign in. Recommendation: ON"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Switch
                             checked={!field.value}
                             onCheckedChange={(value) => field.onChange(!value)}
                             disabled={!canUpdateConfig || !hasAccessToEnhanceSecurity}
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -673,7 +675,7 @@ export const MfaAuthSettingsForm = () => {
                 </CardFooter>
               </Card>
             </form>
-          </Form_Shadcn_>
+          </Form>
         </PageSectionContent>
       </PageSection>
     </>

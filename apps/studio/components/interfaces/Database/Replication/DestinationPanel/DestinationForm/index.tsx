@@ -6,12 +6,14 @@ import { Loader2 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, DialogSectionSeparator, Form_Shadcn_, SheetFooter, SheetSection } from 'ui'
+import { Button, DialogSectionSeparator, Form, SheetFooter, SheetSection } from 'ui'
 import * as z from 'zod'
 
 import {
   useIsETLBigQueryPrivateAlpha,
+  useIsETLDucklakePrivateAlpha,
   useIsETLIcebergPrivateAlpha,
+  useIsETLSnowflakePrivateAlpha,
 } from '../../useIsETLPrivateAlpha'
 import { DestinationType } from '../DestinationPanel.types'
 import { AdvancedSettings } from './AdvancedSettings'
@@ -20,16 +22,23 @@ import { DestinationPanelFormSchema as FormSchema } from './DestinationForm.sche
 import {
   buildDestinationConfig,
   buildDestinationConfigForValidation,
+  getDucklakeValidationIssues,
+  getSnowflakeValidationIssues,
 } from './DestinationForm.utils'
 import { DestinationNameInput } from './DestinationNameInput'
-import { AnalyticsBucketFields, BigQueryFields } from './DestinationPanelFields'
+import {
+  AnalyticsBucketFields,
+  BigQueryFields,
+  DuckLakeFields,
+  SnowflakeFields,
+} from './DestinationPanelFields'
 import { NewPublicationPanel } from './NewPublicationPanel'
 import { NoDestinationsAvailable } from './NoDestinationsAvailable'
 import { PublicationSelection } from './PublicationSelection'
 import { ReplicationDisclaimerDialog } from './ReplicationDisclaimerDialog'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
 import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import {
   BatchConfig,
@@ -54,6 +63,7 @@ import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from '@/state/replication-pipeline-request-status'
+import { type ResponseError } from '@/types'
 
 const formId = 'destination-editor'
 
@@ -70,6 +80,29 @@ interface DestinationFormProps {
   onClose: () => void
 }
 
+type DucklakeApiConfig = {
+  catalog_url: string
+  data_path: string
+  pool_size?: number
+  s3_access_key_id?: string
+  s3_secret_access_key?: string
+  s3_region?: string
+  s3_endpoint?: string
+  s3_url_style?: 'path' | 'vhost'
+  s3_use_ssl?: boolean
+  metadata_schema?: string
+}
+
+type SnowflakeApiConfig = {
+  account_id: string
+  user: string
+  private_key: string
+  private_key_passphrase?: string
+  database: string
+  schema: string
+  role?: string
+}
+
 export const DestinationForm = ({
   selectedType,
   visible,
@@ -81,6 +114,8 @@ export const DestinationForm = ({
 
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
+  const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
+  const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
 
   const [isFormInteracting, setIsFormInteracting] = useState(false)
@@ -108,8 +143,10 @@ export const DestinationForm = ({
     if (etlEnableBigQuery) destinations.push({ value: 'BigQuery', label: 'BigQuery' })
     if (etlEnableIceberg)
       destinations.push({ value: 'Analytics Bucket', label: 'Analytics Bucket' })
+    if (etlEnableDucklake) destinations.push({ value: 'DuckLake', label: 'DuckLake' })
+    if (etlEnableSnowflake) destinations.push({ value: 'Snowflake', label: 'Snowflake' })
     return destinations
-  }, [etlEnableBigQuery, etlEnableIceberg])
+  }, [etlEnableBigQuery, etlEnableDucklake, etlEnableIceberg, etlEnableSnowflake])
   const hasNoAvailableDestinations = availableDestinations.length === 0
 
   const { data: sourcesData } = useReplicationSourcesQuery({ projectRef })
@@ -131,11 +168,12 @@ export const DestinationForm = ({
     pipelineId: existingDestination?.pipelineId,
   })
 
-  const { data: apiKeys } = useAPIKeysQuery(
+  const { data: apiKeysData } = useAPIKeys(
     { projectRef, reveal: true },
     { enabled: canReadAPIKeys }
   )
-  const { serviceKey } = getKeys(apiKeys)
+  const { serviceKey } = apiKeysData ?? {}
+
   const catalogToken = serviceKey?.api_key ?? ''
 
   const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
@@ -171,6 +209,22 @@ export const DestinationForm = ({
     const config = destinationData?.config
     const isBigQueryConfig = config && 'big_query' in config
     const isIcebergConfig = config && 'iceberg' in config
+    const ducklakeConfigValue =
+      config && 'ducklake' in (config as Record<string, unknown>)
+        ? (config as Record<string, unknown>).ducklake
+        : undefined
+    const ducklakeConfig =
+      ducklakeConfigValue && typeof ducklakeConfigValue === 'object'
+        ? (ducklakeConfigValue as DucklakeApiConfig)
+        : undefined
+    const snowflakeConfigValue =
+      config && 'snowflake' in (config as Record<string, unknown>)
+        ? (config as Record<string, unknown>).snowflake
+        : undefined
+    const snowflakeConfig =
+      snowflakeConfigValue && typeof snowflakeConfigValue === 'object'
+        ? (snowflakeConfigValue as SnowflakeApiConfig)
+        : undefined
 
     return {
       // Common fields
@@ -199,6 +253,25 @@ export const DestinationForm = ({
       s3SecretAccessKey: isIcebergConfig ? config.iceberg.supabase.s3_secret_access_key : '',
       s3Region:
         projectSettings?.region ?? (isIcebergConfig ? config.iceberg.supabase.s3_region : ''),
+      // DuckLake fields
+      ducklakeCatalogUrl: ducklakeConfig?.catalog_url ?? '',
+      ducklakeDataPath: ducklakeConfig?.data_path ?? '',
+      ducklakePoolSize: ducklakeConfig?.pool_size,
+      ducklakeS3AccessKeyId: ducklakeConfig?.s3_access_key_id ?? '',
+      ducklakeS3SecretAccessKey: ducklakeConfig?.s3_secret_access_key ?? '',
+      ducklakeS3Region: ducklakeConfig?.s3_region ?? '',
+      ducklakeS3Endpoint: ducklakeConfig?.s3_endpoint ?? '',
+      ducklakeS3UrlStyle: ducklakeConfig?.s3_url_style ?? 'path',
+      ducklakeS3UseSsl: ducklakeConfig?.s3_use_ssl ?? true,
+      ducklakeMetadataSchema: ducklakeConfig?.metadata_schema ?? 'ducklake',
+      // Snowflake fields
+      snowflakeAccountId: snowflakeConfig?.account_id ?? '',
+      snowflakeUser: snowflakeConfig?.user ?? '',
+      snowflakePrivateKey: snowflakeConfig?.private_key ?? '',
+      snowflakePrivateKeyPassphrase: snowflakeConfig?.private_key_passphrase ?? '',
+      snowflakeDatabase: snowflakeConfig?.database ?? '',
+      snowflakeSchema: snowflakeConfig?.schema ?? '',
+      snowflakeRole: snowflakeConfig?.role ?? '',
     }
   }, [destinationData, pipelineData, catalogToken, projectSettings])
 
@@ -244,6 +317,14 @@ export const DestinationForm = ({
           if (data.s3AccessKeyId !== 'create-new' && !data.s3SecretAccessKey?.length) {
             addRequiredFieldError('s3SecretAccessKey', 'S3 Secret Access Key is required')
           }
+        } else if (selectedType === 'DuckLake') {
+          getDucklakeValidationIssues(data).forEach(({ path, message }) => {
+            addRequiredFieldError(path, message)
+          })
+        } else if (selectedType === 'Snowflake') {
+          getSnowflakeValidationIssues(data).forEach(({ path, message }) => {
+            addRequiredFieldError(path, message)
+          })
         }
       })
     ),
@@ -326,8 +407,11 @@ export const DestinationForm = ({
     const hasRequestError = results.some((r) => r.status === 'rejected')
 
     if (hasRequestError) {
-      // If any request failed, show a generic error and stop
-      toast.error('Failed to validate configuration. Please try again.')
+      // If any request failed, surface the upstream message so users see why
+      const rejected = results.find((r): r is PromiseRejectedResult => r.status === 'rejected')
+      const reason =
+        rejected?.reason instanceof Error ? rejected.reason.message : 'Please try again.'
+      toast.error(`Failed to validate configuration: ${reason}`)
       setHasRunValidation(false)
       return false
     }
@@ -439,7 +523,7 @@ export const DestinationForm = ({
       }
     } catch (error) {
       const action = editMode ? 'apply and run' : 'create and start'
-      toast.error(`Failed to ${action} destination`)
+      toast.error(`Failed to ${action} destination: ${(error as ResponseError).message}`)
     }
   }
 
@@ -506,11 +590,11 @@ export const DestinationForm = ({
 
   return (
     <>
-      <SheetSection className="flex-grow overflow-auto px-0 py-0">
+      <SheetSection className="grow overflow-auto px-0 py-0">
         {hasNoAvailableDestinations && !editMode ? (
           <NoDestinationsAvailable />
         ) : (
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
               <div className="p-5 flex flex-col gap-y-6">
                 <p className="text-sm font-medium text-foreground">Destination details</p>
@@ -536,6 +620,10 @@ export const DestinationForm = ({
                   setIsFormInteracting={setIsFormInteracting}
                   onSelectNewBucket={() => setNewBucketSheetVisible(true)}
                 />
+              ) : selectedType === 'DuckLake' && etlEnableDucklake ? (
+                <DuckLakeFields form={form} />
+              ) : selectedType === 'Snowflake' && etlEnableSnowflake ? (
+                <SnowflakeFields form={form} />
               ) : null}
 
               <DialogSectionSeparator />
@@ -555,11 +643,11 @@ export const DestinationForm = ({
                 </>
               )}
             </form>
-          </Form_Shadcn_>
+          </Form>
         )}
       </SheetSection>
 
-      <SheetFooter className="!justify-between">
+      <SheetFooter className="justify-between!">
         <AnimatePresence mode="wait">
           {isValidating || isSaving ? (
             <motion.div

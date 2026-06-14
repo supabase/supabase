@@ -5,11 +5,17 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
-  Modal,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Form,
+  FormControl,
+  FormField,
+  Input,
   Textarea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -84,58 +90,57 @@ export const UpdateCustomReportModal = ({
   }, [initialValues, isDirty, reset])
 
   return (
-    <Modal
-      visible={selectedReport !== undefined}
-      onCancel={handleCancel}
-      hideFooter
-      header="Update custom report"
-      size="small"
-    >
-      <Form_Shadcn_ {...form}>
-        <form onSubmit={form.handleSubmit(onConfirmUpdateReport)} noValidate>
-          <Modal.Content>
-            <FormField_Shadcn_
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItemLayout name="name" layout="vertical" label="Name">
-                  <FormControl_Shadcn_>
-                    <Input_Shadcn_ {...field} id="name" />
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
-              )}
-            />
-          </Modal.Content>
-          <Modal.Content>
-            <FormField_Shadcn_
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItemLayout name="description" layout="vertical" label="Description">
-                  <FormControl_Shadcn_>
-                    <Textarea
-                      {...field}
-                      id="description"
-                      rows={4}
-                      placeholder="Describe your custom report"
-                      className="resize-none"
-                    />
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
-              )}
-            />
-          </Modal.Content>
-          <Modal.Separator />
-          <Modal.Content className="flex items-center justify-end gap-2">
-            <Button htmlType="reset" type="default" onClick={handleCancel} disabled={isUpdating}>
-              Cancel
-            </Button>
-            <Button htmlType="submit" loading={isUpdating} disabled={isUpdating || !isDirty}>
-              Save custom report
-            </Button>
-          </Modal.Content>
-        </form>
-      </Form_Shadcn_>
-    </Modal>
+    <Dialog open={selectedReport !== undefined} onOpenChange={handleCancel}>
+      <DialogContent size="small">
+        <DialogHeader>
+          <DialogTitle>Update custom report</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onConfirmUpdateReport)} noValidate>
+            <DialogSection>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItemLayout name="name" layout="vertical" label="Name">
+                    <FormControl>
+                      <Input {...field} id="name" />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            </DialogSection>
+            <DialogSection>
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItemLayout name="description" layout="vertical" label="Description">
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        id="description"
+                        rows={4}
+                        placeholder="Describe your custom report"
+                        className="resize-none"
+                      />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            </DialogSection>
+            <DialogFooter>
+              <Button htmlType="reset" type="default" onClick={handleCancel} disabled={isUpdating}>
+                Cancel
+              </Button>
+              <Button htmlType="submit" loading={isUpdating} disabled={isUpdating || !isDirty}>
+                Save custom report
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   )
 }

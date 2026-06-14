@@ -15,16 +15,14 @@ export const PullRequestsEmptyState = ({
   branches,
   onBranchSelected,
   isUpdating,
-  githubConnection,
-  gitlessBranching = false,
+  hasGithubConnection,
 }: {
   url: string
   projectRef: string
   branches: Branch[]
   onBranchSelected: (branch: Branch) => void
   isUpdating: boolean
-  githubConnection?: any
-  gitlessBranching: boolean
+  hasGithubConnection?: boolean
 }) => {
   return (
     <div className={EMPTY_STATE_CONTAINER}>
@@ -33,7 +31,7 @@ export const PullRequestsEmptyState = ({
         Create your first merge request to merge changes back to the main branch
       </p>
       <div className="flex items-center space-x-2 mt-4">
-        {githubConnection ? (
+        {hasGithubConnection ? (
           <Button type="outline" asChild icon={<Github />}>
             <a href={url} target="_blank" rel="noopener noreferrer">
               Create pull request
@@ -44,14 +42,13 @@ export const PullRequestsEmptyState = ({
             <Link href={`/project/${projectRef}/settings/integrations`}>Connect to GitHub</Link>
           </Button>
         )}
-        {gitlessBranching && (
-          <BranchSelector
-            type="outline"
-            branches={branches}
-            onBranchSelected={onBranchSelected}
-            isUpdating={isUpdating}
-          />
-        )}
+        <BranchSelector
+          type="outline"
+          align="center"
+          branches={branches}
+          onBranchSelected={onBranchSelected}
+          isUpdating={isUpdating}
+        />
       </div>
     </div>
   )

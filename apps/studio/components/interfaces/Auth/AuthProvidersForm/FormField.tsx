@@ -1,29 +1,30 @@
 import { format } from 'date-fns'
 import { CalendarIcon, ExternalLink } from 'lucide-react'
-import { type Control } from 'react-hook-form'
+import { useEffect } from 'react'
+import { useFormContext, type Control } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import {
   Button,
   Calendar,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
   FormInputGroupInput,
-  Input_Shadcn_,
+  Input,
   InputGroup,
   InputGroupAddon,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Separator,
   SheetSection,
   Switch,
   Textarea,
-  useWatch_Shadcn_,
+  FormField as UIFormField,
+  useWatch,
 } from 'ui'
 import { Input as DataInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -40,6 +41,7 @@ interface FormFieldProps {
   control: Control
   hasAccess: boolean
   disabled?: boolean
+  readOnly?: boolean
 }
 
 const FormField = ({
@@ -50,7 +52,9 @@ const FormField = ({
   control,
   hasAccess,
   disabled: disabledProp,
+  readOnly,
 }: FormFieldProps) => {
+  const { setValue } = useFormContext()
   const { description: originalDescription } = properties
   let description = originalDescription
 
@@ -61,7 +65,7 @@ const FormField = ({
     )
   }
 
-  const fieldValue = useWatch_Shadcn_({ control, name })
+  const fieldValue = useWatch({ control, name })
   if (!hasAccess) {
     const planMessage = organizationSlug
       ? `Only available on [Pro plan](/org/${organizationSlug}/billing?panel=subscriptionPlan) and above.`
@@ -71,11 +75,17 @@ const FormField = ({
   const disabled =
     disabledProp || (properties.type === 'boolean' ? !hasAccess && !fieldValue : !hasAccess)
 
-  const showValue = useWatch_Shadcn_({
+  const showValue = useWatch({
     control,
     name: properties.show?.key,
     disabled: properties.show == null,
   })
+
+  useEffect(() => {
+    if (properties.show?.key != null && !showValue && fieldValue !== '') {
+      setValue(name, '', { shouldDirty: true })
+    }
+  }, [fieldValue, name, properties.show?.key, setValue, showValue])
 
   if (properties.show) {
     if (properties.show.matches) {
@@ -92,10 +102,10 @@ const FormField = ({
       return (
         <>
           <SheetSection>
-            <FormField_Shadcn_
+            <UIFormField
               control={control}
               name={name}
-              disabled={disabled}
+              disabled={disabled || readOnly}
               render={({ field }) => (
                 <FormItemLayout
                   layout="horizontal"
@@ -108,9 +118,9 @@ const FormField = ({
                     ) : null
                   }
                 >
-                  <FormControl_Shadcn_>
-                    <Popover_Shadcn_>
-                      <PopoverTrigger_Shadcn_ asChild>
+                  <FormControl>
+                    <Popover>
+                      <PopoverTrigger asChild>
                         <Button
                           type="outline"
                           className="w-full justify-start text-left font-normal px-3 py-4"
@@ -119,8 +129,8 @@ const FormField = ({
                         >
                           {field.value ? format(new Date(field.value), 'PPP') : 'Pick a date'}
                         </Button>
-                      </PopoverTrigger_Shadcn_>
-                      <PopoverContent_Shadcn_ className="w-auto p-0" align="start">
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
                           mode="single"
                           selected={field.value}
@@ -129,9 +139,9 @@ const FormField = ({
                           }}
                           initialFocus
                         />
-                      </PopoverContent_Shadcn_>
-                    </Popover_Shadcn_>
-                  </FormControl_Shadcn_>
+                      </PopoverContent>
+                    </Popover>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -144,7 +154,7 @@ const FormField = ({
       return (
         <>
           <SheetSection>
-            <FormField_Shadcn_
+            <UIFormField
               control={control}
               name={name}
               disabled={disabled}
@@ -158,13 +168,20 @@ const FormField = ({
                     ) : null
                   }
                 >
-                  <FormControl_Shadcn_ className="col-span-6">
+                  <FormControl className="col-span-6">
                     {properties.isSecret ? (
-                      <DataInput {...field} id={name} size="small" copy reveal />
+                      <DataInput
+                        {...field}
+                        id={name}
+                        size="small"
+                        copy
+                        reveal
+                        readOnly={readOnly}
+                      />
                     ) : (
-                      <Input_Shadcn_ {...field} id={name} />
+                      <Input {...field} id={name} readOnly={readOnly} />
                     )}
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -177,7 +194,7 @@ const FormField = ({
       return (
         <>
           <SheetSection>
-            <FormField_Shadcn_
+            <UIFormField
               control={control}
               name={name}
               disabled={disabled}
@@ -191,15 +208,16 @@ const FormField = ({
                     ) : null
                   }
                 >
-                  <FormControl_Shadcn_ className="col-span-6">
+                  <FormControl className="col-span-6">
                     <Textarea
                       {...field}
                       id={name}
                       rows={4}
                       placeholder="Enter multi-line text"
                       className="resize-none"
+                      readOnly={readOnly}
                     />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -212,7 +230,7 @@ const FormField = ({
       return (
         <>
           <SheetSection>
-            <FormField_Shadcn_
+            <UIFormField
               control={control}
               name={name}
               disabled={disabled}
@@ -226,14 +244,17 @@ const FormField = ({
                     ) : null
                   }
                 >
-                  <FormControl_Shadcn_ className="col-span-6">
+                  <FormControl className="col-span-6">
                     {properties.units ? (
                       <InputGroup>
                         <FormInputGroupInput
                           {...field}
                           id={name}
                           type="number"
-                          onChange={(e) => field.onChange(Number(e.target.value))}
+                          onChange={(e) =>
+                            field.onChange(e.target.value === '' ? '' : Number(e.target.value))
+                          }
+                          readOnly={readOnly}
                         />
                         <InputGroupAddon align="inline-end">
                           <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
@@ -242,14 +263,17 @@ const FormField = ({
                         </InputGroupAddon>
                       </InputGroup>
                     ) : (
-                      <Input_Shadcn_
+                      <Input
                         {...field}
                         id={name}
                         type="number"
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        onChange={(e) =>
+                          field.onChange(e.target.value === '' ? '' : Number(e.target.value))
+                        }
+                        readOnly={readOnly}
                       />
                     )}
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -262,10 +286,10 @@ const FormField = ({
       return (
         <>
           <SheetSection>
-            <FormField_Shadcn_
+            <UIFormField
               control={control}
               name={name}
-              disabled={disabled}
+              disabled={disabled || readOnly}
               render={({ field }) => (
                 <FormItemLayout
                   layout="horizontal"
@@ -285,14 +309,14 @@ const FormField = ({
                     </div>
                   }
                 >
-                  <FormControl_Shadcn_ className="col-span-6">
+                  <FormControl className="col-span-6">
                     <Switch
                       id={name}
                       checked={field.value}
                       onCheckedChange={field.onChange}
                       size="small"
                     />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -305,38 +329,36 @@ const FormField = ({
       return (
         <>
           <SheetSection>
-            <FormField_Shadcn_
+            <UIFormField
               control={control}
               name={name}
-              disabled={disabled}
+              disabled={disabled || readOnly}
               render={({ field }) => (
                 <FormItemLayout
                   layout="horizontal"
                   label={properties.title}
                   description={
                     description ? (
-                      <ReactMarkdown
-                        unwrapDisallowed
-                        disallowedElements={['p']}
-                        className="form-field-markdown"
-                      >
-                        {description}
-                      </ReactMarkdown>
+                      <div className="form-field-markdown">
+                        <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                          {description}
+                        </ReactMarkdown>
+                      </div>
                     ) : null
                   }
                 >
-                  <FormControl_Shadcn_ className="col-span-6">
-                    <Select_Shadcn_
-                      defaultValue={properties.enum[0]}
+                  <FormControl className="col-span-6">
+                    <Select
+                      defaultValue={properties.enum[0]?.value}
                       value={field.value}
                       onValueChange={field.onChange}
                     >
-                      <SelectTrigger_Shadcn_>
-                        <SelectValue_Shadcn_ placeholder="Select an option" />
-                      </SelectTrigger_Shadcn_>
-                      <SelectContent_Shadcn_>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select an option" />
+                      </SelectTrigger>
+                      <SelectContent>
                         {properties.enum.map((option: Enum) => (
-                          <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                          <SelectItem key={option.value} value={option.value}>
                             <span className="flex gap-2 items-center">
                               {option.icon ? (
                                 <img
@@ -347,11 +369,11 @@ const FormField = ({
                               ) : null}
                               {option.label}
                             </span>
-                          </SelectItem_Shadcn_>
+                          </SelectItem>
                         ))}
-                      </SelectContent_Shadcn_>
-                    </Select_Shadcn_>
-                  </FormControl_Shadcn_>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />

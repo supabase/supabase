@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { literal, safeSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Plus, Trash2 } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
@@ -7,10 +8,10 @@ import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  Input,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Separator,
@@ -33,6 +34,7 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { useFDWImportForeignSchemaMutation } from '@/data/fdw/fdw-import-foreign-schema-mutation'
 import { useVectorBucketIndexCreateMutation } from '@/data/storage/vector-bucket-index-create-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -103,6 +105,7 @@ interface CreateVectorTableSheetProps {
 
 export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetProps) => {
   const { data: project } = useSelectedProjectQuery()
+  const { isCli } = useDeploymentMode()
 
   const [visible, setVisible] = useQueryState(
     'newTable',
@@ -116,7 +119,8 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
     ?.split('supabase_target_schema=')[1]
 
   // [Joshen] Can remove this once this restriction is removed
-  const showIndexCreationNotice = isStagingLocal && !!project && project?.region !== 'us-east-1'
+  const showIndexCreationNotice =
+    isStagingLocal && !isCli && !!project && project?.region !== 'us-east-1'
 
   const defaultValues = {
     name: '',
@@ -171,7 +175,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
           serverName: wrapperInstance.server_name,
           sourceSchema: schema,
           targetSchema: schema,
-          schemaOptions: [`bucket_name '${bucketName}'`],
+          schemaOptions: [safeSql`bucket_name ${literal(bucketName)}`],
         })
       }
     } catch (error: any) {
@@ -228,14 +232,14 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
           />
         )}
 
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form
             id={formId}
             onSubmit={form.handleSubmit(onSubmit)}
-            className="overflow-auto flex-grow px-0"
+            className="overflow-auto grow px-0"
           >
             <SheetSection className="flex flex-col gap-y-4">
-              <FormField_Shadcn_
+              <FormField
                 key="name"
                 name="name"
                 control={form.control}
@@ -246,8 +250,8 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                     description="Must be between 3–63 characters. Valid characters are a-z, 0-9, hyphens, and periods."
                     layout="horizontal"
                   >
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
+                    <FormControl>
+                      <Input
                         id="name"
                         data-1p-ignore
                         data-lpignore="true"
@@ -256,14 +260,14 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                         {...field}
                         placeholder="Enter a table name"
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </SheetSection>
             <Separator />
             <SheetSection className="flex flex-col gap-y-4">
-              <FormField_Shadcn_
+              <FormField
                 key="dimension"
                 name="dimension"
                 control={form.control}
@@ -274,8 +278,8 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                     description="Must be an integer between 1–4096."
                     layout="horizontal"
                   >
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
+                    <FormControl>
+                      <Input
                         id="dimension"
                         type="number"
                         placeholder="Enter a numeric value"
@@ -286,12 +290,12 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                         }}
                         value={field.value ?? ''}
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
 
-              <FormField_Shadcn_
+              <FormField
                 key="distanceMetric"
                 name="distanceMetric"
                 control={form.control}
@@ -302,7 +306,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                     layout="horizontal"
                     className="gap-1"
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <RadioGroupStacked
                         id="distance_metric"
                         name="distance_metric"
@@ -321,7 +325,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                           ></RadioGroupStackedItem>
                         ))}
                       </RadioGroupStacked>
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -338,7 +342,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                 {fields.map((field, index) => (
                   <div key={field.id} className="flex items-start gap-2">
                     <div className="flex-1">
-                      <FormField_Shadcn_
+                      <FormField
                         control={form.control}
                         name={`metadataKeys.${index}.value`}
                         render={({ field }) => (
@@ -351,8 +355,8 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                             }
                             layout="vertical"
                           >
-                            <FormControl_Shadcn_>
-                              <Input_Shadcn_
+                            <FormControl>
+                              <Input
                                 {...field}
                                 value={field.value}
                                 size="small"
@@ -363,7 +367,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                                 data-form-type="other"
                                 data-bwignore
                               />
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </FormItemLayout>
                         )}
                       />
@@ -378,14 +382,14 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                   </div>
                 ))}
               </div>
-              <div className="flex items-center justify-center rounded border border-strong border-dashed py-3">
+              <div className="flex items-center justify-center rounded-sm border border-strong border-dashed py-3">
                 <Button type="default" size="tiny" onClick={() => append({ value: '' })}>
                   Add metadata key
                 </Button>
               </div>
             </SheetSection>
           </form>
-        </Form_Shadcn_>
+        </Form>
 
         <SheetFooter>
           <Button type="default" disabled={isCreating} onClick={() => setVisible(false)}>

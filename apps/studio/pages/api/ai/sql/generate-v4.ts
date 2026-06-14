@@ -111,7 +111,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
   let hasAccessToAdvanceModel = false
   let orgHasHipaaAddon: boolean | undefined
   let projectIsSensitive: boolean | undefined
-  let orgIsDpaSigned: boolean | undefined
   let projectRegion: string | undefined
   let orgId: number | undefined
   let planId: string | undefined
@@ -131,7 +130,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       aiOptInLevel = orgDetails.aiOptInLevel
       hasAccessToAdvanceModel = orgDetails.hasAccessToAdvanceModel
       orgHasHipaaAddon = orgDetails.hasHipaaAddon
-      orgIsDpaSigned = orgDetails.isDpaSigned
       orgId = orgDetails.orgId
       planId = orgDetails.planId
       projectIsSensitive = projectDetails.isSensitive
@@ -153,7 +151,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
   const {
     modelParams,
     error: modelError,
-    promptProviderOptions,
+    systemProviderOptions,
   } = await getModel({
     provider: 'openai',
     modelEntry: getAssistantModelEntry(effectiveModel),
@@ -213,14 +211,13 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       allowTracing: isTracingAllowed({
         orgHasHipaaAddon,
         projectIsSensitive,
-        orgIsDpaSigned,
         projectRegion,
       }),
       userId,
       orgId,
       planId,
       requestedModel,
-      promptProviderOptions,
+      systemProviderOptions,
       abortSignal: abortController.signal,
       onSpanCreated: (spanId) => {
         res.setHeader('x-braintrust-span-id', spanId)

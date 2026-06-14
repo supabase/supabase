@@ -13,6 +13,7 @@ const allFeaturesEnabled: GenerateAuthMenuOptions = {
     multiFactor: true,
     attackProtection: true,
     performance: true,
+    passkeys: true,
   },
 }
 
@@ -27,6 +28,7 @@ const allFeaturesDisabled: GenerateAuthMenuOptions = {
     multiFactor: false,
     attackProtection: false,
     performance: false,
+    passkeys: true,
   },
 }
 
@@ -50,9 +52,10 @@ describe('generateAuthMenu', () => {
     expect(names).toContain('Overview')
     expect(names).toContain('Users')
     expect(names).toContain('OAuth Apps')
-    expect(names).toContain('Email')
+    expect(names).toContain('Emails')
     expect(names).toContain('Sign In / Providers')
     expect(names).toContain('OAuth Server')
+    expect(names).toContain('Passkeys')
     expect(names).toContain('Sessions')
     expect(names).toContain('Rate Limits')
     expect(names).toContain('Multi-Factor')
@@ -71,13 +74,14 @@ describe('generateAuthMenu', () => {
     expect(names).toContain('OAuth Apps')
     expect(names).toContain('Policies')
     expect(names).toContain('OAuth Server')
+    expect(names).toContain('Passkeys')
     expect(names).toContain('Sessions')
     expect(names).toContain('URL Configuration')
     expect(names).toContain('Auth Hooks')
     expect(names).toContain('Audit Logs')
 
     expect(names).not.toContain('Overview')
-    expect(names).not.toContain('Email')
+    expect(names).not.toContain('Emails')
     expect(names).not.toContain('Sign In / Providers')
     expect(names).not.toContain('Rate Limits')
     expect(names).not.toContain('Multi-Factor')
@@ -115,7 +119,7 @@ describe('generateAuthMenu', () => {
   it.each([
     ['signInProviders', 'Sign In / Providers'],
     ['rateLimits', 'Rate Limits'],
-    ['emails', 'Email'],
+    ['emails', 'Emails'],
     ['multiFactor', 'Multi-Factor'],
     ['attackProtection', 'Attack Protection'],
     ['performance', 'Performance'],
@@ -140,5 +144,13 @@ describe('generateAuthMenu', () => {
 
     expect(users?.url).toBe('/project/my-project/auth/users')
     expect(oauthApps?.url).toBe('/project/my-project/auth/oauth-apps')
+  })
+
+  it('hides Passkeys when passkeys feature is false', () => {
+    const menu = generateAuthMenu({
+      ...allFeaturesEnabled,
+      features: { ...allFeaturesEnabled.features, passkeys: false },
+    })
+    expect(flatItemNames(menu)).not.toContain('Passkeys')
   })
 })

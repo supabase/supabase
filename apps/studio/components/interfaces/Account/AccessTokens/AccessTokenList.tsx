@@ -24,6 +24,7 @@ import { ExpiresCell, LastUsedCell, TokenNameCell } from './AccessTokenTable/Tok
 import AlertError from '@/components/ui/AlertError'
 import { useAccessTokenDeleteMutation } from '@/data/access-tokens/access-tokens-delete-mutation'
 import { AccessToken, useAccessTokensQuery } from '@/data/access-tokens/access-tokens-query'
+import { useTrack } from '@/lib/telemetry/track'
 
 export interface AccessTokenListProps {
   searchString?: string
@@ -31,6 +32,7 @@ export interface AccessTokenListProps {
 }
 
 export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTokenListProps) => {
+  const track = useTrack()
   const [isOpen, setIsOpen] = useState(false)
   const [token, setToken] = useState<AccessToken | undefined>(undefined)
   const [sort, setSort] = useQueryState(
@@ -42,6 +44,7 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
 
   const { mutate: deleteToken } = useAccessTokenDeleteMutation({
     onSuccess: (_, vars) => {
+      track('access_token_removed', { tokenType: 'classic' })
       onDeleteSuccess(vars.id)
       toast.success('Successfully deleted access token')
       setIsOpen(false)

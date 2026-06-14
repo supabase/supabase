@@ -1,12 +1,12 @@
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
 import Link from 'next/link'
-import { Alert, Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
 import { Restriction } from '../Restriction'
+import { InitiateCancellationFlowButton } from './CancellationFlow'
 import { PlanUpdateSidePanel } from './PlanUpdateSidePanel'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import {
@@ -77,42 +77,47 @@ const Subscription = () => {
               {isError && <AlertError subject="Failed to retrieve subscription" error={error} />}
 
               {isSuccess && (
-                <div className="space-y-6">
-                  <div>
-                    <p className="text-2xl text-brand">{currentPlan?.name ?? 'Unknown'} Plan</p>
-                  </div>
+                <div className="space-y-6 w-full">
+                  <div className="flex justify-between items-center">
+                    <p className="text-2xl text-brand leading-none">
+                      {currentPlan?.name ?? 'Unknown'} Plan
+                    </p>
 
-                  <div>
                     {canChangeTier && (
-                      <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
+                      <div className="flex space-x-2">
                         <Button
                           type="default"
                           className="pointer-events-auto"
-                          disabled={!canChangeTier}
                           onClick={() => snap.setPanelKey('subscriptionPlan')}
                         >
                           Change subscription plan
                         </Button>
-                      </ProjectUpdateDisabledTooltip>
+                        {currentPlan && currentPlan.id !== 'free' && (
+                          <InitiateCancellationFlowButton type="danger">
+                            Cancel Subscription
+                          </InitiateCancellationFlowButton>
+                        )}
+                      </div>
                     )}
-                    {!canChangeTier &&
-                      (projectUpdateDisabled ? (
-                        <Alert
-                          className="mt-2"
-                          withIcon
-                          variant="info"
+                  </div>
+
+                  {!canChangeTier && (
+                    <div>
+                      {projectUpdateDisabled ? (
+                        <Admonition
+                          type="default"
+                          layout="horizontal"
                           title={`Unable to update plan from ${planName}`}
-                        >
-                          We have temporarily disabled project and subscription changes - our
-                          engineers are working on a fix.
-                        </Alert>
+                          description="We have temporarily disabled project and subscription changes - our
+                          engineers are working on a fix."
+                        />
                       ) : (
-                        <Alert
-                          withIcon
-                          className="mt-2"
-                          variant="info"
+                        <Admonition
+                          type="default"
+                          layout="horizontal"
                           title={`Unable to update plan from ${planName}`}
-                          actions={[
+                          description="Please contact us if you'd like to change your plan."
+                          actions={
                             <Button asChild key="contact-support" type="default">
                               <SupportLink
                                 queryParams={{
@@ -122,20 +127,19 @@ const Subscription = () => {
                               >
                                 Contact support
                               </SupportLink>
-                            </Button>,
-                          ]}
-                        >
-                          Please contact us if you'd like to change your plan.
-                        </Alert>
-                      ))}
-                  </div>
+                            </Button>
+                          }
+                        />
+                      )}
+                    </div>
+                  )}
 
                   {!subscription?.usage_billing_enabled && (
                     <Admonition
                       type="default"
                       title="This organization is limited by the included usage"
                     >
-                      <div className="[&>p]:!leading-normal prose text-sm">
+                      <div className="[&>p]:leading-normal! prose text-sm">
                         Projects may become unresponsive when this organization exceeds its{' '}
                         <Link href={`/org/${slug}/usage`}>included usage quota</Link>. To scale
                         seamlessly,{' '}

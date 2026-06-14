@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import { groupBy } from 'lodash'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useState } from 'react'
@@ -99,7 +98,7 @@ export const WorkflowLogs = ({ branch }: WorkflowLogsProps) => {
 
         <DialogSectionSeparator />
 
-        <DialogSection className={cn('!px-0', isWorkflowRunLogsSuccess ? 'py-0 pt-2' : '!py-0')}>
+        <DialogSection className={cn('px-0!', isWorkflowRunLogsSuccess ? 'py-0 pt-2' : 'py-0!')}>
           {!selectedWorkflowRun ? (
             <>
               {isWorkflowRunsLoading && <GenericSkeletonLoader className="py-4" />}
@@ -112,7 +111,7 @@ export const WorkflowLogs = ({ branch }: WorkflowLogsProps) => {
                 (workflowRuns.length > 0 ? (
                   <ul className="divide-y">
                     {workflowRuns.map((workflowRun) => (
-                      <li key={workflowRun.id} className="px-4 py-3">
+                      <li key={workflowRun.id} className="flex justify-between px-4 py-3 gap-2">
                         <button
                           type="button"
                           disabled={workflowRun.id === projectRef}

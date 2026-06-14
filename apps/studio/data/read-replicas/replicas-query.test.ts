@@ -39,7 +39,7 @@ describe('getMaxReplicas', () => {
   })
 
   it('all eligible READ_REPLICA_COMPUTE_CAPS are greater than 0 and at most READ_REPLICAS_MAX_COUNT', () => {
-    for (const [key, cap] of Object.entries(READ_REPLICA_COMPUTE_CAPS)) {
+    for (const [, cap] of Object.entries(READ_REPLICA_COMPUTE_CAPS)) {
       if (cap > 0) {
         expect(cap).toBeLessThanOrEqual(READ_REPLICAS_MAX_COUNT)
       }

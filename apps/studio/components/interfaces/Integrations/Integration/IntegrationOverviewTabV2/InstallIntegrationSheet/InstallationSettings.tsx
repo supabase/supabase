@@ -1,17 +1,20 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import { UseFormReturn } from 'react-hook-form'
-import { Button, Card, CardContent, FormControl_Shadcn_, FormField_Shadcn_, SheetSection } from 'ui'
+import type { FieldPath, FieldValues, UseFormReturn } from 'react-hook-form'
+import { Button, Card, CardContent, FormControl, FormField, SheetSection } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { type InstallIntegrationSheetProps } from './InstallIntegrationSheet'
 
-export const InstallationSettings = ({
+export const InstallationSettings = <
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+>({
   integration,
   form,
 }: InstallIntegrationSheetProps & {
-  form: UseFormReturn<Record<string, string>, unknown, undefined>
+  form: UseFormReturn<TFieldValues, any, TFieldValues>
 }) => {
   const { inputs = {} } = integration
 
@@ -30,9 +33,9 @@ export const InstallationSettings = ({
 
             return (
               <div key={key} className="flex flex-col gap-y-2 p-4">
-                <FormField_Shadcn_
+                <FormField
                   key={key}
-                  name={key}
+                  name={key as TName}
                   control={form.control}
                   render={({ field }) => (
                     <FormItemLayout
@@ -42,13 +45,13 @@ export const InstallationSettings = ({
                       label={label}
                       description={description}
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Input
                           type={type}
                           placeholder={required ? 'Provide a value' : undefined}
                           {...field}
                         />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />

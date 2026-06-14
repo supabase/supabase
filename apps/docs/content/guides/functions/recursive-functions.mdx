@@ -44,7 +44,13 @@ When the rate limit is exceeded, calling another Edge Function throws a `RateLim
 ```typescript
 import { createClient } from 'jsr:@supabase/supabase-js@2'
 
-const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_ANON_KEY')!)
+const SUPABASE_PUBLISHABLE_KEYS = JSON.parse(Deno.env.get('SUPABASE_PUBLISHABLE_KEYS')!)
+
+const supabase = createClient(
+  Deno.env.get('SUPABASE_URL')!,
+  // If you want to use a different api key, change 'default' to your preferred key name
+  SUPABASE_PUBLISHABLE_KEYS['default']
+)
 
 Deno.serve(async (req) => {
   try {
@@ -82,12 +88,16 @@ Deno.serve(async (req) => {
 <TabPanel id="fetch" label="fetch">
 
 ```typescript
+const SUPABASE_PUBLISHABLE_KEYS = JSON.parse(Deno.env.get('SUPABASE_PUBLISHABLE_KEYS')!)
+// If you want to use a different api key, change 'default' to your preferred key name
+const SUPABASE_DEFAULT_PUBLISHABLE_KEY = SUPABASE_PUBLISHABLE_KEYS['default']
+
 Deno.serve(async (req) => {
   try {
     const response = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/other-function`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}`,
+        Authorization: `Bearer ${SUPABASE_DEFAULT_PUBLISHABLE_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ foo: 'bar' }),
@@ -130,7 +140,13 @@ You can also use `retryAfterMs` to implement automatic retries within your funct
 ```typescript
 import { createClient } from 'jsr:@supabase/supabase-js@2'
 
-const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_ANON_KEY')!)
+const SUPABASE_PUBLISHABLE_KEYS = JSON.parse(Deno.env.get('SUPABASE_PUBLISHABLE_KEYS')!)
+
+const supabase = createClient(
+  Deno.env.get('SUPABASE_URL')!,
+  // If you want to use a different api key, change 'default' to your preferred key name
+  SUPABASE_PUBLISHABLE_KEYS['default']
+)
 
 async function invokeWithRetry(functionName: string, payload: object, maxRetries = 3) {
   for (let attempt = 0; attempt < maxRetries; attempt++) {

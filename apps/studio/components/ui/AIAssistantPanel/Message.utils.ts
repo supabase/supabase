@@ -1,3 +1,4 @@
+import { untrustedSql } from '@supabase/pg-meta'
 import { z, type SafeParseReturnType } from 'zod'
 
 // Splits markdown into alternating [plain, code, plain, code, ...] segments.
@@ -81,7 +82,7 @@ const executeSqlChartResultSchema = z
     const chartArgs = chartConfig ?? config
 
     return {
-      sql: sql ?? '',
+      sql: untrustedSql(sql ?? ''),
       label,
       isWriteQuery,
       view: chartArgs?.view,

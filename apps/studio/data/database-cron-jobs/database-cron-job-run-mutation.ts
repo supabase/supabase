@@ -1,3 +1,4 @@
+import { literal, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -22,15 +23,13 @@ export async function runDatabaseCronJobCommand({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `
-DO $$
+    sql: safeSql`DO $$
 DECLARE
   job_command text;
 BEGIN
-  select command into job_command from cron.job where jobid = ${jobId};
+  select command into job_command from cron.job where jobid = ${literal(jobId)};
   EXECUTE job_command;
-END $$;
-`.trim(),
+END $$;`,
     queryKey: databaseCronJobsKeys.create(),
   })
 

@@ -4,17 +4,169 @@ import z from 'zod'
 
 import { DestinationType } from '../DestinationPanel.types'
 import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
-import { DestinationPanelFormSchema } from './DestinationForm.schema'
+import {
+  DestinationPanelFormSchema,
+  type DestinationPanelSchemaType,
+} from './DestinationForm.schema'
 import {
   BigQueryDestinationConfig,
   DestinationConfig,
+  DucklakeDestinationConfig,
   IcebergDestinationConfig,
+  SnowflakeDestinationConfig,
 } from '@/data/replication/create-destination-pipeline-mutation'
 import {
   type CreateS3AccessKeyCredentialVariables,
   type S3AccessKeyCreateData,
 } from '@/data/storage/s3-access-key-create-mutation'
 import { ResponseError } from '@/types'
+
+const normalizeOptionalString = (value?: string) => {
+  const trimmed = value?.trim()
+  return trimmed ? trimmed : undefined
+}
+
+const normalizeRequiredString = (value?: string) => value?.trim() ?? ''
+
+const normalizeOptionalUntrimmedString = (value?: string) => {
+  return value && value.length > 0 ? value : undefined
+}
+
+type DucklakeFieldPath =
+  | 'ducklakeCatalogUrl'
+  | 'ducklakeDataPath'
+  | 'ducklakeS3AccessKeyId'
+  | 'ducklakeS3SecretAccessKey'
+  | 'ducklakeS3Region'
+  | 'ducklakeS3Endpoint'
+  | 'ducklakeMetadataSchema'
+
+export type DucklakeValidationIssue = {
+  path: DucklakeFieldPath
+  message: string
+}
+
+export const getDucklakeValidationIssues = (
+  data: Pick<
+    DestinationPanelSchemaType,
+    | 'ducklakeCatalogUrl'
+    | 'ducklakeDataPath'
+    | 'ducklakeS3AccessKeyId'
+    | 'ducklakeS3SecretAccessKey'
+    | 'ducklakeS3Region'
+    | 'ducklakeS3Endpoint'
+    | 'ducklakeMetadataSchema'
+  >
+): DucklakeValidationIssue[] => {
+  const issues: DucklakeValidationIssue[] = []
+
+  if (!data.ducklakeCatalogUrl?.length) {
+    issues.push({ path: 'ducklakeCatalogUrl', message: 'Catalog URL is required' })
+  } else if (
+    !data.ducklakeCatalogUrl.startsWith('postgres://') &&
+    !data.ducklakeCatalogUrl.startsWith('postgresql://')
+  ) {
+    issues.push({
+      path: 'ducklakeCatalogUrl',
+      message: 'DuckLake catalog URL must be a PostgreSQL-compatible URL',
+    })
+  }
+
+  if (!data.ducklakeDataPath?.length) {
+    issues.push({ path: 'ducklakeDataPath', message: 'Data path is required' })
+  } else if (
+    !data.ducklakeDataPath.startsWith('s3://') ||
+    data.ducklakeDataPath.includes('file://')
+  ) {
+    issues.push({
+      path: 'ducklakeDataPath',
+      message: 'DuckLake data path must start with s3:// and cannot contain file://',
+    })
+  }
+
+  if (!data.ducklakeS3AccessKeyId?.length) {
+    issues.push({ path: 'ducklakeS3AccessKeyId', message: 'S3 Access Key ID is required' })
+  }
+
+  if (!data.ducklakeS3SecretAccessKey?.length) {
+    issues.push({
+      path: 'ducklakeS3SecretAccessKey',
+      message: 'S3 Secret Access Key is required',
+    })
+  }
+
+  if (!data.ducklakeS3Region?.length) {
+    issues.push({ path: 'ducklakeS3Region', message: 'S3 Region is required' })
+  }
+
+  if (!data.ducklakeS3Endpoint?.length) {
+    issues.push({ path: 'ducklakeS3Endpoint', message: 'S3 Endpoint is required' })
+  } else if (
+    data.ducklakeS3Endpoint.startsWith('http://') ||
+    data.ducklakeS3Endpoint.startsWith('https://')
+  ) {
+    issues.push({
+      path: 'ducklakeS3Endpoint',
+      message: 'S3 endpoint should not contain the protocol scheme',
+    })
+  }
+
+  if (data.ducklakeMetadataSchema && !/^[A-Za-z0-9_]+$/.test(data.ducklakeMetadataSchema)) {
+    issues.push({
+      path: 'ducklakeMetadataSchema',
+      message: 'DuckLake metadata schema must contain only letters, numbers, and underscores',
+    })
+  }
+
+  return issues
+}
+
+type SnowflakeFieldPath =
+  | 'snowflakeAccountId'
+  | 'snowflakeUser'
+  | 'snowflakePrivateKey'
+  | 'snowflakeDatabase'
+  | 'snowflakeSchema'
+
+export type SnowflakeValidationIssue = {
+  path: SnowflakeFieldPath
+  message: string
+}
+
+export const getSnowflakeValidationIssues = (
+  data: Pick<
+    DestinationPanelSchemaType,
+    | 'snowflakeAccountId'
+    | 'snowflakeUser'
+    | 'snowflakePrivateKey'
+    | 'snowflakeDatabase'
+    | 'snowflakeSchema'
+  >
+): SnowflakeValidationIssue[] => {
+  const issues: SnowflakeValidationIssue[] = []
+
+  if (!data.snowflakeAccountId?.trim().length) {
+    issues.push({ path: 'snowflakeAccountId', message: 'Account ID is required' })
+  }
+
+  if (!data.snowflakeUser?.trim().length) {
+    issues.push({ path: 'snowflakeUser', message: 'User is required' })
+  }
+
+  if (!data.snowflakePrivateKey?.trim().length) {
+    issues.push({ path: 'snowflakePrivateKey', message: 'Private key is required' })
+  }
+
+  if (!data.snowflakeDatabase?.trim().length) {
+    issues.push({ path: 'snowflakeDatabase', message: 'Database is required' })
+  }
+
+  if (!data.snowflakeSchema?.trim().length) {
+    issues.push({ path: 'snowflakeSchema', message: 'Schema is required' })
+  }
+
+  return issues
+}
 
 // Helper function to build destination config for validation
 export const buildDestinationConfigForValidation = ({
@@ -61,6 +213,33 @@ export const buildDestinationConfigForValidation = ({
         s3AccessKeyId: s3Keys.accessKey,
         s3SecretAccessKey: s3Keys.secretKey,
         s3Region: data.s3Region ?? '',
+      },
+    }
+  } else if (selectedType === 'DuckLake') {
+    return {
+      ducklake: {
+        catalogUrl: data.ducklakeCatalogUrl ?? '',
+        dataPath: data.ducklakeDataPath ?? '',
+        poolSize: data.ducklakePoolSize,
+        s3AccessKeyId: normalizeRequiredString(data.ducklakeS3AccessKeyId),
+        s3SecretAccessKey: normalizeRequiredString(data.ducklakeS3SecretAccessKey),
+        s3Region: normalizeRequiredString(data.ducklakeS3Region),
+        s3Endpoint: normalizeRequiredString(data.ducklakeS3Endpoint),
+        s3UrlStyle: data.ducklakeS3UrlStyle,
+        s3UseSsl: data.ducklakeS3UseSsl,
+        metadataSchema: normalizeOptionalString(data.ducklakeMetadataSchema),
+      },
+    }
+  } else if (selectedType === 'Snowflake') {
+    return {
+      snowflake: {
+        accountId: normalizeRequiredString(data.snowflakeAccountId),
+        user: normalizeRequiredString(data.snowflakeUser),
+        privateKey: data.snowflakePrivateKey ?? '',
+        privateKeyPassphrase: normalizeOptionalUntrimmedString(data.snowflakePrivateKeyPassphrase),
+        database: normalizeRequiredString(data.snowflakeDatabase),
+        schema: normalizeRequiredString(data.snowflakeSchema),
+        role: normalizeOptionalString(data.snowflakeRole),
       },
     }
   } else {
@@ -127,6 +306,31 @@ export const buildDestinationConfig = async ({
       s3Region: data.s3Region ?? '',
     }
     destinationConfig = { iceberg: icebergConfig }
+  } else if (selectedType === 'DuckLake') {
+    const ducklakeConfig: DucklakeDestinationConfig = {
+      catalogUrl: data.ducklakeCatalogUrl ?? '',
+      dataPath: data.ducklakeDataPath ?? '',
+      poolSize: data.ducklakePoolSize,
+      s3AccessKeyId: normalizeRequiredString(data.ducklakeS3AccessKeyId),
+      s3SecretAccessKey: normalizeRequiredString(data.ducklakeS3SecretAccessKey),
+      s3Region: normalizeRequiredString(data.ducklakeS3Region),
+      s3Endpoint: normalizeRequiredString(data.ducklakeS3Endpoint),
+      s3UrlStyle: data.ducklakeS3UrlStyle,
+      s3UseSsl: data.ducklakeS3UseSsl,
+      metadataSchema: normalizeOptionalString(data.ducklakeMetadataSchema),
+    }
+    destinationConfig = { ducklake: ducklakeConfig }
+  } else if (selectedType === 'Snowflake') {
+    const snowflakeConfig: SnowflakeDestinationConfig = {
+      accountId: normalizeRequiredString(data.snowflakeAccountId),
+      user: normalizeRequiredString(data.snowflakeUser),
+      privateKey: data.snowflakePrivateKey ?? '',
+      privateKeyPassphrase: normalizeOptionalUntrimmedString(data.snowflakePrivateKeyPassphrase),
+      database: normalizeRequiredString(data.snowflakeDatabase),
+      schema: normalizeRequiredString(data.snowflakeSchema),
+      role: normalizeOptionalString(data.snowflakeRole),
+    }
+    destinationConfig = { snowflake: snowflakeConfig }
   }
 
   return destinationConfig

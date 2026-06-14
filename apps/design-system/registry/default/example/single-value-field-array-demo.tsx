@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { Button, Form_Shadcn_ } from 'ui'
+import { Button, Form } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
 import { z } from 'zod'
@@ -26,7 +26,7 @@ export default function SingleValueFieldArrayDemo() {
   }
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form className="w-full max-w-2xl" onSubmit={form.handleSubmit(onSubmit)}>
         <FormItemLayout
           label="Redirect URIs"
@@ -50,6 +50,6 @@ export default function SingleValueFieldArrayDemo() {
           </Button>
         </div>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

@@ -43,12 +43,12 @@ const DeveloperExperienceSection = ({
           grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0
           rounded-md border-default overflow-hidden
           sm:divide-x divide-y border
-          [&>div:nth-child(2n+1)]:sm:!border-l-0
-          [&>div:nth-child(2)]:sm:!border-t-0
-          [&>div:nth-child(3)]:lg:!border-t-0
-          [&>div:nth-child(3n)]:lg:!border-l
-          [&>div:nth-child(4n)]:lg:!border-l-0
-          [&>div:nth-child(3n-1)]:lg:!border-l
+          [&>div:nth-child(2n+1)]:sm:border-l-0!
+          [&>div:nth-child(2)]:sm:border-t-0!
+          [&>div:nth-child(3)]:lg:border-t-0!
+          [&>div:nth-child(3n)]:lg:border-l!
+          [&>div:nth-child(4n)]:lg:border-l-0!
+          [&>div:nth-child(3n-1)]:lg:border-l!
         "
       >
         {features.map((feature) => (
@@ -69,7 +69,7 @@ const FeatureCard = ({ feature }: { feature: Feature }) => {
         'flex-1 flex flex-col',
         'items-start justify-between',
         'bg-default w-full h-full min-h-[330px] sm:min-h-[360px]',
-        'text-foreground-lighter [&_strong]:!font-normal [&_strong]:!text-foreground',
+        'text-foreground-lighter [&_strong]:font-normal! [&_strong]:text-foreground!',
         feature.className
       )}
     >
@@ -106,7 +106,7 @@ const FeatureCard = ({ feature }: { feature: Feature }) => {
           <h3 className="">{feature.title}</h3>
         </div>
         <div className="flex-1 flex flex-col justify-between gap-2">
-          <p className="text-sm [&_strong]:!text-foreground">{feature.subheading}</p>
+          <p className="text-sm [&_strong]:text-foreground!">{feature.subheading}</p>
           {feature.highlights && (
             <span className="hidden lg:block text-foreground">{feature.highlights}</span>
           )}

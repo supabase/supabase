@@ -8,6 +8,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ButtonTooltip } from '../ButtonTooltip'
 import { CHART_COLORS } from '../Charts/Charts.constants'
+import { PortalChartTooltip } from '../Charts/PortalChartTooltip'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
 import { BlockViewConfiguration } from './BlockViewConfiguration'
 import { EditQueryButton } from './EditQueryButton'
@@ -47,6 +48,8 @@ export interface QueryBlockProps {
   draggable?: boolean
   disabled?: boolean
   blockWriteQueries?: boolean
+  /** Render the chart tooltip in a portal so it isn't clipped by overflow-hidden ancestors (e.g. report cards). */
+  portalTooltip?: boolean
   onExecute?: (queryType: 'select' | 'mutation') => void
   onRemoveChart?: () => void
   onUpdateChartConfig?: ({ chartConfig }: { chartConfig: Partial<ChartConfig> }) => void
@@ -69,11 +72,13 @@ export const QueryBlock = ({
   draggable = false,
   disabled = false,
   blockWriteQueries = false,
+  portalTooltip = false,
   onExecute,
   onRemoveChart,
   onUpdateChartConfig,
   onDragStart,
 }: QueryBlockProps) => {
+  const chartContainerRef = useRef<HTMLDivElement>(null)
   const [chartSettings, setChartSettings] = useState<ChartConfig>(chartConfig)
   const { xKey, yKey, view = 'table', logScale = false } = chartSettings
 
@@ -237,7 +242,7 @@ export const QueryBlock = ({
       {showSql && (
         <div
           className={cn(
-            'shrink-0 grow-1 w-full h-full overflow-y-auto overscroll-contain max-h-[min(300px, 100%)]',
+            'shrink-0 grow w-full h-full overflow-y-auto overscroll-contain max-h-[min(300px, 100%)]',
             {
               'border-b': results !== undefined,
             }
@@ -249,7 +254,7 @@ export const QueryBlock = ({
             value={sql}
             language="sql"
             className={cn(
-              'max-w-none block !bg-transparent !py-3 !px-3.5 prose dark:prose-dark border-0 text-foreground !rounded-none w-full',
+              'max-w-none block bg-transparent! py-3! px-3.5! prose dark:prose-dark border-0 text-foreground rounded-none! w-full',
               '[&>code]:m-0 [&>code>span]:text-foreground'
             )}
           />
@@ -280,6 +285,7 @@ export const QueryBlock = ({
                 </p>
               )}
               <ChartContainer
+                ref={chartContainerRef}
                 className="aspect-auto px-3 py-2"
                 style={{ height: '230px', minHeight: '230px' }}
               >
@@ -318,14 +324,26 @@ export const QueryBlock = ({
                   />
                   <Tooltip
                     content={
-                      <ChartTooltipContent
-                        className="min-w-[200px]"
-                        labelFormatter={(value) =>
-                          xKeyDateFormat === 'date'
-                            ? dayjs(value).format('MMM D YYYY HH:mm')
-                            : String(value)
-                        }
-                      />
+                      portalTooltip ? (
+                        <PortalChartTooltip
+                          chartRef={chartContainerRef}
+                          className="min-w-[200px]"
+                          labelFormatter={(value) =>
+                            xKeyDateFormat === 'date'
+                              ? dayjs(value).format('MMM D YYYY HH:mm')
+                              : String(value)
+                          }
+                        />
+                      ) : (
+                        <ChartTooltipContent
+                          className="min-w-[200px]"
+                          labelFormatter={(value) =>
+                            xKeyDateFormat === 'date'
+                              ? dayjs(value).format('MMM D YYYY HH:mm')
+                              : String(value)
+                          }
+                        />
+                      )
                     }
                   />
                   <Bar radius={1} dataKey={yKey} fill="hsl(var(--chart-1))">

@@ -1,10 +1,7 @@
-import { format } from 'date-fns'
-import { User } from 'lucide-react'
 import { cn } from 'ui'
 
 import { LOG_TYPES, METHODS, STATUS_CODE_LABELS } from './UnifiedLogs.constants'
 import { ColumnSchema } from './UnifiedLogs.schema'
-import { LogsMeta, SheetField } from './UnifiedLogs.types'
 import { getLevelLabel } from './UnifiedLogs.utils'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { DataTableFilterField, Option } from '@/components/ui/DataTable/DataTable.types'
@@ -52,7 +49,7 @@ export const filterFields = [
 
       return (
         <div className="flex items-center gap-2 w-full min-w-0">
-          <span className="flex-shrink-0 text-foreground">{statusValue}</span>
+          <span className="shrink-0 text-foreground">{statusValue}</span>
           {statusLabel && (
             <span className="text-[0.7rem] text-foreground-lighter truncate" title={statusLabel}>
               {statusLabel}
@@ -114,57 +111,21 @@ export const filterFields = [
       )
     },
   },
-] satisfies DataTableFilterField<ColumnSchema>[]
-
-export const sheetFields = [
   {
-    id: 'id',
-    label: 'Request ID',
-    type: 'readonly',
-    skeletonClassName: 'w-64',
-  },
-  {
-    id: 'date',
-    label: 'Date',
-    type: 'timerange',
-    component: (props) => {
-      const date = new Date(props.date)
-      const month = format(date, 'LLL')
-      const day = format(date, 'dd')
-      const year = format(date, 'y')
-      const time = format(date, 'HH:mm:ss')
-
+    label: 'Event message',
+    value: 'event_message',
+    type: 'checkbox',
+    defaultOpen: false,
+    options: [],
+    hasDynamicOptions: false,
+    hasAsyncSearch: false,
+    hidden: true,
+    component: (props: Option) => {
       return (
-        <div className="font-mono whitespace-nowrap flex items-center gap-1 justify-end">
-          <span>{month}</span>
-          <span className="text-foreground/50">·</span>
-          <span>{day}</span>
-          <span className="text-foreground/50">·</span>
-          <span>{year}</span>
-          <span className="text-foreground/50">·</span>
-          <span>{time}</span>
-        </div>
+        <span className="truncate block w-full text-[0.75rem]" title={props.value as string}>
+          {props.value}
+        </span>
       )
     },
-    skeletonClassName: 'w-36',
   },
-  {
-    id: 'auth_user',
-    label: 'Auth User',
-    type: 'readonly',
-    condition: (props) => Boolean(props.auth_user),
-    component: (props) => (
-      <div className="flex items-center gap-2">
-        <User size={14} className="text-foreground-lighter" />
-        <span className="font-mono">{props.auth_user}</span>
-      </div>
-    ),
-    skeletonClassName: 'w-56',
-  },
-  {
-    id: 'pathname',
-    label: 'Pathname',
-    type: 'input',
-    skeletonClassName: 'w-56',
-  },
-] satisfies SheetField<ColumnSchema, LogsMeta>[]
+] satisfies DataTableFilterField<ColumnSchema>[]

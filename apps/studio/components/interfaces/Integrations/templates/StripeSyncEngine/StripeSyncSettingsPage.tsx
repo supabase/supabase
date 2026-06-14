@@ -4,7 +4,6 @@ import { BadgeCheck, RefreshCwIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
 import { Admonition, ShimmeringLoader, TimestampInfo } from 'ui-patterns'
-import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageSection,
   PageSectionContent,
@@ -15,6 +14,7 @@ import {
 } from 'ui-patterns/PageSection'
 
 import { isInstalled, isSyncRunning, isUninstalling } from './stripe-sync-status'
+import { ConstrainedIntegrationTabScaffold } from '@/components/interfaces/Integrations/ConstrainedIntegrationTabScaffold'
 import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/useStripeSyncStatus'
 
 export const StripeSyncSettingsPage = () => {
@@ -30,17 +30,17 @@ export const StripeSyncSettingsPage = () => {
 
   if (!installed || uninstalling) {
     return (
-      <PageContainer className="mx-0">
+      <ConstrainedIntegrationTabScaffold>
         <PageSection>
-          <Admonition type="default" title="Stripe Sync Engine is not installed" />
+          <Admonition type="default" description="Stripe Sync Engine is not installed." />
         </PageSection>
-      </PageContainer>
+      </ConstrainedIntegrationTabScaffold>
     )
   }
 
   return (
-    <PageContainer className="mx-0">
-      <PageSection>
+    <ConstrainedIntegrationTabScaffold>
+      <PageSection className="py-0!">
         <PageSectionMeta>
           <PageSectionSummary>
             <PageSectionTitle>Manage Stripe data</PageSectionTitle>
@@ -50,7 +50,7 @@ export const StripeSyncSettingsPage = () => {
           </PageSectionSummary>
         </PageSectionMeta>
         <PageSectionContent>
-          <Card className="max-w-4xl">
+          <Card>
             <CardHeader>
               <CardTitle className="text-foreground-lighter">
                 {!syncState ? (
@@ -108,7 +108,7 @@ export const StripeSyncSettingsPage = () => {
                   <h5 className="text-sm">View Stripe data in Table Editor</h5>
                   <p className="text-sm text-foreground-light text-balance">
                     The Stripe Sync Engine stores all synced data in the{' '}
-                    <code className="text-code-inline !break-keep">stripe</code> schema. You can
+                    <code className="text-code-inline break-keep!">stripe</code> schema. You can
                     view and query this data directly in the Table Editor.
                   </p>
                 </div>
@@ -121,6 +121,6 @@ export const StripeSyncSettingsPage = () => {
           </Card>
         </PageSectionContent>
       </PageSection>
-    </PageContainer>
+    </ConstrainedIntegrationTabScaffold>
   )
 }

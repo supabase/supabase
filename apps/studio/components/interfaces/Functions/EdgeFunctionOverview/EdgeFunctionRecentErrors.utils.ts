@@ -45,6 +45,46 @@ export const escapeSqlString = (value: string) => value.replace(/'/g, "''")
 
 export const formatSingleLineMessage = (message: string) => message.replace(/\s+/g, ' ').trim()
 
+/**
+ * Trims a runtime error message down to the meaningful summary, dropping the
+ * stack trace that follows the first ` at ` frame so we can show it inline in
+ * a table cell.
+ */
+export const summarizeErrorMessage = (message: string): string => {
+  const collapsed = formatSingleLineMessage(message)
+  if (!collapsed) return collapsed
+
+  const stackFrameMatch = collapsed.match(/\s+at\s+\S+\s+\(/)
+  if (stackFrameMatch && stackFrameMatch.index !== undefined) {
+    return collapsed.slice(0, stackFrameMatch.index).trim()
+  }
+  return collapsed
+}
+
+/**
+ * Picks the most useful error description for a group. The invocation
+ * `event_message` only contains the request URL, so when we have a related
+ * runtime error log we surface its summary instead.
+ */
+export const getDisplayErrorMessage = (group: RecentErrorGroup): string => {
+  const errorLog = group.logs.find((log) => log.level === 'error')
+  if (errorLog) {
+    const summary = summarizeErrorMessage(errorLog.message)
+    if (summary) return summary
+  }
+  return summarizeErrorMessage(group.message)
+}
+
+const TROUBLESHOOTING_DOCS_BASE = 'https://supabase.com/docs/guides/troubleshooting'
+
+export const buildTroubleshootingDocsUrl = ({ statusCode }: { statusCode?: string }): string => {
+  const numericStatusCode = Number(statusCode)
+  if (Number.isFinite(numericStatusCode) && numericStatusCode >= 100) {
+    return `${TROUBLESHOOTING_DOCS_BASE}/edge-function-${numericStatusCode}-response`
+  }
+  return `${TROUBLESHOOTING_DOCS_BASE}?search=${encodeURIComponent('edge function')}`
+}
+
 export const toAlertError = (error: unknown): AlertErrorProps['error'] | undefined => {
   if (typeof error === 'string') return { message: error }
 

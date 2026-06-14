@@ -2,9 +2,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql, ExecuteSqlData, ExecuteSqlVariables } from './execute-sql-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { sqlEventParser } from '@/lib/sql-event-parser'
+import { useTrack } from '@/lib/telemetry/track'
 import { UseCustomMutationOptions } from '@/types'
 
 // [Joshen] Intention is that we invalidate all database related keys whenever running a mutation related query
@@ -39,31 +38,26 @@ export const useExecuteSqlMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  const { mutate: sendEvent } = useSendEventMutation()
-  const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
 
   return useMutation<ExecuteSqlData, QueryResponseError, ExecuteSqlMutationVariables>({
     mutationFn: (args) => executeSql(args),
     async onSuccess(data, variables, context) {
       const { contextualInvalidation, sql, projectRef } = variables
 
-      // Track all table-related events from SQL execution
       try {
         const tableEvents = sqlEventParser.getTableEvents(sql)
         tableEvents.forEach((event) => {
           if (projectRef) {
-            sendEvent({
-              action: event.type,
-              properties: {
+            track(
+              event.type,
+              {
                 method: 'sql_editor',
                 schema_name: event.schema,
                 table_name: event.tableName,
               },
-              groups: {
-                project: projectRef,
-                ...(org?.slug && { organization: org.slug }),
-              },
-            })
+              { project: projectRef }
+            )
           }
         })
       } catch (error) {

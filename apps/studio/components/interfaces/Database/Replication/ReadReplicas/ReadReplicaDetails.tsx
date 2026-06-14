@@ -137,7 +137,7 @@ export const ReadReplicaDetails = () => {
                     isReactForm={false}
                     layout="horizontal"
                     label="Load Balancer URL"
-                    description="RESTful endpoint for querying and managing your databases through your load balancer"
+                    description="RESTful endpoint for querying and managing your databases through your load balancer."
                   >
                     <Input readOnly copy className="input-mono" value={loadBalancer?.endpoint} />
                   </FormItemLayout>
@@ -154,7 +154,7 @@ export const ReadReplicaDetails = () => {
                       icon={
                         <img
                           alt="region icon"
-                          className="w-5 rounded-sm"
+                          className="w-5 rounded-xs"
                           src={`${BASE_PATH}/img/regions/${region ?? ''}.svg`}
                         />
                       }
@@ -164,7 +164,7 @@ export const ReadReplicaDetails = () => {
                     isReactForm={false}
                     layout="horizontal"
                     label="Compute Size"
-                    description="Size of replica will be identical to the primary database"
+                    description="Size of replica will be identical to the primary database."
                   >
                     <Input readOnly className="input-mono" value={size} />
                   </FormItemLayout>

@@ -13,7 +13,7 @@
     "@react-native-async-storage/async-storage": "2.2.0",
     "@rneui/base": "^5.0.0",
     "@rneui/themed": "^5.0.0",
-    "@supabase/supabase-js": "^2.99.0",
+    "@supabase/supabase-js": "^2",
     "expo": "~55.0.5",
     "expo-image-picker": "^55.0.11",
     "expo-splash-screen": "~55.0.10",

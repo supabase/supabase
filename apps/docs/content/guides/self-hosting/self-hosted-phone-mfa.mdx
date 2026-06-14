@@ -25,7 +25,9 @@ To enable SMS delivery:
 
 ### Step 1: Uncomment and configure the environment variables
 
-```
+Edit the `.env` file as follows:
+
+```sh name=.env
 SMS_PROVIDER=twilio
 SMS_OTP_EXP=60
 SMS_OTP_LENGTH=6
@@ -44,7 +46,7 @@ SMS_TWILIO_MESSAGE_SERVICE_SID=your-message-service-sid
 
 Uncomment the `GOTRUE_SMS_*` lines in the `auth` service's `environment` block:
 
-```yaml
+```yaml name=docker-compose.yml
 auth:
   environment:
     # ... existing variables ...
@@ -90,7 +92,7 @@ The default OTP expiration is **60 seconds**. This is often too short for produc
 
 Set `SMS_OTP_EXP` in `.env` (value is in seconds):
 
-```
+```sh name=.env
 # Set expiration to 5 minutes
 SMS_OTP_EXP=300
 ```
@@ -101,7 +103,7 @@ And ensure `GOTRUE_SMS_OTP_EXP: ${SMS_OTP_EXP}` is uncommented in `docker-compos
 
 The default OTP length is 6 digits. You can set it to any value between 6 and 10:
 
-```
+```sh name=.env
 SMS_OTP_LENGTH=8
 ```
 
@@ -109,7 +111,7 @@ SMS_OTP_LENGTH=8
 
 `SMS_MAX_FREQUENCY` controls the minimum interval between SMS sends to the same phone number. The default is 60 seconds:
 
-```
+```sh name=.env
 ## Allow one SMS every 30 seconds
 SMS_MAX_FREQUENCY=30s
 ```
@@ -118,11 +120,11 @@ SMS_MAX_FREQUENCY=30s
 
 To avoid sending real SMS during development, use `SMS_TEST_OTP` to map phone numbers to fixed OTP codes:
 
-```
+```sh name=.env
 SMS_TEST_OTP=16505551234:123456,16505555678:654321
 ```
 
-And uncomment `GOTRUE_SMS_TEST_OTP: ${SMS_TEST_OTP}` in `docker-compose.yml`.
+Make sure to also uncomment `GOTRUE_SMS_TEST_OTP: ${SMS_TEST_OTP}` in `docker-compose.yml`.
 
 When a test phone number requests an OTP, the Auth service skips SMS delivery and accepts only the mapped code. Other phone numbers continue to use the real SMS provider.
 
@@ -142,7 +144,7 @@ TOTP is **enabled by default** - users can enroll with apps like Google Authenti
 
 To disable TOTP:
 
-```
+```sh name=.env
 MFA_TOTP_ENROLL_ENABLED=false
 MFA_TOTP_VERIFY_ENABLED=false
 ```
@@ -153,7 +155,7 @@ Phone MFA is **disabled by default** (opt-in). It uses the same SMS provider con
 
 To enable:
 
-```
+```sh name=.env
 MFA_PHONE_ENROLL_ENABLED=true
 MFA_PHONE_VERIFY_ENABLED=true
 ```
@@ -162,7 +164,7 @@ MFA_PHONE_VERIFY_ENABLED=true
 
 By default, a user can enroll up to 10 MFA factors. To change this:
 
-```
+```sh name=.env
 MFA_MAX_ENROLLED_FACTORS=5
 ```
 
@@ -172,7 +174,7 @@ MFA_MAX_ENROLLED_FACTORS=5
 
 The default `SMS_OTP_EXP` is 60 seconds. Increase it in `.env`:
 
-```
+```sh name=.env
 SMS_OTP_EXP=300
 ```
 

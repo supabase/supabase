@@ -31,9 +31,24 @@ export const useIsETLIcebergPrivateAlpha = () => {
   return useIsCurrentOrgInFlagList('etlEnableIcebergPrivateAlpha')
 }
 
+export const useIsETLDucklakePrivateAlpha = () => {
+  return useIsCurrentOrgInFlagList('etlEnableDucklakePrivateAlpha')
+}
+
+export const useIsETLSnowflakePrivateAlpha = () => {
+  return useIsCurrentOrgInFlagList('etlEnableSnowflakePrivateAlpha')
+}
+
 export const useIsETLPrivateAlpha = () => {
   const hasAccessToETLBigQuery = useIsCurrentOrgInFlagList('etlEnableBigQueryPrivateAlpha')
   const hasAccessToETLIceberg = useIsCurrentOrgInFlagList('etlEnableIcebergPrivateAlpha')
+  const hasAccessToETLDucklake = useIsCurrentOrgInFlagList('etlEnableDucklakePrivateAlpha')
+  const hasAccessToETLSnowflake = useIsCurrentOrgInFlagList('etlEnableSnowflakePrivateAlpha')
 
-  return hasAccessToETLBigQuery || hasAccessToETLIceberg
+  return (
+    hasAccessToETLBigQuery ||
+    hasAccessToETLIceberg ||
+    hasAccessToETLDucklake ||
+    hasAccessToETLSnowflake
+  )
 }

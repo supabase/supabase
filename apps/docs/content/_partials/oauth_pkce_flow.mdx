@@ -13,7 +13,7 @@ In the browser, `signInWithOAuth` automatically redirects to the OAuth provider'
 
 ```js
 import { createClient, type Provider } from '@supabase/supabase-js';
-const supabase = createClient('url', 'anonKey')
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 const provider = 'provider' as Provider
 
 // ---cut---
@@ -33,7 +33,7 @@ In the server, you need to handle the redirect to the OAuth provider's authentic
 
 ```js
 import { createClient, type Provider } from '@supabase/supabase-js'
-const supabase = createClient('url', 'anonKey')
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 const provider = 'provider' as Provider
 const redirect = (url: string) => {}
 
@@ -69,6 +69,7 @@ Create a new file at `app/auth/callback/route.ts` and populate with the followin
 
 ```ts name=app/auth/callback/route.ts
 import { NextResponse } from 'next/server'
+
 // The client you created from the Server-Side Auth instructions
 import { createClient } from '@/utils/supabase/server'
 

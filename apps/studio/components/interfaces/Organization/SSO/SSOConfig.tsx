@@ -1,24 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useFlag } from 'common'
 import { Trash } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useEffectEvent, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Button,
-  Card,
-  CardContent,
-  CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Switch,
-} from 'ui'
+import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import z from 'zod'
 
 import { AttributeMapping } from './AttributeMapping'
 import { JoinOrganizationOnSignup } from './JoinOrganizationOnSignup'
+import { SSOAdvancedSettings } from './SSOAdvancedSettings'
 import { SSODomains } from './SSODomains'
 import { SSOMetadata } from './SSOMetadata'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
@@ -38,13 +32,12 @@ import { DOCS_URL } from '@/lib/constants'
 const FormSchema = z
   .object({
     enabled: z.boolean(),
-    domains: z
-      .array(
-        z.object({
-          value: z.string().trim().min(1, 'Please provide a domain'),
-        })
-      )
-      .min(1, 'At least one domain is required'),
+    enableSpInitiated: z.boolean(),
+    domains: z.array(
+      z.object({
+        value: z.string().trim(),
+      })
+    ),
     metadataXmlUrl: z.string().trim().optional(),
     metadataXmlFile: z.string().trim().optional(),
     emailMapping: z.array(z.object({ value: z.string().trim().min(1, 'This field is required') })),
@@ -53,6 +46,29 @@ const FormSchema = z
     lastNameMapping: z.array(z.object({ value: z.string().trim() })),
     joinOrgOnSignup: z.boolean(),
     roleOnJoin: z.string().optional(),
+    idjagIssuerUrl: z.string().trim().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (!data.enableSpInitiated) return
+
+    const hasValidDomain = data.domains?.some((d) => d.value && d.value.trim().length > 0)
+    if (!hasValidDomain) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'At least one domain is required when SP-initiated login is enabled',
+        path: ['domains'],
+      })
+    }
+
+    data.domains?.forEach((d, idx) => {
+      if (!d.value || d.value.trim().length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Please provide a domain',
+          path: ['domains', idx, 'value'],
+        })
+      }
+    })
   })
   // set the error on both fields
   .refine((data) => data.metadataXmlUrl || data.metadataXmlFile, {
@@ -68,6 +84,7 @@ export type SSOConfigFormSchema = z.infer<typeof FormSchema>
 
 const defaultValues = {
   enabled: false,
+  enableSpInitiated: false,
   domains: [{ value: '' }],
   metadataXmlUrl: '',
   metadataXmlFile: '',
@@ -77,6 +94,7 @@ const defaultValues = {
   lastNameMapping: [{ value: '' }],
   joinOrgOnSignup: false,
   roleOnJoin: 'Developer',
+  idjagIssuerUrl: '',
 }
 
 export const SSOConfig = () => {
@@ -85,6 +103,13 @@ export const SSOConfig = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const { hasAccess: hasAccessToSso, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('auth.platform.sso')
+  const enterpriseMcpAuthOrgs = useFlag<string>('enableEnterpriseMcpAuth')
+  const showIdjagSettings =
+    typeof enterpriseMcpAuthOrgs === 'string' &&
+    enterpriseMcpAuthOrgs
+      .split(',')
+      .map((s) => s.trim())
+      .includes(organization?.slug ?? '')
 
   const {
     data: ssoConfig,
@@ -105,13 +130,24 @@ export const SSOConfig = () => {
   })
 
   const isSSOEnabled = form.watch('enabled')
+  const enableSpInitiated = form.watch('enableSpInitiated')
 
   const { mutate: createSSOConfig, isPending: isCreating } = useSSOConfigCreateMutation({
-    onSuccess: () => form.reset(),
+    onSuccess: () => {
+      toast.success('Successfully created SSO configuration')
+      // Reset form to current values to mark as clean
+      // This allows useEffect to reset with fresh data when query refetches
+      form.reset(form.getValues())
+    },
   })
 
   const { mutate: updateSSOConfig, isPending: isUpdating } = useSSOConfigUpdateMutation({
-    onSuccess: () => form.reset(),
+    onSuccess: () => {
+      toast.success('Successfully updated SSO configuration')
+      // Reset form to current values to mark as clean
+      // This allows useEffect to reset with fresh data when query refetches
+      form.reset(form.getValues())
+    },
   })
 
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false)
@@ -136,7 +172,8 @@ export const SSOConfig = () => {
       slug: organization!.slug,
       config: {
         enabled: values.enabled,
-        domains: values.domains.map((d) => d.value),
+        // Send empty array if SP-initiated is disabled
+        domains: values.enableSpInitiated ? values.domains.map((d) => d.value).filter(Boolean) : [],
         metadata_xml_file: values.metadataXmlFile!,
         metadata_xml_url: values.metadataXmlUrl!,
         email_mapping: values.emailMapping.map((item) => item.value).filter(Boolean),
@@ -145,6 +182,7 @@ export const SSOConfig = () => {
         user_name_mapping: values.userNameMapping.map((item) => item.value).filter(Boolean),
         join_org_on_signup_enabled: values.joinOrgOnSignup,
         join_org_on_signup_role: roleOnJoin,
+        idjag_issuer_url: values.idjagIssuerUrl || undefined,
       },
     }
 
@@ -160,22 +198,49 @@ export const SSOConfig = () => {
     deleteSSOConfig({ slug: organization.slug })
   }
 
-  useEffect(() => {
-    if (ssoConfig) {
+  const syncFormFromConfig = useEffectEvent(() => {
+    if (!organization?.slug) return
+
+    // Only reset form if it's not dirty (user hasn't made changes)
+    if (ssoConfig && !form.formState.isDirty) {
       form.reset({
         enabled: ssoConfig.enabled,
-        domains: ssoConfig.domains?.map((domain) => ({ value: domain })) ?? [],
+        // Infer SP-initiated from domains presence
+        enableSpInitiated: ssoConfig.domains && ssoConfig.domains.length > 0,
+        domains: ssoConfig.domains?.map((domain) => ({ value: domain })) || [],
         metadataXmlUrl: ssoConfig.metadata_xml_url,
         metadataXmlFile: ssoConfig.metadata_xml_file,
         emailMapping: ssoConfig.email_mapping.map((email) => ({ value: email })),
-        userNameMapping: ssoConfig.user_name_mapping?.map((userName) => ({ value: userName })),
-        firstNameMapping: ssoConfig.first_name_mapping?.map((firstName) => ({ value: firstName })),
-        lastNameMapping: ssoConfig.last_name_mapping?.map((lastName) => ({ value: lastName })),
+        userNameMapping:
+          ssoConfig.user_name_mapping?.map((userName) => ({ value: userName })) || [],
+        firstNameMapping:
+          ssoConfig.first_name_mapping?.map((firstName) => ({ value: firstName })) || [],
+        lastNameMapping:
+          ssoConfig.last_name_mapping?.map((lastName) => ({ value: lastName })) || [],
         joinOrgOnSignup: ssoConfig.join_org_on_signup_enabled,
         roleOnJoin: ssoConfig.join_org_on_signup_role,
+        idjagIssuerUrl: ssoConfig.idjag_issuer_url ?? '',
       })
     }
-  }, [ssoConfig, form])
+  })
+
+  useEffect(() => {
+    syncFormFromConfig()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [ssoConfig, organization?.slug])
+
+  // Automatically add an empty domain field when SP-initiated is enabled
+  const ensureDomainField = useEffectEvent(() => {
+    const currentDomains = form.getValues('domains')
+    if (enableSpInitiated && (!currentDomains || currentDomains.length === 0)) {
+      form.setValue('domains', [{ value: '' }], { shouldValidate: false })
+    }
+  })
+
+  useEffect(() => {
+    ensureDomainField()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [enableSpInitiated])
 
   return (
     <ScaffoldContainer size="small" className="px-6 xl:px-10">
@@ -198,47 +263,94 @@ export const SSOConfig = () => {
           />
         ) : isSuccess || isSSOProviderNotFound ? (
           <>
-            <Form_Shadcn_ {...form}>
+            <Form {...form}>
               <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
                 <Card>
                   <CardContent>
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="enabled"
                       render={({ field }) => (
                         <FormItemLayout
-                          layout="flex"
+                          layout="flex-row-reverse"
                           label="Enable Single Sign-On"
                           description={
                             <>
-                              Enable and configure SSO for your organization. Learn more about SSO{' '}
+                              Enable and configure SSO for your organization.{' '}
                               <InlineLink
                                 className="text-foreground-lighter hover:text-foreground"
                                 href={`${DOCS_URL}/guides/platform/sso`}
                               >
-                                here
+                                Learn more
                               </InlineLink>
                               .
                             </>
                           }
                         >
-                          <FormControl_Shadcn_>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                              size="large"
-                            />
-                          </FormControl_Shadcn_>
+                          <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
                   </CardContent>
 
-                  {(isSSOEnabled || ssoConfig) && (
+                  {isSSOEnabled && (
                     <>
                       <CardContent>
-                        <SSODomains form={form} />
+                        <FormField
+                          control={form.control}
+                          name="enableSpInitiated"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              layout="flex-row-reverse"
+                              label="Enable SP-initiated login"
+                              description="Allow users to start the login flow from the Supabase dashboard by entering their email address. Requires configuring email domains below."
+                            >
+                              <FormControl>
+                                <Switch checked={field.value} onCheckedChange={field.onChange} />
+                              </FormControl>
+                            </FormItemLayout>
+                          )}
+                        />
+
+                        {form.watch('enableSpInitiated') && (
+                          <Admonition
+                            type="note"
+                            title="Understanding SSO login flows"
+                            className="mt-4"
+                          >
+                            <div className="space-y-3 text-sm">
+                              <div>
+                                <strong>SP-initiated (Service Provider):</strong> Users start at
+                                supabase.com, enter their email address, and are redirected to your
+                                identity provider (Okta, Azure AD, etc.) for authentication.
+                                Requires configuring email domains.
+                              </div>
+                              <div>
+                                <strong>IdP-initiated (Identity Provider):</strong> Users click an
+                                app tile or bookmark in your identity provider dashboard and are
+                                directly authenticated into Supabase. Works automatically without
+                                domain configuration.
+                              </div>
+                              <p className="text-foreground-lighter">
+                                Most enterprises use IdP-initiated flow for its simplicity. Enable
+                                SP-initiated only if you need users to start at supabase.com.{' '}
+                                <InlineLink href={`${DOCS_URL}/guides/platform/sso#login-flows`}>
+                                  Learn more about SSO flows
+                                </InlineLink>
+                                .
+                              </p>
+                            </div>
+                          </Admonition>
+                        )}
                       </CardContent>
+
+                      {form.watch('enableSpInitiated') && (
+                        <CardContent>
+                          <SSODomains form={form} />
+                        </CardContent>
+                      )}
 
                       <CardContent>
                         <SSOMetadata form={form} />
@@ -257,6 +369,12 @@ export const SSOConfig = () => {
                       <CardContent>
                         <JoinOrganizationOnSignup form={form} />
                       </CardContent>
+
+                      {showIdjagSettings && (
+                        <CardContent>
+                          <SSOAdvancedSettings form={form} />
+                        </CardContent>
+                      )}
                     </>
                   )}
 
@@ -295,7 +413,7 @@ export const SSOConfig = () => {
                   </CardFooter>
                 </Card>
               </form>
-            </Form_Shadcn_>
+            </Form>
 
             <TextConfirmModal
               visible={isDeleteModalVisible}
@@ -303,16 +421,23 @@ export const SSOConfig = () => {
               variant="destructive"
               title="Delete SSO Provider"
               loading={isDeleting}
-              confirmString={ssoConfig?.domains?.[0] ?? ''}
-              confirmPlaceholder="Type the domain above to confirm"
+              confirmString={ssoConfig?.domains?.[0] || organization?.slug || ''}
+              confirmPlaceholder={`Type ${ssoConfig?.domains?.[0] ? 'the first domain' : 'the organization slug'} to confirm`}
               confirmLabel="I understand, delete SSO provider and members"
               onConfirm={onDeleteSSOConfig}
               onCancel={() => setIsDeleteModalVisible(false)}
             >
               <div className="space-y-3">
                 <p className="text-sm text-foreground-lighter">
-                  You are about to delete the SSO provider for{' '}
-                  <span className="text-foreground font-semibold">{ssoConfig?.domains?.[0]}</span>.
+                  You are about to delete the SSO provider
+                  {ssoConfig?.domains?.[0] && (
+                    <>
+                      {' '}
+                      for{' '}
+                      <span className="text-foreground font-semibold">{ssoConfig.domains[0]}</span>
+                    </>
+                  )}
+                  .
                 </p>
 
                 {ssoMemberCount > 0 && (

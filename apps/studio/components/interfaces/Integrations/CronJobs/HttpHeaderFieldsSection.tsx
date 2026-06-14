@@ -1,12 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useFormContext } from 'react-hook-form'
-import { FormLabel_Shadcn_, SheetSection } from 'ui'
+import { FormLabel, SheetSection } from 'ui'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
 
 import { CreateCronJobForm } from './CreateCronJobSheet/CreateCronJobSheet.constants'
 import { buildEdgeFunctionHeaderAddActions } from '@/components/interfaces/Functions/httpHeaderAddActions'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 interface HTTPHeaderFieldsSectionProps {
@@ -18,12 +18,12 @@ export const HTTPHeaderFieldsSection = ({ variant }: HTTPHeaderFieldsSectionProp
 
   const { ref } = useParams()
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeys } = useAPIKeysQuery(
+  const { data: apiKeysData } = useAPIKeys(
     { projectRef: ref, reveal: true },
     { enabled: canReadAPIKeys }
   )
+  const { serviceKey, secretKey } = apiKeysData ?? {}
 
-  const { serviceKey, secretKey } = getKeys(apiKeys)
   const apiKey = secretKey?.api_key ?? serviceKey?.api_key ?? '[YOUR API KEY]'
   const addActions =
     variant === 'edge_function'
@@ -36,7 +36,7 @@ export const HTTPHeaderFieldsSection = ({ variant }: HTTPHeaderFieldsSectionProp
 
   return (
     <SheetSection>
-      <FormLabel_Shadcn_>HTTP Headers</FormLabel_Shadcn_>
+      <FormLabel>HTTP Headers</FormLabel>
       <KeyValueFieldArray
         control={form.control}
         name="values.httpHeaders"

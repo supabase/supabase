@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useRef, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
+import { Button, Form, FormControl, FormField, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
@@ -72,23 +72,23 @@ export const SignInSSOForm = () => {
   }
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField_Shadcn_
+        <FormField
           key="email"
           name="email"
           control={form.control}
           render={({ field }) => (
             <FormItemLayout name="email" label="Email">
-              <FormControl_Shadcn_>
-                <Input_Shadcn_
+              <FormControl>
+                <Input
                   id="email"
                   type="email"
                   autoComplete="email"
                   {...field}
                   placeholder="gavin@hooli.com"
                 />
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )}
         />
@@ -111,6 +111,6 @@ export const SignInSSOForm = () => {
           Sign in
         </Button>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

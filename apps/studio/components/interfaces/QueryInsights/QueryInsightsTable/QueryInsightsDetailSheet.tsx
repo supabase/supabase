@@ -1,5 +1,4 @@
 import { Loader2 } from 'lucide-react'
-import { useRef } from 'react'
 import {
   AiIconAnimation,
   Button,
@@ -57,7 +56,7 @@ export const QueryInsightsDetailSheet = ({
       <SheetDescription className="sr-only">Query Insights Details &amp; Indexes</SheetDescription>
       <SheetContent
         side="right"
-        className="flex flex-col h-full bg-studio border-l lg:!w-[calc(100vw-802px)] max-w-[700px] w-full"
+        className="flex flex-col h-full bg-studio border-l lg:w-[calc(100vw-802px)]! max-w-[700px] w-full"
         hasOverlay={false}
         onInteractOutside={(event) => {
           if (
@@ -77,27 +76,27 @@ export const QueryInsightsDetailSheet = ({
             <TabsList_Shadcn_ className="px-0 flex gap-x-4 min-h-[46px] border-b-0 [&>button]:h-[47px]">
               <TabsTrigger_Shadcn_
                 value="details"
-                className="px-0 pb-0 data-[state=active]:bg-transparent !shadow-none"
+                className="px-0 pb-0 data-[state=active]:bg-transparent shadow-none!"
               >
                 Query details
               </TabsTrigger_Shadcn_>
               <TabsTrigger_Shadcn_
                 value="indexes"
-                className="px-0 pb-0 data-[state=active]:bg-transparent !shadow-none"
+                className="px-0 pb-0 data-[state=active]:bg-transparent shadow-none!"
               >
                 Indexes
               </TabsTrigger_Shadcn_>
               {activeSheetRow?.issueType !== 'error' && (
                 <TabsTrigger_Shadcn_
                   value="explain"
-                  className="px-0 pb-0 data-[state=active]:bg-transparent !shadow-none"
+                  className="px-0 pb-0 data-[state=active]:bg-transparent shadow-none!"
                 >
                   Explain
                 </TabsTrigger_Shadcn_>
               )}
             </TabsList_Shadcn_>
           </div>
-          <TabsContent_Shadcn_ value="details" className="mt-0 flex-grow min-h-0 overflow-y-auto">
+          <TabsContent_Shadcn_ value="details" className="mt-0 grow min-h-0 overflow-y-auto">
             {activeSheetRow && (
               <QueryDetail
                 selectedRow={activeSheetRow}
@@ -106,12 +105,12 @@ export const QueryInsightsDetailSheet = ({
               />
             )}
           </TabsContent_Shadcn_>
-          <TabsContent_Shadcn_ value="indexes" className="mt-0 flex-grow min-h-0 overflow-y-auto">
+          <TabsContent_Shadcn_ value="indexes" className="mt-0 grow min-h-0 overflow-y-auto">
             {activeSheetRow && <QueryIndexes selectedRow={activeSheetRow} />}
           </TabsContent_Shadcn_>
           <TabsContent_Shadcn_
             value="explain"
-            className="mt-0 flex-grow min-h-0 flex flex-col overflow-hidden"
+            className="mt-0 grow min-h-0 flex flex-col overflow-hidden"
           >
             {explainLoadingQuery ? (
               <div className="px-6 py-4 flex items-center gap-2 text-sm text-foreground-light">
@@ -119,7 +118,7 @@ export const QueryInsightsDetailSheet = ({
               </div>
             ) : activeSheetRow && explainResults[activeSheetRow.query]?.length > 0 ? (
               <>
-                <div className="flex items-center justify-between px-5 py-2 border-b flex-shrink-0">
+                <div className="flex items-center justify-between px-5 py-2 border-b shrink-0">
                   <p className="text-xs text-foreground-lighter">EXPLAIN ANALYZE output</p>
                   <Button
                     type="default"

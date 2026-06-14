@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { AlertCircle } from 'lucide-react'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
+import { Alert, AlertDescription, AlertTitle } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -26,7 +26,6 @@ import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useBackupsQuery } from '@/data/database/backups-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useIsOrioleDbInAws, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL, PROJECT_STATUS } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
@@ -121,15 +120,15 @@ const PITR = () => {
               }
             />
           ) : !isActiveHealthy ? (
-            <Alert_Shadcn_>
+            <Alert>
               <AlertCircle />
-              <AlertTitle_Shadcn_>
+              <AlertTitle>
                 Point in Time Recovery is not available while project is offline
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+              </AlertTitle>
+              <AlertDescription>
                 Your project needs to be online to restore your database with Point in Time Recovery
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
+              </AlertDescription>
+            </Alert>
           ) : (
             <>
               <PITRNotice />

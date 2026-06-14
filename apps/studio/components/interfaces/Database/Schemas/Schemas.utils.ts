@@ -1,11 +1,11 @@
 import dagre from '@dagrejs/dagre'
-import type { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
+import type { PGSchema, PGTable } from '@supabase/pg-meta'
 import { Edge, Node, Position } from '@xyflow/react'
 import { uniqBy } from 'lodash'
 
 import '@xyflow/react/dist/style.css'
 
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 
 import { TableNodeData } from './Schemas.constants'
 import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH } from './SchemaTableNode'
@@ -16,8 +16,8 @@ const RANK_SEP = 50
 
 export async function getGraphDataFromTables(
   ref?: string,
-  schema?: PostgresSchema,
-  tables?: PostgresTable[]
+  schema?: PGSchema,
+  tables?: PGTable[]
 ): Promise<{
   nodes: Node<TableNodeData>[]
   edges: Edge[]
@@ -37,6 +37,7 @@ export async function getGraphDataFromTables(
         isUnique: column.is_unique,
         isUpdateable: column.is_updatable,
         isIdentity: column.is_identity,
+        description: column.comment ?? '',
       }
     })
 
@@ -64,6 +65,25 @@ export async function getGraphDataFromTables(
     tables.flatMap((t) => t.relationships),
     'id'
   )
+
+  // Precompute name → { tableId, columnsByName } lookup so each relationship
+  // resolves its source/target handles in O(1) instead of scanning every table+column.
+  const tablesByName = new Map<string, { tableId: number; columnsByName: Map<string, string> }>()
+  for (const table of tables) {
+    const columnsByName = new Map<string, string>()
+    for (const column of table.columns || []) {
+      columnsByName.set(column.name, column.id)
+    }
+    tablesByName.set(table.name, { tableId: table.id, columnsByName })
+  }
+
+  const findHandleIds = (tableName: string, columnName: string): [string?, string?] => {
+    const entry = tablesByName.get(tableName)
+    if (!entry) return []
+    const columnId = entry.columnsByName.get(columnName)
+    if (columnId === undefined) return []
+    return [String(entry.tableId), columnId]
+  }
 
   for (const rel of uniqueRelationships) {
     // TODO: Support [external->this] relationship?
@@ -95,11 +115,7 @@ export async function getGraphDataFromTables(
         })
       }
 
-      const [source, sourceHandle] = findTablesHandleIds(
-        tables,
-        rel.source_table_name,
-        rel.source_column_name
-      )
+      const [source, sourceHandle] = findHandleIds(rel.source_table_name, rel.source_column_name)
 
       if (source) {
         edges.push({
@@ -123,16 +139,8 @@ export async function getGraphDataFromTables(
       continue
     }
 
-    const [source, sourceHandle] = findTablesHandleIds(
-      tables,
-      rel.source_table_name,
-      rel.source_column_name
-    )
-    const [target, targetHandle] = findTablesHandleIds(
-      tables,
-      rel.target_table_name,
-      rel.target_column_name
-    )
+    const [source, sourceHandle] = findHandleIds(rel.source_table_name, rel.source_column_name)
+    const [target, targetHandle] = findHandleIds(rel.target_table_name, rel.target_column_name)
 
     // We do not support [external->this] flow currently.
     if (source && target) {
@@ -155,31 +163,13 @@ export async function getGraphDataFromTables(
     }
   }
 
-  const savedPositionsLocalStorage = localStorage.getItem(
+  const savedPositionsLocalStorage = safeLocalStorage.getItem(
     LOCAL_STORAGE_KEYS.SCHEMA_VISUALIZER_POSITIONS(ref ?? 'project', schema?.id ?? 0)
   )
   const savedPositions = tryParseJson(savedPositionsLocalStorage)
   return !!savedPositions
     ? getLayoutedElementsViaLocalStorage(nodes, edges, savedPositions)
     : getLayoutedElementsViaDagre(nodes, edges)
-}
-
-function findTablesHandleIds(
-  tables: PostgresTable[],
-  table_name: string,
-  column_name: string
-): [string?, string?] {
-  for (const table of tables) {
-    if (table_name !== table.name) continue
-
-    for (const column of table.columns || []) {
-      if (column_name !== column.name) continue
-
-      return [String(table.id), column.id]
-    }
-  }
-
-  return []
 }
 
 export const getLayoutedElementsViaDagre = (nodes: Node<TableNodeData>[], edges: Edge[]) => {
@@ -254,4 +244,40 @@ const getLayoutedElementsViaLocalStorage = (
     }
   })
   return { nodes, edges }
+}
+
+export const getTableDefinitionAsMarkdown = (table: TableNodeData) => {
+  let markdown = `## Table \`${escapeForMarkdown(table.name)}\`\n\n`
+  if (table.description) {
+    markdown += `${table.description}\n\n`
+  }
+  markdown += `### Columns\n\n`
+  markdown += `| Name | Type | Constraints |\n`
+  markdown += `|------|------|-------------|\n`
+
+  return table.columns.reduce((current, column) => {
+    current += `| \`${escapeForMarkdown(column.name)}\` | \`${escapeForMarkdown(column.format)}\` | ${column.isPrimary ? 'Primary' : ''}${column.isNullable ? ' Nullable' : ''}${column.isUnique ? ' Unique' : ''}${column.isIdentity ? ' Identity' : ''} |\n`
+    return current
+  }, markdown)
+}
+
+export const getSchemaAsMarkdown = (schema: string, tables: TableNodeData[]) => {
+  return tables.reduce((current, table) => {
+    if (table.schema === schema) {
+      current += `${getTableDefinitionAsMarkdown(table)}\n`
+    }
+    return current
+  }, '')
+}
+
+const escapeForMarkdown = (str: string) => {
+  return (
+    str
+      // Escape backslashes first so later escapes are not ambiguous
+      .replace(/\\/g, '\\\\')
+      // Escape backticks and pipes for markdown tables
+      .replace(/([|`])/g, '\\$1')
+      // Remove new lines
+      .replace(/\n/g, ' ')
+  )
 }

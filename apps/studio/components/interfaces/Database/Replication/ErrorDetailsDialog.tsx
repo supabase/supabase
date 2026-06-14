@@ -36,7 +36,7 @@ export const ErrorDetailsDialog = ({
           </DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
-        <DialogSection className="!p-0">
+        <DialogSection className="p-0!">
           <div className="px-4 py-3">
             <p className="text-sm text-foreground-light">
               The following error occurred during replication:
@@ -50,7 +50,7 @@ export const ErrorDetailsDialog = ({
             )}
             language="bash"
             value={reason}
-            className="[&_code]:text-xs [&_code]:text-foreground [&_span]:!text-foreground"
+            className="[&_code]:text-xs [&_code]:text-foreground [&_span]:text-foreground!"
           />
           {solution && (
             <div className="px-4 py-3">

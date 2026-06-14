@@ -15,6 +15,7 @@ import { test } from '../utils/test.js'
 test.describe('Realtime Inspector', () => {
   test.beforeEach(async ({ page, ref }) => {
     await navigateToRealtimeInspector(page, ref)
+    await page.waitForResponse(new RegExp(`/platform/projects/${ref}/settings`))
   })
 
   test.describe('Basic Inspector UI', () => {
@@ -118,9 +119,7 @@ test.describe('Realtime Inspector', () => {
 
       await openBroadcastModal(page)
 
-      const codeEditor = page.getByRole('textbox', { name: /Editor content/i })
-      await expect(codeEditor).toBeInViewport({ timeout: 5000 })
-      await codeEditor.click({ force: true })
+      await page.getByRole('textbox', { name: /Editor content/i }).focus()
       await page.keyboard.press('ControlOrMeta+KeyA')
       await page.keyboard.type('{ invalid json }')
 

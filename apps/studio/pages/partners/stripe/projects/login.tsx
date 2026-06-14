@@ -1,41 +1,52 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
+import { LogOut } from 'lucide-react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Button,
-  LogoLoader,
-  WarningIcon,
-} from 'ui'
+import { Button } from 'ui'
+import { Admonition, ShimmeringLoader } from 'ui-patterns'
 
-import { APIAuthorizationLayout } from '@/components/layouts/APIAuthorizationLayout'
+import {
+  InterstitialAccountRow,
+  InterstitialLayout,
+  LogoPair,
+  PartnerLogo,
+  SupabaseLogo,
+} from '@/components/layouts/InterstitialLayout'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useConfirmAccountRequestMutation } from '@/data/partners/stripe-projects-confirm-mutation'
 import { accountRequestQueryOptions } from '@/data/partners/stripe-projects-query'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { useSignOut } from '@/lib/auth'
+import { BASE_PATH } from '@/lib/constants'
+import { buildStudioPageTitle } from '@/lib/page-title'
+import { useProfileNameAndPicture } from '@/lib/profile'
+import type { NextPageWithLayout } from '@/types'
 
-const StripeProjectsLoginPage = () => {
+const PAGE_TITLE = buildStudioPageTitle({ section: 'Authorize Stripe Projects', brand: 'Supabase' })
+
+const StripeProjectsLoginPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ar_id } = useParams()
-
   const signOut = useSignOut()
+  const { username, primaryEmail, avatarUrl } = useProfileNameAndPicture()
 
   const {
     data: accountRequest,
-    isPending,
-    isSuccess,
-    isError,
+    isPending: isQueryPending,
+    isSuccess: isQuerySuccess,
+    isError: isQueryError,
     error,
-  } = useQuery(accountRequestQueryOptions({ arId: ar_id }))
+  } = useQuery({
+    ...accountRequestQueryOptions({ arId: ar_id }),
+    enabled: typeof ar_id !== 'undefined',
+  })
 
   const {
     mutate: confirmAccountRequest,
-    isPending: isConfirming,
-    isSuccess: isConfirmed,
+    isPending: isConfirmationPending,
+    isSuccess: isConfirmationSuccess,
   } = useConfirmAccountRequestMutation()
 
   useEffect(() => {
@@ -43,114 +54,165 @@ const StripeProjectsLoginPage = () => {
 
     if (!ar_id) {
       router.push('/404')
-      return
     }
   }, [router.isReady, ar_id, router])
 
   const handleApprove = async () => {
-    if (!ar_id || isConfirming) return
+    if (!ar_id || isConfirmationPending) return
     confirmAccountRequest({ arId: ar_id })
   }
 
   const linkedOrg = accountRequest?.linked_organization
   const emailMatches = accountRequest?.email_matches ?? false
-
-  const loadingText = linkedOrg ? 'Completing authorization...' : 'Creating your organization...'
-  const successTitle = linkedOrg ? 'Authorization Complete' : 'Organization Created'
-  const successDescription = linkedOrg
-    ? null
-    : 'Your Supabase organization has been created and linked to your Stripe account.'
+  const displayName = primaryEmail ?? username ?? accountRequest?.email ?? ''
+  const isPending = router.isReady && isQueryPending
+  const isConfirmed = isConfirmationSuccess
+  const isConfirming = isConfirmationPending
+  const isSuccess = isQuerySuccess
+  const isError = isQueryError
+  const showAuthorizationState = isSuccess && !isConfirmed
+  const interstitialDescription = isConfirmed
+    ? undefined
+    : 'This will create an organization on your behalf in Supabase'
 
   return (
-    <APIAuthorizationLayout HeadProvider={Head}>
-      <div className="flex flex-col items-center min-h-[500px]">
-        {isConfirming ? (
-          <>
-            <LogoLoader />
-            <p className="pt-4 text-foreground-light">{loadingText}</p>
-          </>
-        ) : isConfirmed ? (
-          <>
-            <h2 className="py-2 text-lg font-medium">{successTitle}</h2>
-            {successDescription && <p className="text-foreground-light">{successDescription}</p>}
-            <p className="pt-4 text-sm text-foreground-lighter">You can close this window.</p>
-          </>
-        ) : isPending ? (
-          <LogoLoader />
-        ) : isSuccess ? (
-          <>
-            <h2 className="py-2 text-lg font-medium">Stripe Account Authorization</h2>
-            <p className="text-center text-foreground-light">
-              Stripe wants to link a Supabase organization for{' '}
-              <strong>{accountRequest.email}</strong>.
-            </p>
+    <>
+      <Head>
+        <title>{PAGE_TITLE}</title>
+      </Head>
 
-            {!emailMatches ? (
-              <>
-                <Alert_Shadcn_ variant="warning" className="mt-4">
-                  <WarningIcon />
-                  <AlertTitle_Shadcn_>Wrong account</AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
-                    You need to be logged in as <strong>{accountRequest.email}</strong> to approve
-                    this request.
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
-                <div className="py-6">
-                  <Button size="large" type="default" onClick={() => signOut()}>
-                    Sign out
-                  </Button>
+      <InterstitialLayout
+        logo={
+          <LogoPair
+            left={<PartnerLogo src={`${BASE_PATH}/img/icons/stripe-icon.svg`} alt="Stripe" />}
+            right={<SupabaseLogo />}
+          />
+        }
+        title="Authorize Stripe Projects"
+        description={interstitialDescription}
+      >
+        <div className="px-6 pb-6">
+          {isPending && (
+            <div className="flex flex-col gap-6">
+              <div className="flex items-center gap-3 rounded-lg border border-secondary p-3">
+                <ShimmeringLoader className="size-9 flex-shrink-0 rounded-full py-0" />
+                <div className="min-w-0 flex-1 space-y-2">
+                  <ShimmeringLoader className="h-3 w-20 py-0" />
+                  <ShimmeringLoader className="h-4 w-40 max-w-full py-0" />
                 </div>
-              </>
-            ) : linkedOrg ? (
-              // Org already linked to this Stripe account — inform user and confirm
-              <>
-                <p className="mt-4 text-sm text-foreground-light text-center">
-                  Your organization <strong>{linkedOrg.name}</strong> is already linked to your
-                  Stripe account.
-                </p>
-                <div className="py-6">
-                  <Button
-                    size="large"
-                    type="primary"
-                    disabled={isConfirming}
-                    onClick={handleApprove}
-                  >
-                    Continue
-                  </Button>
-                </div>
-              </>
-            ) : (
-              // No linked org — a new one will be created
-              <>
-                <p className="mt-4 text-sm text-foreground-light text-center">
-                  A new Supabase organization will be created and linked to your Stripe account.
-                </p>
-                <div className="py-6">
-                  <Button
-                    size="large"
-                    type="primary"
-                    disabled={isConfirming}
-                    onClick={handleApprove}
-                  >
-                    Approve
-                  </Button>
-                </div>
-              </>
-            )}
-          </>
-        ) : isError ? (
-          <>
-            <h2 className="py-2 text-lg font-medium text-destructive">Error</h2>
-            <p className="text-foreground-light">{error?.message}</p>
-            <div className="py-6">
-              <Button size="large" type="default" onClick={() => signOut()}>
+                <div className="h-8 w-8 flex-shrink-0" />
+              </div>
+              <div className="flex flex-col gap-2">
+                <ShimmeringLoader className="h-10 w-full py-0" />
+                <ShimmeringLoader className="h-10 w-full py-0" />
+              </div>
+            </div>
+          )}
+
+          {isConfirmed && (
+            <div className="flex flex-col gap-4">
+              <Admonition type="success" title="Stripe Projects authorized" />
+              <p className="text-center text-xs text-foreground-lighter text-balance">
+                You can now close this tab.
+              </p>
+            </div>
+          )}
+
+          {showAuthorizationState && !emailMatches && (
+            <div className="flex flex-col gap-3">
+              <Admonition
+                type="warning"
+                description={
+                  <>
+                    You're signed in to a different account. Sign out and sign back in as{' '}
+                    <span className="font-medium text-foreground">{accountRequest?.email}</span>.
+                    Then return to Stripe to restart the request.
+                  </>
+                }
+              />
+              <Button type="default" block onClick={() => signOut()}>
                 Sign out
               </Button>
             </div>
-          </>
-        ) : null}
-      </div>
-    </APIAuthorizationLayout>
+          )}
+
+          {showAuthorizationState && emailMatches && linkedOrg && (
+            <div className="flex flex-col gap-3">
+              <Admonition
+                type="tip"
+                description={
+                  <>
+                    <span className="font-medium text-foreground">{linkedOrg.name}</span> is already
+                    linked to this Stripe account, and just needs to be confirmed.
+                  </>
+                }
+              />
+              <div className="flex flex-col gap-2">
+                <Button type="primary" block loading={isConfirming} onClick={handleApprove}>
+                  Authorize Stripe Projects
+                </Button>
+                <Button type="text" block onClick={() => router.push('/')}>
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {showAuthorizationState && emailMatches && !linkedOrg && (
+            <div className="flex flex-col gap-6">
+              <InterstitialAccountRow
+                avatarUrl={avatarUrl}
+                displayName={displayName}
+                action={
+                  <ButtonTooltip
+                    type="text"
+                    size="small"
+                    className="h-8 w-8 px-0"
+                    onClick={() => signOut()}
+                    icon={
+                      <LogOut size={16} strokeWidth={1.5} className="text-foreground-lighter" />
+                    }
+                    tooltip={{
+                      content: {
+                        side: 'top',
+                        text: 'Sign out',
+                      },
+                    }}
+                  />
+                }
+              />
+
+              <div className="flex flex-col gap-2">
+                <Button
+                  type="primary"
+                  loading={isConfirming}
+                  disabled={isConfirming}
+                  onClick={handleApprove}
+                >
+                  Create organization
+                </Button>
+                <Button type="text" onClick={() => router.push('/')}>
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {isError && (
+            <div className="flex flex-col gap-3">
+              <Admonition
+                type="danger"
+                title="Unable to load authorization"
+                description={error?.message}
+              />
+              <Button type="default" block onClick={() => signOut()}>
+                Sign out
+              </Button>
+            </div>
+          )}
+        </div>
+      </InterstitialLayout>
+    </>
   )
 }
 

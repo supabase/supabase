@@ -3,13 +3,10 @@ import { useParams } from 'common'
 import { PropsWithChildren, useRef } from 'react'
 import { DataGridHandle } from 'react-data-grid'
 
-import { useIsTableFilterBarEnabled } from '../interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Shortcuts } from './components/common/Shortcuts'
 import { Footer } from './components/footer/Footer'
 import { Grid } from './components/grid/Grid'
 import { Header, HeaderProps } from './components/header/Header'
-import { HeaderNew } from './components/header/HeaderNew'
-import { useTableFilter } from './hooks/useTableFilter'
 import { useTableSort } from './hooks/useTableSort'
 import { validateMsSqlSorting } from './MsSqlValidation'
 import { GridProps } from './types'
@@ -42,9 +39,8 @@ export const SupabaseGrid = ({
   const preflightCheck = !tableEditorSnap.tablesToIgnorePreflightCheck.includes(tableId ?? -1)
 
   const gridRef = useRef<DataGridHandle>(null)
-  const newFilterBarEnabled = useIsTableFilterBarEnabled()
 
-  const { filters } = useTableFilter()
+  const filters = snap.filters
   const { sorts, onApplySorts } = useTableSort()
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
@@ -89,11 +85,9 @@ export const SupabaseGrid = ({
   const baseRows = data?.rows ?? EMPTY_ARR
   const rows = formatGridDataWithOperationValues({ operations, rows: baseRows })
 
-  const HeaderComponent = newFilterBarEnabled ? HeaderNew : Header
-
   return (
     <div className="sb-grid h-full flex flex-col">
-      <HeaderComponent
+      <Header
         customHeader={customHeader}
         isRefetching={isRefetching}
         tableQueriesEnabled={tableQueriesEnabled}

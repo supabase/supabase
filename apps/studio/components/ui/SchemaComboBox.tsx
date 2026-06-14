@@ -1,19 +1,19 @@
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { useState } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
 
@@ -79,22 +79,20 @@ export const SchemaComboBox = ({
       )}
 
       {showError && isSchemasError && (
-        <Alert_Shadcn_ variant="warning" className="!px-3 !py-3">
-          <AlertTitle_Shadcn_ className="text-xs text-amber-900">
-            Failed to load schemas
-          </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_ className="text-xs mb-2 break-words">
+        <Alert variant="warning" className="px-3! py-3!">
+          <AlertTitle className="text-xs text-amber-900">Failed to load schemas</AlertTitle>
+          <AlertDescription className="text-xs mb-2 wrap-break-word">
             Error: {(schemasError as any)?.message}
-          </AlertDescription_Shadcn_>
+          </AlertDescription>
           <Button type="default" size="tiny" onClick={() => refetchSchemas()}>
             Reload schemas
           </Button>
-        </Alert_Shadcn_>
+        </Alert>
       )}
 
       {isSchemasSuccess && (
-        <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-          <PopoverTrigger_Shadcn_ asChild>
+        <Popover open={open} onOpenChange={setOpen} modal={false}>
+          <PopoverTrigger asChild>
             <Button
               size={size}
               disabled={disabled}
@@ -108,16 +106,16 @@ export const SchemaComboBox = ({
                 <p className="text-foreground">{label}</p>
               </div>
             </Button>
-          </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="start">
-            <Command_Shadcn_>
-              <CommandInput_Shadcn_ placeholder="Find schema..." />
-              <CommandList_Shadcn_>
-                <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
-                <CommandGroup_Shadcn_>
+          </PopoverTrigger>
+          <PopoverContent className="p-0 w-56" side="bottom" align="start">
+            <Command>
+              <CommandInput placeholder="Find schema..." />
+              <CommandList>
+                <CommandEmpty>No schemas found</CommandEmpty>
+                <CommandGroup>
                   <ScrollArea className={(schemas || []).length > 7 ? 'h-[210px]' : ''}>
                     {schemas?.map((schema) => (
-                      <CommandItem_Shadcn_
+                      <CommandItem
                         key={schema.id}
                         className="cursor-pointer flex items-center justify-between space-x-2 w-full"
                         onSelect={() => toggleSchema(schema.name)}
@@ -127,14 +125,14 @@ export const SchemaComboBox = ({
                         {selectedSchemas.includes(schema.name) && (
                           <Check className="text-brand" strokeWidth={2} size={16} />
                         )}
-                      </CommandItem_Shadcn_>
+                      </CommandItem>
                     ))}
                   </ScrollArea>
-                </CommandGroup_Shadcn_>
-              </CommandList_Shadcn_>
-            </Command_Shadcn_>
-          </PopoverContent_Shadcn_>
-        </Popover_Shadcn_>
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
       )}
     </div>
   )

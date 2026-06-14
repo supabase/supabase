@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 
 import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
-import { generateRegexpWhere } from '../Reports/Reports.constants'
-import { get } from '@/data/fetchers'
+import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
+import { safeSql, type SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
 
 type PostgrestMetricsVariables = {
   projectRef: string
@@ -11,26 +11,26 @@ type PostgrestMetricsVariables = {
   interval: '1hr' | '1day' | '7day'
 }
 
-const getIntervalTrunc = (interval: '1hr' | '1day' | '7day') => {
+function getIntervalTrunc(interval: '1hr' | '1day' | '7day'): SafeLogSqlFragment {
   switch (interval) {
     case '1hr':
-      return 'minute' // 1-minute buckets for 1 hour
+      return safeSql`minute` // 1-minute buckets for 1 hour
     case '1day':
-      return 'hour' // 1-hour buckets for 1 day
+      return safeSql`hour` // 1-hour buckets for 1 day
     case '7day':
-      return 'day' // 1-day buckets for 7 days
+      return safeSql`day` // 1-day buckets for 7 days
     default:
-      return 'hour'
+      return safeSql`hour`
   }
 }
 
-const POSTGREST_METRICS_SQL = (interval: '1hr' | '1day' | '7day') => {
-  const truncInterval = getIntervalTrunc(interval)
+const POSTGREST_METRICS_SQL = (interval: '1hr' | '1day' | '7day'): SafeLogSqlFragment => {
+  const trunc = getIntervalTrunc(interval)
 
-  return `
+  return safeSql`
     -- postgrest-overview-metrics
     select
-      cast(timestamp_trunc(t.timestamp, ${truncInterval}) as datetime) as timestamp,
+      cast(timestamp_trunc(t.timestamp, ${trunc}) as datetime) as timestamp,
       countif(response.status_code < 300) as ok_count,
       countif(response.status_code >= 300 and response.status_code < 400) as warning_count,
       countif(response.status_code >= 400) as error_count
@@ -60,21 +60,17 @@ async function fetchPostgrestMetrics(
 ) {
   const sql = POSTGREST_METRICS_SQL(interval)
 
-  const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-    params: {
-      path: { ref: projectRef },
-      query: {
-        sql,
-        iso_timestamp_start: startDate,
-        iso_timestamp_end: endDate,
-      },
-    },
+  const data = await executeAnalyticsSql({
+    projectRef,
+    endpoint: '/platform/projects/{ref}/analytics/endpoints/logs.all',
+    sql,
+    iso_timestamp_start: startDate,
+    iso_timestamp_end: endDate,
+    method: 'get',
     signal,
   })
 
-  if (error || data?.error) {
-    throw error || data?.error
-  }
+  if (data?.error) throw data.error
 
   return (data?.result || []) as MetricsRow[]
 }

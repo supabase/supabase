@@ -1,4 +1,4 @@
-import { PostgresTable } from '@supabase/postgres-meta'
+import type { PGTable } from '@supabase/pg-meta'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Key } from 'lucide-react'
@@ -29,7 +29,7 @@ import { useTableRowsQuery } from '@/data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface ReferenceRecordPeekProps {
-  table: PostgresTable
+  table: PGTable
   column: string
   value: string | number | Record<string, unknown>
 }
@@ -80,7 +80,7 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
         sortable: false,
         width: columnWidth,
         minWidth: COLUMN_MIN_WIDTH,
-        headerCellClass: 'outline-none !shadow-none',
+        headerCellClass: 'outline-hidden shadow-none!',
         renderHeaderCell: () => (
           <div className="flex h-full items-center justify-center gap-x-2">
             {isPrimaryKey && (

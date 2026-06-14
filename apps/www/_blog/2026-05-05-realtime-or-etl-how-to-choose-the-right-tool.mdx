@@ -1,0 +1,186 @@
+---
+title: 'Realtime or ETL? How to choose the right tool'
+description: 'Both Supabase Realtime and Supabase ETL read changes from your Postgres database using logical replication. But they solve very different problems. Here is how to pick the right one.'
+author: eduardo_gurgel, riccardo_busetti
+date: '2026-05-05'
+categories:
+  - developers
+tags:
+  - realtime
+  - postgres
+  - etl
+  - database
+imgSocial: 'https://zhfonblqamxferhoguzj.supabase.co/functions/v1/generate-og?template=announcement&layout=horizontal&copy=Realtime+or+ETL%0A%5BHow+to+choose+the+right+tool%5D&icon=icon-realtime.svg'
+imgThumb: 'https://zhfonblqamxferhoguzj.supabase.co/functions/v1/generate-og?template=ruler&layout=icon-only&copy=Realtime+or+ETL%0A%5BHow+to+choose+the+right+tool%5D&icon=icon-realtime.svg'
+toc_depth: 2
+---
+
+Both [Supabase Realtime](https://supabase.com/docs/guides/realtime) and [Supabase ETL](https://supabase.com/features/supabase-etl) read changes from your Postgres database. They both use [logical replication](https://supabase.com/docs/guides/database/replication) under the hood. They even look similar when you squint. But they solve very different problems, and choosing the wrong one will frustrate you.
+
+This post explains what each product does, how they differ, and when you should pick one over the other.
+
+## Two tools, two jobs
+
+Here is the simplest way to think about it:
+
+- **Realtime** sends database changes to your users' browsers and apps, right now, as they happen. It is built for live experiences.
+- **ETL** sends database changes in near real-time to analytical destinations like BigQuery and Analytics Buckets. It is built for reliable data movement.
+
+Realtime answers the question: "How do I show my users what just happened?"
+
+ETL answers the question: "How do I get my production data into my analytics warehouse?"
+
+If you mix these up, you will run into problems. We see it happen regularly, and the rest of this post will help you avoid that.
+
+## What Realtime does
+
+[Supabase Realtime](https://supabase.com/docs/guides/realtime) is three features in one product:
+
+1. [**Broadcast.**](https://supabase.com/docs/guides/realtime/broadcast) Send messages between connected clients in real time. No database required. Think cursor positions, typing indicators, or game state.
+2. [**Presence.**](https://supabase.com/docs/guides/realtime/presence) Track who is online and what they are doing. Also no database required. Think "3 users are editing this document" or "Jane is typing..."
+3. [**Postgres Changes.**](https://supabase.com/docs/guides/realtime/postgres-changes) Listen to INSERT, UPDATE, and DELETE events on your database tables and deliver them to subscribed clients over WebSocket.
+
+Two of these three features, Broadcast and Presence, can work without any database interaction. Client-to-client Broadcast sends messages purely over WebSocket with nothing stored. However, [Broadcast from Database](https://supabase.com/blog/realtime-broadcast-from-database) lets you trigger broadcasts from database changes using triggers, giving you control over which events reach which channels. This matters because Realtime is not just a database change listener. It is a real-time communication layer for your application.
+
+### How Postgres Changes works
+
+When a client subscribes to a table, Realtime uses a PostgreSQL replication slot to read changes from the Write-Ahead Log (WAL). For each change, it checks [Row Level Security (RLS)](https://supabase.com/docs/guides/database/postgres/row-level-security) policies against every subscribed user. If a user is authorized to see the change, Realtime sends it over their WebSocket connection.
+
+This is designed for live UI updates. A user inserts a message into a chat table. Other users see it appear instantly. A row updates in a dashboard table. The chart refreshes automatically.
+
+### What Realtime does not guarantee
+
+Realtime's Postgres Changes feature does not guarantee delivery. If a client disconnects for 30 seconds and reconnects, the changes that happened during those 30 seconds are gone. Realtime does not queue them and does not track how far each client has read.
+
+[Broadcast Replay](https://supabase.com/blog/realtime-broadcast-replay) offers limited catch-up for Broadcast from Database messages: clients can request up to 25 messages from the last 3 days using a `since` timestamp. But this only works on private channels, only for database-sourced broadcasts, and is currently in public alpha. It is not a general-purpose replay mechanism for all Realtime events.
+
+Postgres Changes uses temporary replication slots. When no clients are subscribed, it stops replicating data entirely. When clients subscribe again, a new slot is created.
+
+The Realtime team built it this way on purpose. Guaranteed delivery requires persistent state tracking, message queuing, and acknowledgment protocols. Those things add latency and complexity that would make Realtime worse at its actual job: delivering live updates as fast as possible.
+
+If you need every change to arrive at its destination, no matter what, Realtime is not the right tool.
+
+## What ETL does
+
+Supabase ETL is a change-data-capture (CDC) pipeline. It reads every INSERT, UPDATE, DELETE, and TRUNCATE from your Postgres tables and writes them to a destination. Right now, the supported destinations are [Analytics Buckets](https://supabase.com/docs/guides/storage/analytics/introduction) (built on Apache Iceberg) and BigQuery.
+
+ETL replicates your data 1-to-1 in near real-time. If your destination disconnects or has problems, ETL does not skip over data.
+
+### How ETL works
+
+When you create an ETL pipeline, it connects to your database through a permanent replication slot. First, it performs a full copy of your existing data. Then it switches to streaming mode and captures every change as it happens, with latency measured in milliseconds to seconds (based on configuration parameters, data size, and destination type).
+
+It's important to note that Supabase ETL doesn't respect Row-Level Security. Supabase ETL reads every piece of data. If you need to filter data, you should use publication filters.
+
+Changes are batched and written to your destination. If the pipeline crashes, it restarts from the last acknowledged position. No data changes are lost. Note that schema changes (adding or removing columns) do not propagate automatically and require manual handling.
+
+### What ETL guarantees
+
+ETL provides at-least-once delivery. Every change that happens in your database will reach the destination at least once. In rare cases (like a crash during a long-running transaction), a change might be delivered more than once. Exactly-once processing is handled by the destination. Some destinations like BigQuery deduplicate automatically, while others may not.
+
+ETL uses permanent replication slots. This means Postgres holds onto WAL data until ETL confirms it has been processed. If you stop the pipeline for maintenance and restart it later, it picks up exactly where it left off. Be aware that while the pipeline is paused, Postgres continues to retain WAL data. Extended pauses can lead to significant disk growth, and depending on your Postgres configuration, the pipeline may fail if the WAL retention limit is exceeded.
+
+This is the opposite of Realtime's approach. ETL trades speed for reliability. It may not deliver changes to your warehouse in the same millisecond they happen, but it will deliver every single one.
+
+## The key differences
+
+### Delivery guarantees
+
+|                         | **Realtime** | **ETL**               |
+| ----------------------- | ------------ | --------------------- |
+| Guarantee               | Best effort  | At-least-once         |
+| Missed changes          | Lost forever | Replayed on reconnect |
+| Replication slot        | Temporary    | Permanent             |
+| Resume after disconnect | No           | Yes                   |
+
+This is the most important difference. If you need every change to arrive, use ETL. If you need changes to arrive fast and can tolerate occasional gaps, use Realtime.
+
+### Where data goes
+
+Realtime sends data to client applications over WebSocket connections. Your users' browsers and mobile apps are the destination.
+
+ETL sends data to analytical systems. BigQuery, Analytics Buckets, and eventually other data warehouses are the destination.
+
+These are fundamentally different targets with fundamentally different needs. Client apps need low latency. Analytical systems need completeness.
+
+### Database dependency
+
+Realtime's Broadcast and Presence features can work without touching the database. You can build an entire collaborative experience (cursors, presence indicators, ephemeral messaging) without writing a single database query. However, Postgres Changes and [Broadcast from Database](https://supabase.com/blog/realtime-broadcast-from-database) both require database interaction.
+
+ETL is entirely database-driven. Every byte of data it moves comes from your Postgres tables.
+
+### Scale characteristics
+
+Realtime's Broadcast and Presence features are built for high throughput and low latency. They do not run per-subscriber database queries and scale well across many concurrent connections.
+
+Postgres Changes works differently. It processes changes sequentially to maintain ordering. For each change, it runs an RLS authorization check against every subscribed client. With 100 subscribers watching a table, one INSERT generates 100 authorization queries. This is a deliberate design choice that prioritizes correctness and low latency for typical workloads over raw throughput.
+
+ETL processes changes in configurable batches with tunable parallelism. It does not need to authorize individual users because it is moving data to a system, not to end users.
+
+## When to use Realtime
+
+Use Realtime when you need to push live updates to your users:
+
+- **Chat applications.** Messages appear instantly for all participants.
+- **Collaborative editing.** See other users' cursors and changes in real time.
+- **Live dashboards.** Charts and metrics update without page refresh.
+- **Notifications.** Alert users when something relevant happens.
+- **Multiplayer features.** Synchronize game state or shared experiences.
+- **Presence tracking.** Show who is online, who is typing, who is viewing a document.
+
+The common thread: a human is watching and needs to see changes as they happen.
+
+## When to use ETL
+
+Use ETL when you need reliable data movement to analytical systems:
+
+- **Analytics and reporting.** Move production data to BigQuery or Iceberg for querying without impacting your production database.
+- **Audit trails.** Analytics Buckets stores an append-only changelog of every INSERT, UPDATE, and DELETE. Nothing is lost.
+- **Data warehousing.** Replicate your operational data to a columnar format optimized for analytical queries.
+- **Compliance.** Maintain a complete, verifiable history of all data changes.
+- **ML pipelines.** Feed fresh data to training or feature stores without querying production.
+- **Workload isolation.** Run heavy analytical queries against your warehouse instead of your production database.
+
+The common thread: a system needs a complete, reliable copy of your data.
+
+## The mistake we see most often
+
+Some developers discover Realtime's Postgres Changes feature and think: "I can use this to replicate data from one system to another." They write 20 lines of code with supabase-js, subscribe to table changes, and pipe them into another system.
+
+It works great in development. It even works fine in production for a while. Then a WebSocket connection drops for a few seconds and data goes missing. Or the subscribing process restarts and misses a batch of changes. Or load spikes and the sequential RLS authorization checks cannot keep up.
+
+The problem is not that Realtime is broken. The problem is that Realtime was not designed for this job.
+
+If you are piping database changes into another system and you need every change to arrive, use ETL. That is exactly what it was built for.
+
+## Can I use both?
+
+Yes. In fact, many applications should.
+
+Consider an e-commerce platform. You might use Realtime to push order status updates to customers in real time ("Your order has shipped!"). At the same time, you use ETL to replicate all order data to BigQuery for daily sales reports and trend analysis.
+
+Same database. Same tables. Different tools for different jobs.
+
+Realtime handles the live experience. ETL handles the analytical pipeline. Each does what it was designed to do.
+
+## Quick reference
+
+|                     | **Realtime**                                                         | **ETL**                                                    |
+| ------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------- |
+| Purpose             | Live updates to client apps                                          | Reliable data movement to analytics                        |
+| Delivery            | Best effort                                                          | At-least-once                                              |
+| Destinations        | Browsers, mobile apps (WebSocket)                                    | BigQuery, Analytics Buckets                                |
+| Replication slot    | Temporary                                                            | Permanent                                                  |
+| Resume on reconnect | No                                                                   | Yes                                                        |
+| Database required   | Only for Postgres Changes and Broadcast from Database                | Yes, always                                                |
+| Processing          | Sequential per-change with per-subscriber authorization              | Batched with configurable parallelism                      |
+| Latency             | Typically under 100ms                                                | Seconds (batched)                                          |
+| Best for            | Human users watching live data                                       | Systems consuming complete data                            |
+| Built with          | Elixir (Phoenix)                                                     | Rust                                                       |
+| Open source         | [github.com/supabase/realtime](https://github.com/supabase/realtime) | [github.com/supabase/etl](https://github.com/supabase/etl) |
+
+## Getting started
+
+Supabase Realtime is available on all Supabase projects. Check out the [Realtime documentation](https://supabase.com/docs/guides/realtime) to get started.
+
+Supabase ETL is currently in private alpha. You can request access through the Supabase Dashboard or contact your account manager. Read the [ETL blog post](https://supabase.com/blog/introducing-supabase-etl) for more details on how it works.

@@ -1,13 +1,7 @@
 import { useParams } from 'common'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Button,
-  WarningIcon,
-} from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button, WarningIcon } from 'ui'
 import {
   PageSection,
   PageSectionContent,
@@ -54,14 +48,11 @@ export const AuthProvidersForm = () => {
         ) : (
           <div className="-space-y-px">
             {authConfig?.EXTERNAL_EMAIL_ENABLED && authConfig?.MAILER_OTP_EXP > 3600 && (
-              <Alert_Shadcn_
-                className="flex w-full items-center justify-between my-3"
-                variant="warning"
-              >
+              <Alert className="flex w-full items-center justify-between my-3" variant="warning">
                 <WarningIcon />
                 <div>
-                  <AlertTitle_Shadcn_>OTP expiry exceeds recommended threshold</AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_ className="flex flex-col gap-y-3">
+                  <AlertTitle>OTP expiry exceeds recommended threshold</AlertTitle>
+                  <AlertDescription className="flex flex-col gap-y-3">
                     <p>
                       We have detected that you have enabled the email provider with the OTP expiry
                       set to more than an hour. It is recommended to set this value to less than an
@@ -72,9 +63,9 @@ export const AuthProvidersForm = () => {
                         View security recommendations
                       </Link>
                     </Button>
-                  </AlertDescription_Shadcn_>
+                  </AlertDescription>
                 </div>
-              </Alert_Shadcn_>
+              </Alert>
             )}
 
             <ResourceList>

@@ -172,7 +172,7 @@ Choose the appropriate `type` for your admonition:
 - `note` for anything else
 
 ```
-<Admonition type="note" label="Optional label displays as title">
+<Admonition type="note" title="Optional title">
 
 Your content here
 
@@ -210,6 +210,47 @@ Optionally highlight lines by using `mark=${lineNumber}`.
 ### Footnotes
 
 Don't use footnotes.
+
+### Graphs
+
+Render diagrams (flowcharts, sequence diagrams, entity-relationship diagrams, etc.) by writing a fenced code block with `mermaid` as the language. The MDX renderer routes these blocks through the shared `Mermaid` component, so theming follows light/dark mode automatically.
+
+For the full list of supported diagram types and their syntax, see the [official Mermaid diagram reference](https://mermaid.js.org/intro/syntax-reference.html).
+
+Sequence diagram:
+
+````mdx
+```mermaid
+sequenceDiagram
+  participant User
+  participant Browser
+  participant Supabase
+
+  User->>Browser: Clicks "Sign in"
+  Browser->>Supabase: Request authorization
+  Supabase->>Browser: Return token
+```
+````
+
+Flowchart (`flowchart` accepts a direction like `LR`, `TD`, etc.):
+
+````mdx
+```mermaid
+flowchart LR
+  A["content/**/*.md"] -->|Contentlayer| B[MDX]
+  B --> C[Rehype]
+  C -->|Our Plugin| D[SVG]
+  D -->|Base64| E[Embedded Images]
+```
+````
+
+A few tips:
+
+- Use the standard Mermaid diagram keywords (`sequenceDiagram`, `flowchart`, `erDiagram`, etc.) on the first line of the block.
+- Keep diagrams focused on a single flow or concept. If a diagram gets too dense, split it into multiple smaller diagrams.
+- Wrap node labels that contain special characters (`*`, `/`, spaces, punctuation) in double quotes, for example `A["content/**/*.md"]`.
+- Don't hardcode colors. The component themes the diagram automatically so it matches both light and dark mode.
+- Use diagrams to support the prose, not replace it. Explain the key takeaway in text near the diagram.
 
 ### Images
 

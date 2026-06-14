@@ -1,4 +1,4 @@
-import { getImportForeignSchemaSql } from '@supabase/pg-meta'
+import { getImportForeignSchemaSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { wrapWithTransaction } from '@supabase/pg-meta/src/query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -16,7 +16,7 @@ export type FDWImportForeignSchemaVariables = {
   serverName: string
   sourceSchema: string
   targetSchema: string
-  schemaOptions?: string[]
+  schemaOptions?: SafeSqlFragment[]
 }
 
 export async function importForeignSchema({

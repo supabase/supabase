@@ -429,7 +429,7 @@
     },
     "/v1/projects": {
       "get": {
-        "description": "Returns a list of all projects you've previously created.\n\nUse `/v1/organizations/{slug}/projects` instead when possible to get more precise results and pagination support.",
+        "description": "Returns a list of all projects you've previously created.",
         "operationId": "v1-list-all-projects",
         "parameters": [],
         "responses": {
@@ -443,7 +443,10 @@
                 }
               }
             }
-          }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["projects_read"] }],
         "summary": "List all projects",
@@ -467,7 +470,10 @@
             "content": {
               "application/json": { "schema": { "$ref": "#/components/schemas/V1ProjectResponse" } }
             }
-          }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["organization_projects_create"] }],
         "summary": "Create a project",
@@ -563,6 +569,9 @@
               }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Unexpected error listing organizations" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["organizations_read"] }],
@@ -592,6 +601,9 @@
               }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Unexpected error creating an organization" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["organizations_create"] }],
@@ -699,7 +711,7 @@
           }
         },
         "responses": {
-          "201": {
+          "200": {
             "description": "",
             "content": {
               "application/json": {
@@ -802,7 +814,12 @@
             "schema": { "example": "S256", "type": "string", "enum": ["plain", "sha256", "S256"] }
           }
         ],
-        "responses": { "204": { "description": "" } },
+        "responses": {
+          "204": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
         "security": [
           { "bearer": [] },
           { "fga_permissions": ["organization_admin_write", "project_admin_write"] }
@@ -856,6 +873,9 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/SnippetList" } }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to list user's SQL snippets" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["snippets_read"] }],
@@ -888,6 +908,9 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/SnippetResponse" } }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve SQL snippet" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["snippets_read"] }],
@@ -1540,9 +1563,6 @@
               }
             }
           },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve database branches" }
         },
         "security": [
@@ -1587,9 +1607,6 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/BranchResponse" } }
             }
           },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to create database branch" }
         },
         "security": [
@@ -1668,9 +1685,6 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/BranchResponse" } }
             }
           },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to fetch database branch" }
         },
         "security": [
@@ -1739,6 +1753,13 @@
               "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
+          },
+          {
+            "name": "remove_addon",
+            "required": false,
+            "in": "query",
+            "description": "If true, also removes the custom domain add-on from the project subscription.",
+            "schema": { "default": "false", "type": "boolean" }
           }
         ],
         "responses": {
@@ -1906,16 +1927,16 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/JitAccessResponse" } }
+              "application/json": { "schema": { "$ref": "#/components/schemas/JitStateResponse" } }
             }
           },
           "401": { "description": "Unauthorized" },
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to retrieve project's JIT access config" }
+          "500": { "description": "Failed to retrieve project's temporary access configuration." }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["project_admin_read"] }],
-        "summary": "[Beta] Get project's just-in-time access configuration.",
+        "summary": "[Beta] Get project's temporary access configuration.",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
         "x-endpoint-owners": ["security", "management-api"],
@@ -1950,16 +1971,16 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/JitAccessResponse" } }
+              "application/json": { "schema": { "$ref": "#/components/schemas/JitStateResponse" } }
             }
           },
           "401": { "description": "Unauthorized" },
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to update project's just-in-time access configuration." }
+          "500": { "description": "Failed to update project's temporary access configuration." }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["project_admin_write"] }],
-        "summary": "[Beta] Update project's just-in-time access configuration.",
+        "summary": "[Beta] Update project's temporary access configuration.",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
         "x-endpoint-owners": ["security", "management-api"],
@@ -2803,6 +2824,9 @@
               }
             }
           },
+          "400": {
+            "description": "This feature requires the Pro, Team, or Enterprise organization plan."
+          },
           "401": { "description": "Unauthorized" },
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" },
@@ -2811,7 +2835,11 @@
         "security": [{ "bearer": [] }, { "fga_permissions": ["vanity_subdomain_read"] }],
         "summary": "[Beta] Gets current vanity subdomain config",
         "tags": ["Domains"],
-        "x-badges": [{ "name": "OAuth scope: domains:read", "position": "after" }],
+        "x-allowed-plans": ["Pro", "Team", "Enterprise"],
+        "x-badges": [
+          { "name": "OAuth scope: domains:read", "position": "after" },
+          { "name": "Only available on Pro, Team, Enterprise", "position": "before" }
+        ],
         "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:read"
       },
@@ -2880,6 +2908,9 @@
               }
             }
           },
+          "400": {
+            "description": "This feature requires the Pro, Team, or Enterprise organization plan."
+          },
           "401": { "description": "Unauthorized" },
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" },
@@ -2888,7 +2919,11 @@
         "security": [{ "bearer": [] }, { "fga_permissions": ["vanity_subdomain_write"] }],
         "summary": "[Beta] Checks vanity subdomain availability",
         "tags": ["Domains"],
-        "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
+        "x-allowed-plans": ["Pro", "Team", "Enterprise"],
+        "x-badges": [
+          { "name": "OAuth scope: domains:write", "position": "after" },
+          { "name": "Only available on Pro, Team, Enterprise", "position": "before" }
+        ],
         "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
       }
@@ -2926,6 +2961,9 @@
               }
             }
           },
+          "400": {
+            "description": "This feature requires the Pro, Team, or Enterprise organization plan."
+          },
           "401": { "description": "Unauthorized" },
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" },
@@ -2934,7 +2972,11 @@
         "security": [{ "bearer": [] }, { "fga_permissions": ["vanity_subdomain_write"] }],
         "summary": "[Beta] Activates a vanity subdomain for a project.",
         "tags": ["Domains"],
-        "x-badges": [{ "name": "OAuth scope: domains:write", "position": "after" }],
+        "x-allowed-plans": ["Pro", "Team", "Enterprise"],
+        "x-badges": [
+          { "name": "OAuth scope: domains:write", "position": "after" },
+          { "name": "Only available on Pro, Team, Enterprise", "position": "before" }
+        ],
         "x-endpoint-owners": ["infra", "management-api"],
         "x-oauth-scope": "domains:write"
       }
@@ -3182,6 +3224,9 @@
         "responses": {
           "201": { "description": "" },
           "401": { "description": "Unauthorized" },
+          "402": {
+            "description": "This feature requires the Pro, Team, or Enterprise organization plan."
+          },
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to set up read replica" }
@@ -3189,6 +3234,8 @@
         "security": [{ "bearer": [] }, { "fga_permissions": ["infra_read_replicas_write"] }],
         "summary": "[Beta] Set up a read replica",
         "tags": ["Database"],
+        "x-allowed-plans": ["Pro", "Team", "Enterprise"],
+        "x-badges": [{ "name": "Only available on Pro, Team, Enterprise", "position": "before" }],
         "x-endpoint-owners": ["management-api", "infra"]
       }
     },
@@ -6843,6 +6890,145 @@
         "x-oauth-scope": "database:read"
       }
     },
+    "/v1/projects/{ref}/database/backups/restore": {
+      "post": {
+        "operationId": "v1-restore-physical-backup",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/V1RestoreBackupBody" } }
+          }
+        },
+        "responses": {
+          "201": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["backups_write"] }],
+        "summary": "Restores a physical backup for a database",
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-endpoint-owners": ["infra"],
+        "x-internal": true,
+        "x-oauth-scope": "database:write"
+      }
+    },
+    "/v1/projects/{ref}/database/backups/schedule": {
+      "get": {
+        "operationId": "v1-get-backup-schedule",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V1BackupScheduleResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "402": { "description": "This feature requires the Enterprise organization plan." },
+          "403": { "description": "Forbidden action" },
+          "404": { "description": "Project or backup schedule not found" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to retrieve backup schedule" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["backups_read"] }],
+        "summary": "Gets the backup schedule for a project",
+        "tags": ["Database"],
+        "x-allowed-plans": ["Enterprise"],
+        "x-badges": [
+          { "name": "OAuth scope: database:read", "position": "after" },
+          { "name": "Only available on Enterprise", "position": "before" }
+        ],
+        "x-endpoint-owners": ["infra"],
+        "x-oauth-scope": "database:read"
+      },
+      "patch": {
+        "description": "Sets the time at which the daily backup runs. The change takes effect on the next backup window that includes the new time. If the new time has already passed for today, the first backup at the new time will occur the following day. It can only be updated 3 times per 24 hours.",
+        "operationId": "v1-update-backup-schedule",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/V1UpdateBackupScheduleBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V1BackupScheduleResponse" }
+              }
+            }
+          },
+          "400": { "description": "Invalid schedule_for format" },
+          "401": { "description": "Unauthorized" },
+          "402": { "description": "This feature requires the Enterprise organization plan." },
+          "403": { "description": "Forbidden action" },
+          "404": { "description": "Project or backup schedule not found" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to update backup schedule" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["backups_write"] }],
+        "summary": "Updates the backup schedule time for a project",
+        "tags": ["Database"],
+        "x-allowed-plans": ["Enterprise"],
+        "x-badges": [
+          { "name": "OAuth scope: database:write", "position": "after" },
+          { "name": "Only available on Enterprise", "position": "before" }
+        ],
+        "x-endpoint-owners": ["infra"],
+        "x-oauth-scope": "database:write"
+      }
+    },
     "/v1/projects/{ref}/database/backups/undo": {
       "post": {
         "operationId": "v1-undo",
@@ -6912,7 +7098,7 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }, { "fga_permissions": ["organization_projects_read"] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["organization_admin_read"] }],
         "summary": "Get entitlements for an organization",
         "tags": ["Organizations"],
         "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
@@ -7141,12 +7327,17 @@
               }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve projects" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["organization_projects_read"] }],
         "summary": "Gets all projects for the given organization",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api"]
+        "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
+        "x-endpoint-owners": ["management-api"],
+        "x-oauth-scope": "projects:read"
       }
     }
   },
@@ -7284,7 +7475,9 @@
               "MIGRATIONS_FAILED",
               "FUNCTIONS_DEPLOYED",
               "FUNCTIONS_FAILED"
-            ]
+            ],
+            "description": "This field is deprecated. List action runs to get branch status instead.",
+            "deprecated": true
           },
           "created_at": { "type": "string", "format": "date-time" },
           "updated_at": { "type": "string", "format": "date-time" },
@@ -7348,92 +7541,6 @@
         "type": "object",
         "properties": { "message": { "type": "string", "enum": ["Branch restoration initiated"] } },
         "required": ["message"]
-      },
-      "V1ListProjectsPaginatedResponse": {
-        "type": "object",
-        "properties": {
-          "projects": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id": { "type": "number" },
-                "cloud_provider": { "type": "string" },
-                "inserted_at": { "type": "string", "nullable": true },
-                "name": { "type": "string" },
-                "organization_id": { "type": "number" },
-                "organization_slug": { "type": "string" },
-                "ref": { "type": "string" },
-                "region": { "type": "string" },
-                "status": { "type": "string" },
-                "subscription_id": { "type": "string", "nullable": true },
-                "is_branch_enabled": { "type": "boolean" },
-                "is_physical_backups_enabled": { "type": "boolean", "nullable": true },
-                "preview_branch_refs": { "type": "array", "items": { "type": "string" } },
-                "disk_volume_size_gb": { "type": "number" },
-                "infra_compute_size": {
-                  "type": "string",
-                  "enum": [
-                    "pico",
-                    "nano",
-                    "micro",
-                    "small",
-                    "medium",
-                    "large",
-                    "xlarge",
-                    "2xlarge",
-                    "4xlarge",
-                    "8xlarge",
-                    "12xlarge",
-                    "16xlarge",
-                    "24xlarge",
-                    "24xlarge_optimized_memory",
-                    "24xlarge_optimized_cpu",
-                    "24xlarge_high_memory",
-                    "48xlarge",
-                    "48xlarge_optimized_memory",
-                    "48xlarge_optimized_cpu",
-                    "48xlarge_high_memory"
-                  ]
-                }
-              },
-              "required": [
-                "id",
-                "cloud_provider",
-                "inserted_at",
-                "name",
-                "organization_id",
-                "organization_slug",
-                "ref",
-                "region",
-                "status",
-                "subscription_id",
-                "is_branch_enabled",
-                "is_physical_backups_enabled",
-                "preview_branch_refs"
-              ]
-            }
-          },
-          "pagination": {
-            "type": "object",
-            "properties": {
-              "count": {
-                "type": "number",
-                "description": "Total number of projects. Use this to calculate the total number of pages."
-              },
-              "limit": {
-                "type": "number",
-                "description": "Maximum number of projects per page (actual number may be less)"
-              },
-              "offset": {
-                "type": "number",
-                "description": "Number of projects skipped in this response"
-              }
-            },
-            "required": ["count", "limit", "offset"]
-          }
-        },
-        "required": ["projects", "pagination"]
       },
       "V1ProjectWithDatabaseResponse": {
         "type": "object",
@@ -8373,50 +8480,37 @@
         "required": ["custom_hostname"],
         "example": { "custom_hostname": "docs.example.com" }
       },
-      "JitAccessResponse": {
-        "type": "object",
-        "properties": {
-          "user_id": { "type": "string", "format": "uuid" },
-          "user_roles": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "role": { "type": "string", "minLength": 1 },
-                "expires_at": { "type": "number" },
-                "allowed_networks": {
-                  "type": "object",
-                  "properties": {
-                    "allowed_cidrs": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": { "cidr": { "type": "string" } },
-                        "required": ["cidr"]
-                      }
-                    },
-                    "allowed_cidrs_v6": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": { "cidr": { "type": "string" } },
-                        "required": ["cidr"]
-                      }
-                    }
-                  }
-                }
-              },
-              "required": ["role"]
-            }
+      "JitStateResponse": {
+        "discriminator": { "propertyName": "state" },
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": { "type": "string", "enum": ["enabled", "disabled"] },
+              "appliedSuccessfully": { "type": "boolean" }
+            },
+            "required": ["state"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": { "type": "string", "enum": ["unavailable"] },
+              "unavailableReason": {
+                "type": "string",
+                "enum": [
+                  "manual_migration_required",
+                  "postgres_upgrade_required",
+                  "temporarily_unavailable"
+                ]
+              }
+            },
+            "required": ["state", "unavailableReason"]
           }
-        },
-        "required": ["user_id", "user_roles"]
+        ]
       },
       "JitAccessRequestRequest": {
         "type": "object",
-        "properties": {
-          "state": { "type": "string", "enum": ["enabled", "disabled", "unavailable"] }
-        },
+        "properties": { "state": { "type": "string", "enum": ["enabled", "disabled"] } },
         "required": ["state"],
         "example": { "state": "enabled" }
       },
@@ -8867,6 +8961,31 @@
                     "slot_name": { "type": "string" }
                   },
                   "required": ["type", "slot_name"]
+                },
+                {
+                  "type": "object",
+                  "properties": { "type": { "type": "string", "enum": ["x86_architecture"] } },
+                  "required": ["type"]
+                },
+                {
+                  "type": "object",
+                  "properties": { "type": { "type": "string", "enum": ["project_hibernating"] } },
+                  "required": ["type"]
+                }
+              ]
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "discriminator": { "propertyName": "type" },
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string", "enum": ["pg_graphql_introspection_change"] }
+                  },
+                  "required": ["type"]
                 }
               ]
             }
@@ -8883,7 +9002,8 @@
           "objects_to_be_dropped",
           "unsupported_extensions",
           "user_defined_objects_in_internal_schemas",
-          "validation_errors"
+          "validation_errors",
+          "warnings"
         ]
       },
       "DatabaseUpgradeStatusResponse": {
@@ -10743,6 +10863,46 @@
         "properties": { "message": { "type": "string" } },
         "required": ["message"]
       },
+      "JitAccessResponse": {
+        "type": "object",
+        "properties": {
+          "user_id": { "type": "string", "format": "uuid" },
+          "user_roles": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "role": { "type": "string", "minLength": 1 },
+                "expires_at": { "type": "number" },
+                "allowed_networks": {
+                  "type": "object",
+                  "properties": {
+                    "allowed_cidrs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": { "cidr": { "type": "string" } },
+                        "required": ["cidr"]
+                      }
+                    },
+                    "allowed_cidrs_v6": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": { "cidr": { "type": "string" } },
+                        "required": ["cidr"]
+                      }
+                    }
+                  }
+                },
+                "branches_only": { "type": "boolean" }
+              },
+              "required": ["role"]
+            }
+          }
+        },
+        "required": ["user_id", "user_roles"]
+      },
       "AuthorizeJitAccessBody": {
         "type": "object",
         "properties": {
@@ -10781,7 +10941,8 @@
                     }
                   }
                 }
-              }
+              },
+              "branches_only": { "type": "boolean" }
             },
             "required": ["role"]
           }
@@ -10824,7 +10985,8 @@
                             }
                           }
                         }
-                      }
+                      },
+                      "branches_only": { "type": "boolean" }
                     },
                     "required": ["role"]
                   }
@@ -10867,7 +11029,8 @@
                       }
                     }
                   }
-                }
+                },
+                "branches_only": { "type": "boolean" }
               },
               "required": ["role"]
             }
@@ -10880,7 +11043,8 @@
             {
               "role": "postgres",
               "expires_at": 1740787200,
-              "allowed_networks": { "allowed_cidrs": [{ "cidr": "203.0.113.0/24" }] }
+              "allowed_networks": { "allowed_cidrs": [{ "cidr": "203.0.113.0/24" }] },
+              "branches_only": false
             }
           ]
         }
@@ -12057,6 +12221,7 @@
             "items": {
               "type": "object",
               "properties": {
+                "id": { "type": "integer" },
                 "is_physical_backup": { "type": "boolean" },
                 "status": {
                   "type": "string",
@@ -12064,7 +12229,7 @@
                 },
                 "inserted_at": { "type": "string" }
               },
-              "required": ["is_physical_backup", "status", "inserted_at"]
+              "required": ["id", "is_physical_backup", "status", "inserted_at"]
             }
           },
           "physical_backup_data": {
@@ -12100,6 +12265,41 @@
         },
         "required": ["name", "status", "completed_on"]
       },
+      "V1RestoreBackupBody": {
+        "type": "object",
+        "properties": { "id": { "type": "integer" } },
+        "required": ["id"],
+        "example": { "id": 12345 }
+      },
+      "V1BackupScheduleResponse": {
+        "type": "object",
+        "properties": {
+          "schedule_for": {
+            "type": "string",
+            "description": "Time of day to schedule daily backups, in UTC. Format: HH:MM:SS.",
+            "example": "04:00:00"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of when the backup schedule was last updated.",
+            "example": "2026-05-04T14:40:44+00:00"
+          }
+        },
+        "required": ["schedule_for", "updated_at"]
+      },
+      "V1UpdateBackupScheduleBody": {
+        "type": "object",
+        "properties": {
+          "schedule_for": {
+            "type": "string",
+            "description": "Time of day to schedule daily backups, in UTC. Format: HH:MM:SS.",
+            "example": "04:00:00"
+          }
+        },
+        "required": ["schedule_for"],
+        "example": { "schedule_for": "04:00:00" }
+      },
       "V1UndoBody": {
         "type": "object",
         "properties": { "name": { "type": "string", "maxLength": 20 } },
@@ -12134,6 +12334,7 @@
                         "security.audit_logs_days",
                         "security.questionnaire",
                         "security.soc2_report",
+                        "security.iso27001_certificate",
                         "security.private_link",
                         "security.enforce_mfa",
                         "log.retention_days",
@@ -12142,6 +12343,7 @@
                         "ipv4",
                         "pitr.available_variants",
                         "log_drains",
+                        "audit_log_drains",
                         "branching_limit",
                         "branching_persistent",
                         "auth.mfa_phone",
@@ -12156,8 +12358,10 @@
                         "auth.advanced_auth_settings",
                         "auth.performance_settings",
                         "auth.password_hibp",
+                        "auth.custom_oauth.max_providers",
                         "backup.retention_days",
                         "backup.restore_to_new_project",
+                        "backup.schedule",
                         "function.max_count",
                         "function.size_limit_mb",
                         "realtime.max_concurrent_users",

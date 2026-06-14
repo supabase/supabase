@@ -146,7 +146,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
                       <div
                         className={cn(
                           'flex items-center justify-center gap-x-1',
-                          !!log.status && 'border px-1 py-0.5 rounded',
+                          !!log.status && 'border px-1 py-0.5 rounded-sm',
                           is400
                             ? 'text-warning border-warning bg-warning-300'
                             : is500

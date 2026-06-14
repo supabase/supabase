@@ -12,8 +12,8 @@ import {
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import type { LogData, QueryType } from './Logs.types'
-import { apiKey, role as extractRole, jwtAPIKey } from './Logs.utils'
+import type { LogData, PreviewLogData, QueryType } from './Logs.types'
+import { apiKey, role as extractRole, jwtAPIKey, parseMultigresEventMessage } from './Logs.utils'
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
@@ -70,6 +70,16 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
 
         return <DefaultPreviewSelectionRenderer log={apiLog} />
 
+      case 'multigres': {
+        const parsedMultigresMessage = parseMultigresEventMessage(log.event_message)
+        // Spread the log last so its canonical fields (id, timestamp, event_message)
+        // always win over any same-named keys inside the parsed event_message.
+        const multigresLog = (
+          parsedMultigresMessage ? { ...parsedMultigresMessage, ...log } : log
+        ) as PreviewLogData
+        return <DefaultPreviewSelectionRenderer log={multigresLog} />
+      }
+
       case 'database':
         const hint = log?.metadata?.[0]?.parsed?.[0]?.hint
         const detail = log?.metadata?.[0]?.parsed?.[0]?.detail
@@ -87,8 +97,8 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
   }
 
   return (
-    <div className="relative flex h-full flex-grow flex-col overflow-y-scroll bg-surface-100 border-t">
-      <div className="relative flex-grow flex flex-col h-full">
+    <div className="relative flex h-full grow flex-col overflow-y-scroll bg-surface-100 border-t">
+      <div className="relative grow flex flex-col h-full">
         <Tabs_Shadcn_ defaultValue="details" className="flex flex-col h-full">
           <TabsList_Shadcn_ className="px-2 pt-2 relative">
             <TabsTrigger_Shadcn_ className="px-3" value="details">
@@ -168,7 +178,7 @@ function LogDetailEmptyState({
           'flex w-full max-w-sm flex-col items-center justify-center gap-6 text-center transition-all delay-300 duration-500'
         )}
       >
-        <div className="relative flex h-4 w-32 items-center rounded border border-control px-2">
+        <div className="relative flex h-4 w-32 items-center rounded-sm border border-control px-2">
           <div className="h-0.5 w-2/3 rounded-full bg-surface-300"></div>
           <div className="absolute right-1 -bottom-4">
             <MousePointerClick size="24" strokeWidth={1} />

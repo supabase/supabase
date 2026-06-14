@@ -9,9 +9,9 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Switch,
   Tooltip,
   TooltipContent,
@@ -29,10 +29,10 @@ import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
 import { useOrganizationMfaToggleMutation } from '@/data/organizations/organization-mfa-mutation'
 import { useOrganizationMfaQuery } from '@/data/organizations/organization-mfa-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useProfile } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
 
 const schema = z.object({
   enforceMfa: z.boolean(),
@@ -51,7 +51,7 @@ export const SecuritySettings = () => {
     PermissionAction.UPDATE,
     'organizations'
   )
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const { hasAccess: hasAccessToEnforceMfa, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('security.enforce_mfa')
@@ -71,15 +71,7 @@ export const SecuritySettings = () => {
     },
     onSuccess: (data) => {
       toast.success('Successfully updated organization MFA settings')
-      sendEvent({
-        action: 'organization_mfa_enforcement_updated',
-        properties: {
-          mfaEnforced: data.enforced,
-        },
-        groups: {
-          organization: slug ?? 'Unknown',
-        },
-      })
+      track('organization_mfa_enforcement_updated', { mfaEnforced: data.enforced })
     },
   })
 
@@ -131,11 +123,11 @@ export const SecuritySettings = () => {
             )}
 
             {isSuccessMfa && hasAccessToEnforceMfa && (
-              <Form_Shadcn_ {...form}>
+              <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                   <Card>
                     <CardContent>
-                      <FormField_Shadcn_
+                      <FormField
                         control={form.control}
                         name="enforceMfa"
                         render={({ field }) => (
@@ -144,7 +136,7 @@ export const SecuritySettings = () => {
                             label="Require MFA to access organization"
                             description="Team members must have MFA enabled and a valid MFA session to access the organization and any projects."
                           >
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <Switch
@@ -171,7 +163,7 @@ export const SecuritySettings = () => {
                                   </TooltipContent>
                                 )}
                               </Tooltip>
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </FormItemLayout>
                         )}
                       />
@@ -205,7 +197,7 @@ export const SecuritySettings = () => {
                     </CardFooter>
                   </Card>
                 </form>
-              </Form_Shadcn_>
+              </Form>
             )}
           </>
         )}

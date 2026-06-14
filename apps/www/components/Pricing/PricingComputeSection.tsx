@@ -1,3 +1,5 @@
+'use client'
+
 import { ChevronDownIcon } from '@heroicons/react/outline'
 import Link from 'next/link'
 import React, { useEffect, useRef, useState } from 'react'
@@ -87,7 +89,7 @@ const PricingComputeSection = () => {
                   <p className="text-foreground-light font-medium">
                     Everything in the Pro Plan, plus:
                   </p>
-                  <p className="text-foreground-light">SOC2</p>
+                  <p className="text-foreground-light">SOC2 & ISO 27001</p>
                   <p className="text-foreground-light">Project-scoped and read-only access</p>
                   <p className="text-foreground-light">HIPAA available as paid add-on</p>
                   <p className="text-foreground-light">SSO for Supabase Dashboard</p>
@@ -114,14 +116,14 @@ const PricingComputeSection = () => {
       </div>
       <hr className="border-0 border-t" />
       <div className="flex flex-col">
-        <div className="flex gap-2 p-6 justify-between items-center mt-2">
+        <div className="flex flex-col items-start md:flex-row gap-2 p-6 justify-between md:items-center mt-2">
           <div className="grid gap-2">
             <p>
-              <span className="border bg-alternative px-3 py-0.5 text-foreground text-sm rounded-full">
+              <span className="border bg-alternative px-3 py-0.5 text-foreground text-sm rounded-full text-nowrap">
                 Starts from <span translate="no">$10</span>/month
               </span>
             </p>
-            <h3 className="text-foreground text-2xl">
+            <h3 className="text-foreground text-2xl ml-0.5 md:ml-0 mb-2 md:mb-0">
               Scale compute up to
               <br className="hidden sm:block" /> 64 cores and 256 GB RAM
             </h3>
@@ -134,12 +136,12 @@ const PricingComputeSection = () => {
           </Button>
         </div>
         <div
-          className="relative w-full overflow-hidden transition-all !ease-[cubic-bezier(.76,0,.23,1)] duration-300"
+          className="relative w-full overflow-hidden transition-all ease-[cubic-bezier(.76,0,.23,1)]! duration-300"
           style={{ height: showTable ? `${height}px` : '200px' }}
         >
           <div
             className={cn(
-              'absolute inset-0 top-auto w-full h-40 bg-gradient-to-t from-background-surface-100 z-20 to-transparent transition-opacity pointer-events-none not-sr-only',
+              'absolute inset-0 top-auto w-full h-40 bg-linear-to-t from-background-surface-100 z-20 to-transparent transition-opacity pointer-events-none not-sr-only',
               showTable ? 'opacity-0 delay-200' : 'opacity-100'
             )}
           />
