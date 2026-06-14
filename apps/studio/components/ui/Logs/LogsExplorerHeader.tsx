@@ -15,6 +15,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
+  ScrollArea,
   SidePanel,
   Tooltip,
   TooltipContent,
@@ -101,7 +102,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
           </SidePanel.Content>
           <SidePanel.Separator />
           <div className="px-4 pb-4 flex flex-col gap-4">
-            <Popover open={open} onOpenChange={setOpen}>
+            <Popover open={open} onOpenChange={setOpen} modal={false}>
               <PopoverTrigger asChild>
                 <Button
                   type="default"
@@ -114,30 +115,32 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
                   {selectedSchema?.name ?? 'Select source...'}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="p-0" sameWidthAsTrigger>
+              <PopoverContent className="p-0 pointer-events-auto" sameWidthAsTrigger>
                 <Command>
                   <CommandInput placeholder="Search source..." />
-                  <CommandList>
+                  <CommandList onWheel={(event) => event.stopPropagation()}>
                     <CommandEmpty>No source found.</CommandEmpty>
                     <CommandGroup>
-                      {logConstants.schemas.map((schema) => (
-                        <CommandItem
-                          key={schema.reference}
-                          value={schema.reference}
-                          onSelect={() => {
-                            setSelectedSchema(schema)
-                            setOpen(false)
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              'mr-2 h-4 w-4',
-                              selectedSchema === schema ? 'opacity-100' : 'opacity-0'
-                            )}
-                          />
-                          {schema.name}
-                        </CommandItem>
-                      ))}
+                      <ScrollArea className={logConstants.schemas.length > 7 ? 'h-[210px]' : ''}>
+                        {logConstants.schemas.map((schema) => (
+                          <CommandItem
+                            key={schema.reference}
+                            value={schema.reference}
+                            onSelect={() => {
+                              setSelectedSchema(schema)
+                              setOpen(false)
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                'mr-2 h-4 w-4',
+                                selectedSchema === schema ? 'opacity-100' : 'opacity-0'
+                              )}
+                            />
+                            {schema.name}
+                          </CommandItem>
+                        ))}
+                      </ScrollArea>
                     </CommandGroup>
                   </CommandList>
                 </Command>
