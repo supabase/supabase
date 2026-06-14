@@ -101,8 +101,6 @@ export default {
       )
     }
 
-    return Response.json({}, {
-      status: 200,
-    })
+    return Response.json({}, { status: 200 })
   }),
 }
