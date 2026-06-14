@@ -1,0 +1,151 @@
+---
+id: 'auth-line'
+title: 'Login with LINE'
+description: 'Add LINE OAuth to your Supabase project'
+---
+
+To enable LINE Auth for your project, you need to set up a LINE Login channel and add the channel credentials to your Supabase Dashboard.
+
+## Overview
+
+Setting up LINE Login consists of these broad steps:
+
+- Create a provider and a LINE Login channel in the [LINE Developers Console](https://developers.line.biz/console/).
+- Obtain a `Channel ID` - this serves as the `client_id`.
+- Obtain a `Channel secret` - this serves as the `client_secret`.
+- Add your callback URL to the channel.
+- (Optional) Apply for the email address permission.
+- Add your `Channel ID` and `Channel secret` to your [Supabase Project](/dashboard).
+- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
+
+## Access your LINE Developers account
+
+- Go to the [LINE Developers Console](https://developers.line.biz/console/).
+- Log in with your LINE account or business account.
+
+## Create a provider and channel
+
+- In the console, create a new **Provider** (or select an existing one).
+- Under the provider, click **Create a new channel** and select **LINE Login**.
+- Fill out the required channel information:
+  - Channel name.
+  - Channel description.
+  - App type (select **Web app** to use LINE Login on a website).
+  - Email address.
+- Agree to the terms and click **Create**.
+
+## Obtain your Channel ID and Channel secret
+
+- Open your LINE Login channel.
+- Go to the **Basic settings** tab.
+- Note the **Channel ID**. This serves as your `client_id`.
+- Note the **Channel secret**. This serves as your `client_secret`.
+
+## Find your callback URL
+
+<$Partial path="social_provider_setup.mdx" variables={{ "provider": "LINE" }} />
+
+- In your LINE Login channel, go to the **LINE Login** tab.
+- Under **Callback URL**, click **Edit** and enter your callback URL.
+- Click **Update**.
+
+## Enable the email address permission (optional)
+
+LINE only returns the user's email address when the **Email address permission** is granted for your channel.
+
+- In your LINE Login channel, go to the **Basic settings** tab.
+- Scroll to **OpenID Connect** > **Email address permission** and click **Apply**.
+- Submit the required screenshot of your consent screen and wait for approval.
+
+If you don't need an email address (or it isn't available for your channel), enable **Allow users without an email** in the Supabase LINE provider settings.
+
+## Add your OAuth credentials to Supabase
+
+<$Partial path="social_provider_settings_supabase.mdx" variables={{ "provider": "LINE" }} />
+
+If you did not enable the email address permission in LINE, enable **Allow users without an email** in the LINE provider settings.
+
+## Add login code to your client app
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+<$Partial path="create_client_snippet.mdx" />
+
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/auth-signinwithoauth) with `line` as the `provider`:
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
+
+// ---cut---
+async function signInWithLine() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'line',
+  })
+}
+```
+
+</TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/dart/auth-signinwithoauth) with `line` as the `provider`:
+
+```dart
+Future<void> signInWithLine() async {
+  await supabase.auth.signInWithOAuth(
+    OAuthProvider.line,
+    redirectTo: kIsWeb ? null : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
+    authScreenLaunchMode:
+        kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
+  );
+}
+```
+
+</TabPanel>
+</Tabs>
+
+<$Partial path="oauth_pkce_flow.mdx" />
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```js
+async function signOut() {
+  const { error } = await supabase.auth.signOut()
+}
+```
+
+</TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```dart
+Future<void> signOut() async {
+  await supabase.auth.signOut();
+}
+```
+
+</TabPanel>
+</Tabs>
+
+## Resources
+
+- [LINE Developers Console](https://developers.line.biz/console/)
+- [LINE Login documentation](https://developers.line.biz/en/docs/line-login/)

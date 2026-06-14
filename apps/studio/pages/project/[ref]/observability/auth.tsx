@@ -118,6 +118,7 @@ const AuthUsage = () => {
     { label: 'SSO/SAML', value: 'sso/saml' },
     { label: 'Magic link', value: 'magiclink' },
     { label: 'Keycloak', value: 'keycloak' },
+    { label: 'LINE', value: 'line' },
     { label: 'Facebook', value: 'facebook' },
     { label: 'Twitch', value: 'twitch' },
     { label: 'LinkedIn OIDC', value: 'linkedin_oidc' },
