@@ -173,7 +173,10 @@ export const EdgeFunctionsDiffPanel = ({
     return <Skeleton className="h-64" />
   }
 
-  const noChanges = diffResults.addedSlugs.length === 0 && diffResults.modifiedSlugs.length === 0
+  const noChanges =
+    diffResults.addedSlugs.length === 0 &&
+    diffResults.modifiedSlugs.length === 0 &&
+    diffResults.removedSlugs.length === 0
 
   if (noChanges) {
     return (
@@ -205,23 +208,22 @@ export const EdgeFunctionsDiffPanel = ({
           </div>
         </div>
       )}
-      {/* TODO: Removing functions is not supported yet */}
-      {/* {diffResults.removedSlugs.length > 0 && (
+      {diffResults.removedSlugs.length > 0 && (
         <div>
           <div className="space-y-4">
             {diffResults.removedSlugs.map((slug) => (
               <FunctionDiff
                 key={slug}
                 functionSlug={slug}
-                currentBody={EMPTY_ARR}
+                currentBody={EMPTY_FUNCTION_BODY}
                 mainBody={diffResults.removedBodiesMap[slug]!}
-                currentBranchRef={mainBranchRef}
+                currentBranchRef={currentBranchRef}
                 fileInfos={diffResults.functionFileInfo[slug] || EMPTY_ARR}
               />
             ))}
           </div>
         </div>
-      )} */}
+      )}
 
       {diffResults.modifiedSlugs.length > 0 && (
         <div className="space-y-4">
