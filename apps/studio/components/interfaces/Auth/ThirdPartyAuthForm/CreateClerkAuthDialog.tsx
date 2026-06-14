@@ -31,7 +31,7 @@ interface CreateClerkAuthIntegrationProps {
   onDelete: () => void
 }
 
-const FORM_ID = 'create-firebase-auth-integration-form'
+const FORM_ID = 'create-clerk-auth-integration-form'
 
 const FormSchema = z
   .object({
