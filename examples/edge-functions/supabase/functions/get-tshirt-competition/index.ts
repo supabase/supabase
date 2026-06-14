@@ -21,9 +21,9 @@ function turnEmailToCount(email: string): string {
   )}`
 }
 
-// Deploy with verify_jwt = false.
+// Public challenge endpoint, so deploy with verify_jwt = false.
 export default {
-  fetch: withSupabase({ auth: 'secret' }, async (req, ctx) => {
+  fetch: withSupabase<any>({ auth: 'none' }, async (req, ctx) => {
     try {
       const url = new URL(req.url)
       const email = url.searchParams.get('email')

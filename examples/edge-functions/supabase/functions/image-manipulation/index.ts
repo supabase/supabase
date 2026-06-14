@@ -1,14 +1,10 @@
 // This is an example showing how to use Magick WASM to do image manipulations in Edge Functions.
 //
-import {
-  ImageMagick,
-  initializeImageMagick,
-  MagickFormat,
-} from 'npm:@imagemagick/magick-wasm@0.0.30'
+import { ImageMagick, initializeImageMagick, MagickFormat } from 'npm:@imagemagick/magick-wasm@^0'
 import { withSupabase } from 'npm:@supabase/server@^1'
 
 const wasmBytes = await Deno.readFile(
-  new URL('magick.wasm', import.meta.resolve('npm:@imagemagick/magick-wasm@0.0.30'))
+  new URL('magick.wasm', import.meta.resolve('npm:@imagemagick/magick-wasm@^0'))
 )
 await initializeImageMagick(wasmBytes)
 
@@ -18,7 +14,7 @@ export default {
     const formData = await req.formData()
     const file = formData.get('file')
     if (!(file instanceof Blob)) {
-      return new Response('file is required', { status: 400 })
+      return Response.json({ error: 'file is required' }, { status: 400 })
     }
     const content = await file.bytes()
 
@@ -31,6 +27,8 @@ export default {
       return img.write((data) => data)
     })
 
-    return new Response(result, { headers: { 'Content-Type': 'image/png' } })
+    return new Response(Uint8Array.from(result), {
+      headers: { 'Content-Type': 'image/png' },
+    })
   }),
 }

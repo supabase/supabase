@@ -93,6 +93,7 @@ verify_jwt = false
 [functions.upstash-redis-counter]
 verify_jwt = false
 [functions.upstash-redis-ratelimit]
+verify_jwt = true
 
 [functions.kysely-postgres]
 verify_jwt = false

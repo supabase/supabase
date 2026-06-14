@@ -8,7 +8,7 @@ export default {
     try {
       const { filename } = await req.json()
       if (!filename) {
-        return new Response('Missing filename', { status: 400 })
+        return Response.json({ error: 'Missing filename' }, { status: 400 })
       }
 
       const { data, error } = await ctx.supabaseAdmin.storage
@@ -16,12 +16,12 @@ export default {
         .createSignedUploadUrl(filename)
 
       if (error) {
-        return new Response(error.message, { status: 500 })
+        return Response.json({ error: error.message }, { status: 500 })
       }
 
       return Response.json({ token: data.token })
     } catch (error) {
-      return new Response((error as Error).message, { status: 500 })
+      return Response.json({ error: (error as Error).message }, { status: 500 })
     }
   }),
 }

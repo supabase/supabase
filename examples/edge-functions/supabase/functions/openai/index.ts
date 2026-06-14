@@ -1,6 +1,3 @@
-import 'https://deno.land/x/xhr@0.3.0/mod.ts'
-
-import { CreateCompletionRequest } from 'https://esm.sh/openai@3.1.0'
 import { withSupabase } from 'npm:@supabase/server@^1'
 
 // Public endpoint, so deploy with verify_jwt = false.
@@ -8,7 +5,7 @@ export default {
   fetch: withSupabase({ auth: 'none' }, async (req) => {
     const { query } = await req.json()
 
-    const completionConfig: CreateCompletionRequest = {
+    const completionConfig = {
       model: 'text-davinci-003',
       prompt: query,
       max_tokens: 256,

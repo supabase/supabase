@@ -1,5 +1,5 @@
-import { Ratelimit } from 'https://cdn.skypack.dev/@upstash/ratelimit@0.4.4'
-import { Redis } from 'https://deno.land/x/upstash_redis@v1.19.3/mod.ts'
+import { Ratelimit } from 'npm:@upstash/ratelimit@^2'
+import { Redis } from 'npm:@upstash/redis@^1'
 import { withSupabase } from 'npm:@supabase/server@^1'
 
 console.log(`Function "upstash-redis-counter" up and running!`)
@@ -21,7 +21,7 @@ export default {
 
       // Use a constant string to limit all requests with a single ratelimit
       // Or use a userID, apiKey or ip address for individual limits.
-      const identifier = ctx.userClaims?.sub
+      const identifier = ctx.userClaims?.id
       const { success } = await ratelimit.limit(identifier)
 
       if (!success) {

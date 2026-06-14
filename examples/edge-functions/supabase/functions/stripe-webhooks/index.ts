@@ -2,15 +2,10 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 
-// Import via bare specifier thanks to the import_map.json file.
-import Stripe from 'https://esm.sh/stripe@14?target=denonext'
+import Stripe from 'npm:stripe@^22'
 import { withSupabase } from 'npm:@supabase/server@^1'
 
-const stripe = new Stripe(Deno.env.get('STRIPE_API_KEY') as string, {
-  // This is needed to use the Fetch API rather than relying on the Node http
-  // package.
-  apiVersion: '2024-11-20',
-})
+const stripe = new Stripe(Deno.env.get('STRIPE_API_KEY') as string)
 // This is needed in order to use the Web Crypto API in Deno.
 const cryptoProvider = Stripe.createSubtleCryptoProvider()
 

@@ -2,7 +2,7 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 
-import { Redis } from 'https://deno.land/x/upstash_redis@v1.19.3/mod.ts'
+import { Redis } from 'npm:@upstash/redis@^1'
 import { withSupabase } from 'npm:@supabase/server@^1'
 
 console.log(`Function "upstash-redis-counter" up and running!`)

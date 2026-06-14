@@ -1,4 +1,4 @@
-import { Bot, webhookCallback } from 'https://deno.land/x/grammy@v1.8.3/mod.ts'
+import { Bot, webhookCallback } from 'npm:grammy@^1'
 import { withSupabase } from 'npm:@supabase/server@^1'
 
 // Follow this setup guide to integrate the Deno language server with your editor:
@@ -27,6 +27,7 @@ export default {
       return await handleUpdate(req)
     } catch (err) {
       console.error(err)
+      return new Response('Internal Server Error', { status: 500 })
     }
   }),
 }
