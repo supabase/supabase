@@ -1,8 +1,8 @@
-import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
-import { renderAsync } from 'npm:@react-email/components@0.0.22'
+import { Webhook } from 'npm:standardwebhooks@^1'
+import { render } from 'npm:@react-email/render@^2'
 import { withSupabase } from 'npm:@supabase/server@^1'
-import React from 'npm:react@18.3.1'
-import { Resend } from 'npm:resend@4.0.0'
+import React from 'npm:react@^19'
+import { Resend } from 'npm:resend@^6'
 
 import { MagicLinkEmail } from './_templates/magic-link.tsx'
 import { SignUpEmail } from './_templates/sign-up.tsx'
@@ -15,7 +15,7 @@ const hookSecret = (Deno.env.get('SEND_EMAIL_HOOK_SECRET') as string).replace('v
 export default {
   fetch: withSupabase({ auth: 'none' }, async (req, _ctx) => {
     if (req.method !== 'POST') {
-      return new Response('not allowed', { status: 400 })
+      return Response.json({ error: 'not allowed' }, { status: 400 })
     }
 
     const payload = await req.text()
@@ -47,7 +47,7 @@ export default {
       let html: string
 
       if (email_action_type === 'signup') {
-        html = await renderAsync(
+        html = await render(
           React.createElement(SignUpEmail, {
             username: user['user_metadata'].username,
             lang: user['user_metadata'].lang,
@@ -59,7 +59,7 @@ export default {
           })
         )
       } else if (email_action_type == 'login') {
-        html = await renderAsync(
+        html = await render(
           React.createElement(MagicLinkEmail, {
             supabase_url: Deno.env.get('SUPABASE_URL') ?? '',
             token,
@@ -84,25 +84,25 @@ export default {
       }
     } catch (error) {
       console.log(error)
-      return new Response(
-        JSON.stringify({
+      const httpCode =
+        typeof error === 'object' && error !== null && 'code' in error ? error.code : undefined
+      const message = error instanceof Error ? error.message : 'Unauthorized'
+
+      return Response.json(
+        {
           error: {
-            http_code: error.code,
-            message: error.message,
+            http_code: httpCode,
+            message,
           },
-        }),
+        },
         {
           status: 401,
-          headers: { 'Content-Type': 'application/json' },
         }
       )
     }
 
-    const responseHeaders = new Headers()
-    responseHeaders.set('Content-Type', 'application/json')
-    return new Response(JSON.stringify({}), {
+    return Response.json({}, {
       status: 200,
-      headers: responseHeaders,
     })
   }),
 }

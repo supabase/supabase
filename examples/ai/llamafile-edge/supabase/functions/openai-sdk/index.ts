@@ -3,7 +3,7 @@
 // This enables autocomplete, go to definition, etc.
 
 // Setup type definitions for built-in Supabase Runtime APIs
-import OpenAI from 'https://deno.land/x/openai@v4.53.2/mod.ts'
+import OpenAI from 'npm:openai@^6'
 import { withSupabase } from 'npm:@supabase/server@^1'
 
 console.log('Hello from openai-sdk compatible!')
