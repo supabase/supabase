@@ -94,6 +94,11 @@ export const CodeEditor = ({
       lineNumbersMinChars: hideLineNumbers ? 0 : 4,
       folding: hideLineNumbers ? false : undefined,
       scrollBeyondLastLine: false,
+      // --- ANTI-BUG SETTINGS ---
+      acceptSuggestionOnCommitCharacter: false, // Stops auto-replacing when typing spaces/punctuation
+      acceptSuggestionOnEnter: 'smart', // Only accepts suggestions deliberately
+      wordBasedSuggestions: 'off', // Prevents editor from randomly suggesting words from your own strings
+      // --- END SETTINGS ---
     },
     options
   )
