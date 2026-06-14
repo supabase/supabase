@@ -26,6 +26,7 @@ import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
 import { AuthAlert } from './AuthAlert'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
+import { decodeSmsTemplateNewlines, encodeSmsTemplateNewlines } from './ProviderForm.utils'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -93,6 +94,13 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
           return
         }
 
+        // Show stored newline characters as `\n` escape sequences so the value the
+        // user sees matches what they typed before saving (see ProviderForm.utils).
+        if (key === 'SMS_TEMPLATE') {
+          values[key] = decodeSmsTemplateNewlines(config.SMS_TEMPLATE ?? '')
+          return
+        }
+
         const isDoubleNegative = doubleNegativeKeys.includes(key)
         if (provider.title === 'SAML 2.0') {
           const configValue = (config as any)[key]
@@ -135,8 +143,9 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
       payload.PASSWORD_REQUIRED_CHARACTERS = ''
     }
 
+    // Encode user-typed `\n` escape sequences into real newlines for the API.
     if (payload.SMS_TEMPLATE) {
-      payload.SMS_TEMPLATE = payload.SMS_TEMPLATE.replace(/\\n/g, '\n')
+      payload.SMS_TEMPLATE = encodeSmsTemplateNewlines(payload.SMS_TEMPLATE)
     }
 
     updateAuthConfig(
