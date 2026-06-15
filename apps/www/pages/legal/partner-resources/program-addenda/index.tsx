@@ -52,7 +52,7 @@ export default function ProgramAddendaPage({ addenda }: { addenda: AddendumSumma
                   href={v.href}
                   className="text-foreground-light transition-colors hover:text-foreground hover:underline"
                 >
-                  {item.title} — {v.id}
+                  {item.title}
                 </Link>
                 {v.isLatest ? (
                   <Badge variant="success">Effective {v.effectiveDate}</Badge>
