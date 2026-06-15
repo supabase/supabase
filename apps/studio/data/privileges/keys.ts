@@ -1,6 +1,6 @@
 export const privilegeKeys = {
-  tablePrivilegesList: (projectRef: string | undefined) =>
-    ['projects', projectRef, 'database', 'table-privileges'] as const,
+  tablePrivilegesList: (projectRef: string | undefined, includedSchemas?: string[]) =>
+    ['projects', projectRef, 'database', 'table-privileges', includedSchemas].filter(Boolean),
   columnPrivilegesList: (projectRef: string | undefined) =>
     ['projects', projectRef, 'database', 'column-privileges'] as const,
   exposedTablesInfinite: (projectRef: string | undefined, search?: string) =>
