@@ -10,6 +10,7 @@ import { createSqlSnippetSkeletonV2 } from './SQLEditor.utils'
 import { generateUuid } from '@/lib/api/snippets.browser'
 import type { SnippetWithContent } from '@/state/sql-editor-v2'
 import { createTabId } from '@/state/tabs'
+import type { SqlSnippets } from '@/types'
 
 type SqlEditorV2Actions = {
   addSnippet: (args: { projectRef: string; snippet: SnippetWithContent }) => void
@@ -24,6 +25,7 @@ type TabsActions = {
       sqlId?: string
       name?: string
       isDraft?: boolean
+      sqlSource?: SqlSnippets.Source
     }
     isPreview?: boolean
   }) => void
@@ -37,6 +39,8 @@ export type CreateDraftSqlTabParams = {
   tabs: TabsActions
   router?: NextRouter
   initialSql?: string
+  source?: SqlSnippets.Source
+  logDateRange?: SqlSnippets.LogDateRange
   /** When true, only registers state without changing the route */
   skipNavigation?: boolean
 }
@@ -49,6 +53,8 @@ export function createDraftSqlTab({
   tabs,
   router,
   initialSql = '',
+  source = 'project',
+  logDateRange,
   skipNavigation = false,
 }: CreateDraftSqlTabParams): string {
   const name = generateSnippetTitle()
@@ -60,6 +66,8 @@ export function createDraftSqlTab({
     sql: initialSql,
     owner_id: ownerId,
     project_id: projectId,
+    source,
+    logDateRange,
   })
 
   snippet.isDraftTab = true
@@ -69,6 +77,8 @@ export function createDraftSqlTab({
   persistDraftSqlTab(projectRef, draftId, {
     sql: initialSql,
     name,
+    source,
+    logDateRange,
   })
 
   tabs.addTab({
@@ -79,6 +89,7 @@ export function createDraftSqlTab({
       sqlId: draftId,
       name,
       isDraft: true,
+      sqlSource: source,
     },
     // Drafts are permanent tabs (not preview), so opening another draft never evicts an existing
     // empty one — each "new query" gets its own tab.
@@ -100,6 +111,8 @@ export function restoreDraftSqlTab({
   snapV2,
   name = generateSnippetTitle(),
   initialSql = '',
+  source,
+  logDateRange,
 }: Omit<CreateDraftSqlTabParams, 'tabs' | 'router' | 'skipNavigation'> & {
   draftId: string
   name?: string
@@ -108,6 +121,8 @@ export function restoreDraftSqlTab({
   const persisted = readPersistedDraftSqlTab(projectRef, draftId)
   const resolvedName = persisted?.name ?? name
   const resolvedSql = persisted?.sql ?? initialSql
+  const resolvedSource = persisted?.source ?? source ?? 'project'
+  const resolvedLogDateRange = persisted?.logDateRange ?? logDateRange
 
   const snippet = createSqlSnippetSkeletonV2({
     idOverride: draftId,
@@ -115,6 +130,8 @@ export function restoreDraftSqlTab({
     sql: resolvedSql,
     owner_id: ownerId,
     project_id: projectId,
+    source: resolvedSource,
+    logDateRange: resolvedLogDateRange,
   })
 
   snippet.isDraftTab = true
@@ -141,7 +158,15 @@ export function restoreOpenDraftSqlTabs({
   openTabs: readonly string[]
   tabsMap: Record<
     string,
-    { type: string; metadata?: { sqlId?: string; isDraft?: boolean; name?: string } }
+    {
+      type: string
+      metadata?: {
+        sqlId?: string
+        isDraft?: boolean
+        name?: string
+        sqlSource?: SqlSnippets.Source
+      }
+    }
   >
   existingSnippetIds: Set<string>
 }) {
@@ -166,6 +191,7 @@ export function restoreOpenDraftSqlTabs({
       ownerId,
       snapV2,
       name: tab.metadata.name,
+      source: tab.metadata.sqlSource,
     })
   }
 

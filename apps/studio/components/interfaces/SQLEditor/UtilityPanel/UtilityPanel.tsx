@@ -1,9 +1,8 @@
 import { useParams } from 'common'
 import { toast } from 'sonner'
-import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import { ToggleGroup, ToggleGroupItem } from 'ui'
 
 import { ChartConfig } from './ChartConfig'
-import { UtilityActions } from './UtilityActions'
 import { UtilityTabExplain } from './UtilityTabExplain'
 import { UtilityTabResults } from './UtilityTabResults'
 import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
@@ -11,6 +10,9 @@ import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation
 import { Snippet } from '@/data/content/sql-folders-query'
 import { useTrack } from '@/lib/telemetry/track'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import type { SqlSnippets } from '@/types'
+
+export type SqlOutputView = 'table' | 'chart' | 'explain'
 
 export type UtilityPanelProps = {
   id: string
@@ -18,15 +20,12 @@ export type UtilityPanelProps = {
   isExplainExecuting?: boolean
   isDebugging?: boolean
   isDisabled?: boolean
-  hasSelection: boolean
-  prettifyQuery: () => void
-  executeQuery: () => void
   executeExplainQuery: () => void
-  onSave: () => void
   onDebug: () => void
   buildDebugPrompt: () => string
-  activeTab?: string
-  onActiveTabChange?: (tab: string) => void
+  source: SqlSnippets.Source
+  activeView?: SqlOutputView
+  onActiveViewChange?: (view: SqlOutputView) => void
 }
 
 const DEFAULT_CHART_CONFIG: ChartConfig = {
@@ -44,15 +43,12 @@ export const UtilityPanel = ({
   isExplainExecuting,
   isDebugging,
   isDisabled,
-  hasSelection,
-  prettifyQuery,
-  executeQuery,
   executeExplainQuery,
-  onSave,
   onDebug,
   buildDebugPrompt,
-  activeTab = 'results',
-  onActiveTabChange,
+  source,
+  activeView = 'table',
+  onActiveViewChange,
 }: UtilityPanelProps) => {
   const { ref } = useParams()
   const track = useTrack()
@@ -61,12 +57,15 @@ export const UtilityPanel = ({
   const snippet = snapV2.snippets[id]?.snippet
   const result = snapV2.results[id]?.[0]
 
-  const handleTabChange = (tab: string) => {
+  const handleViewChange = (view: string) => {
+    if (!view) return
+    const nextView = view as SqlOutputView
+
     // When switching to the explain tab, trigger the explain query
-    if (tab === 'explain') {
+    if (nextView === 'explain' && source === 'project') {
       executeExplainQuery()
     }
-    onActiveTabChange?.(tab)
+    onActiveViewChange?.(nextView)
   }
 
   const { mutate: upsertContent } = useContentUpsertMutation({
@@ -128,65 +127,68 @@ export const UtilityPanel = ({
   }
 
   return (
-    <Tabs_Shadcn_
-      value={activeTab}
-      onValueChange={handleTabChange}
-      className="w-full h-full flex flex-col"
-    >
-      <TabsList_Shadcn_ className="flex justify-between gap-2 px-4 overflow-x-auto min-h-[42px]">
-        <div className="flex items-center gap-4">
-          <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
-            <span className="translate-y-px">Results</span>
-          </TabsTrigger_Shadcn_>
-          <TabsTrigger_Shadcn_ className="py-3 text-xs" value="explain">
-            <span className="translate-y-px">Explain</span>
-          </TabsTrigger_Shadcn_>
-          <TabsTrigger_Shadcn_ className="py-3 text-xs" value="chart">
-            <span className="translate-y-px">Chart</span>
-          </TabsTrigger_Shadcn_>
+    <div className="w-full h-full flex flex-col">
+      <div className="flex items-center justify-between gap-2 px-4 overflow-x-auto min-h-[42px] border-b">
+        <ToggleGroup
+          type="single"
+          value={activeView}
+          onValueChange={handleViewChange}
+          size="sm"
+          variant="outline"
+          className="flex items-center"
+        >
+          <ToggleGroupItem value="table" className="h-7 px-3 text-xs">
+            Table
+          </ToggleGroupItem>
+          <ToggleGroupItem value="chart" className="h-7 px-3 text-xs">
+            Chart
+          </ToggleGroupItem>
+          <ToggleGroupItem
+            value="explain"
+            disabled={source === 'logs'}
+            className="h-7 px-3 text-xs"
+          >
+            Explain
+          </ToggleGroupItem>
+        </ToggleGroup>
 
-          {result?.rows && (
-            <DownloadResultsButton
-              type="text"
-              results={result.rows as any[]}
-              fileName={`Supabase Snippet ${snippet.name}`}
-              onDownloadAsCSV={() => track('sql_editor_result_download_csv_clicked')}
-              onCopyAsMarkdown={() => track('sql_editor_result_copy_markdown_clicked')}
-              onCopyAsJSON={() => track('sql_editor_result_copy_json_clicked')}
-              onCopyAsCSV={() => track('sql_editor_result_copy_csv_clicked')}
-            />
-          )}
+        {result?.rows && (
+          <DownloadResultsButton
+            type="text"
+            results={result.rows as any[]}
+            fileName={`Supabase Snippet ${snippet.name}`}
+            onDownloadAsCSV={() => track('sql_editor_result_download_csv_clicked')}
+            onCopyAsMarkdown={() => track('sql_editor_result_copy_markdown_clicked')}
+            onCopyAsJSON={() => track('sql_editor_result_copy_json_clicked')}
+            onCopyAsCSV={() => track('sql_editor_result_copy_csv_clicked')}
+          />
+        )}
+      </div>
+
+      {activeView === 'table' && (
+        <div className="grow min-h-0">
+          <UtilityTabResults
+            id={id}
+            isExecuting={isExecuting}
+            isDisabled={isDisabled}
+            onDebug={onDebug}
+            buildDebugPrompt={buildDebugPrompt}
+            isDebugging={isDebugging}
+          />
         </div>
+      )}
 
-        <UtilityActions
-          id={id}
-          isExecuting={isExecuting}
-          isDisabled={isDisabled}
-          hasSelection={hasSelection}
-          prettifyQuery={prettifyQuery}
-          executeQuery={executeQuery}
-          onSave={onSave}
-        />
-      </TabsList_Shadcn_>
+      {activeView === 'explain' && (
+        <div className="grow min-h-0">
+          <UtilityTabExplain id={id} isExecuting={isExplainExecuting} />
+        </div>
+      )}
 
-      <TabsContent_Shadcn_ asChild value="results" className="mt-0 grow">
-        <UtilityTabResults
-          id={id}
-          isExecuting={isExecuting}
-          isDisabled={isDisabled}
-          onDebug={onDebug}
-          buildDebugPrompt={buildDebugPrompt}
-          isDebugging={isDebugging}
-        />
-      </TabsContent_Shadcn_>
-
-      <TabsContent_Shadcn_ asChild value="explain" className="mt-0 grow">
-        <UtilityTabExplain id={id} isExecuting={isExplainExecuting} />
-      </TabsContent_Shadcn_>
-
-      <TabsContent_Shadcn_ asChild value="chart" className="mt-0 grow">
-        <ChartConfig results={result} config={chartConfig} onConfigChange={onConfigChange} />
-      </TabsContent_Shadcn_>
-    </Tabs_Shadcn_>
+      {activeView === 'chart' && (
+        <div className="grow min-h-0">
+          <ChartConfig results={result} config={chartConfig} onConfigChange={onConfigChange} />
+        </div>
+      )}
+    </div>
   )
 }

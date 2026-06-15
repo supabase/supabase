@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 
+import { SqlSnippetSourceIcon } from '@/components/interfaces/SQLEditor/SQLEditorSource.utils'
 import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
 import { useTabsStateSnapshot } from '@/state/tabs'
 
@@ -17,7 +18,11 @@ export const TabPreview = ({ tab }: { tab: string }) => {
       animate={{ opacity: 0.7 }}
       className="flex relative items-center gap-2 px-3 text-xs bg-dash-sidebar dark:bg-surface-100 shadow-lg rounded-xs h-10"
     >
-      <EntityTypeIcon type={tabData.type} />
+      {tabData.type === 'sql' ? (
+        <SqlSnippetSourceIcon source={tabData.metadata?.sqlSource} />
+      ) : (
+        <EntityTypeIcon type={tabData.type} />
+      )}
       <span>{tabData.label || 'Untitled'}</span>
       <div className="absolute w-full top-0 left-0 right-0 h-px bg-foreground-muted" />
     </motion.div>

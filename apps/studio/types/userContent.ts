@@ -26,6 +26,15 @@ export interface UserContentMap {
 }
 
 export namespace SqlSnippets {
+  export type Source = 'project' | 'logs'
+
+  export type LogDateRange = {
+    to: string
+    from: string
+    isHelper?: boolean
+    text?: string
+  }
+
   /**
    * To be stored in the database: public.user_content.content
    * In this case there is only one thing to store, but it's good to
@@ -42,6 +51,12 @@ export namespace SqlSnippets {
 
     // we can add some versioning to this schema in case we need to change the format.
     schema_version: string
+
+    // Determines which execution backend the editor should use.
+    source?: Source
+
+    // Logs-specific execution settings. Only used when source is "logs".
+    logDateRange?: LogDateRange
 
     chart?: {
       type: 'bar' | 'line'

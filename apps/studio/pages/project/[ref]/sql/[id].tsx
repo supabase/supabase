@@ -13,6 +13,7 @@ import {
 import { readPersistedDraftSqlTab } from '@/components/interfaces/SQLEditor/draftSqlTabStorage.utils'
 import { SQLEditor } from '@/components/interfaces/SQLEditor/SQLEditor'
 import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
+import { getSqlSnippetSource } from '@/components/interfaces/SQLEditor/SQLEditorSource.utils'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import { EditorBaseLayout } from '@/components/layouts/editors/EditorBaseLayout'
 import { useEditorType } from '@/components/layouts/editors/EditorsLayout.hooks'
@@ -151,6 +152,7 @@ const SqlEditor: NextPageWithLayout = () => {
 
     const tabId = createTabId('sql', { id })
     const snippet = allSnippets.find((x) => x.id === id)
+    const sqlSource = snippet ? getSqlSnippetSource(snippet) : (persistedDraft?.source ?? 'project')
 
     tabs.addTab({
       id: tabId,
@@ -160,6 +162,7 @@ const SqlEditor: NextPageWithLayout = () => {
         sqlId: id,
         name: snippet?.name ?? persistedDraft?.name,
         isDraft: isDraftId,
+        sqlSource,
       },
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps

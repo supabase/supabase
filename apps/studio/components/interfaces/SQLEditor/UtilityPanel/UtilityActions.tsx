@@ -1,6 +1,6 @@
 import { Hotkey } from '@tanstack/react-hotkeys'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { AlignLeft, Check, Heart, Keyboard, MoreVertical } from 'lucide-react'
+import { AlignLeft, Check, ChevronDown, Heart, Keyboard, MoreVertical } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -8,6 +8,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuTrigger,
   KeyboardShortcut,
   Tooltip,
@@ -19,6 +21,12 @@ import { SqlRunButton } from './RunButton'
 import { SqlSaveButton } from './SaveButton'
 import SavingIndicator from './SavingIndicator'
 import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
+import { EXPLORER_DATEPICKER_HELPERS } from '@/components/interfaces/Settings/Logs/Logs.constants'
+import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
+import {
+  SQL_SNIPPET_SOURCE_LABELS,
+  SqlSnippetSourceIcon,
+} from '@/components/interfaces/SQLEditor/SQLEditorSource.utils'
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -26,14 +34,19 @@ import { useProfile } from '@/lib/profile'
 import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import type { SqlSnippets } from '@/types'
 
 export type UtilityActionsProps = {
   id: string
   isExecuting?: boolean
   isDisabled?: boolean
   hasSelection?: boolean
+  source: SqlSnippets.Source
+  logDateRange: SqlSnippets.LogDateRange
   prettifyQuery: () => void
   executeQuery: () => void
+  onSourceChange: (source: SqlSnippets.Source) => void
+  onLogDateRangeChange: (value: SqlSnippets.LogDateRange) => void
   onSave: () => void
 }
 
@@ -42,8 +55,12 @@ export const UtilityActions = ({
   isExecuting = false,
   isDisabled = false,
   hasSelection = false,
+  source,
+  logDateRange,
   prettifyQuery,
   executeQuery,
+  onSourceChange,
+  onLogDateRangeChange,
   onSave,
 }: UtilityActionsProps) => {
   const { ref } = useParams()
@@ -65,6 +82,7 @@ export const UtilityActions = ({
   const isSaving = snapV2.savingStates[id] === 'UPDATING'
   const isReadOnly =
     snippet?.snippet.visibility === 'project' && snippet?.snippet.owner_id !== profile?.id
+  const sourceControlsDisabled = isDisabled || isReadOnly
 
   const hotkeySequnece: Hotkey | undefined =
     SHORTCUT_DEFINITIONS[SHORTCUT_IDS.SQL_EDITOR_FORMAT].sequence[0]
@@ -80,6 +98,11 @@ export const UtilityActions = ({
   const addFavorite = () => snapV2.addFavorite(id)
 
   const removeFavorite = () => snapV2.removeFavorite(id)
+
+  const onSelectSource = (source: string) => {
+    if (sourceControlsDisabled) return
+    onSourceChange(source as SqlSnippets.Source)
+  }
 
   const onSelectDatabase = (databaseId: string) => {
     snapV2.resetResults(id)
@@ -187,26 +210,65 @@ export const UtilityActions = ({
             onClick={onSave}
           />
         )}
-        <div className="flex items-center">
-          {IS_PLATFORM && (
-            <DatabaseSelector
-              selectedDatabaseId={lastSelectedDb.length === 0 ? undefined : lastSelectedDb}
-              variant="connected-on-right"
-              onSelectId={onSelectDatabase}
+        <div className="flex items-center gap-x-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="default"
+                disabled={sourceControlsDisabled}
+                icon={<SqlSnippetSourceIcon source={source} />}
+                iconRight={<ChevronDown strokeWidth={1.5} size={12} />}
+              >
+                {SQL_SNIPPET_SOURCE_LABELS[source]}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuRadioGroup value={source} onValueChange={onSelectSource}>
+                <DropdownMenuRadioItem value="project" className="gap-x-2">
+                  <SqlSnippetSourceIcon source="project" />
+                  Project
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="logs" className="gap-x-2">
+                  <SqlSnippetSourceIcon source="logs" />
+                  Logs
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {source === 'logs' && (
+            <LogsDatePicker
+              value={logDateRange}
+              onSubmit={onLogDateRangeChange}
+              helpers={EXPLORER_DATEPICKER_HELPERS}
+              buttonTriggerProps={{ className: 'h-[30px]', disabled: sourceControlsDisabled }}
             />
           )}
-          <RoleImpersonationPopover
-            serviceRoleLabel="postgres"
-            header="Run SQL query as a role"
-            variant={IS_PLATFORM ? 'connected-on-both' : 'connected-on-right'}
-          />
-          <SqlRunButton
-            hasSelection={hasSelection}
-            isDisabled={isDisabled || isExecuting}
-            isExecuting={isExecuting}
-            className="rounded-l-none"
-            onClick={executeQuery}
-          />
+
+          <div className="flex items-center">
+            {source === 'project' && IS_PLATFORM && (
+              <DatabaseSelector
+                selectedDatabaseId={lastSelectedDb.length === 0 ? undefined : lastSelectedDb}
+                variant="connected-on-right"
+                showLabel={false}
+                onSelectId={onSelectDatabase}
+              />
+            )}
+            {source === 'project' && (
+              <RoleImpersonationPopover
+                serviceRoleLabel="postgres"
+                header="Run SQL query as a role"
+                variant={IS_PLATFORM ? 'connected-on-both' : 'connected-on-right'}
+              />
+            )}
+            <SqlRunButton
+              hasSelection={hasSelection}
+              isDisabled={isDisabled || isExecuting}
+              isExecuting={isExecuting}
+              className={cn(source === 'project' && 'rounded-l-none')}
+              onClick={executeQuery}
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -6,6 +6,7 @@ import { proxy, subscribe, useSnapshot } from 'valtio'
 
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import type { SqlSnippets } from '@/types'
 
 export const editorEntityTypes = {
   table: ['r', 'v', 'm', 'f', 'p'],
@@ -36,6 +37,7 @@ export interface Tab {
     name?: string
     tableId?: number
     sqlId?: string
+    sqlSource?: SqlSnippets.Source
     scrollTop?: number
     /** Marks a SQL tab as an unsaved draft so it can be hidden from the saved-snippets nav and restored from local storage */
     isDraft?: boolean
@@ -57,6 +59,7 @@ export interface RecentItem {
     name?: string
     tableId?: number
     sqlId?: string
+    sqlSource?: SqlSnippets.Source
     isDraft?: boolean
   }
 }

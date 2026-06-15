@@ -29,6 +29,10 @@ import {
 } from 'ui'
 
 import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
+import {
+  getSqlSnippetSource,
+  SqlSnippetSourceIcon,
+} from '@/components/interfaces/SQLEditor/SQLEditorSource.utils'
 import { getContentById } from '@/data/content/content-id-query'
 import { useSQLSnippetFolderContentsQuery } from '@/data/content/sql-folder-contents-query'
 import { Snippet } from '@/data/content/sql-folders-query'
@@ -193,6 +197,8 @@ export const SQLEditorTreeViewItem = ({
 
     const snippet = element.metadata
     let sql: string = ''
+    let source = getSqlSnippetSource(snippet)
+    let logDateRange = snippet.content?.logDateRange
 
     if (snippet.content && snippet.content.unchecked_sql) {
       sql = snippet.content.unchecked_sql
@@ -201,6 +207,8 @@ export const SQLEditorTreeViewItem = ({
       const { content } = await getContentById({ projectRef, id: snippet.id })
       if ('unchecked_sql' in content) {
         sql = content.unchecked_sql
+        source = content.source ?? source
+        logDateRange = content.logDateRange ?? logDateRange
       }
     }
 
@@ -209,6 +217,8 @@ export const SQLEditorTreeViewItem = ({
       sql,
       owner_id: profile?.id,
       project_id: project?.id,
+      source,
+      logDateRange,
     })
 
     snapV2.addSnippet({ projectRef, snippet: snippetCopy })
@@ -255,6 +265,11 @@ export const SQLEditorTreeViewItem = ({
             name={element.name}
             nameForTitle={props.nameForTitle}
             description={element.metadata?.description || undefined}
+            icon={
+              !isBranch ? (
+                <SqlSnippetSourceIcon source={getSqlSnippetSource(element.metadata)} />
+              ) : undefined
+            }
             xPadding={16}
           />
         </ContextMenuTrigger>

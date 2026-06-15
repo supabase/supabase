@@ -1,8 +1,12 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 
+import type { SqlSnippets } from '@/types'
+
 export type PersistedDraftSqlTab = {
   sql: string
   name: string
+  source?: SqlSnippets.Source
+  logDateRange?: SqlSnippets.LogDateRange
   updatedAt: number
 }
 
@@ -43,6 +47,8 @@ export function persistDraftSqlTab(
   patch: {
     sql?: string
     name: string
+    source?: SqlSnippets.Source
+    logDateRange?: SqlSnippets.LogDateRange
   }
 ) {
   if (typeof window === 'undefined' || !projectRef) return
@@ -53,6 +59,8 @@ export function persistDraftSqlTab(
   storage[draftId] = {
     sql: patch.sql ?? existing?.sql ?? '',
     name: patch.name,
+    source: patch.source ?? existing?.source ?? 'project',
+    logDateRange: patch.logDateRange ?? existing?.logDateRange,
     updatedAt: Date.now(),
   }
 

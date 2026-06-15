@@ -14,6 +14,7 @@ import { generateUuid } from '@/lib/api/snippets.browser'
 import { removeCommentsFromSql } from '@/lib/helpers'
 import { sqlEventParser } from '@/lib/sql-event-parser'
 import type { SnippetWithContent } from '@/state/sql-editor-v2'
+import type { SqlSnippets } from '@/types'
 
 export type CreateTableWithoutRLS = {
   schema?: string
@@ -54,12 +55,16 @@ export const createSqlSnippetSkeletonV2 = ({
   project_id,
   folder_id,
   idOverride,
+  source = 'project',
+  logDateRange,
 }: {
   name: string
   sql: string
   owner_id: number
   project_id: number
   folder_id?: string
+  source?: SqlSnippets.Source
+  logDateRange?: SqlSnippets.LogDateRange
   /**
    * Optionally, provide a specific snippetId to use for the snippet. This is used to ensure the snippet is created
    * with a known id, such as to prevent flicker in the SQL editor when adding new unsaved snippets.
@@ -82,6 +87,8 @@ export const createSqlSnippetSkeletonV2 = ({
       ...NEW_SQL_SNIPPET_SKELETON.content,
       content_id: id ?? '',
       unchecked_sql: untrustedSql(sql ?? ''),
+      source,
+      ...(logDateRange !== undefined ? { logDateRange } : {}),
     } as any,
     isNotSavedInDatabaseYet: true,
   }
