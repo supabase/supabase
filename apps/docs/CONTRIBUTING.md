@@ -361,13 +361,12 @@ Here are some exceptions and Supabase-specific guidelines.
 ### Word list
 
 - `Frontend` isn't hyphenated (not `front-end`).
+- `Backend` isn't hyphenated (not `back-end`).
 - `Login` is a noun. `Log in` is a verb.
 - `Postgres` is capitalized, except in code, and used instead of `PostgreSQL`.
 - `Setup` is a noun. `Set up` is a verb.
 - `Supabase` is capitalized (not `supabase`), except in code.
 - `Supabase Platform` is in title case (not `Supabase platform`).
-- `Backend` isn't hyphenated (not `back-end`).
-- English instead of Latin abbreviations: `for example` (not `e.g.`), `that is` (not `i.e.`), and `with`, `by`, or `through` (not `via`). 
 
 ## Search
 

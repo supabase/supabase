@@ -2,16 +2,12 @@ description = "Prefer '%r' to '%s'."
 level = "WARNING"
 words = [
     [
-        "e.g.",
-        "for example",
-    ],
-    [
         "eg.",
-        "for example",
+        "e.g.",
     ],
     [
         "eg",
-        "for example",
+        "e.g.",
     ],
     [
         "i.e.",
