@@ -45,6 +45,7 @@ import {
 } from '@/data/privileges/table-privileges-revoke-mutation'
 import { useTablesQuery } from '@/data/tables/tables-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { getErrorMessage } from '@/lib/get-error-message'
 
 const ACTIONS = ['select', 'insert', 'update', 'delete']
 const ROLES = ['anon', 'authenticated', 'postgres', 'service_role']
@@ -212,8 +213,8 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
       ])
       toast.success('Successfully updated permissions')
       setOpen(false)
-    } catch (error: any) {
-      toast.error(`Failed to update permissions: ${error.message}`)
+    } catch (error: unknown) {
+      toast.error(`Failed to update permissions: ${getErrorMessage(error)}`)
     } finally {
       setIsSaving(false)
     }
@@ -221,12 +222,15 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
 
   useEffect(() => {
     if (open && isSuccessPrivileges && queuePrivileges) {
-      const initialState = queuePrivileges.privileges.reduce((a, b) => {
-        return {
-          ...a,
-          [b.grantee]: { ...(a as any)[b.grantee], [b.privilege_type.toLowerCase()]: true },
-        }
-      }, {})
+      const initialState = queuePrivileges.privileges.reduce<{ [key: string]: Privileges }>(
+        (a, b) => {
+          return {
+            ...a,
+            [b.grantee]: { ...a[b.grantee], [b.privilege_type.toLowerCase()]: true },
+          }
+        },
+        {}
+      )
       setPrivileges(initialState)
     }
   }, [open, isSuccessPrivileges])
