@@ -54,7 +54,15 @@ const formSchema = z
   .object({
     name: z.string().min(1, 'Name is required'),
     description: z.string().optional(),
-    maxConnections: z.number().min(1).max(1000),
+    maxConnections: z
+      .union([
+        z.literal(''),
+        z.coerce
+          .number()
+          .gte(1000, 'Max connections should be at least 1000')
+          .lte(10000, 'Max connections should not exceed 10000'),
+      ])
+      .refine((value) => value !== '', 'Max connections is required'),
     enableFeature: z.boolean(),
     enableRls: z.boolean(),
     enableNotifications: z.boolean(),
@@ -64,7 +72,15 @@ const formSchema = z
     queueType: z.enum(['basic', 'partitioned']),
     expiryDate: z.date().optional(),
     password: z.string().min(8, 'Password must be at least 8 characters'),
-    duration: z.number().min(5).max(30),
+    duration: z
+      .union([
+        z.literal(''),
+        z.coerce
+          .number()
+          .gte(1000, 'Duration should be at least 5ms')
+          .lte(10000, 'Duration should not exceed 30ms'),
+      ])
+      .refine((value) => value !== '', 'Duration is required'),
     redirectUris: z.array(z.object({ value: z.string().url('Must be a valid URL') })),
     httpHeaders: z.array(z.object({ key: z.string().trim(), value: z.string().trim() })),
     apiKey: z.string().optional(),
@@ -160,7 +176,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Password Input */}
               <SheetSection>
@@ -181,7 +197,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Copyable Input */}
               <SheetSection>
@@ -209,7 +225,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Number Input */}
               <SheetSection>
@@ -223,20 +239,14 @@ export default function FormPatternsSidePanel() {
                       description="Numeric input with min/max validation"
                     >
                       <FormControl className="col-span-6">
-                        <Input
-                          {...field}
-                          type="number"
-                          min={1}
-                          max={1000}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
-                        />
+                        <Input {...field} type="number" min={1} max={1000} />
                       </FormControl>
                     </FormItemLayout>
                   )}
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Input with Units */}
               <SheetSection>
@@ -253,7 +263,7 @@ export default function FormPatternsSidePanel() {
                         <InputGroup>
                           <FormInputGroupInput {...field} type="number" min={5} max={30} />
                           <InputGroupAddon align="inline-end">
-                            <InputGroupText>MB</InputGroupText>
+                            <InputGroupText>ms</InputGroupText>
                           </InputGroupAddon>
                         </InputGroup>
                       </FormControl>
@@ -262,7 +272,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Textarea */}
               <SheetSection>
@@ -288,7 +298,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Icon Upload */}
               <SheetSection>
@@ -356,7 +366,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* File Upload */}
               <SheetSection>
@@ -449,7 +459,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Switch */}
               <SheetSection>
@@ -545,7 +555,7 @@ export default function FormPatternsSidePanel() {
                 </FormItemLayout>
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Select */}
               <SheetSection>
@@ -575,7 +585,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Multi-Select */}
               <SheetSection>
@@ -601,7 +611,7 @@ export default function FormPatternsSidePanel() {
                             badgeLimit="wrap"
                             showIcon={false}
                             deletableBadge
-                            className="w-full min-w-lg!"
+                            className="w-full"
                           />
                           <MultiSelectorContent>
                             <MultiSelectorList>
@@ -617,7 +627,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Radio Group */}
               <SheetSection>
@@ -649,7 +659,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Date Picker */}
               <SheetSection>
@@ -688,7 +698,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Field Array */}
               <SheetSection>
@@ -717,7 +727,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Key/Value Field Array */}
               <SheetSection>
@@ -748,7 +758,7 @@ export default function FormPatternsSidePanel() {
                 />
               </SheetSection>
 
-              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+              <Separator className="w-full" />
 
               {/* Action Field */}
               <SheetSection>

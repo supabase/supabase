@@ -85,7 +85,7 @@ limit 25`)
     expect(getSinceLastDeployInvocationCountSql()).toContain(
       'SELECT count(*) as count FROM function_edge_logs'
     )
-    expect(getSinceLastDeployInvocationCountSql()).toContain("(function_id = '__pending__')")
+    expect(getSinceLastDeployInvocationCountSql()).toContain("(`function_id` = '__pending__')")
 
     expect(
       getSinceLastDeployInvocationCount([

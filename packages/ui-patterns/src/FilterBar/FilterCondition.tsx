@@ -30,7 +30,6 @@ export function FilterCondition({
   const {
     filters: rootFilters,
     filterProperties,
-    isLoading,
     propertyOptionsCache,
     loadingOptions,
     handleInputChange,
@@ -178,12 +177,12 @@ export function FilterCondition({
 
   // If the value options are only a custom component, open it immediately
   useEffect(() => {
-    if (!isActive || isLoading) return
+    if (!isActive) return
     const hasOnlyCustom = valueItems.length > 0 && valueItems.every((i) => i.isCustom)
     if (hasOnlyCustom && !showValueCustom) {
       setShowValueCustom(true)
     }
-  }, [isActive, isLoading, valueItems, showValueCustom])
+  }, [isActive, valueItems, showValueCustom])
 
   const handleOperatorBackspace = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -265,7 +264,7 @@ export function FilterCondition({
       data-testid={`filter-condition-${property.name}`}
       data-highlighted={isHighlighted}
     >
-      <Popover open={isPropertyActive && !isLoading && propertyItems.length > 0}>
+      <Popover open={isPropertyActive && propertyItems.length > 0}>
         <PopoverAnchor asChild>
           <div ref={propertyLabelRef} className="relative inline-flex items-center shrink-0">
             {isPropertyActive ? (
@@ -319,7 +318,7 @@ export function FilterCondition({
           />
         </PopoverContent>
       </Popover>
-      <Popover open={isOperatorActive && !isLoading && operatorItems.length > 0}>
+      <Popover open={isOperatorActive && operatorItems.length > 0}>
         <PopoverAnchor asChild>
           <div className="relative inline-block">
             <Input
@@ -334,7 +333,6 @@ export function FilterCondition({
               onBlur={handleOperatorBlur}
               onKeyDown={handleOperatorKeyDown}
               className="h-full border-none bg-transparent py-0 px-1 text-center text-xs md:text-xs focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground w-full absolute left-0 top-0"
-              disabled={isLoading}
               aria-label={`Operator for ${property.label}`}
               data-testid={`filter-operator-${property.name}`}
               tabIndex={-1}
@@ -370,7 +368,7 @@ export function FilterCondition({
           />
         </PopoverContent>
       </Popover>
-      <Popover open={isActive && !isLoading && (showValueCustom || valueItems.length > 0)}>
+      <Popover open={isActive && (showValueCustom || valueItems.length > 0)}>
         <PopoverAnchor asChild>
           <div className="relative inline-block max-w-[180px]">
             <Input
@@ -382,7 +380,6 @@ export function FilterCondition({
               onBlur={handleValueBlur}
               onKeyDown={handleValueKeyDown}
               className="h-full border-none bg-transparent py-0 px-1 text-xs md:text-xs focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full absolute left-0 top-0"
-              disabled={isLoading}
               aria-label={`Value for ${property.label}`}
               data-testid={`filter-value-${property.name}`}
               tabIndex={-1}

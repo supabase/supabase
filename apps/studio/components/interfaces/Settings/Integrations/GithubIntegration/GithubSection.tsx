@@ -1,16 +1,18 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useMemo } from 'react'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { IntegrationImageHandler } from '../IntegrationsSettings'
+import { IntegrationSectionIcon } from '../IntegrationsSettings'
 import { GitHubIntegrationConnectionForm } from './GitHubIntegrationConnectionForm'
-import {
-  ScaffoldContainer,
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from '@/components/layouts/Scaffold'
 import NoPermission from '@/components/ui/NoPermission'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -33,39 +35,30 @@ export const GitHubSection = () => {
     [connections, projectRef]
   )
 
-  const GitHubTitle = `GitHub Integration`
-
   return (
-    <ScaffoldContainer>
-      <ScaffoldSection className="py-12">
-        <ScaffoldSectionDetail title={GitHubTitle}>
-          <p>Connect any of your GitHub repositories to a project.</p>
-          <IntegrationImageHandler title="github" />
-        </ScaffoldSectionDetail>
-        <ScaffoldSectionContent>
-          {isLoadingPermissions ? (
-            <GenericSkeletonLoader />
-          ) : !canReadGitHubConnection ? (
-            <NoPermission resourceText="view this organization's GitHub connections" />
-          ) : (
-            <div className="space-y-6">
-              <div className="space-y-1">
-                <h3 className="text-sm font-medium text-foreground">
-                  How does the GitHub integration work?
-                </h3>
-                <p className="text-sm text-foreground-light">
-                  Connecting to GitHub allows you to sync preview branches with a chosen GitHub
-                  branch, keep your production branch in sync, and automatically create preview
-                  branches for every pull request.
-                </p>
-              </div>
-              <div>
-                <GitHubIntegrationConnectionForm connection={existingConnection} />
-              </div>
-            </div>
-          )}
-        </ScaffoldSectionContent>
-      </ScaffoldSection>
-    </ScaffoldContainer>
+    <PageSection>
+      <PageSectionMeta>
+        <div className="flex flex-1 items-start gap-6">
+          <IntegrationSectionIcon title="github" />
+          <PageSectionSummary>
+            <PageSectionTitle>GitHub Integration</PageSectionTitle>
+            <PageSectionDescription>
+              Connect any of your GitHub repositories to a project. Supabase applies database
+              changes when you merge into your production branch. If branching is enabled, each pull
+              request gets its own preview database.
+            </PageSectionDescription>
+          </PageSectionSummary>
+        </div>
+      </PageSectionMeta>
+      <PageSectionContent>
+        {isLoadingPermissions ? (
+          <GenericSkeletonLoader />
+        ) : !canReadGitHubConnection ? (
+          <NoPermission resourceText="view this organization's GitHub connections" />
+        ) : (
+          <GitHubIntegrationConnectionForm connection={existingConnection} />
+        )}
+      </PageSectionContent>
+    </PageSection>
   )
 }

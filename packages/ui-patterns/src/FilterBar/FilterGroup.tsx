@@ -21,11 +21,11 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
     filterProperties,
     activeInput,
     freeformText,
-    isLoading,
     supportsOperators,
     actions,
     variant,
     highlightedConditionPath,
+    freeformDefaultProperty,
     handleInputBlur,
     handleGroupFreeformFocus,
     handleGroupFreeformChange,
@@ -87,6 +87,16 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
     return pathsEqual(conditionPath, highlightedConditionPath)
   }
 
+  // Free-text search only applies to the root group's input — nested groups don't synthesize
+  // a "Search <property>" item.
+  const resolvedFreeformDefaultProperty = useMemo(
+    () =>
+      path.length === 0 && freeformDefaultProperty
+        ? filterProperties.find((p) => p.name === freeformDefaultProperty)
+        : undefined,
+    [path.length, freeformDefaultProperty, filterProperties]
+  )
+
   const items = useMemo(
     () =>
       buildPropertyItems({
@@ -94,8 +104,17 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
         inputValue: (isActive ? freeformText : localFreeformValue) || '',
         actions,
         supportsOperators,
+        freeformDefaultProperty: resolvedFreeformDefaultProperty,
       }),
-    [filterProperties, isActive, freeformText, localFreeformValue, actions, supportsOperators]
+    [
+      filterProperties,
+      isActive,
+      freeformText,
+      localFreeformValue,
+      actions,
+      supportsOperators,
+      resolvedFreeformDefaultProperty,
+    ]
   )
 
   const emptyPlaceholder = useMemo(
@@ -176,7 +195,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
             </React.Fragment>
           )
         })}
-        <Popover open={isActive && !isLoading && items.length > 0 && !highlightedConditionPath}>
+        <Popover open={isActive && items.length > 0 && !highlightedConditionPath}>
           <PopoverAnchor asChild>
             {isRootGroup ? (
               <Input
@@ -191,7 +210,6 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                 placeholder={
                   group.conditions.length === 0 ? emptyPlaceholder : 'Add more filters...'
                 }
-                disabled={isLoading}
                 data-testid="filter-bar-freeform-input"
                 autoComplete="off"
                 data-1p-ignore
@@ -210,7 +228,6 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                   onKeyDown={handleFreeformKeyDown}
                   className="h-full border-none bg-transparent py-0 text-xs md:text-xs focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full absolute left-0 top-0 px-2"
                   placeholder="+ Add filter"
-                  disabled={isLoading}
                   autoComplete="off"
                   data-1p-ignore
                   data-lpignore="true"
@@ -223,7 +240,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
             )}
           </PopoverAnchor>
           <PopoverContent
-            className="min-w-[220px] p-0"
+            className="min-w-[220px] max-w-[360px] p-0"
             align="start"
             side="bottom"
             onOpenAutoFocus={(e) => e.preventDefault()}

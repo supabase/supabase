@@ -1,0 +1,30 @@
+{
+  "name": "realtime-chat-nuxtjs",
+  "type": "registry:block",
+  "title": "Realtime Chat",
+  "description": "Component which provides a realtime chat interface.",
+  "registryDependencies": ["button", "input"],
+  "files": [
+    {
+      "path": "registry/default/realtime-chat/nuxtjs/app/components/realtime-chat.vue",
+      "type": "registry:component",
+      "target": "app/components/realtime-chat.vue"
+    },
+    {
+      "path": "registry/default/realtime-chat/nuxtjs/app/components/chat-message-item.vue",
+      "type": "registry:component",
+      "target": "app/components/chat-message-item.vue"
+    },
+    {
+      "path": "registry/default/realtime-chat/nuxtjs/app/composables/useChatScroll.ts",
+      "type": "registry:component",
+      "target": "app/composables/useChatScroll.ts"
+    },
+    {
+      "path": "registry/default/realtime-chat/nuxtjs/app/composables/useRealtimeChat.ts",
+      "type": "registry:component",
+      "target": "app/composables/useRealtimeChat.ts"
+    }
+  ],
+  "dependencies": ["@supabase/supabase-js@latest", "lucide-vue-next@latest"]
+}

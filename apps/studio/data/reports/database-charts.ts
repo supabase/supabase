@@ -1,26 +1,16 @@
 import { COMPUTE_DISK, COMPUTE_MAX_IOPS } from 'shared-data'
 
-import { mapComputeSizeNameToAddonVariantId } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
+import {
+  hasBurstableIO,
+  mapComputeSizeNameToAddonVariantId,
+} from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { compactNumberFormatter } from '@/components/ui/Charts/Charts.utils'
 import { ReportAttributes } from '@/components/ui/Charts/ComposedChart.utils'
 import { DiskAttributesData } from '@/data/config/disk-attributes-query'
 import { MaxConnectionsData } from '@/data/database/max-connections-query'
 import { Project } from '@/data/projects/project-detail-query'
 import { DOCS_URL } from '@/lib/constants'
-import { formatBytes } from '@/lib/helpers'
-
-// Compute variants below 4XL run on EBS instances that draw on a burst
-// credit pool for disk IO, so the burst balance chart only makes sense for
-// these. Larger instances have dedicated IOPS and don't expose this metric.
-const BURSTABLE_IO_VARIANTS = new Set([
-  'ci_nano',
-  'ci_micro',
-  'ci_small',
-  'ci_medium',
-  'ci_large',
-  'ci_xlarge',
-  'ci_2xlarge',
-])
+import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
 
 export const getReportAttributesV2: (
   entitledFeatures: string[],
@@ -29,7 +19,8 @@ export const getReportAttributesV2: (
   maxConnections?: MaxConnectionsData,
   pgBouncerMaxConnections?: number,
   isSpendCapEnabled?: boolean,
-  showDiskIOBurstBalanceChart?: boolean
+  showDiskIOBurstBalanceChart?: boolean,
+  showMemoryCommitmentChart?: boolean
 ) => ReportAttributes[] = (
   entitledFeatures,
   project,
@@ -37,7 +28,8 @@ export const getReportAttributesV2: (
   maxConnections,
   pgBouncerMaxConnections,
   isSpendCapEnabled,
-  showDiskIOBurstBalanceChart
+  showDiskIOBurstBalanceChart,
+  showMemoryCommitmentChart
 ) => {
   const computeVariantId = mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
   const provisionedDiskIops = diskConfig?.attributes?.iops
@@ -46,8 +38,8 @@ export const getReportAttributesV2: (
     typeof provisionedDiskIops === 'number' && typeof computeIopsLimit === 'number'
       ? Math.min(provisionedDiskIops, computeIopsLimit)
       : provisionedDiskIops
-  const hasBurstableIO = BURSTABLE_IO_VARIANTS.has(computeVariantId)
-  const showBurstBalanceChart = !!showDiskIOBurstBalanceChart && hasBurstableIO
+  const showBurstBalanceChart =
+    !!showDiskIOBurstBalanceChart && hasBurstableIO(project?.infra_compute_size)
   const baselineThroughputMBps = COMPUTE_DISK[computeVariantId]?.baselineThroughputMBps
   const baselineThroughputLabel =
     typeof baselineThroughputMBps === 'number' ? `${baselineThroughputMBps} MB/s` : 'its baseline'
@@ -68,7 +60,7 @@ export const getReportAttributesV2: (
       valuePrecision: 2,
       YAxisProps: {
         width: 75,
-        tickFormatter: (value: number) => formatBytes(value, 2),
+        tickFormatter: (value: number) => formatBytesMinMB(value, 2),
       },
       attributes: [
         {
@@ -92,13 +84,65 @@ export const getReportAttributesV2: (
           tooltip:
             'Unallocated memory available for use. A small portion is always reserved by the operating system',
         },
+        {
+          attribute: 'ram_usage_total',
+          provider: 'infra-monitoring',
+          label: 'Total RAM',
+          isMaxValue: true,
+          omitFromTotal: true,
+          tooltip: 'Total RAM available on this instance',
+        },
+        {
+          attribute: 'ram_usage_swap',
+          provider: 'infra-monitoring',
+          label: 'Swap',
+          omitFromTotal: true,
+          tooltip:
+            'Swap space in use by the operating system. Sustained swap usage indicates memory pressure and may degrade database performance',
+        },
+      ],
+    },
+    {
+      id: 'memory-commitment',
+      label: 'Memory commitment',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-commitment`,
+      hide: !showMemoryCommitmentChart,
+      showTooltip: true,
+      showLegend: true,
+      hideChartType: false,
+      defaultChartStyle: 'bar',
+      showMaxValue: true,
+      showGrid: true,
+      syncId: 'database-reports',
+      valuePrecision: 2,
+      YAxisProps: {
+        width: 75,
+        tickFormatter: (value: number) => formatBytesMinMB(value, 2),
+      },
+      attributes: [
+        {
+          attribute: 'ram_commit_used',
+          provider: 'infra-monitoring',
+          label: 'Committed',
+          tooltip:
+            'Total memory the kernel has promised to processes (RAM plus swap). Sustained values near or above the commit limit indicate overcommitment and a high risk of out-of-memory failures',
+        },
+        {
+          attribute: 'ram_commit_limit',
+          provider: 'infra-monitoring',
+          label: 'Commit limit',
+          isMaxValue: true,
+          omitFromTotal: true,
+          tooltip:
+            'Maximum memory the kernel will commit (RAM plus swap, adjusted by the overcommit ratio). Committed memory approaching this limit puts the database at risk of being killed when the system runs out of memory',
+        },
       ],
     },
     {
       id: 'swap-usage',
       label: 'Swap usage',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-usage`,
-      hide: false,
+      hide: true,
       showTooltip: true,
       showLegend: false,
       hideChartType: false,
@@ -109,7 +153,9 @@ export const getReportAttributesV2: (
       valuePrecision: 2,
       YAxisProps: {
         width: 75,
-        tickFormatter: (value: number) => formatBytes(value, 2),
+        tickFormatter: (value: number) => formatBytesMinMB(value, 2),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        domain: [0, (dataMax: number) => Math.max(dataMax, 1024 * 1024 * 1024)] as any,
       },
       attributes: [
         {
@@ -133,7 +179,6 @@ export const getReportAttributesV2: (
       showLegend: true,
       showMaxValue: false,
       showGrid: true,
-      normalizeVisibleStackToPercent: true,
       YAxisProps: {
         width: 55,
         domain: [0, 100] as [number, number],
@@ -191,24 +236,6 @@ export const getReportAttributesV2: (
           fill: { light: '#DB8BD3', dark: '#4A3D5C' },
           tooltip:
             'CPU time spent on other tasks (e.g., background processes, software interrupts)',
-        },
-        {
-          attribute: 'cpu_usage_busy_idle',
-          provider: 'infra-monitoring',
-          label: 'Idle',
-          format: '%',
-          omitFromTotal: true,
-          color: { light: '#6EA85F', dark: '#A3FFC2' },
-          fill: { light: '#A6D8AE', dark: '#2A5C3F' },
-          tooltip: 'CPU time spent idle and available for new work',
-        },
-        {
-          attribute: 'cpu_usage_max',
-          provider: 'reference-line',
-          label: 'Max',
-          value: 100,
-          tooltip: 'Max CPU usage',
-          isMaxValue: true,
         },
       ],
     },

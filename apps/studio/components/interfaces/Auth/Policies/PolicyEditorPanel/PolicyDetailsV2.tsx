@@ -11,12 +11,12 @@ import { UseFormReturn } from 'react-hook-form'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   FormControl,
   FormField,
   FormItem,
@@ -182,14 +182,14 @@ export const PolicyDetailsV2 = ({
                         align="start"
                         sameWidthAsTrigger
                       >
-                        <Command_Shadcn_>
-                          <CommandInput_Shadcn_ placeholder="Find a table..." />
-                          <CommandList_Shadcn_ onWheel={(event) => event.stopPropagation()}>
-                            <CommandEmpty_Shadcn_>No tables found</CommandEmpty_Shadcn_>
-                            <CommandGroup_Shadcn_>
+                        <Command>
+                          <CommandInput placeholder="Find a table..." />
+                          <CommandList onWheel={(event) => event.stopPropagation()}>
+                            <CommandEmpty>No tables found</CommandEmpty>
+                            <CommandGroup>
                               <ScrollArea className={(tables ?? []).length > 7 ? 'h-[200px]' : ''}>
                                 {(tables ?? []).map((table) => (
-                                  <CommandItem_Shadcn_
+                                  <CommandItem
                                     key={table.id}
                                     className="cursor-pointer flex items-center justify-between space-x-2 w-full"
                                     onSelect={() => {
@@ -205,12 +205,12 @@ export const PolicyDetailsV2 = ({
                                       {field.value === table.name ? <Check size={13} /> : ''}
                                       {table.name}
                                     </span>
-                                  </CommandItem_Shadcn_>
+                                  </CommandItem>
                                 ))}
                               </ScrollArea>
-                            </CommandGroup_Shadcn_>
-                          </CommandList_Shadcn_>
-                        </Command_Shadcn_>
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
                       </PopoverContent>
                     </Popover>
                   </FormControl>

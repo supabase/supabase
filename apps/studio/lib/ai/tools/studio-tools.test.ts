@@ -136,8 +136,9 @@ describe('ai/tools/studio-tools', () => {
       expect(tools.execute_sql.needsApproval).toBe(true)
     })
 
-    it('should sanitize execute_sql output without data opt-in', async () => {
-      vi.mocked(executeSql).mockResolvedValue({ result: [{ email: 'test@example.com' }] })
+    it('should return execute_sql rows to the UI and sanitize model output without data opt-in', async () => {
+      const rows = [{ email: 'test@example.com' }]
+      vi.mocked(executeSql).mockResolvedValue({ result: rows })
 
       const tools = getStudioTools({
         projectRef: 'test-project',
@@ -165,7 +166,11 @@ describe('ai/tools/studio-tools', () => {
         undefined,
         undefined
       )
-      expect(result).toBe(NO_DATA_PERMISSIONS)
+      expect(result).toEqual(rows)
+      expect((tools.execute_sql as any).toModelOutput({ output: result })).toEqual({
+        type: 'text',
+        value: NO_DATA_PERMISSIONS,
+      })
     })
 
     it('should return execute_sql rows with data opt-in', async () => {
@@ -199,6 +204,10 @@ describe('ai/tools/studio-tools', () => {
         undefined
       )
       expect(result).toEqual(rows)
+      expect((tools.execute_sql as any).toModelOutput({ output: result })).toEqual({
+        type: 'json',
+        value: rows,
+      })
     })
 
     it('should validate rename_chat input schema correctly', () => {

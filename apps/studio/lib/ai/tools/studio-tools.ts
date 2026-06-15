@@ -10,6 +10,7 @@ import {
   PG_BEST_PRACTICES,
   REALTIME_PROMPT,
   RLS_PROMPT,
+  STORAGE_PROMPT,
 } from '@/lib/ai/prompts'
 import { NO_DATA_PERMISSIONS } from '@/lib/ai/tools/tool-sanitizer'
 import { fixSqlBackslashEscapes } from '@/lib/ai/util'
@@ -17,6 +18,7 @@ import { fixSqlBackslashEscapes } from '@/lib/ai/util'
 const KNOWLEDGE = {
   pg_best_practices: PG_BEST_PRACTICES,
   rls: RLS_PROMPT,
+  storage: STORAGE_PROMPT,
   edge_functions: EDGE_FUNCTION_PROMPT,
   realtime: REALTIME_PROMPT,
 } as const
@@ -39,7 +41,7 @@ export const executeSqlInputSchema = z.object({
     .boolean()
     .default(false)
     .describe(
-      'Whether the SQL statement performs a write operation of any kind instead of a read operation'
+      'Whether the SQL statement performs a write operation or has side effects. Set true for INSERT/UPDATE/DELETE/DDL and for SELECT statements that call side-effecting functions, such as select cron.schedule(...), cron.unschedule(...), or functions that create, modify, schedule, enqueue, notify, or trigger work.'
     ),
 })
 
@@ -77,7 +79,12 @@ export const getStudioTools = (ctx: StudioToolsContext = {}) => {
           undefined,
           authHeaders
         )
-        return aiOptInLevel === 'schema_and_log_and_data' ? result : NO_DATA_PERMISSIONS
+        return result
+      },
+      toModelOutput: ({ output }) => {
+        return aiOptInLevel === 'schema_and_log_and_data'
+          ? { type: 'json', value: output }
+          : { type: 'text', value: NO_DATA_PERMISSIONS }
       },
     }),
     deploy_edge_function: tool({

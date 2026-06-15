@@ -338,8 +338,12 @@ export const gettingstarted: NavMenuConstant = {
   items: [
     { name: 'Build with AI tools', url: '/guides/ai-tools' },
     { name: 'API Keys', url: '/guides/getting-started/api-keys' },
-    { name: 'Local Development', url: '/guides/cli/getting-started' },
+    { name: 'Local Development', url: '/guides/local-development/cli/getting-started' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
+    {
+      name: 'Migrating to new API keys',
+      url: '/guides/getting-started/migrating-to-new-api-keys',
+    },
     {
       name: 'Framework Quickstarts',
       enabled: frameworkQuickstartsEnabled,
@@ -745,13 +749,19 @@ export const auth: NavMenuConstant = {
           enabled: allAuthProvidersEnabled,
         },
         {
-          name: 'Email (Magic Link or OTP)',
+          name: 'Email (Magic link or OTP)',
           url: '/guides/auth/auth-email-passwordless',
           enabled: allAuthProvidersEnabled,
         },
         {
           name: 'Phone Login',
           url: '/guides/auth/phone-login' as `/${string}`,
+          enabled: allAuthProvidersEnabled,
+        },
+
+        {
+          name: 'Passkey',
+          url: '/guides/auth/passkeys',
           enabled: allAuthProvidersEnabled,
         },
 
@@ -1325,76 +1335,130 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/wrappers/overview' as `/${string}`,
         },
         {
-          name: 'Connecting to Auth0',
-          url: '/guides/database/extensions/wrappers/auth0' as `/${string}`,
-        },
-        {
-          name: 'Connecting to Airtable',
-          url: '/guides/database/extensions/wrappers/airtable' as `/${string}`,
-        },
-        {
-          name: 'Connecting to AWS Cognito',
-          url: '/guides/database/extensions/wrappers/cognito' as `/${string}`,
-        },
-        {
-          name: 'Connecting to AWS S3',
-          url: '/guides/database/extensions/wrappers/s3' as `/${string}`,
-        },
-        {
-          name: 'Connecting to AWS S3 Vectors',
-          url: '/guides/database/extensions/wrappers/s3_vectors' as `/${string}`,
-        },
-        {
-          name: 'Connecting to BigQuery',
-          url: '/guides/database/extensions/wrappers/bigquery' as `/${string}`,
-        },
-        {
-          name: 'Connecting to Clerk',
-          url: '/guides/database/extensions/wrappers/clerk' as `/${string}`,
-        },
-        {
-          name: 'Connecting to ClickHouse',
-          url: '/guides/database/extensions/wrappers/clickhouse' as `/${string}`,
-        },
-        {
-          name: 'Connecting to DuckDB',
-          url: '/guides/database/extensions/wrappers/duckdb' as `/${string}`,
-        },
-        {
-          name: 'Connecting to Firebase',
-          url: '/guides/database/extensions/wrappers/firebase' as `/${string}`,
-        },
-        {
-          name: 'Connecting to Iceberg',
-          url: '/guides/database/extensions/wrappers/iceberg' as `/${string}`,
-        },
-        {
-          name: 'Connecting to Logflare',
-          url: '/guides/database/extensions/wrappers/logflare' as `/${string}`,
-        },
-        {
-          name: 'Connecting to MSSQL',
-          url: '/guides/database/extensions/wrappers/mssql' as `/${string}`,
-        },
-        {
-          name: 'Connecting to Notion',
-          url: '/guides/database/extensions/wrappers/notion' as `/${string}`,
-        },
-        {
-          name: 'Connecting to Paddle',
-          url: '/guides/database/extensions/wrappers/paddle' as `/${string}`,
-        },
-        {
-          name: 'Connecting to Redis',
-          url: '/guides/database/extensions/wrappers/redis' as `/${string}`,
-        },
-        {
-          name: 'Connecting to Snowflake',
-          url: '/guides/database/extensions/wrappers/snowflake' as `/${string}`,
-        },
-        {
-          name: 'Connecting to Stripe',
-          url: '/guides/database/extensions/wrappers/stripe' as `/${string}`,
+          name: 'Sources',
+          url: '/guides/database/extensions/wrappers/overview' as `/${string}`,
+          items: [
+            {
+              name: 'Airtable',
+              url: '/guides/database/extensions/wrappers/airtable' as `/${string}`,
+            },
+            {
+              name: 'Auth0',
+              url: '/guides/database/extensions/wrappers/auth0' as `/${string}`,
+            },
+            {
+              name: 'AWS Cognito',
+              url: '/guides/database/extensions/wrappers/cognito' as `/${string}`,
+            },
+            {
+              name: 'AWS DynamoDB',
+              url: '/guides/database/extensions/wrappers/dynamodb' as `/${string}`,
+            },
+            {
+              name: 'AWS S3',
+              url: '/guides/database/extensions/wrappers/s3' as `/${string}`,
+            },
+            {
+              name: 'AWS S3 Vectors',
+              url: '/guides/database/extensions/wrappers/s3_vectors' as `/${string}`,
+            },
+            {
+              name: 'BigQuery',
+              url: '/guides/database/extensions/wrappers/bigquery' as `/${string}`,
+            },
+            {
+              name: 'Cal.com',
+              url: '/guides/database/extensions/wrappers/cal' as `/${string}`,
+            },
+            {
+              name: 'Calendly',
+              url: '/guides/database/extensions/wrappers/calendly' as `/${string}`,
+            },
+            {
+              name: 'Clerk',
+              url: '/guides/database/extensions/wrappers/clerk' as `/${string}`,
+            },
+            {
+              name: 'ClickHouse',
+              url: '/guides/database/extensions/wrappers/clickhouse' as `/${string}`,
+            },
+            {
+              name: 'Cloudflare D1',
+              url: '/guides/database/extensions/wrappers/cloudflare-d1' as `/${string}`,
+            },
+            {
+              name: 'DuckDB',
+              url: '/guides/database/extensions/wrappers/duckdb' as `/${string}`,
+            },
+            {
+              name: 'Firebase',
+              url: '/guides/database/extensions/wrappers/firebase' as `/${string}`,
+            },
+            {
+              name: 'Gravatar',
+              url: '/guides/database/extensions/wrappers/gravatar' as `/${string}`,
+            },
+            {
+              name: 'HubSpot',
+              url: '/guides/database/extensions/wrappers/hubspot' as `/${string}`,
+            },
+            {
+              name: 'Iceberg',
+              url: '/guides/database/extensions/wrappers/iceberg' as `/${string}`,
+            },
+            {
+              name: 'Infura',
+              url: '/guides/database/extensions/wrappers/infura' as `/${string}`,
+            },
+            {
+              name: 'Logflare',
+              url: '/guides/database/extensions/wrappers/logflare' as `/${string}`,
+            },
+            {
+              name: 'MSSQL',
+              url: '/guides/database/extensions/wrappers/mssql' as `/${string}`,
+            },
+            {
+              name: 'MySQL',
+              url: '/guides/database/extensions/wrappers/mysql' as `/${string}`,
+            },
+            {
+              name: 'Notion',
+              url: '/guides/database/extensions/wrappers/notion' as `/${string}`,
+            },
+            {
+              name: 'OpenAPI',
+              url: '/guides/database/extensions/wrappers/openapi' as `/${string}`,
+            },
+            {
+              name: 'Orb',
+              url: '/guides/database/extensions/wrappers/orb' as `/${string}`,
+            },
+            {
+              name: 'Paddle',
+              url: '/guides/database/extensions/wrappers/paddle' as `/${string}`,
+            },
+            {
+              name: 'Redis',
+              url: '/guides/database/extensions/wrappers/redis' as `/${string}`,
+            },
+            {
+              name: 'Shopify',
+              url: '/guides/database/extensions/wrappers/shopify' as `/${string}`,
+            },
+            {
+              name: 'Slack',
+              url: '/guides/database/extensions/wrappers/slack' as `/${string}`,
+            },
+            {
+              name: 'Snowflake',
+              url: '/guides/database/extensions/wrappers/snowflake' as `/${string}`,
+            },
+            {
+              name: 'Stripe',
+              url: '/guides/database/extensions/wrappers/stripe' as `/${string}`,
+            },
+          ],
         },
       ],
     },
@@ -1551,6 +1615,16 @@ export const api: NavMenuConstant = {
         },
       ],
     },
+    {
+      name: 'Debugging',
+      url: undefined,
+      items: [
+        {
+          name: 'Handling Errors in supabase-js',
+          url: '/guides/api/handling-errors-in-supabase-js',
+        },
+      ],
+    },
   ],
 }
 
@@ -1671,6 +1745,10 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/status-codes' as `/${string}`,
         },
         {
+          name: 'Error codes',
+          url: '/guides/functions/error-codes' as `/${string}`,
+        },
+        {
           name: 'Recursive/Nested function calls',
           url: '/guides/functions/recursive-functions' as `/${string}`,
         },
@@ -1695,6 +1773,7 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/auth',
           items: [
             { name: 'Securing your functions', url: '/guides/functions/auth' },
+            { name: 'Authorization headers', url: '/guides/functions/auth-headers' },
             { name: 'Legacy JWT secret', url: '/guides/functions/auth-legacy-jwt' },
           ],
         },
@@ -1781,6 +1860,10 @@ export const functions: NavMenuConstant = {
         {
           name: 'Image Transformation & Optimization',
           url: '/guides/functions/examples/image-manipulation' as `/${string}`,
+        },
+        {
+          name: 'Resumable WebSockets with replay',
+          url: '/guides/functions/examples/resumable-websockets' as `/${string}`,
         },
       ],
     },
@@ -2109,6 +2192,11 @@ export const storage: NavMenuConstant = {
         {
           name: 'Querying Vectors',
           url: '/guides/storage/vector/querying-vectors' as `/${string}`,
+        },
+        {
+          name: 'Local Development',
+          url: '/guides/storage/vector/local-development' as `/${string}`,
+          enabled: billingEnabled,
         },
         {
           name: 'Limits',
@@ -2521,6 +2609,7 @@ export const security: NavMenuConstant = {
         },
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
         { name: 'Securing your API', url: '/guides/api/securing-your-api' },
+        { name: 'Securing your npm installs', url: '/guides/security/npm-security' },
       ],
     },
   ],
@@ -2669,6 +2758,10 @@ export const platform: NavMenuConstant = {
           name: 'Network Restrictions',
           url: '/guides/platform/network-restrictions' as `/${string}`,
         },
+        {
+          name: 'Temporary Access',
+          url: '/guides/platform/temporary-access' as `/${string}`,
+        },
         { name: 'Performance Tuning', url: '/guides/platform/performance' as `/${string}` },
         { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement' as `/${string}` },
         {
@@ -2780,6 +2873,18 @@ export const platform: NavMenuConstant = {
               url: '/guides/platform/manage-your-usage/branching' as `/${string}`,
             },
             {
+              name: 'Logs',
+              url: '/guides/platform/manage-your-usage/logs' as `/${string}`,
+            },
+            {
+              name: 'Logs Ingest',
+              url: '/guides/platform/manage-your-usage/logs-ingest' as `/${string}`,
+            },
+            {
+              name: 'Logs Query',
+              url: '/guides/platform/manage-your-usage/logs-query' as `/${string}`,
+            },
+            {
               name: 'Log Drains',
               url: '/guides/platform/manage-your-usage/log-drains' as `/${string}`,
             },
@@ -2855,8 +2960,16 @@ export const telemetry: NavMenuConstant = {
           url: '/guides/telemetry/advanced-log-filtering' as `/${string}`,
         },
         {
+          name: 'Logs field reference',
+          url: '/guides/telemetry/log-field-reference' as `/${string}`,
+        },
+        {
           name: 'Log drains',
           url: '/guides/telemetry/log-drains' as `/${string}`,
+        },
+        {
+          name: 'Tracing with the JS SDK',
+          url: '/guides/telemetry/client-side-tracing' as `/${string}`,
         },
         {
           name: 'Reports',

@@ -9,10 +9,10 @@ Adam Mokan
 AJ Matias
 Akash Manimaran
 Alaister Young
-Alan De Los Santos
 Aleksi Immonen
 Alex Hall
 Alex Hsu
+Alexander Alexandrov
 Alexander Korotkov
 Ali Waseem
 Allan S
@@ -23,7 +23,6 @@ Ana Mogul
 Andrew Valleteau
 Andrey A
 Angelico de los Reyes
-Anna Weihl
 Ant Evans
 Ant Wilson
 Ariuna K
@@ -51,12 +50,14 @@ Chase Cresgy
 Chase Granberry
 Chris Caruso
 Chris Chandler
+Chris Chapman (Chappie)
 Chris Copplestone
 Chris Gwilliams
 Chris Martin
 Chris Stockton
 Chris Ward
 Christian Funkhouser
+Claudiu Dragalina-Paraipan
 Clayton Kast
 Colin Goodheart-Smithe
 Colin Murray
@@ -81,16 +82,17 @@ Dennis Senn
 Dimitrios Liappis
 Div Arora
 Divit D
+Divya Sharma
 Douglas Hunley
 Dustin Keib
 Eduardo Gurgel
 Eleftheria Trivyzaki
 Eliot Whalan
 Emmett Folger
+Erfi Anugrah
 Eric Kharitonashvili
 Etienne Stalmans
 Eyal Ehrlich
-Fabrizio Cataldo
 Fabrizio Fenoglio
 Fady A
 Fatuma Abdullahi
@@ -109,6 +111,7 @@ Greg P
 Greg Richardson
 Gregor Vand
 Guilherme Souza
+Hanefi Önaldı
 Hannah Bowers
 Hardik Maheshwari
 Haritabh Gupta
@@ -176,12 +179,12 @@ Leonardo Santiago
 Liam Cloud Hogan
 Lindsay Moss
 Lukas Bernert
+Lukas Klingsbo
 Łukasz Niemier
 Maksym Ionutsa
 Manuel Mendez
 Manan Gupta
 Marcus Weiner
-Margarita Sandomirskaia
 Marija Milicevic
 Mark Burggraf
 Matthew Hambright
@@ -193,14 +196,17 @@ Mats Kindahl
 Mert Yerekapan
 Michal Kleczek
 Michelle Jubrey
-Miles Thomas
+Miranda Limonczenko
 Monica Khoury
+Mrinal Paliwal
 Mykhailo Mischa Lieibenson
 Natalie Roberge
 Nick B
 Nick Littman
 Nick Nowlan
+Nicola Ferraro
 Nicolas Nosenzo
+Noah Moss
 Nyannyacha
 Oli R
 Pamela Chia
@@ -217,6 +223,7 @@ Peter Lyn
 Peter Soderberg
 Pierre Ducroquet
 Qiao Han
+Quintin Willison
 Rafael Chacón
 Raminder Singh
 Raúl Barroso
@@ -243,6 +250,7 @@ Sean Oliver
 Sean Romberg
 Sean Thompson
 Sergio Cioban Filho
+Shaii O
 Shane E
 Shreekar Shetty
 Sreyas Udayavarman

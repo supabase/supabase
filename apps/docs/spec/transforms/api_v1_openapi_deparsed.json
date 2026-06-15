@@ -322,7 +322,9 @@
                         "MIGRATIONS_FAILED",
                         "FUNCTIONS_DEPLOYED",
                         "FUNCTIONS_FAILED"
-                      ]
+                      ],
+                      "description": "This field is deprecated. List action runs to get branch status instead.",
+                      "deprecated": true
                     },
                     "created_at": {
                       "type": "string",
@@ -1912,7 +1914,7 @@
           }
         },
         "responses": {
-          "201": {
+          "200": {
             "description": "",
             "content": {
               "application/json": {
@@ -4010,7 +4012,9 @@
                           "MIGRATIONS_FAILED",
                           "FUNCTIONS_DEPLOYED",
                           "FUNCTIONS_FAILED"
-                        ]
+                        ],
+                        "description": "This field is deprecated. List action runs to get branch status instead.",
+                        "deprecated": true
                       },
                       "created_at": {
                         "type": "string",
@@ -4250,7 +4254,9 @@
                         "MIGRATIONS_FAILED",
                         "FUNCTIONS_DEPLOYED",
                         "FUNCTIONS_FAILED"
-                      ]
+                      ],
+                      "description": "This field is deprecated. List action runs to get branch status instead.",
+                      "deprecated": true
                     },
                     "created_at": {
                       "type": "string",
@@ -4469,7 +4475,9 @@
                         "MIGRATIONS_FAILED",
                         "FUNCTIONS_DEPLOYED",
                         "FUNCTIONS_FAILED"
-                      ]
+                      ],
+                      "description": "This field is deprecated. List action runs to get branch status instead.",
+                      "deprecated": true
                     },
                     "created_at": {
                       "type": "string",
@@ -4752,6 +4760,16 @@
               "pattern": "^[a-z]+$",
               "example": "abcdefghijklmnopqrst",
               "type": "string"
+            }
+          },
+          {
+            "name": "remove_addon",
+            "required": false,
+            "in": "query",
+            "description": "If true, also removes the custom domain add-on from the project subscription.",
+            "schema": {
+              "default": "false",
+              "type": "boolean"
             }
           }
         ],
@@ -7450,6 +7468,9 @@
               }
             }
           },
+          "400": {
+            "description": "This feature requires the Pro, Team, or Enterprise organization plan."
+          },
           "401": {
             "description": "Unauthorized"
           },
@@ -7473,10 +7494,15 @@
         ],
         "summary": "[Beta] Gets current vanity subdomain config",
         "tags": ["Domains"],
+        "x-allowed-plans": ["Pro", "Team", "Enterprise"],
         "x-badges": [
           {
             "name": "OAuth scope: domains:read",
             "position": "after"
+          },
+          {
+            "name": "Only available on Pro, Team, Enterprise",
+            "position": "before"
           }
         ],
         "x-endpoint-owners": ["infra", "management-api"],
@@ -7591,6 +7617,9 @@
               }
             }
           },
+          "400": {
+            "description": "This feature requires the Pro, Team, or Enterprise organization plan."
+          },
           "401": {
             "description": "Unauthorized"
           },
@@ -7614,10 +7643,15 @@
         ],
         "summary": "[Beta] Checks vanity subdomain availability",
         "tags": ["Domains"],
+        "x-allowed-plans": ["Pro", "Team", "Enterprise"],
         "x-badges": [
           {
             "name": "OAuth scope: domains:write",
             "position": "after"
+          },
+          {
+            "name": "Only available on Pro, Team, Enterprise",
+            "position": "before"
           }
         ],
         "x-endpoint-owners": ["infra", "management-api"],
@@ -7679,6 +7713,9 @@
               }
             }
           },
+          "400": {
+            "description": "This feature requires the Pro, Team, or Enterprise organization plan."
+          },
           "401": {
             "description": "Unauthorized"
           },
@@ -7702,10 +7739,15 @@
         ],
         "summary": "[Beta] Activates a vanity subdomain for a project.",
         "tags": ["Domains"],
+        "x-allowed-plans": ["Pro", "Team", "Enterprise"],
         "x-badges": [
           {
             "name": "OAuth scope: domains:write",
             "position": "after"
+          },
+          {
+            "name": "Only available on Pro, Team, Enterprise",
+            "position": "before"
           }
         ],
         "x-endpoint-owners": ["infra", "management-api"],
@@ -8034,6 +8076,46 @@
                               }
                             },
                             "required": ["type", "slot_name"]
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["x86_architecture"]
+                              }
+                            },
+                            "required": ["type"]
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["project_hibernating"]
+                              }
+                            },
+                            "required": ["type"]
+                          }
+                        ]
+                      }
+                    },
+                    "warnings": {
+                      "type": "array",
+                      "items": {
+                        "discriminator": {
+                          "propertyName": "type"
+                        },
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["pg_graphql_introspection_change"]
+                              }
+                            },
+                            "required": ["type"]
                           }
                         ]
                       }
@@ -8050,7 +8132,8 @@
                     "objects_to_be_dropped",
                     "unsupported_extensions",
                     "user_defined_objects_in_internal_schemas",
-                    "validation_errors"
+                    "validation_errors",
+                    "warnings"
                   ]
                 }
               }
@@ -8406,6 +8489,9 @@
           "401": {
             "description": "Unauthorized"
           },
+          "402": {
+            "description": "This feature requires the Pro, Team, or Enterprise organization plan."
+          },
           "403": {
             "description": "Forbidden action"
           },
@@ -8426,6 +8512,13 @@
         ],
         "summary": "[Beta] Set up a read replica",
         "tags": ["Database"],
+        "x-allowed-plans": ["Pro", "Team", "Enterprise"],
+        "x-badges": [
+          {
+            "name": "Only available on Pro, Team, Enterprise",
+            "position": "before"
+          }
+        ],
         "x-endpoint-owners": ["management-api", "infra"]
       }
     },
@@ -16444,6 +16537,9 @@
                                 }
                               }
                             }
+                          },
+                          "branches_only": {
+                            "type": "boolean"
                           }
                         },
                         "required": ["role"]
@@ -16580,6 +16676,9 @@
                               }
                             }
                           }
+                        },
+                        "branches_only": {
+                          "type": "boolean"
                         }
                       },
                       "required": ["role"]
@@ -16692,6 +16791,9 @@
                               }
                             }
                           }
+                        },
+                        "branches_only": {
+                          "type": "boolean"
                         }
                       },
                       "required": ["role"]
@@ -16711,7 +16813,8 @@
                             "cidr": "203.0.113.0/24"
                           }
                         ]
-                      }
+                      },
+                      "branches_only": false
                     }
                   ]
                 }
@@ -16771,6 +16874,9 @@
                                 }
                               }
                             }
+                          },
+                          "branches_only": {
+                            "type": "boolean"
                           }
                         },
                         "required": ["role"]
@@ -16884,6 +16990,9 @@
                                       }
                                     }
                                   }
+                                },
+                                "branches_only": {
+                                  "type": "boolean"
                                 }
                               },
                               "required": ["role"]
@@ -21547,6 +21656,203 @@
         "x-oauth-scope": "database:write"
       }
     },
+    "/v1/projects/{ref}/database/backups/schedule": {
+      "get": {
+        "operationId": "v1-get-backup-schedule",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "schedule_for": {
+                      "type": "string",
+                      "description": "Time of day to schedule daily backups, in UTC. Format: HH:MM:SS.",
+                      "example": "04:00:00"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Timestamp of when the backup schedule was last updated.",
+                      "example": "2026-05-04T14:40:44+00:00"
+                    }
+                  },
+                  "required": ["schedule_for", "updated_at"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "402": {
+            "description": "This feature requires the Enterprise organization plan."
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "404": {
+            "description": "Project or backup schedule not found"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to retrieve backup schedule"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "fga_permissions": ["backups_read"]
+          }
+        ],
+        "summary": "Gets the backup schedule for a project",
+        "tags": ["Database"],
+        "x-allowed-plans": ["Enterprise"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:read",
+            "position": "after"
+          },
+          {
+            "name": "Only available on Enterprise",
+            "position": "before"
+          }
+        ],
+        "x-endpoint-owners": ["infra"],
+        "x-oauth-scope": "database:read"
+      },
+      "patch": {
+        "description": "Sets the time at which the daily backup runs. The change takes effect on the next backup window that includes the new time. If the new time has already passed for today, the first backup at the new time will occur the following day. It can only be updated 3 times per 24 hours.",
+        "operationId": "v1-update-backup-schedule",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "schedule_for": {
+                    "type": "string",
+                    "description": "Time of day to schedule daily backups, in UTC. Format: HH:MM:SS.",
+                    "example": "04:00:00"
+                  }
+                },
+                "required": ["schedule_for"],
+                "example": {
+                  "schedule_for": "04:00:00"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "schedule_for": {
+                      "type": "string",
+                      "description": "Time of day to schedule daily backups, in UTC. Format: HH:MM:SS.",
+                      "example": "04:00:00"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Timestamp of when the backup schedule was last updated.",
+                      "example": "2026-05-04T14:40:44+00:00"
+                    }
+                  },
+                  "required": ["schedule_for", "updated_at"]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid schedule_for format"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "402": {
+            "description": "This feature requires the Enterprise organization plan."
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "404": {
+            "description": "Project or backup schedule not found"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to update backup schedule"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "fga_permissions": ["backups_write"]
+          }
+        ],
+        "summary": "Updates the backup schedule time for a project",
+        "tags": ["Database"],
+        "x-allowed-plans": ["Enterprise"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:write",
+            "position": "after"
+          },
+          {
+            "name": "Only available on Enterprise",
+            "position": "before"
+          }
+        ],
+        "x-endpoint-owners": ["infra"],
+        "x-oauth-scope": "database:write"
+      }
+    },
     "/v1/projects/{ref}/database/backups/undo": {
       "post": {
         "operationId": "v1-undo",
@@ -21679,6 +21985,7 @@
                                   "ipv4",
                                   "pitr.available_variants",
                                   "log_drains",
+                                  "audit_log_drains",
                                   "branching_limit",
                                   "branching_persistent",
                                   "auth.mfa_phone",
@@ -21696,6 +22003,7 @@
                                   "auth.custom_oauth.max_providers",
                                   "backup.retention_days",
                                   "backup.restore_to_new_project",
+                                  "backup.schedule",
                                   "function.max_count",
                                   "function.size_limit_mb",
                                   "realtime.max_concurrent_users",
@@ -22634,7 +22942,9 @@
               "MIGRATIONS_FAILED",
               "FUNCTIONS_DEPLOYED",
               "FUNCTIONS_FAILED"
-            ]
+            ],
+            "description": "This field is deprecated. List action runs to get branch status instead.",
+            "deprecated": true
           },
           "created_at": {
             "type": "string",
@@ -24855,6 +25165,46 @@
                     }
                   },
                   "required": ["type", "slot_name"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["x86_architecture"]
+                    }
+                  },
+                  "required": ["type"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["project_hibernating"]
+                    }
+                  },
+                  "required": ["type"]
+                }
+              ]
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "discriminator": {
+                "propertyName": "type"
+              },
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["pg_graphql_introspection_change"]
+                    }
+                  },
+                  "required": ["type"]
                 }
               ]
             }
@@ -24871,7 +25221,8 @@
           "objects_to_be_dropped",
           "unsupported_extensions",
           "user_defined_objects_in_internal_schemas",
-          "validation_errors"
+          "validation_errors",
+          "warnings"
         ]
       },
       "DatabaseUpgradeStatusResponse": {
@@ -28573,6 +28924,9 @@
                       }
                     }
                   }
+                },
+                "branches_only": {
+                  "type": "boolean"
                 }
               },
               "required": ["role"]
@@ -28644,6 +28998,9 @@
                     }
                   }
                 }
+              },
+              "branches_only": {
+                "type": "boolean"
               }
             },
             "required": ["role"]
@@ -28703,6 +29060,9 @@
                             }
                           }
                         }
+                      },
+                      "branches_only": {
+                        "type": "boolean"
                       }
                     },
                     "required": ["role"]
@@ -28763,6 +29123,9 @@
                       }
                     }
                   }
+                },
+                "branches_only": {
+                  "type": "boolean"
                 }
               },
               "required": ["role"]
@@ -28782,7 +29145,8 @@
                     "cidr": "203.0.113.0/24"
                   }
                 ]
-              }
+              },
+              "branches_only": false
             }
           ]
         }
@@ -30825,6 +31189,37 @@
           "id": 12345
         }
       },
+      "V1BackupScheduleResponse": {
+        "type": "object",
+        "properties": {
+          "schedule_for": {
+            "type": "string",
+            "description": "Time of day to schedule daily backups, in UTC. Format: HH:MM:SS.",
+            "example": "04:00:00"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of when the backup schedule was last updated.",
+            "example": "2026-05-04T14:40:44+00:00"
+          }
+        },
+        "required": ["schedule_for", "updated_at"]
+      },
+      "V1UpdateBackupScheduleBody": {
+        "type": "object",
+        "properties": {
+          "schedule_for": {
+            "type": "string",
+            "description": "Time of day to schedule daily backups, in UTC. Format: HH:MM:SS.",
+            "example": "04:00:00"
+          }
+        },
+        "required": ["schedule_for"],
+        "example": {
+          "schedule_for": "04:00:00"
+        }
+      },
       "V1UndoBody": {
         "type": "object",
         "properties": {
@@ -30875,6 +31270,7 @@
                         "ipv4",
                         "pitr.available_variants",
                         "log_drains",
+                        "audit_log_drains",
                         "branching_limit",
                         "branching_persistent",
                         "auth.mfa_phone",
@@ -30892,6 +31288,7 @@
                         "auth.custom_oauth.max_providers",
                         "backup.retention_days",
                         "backup.restore_to_new_project",
+                        "backup.schedule",
                         "function.max_count",
                         "function.size_limit_mb",
                         "realtime.max_concurrent_users",

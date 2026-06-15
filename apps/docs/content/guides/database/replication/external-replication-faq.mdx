@@ -1,22 +1,26 @@
 ---
 id: 'external-replication-faq'
-title: 'External replication FAQ'
-description: 'Frequently asked questions about external replication.'
-subtitle: 'Common questions and answers about external replication.'
+title: 'External replication (ETL) FAQ'
+description: 'Frequently asked questions about external replication (ETL).'
+subtitle: 'Common questions and answers about external replication (ETL).'
 sidebar_label: 'FAQ'
 ---
 
-<Admonition type="caution" label="Private Alpha">
+<Admonition type="caution" title="Private Alpha">
 
-External replication is currently in private alpha. Access is limited and features may change.
+External replication (ETL) is currently in private alpha. Managed pipelines run through Supabase ETL. Access is limited and features may change.
 
 </Admonition>
 
 ## What destinations are supported?
 
-External replication currently supports **BigQuery** as the managed destination. See the [BigQuery destination guide](/docs/guides/database/replication/bigquery) for configuration details.
+External replication (ETL) currently supports **BigQuery** as the managed destination. See the [BigQuery destination guide](/docs/guides/database/replication/bigquery) for configuration details.
 
-We are working on new destinations. Availability may continue to vary based on the planned roll-out strategy.
+We are working on new destinations. "External" means outside the source database, so supported destinations can be Supabase-managed or third-party systems as support expands. Availability may continue to vary based on the planned roll-out strategy.
+
+## Which plans support external replication (ETL)? [#which-plans-support-external-replication]
+
+External replication (ETL) is available on the Pro, Team, and Enterprise plans.
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
@@ -26,11 +30,11 @@ We are currently working on a new Supabase Warehouse product designed to address
 
 As a result, managed replication to Analytics Buckets is no longer available. Right now, **BigQuery** is the only supported managed destination, and we are actively working on expanding capabilities.
 
-## What does external replication install in the database?
+## What does external replication (ETL) install in the database? [#what-does-external-replication-install-in-the-database]
 
-When you enable external replication, Supabase installs database objects that help track replication state and support schema changes:
+When you enable external replication (ETL), Supabase installs database objects that help Supabase ETL track replication state and support schema changes:
 
-- An event trigger that runs on every `ALTER TABLE` statement. External replication uses this to support schema change handling.
+- An event trigger that runs on every `ALTER TABLE` statement. Supabase ETL uses this to support schema change handling.
 - A set of tables in the `etl` schema. These tables track replication state for your pipelines.
 
 The replication state tables are not updated very often, especially after the initial copy phase is complete.
@@ -41,19 +45,21 @@ Schema change support is currently in beta and limited to the BigQuery destinati
 
 Supported schema changes:
 
-- Adding a column
+- Adding a nullable column
 - Removing a column
 - Renaming a column
+- Dropping a `NOT NULL` constraint
+- Setting or dropping supported column default metadata
 
-External replication does not currently support changing column data types or replicating column default values. See [BigQuery schema change support](/docs/guides/database/replication/bigquery#schema-change-support) for details.
+External replication (ETL) does not currently support changing column data types, adding `NOT NULL` with `SET NOT NULL`, or filling existing destination rows for `ADD COLUMN ... DEFAULT`. Supported defaults are applied as destination metadata for future rows where BigQuery can represent them. See [BigQuery schema change support](/docs/guides/database/replication/bigquery#schema-change-support) for details.
 
-## What happens when you disable external replication?
+## What happens when you disable external replication (ETL)? [#what-happens-when-you-disable-external-replication]
 
-Disabling external replication removes the database objects that were installed in your source database, including the replication state tables in the `etl` schema and the DDL event trigger.
+Disabling external replication (ETL) removes the database objects that were installed in your source database, including the replication state tables in the `etl` schema and the DDL event trigger.
 
-You must delete all external replication pipelines before the disable action is available. For the Dashboard steps, see [Disabling external replication](/docs/guides/database/replication/external-replication-setup#disabling-external-replication).
+To remove external replication (ETL) from a project, delete all replication pipelines first. After all pipelines are deleted, the disable action becomes available. For the Dashboard steps, see [Disabling external replication (ETL)](/docs/guides/database/replication/external-replication-setup#disabling-external-replication).
 
-Disabling external replication stops Supabase from managing external replication for the project. It does not delete tables or data that were already written to your destination.
+Disabling external replication (ETL) stops Supabase from managing replication for the project. It does not delete tables or data that were already written to your destination.
 
 ## Why is a table not being replicated?
 
@@ -61,9 +67,19 @@ Common reasons:
 
 - **Missing primary key**: Tables must have a primary key to be replicated (Postgres logical replication requirement)
 - **Not in publication**: Ensure the table is included in your Postgres publication
-- **Unsupported data types**: Tables with custom data types are not supported
+- **Generated columns**: Generated columns are skipped during replication
 
 Check your publication settings and verify your table meets the requirements.
+
+Custom data types replicate as strings. Check that your destination can interpret those string values correctly.
+
+## Why are partitioned tables replicated as separate tables?
+
+Postgres controls this with the publication's `publish_via_partition_root` setting. If the setting is `false`, or if you created the publication manually with SQL and did not set it, Postgres publishes changes from the leaf partitions. External replication (ETL) then creates destination tables for those leaf partitions. If `publish_via_partition_root = true`, Postgres publishes changes as the partition root, so the partition hierarchy is treated as the published partition root.
+
+Publications created from the Dashboard replication flow use `publish_via_partition_root = true`.
+
+See [Partitioned tables](/docs/guides/database/replication/external-replication-setup#partitioned-tables) for examples and the full behavior.
 
 ## How does replica identity affect updates and deletes?
 
@@ -128,6 +144,20 @@ Pipeline failures occur during the streaming phase when an error happens while r
 
 See [Handling errors](/docs/guides/database/replication/external-replication-monitoring#handling-errors) for more details.
 
+## Why is replication lag increasing?
+
+Lag increases when Postgres produces WAL faster than the pipeline can confirm it has processed. Common causes include a slow or rate-limited destination, a pipeline issue, heavy source database activity, long transactions, network latency between the pipeline and source database, or a stopped/disconnected pipeline.
+
+Open [**Database > Replication**](/dashboard/project/_/database/replication), click **View status**, and check **Waiting to sync**, **Room before pausing**, **Last check-in**, **Connected**, and **Slot status**. See [Dealing with replication lag](/docs/guides/database/replication/external-replication-monitoring#dealing-with-replication-lag) for the full investigation and response flow.
+
+## What does a `Lost` slot status mean?
+
+`Lost` means Postgres has already removed WAL files that the pipeline's replication slot needed. The pipeline cannot continue from that slot.
+
+You can recreate the pipeline, or open the pipeline's **Advanced settings**, set **Invalidated slot behavior** to **Recreate**, and restart the pipeline. On restart, the pipeline creates a new replication slot and starts replication from scratch for all tables. This is required for consistency because the old slot can no longer provide every change the pipeline missed.
+
+See [Slot statuses](/docs/guides/database/replication/external-replication-monitoring#slot-statuses) for all slot states and what to do next.
+
 ## Why is a table in error state?
 
 Table errors occur during the copy phase. To recover, click **View status**, find the affected table, and reset the table state. This will restart the table copy from the beginning.
@@ -141,7 +171,7 @@ Check the [**Database > Replication**](/dashboard/project/_/database/replication
 3. Ensure all tables show **Live** state (actively replicating)
 4. Monitor replication lag metrics
 
-See the [external replication monitoring guide](/docs/guides/database/replication/external-replication-monitoring) for comprehensive monitoring instructions.
+See the [external replication (ETL) monitoring guide](/docs/guides/database/replication/external-replication-monitoring) for comprehensive monitoring instructions.
 
 ## How to stop or pause replication
 
@@ -152,6 +182,16 @@ You can manage your pipeline using the actions menu in the destinations list. Se
 Stopping replication causes changes to queue up in the WAL.
 
 </Admonition>
+
+## What happens if a project becomes inactive?
+
+If your project becomes inactive, external replication (ETL) stops any running pipelines and does not automatically resume them after the project is restarted.
+
+After restarting the project, restart each replication pipeline manually from the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard.
+
+## What happens after a downgrade to the free plan?
+
+When a project is downgraded to the Free Plan, all external replication (ETL) pipelines for that project are deleted.
 
 ## What happens if a table is deleted at the destination?
 
@@ -205,6 +245,6 @@ Navigate to the [**Logs > Replication**](/dashboard/project/_/logs/explorer) sec
 
 If you need assistance:
 
-1. Check the [external replication setup guide](/docs/guides/database/replication/external-replication-setup) and [external replication monitoring guide](/docs/guides/database/replication/external-replication-monitoring)
+1. Check the [external replication (ETL) setup guide](/docs/guides/database/replication/external-replication-setup) and [external replication (ETL) monitoring guide](/docs/guides/database/replication/external-replication-monitoring)
 2. Review this FAQ for common issues
 3. Contact support with your error details and logs

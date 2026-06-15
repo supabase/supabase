@@ -1,4 +1,9 @@
-import { skillBasedSolutions, useCaseSolutions } from 'data/Solutions'
+import {
+  appTypeSolutions,
+  migrationSolutions,
+  skillBasedSolutions,
+  useCaseSolutions,
+} from 'data/Solutions'
 import { PrivacySettings } from 'ui-patterns/PrivacySettings'
 
 const footerData = [
@@ -55,6 +60,14 @@ const footerData = [
         url: solution.url,
       })),
       ...useCaseSolutions.solutions.map((solution) => ({
+        text: solution.text,
+        url: solution.url,
+      })),
+      ...appTypeSolutions.solutions.map((solution) => ({
+        text: solution.text,
+        url: solution.url,
+      })),
+      ...migrationSolutions.solutions.map((solution) => ({
         text: solution.text,
         url: solution.url,
       })),
@@ -165,6 +178,10 @@ const footerData = [
       {
         text: 'General Availability',
         url: '/ga',
+      },
+      {
+        text: 'Legal',
+        url: '/legal',
       },
       {
         text: 'Terms of Service',

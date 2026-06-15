@@ -1,5 +1,16 @@
 import type { ExtendedSupportCategories } from './Support.constants'
+import type { SupportFormValues } from './SupportForm.schema'
 import { neverGuard } from '@/lib/helpers'
+
+export type SubmittedSupportRequest = Pick<
+  SupportFormValues,
+  'category' | 'severity' | 'subject' | 'message' | 'affectedServices' | 'allowSupportAccess'
+> & {
+  organizationSlug: string | undefined
+  projectRef: string | undefined
+  library?: string
+  dashboardLogs?: string
+}
 
 export type SupportFormState =
   | {
@@ -16,6 +27,7 @@ export type SupportFormState =
       sentProjectRef: string | undefined
       sentOrgSlug: string | undefined
       sentCategory: ExtendedSupportCategories
+      submittedRequest: SubmittedSupportRequest
     }
   | {
       type: 'error'
@@ -30,6 +42,7 @@ export type SupportFormActions =
       sentProjectRef: string | undefined
       sentOrgSlug: string | undefined
       sentCategory: ExtendedSupportCategories
+      submittedRequest: SubmittedSupportRequest
       debugSource?: string
     }
   | { type: 'ERROR'; message: string; debugSource?: string }
@@ -69,6 +82,7 @@ export function supportFormReducer(
           sentProjectRef: action.sentProjectRef,
           sentOrgSlug: action.sentOrgSlug,
           sentCategory: action.sentCategory,
+          submittedRequest: action.submittedRequest,
         }
       }
       if (action.type === 'ERROR') {
