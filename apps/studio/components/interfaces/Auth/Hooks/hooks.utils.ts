@@ -2,14 +2,17 @@ import { ident, safeSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-f
 
 import { Hook } from './hooks.constants'
 
+export const isHttpHookUrl = (uri: string) =>
+  uri.startsWith('http://') || uri.startsWith('https://')
+
 export const extractMethod = (
   uri: string,
   secret?: string
 ):
   | { type: 'postgres'; schema: string; functionName: string }
-  | { type: 'https'; url: string; secret: string } => {
-  if (uri.startsWith('https')) {
-    return { type: 'https', url: uri, secret: secret || '' }
+  | { type: 'http'; url: string; secret: string } => {
+  if (isHttpHookUrl(uri)) {
+    return { type: 'http', url: uri, secret: secret || '' }
   } else {
     const [_proto, _x, _db, schema, functionName] = (uri || '').split('/')
 
@@ -26,7 +29,7 @@ export const isValidHook = (h: Hook) => {
     (h.method.type === 'postgres' &&
       h.method.schema.length > 0 &&
       h.method.functionName.length > 0) ||
-    (h.method.type === 'https' && h.method.url.startsWith('https') && h.method.secret.length > 0)
+    (h.method.type === 'http' && isHttpHookUrl(h.method.url) && h.method.secret.length > 0)
   )
 }
 
