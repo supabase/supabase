@@ -47,7 +47,7 @@ const LegalDocVersions = ({ versions }: Props) => {
     <>
       {versions.length > 1 ? (
         <div className="not-prose mb-8 flex items-center gap-3">
-          <label htmlFor="legal-doc-version" className="text-foreground-lighter text-sm">
+          <label htmlFor="legal-doc-version" className="text-foreground-lighter text-sm sr-only">
             Version
           </label>
           <Select value={activeId} onValueChange={handleChange}>
