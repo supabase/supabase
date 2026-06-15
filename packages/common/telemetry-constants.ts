@@ -1254,6 +1254,9 @@ export interface MetricsAPIBannerDismissButtonClickedEvent {
  */
 export interface UnifiedLogsBannerCtaButtonClickedEvent {
   action: 'unified_logs_banner_cta_button_clicked'
+  properties: {
+    is_enabled: boolean
+  }
   groups: TelemetryGroups
 }
 

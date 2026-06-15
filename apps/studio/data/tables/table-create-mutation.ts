@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 
 import { tableKeys } from './keys'
 import { privilegeKeys } from '@/data/privileges/keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type CreateTableBody = {

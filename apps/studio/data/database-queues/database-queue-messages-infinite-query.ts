@@ -10,7 +10,7 @@ import {
   pgmqQueueTable,
 } from '@/components/interfaces/Integrations/Queues/Queues.utils'
 import { QUEUE_MESSAGE_TYPE } from '@/components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { DATE_FORMAT } from '@/lib/constants'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 

@@ -5,7 +5,7 @@ import { useCallback } from 'react'
 import { z } from 'zod'
 
 import { tableKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { SafePostgresTable } from '@/lib/postgres-types'
 import type { ResponseError, UseCustomInfiniteQueryOptions, UseCustomQueryOptions } from '@/types'
 

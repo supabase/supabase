@@ -97,7 +97,7 @@ Deno.serve(async (req) => {
     const response = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/other-function`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${SUPABASE_DEFAULT_PUBLISHABLE_KEY}`,
+        apikey: SUPABASE_DEFAULT_PUBLISHABLE_KEY,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ foo: 'bar' }),
