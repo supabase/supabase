@@ -42,7 +42,9 @@ const DEFAULT_PROFILE_CONTEXT: ProfileContextType = {
 
 describe('APIAuthorizationPage', () => {
   test('renders loading interstitial while router is not ready', () => {
-    customRender(<APIAuthorizationPage />, { profileContext: DEFAULT_PROFILE_CONTEXT })
+    customRender(<APIAuthorizationPage dehydratedState={{}} />, {
+      profileContext: DEFAULT_PROFILE_CONTEXT,
+    })
     expect(screen.getByText('Loading...')).toBeInTheDocument()
   })
 })

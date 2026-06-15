@@ -160,7 +160,10 @@ describe('ApiAuthorizationScreen', () => {
       addAPIMock({
         method: 'get',
         path: '/platform/oauth/authorizations/:id',
-        response: () => HttpResponse.json(null),
+        response: () =>
+          HttpResponse.json<GetOAuthAuthorizationResponse>(
+            null as unknown as GetOAuthAuthorizationResponse
+          ),
       })
       renderScreen()
       await screen.findByText('Unable to load authorization')
