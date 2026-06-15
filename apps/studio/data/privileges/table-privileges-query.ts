@@ -23,9 +23,7 @@ async function getTablePrivileges(
   signal?: AbortSignal
 ) {
   const sql = pgMeta.tablePrivileges.list({ includedSchemas }).sql
-  const queryKey = !!includedSchemas
-    ? [`table-privileges?schemas=${includedSchemas.join(',')}`]
-    : ['table-privileges']
+  const queryKey = ['table-privileges', includedSchemas?.join(',')]
 
   const { result } = await executeSql({ projectRef, connectionString, sql, queryKey }, signal)
 

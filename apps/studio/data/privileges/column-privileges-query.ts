@@ -32,7 +32,7 @@ export async function getColumnPrivileges(
   if (!projectRef) throw new Error('projectRef is required')
 
   const sql = pgMeta.columnPrivileges.list({ includedSchemas: [schema] }).sql
-  const queryKey = !!schema ? [`column-privileges?schema=${schema}`] : ['column-privileges']
+  const queryKey = ['column-privileges', schema]
   const { result } = await executeSql({ projectRef, connectionString, sql, queryKey }, signal)
   return result as ColumnPrivilegesData
 }
