@@ -17,6 +17,7 @@ export function formatAddendumDate(yyyymmdd: string) {
   const year = Number(yyyymmdd.slice(0, 4))
   const month = Number(yyyymmdd.slice(4, 6))
   const day = Number(yyyymmdd.slice(6, 8))
+  if (month < 1 || month > 12) throw new Error(`Invalid month ${month} in date "${yyyymmdd}"`)
   return `${MONTHS[month - 1]} ${day}, ${year}`
 }
 
