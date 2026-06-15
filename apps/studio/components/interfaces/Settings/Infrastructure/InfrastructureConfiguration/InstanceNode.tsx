@@ -28,6 +28,7 @@ import {
   NODE_SEP,
   NODE_WIDTH,
   PrimaryNodeData,
+  REGION_NODE_HEIGHT,
   REPLICA_STATUS,
   ReplicaNodeData,
 } from './InstanceConfiguration.constants'
@@ -200,7 +201,7 @@ export const PrimaryNode = ({ data }: NodeProps<Node<PrimaryNodeData>>) => {
                     <>
                       <span className="text-foreground-lighter">·</span>
                       <span className="text-foreground-light">
-                        {connections.current}/{connections.max} conns
+                        {connections.peak}/{connections.max} conns
                       </span>
                     </>
                   )}
@@ -435,7 +436,7 @@ export const RegionNode = ({ data }: any) => {
   return (
     <div
       className="relative flex justify-between rounded-sm bg-black/10 border border-default border-white/10 border-2 p-3"
-      style={{ width: regionNodeWidth, height: 162 }}
+      style={{ width: regionNodeWidth, height: REGION_NODE_HEIGHT }}
     >
       <div className="absolute bottom-2 flex items-center justify-between gap-x-2">
         <img

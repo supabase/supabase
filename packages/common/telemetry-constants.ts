@@ -310,16 +310,22 @@ export interface ProjectCreationDefaultPrivilegesExposedEvent {
     /** Where the checkbox was shown. */
     surface: 'main' | 'vercel'
     /**
-     * State of the "Enable Data API" toggle at exposure time. Main flow only —
-     * the Vercel surface has no such toggle, so this is omitted there.
+     * Current state of the "Automatically expose new tables" checkbox
+     * (`dataApiDefaultPrivileges` form field) at exposure time. This is the
+     * field the experiment actually controls.
+     * true = default privileges granted (legacy behaviour)
+     * false = revoke SQL runs on create (new behaviour, treatment default)
      */
-    dataApiEnabled?: boolean
+    dataApiDefaultPrivileges: boolean
     /**
      * Raw value of the dataApiRevokeOnCreateDefault PostHog flag at exposure time.
-     * true = revoke cohort (checkbox defaulted to unchecked)
-     * false = control cohort (checkbox defaulted to checked)
+     * Accepts boolean (current rollout shape) or string (post-multivariate-migration
+     * variant name, e.g. 'test' / 'control'). See GROWTH-877 for the migration plan.
+     * true | 'test' = revoke cohort (checkbox defaulted to unchecked)
+     * false = outside the rollout (checkbox defaulted to checked)
+     * 'control' = in-experiment control arm (checkbox defaulted to checked)
      */
-    dataApiRevokeOnCreateDefaultEnabled: boolean
+    dataApiRevokeOnCreateDefaultEnabled: boolean | string
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -378,14 +384,17 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      */
     dataApiDefaultPrivilegesGranted?: boolean
     /**
-     * Whether the dataApiRevokeOnCreateDefault PostHog flag was enabled for this user.
+     * Raw value of the dataApiRevokeOnCreateDefault PostHog flag at submission time.
      * Controls only the default checkbox state of "Automatically expose new tables and functions"
      * at project creation. Tracking it lets us correlate flag cohort with user choice.
-     * true = user is in the staged rollout cohort (checkbox defaulted to unchecked)
+     * Accepts boolean (current rollout shape) or string (post-multivariate-migration
+     * variant name, e.g. 'test' / 'control'). See GROWTH-877 for the migration plan.
+     * true | 'test' = user is in the treatment arm (checkbox defaulted to unchecked)
      * false = user is outside the rollout (checkbox defaulted to checked)
+     * 'control' = in-experiment control arm (checkbox defaulted to checked)
      * omitted = PostHog flags had not loaded at the time of project creation
      */
-    dataApiRevokeOnCreateDefaultEnabled?: boolean
+    dataApiRevokeOnCreateDefaultEnabled?: boolean | string
   }
   groups: TelemetryGroups
 }
@@ -1142,6 +1151,24 @@ export interface SqlEditorQueryRunButtonClickedEvent {
 }
 
 /**
+ * User clicked on the "Cancel Subscription" Button on the billing settings page.
+ *
+ * @group Events
+ * @source studio
+ * @page /billing
+ */
+export interface StudioBillingCancelSubscriptionClickedEvent {
+  action: 'studio_billing_cancel_subscription_clicked'
+  properties: {
+    /**
+     * The plan type the org is currently on.
+     */
+    currentPlan: string
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * User clicked on the CTA button on a plan in the pricing side panel in studio.
  *
  * @group Events
@@ -1215,6 +1242,30 @@ export interface MetricsAPIBannerCtaButtonClickedEvent {
  */
 export interface MetricsAPIBannerDismissButtonClickedEvent {
   action: 'metrics_api_banner_dismiss_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicks on the Unified Logs banner CTA button in studio project pages.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/*
+ */
+export interface UnifiedLogsBannerCtaButtonClickedEvent {
+  action: 'unified_logs_banner_cta_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the dismiss button on the Unified Logs banner in studio project pages.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/*
+ */
+export interface UnifiedLogsBannerDismissButtonClickedEvent {
+  action: 'unified_logs_banner_dismiss_button_clicked'
   groups: TelemetryGroups
 }
 
@@ -1454,6 +1505,21 @@ export interface SupportTicketSubmittedEvent {
  */
 export interface AiAssistantInSupportFormClickedEvent {
   action: 'ai_assistant_in_support_form_clicked'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked the Assistant follow-up card after submitting a support ticket.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/support/new
+ */
+export interface SupportAssistantFollowUpCardClickedEvent {
+  action: 'support_assistant_follow_up_card_clicked'
+  properties: {
+    ticketCategory: string
+  }
   groups: Partial<TelemetryGroups>
 }
 
@@ -1913,6 +1979,8 @@ export interface HomeConnectActionClickedEvent {
   groups: TelemetryGroups
 }
 
+export type ConnectSheetSource = 'header_button' | 'connect_section' | 'keyboard_shortcut'
+
 /**
  * User opened the ConnectSheet panel.
  *
@@ -1926,7 +1994,7 @@ export interface ConnectSheetOpenedEvent {
     /**
      * Where the sheet was opened from
      */
-    source: 'header_button' | 'connect_section'
+    source: ConnectSheetSource
   }
   groups: TelemetryGroups
 }
@@ -2424,7 +2492,6 @@ export interface LogDrainSaveButtonClickedEvent {
       | 'clickhouse'
       | 'webhook'
       | 'datadog'
-      | 'elastic'
       | 'loki'
       | 'sentry'
       | 's3'
@@ -2455,7 +2522,6 @@ export interface LogDrainRemovedEvent {
       | 'clickhouse'
       | 'webhook'
       | 'datadog'
-      | 'elastic'
       | 'loki'
       | 'sentry'
       | 's3'
@@ -2465,6 +2531,66 @@ export interface LogDrainRemovedEvent {
       | 'syslog'
   }
   groups: TelemetryGroups
+}
+
+/**
+ * User clicked the save destination button in the add audit log drain sheet.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/org/{slug}/audit-log-drains (LogDrainDestinationSheetForm)
+ */
+export interface AuditLogDrainSaveButtonClickedEvent {
+  action: 'audit_log_drain_save_button_clicked'
+  properties: {
+    /**
+     * Type of the destination saved
+     */
+    destination:
+      | 'postgres'
+      | 'bigquery'
+      | 'clickhouse'
+      | 'webhook'
+      | 'datadog'
+      | 'loki'
+      | 'sentry'
+      | 's3'
+      | 'axiom'
+      | 'last9'
+      | 'otlp'
+      | 'syslog'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User confirmed removal of an audit log drain destination in the delete-confirm modal.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/org/{slug}/audit-log-drains
+ */
+export interface AuditLogDrainRemovedEvent {
+  action: 'audit_log_drain_removed'
+  properties: {
+    /**
+     * Type of the destination removed
+     */
+    destination:
+      | 'postgres'
+      | 'bigquery'
+      | 'clickhouse'
+      | 'webhook'
+      | 'datadog'
+      | 'loki'
+      | 'sentry'
+      | 's3'
+      | 'axiom'
+      | 'last9'
+      | 'otlp'
+      | 'syslog'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
 }
 
 type AdvisorCategory = 'PERFORMANCE' | 'SECURITY'
@@ -2893,39 +3019,9 @@ export interface ComputeBadgeUpgradeClickedEvent {
   properties: {
     computeSize: string
     planId: string
-    upgradeType: 'pro_upgrade' | 'free_micro_upgrade' | 'compute_upgrade'
+    upgradeType: 'free_micro_upgrade' | 'compute_upgrade'
   }
   groups: TelemetryGroups
-}
-
-/**
- * Fly.io deprecation banner rendered for a user with at least one Fly.io project or branch.
- *
- * @group Events
- * @source studio
- */
-export interface FlyDeprecationBannerExposedEvent {
-  action: 'fly_deprecation_banner_exposed'
-  groups: TelemetryGroups
-  properties: {
-    primaryCount: number
-    branchCount: number
-  }
-}
-
-/**
- * User dismissed the Fly.io deprecation banner.
- *
- * @group Events
- * @source studio
- */
-export interface FlyDeprecationBannerDismissedEvent {
-  action: 'fly_deprecation_banner_dismissed'
-  groups: TelemetryGroups
-  properties: {
-    primaryCount: number
-    branchCount: number
-  }
 }
 
 /**
@@ -3040,14 +3136,36 @@ export interface AccessTokenRemovedEvent {
 }
 
 /**
- * User clicked the "Upgrade to Pro" CTA in the dashboard header.
- * GROWTH-615: always-visible upgrade button in dashboard header for free-plan users.
+ * User clicked the "Upgrade to Pro" CTA in one of the experiment placement surfaces.
+ * GROWTH experiment: `upgradeCtaPlacement` (user_dropdown / org_projects_list).
  *
  * @group Events
  * @source studio
  */
-export interface HeaderUpgradeCtaClickedEvent {
-  action: 'header_upgrade_cta_clicked'
+export interface UpgradeCtaClickedEvent {
+  action: 'upgrade_cta_clicked'
+  properties: {
+    placement: 'user_dropdown' | 'org_projects_list'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User was exposed to the upgrade CTA placement experiment.
+ * Fires once per session per free-plan user enrolled in any variant (including control),
+ * so the conversion analysis has a baseline cohort.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface UpgradeCtaPlacementExperimentExposedEvent {
+  action: 'upgrade_cta_placement_experiment_exposed'
+  properties: {
+    /**
+     * The experiment variant shown to the user
+     */
+    variant: 'control' | 'user_dropdown' | 'org_projects_list'
+  }
   groups: Omit<TelemetryGroups, 'project'>
 }
 
@@ -3094,7 +3212,15 @@ export interface UnifiedLogsRowClickedEvent {
      * Server values are validated against this set by zod (UnifiedLogs.schema.ts) before
      * reaching the table; anything else is rejected upstream so the union here is exhaustive.
      */
-    logType: 'postgres' | 'postgrest' | 'auth' | 'storage' | 'edge function'
+    logType:
+      | 'postgres'
+      | 'postgrest'
+      | 'auth'
+      | 'storage'
+      | 'edge function'
+      | 'realtime'
+      | 'supavisor'
+      | 'pgbouncer'
   }
   groups: TelemetryGroups
 }
@@ -3359,10 +3485,13 @@ export type TelemetryEvent =
   | StoragePublicBucketSelectPolicyRemovedEvent
   | StoragePublicBucketSelectPolicyWarningDismissButtonClickedEvent
   | StudioPricingPlanCtaClickedEvent
+  | StudioBillingCancelSubscriptionClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
   | MetricsAPIBannerCtaButtonClickedEvent
   | MetricsAPIBannerDismissButtonClickedEvent
+  | UnifiedLogsBannerCtaButtonClickedEvent
+  | UnifiedLogsBannerDismissButtonClickedEvent
   | IndexAdvisorEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
   | IndexAdvisorTabClickedEvent
@@ -3379,6 +3508,7 @@ export type TelemetryEvent =
   | SupabaseUiCommandCopyButtonClickedEvent
   | SupportTicketSubmittedEvent
   | AiAssistantInSupportFormClickedEvent
+  | SupportAssistantFollowUpCardClickedEvent
   | OrganizationMfaEnforcementUpdatedEvent
   | ForeignDataWrapperCreatedEvent
   | StorageBucketCreatedEvent
@@ -3423,6 +3553,8 @@ export type TelemetryEvent =
   | SidebarOpenedEvent
   | LogDrainSaveButtonClickedEvent
   | LogDrainRemovedEvent
+  | AuditLogDrainSaveButtonClickedEvent
+  | AuditLogDrainRemovedEvent
   | AdvisorDetailOpenedEvent
   | AdvisorAssistantButtonClickedEvent
   | QueryPerformanceAIExplanationButtonClickedEvent
@@ -3446,11 +3578,10 @@ export type TelemetryEvent =
   | OrgMenuBackClickedEvent
   | OrgMenuItemClickedEvent
   | ComputeBadgeUpgradeClickedEvent
-  | FlyDeprecationBannerExposedEvent
-  | FlyDeprecationBannerDismissedEvent
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
-  | HeaderUpgradeCtaClickedEvent
+  | UpgradeCtaClickedEvent
+  | UpgradeCtaPlacementExperimentExposedEvent
   | AccessTokenCreatedEvent
   | AccessTokenRemovedEvent
   | ResourceExhaustionBannerUpgradeClickedEvent

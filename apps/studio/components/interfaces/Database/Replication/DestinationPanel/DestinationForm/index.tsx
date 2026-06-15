@@ -13,6 +13,7 @@ import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLDucklakePrivateAlpha,
   useIsETLIcebergPrivateAlpha,
+  useIsETLSnowflakePrivateAlpha,
 } from '../../useIsETLPrivateAlpha'
 import { DestinationType } from '../DestinationPanel.types'
 import { AdvancedSettings } from './AdvancedSettings'
@@ -22,16 +23,22 @@ import {
   buildDestinationConfig,
   buildDestinationConfigForValidation,
   getDucklakeValidationIssues,
+  getSnowflakeValidationIssues,
 } from './DestinationForm.utils'
 import { DestinationNameInput } from './DestinationNameInput'
-import { AnalyticsBucketFields, BigQueryFields, DuckLakeFields } from './DestinationPanelFields'
+import {
+  AnalyticsBucketFields,
+  BigQueryFields,
+  DuckLakeFields,
+  SnowflakeFields,
+} from './DestinationPanelFields'
 import { NewPublicationPanel } from './NewPublicationPanel'
 import { NoDestinationsAvailable } from './NoDestinationsAvailable'
 import { PublicationSelection } from './PublicationSelection'
 import { ReplicationDisclaimerDialog } from './ReplicationDisclaimerDialog'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
 import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import {
   BatchConfig,
@@ -84,7 +91,16 @@ type DucklakeApiConfig = {
   s3_url_style?: 'path' | 'vhost'
   s3_use_ssl?: boolean
   metadata_schema?: string
-  expire_snapshots_older_than?: string
+}
+
+type SnowflakeApiConfig = {
+  account_id: string
+  user: string
+  private_key: string
+  private_key_passphrase?: string
+  database: string
+  schema: string
+  role?: string
 }
 
 export const DestinationForm = ({
@@ -99,6 +115,7 @@ export const DestinationForm = ({
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
+  const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
 
   const [isFormInteracting, setIsFormInteracting] = useState(false)
@@ -127,8 +144,9 @@ export const DestinationForm = ({
     if (etlEnableIceberg)
       destinations.push({ value: 'Analytics Bucket', label: 'Analytics Bucket' })
     if (etlEnableDucklake) destinations.push({ value: 'DuckLake', label: 'DuckLake' })
+    if (etlEnableSnowflake) destinations.push({ value: 'Snowflake', label: 'Snowflake' })
     return destinations
-  }, [etlEnableBigQuery, etlEnableDucklake, etlEnableIceberg])
+  }, [etlEnableBigQuery, etlEnableDucklake, etlEnableIceberg, etlEnableSnowflake])
   const hasNoAvailableDestinations = availableDestinations.length === 0
 
   const { data: sourcesData } = useReplicationSourcesQuery({ projectRef })
@@ -150,11 +168,12 @@ export const DestinationForm = ({
     pipelineId: existingDestination?.pipelineId,
   })
 
-  const { data: apiKeys } = useAPIKeysQuery(
+  const { data: apiKeysData } = useAPIKeys(
     { projectRef, reveal: true },
     { enabled: canReadAPIKeys }
   )
-  const { serviceKey } = getKeys(apiKeys)
+  const { serviceKey } = apiKeysData ?? {}
+
   const catalogToken = serviceKey?.api_key ?? ''
 
   const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
@@ -198,6 +217,14 @@ export const DestinationForm = ({
       ducklakeConfigValue && typeof ducklakeConfigValue === 'object'
         ? (ducklakeConfigValue as DucklakeApiConfig)
         : undefined
+    const snowflakeConfigValue =
+      config && 'snowflake' in (config as Record<string, unknown>)
+        ? (config as Record<string, unknown>).snowflake
+        : undefined
+    const snowflakeConfig =
+      snowflakeConfigValue && typeof snowflakeConfigValue === 'object'
+        ? (snowflakeConfigValue as SnowflakeApiConfig)
+        : undefined
 
     return {
       // Common fields
@@ -237,7 +264,14 @@ export const DestinationForm = ({
       ducklakeS3UrlStyle: ducklakeConfig?.s3_url_style ?? 'path',
       ducklakeS3UseSsl: ducklakeConfig?.s3_use_ssl ?? true,
       ducklakeMetadataSchema: ducklakeConfig?.metadata_schema ?? 'ducklake',
-      ducklakeExpireSnapshotsOlderThan: ducklakeConfig?.expire_snapshots_older_than ?? '',
+      // Snowflake fields
+      snowflakeAccountId: snowflakeConfig?.account_id ?? '',
+      snowflakeUser: snowflakeConfig?.user ?? '',
+      snowflakePrivateKey: snowflakeConfig?.private_key ?? '',
+      snowflakePrivateKeyPassphrase: snowflakeConfig?.private_key_passphrase ?? '',
+      snowflakeDatabase: snowflakeConfig?.database ?? '',
+      snowflakeSchema: snowflakeConfig?.schema ?? '',
+      snowflakeRole: snowflakeConfig?.role ?? '',
     }
   }, [destinationData, pipelineData, catalogToken, projectSettings])
 
@@ -285,6 +319,10 @@ export const DestinationForm = ({
           }
         } else if (selectedType === 'DuckLake') {
           getDucklakeValidationIssues(data).forEach(({ path, message }) => {
+            addRequiredFieldError(path, message)
+          })
+        } else if (selectedType === 'Snowflake') {
+          getSnowflakeValidationIssues(data).forEach(({ path, message }) => {
             addRequiredFieldError(path, message)
           })
         }
@@ -584,6 +622,8 @@ export const DestinationForm = ({
                 />
               ) : selectedType === 'DuckLake' && etlEnableDucklake ? (
                 <DuckLakeFields form={form} />
+              ) : selectedType === 'Snowflake' && etlEnableSnowflake ? (
+                <SnowflakeFields form={form} />
               ) : null}
 
               <DialogSectionSeparator />

@@ -7,6 +7,7 @@ import { Fragment, UIEvent, useCallback, useRef } from 'react'
 import { Button, cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
 
+import AlertError from '../AlertError'
 import { formatCompactNumber } from './DataTable.utils'
 import { useDataTable } from './providers/DataTableProvider'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './Table'
@@ -20,8 +21,6 @@ export interface DataTableInfiniteProps<TData, TValue, _TMeta> {
   totalRows?: number
   filterRows?: number
   totalRowsFetched?: number
-  isFetching?: boolean
-  isLoading?: boolean
   hasNextPage?: boolean
   fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<unknown>
   setColumnOrder: (columnOrder: string[]) => void
@@ -44,8 +43,8 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   setColumnVisibility,
   searchParamsParser,
 }: DataTableInfiniteProps<TData, TValue, TMeta>) {
-  const { table, isLoading, isFetching } = useDataTable()
   const tableRef = useRef<HTMLTableElement>(null)
+  const { table, error, isError, isLoading, isFetching, openRowId, setOpenRowId } = useDataTable()
 
   const headerGroups = table.getHeaderGroups()
   const headers = headerGroups[0].headers
@@ -64,10 +63,14 @@ export function DataTableInfinite<TData, TValue, TMeta>({
     [fetchNextPage, isFetching, totalRows, totalRowsFetched]
   )
 
-  useShortcut(SHORTCUT_IDS.DATA_TABLE_RESET_COLUMNS, () => {
-    setColumnOrder([])
-    setColumnVisibility(defaultColumnVisibility)
-  })
+  useShortcut(
+    SHORTCUT_IDS.DATA_TABLE_RESET_COLUMNS,
+    () => {
+      setColumnOrder([])
+      setColumnVisibility(defaultColumnVisibility)
+    },
+    { registerInCommandMenu: true }
+  )
 
   return (
     <Table
@@ -127,7 +130,8 @@ export function DataTableInfinite<TData, TValue, TMeta>({
               row={row}
               table={table}
               searchParamsParser={searchParamsParser}
-              selected={row.getIsSelected()}
+              selected={row.id === openRowId}
+              onSelect={() => setOpenRowId(row.id === openRowId ? undefined : row.id)}
             />
           ))
         ) : isLoading ? (
@@ -144,6 +148,20 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                 ))}
               </TableRow>
             ))}
+          </Fragment>
+        ) : isError ? (
+          <Fragment>
+            <TableRow className="hover:bg-transparent h-full">
+              <TableCell colSpan={columns.length} className="text-center">
+                <div className="flex flex-col items-start justify-start h-full gap-3 px-4 pt-4">
+                  <AlertError
+                    error={error}
+                    className="text-left"
+                    subject="Failed to retrieve logs"
+                  />
+                </div>
+              </TableCell>
+            </TableRow>
           </Fragment>
         ) : (
           <Fragment>
@@ -214,14 +232,16 @@ function DataTableRow<TData>({
   table,
   selected,
   searchParamsParser,
+  onSelect,
 }: {
   row: Row<TData>
   table: TTable<TData>
   selected?: boolean
   searchParamsParser: any
+  onSelect: () => void
 }) {
   useQueryState('live', searchParamsParser.live)
-  const rowClassName = (table.options.meta as any)?.getRowClassName?.(row)
+  const rowClassName = cn('group/row', (table.options.meta as any)?.getRowClassName?.(row))
   const cells = row.getVisibleCells()
 
   return (
@@ -229,11 +249,11 @@ function DataTableRow<TData>({
       id={row.id}
       tabIndex={0}
       data-state={selected && 'selected'}
-      onClick={() => row.toggleSelected()}
+      onClick={onSelect}
       onKeyDown={(event) => {
         if (event.key === 'Enter') {
           event.preventDefault()
-          row.toggleSelected()
+          onSelect()
         }
       }}
       className={cn(rowClassName)}

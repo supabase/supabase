@@ -1,10 +1,12 @@
 import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback } from 'react'
 
+import { replicaKeys } from '../read-replicas/keys'
+import { ReadReplicasData } from '../read-replicas/replicas-query'
 import { projectKeys } from './keys'
 import { OrgProjectsResponse } from './org-projects-infinite-query'
 import type { components } from '@/data/api'
-import { get, handleError, isValidConnString } from '@/data/fetchers'
+import { get, handleError, isValidConnString, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type ProjectDetailVariables = { ref?: string }
@@ -22,7 +24,8 @@ export interface Project extends Omit<ProjectDetail, 'status'> {
 export async function getProjectDetail(
   { ref }: ProjectDetailVariables,
   signal?: AbortSignal,
-  headers?: Record<string, string>
+  headers?: Record<string, string>,
+  queryClient?: QueryClient
 ) {
   if (!ref) throw new Error('Project ref is required')
 
@@ -32,8 +35,50 @@ export async function getProjectDetail(
     headers,
   })
 
+  let connectionString = data?.connectionString
+
+  /**
+   * A project is marked as active but potentially hibernated and needs to be woken up (typically few seconds only).
+   * To prevent odd side effects like pg-meta queries failing or the likes, we wake up the project proactively and wait for it
+   * to be back online before returning the project details.
+   */
+  if (data?.is_hibernating) {
+    // In case project was scaled down, explicitly wake it up before continuing to return the project details
+    const { error: errorWaking, data: wakeResponse } = await post('/platform/projects/{ref}/wake', {
+      params: { path: { ref } },
+      signal,
+      headers,
+    })
+
+    // We will still let the user load the page in case of a wake error, but log it for debugging purposes
+    if (errorWaking) {
+      console.error('Error waking up the project', { ref, errorWaking })
+    }
+
+    // As the instance IP has changed, we need to use the latest encrypted connection string
+    if (wakeResponse) {
+      connectionString = wakeResponse.connection_string
+
+      // If replicas were previously fetched, they will hold the old connection string that we need to replace
+      queryClient?.setQueryData<ReadReplicasData>(replicaKeys.list(ref), (old) => {
+        if (!old) return old
+
+        return old.map((db) => {
+          if (db.identifier === ref) {
+            return {
+              ...db,
+              connectionString: wakeResponse.connection_string,
+              connection_string_read_only: wakeResponse.connection_string_read_only,
+            }
+          }
+          return db
+        })
+      })
+    }
+  }
+
   if (error) handleError(error)
-  return data as Project
+  return { ...data, connectionString: connectionString } as Project
 }
 
 export type ProjectDetailData = Awaited<ReturnType<typeof getProjectDetail>>
@@ -45,10 +90,12 @@ export const useProjectDetailQuery = <TData = ProjectDetailData>(
     enabled = true,
     ...options
   }: UseCustomQueryOptions<ProjectDetailData, ProjectDetailError, TData> = {}
-) =>
-  useQuery<ProjectDetailData, ProjectDetailError, TData>({
+) => {
+  const queryClient = useQueryClient()
+
+  return useQuery<ProjectDetailData, ProjectDetailError, TData>({
     queryKey: projectKeys.detail(ref),
-    queryFn: ({ signal }) => getProjectDetail({ ref }, signal),
+    queryFn: ({ signal }) => getProjectDetail({ ref }, signal, undefined, queryClient),
     enabled: enabled && typeof ref !== 'undefined',
     staleTime: 30 * 1000,
     refetchInterval: (query) => {
@@ -62,13 +109,15 @@ export const useProjectDetailQuery = <TData = ProjectDetailData>(
 
       return false
     },
+
     ...options,
   })
+}
 
 export function prefetchProjectDetail(client: QueryClient, { ref }: ProjectDetailVariables) {
   return client.fetchQuery({
     queryKey: projectKeys.detail(ref),
-    queryFn: ({ signal }) => getProjectDetail({ ref }, signal),
+    queryFn: ({ signal }) => getProjectDetail({ ref }, signal, undefined, client),
   })
 }
 

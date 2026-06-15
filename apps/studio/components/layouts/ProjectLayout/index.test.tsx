@@ -79,6 +79,7 @@ vi.mock('common', () => ({
       `free-micro-upgrade-banner-dismissed-${ref}`,
     PROJECT_INTEGRATION_BANNER_DISMISSED: (ref: string, integrationSource: string) =>
       `project-integration-banner-dismissed-${ref}-${integrationSource}`,
+    UNIFIED_LOGS_BANNER_DISMISSED: 'unified-logs-banner-dismissed',
   },
   isFeatureEnabled: () => false,
 }))
@@ -96,11 +97,11 @@ vi.mock('ui', () => ({
   Alert: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   AlertDescription: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   AlertTitle: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-  CommandInput_Shadcn_: { displayName: 'CommandInput' },
-  Command_Shadcn_: { displayName: 'Command' },
-  CommandGroup_Shadcn_: { displayName: 'CommandGroup' },
-  CommandItem_Shadcn_: { displayName: 'CommandItem' },
-  CommandList_Shadcn_: { displayName: 'CommandList' },
+  CommandInput: { displayName: 'CommandInput' },
+  Command: { displayName: 'Command' },
+  CommandGroup: { displayName: 'CommandGroup' },
+  CommandItem: { displayName: 'CommandItem' },
+  CommandList: { displayName: 'CommandList' },
   LogoLoader: () => <div data-testid="logo-loader" />,
   ResizableHandle: (props: any) => <div {...props} />,
   ResizablePanel: ({ children, ...props }: any) => <div {...props}>{children}</div>,
@@ -126,6 +127,7 @@ vi.mock('../editors/EditorsLayout.hooks', () => ({
 }))
 
 vi.mock('../MainScrollContainerContext', () => ({
+  useMainScrollContainer: () => null,
   useSetMainScrollContainer: () => () => {},
 }))
 
@@ -169,7 +171,10 @@ vi.mock('@/hooks/misc/useLocalStorage', () => ({
 }))
 
 vi.mock('@/components/ui/BannerStack/BannerStackProvider', () => ({
-  BANNER_ID: { FREE_MICRO_UPGRADE: 'free-micro-upgrade-banner' },
+  BANNER_ID: {
+    FREE_MICRO_UPGRADE: 'free-micro-upgrade-banner',
+    UNIFIED_LOGS: 'unified-logs-banner',
+  },
   useBannerStack: () => ({
     addBanner: mockAddBanner,
     dismissBanner: mockDismissBanner,
@@ -179,6 +184,20 @@ vi.mock('@/components/ui/BannerStack/BannerStackProvider', () => ({
 
 vi.mock('@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade', () => ({
   BannerFreeMicroUpgrade: () => null,
+}))
+
+vi.mock('@/components/ui/BannerStack/Banners/BannerUnifiedLogs', () => ({
+  BannerUnifiedLogs: () => null,
+}))
+
+vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
+  useUnifiedLogsPreview: () => ({
+    isEnabled: false,
+    isEligible: false,
+    isLoading: false,
+    enable: () => {},
+    disable: () => {},
+  }),
 }))
 
 vi.mock('@/data/usage/resource-warnings-query', () => ({

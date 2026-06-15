@@ -1,4 +1,4 @@
-import { IS_PLATFORM, useFlag } from 'common'
+import { useFlag } from 'common'
 import { BookOpen, Check, ChevronDown, ChevronsUpDown, Copy, ExternalLink, X } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useEffect, useState } from 'react'
@@ -7,12 +7,12 @@ import {
   Badge,
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
@@ -38,6 +38,7 @@ import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
 import { LogsWarning, LogTemplate } from './Logs.types'
 import Table from '@/components/to-be-cleaned/Table'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
 import { DOCS_URL } from '@/lib/constants'
 
 export interface LogsQueryPanelProps {
@@ -98,7 +99,13 @@ const LogsQueryPanel = ({
   }, [value.from, value.to, value.text, value.isHelper])
 
   const [open, setOpen] = useState(false)
-  const [selectedSchema, setSelectedSchema] = useState(logConstants.schemas[0])
+
+  const showMultigresLogs = useShowMultigresLogs()
+  const schemas = logConstants.schemas.filter(
+    (schema) => schema.reference !== 'multigres_logs' || showMultigresLogs
+  )
+
+  const [selectedSchema, setSelectedSchema] = useState(schemas[0])
 
   return (
     <div className="flex items-center border-b bg-surface-100 h-(--header-height)">
@@ -129,7 +136,7 @@ const LogsQueryPanel = ({
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {IS_PLATFORM && logsTemplates && (
+            {logsTemplates && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button type="default" iconRight={<ChevronDown />}>
@@ -280,13 +287,13 @@ const LogsQueryPanel = ({
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="p-0" sameWidthAsTrigger>
-                  <Command_Shadcn_>
-                    <CommandInput_Shadcn_ placeholder="Search source..." />
-                    <CommandList_Shadcn_>
-                      <CommandEmpty_Shadcn_>No source found.</CommandEmpty_Shadcn_>
-                      <CommandGroup_Shadcn_>
-                        {logConstants.schemas.map((schema) => (
-                          <CommandItem_Shadcn_
+                  <Command>
+                    <CommandInput placeholder="Search source..." />
+                    <CommandList>
+                      <CommandEmpty>No source found.</CommandEmpty>
+                      <CommandGroup>
+                        {schemas.map((schema) => (
+                          <CommandItem
                             key={schema.reference}
                             value={schema.reference}
                             onSelect={() => {
@@ -301,11 +308,11 @@ const LogsQueryPanel = ({
                               )}
                             />
                             {schema.name}
-                          </CommandItem_Shadcn_>
+                          </CommandItem>
                         ))}
-                      </CommandGroup_Shadcn_>
-                    </CommandList_Shadcn_>
-                  </Command_Shadcn_>
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
                 </PopoverContent>
               </Popover>
               <Table

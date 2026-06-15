@@ -79,10 +79,8 @@ vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
   }),
 }))
 
-vi.mock('@/data/telemetry/send-event-mutation', () => ({
-  useSendEventMutation: () => ({
-    mutate: vi.fn(),
-  }),
+vi.mock('@/lib/telemetry/track', () => ({
+  useTrack: () => vi.fn(),
 }))
 
 const resetSidebarManagerState = () => {

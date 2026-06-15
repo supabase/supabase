@@ -5,6 +5,8 @@ const pricingMetricBytes = [
   PricingMetric.EGRESS,
   PricingMetric.CACHED_EGRESS,
   PricingMetric.STORAGE_SIZE,
+  PricingMetric.LOG_INGESTION,
+  PricingMetric.LOG_QUERYING,
 ]
 
 const pricingMetricNotHrs = [
@@ -59,6 +61,7 @@ export const billingMetricUnit = (pricingMetric: PricingMetric) => {
       PricingMetric.PITR_14,
       PricingMetric.PITR_28,
       PricingMetric.LOG_DRAIN,
+      PricingMetric.ETL_PIPELINE,
       PricingMetric.AUTH_MFA_PHONE,
       PricingMetric.AUTH_MFA_WEB_AUTHN,
     ].includes(pricingMetric)

@@ -1,15 +1,18 @@
 import { InfiniteData, keepPreviousData, useInfiniteQuery } from '@tanstack/react-query'
 import { useFlag } from 'common'
 
+import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
 import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
+import { analyticsLiteral, safeSql } from './safe-analytics-sql'
+import { extractLogMetadata } from './unified-logs.utils'
 import { getUnifiedLogsQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getUnifiedLogsQuery as getUnifiedLogsQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import {
   PageParam,
   QuerySearchParamsType,
 } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
-import { handleError, post } from '@/data/fetchers'
+import { handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
 const LOGS_PAGE_LIMIT = 50
@@ -83,7 +86,7 @@ export async function getUnifiedLogs(
 
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
   const buildQuery = pickLogsQueryBuilder(useOtel, getUnifiedLogsQuery, getUnifiedLogsQueryBq)
-  const sql = `${buildQuery(search)} ORDER BY timestamp DESC, id DESC LIMIT ${LOGS_PAGE_LIMIT}`
+  const sql = safeSql`${buildQuery(search)} ORDER BY timestamp DESC, id DESC LIMIT ${analyticsLiteral(LOGS_PAGE_LIMIT)}`
 
   const cursorValue = pageParam?.cursor
   const cursorDirection = pageParam?.direction
@@ -105,17 +108,18 @@ export async function getUnifiedLogs(
     timestampEnd = isoTimestampEnd
   }
 
-  let headers = new Headers(headersInit)
-
   const endpoint = logsAllEndpointUrl(useOtel)
-  const { data, error } = await post(endpoint, {
-    params: { path: { ref: projectRef } },
-    body: { iso_timestamp_start: isoTimestampStart, iso_timestamp_end: timestampEnd, sql },
+  const data = await executeAnalyticsSql({
+    projectRef,
+    endpoint,
+    sql,
+    iso_timestamp_start: isoTimestampStart,
+    iso_timestamp_end: timestampEnd,
     signal,
-    headers,
+    headers: headersInit,
   })
 
-  if (error) handleError(error)
+  if (data.error) handleError(new Error(data.error as string))
 
   const resultData = data?.result ?? []
 
@@ -131,15 +135,17 @@ export async function getUnifiedLogs(
       ? new Date(/Z$|[+-]\d{2}:?\d{2}$/.test(ts) ? ts : `${ts}Z`)
       : new Date(Number(ts) / 1000)
 
+    const { status, method, pathname } = extractLogMetadata(row)
+
     return {
       id: row.id,
       date,
+      method,
+      pathname,
+      status,
       timestamp: row.timestamp,
       level: row.level as LogLevel,
-      status: row.status || 200,
-      method: row.method,
       host: row.host,
-      pathname: (row.url || '').replace(/^https?:\/\/[^\/]+/, '') || row.pathname || '',
       event_message: row.event_message || row.body || '',
       headers:
         typeof row.headers === 'string' ? JSON.parse(row.headers || '{}') : row.headers || {},

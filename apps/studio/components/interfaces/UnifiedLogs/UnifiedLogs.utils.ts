@@ -4,22 +4,6 @@ import { cn } from 'ui'
 import { FacetMetadataSchema } from './UnifiedLogs.schema'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 
-export const logEventBus = {
-  listeners: new Map<string, Set<(rowId: string) => void>>(),
-
-  on(event: 'selectTraceTab', callback: (rowId: string) => void) {
-    if (!this.listeners.has(event)) {
-      this.listeners.set(event, new Set())
-    }
-    this.listeners.get(event)?.add(callback)
-    return () => this.listeners.get(event)?.delete(callback)
-  },
-
-  emit(event: 'selectTraceTab', rowId: string) {
-    this.listeners.get(event)?.forEach((callback) => callback(rowId))
-  },
-}
-
 export const getFacetedUniqueValues = <TData>(facets?: Record<string, FacetMetadataSchema>) => {
   return (_table: TTable<TData>, columnId: string) => {
     return new Map(facets?.[columnId]?.rows?.map(({ value, total }) => [value, total]) || [])
@@ -111,7 +95,42 @@ export function formatServiceTypeForDisplay(serviceType: string): string {
     postgres: 'Postgres',
     auth: 'Auth',
     storage: 'Storage',
+    realtime: 'Realtime',
+    supavisor: 'Supavisor',
+    pgbouncer: 'PgBouncer',
   }
 
   return specialCases[serviceType.toLowerCase()] || serviceType
+}
+
+/**
+ * Parses an auth log event_message that may be a stringified JSON object.
+ * Auth log entries store metadata as JSON in event_message (e.g. {"msg":"...","level":"info"}).
+ * Extracts the human-readable msg field, falling back to error, then the raw string.
+ * The fallback ensures self-hosted versions with different formats still render correctly.
+ */
+export function parseAuthLogEventMessage(value: string | undefined): string | undefined {
+  if (!value) return value
+
+  try {
+    const parsed = JSON.parse(value)
+
+    if (parsed && typeof parsed === 'object') {
+      const err = parsed.error || parsed.error_code
+      if (typeof err === 'string' && err.trim()) {
+        return !/^\d{3}:/.test(err) ? err.replaceAll('_', ' ') : err
+      }
+
+      const msg = parsed.msg
+      if (typeof msg === 'string' && msg.trim()) {
+        const action = parsed.action ?? parsed.auth_event?.action
+        const authEvent = typeof action === 'string' ? action.replaceAll('_', ' ') : undefined
+        return `${authEvent ? `${authEvent}: ` : ''}${msg}`
+      }
+    }
+
+    return value
+  } catch (error) {
+    return value
+  }
 }

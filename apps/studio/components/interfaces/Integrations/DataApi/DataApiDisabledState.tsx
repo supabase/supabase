@@ -12,8 +12,8 @@ export const DataApiDisabledState = ({ description }: DataApiDisabledStateProps)
   const { ref: projectRef } = useParams()
 
   return (
-    <div className="flex w-full flex-1 items-center justify-center p-10">
-      <Alert className="max-w-md">
+    <div className="flex w-full p-10">
+      <Alert className="max-w-md mx-auto">
         <AlertCircle size={16} />
         <AlertTitle>Data API is disabled</AlertTitle>
         <AlertDescription>

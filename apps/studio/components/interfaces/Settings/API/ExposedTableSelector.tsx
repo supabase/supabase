@@ -5,11 +5,11 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -120,15 +120,15 @@ export const ExposedTableSelector = ({
         align="start"
         sameWidthAsTrigger
       >
-        <Command_Shadcn_ shouldFilter={false}>
-          <CommandInput_Shadcn_
+        <Command shouldFilter={false}>
+          <CommandInput
             className="text-xs"
             placeholder="Find table..."
             value={search}
             onValueChange={setSearch}
           />
-          <CommandList_Shadcn_>
-            <CommandGroup_Shadcn_>
+          <CommandList>
+            <CommandGroup>
               {isPending ? (
                 <>
                   <div className="px-2 py-1">
@@ -173,7 +173,7 @@ export const ExposedTableSelector = ({
                       })
 
                       return (
-                        <CommandItem_Shadcn_
+                        <CommandItem
                           key={table.id}
                           value={`${table.schema}.${table.name}-${table.id}`}
                           className={cn(
@@ -260,7 +260,7 @@ export const ExposedTableSelector = ({
                               )}
                             </div>
                           </div>
-                        </CommandItem_Shadcn_>
+                        </CommandItem>
                       )
                     })}
                     <div ref={sentinelRef} className="h-1 -mt-1" />
@@ -272,9 +272,9 @@ export const ExposedTableSelector = ({
                   </ScrollArea>
                 </>
               )}
-            </CommandGroup_Shadcn_>
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
+            </CommandGroup>
+          </CommandList>
+        </Command>
       </PopoverContent>
     </Popover>
   )

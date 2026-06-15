@@ -34,6 +34,8 @@ import {
   GITHUB_INTEGRATION_INSTALLATION_URL,
   GITHUB_INTEGRATION_REVOKE_AUTHORIZATION_URL,
 } from '@/lib/github'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 type GitHubSectionProps = {
   canCreateGitHubConnection: boolean
@@ -165,6 +167,10 @@ export const IntegrationSettings = () => {
   const onAddGitHubConnection = useCallback(() => {
     router.push('/project/_/settings/integrations')
   }, [router])
+
+  useShortcut(SHORTCUT_IDS.ORG_INTEGRATIONS_ADD_CONNECTION, onAddGitHubConnection, {
+    enabled: canCreateGitHubConnection,
+  })
 
   const onDeleteGitHubConnection = useCallback(
     async (connection: IntegrationProjectConnection) => {

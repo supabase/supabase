@@ -1,9 +1,28 @@
-import { posthogClient } from 'common'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 
 import { usePHFlag } from '../ui/useFlag'
 import { IS_TEST_ENV } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
+
+/**
+ * Returns true iff the user is assigned to the treatment arm of the
+ * dataApiRevokeOnCreateDefault experiment. Shape-agnostic across the current
+ * boolean rollout config and a future multivariate experiment with named
+ * variants. See GROWTH-877 for the migration plan.
+ *
+ * Accepts:
+ *   - `true`     → treatment (current boolean shape)
+ *   - `'test'`   → treatment (future multivariate shape)
+ *   - anything else (`false`, `'control'`, `null`, `undefined`) → not treatment
+ *
+ * Use this everywhere the flag's value is read so the PostHog config can
+ * migrate to multivariate without a coordinated frontend deploy.
+ */
+export const isInDataApiRevokeTreatment = (flag: boolean | string | undefined): boolean => {
+  if (flag === true) return true
+  if (flag === 'test') return true
+  return false
+}
 
 /**
  * Controls the default state of the "Automatically expose new tables"
@@ -12,7 +31,7 @@ import { useTrack } from '@/lib/telemetry/track'
  * to checked (current behaviour — default grants remain).
  */
 export const useDataApiRevokeOnCreateDefaultEnabled = (): boolean => {
-  const flag = usePHFlag<boolean>('dataApiRevokeOnCreateDefault')
+  const flag = usePHFlag<boolean | string>('dataApiRevokeOnCreateDefault')
 
   // Preserve current behaviour (default grants remain) in tests so existing
   // E2E flows don't change silently. Tests that need the revoke-default path
@@ -21,63 +40,56 @@ export const useDataApiRevokeOnCreateDefaultEnabled = (): boolean => {
     return false
   }
 
-  return !!flag
+  return isInDataApiRevokeTreatment(flag)
 }
 
 type DefaultPrivilegesExposureOptions =
-  | { surface: 'main'; dataApiEnabled: boolean }
-  | { surface: 'vercel'; orgSlug: string | undefined }
+  | {
+      surface: 'main'
+      dataApiDefaultPrivileges: boolean
+      hasUserModified: boolean
+    }
+  | {
+      surface: 'vercel'
+      orgSlug: string | undefined
+      dataApiDefaultPrivileges: boolean
+      hasUserModified: boolean
+    }
 
 /**
- * Fires `project_creation_default_privileges_exposed` once per mount after both
- * the `dataApiRevokeOnCreateDefault` flag resolves AND the `org_count` person
- * property has been set on the PostHog SDK. Waiting for both signals avoids
- * locking in the variant on the initial /flags/ response, which races the
- * org_count identify for brand-new signups — the exposure must reflect the
- * targeting-aware flag value. Deduplicated via ref so re-renders and mid-session
- * flag flips don't re-fire.
+ * Fires `project_creation_default_privileges_exposed` once per mount, once the
+ * flag has resolved AND the form value is consistent with the flag's expected
+ * default. The convergence gate avoids a render-ordering race: caller-side
+ * sync effects (in /new/[slug] and the Vercel deploy flow) update the form
+ * value when the flag resolves late, but child effects fire before parent
+ * effects in the same commit, so without the gate the exposure would capture
+ * the stale pre-sync value. If the user has dirtied the field, fire
+ * immediately with their explicit value. Deduplicated via ref.
  */
 export const useTrackDefaultPrivilegesExposure = (options: DefaultPrivilegesExposureOptions) => {
   const track = useTrack()
-  const flag = usePHFlag<boolean>('dataApiRevokeOnCreateDefault')
+  const flag = usePHFlag<boolean | string>('dataApiRevokeOnCreateDefault')
   const hasTracked = useRef(false)
-  const [orgCountReady, setOrgCountReady] = useState(
-    () => posthogClient.getPersonProperty('org_count') !== undefined
-  )
 
-  const { surface } = options
-  const dataApiEnabled = options.surface === 'main' ? options.dataApiEnabled : null
+  const { surface, dataApiDefaultPrivileges, hasUserModified } = options
   const orgSlug = options.surface === 'vercel' ? options.orgSlug : undefined
-
-  // Mark ready once org_count appears on the SDK person. A /flags/ response
-  // received after our identify will have included org_count in the evaluation,
-  // so subscribing via onFeatureFlags is the right signal that the flag store
-  // reflects the targeting-aware value.
-  useEffect(() => {
-    if (orgCountReady) return
-    const check = () => {
-      if (posthogClient.getPersonProperty('org_count') !== undefined) {
-        setOrgCountReady(true)
-      }
-    }
-    check()
-    return posthogClient.onFeatureFlags(check)
-  }, [orgCountReady])
 
   useEffect(() => {
     if (hasTracked.current) return
     if (flag === undefined) return
-    if (!orgCountReady) return
     if (surface === 'vercel' && !orgSlug) return
+    // Gate on form-flag convergence unless the user explicitly dirtied the field.
+    const expectedDefault = !isInDataApiRevokeTreatment(flag)
+    if (!hasUserModified && dataApiDefaultPrivileges !== expectedDefault) return
     hasTracked.current = true
     track(
       'project_creation_default_privileges_exposed',
       {
         surface,
-        ...(dataApiEnabled !== null && { dataApiEnabled }),
+        dataApiDefaultPrivileges,
         dataApiRevokeOnCreateDefaultEnabled: flag,
       },
       surface === 'vercel' ? { organization: orgSlug } : undefined
     )
-  }, [flag, orgCountReady, track, surface, dataApiEnabled, orgSlug])
+  }, [flag, track, surface, dataApiDefaultPrivileges, hasUserModified, orgSlug])
 }

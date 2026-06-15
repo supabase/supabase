@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { useFlag } from 'common'
 
+import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
 import { logsAllEndpointUrl } from './logs-endpoint'
-import { bqIdent, safeSql } from './safe-analytics-sql'
+import { quotedIdent, safeSql } from './safe-analytics-sql'
 import {
   getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
@@ -15,7 +16,6 @@ import {
   getUnifiedLogsCTE,
 } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
-import { handleError, post } from '@/data/fetchers'
 import { ExecuteSqlError } from '@/data/sql/execute-sql-query'
 import { UseCustomQueryOptions } from '@/types'
 
@@ -34,22 +34,25 @@ export async function getUnifiedLogsFacetCount(
   }
 
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
+  const cteName = quotedIdent(facet.replaceAll('.', '_') + '_count')
+
   const sql = useOtel
     ? getFacetCountQuery({ search, facet, facetSearch })
     : safeSql`
 ${getUnifiedLogsCTE()},
-${getFacetCountCTE({ search, facet, facetSearch })}
-SELECT dimension, value, count from ${bqIdent(facet + '_count')};
+${getFacetCountCTE({ search, facet, facetSearch, cteName })}
+SELECT dimension, value, count from ${cteName};
 `
 
   const endpoint = logsAllEndpointUrl(useOtel)
-  const { data, error } = await post(endpoint, {
-    params: { path: { ref: projectRef } },
-    body: { iso_timestamp_start: isoTimestampStart, iso_timestamp_end: isoTimestampEnd, sql },
+  const data = await executeAnalyticsSql({
+    projectRef,
+    endpoint,
+    sql,
+    iso_timestamp_start: isoTimestampStart,
+    iso_timestamp_end: isoTimestampEnd,
     signal,
   })
-
-  if (error) handleError(error)
   return (data.result ?? []) as Option[]
 }
 

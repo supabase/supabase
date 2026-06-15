@@ -9,10 +9,10 @@ import {
   Button,
   ButtonProps,
   cn,
-  Command_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -123,12 +123,12 @@ export const DatabaseSelector = ({
         </div>
       </PopoverTrigger>
       <PopoverContent className="p-0 w-64" side="bottom" align={align}>
-        <Command_Shadcn_>
-          <CommandList_Shadcn_>
+        <Command>
+          <CommandList>
             {additionalOptions.length > 0 && (
-              <CommandGroup_Shadcn_ className="border-b">
+              <CommandGroup className="border-b">
                 {additionalOptions.map((option) => (
-                  <CommandItem_Shadcn_
+                  <CommandItem
                     key={option.id}
                     value={option.id}
                     className="cursor-pointer w-full"
@@ -147,11 +147,11 @@ export const DatabaseSelector = ({
                       <p>{option.name}</p>
                       {option.id === selectedDatabaseId && <Check size={14} />}
                     </div>
-                  </CommandItem_Shadcn_>
+                  </CommandItem>
                 ))}
-              </CommandGroup_Shadcn_>
+              </CommandGroup>
             )}
-            <CommandGroup_Shadcn_>
+            <CommandGroup>
               <ScrollArea className={(databases || []).length > 7 ? 'h-[210px]' : ''}>
                 {sortedDatabases?.map((database) => {
                   const region = formatDatabaseRegion(database.region)
@@ -185,7 +185,7 @@ export const DatabaseSelector = ({
                   }
 
                   return (
-                    <CommandItem_Shadcn_
+                    <CommandItem
                       key={database.identifier}
                       value={database.identifier}
                       className="cursor-pointer w-full"
@@ -208,14 +208,14 @@ export const DatabaseSelector = ({
                         </p>
                         {database.identifier === selectedDatabaseId && <Check size={16} />}
                       </div>
-                    </CommandItem_Shadcn_>
+                    </CommandItem>
                   )
                 })}
               </ScrollArea>
-            </CommandGroup_Shadcn_>
+            </CommandGroup>
             {IS_PLATFORM && infrastructureReadReplicas && (
-              <CommandGroup_Shadcn_ className="border-t">
-                <CommandItem_Shadcn_
+              <CommandGroup className="border-t">
+                <CommandItem
                   className="cursor-pointer w-full"
                   onSelect={() => {
                     setOpen(false)
@@ -235,11 +235,11 @@ export const DatabaseSelector = ({
                     <Plus size={14} strokeWidth={1.5} />
                     <p>Create a new read replica</p>
                   </Link>
-                </CommandItem_Shadcn_>
-              </CommandGroup_Shadcn_>
+                </CommandItem>
+              </CommandGroup>
             )}
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
+          </CommandList>
+        </Command>
       </PopoverContent>
     </Popover>
   )

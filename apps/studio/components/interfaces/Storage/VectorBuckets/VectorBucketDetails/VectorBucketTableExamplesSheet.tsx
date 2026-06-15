@@ -8,10 +8,10 @@ import { useState } from 'react'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -28,7 +28,7 @@ import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { useS3VectorsWrapperExtension } from '../useS3VectorsWrapper'
 import { useS3VectorsWrapperInstance } from '../useS3VectorsWrapperInstance'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { VectorBucketIndex } from '@/data/storage/vector-buckets-indexes-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { DOCS_URL } from '@/lib/constants'
@@ -143,8 +143,8 @@ function VectorBucketIndexExamples({
     PermissionAction.READ,
     'service_api_keys'
   )
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
-  const { secretKey } = canReadAPIKeys ? getKeys(apiKeys) : { secretKey: null }
+  const { data: apiKeysData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
+  const { secretKey } = apiKeysData ?? {}
 
   const { data: wrapperInstance } = useS3VectorsWrapperInstance({ bucketId })
   const foreignTable = wrapperInstance?.tables?.find((x) => x.name === indexName)
@@ -177,7 +177,7 @@ values
 
   const jsCode = `import { createClient } from '@supabase/supabase-js'
 
-// Adding vector data requires a secret or service role key 
+// Adding vector data requires a secret or service role key
 // This code SHOULD NOT be run on the client side as you will be vulnerable to a data leak
 const client = createClient(
   process.env.SUPABASE_URL,
@@ -228,26 +228,26 @@ const result = await index.putVectors({
               </div>
             </PopoverTrigger>
             <PopoverContent className="p-0 w-32" side="bottom" align="end">
-              <Command_Shadcn_>
-                <CommandList_Shadcn_>
-                  <CommandGroup_Shadcn_>
-                    <CommandItem_Shadcn_
+              <Command>
+                <CommandList>
+                  <CommandGroup>
+                    <CommandItem
                       className="cursor-pointer"
                       onSelect={() => onLanguageChange('sql')}
                       onClick={() => onLanguageChange('sql')}
                     >
                       <p>SQL</p>
-                    </CommandItem_Shadcn_>
-                    <CommandItem_Shadcn_
+                    </CommandItem>
+                    <CommandItem
                       className="cursor-pointer"
                       onSelect={() => onLanguageChange('javascript')}
                       onClick={() => onLanguageChange('javascript')}
                     >
                       <p>JavaScript</p>
-                    </CommandItem_Shadcn_>
-                  </CommandGroup_Shadcn_>
-                </CommandList_Shadcn_>
-              </Command_Shadcn_>
+                    </CommandItem>
+                  </CommandGroup>
+                </CommandList>
+              </Command>
             </PopoverContent>
           </Popover>
 

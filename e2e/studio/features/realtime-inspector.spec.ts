@@ -15,6 +15,7 @@ import { test } from '../utils/test.js'
 test.describe('Realtime Inspector', () => {
   test.beforeEach(async ({ page, ref }) => {
     await navigateToRealtimeInspector(page, ref)
+    await page.waitForResponse(new RegExp(`/platform/projects/${ref}/settings`))
   })
 
   test.describe('Basic Inspector UI', () => {

@@ -5,8 +5,7 @@ import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { ConfirmFooter } from './ConfirmFooter'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface EdgeFunctionRendererProps {
   label: string
@@ -30,8 +29,7 @@ export const EdgeFunctionRenderer = ({
   showConfirmFooter = true,
 }: PropsWithChildren<EdgeFunctionRendererProps>) => {
   const { ref } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const [showReplaceWarning, setShowReplaceWarning] = useState(false)
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref }, { enabled: !!ref })
@@ -69,14 +67,7 @@ export const EdgeFunctionRenderer = ({
     if (!code || isDeploying || !ref || !functionName) return
 
     setShowReplaceWarning(false)
-    sendEvent({
-      action: 'edge_function_deploy_button_clicked',
-      properties: { origin: 'functions_ai_assistant' },
-      groups: {
-        project: ref ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
-    })
+    track('edge_function_deploy_button_clicked', { origin: 'functions_ai_assistant' })
     onApprove?.()
   }
 
@@ -113,7 +104,8 @@ export const EdgeFunctionRenderer = ({
           <ConfirmFooter
             message="Assistant wants to deploy this Edge Function"
             cancelLabel="Skip"
-            confirmLabel={isDeploying ? 'Deploying...' : 'Deploy'}
+            confirmLabel="Deploy"
+            confirmLabelLoading="Deploying..."
             isLoading={isDeploying}
             onCancel={() => onDeny?.()}
             onConfirm={handleDeploy}
