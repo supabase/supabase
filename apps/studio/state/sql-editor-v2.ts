@@ -6,6 +6,7 @@ import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 import { devtools, proxyMap } from 'valtio/utils'
 
 import type { QueryPlanRow } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
+import { persistDraftSqlTab } from '@/components/interfaces/SQLEditor/draftSqlTabStorage.utils'
 import { DiffType } from '@/components/interfaces/SQLEditor/SQLEditor.types'
 import { upsertContent, UpsertContentPayload } from '@/data/content/content-upsert-mutation'
 import { contentKeys } from '@/data/content/keys'
@@ -31,9 +32,19 @@ type StateSnippet = {
 export interface SnippetWithContent extends Snippet {
   content?: SqlSnippets.Content
   isNotSavedInDatabaseYet?: boolean
+  /** Ephemeral SQL editor tab — persisted only to local storage, not shown in the sidebar until saved */
+  isDraftTab?: boolean
 }
 
 const NEW_FOLDER_ID = 'new-folder'
+
+/**
+ * A draft tab is an unsaved snippet that lives only in the Valtio store + local storage. Drafts must
+ * never be queued for the async DB save (`needsSaving`) until the user explicitly saves them.
+ */
+function isDraftSqlTabId(id: string) {
+  return sqlEditorState.snippets[id]?.snippet?.isDraftTab === true
+}
 
 export const sqlEditorState = proxy({
   // ========================================================================
@@ -136,7 +147,7 @@ export const sqlEditorState = proxy({
     skipSave = false,
   }: {
     id: string
-    snippet: Partial<Snippet>
+    snippet: Partial<SnippetWithContent>
     skipSave?: boolean
   }) => {
     if (sqlEditorState.snippets[id]) {
@@ -144,7 +155,7 @@ export const sqlEditorState = proxy({
         ...sqlEditorState.snippets[id].snippet,
         ...snippet,
       }
-      if (!skipSave) sqlEditorState.needsSaving.set(id, true)
+      if (!skipSave && !isDraftSqlTabId(id)) sqlEditorState.needsSaving.set(id, true)
     }
   },
 
@@ -172,15 +183,28 @@ export const sqlEditorState = proxy({
     id,
     sql,
     shouldInvalidate = false,
+    skipSave = false,
   }: {
     id: string
     sql: string
     shouldInvalidate?: boolean
+    skipSave?: boolean
   }) => {
     let snippet = sqlEditorState.snippets[id]?.snippet
     if (snippet?.content) {
       snippet.content.unchecked_sql = untrustedSql(sql)
-      sqlEditorState.needsSaving.set(id, shouldInvalidate)
+
+      // Drafts are not persisted to the DB — store their content in local storage instead so it
+      // survives reloads, and never queue them for the async DB save.
+      if (isDraftSqlTabId(id)) {
+        const stateSnippet = sqlEditorState.snippets[id]
+        if (stateSnippet) {
+          persistDraftSqlTab(stateSnippet.projectRef, id, { sql, name: snippet.name })
+        }
+        return
+      }
+
+      if (!skipSave) sqlEditorState.needsSaving.set(id, shouldInvalidate)
     }
   },
 
@@ -295,7 +319,10 @@ export const sqlEditorState = proxy({
    */
   setLimit: (value: number) => (sqlEditorState.limit = value),
 
-  addNeedsSaving: (id: string) => sqlEditorState.needsSaving.set(id, true),
+  addNeedsSaving: (id: string) => {
+    if (isDraftSqlTabId(id)) return
+    sqlEditorState.needsSaving.set(id, true)
+  },
 
   addFavorite: (id: string) => {
     const storeSnippet = sqlEditorState.snippets[id]
@@ -480,6 +507,13 @@ if (typeof window !== 'undefined') {
       const folder = state.folders[id]
 
       if (snippet) {
+        // Drafts should never reach this point, but guard against a snippet that was queued and then
+        // flipped back to a draft mid-cycle.
+        if (snippet.snippet.isDraftTab) {
+          sqlEditorState.needsSaving.delete(id)
+          return
+        }
+
         const {
           name,
           description,

@@ -79,9 +79,14 @@ export function useSqlEditorTabsCleanup() {
       ...IGNORED_TAB_IDS,
     ]
 
-    // Remove any snippet tabs that might no longer be existing (removed outside of the dashboard session)
+    // Remove any snippet tabs that might no longer be existing (removed outside of the dashboard session).
+    // Draft tabs are unsaved snippets that only live in local storage, so they are never in the
+    // fetched snippets list — they must be excluded from cleanup or they'd be wiped on every load.
     const snippetTabsToBeCleaned = openTabsRef.current.filter(
-      (id: string) => id.startsWith('sql') && !currentContentIds.includes(id)
+      (id: string) =>
+        id.startsWith('sql') &&
+        !currentContentIds.includes(id) &&
+        !tabMapRef.current[id]?.metadata?.isDraft
     )
     tabs.removeTabs(snippetTabsToBeCleaned)
 
@@ -89,7 +94,9 @@ export function useSqlEditorTabsCleanup() {
     const recentItems = tabs.getRecentItemsByType('sql')
     tabs.removeRecentItems(
       recentItems
-        ? recentItems.filter((item) => !currentContentIds.includes(item.id)).map((item) => item.id)
+        ? recentItems
+            .filter((item) => !currentContentIds.includes(item.id) && !item.metadata?.isDraft)
+            .map((item) => item.id)
         : []
     )
 

@@ -24,6 +24,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
+import { removePersistedDraftSqlTab } from './draftSqlTabStorage.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
 import { useSqlTitleGenerateMutation } from '@/data/ai/sql-title-mutation'
@@ -76,6 +77,11 @@ export const RenameQueryModal = ({
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
 
   const { id, name, description } = snippet
+
+  // A draft is an unsaved snippet that only exists in local storage. Confirming the dialog is what
+  // persists it for the first time (draft -> saved), so we also clear its local-storage entry and
+  // draft flags here.
+  const isDraftSnippet = (snippet as any)?.isDraftTab === true
 
   const { mutate: getGeneratedValues, isPending: isTitleGenerationLoading } =
     useSqlTitleGenerateMutation({
@@ -130,11 +136,27 @@ export const RenameQueryModal = ({
         } as UpsertContentPayload,
       })
 
+      // The draft has now been persisted to the database — drop its local-storage entry.
+      if (isDraftSnippet) removePersistedDraftSqlTab(ref, id)
+
       if (IS_PLATFORM) {
         snapV2.renameSnippet({ id, name, description })
 
+        if (isDraftSnippet) {
+          // Promote the in-memory draft to a regular saved snippet so it stops being hidden from the
+          // sidebar and resumes normal auto-save on subsequent edits.
+          snapV2.updateSnippet({
+            id,
+            snippet: { isDraftTab: false, isNotSavedInDatabaseYet: false },
+            skipSave: true,
+          })
+        }
+
         const tabId = createTabId('sql', { id })
-        tabsSnap.updateTab(tabId, { label: name })
+        tabsSnap.updateTab(tabId, {
+          label: name,
+          ...(isDraftSnippet ? { metadata: { isDraft: false } } : {}),
+        })
       } else if (changedSnippet) {
         // In self-hosted, the snippet also updates the id when renaming it. This code is to ensure the previous snippet
         // is removed, new one is added, tab state is updated and the router is updated.
@@ -152,7 +174,9 @@ export const RenameQueryModal = ({
         }
       }
 
-      toast.success('Successfully renamed snippet!')
+      toast.success(
+        isDraftSnippet ? 'Successfully saved snippet!' : 'Successfully renamed snippet!'
+      )
       if (onComplete) onComplete()
     } catch (error: any) {
       // [Joshen] We probably need some rollback cause all the saving is async
@@ -181,7 +205,7 @@ export const RenameQueryModal = ({
     <Dialog open={visible} onOpenChange={handleCancel}>
       <DialogContent size="small">
         <DialogHeader>
-          <DialogTitle>Rename</DialogTitle>
+          <DialogTitle>{isDraftSnippet ? 'Save query' : 'Rename'}</DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
         <Form {...form}>
@@ -250,8 +274,12 @@ export const RenameQueryModal = ({
               >
                 Cancel
               </Button>
-              <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting || !isDirty}>
-                Rename query
+              <Button
+                htmlType="submit"
+                loading={isSubmitting}
+                disabled={isSubmitting || (!isDirty && !isDraftSnippet)}
+              >
+                {isDraftSnippet ? 'Save query' : 'Rename query'}
               </Button>
             </DialogFooter>
           </form>

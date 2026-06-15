@@ -17,11 +17,13 @@ import {
 } from 'ui'
 
 import { SqlRunButton } from './RunButton'
+import { SqlSaveButton } from './SaveButton'
 import SavingIndicator from './SavingIndicator'
 import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from '@/lib/constants'
+import { useProfile } from '@/lib/profile'
 import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
@@ -33,6 +35,7 @@ export type UtilityActionsProps = {
   hasSelection?: boolean
   prettifyQuery: () => void
   executeQuery: () => void
+  onSave: () => void
 }
 
 export const UtilityActions = ({
@@ -42,8 +45,10 @@ export const UtilityActions = ({
   hasSelection = false,
   prettifyQuery,
   executeQuery,
+  onSave,
 }: UtilityActionsProps) => {
   const { ref } = useParams()
+  const { profile } = useProfile()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const [isAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
@@ -58,6 +63,9 @@ export const UtilityActions = ({
 
   const snippet = snapV2.snippets[id]
   const isFavorite = snippet !== undefined ? snippet.snippet.favorite : false
+  const isSaving = snapV2.savingStates[id] === 'UPDATING'
+  const isReadOnly =
+    snippet?.snippet.visibility === 'project' && snippet?.snippet.owner_id !== profile?.id
 
   const hotkeySequnece: Hotkey | undefined =
     SHORTCUT_DEFINITIONS[SHORTCUT_IDS.SQL_EDITOR_FORMAT].sequence[0]
@@ -194,6 +202,13 @@ export const UtilityActions = ({
       </div>
 
       <div className="flex items-center justify-between gap-x-2">
+        {IS_PLATFORM && (
+          <SqlSaveButton
+            isDisabled={isDisabled || isReadOnly}
+            isSaving={isSaving}
+            onClick={onSave}
+          />
+        )}
         <div className="flex items-center">
           {IS_PLATFORM && (
             <DatabaseSelector

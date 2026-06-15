@@ -2,7 +2,6 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { FilePlus, FolderPlus, Plus, X } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -24,6 +23,7 @@ import {
 
 import { SearchList } from './SQLEditorNavV2/SearchList'
 import { SQLEditorNav } from './SQLEditorNavV2/SQLEditorNav'
+import { useCreateDraftSqlTab } from '@/components/interfaces/SQLEditor/useCreateDraftSqlTab'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -32,7 +32,6 @@ import { getAppStateSnapshot } from '@/state/app-state'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 export const SQLEditorMenu = () => {
-  const router = useRouter()
   const { ref } = useParams()
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
@@ -47,6 +46,7 @@ export const SQLEditorMenu = () => {
 
   const appState = getAppStateSnapshot()
   const debouncedSearch = useDebounce(search, 500)
+  const { createDraftTab } = useCreateDraftSqlTab()
 
   const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
@@ -72,7 +72,8 @@ export const SQLEditorMenu = () => {
       return toast('Your queries will not be saved as you do not have sufficient permissions')
     }
     try {
-      router.push(`/project/${ref}/sql/new?skip=true`)
+      // Open a fresh draft tab directly instead of routing through the transient /sql/new route
+      createDraftTab()
       setSearch('')
       setShowSearch(false)
     } catch (error: any) {

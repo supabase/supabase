@@ -1,18 +1,15 @@
 import Editor, { Monaco, OnMount } from '@monaco-editor/react'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { useRouter } from 'next/router'
 import { MutableRefObject, useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
-import { createSqlSnippetSkeletonV2 } from './SQLEditor.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { getEditorSelectionParts } from '@/components/ui/AIEditor/utils'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -31,6 +28,7 @@ export type MonacoEditorProps = {
   executeQuery: () => void
   executeExplainQuery: () => void
   prettifyQuery: () => void
+  onSave?: () => void
   onHasSelection: (value: boolean) => void
   onMount?: (editor: IStandaloneCodeEditor) => void
   onPrompt?: (value: {
@@ -45,7 +43,6 @@ export type MonacoEditorProps = {
 
 const MonacoEditor = ({
   id,
-  snippetName,
   editorRef,
   monacoRef,
   autoFocus = true,
@@ -54,14 +51,13 @@ const MonacoEditor = ({
   executeQuery,
   executeExplainQuery,
   prettifyQuery,
+  onSave,
   onHasSelection,
   onPrompt,
   onMount,
 }: MonacoEditorProps) => {
-  const router = useRouter()
   const { profile } = useProfile()
-  const { ref, content } = useParams()
-  const { data: project } = useSelectedProjectQuery()
+  const { content } = useParams()
 
   const snapV2 = useSqlEditorV2StateSnapshot()
   const tabsSnap = useTabsStateSnapshot()
@@ -92,6 +88,9 @@ const MonacoEditor = ({
 
   const prettifyQueryRef = useRef(prettifyQuery)
   prettifyQueryRef.current = prettifyQuery
+
+  const onSaveRef = useRef(onSave)
+  onSaveRef.current = onSave
 
   const aiHotkeyEnabledRef = useRef(isAIAssistantHotkeyEnabled)
   aiHotkeyEnabledRef.current = isAIAssistantHotkeyEnabled
@@ -163,7 +162,7 @@ const MonacoEditor = ({
       contextMenuGroupId: 'operation',
       contextMenuOrder: 0,
       run: () => {
-        if (snippet) snapV2.addNeedsSaving(snippet.snippet.id)
+        onSaveRef.current?.()
       },
     })
 
@@ -245,26 +244,21 @@ const MonacoEditor = ({
 
   function handleEditorChange(value: string | undefined) {
     tabsSnap.makeActiveTabPermanent()
-    if (id && value) {
-      if (!snippet && ref && profile !== undefined && project !== undefined) {
-        const snippet = createSqlSnippetSkeletonV2({
-          idOverride: id,
-          name: snippetName,
-          sql: value,
-          owner_id: profile?.id,
-          project_id: project?.id,
-        })
-        snapV2.addSnippet({ projectRef: ref, snippet })
-        router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
-      }
+    if (id && value !== undefined) {
       setValue(value)
     }
   }
 
   useEffect(() => {
     if (debouncedValue.length > 0 && snippet) {
-      const shouldInvalidate = snippet.snippet.isNotSavedInDatabaseYet
-      snapV2.setSql({ id, sql: value, shouldInvalidate })
+      // Drafts persist to local storage (handled within setSql); saved snippets queue a debounced
+      // DB save exactly as before.
+      if (snippet.snippet.isDraftTab) {
+        snapV2.setSql({ id, sql: value, skipSave: true })
+      } else {
+        const shouldInvalidate = snippet.snippet.isNotSavedInDatabaseYet
+        snapV2.setSql({ id, sql: value, shouldInvalidate })
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedValue])

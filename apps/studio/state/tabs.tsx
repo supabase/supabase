@@ -37,6 +37,8 @@ export interface Tab {
     tableId?: number
     sqlId?: string
     scrollTop?: number
+    /** Marks a SQL tab as an unsaved draft so it can be hidden from the saved-snippets nav and restored from local storage */
+    isDraft?: boolean
   }
   isPreview?: boolean
   createdAt?: Date
@@ -55,6 +57,7 @@ export interface RecentItem {
     name?: string
     tableId?: number
     sqlId?: string
+    isDraft?: boolean
   }
 }
 
@@ -222,7 +225,14 @@ export function createTabsState(projectRef: string) {
       store.previewTabId = tab.id
       store.activeTab = tab.id
     },
-    updateTab: (id: string, updates: { label?: string; scrollTop?: number }) => {
+    updateTab: (
+      id: string,
+      updates: {
+        label?: string
+        scrollTop?: number
+        metadata?: Partial<NonNullable<Tab['metadata']>>
+      }
+    ) => {
       if (!!store.tabsMap[id]) {
         if ('label' in updates) {
           store.tabsMap[id].label = updates.label
@@ -237,6 +247,12 @@ export function createTabsState(projectRef: string) {
         }
         if ('scrollTop' in updates && store.tabsMap[id].metadata) {
           store.tabsMap[id].metadata.scrollTop = updates.scrollTop
+        }
+        if (updates.metadata && store.tabsMap[id].metadata) {
+          store.tabsMap[id].metadata = {
+            ...store.tabsMap[id].metadata,
+            ...updates.metadata,
+          }
         }
       }
     },

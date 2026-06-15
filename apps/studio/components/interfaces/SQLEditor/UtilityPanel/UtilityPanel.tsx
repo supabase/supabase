@@ -22,6 +22,7 @@ export type UtilityPanelProps = {
   prettifyQuery: () => void
   executeQuery: () => void
   executeExplainQuery: () => void
+  onSave: () => void
   onDebug: () => void
   buildDebugPrompt: () => string
   activeTab?: string
@@ -47,6 +48,7 @@ export const UtilityPanel = ({
   prettifyQuery,
   executeQuery,
   executeExplainQuery,
+  onSave,
   onDebug,
   buildDebugPrompt,
   activeTab = 'results',
@@ -163,6 +165,7 @@ export const UtilityPanel = ({
           hasSelection={hasSelection}
           prettifyQuery={prettifyQuery}
           executeQuery={executeQuery}
+          onSave={onSave}
         />
       </TabsList_Shadcn_>
 

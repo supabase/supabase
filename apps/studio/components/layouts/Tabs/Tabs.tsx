@@ -27,6 +27,7 @@ import { CollapseButton } from './CollapseButton'
 import { SortableTab } from './SortableTab'
 import { TabPreview } from './TabPreview'
 import { useTabsScroll } from './Tabs.utils'
+import { useCreateDraftSqlTab } from '@/components/interfaces/SQLEditor/useCreateDraftSqlTab'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { editorEntityTypes, useTabsStateSnapshot, type Tab } from '@/state/tabs'
 
@@ -37,6 +38,7 @@ export const EditorTabs = () => {
 
   const editor = useEditorType()
   const tabs = useTabsStateSnapshot()
+  const { createDraftTab } = useCreateDraftSqlTab()
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -222,11 +224,15 @@ export const EditorTabs = () => {
             {!hasNewTab && (
               <motion.button
                 className="flex items-center justify-center w-10 min-h-(--header-height) hover:bg-surface-100 shrink-0 border-b"
-                onClick={() =>
-                  router.push(
-                    `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new?skip=true`
-                  )
-                }
+                onClick={() => {
+                  // For SQL, open a fresh draft tab directly so we skip the transient /sql/new route
+                  // (which would briefly show a "new" placeholder tab).
+                  if (editor === 'table') {
+                    router.push(`/project/${router.query.ref}/editor/new?skip=true`)
+                  } else {
+                    createDraftTab()
+                  }
+                }}
                 initial={{ opacity: 0, scale: 0.8, x: -10 }}
                 animate={{ opacity: 1, scale: 1, x: 0 }}
                 transition={{ duration: 0.2 }}
