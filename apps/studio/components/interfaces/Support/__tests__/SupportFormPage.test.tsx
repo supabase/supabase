@@ -1959,11 +1959,13 @@ describe('SupportFormPage', () => {
 
     await userEvent.click(getSubmitButton(screen))
 
-    // The user-friendly rate-limit message is surfaced via toast.
+    // The user-friendly rate-limit message is surfaced via toast, and it tells
+    // the user how long to wait (60s window, since no Retry-After header is sent).
     await waitFor(() => {
       expect(toastErrorSpy).toHaveBeenCalled()
     })
-    expect(toastErrorSpy.mock.calls[0]?.[0]).toMatch(/too many requests/i)
+    expect(toastErrorSpy.mock.calls[0]?.[0]).toMatch(/too many support requests/i)
+    expect(toastErrorSpy.mock.calls[0]?.[0]).toMatch(/try again in 60 seconds/i)
 
     // The form should recover (return to editing) and not be locked.
     await waitFor(() => {

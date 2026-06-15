@@ -67,12 +67,12 @@ export async function sendSupportTicket({
 
   if (error) {
     if (error.code === 429) {
-      const retryAfter = typeof error.retryAfter === 'number' ? error.retryAfter : undefined
-      const waitHint = retryAfter
-        ? `Please wait ${retryAfter} second${retryAfter === 1 ? '' : 's'} before trying again.`
-        : 'Please wait a moment before trying again.'
+      // The support feedback endpoint is throttled to 1 request per 60 seconds
+      // server-side. It does not return a standard Retry-After header, so fall
+      // back to the known 60 second window when one isn't provided.
+      const retryAfter = typeof error.retryAfter === 'number' ? error.retryAfter : 60
       throw new ResponseError(
-        `You have submitted too many support requests. ${waitHint}`,
+        `You have submitted too many support requests. Please try again in ${retryAfter} second${retryAfter === 1 ? '' : 's'}.`,
         429,
         undefined,
         retryAfter
