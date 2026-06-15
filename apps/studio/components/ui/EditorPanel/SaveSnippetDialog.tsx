@@ -35,7 +35,7 @@ export const SaveSnippetDialog = ({ open, sql, onOpenChange, onSave }: SaveSnipp
   const isApiKeySet = !!check?.hasKey
 
   // Orgs on HIPAA plans or that have disabled AI should not have access to Supabase AI
-  const { aiOptInLevel } = useOrgAiOptInLevel()
+  const { aiOptInLevel, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
   const isAiOptedOut = aiOptInLevel === 'disabled'
 
   const { mutate: generateTitle, isPending: isGenerating } = useSqlTitleGenerateMutation({
@@ -75,31 +75,33 @@ export const SaveSnippetDialog = ({ open, sql, onOpenChange, onSave }: SaveSnipp
               }}
             />
           </div>
-          {!isAiOptedOut && (
-            <div className="flex justify-end">
-              <ButtonTooltip
-                type="default"
-                size="tiny"
-                disabled={isGenerating || !isApiKeySet}
-                onClick={() => generateTitle({ sql })}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: isApiKeySet
-                      ? undefined
-                      : 'Add your "OPENAI_API_KEY" to your environment variables to use this feature.',
-                  },
-                }}
-              >
-                <div className="flex items-center gap-1">
-                  <div className="scale-75">
-                    <AiIconAnimation loading={isGenerating} />
-                  </div>
-                  <span>Generate with AI</span>
+          <div className="flex justify-end">
+            <ButtonTooltip
+              type="default"
+              size="tiny"
+              disabled={isGenerating || !isApiKeySet || isHipaaProjectDisallowed || isAiOptedOut}
+              onClick={() => generateTitle({ sql })}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: isHipaaProjectDisallowed
+                    ? 'This feature is not available for HIPAA projects.'
+                    : isAiOptedOut
+                      ? 'Your organization has opted out of AI features.'
+                      : isApiKeySet
+                        ? undefined
+                        : 'Add your "OPENAI_API_KEY" to your environment variables to use this feature.',
+                },
+              }}
+            >
+              <div className="flex items-center gap-1">
+                <div className="scale-75">
+                  <AiIconAnimation loading={isGenerating} />
                 </div>
-              </ButtonTooltip>
-            </div>
-          )}
+                <span>Generate with AI</span>
+              </div>
+            </ButtonTooltip>
+          </div>
         </DialogSection>
         <DialogSectionSeparator />
         <DialogFooter className="px-5 py-4">

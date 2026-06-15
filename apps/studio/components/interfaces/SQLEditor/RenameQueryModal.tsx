@@ -64,7 +64,7 @@ export const RenameQueryModal = ({
   const isSQLSnippet = snippet.type === 'sql'
 
   // Orgs on HIPAA plans or that have disabled AI should not have access to Supabase AI
-  const { aiOptInLevel } = useOrgAiOptInLevel()
+  const { aiOptInLevel, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
   const isAiOptedOut = aiOptInLevel === 'disabled'
 
   const { id, name, description } = snippet
@@ -191,29 +191,36 @@ export const RenameQueryModal = ({
                 )}
               />
               <div className="flex w-full justify-end mt-2">
-                {!isAiOptedOut && (
-                  <ButtonTooltip
-                    type="default"
-                    onClick={() => generateTitle()}
-                    size="tiny"
-                    disabled={isTitleGenerationLoading || !isApiKeySet}
-                    tooltip={{
-                      content: {
-                        side: 'bottom',
-                        text: isApiKeySet
-                          ? undefined
-                          : 'Add your "OPENAI_API_KEY" to your environment variables to use this feature.',
-                      },
-                    }}
-                  >
-                    <div className="flex items-center gap-1">
-                      <div className="scale-75">
-                        <AiIconAnimation loading={isTitleGenerationLoading} />
-                      </div>
-                      <span>Rename with Supabase AI</span>
+                <ButtonTooltip
+                  type="default"
+                  onClick={() => generateTitle()}
+                  size="tiny"
+                  disabled={
+                    isTitleGenerationLoading ||
+                    !isApiKeySet ||
+                    isHipaaProjectDisallowed ||
+                    isAiOptedOut
+                  }
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: isHipaaProjectDisallowed
+                        ? 'This feature is not available for HIPAA projects.'
+                        : isAiOptedOut
+                          ? 'Your organization has opted out of AI features.'
+                          : isApiKeySet
+                            ? undefined
+                            : 'Add your "OPENAI_API_KEY" to your environment variables to use this feature.',
+                    },
+                  }}
+                >
+                  <div className="flex items-center gap-1">
+                    <div className="scale-75">
+                      <AiIconAnimation loading={isTitleGenerationLoading} />
                     </div>
-                  </ButtonTooltip>
-                )}
+                    <span>Rename with Supabase AI</span>
+                  </div>
+                </ButtonTooltip>
               </div>
               <FormField
                 control={form.control}
