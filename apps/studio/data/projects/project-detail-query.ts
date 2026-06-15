@@ -165,7 +165,7 @@ export const useSetProjectStatus = () => {
   }) => {
     // Org projects infinite query
     if (slug) {
-      queryClient.setQueriesData<{ pageParams: any; pages: OrgProjectsResponse[] } | undefined>(
+      queryClient.setQueriesData<{ pages: OrgProjectsResponse[] } | undefined>(
         { queryKey: projectKeys.infiniteListByOrg(slug) },
         (old) => {
           if (!old) return old
@@ -186,7 +186,7 @@ export const useSetProjectStatus = () => {
     }
 
     // Projects infinite query
-    queryClient.setQueriesData<{ pageParams: any; pages: OrgProjectsResponse[] } | undefined>(
+    queryClient.setQueriesData<{ pages: OrgProjectsResponse[] } | undefined>(
       { queryKey: projectKeys.infiniteList() },
       (old) => {
         if (!old) return old
