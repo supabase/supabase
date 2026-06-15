@@ -92,10 +92,9 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
   const { data: allTablePrivileges, isSuccess: isSuccessPrivileges } = useTablePrivilegesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+    includedSchemas: ['pgmq'],
   })
-  const queuePrivileges = allTablePrivileges?.find(
-    (x) => x.schema === 'pgmq' && x.name === queueRelname
-  )
+  const queuePrivileges = allTablePrivileges?.find((x) => x.name === queueRelname)
 
   const { mutateAsync: grantPrivilege } = useTablePrivilegesGrantMutation()
   const { mutateAsync: revokePrivilege } = useTablePrivilegesRevokeMutation()
