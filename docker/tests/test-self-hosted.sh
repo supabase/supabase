@@ -444,9 +444,17 @@ check "/mcp blocked" "403" \
 
 echo ""
 echo "--- Realtime ---"
-check "Realtime health" "true" \
-    "$([ "$(http_status "$BASE_URL/realtime/v1/api/tenants" \
-        -H "apikey: $ANON_KEY")" != "401" ] && echo true || echo false)"
+check "Realtime health (ping)" "200" \
+    "$(http_status "$BASE_URL/realtime/v1/api/ping" \
+        -H "apikey: $ANON_KEY")"
+
+# Management endpoints must be blocked at the gateway (even with a valid key)
+check "Realtime /api/tenants blocked" "403" \
+    "$(http_status "$BASE_URL/realtime/v1/api/tenants" \
+        -H "apikey: $ANON_KEY")"
+check "Realtime /api/openapi blocked" "403" \
+    "$(http_status "$BASE_URL/realtime/v1/api/openapi" \
+        -H "apikey: $ANON_KEY")"
 
 # ---------------------------------------------
 # Summary

@@ -201,6 +201,14 @@ export const hubspotFormConfigSchema = z.object({
    * Example: { workEmail: 'email', companyName: 'company' }
    */
   fieldMap: z.record(z.string(), z.string()).optional(),
+  /**
+   * Form field `name`s to NOT forward to HubSpot. Use this for fields that
+   * should only reach another provider (e.g. Notion-only fields). By default
+   * every submitted field is sent to HubSpot, so an unmapped field a HubSpot
+   * form doesn't define would otherwise cause the whole submission to fail.
+   * Example: ['attending']
+   */
+  excludeFields: z.array(z.string()).optional(),
   /** Legal consent text for GDPR. */
   consent: z.string().optional(),
 })
