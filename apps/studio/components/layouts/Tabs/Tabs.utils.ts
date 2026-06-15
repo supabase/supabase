@@ -1,8 +1,81 @@
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { useCallback, useEffect, useRef } from 'react'
 
 import { Entity } from '@/data/entity-types/entity-types-infinite-query'
 import useLatest from '@/hooks/misc/useLatest'
-import { createTabId, editorEntityTypes, useTabsStateSnapshot } from '@/state/tabs'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { createTabId, editorEntityTypes, useTabsStateSnapshot, type Tab } from '@/state/tabs'
+
+type SqlTabSnippetState = {
+  snippet?: {
+    isDraftTab?: boolean
+    isNotSavedInDatabaseYet?: boolean
+    content?: {
+      unchecked_sql?: string
+    }
+  }
+}
+
+export function getSqlIdFromTab(tab: Pick<Tab, 'id' | 'type' | 'metadata'>) {
+  if (tab.type !== 'sql') return undefined
+  return tab.metadata?.sqlId ?? (tab.id.startsWith('sql-') ? tab.id.slice(4) : undefined)
+}
+
+export function hasUnsavedSqlTabChanges({
+  tab,
+  snippet,
+  savedSql,
+  autoSaveSnippets,
+}: {
+  tab: Pick<Tab, 'id' | 'type' | 'metadata'>
+  snippet?: SqlTabSnippetState
+  savedSql?: string
+  autoSaveSnippets: boolean
+}) {
+  if (tab.type !== 'sql') return false
+
+  if (tab.metadata?.isDraft || snippet?.snippet?.isDraftTab) return true
+  if (snippet?.snippet?.isNotSavedInDatabaseYet) return true
+  if (autoSaveSnippets || savedSql === undefined) return false
+
+  return (snippet?.snippet?.content?.unchecked_sql ?? '') !== savedSql
+}
+
+export function getTabDisplayLabel({
+  tab,
+  snippet,
+  savedSql,
+  autoSaveSnippets,
+}: {
+  tab: Pick<Tab, 'id' | 'type' | 'label' | 'metadata'>
+  snippet?: SqlTabSnippetState
+  savedSql?: string
+  autoSaveSnippets: boolean
+}) {
+  const label = tab.label || 'Untitled'
+
+  return hasUnsavedSqlTabChanges({ tab, snippet, savedSql, autoSaveSnippets }) ? `${label}*` : label
+}
+
+export function useTabDisplayLabel(tab: Tab | undefined) {
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const [autoSaveSnippets] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_AUTO_SAVE_SNIPPETS,
+    true
+  )
+
+  if (!tab) return 'Untitled'
+
+  const sqlId = getSqlIdFromTab(tab)
+
+  return getTabDisplayLabel({
+    tab,
+    snippet: sqlId ? snapV2.snippets[sqlId] : undefined,
+    savedSql: sqlId ? snapV2.savedSql[sqlId] : undefined,
+    autoSaveSnippets,
+  })
+}
 
 export function useTableEditorTabsCleanUp() {
   const tabs = useTabsStateSnapshot()
