@@ -491,7 +491,7 @@ export const LogTable = ({
         </div>
       )}
 
-      <div className="space-x-2">
+      <div className="gap-x-2 flex items-center">
         {IS_PLATFORM && (
           <ButtonTooltip
             type="default"
