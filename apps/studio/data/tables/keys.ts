@@ -4,7 +4,7 @@ export const tableKeys = {
     projectRef: string | undefined,
     schema: string | undefined,
     options?: { includeColumns?: boolean }
-  ) => ['projects', projectRef, 'tables', schema, options] as const,
+  ) => ['projects', projectRef, 'tables', schema, options].filter(Boolean),
   infiniteListPrefix: (projectRef: string | undefined, schema?: string) =>
     ['projects', projectRef, 'tables', 'infinite', schema].filter(
       (part) => part !== undefined && part !== null && part !== ''
