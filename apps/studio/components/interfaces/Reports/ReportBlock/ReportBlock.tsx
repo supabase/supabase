@@ -1,15 +1,17 @@
 import { acceptUntrustedSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { X } from 'lucide-react'
+import { ScrollText, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { BURSTABLE_IO_METRIC_KEYS, DEPRECATED_REPORTS } from '../Reports.constants'
 import { ChartBlock } from './ChartBlock'
 import { DeprecatedChartBlock } from './DeprecatedChartBlock'
+import { ReportBlockContainer } from './ReportBlockContainer'
 import { UnavailableChartBlock } from './UnavailableChartBlock'
 import { hasBurstableIO } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
+import { getSqlSnippetSource } from '@/components/interfaces/SQLEditor/SQLEditorSource.utils'
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DEFAULT_CHART_CONFIG, QueryBlock } from '@/components/ui/QueryBlock/QueryBlock'
@@ -79,6 +81,11 @@ export const ReportBlock = ({
   )
 
   const sql = isSnippet ? (data?.content as SqlSnippets.Content)?.unchecked_sql : undefined
+  // Logs snippets run against the analytics backend, not Postgres. Reports only execute Postgres
+  // SQL, so guard against running log SQL against the database (which would error or return wrong
+  // data) until logs snippets are supported in reports.
+  const isLogsSnippet =
+    isSnippet && getSqlSnippetSource({ content: data?.content as any }) === 'logs'
   const chartConfig = { ...DEFAULT_CHART_CONFIG, ...(item.chartConfig ?? {}) }
   const isDeprecatedChart = DEPRECATED_REPORTS.includes(item.attribute)
   const snippetMissing = contentError?.message.includes('Content not found')
@@ -118,7 +125,7 @@ export const ReportBlock = ({
         sql: acceptUntrustedSql(sql),
       })
     },
-    enabled: !isLoadingContent && contentError == null,
+    enabled: !isLoadingContent && contentError == null && !isLogsSnippet,
     refetchOnWindowFocus: false,
   })
 
@@ -146,7 +153,34 @@ export const ReportBlock = ({
 
   return (
     <>
-      {isSnippet ? (
+      {isLogsSnippet ? (
+        <ReportBlockContainer
+          draggable
+          showDragHandle
+          loading={false}
+          icon={<ScrollText size={14} className="text-foreground-muted" />}
+          label={item.label}
+          actions={
+            <ButtonTooltip
+              type="text"
+              icon={<X />}
+              className="h-7 w-7"
+              onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
+              tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
+            />
+          }
+        >
+          <div className="flex flex-1 flex-col justify-center gap-y-1 px-5 py-4">
+            <p className="text-xs text-foreground-light">
+              Logs snippets aren't supported in reports yet
+            </p>
+            <p className="text-xs text-foreground-lighter">
+              This snippet queries the logs backend, which reports can't run. Open it in the SQL
+              editor to view its results, or remove this chart from your report.
+            </p>
+          </div>
+        </ReportBlockContainer>
+      ) : isSnippet ? (
         <QueryBlock
           blockWriteQueries
           portalTooltip

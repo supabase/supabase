@@ -19,6 +19,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { BURSTABLE_IO_METRIC_KEYS, DEPRECATED_REPORTS } from './Reports.constants'
 import { hasBurstableIO } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
+import { getSqlSnippetSource } from '@/components/interfaces/SQLEditor/SQLEditorSource.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useContentQuery } from '@/data/content/content-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -71,7 +72,12 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
     type: 'sql',
     name: debouncedSearch.length === 0 ? undefined : debouncedSearch,
   })
-  const snippets = data?.content
+  // Reports execute snippet SQL against Postgres, so logs snippets can't run here — hide them from
+  // the picker. Snippets whose content isn't loaded default to "database" and remain selectable;
+  // ReportBlock guards those at execution time.
+  const snippets = data?.content?.filter(
+    (snippet) => getSqlSnippetSource({ content: snippet.content as any }) !== 'logs'
+  )
 
   return (
     <>
