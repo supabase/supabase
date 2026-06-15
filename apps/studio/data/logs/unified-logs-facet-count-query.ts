@@ -16,8 +16,7 @@ import {
   getUnifiedLogsCTE,
 } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
-import { ExecuteSqlError } from '@/data/sql/execute-sql-query'
-import { UseCustomQueryOptions } from '@/types'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type UnifiedLogsFacetCountVariables = UnifiedLogsVariables & {
   facet: string
@@ -57,7 +56,7 @@ SELECT dimension, value, count from ${cteName};
 }
 
 export type UnifiedLogsFacetCountData = Awaited<ReturnType<typeof getUnifiedLogsFacetCount>>
-export type UnifiedLogsFacetCountError = ExecuteSqlError
+export type UnifiedLogsFacetCountError = ResponseError
 
 export const useUnifiedLogsFacetCountQuery = <TData = UnifiedLogsFacetCountData>(
   { projectRef, search, facet, facetSearch }: UnifiedLogsFacetCountVariables,

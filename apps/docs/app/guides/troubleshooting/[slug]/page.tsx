@@ -1,5 +1,4 @@
-import { notFound } from 'next/navigation'
-
+import { notFoundWithPathname } from '~/features/docs/notFound.utils'
 import TroubleshootingPage from '~/features/docs/Troubleshooting.page'
 import { getAllTroubleshootingEntries, getArticleSlug } from '~/features/docs/Troubleshooting.utils'
 import { PROD_URL } from '~/lib/constants'
@@ -20,7 +19,7 @@ export default async function TroubleshootingEntryPage(props: {
   const entry = allTroubleshootingEntries.find((entry) => getArticleSlug(entry) === slug)
 
   if (!entry) {
-    notFound()
+    notFoundWithPathname(`/guides/troubleshooting/${slug}`)
   }
 
   return <TroubleshootingPage entry={entry} />
