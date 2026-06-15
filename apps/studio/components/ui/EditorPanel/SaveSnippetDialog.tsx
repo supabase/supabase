@@ -1,4 +1,3 @@
-import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -15,14 +14,11 @@ import {
   Label,
 } from 'ui'
 
-import { subscriptionHasHipaaAddon } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
 import { useSqlTitleGenerateMutation } from '@/data/ai/sql-title-mutation'
-import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 interface SaveSnippetDialogProps {
   open: boolean
@@ -32,19 +28,15 @@ interface SaveSnippetDialogProps {
 }
 
 export const SaveSnippetDialog = ({ open, sql, onOpenChange, onSave }: SaveSnippetDialogProps) => {
-  const { ref } = useParams()
-  const { data: organization } = useSelectedOrganizationQuery()
-  const { data: subscription } = useOrgSubscriptionQuery(
-    { orgSlug: organization?.slug },
-    { enabled: open }
-  )
-  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: ref })
   const { data: check } = useCheckOpenAIKeyQuery()
 
   const [name, setName] = useState(generateSnippetTitle())
 
   const isApiKeySet = !!check?.hasKey
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
+
+  // Orgs on HIPAA plans or that have disabled AI should not have access to Supabase AI
+  const { aiOptInLevel } = useOrgAiOptInLevel()
+  const isAiOptedOut = aiOptInLevel === 'disabled'
 
   const { mutate: generateTitle, isPending: isGenerating } = useSqlTitleGenerateMutation({
     onSuccess: ({ title }) => setName(title),
@@ -83,7 +75,7 @@ export const SaveSnippetDialog = ({ open, sql, onOpenChange, onSave }: SaveSnipp
               }}
             />
           </div>
-          {!hasHipaaAddon && (
+          {!isAiOptedOut && (
             <div className="flex justify-end">
               <ButtonTooltip
                 type="default"

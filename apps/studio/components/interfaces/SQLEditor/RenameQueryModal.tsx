@@ -23,11 +23,9 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
 import { useSqlTitleGenerateMutation } from '@/data/ai/sql-title-mutation'
-import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { getContentById } from '@/data/content/content-id-query'
 import {
   UpsertContentPayload,
@@ -35,8 +33,7 @@ import {
 } from '@/data/content/content-upsert-mutation'
 import { Snippet } from '@/data/content/sql-folders-query'
 import type { SqlSnippet } from '@/data/content/sql-snippets-query'
-import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
@@ -61,19 +58,14 @@ export const RenameQueryModal = ({
 }: RenameQueryModalProps) => {
   const { ref } = useParams()
   const router = useRouter()
-  const { data: organization } = useSelectedOrganizationQuery()
 
   const snapV2 = useSqlEditorV2StateSnapshot()
   const tabsSnap = useTabsStateSnapshot()
-  const { data: subscription } = useOrgSubscriptionQuery(
-    { orgSlug: organization?.slug },
-    { enabled: visible }
-  )
   const isSQLSnippet = snippet.type === 'sql'
-  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: ref })
 
-  // Customers on HIPAA plans should not have access to Supabase AI
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
+  // Orgs on HIPAA plans or that have disabled AI should not have access to Supabase AI
+  const { aiOptInLevel } = useOrgAiOptInLevel()
+  const isAiOptedOut = aiOptInLevel === 'disabled'
 
   const { id, name, description } = snippet
 
@@ -199,7 +191,7 @@ export const RenameQueryModal = ({
                 )}
               />
               <div className="flex w-full justify-end mt-2">
-                {!hasHipaaAddon && (
+                {!isAiOptedOut && (
                   <ButtonTooltip
                     type="default"
                     onClick={() => generateTitle()}
