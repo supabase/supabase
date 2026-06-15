@@ -92,7 +92,13 @@ export function guessChartAxisKeys(
   const numericKeys = getNumericKeys(rows)
   if (!numericKeys.length) return null
 
-  const yKey = [...numericKeys].sort((a, b) => scoreYAxisKey(b) - scoreYAxisKey(a))[0]
+  const yKey = [...numericKeys].sort((a, b) => {
+    const scoreDiff = scoreYAxisKey(b) - scoreYAxisKey(a)
+    if (scoreDiff !== 0) return scoreDiff
+    // Tie-break: prefer the later numeric column as the measure (y). In typical grouped queries
+    // (e.g. `select month, sum(revenue) ... group by month`) the dimension comes first.
+    return columnKeys.indexOf(b) - columnKeys.indexOf(a)
+  })[0]
 
   const dateKeys = getDateKeys(rows).filter((key) => key !== yKey)
   const categoricalKeys = getCategoricalKeys(rows).filter((key) => key !== yKey)
