@@ -189,7 +189,7 @@ describe('createDraftSqlTab', () => {
     // Persisted to local storage with the initial sql
     expect(readPersistedDraftSqlTab(PROJECT_REF, draftId)).toMatchObject({
       sql: 'select 1',
-      source: 'project',
+      source: 'database',
     })
   })
 
@@ -276,7 +276,7 @@ describe('restoreDraftSqlTab', () => {
       id: 'draft-2',
       name: 'Fallback name',
       isDraftTab: true,
-      content: { unchecked_sql: 'select 2', source: 'project' },
+      content: { unchecked_sql: 'select 2', source: 'database' },
     })
   })
 })

@@ -55,7 +55,7 @@ export const createSqlSnippetSkeletonV2 = ({
   project_id,
   folder_id,
   idOverride,
-  source = 'project',
+  source = 'database',
   logDateRange,
 }: {
   name: string

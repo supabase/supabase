@@ -996,34 +996,36 @@ export const SQLEditor = () => {
           autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
         >
           <ResizablePanel defaultSize="50" maxSize="70">
-            <div className="grow border-b h-full flex flex-col overflow-hidden">
+            <div className="grow h-full flex flex-col overflow-hidden">
               {isLoading ? (
                 <div className="flex h-full w-full items-center justify-center">
                   <Loader2 className="animate-spin text-brand" />
                 </div>
               ) : (
                 <>
-                  <div className="flex items-center justify-between gap-x-4 px-4 min-h-[42px] border-b bg-surface-100">
-                    <div className="flex items-center gap-x-2 min-w-0">
+                  <div className="flex items-center gap-x-4 px-4 min-h-[42px] border-b bg-surface-100 xl:justify-between">
+                    <div className="hidden min-w-0 shrink items-center gap-x-2 xl:flex">
                       <SqlSnippetSourceIcon source={snippetSource} />
                       <span className="truncate text-sm text-foreground" title={snippet?.name}>
                         {snippet?.name ?? 'Untitled query'}
                       </span>
                     </div>
 
-                    <UtilityActions
-                      id={id}
-                      isExecuting={snippetSource === 'logs' ? isExecutingLogs : isExecuting}
-                      isDisabled={isDiffOpen}
-                      hasSelection={hasSelection}
-                      source={snippetSource}
-                      logDateRange={logDateRange}
-                      prettifyQuery={prettifyQuery}
-                      executeQuery={executeQueryFromButton}
-                      onSourceChange={handleSourceChange}
-                      onLogDateRangeChange={handleLogDateRangeChange}
-                      onSave={handleSave}
-                    />
+                    <div className="min-w-0 flex-1">
+                      <UtilityActions
+                        id={id}
+                        isExecuting={snippetSource === 'logs' ? isExecutingLogs : isExecuting}
+                        isDisabled={isDiffOpen}
+                        hasSelection={hasSelection}
+                        source={snippetSource}
+                        logDateRange={logDateRange}
+                        prettifyQuery={prettifyQuery}
+                        executeQuery={executeQueryFromButton}
+                        onSourceChange={handleSourceChange}
+                        onLogDateRangeChange={handleLogDateRangeChange}
+                        onSave={handleSave}
+                      />
+                    </div>
                   </div>
 
                   <div className="relative grow min-h-0">
@@ -1062,7 +1064,10 @@ export const SQLEditor = () => {
                         )}
                       </div>
                     )}
-                    <div key={id} className="w-full h-full relative">
+                    <div
+                      key={id}
+                      className="w-full h-full relative [&_.monaco-editor]:outline-none"
+                    >
                       <MonacoEditor
                         autoFocus
                         placeholder={

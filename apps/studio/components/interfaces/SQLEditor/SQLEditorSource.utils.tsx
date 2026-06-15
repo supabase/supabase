@@ -4,10 +4,10 @@ import { cn } from 'ui'
 import type { SnippetWithContent } from '@/state/sql-editor-v2'
 import type { SqlSnippets } from '@/types'
 
-export const DEFAULT_SQL_SNIPPET_SOURCE: SqlSnippets.Source = 'project'
+export const DEFAULT_SQL_SNIPPET_SOURCE: SqlSnippets.Source = 'database'
 
 export const SQL_SNIPPET_SOURCE_LABELS: Record<SqlSnippets.Source, string> = {
-  project: 'Project',
+  database: 'Database',
   logs: 'Logs',
 }
 

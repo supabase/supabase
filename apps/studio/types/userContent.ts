@@ -26,7 +26,7 @@ export interface UserContentMap {
 }
 
 export namespace SqlSnippets {
-  export type Source = 'project' | 'logs'
+  export type Source = 'database' | 'logs'
 
   export type LogDateRange = {
     to: string

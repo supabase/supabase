@@ -152,7 +152,9 @@ const SqlEditor: NextPageWithLayout = () => {
 
     const tabId = createTabId('sql', { id })
     const snippet = allSnippets.find((x) => x.id === id)
-    const sqlSource = snippet ? getSqlSnippetSource(snippet) : (persistedDraft?.source ?? 'project')
+    const sqlSource = snippet
+      ? getSqlSnippetSource(snippet)
+      : (persistedDraft?.source ?? 'database')
 
     tabs.addTab({
       id: tabId,

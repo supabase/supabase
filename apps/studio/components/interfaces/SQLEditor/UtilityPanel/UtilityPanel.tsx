@@ -1,4 +1,6 @@
 import { useParams } from 'common'
+import { BarChart2, ListTree, Table } from 'lucide-react'
+import { useCallback } from 'react'
 import { toast } from 'sonner'
 import { ToggleGroup, ToggleGroupItem } from 'ui'
 
@@ -62,7 +64,7 @@ export const UtilityPanel = ({
     const nextView = view as SqlOutputView
 
     // When switching to the explain tab, trigger the explain query
-    if (nextView === 'explain' && source === 'project') {
+    if (nextView === 'explain' && source === 'database') {
       executeExplainQuery()
     }
     onActiveViewChange?.(nextView)
@@ -107,28 +109,44 @@ export const UtilityPanel = ({
 
   const chartConfig = getChartConfig()
 
-  function onConfigChange(config: ChartConfig) {
-    if (!ref || !snippet?.id) return
+  const onConfigChange = useCallback(
+    (config: ChartConfig) => {
+      if (!snippet?.content) return
 
-    upsertContent({
-      projectRef: ref,
-      payload: {
-        ...snippet,
-        id: snippet.id,
-        description: snippet.description || '',
-        project_id: snippet.project_id || 0,
-        content: {
-          ...snippet.content,
-          content_id: id,
-          chart: config,
+      snapV2.updateSnippet({
+        id,
+        snippet: {
+          content: {
+            ...snippet.content,
+            chart: config,
+          },
         },
-      },
-    })
-  }
+        skipSave: true,
+      })
+
+      if (!ref || !snippet.id) return
+
+      upsertContent({
+        projectRef: ref,
+        payload: {
+          ...snippet,
+          id: snippet.id,
+          description: snippet.description || '',
+          project_id: snippet.project_id || 0,
+          content: {
+            ...snippet.content,
+            content_id: id,
+            chart: config,
+          },
+        },
+      })
+    },
+    [id, ref, snippet, snapV2, upsertContent]
+  )
 
   return (
     <div className="w-full h-full flex flex-col">
-      <div className="flex items-center justify-between gap-2 px-4 overflow-x-auto min-h-[42px] border-b">
+      <div className="flex shrink-0 items-center justify-between gap-2 overflow-x-auto border-b p-1.5">
         <ToggleGroup
           type="single"
           value={activeView}
@@ -137,17 +155,21 @@ export const UtilityPanel = ({
           variant="outline"
           className="flex items-center"
         >
-          <ToggleGroupItem value="table" className="h-7 px-3 text-xs">
+          <ToggleGroupItem value="table" className="h-7 gap-1.5 px-3 text-xs" aria-label="Table">
+            <Table size={14} strokeWidth={1.5} />
             Table
           </ToggleGroupItem>
-          <ToggleGroupItem value="chart" className="h-7 px-3 text-xs">
+          <ToggleGroupItem value="chart" className="h-7 gap-1.5 px-3 text-xs" aria-label="Chart">
+            <BarChart2 size={14} strokeWidth={1.5} />
             Chart
           </ToggleGroupItem>
           <ToggleGroupItem
             value="explain"
             disabled={source === 'logs'}
-            className="h-7 px-3 text-xs"
+            className="h-7 gap-1.5 px-3 text-xs"
+            aria-label="Explain"
           >
+            <ListTree size={14} strokeWidth={1.5} />
             Explain
           </ToggleGroupItem>
         </ToggleGroup>

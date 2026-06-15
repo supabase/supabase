@@ -1,12 +1,12 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import dayjs from 'dayjs'
-import { ArrowUpDown, X } from 'lucide-react'
+import { ArrowUpDown, BarChart2, X } from 'lucide-react'
 import Link from 'next/link'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import {
   Badge,
   Button,
   Checkbox,
+  cn,
   Label,
   ResizableHandle,
   ResizablePanel,
@@ -21,10 +21,24 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+import {
+  Chart,
+  ChartBar,
+  ChartCard,
+  ChartContent,
+  ChartEmptyState,
+  ChartLine,
+} from 'ui-patterns/Chart'
 
+import {
+  getSqlEditorChartDateTimeFormat,
+  guessChartAxisKeys,
+  isSqlEditorChartXAxisDate,
+  mapSqlRowsToChartTicks,
+  shouldAutoConfigureChartAxes,
+} from './ChartConfig.utils'
+import { SqlEditorResultsEmptyState } from './SqlEditorResultsEmptyState'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import BarChart from '@/components/ui/Charts/BarChart'
-import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 type Results = { rows: readonly any[] }
@@ -92,6 +106,17 @@ export const ChartConfig = ({
     })
   }, [results])
 
+  useEffect(() => {
+    if (!shouldAutoConfigureChartAxes(results.rows, config)) return
+
+    const guessed = guessChartAxisKeys(results.rows)
+    if (!guessed) return
+
+    onConfigChange({ ...config, ...guessed })
+    // Only re-guess when the result shape or saved axis keys change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [results.rows, config.xKey, config.yKey])
+
   const hasConfig = config.xKey && config.yKey
 
   const canFlip = useMemo(() => {
@@ -106,14 +131,30 @@ export const ChartConfig = ({
 
   const resultToRender = config.cumulative ? cumulativeResults : results.rows
 
-  const getDateFormat = (key: any) => {
-    const value = resultToRender?.[0]?.[key] || ''
-    if (typeof value === 'number') return 'number'
-    if (dayjs(value).isValid()) return 'date'
-    return 'string'
-  }
+  const xAxisIsDate = useMemo(
+    () => isSqlEditorChartXAxisDate(config.xKey, resultToRender),
+    [config.xKey, resultToRender]
+  )
 
-  const xKeyDateFormat = getDateFormat(config.xKey)
+  const chartData = useMemo(
+    () => mapSqlRowsToChartTicks(resultToRender, config.xKey, config.yKey),
+    [config.xKey, config.yKey, resultToRender]
+  )
+
+  const chartDateTimeFormat = useMemo(
+    () => getSqlEditorChartDateTimeFormat(config.xKey, resultToRender),
+    [config.xKey, resultToRender]
+  )
+
+  const chartConfig = useMemo(
+    () => ({
+      [config.yKey]: {
+        label: config.yKey,
+        color: 'hsl(var(--brand-default))',
+      },
+    }),
+    [config.yKey]
+  )
 
   const onFlip = () => {
     const newY = config.xKey
@@ -122,63 +163,77 @@ export const ChartConfig = ({
   }
 
   if (!resultKeys.length) {
-    return (
-      <div className="p-2">
-        <NoDataPlaceholder
-          size="normal"
-          description="Execute a query and configure the chart options."
-        />
-      </div>
-    )
+    return <SqlEditorResultsEmptyState />
   }
 
+  const configureChartEmptyState = (
+    <ChartEmptyState
+      className="h-full w-full"
+      icon={<BarChart2 size={16} />}
+      title="Configure your chart"
+      description="Select your X and Y axis in the chart options panel"
+    />
+  )
+
+  const chartVisualization =
+    config.type === 'line' ? (
+      <ChartLine
+        data={chartData}
+        dataKey={config.yKey}
+        config={chartConfig}
+        DateTimeFormat={chartDateTimeFormat}
+        isFullHeight
+        showGrid={config.showGrid}
+        showYAxis={config.showLabels}
+        className={cn(
+          'h-full',
+          !xAxisIsDate && '[&_[data-testid=chart-line]>div:last-child]:hidden'
+        )}
+        YAxisProps={{
+          tickFormatter: (value: number) => value.toLocaleString(),
+          width: config.showLabels ? 80 : undefined,
+        }}
+      />
+    ) : (
+      <ChartBar
+        data={chartData}
+        dataKey={config.yKey}
+        config={chartConfig}
+        DateTimeFormat={chartDateTimeFormat}
+        isFullHeight
+        showGrid={config.showGrid}
+        showYAxis={config.showLabels}
+        className={cn(
+          'h-full',
+          !xAxisIsDate && '[&_[data-testid=chart-bar]>div:last-child]:hidden'
+        )}
+        YAxisProps={{
+          tickFormatter: (value: number) => value.toLocaleString(),
+          width: config.showLabels ? 80 : undefined,
+        }}
+      />
+    )
+
   return (
-    <ResizablePanelGroup orientation="horizontal" className="grow h-full">
-      <ResizablePanel className="p-4 h-full" defaultSize="75">
-        {!hasConfig ? (
-          <ResizablePanel className="p-4 h-full" defaultSize="75">
-            <NoDataPlaceholder
-              size="normal"
-              title="Configure your chart"
-              description="Select your X and Y axis in the chart options panel"
-            />
-          </ResizablePanel>
-        ) : config.type === 'bar' ? (
-          <BarChart
-            showLegend
-            size="normal"
-            xAxisIsDate={xKeyDateFormat === 'date'}
-            data={resultToRender}
-            xAxisKey={config.xKey}
-            yAxisKey={config.yKey}
-            showGrid={config.showGrid}
-            XAxisProps={{
-              angle: 0,
-              interval: 'preserveStart',
-              hide: !config.showLabels,
-              tickFormatter: (idx: string) => {
-                const value = resultToRender[+idx][config.xKey]
-                if (xKeyDateFormat === 'date') {
-                  return dayjs(value).format('MMM D YYYY HH:mm')
-                }
-                return value
-              },
-            }}
-            YAxisProps={{
-              tickFormatter: (value: number) => value.toLocaleString(),
-              hide: !config.showLabels,
-              domain: [0, 'dataMax'],
-            }}
-          />
-        ) : null}
+    <ResizablePanelGroup orientation="horizontal" className="h-full min-h-0">
+      <ResizablePanel defaultSize="75" minSize="40" className="min-h-0">
+        <Chart className="flex h-full min-h-0 flex-col">
+          <ChartCard asChild>
+            <div className="flex h-full min-h-0 flex-col">
+              <ChartContent
+                className="flex min-h-0 flex-1 flex-col p-4"
+                isEmpty={!hasConfig}
+                emptyState={configureChartEmptyState}
+              >
+                <div className="min-h-0 flex-1">{chartVisualization}</div>
+              </ChartContent>
+            </div>
+          </ChartCard>
+        </Chart>
       </ResizablePanel>
       <ResizableHandle withHandle />
-      <ResizablePanel
-        defaultSize="25"
-        minSize="15"
-        className="px-3 py-3 space-y-4 overflow-y-auto!"
-      >
-        <div className="flex justify-between items-center h-5">
+      <ResizablePanel defaultSize="25" minSize="15" className="space-y-4 overflow-y-auto px-3 py-3">
+        <div className="flex h-5 items-center justify-between">
           <h2 className="text-sm text-foreground-lighter">Chart options</h2>
           {config.xKey && config.yKey && (
             <ButtonTooltip
@@ -203,11 +258,11 @@ export const ChartConfig = ({
         </div>
 
         {!acknowledged && (
-          <Admonition showIcon={false} type="tip" className="p-2 relative group">
+          <Admonition showIcon={false} type="tip" className="group relative p-2">
             <Tooltip>
               <TooltipTrigger
                 onClick={() => setAcknowledged(true)}
-                className="absolute top-3 right-3 opacity-30 group-hover:opacity-100 transition-opacity"
+                className="absolute right-3 top-3 opacity-30 transition-opacity group-hover:opacity-100"
               >
                 <X size={14} className="text-foreground-light" />
               </TooltipTrigger>
@@ -217,7 +272,7 @@ export const ChartConfig = ({
               <Badge variant="success">New</Badge>
               <p className="text-xs">Add this chart to custom reports</p>
             </div>
-            <p className="text-xs text-foreground-light mt-1!">
+            <p className="mt-1! text-xs text-foreground-light">
               SQL snippets can now be added and saved to your custom reports. Try it out now!
             </p>
             <Button asChild size="tiny" type="default" className="mt-1">
@@ -267,7 +322,7 @@ export const ChartConfig = ({
             </SelectContent>
           </Select>
         </div>
-        <div className="*:flex *:gap-2 *:items-center grid gap-2 *:text-foreground-light *:p-1.5 *:pl-0">
+        <div className="grid gap-2 *:flex *:items-center *:gap-2 *:p-1.5 *:pl-0 *:text-foreground-light">
           <Label className="" htmlFor="cumulative">
             <Checkbox
               id="cumulative"

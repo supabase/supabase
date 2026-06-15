@@ -15,7 +15,7 @@ export const NEW_SQL_SNIPPET_SKELETON: UserContent<SqlSnippets.Content> = {
     schema_version: SQL_SNIPPET_SCHEMA_VERSION,
     content_id: '',
     unchecked_sql: untrustedSql(''),
-    source: 'project',
+    source: 'database',
   },
 }
 

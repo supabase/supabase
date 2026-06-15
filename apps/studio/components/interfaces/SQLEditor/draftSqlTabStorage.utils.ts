@@ -59,7 +59,7 @@ export function persistDraftSqlTab(
   storage[draftId] = {
     sql: patch.sql ?? existing?.sql ?? '',
     name: patch.name,
-    source: patch.source ?? existing?.source ?? 'project',
+    source: patch.source ?? existing?.source ?? 'database',
     logDateRange: patch.logDateRange ?? existing?.logDateRange,
     updatedAt: Date.now(),
   }

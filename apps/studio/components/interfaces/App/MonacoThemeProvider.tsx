@@ -19,7 +19,10 @@ export const getTheme = (theme: string) => {
       { token: 'comment', foreground: '666666' },
       { token: 'predefined.sql', foreground: isDarkMode ? 'D4D4D4' : '444444' },
     ],
-    colors: { 'editor.background': isDarkMode ? '#1f1f1f' : '#f0f0f0' },
+    colors: {
+      'editor.background': isDarkMode ? '#1f1f1f' : '#f0f0f0',
+      focusBorder: '#00000000',
+    },
   }
 }
 

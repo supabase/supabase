@@ -53,7 +53,7 @@ function persistDraftSnippet(stateSnippet: StateSnippet) {
   persistDraftSqlTab(projectRef, snippet.id, {
     sql: snippet.content.unchecked_sql,
     name: snippet.name,
-    source: snippet.content.source ?? 'project',
+    source: snippet.content.source ?? 'database',
     logDateRange: snippet.content.logDateRange,
   })
 }

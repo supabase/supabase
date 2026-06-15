@@ -53,7 +53,7 @@ export function createDraftSqlTab({
   tabs,
   router,
   initialSql = '',
-  source = 'project',
+  source = 'database',
   logDateRange,
   skipNavigation = false,
 }: CreateDraftSqlTabParams): string {
@@ -121,7 +121,7 @@ export function restoreDraftSqlTab({
   const persisted = readPersistedDraftSqlTab(projectRef, draftId)
   const resolvedName = persisted?.name ?? name
   const resolvedSql = persisted?.sql ?? initialSql
-  const resolvedSource = persisted?.source ?? source ?? 'project'
+  const resolvedSource = persisted?.source ?? source ?? 'database'
   const resolvedLogDateRange = persisted?.logDateRange ?? logDateRange
 
   const snippet = createSqlSnippetSkeletonV2({
