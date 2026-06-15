@@ -169,5 +169,11 @@ describe('ChartConfig.utils', () => {
         ])
       ).toBe('MMM D YYYY HH:mm')
     })
+
+    it('returns the fallback format for non-date axes', () => {
+      expect(getSqlEditorChartDateTimeFormat('region', [{ region: 'us-east', count: 1 }])).toBe(
+        'MMM D, YYYY, hh:mma'
+      )
+    })
   })
 })

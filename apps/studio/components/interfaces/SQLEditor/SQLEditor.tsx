@@ -45,6 +45,7 @@ import {
   checkDestructiveQuery,
   checkIfAppendLimitRequired,
   filterTablesCoveredByEnsureRLSTrigger,
+  formatLogQueryError,
   getCreateTablesMissingRLS,
   hasActiveEnsureRLSTrigger,
   isUpdateWithoutWhere,
@@ -113,12 +114,6 @@ const getDefaultLogDateRange = (): SqlSnippets.LogDateRange => {
     isHelper: true,
     text: helper.text,
   }
-}
-
-const formatLogQueryError = (error: unknown) => {
-  if (typeof error === 'string') return { message: error }
-  if (error && typeof error === 'object' && 'message' in error) return error
-  return { message: 'Failed to run log query' }
 }
 
 export const SQLEditor = () => {

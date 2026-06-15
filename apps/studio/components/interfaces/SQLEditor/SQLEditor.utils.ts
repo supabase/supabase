@@ -268,3 +268,15 @@ export const suffixWithLimit = (sql: SafeSqlFragment, limit: number = 0): SafeSq
     cleanedSql.endsWith(';') ? sql.replace(/[;]+$/, ` limit ${limit};`) : `${sql} limit ${limit};`
   ) as SafeSqlFragment
 }
+
+/**
+ * Normalizes an error from a log query (string, error-like object, or unknown) into a stable
+ * `{ message }` shape suitable for `addResultError`.
+ */
+export const formatLogQueryError = (error: unknown): { message: string } => {
+  if (typeof error === 'string') return { message: error }
+  if (error && typeof error === 'object' && 'message' in error) {
+    return { message: String((error as { message: unknown }).message) }
+  }
+  return { message: 'Failed to run log query' }
+}

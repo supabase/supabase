@@ -4,6 +4,7 @@ import { useCallback } from 'react'
 import { toast } from 'sonner'
 import { ToggleGroup, ToggleGroupItem } from 'ui'
 
+import { isDraftSqlSnippet } from '../createDraftSqlTab'
 import { ChartConfig } from './ChartConfig'
 import { UtilityTabExplain } from './UtilityTabExplain'
 import { UtilityTabResults } from './UtilityTabResults'
@@ -124,7 +125,8 @@ export const UtilityPanel = ({
         skipSave: true,
       })
 
-      if (!ref || !snippet.id) return
+      // Drafts are never written to the DB until an explicit save — only update local state above.
+      if (!ref || !snippet.id || isDraftSqlSnippet(snippet)) return
 
       upsertContent({
         projectRef: ref,
@@ -152,7 +154,7 @@ export const UtilityPanel = ({
           value={activeView}
           onValueChange={handleViewChange}
           size="sm"
-          variant="outline"
+          variant="default"
           className="flex items-center"
         >
           <ToggleGroupItem value="table" className="h-7 gap-1.5 px-3 text-xs" aria-label="Table">
