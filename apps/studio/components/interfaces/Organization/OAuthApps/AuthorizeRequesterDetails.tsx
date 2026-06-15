@@ -1,6 +1,6 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
 import { Check, ChevronDown } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Badge,
   Card,
@@ -165,15 +165,28 @@ const PERMISSION_GROUPS: PermissionGroup[] = [
   },
 ]
 
-export const RequesterLogo = ({ icon, name }: { icon: string | null; name: string }) => (
-  <LogoBox>
-    {icon ? (
-      <img alt={name} src={icon} className="size-full object-cover" />
-    ) : (
-      <span className="text-lg font-medium text-foreground-light">{name.slice(0, 1)}</span>
-    )}
-  </LogoBox>
-)
+export const RequesterLogo = ({ icon, name }: { icon: string | null; name: string }) => {
+  const [imageFailed, setImageFailed] = useState(false)
+
+  useEffect(() => {
+    setImageFailed(false)
+  }, [icon])
+
+  return (
+    <LogoBox>
+      {!icon || imageFailed ? (
+        <span className="text-lg font-medium text-foreground-light">{name.slice(0, 1)}</span>
+      ) : (
+        <img
+          alt={name}
+          src={icon}
+          className="size-full object-cover"
+          onError={() => setImageFailed(true)}
+        />
+      )}
+    </LogoBox>
+  )
+}
 
 export const AuthorizeRequesterDetails = ({
   name,
