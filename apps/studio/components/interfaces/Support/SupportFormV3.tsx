@@ -2,7 +2,7 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useConstant, useFlag } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
-import { type Dispatch, type MouseEventHandler } from 'react'
+import { type Dispatch, type MouseEventHandler, useRef } from 'react'
 import type { SubmitHandler, UseFormReturn } from 'react-hook-form'
 import { Form, Separator } from 'ui'
 
@@ -77,6 +77,7 @@ export const SupportFormV3 = ({
 }: SupportFormV3Props) => {
   const { profile } = useProfile()
   const respondToEmail = profile?.primary_email ?? 'your email'
+  const submittingRef = useRef(false)
 
   const { organizationSlug, projectRef, category, severity, subject, library } = form.watch()
 
@@ -99,6 +100,7 @@ export const SupportFormV3 = ({
 
   const { mutate: submitSupportTicket } = useSendSupportTicketMutation({
     onSuccess: (_, variables) => {
+      submittingRef.current = false
       dispatch({
         type: 'SUCCESS',
         sentProjectRef: variables.projectRef,
@@ -119,6 +121,7 @@ export const SupportFormV3 = ({
       })
     },
     onError: (error) => {
+      submittingRef.current = false
       dispatch({
         type: 'ERROR',
         message: error.message,
@@ -127,6 +130,9 @@ export const SupportFormV3 = ({
   })
 
   const onSubmit: SubmitHandler<SupportFormValues> = async (formValues) => {
+    if (submittingRef.current) return
+    submittingRef.current = true
+
     if (
       !simplifiedSupportForm &&
       showClientLibraries &&

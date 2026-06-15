@@ -2,7 +2,7 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useConstant, useFlag } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
-import { type Dispatch, type MouseEventHandler } from 'react'
+import { type Dispatch, type MouseEventHandler, useRef } from 'react'
 import type { SubmitHandler, UseFormReturn } from 'react-hook-form'
 import { DialogSectionSeparator, Form } from 'ui'
 
@@ -69,6 +69,7 @@ interface SupportFormV2Props {
 export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFormV2Props) => {
   const { profile } = useProfile()
   const respondToEmail = profile?.primary_email ?? 'your email'
+  const submittingRef = useRef(false)
 
   const { organizationSlug, projectRef, category, severity, subject, library } = form.watch()
 
@@ -91,6 +92,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
 
   const { mutate: submitSupportTicket } = useSendSupportTicketMutation({
     onSuccess: (_, variables) => {
+      submittingRef.current = false
       dispatch({
         type: 'SUCCESS',
         sentProjectRef: variables.projectRef,
@@ -111,6 +113,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
       })
     },
     onError: (error) => {
+      submittingRef.current = false
       dispatch({
         type: 'ERROR',
         message: error.message,
@@ -119,6 +122,9 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
   })
 
   const onSubmit: SubmitHandler<SupportFormValues> = async (formValues) => {
+    if (submittingRef.current) return
+    submittingRef.current = true
+
     // Library is required when selecting "APIs and Client Libraries" category,
     // but only when the library selector is visible (not in simplified form)
     if (
