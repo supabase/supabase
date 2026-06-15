@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  formatInvokeHeaderArgs,
-  getInvokeHeaders,
-  USER_JWT_PLACEHOLDER,
-} from './Functions.utils'
+import { formatInvokeHeaderArgs, getInvokeHeaders, USER_JWT_PLACEHOLDER } from './Functions.utils'
 
 describe('getInvokeHeaders', () => {
   it('sends a legacy anon key on a single Authorization header', () => {
@@ -62,9 +58,9 @@ describe('getInvokeHeaders', () => {
 
 describe('formatInvokeHeaderArgs', () => {
   it('formats a single header as a cURL -H arg', () => {
-    expect(
-      formatInvokeHeaderArgs([{ name: 'apikey', value: '[YOUR PUBLISHABLE KEY]' }])
-    ).toBe("-H 'apikey: [YOUR PUBLISHABLE KEY]'")
+    expect(formatInvokeHeaderArgs([{ name: 'apikey', value: '[YOUR PUBLISHABLE KEY]' }])).toBe(
+      "-H 'apikey: [YOUR PUBLISHABLE KEY]'"
+    )
   })
 
   it('joins multiple headers with a space', () => {

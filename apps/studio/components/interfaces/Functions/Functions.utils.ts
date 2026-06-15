@@ -3,7 +3,7 @@
  * Shown in invoke snippets on the `Authorization` header when a function enforces JWT
  * verification, so the user knows to substitute a real user token.
  */
-export const USER_JWT_PLACEHOLDER = 'YOUR_USER_JWT'
+export const USER_JWT_PLACEHOLDER = '[YOUR USER JWT]'
 
 export type InvokeHeader = { name: 'apikey' | 'Authorization'; value: string }
 

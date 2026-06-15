@@ -5,12 +5,8 @@ import { useRouter } from 'next/router'
 import { ComponentPropsWithoutRef, ElementRef, forwardRef, useState } from 'react'
 import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
-import {
-  formatInvokeHeaderArgs,
-  getInvokeHeaders,
-  USER_JWT_PLACEHOLDER,
-} from './Functions.utils'
 import type { Commands } from './Functions.types'
+import { formatInvokeHeaderArgs, getInvokeHeaders, USER_JWT_PLACEHOLDER } from './Functions.utils'
 import CommandRender from '@/components/interfaces/Functions/CommandRender'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useAccessTokensQuery } from '@/data/access-tokens/access-tokens-query'
