@@ -11,7 +11,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { ChevronUp, Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -45,26 +45,36 @@ import {
   checkDestructiveQuery,
   checkIfAppendLimitRequired,
   filterTablesCoveredByEnsureRLSTrigger,
+  formatLogQueryError,
   getCreateTablesMissingRLS,
   hasActiveEnsureRLSTrigger,
   isUpdateWithoutWhere,
   suffixWithLimit,
 } from './SQLEditor.utils'
+import { getSqlSnippetSource, SqlSnippetSourceIcon } from './SQLEditorSource.utils'
 import { useAddDefinitions } from './useAddDefinitions'
 import { useCreateDraftSqlTab } from './useCreateDraftSqlTab'
 import { useRestorePersistedDraftSqlTabs } from './useRestorePersistedDraftSqlTabs'
-import { UtilityPanel } from './UtilityPanel/UtilityPanel'
+import { UtilityActions } from './UtilityPanel/UtilityActions'
+import { UtilityPanel, type SqlOutputView } from './UtilityPanel/UtilityPanel'
 import {
   isExplainQuery,
   isExplainSql,
   splitSqlStatements,
 } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
+import {
+  EXPLORER_DATEPICKER_HELPERS,
+  getDefaultHelper,
+} from '@/components/interfaces/Settings/Logs/Logs.constants'
+import { resolveLogDateRange } from '@/components/interfaces/Settings/Logs/logsDateRange'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import ResizableAIWidget from '@/components/ui/AIEditor/ResizableAIWidget'
 import { GridFooter } from '@/components/ui/GridFooter'
 import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
 import { constructHeaders, isValidConnString } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'
+import { useExecuteLogSqlMutation } from '@/data/logs/execute-log-sql-mutation'
+import { acceptUntrustedLogSql, untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { isError } from '@/data/utils/error-check'
@@ -86,6 +96,7 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
+import type { SqlSnippets } from '@/types'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -93,6 +104,17 @@ const DiffEditor = dynamic(
   () => import('../../ui/DiffEditor').then(({ DiffEditor }) => DiffEditor),
   { ssr: false }
 )
+
+const getDefaultLogDateRange = (): SqlSnippets.LogDateRange => {
+  const helper = getDefaultHelper(EXPLORER_DATEPICKER_HELPERS)
+
+  return {
+    from: helper.calcFrom(),
+    to: helper.calcTo(),
+    isHelper: true,
+    text: helper.text,
+  }
+}
 
 export const SQLEditor = () => {
   const os = detectOS()
@@ -140,7 +162,7 @@ export const SQLEditor = () => {
   const [potentialIssues, setPotentialIssues] = useState<PotentialIssues>()
 
   const [showWidget, setShowWidget] = useState(false)
-  const [activeUtilityTab, setActiveUtilityTab] = useState<string>('results')
+  const [activeOutputView, setActiveOutputView] = useState<SqlOutputView>('table')
   const [renameModalOpen, setRenameModalOpen] = useState(false)
 
   const refocusEditor = useCallback(() => {
@@ -182,6 +204,10 @@ export const SQLEditor = () => {
 
   const limit = snapV2.limit
   const results = snapV2.results[id]?.[0]
+  const snippet = snapV2.snippets[id]?.snippet
+  const snippetSource = getSqlSnippetSource(snippet)
+  const defaultLogDateRange = useMemo(() => getDefaultLogDateRange(), [id])
+  const logDateRange = snippet?.content?.logDateRange ?? defaultLogDateRange
   const snippetIsLoading = !(
     id in snapV2.snippets && snapV2.snippets[id].snippet.content !== undefined
   )
@@ -213,10 +239,10 @@ export const SQLEditor = () => {
 
         if (showPrettyExplain && isExplainQuery(data.result)) {
           snapV2.addExplainResult(id, data.result)
-          setActiveUtilityTab('explain')
-        } else if (activeUtilityTab === 'explain') {
+          setActiveOutputView('explain')
+        } else if (activeOutputView === 'explain') {
           // If on Explain tab but ran a non-EXPLAIN query, switch to Results tab
-          setActiveUtilityTab('results')
+          setActiveOutputView('table')
         }
       }
 
@@ -264,17 +290,40 @@ export const SQLEditor = () => {
     },
   })
 
+  const { mutate: executeLogs, isPending: isExecutingLogs } = useExecuteLogSqlMutation({
+    onSuccess(data) {
+      if (id) {
+        if (data.error) {
+          snapV2.addResultError(id, formatLogQueryError(data.error))
+        } else {
+          snapV2.addResult(id, data.result ?? [])
+        }
+        setActiveOutputView('table')
+      }
+
+      refocusEditorAfterRunIfNeeded()
+    },
+    onError(error) {
+      if (id) {
+        snapV2.addResultError(id, formatLogQueryError(error))
+        setActiveOutputView('table')
+      }
+
+      refocusEditorAfterRunIfNeeded()
+    },
+  })
+
   const { mutate: executeExplain, isPending: isExplainExecuting } = useExecuteSqlMutation({
     onSuccess(data) {
       if (id) {
         snapV2.addExplainResult(id, data.result)
-        setActiveUtilityTab('explain')
+        setActiveOutputView('explain')
       }
     },
     onError(error) {
       if (id) {
         snapV2.addExplainResultError(id, error)
-        setActiveUtilityTab('explain')
+        setActiveOutputView('explain')
       }
     },
   })
@@ -323,8 +372,13 @@ export const SQLEditor = () => {
       // use the latest state
       const state = getSqlEditorV2StateSnapshot()
       const snippet = state.snippets[id]
+      const source = getSqlSnippetSource(snippet?.snippet)
 
-      if (editorRef.current === null || isExecuting || project === undefined) {
+      if (
+        editorRef.current === null ||
+        project === undefined ||
+        (source === 'logs' ? isExecutingLogs : isExecuting)
+      ) {
         clearPendingRunRefocus()
         return
       }
@@ -338,6 +392,34 @@ export const SQLEditor = () => {
           snippet.snippet.content?.unchecked_sql)
         : selectedValue || editorRef.current?.getValue()
       const sql = sqlOverride ?? editorSql
+
+      if (source === 'logs') {
+        const logSql = String(sql ?? '')
+        if (!logSql.trim()) {
+          clearPendingRunRefocus()
+          return toast.error('Cannot run an empty log query')
+        }
+
+        if (lineHighlights.length > 0) {
+          editor?.deltaDecorations(lineHighlights, [])
+          setLineHighlights([])
+        }
+
+        const range = resolveLogDateRange(
+          snippet?.snippet.content?.logDateRange ?? defaultLogDateRange
+        )
+
+        snapV2.resetExplainResult(id)
+        executeLogs({
+          projectRef: project.ref,
+          sql: acceptUntrustedLogSql(untrustedLogSql(logSql)),
+          iso_timestamp_start: range.from,
+          iso_timestamp_end: range.to,
+        })
+
+        track('sql_editor_query_run_button_clicked')
+        return
+      }
 
       const hasDestructiveOperations = checkDestructiveQuery(sql)
       const hasUpdateWithoutWhere = isUpdateWithoutWhere(sql)
@@ -403,13 +485,17 @@ export const SQLEditor = () => {
       isDiffOpen,
       id,
       isExecuting,
+      isExecutingLogs,
       project,
       execute,
+      executeLogs,
       getImpersonatedRoleState,
       databaseSelectorState.selectedDatabaseId,
       databases,
       eventTriggers,
       limit,
+      defaultLogDateRange,
+      snapV2,
       track,
     ]
   )
@@ -426,6 +512,11 @@ export const SQLEditor = () => {
     // use the latest state
     const state = getSqlEditorV2StateSnapshot()
     const snippet = state.snippets[id]
+
+    if (getSqlSnippetSource(snippet?.snippet) === 'logs') {
+      setActiveOutputView('table')
+      return
+    }
 
     if (editorRef.current !== null && !isExplainExecuting && project !== undefined) {
       const editor = editorRef.current
@@ -444,7 +535,7 @@ export const SQLEditor = () => {
           message:
             'EXPLAIN only works on a single SQL statement. Please select just one query to analyze.',
         })
-        setActiveUtilityTab('explain')
+        setActiveOutputView('explain')
         return
       }
 
@@ -536,6 +627,33 @@ export const SQLEditor = () => {
       snapV2.addNeedsSaving(id)
     }
   }, [id, snapV2])
+
+  const handleSourceChange = useCallback(
+    (source: SqlSnippets.Source) => {
+      if (!id) return
+
+      snapV2.setSnippetSource({ id, source })
+      if (source === 'logs' && !snapV2.snippets[id]?.snippet.content?.logDateRange) {
+        snapV2.setSnippetLogDateRange({ id, logDateRange: defaultLogDateRange })
+      }
+
+      snapV2.resetResults(id)
+      if (source === 'logs' && activeOutputView === 'explain') {
+        setActiveOutputView('table')
+      }
+
+      tabs.updateTab(createTabId('sql', { id }), { metadata: { sqlSource: source } })
+    },
+    [activeOutputView, defaultLogDateRange, id, snapV2, tabs]
+  )
+
+  const handleLogDateRangeChange = useCallback(
+    (value: SqlSnippets.LogDateRange) => {
+      if (!id) return
+      snapV2.setSnippetLogDateRange({ id, logDateRange: value })
+    },
+    [id, snapV2]
+  )
 
   const buildDebugPrompt = useCallback(() => {
     const snippet = snapV2.snippets[id]
@@ -735,6 +853,15 @@ export const SQLEditor = () => {
   }, [closeDiff, id])
 
   useEffect(() => {
+    if (!id) return
+    tabs.updateTab(createTabId('sql', { id }), { metadata: { sqlSource: snippetSource } })
+    if (snippetSource === 'logs' && activeOutputView === 'explain') {
+      setActiveOutputView('table')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, snippetSource])
+
+  useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (!isDiffOpen && !promptState.isOpen) return
 
@@ -864,107 +991,137 @@ export const SQLEditor = () => {
           autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
         >
           <ResizablePanel defaultSize="50" maxSize="70">
-            <div className="grow overflow-y-auto border-b h-full">
+            <div className="grow h-full flex flex-col overflow-hidden">
               {isLoading ? (
                 <div className="flex h-full w-full items-center justify-center">
                   <Loader2 className="animate-spin text-brand" />
                 </div>
               ) : (
                 <>
-                  {isDiffOpen && (
-                    <div className="w-full h-full">
-                      <DiffEditor
-                        language="pgsql"
-                        original={defaultSqlDiff.original}
-                        modified={defaultSqlDiff.modified}
-                        onMount={(editor) => {
-                          diffEditorRef.current = editor
-                          setIsDiffEditorMounted(true)
+                  <div className="flex items-center gap-x-4 px-4 min-h-[42px] border-b bg-surface-100 xl:justify-between">
+                    <div className="hidden min-w-0 shrink items-center gap-x-2 xl:flex">
+                      <SqlSnippetSourceIcon source={snippetSource} />
+                      <span className="truncate text-sm text-foreground" title={snippet?.name}>
+                        {snippet?.name ?? 'Untitled query'}
+                      </span>
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <UtilityActions
+                        id={id}
+                        isExecuting={snippetSource === 'logs' ? isExecutingLogs : isExecuting}
+                        isDisabled={isDiffOpen}
+                        hasSelection={hasSelection}
+                        source={snippetSource}
+                        logDateRange={logDateRange}
+                        prettifyQuery={prettifyQuery}
+                        executeQuery={executeQueryFromButton}
+                        onSourceChange={handleSourceChange}
+                        onLogDateRangeChange={handleLogDateRangeChange}
+                        onSave={handleSave}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="relative grow min-h-0">
+                    {isDiffOpen && (
+                      <div className="w-full h-full">
+                        <DiffEditor
+                          language="pgsql"
+                          original={defaultSqlDiff.original}
+                          modified={defaultSqlDiff.modified}
+                          onMount={(editor) => {
+                            diffEditorRef.current = editor
+                            setIsDiffEditorMounted(true)
+                          }}
+                        />
+                        {showWidget && (
+                          <ResizableAIWidget
+                            editor={diffEditorRef.current!}
+                            id="ask-ai-diff"
+                            value={promptInput}
+                            onChange={setPromptInput}
+                            onSubmit={(prompt: string) => {
+                              handlePrompt(prompt, {
+                                beforeSelection: promptState.beforeSelection,
+                                selection: promptState.selection || defaultSqlDiff.modified,
+                                afterSelection: promptState.afterSelection,
+                              })
+                            }}
+                            onAccept={acceptAiHandler}
+                            onReject={discardAiHandler}
+                            onCancel={resetPrompt}
+                            isDiffVisible={true}
+                            isLoading={isCompletionLoading}
+                            startLineNumber={Math.max(0, promptState.startLineNumber)}
+                            endLineNumber={promptState.endLineNumber}
+                          />
+                        )}
+                      </div>
+                    )}
+                    <div
+                      key={id}
+                      className="w-full h-full relative [&_.monaco-editor]:outline-none"
+                    >
+                      <MonacoEditor
+                        autoFocus
+                        placeholder={
+                          !promptState.isOpen && !editorRef.current?.getValue()
+                            ? 'Hit ' +
+                              (os === 'macos' ? 'CMD+SHIFT+K' : `CTRL+SHIFT+K`) +
+                              ' to generate query or just start typing'
+                            : ''
+                        }
+                        id={id}
+                        snippetName={snapV2.snippets[id]?.snippet.name ?? ''}
+                        className={cn(isDiffOpen && 'hidden')}
+                        editorRef={editorRef}
+                        monacoRef={monacoRef}
+                        executeQuery={executeQuery}
+                        executeExplainQuery={executeExplainQuery}
+                        prettifyQuery={prettifyQuery}
+                        onSave={handleSave}
+                        onHasSelection={setHasSelection}
+                        onMount={onMount}
+                        onPrompt={({
+                          selection,
+                          beforeSelection,
+                          afterSelection,
+                          startLineNumber,
+                          endLineNumber,
+                        }) => {
+                          setPromptState((prev) => ({
+                            ...prev,
+                            isOpen: true,
+                            selection,
+                            beforeSelection,
+                            afterSelection,
+                            startLineNumber,
+                            endLineNumber,
+                          }))
                         }}
                       />
-                      {showWidget && (
+                      {editorRef.current && promptState.isOpen && !isDiffOpen && (
                         <ResizableAIWidget
-                          editor={diffEditorRef.current!}
-                          id="ask-ai-diff"
+                          editor={editorRef.current}
+                          id="ask-ai"
                           value={promptInput}
                           onChange={setPromptInput}
                           onSubmit={(prompt: string) => {
                             handlePrompt(prompt, {
                               beforeSelection: promptState.beforeSelection,
-                              selection: promptState.selection || defaultSqlDiff.modified,
+                              selection: promptState.selection,
                               afterSelection: promptState.afterSelection,
                             })
                           }}
-                          onAccept={acceptAiHandler}
-                          onReject={discardAiHandler}
                           onCancel={resetPrompt}
-                          isDiffVisible={true}
+                          isDiffVisible={false}
                           isLoading={isCompletionLoading}
                           startLineNumber={Math.max(0, promptState.startLineNumber)}
                           endLineNumber={promptState.endLineNumber}
                         />
                       )}
                     </div>
-                  )}
-                  <div key={id} className="w-full h-full relative">
-                    <MonacoEditor
-                      autoFocus
-                      placeholder={
-                        !promptState.isOpen && !editorRef.current?.getValue()
-                          ? 'Hit ' +
-                            (os === 'macos' ? 'CMD+SHIFT+K' : `CTRL+SHIFT+K`) +
-                            ' to generate query or just start typing'
-                          : ''
-                      }
-                      id={id}
-                      snippetName={snapV2.snippets[id]?.snippet.name ?? ''}
-                      className={cn(isDiffOpen && 'hidden')}
-                      editorRef={editorRef}
-                      monacoRef={monacoRef}
-                      executeQuery={executeQuery}
-                      executeExplainQuery={executeExplainQuery}
-                      prettifyQuery={prettifyQuery}
-                      onSave={handleSave}
-                      onHasSelection={setHasSelection}
-                      onMount={onMount}
-                      onPrompt={({
-                        selection,
-                        beforeSelection,
-                        afterSelection,
-                        startLineNumber,
-                        endLineNumber,
-                      }) => {
-                        setPromptState((prev) => ({
-                          ...prev,
-                          isOpen: true,
-                          selection,
-                          beforeSelection,
-                          afterSelection,
-                          startLineNumber,
-                          endLineNumber,
-                        }))
-                      }}
-                    />
-                    {editorRef.current && promptState.isOpen && !isDiffOpen && (
-                      <ResizableAIWidget
-                        editor={editorRef.current}
-                        id="ask-ai"
-                        value={promptInput}
-                        onChange={setPromptInput}
-                        onSubmit={(prompt: string) => {
-                          handlePrompt(prompt, {
-                            beforeSelection: promptState.beforeSelection,
-                            selection: promptState.selection,
-                            afterSelection: promptState.afterSelection,
-                          })
-                        }}
-                        onCancel={resetPrompt}
-                        isDiffVisible={false}
-                        isLoading={isCompletionLoading}
-                        startLineNumber={Math.max(0, promptState.startLineNumber)}
-                        endLineNumber={promptState.endLineNumber}
-                      />
-                    )}
                   </div>
                 </>
               )}
@@ -981,74 +1138,75 @@ export const SQLEditor = () => {
             ) : (
               <UtilityPanel
                 id={id}
-                isExecuting={isExecuting}
+                isExecuting={snippetSource === 'logs' ? isExecutingLogs : isExecuting}
                 isExplainExecuting={isExplainExecuting}
                 isDisabled={isDiffOpen}
-                hasSelection={hasSelection}
-                prettifyQuery={prettifyQuery}
-                executeQuery={executeQueryFromButton}
                 executeExplainQuery={executeExplainQuery}
-                onSave={handleSave}
                 onDebug={onDebug}
                 buildDebugPrompt={buildDebugPrompt}
-                activeTab={activeUtilityTab}
-                onActiveTabChange={setActiveUtilityTab}
+                source={snippetSource}
+                activeView={activeOutputView}
+                onActiveViewChange={setActiveOutputView}
               />
             )}
           </ResizablePanel>
 
           <div className="h-9">
-            {results?.rows !== undefined && !isExecuting && (
-              <GridFooter className="flex items-center justify-between gap-2">
-                <Tooltip>
-                  <TooltipTrigger>
-                    <p className="text-xs">
-                      <span className="text-foreground">
-                        {results.rows.length} row{results.rows.length > 1 ? 's' : ''}
-                      </span>
-                      <span className="text-foreground-lighter ml-1">
-                        {results.autoLimit !== undefined &&
-                          ` (Limited to only ${results.autoLimit} rows)`}
-                      </span>
-                    </p>
-                  </TooltipTrigger>
-                  <TooltipContent className="max-w-xs">
-                    <p className="flex flex-col gap-y-1">
-                      <span>
-                        Results are automatically limited to preserve browser performance, in
-                        particular if your query returns an exceptionally large number of rows.
-                      </span>
+            {results?.rows !== undefined &&
+              !(snippetSource === 'logs' ? isExecutingLogs : isExecuting) && (
+                <GridFooter className="flex items-center justify-between gap-2">
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <p className="text-xs">
+                        <span className="text-foreground">
+                          {results.rows.length} row{results.rows.length > 1 ? 's' : ''}
+                        </span>
+                        <span className="text-foreground-lighter ml-1">
+                          {results.autoLimit !== undefined &&
+                            ` (Limited to only ${results.autoLimit} rows)`}
+                        </span>
+                      </p>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <p className="flex flex-col gap-y-1">
+                        <span>
+                          Results are automatically limited to preserve browser performance, in
+                          particular if your query returns an exceptionally large number of rows.
+                        </span>
 
-                      <span className="text-foreground-light">
-                        You may change or remove this limit from the dropdown on the right
-                      </span>
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-                {results.autoLimit !== undefined && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button type="default" iconRight={<ChevronUp size={14} />}>
-                        Limit results to:{' '}
-                        {ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === snapV2.limit)?.label}
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-40" align="end">
-                      <DropdownMenuRadioGroup
-                        value={snapV2.limit.toString()}
-                        onValueChange={(val) => snapV2.setLimit(Number(val))}
-                      >
-                        {ROWS_PER_PAGE_OPTIONS.map((option) => (
-                          <DropdownMenuRadioItem key={option.label} value={option.value.toString()}>
-                            {option.label}
-                          </DropdownMenuRadioItem>
-                        ))}
-                      </DropdownMenuRadioGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
-              </GridFooter>
-            )}
+                        <span className="text-foreground-light">
+                          You may change or remove this limit from the dropdown on the right
+                        </span>
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                  {results.autoLimit !== undefined && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button type="default" iconRight={<ChevronUp size={14} />}>
+                          Limit results to:{' '}
+                          {ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === snapV2.limit)?.label}
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-40" align="end">
+                        <DropdownMenuRadioGroup
+                          value={snapV2.limit.toString()}
+                          onValueChange={(val) => snapV2.setLimit(Number(val))}
+                        >
+                          {ROWS_PER_PAGE_OPTIONS.map((option) => (
+                            <DropdownMenuRadioItem
+                              key={option.label}
+                              value={option.value.toString()}
+                            >
+                              {option.label}
+                            </DropdownMenuRadioItem>
+                          ))}
+                        </DropdownMenuRadioGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+                </GridFooter>
+              )}
           </div>
         </ResizablePanelGroup>
       </div>

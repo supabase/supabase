@@ -50,6 +50,7 @@
  * Never cast arbitrary strings to this type.
  */
 export type SafeLogSqlFragment = string & { readonly __safeLogSqlFragmentBrand: never }
+export type UntrustedLogSqlFragment = string & { readonly __untrustedLogSqlFragmentBrand: never }
 
 type LogSqlFragmentSeparator =
   | ','
@@ -90,6 +91,22 @@ export function safeSql(
  */
 function rawSql(sql: string): SafeLogSqlFragment {
   return sql as SafeLogSqlFragment
+}
+
+/**
+ * Marks raw log SQL as user-controlled input. This does not make the SQL safe to execute; it only
+ * makes the trust boundary explicit at call sites that receive text from an editor, URL, or LLM.
+ */
+export function untrustedLogSql(sql: string): UntrustedLogSqlFragment {
+  return sql as UntrustedLogSqlFragment
+}
+
+/**
+ * Accepts a complete untrusted log-SQL statement for execution after a deliberate user action.
+ * Do not use this for string fragments that will be composed into a larger analytics query.
+ */
+export function acceptUntrustedLogSql(sql: UntrustedLogSqlFragment): SafeLogSqlFragment {
+  return rawSql(sql)
 }
 
 /** Joins already-safe log-SQL fragments with a fixed structural separator. */

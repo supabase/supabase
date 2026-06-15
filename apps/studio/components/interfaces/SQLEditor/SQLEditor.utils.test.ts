@@ -8,6 +8,7 @@ import {
   checkDestructiveQuery,
   checkIfAppendLimitRequired,
   filterTablesCoveredByEnsureRLSTrigger,
+  formatLogQueryError,
   getCreateTablesMissingRLS,
   hasActiveEnsureRLSTrigger,
   isUpdateWithoutWhere,
@@ -942,5 +943,21 @@ describe('SQLEditor.utils:checkAlterDatabaseConnection', () => {
       alter database postgres allow_connections false;
     `)
     expect(match).toBe(true)
+  })
+})
+
+describe('formatLogQueryError', () => {
+  it('wraps a string error in a message object', () => {
+    expect(formatLogQueryError('boom')).toEqual({ message: 'boom' })
+  })
+
+  it('extracts and coerces message from an error-like object, dropping extra fields', () => {
+    expect(formatLogQueryError({ message: 'boom', code: 500 })).toEqual({ message: 'boom' })
+    expect(formatLogQueryError({ message: 123 })).toEqual({ message: '123' })
+  })
+
+  it('falls back to a default message for unrecognized errors', () => {
+    expect(formatLogQueryError(undefined)).toEqual({ message: 'Failed to run log query' })
+    expect(formatLogQueryError({})).toEqual({ message: 'Failed to run log query' })
   })
 })

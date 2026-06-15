@@ -6,6 +6,7 @@ import { useMemo } from 'react'
 import { cn, TabsTrigger_Shadcn_ } from 'ui'
 
 import { useEditorType } from '../editors/EditorsLayout.hooks'
+import { SqlSnippetSourceIcon } from '@/components/interfaces/SQLEditor/SQLEditorSource.utils'
 import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useTabsStateSnapshot, type Tab } from '@/state/tabs'
@@ -84,7 +85,11 @@ export const SortableTab = ({
         )}
         {...listeners}
       >
-        <EntityTypeIcon type={tab.type} />
+        {tab.type === 'sql' ? (
+          <SqlSnippetSourceIcon source={tab.metadata?.sqlSource} />
+        ) : (
+          <EntityTypeIcon type={tab.type} />
+        )}
         <div className="flex items-center gap-0">
           <AnimatePresence mode="popLayout" initial>
             {shouldShowSchema && (

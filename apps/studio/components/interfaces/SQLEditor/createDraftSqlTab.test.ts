@@ -15,6 +15,12 @@ import {
 import { persistDraftSqlTab, readPersistedDraftSqlTab } from './draftSqlTabStorage.utils'
 
 const PROJECT_REF = 'test-project'
+const LOG_DATE_RANGE = {
+  from: '2026-06-15T00:00:00.000Z',
+  to: '2026-06-15T01:00:00.000Z',
+  isHelper: true,
+  text: 'Last hour',
+}
 
 describe('isDraftSqlSnippet', () => {
   it('is true only when isDraftTab is set', () => {
@@ -181,7 +187,40 @@ describe('createDraftSqlTab', () => {
     expect(addedTab.metadata).toMatchObject({ sqlId: draftId, isDraft: true })
 
     // Persisted to local storage with the initial sql
-    expect(readPersistedDraftSqlTab(PROJECT_REF, draftId)).toMatchObject({ sql: 'select 1' })
+    expect(readPersistedDraftSqlTab(PROJECT_REF, draftId)).toMatchObject({
+      sql: 'select 1',
+      source: 'database',
+    })
+  })
+
+  it('registers a logs draft with source metadata', () => {
+    const addSnippet = vi.fn()
+    const addTab = vi.fn()
+
+    const draftId = createDraftSqlTab({
+      projectRef: PROJECT_REF,
+      projectId: 1,
+      ownerId: 2,
+      snapV2: { addSnippet },
+      tabs: { addTab },
+      initialSql: 'select * from edge_logs',
+      source: 'logs',
+      logDateRange: LOG_DATE_RANGE,
+      skipNavigation: true,
+    })
+
+    const addedSnippet = addSnippet.mock.calls[0][0].snippet
+    expect(addedSnippet.content).toMatchObject({
+      source: 'logs',
+      logDateRange: LOG_DATE_RANGE,
+    })
+
+    const addedTab = addTab.mock.calls[0][0]
+    expect(addedTab.metadata).toMatchObject({ sqlId: draftId, sqlSource: 'logs' })
+    expect(readPersistedDraftSqlTab(PROJECT_REF, draftId)).toMatchObject({
+      source: 'logs',
+      logDateRange: LOG_DATE_RANGE,
+    })
   })
 })
 
@@ -194,6 +233,8 @@ describe('restoreDraftSqlTab', () => {
     persistDraftSqlTab(PROJECT_REF, 'draft-1', {
       sql: 'select 1',
       name: 'My draft',
+      source: 'logs',
+      logDateRange: LOG_DATE_RANGE,
     })
 
     const addSnippet = vi.fn()
@@ -212,7 +253,7 @@ describe('restoreDraftSqlTab', () => {
       id: 'draft-1',
       name: 'My draft',
       isDraftTab: true,
-      content: { unchecked_sql: 'select 1' },
+      content: { unchecked_sql: 'select 1', source: 'logs', logDateRange: LOG_DATE_RANGE },
     })
   })
 
@@ -235,7 +276,7 @@ describe('restoreDraftSqlTab', () => {
       id: 'draft-2',
       name: 'Fallback name',
       isDraftTab: true,
-      content: { unchecked_sql: 'select 2' },
+      content: { unchecked_sql: 'select 2', source: 'database' },
     })
   })
 })
@@ -246,7 +287,12 @@ describe('restoreOpenDraftSqlTabs', () => {
   })
 
   it('restores missing draft snippets and returns all open draft ids', () => {
-    persistDraftSqlTab(PROJECT_REF, 'draft-a', { sql: 'select a', name: 'Draft A' })
+    persistDraftSqlTab(PROJECT_REF, 'draft-a', {
+      sql: 'select a',
+      name: 'Draft A',
+      source: 'logs',
+      logDateRange: LOG_DATE_RANGE,
+    })
     persistDraftSqlTab(PROJECT_REF, 'draft-c', { sql: 'select c', name: 'Draft C' })
 
     const addSnippet = vi.fn()
@@ -279,7 +325,7 @@ describe('restoreOpenDraftSqlTabs', () => {
     expect(restoredDraftA).toMatchObject({
       name: 'Draft A',
       isDraftTab: true,
-      content: { unchecked_sql: 'select a' },
+      content: { unchecked_sql: 'select a', source: 'logs', logDateRange: LOG_DATE_RANGE },
     })
   })
 

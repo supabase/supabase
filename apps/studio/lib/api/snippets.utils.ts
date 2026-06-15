@@ -25,6 +25,15 @@ export const SnippetSchema = z.object({
     sql: z.string(),
     content_id: z.string(),
     schema_version: z.literal('1.0'),
+    source: z.union([z.literal('database'), z.literal('logs')]).optional(),
+    logDateRange: z
+      .object({
+        to: z.string(),
+        from: z.string(),
+        isHelper: z.boolean().optional(),
+        text: z.string().optional(),
+      })
+      .optional(),
   }),
   visibility: z.union([
     z.literal('user'),
@@ -87,6 +96,7 @@ const buildSnippet = (
       sql: content,
       content_id: uuidv4(),
       schema_version: '1.0',
+      source: 'database',
     },
     visibility: 'user',
     project_id: 1,

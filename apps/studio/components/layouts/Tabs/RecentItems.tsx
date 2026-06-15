@@ -5,6 +5,7 @@ import Link from 'next/link'
 
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
+import { SqlSnippetSourceIcon } from '@/components/interfaces/SQLEditor/SQLEditorSource.utils'
 import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { editorEntityTypes, useTabsStateSnapshot } from '@/state/tabs'
@@ -71,7 +72,11 @@ export function RecentItems() {
                     className="flex items-center gap-4 rounded-lg bg-surface-100 py-2 transition-colors hover:bg-surface-200"
                   >
                     <div className="flex h-6 w-6 items-center justify-center rounded-sm bg-surface-100 border">
-                      <EntityTypeIcon type={item.type} />
+                      {item.type === 'sql' ? (
+                        <SqlSnippetSourceIcon source={item.metadata?.sqlSource} />
+                      ) : (
+                        <EntityTypeIcon type={item.type} />
+                      )}
                     </div>
                     <div className="flex flex-1 gap-5 items-center">
                       <span className="text-sm text-foreground">

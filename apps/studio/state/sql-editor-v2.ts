@@ -46,6 +46,18 @@ function isDraftSqlTabId(id: string) {
   return sqlEditorState.snippets[id]?.snippet?.isDraftTab === true
 }
 
+function persistDraftSnippet(stateSnippet: StateSnippet) {
+  const { snippet, projectRef } = stateSnippet
+  if (!snippet.id || !snippet.content) return
+
+  persistDraftSqlTab(projectRef, snippet.id, {
+    sql: snippet.content.unchecked_sql,
+    name: snippet.name,
+    source: snippet.content.source ?? 'database',
+    logDateRange: snippet.content.logDateRange,
+  })
+}
+
 export const sqlEditorState = proxy({
   // ========================================================================
   // ## Data properties within the store
@@ -155,6 +167,10 @@ export const sqlEditorState = proxy({
         ...sqlEditorState.snippets[id].snippet,
         ...snippet,
       }
+      if (isDraftSqlTabId(id)) {
+        persistDraftSnippet(sqlEditorState.snippets[id])
+        return
+      }
       if (!skipSave && !isDraftSqlTabId(id)) sqlEditorState.needsSaving.set(id, true)
     }
   },
@@ -198,14 +214,48 @@ export const sqlEditorState = proxy({
       // survives reloads, and never queue them for the async DB save.
       if (isDraftSqlTabId(id)) {
         const stateSnippet = sqlEditorState.snippets[id]
-        if (stateSnippet) {
-          persistDraftSqlTab(stateSnippet.projectRef, id, { sql, name: snippet.name })
-        }
+        if (stateSnippet) persistDraftSnippet(stateSnippet)
         return
       }
 
       if (!skipSave) sqlEditorState.needsSaving.set(id, shouldInvalidate)
     }
+  },
+
+  setSnippetSource: ({ id, source }: { id: string; source: SqlSnippets.Source }) => {
+    const snippet = sqlEditorState.snippets[id]?.snippet
+    if (!snippet?.content) return
+
+    snippet.content.source = source
+
+    if (isDraftSqlTabId(id)) {
+      const stateSnippet = sqlEditorState.snippets[id]
+      if (stateSnippet) persistDraftSnippet(stateSnippet)
+      return
+    }
+
+    sqlEditorState.needsSaving.set(id, true)
+  },
+
+  setSnippetLogDateRange: ({
+    id,
+    logDateRange,
+  }: {
+    id: string
+    logDateRange: SqlSnippets.LogDateRange
+  }) => {
+    const snippet = sqlEditorState.snippets[id]?.snippet
+    if (!snippet?.content) return
+
+    snippet.content.logDateRange = logDateRange
+
+    if (isDraftSqlTabId(id)) {
+      const stateSnippet = sqlEditorState.snippets[id]
+      if (stateSnippet) persistDraftSnippet(stateSnippet)
+      return
+    }
+
+    sqlEditorState.needsSaving.set(id, true)
   },
 
   /**

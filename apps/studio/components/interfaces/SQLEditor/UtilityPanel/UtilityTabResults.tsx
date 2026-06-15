@@ -5,6 +5,7 @@ import { forwardRef } from 'react'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import Results from './Results'
+import { SqlEditorResultsEmptyState } from './SqlEditorResultsEmptyState'
 import { getSqlErrorLines } from './UtilityTabResults.utils'
 import { subscriptionHasHipaaAddon } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
@@ -169,20 +170,8 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
           </div>
         </div>
       )
-    } else if (!result) {
-      return (
-        <div className="bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark overflow-y-auto">
-          <p className="m-0 border-0 px-4 py-4 text-sm text-foreground-light">
-            Click <code className="text-code-inline">Run</code> to execute your query
-          </p>
-        </div>
-      )
-    } else if (result.rows.length <= 0) {
-      return (
-        <div className="bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark overflow-y-auto">
-          <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Success. No rows returned</p>
-        </div>
-      )
+    } else if (!result || result.rows.length <= 0) {
+      return <SqlEditorResultsEmptyState />
     }
 
     return <Results rows={result.rows} />
