@@ -2,9 +2,13 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 
 import { withSupabase } from 'npm:@supabase/server@^1'
-import type { SupabaseClient } from 'npm:@supabase/supabase-js@2'
-import { ElevenLabsClient } from 'npm:elevenlabs@1.52.0'
-import * as hash from 'npm:object-hash'
+import type { SupabaseClient } from 'npm:@supabase/supabase-js@^2'
+import { ElevenLabsClient } from 'npm:elevenlabs@^1'
+import * as hash from 'npm:object-hash@^3'
+
+declare const EdgeRuntime: {
+  waitUntil(promise: Promise<unknown>): void
+}
 
 const client = new ElevenLabsClient({
   apiKey: Deno.env.get('ELEVENLABS_API_KEY'),

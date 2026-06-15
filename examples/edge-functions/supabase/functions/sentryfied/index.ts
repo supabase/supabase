@@ -1,14 +1,12 @@
-import * as Sentry from 'https://deno.land/x/sentry/index.mjs'
+import * as Sentry from 'npm:@sentry/deno@^10'
 import { withSupabase } from 'npm:@supabase/server@^1'
 
 Sentry.init({
-  dsn: SENTRY_DSN,
+  dsn: Deno.env.get('SENTRY_DSN'),
   integrations: [],
   debug: true,
   // Performance Monitoring
   tracesSampleRate: 1.0,
-  // Set sampling rate for profiling - this is relative to tracesSampleRate
-  profilesSampleRate: 1.0,
 })
 
 // Set region and execution_id as custom tags

@@ -1,4 +1,4 @@
-import { HfInference } from 'https://esm.sh/@huggingface/inference@2.3.2'
+import { HfInference } from 'npm:@huggingface/inference@^4'
 import { withSupabase } from 'npm:@supabase/server@^1'
 
 import { Database } from './types.ts'
@@ -41,6 +41,6 @@ export default {
       .insert({ id: soRecord.id!, caption: imgDesc.generated_text })
       .throwOnError()
 
-    return new Response('ok')
+    return Response.json({ status: 'ok' })
   }),
 }

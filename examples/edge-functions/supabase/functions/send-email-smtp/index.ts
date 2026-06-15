@@ -3,7 +3,7 @@
 // This enables autocomplete, go to definition, etc.
 
 import { withSupabase } from 'npm:@supabase/server@^1'
-import nodemailer from 'npm:nodemailer@6.9.10'
+import nodemailer from 'npm:nodemailer@^9'
 
 const transport = nodemailer.createTransport({
   host: Deno.env.get('SMTP_HOSTNAME')!,
@@ -39,7 +39,7 @@ export default {
         )
       })
     } catch (error) {
-      return new Response(error.message, { status: 500 })
+      return Response.json({ error: error.message }, { status: 500 })
     }
 
     return Response.json({

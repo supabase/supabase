@@ -1,5 +1,5 @@
-import { ImageResponse } from 'https://deno.land/x/og_edge@0.0.4/mod.ts'
-import React from 'https://esm.sh/react@18.2.0?deno-std=0.177.0'
+import { ImageResponse } from 'npm:@vercel/og@^0'
+import React from 'npm:react@19'
 
 const STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw6'
 const BACKGROUND_IMAGE_STD = `${STORAGE_URL}/lw6_ticket_regular.png`

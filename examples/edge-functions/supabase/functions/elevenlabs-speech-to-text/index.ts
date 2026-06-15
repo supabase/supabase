@@ -5,10 +5,14 @@
 // Setup type definitions for built-in Supabase Runtime APIs
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 
-import { Bot, webhookCallback } from 'https://deno.land/x/grammy@v1.34.0/mod.ts'
+import { Bot, webhookCallback } from 'npm:grammy@^1'
 import { withSupabase } from 'npm:@supabase/server@^1'
-import type { SupabaseClient } from 'npm:@supabase/supabase-js@2'
-import { ElevenLabsClient } from 'npm:elevenlabs@1.50.5'
+import type { SupabaseClient } from 'npm:@supabase/supabase-js@^2'
+import { ElevenLabsClient } from 'npm:elevenlabs@^1'
+
+declare const EdgeRuntime: {
+  waitUntil(promise: Promise<unknown>): void
+}
 
 console.log(`Function "elevenlabs-scribe-bot" up and running!`)
 
@@ -80,7 +84,8 @@ async function scribe({
 
 // Use beforeunload event handler to be notified when function is about to shutdown
 addEventListener('beforeunload', (ev) => {
-  console.log('Function will be shutdown due to', ev.detail?.reason)
+  const reason = (ev as Event & { detail?: { reason?: string } }).detail?.reason
+  console.log('Function will be shutdown due to', reason)
 
   // save state or log the current progress
 })

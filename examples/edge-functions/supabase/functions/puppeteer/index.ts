@@ -1,4 +1,4 @@
-import puppeteer from 'https://deno.land/x/puppeteer@16.2.0/mod.ts'
+import puppeteer from 'npm:puppeteer@^25'
 import { withSupabase } from 'npm:@supabase/server@^1'
 
 // Public endpoint, so deploy with verify_jwt = false.
@@ -19,7 +19,7 @@ export default {
       await page.goto(url)
       const screenshot = await page.screenshot()
 
-      return new Response(screenshot, {
+      return new Response(screenshot as BodyInit, {
         headers: { 'Content-Type': 'image/png' },
       })
     } catch (e) {

@@ -2,7 +2,7 @@
 // - `generated-images` bucket already created.
 // - `OPENAI_API_KEY` environment variable set.
 
-import OpenAI, { toFile } from 'jsr:@openai/openai@4.96.2'
+import OpenAI, { toFile } from 'jsr:@openai/openai@^6'
 import { withSupabase } from 'npm:@supabase/server@^1'
 
 // Deploy with verify_jwt = false.

@@ -46,8 +46,14 @@ verify_jwt = false
 verify_jwt = false
 [functions.cloudflare-turnstile]
 verify_jwt = false
+[functions.custom-jwt-validation]
+verify_jwt = false
 [functions.connect-supabase]
 [functions.discord-bot]
+[functions.elevenlabs-speech-to-text]
+verify_jwt = false
+[functions.elevenlabs-text-to-speech]
+verify_jwt = false
 [functions.file-upload-storage]
 [functions.get-tshirt-competition]
 verify_jwt = false
@@ -64,11 +70,16 @@ verify_jwt = false
 verify_jwt = false
 [functions.openai]
 verify_jwt = false
+[functions.openai-image-generation]
+verify_jwt = false
 [functions.opengraph]
 verify_jwt = false
 [functions.postgres-on-the-edge]
 [functions.puppeteer]
 verify_jwt = false
+[functions.simple-mcp-server]
+verify_jwt = false
+entrypoint = "./functions/mcp/simple-mcp-server/index.ts"
 [functions.read-storage]
 [functions.restful-tasks]
 [functions.select-from-table-with-auth-rls]

@@ -1,4 +1,4 @@
-import * as Sentry from 'https://deno.land/x/sentry@7.102.0/index.mjs'
+import * as Sentry from 'npm:@sentry/deno@^10'
 import { withSupabase } from 'npm:@supabase/server@^1'
 
 // Follow this setup guide to integrate the Deno language server with your editor:
@@ -67,7 +67,6 @@ export default {
   2. Make an HTTP request:
 
   curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/sentry' \
-    --header 'apikey: <SUPABASE_PUBLISHABLE_KEY>' \
     --header 'Content-Type: application/json' \
     --data '{"answer":"mysql", "twitter":"thorwebdev"}'
 
