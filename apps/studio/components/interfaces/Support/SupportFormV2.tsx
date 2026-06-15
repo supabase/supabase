@@ -2,7 +2,7 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useConstant, useFlag } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
-import { type Dispatch, type MouseEventHandler, useRef } from 'react'
+import { useRef, type Dispatch, type MouseEventHandler } from 'react'
 import type { SubmitHandler, UseFormReturn } from 'react-hook-form'
 import { DialogSectionSeparator, Form } from 'ui'
 
@@ -117,13 +117,13 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
       dispatch({
         type: 'ERROR',
         message: error.message,
+        code: error.code,
       })
     },
   })
 
   const onSubmit: SubmitHandler<SupportFormValues> = async (formValues) => {
     if (submittingRef.current) return
-    submittingRef.current = true
 
     // Library is required when selecting "APIs and Client Libraries" category,
     // but only when the library selector is visible (not in simplified form)
@@ -140,72 +140,90 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
       return
     }
 
+    // Synchronous validation has passed. JS is single-threaded, so the form
+    // cannot be double-submitted before this point. Set the guard only now, so
+    // that the early returns above never leave the form permanently locked.
+    submittingRef.current = true
     dispatch({ type: 'SUBMIT' })
 
-    const { attachDashboardLogs: formAttachDashboardLogs, ...values } = formValues
-    const attachDashboardLogs =
-      formAttachDashboardLogs && DASHBOARD_LOG_CATEGORIES.includes(values.category)
+    try {
+      const { attachDashboardLogs: formAttachDashboardLogs, ...values } = formValues
+      const attachDashboardLogs =
+        formAttachDashboardLogs && DASHBOARD_LOG_CATEGORIES.includes(values.category)
 
-    const [attachments, dashboardLogUrl] = await Promise.all([
-      attachmentUpload.createAttachments(),
-      attachDashboardLogs
-        ? uploadDashboardLog({
-            userId: profile?.gotrue_id,
-            sanitizedLogs: sanitizedLogSnapshot,
-            uploadDashboardLogFn,
-          })
-        : undefined,
-    ])
+      const [attachments, dashboardLogUrl] = await Promise.all([
+        attachmentUpload.createAttachments(),
+        attachDashboardLogs
+          ? uploadDashboardLog({
+              userId: profile?.gotrue_id,
+              sanitizedLogs: sanitizedLogSnapshot,
+              uploadDashboardLogFn,
+            })
+          : undefined,
+      ])
 
-    const selectedLibrary = values.library
-      ? CLIENT_LIBRARIES.find((library) => library.language === values.library)
-      : undefined
+      const selectedLibrary = values.library
+        ? CLIENT_LIBRARIES.find((library) => library.language === values.library)
+        : undefined
 
-    const payload = {
-      ...values,
-      organizationSlug: values.organizationSlug ?? NO_ORG_MARKER,
-      projectRef: values.projectRef ?? NO_PROJECT_MARKER,
-      allowSupportAccess:
-        values.category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(values.category)
-          ? values.allowSupportAccess
-          : false,
-      library:
-        values.category === SupportCategories.PROBLEM && selectedLibrary !== undefined
-          ? selectedLibrary.key
-          : '',
-      message: formatMessage({
-        message: values.message,
-        attachments,
-        error: initialError,
-      }),
-      verified: true,
-      tags: ['dashboard-support-form'],
-      siteUrl: '',
-      additionalRedirectUrls: '',
-      affectedServices: CATEGORIES_WITHOUT_AFFECTED_SERVICES.includes(values.category)
-        ? ''
-        : values.affectedServices
-            .split(',')
-            .map((x) => x.trim().replace(/ /g, '_').toLowerCase())
-            .join(';'),
-      browserInformation: detectBrowser(),
-      dashboardLogs: dashboardLogUrl?.[0],
-      dashboardStudioVersion: commit ? formatStudioVersion(commit) : undefined,
-    }
-
-    if (values.projectRef !== NO_PROJECT_MARKER) {
-      try {
-        const authConfig = await getProjectAuthConfig({
-          projectRef: values.projectRef,
-        })
-        payload.siteUrl = authConfig.SITE_URL
-        payload.additionalRedirectUrls = authConfig.URI_ALLOW_LIST
-      } catch {
-        // [Joshen] No error handler required as fetching these info are nice to haves, not necessary
+      const payload = {
+        ...values,
+        organizationSlug: values.organizationSlug ?? NO_ORG_MARKER,
+        projectRef: values.projectRef ?? NO_PROJECT_MARKER,
+        allowSupportAccess:
+          values.category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(values.category)
+            ? values.allowSupportAccess
+            : false,
+        library:
+          values.category === SupportCategories.PROBLEM && selectedLibrary !== undefined
+            ? selectedLibrary.key
+            : '',
+        message: formatMessage({
+          message: values.message,
+          attachments,
+          error: initialError,
+        }),
+        verified: true,
+        tags: ['dashboard-support-form'],
+        siteUrl: '',
+        additionalRedirectUrls: '',
+        affectedServices: CATEGORIES_WITHOUT_AFFECTED_SERVICES.includes(values.category)
+          ? ''
+          : values.affectedServices
+              .split(',')
+              .map((x) => x.trim().replace(/ /g, '_').toLowerCase())
+              .join(';'),
+        browserInformation: detectBrowser(),
+        dashboardLogs: dashboardLogUrl?.[0],
+        dashboardStudioVersion: commit ? formatStudioVersion(commit) : undefined,
       }
-    }
 
-    submitSupportTicket(payload)
+      if (values.projectRef !== NO_PROJECT_MARKER) {
+        try {
+          const authConfig = await getProjectAuthConfig({
+            projectRef: values.projectRef,
+          })
+          payload.siteUrl = authConfig.SITE_URL
+          payload.additionalRedirectUrls = authConfig.URI_ALLOW_LIST
+        } catch {
+          // [Joshen] No error handler required as fetching these info are nice to haves, not necessary
+        }
+      }
+
+      submitSupportTicket(payload)
+    } catch (error) {
+      // The attachment/log upload steps can throw before the mutation runs, in
+      // which case neither onSuccess nor onError fires. Reset the guard and
+      // transition out of 'submitting' so the form is not permanently locked.
+      submittingRef.current = false
+      dispatch({
+        type: 'ERROR',
+        message:
+          error instanceof Error
+            ? error.message
+            : 'Something went wrong while preparing your request. Please try again.',
+      })
+    }
   }
 
   const handleFormSubmit = form.handleSubmit(onSubmit)
