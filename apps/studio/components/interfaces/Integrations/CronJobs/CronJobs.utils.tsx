@@ -1,7 +1,11 @@
 import { keyword, literal, safeSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
 import { toString as CronToString } from 'cronstrue'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import { Column } from 'react-data-grid'
 import { cn } from 'ui'
+
+dayjs.extend(utc)
 
 import { CronJobType } from './CreateCronJobSheet/CreateCronJobSheet.constants'
 import { CRON_TABLE_COLUMNS, HTTPHeader, secondsPattern } from './CronJobs.constants'
@@ -250,22 +254,10 @@ export function calculateDuration(start: string, end: string): string {
 }
 
 export function formatDate(dateString: string): string {
-  const date = new Date(dateString)
-  if (isNaN(date.getTime())) {
-    return 'Invalid Date'
-  }
-  const options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'short',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false,
-    timeZone: 'UTC',
-    timeZoneName: 'short',
-  }
-  return date.toLocaleString(undefined, options)
+  if (!dateString) return 'Invalid Date'
+  const parsed = dayjs.utc(dateString)
+  if (!parsed.isValid()) return 'Invalid Date'
+  return parsed.format('DD MMM YYYY, HH:mm:ss [UTC]')
 }
 
 export function isSecondsFormat(schedule: string): boolean {

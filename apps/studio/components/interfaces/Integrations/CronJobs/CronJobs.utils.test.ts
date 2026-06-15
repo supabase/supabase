@@ -470,17 +470,20 @@ describe('formatDate', () => {
     expect(formatDate('not-a-date')).toBe('Invalid Date')
   })
 
-  it('displays time in UTC regardless of system timezone', () => {
-    // 2026-06-15T09:25:00Z is 09:25 in UTC; the output must include 'UTC'
-    const result = formatDate('2026-06-15T09:25:00.000Z')
-    expect(result).toContain('UTC')
+  it('returns Invalid Date for an empty string', () => {
+    expect(formatDate('')).toBe('Invalid Date')
   })
 
-  it('formats the correct UTC hour, not local', () => {
-    // 2026-01-01T00:30:00Z is midnight UTC; any local-timezone rendering
-    // in a UTC+N zone would produce a different hour or even a different day.
-    const result = formatDate('2026-01-01T00:30:00.000Z')
-    expect(result).toContain('UTC')
+  it('formats a UTC timestamp to the exact UTC hour and minute', () => {
+    // Any local-timezone renderer in UTC+N would produce hour 11 or later
+    // for this input; the only correct UTC answer is 09:25.
+    expect(formatDate('2026-06-15T09:25:00.000Z')).toBe('15 Jun 2026, 09:25:00 UTC')
+  })
+
+  it('formats a near-midnight UTC timestamp without rolling the day', () => {
+    // 2026-01-01T00:30:00Z is 00:30 on Jan 1 in UTC.
+    // A UTC+5 renderer would produce Dec 31 at 19:30 — the wrong day entirely.
+    expect(formatDate('2026-01-01T00:30:00.000Z')).toBe('01 Jan 2026, 00:30:00 UTC')
   })
 })
 
