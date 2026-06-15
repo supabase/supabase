@@ -9,45 +9,42 @@ import { UseCustomQueryOptions } from '@/types'
 export type TablePrivilegesVariables = {
   projectRef?: string
   connectionString?: string | null
+  includedSchemas?: string[]
 }
 
 export type PgTablePrivileges = z.infer<typeof pgMeta.tablePrivileges.zod>
 
 const pgMetaTablePrivilegesList = pgMeta.tablePrivileges.list()
-
 export type TablePrivilegesData = z.infer<typeof pgMetaTablePrivilegesList.zod>
 export type TablePrivilegesError = ExecuteSqlError
 
 async function getTablePrivileges(
-  { projectRef, connectionString }: TablePrivilegesVariables,
+  { projectRef, connectionString, includedSchemas }: TablePrivilegesVariables,
   signal?: AbortSignal
 ) {
-  const { result } = await executeSql(
-    {
-      projectRef,
-      connectionString,
-      sql: pgMetaTablePrivilegesList.sql,
-      queryKey: ['table-privileges'],
-    },
-    signal
-  )
+  const sql = pgMeta.tablePrivileges.list({ includedSchemas }).sql
+  const queryKey = ['table-privileges', includedSchemas?.join(',')]
+
+  const { result } = await executeSql({ projectRef, connectionString, sql, queryKey }, signal)
 
   return result as TablePrivilegesData
 }
 
 export const useTablePrivilegesQuery = <TData = TablePrivilegesData>(
-  { projectRef, connectionString }: TablePrivilegesVariables,
+  vars: TablePrivilegesVariables,
   {
     enabled = true,
     ...options
   }: UseCustomQueryOptions<TablePrivilegesData, TablePrivilegesError, TData> = {}
-) =>
-  useQuery<TablePrivilegesData, TablePrivilegesError, TData>({
-    queryKey: privilegeKeys.tablePrivilegesList(projectRef),
-    queryFn: ({ signal }) => getTablePrivileges({ projectRef, connectionString }, signal),
+) => {
+  const { projectRef, includedSchemas } = vars
+  return useQuery<TablePrivilegesData, TablePrivilegesError, TData>({
+    queryKey: privilegeKeys.tablePrivilegesList(projectRef, includedSchemas),
+    queryFn: ({ signal }) => getTablePrivileges(vars, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     ...options,
   })
+}
 
 export function invalidateTablePrivilegesQuery(
   client: QueryClient,
