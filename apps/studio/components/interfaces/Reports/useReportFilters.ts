@@ -1,6 +1,7 @@
 import { parseAsString, useQueryStates } from 'nuqs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
+import { PRODUCT_FILTER_PATHS } from './Reports.constants'
 import type { ReportFilter, ReportFilterItem, ReportFilterProperty } from './Reports.types'
 
 export enum ReportFilterKeys {
@@ -220,7 +221,13 @@ export const useReportFilters = ({
 
       // Separate product filters (managed by dropdown) from other filters (managed by ReportFilterPopover)
       const PRODUCT_FILTER_KEYS = ['request.path']
-      const PRODUCT_FILTER_VALUES = ['/rest', '/auth', '/storage', '/realtime', '/graphql']
+      const PRODUCT_FILTER_VALUES: string[] = [
+        PRODUCT_FILTER_PATHS.rest,
+        PRODUCT_FILTER_PATHS.auth,
+        PRODUCT_FILTER_PATHS.storage,
+        PRODUCT_FILTER_PATHS.realtime,
+        PRODUCT_FILTER_PATHS.graphql,
+      ]
 
       const productFilters = filters.filter(
         (f) =>
