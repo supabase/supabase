@@ -5,7 +5,7 @@ import { useParams } from 'common'
 import { AlertTriangle, Code, Loader2, Table2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
-import { cn, CommandEmpty, CommandGroup, CommandItem, CommandList } from 'ui'
+import { cn, CommandGroup, CommandItem, CommandList } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import {
