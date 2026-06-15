@@ -16,6 +16,7 @@ import { Link } from './markdown-schema/Link'
 import { Panel } from './markdown-schema/Panel'
 import { StepHike } from './markdown-schema/StepHike'
 import { TabPanel } from './markdown-schema/TabPanel'
+import { Admonition } from './markdown-schema/Admonition'
 
 const PARTIALS_DIR = path.join(process.cwd(), 'content', '_partials')
 
@@ -127,6 +128,7 @@ function applySchema(parent: Parent, schema: ComponentSchema): void {
  * component not listed is unwrapped (children are kept, wrapper is dropped).
  */
 const SCHEMA: ComponentSchema = {
+  Admonition,
   Link,
   GlassPanel: Panel,
   IconPanel: Panel,
