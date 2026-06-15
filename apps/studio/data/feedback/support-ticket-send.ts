@@ -67,9 +67,15 @@ export async function sendSupportTicket({
 
   if (error) {
     if (error.code === 429) {
+      const retryAfter = typeof error.retryAfter === 'number' ? error.retryAfter : undefined
+      const waitHint = retryAfter
+        ? `Please wait ${retryAfter} second${retryAfter === 1 ? '' : 's'} before trying again.`
+        : 'Please wait a moment before trying again.'
       throw new ResponseError(
-        'You have submitted too many requests. Please wait a moment before trying again.',
-        429
+        `You have submitted too many support requests. ${waitHint}`,
+        429,
+        undefined,
+        retryAfter
       )
     }
     handleError(error, {
