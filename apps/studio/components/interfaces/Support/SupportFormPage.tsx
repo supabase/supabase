@@ -82,7 +82,11 @@ function SupportFormPageContent() {
 
   useStateTransition(state, 'submitting', 'error', (_, curr) => {
     toast.error(`Failed to submit support ticket: ${curr.message}`)
-    Sentry.captureMessage(`Failed to submit Support Form: ${curr.message}`)
+    // Skip Sentry for rate-limited submissions (429) since they are expected and
+    // would otherwise flood the issue tracker with double-submit noise.
+    if (curr.code !== 429) {
+      Sentry.captureMessage(`Failed to submit Support Form: ${curr.message}`)
+    }
     dispatch({ type: 'RETURN_TO_EDITING' })
   })
 

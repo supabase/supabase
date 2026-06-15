@@ -32,6 +32,8 @@ export type SupportFormState =
   | {
       type: 'error'
       message: string
+      /** HTTP status code from the failed request, when available. */
+      code?: number
     }
 
 export type SupportFormActions =
@@ -45,7 +47,7 @@ export type SupportFormActions =
       submittedRequest: SubmittedSupportRequest
       debugSource?: string
     }
-  | { type: 'ERROR'; message: string; debugSource?: string }
+  | { type: 'ERROR'; message: string; code?: number; debugSource?: string }
   | { type: 'RETURN_TO_EDITING'; debugSource?: string }
 
 export function createInitialSupportFormState(): SupportFormState {
@@ -89,6 +91,7 @@ export function supportFormReducer(
         return {
           type: 'error',
           message: action.message,
+          code: action.code,
         }
       }
       console.warn(
