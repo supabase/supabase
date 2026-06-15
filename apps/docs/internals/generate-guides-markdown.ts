@@ -15,6 +15,7 @@ import { getInternalLinkBaseUrl, prefixInternalLinks } from './internal-links'
 import { Link } from './markdown-schema/Link'
 import { Panel } from './markdown-schema/Panel'
 import { StepHike } from './markdown-schema/StepHike'
+import { TabPanel } from './markdown-schema/TabPanel'
 
 const PARTIALS_DIR = path.join(process.cwd(), 'content', '_partials')
 
@@ -130,6 +131,7 @@ const SCHEMA: ComponentSchema = {
   GlassPanel: Panel,
   IconPanel: Panel,
   ...StepHike,
+  TabPanel,
 }
 
 async function generateOne(filePath: string, linkBaseUrl: string): Promise<string> {
