@@ -1727,6 +1727,10 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/logging' as `/${string}`,
         },
         {
+          name: 'Error codes',
+          url: '/guides/functions/error-codes' as `/${string}`,
+        },
+        {
           name: 'Troubleshooting',
           url: '/guides/functions/troubleshooting' as `/${string}`,
         },
@@ -1743,10 +1747,6 @@ export const functions: NavMenuConstant = {
         {
           name: 'Status codes',
           url: '/guides/functions/status-codes' as `/${string}`,
-        },
-        {
-          name: 'Error codes',
-          url: '/guides/functions/error-codes' as `/${string}`,
         },
         {
           name: 'Recursive/Nested function calls',
