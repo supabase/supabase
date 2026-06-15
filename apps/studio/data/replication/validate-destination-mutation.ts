@@ -8,13 +8,28 @@ import type { ResponseError, UseCustomMutationOptions } from '@/types'
 type ValidateDestinationParams = {
   projectRef: string
   destinationConfig: DestinationConfig
+  sourceId?: number
+  publicationName?: string
+  maxFillMs?: number
+  maxTableSyncWorkers?: number
+  maxCopyConnectionsPerTable?: number
+  invalidatedSlotBehavior?: 'error' | 'recreate'
 }
 
 type ValidateDestinationResponse = components['schemas']['ValidateDestinationResponse']
 export type ValidationFailure = ValidateDestinationResponse['validation_failures'][number]
 
 async function validateDestination(
-  { projectRef, destinationConfig }: ValidateDestinationParams,
+  {
+    projectRef,
+    destinationConfig,
+    sourceId,
+    publicationName,
+    maxFillMs,
+    maxTableSyncWorkers,
+    maxCopyConnectionsPerTable,
+    invalidatedSlotBehavior,
+  }: ValidateDestinationParams,
   signal?: AbortSignal
 ): Promise<ValidateDestinationResponse> {
   if (!projectRef) throw new Error('projectRef is required')
@@ -108,9 +123,25 @@ async function validateDestination(
     )
   }
 
+  const batchConfig = maxFillMs !== undefined ? { max_fill_ms: maxFillMs } : undefined
+  const pipelineConfig =
+    publicationName === undefined
+      ? undefined
+      : {
+          publication_name: publicationName,
+          max_table_sync_workers: maxTableSyncWorkers,
+          max_copy_connections_per_table: maxCopyConnectionsPerTable,
+          invalidated_slot_behavior: invalidatedSlotBehavior,
+          batch: batchConfig,
+        }
+
   const { data, error } = await post('/platform/replication/{ref}/destinations/validate', {
     params: { path: { ref: projectRef } },
-    body: { config },
+    body: {
+      config,
+      source_id: sourceId,
+      pipeline_config: pipelineConfig,
+    },
     signal,
   })
 

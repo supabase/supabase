@@ -104,7 +104,10 @@ export const PublicationsComboBox = ({
                   No publications available
                 </p>
               )}
-              <ScrollArea className={publications.length > 7 ? 'h-[210px]' : ''}>
+              <ScrollArea
+                className={publications.length > 7 ? 'h-[210px]' : ''}
+                onWheel={(e) => e.stopPropagation()}
+              >
                 {publications.map((pub) => (
                   <CommandItem
                     key={pub.name}
