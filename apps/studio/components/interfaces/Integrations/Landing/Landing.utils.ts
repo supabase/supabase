@@ -142,7 +142,10 @@ export const isOAuthInstalled = ({
 
   if (integration.id === 'grafana') {
     // Grafana is not yet sending integration status, so just use presence of API key.
-    return isSecretKeyPrefixPresent(projectData, 'grafana_cloud_integration_')
+    return (
+      isOAuthAppAuthorized(projectData, integration) ||
+      isSecretKeyPrefixPresent(projectData, 'grafana_cloud_integration_')
+    )
   }
 
   if (integration.id === 'aikido') {
@@ -151,7 +154,7 @@ export const isOAuthInstalled = ({
 
   if (integration.id === 'doppler') {
     return (
-      isEdgeFunctionSecretPresent(projectData, 'DOPPLER_CONFIG') &&
+      isEdgeFunctionSecretPresent(projectData, 'DOPPLER_CONFIG') ||
       isPartnerIntegrationReady(projectData, integration)
     )
   }
@@ -175,6 +178,109 @@ export const isOAuthInstalled = ({
   }
 
   return false
+}
+
+/**
+ * A resource associated with a specific integration provisions that can be managed by the user
+ */
+export type ConnectedResource =
+  | { kind: 'oauth_app'; key: string; title: string; description: string; app: AuthorizedApp }
+  | { kind: 'api_key'; key: string; title: string; description: string; apiKey: APIKey }
+  | {
+      kind: 'edge_function_secret'
+      key: string
+      title: string
+      description: string
+      secret: ProjectSecret
+    }
+  | { kind: 'smtp'; key: string; title: string; description: string }
+
+/**
+ * Temporary manual overrides for specific integrations.
+ * TODO(integrations-team) to move logic to database
+ * Complements the special-case logic in {@link isOAuthInstalled}.
+ */
+const INTEGRATION_RESOURCE_OVERRIDES: Record<
+  string,
+  { secretKeyPrefix?: string; edgeFunctionSecretName?: string; resendSmtp?: boolean }
+> = {
+  grafana: { secretKeyPrefix: 'grafana_cloud_integration_' },
+  doppler: { edgeFunctionSecretName: 'DOPPLER_CONFIG' },
+  resend: { resendSmtp: true },
+}
+
+/**
+ * Collects every resource an OAuth integration has provisioned on the current project/organization
+ * so it can be displayed and removed from the integration's settings tab. Keyed off the same data
+ * and identifiers used by {@link isOAuthInstalled}.
+ */
+export const getConnectedResources = ({
+  integration,
+  projectData,
+}: {
+  integration: IntegrationDefinition
+  projectData: ProjectOAuthIntegrationData
+}): ConnectedResource[] => {
+  const overrides = INTEGRATION_RESOURCE_OVERRIDES[integration.id] ?? {}
+  const resources: ConnectedResource[] = []
+
+  // OAuth apps
+  if (integration.oauthAppId) {
+    const app = projectData.oauthApps.find((a) => a.app_id === integration.oauthAppId)
+    if (app) {
+      resources.push({
+        kind: 'oauth_app',
+        key: `oauth_app:${app.id}`,
+        title: 'OAuth application',
+        description: `Grants ${integration.name} access to your organization and its projects.`,
+        app,
+      })
+    }
+  }
+
+  // Secret API keys
+  const secretKeyPrefix = overrides.secretKeyPrefix ?? integration.secretKeyPrefix
+  if (secretKeyPrefix) {
+    projectData.apiKeys
+      .filter((key) => key.type === 'secret' && key.name.startsWith(secretKeyPrefix))
+      .forEach((apiKey) => {
+        resources.push({
+          kind: 'api_key',
+          key: `api_key:${apiKey.id}`,
+          title: 'Secret API key',
+          description: apiKey.name,
+          apiKey,
+        })
+      })
+  }
+
+  // Edge Function secrets
+  const edgeFunctionSecretName =
+    overrides.edgeFunctionSecretName ?? integration.edgeFunctionSecretName
+  if (edgeFunctionSecretName) {
+    const secret = projectData.edgeFunctionSecrets.find((s) => s.name === edgeFunctionSecretName)
+    if (secret) {
+      resources.push({
+        kind: 'edge_function_secret',
+        key: `edge_function_secret:${secret.name}`,
+        title: 'Edge Function secret',
+        description: secret.name,
+        secret,
+      })
+    }
+  }
+
+  // Custom SMTP relay
+  if (overrides.resendSmtp && projectData.authConfig?.SMTP_HOST === 'smtp.resend.com') {
+    resources.push({
+      kind: 'smtp',
+      key: 'smtp',
+      title: 'SMTP settings',
+      description: `Custom SMTP relay configured to send project emails through ${integration.name}.`,
+    })
+  }
+
+  return resources
 }
 
 export const hasMatchingWrapper = ({ meta, wrappers }: { meta: WrapperMeta; wrappers: FDW[] }) => {
