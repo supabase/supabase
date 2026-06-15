@@ -134,7 +134,8 @@ const columns = cronJobColumns.map((col) => {
             <div className="flex items-center">
               <TimestampInfo
                 utcTimestamp={formattedValue}
-                labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
+                displayAs="utc"
+                labelFormat="DD MMM YYYY HH:mm:ss [(UTC)]"
                 className="text-xs"
               />
             </div>

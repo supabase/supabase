@@ -256,7 +256,8 @@ export const CronJobTableCell = ({
             ) : (
               <TimestampInfo
                 utcTimestamp={formattedValue}
-                labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
+                displayAs="utc"
+                labelFormat="DD MMM YYYY HH:mm:ss [(UTC)]"
                 className="font-sans text-xs"
               />
             )
