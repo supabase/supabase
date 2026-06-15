@@ -1,4 +1,4 @@
-import { FeatureFlagContext, IS_PLATFORM } from 'common'
+import { FeatureFlagContext, IS_PLATFORM, useFlag } from 'common'
 import { fullImageUrl } from 'common/marketplace-client'
 import { Boxes } from 'lucide-react'
 import dynamic from 'next/dynamic'
@@ -48,6 +48,11 @@ export const useAvailableIntegrations = () => {
   const isMarketplaceEnabled = useIsMarketplaceEnabled()
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
 
+  const grafanaEnabled = useFlag('grafanaDashboardIntegrationEnabled')
+  const resendEnabled = useFlag('resendDashboardIntegrationEnabled')
+  const aikidoEnabled = useFlag('aikidoDashboardIntegrationEnabled')
+  const dopplerEnabled = useFlag('dopplerDashboardIntegrationEnabled')
+
   const { data: cliData } = useCLIReleaseVersionQuery()
   const isCLI = !!cliData?.current
 
@@ -83,6 +88,7 @@ export const useAvailableIntegrations = () => {
             content,
             built_by: authorName,
             listing_logo: listingLogo,
+            oauth_app_id: oauthAppId,
           } = integration
 
           const status = undefined
@@ -109,6 +115,7 @@ export const useAvailableIntegrations = () => {
             installIdentificationMethod: installMethod ?? undefined,
             secretKeyPrefix: secretKeyPrefix ?? undefined,
             edgeFunctionSecretName: edgeFunctionSecretName ?? undefined,
+            oauthAppId: oauthAppId ?? undefined,
             listingId: listingId ?? undefined,
             author,
             requiredExtensions: [],
@@ -204,10 +211,24 @@ export const useAvailableIntegrations = () => {
   }, [integrationsWrappers, isCLI, marketplaceWrappers])
 
   const dataWithMarketplace = useMemo(() => {
-    return [...marketplaceIntegrations, ...allIntegrations].sort((a, b) =>
-      a.name.localeCompare(b.name)
-    )
-  }, [marketplaceIntegrations, allIntegrations])
+    const flagGatedIds: Record<string, boolean> = {
+      grafana: grafanaEnabled,
+      resend: resendEnabled,
+      aikido: aikidoEnabled,
+      doppler: dopplerEnabled,
+    }
+
+    return [...marketplaceIntegrations, ...allIntegrations]
+      .filter((integration) => flagGatedIds[integration.id] !== false)
+      .sort((a, b) => a.name.localeCompare(b.name))
+  }, [
+    marketplaceIntegrations,
+    allIntegrations,
+    grafanaEnabled,
+    resendEnabled,
+    aikidoEnabled,
+    dopplerEnabled,
+  ])
 
   return {
     data: dataWithMarketplace,

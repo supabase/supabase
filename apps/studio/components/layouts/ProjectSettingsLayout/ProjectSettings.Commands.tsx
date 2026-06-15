@@ -135,6 +135,12 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
         defaultHidden: true,
       },
       {
+        id: 'nav-project-settings-reset-database-password',
+        name: 'Reset database password',
+        route: `/project/${ref}/database/settings#database-password`,
+        defaultHidden: true,
+      },
+      {
         id: 'nav-project-settings-connection-string',
         name: 'Connection string',
         action: () => {

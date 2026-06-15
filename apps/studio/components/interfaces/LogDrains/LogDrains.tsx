@@ -7,6 +7,7 @@ import { LogDrainsEmpty } from './LogDrainsEmpty'
 import { LogDrainsList } from './LogDrainsList'
 import { useDeleteLogDrainMutation } from '@/data/log-drains/delete-log-drain-mutation'
 import { LogDrainData, useLogDrainsQuery } from '@/data/log-drains/log-drains-query'
+import { useTestLogDrainMutation } from '@/data/log-drains/test-log-drain-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -35,6 +36,12 @@ export function LogDrains({
     },
   })
 
+  const { mutate: testLogDrain } = useTestLogDrainMutation({
+    onSuccess: () => {
+      toast.success('Log drain connection test succeeded')
+    },
+  })
+
   if (isLoadingEntitlement) {
     return (
       <div>
@@ -59,6 +66,11 @@ export function LogDrains({
         if (ref) {
           deleteLogDrain({ token: drain.token, projectRef: ref })
           track('log_drain_removed', { destination: drain.type })
+        }
+      }}
+      onTestDrain={(drain) => {
+        if (ref) {
+          testLogDrain({ token: drain.token, projectRef: ref })
         }
       }}
     />

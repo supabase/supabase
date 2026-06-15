@@ -52,15 +52,26 @@ test.describe('Database', () => {
       // copies schema definition to clipboard
       await page.getByRole('button', { name: 'Copy as SQL' }).click()
       await expect(page.getByTestId('copy-sql-ready')).toBeVisible()
-      await expectClipboardValue({
-        page,
-        value: `CREATE TABLE public.${databaseTableName} (
-  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
-  created_at timestamp with time zone DEFAULT now(),
-  ${databaseColumnName} text,
-  CONSTRAINT ${databaseTableName}_pkey PRIMARY KEY (id)
-);`,
-      })
+      //pg-meta does not guarantee column order within a table. So isolate this table's CREATE TABLE block and
+      // assert each line is present regardless of column order.
+      const expectedTableLines = [
+        `CREATE TABLE public.${databaseTableName} (`,
+        `  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,`,
+        `  created_at timestamp with time zone DEFAULT now(),`,
+        `  ${databaseColumnName} text,`,
+        `  CONSTRAINT ${databaseTableName}_pkey PRIMARY KEY (id)`,
+      ]
+      await expect(async () => {
+        await using handle = await page.evaluateHandle(() => navigator.clipboard.readText())
+        const clipboard = await handle.jsonValue()
+        // The trailing " (" disambiguates from tables sharing this name as a prefix.
+        const start = clipboard.indexOf(`CREATE TABLE public.${databaseTableName} (`)
+        expect(start, 'clipboard should contain the table definition').toBeGreaterThanOrEqual(0)
+        const block = clipboard.slice(start, clipboard.indexOf(');', start) + 2)
+        for (const line of expectedTableLines) {
+          expect(block).toContain(line)
+        }
+      }).toPass({ timeout: 2000 })
 
       await expect(page.getByText('Successfully copied as SQL')).toBeVisible({ timeout: 15000 })
       await dismissToastsIfAny(page)
@@ -730,7 +741,7 @@ test.describe('Database', () => {
 
       // create new index
       await page.getByRole('button', { name: 'Create index' }).click()
-      await page.getByRole('button', { name: 'Choose a table' }).click()
+      await page.getByRole('button', { name: 'Select a table' }).click()
 
       const columnsWait = waitForApiResponse(
         page,

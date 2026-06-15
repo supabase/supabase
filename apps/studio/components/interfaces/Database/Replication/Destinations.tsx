@@ -32,6 +32,7 @@ import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLDucklakePrivateAlpha,
   useIsETLIcebergPrivateAlpha,
+  useIsETLSnowflakePrivateAlpha,
 } from './useIsETLPrivateAlpha'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -54,6 +55,7 @@ export const Destinations = () => {
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
+  const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 
   const newDestinationDefaultType = infrastructureReadReplicas
@@ -64,7 +66,9 @@ export const Destinations = () => {
         ? 'Analytics Bucket'
         : etlEnableDucklake
           ? 'DuckLake'
-          : null
+          : etlEnableSnowflake
+            ? 'Snowflake'
+            : null
 
   const prefetchedRef = useRef(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -80,6 +84,7 @@ export const Destinations = () => {
       'BigQuery',
       'Analytics Bucket',
       'DuckLake',
+      'Snowflake',
     ]).withOptions({
       history: 'push',
       clearOnDefault: true,
@@ -280,7 +285,7 @@ export const Destinations = () => {
                     <TableHead key="status" className="w-[150px]">
                       Status
                     </TableHead>
-                    <TableHead key="lag" className="w-[80px]">
+                    <TableHead key="lag" className="w-[150px]">
                       Lag
                     </TableHead>
                     <TableHead key="publication">Publication</TableHead>
@@ -307,10 +312,10 @@ export const Destinations = () => {
                     filteredReplicas.length === 0 &&
                     (hasReplicas || hasDestinations) && (
                       <TableRow>
-                        <TableCell colSpan={5}>
+                        <TableCell colSpan={6}>
                           <p>No results found</p>
                           <p className="text-foreground-light">
-                            Your search for "{filterString}" did not return any results
+                            Your search for "{filterString}" did not return any results.
                           </p>
                         </TableCell>
                       </TableRow>
@@ -332,7 +337,7 @@ export const Destinations = () => {
               <h4>Replication keeps your data in sync across systems</h4>
               <p className="text-foreground-light text-sm text-balance text-center mt-1">
                 Deploy read replicas for lower latency and better resource management, or capture
-                database changes to external platforms for real-time data pipelines.
+                database changes to external destinations for real-time data pipelines.
               </p>
               <Button
                 icon={<Plus />}

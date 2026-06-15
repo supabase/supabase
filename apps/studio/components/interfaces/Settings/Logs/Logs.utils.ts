@@ -6,7 +6,12 @@ import uniqBy from 'lodash/uniqBy'
 import { useEffect } from 'react'
 import logConstants from 'shared-data/log-constants'
 
-import { LogsTableName, SQL_FILTER_TEMPLATES } from './Logs.constants'
+import {
+  AUTH_LOG_ERROR_CONDITION,
+  AUTH_LOG_WARNING_CONDITION,
+  LogsTableName,
+  SQL_FILTER_TEMPLATES,
+} from './Logs.constants'
 import type { Filters, LogData, LogsEndpointParams, QueryType } from './Logs.types'
 import { convertResultsToCSV } from '@/components/interfaces/SQLEditor/UtilityPanel/Results.utils'
 import BackwardIterator from '@/components/ui/CodeEditor/Providers/BackwardIterator'
@@ -713,7 +718,7 @@ function getErrorCondition(table: LogsTableName): SafeLogSqlFragment {
     case 'postgres_logs':
       return safeSql`parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')`
     case 'auth_logs':
-      return safeSql`metadata.level = 'error' OR SAFE_CAST(metadata.status AS INT64) >= 400`
+      return AUTH_LOG_ERROR_CONDITION
     case 'function_edge_logs':
       return safeSql`response.status_code >= 500`
     case 'function_logs':
@@ -734,7 +739,7 @@ function getWarningCondition(table: LogsTableName): SafeLogSqlFragment {
     case 'postgres_logs':
       return safeSql`parsed.error_severity IN ('WARNING')`
     case 'auth_logs':
-      return safeSql`metadata.level = 'warning'`
+      return AUTH_LOG_WARNING_CONDITION
     case 'function_edge_logs':
       return safeSql`response.status_code >= 400 AND response.status_code < 500`
     case 'function_logs':
@@ -744,6 +749,33 @@ function getWarningCondition(table: LogsTableName): SafeLogSqlFragment {
     default:
       return safeSql`false`
   }
+}
+
+export const HTTP_SERVER_ERROR_STATUS = 500
+export const HTTP_CLIENT_ERROR_STATUS = 400
+
+/**
+ * Derives the severity badge shown in the auth log table from the log level and
+ * HTTP status, matching the chart: 5xx → error, 4xx → warning, otherwise the
+ * log level. See the AUTH_LOG_*_CONDITION constants in Logs.constants.ts for the
+ * matching SQL and the reason auth logs need this.
+ */
+export function getAuthLogSeverity(level?: unknown, status?: unknown): string {
+  const normalizedLevel = typeof level === 'string' ? level : ''
+
+  // Preserve explicit error-class levels so we never downgrade them and so the
+  // original label (e.g. "fatal") is kept.
+  if (normalizedLevel === 'error' || normalizedLevel === 'fatal') return normalizedLevel
+
+  const statusCode =
+    typeof status === 'number' ? status : typeof status === 'string' ? Number(status) : NaN
+  const hasStatus = Number.isFinite(statusCode)
+
+  if (hasStatus && statusCode >= HTTP_SERVER_ERROR_STATUS) return 'error'
+  if (normalizedLevel === 'warning') return 'warning'
+  if (hasStatus && statusCode >= HTTP_CLIENT_ERROR_STATUS) return 'warning'
+
+  return normalizedLevel
 }
 
 export function jwtAPIKey(metadata: any) {
