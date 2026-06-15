@@ -29,7 +29,7 @@
     "config": "workspace:*",
     "tailwindcss": "catalog:",
     "tsconfig": "workspace:*",
-    "vite": "^7.3.2",
+    "vite": "^7.3.5",
     "vite-tsconfig-paths": "catalog:"
   }
 }
