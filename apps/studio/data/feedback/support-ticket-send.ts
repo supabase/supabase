@@ -66,11 +66,15 @@ export async function sendSupportTicket({
   })
 
   if (error) {
-    if (error.code === 429) {
+    // openapi-fetch types this error as `never` (the endpoint declares no error
+    // schema), but at runtime our fetcher populates `code` and `retryAfter` from
+    // the response, so we read them through a narrow shape.
+    const apiError = error as { code?: number; retryAfter?: number }
+    if (apiError.code === 429) {
       // The support feedback endpoint is throttled to 1 request per 60 seconds
       // server-side. It does not return a standard Retry-After header, so fall
       // back to the known 60 second window when one isn't provided.
-      const retryAfter = typeof error.retryAfter === 'number' ? error.retryAfter : 60
+      const retryAfter = typeof apiError.retryAfter === 'number' ? apiError.retryAfter : 60
       throw new ResponseError(
         `You have submitted too many support requests. Please try again in ${retryAfter} second${retryAfter === 1 ? '' : 's'}.`,
         429,
