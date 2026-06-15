@@ -8,7 +8,7 @@ sidebar_label: 'FAQ'
 
 <Admonition type="caution" title="Private Alpha">
 
-External replication (ETL) is currently in private alpha. Access is limited and features may change.
+External replication (ETL) is currently in private alpha. Managed pipelines run through Supabase ETL. Access is limited and features may change.
 
 </Admonition>
 
@@ -18,7 +18,7 @@ External replication (ETL) currently supports **BigQuery** as the managed destin
 
 We are working on new destinations. "External" means outside the source database, so supported destinations can be Supabase-managed or third-party systems as support expands. Availability may continue to vary based on the planned roll-out strategy.
 
-## Which plans support external replication (ETL)?
+## Which plans support external replication (ETL)? [#which-plans-support-external-replication]
 
 External replication (ETL) is available on the Pro, Team, and Enterprise plans.
 
@@ -30,7 +30,7 @@ We are currently working on a new Supabase Warehouse product designed to address
 
 As a result, managed replication to Analytics Buckets is no longer available. Right now, **BigQuery** is the only supported managed destination, and we are actively working on expanding capabilities.
 
-## What does external replication (ETL) install in the database?
+## What does external replication (ETL) install in the database? [#what-does-external-replication-install-in-the-database]
 
 When you enable external replication (ETL), Supabase installs database objects that help Supabase ETL track replication state and support schema changes:
 
@@ -53,11 +53,11 @@ Supported schema changes:
 
 External replication (ETL) does not currently support changing column data types, adding `NOT NULL` with `SET NOT NULL`, or filling existing destination rows for `ADD COLUMN ... DEFAULT`. Supported defaults are applied as destination metadata for future rows where BigQuery can represent them. See [BigQuery schema change support](/docs/guides/database/replication/bigquery#schema-change-support) for details.
 
-## What happens when you disable external replication (ETL)?
+## What happens when you disable external replication (ETL)? [#what-happens-when-you-disable-external-replication]
 
 Disabling external replication (ETL) removes the database objects that were installed in your source database, including the replication state tables in the `etl` schema and the DDL event trigger.
 
-To remove external replication (ETL) from a project, delete all replication pipelines first. After all pipelines are deleted, the disable action becomes available. For the Dashboard steps, see [Disabling external replication (ETL)](/docs/guides/database/replication/external-replication-setup#disabling-external-replication-etl).
+To remove external replication (ETL) from a project, delete all replication pipelines first. After all pipelines are deleted, the disable action becomes available. For the Dashboard steps, see [Disabling external replication (ETL)](/docs/guides/database/replication/external-replication-setup#disabling-external-replication).
 
 Disabling external replication (ETL) stops Supabase from managing replication for the project. It does not delete tables or data that were already written to your destination.
 

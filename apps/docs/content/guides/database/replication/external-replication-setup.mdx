@@ -8,7 +8,7 @@ sidebar_label: 'Setting up'
 
 <Admonition type="caution" title="Private Alpha">
 
-External replication (ETL) is currently in private alpha. Access is limited and features may change.
+External replication (ETL) is currently in private alpha. Managed pipelines run through Supabase ETL. Access is limited and features may change.
 
 </Admonition>
 
@@ -20,7 +20,7 @@ External replication (ETL) requires two main components: a **Postgres publicatio
 
 <Admonition type="tip">
 
-If you already have a Postgres publication set up, you can skip to [Step 2: Enable external replication (ETL)](#step-2-enable-external-replication-etl).
+If you already have a Postgres publication set up, you can skip to [Step 2: Enable external replication (ETL)](#step-2-enable-external-replication).
 
 </Admonition>
 
@@ -133,7 +133,7 @@ After creating a publication via SQL, you can view it in the Dashboard:
 1. Navigate to the [**Database > Publications**](/dashboard/project/_/database/publications) section of the Dashboard
 2. You'll see all your publications listed with their tables
 
-### Step 2: Enable external replication (ETL)
+### Step 2: Enable external replication (ETL) [#step-2-enable-external-replication]
 
 Before creating an external replication (ETL) pipeline, enable it for your project:
 
@@ -219,7 +219,7 @@ Available actions:
 - **Edit destination**: Modify destination settings like credentials or advanced options
 - **Delete**: Remove the destination and permanently stop replication
 
-### Disabling external replication (ETL)
+### Disabling external replication (ETL) [#disabling-external-replication]
 
 To turn off external replication (ETL) for a project, delete all replication pipelines first. After all pipelines are removed, open the three-dot actions menu on the Replication page and click **Disable external replication (ETL)**.
 
@@ -230,7 +230,7 @@ To turn off external replication (ETL) for a project, delete all replication pip
   height={2156}
 />
 
-For cleanup details, see [What happens when you disable external replication (ETL)?](/docs/guides/database/replication/external-replication-faq#what-happens-when-you-disable-external-replication-etl).
+For cleanup details, see [What happens when you disable external replication (ETL)?](/docs/guides/database/replication/external-replication-faq#what-happens-when-you-disable-external-replication).
 
 ### Adding or removing tables
 

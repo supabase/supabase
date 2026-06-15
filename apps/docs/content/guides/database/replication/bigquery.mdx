@@ -8,7 +8,7 @@ sidebar_label: 'BigQuery'
 
 <Admonition type="caution" title="Private Alpha">
 
-External replication (ETL) is currently in private alpha. Access is limited and features may change.
+External replication (ETL) is currently in private alpha. Managed pipelines run through Supabase ETL. Access is limited and features may change.
 
 </Admonition>
 
@@ -90,9 +90,9 @@ Once configured, replication to BigQuery:
 
 ## Source table requirements
 
-BigQuery replication requires each source table to have a primary key, and the publication must include the primary-key columns. External replication (ETL) declares those columns as the BigQuery destination primary key so BigQuery CDC can apply `UPSERT` and `DELETE` rows.
+BigQuery replication requires each source table to have a primary key, and the publication must include the primary-key columns. Supabase ETL declares those columns as the BigQuery destination primary key so BigQuery change data capture (CDC) can apply `UPSERT` and `DELETE` rows.
 
-BigQuery primary keys are `NOT ENFORCED`, and BigQuery CDC supports composite primary keys with up to 16 columns. Your source primary key must stay unique and non-null because BigQuery uses it to match CDC rows.
+BigQuery primary keys are `NOT ENFORCED`, and BigQuery change data capture (CDC) supports composite primary keys with up to 16 columns. Your source primary key must stay unique and non-null because BigQuery uses it to match CDC rows.
 
 Source tables must also use a BigQuery-compatible Postgres `REPLICA IDENTITY` setting. Most tables can keep the Postgres default, as long as they have a primary key and all primary-key columns are included in the publication.
 
@@ -145,7 +145,7 @@ This structure handles table truncations while maintaining query compatibility.
 
 ## Schema change support
 
-Schema change support for BigQuery is currently in beta. External replication (ETL) supports a limited set of schema changes while the feature is developed further.
+Schema change support for BigQuery is currently in beta. Supabase ETL supports a limited set of schema changes for BigQuery while the feature is developed further.
 
 Supported schema changes:
 

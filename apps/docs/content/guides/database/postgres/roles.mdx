@@ -113,7 +113,14 @@ Used by the Auth middleware to connect to the database and run migration. Access
 
 ### `supabase_etl_admin`
 
-Used by [external replication (ETL)](/docs/guides/database/replication), powered by Supabase ETL, to replicate database changes to destination systems. Has read-all access and replication privileges for change data capture, bypasses Row Level Security, and can write to the `etl` schema.
+`supabase_etl_admin` is used by [Database replication](/docs/guides/database/replication) through Supabase ETL.
+
+This role:
+
+- Replicates database changes to destination systems
+- Has read-all access
+- Has replication privileges for change data capture, bypasses Row Level Security
+- Can write to the `etl` schema
 
 ### `dashboard_user`
 
