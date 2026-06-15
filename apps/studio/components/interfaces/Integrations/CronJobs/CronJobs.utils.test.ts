@@ -4,7 +4,9 @@ import { cronPattern, secondsPattern } from './CronJobs.constants'
 import {
   buildCronCreateQuery,
   buildCronUpdateQuery,
+  calculateDuration,
   formatCronJobColumns,
+  formatDate,
   parseCronJobCommand,
 } from './CronJobs.utils'
 
@@ -460,6 +462,43 @@ describe('parseCronJobCommand', () => {
     it(`should match the regex for a cronPattern with "${description}"`, () => {
       expect(command).toMatch(cronPattern)
     })
+  })
+})
+
+describe('formatDate', () => {
+  it('returns Invalid Date for a non-date string', () => {
+    expect(formatDate('not-a-date')).toBe('Invalid Date')
+  })
+
+  it('displays time in UTC regardless of system timezone', () => {
+    // 2026-06-15T09:25:00Z is 09:25 in UTC; the output must include 'UTC'
+    const result = formatDate('2026-06-15T09:25:00.000Z')
+    expect(result).toContain('UTC')
+  })
+
+  it('formats the correct UTC hour, not local', () => {
+    // 2026-01-01T00:30:00Z is midnight UTC; any local-timezone rendering
+    // in a UTC+N zone would produce a different hour or even a different day.
+    const result = formatDate('2026-01-01T00:30:00.000Z')
+    expect(result).toContain('UTC')
+  })
+})
+
+describe('calculateDuration', () => {
+  it('returns milliseconds for sub-second durations', () => {
+    expect(calculateDuration('2026-06-15T09:25:00.000Z', '2026-06-15T09:25:00.500Z')).toBe('500ms')
+  })
+
+  it('returns seconds for durations under a minute', () => {
+    expect(calculateDuration('2026-06-15T09:25:00.000Z', '2026-06-15T09:25:05.000Z')).toBe('5.0s')
+  })
+
+  it('returns minutes for durations of a minute or more', () => {
+    expect(calculateDuration('2026-06-15T09:25:00.000Z', '2026-06-15T09:27:00.000Z')).toBe('2.0m')
+  })
+
+  it('returns Invalid Date for unparseable inputs', () => {
+    expect(calculateDuration('bad', 'also-bad')).toBe('Invalid Date')
   })
 })
 

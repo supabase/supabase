@@ -256,13 +256,14 @@ export function formatDate(dateString: string): string {
   }
   const options: Intl.DateTimeFormatOptions = {
     year: 'numeric',
-    month: 'short', // Use 'long' for full month name
+    month: 'short',
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
-    hour12: false, // Use 12-hour format if preferred
-    timeZoneName: 'short', // Optional: to include timezone
+    hour12: false,
+    timeZone: 'UTC',
+    timeZoneName: 'short',
   }
   return date.toLocaleString(undefined, options)
 }
