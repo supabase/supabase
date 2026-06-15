@@ -204,3 +204,55 @@ export function shouldHideDraftSqlTabFromNav(
   if (snippet?.isNotSavedInDatabaseYet) return true
   return false
 }
+
+type DraftSqlTabLike = {
+  type?: string
+  metadata?: {
+    isDraft?: boolean
+    sqlId?: string
+  }
+}
+
+export function getDraftSqlTabSql({
+  projectRef,
+  sqlId,
+  snippetSql,
+}: {
+  projectRef?: string
+  sqlId: string
+  snippetSql?: string
+}) {
+  if (typeof snippetSql === 'string') return snippetSql
+  if (projectRef) return readPersistedDraftSqlTab(projectRef, sqlId)?.sql ?? ''
+  return ''
+}
+
+export function shouldConfirmCloseDraftSqlTab(tab: DraftSqlTabLike | undefined, sql: string) {
+  if (tab?.type !== 'sql' || !tab.metadata?.isDraft || !tab.metadata.sqlId) return false
+  return sql.trim().length > 0
+}
+
+export function countDraftSqlTabsRequiringCloseConfirmation(
+  tabIds: string[],
+  tabsMap: Record<string, DraftSqlTabLike | undefined>,
+  getTabSql: (tabId: string) => string
+) {
+  return tabIds.filter((tabId) => shouldConfirmCloseDraftSqlTab(tabsMap[tabId], getTabSql(tabId)))
+    .length
+}
+
+export function getDiscardDraftSqlTabsDialogCopy(count: number) {
+  if (count <= 1) {
+    return {
+      title: 'Discard unsaved query?',
+      description: 'This query has not been saved. Closing this tab will discard its contents.',
+      confirmLabel: 'Discard query',
+    }
+  }
+
+  return {
+    title: `Close ${count} tabs with unsaved changes?`,
+    description: `You are about to close ${count} tabs that have unsaved changes. Their contents will be discarded.`,
+    confirmLabel: `Discard ${count} queries`,
+  }
+}

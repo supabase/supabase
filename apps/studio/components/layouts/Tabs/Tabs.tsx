@@ -28,6 +28,8 @@ import { SortableTab } from './SortableTab'
 import { TabPreview } from './TabPreview'
 import { useTabsScroll } from './Tabs.utils'
 import { useCreateDraftSqlTab } from '@/components/interfaces/SQLEditor/useCreateDraftSqlTab'
+import { useDraftSqlTabCloseConfirmation } from '@/components/interfaces/SQLEditor/useDraftSqlTabCloseConfirmation'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { editorEntityTypes, useTabsStateSnapshot, type Tab } from '@/state/tabs'
 
@@ -39,6 +41,11 @@ export const EditorTabs = () => {
   const editor = useEditorType()
   const tabs = useTabsStateSnapshot()
   const { createDraftTab } = useCreateDraftSqlTab()
+  const { requestClose, requestCloseSingle, modalProps, dialogCopy } =
+    useDraftSqlTabCloseConfirmation({
+      projectRef: ref,
+      tabs,
+    })
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -79,7 +86,9 @@ export const EditorTabs = () => {
   }
 
   const handleClose = (tabId: string) => {
-    tabs.handleTabClose({ id: tabId, router, editor, onClearDashboardHistory })
+    requestCloseSingle(tabId, () => {
+      tabs.handleTabClose({ id: tabId, router, editor, onClearDashboardHistory })
+    })
   }
 
   const handleCloseAll = () => {
@@ -89,9 +98,11 @@ export const EditorTabs = () => {
           ? tabs.openTabs.filter((x) => !x.startsWith('sql'))
           : tabs.openTabs.filter((x) => x.startsWith('sql'))
 
-      tabs.removeTabs(tabsToClose)
-      onClearDashboardHistory()
-      router.push(`/project/${ref}/${editor === 'table' ? 'editor' : 'sql'}`)
+      requestClose(tabsToClose, () => {
+        tabs.removeTabs(tabsToClose)
+        onClearDashboardHistory()
+        router.push(`/project/${ref}/${editor === 'table' ? 'editor' : 'sql'}`)
+      })
     }
   }
 
@@ -102,13 +113,15 @@ export const EditorTabs = () => {
           ? tabs.openTabs.filter((x) => !x.startsWith('sql') && x !== tabId)
           : tabs.openTabs.filter((x) => x.startsWith('sql') && x !== tabId)
 
-      tabs.removeTabs(tabsToClose)
-      onClearDashboardHistory()
+      requestClose(tabsToClose, () => {
+        tabs.removeTabs(tabsToClose)
+        onClearDashboardHistory()
 
-      const entityId = editor === 'table' ? tabId.split('-')[1] : tabId.split('sql-')[1]
-      if (id !== entityId) {
-        router.push(`/project/${ref}/${editor === 'table' ? 'editor' : 'sql'}/${entityId}`)
-      }
+        const entityId = editor === 'table' ? tabId.split('-')[1] : tabId.split('sql-')[1]
+        if (id !== entityId) {
+          router.push(`/project/${ref}/${editor === 'table' ? 'editor' : 'sql'}/${entityId}`)
+        }
+      })
     }
   }
 
@@ -121,13 +134,16 @@ export const EditorTabs = () => {
       const tabIdx = openedTabs.indexOf(tabId)
       const activeTabIdx = openedTabs.indexOf(tabs.activeTab!)
       const tabsToClose = openedTabs.slice(tabIdx + 1)
-      tabs.removeTabs(tabsToClose)
 
-      const isActiveTabClosed = tabIdx < activeTabIdx
-      if (isActiveTabClosed) {
-        const id = editor === 'table' ? tabId.split('-')[1] : tabId.split('sql-')[1]
-        router.push(`/project/${ref}/${editor === 'table' ? 'editor' : 'sql'}/${id}`)
-      }
+      requestClose(tabsToClose, () => {
+        tabs.removeTabs(tabsToClose)
+
+        const isActiveTabClosed = tabIdx < activeTabIdx
+        if (isActiveTabClosed) {
+          const id = editor === 'table' ? tabId.split('-')[1] : tabId.split('sql-')[1]
+          router.push(`/project/${ref}/${editor === 'table' ? 'editor' : 'sql'}/${id}`)
+        }
+      })
     }
   }
 
@@ -252,6 +268,12 @@ export const EditorTabs = () => {
       <DragOverlay dropAnimation={null}>
         {tabs.activeTab ? <TabPreview tab={tabs.activeTab} /> : null}
       </DragOverlay>
+
+      <DiscardChangesConfirmationDialog
+        {...modalProps}
+        {...dialogCopy}
+        cancelLabel="Keep editing"
+      />
     </DndContext>
   )
 }
