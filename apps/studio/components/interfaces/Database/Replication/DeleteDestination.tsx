@@ -24,7 +24,7 @@ export const DeleteDestination = ({
       confirmLabel={isLoading ? 'Deleting...' : `Delete destination`}
       confirmPlaceholder="Type in name of destination"
       confirmString={name ?? 'Unknown'}
-      text={`This will delete the destination "${name}"`}
+      text={`This will delete the destination "${name}".`}
       alert={{ title: 'You cannot recover this destination once deleted.' }}
       onCancel={() => setVisible(!visible)}
       onConfirm={onDelete}

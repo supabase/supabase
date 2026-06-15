@@ -128,7 +128,6 @@ export const NewOrgForm = ({
 
   const [searchParams] = useQueryStates({
     returnTo: parseAsString.withDefault(''),
-    returnToOrgParam: parseAsString.withDefault(''),
     auth_id: parseAsString.withDefault(''),
     token: parseAsString.withDefault(''),
   })
@@ -275,42 +274,23 @@ export const NewOrgForm = ({
     }
   }
 
-  const getReturnToUrl = (org: { slug: string }) => {
-    if (!searchParams.returnTo) return undefined
-
-    const url = new URL(validateReturnTo(searchParams.returnTo), window.location.origin)
-    if (searchParams.returnToOrgParam) {
-      url.searchParams.set(searchParams.returnToOrgParam, org.slug)
-    }
-    if (searchParams.auth_id) {
-      url.searchParams.set('auth_id', searchParams.auth_id)
-    }
-    if (searchParams.token) {
-      url.searchParams.set('token', searchParams.token)
-    }
-
-    return `${url.pathname}${url.search}`
-  }
-
   const onOrganizationCreated = (org: { slug: string }) => {
     const prefilledProjectName = user.profile?.username
       ? user.profile.username + `'s Project`
       : 'My Project'
 
-    const returnToUrl = getReturnToUrl(org)
+    if (searchParams.returnTo) {
+      const url = new URL(validateReturnTo(searchParams.returnTo, '/'), window.location.origin)
+      if (searchParams.auth_id) {
+        url.searchParams.set('auth_id', searchParams.auth_id)
+      }
+      if (searchParams.token) {
+        url.searchParams.set('token', searchParams.token)
+      }
 
-    if (returnToUrl) {
-      router.push(returnToUrl, undefined, { shallow: false })
+      router.push(url.toString(), undefined, { shallow: false })
     } else {
       router.push(`/new/${org.slug}?projectName=${prefilledProjectName}`)
-    }
-  }
-
-  const onCancel = () => {
-    if (!!lastVisitedOrganization) {
-      router.push(`/org/${lastVisitedOrganization}`)
-    } else {
-      router.push('/organizations')
     }
   }
 
@@ -395,7 +375,10 @@ export const NewOrgForm = ({
               <Button
                 type="default"
                 disabled={newOrgLoading || paymentConfirmationLoading}
-                onClick={onCancel}
+                onClick={() => {
+                  if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
+                  else router.push('/organizations')
+                }}
               >
                 Cancel
               </Button>

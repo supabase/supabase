@@ -3,7 +3,7 @@ import { expect, Page } from '@playwright/test'
 import { createTableWithRLS, dropTable } from '../utils/db/queries.js'
 import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
-import { createApiResponseWaiter, waitForApiResponse } from '../utils/wait-for-response.js'
+import { createApiResponseWaiter } from '../utils/wait-for-response.js'
 
 /**
  * Helper function to navigate to policies page and wait for it to load
@@ -13,39 +13,6 @@ const navigateToPoliciesPage = async (page: Page, ref: string) => {
   await page.goto(toUrl(`/project/${ref}/auth/policies`))
   await wait
   await page.waitForTimeout(500)
-}
-
-/**
- * Helper function to delete a policy if it exists
- */
-const deletePolicyIfExists = async (page: Page, ref: string, policyNameToDelete: string) => {
-  // Look for the policy in the table
-  const policyButton = page.getByRole('button', { name: policyNameToDelete })
-  const policyExists = (await policyButton.count()) > 0
-
-  if (policyExists) {
-    // Click the policy row actions button
-    await page.getByTestId(`policy-${policyNameToDelete}-actions-button`).click()
-    await page.waitForTimeout(200)
-
-    // Click delete
-    await page.getByText('Delete', { exact: true }).click()
-    await page.waitForTimeout(200)
-
-    const waitForDeletion = waitForApiResponse(page, 'pg-meta', ref, 'query?key=')
-    // Confirm deletion
-    await page.getByRole('button', { name: 'Delete' }).click()
-
-    // Wait for deletion to complete
-    await waitForDeletion
-
-    await expect(
-      page.getByText('Successfully removed policy'),
-      'Policy deletion confirmation should be visible'
-    ).toBeVisible({ timeout: 50000 })
-
-    await page.waitForTimeout(500)
-  }
 }
 
 test.describe('RLS Policies', () => {
@@ -160,10 +127,17 @@ test.describe('RLS Policies', () => {
           'RLS disable confirmation modal should appear'
         ).toBeVisible({ timeout: 50000 })
         await expect(
-          page.getByText(
-            'This table will become publicly readable and writable. Anyone can view, add, update, or delete data in this table, and existing RLS policies will no longer apply.'
-          ),
+          page.getByRole('alertdialog'),
           'RLS disable confirmation should explain the access risk'
+        ).toContainText(
+          'This table will become publicly readable and writable. Anyone can view, add, update, or delete data in this table, and existing RLS policies will no longer apply.'
+        )
+        await expect(
+          page
+            .getByRole('alertdialog')
+            .locator('span.font-medium.text-foreground')
+            .filter({ hasText: 'Anyone can view, add, update, or delete data in this table' }),
+          'Key risk phrase should be visually emphasized'
         ).toBeVisible()
         await expect(
           page.getByRole('alertdialog').getByRole('link', { name: 'Learn more' })

@@ -3,13 +3,14 @@ import { tool } from 'ai'
 import { z } from 'zod'
 
 import { deployEdgeFunction } from '@/data/edge-functions/edge-functions-deploy-mutation'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import {
   EDGE_FUNCTION_PROMPT,
   PG_BEST_PRACTICES,
   REALTIME_PROMPT,
   RLS_PROMPT,
+  STORAGE_PROMPT,
 } from '@/lib/ai/prompts'
 import { NO_DATA_PERMISSIONS } from '@/lib/ai/tools/tool-sanitizer'
 import { fixSqlBackslashEscapes } from '@/lib/ai/util'
@@ -17,6 +18,7 @@ import { fixSqlBackslashEscapes } from '@/lib/ai/util'
 const KNOWLEDGE = {
   pg_best_practices: PG_BEST_PRACTICES,
   rls: RLS_PROMPT,
+  storage: STORAGE_PROMPT,
   edge_functions: EDGE_FUNCTION_PROMPT,
   realtime: REALTIME_PROMPT,
 } as const

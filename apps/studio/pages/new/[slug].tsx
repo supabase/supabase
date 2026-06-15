@@ -26,6 +26,7 @@ import { sizes } from '@/components/interfaces/ProjectCreation/ProjectCreation.c
 import { FormSchema } from '@/components/interfaces/ProjectCreation/ProjectCreation.schema'
 import {
   instanceLabel,
+  monthlyInstancePrice,
   smartRegionToExactRegion,
 } from '@/components/interfaces/ProjectCreation/ProjectCreation.utils'
 import { ProjectCreationFooter } from '@/components/interfaces/ProjectCreation/ProjectCreationFooter'
@@ -46,7 +47,7 @@ import { useAuthorizedAppsQuery } from '@/data/oauth/authorized-apps-query'
 import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
 import { useOrganizationAvailableRegionsQuery } from '@/data/organizations/organization-available-regions-query'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
-import { DesiredInstanceSize, instanceSizeSpecs } from '@/data/projects/new-project.constants'
+import { DesiredInstanceSize } from '@/data/projects/new-project.constants'
 import {
   OrgProject,
   useOrgProjectsInfiniteQuery,
@@ -227,7 +228,7 @@ const Wizard: NextPageWithLayout = () => {
   const availableComputeCredits = organizationProjects.length === 0 ? 10 : 0
   const additionalMonthlySpend = isFreePlan
     ? 0
-    : instanceSizeSpecs[instanceSize as DesiredInstanceSize]!.priceMonthly - availableComputeCredits
+    : monthlyInstancePrice(instanceSize) - availableComputeCredits
 
   const { data: _defaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
     {

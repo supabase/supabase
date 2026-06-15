@@ -14,7 +14,7 @@ import {
 } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
-import { PostgresFlowDetail } from './ServiceFlow/components/blocks/PostgresFlowDetail'
+import { PostgresFlowDetail } from './ServiceFlow/components/PostgresFlowDetail'
 import {
   MemoizedEdgeFunctionBlock,
   MemoizedGoTrueBlock,
@@ -30,6 +30,7 @@ import { QuerySearchParamsType } from './UnifiedLogs.types'
 import { getRowTimestampMs } from './UnifiedLogs.utils'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
 import {
+  SERVICE_FLOW_TYPES,
   ServiceFlowType,
   useUnifiedLogInspectionQuery,
 } from '@/data/logs/unified-log-inspection-query'
@@ -63,8 +64,12 @@ export function ServiceFlowPanel({
   }, [selectedRowKey])
 
   const logType = selectedRow?.log_type
-  const serviceFlowType: ServiceFlowType | undefined =
-    logType === 'edge function' ? 'edge-function' : (logType as ServiceFlowType)
+  const normalizedLogType = logType === 'edge function' ? 'edge-function' : logType
+  const serviceFlowType: ServiceFlowType | undefined = SERVICE_FLOW_TYPES.includes(
+    normalizedLogType as ServiceFlowType
+  )
+    ? (normalizedLogType as ServiceFlowType)
+    : undefined
   const shouldShowServiceFlow = !!serviceFlowType
 
   useEffect(() => {
@@ -158,13 +163,12 @@ export function ServiceFlowPanel({
                     table={table}
                   />
                 ) : (
-                  <div className="[&>*:nth-child(even)]:bg-surface-100/50">
+                  <div>
                     <DetailSectionHeader
                       title="Request started"
                       icon={Clock}
                       summary={formattedTime ?? undefined}
                     />
-
                     <MemoizedNetworkBlock
                       data={selectedRow}
                       enrichedData={serviceFlowData?.result?.[0]}
@@ -172,7 +176,6 @@ export function ServiceFlowPanel({
                       filterFields={filterFields}
                       table={table}
                     />
-
                     {serviceFlowType === 'auth' ? (
                       <MemoizedGoTrueBlock
                         data={selectedRow}

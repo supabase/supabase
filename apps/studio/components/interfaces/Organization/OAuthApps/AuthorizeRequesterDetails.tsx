@@ -9,11 +9,8 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
-import { InfoTooltipIcon } from 'ui-patterns/info-tooltip'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import { PERMISSIONS_DESCRIPTIONS } from './OAuthApps.constants'
 import { LogoBox } from '@/components/layouts/InterstitialLayout'
@@ -294,20 +291,9 @@ function PermissionDetails({
                   >
                     <div className="flex min-w-0 items-center gap-1.5">
                       <p className="truncate text-sm text-foreground">{permission.label}</p>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button
-                            type="button"
-                            aria-label={`${permission.label} permission details`}
-                            className="flex shrink-0 text-foreground-muted transition-colors hover:text-foreground"
-                          >
-                            <InfoTooltipIcon className="size-3.5 fill-foreground-muted/75 transition-colors" />
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent side="right" className="max-w-64 text-xs">
-                          {formatPermissionDescription(permission.description)}
-                        </TooltipContent>
-                      </Tooltip>
+                      <InfoTooltip side="right" className="max-w-64 text-xs">
+                        {formatPermissionDescription(permission.description)}
+                      </InfoTooltip>
                     </div>
                     <Badge variant={getPermissionLevelBadgeVariant(permission.level)}>
                       {formatPermissionLevel(permission.level)}

@@ -1,15 +1,8 @@
 import dayjs from 'dayjs'
-import { useState, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import {
   Button,
-  Card,
-  CardContent,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
   Form,
   FormControl,
   FormField,
@@ -20,24 +13,15 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 import { Admonition, ShimmeringLoader } from 'ui-patterns'
-import { InfoTooltipIcon } from 'ui-patterns/info-tooltip'
 
 import type { ApprovalState, IApprovalFormSchema } from './ApiAuthorization.Schema'
 import {
   AuthorizeRequesterDetails,
   RequesterLogo,
 } from '@/components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
-import {
-  InterstitialLayout,
-  InterstitialMetadataPill,
-  LogoPair,
-  SupabaseLogo,
-} from '@/components/layouts/InterstitialLayout'
+import { InterstitialLayout, LogoPair, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
 import type { ApiAuthorizationResponse } from '@/data/api-authorization/api-authorization-query'
 import type { Organization, ResponseError } from '@/types'
 
@@ -70,7 +54,14 @@ export type OrganizationsState =
   | OrganizationsState_NotMember
   | OrganizationsState_Success
 
-const CURSOR_MCP_PUBLISHER_DOMAIN = 'anysphere.cursor-mcp'
+function isExternalRedirectUrl(url: string): boolean {
+  try {
+    const { hostname } = new URL(url)
+    return hostname !== 'localhost' && hostname !== '127.0.0.1' && hostname !== '::1'
+  } catch {
+    return false
+  }
+}
 
 export interface ApiAuthorizationMainViewProps {
   approvalState: ApprovalState
@@ -93,7 +84,8 @@ export function ApiAuthorizationMainView({
 }: ApiAuthorizationMainViewProps): ReactNode {
   const isExpired = dayjs().isAfter(dayjs(requester.expires_at))
   const showReadyContent = !isExpired && organizations._tag === 'success'
-  const showPublisherInfo = requester.domain === CURSOR_MCP_PUBLISHER_DOMAIN
+  const redirectUrl = requester.redirect_uri ?? requester.website
+  const externalRedirectUrl = isExternalRedirectUrl(redirectUrl) ? redirectUrl : undefined
 
   return (
     <InterstitialLayout
@@ -105,14 +97,6 @@ export function ApiAuthorizationMainView({
       }
       title={`Authorize ${requester.name}`}
       description="This application wants to access your Supabase account"
-      subtitle={
-        showPublisherInfo ? (
-          <CursorPublisherInfoDialog domain={requester.domain} />
-        ) : (
-          <InterstitialMetadataPill>{requester.domain}</InterstitialMetadataPill>
-        )
-      }
-      subtitleClassName="leading-none"
     >
       <div className="px-6 pb-6">
         <span className="sr-only">Authorize API access for {requester.name}</span>
@@ -147,6 +131,7 @@ export function ApiAuthorizationMainView({
                   <FormFooter
                     approvalState={approvalState}
                     requester={requester}
+                    redirectUrl={externalRedirectUrl}
                     onApprove={onApprove}
                     onDecline={onDecline}
                   />
@@ -157,42 +142,6 @@ export function ApiAuthorizationMainView({
         </div>
       </div>
     </InterstitialLayout>
-  )
-}
-
-function CursorPublisherInfoDialog({ domain }: { domain: string }): ReactNode {
-  const [open, setOpen] = useState(false)
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <button
-            type="button"
-            aria-label="About this publisher"
-            className="mx-auto mt-1.5 flex w-fit cursor-pointer items-center gap-1.5 rounded-full border border-muted pl-2 pr-1.5 py-1 font-mono text-[11px] tracking-tight text-foreground-lighter transition-colors hover:border-foreground-muted hover:bg-surface-200 hover:text-foreground-light"
-            onClick={() => setOpen(true)}
-          >
-            <span>{domain}</span>
-            <InfoTooltipIcon className="size-3.5 fill-foreground-muted transition-colors" />
-          </button>
-        </TooltipTrigger>
-        <TooltipContent side="bottom" className="max-w-56 text-xs">
-          Make sure you trust this publisher
-        </TooltipContent>
-      </Tooltip>
-      <DialogContent size="small">
-        <DialogHeader>
-          <DialogTitle>About this publisher</DialogTitle>
-          <DialogDescription>
-            <code className="text-code-inline">anysphere-mcp</code> is the publisher of the Cursor
-            application. Make sure you trust the author and source of this app. After you authorize,
-            it will be able to view or control your organization's projects based on the selected
-            permissions.
-          </DialogDescription>
-        </DialogHeader>
-      </DialogContent>
-    </Dialog>
   )
 }
 
@@ -212,19 +161,7 @@ function OrganizationsLoader(): ReactNode {
       <p className="text-xs font-medium uppercase tracking-wider text-foreground-light">
         Organization
       </p>
-      <div className="space-y-2">
-        {Array.from({ length: 3 }).map((_, index) => (
-          <Card key={index} className="shadow-none">
-            <CardContent className="flex items-center gap-3 border-none px-4 py-3">
-              <ShimmeringLoader className="size-9 flex-shrink-0 rounded-lg py-0" />
-              <div className="flex min-w-0 flex-1 flex-col gap-2">
-                <ShimmeringLoader className="h-4 w-28 py-0" />
-                <ShimmeringLoader className="h-3 w-20 py-0" />
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <ShimmeringLoader className="h-[34px] w-full rounded-md py-0" />
     </section>
   )
 }
@@ -341,6 +278,7 @@ function OrganizationSelector({
 interface FormFooterProps {
   approvalState: ApprovalState
   requester: ApiAuthorizationResponse
+  redirectUrl?: string
   onDecline: () => void
   onApprove: () => void
 }
@@ -348,6 +286,7 @@ interface FormFooterProps {
 function FormFooter({
   approvalState,
   requester,
+  redirectUrl,
   onDecline,
   onApprove,
 }: FormFooterProps): ReactNode {
@@ -368,6 +307,13 @@ function FormFooter({
       >
         Cancel
       </Button>
+      {redirectUrl && (
+        <div className="mt-3 border-t border-muted pt-5">
+          <p className="text-center text-xs text-foreground-lighter text-balance">
+            Authorizing will redirect you to <span className="text-foreground">{redirectUrl}</span>
+          </p>
+        </div>
+      )}
     </div>
   )
 }
