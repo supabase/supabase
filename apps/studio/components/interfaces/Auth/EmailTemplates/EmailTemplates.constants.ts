@@ -8,19 +8,19 @@ import { getAuthTemplateType } from './EmailTemplates.utils'
 export const AUTH_TEMPLATE_RESET_TYPES: AuthTemplateResetType[] =
   AUTH_TEMPLATE_TYPES.map(getAuthTemplateType)
 
-/** Docs heading anchors for customizing-email-templates.mdx (github-slugger output). */
+/** Docs heading anchors for customizing-email-templates.mdx (ui Heading slugify output). */
 export const EMAIL_TEMPLATE_DOCS_ANCHORS = {
   CONFIRMATION: 'authemailtemplateconfirmation',
   INVITE: 'authemailtemplateinvite',
-  MAGIC_LINK: 'authemailtemplatemagic_link',
-  EMAIL_CHANGE: 'authemailtemplateemail_change',
+  MAGIC_LINK: 'authemailtemplatemagiclink',
+  EMAIL_CHANGE: 'authemailtemplateemailchange',
   RECOVERY: 'authemailtemplaterecovery',
   REAUTHENTICATION: 'authemailtemplatereauthentication',
-  PASSWORD_CHANGED_NOTIFICATION: 'authemailnotificationpassword_changed',
-  EMAIL_CHANGED_NOTIFICATION: 'authemailnotificationemail_changed',
-  PHONE_CHANGED_NOTIFICATION: 'authemailnotificationphone_changed',
-  IDENTITY_LINKED_NOTIFICATION: 'authemailnotificationidentity_linked',
-  IDENTITY_UNLINKED_NOTIFICATION: 'authemailnotificationidentity_unlinked',
-  MFA_FACTOR_ENROLLED_NOTIFICATION: 'authemailnotificationmfa_factor_enrolled',
-  MFA_FACTOR_UNENROLLED_NOTIFICATION: 'authemailnotificationmfa_factor_unenrolled',
+  PASSWORD_CHANGED_NOTIFICATION: 'authemailnotificationpasswordchanged',
+  EMAIL_CHANGED_NOTIFICATION: 'authemailnotificationemailchanged',
+  PHONE_CHANGED_NOTIFICATION: 'authemailnotificationphonechanged',
+  IDENTITY_LINKED_NOTIFICATION: 'authemailnotificationidentitylinked',
+  IDENTITY_UNLINKED_NOTIFICATION: 'authemailnotificationidentityunlinked',
+  MFA_FACTOR_ENROLLED_NOTIFICATION: 'authemailnotificationmfafactorenrolled',
+  MFA_FACTOR_UNENROLLED_NOTIFICATION: 'authemailnotificationmfafactorunenrolled',
 } as const satisfies Record<AuthTemplateType, string>

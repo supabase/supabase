@@ -20,9 +20,16 @@ const DOCS_HEADINGS: Record<AuthTemplateType, string> = {
   MFA_FACTOR_UNENROLLED_NOTIFICATION: 'auth.email.notification.mfa_factor_unenrolled',
 }
 
-/** Matches github-slugger / rehype-slug output for these dot-separated config paths. */
+/**
+ * Matches docs `Heading` anchor generation in
+ * packages/ui/src/components/CustomHTMLElements/CustomHTMLElements.utils.ts
+ */
 function docsHeadingToAnchor(heading: string) {
-  return heading.replace(/\./g, '').toLowerCase()
+  return heading
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9- ]/g, '')
+    .replace(/[ ]/g, '-')
 }
 
 describe('EmailTemplates.constants: EMAIL_TEMPLATE_DOCS_ANCHORS', () => {
