@@ -12,6 +12,8 @@ import { gfm } from 'micromark-extension-gfm'
 import { mdxjs } from 'micromark-extension-mdxjs'
 
 import { getInternalLinkBaseUrl, prefixInternalLinks } from './internal-links'
+import { Link } from './markdown-schema/Link'
+import { Panel } from './markdown-schema/Panel'
 
 const PARTIALS_DIR = path.join(process.cwd(), 'content', '_partials')
 
@@ -122,7 +124,11 @@ function applySchema(parent: Parent, schema: ComponentSchema): void {
  * and returns the markdown string that should replace the JSX element. Any
  * component not listed is unwrapped (children are kept, wrapper is dropped).
  */
-const SCHEMA: ComponentSchema = {}
+const SCHEMA: ComponentSchema = {
+  Link,
+  GlassPanel: Panel,
+  IconPanel: Panel,
+}
 
 async function generateOne(filePath: string, linkBaseUrl: string): Promise<string> {
   const raw = await fs.readFile(filePath, 'utf8')
@@ -135,8 +141,11 @@ async function generateOne(filePath: string, linkBaseUrl: string): Promise<strin
 
   const headerParts: string[] = []
   if (data.title) headerParts.push(`# ${data.title}`)
-  const lede = data.subtitle ?? data.description
-  if (lede) headerParts.push(String(lede))
+  if (data.subtitle) headerParts.push(String(data.subtitle))
+  // Add description only when differs from subtitle.
+  if (data.description && String(data.description) !== String(data.subtitle))
+    headerParts.push(String(data.description))
+
   const header = headerParts.join('\n\n')
 
   return header ? `${header}\n\n${body}` : body
