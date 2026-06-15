@@ -1,9 +1,10 @@
 'use client'
 
+import { useDebounce } from '@uidotdev/usehooks'
 import { IS_PLATFORM } from 'common'
 import { Auth, EdgeFunctions, Storage } from 'icons'
 import { Database } from 'lucide-react'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import {
   CommandHeader,
@@ -71,12 +72,23 @@ function ContextSearchPage({
 }) {
   const query = useQuery()
 
+  const [filterString, setFilterString] = useState('')
+  const debouncedFilterString = useDebounce(filterString, 300)
+
   return (
-    <CommandWrapper>
+    <CommandWrapper shouldFilter={context !== 'database-tables'}>
       <CommandHeader>
-        <CommandMenuInput placeholder={placeholder} />
+        <CommandMenuInput
+          placeholder={placeholder}
+          value={filterString}
+          onValueChange={setFilterString}
+        />
       </CommandHeader>
-      <ContextSearchResults context={context} query={query} />
+      <ContextSearchResults
+        context={context}
+        query={query}
+        debouncedFilterString={debouncedFilterString}
+      />
     </CommandWrapper>
   )
 }

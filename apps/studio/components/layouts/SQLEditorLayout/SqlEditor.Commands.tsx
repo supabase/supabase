@@ -4,7 +4,7 @@ import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { AlertTriangle, Code, Loader2, Table2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { cn, CommandEmpty, CommandGroup, CommandItem, CommandList } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import type { CommandOptions } from 'ui-patterns/CommandMenu'
@@ -30,12 +30,10 @@ import { useSqlSnippetsQuery, type SqlSnippet } from '@/data/content/sql-snippet
 import {
   useInfiniteTablesQuery,
   usePrefetchTables,
-  useTablesQuery,
   type TablesData,
 } from '@/data/tables/tables-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 import { useProfile } from '@/lib/profile'
 
 export function useSqlEditorGotoCommands(options?: CommandOptions) {
@@ -354,12 +352,11 @@ function TableSelector() {
           onValueChange={setFilterString}
         />
       </CommandHeader>
-      <CommandList>
+      <CommandList className="pb-10">
         {isLoading && <LoadingState />}
         {isError && <ErrorState />}
         {isSuccess && (
           <>
-            <CommandEmpty />
             <CommandGroup>
               {tables?.map((table) => (
                 <CommandItem
@@ -376,13 +373,30 @@ function TableSelector() {
                 </CommandItem>
               ))}
             </CommandGroup>
-            <div ref={sentinelRef} className="text-xs px-4 pb-2 text-foreground-lighter">
-              {isFetchingNextTablesPage
-                ? 'Loading more tables…'
-                : `${tables.length} ${tables.length === 1 ? 'table' : 'tables'}${
-                    hasNextTablesPage ? ' loaded' : ''
-                  }`}
-            </div>
+            {tables.length === 0 && debouncedFilterString && (
+              <p className="text-xs text-center text-foreground-lighter py-3">
+                No tables found based on your search
+              </p>
+            )}
+            {tables.length > 0 && (
+              <>
+                <div ref={sentinelRef} />
+                <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between min-h-9 h-9 px-4 border-t bg-surface-200 text-xs text-foreground-light z-10">
+                  <div className="flex items-center gap-x-2">
+                    {isFetchingNextTablesPage ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 size={14} className="animate-spin" /> Loading...
+                      </span>
+                    ) : (
+                      <span>
+                        Total: {tables.length} {tables.length === 1 ? 'table' : 'tables'}
+                        {hasNextTablesPage ? ' loaded' : ''}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
           </>
         )}
       </CommandList>

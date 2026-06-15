@@ -1,5 +1,6 @@
 'use client'
 
+import { ReactNode } from 'react'
 import { cn, CommandList } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
 import { TextHighlighter } from 'ui-patterns/CommandMenu'
@@ -53,6 +54,7 @@ interface ResultsListProps {
   onResultClick?: (result: SearchResult) => void
   getRoute?: (result: SearchResult) => `/${string}` | `http${string}`
   className?: string
+  infiniteLoadingObserver?: ReactNode
 }
 
 export function ResultsList({
@@ -62,6 +64,7 @@ export function ResultsList({
   onResultClick,
   getRoute,
   className,
+  infiniteLoadingObserver,
 }: ResultsListProps) {
   const commands = results.map((result): IRouteCommand | IActionCommand => {
     const ResultIcon = getIcon ? getIcon(result) : Icon
@@ -106,6 +109,7 @@ export function ResultsList({
           </CommandMenuItem>
         ))}
       </CommandMenuGroup>
+      {infiniteLoadingObserver}
     </CommandList>
   )
 }
