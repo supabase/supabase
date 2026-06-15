@@ -70,8 +70,8 @@ export function SupportForm({ initialParams }: SupportFormProps) {
 
   useStateTransition(state, 'submitting', 'error', (_, curr) => {
     toast.error(`Failed to submit support ticket: ${curr.message}`)
-    // Skip Sentry for rate-limited submissions (429) since they are expected and
-    // would otherwise flood the issue tracker with double-submit noise.
+    // Skip Sentry for rate-limited submissions (429) since they are an expected,
+    // recoverable condition and would otherwise flood the issue tracker with noise.
     if (curr.code !== 429) {
       Sentry.captureMessage(`Failed to submit Support Form: ${curr.message}`)
     }
