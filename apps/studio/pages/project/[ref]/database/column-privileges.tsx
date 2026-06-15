@@ -110,6 +110,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
   } = useColumnPrivilegesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+    schema: selectedSchema,
   })
 
   const columnPrivileges = useMemo(
