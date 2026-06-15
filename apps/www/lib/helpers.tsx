@@ -131,12 +131,16 @@ export const debounce = <T extends (...args: any[]) => any>(
   pending: () => boolean
 } => {
   let timeoutId: ReturnType<typeof setTimeout> | undefined
+  let lastArgs: Parameters<T> | undefined
   let lastCallTime: number | undefined
   let lastInvokeTime = 0
 
   const { leading = false, trailing = true } = options
 
-  function invokeFunc(time: number, ...args: Parameters<T>) {
+  function invokeFunc(time: number) {
+    const args = lastArgs ?? ([] as unknown as Parameters<T>)
+
+    lastArgs = undefined
     lastInvokeTime = time
     func.apply(null, args)
   }
@@ -149,10 +153,10 @@ export const debounce = <T extends (...args: any[]) => any>(
     clearTimeout(id)
   }
 
-  function leadingEdge(time: number, ...args: Parameters<T>) {
+  function leadingEdge(time: number) {
     lastInvokeTime = time
     timeoutId = startTimer(timerExpired, wait)
-    return leading ? invokeFunc(time, ...args) : undefined
+    return leading ? invokeFunc(time) : undefined
   }
 
   function remainingWait(time: number) {
@@ -186,10 +190,12 @@ export const debounce = <T extends (...args: any[]) => any>(
   function trailingEdge(time: number) {
     timeoutId = undefined
 
-    if (trailing) {
-      // For trailing edge, we don't have the original arguments, so we call without them
-      return invokeFunc(time, ...([] as any))
+    // Only invoke if we have pending arguments captured from a debounced call.
+    if (trailing && lastArgs !== undefined) {
+      return invokeFunc(time)
     }
+
+    lastArgs = undefined
   }
 
   function cancel() {
@@ -197,6 +203,7 @@ export const debounce = <T extends (...args: any[]) => any>(
       cancelTimer(timeoutId)
     }
     lastInvokeTime = 0
+    lastArgs = undefined
     lastCallTime = undefined
     timeoutId = undefined
   }
@@ -213,15 +220,16 @@ export const debounce = <T extends (...args: any[]) => any>(
     const time = Date.now()
     const isInvoking = shouldInvoke(time)
 
+    lastArgs = args
     lastCallTime = time
 
     if (isInvoking) {
       if (timeoutId === undefined) {
-        return leadingEdge(lastCallTime, ...args)
+        return leadingEdge(lastCallTime)
       }
       if (trailing) {
         timeoutId = startTimer(timerExpired, wait)
-        return invokeFunc(lastCallTime, ...args)
+        return invokeFunc(lastCallTime)
       }
     }
     if (timeoutId === undefined) {
