@@ -1,7 +1,6 @@
 import Editor, { Monaco, OnMount } from '@monaco-editor/react'
-import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { MutableRefObject, useEffect, useRef, useState } from 'react'
+import { MutableRefObject, useEffect, useRef } from 'react'
 import { cn } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
@@ -68,13 +67,13 @@ const MonacoEditor = ({
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
     true
   )
+  const [autoSaveSnippets] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_AUTO_SAVE_SNIPPETS,
+    true
+  )
   const isAIAssistantHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.AI_ASSISTANT_TOGGLE)
   const isCommandMenuHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.COMMAND_MENU_OPEN)
   const setCommandMenuOpen = useSetCommandMenuOpen()
-
-  // [Joshen] Lodash debounce doesn't seem to be working here, so opting to use useDebounce
-  const [value, setValue] = useState('')
-  const debouncedValue = useDebounce(value, 1000)
 
   const snippet = snapV2.snippets[id]
   const disableEdit =
@@ -244,24 +243,19 @@ const MonacoEditor = ({
 
   function handleEditorChange(value: string | undefined) {
     tabsSnap.makeActiveTabPermanent()
-    if (id && value !== undefined) {
-      setValue(value)
-    }
-  }
-
-  useEffect(() => {
-    if (debouncedValue.length > 0 && snippet) {
-      // Drafts persist to local storage (handled within setSql); saved snippets queue a debounced
-      // DB save exactly as before.
+    if (id && value !== undefined && snippet) {
+      // Drafts persist to local storage (handled within setSql); saved snippets either autosave or
+      // stay local until the user explicitly saves, depending on the preference.
       if (snippet.snippet.isDraftTab) {
         snapV2.setSql({ id, sql: value, skipSave: true })
       } else {
-        const shouldInvalidate = snippet.snippet.isNotSavedInDatabaseYet
-        snapV2.setSql({ id, sql: value, shouldInvalidate })
+        snapV2.setSql({ id, sql: value })
+        if (autoSaveSnippets) {
+          snapV2.addNeedsSaving(id, { saveSql: true })
+        }
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedValue])
+  }
 
   // if an SQL query is passed by the content parameter, set the editor value to its content. This
   // is usually used for sending the user to SQL editor from other pages with SQL.

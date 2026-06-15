@@ -1,15 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
-  countDraftSqlTabsRequiringCloseConfirmation,
+  countSqlTabsRequiringCloseConfirmation,
   createDraftSqlTab,
-  getDiscardDraftSqlTabsDialogCopy,
+  getDiscardSqlTabsDialogCopy,
   getDraftSqlTabSql,
   getOpenDraftSqlTabIds,
   isDraftSqlSnippet,
   restoreDraftSqlTab,
   restoreOpenDraftSqlTabs,
-  shouldConfirmCloseDraftSqlTab,
+  shouldConfirmCloseSqlTab,
   shouldHideDraftSqlTabFromNav,
 } from './createDraftSqlTab'
 import { persistDraftSqlTab, readPersistedDraftSqlTab } from './draftSqlTabStorage.utils'
@@ -83,61 +83,75 @@ describe('getDraftSqlTabSql', () => {
   })
 })
 
-describe('shouldConfirmCloseDraftSqlTab', () => {
+describe('shouldConfirmCloseSqlTab', () => {
   const draftTab = { type: 'sql', metadata: { isDraft: true, sqlId: 'draft-1' } }
 
-  it('requires confirmation only for draft sql tabs with content', () => {
-    expect(shouldConfirmCloseDraftSqlTab(draftTab, 'select 1')).toBe(true)
-    expect(shouldConfirmCloseDraftSqlTab(draftTab, '   ')).toBe(false)
-    expect(
-      shouldConfirmCloseDraftSqlTab({ type: 'sql', metadata: { sqlId: 'draft-1' } }, 'select 1')
-    ).toBe(false)
-    expect(
-      shouldConfirmCloseDraftSqlTab({ type: 'r', metadata: { isDraft: true } }, 'select 1')
-    ).toBe(false)
+  it('requires confirmation for draft sql tabs with content', () => {
+    expect(shouldConfirmCloseSqlTab(draftTab, 'select 1')).toBe(true)
+    expect(shouldConfirmCloseSqlTab(draftTab, '   ')).toBe(false)
+    expect(shouldConfirmCloseSqlTab({ type: 'r', metadata: { isDraft: true } }, 'select 1')).toBe(
+      false
+    )
+  })
+
+  it('requires confirmation for saved sql tabs with dirty content', () => {
+    const savedTab = { type: 'sql', metadata: { sqlId: 'saved-1' } }
+
+    expect(shouldConfirmCloseSqlTab(savedTab, 'select 2', 'select 1')).toBe(true)
+    expect(shouldConfirmCloseSqlTab(savedTab, 'select 1', 'select 1')).toBe(false)
+    expect(shouldConfirmCloseSqlTab(savedTab, 'select 1')).toBe(false)
   })
 })
 
-describe('countDraftSqlTabsRequiringCloseConfirmation', () => {
+describe('countSqlTabsRequiringCloseConfirmation', () => {
   const draftTab = (sqlId: string) => ({
     type: 'sql',
     metadata: { isDraft: true, sqlId },
   })
 
-  it('counts only draft sql tabs with content', () => {
+  it('counts dirty saved sql tabs and draft sql tabs with content', () => {
     const tabsMap = {
       'sql-a': draftTab('draft-a'),
       'sql-b': draftTab('draft-b'),
       'sql-c': { type: 'sql', metadata: { sqlId: 'saved-c' } },
       'sql-d': draftTab('draft-d'),
+      'sql-e': { type: 'sql', metadata: { sqlId: 'saved-e' } },
     }
 
     const getTabSql = (tabId: string) => {
       if (tabId === 'sql-b') return '   '
       if (tabId === 'sql-d') return 'select d'
+      if (tabId === 'sql-c') return 'select changed'
+      if (tabId === 'sql-e') return 'select e'
       return 'select a'
+    }
+    const getSavedSql = (tabId: string) => {
+      if (tabId === 'sql-c') return 'select c'
+      if (tabId === 'sql-e') return 'select e'
+      return undefined
     }
 
     expect(
-      countDraftSqlTabsRequiringCloseConfirmation(
-        ['sql-a', 'sql-b', 'sql-c', 'sql-d'],
+      countSqlTabsRequiringCloseConfirmation(
+        ['sql-a', 'sql-b', 'sql-c', 'sql-d', 'sql-e'],
         tabsMap,
-        getTabSql
+        getTabSql,
+        getSavedSql
       )
-    ).toBe(2)
+    ).toBe(3)
   })
 })
 
-describe('getDiscardDraftSqlTabsDialogCopy', () => {
+describe('getDiscardSqlTabsDialogCopy', () => {
   it('uses singular copy for a single tab', () => {
-    expect(getDiscardDraftSqlTabsDialogCopy(1)).toMatchObject({
-      title: 'Discard unsaved query?',
+    expect(getDiscardSqlTabsDialogCopy(1)).toMatchObject({
+      title: 'Discard unsaved changes?',
       confirmLabel: 'Discard query',
     })
   })
 
   it('uses plural copy with a count for multiple tabs', () => {
-    expect(getDiscardDraftSqlTabsDialogCopy(3)).toMatchObject({
+    expect(getDiscardSqlTabsDialogCopy(3)).toMatchObject({
       title: 'Close 3 tabs with unsaved changes?',
       description:
         'You are about to close 3 tabs that have unsaved changes. Their contents will be discarded.',
@@ -182,6 +196,34 @@ describe('createDraftSqlTab', () => {
 
     // Persisted to local storage with the initial sql
     expect(readPersistedDraftSqlTab(PROJECT_REF, draftId)).toMatchObject({ sql: 'select 1' })
+  })
+
+  it('registers an autosaved snippet + tab and queues the initial save', () => {
+    const addSnippet = vi.fn()
+    const addNeedsSaving = vi.fn()
+    const addTab = vi.fn()
+
+    const snippetId = createDraftSqlTab({
+      projectRef: PROJECT_REF,
+      projectId: 1,
+      ownerId: 2,
+      snapV2: { addSnippet, addNeedsSaving },
+      tabs: { addTab },
+      initialSql: 'select 1',
+      creationMode: 'saved',
+      skipNavigation: true,
+    })
+
+    expect(addSnippet).toHaveBeenCalledTimes(1)
+    const addedSnippet = addSnippet.mock.calls[0][0].snippet
+    expect(addedSnippet.id).toBe(snippetId)
+    expect(addedSnippet.isDraftTab).toBeUndefined()
+
+    expect(addNeedsSaving).toHaveBeenCalledWith(snippetId, { saveSql: true })
+    expect(addTab).toHaveBeenCalledTimes(1)
+    expect(addTab.mock.calls[0][0].metadata).toMatchObject({ sqlId: snippetId })
+    expect(addTab.mock.calls[0][0].metadata.isDraft).toBeUndefined()
+    expect(readPersistedDraftSqlTab(PROJECT_REF, snippetId)).toBeUndefined()
   })
 })
 

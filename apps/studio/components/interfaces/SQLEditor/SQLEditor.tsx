@@ -32,7 +32,11 @@ import {
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
 import { RenameQueryModal } from './RenameQueryModal'
 import { RunQueryWarningModal } from './RunQueryWarningModal'
-import { ROWS_PER_PAGE_OPTIONS, sqlAiDisclaimerComment } from './SQLEditor.constants'
+import {
+  ROWS_PER_PAGE_OPTIONS,
+  sqlAiDisclaimerComment,
+  untitledSnippetTitle,
+} from './SQLEditor.constants'
 import {
   DiffType,
   IStandaloneCodeEditor,
@@ -62,15 +66,18 @@ import {
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import ResizableAIWidget from '@/components/ui/AIEditor/ResizableAIWidget'
 import { GridFooter } from '@/components/ui/GridFooter'
+import { useSqlTitleGenerateMutation } from '@/data/ai/sql-title-mutation'
 import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
 import { constructHeaders, isValidConnString } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { isError } from '@/data/utils/error-check'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { BASE_PATH } from '@/lib/constants'
+import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 import { formatSql } from '@/lib/formatSql'
 import { detectOS } from '@/lib/helpers'
 import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
@@ -108,7 +115,12 @@ export const SQLEditor = () => {
   const snapV2 = useSqlEditorV2StateSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
+  const { aiOptInLevel, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
   const showPrettyExplain = useFlag('ShowPrettyExplain')
+  const [autoSaveSnippets] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_AUTO_SAVE_SNIPPETS,
+    true
+  )
 
   const {
     sourceSqlDiff,
@@ -279,6 +291,23 @@ export const SQLEditor = () => {
     },
   })
 
+  const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
+
+  const setAiTitle = useCallback(
+    async (id: string, sql: string) => {
+      try {
+        const { title: name } = await generateSqlTitle({ sql })
+        snapV2.updateSnippet({ id, snippet: { name } })
+        snapV2.addNeedsSaving(id)
+        const tabId = createTabId('sql', { id })
+        tabs.updateTab(tabId, { label: name })
+      } catch {
+        // Title generation is best-effort and should not interrupt query execution.
+      }
+    },
+    [generateSqlTitle, snapV2, tabs]
+  )
+
   const prettifyQuery = useCallback(async () => {
     if (isDiffOpen) return
 
@@ -364,6 +393,17 @@ export const SQLEditor = () => {
         return
       }
 
+      if (
+        autoSaveSnippets &&
+        aiOptInLevel !== 'disabled' &&
+        !isHipaaProjectDisallowed &&
+        snippet?.snippet.name.startsWith(untitledSnippetTitle) &&
+        IS_PLATFORM
+      ) {
+        // Intentionally don't await title generation.
+        setAiTitle(id, sql)
+      }
+
       if (lineHighlights.length > 0) {
         editor?.deltaDecorations(lineHighlights, [])
         setLineHighlights([])
@@ -404,8 +444,12 @@ export const SQLEditor = () => {
       id,
       isExecuting,
       project,
+      autoSaveSnippets,
+      aiOptInLevel,
+      isHipaaProjectDisallowed,
       execute,
       getImpersonatedRoleState,
+      setAiTitle,
       databaseSelectorState.selectedDatabaseId,
       databases,
       eventTriggers,
@@ -532,8 +576,8 @@ export const SQLEditor = () => {
       snapV2.setSql({ id, sql, skipSave: true })
       setRenameModalOpen(true)
     } else {
-      snapV2.setSql({ id, sql, shouldInvalidate: snippet.isNotSavedInDatabaseYet })
-      snapV2.addNeedsSaving(id)
+      snapV2.setSql({ id, sql, skipSave: true })
+      snapV2.addNeedsSaving(id, { saveSql: true })
     }
   }, [id, snapV2])
 

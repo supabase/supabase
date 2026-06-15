@@ -2,8 +2,8 @@ import { useCallback, useMemo, useState } from 'react'
 
 import {
   clearPersistedDraftSqlTab,
-  countDraftSqlTabsRequiringCloseConfirmation,
-  getDiscardDraftSqlTabsDialogCopy,
+  countSqlTabsRequiringCloseConfirmation,
+  getDiscardSqlTabsDialogCopy,
   getDraftSqlTabSql,
 } from './createDraftSqlTab'
 import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
@@ -15,7 +15,7 @@ type TabsSnapshot = {
 
 type PendingClose = {
   execute: () => void
-  unsavedDraftTabCount: number
+  unsavedSqlTabCount: number
 }
 
 export function useDraftSqlTabCloseConfirmation({
@@ -42,7 +42,18 @@ export function useDraftSqlTabCloseConfirmation({
     [projectRef, tabs.tabsMap]
   )
 
-  const cleanupDraftTabs = useCallback(
+  const getSavedSql = useCallback(
+    (tabId: string) => {
+      const tab = tabs.tabsMap[tabId]
+      const sqlId = tab?.metadata?.sqlId
+      if (!sqlId) return undefined
+
+      return getSqlEditorV2StateSnapshot().savedSql[sqlId]
+    },
+    [tabs.tabsMap]
+  )
+
+  const discardUnsavedSqlChanges = useCallback(
     (tabIds: string[]) => {
       if (!projectRef) return
 
@@ -50,10 +61,17 @@ export function useDraftSqlTabCloseConfirmation({
         const tab = tabs.tabsMap[tabId]
         const sqlId = tab?.metadata?.sqlId
 
-        if (tab?.type !== 'sql' || !tab.metadata?.isDraft || !sqlId) continue
+        if (tab?.type !== 'sql' || !sqlId) continue
 
-        clearPersistedDraftSqlTab(projectRef, sqlId)
-        snapV2.removeSnippet(sqlId, true)
+        if (tab.metadata?.isDraft) {
+          clearPersistedDraftSqlTab(projectRef, sqlId)
+          snapV2.removeSnippet(sqlId, true)
+        } else {
+          const savedSql = getSqlEditorV2StateSnapshot().savedSql[sqlId]
+          if (savedSql !== undefined) {
+            snapV2.setSql({ id: sqlId, sql: savedSql, skipSave: true })
+          }
+        }
       }
     },
     [projectRef, snapV2, tabs.tabsMap]
@@ -61,27 +79,28 @@ export function useDraftSqlTabCloseConfirmation({
 
   const requestClose = useCallback(
     (tabIds: string[], execute: () => void) => {
-      const unsavedDraftTabCount = countDraftSqlTabsRequiringCloseConfirmation(
+      const unsavedSqlTabCount = countSqlTabsRequiringCloseConfirmation(
         tabIds,
         tabs.tabsMap,
-        getTabSql
+        getTabSql,
+        getSavedSql
       )
 
-      if (unsavedDraftTabCount === 0) {
-        cleanupDraftTabs(tabIds)
+      if (unsavedSqlTabCount === 0) {
+        discardUnsavedSqlChanges(tabIds)
         execute()
         return
       }
 
       setPendingClose({
-        unsavedDraftTabCount,
+        unsavedSqlTabCount,
         execute: () => {
-          cleanupDraftTabs(tabIds)
+          discardUnsavedSqlChanges(tabIds)
           execute()
         },
       })
     },
-    [cleanupDraftTabs, getTabSql, tabs.tabsMap]
+    [discardUnsavedSqlChanges, getSavedSql, getTabSql, tabs.tabsMap]
   )
 
   const requestCloseSingle = useCallback(
@@ -110,8 +129,8 @@ export function useDraftSqlTabCloseConfirmation({
   )
 
   const dialogCopy = useMemo(
-    () => getDiscardDraftSqlTabsDialogCopy(pendingClose?.unsavedDraftTabCount ?? 0),
-    [pendingClose?.unsavedDraftTabCount]
+    () => getDiscardSqlTabsDialogCopy(pendingClose?.unsavedSqlTabCount ?? 0),
+    [pendingClose?.unsavedSqlTabCount]
   )
 
   return {

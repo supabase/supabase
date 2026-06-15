@@ -13,6 +13,7 @@ import { createTabId } from '@/state/tabs'
 
 type SqlEditorV2Actions = {
   addSnippet: (args: { projectRef: string; snippet: SnippetWithContent }) => void
+  addNeedsSaving?: (id: string, options?: { saveSql?: boolean }) => void
 }
 
 type TabsActions = {
@@ -37,6 +38,7 @@ export type CreateDraftSqlTabParams = {
   tabs: TabsActions
   router?: NextRouter
   initialSql?: string
+  creationMode?: 'draft' | 'saved'
   /** When true, only registers state without changing the route */
   skipNavigation?: boolean
 }
@@ -49,47 +51,54 @@ export function createDraftSqlTab({
   tabs,
   router,
   initialSql = '',
+  creationMode = 'draft',
   skipNavigation = false,
 }: CreateDraftSqlTabParams): string {
   const name = generateSnippetTitle()
-  const draftId = generateUuid([`${name}.sql`, Date.now().toString()])
+  const snippetId = generateUuid([`${name}.sql`, Date.now().toString()])
 
   const snippet = createSqlSnippetSkeletonV2({
-    idOverride: draftId,
+    idOverride: snippetId,
     name,
     sql: initialSql,
     owner_id: ownerId,
     project_id: projectId,
   })
 
-  snippet.isDraftTab = true
+  if (creationMode === 'draft') {
+    snippet.isDraftTab = true
+  }
 
   snapV2.addSnippet({ projectRef, snippet })
 
-  persistDraftSqlTab(projectRef, draftId, {
-    sql: initialSql,
-    name,
-  })
+  if (creationMode === 'draft') {
+    persistDraftSqlTab(projectRef, snippetId, {
+      sql: initialSql,
+      name,
+    })
+  } else {
+    snapV2.addNeedsSaving?.(snippetId, { saveSql: true })
+  }
 
   tabs.addTab({
-    id: createTabId('sql', { id: draftId }),
+    id: createTabId('sql', { id: snippetId }),
     type: 'sql',
     label: name,
     metadata: {
-      sqlId: draftId,
+      sqlId: snippetId,
       name,
-      isDraft: true,
+      ...(creationMode === 'draft' ? { isDraft: true } : {}),
     },
-    // Drafts are permanent tabs (not preview), so opening another draft never evicts an existing
+    // New query tabs are permanent (not preview), so opening another one never evicts an existing
     // empty one — each "new query" gets its own tab.
     isPreview: false,
   })
 
   if (!skipNavigation && router) {
-    void router.push(`/project/${projectRef}/sql/${draftId}`)
+    void router.push(`/project/${projectRef}/sql/${snippetId}`)
   }
 
-  return draftId
+  return snippetId
 }
 
 export function restoreDraftSqlTab({
@@ -205,7 +214,7 @@ export function shouldHideDraftSqlTabFromNav(
   return false
 }
 
-type DraftSqlTabLike = {
+type SqlTabLike = {
   type?: string
   metadata?: {
     isDraft?: boolean
@@ -227,25 +236,33 @@ export function getDraftSqlTabSql({
   return ''
 }
 
-export function shouldConfirmCloseDraftSqlTab(tab: DraftSqlTabLike | undefined, sql: string) {
-  if (tab?.type !== 'sql' || !tab.metadata?.isDraft || !tab.metadata.sqlId) return false
-  return sql.trim().length > 0
-}
-
-export function countDraftSqlTabsRequiringCloseConfirmation(
-  tabIds: string[],
-  tabsMap: Record<string, DraftSqlTabLike | undefined>,
-  getTabSql: (tabId: string) => string
+export function shouldConfirmCloseSqlTab(
+  tab: SqlTabLike | undefined,
+  sql: string,
+  savedSql?: string
 ) {
-  return tabIds.filter((tabId) => shouldConfirmCloseDraftSqlTab(tabsMap[tabId], getTabSql(tabId)))
-    .length
+  if (tab?.type !== 'sql' || !tab.metadata?.sqlId) return false
+  if (tab.metadata.isDraft) return sql.trim().length > 0
+  if (savedSql === undefined) return false
+  return sql !== savedSql
 }
 
-export function getDiscardDraftSqlTabsDialogCopy(count: number) {
+export function countSqlTabsRequiringCloseConfirmation(
+  tabIds: string[],
+  tabsMap: Record<string, SqlTabLike | undefined>,
+  getTabSql: (tabId: string) => string,
+  getSavedSql: (tabId: string) => string | undefined
+) {
+  return tabIds.filter((tabId) =>
+    shouldConfirmCloseSqlTab(tabsMap[tabId], getTabSql(tabId), getSavedSql(tabId))
+  ).length
+}
+
+export function getDiscardSqlTabsDialogCopy(count: number) {
   if (count <= 1) {
     return {
-      title: 'Discard unsaved query?',
-      description: 'This query has not been saved. Closing this tab will discard its contents.',
+      title: 'Discard unsaved changes?',
+      description: 'This query has unsaved changes. Closing this tab will discard them.',
       confirmLabel: 'Discard query',
     }
   }

@@ -45,6 +45,7 @@ export const LOCAL_STORAGE_KEYS = {
   SQL_EDITOR_AI_SCHEMA: (ref: string) => `supabase_sql-editor-ai-schema-enabled-${ref}`,
   SQL_EDITOR_AI_OPEN: 'supabase_sql-editor-ai-open',
   SQL_EDITOR_LAST_SELECTED_DB: (ref: string) => `sql-editor-last-selected-db-${ref}`,
+  SQL_EDITOR_AUTO_SAVE_SNIPPETS: 'supabase_sql-editor-auto-save-snippets',
   // Stores unsaved/untitled SQL editor draft tabs (sql + name) so they survive reloads until explicitly saved
   SQL_EDITOR_DRAFT_TABS: (ref: string) => `sql-editor-draft-tabs-${ref}`,
   SQL_EDITOR_SQL_BLOCK_ACKNOWLEDGED: (ref: string) => `sql-editor-sql-block-acknowledged-${ref}`,

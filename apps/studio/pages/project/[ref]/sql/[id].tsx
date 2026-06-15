@@ -1,4 +1,5 @@
 import { usePrevious } from '@uidotdev/usehooks'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { useParams } from 'common/hooks/useParams'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -20,6 +21,7 @@ import SQLEditorLayout from '@/components/layouts/SQLEditorLayout/SQLEditorLayou
 import { SQLEditorMenu } from '@/components/layouts/SQLEditorLayout/SQLEditorMenu'
 import { useContentIdQuery } from '@/data/content/content-id-query'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useProfile } from '@/lib/profile'
@@ -38,6 +40,10 @@ const SqlEditor: NextPageWithLayout = () => {
   const tabs = useTabsStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const { history, setLastVisitedSnippet } = useDashboardHistory()
+  const [autoSaveSnippets] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_AUTO_SAVE_SNIPPETS,
+    true
+  )
 
   const allSnippets = useSnippets(ref!)
   const snippet = allSnippets.find((x) => x.id === id)
@@ -124,11 +130,23 @@ const SqlEditor: NextPageWithLayout = () => {
       snapV2,
       tabs,
       initialSql: typeof content === 'string' ? content : '',
+      creationMode: autoSaveSnippets ? 'saved' : 'draft',
       skipNavigation: true,
     })
     router.replace(`/project/${ref}/sql/${draftId}`)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, router.isReady, ref, project, profile, skip, content, allSnippets, history.sql])
+  }, [
+    id,
+    router.isReady,
+    ref,
+    project,
+    profile,
+    skip,
+    content,
+    allSnippets,
+    history.sql,
+    autoSaveSnippets,
+  ])
 
   // Restore a draft opened directly by URL (e.g. on refresh) from local storage into the editor state
   useEffect(() => {

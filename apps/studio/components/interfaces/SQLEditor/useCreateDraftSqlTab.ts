@@ -1,10 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useCallback } from 'react'
 
 import { createDraftSqlTab } from './createDraftSqlTab'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
@@ -17,6 +18,10 @@ export function useCreateDraftSqlTab() {
   const { data: project } = useSelectedProjectQuery()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const tabs = useTabsStateSnapshot()
+  const [autoSaveSnippets] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_AUTO_SAVE_SNIPPETS,
+    true
+  )
 
   const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
@@ -42,9 +47,10 @@ export function useCreateDraftSqlTab() {
         tabs,
         router,
         initialSql: options?.initialSql,
+        creationMode: autoSaveSnippets ? 'saved' : 'draft',
       })
     },
-    [canCreateSQLSnippet, profile, project, projectRef, router, snapV2, tabs]
+    [autoSaveSnippets, canCreateSQLSnippet, profile, project, projectRef, router, snapV2, tabs]
   )
 
   return { createDraftTab, canCreateSQLSnippet }

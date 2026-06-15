@@ -142,6 +142,7 @@ export const RenameQueryModal = ({
             snippet: { isDraftTab: false, isNotSavedInDatabaseYet: false },
             skipSave: true,
           })
+          snapV2.setSavedSql(id)
         }
 
         const tabId = createTabId('sql', { id })

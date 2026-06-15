@@ -46,6 +46,10 @@ function isDraftSqlTabId(id: string) {
   return sqlEditorState.snippets[id]?.snippet?.isDraftTab === true
 }
 
+function getSnippetSql(snippet: SnippetWithContent | undefined) {
+  return (snippet?.content?.unchecked_sql ?? '') as string
+}
+
 export const sqlEditorState = proxy({
   // ========================================================================
   // ## Data properties within the store
@@ -99,6 +103,16 @@ export const sqlEditorState = proxy({
     [snippetId: string]: 'IDLE' | 'UPDATING' | 'UPDATING_FAILED'
   },
   /**
+   * Last SQL content known to be persisted. Used to keep editor SQL changes manual-save only.
+   */
+  savedSql: {} as {
+    [snippetId: string]: string | undefined
+  },
+  /**
+   * Marks saves that should persist the current editor SQL instead of only snippet metadata.
+   */
+  saveSqlOnNextSave: proxyMap<string, boolean>([]),
+  /**
    * UI-imposed limit for the number of results a query can return (applied to the SQL query being run if applicable).
    * Acts as a safeguard to prevent accidentally taking down the database from a really large SELECT query.
    * Related to `autoLimit` in `results`. Refer to `checkIfAppendLimitRequired` and `suffixWithLimit` for usage.
@@ -136,6 +150,10 @@ export const sqlEditorState = proxy({
     sqlEditorState.results[snippet.id] = []
     sqlEditorState.explainResults[snippet.id] = { rows: [] }
     sqlEditorState.savingStates[snippet.id] = 'IDLE'
+
+    if (snippet.content && !snippet.isDraftTab) {
+      sqlEditorState.savedSql[snippet.id] = getSnippetSql(snippet)
+    }
   },
 
   /**
@@ -169,6 +187,7 @@ export const sqlEditorState = proxy({
     if (storedSnippet) {
       if (!storedSnippet.snippet.content) {
         storedSnippet.snippet.content = snippet.content
+        sqlEditorState.savedSql[snippet.id] = getSnippetSql(snippet)
       }
     } else {
       sqlEditorState.addSnippet({ projectRef: projectRef, snippet })
@@ -176,14 +195,12 @@ export const sqlEditorState = proxy({
   },
 
   /**
-   * Update the snippet content of a snippet and queue for sync saving
-   * Possibly can consolidate with `updateSnippet` to simplify
+   * Update the snippet content in local editor state. Saved snippets are persisted only when the
+   * user explicitly saves; drafts continue to persist their local draft content.
    */
   setSql: ({
     id,
     sql,
-    shouldInvalidate = false,
-    skipSave = false,
   }: {
     id: string
     sql: string
@@ -203,9 +220,11 @@ export const sqlEditorState = proxy({
         }
         return
       }
-
-      if (!skipSave) sqlEditorState.needsSaving.set(id, shouldInvalidate)
     }
+  },
+
+  setSavedSql: (id: string, sql?: string) => {
+    sqlEditorState.savedSql[id] = sql ?? getSnippetSql(sqlEditorState.snippets[id]?.snippet)
   },
 
   /**
@@ -241,6 +260,9 @@ export const sqlEditorState = proxy({
 
     const { [id]: explainResult, ...otherExplainResults } = sqlEditorState.explainResults
     sqlEditorState.explainResults = otherExplainResults
+
+    delete sqlEditorState.savedSql[id]
+    sqlEditorState.saveSqlOnNextSave.delete(id)
 
     if (!skipSave) sqlEditorState.needsSaving.delete(id)
   },
@@ -319,8 +341,9 @@ export const sqlEditorState = proxy({
    */
   setLimit: (value: number) => (sqlEditorState.limit = value),
 
-  addNeedsSaving: (id: string) => {
+  addNeedsSaving: (id: string, options?: { saveSql?: boolean }) => {
     if (isDraftSqlTabId(id)) return
+    if (options?.saveSql) sqlEditorState.saveSqlOnNextSave.set(id, true)
     sqlEditorState.needsSaving.set(id, true)
   },
 
@@ -447,8 +470,15 @@ async function upsertSnippet(
     if (snippet?.content && 'isNotSavedInDatabaseYet' in snippet) {
       snippet.isNotSavedInDatabaseYet = false
     }
+    const savedPayloadSql = (payload.content as Partial<SqlSnippets.Content>).unchecked_sql
+    if (savedPayloadSql !== undefined) {
+      sqlEditorState.savedSql[id] = savedPayloadSql
+    }
     sqlEditorState.savingStates[id] = 'IDLE'
   } catch (error) {
+    if ((payload.content as Partial<SqlSnippets.Content>).unchecked_sql !== undefined) {
+      sqlEditorState.saveSqlOnNextSave.set(id, true)
+    }
     sqlEditorState.savingStates[id] = 'UPDATING_FAILED'
   }
 }
@@ -524,6 +554,9 @@ if (typeof window !== 'undefined') {
           content,
           favorite,
         } = snippet.snippet
+        const shouldSaveSql =
+          state.saveSqlOnNextSave.get(id) === true || snippet.snippet.isNotSavedInDatabaseYet
+        const savedSql = state.savedSql[id]
 
         if (visibility === 'project' && !!folder_id) {
           toast.error('Shared snippet cannot be within a folder')
@@ -542,13 +575,17 @@ if (typeof window !== 'undefined') {
               folder_id: folder_id ?? undefined,
               favorite: favorite ?? false,
               content: {
-                ...content!,
+                ...(content as SqlSnippets.Content),
+                unchecked_sql: shouldSaveSql
+                  ? content?.unchecked_sql
+                  : (savedSql ?? content?.unchecked_sql),
                 content_id: id,
-              },
+              } as SqlSnippets.Content,
             },
             shouldInvalidate
           )
           sqlEditorState.needsSaving.delete(id)
+          sqlEditorState.saveSqlOnNextSave.delete(id)
         }
       } else if (folder) {
         upsertFolder(id, folder.projectRef, folder.folder.name)
