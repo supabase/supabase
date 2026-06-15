@@ -12,8 +12,7 @@ import {
 import { getLogsCountQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getLogsCountQuery as getLogsCountQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import { FacetMetadataSchema } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.schema'
-import { ExecuteSqlError } from '@/data/sql/execute-sql-query'
-import { UseCustomQueryOptions } from '@/types'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export async function getUnifiedLogsCount(
   { projectRef, search, useOtel = false }: UnifiedLogsVariables & { useOtel?: boolean },
@@ -80,7 +79,7 @@ export async function getUnifiedLogsCount(
 }
 
 export type UnifiedLogsCountData = Awaited<ReturnType<typeof getUnifiedLogsCount>>
-export type UnifiedLogsCountError = ExecuteSqlError
+export type UnifiedLogsCountError = ResponseError
 
 export const useUnifiedLogsCountQuery = <TData = UnifiedLogsCountData>(
   { projectRef, search }: UnifiedLogsVariables,

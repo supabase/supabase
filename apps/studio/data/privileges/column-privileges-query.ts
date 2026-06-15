@@ -2,7 +2,7 @@ import pgMeta from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
-import { executeSql } from '../sql/execute-sql-query'
+import { executeSql } from '../sql/execute-sql-mutation'
 import { privilegeKeys } from './keys'
 import type { components } from '@/data/api'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
