@@ -16,6 +16,7 @@ export type TablesVariables = {
   /** Defaults to false */
   includeColumns?: boolean
   sortByProperty?: keyof PGTable
+  excludedSchemas?: string[]
 }
 
 const pgMetaTablesList = pgMeta.tables.list()
@@ -27,6 +28,7 @@ export async function getTables(
     connectionString,
     schema,
     includeColumns = false,
+    excludedSchemas,
     sortByProperty = 'name',
   }: TablesVariables,
   signal?: AbortSignal
@@ -35,6 +37,7 @@ export async function getTables(
   const sql = pgMeta.tables.list({
     includeColumns,
     includedSchemas: schema ? [schema] : undefined,
+    excludedSchemas,
   }).sql
   const queryKey = ['tables', schema]
 
@@ -49,13 +52,13 @@ export async function getTables(
 export type TablesError = ResponseError
 
 export const useTablesQuery = <TData = TablesData>(
-  { projectRef, connectionString, schema, includeColumns }: TablesVariables,
+  vars: TablesVariables,
   { enabled = true, ...options }: UseCustomQueryOptions<TablesData, TablesError, TData> = {}
 ) => {
+  const { projectRef, schema, includeColumns, excludedSchemas } = vars
   return useQuery<TablesData, TablesError, TData>({
-    queryKey: tableKeys.list(projectRef, schema, includeColumns),
-    queryFn: ({ signal }) =>
-      getTables({ projectRef, connectionString, schema, includeColumns }, signal),
+    queryKey: tableKeys.list(projectRef, schema, { includeColumns, excludedSchemas }),
+    queryFn: ({ signal }) => getTables(vars, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     ...options,
   })
@@ -72,9 +75,13 @@ export function useGetTables({
   const queryClient = useQueryClient()
 
   return useCallback(
-    (schema?: TablesVariables['schema'], includeColumns?: TablesVariables['includeColumns']) => {
+    (
+      schema?: TablesVariables['schema'],
+      includeColumns?: TablesVariables['includeColumns'],
+      excludedSchemas?: TablesVariables['excludedSchemas']
+    ) => {
       return queryClient.fetchQuery({
-        queryKey: tableKeys.list(projectRef, schema, includeColumns),
+        queryKey: tableKeys.list(projectRef, schema, { includeColumns, excludedSchemas }),
         queryFn: ({ signal }) =>
           getTables({ projectRef, connectionString, schema, includeColumns }, signal),
       })
@@ -90,9 +97,13 @@ export function usePrefetchTables({
   const queryClient = useQueryClient()
 
   return useCallback(
-    (schema?: TablesVariables['schema'], includeColumns?: TablesVariables['includeColumns']) => {
+    (
+      schema?: TablesVariables['schema'],
+      includeColumns?: TablesVariables['includeColumns'],
+      excludedSchemas?: TablesVariables['excludedSchemas']
+    ) => {
       return queryClient.prefetchQuery({
-        queryKey: tableKeys.list(projectRef, schema, includeColumns),
+        queryKey: tableKeys.list(projectRef, schema, { includeColumns, excludedSchemas }),
         queryFn: ({ signal }) =>
           getTables({ projectRef, connectionString, schema, includeColumns }, signal),
       })
@@ -152,7 +163,7 @@ export async function getTablesPage(
   return result as SafePostgresTable[]
 }
 
-export const useInfiniteTablesQuery = <TData = InfiniteData<TablesData>>(
+export const useInfiniteTablesQuery = <TData = InfiniteData<SafePostgresTable>>(
   {
     projectRef,
     connectionString,
