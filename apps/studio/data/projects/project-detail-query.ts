@@ -116,6 +116,7 @@ export const useProjectDetailQuery = <TData = ProjectDetailData>(
 
 export function prefetchProjectDetail(client: QueryClient, { ref }: ProjectDetailVariables) {
   return client.fetchQuery({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: projectKeys.detail(ref),
     queryFn: ({ signal }) => getProjectDetail({ ref }, signal, undefined, client),
   })
