@@ -140,7 +140,8 @@ client.use(
 
         body.requestId = request.headers.get('X-Request-Id')
 
-        const retryAfterHeader = response.headers.get('Retry-After')
+        const retryAfterHeader =
+          response.headers.get('Retry-After') ?? response.headers.get('X-RateLimit-Reset')
         body.retryAfter = retryAfterHeader ? parseInt(retryAfterHeader) : undefined
 
         const requestUrl = new URL(request.url)
@@ -296,10 +297,11 @@ async function handleFetchError(response: unknown): Promise<ResponseError> {
     resJson.msg ??
     resJson.error ??
     `An error has occurred: ${status ?? 'Unknown error'}`
-  const retryAfter =
-    response instanceof Response && response.headers.get('Retry-After')
-      ? parseInt(response.headers.get('Retry-After')!)
-      : undefined
+  const retryAfterHeader =
+    response instanceof Response
+      ? (response.headers.get('Retry-After') ?? response.headers.get('X-RateLimit-Reset'))
+      : null
+  const retryAfter = retryAfterHeader ? parseInt(retryAfterHeader) : undefined
 
   let error = new ResponseError(message, status, undefined, retryAfter)
 
