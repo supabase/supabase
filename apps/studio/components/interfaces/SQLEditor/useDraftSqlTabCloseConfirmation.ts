@@ -133,10 +133,13 @@ export function useDraftSqlTabCloseConfirmation({
     [pendingClose?.unsavedSqlTabCount]
   )
 
-  return {
-    requestClose,
-    requestCloseSingle,
-    modalProps,
-    dialogCopy,
-  }
+  return useMemo(
+    () => ({
+      requestClose,
+      requestCloseSingle,
+      modalProps,
+      dialogCopy,
+    }),
+    [dialogCopy, modalProps, requestClose, requestCloseSingle]
+  )
 }

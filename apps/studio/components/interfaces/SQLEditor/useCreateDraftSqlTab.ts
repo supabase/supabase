@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useRouter } from 'next/router'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import { createDraftSqlTab } from './createDraftSqlTab'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -53,5 +53,8 @@ export function useCreateDraftSqlTab() {
     [autoSaveSnippets, canCreateSQLSnippet, profile, project, projectRef, router, snapV2, tabs]
   )
 
-  return { createDraftTab, canCreateSQLSnippet }
+  return useMemo(
+    () => ({ createDraftTab, canCreateSQLSnippet }),
+    [canCreateSQLSnippet, createDraftTab]
+  )
 }

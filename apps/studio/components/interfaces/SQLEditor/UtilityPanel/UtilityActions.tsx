@@ -12,7 +12,6 @@ import {
 } from 'ui'
 
 import { SqlRunButton } from './RunButton'
-import { SqlSaveButton } from './SaveButton'
 import SavingIndicator from './SavingIndicator'
 import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
@@ -130,11 +129,17 @@ export const UtilityActions = ({
 
       <div className="flex items-center justify-between gap-x-2">
         {IS_PLATFORM && (!autoSaveSnippets || isDraft) && (
-          <SqlSaveButton
-            isDisabled={isDisabled || isReadOnly || !hasUnsavedSqlChanges}
-            isSaving={isSaving}
+          <Button
             onClick={onSave}
-          />
+            disabled={isDisabled || isReadOnly || !hasUnsavedSqlChanges}
+            loading={isSaving}
+            type="default"
+            size="tiny"
+            data-testid="sql-save-button"
+            iconRight={<KeyboardShortcut keys={['Meta', 'S']} variant="inline" />}
+          >
+            Save
+          </Button>
         )}
         <div className="flex items-center">
           {IS_PLATFORM && (

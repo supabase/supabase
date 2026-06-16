@@ -244,7 +244,7 @@ export const EditorTabs = () => {
                   // For SQL, open a fresh draft tab directly so we skip the transient /sql/new route
                   // (which would briefly show a "new" placeholder tab).
                   if (editor === 'table') {
-                    router.push(`/project/${router.query.ref}/editor/new?skip=true`)
+                    router.push(`/project/${ref}/editor/new?skip=true`)
                   } else {
                     createDraftTab()
                   }

@@ -37,6 +37,14 @@ export function readPersistedDraftSqlTab(
   return readDraftSqlTabStorage(projectRef)[draftId]
 }
 
+function writeDraftSqlTabStorage(projectRef: string, storage: DraftSqlTabStorage) {
+  try {
+    localStorage.setItem(getDraftSqlTabStorageKey(projectRef), JSON.stringify(storage))
+  } catch {
+    return
+  }
+}
+
 export function persistDraftSqlTab(
   projectRef: string,
   draftId: string,
@@ -56,7 +64,7 @@ export function persistDraftSqlTab(
     updatedAt: Date.now(),
   }
 
-  localStorage.setItem(getDraftSqlTabStorageKey(projectRef), JSON.stringify(storage))
+  writeDraftSqlTabStorage(projectRef, storage)
 }
 
 export function removePersistedDraftSqlTab(projectRef: string, draftId: string) {
@@ -66,7 +74,7 @@ export function removePersistedDraftSqlTab(projectRef: string, draftId: string) 
   if (!(draftId in storage)) return
 
   delete storage[draftId]
-  localStorage.setItem(getDraftSqlTabStorageKey(projectRef), JSON.stringify(storage))
+  writeDraftSqlTabStorage(projectRef, storage)
 }
 
 export function prunePersistedDraftSqlTabs(projectRef: string, openDraftIds: string[]) {
@@ -84,6 +92,6 @@ export function prunePersistedDraftSqlTabs(projectRef: string, openDraftIds: str
   }
 
   if (hasChanges) {
-    localStorage.setItem(getDraftSqlTabStorageKey(projectRef), JSON.stringify(storage))
+    writeDraftSqlTabStorage(projectRef, storage)
   }
 }

@@ -1,6 +1,7 @@
 import Editor, { Monaco, OnMount } from '@monaco-editor/react'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { MutableRefObject, useEffect, useRef } from 'react'
+import { useEffect } from 'react'
+import type { MutableRefObject } from 'react'
 import { cn } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
@@ -8,6 +9,7 @@ import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { getEditorSelectionParts } from '@/components/ui/AIEditor/utils'
+import useLatest from '@/hooks/misc/useLatest'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useProfile } from '@/lib/profile'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -79,26 +81,13 @@ const MonacoEditor = ({
   const disableEdit =
     snippet?.snippet.visibility === 'project' && snippet?.snippet.owner_id !== profile?.id
 
-  const executeQueryRef = useRef(executeQuery)
-  executeQueryRef.current = executeQuery
-
-  const executeExplainQueryRef = useRef(executeExplainQuery)
-  executeExplainQueryRef.current = executeExplainQuery
-
-  const prettifyQueryRef = useRef(prettifyQuery)
-  prettifyQueryRef.current = prettifyQuery
-
-  const onSaveRef = useRef(onSave)
-  onSaveRef.current = onSave
-
-  const aiHotkeyEnabledRef = useRef(isAIAssistantHotkeyEnabled)
-  aiHotkeyEnabledRef.current = isAIAssistantHotkeyEnabled
-
-  const commandMenuHotkeyEnabledRef = useRef(isCommandMenuHotkeyEnabled)
-  commandMenuHotkeyEnabledRef.current = isCommandMenuHotkeyEnabled
-
-  const setCommandMenuOpenRef = useRef(setCommandMenuOpen)
-  setCommandMenuOpenRef.current = setCommandMenuOpen
+  const executeQueryRef = useLatest(executeQuery)
+  const executeExplainQueryRef = useLatest(executeExplainQuery)
+  const prettifyQueryRef = useLatest(prettifyQuery)
+  const onSaveRef = useLatest(onSave)
+  const aiHotkeyEnabledRef = useLatest(isAIAssistantHotkeyEnabled)
+  const commandMenuHotkeyEnabledRef = useLatest(isCommandMenuHotkeyEnabled)
+  const setCommandMenuOpenRef = useLatest(setCommandMenuOpen)
 
   const handleEditorOnMount: OnMount = async (editor, monaco) => {
     editorRef.current = editor

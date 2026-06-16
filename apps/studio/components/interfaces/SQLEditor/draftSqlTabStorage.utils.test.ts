@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   getDraftSqlTabStorageKey,
@@ -13,6 +13,10 @@ const PROJECT_REF = 'test-project'
 describe('draftSqlTabStorage', () => {
   beforeEach(() => {
     localStorage.clear()
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
   })
 
   it('persists and reads draft tab sql', () => {
@@ -62,6 +66,26 @@ describe('draftSqlTabStorage', () => {
 
     expect(readPersistedDraftSqlTab(PROJECT_REF, 'draft-1')).toBeUndefined()
     expect(readPersistedDraftSqlTab(PROJECT_REF, 'draft-2')).toBeDefined()
+  })
+
+  it('does not throw when localStorage writes fail', () => {
+    localStorage.setItem(
+      getDraftSqlTabStorageKey(PROJECT_REF),
+      JSON.stringify({
+        'draft-1': { sql: 'select 1', name: 'One', updatedAt: Date.now() },
+        'draft-2': { sql: 'select 2', name: 'Two', updatedAt: Date.now() },
+      })
+    )
+
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('Storage unavailable')
+    })
+
+    expect(() =>
+      persistDraftSqlTab(PROJECT_REF, 'draft-3', { sql: 'select 3', name: 'Three' })
+    ).not.toThrow()
+    expect(() => removePersistedDraftSqlTab(PROJECT_REF, 'draft-1')).not.toThrow()
+    expect(() => prunePersistedDraftSqlTabs(PROJECT_REF, ['draft-2'])).not.toThrow()
   })
 
   it('uses a project-scoped storage key', () => {
