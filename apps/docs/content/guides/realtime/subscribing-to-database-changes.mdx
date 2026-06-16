@@ -30,7 +30,7 @@ using ( true );
 
 ### Create a trigger function
 
-Let's create a function that we can call any time a record is created, updated, or deleted. This function will make use of some of Postgres's native [trigger variables](https://www.postgresql.org/docs/current/plpgsql-trigger.html#PLPGSQL-DML-TRIGGER). For this example, we want to have a topic with the name `topic:<record id>` to which we're going to broadcast events.
+Create a function to call whenever a record is created, updated, or deleted. This function will make use of some of Postgres's native [trigger variables](https://www.postgresql.org/docs/current/plpgsql-trigger.html#PLPGSQL-DML-TRIGGER). For this example, we want to have a topic with the name `topic:<record id>` to which we're going to broadcast events.
 
 {/* prettier-ignore */}
 ```sql
@@ -56,7 +56,7 @@ $$;
 
 ### Create a trigger
 
-Let's set up a trigger so the function is executed after any changes to the table.
+Set up a trigger so the function runs after any changes to the table.
 
 {/* prettier-ignore */}
 ```sql

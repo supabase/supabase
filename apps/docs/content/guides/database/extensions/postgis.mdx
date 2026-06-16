@@ -47,9 +47,13 @@ drop extension if exists postgis;
 
 ## Examples
 
+<<<<<<< Updated upstream
 Now that we are ready to get started with PostGIS, let’s create a table and see how we can use PostGIS for some typical use cases. Imagine we are creating a basic restaurant-searching app.
+=======
+Create a table and see how to use PostGIS for typical use cases. Imagine a restaurant-searching app.
+>>>>>>> Stashed changes
 
-Let’s create our table. Each row represents a restaurant with its location stored in `location` column as a `Point` type.
+Create the table. Each row represents a restaurant with its location stored in `location` column as a `Point` type.
 
 ```sql
 create table if not exists public.restaurants (
@@ -330,7 +334,7 @@ val data = supabase.postgrest.rpc(
 
 ![Searching within a bounding box of a map](/docs/img/guides/database/extensions/postgis/map.png)
 
-When you are working on a map-based application where the user scrolls through your map, you might want to load the data that lies within the bounding box of the map every time your users scroll. PostGIS can return the rows that are within the bounding box just by supplying the bottom left and the top right coordinates. Let’s look at what the function would look like:
+When you are working on a map-based application where the user scrolls through your map, you might want to load the data that lies within the bounding box of the map every time your users scroll. PostGIS can return the rows that are within the bounding box just by supplying the bottom left and the top right coordinates. The function looks like this:
 
 ```sql
 create or replace function restaurants_in_view(min_lat float, min_long float, max_lat float, max_long float)
