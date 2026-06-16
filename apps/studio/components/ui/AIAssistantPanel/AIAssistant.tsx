@@ -1,6 +1,6 @@
 import type { UIMessage as MessageType } from '@ai-sdk/react'
 import { useChat } from '@ai-sdk/react'
-import { isToolUIPart, lastAssistantMessageIsCompleteWithApprovalResponses } from 'ai'
+import { lastAssistantMessageIsCompleteWithApprovalResponses } from 'ai'
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { useParams, useSearchParamsShallow } from 'common/hooks'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -39,6 +39,7 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { getParallelApprovalIdsToReject } from '@/lib/ai/message-utils'
 import {
   DEFAULT_ASSISTANT_BASE_MODEL_ID,
   defaultAssistantModelId,
@@ -368,23 +369,13 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   useEffect(() => {
     // Approval-required tools can't run in parallel. Auto-deny extras so the model reissues them sequentially.
-    const lastMessage = chatMessages.findLast((m) => m.role === 'assistant')
-    if (!lastMessage) return
-
-    const pendingApprovals = (lastMessage.parts ?? []).filter(
-      (part) => isToolUIPart(part) && part.state === 'approval-requested'
-    )
-    if (pendingApprovals.length <= 1) return
-
-    for (const part of pendingApprovals.slice(1)) {
-      if (isToolUIPart(part)) {
-        addToolApprovalResponse?.({
-          id: part.approval.id,
-          approved: false,
-          reason:
-            'Only one approval-required tool call is allowed per turn. Please reissue this tool call after the current one completes.',
-        })
-      }
+    for (const id of getParallelApprovalIdsToReject(chatMessages)) {
+      addToolApprovalResponse?.({
+        id,
+        approved: false,
+        reason:
+          'Only one approval-required tool call is allowed per turn. Please reissue this tool call after the current one completes.',
+      })
     }
   }, [chatMessages, addToolApprovalResponse])
 
