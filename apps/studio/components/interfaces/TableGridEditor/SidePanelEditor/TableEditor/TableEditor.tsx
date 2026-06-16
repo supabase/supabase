@@ -478,7 +478,7 @@ export const TableEditor = ({
           >
             <DocsButton
               abbrev={false}
-              className="mt-2"
+              className="mt-2 w-min"
               href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
             />
           </Admonition>
@@ -496,7 +496,7 @@ export const TableEditor = ({
           >
             <DocsButton
               abbrev={false}
-              className="mt-2"
+              className="mt-2 w-min"
               href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
             />
           </Admonition>

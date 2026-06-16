@@ -129,7 +129,10 @@ export const getContextualInvalidationKeys = ({
         'auth/users': [authKeys.usersInfinite(ref)],
         'auth/policies': [databasePoliciesKeys.list(ref)],
         'database/functions': [databaseKeys.databaseFunctions(ref)],
-        'database/tables': [tableKeys.list(ref, schema, true), tableKeys.list(ref, schema, false)],
+        'database/tables': [
+          tableKeys.list(ref, schema, { includeColumns: true }),
+          tableKeys.list(ref, schema, { includeColumns: false }),
+        ],
         'database/triggers': [databaseTriggerKeys.list(ref)],
         'database/types': [enumeratedTypesKeys.list(ref)],
         'database/extensions': [databaseExtensionsKeys.list(ref)],
