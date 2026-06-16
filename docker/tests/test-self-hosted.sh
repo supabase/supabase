@@ -209,21 +209,32 @@ echo ""
 echo "--- GraphQL (optional; off by default) ---"
 # pg_graphql is OFF by default since the PG17 image (the image drops the extension
 # on init, matching platform behavior for new projects), but users may enable it
-# (Studio extensions UI / CREATE EXTENSION pg_graphql). Both are valid states, so
-# assert only that the endpoint is wired up and responding, and report which one.
-gql_resp=$(http_body "$BASE_URL/graphql/v1" \
+# (Studio extensions UI / CREATE EXTENSION pg_graphql). Both are valid states. A
+# healthy endpoint returns HTTP 200 either way:
+#   enabled  => {"data": ...}
+#   disabled => {"errors":[{"message":"pg_graphql extension is not enabled."}]}
+# Assert the status AND the response shape, so a non-200, non-JSON, or empty body
+# (a real gateway/runtime failure) is not silently classified as "disabled".
+gql_status=$(http_status "$BASE_URL/graphql/v1" \
     -H "apikey: $ANON_KEY" \
     -H "Content-Type: application/json" \
     -d '{"query":"{ __typename }"}')
-if echo "$gql_resp" | jq -e '.data' >/dev/null 2>&1; then
-    gql_state="enabled"        # introspection returned data
-elif echo "$gql_resp" | jq -e '.' >/dev/null 2>&1; then
-    gql_state="disabled"       # endpoint answered with JSON, extension just isn't on
+gql_body=$(http_body "$BASE_URL/graphql/v1" \
+    -H "apikey: $ANON_KEY" \
+    -H "Content-Type: application/json" \
+    -d '{"query":"{ __typename }"}')
+if [ "$gql_status" = "200" ] && echo "$gql_body" | jq -e '.data' >/dev/null 2>&1; then
+    gql_state="enabled"
+elif [ "$gql_status" = "200" ] && echo "$gql_body" | jq -e '.errors' >/dev/null 2>&1; then
+    gql_state="disabled"
 else
-    gql_state="unreachable"    # no / non-JSON response => routing or service is broken
+    gql_state="unhealthy (HTTP $gql_status)"
 fi
-[ "$gql_state" = "unreachable" ] && gql_actual="unreachable" || gql_actual="responding"
-check "GraphQL endpoint responding" "responding" "$gql_actual"
+case "$gql_state" in
+    enabled | disabled) gql_health="healthy" ;;
+    *) gql_health="unhealthy" ;;
+esac
+check "GraphQL endpoint healthy" "healthy" "$gql_health"
 echo "  (GraphQL is $gql_state)"
 
 # ---------------------------------------------
