@@ -134,11 +134,17 @@ export const UtilityActions = ({
       <div className={cn('items-center gap-x-2', isAiOpen ? 'hidden 2xl:flex' : 'flex')}>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              type="text"
-              className="px-1"
-              icon={<Keyboard className="text-foreground-light" />}
-            />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="text"
+                  className="px-1"
+                  icon={<Keyboard className="text-foreground-light" />}
+                  aria-label="Enable Intellisense"
+                />
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Enable Intellisense</TooltipContent>
+            </Tooltip>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-48">
             <DropdownMenuItem className="justify-between" onClick={toggleIntellisense}>
@@ -158,6 +164,7 @@ export const UtilityActions = ({
                   onClick={removeFavorite}
                   className="px-1"
                   icon={<Heart className="fill-brand stroke-none" />}
+                  aria-label="Remove from favorites"
                 />
               ) : (
                 <Button
@@ -166,6 +173,7 @@ export const UtilityActions = ({
                   onClick={addFavorite}
                   className="px-1"
                   icon={<Heart className="fill-none stroke-foreground-light" />}
+                  aria-label="Add to favorites"
                 />
               )}
             </TooltipTrigger>
@@ -182,6 +190,7 @@ export const UtilityActions = ({
               onClick={prettifyQuery}
               className="px-1"
               icon={<AlignLeft strokeWidth={2} className="text-foreground-light" />}
+              aria-label="Prettify SQL"
             />
           </TooltipTrigger>
           <TooltipContent side="bottom" className="p-1 pl-2.5">
