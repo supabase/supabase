@@ -1727,6 +1727,10 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/logging' as `/${string}`,
         },
         {
+          name: 'Error codes',
+          url: '/guides/functions/error-codes' as `/${string}`,
+        },
+        {
           name: 'Troubleshooting',
           url: '/guides/functions/troubleshooting' as `/${string}`,
         },
@@ -2188,6 +2192,11 @@ export const storage: NavMenuConstant = {
         {
           name: 'Querying Vectors',
           url: '/guides/storage/vector/querying-vectors' as `/${string}`,
+        },
+        {
+          name: 'Local Development',
+          url: '/guides/storage/vector/local-development' as `/${string}`,
+          enabled: billingEnabled,
         },
         {
           name: 'Limits',
