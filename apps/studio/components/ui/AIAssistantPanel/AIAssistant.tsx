@@ -39,6 +39,7 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { getParallelApprovalIdsToReject } from '@/lib/ai/message-utils'
 import {
   DEFAULT_ASSISTANT_BASE_MODEL_ID,
   defaultAssistantModelId,
@@ -365,6 +366,18 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       setIsResubmitting(false)
     }
   }, [isResubmitting, chatStatus, error])
+
+  useEffect(() => {
+    // Approval-required tools can't run in parallel. Auto-deny extras so the model reissues them sequentially.
+    for (const id of getParallelApprovalIdsToReject(chatMessages)) {
+      addToolApprovalResponse?.({
+        id,
+        approved: false,
+        reason:
+          'Only one approval-required tool call is allowed per turn. Please reissue this tool call after the current one completes.',
+      })
+    }
+  }, [chatMessages, addToolApprovalResponse])
 
   useEffect(() => {
     setValue(snap.initialInput || '')
