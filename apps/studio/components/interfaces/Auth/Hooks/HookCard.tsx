@@ -67,7 +67,7 @@ export const HookCard = ({ hook, onSelect }: HookCardProps) => {
             <div className="flex flex-col w-full space-y-2">
               <div className="flex flex-row items-center">
                 <span className="text-foreground-light w-20">type</span>
-                <span className="text-foreground">HTTPS endpoint</span>
+                <span className="text-foreground">HTTP endpoint</span>
               </div>
               <div className="flex flex-row items-center">
                 <label htmlFor="url" className="text-foreground-light w-20">
