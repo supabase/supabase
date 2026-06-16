@@ -1,7 +1,7 @@
 import { ident, joinSqlFragments, literal, safeSql } from '@supabase/pg-meta'
 
 import { RlsTableStatus } from './get-schema-ddl'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 
 export interface TableSeedData {
   schema: string

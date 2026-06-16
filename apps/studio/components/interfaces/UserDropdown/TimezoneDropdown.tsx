@@ -81,6 +81,19 @@ export const TimezoneDropdown = () => {
                       )}
                     />
                   </CommandItem>
+                  <CommandItem
+                    key="UTC"
+                    value="UTC Coordinated Universal Time"
+                    onSelect={() => handleSelect('UTC')}
+                  >
+                    {'(UTC) Coordinated Universal Time'}
+                    <CheckIcon
+                      className={cn(
+                        'ml-auto h-4 w-4',
+                        !isAutoDetected && storedTimezone === 'UTC' ? 'opacity-100' : 'opacity-0'
+                      )}
+                    />
+                  </CommandItem>
                   {TIMEZONES_BY_IANA.map((entry) => {
                     const ianaName = entry.utc[0]
                     const isSelected = !isAutoDetected && storedTimezone === ianaName

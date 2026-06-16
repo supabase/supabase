@@ -91,6 +91,7 @@ const ProjectNeedsSecuringGate = ({ children }: PropsWithChildren) => {
     data: dbSchema,
     error: postgrestConfigError,
     isPending: isLoadingPostgrestConfig,
+    isSuccess: isSuccessPostgrestConfig,
   } = useProjectPostgrestConfigQuery(
     { projectRef },
     {
@@ -99,19 +100,20 @@ const ProjectNeedsSecuringGate = ({ children }: PropsWithChildren) => {
     }
   )
 
+  const exposedSchemas = getExposedSchemas(dbSchema)
+
   const {
     data: tablePrivileges,
     error: tablePrivilegesError,
     isPending: isLoadingTablePrivileges,
   } = useTablePrivilegesQuery(
-    { projectRef, connectionString: project?.connectionString },
-    { enabled: shouldRenderGate }
+    { projectRef, connectionString: project?.connectionString, includedSchemas: exposedSchemas },
+    { enabled: shouldRenderGate && isSuccessPostgrestConfig }
   )
 
   const tableRows = useMemo(() => {
     if (!tables) return []
 
-    const exposedSchemas = getExposedSchemas(dbSchema)
     const dataApiAccessByTable = new Map<string, boolean>()
 
     for (const entry of tablePrivileges ?? []) {
@@ -128,7 +130,6 @@ const ProjectNeedsSecuringGate = ({ children }: PropsWithChildren) => {
 
     return sortTables(
       tables
-        .filter((table) => exposedSchemas.includes(table.schema))
         .filter((table) => !table.rls_enabled && rlsIssueKeys.has(getTableKey(table)))
         .map((table) => {
           const key = getTableKey(table)
@@ -143,7 +144,7 @@ const ProjectNeedsSecuringGate = ({ children }: PropsWithChildren) => {
           }
         })
     )
-  }, [dbSchema, rlsIssueKeys, tablePrivileges, tables])
+  }, [rlsIssueKeys, tablePrivileges, tables])
 
   if (!isProjectHomeRoute || !projectRef || isLoadingLints || !hasRlsIssues) {
     return <>{children}</>
