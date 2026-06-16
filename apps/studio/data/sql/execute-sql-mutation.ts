@@ -158,7 +158,8 @@ export async function executeSql<T = any>(
     }
 
     const key =
-      queryKey?.filter((seg) => typeof seg === 'string' || typeof seg === 'number').join('-') ?? ''
+      queryKey?.filter((seg) => typeof seg === 'string' || typeof seg === 'number').join('-') ??
+      undefined
     const result = await post('/platform/pg-meta/{ref}/query', {
       ...options,
       body: { query: sql, disable_statement_timeout: isStatementTimeoutDisabled },
