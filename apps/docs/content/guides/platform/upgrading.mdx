@@ -206,3 +206,59 @@ select graphql.resolve('{ __schema { queryType { name } } }');
 ```
 
 Existing projects on pg_graphql 1.5.x are not impacted unless they choose to upgrade.
+
+### Ltree indexes require reindexing after upgrade
+
+After upgrading, indexes on `ltree` columns that were built under the previous version can return incomplete results — for example, label searches silently miss rows that are present — until the index is rebuilt. This affects databases using a multibyte encoding (such as UTF-8) or a non-`libc` collation provider (ICU or builtin).
+
+This is silent: no error is raised. Affected queries return fewer rows than expected until the indexes are reindexed.
+
+To find affected indexes, run the following in the SQL editor:
+
+```sql
+select schemaname, tablename, indexname
+from pg_indexes
+where
+  indexname in (
+    select c.relname
+    from
+      pg_index as i
+      join pg_class as c on i.indexrelid = c.oid
+      join pg_attribute as a on a.attrelid = i.indrelid and a.attnum = ANY(i.indkey)
+      join pg_type as t on a.atttypid = t.oid
+    where t.typname in ('ltree', '_ltree')
+  );
+```
+
+To remediate, reindex each affected index. `REINDEX INDEX CONCURRENTLY` runs online with no downtime:
+
+```sql
+REINDEX INDEX CONCURRENTLY <index_name>;
+```
+
+### Custom operator selectivity estimators
+
+Attaching a non-built-in (extension- or user-provided) selectivity estimator function to an operator now requires superuser. Existing operators continue to work — the check only fires when an operator is (re)created, most commonly during `pg_dump` / `pg_restore`, a logical restore, or a branch.
+
+Because Supabase database roles are not superusers, recreating such an operator on your behalf (for example during a restore or branch) can fail with:
+
+```
+ERROR: must be superuser to specify a non-built-in restriction estimator function
+```
+
+Most projects are not affected. To check whether your database has any user-defined operators that reference a non-built-in estimator:
+
+```sql
+SELECT n.nspname AS schema, o.oprname AS operator
+FROM pg_operator o
+JOIN pg_namespace n ON o.oprnamespace = n.oid
+WHERE n.nspname NOT IN ('pg_catalog', 'information_schema')
+  AND ((o.oprrest <> 0 AND o.oprrest::oid >= 10000)
+    OR (o.oprjoin <> 0 AND o.oprjoin::oid >= 10000))
+  AND NOT EXISTS (
+    SELECT 1 FROM pg_depend d
+    WHERE d.classid = 'pg_operator'::regclass AND d.objid = o.oid AND d.deptype = 'e'
+  );
+```
+
+If this returns no rows, your project is unaffected.
