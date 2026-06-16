@@ -3,21 +3,20 @@ import { useRouter } from 'next/router'
 import { useCallback } from 'react'
 import { toast } from 'sonner'
 import { GenericSkeletonLoader } from 'ui-patterns'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
 import { IntegrationConnectionItem } from '../../Integrations/VercelGithub/IntegrationConnection'
 import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
 import { EmptyIntegrationConnection } from '@/components/interfaces/Integrations/VercelGithub/IntegrationPanels'
-import { IntegrationImageHandler } from '@/components/interfaces/Settings/Integrations/IntegrationsSettings'
+import { IntegrationSectionIcon } from '@/components/interfaces/Settings/Integrations/IntegrationsSettings'
 import { VercelSection } from '@/components/interfaces/Settings/Integrations/VercelIntegration/VercelSection'
-import {
-  ScaffoldContainer,
-  ScaffoldContainerLegacy,
-  ScaffoldDivider,
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-  ScaffoldTitle,
-} from '@/components/layouts/Scaffold'
 import { InlineLink } from '@/components/ui/InlineLink'
 import NoPermission from '@/components/ui/NoPermission'
 import { useGitHubAuthorizationQuery } from '@/data/integrations/github-authorization-query'
@@ -58,84 +57,80 @@ const GitHubSection = ({
   onAddGitHubConnection,
   onDeleteGitHubConnection,
 }: GitHubSectionProps) => (
-  <ScaffoldContainer>
-    <ScaffoldSection className="py-12">
-      <ScaffoldSectionDetail title="GitHub Connections">
-        <p>Connect any of your GitHub repositories to a project.</p>
-        <IntegrationImageHandler title="github" />
-      </ScaffoldSectionDetail>
-      <ScaffoldSectionContent>
-        {isLoadingPermissions ? (
-          <GenericSkeletonLoader />
-        ) : !canReadGithubConnection ? (
-          <NoPermission resourceText="view this organization's GitHub connections" />
-        ) : (
-          <div className="space-y-6">
-            <div className="space-y-1">
-              <h3 className="text-sm font-medium text-foreground">
-                How do GitHub connections work?
-              </h3>
-              <p className="text-sm text-foreground-light">
-                Connect a GitHub repository to a Supabase project. The GitHub app watches file,
-                branch, and pull request activity in your repository.
-              </p>
-            </div>
+  <PageSection>
+    <PageSectionMeta>
+      <div className="flex flex-1 items-start gap-6">
+        <IntegrationSectionIcon title="github" />
+        <PageSectionSummary>
+          <PageSectionTitle>GitHub Connections</PageSectionTitle>
+          <PageSectionDescription>
+            Connect any of your GitHub repositories to a project. The GitHub app watches file,
+            branch, and pull request activity in your repository.
+          </PageSectionDescription>
+        </PageSectionSummary>
+      </div>
+    </PageSectionMeta>
+    <PageSectionContent>
+      {isLoadingPermissions ? (
+        <GenericSkeletonLoader />
+      ) : !canReadGithubConnection ? (
+        <NoPermission resourceText="view this organization's GitHub connections" />
+      ) : (
+        <div className="space-y-6">
+          <div>
+            <ul className="flex flex-col gap-y-2">
+              {connections?.map((connection) => (
+                <IntegrationConnectionItem
+                  key={connection.id}
+                  disabled={!canUpdateGitHubConnection}
+                  connection={{
+                    id: String(connection.id),
+                    added_by: {
+                      id: String(connection.user?.id),
+                      primary_email: connection.user?.primary_email ?? '',
+                      username: connection.user?.username ?? '',
+                    },
+                    foreign_project_id: String(connection.repository.id),
+                    supabase_project_ref: connection.project.ref,
+                    organization_integration_id: 'unused',
+                    inserted_at: connection.inserted_at,
+                    updated_at: connection.updated_at,
+                    metadata: {
+                      name: connection.repository.name,
+                    } as IntegrationProjectConnection['metadata'],
+                  }}
+                  type="GitHub"
+                  onDeleteConnection={onDeleteGitHubConnection}
+                />
+              ))}
+            </ul>
 
-            <div>
-              <ul className="flex flex-col gap-y-2">
-                {connections?.map((connection) => (
-                  <IntegrationConnectionItem
-                    key={connection.id}
-                    disabled={!canUpdateGitHubConnection}
-                    connection={{
-                      id: String(connection.id),
-                      added_by: {
-                        id: String(connection.user?.id),
-                        primary_email: connection.user?.primary_email ?? '',
-                        username: connection.user?.username ?? '',
-                      },
-                      foreign_project_id: String(connection.repository.id),
-                      supabase_project_ref: connection.project.ref,
-                      organization_integration_id: 'unused',
-                      inserted_at: connection.inserted_at,
-                      updated_at: connection.updated_at,
-                      metadata: {
-                        name: connection.repository.name,
-                      } as IntegrationProjectConnection['metadata'],
-                    }}
-                    type="GitHub"
-                    onDeleteConnection={onDeleteGitHubConnection}
-                  />
-                ))}
-              </ul>
-
-              <EmptyIntegrationConnection
-                onClick={onAddGitHubConnection}
-                showNode={false}
-                disabled={!canCreateGitHubConnection}
-              >
-                Add new project connection
-              </EmptyIntegrationConnection>
-            </div>
-
-            {isGitHubAuthorized && (
-              <p className="text-sm text-foreground-light">
-                You are authorized with the Supabase GitHub App. You can configure your{' '}
-                <InlineLink href={GITHUB_INTEGRATION_INSTALLATION_URL}>
-                  GitHub App installations and repository access
-                </InlineLink>
-                , or{' '}
-                <InlineLink href={GITHUB_INTEGRATION_REVOKE_AUTHORIZATION_URL}>
-                  revoke your authorization
-                </InlineLink>
-                .
-              </p>
-            )}
+            <EmptyIntegrationConnection
+              onClick={onAddGitHubConnection}
+              showNode={false}
+              disabled={!canCreateGitHubConnection}
+            >
+              Add new project connection
+            </EmptyIntegrationConnection>
           </div>
-        )}
-      </ScaffoldSectionContent>
-    </ScaffoldSection>
-  </ScaffoldContainer>
+
+          {isGitHubAuthorized && (
+            <p className="text-sm text-foreground-light">
+              You are authorized with the Supabase GitHub App. You can configure your{' '}
+              <InlineLink href={GITHUB_INTEGRATION_INSTALLATION_URL}>
+                GitHub App installations and repository access
+              </InlineLink>
+              , or{' '}
+              <InlineLink href={GITHUB_INTEGRATION_REVOKE_AUTHORIZATION_URL}>
+                revoke your authorization
+              </InlineLink>
+              .
+            </p>
+          )}
+        </div>
+      )}
+    </PageSectionContent>
+  </PageSection>
 )
 
 export const IntegrationSettings = () => {
@@ -189,9 +184,6 @@ export const IntegrationSettings = () => {
 
   return (
     <>
-      <ScaffoldContainerLegacy>
-        <ScaffoldTitle>Integrations</ScaffoldTitle>
-      </ScaffoldContainerLegacy>
       <GitHubSection
         canCreateGitHubConnection={canCreateGitHubConnection}
         canReadGithubConnection={canReadGithubConnection}
@@ -204,7 +196,6 @@ export const IntegrationSettings = () => {
       />
       {showVercelIntegration && (
         <>
-          <ScaffoldDivider />
           <VercelSection isProjectScoped={false} />
           <SidePanelVercelProjectLinker />
         </>
