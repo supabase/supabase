@@ -284,7 +284,7 @@ async function processWithDelay(items: any[]) {
 
 | Pattern                         | Budget consumption | Recommendation    |
 | ------------------------------- | ------------------ | ----------------- |
-| Simple chain (A to B to C)      | Low                | Generally safe    |
+| Basic chain (A to B to C)      | Low                | Generally safe    |
 | Fan-out (A to B, C, D, E)       | Moderate           | Limit concurrency |
 | Deep recursion (A to A to A...) | High               | Set max depth     |
 | Unbounded loops                 | Very high          | Avoid, use queues |
