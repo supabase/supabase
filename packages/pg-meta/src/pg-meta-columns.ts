@@ -357,18 +357,15 @@ BEGIN
 END
 $$;`
   }
-
-  // TODO: Can't set default if column is previously identity even if
-  // is_identity: false. Must do two separate PATCHes (once to drop identity
-  // and another to set default).
-  // NOTE: nameSql must be last. defaultValueSql must be after typeSql.
+  // identitySql must be before defaultValueSql so that we can drop identity and set default in one go.
+  // NOTE: nameSql must be last. defaultValueSql must be after typeSql and identitySql.
   // identitySql must be after isNullableSql.
   const sql = safeSql`
 BEGIN;
   ${isNullableSql}
   ${typeSql}
-  ${defaultValueSql}
   ${identitySql}
+  ${defaultValueSql}
   ${isUniqueSql}
   ${commentSql}
   ${checkSql}

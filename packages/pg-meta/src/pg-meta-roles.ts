@@ -177,15 +177,17 @@ function update(identifier: RoleIdentifier, params: RoleUpdateParams): { sql: Sa
     password,
     validUntil,
   } = params
+  const searchVal = 'id' in identifier ? String((identifier as any).id) : (identifier as any).name
   const sql = safeSql`
 do $$
 declare
+  search_val text := ${literal(searchVal)};
   old record;
 begin
   with roles as (${ROLES_SQL})
   select * into old from roles where ${getIdentifierWhereClause(identifier)};
   if old is null then
-    raise exception 'Cannot find role with id %', id;
+    raise exception 'Cannot find role %', search_val;
   end if;
 
   execute(format('alter role %I
@@ -224,18 +226,20 @@ function remove(
   identifier: RoleIdentifier,
   { ifExists = false }: RoleRemoveParams = {}
 ): { sql: SafeSqlFragment } {
+  const searchVal = 'id' in identifier ? String((identifier as any).id) : (identifier as any).name
   const sql = safeSql`
 do $$
 declare
+  search_val text := ${literal(searchVal)};
   old record;
 begin
   with roles as (${ROLES_SQL})
   select * into old from roles where ${getIdentifierWhereClause(identifier)};
   if old is null then
-    raise exception 'Cannot find role with id %', id;
+    ${ifExists ? safeSql`null;` : safeSql`raise exception 'Cannot find role %', search_val;`}
+  else
+    execute(format('drop role %I;', old.name));
   end if;
-
-  execute(format('drop role ${ifExists ? safeSql`if exists` : safeSql``} %I;', old.name));
 end
 $$;
 `
