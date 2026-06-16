@@ -6,9 +6,18 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { tweets } from 'shared-data'
 
+import {
+  DestinationLogo,
+  InterstitialLayout,
+  LogoPair,
+  SupabaseLogo,
+} from '@/components/layouts/InterstitialLayout'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { IdentityProviderIcon } from '@/components/ui/ProviderIcon'
+import { useInboundBranding } from '@/hooks/misc/useInboundBranding'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
+import { getProviderDisplay } from '@/lib/external-identity-providers'
 import { auth, buildPathWithParams, getReturnToPath } from '@/lib/gotrue'
 
 type SignInLayoutProps = {
@@ -16,6 +25,12 @@ type SignInLayoutProps = {
   subheading: string
   showDisclaimer?: boolean
   logoLinkToMarketingSite?: boolean
+  /**
+   * When set, the layout can show a focused-provider interstitial or swap its default heading for
+   * a destination-branded header (see {@link useInboundBranding}). The flow controls the verb
+   * ("Sign in" vs "Sign up").
+   */
+  inboundFlow?: 'sign-in' | 'sign-up'
 }
 
 const SignInLayout = ({
@@ -23,9 +38,11 @@ const SignInLayout = ({
   subheading,
   showDisclaimer = true,
   logoLinkToMarketingSite = false,
+  inboundFlow,
   children,
 }: PropsWithChildren<SignInLayoutProps>) => {
   const router = useRouter()
+  const branding = useInboundBranding(inboundFlow)
   const queryClient = useQueryClient()
   const { resolvedTheme } = useTheme()
   const ongoingIncident = useFlag('ongoingIncident')
@@ -106,6 +123,71 @@ const SignInLayout = ({
     }
   }, [])
 
+  const verb = inboundFlow === 'sign-up' ? 'Sign up' : 'Sign in'
+
+  const termsText = (
+    <>
+      By continuing, you agree to Supabase’s{' '}
+      <Link href="https://supabase.com/terms" className="underline hover:text-foreground-light">
+        Terms of Service
+      </Link>{' '}
+      and{' '}
+      <Link href="https://supabase.com/privacy" className="underline hover:text-foreground-light">
+        Privacy Policy
+      </Link>
+      , and to receive periodic emails with updates.
+    </>
+  )
+
+  // Focused provider: render a dedicated single-provider interstitial (same card layout as the
+  // external-identity flows). When we also know the destination the inbound link is returning the
+  // user to, frame the screen around it.
+  if (inboundFlow && branding.focusProvider) {
+    const { destination, focusProvider } = branding
+
+    return (
+      <InterstitialLayout
+        logo={
+          <LogoPair
+            left={
+              <DestinationLogo
+                icon={
+                  destination?.icon ?? (
+                    <IdentityProviderIcon
+                      display={getProviderDisplay(focusProvider.id)}
+                      size={28}
+                    />
+                  )
+                }
+                name={destination?.displayName ?? focusProvider.displayName}
+              />
+            }
+            right={<SupabaseLogo />}
+          />
+        }
+        title={destination ? `Continue to ${destination.displayName}` : `${verb} to Supabase`}
+        description={
+          destination
+            ? `${verb} to Supabase using your ${focusProvider.displayName} account`
+            : `Use your ${focusProvider.displayName} account to continue`
+        }
+        footer={
+          showDisclaimer && showTos ? (
+            <p className="text-xs text-foreground-lighter">{termsText}</p>
+          ) : undefined
+        }
+      >
+        <div className="px-6 pb-6">{children}</div>
+      </InterstitialLayout>
+    )
+  }
+
+  // Destination known but no focused provider: keep the regular screen but brand its heading.
+  const brandedDestination = inboundFlow ? branding.destination : undefined
+  const brandedHeading = brandedDestination
+    ? `${verb} to continue to ${brandedDestination.displayName}`
+    : undefined
+
   return (
     <>
       <div className="relative flex flex-col bg-alternative min-h-screen">
@@ -140,10 +222,25 @@ const SignInLayout = ({
         <div className="flex flex-1 h-full">
           <main className="flex flex-col items-center flex-1 shrink-0 px-5 pt-16 pb-8 border-r shadow-lg bg-studio border-default">
             <div className="flex-1 flex flex-col justify-center w-[330px] sm:w-[384px]">
-              <div className="mb-10">
-                <h1 className="mt-8 mb-2 lg:text-3xl">{heading}</h1>
-                <h2 className="text-sm text-foreground-light">{subheading}</h2>
-              </div>
+              {brandedDestination ? (
+                <div className="mb-10 flex flex-col items-center gap-5 text-center">
+                  <LogoPair
+                    left={
+                      <DestinationLogo
+                        icon={brandedDestination.icon}
+                        name={brandedDestination.displayName}
+                      />
+                    }
+                    right={<SupabaseLogo />}
+                  />
+                  <h1 className="text-balance lg:text-2xl">{brandedHeading}</h1>
+                </div>
+              ) : (
+                <div className="mb-10">
+                  <h1 className="mt-8 mb-2 lg:text-3xl">{heading}</h1>
+                  <h2 className="text-sm text-foreground-light">{subheading}</h2>
+                </div>
+              )}
 
               {children}
             </div>
@@ -151,21 +248,7 @@ const SignInLayout = ({
             {showDisclaimer && showTos && (
               <div className="text-center text-balance">
                 <p className="text-xs text-foreground-lighter sm:mx-auto sm:max-w-sm">
-                  By continuing, you agree to Supabase’s{' '}
-                  <Link
-                    href="https://supabase.com/terms"
-                    className="underline hover:text-foreground-light"
-                  >
-                    Terms of Service
-                  </Link>{' '}
-                  and{' '}
-                  <Link
-                    href="https://supabase.com/privacy"
-                    className="underline hover:text-foreground-light"
-                  >
-                    Privacy Policy
-                  </Link>
-                  , and to receive periodic emails with updates.
+                  {termsText}
                 </p>
               </div>
             )}

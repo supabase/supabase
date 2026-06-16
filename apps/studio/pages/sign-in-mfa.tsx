@@ -19,7 +19,7 @@ const SignInMfaPage: NextPageWithLayout = () => {
 
   const queryClient = useQueryClient()
   const {
-    // current methods for mfa are github and sso
+    // the external identity provider id (e.g. github) or sso used to sign in
     method: signInMethod = 'unknown',
   } = useParams()
   const signInMethodRef = useLatest(signInMethod)

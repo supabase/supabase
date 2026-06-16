@@ -7,10 +7,12 @@ import { Button } from 'ui'
 import { LastSignInWrapper } from '@/components/interfaces/SignIn/LastSignInWrapper'
 import { SignInForm } from '@/components/interfaces/SignIn/SignInForm'
 import { SignInWithCustom } from '@/components/interfaces/SignIn/SignInWithCustom'
-import { SignInWithGitHub } from '@/components/interfaces/SignIn/SignInWithGitHub'
+import { SignInWithExternalProvider } from '@/components/interfaces/SignIn/SignInWithExternalProvider'
 import { AuthenticationLayout } from '@/components/layouts/AuthenticationLayout'
 import SignInLayout from '@/components/layouts/SignInLayout/SignInLayout'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useEnabledIdentityProviders } from '@/hooks/misc/useEnabledIdentityProviders'
+import { useInboundBranding } from '@/hooks/misc/useInboundBranding'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
@@ -19,12 +21,10 @@ const SignInPage: NextPageWithLayout = () => {
   const router = useRouter()
 
   const {
-    dashboardAuthSignInWithGithub: signInWithGithubEnabled,
     dashboardAuthSignInWithSso: signInWithSsoEnabled,
     dashboardAuthSignInWithEmail: signInWithEmailEnabled,
     dashboardAuthSignUp: signUpEnabled,
   } = useIsFeatureEnabled([
-    'dashboard_auth:sign_in_with_github',
     'dashboard_auth:sign_in_with_sso',
     'dashboard_auth:sign_in_with_email',
     'dashboard_auth:sign_up',
@@ -33,9 +33,11 @@ const SignInPage: NextPageWithLayout = () => {
   const { dashboardAuthCustomProvider: customProvider } = useCustomContent([
     'dashboard_auth:custom_provider',
   ])
+  const branding = useInboundBranding('sign-in')
+  const signInProviders = useEnabledIdentityProviders().filter((provider) => provider.showOnSignIn)
 
   const showOrDivider =
-    (signInWithGithubEnabled || signInWithSsoEnabled || customProvider) && signInWithEmailEnabled
+    (signInProviders.length > 0 || signInWithSsoEnabled || customProvider) && signInWithEmailEnabled
 
   useEffect(() => {
     if (!IS_PLATFORM) {
@@ -44,11 +46,23 @@ const SignInPage: NextPageWithLayout = () => {
     }
   }, [router])
 
+  // Inbound link focused us on a single provider — offer only that one (SignInLayout renders the
+  // matching interstitial frame around it).
+  if (branding.focusProvider) {
+    return (
+      <div className="flex flex-col gap-5">
+        <SignInWithExternalProvider provider={branding.focusProvider} label="Continue" />
+      </div>
+    )
+  }
+
   return (
     <>
       <div className="flex flex-col gap-5">
         {customProvider && <SignInWithCustom providerName={customProvider} />}
-        {signInWithGithubEnabled && <SignInWithGitHub />}
+        {signInProviders.map((provider) => (
+          <SignInWithExternalProvider key={provider.id} provider={provider} />
+        ))}
         {signInWithSsoEnabled && (
           <LastSignInWrapper type="sso">
             <Button
@@ -56,7 +70,7 @@ const SignInPage: NextPageWithLayout = () => {
               block
               size="large"
               type="outline"
-              icon={<Lock width={18} height={18} />}
+              icon={<Lock width={18} height={18} className="text-foreground" />}
             >
               <Link
                 href={{
@@ -109,6 +123,7 @@ SignInPage.getLayout = (page) => (
       heading="Welcome back"
       subheading="Sign in to your account"
       logoLinkToMarketingSite={true}
+      inboundFlow="sign-in"
     >
       {page}
     </SignInLayout>

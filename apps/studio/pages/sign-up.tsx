@@ -1,28 +1,42 @@
 import Link from 'next/link'
 
-import { SignInWithGitHub } from '@/components/interfaces/SignIn/SignInWithGitHub'
+import { SignInWithExternalProvider } from '@/components/interfaces/SignIn/SignInWithExternalProvider'
 import { SignUpForm } from '@/components/interfaces/SignIn/SignUpForm'
 import SignInLayout from '@/components/layouts/SignInLayout/SignInLayout'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { useEnabledIdentityProviders } from '@/hooks/misc/useEnabledIdentityProviders'
+import { useInboundBranding } from '@/hooks/misc/useInboundBranding'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import type { NextPageWithLayout } from '@/types'
 
 const SignUpPage: NextPageWithLayout = () => {
-  const {
-    dashboardAuthSignUp: signUpEnabled,
-    dashboardAuthSignInWithGithub: signInWithGithubEnabled,
-  } = useIsFeatureEnabled(['dashboard_auth:sign_up', 'dashboard_auth:sign_in_with_github'])
+  const { dashboardAuthSignUp: signUpEnabled } = useIsFeatureEnabled(['dashboard_auth:sign_up'])
+  const branding = useInboundBranding('sign-up')
+  const signUpProviders = useEnabledIdentityProviders().filter((provider) => provider.showOnSignUp)
+  const showOAuthProviders = signUpProviders.length > 0
 
   if (!signUpEnabled) {
     return <UnknownInterface fullHeight={false} urlBack="/sign-in" />
   }
 
+  // Inbound link focused us on a single provider — offer only that one (SignInLayout renders the
+  // matching interstitial frame around it).
+  if (branding.focusProvider) {
+    return (
+      <div className="flex flex-col gap-5">
+        <SignInWithExternalProvider provider={branding.focusProvider} label="Continue" />
+      </div>
+    )
+  }
+
   return (
     <>
       <div className="flex flex-col gap-5">
-        {signInWithGithubEnabled && (
+        {showOAuthProviders && (
           <>
-            <SignInWithGitHub />
+            {signUpProviders.map((provider) => (
+              <SignInWithExternalProvider key={provider.id} provider={provider} />
+            ))}
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
@@ -52,7 +66,7 @@ const SignUpPage: NextPageWithLayout = () => {
 }
 
 SignUpPage.getLayout = (page) => (
-  <SignInLayout heading="Get started" subheading="Create a new account">
+  <SignInLayout heading="Get started" subheading="Create a new account" inboundFlow="sign-up">
     {page}
   </SignInLayout>
 )
