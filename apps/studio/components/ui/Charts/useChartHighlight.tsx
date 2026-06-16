@@ -14,7 +14,11 @@ export interface ChartHighlight {
   popoverPosition: { x: number; y: number } | null
   handleMouseDown: (e: ChartHighlightMouseEvent) => void
   handleMouseMove: (e: ChartHighlightMouseEvent) => void
-  handleMouseUp: (e: { chartX?: number; chartY?: number }) => void
+  handleMouseUp: (e: {
+    activeCoordinate?: { x: number; y: number } | null
+    chartX?: number
+    chartY?: number
+  }) => void
   clearHighlight: () => void
 }
 
@@ -64,20 +68,21 @@ export function useChartHighlight(): ChartHighlight {
     }
   }
 
-  const handleMouseUp = (e: unknown) => {
+  const handleMouseUp = (e: {
+    activeCoordinate?: { x: number; y: number } | null
+    chartX?: number
+    chartY?: number
+  }) => {
     if (!isSelecting) return
     setIsSelecting(false)
     setInitialPoint(undefined)
 
-    if (
-      typeof e === 'object' &&
-      e !== null &&
-      'chartX' in e &&
-      'chartY' in e &&
-      typeof e.chartX === 'number' &&
-      typeof e.chartY === 'number'
-    ) {
-      setPopoverPosition({ x: e.chartX, y: e.chartY })
+    // recharts v3 exposes the pointer position via `activeCoordinate` rather than the
+    // top-level `chartX`/`chartY` fields used in v2; support both.
+    const x = e?.activeCoordinate?.x ?? e?.chartX
+    const y = e?.activeCoordinate?.y ?? e?.chartY
+    if (typeof x === 'number' && typeof y === 'number') {
+      setPopoverPosition({ x, y })
     }
   }
 

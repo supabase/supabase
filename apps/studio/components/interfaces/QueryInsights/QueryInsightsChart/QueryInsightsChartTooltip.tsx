@@ -1,11 +1,14 @@
 import dayjs from 'dayjs'
-import type { TooltipProps } from 'recharts'
+import type { TooltipContentProps } from 'recharts'
 
 import { formatDuration } from '../QueryInsightsTable/QueryInsightsTable.utils'
 import { isTimeMetric } from './QueryInsightsChart.utils'
 import { guessLocalTimezone } from '@/lib/dayjs'
 
-export const QueryInsightsChartTooltip = ({ active, payload }: TooltipProps<number, string>) => {
+export const QueryInsightsChartTooltip = ({
+  active,
+  payload,
+}: Partial<TooltipContentProps<number, string>>) => {
   if (!active || !payload?.length) return null
 
   const time = payload[0]?.payload?.time
