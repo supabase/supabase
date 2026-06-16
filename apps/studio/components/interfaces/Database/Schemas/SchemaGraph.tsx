@@ -513,7 +513,7 @@ export const SchemaGraph = () => {
                 }
               >
                 {canAddTables && (
-                  <Button asChild className="mt-2" type="default" icon={<Plus />}>
+                  <Button asChild className="mt-2 w-min" type="default" icon={<Plus />}>
                     <Link href={`/project/${ref}/editor?create=table`}>New table</Link>
                   </Button>
                 )}

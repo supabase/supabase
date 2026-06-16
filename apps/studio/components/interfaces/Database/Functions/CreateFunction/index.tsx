@@ -262,7 +262,8 @@ export const CreateFunction = ({
                         <FormLabel className="text-base text-foreground">Definition</FormLabel>
                         <FormDescription className="text-sm text-foreground-light">
                           <p>
-                            The language below should be written in <code>{language}</code>.
+                            The language below should be written in{' '}
+                            <code className="text-code-inline">{language}</code>.
                           </p>
                           {!isEditing && <p>Change the language in the Advanced Settings below.</p>}
                         </FormDescription>
@@ -295,8 +296,8 @@ export const CreateFunction = ({
                     <div className="space-y-8 rounded-sm bg-studio py-4 px-6 border border-overlay">
                       <FormItem className="flex flex-row items-center justify-between">
                         <div className="space-y-0.5">
-                          <FormLabel className="text-base">Show advanced settings</FormLabel>
-                          <FormDescription>
+                          <FormLabel className="text-sm">Show advanced settings</FormLabel>
+                          <FormDescription className="text-foreground-lighter">
                             These are settings that might be familiar for Postgres developers
                           </FormDescription>
                         </div>

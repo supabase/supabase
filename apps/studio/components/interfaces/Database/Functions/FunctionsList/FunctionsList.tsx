@@ -163,6 +163,7 @@ export const FunctionsList = () => {
   } = useDatabaseFunctionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+    schema: selectedSchema,
   })
 
   // Get unique return types from functions in the selected schema
