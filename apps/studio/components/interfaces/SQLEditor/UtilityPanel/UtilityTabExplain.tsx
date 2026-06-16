@@ -1,4 +1,4 @@
-import { Loader2 } from 'lucide-react'
+import { Loader2, Workflow } from 'lucide-react'
 import { useState } from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -15,12 +15,29 @@ import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 export type UtilityTabExplainProps = {
   id: string
   isExecuting?: boolean
+  hasSql?: boolean
 }
 
-export function UtilityTabExplain({ id, isExecuting }: UtilityTabExplainProps) {
+export function UtilityTabExplain({ id, isExecuting, hasSql = true }: UtilityTabExplainProps) {
   const snapV2 = useSqlEditorV2StateSnapshot()
   const explainResult = snapV2.explainResults[id]
   const [mode, setMode] = useState<'visual' | 'raw'>('visual')
+
+  if (!hasSql) {
+    return (
+      <div className="h-full p-2">
+        <div className="border-control flex h-full w-full flex-col items-center justify-center gap-y-2 border border-dashed text-center">
+          <Workflow size={20} className="text-border-stronger" strokeWidth={1.5} />
+          <div className="px-1">
+            <p className="text-foreground-light text-xs">No execution plan to show</p>
+            <p className="text-foreground-lighter text-xs">
+              Add a query to view its execution plan.
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   if (isExecuting) {
     return (

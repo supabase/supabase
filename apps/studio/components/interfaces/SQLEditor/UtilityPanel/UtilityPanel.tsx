@@ -1,14 +1,6 @@
 import { useParams } from 'common'
 import { toast } from 'sonner'
-import {
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
+import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 
 import { ChartConfig } from './ChartConfig'
 import { UtilityActions } from './UtilityActions'
@@ -71,8 +63,7 @@ export const UtilityPanel = ({
 
   const handleTabChange = (tab: string) => {
     // When switching to the explain tab, trigger the explain query
-    if (tab === 'explain') {
-      if (!hasSql) return
+    if (tab === 'explain' && hasSql) {
       executeExplainQuery()
     }
     onActiveTabChange?.(tab)
@@ -147,18 +138,9 @@ export const UtilityPanel = ({
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
             <span className="translate-y-px">Results</span>
           </TabsTrigger_Shadcn_>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span>
-                <TabsTrigger_Shadcn_ className="py-3 text-xs" value="explain" disabled={!hasSql}>
-                  <span className="translate-y-px">Explain</span>
-                </TabsTrigger_Shadcn_>
-              </span>
-            </TooltipTrigger>
-            {!hasSql && (
-              <TooltipContent side="bottom">Add a query to view its execution plan</TooltipContent>
-            )}
-          </Tooltip>
+          <TabsTrigger_Shadcn_ className="py-3 text-xs" value="explain">
+            <span className="translate-y-px">Explain</span>
+          </TabsTrigger_Shadcn_>
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="chart">
             <span className="translate-y-px">Chart</span>
           </TabsTrigger_Shadcn_>
@@ -198,7 +180,7 @@ export const UtilityPanel = ({
       </TabsContent_Shadcn_>
 
       <TabsContent_Shadcn_ asChild value="explain" className="mt-0 grow">
-        <UtilityTabExplain id={id} isExecuting={isExplainExecuting} />
+        <UtilityTabExplain id={id} isExecuting={isExplainExecuting} hasSql={hasSql} />
       </TabsContent_Shadcn_>
 
       <TabsContent_Shadcn_ asChild value="chart" className="mt-0 grow">

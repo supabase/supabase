@@ -123,9 +123,10 @@ export const ChartConfig = ({
 
   if (!resultKeys.length) {
     return (
-      <div className="p-2">
+      <div className="p-2 h-full">
         <NoDataPlaceholder
           size="normal"
+          isFullHeight
           description="Execute a query and configure the chart options."
         />
       </div>
