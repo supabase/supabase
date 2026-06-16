@@ -18,13 +18,14 @@ import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
 import { ChartIntervalDropdown } from '@/components/ui/Logs/ChartIntervalDropdown'
 import { CHART_INTERVALS } from '@/components/ui/Logs/logs.utils'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useTrack } from '@/lib/telemetry/track'
 
 // The homepage usage cards only surface this subset of the services returned by
 // the shared service-health endpoint, and the telemetry events are typed to match.
-type HomeServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime'
+type HomeServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime' | 'data_api'
 
 type ChartIntervalKey = '1hr' | '1day' | '7day'
 
@@ -55,6 +56,7 @@ export const ProjectUsageSectionDeltas = () => {
     'project_auth:all',
     'project_storage:all',
   ])
+  const { isEnabled: dataApiEnabled } = useIsDataApiEnabled({ projectRef })
   const { getEntitlementMax } = useCheckEntitlements('log.retention_days')
   const retentionDays = getEntitlementMax()
 
@@ -113,8 +115,14 @@ export const ProjectUsageSectionDeltas = () => {
         route: '/logs/realtime-logs',
         enabled: true,
       },
+      {
+        key: 'data_api',
+        title: 'API Gateway',
+        route: '/logs/edge-logs',
+        enabled: dataApiEnabled,
+      },
     ],
-    [projectRef, authEnabled, storageEnabled]
+    [projectRef, authEnabled, storageEnabled, dataApiEnabled]
   )
 
   // Build per-service stats, then order them so the busiest services come first
