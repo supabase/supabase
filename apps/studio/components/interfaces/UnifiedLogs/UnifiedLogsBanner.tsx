@@ -42,7 +42,7 @@ export function UnifiedLogsBanner({
   }
 
   return (
-    <div role="status" className={stripClassName}>
+    <div className={stripClassName}>
       <p className="min-w-0 flex-1 truncate text-xs font-medium text-foreground">
         Try Unified Logs
       </p>
