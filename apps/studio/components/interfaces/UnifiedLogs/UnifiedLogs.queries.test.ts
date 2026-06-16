@@ -134,29 +134,27 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
   })
 
   describe('getLogsCountQuery', () => {
-    it('emits one UNION ALL branch per log_type bucket and per level', () => {
+    it('emits a single-scan arrayJoin explode over all dimensions (no UNION ALL)', () => {
       const sql = getLogsCountQuery(baseSearch)
-      // Per-log-type counts
-      for (const lt of ['edge', 'postgrest', 'storage', 'postgres', 'edge function', 'auth']) {
-        expect(sql).toContain(`'${lt}'`)
-      }
-      // Per-level counts
-      for (const lvl of ['success', 'warning', 'error']) {
-        expect(sql).toContain(`'${lvl}'`)
-      }
-      // Bundled via UNION ALL — multiple occurrences expected
-      expect(sql.match(/UNION ALL/g)?.length ?? 0).toBeGreaterThan(5)
+      // One multi-dimensional pass, not a stack of UNION ALL branches.
+      expect(sql).not.toContain('UNION ALL')
+      expect(sql).toContain(`arrayJoin(['total','log_type','level','method','status','pathname'])`)
+      // multiIf picks each dimension's value off the exploded dimension alias.
+      expect(sql).toContain('multiIf(')
+      expect(sql).toContain(`dimension = 'total', 'all'`)
+      // Single FROM logs scan with a top-level GROUP BY and empty-bucket drop.
+      expect(sql.match(/FROM logs/g)?.length ?? 0).toBe(1)
+      expect(sql).toContain('GROUP BY dimension, value')
+      expect(sql).toContain(`HAVING value != ''`)
     })
 
-    it('honours an active log_type filter in the total count branch', () => {
+    it('honours an active log_type filter in the shared WHERE', () => {
       const sql = getLogsCountQuery(withFilters('log_type:eq:edge'))
-      // The first branch is the total — its WHERE must include the edge
-      // log_type predicate, otherwise the total badge would over-count
-      // when a log_type filter is active.
-      const totalBranch = sql.split(/\bUNION ALL\b/)[0]
-      expect(totalBranch).toContain(`'total'`)
-      expect(totalBranch).toContain(`source = 'edge_logs'`)
-      expect(totalBranch).not.toContain(`source = 'postgres_logs'`)
+      // The single WHERE backs every dimension (including the total badge), so
+      // it must carry the edge log_type predicate and exclude postgres.
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(`source = 'edge_logs'`)
+      expect(where).not.toContain(`source = 'postgres_logs'`)
     })
   })
 
