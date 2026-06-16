@@ -5,9 +5,6 @@ description: 'Use a custom domain instead of the default Supabase domain for you
 tocVideo: '6rcGnW_Mh-0'
 ---
 
-{/* supa-mdx-lint-disable Rule004ExcludeWords */}
-
-
 Custom domains allow you to present a branded experience to your users. These are available as a [paid add-on for projects on a paid plan](/dashboard/project/_/settings/addons?panel=customDomain).
 
 There are two types of domains supported by Supabase:
@@ -93,6 +90,7 @@ Use the [`domains reverify`](/docs/reference/cli/supabase-domains-reverify) comm
 supabase domains reverify --project-ref abcdefghijklmnopqrst
 ```
 
+{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 In the background, Supabase will check your DNS records and issue an SSL certificate. Supabase uses multiple Certificate Authorities (including Let's Encrypt, Google Trust Services and SSL.com) to ensure high availability. The specific issuer is chosen based on availability and this process can take up to 30 minutes.
 
 ### Prepare to activate your domain
