@@ -15,7 +15,13 @@ import {
 export const calculateDateRange = (
   interval: '1hr' | '1day' | '7day'
 ): { startDate: string; endDate: string } => {
-  const now = dayjs()
+  // Snap to the start of the current minute so the range (and therefore the
+  // query key derived from it) stays stable across re-renders and remounts
+  // within the same minute. Without this, each mount computes a fresh
+  // millisecond-precise "now", which re-keys the query and flashes the charts
+  // back into a loading state whenever the surrounding subtree remounts (e.g.
+  // when the homepage security gate resolves after lints load).
+  const now = dayjs().startOf('minute')
   const end = now.toISOString()
   let start: string
 
