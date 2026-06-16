@@ -122,6 +122,7 @@ export const SupportFormV3 = ({
       dispatch({
         type: 'ERROR',
         message: error.message,
+        code: error.code,
       })
     },
   })

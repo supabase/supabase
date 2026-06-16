@@ -1,7 +1,6 @@
 import { isAbsolute, relative } from 'path'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
-import { notFoundWithPathname } from '~/features/docs/notFound.utils'
 import { getEmptyArray } from '~/features/helpers.fn'
 import { IS_DEV } from '~/lib/constants'
 import { linkTransform, UrlTransformFunction } from '~/lib/mdx/plugins/rehypeLinkTransform'
@@ -10,6 +9,7 @@ import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
 import { getGitHubFileContents } from '~/lib/octokit'
 import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
+import { notFound } from 'next/navigation'
 import rehypeSlug from 'rehype-slug'
 
 // We fetch these docs at build time from an external repo
@@ -128,7 +128,7 @@ const getContent = async ({ slug }: Params) => {
   const page = pageMap.find((page) => page.slug === slug?.at(0))
 
   if (!page) {
-    notFoundWithPathname(`/guides/graphql${slug?.length ? `/${slug.join('/')}` : ''}`)
+    notFound()
   }
 
   const { remoteFile, meta } = page

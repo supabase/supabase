@@ -6,8 +6,8 @@ import {
   wrapInMarkdownCodeBlock,
 } from '~/app/guides/getting-started/ai-prompts/[slug]/AiPrompts.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
-import { notFoundWithPathname } from '~/features/docs/notFound.utils'
 import { source } from 'common-tags'
+import { notFound } from 'next/navigation'
 
 export const dynamicParams = false
 
@@ -18,7 +18,7 @@ export default async function AiPromptsPage(props: { params: Promise<{ slug: str
 
   const prompt = await getAiPrompt(slug)
   if (!prompt) {
-    notFoundWithPathname(`/guides/ai-tools/ai-prompts/${slug}`)
+    notFound()
   }
 
   let { heading, content } = prompt

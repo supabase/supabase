@@ -82,7 +82,9 @@ function SupportFormPageContent() {
 
   useStateTransition(state, 'submitting', 'error', (_, curr) => {
     toast.error(`Failed to submit support ticket: ${curr.message}`)
-    Sentry.captureMessage(`Failed to submit Support Form: ${curr.message}`)
+    if (curr.code !== 429) {
+      Sentry.captureMessage(`Failed to submit Support Form: ${curr.message}`)
+    }
     dispatch({ type: 'RETURN_TO_EDITING' })
   })
 
@@ -258,8 +260,7 @@ function SupportFormBody({
   return (
     <div
       className={cn(
-        'min-w-full w-full space-y-12 rounded-sm border bg-panel-body-light shadow-md',
-        `${isSuccess ? 'pt-8' : 'py-8'}`,
+        'min-w-full w-full space-y-12 rounded-sm border bg-panel-body-light shadow-md py-8',
         'border-default'
       )}
     >
