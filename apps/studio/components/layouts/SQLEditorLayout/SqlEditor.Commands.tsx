@@ -347,7 +347,7 @@ function TableSelector() {
         <Breadcrumb />
         <CommandMenuInput
           autoFocus
-          placeholder="Search for a table to query"
+          placeholder="Search for schema or a table to query"
           value={filterString}
           onValueChange={setFilterString}
         />

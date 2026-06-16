@@ -37,7 +37,7 @@ const SEARCH_CONTEXT_OPTIONS: SearchContextOption[] = [
     value: 'database-tables',
     label: 'Database Tables',
     pageName: 'Search Database Tables',
-    placeholder: 'Search database tables...',
+    placeholder: 'Search database schema or tables...',
     icon: Database,
   },
   {
