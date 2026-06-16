@@ -38,8 +38,13 @@ export const ValidationWarningsDialog = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
-          <AlertDialogAction disabled={isLoading} loading={isLoading} onClick={onConfirm}>
-            Create with warnings
+          <AlertDialogAction
+            variant="warning"
+            disabled={isLoading}
+            loading={isLoading}
+            onClick={onConfirm}
+          >
+            Proceed to create
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
