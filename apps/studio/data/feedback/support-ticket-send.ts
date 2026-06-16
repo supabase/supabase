@@ -66,15 +66,27 @@ export async function sendSupportTicket({
   })
 
   if (error) {
-    // openapi-fetch types this error as `never` (the endpoint declares no error
-    // schema), but at runtime our fetcher populates `code` and `retryAfter` from
-    // the response, so we read them through a narrow shape.
-    const apiError = error as { code?: number; retryAfter?: number }
-    if (apiError.code === 429) {
-      // The support feedback endpoint is throttled to 1 request per 60 seconds
-      // server-side. It does not return a standard Retry-After header, so fall
-      // back to the known 60 second window when one isn't provided.
-      const retryAfter = typeof apiError.retryAfter === 'number' ? apiError.retryAfter : 60
+    // openapi-fetch resolves this endpoint's result to `never`, so we widen to
+    // `unknown` and validate the fields at runtime (the same checks handleError
+    // uses) rather than asserting a shape.
+    const apiError: unknown = error
+    let code: number | undefined
+    let retryAfterValue: number | undefined
+    if (typeof apiError === 'object' && apiError !== null) {
+      if ('code' in apiError && typeof apiError.code === 'number') {
+        code = apiError.code
+      }
+      if ('retryAfter' in apiError && typeof apiError.retryAfter === 'number') {
+        retryAfterValue = apiError.retryAfter
+      }
+    }
+
+    // Rate-limited submissions (429) are an expected, recoverable condition, so we
+    // surface a friendly message and do not report them to Sentry. The endpoint is
+    // throttled to one request per 60 seconds and does not always send a retryAfter
+    // value, so fall back to that known window.
+    if (code === 429) {
+      const retryAfter = retryAfterValue ?? 60
       throw new ResponseError(
         `You have submitted too many support requests. Please try again in ${retryAfter} second${retryAfter === 1 ? '' : 's'}.`,
         429,
@@ -82,6 +94,8 @@ export async function sendSupportTicket({
         retryAfter
       )
     }
+
+    // Any other error: capture to Sentry and rethrow with support-form context.
     handleError(error, {
       alwaysCapture: true,
       sentryContext: {
