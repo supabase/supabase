@@ -17,12 +17,12 @@ Testing is a critical part of database development, especially when working with
 - Functions and procedures
 - Data integrity
 
-This example demonstrates setting up and testing RLS policies for a simple todo application:
+This example demonstrates setting up and testing RLS policies for a basic todo application:
 
 1. Create a test table with RLS enabled:
 
    ```sql
-   -- Create a simple todos table
+   -- Create a todos table
    create table todos (
    id uuid primary key default gen_random_uuid(),
    task text not null,
