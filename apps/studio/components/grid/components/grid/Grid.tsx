@@ -89,11 +89,15 @@ export const Grid = memo(
       const tableEntityType = snap.originalTable?.entity_type
       const isForeignTable = tableEntityType === ENTITY_TYPE.FOREIGN_TABLE
       const isTableEmpty = (rows ?? []).length === 0
+      // Importing data writes rows to the table, so it must respect the same gate as the "Insert"
+      // button: tables in protected schemas, non-table entities (e.g. views), and tables the user
+      // lacks permission to edit are not editable and should not allow CSV imports.
+      const isEditable = snap.editable
 
       const track = useTrack()
 
       const { isDraggedOver, onDragOver, onFileDrop } = useCsvFileDrop({
-        enabled: isTableEmpty && !isForeignTable,
+        enabled: isTableEmpty && !isForeignTable && isEditable,
         onFileDropped: (file) => tableEditorSnap.onImportData(valtioRef(file)),
         onTelemetryEvent: (eventName) => track(eventName),
       })
@@ -322,7 +326,7 @@ export const Grid = memo(
                             started.
                           </p>
                         </div>
-                      ) : (
+                      ) : isEditable ? (
                         <div className="flex flex-col items-center gap-4 mt-4">
                           <Button
                             type="default"
@@ -338,7 +342,7 @@ export const Grid = memo(
                             or drag and drop a CSV file here
                           </p>
                         </div>
-                      )}
+                      ) : null}
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center">
