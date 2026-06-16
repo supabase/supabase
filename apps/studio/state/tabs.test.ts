@@ -59,4 +59,25 @@ describe('tabs recent items', () => {
     expect(store.recentItems[0].label).toBe('routines')
     expect(store.recentItems[0].metadata?.name).toBe('routines')
   })
+
+  it('merges partial metadata updates without dropping other metadata', () => {
+    const store = createTabsState('default')
+
+    store.addTab({
+      id: 'sql-1',
+      type: 'sql',
+      label: 'Untitled query',
+      metadata: { sqlId: '1', name: 'Untitled query', isDraft: true },
+      isPreview: false,
+    })
+
+    // Promote a draft to saved — only the isDraft flag changes
+    store.updateTab('sql-1', { metadata: { isDraft: false } })
+
+    expect(store.tabsMap['sql-1'].metadata).toMatchObject({
+      sqlId: '1',
+      name: 'Untitled query',
+      isDraft: false,
+    })
+  })
 })

@@ -1,11 +1,17 @@
 import { usePrevious } from '@uidotdev/usehooks'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { useParams } from 'common/hooks/useParams'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 
+import {
+  createDraftSqlTab,
+  restoreDraftSqlTab,
+} from '@/components/interfaces/SQLEditor/createDraftSqlTab'
+import { readPersistedDraftSqlTab } from '@/components/interfaces/SQLEditor/draftSqlTabStorage.utils'
 import { SQLEditor } from '@/components/interfaces/SQLEditor/SQLEditor'
 import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
@@ -15,8 +21,10 @@ import SQLEditorLayout from '@/components/layouts/SQLEditorLayout/SQLEditorLayou
 import { SQLEditorMenu } from '@/components/layouts/SQLEditorLayout/SQLEditorMenu'
 import { useContentIdQuery } from '@/data/content/content-id-query'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
+import { useProfile } from '@/lib/profile'
 import { SnippetWithContent, useSnippets, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 import type { NextPageWithLayout } from '@/types'
@@ -26,21 +34,37 @@ const SqlEditor: NextPageWithLayout = () => {
   const { id, ref, content, skip } = useParams()
   const previousRoute = usePrevious(id)
   const { data: project } = useSelectedProjectQuery()
+  const { profile } = useProfile()
 
   const editor = useEditorType()
   const tabs = useTabsStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const { history, setLastVisitedSnippet } = useDashboardHistory()
+  const [autoSaveSnippets] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_AUTO_SAVE_SNIPPETS,
+    true
+  )
 
   const allSnippets = useSnippets(ref!)
   const snippet = allSnippets.find((x) => x.id === id)
 
   const tabId = !!id ? tabs.openTabs.find((x) => x.endsWith(id)) : undefined
 
+  // A draft is an unsaved snippet that only lives in local storage until the user explicitly saves it
+  const persistedDraft =
+    !!ref && !!id && id !== 'new' ? readPersistedDraftSqlTab(ref, id) : undefined
+  const isDraftId = !!persistedDraft || !!(snippet as SnippetWithContent | undefined)?.isDraftTab
+
+  const hasCreatedDraftRef = useRef(false)
+
   // [Joshen] May need to investigate separately, but occasionally addSnippet doesnt exist in
   // the snapV2 valtio store for some reason hence why the added typeof check here
+  // Drafts are never fetched from the backend since they don't exist there yet.
   const canFetchContentBasedOnId = Boolean(
-    id !== 'new' && typeof snapV2.addSnippet === 'function' && !snippet?.isNotSavedInDatabaseYet
+    id !== 'new' &&
+    !isDraftId &&
+    typeof snapV2.addSnippet === 'function' &&
+    !snippet?.isNotSavedInDatabaseYet
   )
   const { data, error, isError } = useContentIdQuery(
     { projectRef: ref, id },
@@ -75,19 +99,69 @@ const SqlEditor: NextPageWithLayout = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref, data, project])
 
-  // Load the last visited snippet when landing on /new
+  // When landing on /new, either redirect to the last visited snippet or open a fresh untitled draft
+  // tab (persisted only to local storage until the user explicitly saves it).
   useEffect(() => {
-    if (
-      id === 'new' &&
-      skip !== 'true' && // [Joshen] Skip flag implies to skip loading the last visited snippet
-      history.sql !== undefined &&
-      content === undefined
-    ) {
-      const snippet = allSnippets.find((snippet) => snippet.id === history.sql)
-      if (snippet !== undefined) router.replace(`/project/${ref}/sql/${history.sql}`)
+    // Reset the guard whenever we navigate away from /new so the next visit creates a fresh draft.
+    // The page component stays mounted across /sql/[id] route changes, so a sticky ref would otherwise
+    // prevent creating a second draft.
+    if (id !== 'new') {
+      hasCreatedDraftRef.current = false
+      return
     }
+    if (!router.isReady || !ref || !project || !profile) return
+    if (hasCreatedDraftRef.current) return
+
+    // [Joshen] Skip flag implies to skip loading the last visited snippet
+    if (skip !== 'true' && content === undefined && history.sql !== undefined) {
+      const lastSnippet = allSnippets.find((s) => s.id === history.sql)
+      if (lastSnippet !== undefined) {
+        hasCreatedDraftRef.current = true
+        router.replace(`/project/${ref}/sql/${history.sql}`)
+        return
+      }
+    }
+
+    hasCreatedDraftRef.current = true
+    const draftId = createDraftSqlTab({
+      projectRef: ref,
+      projectId: project.id,
+      ownerId: profile.id,
+      snapV2,
+      tabs,
+      initialSql: typeof content === 'string' ? content : '',
+      creationMode: autoSaveSnippets ? 'saved' : 'draft',
+      skipNavigation: true,
+    })
+    router.replace(`/project/${ref}/sql/${draftId}`)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, allSnippets, content])
+  }, [
+    id,
+    router.isReady,
+    ref,
+    project,
+    profile,
+    skip,
+    content,
+    allSnippets,
+    history.sql,
+    autoSaveSnippets,
+  ])
+
+  // Restore a draft opened directly by URL (e.g. on refresh) from local storage into the editor state
+  useEffect(() => {
+    if (!ref || !id || id === 'new' || !project || !profile) return
+    if (!persistedDraft || snippet) return
+
+    restoreDraftSqlTab({
+      draftId: id,
+      projectRef: ref,
+      projectId: project.id,
+      ownerId: profile.id,
+      snapV2,
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ref, id, project, profile, persistedDraft, snippet])
 
   // Watch for route changes
   useEffect(() => {
@@ -99,10 +173,11 @@ const SqlEditor: NextPageWithLayout = () => {
     tabs.addTab({
       id: tabId,
       type: 'sql',
-      label: snippet?.name || generateSnippetTitle(),
+      label: snippet?.name || persistedDraft?.name || generateSnippetTitle(),
       metadata: {
         sqlId: id,
-        name: snippet?.name,
+        name: snippet?.name ?? persistedDraft?.name,
+        isDraft: isDraftId,
       },
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps

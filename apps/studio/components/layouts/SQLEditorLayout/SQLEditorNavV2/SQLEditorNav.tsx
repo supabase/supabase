@@ -22,6 +22,7 @@ import { DEFAULT_SECTION_STATE, type SectionState } from './SQLEditorNav.constan
 import { formatFolderResponseForTreeView, getLastItemIds, ROOT_NODE } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
 import { UnshareSnippetModal } from './UnshareSnippetModal'
+import { isDraftSqlSnippet } from '@/components/interfaces/SQLEditor/createDraftSqlTab'
 import { DownloadSnippetModal } from '@/components/interfaces/SQLEditor/DownloadSnippetModal'
 import { MoveQueryModal } from '@/components/interfaces/SQLEditor/MoveQueryModal'
 import { RenameQueryModal } from '@/components/interfaces/SQLEditor/RenameQueryModal'
@@ -128,7 +129,12 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
       }
     )
 
-    if (snippet && snippet.visibility === 'user' && !snippetInfo.snippetIds.has(snippet.id)) {
+    if (
+      snippet &&
+      snippet.visibility === 'user' &&
+      !isDraftSqlSnippet(snippet) &&
+      !snippetInfo.snippetIds.has(snippet.id)
+    ) {
       snippetInfo.snippetIds.add(snippet.id)
       snippetInfo.snippets = [...snippetInfo.snippets, snippet]
     }
@@ -203,7 +209,12 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   const favoriteSnippets = useMemo(() => {
     let snippets = favoriteSqlSnippetsData?.pages.flatMap((page) => page.contents ?? []) ?? []
 
-    if (snippet && snippet.favorite && !snippets.find((x) => x.id === snippet.id)) {
+    if (
+      snippet &&
+      snippet.favorite &&
+      !isDraftSqlSnippet(snippet) &&
+      !snippets.find((x) => x.id === snippet.id)
+    ) {
       snippets.push(snippet as SqlSnippet)
     }
 
@@ -254,7 +265,12 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   const sharedSnippets = useMemo(() => {
     let snippets = sharedSqlSnippetsData?.pages.flatMap((page) => page.contents ?? []) ?? []
 
-    if (snippet && snippet.visibility === 'project' && !snippets.find((x) => x.id === snippet.id)) {
+    if (
+      snippet &&
+      snippet.visibility === 'project' &&
+      !isDraftSqlSnippet(snippet) &&
+      !snippets.find((x) => x.id === snippet.id)
+    ) {
       snippets.push(snippet as SqlSnippet)
     }
 

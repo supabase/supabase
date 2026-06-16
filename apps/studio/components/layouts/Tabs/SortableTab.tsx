@@ -6,6 +6,7 @@ import { useMemo } from 'react'
 import { cn, TabsTrigger_Shadcn_ } from 'ui'
 
 import { useEditorType } from '../editors/EditorsLayout.hooks'
+import { useTabDisplayLabel } from './Tabs.utils'
 import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useTabsStateSnapshot, type Tab } from '@/state/tabs'
@@ -32,6 +33,7 @@ export const SortableTab = ({
   const editor = useEditorType()
   const tabs = useTabsStateSnapshot()
   const { selectedSchema: currentSchema } = useQuerySchemaState()
+  const displayLabel = useTabDisplayLabel(tab)
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: tab.id,
   })
@@ -99,7 +101,7 @@ export const SortableTab = ({
               </motion.span>
             )}
           </AnimatePresence>
-          <span>{tab.label || 'Untitled'}</span>
+          <span>{displayLabel}</span>
         </div>
         <span
           role="button"

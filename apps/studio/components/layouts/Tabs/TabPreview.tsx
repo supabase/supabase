@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 
+import { useTabDisplayLabel } from './Tabs.utils'
 import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
 import { useTabsStateSnapshot } from '@/state/tabs'
 
@@ -7,6 +8,7 @@ export const TabPreview = ({ tab }: { tab: string }) => {
   const tabs = useTabsStateSnapshot()
 
   const tabData = tabs.tabsMap[tab]
+  const displayLabel = useTabDisplayLabel(tabData)
 
   if (!tabData) return null
 
@@ -18,7 +20,7 @@ export const TabPreview = ({ tab }: { tab: string }) => {
       className="flex relative items-center gap-2 px-3 text-xs bg-dash-sidebar dark:bg-surface-100 shadow-lg rounded-xs h-10"
     >
       <EntityTypeIcon type={tabData.type} />
-      <span>{tabData.label || 'Untitled'}</span>
+      <span>{displayLabel}</span>
       <div className="absolute w-full top-0 left-0 right-0 h-px bg-foreground-muted" />
     </motion.div>
   )

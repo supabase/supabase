@@ -1,19 +1,14 @@
 import { Hotkey } from '@tanstack/react-hotkeys'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { AlignLeft, Check, Heart, Keyboard, MoreVertical } from 'lucide-react'
+import { AlignLeft, Check, Keyboard, MoreVertical, Save } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
   KeyboardShortcut,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 
 import { SqlRunButton } from './RunButton'
@@ -22,6 +17,7 @@ import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonat
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from '@/lib/constants'
+import { useProfile } from '@/lib/profile'
 import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
@@ -33,6 +29,7 @@ export type UtilityActionsProps = {
   hasSelection?: boolean
   prettifyQuery: () => void
   executeQuery: () => void
+  onSave: () => void
 }
 
 export const UtilityActions = ({
@@ -42,13 +39,18 @@ export const UtilityActions = ({
   hasSelection = false,
   prettifyQuery,
   executeQuery,
+  onSave,
 }: UtilityActionsProps) => {
   const { ref } = useParams()
+  const { profile } = useProfile()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const [isAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
   const [intellisenseEnabled, setIntellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
+    true
+  )
+  const [autoSaveSnippets, setAutoSaveSnippets] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_AUTO_SAVE_SNIPPETS,
     true
   )
   const [lastSelectedDb, setLastSelectedDb] = useLocalStorageQuery(
@@ -57,7 +59,15 @@ export const UtilityActions = ({
   )
 
   const snippet = snapV2.snippets[id]
-  const isFavorite = snippet !== undefined ? snippet.snippet.favorite : false
+  const isSaving = snapV2.savingStates[id] === 'UPDATING'
+  const sql = snippet?.snippet.content?.unchecked_sql ?? ''
+  const isDraft = snippet?.snippet.isDraftTab === true
+  const savedSql = snapV2.savedSql[id]
+  const hasUnsavedSqlChanges = isDraft
+    ? sql.trim().length > 0
+    : savedSql !== undefined && sql !== savedSql
+  const isReadOnly =
+    snippet?.snippet.visibility === 'project' && snippet?.snippet.owner_id !== profile?.id
 
   const hotkeySequnece: Hotkey | undefined =
     SHORTCUT_DEFINITIONS[SHORTCUT_IDS.SQL_EDITOR_FORMAT].sequence[0]
@@ -70,9 +80,9 @@ export const UtilityActions = ({
     )
   }
 
-  const addFavorite = () => snapV2.addFavorite(id)
-
-  const removeFavorite = () => snapV2.removeFavorite(id)
+  const toggleAutoSaveSnippets = () => {
+    setAutoSaveSnippets(!autoSaveSnippets)
+  }
 
   const onSelectDatabase = (databaseId: string) => {
     snapV2.resetResults(id)
@@ -88,7 +98,7 @@ export const UtilityActions = ({
           <Button
             data-testid="sql-editor-utility-actions"
             type="default"
-            className={cn('px-1', isAiOpen ? 'block 2xl:hidden' : 'hidden')}
+            className="px-1"
             icon={<MoreVertical className="text-foreground-light" />}
           />
         </DropdownMenuTrigger>
@@ -100,27 +110,6 @@ export const UtilityActions = ({
             </span>
             {intellisenseEnabled && <Check className="text-brand" size={16} />}
           </DropdownMenuItem>
-          {IS_PLATFORM && (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="gap-x-2"
-                onClick={() => {
-                  if (isFavorite) removeFavorite()
-                  else addFavorite()
-                }}
-              >
-                <Heart
-                  size={14}
-                  strokeWidth={2}
-                  className={
-                    isFavorite ? 'fill-brand stroke-none' : 'fill-none stroke-foreground-light'
-                  }
-                />
-                {isFavorite ? 'Remove from' : 'Add to'} favorites
-              </DropdownMenuItem>
-            </>
-          )}
           <DropdownMenuItem className="justify-between" onClick={prettifyQuery}>
             <span className="flex items-center gap-x-2">
               <AlignLeft size={14} strokeWidth={2} className="text-foreground-light" />
@@ -128,72 +117,30 @@ export const UtilityActions = ({
             </span>
             {formatKeys && <KeyboardShortcut keys={formatKeys} />}
           </DropdownMenuItem>
+          <DropdownMenuItem className="justify-between" onClick={toggleAutoSaveSnippets}>
+            <span className="flex items-center gap-x-2">
+              <Save size={14} className="text-foreground-light" />
+              Auto save snippets
+            </span>
+            {autoSaveSnippets && <Check className="text-brand" size={16} />}
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <div className={cn('items-center gap-x-2', isAiOpen ? 'hidden 2xl:flex' : 'flex')}>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              type="text"
-              className="px-1"
-              icon={<Keyboard className="text-foreground-light" />}
-            />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-48">
-            <DropdownMenuItem className="justify-between" onClick={toggleIntellisense}>
-              Intellisense enabled
-              {intellisenseEnabled && <Check className="text-brand" size={16} />}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {IS_PLATFORM && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              {isFavorite ? (
-                <Button
-                  type="text"
-                  size="tiny"
-                  onClick={removeFavorite}
-                  className="px-1"
-                  icon={<Heart className="fill-brand stroke-none" />}
-                />
-              ) : (
-                <Button
-                  type="text"
-                  size="tiny"
-                  onClick={addFavorite}
-                  className="px-1"
-                  icon={<Heart className="fill-none stroke-foreground-light" />}
-                />
-              )}
-            </TooltipTrigger>
-            <TooltipContent side="bottom">
-              {isFavorite ? 'Remove from' : 'Add to'} favorites
-            </TooltipContent>
-          </Tooltip>
-        )}
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              type="text"
-              onClick={prettifyQuery}
-              className="px-1"
-              icon={<AlignLeft strokeWidth={2} className="text-foreground-light" />}
-            />
-          </TooltipTrigger>
-          <TooltipContent side="bottom" className="p-1 pl-2.5">
-            <div className="flex items-center gap-2.5">
-              <span>Prettify SQL</span>
-              {formatKeys && <KeyboardShortcut keys={formatKeys} />}
-            </div>
-          </TooltipContent>
-        </Tooltip>
-      </div>
-
       <div className="flex items-center justify-between gap-x-2">
+        {IS_PLATFORM && (!autoSaveSnippets || isDraft) && (
+          <Button
+            onClick={onSave}
+            disabled={isDisabled || isReadOnly || !hasUnsavedSqlChanges}
+            loading={isSaving}
+            type="default"
+            size="tiny"
+            data-testid="sql-save-button"
+            iconRight={<KeyboardShortcut keys={['Meta', 'S']} variant="inline" />}
+          >
+            Save
+          </Button>
+        )}
         <div className="flex items-center">
           {IS_PLATFORM && (
             <DatabaseSelector

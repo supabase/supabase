@@ -8,11 +8,10 @@ import {
 } from '@supabase/pg-meta'
 import { wrapWithRollback } from '@supabase/pg-meta/src/query'
 import { useQueryClient } from '@tanstack/react-query'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { ChevronUp, Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
-import { useRouter } from 'next/router'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -31,9 +30,9 @@ import {
 } from 'ui'
 
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
+import { RenameQueryModal } from './RenameQueryModal'
 import { RunQueryWarningModal } from './RunQueryWarningModal'
 import {
-  generateSnippetTitle,
   ROWS_PER_PAGE_OPTIONS,
   sqlAiDisclaimerComment,
   untitledSnippetTitle,
@@ -49,7 +48,6 @@ import {
   checkAlterDatabaseConnection,
   checkDestructiveQuery,
   checkIfAppendLimitRequired,
-  createSqlSnippetSkeletonV2,
   filterTablesCoveredByEnsureRLSTrigger,
   getCreateTablesMissingRLS,
   hasActiveEnsureRLSTrigger,
@@ -57,6 +55,8 @@ import {
   suffixWithLimit,
 } from './SQLEditor.utils'
 import { useAddDefinitions } from './useAddDefinitions'
+import { useCreateDraftSqlTab } from './useCreateDraftSqlTab'
+import { useRestorePersistedDraftSqlTabs } from './useRestorePersistedDraftSqlTabs'
 import { UtilityPanel } from './UtilityPanel/UtilityPanel'
 import {
   isExplainQuery,
@@ -73,14 +73,13 @@ import { lintKeys } from '@/data/lint/keys'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { isError } from '@/data/utils/error-check'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { generateUuid } from '@/lib/api/snippets.browser'
-import { BASE_PATH } from '@/lib/constants'
+import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 import { formatSql } from '@/lib/formatSql'
 import { detectOS } from '@/lib/helpers'
-import { useProfile } from '@/lib/profile'
 import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -104,10 +103,8 @@ const DiffEditor = dynamic(
 
 export const SQLEditor = () => {
   const os = detectOS()
-  const router = useRouter()
   const { ref, id: urlId } = useParams()
 
-  const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
 
@@ -118,8 +115,12 @@ export const SQLEditor = () => {
   const snapV2 = useSqlEditorV2StateSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
-  const { aiOptInLevel } = useOrgAiOptInLevel()
+  const { aiOptInLevel, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
   const showPrettyExplain = useFlag('ShowPrettyExplain')
+  const [autoSaveSnippets] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_AUTO_SAVE_SNIPPETS,
+    true
+  )
 
   const {
     sourceSqlDiff,
@@ -140,6 +141,11 @@ export const SQLEditor = () => {
   const scrollTopRef = useRef<number>(0)
   const shouldRefocusAfterRunRef = useRef(false)
 
+  const { createDraftTab } = useCreateDraftSqlTab()
+
+  // Restore any open unsaved draft tabs from local storage on mount, and prune stale entries
+  useRestorePersistedDraftSqlTabs()
+
   const [hasSelection, setHasSelection] = useState<boolean>(false)
   const [lineHighlights, setLineHighlights] = useState<string[]>([])
   const [isDiffEditorMounted, setIsDiffEditorMounted] = useState(false)
@@ -147,6 +153,7 @@ export const SQLEditor = () => {
 
   const [showWidget, setShowWidget] = useState(false)
   const [activeUtilityTab, setActiveUtilityTab] = useState<string>('results')
+  const [renameModalOpen, setRenameModalOpen] = useState(false)
 
   const refocusEditor = useCallback(() => {
     requestAnimationFrame(() => {
@@ -160,11 +167,10 @@ export const SQLEditor = () => {
 
   const openNewSnippet = useCallback(() => {
     if (!ref) return
-    // skip=true bypasses the "load last visited snippet" redirect on /sql/new.
-    // Without it, the effect in pages/project/[ref]/sql/[id].tsx bounces back
-    // to the previous snippet.
-    router.push(`/project/${ref}/sql/new?skip=true`)
-  }, [ref, router])
+    // Open a fresh untitled draft tab (persisted only to local storage until the user saves it),
+    // instead of immediately creating a snippet in the database.
+    createDraftTab()
+  }, [ref, createDraftTab])
 
   useShortcut(SHORTCUT_IDS.SQL_EDITOR_NEW_SNIPPET, openNewSnippet, {
     registerInCommandMenu: true,
@@ -181,22 +187,17 @@ export const SQLEditor = () => {
     refocusEditor()
   }, [refocusEditor])
 
-  // generate a new snippet title and an id to be used for new snippets. The dependency on urlId is to avoid a bug which
-  // shows up when clicking on the SQL Editor while being in the SQL editor on a random snippet.
-  const [generatedNewSnippetName, generatedId] = useMemo(() => {
-    const name = generateSnippetTitle()
-    return [name, generateUuid([`${name}.sql`])]
-  }, [urlId])
-
-  // the id is stable across renders - it depends either on the url or on the memoized generated id
-  const id = !urlId || urlId === 'new' ? generatedId : urlId
+  // The id always comes from the URL now. `/sql/new` is resolved to a concrete draft id by the page
+  // (pages/project/[ref]/sql/[id].tsx) which creates the draft and replaces the route, so while the
+  // url is still `new` we render the loading state.
+  const id = !urlId || urlId === 'new' ? '' : urlId
 
   const limit = snapV2.limit
   const results = snapV2.results[id]?.[0]
   const snippetIsLoading = !(
     id in snapV2.snippets && snapV2.snippets[id].snippet.content !== undefined
   )
-  const isLoading = urlId === 'new' ? false : snippetIsLoading
+  const isLoading = !urlId || urlId === 'new' ? true : snippetIsLoading
 
   useAddDefinitions(id, monacoRef.current)
 
@@ -216,7 +217,6 @@ export const SQLEditor = () => {
   )
 
   /* React query mutations */
-  const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
   const track = useTrack()
   const { mutate: execute, isPending: isExecuting } = useExecuteSqlMutation({
     onSuccess(data, vars) {
@@ -291,6 +291,8 @@ export const SQLEditor = () => {
     },
   })
 
+  const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
+
   const setAiTitle = useCallback(
     async (id: string, sql: string) => {
       try {
@@ -299,11 +301,11 @@ export const SQLEditor = () => {
         snapV2.addNeedsSaving(id)
         const tabId = createTabId('sql', { id })
         tabs.updateTab(tabId, { label: name })
-      } catch (error) {
-        // [Joshen] No error handler required as this happens in the background and not necessary to ping the user
+      } catch {
+        // Title generation is best-effort and should not interrupt query execution.
       }
     },
-    [generateSqlTitle, snapV2]
+    [generateSqlTitle, snapV2, tabs]
   )
 
   const prettifyQuery = useCallback(async () => {
@@ -392,13 +394,13 @@ export const SQLEditor = () => {
       }
 
       if (
-        // Don't auto-generate a title when the org has disabled AI or is a HIPAA project,
-        // as that would silently forward the query to the AI provider without consent
+        autoSaveSnippets &&
         aiOptInLevel !== 'disabled' &&
+        !isHipaaProjectDisallowed &&
         snippet?.snippet.name.startsWith(untitledSnippetTitle) &&
         IS_PLATFORM
       ) {
-        // Intentionally don't await title gen (lazy)
+        // Intentionally don't await title generation.
         setAiTitle(id, sql)
       }
 
@@ -442,7 +444,9 @@ export const SQLEditor = () => {
       id,
       isExecuting,
       project,
+      autoSaveSnippets,
       aiOptInLevel,
+      isHipaaProjectDisallowed,
       execute,
       getImpersonatedRoleState,
       setAiTitle,
@@ -538,30 +542,6 @@ export const SQLEditor = () => {
     registerInCommandMenu: true,
   })
 
-  const handleNewQuery = useCallback(
-    async (sql: string, name: string) => {
-      if (!ref) return console.error('Project ref is required')
-      if (!profile) return console.error('Profile is required')
-      if (!project) return console.error('Project is required')
-
-      try {
-        const snippet = createSqlSnippetSkeletonV2({
-          name,
-          sql,
-          owner_id: profile.id,
-          project_id: project.id,
-        })
-        snapV2.addSnippet({ projectRef: ref, snippet })
-        snapV2.addNeedsSaving(snippet.id!)
-        router.push(`/project/${ref}/sql/${snippet.id}`)
-      } catch (error: any) {
-        toast.error(`Failed to create new query: ${error.message}`)
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [profile?.id, project?.id, ref, router, snapV2]
-  )
-
   const onMount = (editor: IStandaloneCodeEditor) => {
     const tabId = createTabId('sql', { id })
     const tabData = tabs.tabsMap[tabId]
@@ -574,6 +554,32 @@ export const SQLEditor = () => {
     }, 20)
     editor.onDidScrollChange((e) => (scrollTopRef.current = e.scrollTop))
   }
+
+  // Explicit save. Drafts open the rename dialog (which persists the snippet on confirm); already-saved
+  // snippets save silently, exactly as before.
+  const handleSave = useCallback(() => {
+    if (!id) return
+
+    const state = getSqlEditorV2StateSnapshot()
+    const snippet = state.snippets[id]?.snippet
+    if (!snippet) return
+
+    const sql = editorRef.current?.getValue() ?? ''
+    if (!sql.trim()) {
+      toast.error('Cannot save an empty query')
+      return
+    }
+
+    if (snippet.isDraftTab) {
+      // Flush the latest editor SQL into the draft's content before opening the rename dialog,
+      // which performs the draft -> saved transition on confirm.
+      snapV2.setSql({ id, sql, skipSave: true })
+      setRenameModalOpen(true)
+    } else {
+      snapV2.setSql({ id, sql, skipSave: true })
+      snapV2.addNeedsSaving(id, { saveSql: true })
+    }
+  }, [id, snapV2])
 
   const buildDebugPrompt = useCallback(() => {
     const snippet = snapV2.snippets[id]
@@ -627,8 +633,8 @@ export const SQLEditor = () => {
       const sql = diffModel.modified.getValue()
 
       if (selectedDiffType === DiffType.NewSnippet) {
-        const { title } = await generateSqlTitle({ sql })
-        await handleNewQuery(sql, title)
+        // Open AI-generated new queries as an unsaved draft instead of auto-creating a saved snippet
+        createDraftTab({ initialSql: sql })
       } else {
         editorRef.current.executeEdits('apply-ai-edit', [
           {
@@ -647,7 +653,7 @@ export const SQLEditor = () => {
       setIsAcceptDiffLoading(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sourceSqlDiff, selectedDiffType, handleNewQuery, generateSqlTitle, router, id, snapV2, track])
+  }, [sourceSqlDiff, selectedDiffType, createDraftTab, id, snapV2, track])
 
   const discardAiHandler = useCallback(() => {
     track('assistant_sql_diff_handler_evaluated', { handlerAccepted: false })
@@ -888,6 +894,13 @@ export const SQLEditor = () => {
         }}
       />
 
+      <RenameQueryModal
+        snippet={snapV2.snippets[id]?.snippet as any}
+        visible={renameModalOpen}
+        onCancel={() => setRenameModalOpen(false)}
+        onComplete={() => setRenameModalOpen(false)}
+      />
+
       <div className="flex h-full">
         <ResizablePanelGroup
           className="relative"
@@ -948,17 +961,14 @@ export const SQLEditor = () => {
                           : ''
                       }
                       id={id}
-                      snippetName={
-                        urlId === 'new'
-                          ? generatedNewSnippetName
-                          : (snapV2.snippets[id]?.snippet.name ?? generatedNewSnippetName)
-                      }
+                      snippetName={snapV2.snippets[id]?.snippet.name ?? ''}
                       className={cn(isDiffOpen && 'hidden')}
                       editorRef={editorRef}
                       monacoRef={monacoRef}
                       executeQuery={executeQuery}
                       executeExplainQuery={executeExplainQuery}
                       prettifyQuery={prettifyQuery}
+                      onSave={handleSave}
                       onHasSelection={setHasSelection}
                       onMount={onMount}
                       onPrompt={({
@@ -1022,6 +1032,7 @@ export const SQLEditor = () => {
                 prettifyQuery={prettifyQuery}
                 executeQuery={executeQueryFromButton}
                 executeExplainQuery={executeExplainQuery}
+                onSave={handleSave}
                 onDebug={onDebug}
                 buildDebugPrompt={buildDebugPrompt}
                 activeTab={activeUtilityTab}
