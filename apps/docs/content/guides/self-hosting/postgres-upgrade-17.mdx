@@ -9,11 +9,6 @@ Self-hosted Supabase ships with Postgres 17 by default. This guide covers two sc
 - **New deployment** - start fresh with Postgres 17 (no existing data)
 - **Upgrade existing deployment** - migrate from Postgres 15 to Postgres 17 using `pg_upgrade`
 
-## Before you begin
-
-- Complete the [Self-Hosting with Docker](/docs/guides/self-hosting/docker) setup
-- Your current database image should be `supabase/postgres:15.x`
-
 ## New deployment with Postgres 17
 
 Postgres 17 is the default, so a new self-hosted instance with **no existing data** starts on Postgres 17 - no override needed:
@@ -26,17 +21,7 @@ The rest of the setup is unchanged (see the Docker install [guide](/docs/guides/
 
 <Admonition type="note" title="GraphQL is off by default">
 
-On a fresh Postgres 17 deployment, the `pg_graphql` extension is **disabled by default**. Enable it from Studio (Database → Extensions) or with `create extension pg_graphql;`. Databases that already use GraphQL keep it after an upgrade.
-
-</Admonition>
-
-<Admonition type="tip" title="Staying on Postgres 15">
-
-To stay on Postgres 15 (for example, before upgrading an existing deployment), use the Postgres 15 override:
-
-```sh
-docker compose -f docker-compose.yml -f docker-compose.pg15.yml up -d
-```
+On a fresh Postgres 17 deployment, the `pg_graphql` extension is **disabled by default**. Enable it from Studio (**Database** > **Extensions**) or with `create extension pg_graphql;`. Databases that already use GraphQL keep it after an upgrade.
 
 </Admonition>
 
@@ -122,12 +107,6 @@ sudo bash utils/upgrade-pg17.sh
 The script might require your confirmation at some steps (e.g., while checking for disk space, or whether to disable extensions, or remove previous backups).
 
 ### After the upgrade
-
-After a successful upgrade, always use both compose files:
-
-```sh
-docker compose -f docker-compose.yml -f docker-compose.pg17.yml up -d
-```
 
 To verify that Postgres 17 is running:
 
@@ -320,5 +299,5 @@ docker compose run --rm db \
 Start Postgres 15:
 
 ```sh
-docker compose up -d
+docker compose -f docker-compose.yml -f docker-compose.pg17.yml up -d
 ```
