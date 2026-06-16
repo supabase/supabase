@@ -5,17 +5,6 @@ export type LogsBarChartDatum = {
   warning_count: number
 }
 
-export const toLogsBarChartData = (
-  rows: Array<Record<string, unknown>> = []
-): LogsBarChartDatum[] => {
-  return rows.map((r) => ({
-    timestamp: r.timestamp?.toString() ?? '',
-    ok_count: Number(r.ok_count) || 0,
-    warning_count: Number(r.warning_count) || 0,
-    error_count: Number(r.error_count) || 0,
-  }))
-}
-
 export const sumTotal = (data: LogsBarChartDatum[]): number =>
   data.reduce((acc, r) => acc + r.ok_count + r.warning_count + r.error_count, 0)
 
@@ -36,9 +25,17 @@ export const computeSuccessAndNonSuccessRates = (
   return { successRate, nonSuccessRate }
 }
 
-export const computeChangePercent = (current: number, previous: number): number => {
-  if (previous === 0) return current > 0 ? 100 : 0
-  return ((current - previous) / previous) * 100
-}
+/**
+ * Orders services so the busiest (highest total requests) come first. Services
+ * with no traffic sink to the end of the list, where the homepage renders them
+ * as disabled.
+ */
+export const sortServicesByTraffic = <T extends { total: number }>(services: T[]): T[] =>
+  [...services].sort((a, b) => b.total - a.total)
 
-export const formatDelta = (v: number): string => `${v >= 0 ? '+' : ''}${v.toFixed(1)}%`
+/**
+ * A service card is disabled once loading has settled and the service still has
+ * no traffic for the selected period.
+ */
+export const isServiceDisabled = (total: number, isLoading: boolean): boolean =>
+  !isLoading && total <= 0

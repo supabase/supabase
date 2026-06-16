@@ -8,38 +8,31 @@ import { Row } from 'ui-patterns'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
 import {
-  computeChangePercent,
   computeSuccessAndNonSuccessRates,
-  formatDelta,
-  sumErrors,
-  sumTotal,
-  sumWarnings,
+  isServiceDisabled,
+  sortServicesByTraffic,
   type LogsBarChartDatum,
 } from './ProjectUsage.metrics'
-import { useServiceStats, type ServiceKey } from './ProjectUsageSection.utils'
+import { useServiceHealthMetrics } from '@/components/interfaces/Observability/useServiceHealthMetrics'
 import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
 import { ChartIntervalDropdown } from '@/components/ui/Logs/ChartIntervalDropdown'
 import { CHART_INTERVALS } from '@/components/ui/Logs/logs.utils'
-import type { ProjectMetricsInterval } from '@/data/analytics/project-metrics-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useTrack } from '@/lib/telemetry/track'
 
-const INTERVAL_VALUES: readonly ProjectMetricsInterval[] = [
-  '15min',
-  '1hr',
-  '3hr',
-  '1day',
-  '3day',
-  '7day',
-]
+// The homepage usage cards only surface this subset of the services returned by
+// the shared service-health endpoint, and the telemetry events are typed to match.
+type HomeServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime'
 
-const isProjectMetricsInterval = (value: string): value is ProjectMetricsInterval =>
-  (INTERVAL_VALUES as readonly string[]).includes(value)
+type ChartIntervalKey = '1hr' | '1day' | '7day'
+
+const isChartIntervalKey = (value: string): value is ChartIntervalKey =>
+  value === '1hr' || value === '1day' || value === '7day'
 
 type ServiceEntry = {
-  key: ServiceKey
+  key: HomeServiceKey
   title: string
   href?: string
   route: string
@@ -51,9 +44,6 @@ type ServiceComputed = ServiceEntry & {
   total: number
   warn: number
   err: number
-  prevTotal: number
-  isLoading: boolean
-  error: unknown | null
 }
 
 export const ProjectUsageSectionDeltas = () => {
@@ -68,9 +58,9 @@ export const ProjectUsageSectionDeltas = () => {
   const { getEntitlementMax } = useCheckEntitlements('log.retention_days')
   const retentionDays = getEntitlementMax()
 
-  const DEFAULT_INTERVAL: ProjectMetricsInterval =
+  const DEFAULT_INTERVAL: ChartIntervalKey =
     retentionDays !== undefined && retentionDays < 7 ? '1hr' : '1day'
-  const [interval, setSelectedInterval] = useState<ProjectMetricsInterval>(DEFAULT_INTERVAL)
+  const [interval, setSelectedInterval] = useState<ChartIntervalKey>(DEFAULT_INTERVAL)
 
   useEffect(() => {
     setSelectedInterval(retentionDays !== undefined && retentionDays < 7 ? '1hr' : '1day')
@@ -79,10 +69,14 @@ export const ProjectUsageSectionDeltas = () => {
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
   const datetimeFormat = selectedInterval.format || 'MMM D, ha'
 
-  const statsByService = useServiceStats(projectRef, interval)
+  const { services: serviceData, isLoading } = useServiceHealthMetrics(
+    projectRef ?? '',
+    interval,
+    0
+  )
 
   // Functions is included here (and absent from the V2 chart) because the
-  // project.metrics endpoint exposes per-function metrics that the legacy
+  // service-health endpoint exposes per-function metrics that the legacy
   // usage.api-counts endpoint does not.
   const serviceBase: ServiceEntry[] = useMemo(
     () => [
@@ -123,35 +117,45 @@ export const ProjectUsageSectionDeltas = () => {
     [projectRef, authEnabled, storageEnabled]
   )
 
-  const services: ServiceComputed[] = useMemo(
-    () =>
-      serviceBase.map((s) => {
-        const currentStats = statsByService[s.key].current
-        const previousStats = statsByService[s.key].previous
-        const data = currentStats.eventChartData
+  // Build per-service stats, then order them so the busiest services come first
+  // and services with no data sink to the end (where they render disabled).
+  const services: ServiceComputed[] = useMemo(() => {
+    const computed = serviceBase
+      .filter((s) => s.enabled)
+      .map((s) => {
+        const stats = serviceData[s.key]
         return {
           ...s,
-          data,
-          total: sumTotal(data),
-          warn: sumWarnings(data),
-          err: sumErrors(data),
-          prevTotal: sumTotal(previousStats.eventChartData),
-          isLoading: currentStats.isLoading,
-          error: currentStats.error,
+          data: stats.eventChartData,
+          total: stats.total,
+          warn: stats.warningCount,
+          err: stats.errorCount,
         }
-      }),
-    [serviceBase, statsByService]
-  )
+      })
 
-  const isLoading = services.some((s) => s.isLoading)
+    return sortServicesByTraffic(computed)
+  }, [serviceBase, serviceData])
+
+  const totalRequests = services.reduce((sum, s) => sum + s.total, 0)
+  const totalErrors = services.reduce((sum, s) => sum + s.err, 0)
+  const totalWarnings = services.reduce((sum, s) => sum + s.warn, 0)
+
+  const { successRate, nonSuccessRate } = computeSuccessAndNonSuccessRates(
+    totalRequests,
+    totalWarnings,
+    totalErrors
+  )
+  const nonSuccessClass = nonSuccessRate > 0 ? 'text-destructive' : 'text-brand-link'
 
   const handleBarClick =
-    (logRoute: string, serviceKey: ServiceKey) => (datum: LogsBarChartDatum) => {
+    (logRoute: string, serviceKey: HomeServiceKey) => (datum: LogsBarChartDatum) => {
       if (!datum?.timestamp) return
 
-      const datumTimestamp = dayjs(datum.timestamp).toISOString()
-      const start = dayjs(datumTimestamp).subtract(1, 'minute').toISOString()
-      const end = dayjs(datumTimestamp).add(1, 'minute').toISOString()
+      // datum.timestamp is the UTC bucket boundary from the endpoint, so scope the
+      // log view to exactly that bucket's width.
+      const unit = interval === '1hr' ? 'minute' : interval === '1day' ? 'hour' : 'day'
+      const start = datum.timestamp
+      const end = dayjs(datum.timestamp).add(1, unit).toISOString()
 
       const queryParams = new URLSearchParams({
         iso_timestamp_start: start,
@@ -166,21 +170,6 @@ export const ProjectUsageSectionDeltas = () => {
       })
     }
 
-  const enabledServices = services.filter((s) => s.enabled)
-  const totalRequests = enabledServices.reduce((sum, s) => sum + s.total, 0)
-  const totalErrors = enabledServices.reduce((sum, s) => sum + s.err, 0)
-  const totalWarnings = enabledServices.reduce((sum, s) => sum + s.warn, 0)
-  const prevTotalRequests = enabledServices.reduce((sum, s) => sum + s.prevTotal, 0)
-
-  const { successRate, nonSuccessRate } = computeSuccessAndNonSuccessRates(
-    totalRequests,
-    totalWarnings,
-    totalErrors
-  )
-  const totalChangePct = computeChangePercent(totalRequests, prevTotalRequests)
-  const totalDeltaClass = totalChangePct >= 0 ? 'text-brand-link' : 'text-destructive'
-  const nonSuccessClass = nonSuccessRate > 0 ? 'text-destructive' : 'text-brand-link'
-
   return (
     <div className="space-y-6">
       <div className="flex flex-row justify-between items-center gap-x-2">
@@ -188,7 +177,6 @@ export const ProjectUsageSectionDeltas = () => {
           <div className="flex items-start gap-2 heading-section text-foreground-light">
             <span className="text-foreground">{totalRequests.toLocaleString()}</span>
             <span>Total Requests</span>
-            <span className={cn('text-sm', totalDeltaClass)}>{formatDelta(totalChangePct)}</span>
           </div>
           <div className="flex items-start gap-2 heading-section text-foreground-light">
             <span className="text-foreground">{successRate.toFixed(1)}%</span>
@@ -201,7 +189,7 @@ export const ProjectUsageSectionDeltas = () => {
         <ChartIntervalDropdown
           value={interval}
           onChange={(next) => {
-            if (isProjectMetricsInterval(next)) setSelectedInterval(next)
+            if (isChartIntervalKey(next)) setSelectedInterval(next)
           }}
           organizationSlug={organization?.slug}
           dropdownAlign="end"
@@ -209,74 +197,80 @@ export const ProjectUsageSectionDeltas = () => {
         />
       </div>
       <Row maxColumns={4} minWidth={280}>
-        {enabledServices.map((s) => (
-          <Card key={s.key} className="mb-0 md:mb-0 flex flex-col h-64">
-            <CardHeader className="flex flex-row items-end justify-between gap-2 space-y-0 pb-0 border-b-0">
-              <div className="flex items-center gap-2">
-                <div className="flex flex-col">
-                  <CardTitle className="text-xs font-mono uppercase text-foreground-light">
-                    {s.href ? (
-                      <Link
-                        href={s.href}
-                        onClick={() => {
-                          track('home_project_usage_service_clicked', {
-                            service_type: s.key,
-                            total_requests: s.total,
-                            error_count: s.err,
-                          })
-                        }}
-                      >
-                        {s.title}
-                      </Link>
-                    ) : (
-                      s.title
-                    )}
-                  </CardTitle>
-                  <span className="text-foreground text-xl">{s.total.toLocaleString()}</span>
-                </div>
-              </div>
-              <div className="flex items-end gap-4 text-foreground-light">
-                <div className="flex flex-col items-end">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-warning rounded-full" />
-                    <span className="heading-meta">Warn</span>
+        {services.map((s) => {
+          const disabled = isServiceDisabled(s.total, isLoading)
+          return (
+            <Card
+              key={s.key}
+              className={cn('mb-0 md:mb-0 flex flex-col h-64', disabled && 'opacity-60')}
+            >
+              <CardHeader className="flex flex-row items-end justify-between gap-2 space-y-0 pb-0 border-b-0">
+                <div className="flex items-center gap-2">
+                  <div className="flex flex-col">
+                    <CardTitle className="text-xs font-mono uppercase text-foreground-light">
+                      {s.href && !disabled ? (
+                        <Link
+                          href={s.href}
+                          onClick={() => {
+                            track('home_project_usage_service_clicked', {
+                              service_type: s.key,
+                              total_requests: s.total,
+                              error_count: s.err,
+                            })
+                          }}
+                        >
+                          {s.title}
+                        </Link>
+                      ) : (
+                        s.title
+                      )}
+                    </CardTitle>
+                    <span className="text-foreground text-xl">{s.total.toLocaleString()}</span>
                   </div>
-                  <span className="text-foreground text-base">{s.warn.toLocaleString()}</span>
                 </div>
-                <div className="flex flex-col items-end">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-destructive rounded-full" />
-                    <span className="heading-meta">Err</span>
+                <div className="flex items-end gap-4 text-foreground-light">
+                  <div className="flex flex-col items-end">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-warning rounded-full" />
+                      <span className="heading-meta">Warn</span>
+                    </div>
+                    <span className="text-foreground text-base">{s.warn.toLocaleString()}</span>
                   </div>
-                  <span className="text-foreground text-base">{s.err.toLocaleString()}</span>
+                  <div className="flex flex-col items-end">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-destructive rounded-full" />
+                      <span className="heading-meta">Err</span>
+                    </div>
+                    <span className="text-foreground text-base">{s.err.toLocaleString()}</span>
+                  </div>
                 </div>
-              </div>
-            </CardHeader>
-            <CardContent className="p-card flex-1 h-full overflow-hidden">
-              <Loading isFullHeight active={isLoading}>
-                <LogsBarChart
-                  isFullHeight
-                  data={s.data}
-                  DateTimeFormat={datetimeFormat}
-                  onBarClick={handleBarClick(s.route, s.key)}
-                  hideZeroValues={true}
-                  chartConfig={{
-                    error_count: { label: 'Errors' },
-                    warning_count: { label: 'Warnings' },
-                    ok_count: { label: 'Requests' },
-                  }}
-                  EmptyState={
-                    <NoDataPlaceholder
-                      size="small"
-                      message="No data for selected period"
-                      isFullHeight
-                    />
-                  }
-                />
-              </Loading>
-            </CardContent>
-          </Card>
-        ))}
+              </CardHeader>
+              <CardContent className="p-card flex-1 h-full overflow-hidden">
+                <Loading isFullHeight active={isLoading}>
+                  <LogsBarChart
+                    isFullHeight
+                    data={s.data}
+                    DateTimeFormat={datetimeFormat}
+                    onBarClick={disabled ? undefined : handleBarClick(s.route, s.key)}
+                    hideZeroValues={true}
+                    chartConfig={{
+                      error_count: { label: 'Errors' },
+                      warning_count: { label: 'Warnings' },
+                      ok_count: { label: 'Requests' },
+                    }}
+                    EmptyState={
+                      <NoDataPlaceholder
+                        size="small"
+                        message="No data for selected period"
+                        isFullHeight
+                      />
+                    }
+                  />
+                </Loading>
+              </CardContent>
+            </Card>
+          )
+        })}
       </Row>
     </div>
   )
