@@ -18,7 +18,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
-import FunctionList from './FunctionList'
+import { FunctionList } from './FunctionList'
 import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { CreateFunction } from '@/components/interfaces/Database/Functions/CreateFunction'
 import {
@@ -168,7 +168,9 @@ export const FunctionsList = () => {
 
   // Get unique return types from functions in the selected schema
   const schemaFunctions = functions.filter((fn) => fn.schema === selectedSchema)
-  const uniqueReturnTypes = Array.from(new Set(schemaFunctions.map((fn) => fn.return_type))).sort()
+  const uniqueReturnTypes = Array.from(new Set(schemaFunctions.map((fn) => fn.return_type)))
+    .filter(Boolean)
+    .sort()
 
   // Get security options based on what exists in the selected schema
   const hasDefiner = schemaFunctions.some((fn) => fn.security_definer)
@@ -378,6 +380,7 @@ export const FunctionsList = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead key="name">Name</TableHead>
+                  <TableHead key="type">Type</TableHead>
                   <TableHead key="arguments" className="table-cell">
                     Arguments
                   </TableHead>
@@ -392,7 +395,6 @@ export const FunctionsList = () => {
               </TableHeader>
               <TableBody>
                 <FunctionList
-                  schema={selectedSchema}
                   filterString={filterString}
                   isLocked={isSchemaLocked}
                   returnTypeFilter={returnTypeFilter ?? []}
@@ -400,7 +402,6 @@ export const FunctionsList = () => {
                   duplicateFunction={duplicateFunction}
                   editFunction={editFunction}
                   deleteFunction={(fn) => setSelectedFunctionToDelete(fn.id.toString())}
-                  functions={functions ?? []}
                 />
               </TableBody>
             </Table>
