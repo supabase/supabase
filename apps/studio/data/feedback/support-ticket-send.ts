@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { z } from 'zod'
 
 // End of third-party imports
 
@@ -25,6 +26,11 @@ export type sendSupportTicketVariables = {
   dashboardLogs?: string
   dashboardStudioVersion?: string
 }
+
+const RateLimitErrorSchema = z.object({
+  code: z.number().optional(),
+  retryAfter: z.number().optional(),
+})
 
 export async function sendSupportTicket({
   subject,
@@ -66,36 +72,21 @@ export async function sendSupportTicket({
   })
 
   if (error) {
-    // openapi-fetch resolves this endpoint's result to `never`, so we widen to
-    // `unknown` and validate the fields at runtime (the same checks handleError
-    // uses) rather than asserting a shape.
-    const apiError: unknown = error
-    let code: number | undefined
-    let retryAfterValue: number | undefined
-    if (typeof apiError === 'object' && apiError !== null) {
-      if ('code' in apiError && typeof apiError.code === 'number') {
-        code = apiError.code
-      }
-      if ('retryAfter' in apiError && typeof apiError.retryAfter === 'number') {
-        retryAfterValue = apiError.retryAfter
-      }
-    }
+    const parsedError = RateLimitErrorSchema.safeParse(error)
+    const { code, retryAfter } = parsedError.success ? parsedError.data : {}
 
-    // Rate-limited submissions (429) are an expected, recoverable condition, so we
-    // surface a friendly message and do not report them to Sentry. The endpoint is
-    // throttled to one request per 60 seconds and does not always send a retryAfter
-    // value, so fall back to that known window.
+    // 429s are expected and recoverable, so we skip the Sentry capture below and
+    // fall back to the endpoint's 60 second window when no retryAfter is provided.
     if (code === 429) {
-      const retryAfter = retryAfterValue ?? 60
+      const waitSeconds = retryAfter ?? 60
       throw new ResponseError(
-        `You have submitted too many support requests. Please try again in ${retryAfter} second${retryAfter === 1 ? '' : 's'}.`,
+        `You have submitted too many support requests. Please try again in ${waitSeconds} second${waitSeconds === 1 ? '' : 's'}.`,
         429,
         undefined,
-        retryAfter
+        waitSeconds
       )
     }
 
-    // Any other error: capture to Sentry and rethrow with support-form context.
     handleError(error, {
       alwaysCapture: true,
       sentryContext: {
