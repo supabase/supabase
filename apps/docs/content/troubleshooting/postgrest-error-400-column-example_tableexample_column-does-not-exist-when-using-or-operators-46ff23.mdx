@@ -9,7 +9,7 @@ message = "column example_table.example_column does not exist"
 
 ---
 
-If you receive a `400` error with the message `column example_table.example_column does not exist` only on mutation requests (`PATCH`, `POST`, `DELETE`) — while `SELECT` queries on the same column work fine — this is a known bug in PostgREST versions prior to 14.4 ([issue #3707](https://github.com/PostgREST/postgrest/issues/3707)).
+If you receive a `400` error with the message `column example_table.example_column does not exist` only on mutation requests (`PATCH`, `POST`, `DELETE`) — while `SELECT` queries on the same column work fine — this is a known bug in PostgREST versions before 14.4 ([issue #3707](https://github.com/PostgREST/postgrest/issues/3707)).
 
 ## Root cause
 
@@ -25,7 +25,7 @@ The bug is triggered when an `or()` filter is included in a mutation request. Po
 
 ### Option 1: Upgrade (permanent fix)
 
-Navigate to [Project Settings > Infrastructure](/dashboard/project/_/settings/infrastructure) and upgrade to the latest PostgreSQL version. This automatically upgrades PostgREST to 14.5+, where the bug is resolved.
+Navigate to [Project Settings > Infrastructure](/dashboard/project/_/settings/infrastructure) and upgrade to the latest Postgres version. This automatically upgrades PostgREST to 14.5+, where the bug is resolved.
 
 ### Option 2: Query workaround (immediate)
 
