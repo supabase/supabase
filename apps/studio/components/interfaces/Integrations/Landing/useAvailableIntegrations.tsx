@@ -1,9 +1,9 @@
-import { FeatureFlagContext, IS_PLATFORM, useFlag } from 'common'
+import { FeatureFlagContext, getFlags, IS_PLATFORM, useFlag, useUser } from 'common'
 import { fullImageUrl } from 'common/marketplace-client'
 import { Boxes } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
-import { useContext, useMemo } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import { cn } from 'ui'
 
 import { INTEGRATIONS, Loading, type IntegrationDefinition } from './Integrations.constants'
@@ -38,6 +38,18 @@ function isForeignDataWrapper(integration: MarketplaceIntegration) {
   return integration.categories.some((c) => c?.slug === 'foreign-data-wrapper')
 }
 
+function parsePreviewListingsFlag(flagVal: string | false): (slug: string) => boolean {
+  if (flagVal === false) {
+    return (_slug) => false
+  }
+  const slugs = flagVal.split(",").map((s) => s.trim())
+  if (slugs.includes('*')) {
+    return (_slug) => true
+  } else {
+    return (slug) => slugs.includes(slug)
+  }
+}
+
 /**
  * [Joshen] Returns a combination of
  * - Marketplace integrations retrieved remotely (Only if feature flag enabled)
@@ -48,18 +60,21 @@ export const useAvailableIntegrations = () => {
   const isMarketplaceEnabled = useIsMarketplaceEnabled()
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
 
-  const grafanaEnabled = useFlag('grafanaDashboardIntegrationEnabled')
-  const resendEnabled = useFlag('resendDashboardIntegrationEnabled')
-  const aikidoEnabled = useFlag('aikidoDashboardIntegrationEnabled')
-  const dopplerEnabled = useFlag('dopplerDashboardIntegrationEnabled')
-
   const { data: cliData } = useCLIReleaseVersionQuery()
   const isCLI = !!cliData?.current
 
-  const { data, error } = useMarketplaceIntegrationsQuery({ enabled: isMarketplaceEnabled })
-  const isPending = IS_PLATFORM && (!hasLoaded || (isMarketplaceEnabled && !data && !error))
-  const isSuccess = !IS_PLATFORM || (hasLoaded && (!isMarketplaceEnabled || (!!data && !error)))
+  const { data: marketplaceData, error } = useMarketplaceIntegrationsQuery({ enabled: isMarketplaceEnabled })
+  const isPending = IS_PLATFORM && (!hasLoaded || (isMarketplaceEnabled && !marketplaceData && !error))
+  const isSuccess = !IS_PLATFORM || (hasLoaded && (!isMarketplaceEnabled || (!!marketplaceData && !error)))
   const isError = IS_PLATFORM && isMarketplaceEnabled && !!error
+
+  console.log(marketplaceData)
+
+  const previewListingsEnabled = useFlag<string>('previewMarketplaceListings')
+  const isPreviewEnabled = useMemo(() => parsePreviewListingsFlag(previewListingsEnabled), [previewListingsEnabled])
+
+  const enabledMarketplaceListings = useMemo(() => (marketplaceData ?? []).filter((integration) => (integration.review_status === 'approved' || (integration.review_status === 'preview' && isPreviewEnabled(integration.slug)))),
+    [marketplaceData, isPreviewEnabled])
 
   // [Joshen] Format marketplace integrations into existing ones for now
   // Likely that we might need to change, but can look into separately
@@ -67,8 +82,8 @@ export const useAvailableIntegrations = () => {
   // hardcoded studio wrappers below as content overrides.
   const marketplaceIntegrations: IntegrationDefinition[] = useMemo(
     () =>
-      (data ?? [])
-        ?.filter((integration) => !isForeignDataWrapper(integration))
+      enabledMarketplaceListings
+        .filter((integration) => !isForeignDataWrapper(integration))
         .map((integration) => {
           const {
             id: listingId,
@@ -143,19 +158,19 @@ export const useAvailableIntegrations = () => {
             },
           }
         }),
-    [data]
+    [enabledMarketplaceListings]
   )
 
   // Marketplace wrapper listings keyed by their studio-equivalent id
   // (marketplace uses dash-separated slugs, studio uses underscore-separated ids).
   const marketplaceWrappers = useMemo(() => {
     const map: Record<string, MarketplaceIntegration> = {}
-    ;(data ?? []).forEach((integration) => {
-      if (!isForeignDataWrapper(integration)) return
-      map[integration.slug.replaceAll('-', '_')] = integration
-    })
+      ; enabledMarketplaceListings.forEach((integration) => {
+        if (!isForeignDataWrapper(integration)) return
+        map[integration.slug.replaceAll('-', '_')] = integration
+      })
     return map
-  }, [data])
+  }, [enabledMarketplaceListings])
 
   // [Joshen] Existing integrations that are defined within studio
   // Available integrations are all integrations that can be installed. If an integration can't be installed (needed
@@ -211,24 +226,9 @@ export const useAvailableIntegrations = () => {
   }, [integrationsWrappers, isCLI, marketplaceWrappers])
 
   const dataWithMarketplace = useMemo(() => {
-    const flagGatedIds: Record<string, boolean> = {
-      grafana: grafanaEnabled,
-      resend: resendEnabled,
-      aikido: aikidoEnabled,
-      doppler: dopplerEnabled,
-    }
-
     return [...marketplaceIntegrations, ...allIntegrations]
-      .filter((integration) => flagGatedIds[integration.id] !== false)
       .sort((a, b) => a.name.localeCompare(b.name))
-  }, [
-    marketplaceIntegrations,
-    allIntegrations,
-    grafanaEnabled,
-    resendEnabled,
-    aikidoEnabled,
-    dopplerEnabled,
-  ])
+  }, [marketplaceIntegrations, allIntegrations])
 
   return {
     data: dataWithMarketplace,
