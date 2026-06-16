@@ -68,8 +68,6 @@ export const useAvailableIntegrations = () => {
   const isSuccess = !IS_PLATFORM || (hasLoaded && (!isMarketplaceEnabled || (!!marketplaceData && !error)))
   const isError = IS_PLATFORM && isMarketplaceEnabled && !!error
 
-  console.log(marketplaceData)
-
   const previewListingsEnabled = useFlag<string>('previewMarketplaceListings')
   const isPreviewEnabled = useMemo(() => parsePreviewListingsFlag(previewListingsEnabled), [previewListingsEnabled])
 
