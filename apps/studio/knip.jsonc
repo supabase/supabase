@@ -1,0 +1,21 @@
+// Custom knip config for studio app (temporary until we hand most of the warnings)
+{
+  "$schema": "https://unpkg.com/knip@5/schema-jsonc.json",
+  "exclude": ["types", "exports"],
+  "ignore": [
+    "examples/**",
+    "**/*.mdx",
+    // skip supabase functions
+    "supabase/functions/**",
+    "**/*.test.ts",
+    // ignore studio public folder
+    "public/**",
+    // ignore studio components that are dynamically imported
+    "components/interfaces/ConnectSheet/content/**",
+    "components/interfaces/ConnectSheet/ConnectionParameters.tsx",
+    "components/interfaces/ConnectSheet/DirectConnectionExamples.tsx",
+    "components/interfaces/ConnectSheet/useMcpUrl.ts",
+    // ignore studio data templates
+    "data/__templates/**",
+  ],
+}

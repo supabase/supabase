@@ -39,7 +39,7 @@
     "setup:cli": "supabase start -x studio && supabase status --output json > keys.json && node scripts/generateLocalEnv.js",
     "generate:types": "supabase gen types typescript --local > ./supabase/functions/common/database-types.ts",
     "api:codegen": "cd packages/api-types && pnpm run codegen",
-    "knip": "pnpx knip@~5.50.0",
+    "knip": "pnpx knip@~6.17.1",
     "authorize-vercel-deploys": "tsx scripts/authorizeVercelDeploys.ts"
   },
   "devDependencies": {
