@@ -43,11 +43,13 @@ export type ChartConfig = {
 interface ChartContextValue {
   isLoading?: boolean
   isDisabled?: boolean
+  isErrored?: boolean
 }
 
 const ChartContext = React.createContext<ChartContextValue>({
   isLoading: false,
   isDisabled: false,
+  isErrored: false,
 })
 
 export const useChart = () => {
@@ -59,15 +61,19 @@ interface ChartProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
   isLoading?: boolean
   isDisabled?: boolean
+  isErrored?: boolean
   className?: string
 }
 
 const chartTableClasses = `[&_tr]:border-b [&_tr]:border-border [&_thead_tr]:bg-transparent! [&_thead_th]:py-2! [&_thead_th]:!px-card [&_thead_th]:h-auto [&_tbody_td]:py-2.5 [&_tbody_td]:px-card [&_tbody_td]:text-xs [&_table]:mb-1 [&_table]:border-b [&_table]:border-border`
 
 const Chart = React.forwardRef<HTMLDivElement, ChartProps>(
-  ({ children, isLoading = false, isDisabled = false, className, ...props }, ref) => {
+  (
+    { children, isLoading = false, isDisabled = false, isErrored = false, className, ...props },
+    ref
+  ) => {
     return (
-      <ChartContext.Provider value={{ isLoading, isDisabled }}>
+      <ChartContext.Provider value={{ isLoading, isDisabled, isErrored }}>
         <div ref={ref} className={cn('relative w-full', className)} {...props}>
           {children}
         </div>
@@ -306,6 +312,7 @@ interface ChartContentProps extends React.HTMLAttributes<HTMLDivElement> {
   isEmpty?: boolean
   emptyState?: React.ReactNode
   loadingState?: React.ReactNode
+  errorState?: React.ReactNode
   disabledState?: React.ReactNode
   disabledActions?: ChartAction[]
 }
@@ -318,19 +325,22 @@ const ChartContent = React.forwardRef<HTMLDivElement, ChartContentProps>(
       isEmpty = false,
       emptyState,
       loadingState,
+      errorState,
       disabledState,
       disabledActions,
       ...props
     },
     ref
   ) => {
-    const { isLoading, isDisabled } = useChart()
+    const { isLoading, isDisabled, isErrored } = useChart()
     let content: React.ReactNode
 
     if (isDisabled) {
       content = disabledState
     } else if (isLoading) {
       content = loadingState
+    } else if (isErrored) {
+      content = errorState
     } else if (isEmpty) {
       content = emptyState
     } else {
