@@ -274,11 +274,17 @@ export const ProjectUsageSectionDeltas = () => {
                       ok_count: { label: 'Requests' },
                     }}
                     EmptyState={
-                      <NoDataPlaceholder
-                        size="small"
-                        message="No data for selected period"
-                        isFullHeight
-                      />
+                      // While loading, render a blank empty state so the loading
+                      // spinner doesn't sit on top of the "No data" placeholder.
+                      isLoading ? (
+                        <></>
+                      ) : (
+                        <NoDataPlaceholder
+                          size="small"
+                          message="No data for selected period"
+                          isFullHeight
+                        />
+                      )
                     }
                   />
                 </Loading>
