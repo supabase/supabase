@@ -86,7 +86,7 @@ Now lets add the `HCaptcha` component to the JSX section of our code
 <HCaptcha />
 ```
 
-We will pass it the sitekey we copied from the hCaptcha website as a property along with a `onVerify` property which takes a callback function. This callback function will have a token as one of its properties. Set the token in the state using `setCaptchaToken`
+Pass it the sitekey we copied from the hCaptcha website as a property along with a `onVerify` property which takes a callback function. This callback function will have a token as one of its properties. Set the token in the state using `setCaptchaToken`
 
 ```jsx
 <HCaptcha
@@ -165,7 +165,7 @@ Now lets add the Cloudflare Turnstile component to the JSX section of our code:
 <Turnstile />
 ```
 
-We will pass it the sitekey we copied from the Cloudflare website as a property along with a `onSuccess` property which takes a callback function. This callback function will have a token as one of its properties. Set the token in the state using `setCaptchaToken`:
+Pass it the sitekey we copied from the Cloudflare website as a property along with a `onSuccess` property which takes a callback function. This callback function will have a token as one of its properties. Set the token in the state using `setCaptchaToken`:
 
 ```jsx
 <Turnstile
