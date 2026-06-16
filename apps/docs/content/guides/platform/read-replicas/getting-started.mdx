@@ -100,7 +100,7 @@ We combine it with streaming replication to reduce replication lag. Once WAL-G f
 
 ### Restart or compute add-on change behaviour
 
-When you restart a project that utilizes Read Replicas, or change the compute add-on size, the Primary database gets restarted first. During this period, the Read Replicas remain available.
+When you restart a project that uses Read Replicas, or change the compute add-on size, the Primary database gets restarted first. During this period, the Read Replicas remain available.
 
 Once the Primary database has completed restarting (or resizing, in case of a compute add-on change) and become available for usage, all the Read Replicas are restarted (and resized, if needed) concurrently.
 

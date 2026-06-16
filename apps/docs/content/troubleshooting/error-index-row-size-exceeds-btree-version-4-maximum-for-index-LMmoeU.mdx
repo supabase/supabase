@@ -24,7 +24,7 @@ B-tree row can be a single attribute or multiple attributes. These cases are bet
 
 ## B-tree is built with multiple attributes
 
-B-tree with multiple attributes will perform better than several only in case the likely SELECT queries use several attributes that include the first attributes that are in the index. I.e. select by 1-st, 2-nd, 3-d but not by 2-nd, 3-d and 5-th index attributes.
+B-tree with multiple attributes will perform better than several only in case the likely SELECT queries use several attributes that include the first attributes that are in the index. That is, select by 1-st, 2-nd, 3-d but not by 2-nd, 3-d and 5-th index attributes.
 
 The other case when multiple attributes B-tree is good is when we have INSERT/UPDATE workload that is comparable to SELECT load (generally SELECTS a way more often). Then we can save speed-up updating a single index instead of several at INSERT/UPDATE at cost of SELECT performance decrease.
 
@@ -36,7 +36,7 @@ This can be if the index is built on text, JSON column etc. It's not prohibited 
 
 One of the measures of index efficiency is the ratio of index entries to the width of all possible values space for this datatype. If we have say 100000 distinct values of int32 in the index then the ratio is 1/40000. If we have text with length of 2704 bytes (maximum for B-tree index) we can hardly imagine the number of distinct values that gives us even a comparable ratio. That said indexing of that long values stores much redundancy in the index.
 
-The solution is simple: use some king of hashing to transfer the values to much narrower space. I.e. md5. The solution is simple, you build a functional index (=index by expression):
+The solution is: use some king of hashing to transfer the values to much narrower space. That is, md5. The solution is, you build a functional index (=index by expression):
 
 ```sql
 create index on table_name (MD5(column_name));
@@ -48,7 +48,7 @@ instead of:
 create index on table_name (column_name);
 ```
 
-Then you must modify you SELECTs to be using the same function (otherwise the functional index will not be used in SELECT queries). I.e.
+Then you must modify you SELECTs to be using the same function (otherwise the functional index will not be used in SELECT queries). That is.
 
 ```sql
 select * from table_name where MD5(column_name) = MD5('search_value');
@@ -62,6 +62,6 @@ select * from table_name where column_name = 'search_value';
 
 [More on building index by expression](https://www.postgresql.org/docs/current/sql-createindex.html)
 
-For some datatypes other than text that allows queries by partial inclusion (i.e. that the pair key-value is includes in a JSON or for implementing tsvector phrase search) you'd just use GIST/GIN indexes that inherently have values space much narrower that the whole to be indexed.
+For some datatypes other than text that allows queries by partial inclusion (that is, that the pair key-value is includes in a JSON or for implementing tsvector phrase search) you'd use GIST/GIN indexes that inherently have values space much narrower that the whole to be indexed.
 
 [More on GIN/GiST indexes](https://www.postgresql.org/docs/15/textsearch-indexes.html)

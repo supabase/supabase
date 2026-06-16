@@ -12,7 +12,7 @@ RUM index is based on GIN that stores additional per-entry information in a post
 - Text search with ranking by text distance operator
 - Text `SELECT`s with ordering by some non-indexed additional column e.g. by timestamp.
 
-RUM works best in scenarios when the possible keys are highly repeatable. I.e. all texts are composed of a
+RUM works best in scenarios when the possible keys are highly repeatable. That is, all texts are composed of a
 limited amount of words, so per-lexeme indexing gives significant speed-up in searching texts containing word
 combinations or phrases.
 
@@ -143,7 +143,7 @@ SELECT * FROM test_array WHERE i && '{1}' ORDER BY i `<=>` '{1}' ASC;
 
 `rum_anyarray_addon_ops`
 
-The does the same with `anyarray` index as `rum_tsvector_addon_ops` i.e. allows to order select results using distance
+The does the same with `anyarray` index as `rum_tsvector_addon_ops` that is, allows to order select results using distance
 operator by attached column.
 
 ## Limitations

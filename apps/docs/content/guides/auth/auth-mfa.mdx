@@ -222,7 +222,7 @@ create policy "Policy name."
 ```
 
 - The policy will accept both `aal1` and `aal2` for users with a `created_at`
-  timestamp prior to 12th December 2022 at 00:00 UTC, but will only accept
+  timestamp before 12th December 2022 at 00:00 UTC, but will only accept
   `aal2` for all other timestamps.
 - The `<@` operator is Postgres's ["contained in"
   operator.](https://www.postgresql.org/docs/current/functions-array.html)
@@ -271,7 +271,7 @@ It is possible to enforce MFA on the Server-Side Rendering level. However, this 
 
 You can use the `supabase.auth.mfa.getAuthenticatorAssuranceLevel()` and `supabase.auth.mfa.listFactors()` APIs to identify the AAL level of the session and any factors that are enabled for a user, similar to how you would use these on the browser.
 
-However, encountering a different AAL level on the server may not actually be a security problem. Consider these likely scenarios:
+However, encountering a different AAL level on the server may not be a security problem. Consider these likely scenarios:
 
 1. User signed-in with a conventional method but closed their tab on the MFA
    flow.
@@ -284,7 +284,7 @@ We thus recommend you redirect users to a page where they can authenticate using
 
 ### APIs
 
-If your application uses the Supabase Database, Storage or Edge Functions, just using Row Level Security policies will give you sufficient protection. In the event that you have other APIs that you wish to protect, follow these general guidelines:
+If your application uses the Supabase Database, Storage or Edge Functions, using Row Level Security policies will give you sufficient protection. In the event that you have other APIs that you wish to protect, follow these general guidelines:
 
 1. **Use a good JWT verification and parsing library for your language.**
    This will let you securely parse JWTs and extract their claims.
@@ -331,7 +331,7 @@ For example, the following structure describes a user that first signed in with 
 }
 ```
 
-Use the `supabase.auth.mfa.getAuthenticatorAssuranceLevel()` method to get easy access to this information in your browser app.
+Use the `supabase.auth.mfa.getAuthenticatorAssuranceLevel()` method to get access to this information in your browser app.
 
 You can use this Postgres snippet in RLS policies, too:
 

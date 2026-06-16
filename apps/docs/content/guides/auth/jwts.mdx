@@ -252,7 +252,7 @@ Consider the following:
 - It is difficult to detect or identify when or how a shared secret has been given to a malicious actor.
 - Consider who might have even accidental access to the shared secret: systems, staff, devices (and their disk encryption and vulnerability patch status).
 - A malicious actor can use a shared secret **far into the future**, so lacking current evidence of compromise does not mean your data is secure.
-- It can be very easy to accidentally leak the shared secret in publicly available source code such as in your website or frontend, mobile app package or other executable. This is especially true if you accidentally add the secret in environment variables prefixed with `NEXT_PUBLIC_`, `VITE_`, `PUBLIC_` or other conventions by web frameworks.
+- It can be very to accidentally leak the shared secret in publicly available source code such as in your website or frontend, mobile app package or other executable. This is especially true if you accidentally add the secret in environment variables prefixed with `NEXT_PUBLIC_`, `VITE_`, `PUBLIC_` or other conventions by web frameworks.
 - Rotating shared secrets might require careful coordination to avoid downtime of your app.
 
 </Admonition>

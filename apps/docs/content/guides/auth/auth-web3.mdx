@@ -13,7 +13,7 @@ Supported Web3 wallets:
 
 ## How does it work?
 
-Sign in with Web3 utilizes the [EIP 4361](https://eips.ethereum.org/EIPS/eip-4361) standard to authenticate wallet addresses off-chain. This standard is widely supported by the Ethereum and Solana ecosystems, making it the best choice for verifying wallet ownership.
+Sign in with Web3 uses the [EIP 4361](https://eips.ethereum.org/EIPS/eip-4361) standard to authenticate wallet addresses off-chain. This standard is widely supported by the Ethereum and Solana ecosystems, making it the best choice for verifying wallet ownership.
 
 Authentication works by asking the Web3 wallet application to sign a predefined message with the user's wallet. This message is parsed both by the Web3 wallet application and Supabase Auth to verify its validity and purpose, before creating a user account or session.
 
@@ -63,7 +63,7 @@ enabled = true
 
 ### Potential for abuse
 
-User accounts that sign in with their Web3 wallet will not have an email address or phone number associated with them. This can open your project to abuse as creating a Web3 wallet account is free and easy to automate and difficult to correlate with a real person's identity.
+User accounts that sign in with their Web3 wallet will not have an email address or phone number associated with them. This can open your project to abuse as creating a Web3 wallet account is free to automate and difficult to correlate with a real person's identity.
 
 Control your project's exposure by configuring in the dashboard:
 

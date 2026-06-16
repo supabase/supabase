@@ -89,7 +89,7 @@ Never expose your secret keys publicly. Your data is at risk. **Do not:**
 - Never use in a browser, even on `localhost`.
 - Do not pass in URLs or query params, as these are often logged.
 - Be careful passing them in request headers without prior log sanitization.
-- Take extra care logging even potentially **invalid API keys**. Simple typos might reveal the real key in the future.
+- Take extra care logging even potentially **invalid API keys**. typos might reveal the real key in the future.
 - Reveal, copy, use or manipulate on hardware devices without full disk encryption and which you do not directly own or control (such as public computers, friend's laptop, etc.)
 
 Ensure you handle them with care and using [secure coding practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/stable-en/).
@@ -118,7 +118,7 @@ Below are some starting guidelines on how to securely work with secret keys:
 
 ### What to do if a secret key or `service_role` has been leaked or compromised?
 
-Don't rush if this has happened, or you are suspecting it has. Make sure you have fully considered the situation and have remediated the root cause of the suspicion or vulnerability **first**. Consider using the [OWASP Risk Rating Methodology](https://owasp.org/www-community/OWASP_Risk_Rating_Methodology) as an easy way to identify the severity of the incident and to plan your next steps.
+Don't rush if this has happened, or you are suspecting it has. Make sure you have fully considered the situation and have remediated the root cause of the suspicion or vulnerability **first**. Consider using the [OWASP Risk Rating Methodology](https://owasp.org/www-community/OWASP_Risk_Rating_Methodology) as a way to identify the severity of the incident and to plan your next steps.
 
 To rotate a secret key (`sb_secret_...`), use the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard to create a new secret API key, then replace it with the compromised key. Once all components are using the new key, delete the compromised one.
 

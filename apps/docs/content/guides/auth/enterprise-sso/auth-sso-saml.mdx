@@ -106,7 +106,7 @@ If you use [Multi-Factor Authentication](/docs/guides/auth/auth-mfa) with SSO, t
 
 A common use case with SSO is to use the UUID of the identity provider as the identifier for the organization the user belongs to -- frequently known as a tenant. By associating the identity provider's UUID with your tenants, you can use restrictive RLS policies to scope down actions and data that a user is able to access.
 
-For example, let's say you have a table like:
+For example, say you have a table like:
 
 ```sql
 create table organization_settings (
@@ -182,7 +182,7 @@ Once you've added an identity provider, users who have access to it can sign in 
 - By signing-in from your application's user interface, commonly known as **SP (Service Provider) Initiated Flow**
 - By clicking on an icon in the application menu on the company intranet or identity provider page, commonly known as **Identity Provider Initiated (IdP) Flow**
 
-To initiate a sign-in request from your application's user interface (i.e. the SP Initiated Flow), you can use:
+To initiate a sign-in request from your application's user interface (that is, the SP Initiated Flow), you can use:
 
 <Tabs
   scrollable
@@ -446,7 +446,7 @@ You can use the `-o json` flag to output the information as JSON, should you nee
 
 ### Publishing your application to an identity provider's marketplace
 
-Many cloud-based identity providers offer a marketplace where you can register your application for easy on-boarding with customers. When you use Supabase Auth's SAML 2.0 support you can register your project in any one of these marketplaces.
+Many cloud-based identity providers offer a marketplace where you can register your application for on-boarding with customers. When you use Supabase Auth's SAML 2.0 support you can register your project in any one of these marketplaces.
 
 Refer to the relevant documentation for each cloud-based identity provider on how you can do this. Some common marketplaces are:
 
@@ -472,7 +472,7 @@ Should you run into this problem, it is most likely a misconfiguration issue **o
 
 ### Accessing the private key used for SAML in your project
 
-At this time it is not possible to extract the RSA private key used by your project's Supabase Auth server. This is done to keep the private key as secure as possible, given that SAML does not offer an easy way to rotate keys without disrupting service. (Use a SAML 2.0 Metadata URL whenever possible for this reason!)
+At this time it is not possible to extract the RSA private key used by your project's Supabase Auth server. This is done to keep the private key as secure as possible, given that SAML does not offer an way to rotate keys without disrupting service. (Use a SAML 2.0 Metadata URL whenever possible for this reason!)
 
 If you really need access to the key, [open a support ticket](/dashboard/support/new) and we'll try to support you as best as possible.
 

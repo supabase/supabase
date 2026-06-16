@@ -24,9 +24,9 @@ To illustrate how edge functions operate, consider a photo-sharing app where use
 - **Why Edge Functions?**:
   - They handle compute-intensive tasks without burdening the client device or the database.
   - Execution happens server-side but at the edge, ensuring speed and scalability.
-  - Developers define the function in a simple JavaScript file within the Supabase functions directory.
+ - Developers define the function in a JavaScript file within the Supabase functions directory.
 
-This example highlights edge functions as lightweight, on-demand code snippets that integrate seamlessly with Supabase services like Storage and Auth.
+This example highlights edge functions as lightweight, on-demand code snippets that integrate with Supabase services like Storage and Auth.
 
 ## 2. Deployment process
 
@@ -47,7 +47,7 @@ Once deployed, the function is ready for invocation from anywhere, with Supabase
 
 ## 3. Global distribution and routing
 
-Edge functions leverage a distributed architecture to minimize latency by running code close to the user.
+Edge functions use a distributed architecture to minimize latency by running code close to the user.
 
 - **Architecture Components**:
   - **Global API Gateway**: Acts as the entry point for all requests. It uses the requester's IP address to determine geographic location and routes the request to the nearest edge location (e.g., routing a request from Amsterdam to Frankfurt).

@@ -132,7 +132,7 @@ const client = new SupabaseManagementAPI({ accessToken: '<access token>' })
 
 ## Integration recommendations
 
-There are a couple common patterns you can consider adding to your integration that can facilitate a great user experience.
+There are a couple common patterns you can consider adding to your integration that can help a great user experience.
 
 ### Store API keys in env variables
 
@@ -162,7 +162,7 @@ You can configure the user's [custom SMTP settings](/docs/guides/auth/auth-smtp)
 
 ### Handling dynamic redirect URLs
 
-To handle multiple, dynamically generated redirect URLs within the same OAuth app, you can leverage the `state` query parameter. When starting the OAuth process, include the desired, encoded redirect URL in the `state` parameter.
+To handle multiple, dynamically generated redirect URLs within the same OAuth app, you can use the `state` query parameter. When starting the OAuth process, include the desired, encoded redirect URL in the `state` parameter.
 Once authorization is complete, we will sends the `state` value back to your app. You can then verify its integrity and extract the correct redirect URL, decoding it and redirecting the user to the correct URL.
 
 ## Current limitations

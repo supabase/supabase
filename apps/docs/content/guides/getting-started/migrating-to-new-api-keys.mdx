@@ -195,7 +195,7 @@ A good way to try this is to duplicate one of your functions and migrate the cop
 
 Before turning the legacy keys off, confirm nothing still depends on them. There's no automatic usage indicator, so this is a manual check. Go through every place that holds a Supabase key and make sure it now uses a publishable or secret key.
 
-Don't forget callers that are easy to miss:
+Don't forget callers that are to miss:
 
 - Mobile or desktop app versions already in users' hands.
 - CI/CD pipelines and deployment scripts.

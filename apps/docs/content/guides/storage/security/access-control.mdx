@@ -8,13 +8,13 @@ tocVideo: '4ERX__Y908k'
 
 Supabase Storage is designed to work perfectly with Postgres [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS).
 
-You can use RLS to create [Security Access Policies](https://www.postgresql.org/docs/current/sql-createpolicy.html) that are incredibly powerful and flexible, allowing you to restrict access based on your business needs.
+You can use RLS to create [Security Access Policies](https://www.postgresql.org/docs/current/sql-createpolicy.html) that are incredibly and flexible, allowing you to restrict access based on your business needs.
 
 ## Access policies
 
 By default Storage does not allow any uploads to buckets without RLS policies. You selectively allow certain operations by creating RLS policies on the `storage.objects` table.
 
-You can find the documentation for the storage schema [here](/docs/guides/storage/schema/design) , and to simplify the process of crafting your policies, you can utilize these [helper functions](/docs/guides/storage/schema/helper-functions) .
+You can find the documentation for the storage schema [here](/docs/guides/storage/schema/design), and to simplify the process of crafting your policies, you can use these [helper functions](/docs/guides/storage/schema/helper-functions) .
 
 If you need different `SELECT` policies for different Storage actions, such as listing objects versus reading authenticated objects, use the operation-aware helpers `storage.allow_only_operation()` and `storage.allow_any_operation()` documented in [Storage Helper Functions](/docs/guides/storage/schema/helper-functions).
 
@@ -30,7 +30,7 @@ To allow overwriting files using the `upsert` functionality you will need to add
 
 ## Policy examples
 
-An easy way to get started would be to create RLS policies for `SELECT`, `INSERT`, `UPDATE`, `DELETE` operations and restrict the policies to meet your security requirements. For example, one can start with the following `INSERT` policy:
+An way to get started would be to create RLS policies for `SELECT`, `INSERT`, `UPDATE`, `DELETE` operations and restrict the policies to meet your security requirements. For example, one can start with the following `INSERT` policy:
 
 ```sql
 create policy "policy_name"

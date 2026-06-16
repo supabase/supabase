@@ -18,7 +18,7 @@ You can enable the [IPv4 add-on](/docs/guides/platform/ipv4-address) for your pr
 
 ## What is XMIN and should it be used?
 
-Xmin is a different form of replication from logical replication and should only be used if logical replication is not available for your database (i.e. older versions of Postgres).
+Xmin is a different form of replication from logical replication and should only be used if logical replication is not available for your database (that is, older versions of Postgres).
 
 Xmin performs replication by checking the [xmin system column](https://www.postgresql.org/docs/current/ddl-system-columns.html) and determining if that row has already been synchronized.
 

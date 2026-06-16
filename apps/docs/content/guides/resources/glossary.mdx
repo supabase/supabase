@@ -64,13 +64,13 @@ A one-time password is a short, randomly generated and difficult to guess passwo
 
 ## Password hashing function
 
-Password hashing functions are specially-designed algorithms that allow web servers to verify a password without storing it as-is. Unlike other difficult to guess strings generated from secure random number generators, passwords are picked by users and often are easy to guess by attackers. These algorithms slow down and make it very costly for attackers to guess passwords.
+Password hashing functions are specially-designed algorithms that allow web servers to verify a password without storing it as-is. Unlike other difficult to guess strings generated from secure random number generators, passwords are picked by users and often are to guess by attackers. These algorithms slow down and make it very costly for attackers to guess passwords.
 
 There are three generally accepted password hashing functions: Argon2, bcrypt and scrypt.
 
 ## Password strength
 
-Password strength is a measurement of how difficult a password is to guess. Simple measurement includes calculating the number of possibilities given the types of characters used in the password. For example a password of only letters has fewer variations than ones with letters and digits. Better measurements include strategies such as looking for similarity to words, phrases or already known passwords.
+Password strength is a measurement of how difficult a password is to guess. measurement includes calculating the number of possibilities given the types of characters used in the password. For example a password of only letters has fewer variations than ones with letters and digits. Better measurements include strategies such as looking for similarity to words, phrases or already known passwords.
 
 ## PKCE
 
@@ -90,7 +90,7 @@ A refresh token is a long-lived (in most cases with an indefinite lifetime) toke
 
 ## Refresh token flow
 
-The refresh token flow is a mechanism that issues a new refresh and access token on the basis of a valid refresh token. It is used to extend authorization access for an application. An application that is being constantly used will invoke the refresh token flow just before the access token expires.
+The refresh token flow is a mechanism that issues a new refresh and access token on the basis of a valid refresh token. It is used to extend authorization access for an application. An application that is being constantly used will invoke the refresh token flow before the access token expires.
 
 ## Replay attack
 

@@ -9,12 +9,12 @@ This guide assumes you have already followed [the Build a Supabase Integration g
 
 When a Supabase user clicks the **Install Integration** button in the Dashboard, they are redirected to your system to begin the OAuth flow. You can implement this redirect in one of two ways:
 
-- **[Simple redirect](#method-1-simple-redirect)**: Easier to build, but your system cannot verify that the incoming user was sent by Supabase.
+- **[Redirect](#method-1-redirect)**: Easier to build, but your system cannot verify that the incoming user was sent by Supabase.
 - **[Signed redirect](#method-2-signed-redirect)**: More work to build, but cryptographically verifies that the redirect originated from Supabase. **Recommended for production integrations.**
 
 Pick the method that fits your security requirements, then follow the matching section below.
 
-## Method 1: Simple redirect
+## Method 1: Redirect
 
 In this method, you implement a single `GET` endpoint. Supabase redirects the user to this endpoint when they click **Install Integration**, and your endpoint kicks off the OAuth flow.
 

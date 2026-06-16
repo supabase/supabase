@@ -3,7 +3,7 @@ title: 'OAuth 2.1 Server'
 description: 'Turn your Supabase project into an OAuth 2.1 and OpenID Connect identity provider'
 ---
 
-Supabase Auth can act as an OAuth 2.1 and OpenID Connect (OIDC) identity provider. This allows other applications and services to use your Supabase project as their authentication provider, just like "Sign in with Google" or "Sign in with GitHub".
+Supabase Auth can act as an OAuth 2.1 and OpenID Connect (OIDC) identity provider. This allows other applications and services to use your Supabase project as their authentication provider, like "Sign in with Google" or "Sign in with GitHub".
 
 You can use this to build "Sign in with [Your App]" experiences, authenticate AI agents through the Model Context Protocol (MCP), power developer platforms with third-party integrations, or implement standards-compliant enterprise SSO.
 
@@ -42,7 +42,7 @@ Access tokens are standard Supabase JWTs that include `user_id`, `role`, and `cl
 
 ### Integration with existing auth
 
-OAuth 2.1 Server works seamlessly with your existing Supabase Auth configuration:
+OAuth 2.1 Server works with your existing Supabase Auth configuration:
 
 - Users can authenticate using any enabled method (password, magic link, social providers, MFA, phone)
 - [Custom Access Token Hooks](/docs/guides/auth/auth-hooks/custom-access-token-hook) apply to OAuth tokens, allowing you to customize claims like `audience` or add client-specific permissions

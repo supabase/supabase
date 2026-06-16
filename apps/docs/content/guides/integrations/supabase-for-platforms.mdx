@@ -267,7 +267,7 @@ It's important that the data in development branches is NOT production data, esp
 
 </Admonition>
 
-It's common in `DEV` branches to "seed" data. This is basically test data for users. Let's insert the following seed to our new todos table:
+It's common in `DEV` branches to "seed" data. This is basically test data for users. insert the following seed to our new todos table:
 
 ```sql
 insert into todos (task)
@@ -335,7 +335,7 @@ Merging changes will automatically merge only the following:
 
 Management API endpoint: [`GET /v1/projects/{ref}/advisors/security`](https://api.supabase.com/api/v1#tag/advisors/get/v1/projects/{ref}/advisors/security)
 
-Prior to deploying to production we strongly recommend running the security advisor on the project to make sure the latest changes are secure.
+Before deploying to production we strongly recommend running the security advisor on the project to make sure the latest changes are secure.
 
 ```sh
 curl https://api.supabase.com/v1/projects/{ref}/advisors/security \
@@ -351,7 +351,7 @@ Management API endpoint: [`POST /v1/projects/{ref}/database/backups/restore-pitr
 ![Rollback](/docs/img/integrations/rollback.png)
 
 - Rollbacks can cause data loss. Only use it in `PROD` when absolutely necessary.
-- Only available in prod when a project has already explicitly enabled PITR prior to rolling back.
+- Only available in prod when a project has already explicitly enabled PITR before rolling back.
 
 ```sh
 curl https://api.supabase.com/v1/projects/database/backups/restore-pitr \

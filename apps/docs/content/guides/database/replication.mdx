@@ -34,7 +34,7 @@ External replication (ETL) is currently in private alpha. Managed pipelines run 
 
 </Admonition>
 
-External replication (ETL) is powered by [Supabase ETL](https://github.com/supabase/etl). It uses Postgres logical replication under the hood and provides a managed Dashboard workflow for replicating data from Supabase Postgres to destination systems. In this context, "external" means outside the source database. Destinations can be Supabase-managed or third-party systems as support expands.
+External replication (ETL) is with [Supabase ETL](https://github.com/supabase/etl). It uses Postgres logical replication under the hood and provides a managed Dashboard workflow for replicating data from Supabase Postgres to destination systems. In this context, "external" means outside the source database. Destinations can be Supabase-managed or third-party systems as support expands.
 
 - [Set up external replication (ETL)](/docs/guides/database/replication/external-replication-setup)
 
@@ -78,7 +78,7 @@ When setting up logical replication, three key components are involved:
 
 - `publication` - A set of tables on your primary database that will be `published`
 - `replication slot` - A slot used for replicating the data from a single publication. The slot, when created, will specify the output format of the changes
-- `subscription` - A subscription is created from an external system (i.e. another Postgres database) and must specify the name of the `publication`. If you do not specify a replication slot, one is automatically created
+- `subscription` - A subscription is created from an external system (that is, another Postgres database) and must specify the name of the `publication`. If you do not specify a replication slot, one is automatically created
 
 ## Logical replication output format
 
@@ -86,7 +86,7 @@ Logical replication is typically output in two forms, `pgoutput` and `wal2json`.
 
 ## Logical replication configuration
 
-When using logical replication, Postgres keeps WAL files around for longer than it otherwise needs them. If the files are removed too quickly, then your `replication slot` can become inactive or lost if the database receives a large number of changes in a short time.
+When using logical replication, Postgres keeps WAL files around for longer than it otherwise needs them. If the files are removed too, then your `replication slot` can become inactive or lost if the database receives a large number of changes in a short time.
 
 In order to mitigate this, Postgres has many options and settings that can be [tweaked](/docs/guides/database/custom-postgres-config) to manage the WAL usage effectively. Not all of these settings are user configurable as they can impact the stability of your database. For those that are, these should be considered as advanced configuration and not changed without understanding that they can cause additional disk space and resources to be used, as well as incur additional costs.
 

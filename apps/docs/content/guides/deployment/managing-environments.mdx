@@ -320,7 +320,7 @@ When configured correctly, your repository will have CI and Release workflows th
 
 Follow the [migration steps](#create-a-new-migration) to create a `supabase/migrations/<timestamp>_new_employee.sql` file.
 
-Checkout a new branch `feat/employee` from `develop` , commit the migration file, and push to GitHub.
+Checkout a new branch `feat/employee` from `develop`, commit the migration file, and push to GitHub.
 
 ```bash
 git checkout -b feat/employee
@@ -345,7 +345,7 @@ The `release` job applies all new migration scripts merged in `supabase/migratio
 
 When setting up a new staging project, you might need to sync the initial schema with migrations previously applied to the production project.
 
-One way is to leverage the Release workflow:
+One way is to use the Release workflow:
 
 - Create a new branch `develop` and choose `main` as the branch source
 - Push the `develop` branch to GitHub

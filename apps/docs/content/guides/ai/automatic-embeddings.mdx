@@ -5,7 +5,7 @@ description: 'Automate embedding generation and updates in Postgres'
 sidebar_label: 'Automatic embeddings'
 ---
 
-Vector embeddings enable powerful [semantic search](/docs/guides/ai/semantic-search) capabilities in Postgres, but managing them alongside your content has traditionally been complex. This guide demonstrates how to automate embedding generation and updates using Supabase [Edge Functions](/docs/guides/functions), [pgmq](/docs/guides/database/extensions/pgmq), [pg_net](/docs/guides/database/extensions/pg_net), and [pg_cron](/docs/guides/cron).
+Vector embeddings enable [semantic search](/docs/guides/ai/semantic-search) capabilities in Postgres, but managing them alongside your content has traditionally been complex. This guide demonstrates how to automate embedding generation and updates using Supabase [Edge Functions](/docs/guides/functions), [pgmq](/docs/guides/database/extensions/pgmq), [pg_net](/docs/guides/database/extensions/pg_net), and [pg_cron](/docs/guides/cron).
 
 ## Understanding the challenge
 
@@ -20,7 +20,7 @@ While Postgres [full-text search](/docs/guides/database/full-text-search) can ha
 
 ## Understanding the architecture
 
-We'll leverage the following Postgres and Supabase features to create the automated embedding system:
+We'll use the following Postgres and Supabase features to create the automated embedding system:
 
 1. [pgvector](/docs/guides/database/extensions/pgvector): Stores and queries vector embeddings
 1. [pgmq](/docs/guides/queues): Queues embedding generation requests for processing and retries
@@ -41,7 +41,7 @@ We'll start by setting up the infrastructure needed to queue and process embeddi
 
 ### Step 1: Enable extensions
 
-First, let's enable the required extensions:
+First, enable the required extensions:
 
 <Tabs
   scrollable
@@ -174,7 +174,7 @@ Here we create:
 - A generic function to invoke any Edge Function with a given name and request body.
 - A generic trigger function to clear a column on update. This function accepts the column name as an argument and sets it to `NULL` in the `NEW` record. We'll explain how to use this function later.
 
-Every project has a unique API URL that is required to invoke Edge Functions. Let's go ahead and add the project URL secret to Vault depending on your environment.
+Every project has a unique API URL that is required to invoke Edge Functions. go ahead and add the project URL secret to Vault depending on your environment.
 
 When working with a local Supabase stack, add the following to your `supabase/seed.sql` file:
 
@@ -303,7 +303,7 @@ select
   );
 ```
 
-Let's discuss some common questions about this approach:
+Discuss some common questions about this approach:
 
 #### Why not generate all embeddings in a single Edge Function request?
 
@@ -572,7 +572,7 @@ See [Deploy to Production](/docs/guides/functions/deploy) for more information o
 
 ## Usage
 
-Now that the infrastructure is in place, let's go through an example of how to use this system to automatically generate embeddings for a table of documents. You can use this approach with multiple tables and customize the input for each embedding generation as needed.
+Now that the infrastructure is in place, go through an example of how to use this system to automatically generate embeddings for a table of documents. You can use this approach with multiple tables and customize the input for each embedding generation as needed.
 
 ### 1. Create table to store documents with embeddings
 
@@ -675,7 +675,7 @@ We intentionally use a `before` trigger because it allows us to modify the recor
 
 ### 3. Insert and update documents
 
-Let's insert a new document and update its content to see the embedding generation in action:
+Insert a new document and update its content to see the embedding generation in action:
 
 ```sql
 -- Insert a new document
@@ -701,7 +701,7 @@ where title = 'Understanding Vector Databases';
 
 You should see the generated embedding for the document.
 
-Next let's update the content of the document:
+Next update the content of the document:
 
 ```sql
 -- Update the content of the document
@@ -807,7 +807,7 @@ where
 
 ## Conclusion
 
-Automating embedding generation and updates in Postgres allow you to build powerful semantic search capabilities without the complexity of managing embeddings manually.
+Automating embedding generation and updates in Postgres allow you to build semantic search capabilities without the complexity of managing embeddings manually.
 
 By combining Postgres features like triggers, queues, and other extensions with Supabase Edge Functions, we can create a robust system that handles embedding generation asynchronously and retries failed jobs automatically.
 

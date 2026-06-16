@@ -18,7 +18,7 @@ If you get stuck while working through this guide, you can find the [full exampl
 
 ## Building the app
 
-Let's start building the Vue 3 app from scratch.
+Start building the Vue 3 app from scratch.
 
 ### Initialize a Nuxt 3 app
 
@@ -30,7 +30,7 @@ npx nuxi init nuxt-user-management
 cd nuxt-user-management
 ```
 
-Then let's install the only additional dependency: [Nuxt Supabase](https://supabase.nuxtjs.org/). We only need to import Nuxt Supabase as a dev dependency.
+Then install the only additional dependency: [Nuxt Supabase](https://supabase.nuxtjs.org/). We only need to import Nuxt Supabase as a dev dependency.
 
 ```bash
 npm install @nuxtjs/supabase --save-dev
@@ -73,7 +73,7 @@ export default defineNuxtConfig({
 
 ### Set up Auth component
 
-Let's set up a Vue component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
+Set up a Vue component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
 
 <$CodeTabs>
 
@@ -128,7 +128,7 @@ To access the user information, use the composable [`useSupabaseUser`](https://s
 ### Account component
 
 After a user is signed in we can allow them to edit their profile details and manage their account.
-Let's create a new component for that called `Account.vue`.
+Create a new component for that called `Account.vue`.
 
 <$CodeTabs>
 

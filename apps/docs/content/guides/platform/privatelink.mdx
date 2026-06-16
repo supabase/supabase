@@ -26,7 +26,7 @@ Supabase PrivateLink is an organisation level configuration. It works by sharing
 
 The connection architecture changes from public internet routing to a dedicated private path through AWS's secure network backbone.
 
-Supabase PrivateLink is currently just for direct database and PgBouncer connections only. It does not support other Supabase services like API, Storage, Auth, or Realtime. These services will continue to operate over public internet connections.
+Supabase PrivateLink is currently for direct database and PgBouncer connections only. It does not support other Supabase services like API, Storage, Auth, or Realtime. These services will continue to operate over public internet connections.
 
 ## Requirements
 
@@ -78,7 +78,7 @@ Ensure your security groups allow traffic on the appropriate ports:
 3. Give your security group a descriptive name and select the appropriate VPC
 4. Add an inbound rule for:
    - Type: Postgres (TCP, port 5432)
-   - Destination that is appropriate for your network. i.e. the subnet of your VPC or security group of your application instances
+   - Destination that is appropriate for your network. that is, the subnet of your VPC or security group of your application instances
 5. Finish creating the security group by clicking **Create security group**
 
 #### Step 4: Create connection

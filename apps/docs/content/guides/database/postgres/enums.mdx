@@ -31,7 +31,7 @@ There is a lot of overlap between Enums and foreign keys. Both can be used to de
 
 There are also some disadvantages to using Enums:
 
-- Limited Flexibility: Adding and removing values requires modifying the database schema (i.e.: using migrations) rather than adding data to a table.
+- Limited Flexibility: Adding and removing values requires modifying the database schema (that is.: using migrations) rather than adding data to a table.
 - Maintenance Overhead: Enum types require ongoing maintenance. If your application's requirements change frequently, maintaining enums can become burdensome.
 
 In general you should only use Enums when the list of values is small, fixed, and unlikely to change often. Things like "a list of continents" or "a list of departments" are good candidates for Enums.
@@ -93,7 +93,7 @@ where name = 'Alice';
 
 To add new values to an existing Postgres Enum, you can use the `ALTER TYPE` statement. Here's how you can do it:
 
-Let's say you have an existing Enum called `mood`, and you want to add a new value, `content`:
+Say you have an existing Enum called `mood`, and you want to add a new value, `content`:
 
 {/* prettier-ignore */}
 ```sql

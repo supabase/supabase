@@ -5,7 +5,7 @@ description: 'Learn about rate limiting for Edge Functions that call other Edge 
 subtitle: 'Understanding rate limits when Edge Functions invoke each other'
 ---
 
-Edge Functions can call other Edge Functions using `fetch()`. This enables powerful patterns like function chaining, fan-out/fan-in workflows, and recursive processing. To protect platform stability and prevent runaway amplification, Supabase rate limits these internal function-to-function calls.
+Edge Functions can call other Edge Functions using `fetch()`. This enables patterns like function chaining, fan-out/fan-in workflows, and recursive processing. To protect platform stability and prevent runaway amplification, Supabase rate limits these internal function-to-function calls.
 
 ## What gets rate limited
 
@@ -284,7 +284,7 @@ async function processWithDelay(items: any[]) {
 
 | Pattern                         | Budget consumption | Recommendation    |
 | ------------------------------- | ------------------ | ----------------- |
-| Simple chain (A to B to C)      | Low                | Generally safe    |
+| chain (A to B to C) | Low | Generally safe |
 | Fan-out (A to B, C, D, E)       | Moderate           | Limit concurrency |
 | Deep recursion (A to A to A...) | High               | Set max depth     |
 | Unbounded loops                 | Very high          | Avoid, use queues |

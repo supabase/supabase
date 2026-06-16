@@ -11,7 +11,7 @@ The `auth-helpers` packages are deprecated and replaced with the `@supabase/ssr`
 
 Here are the steps for you to migrate your application from the `auth-helpers` package to `@supabase/ssr` package.
 
-Depending on your implementation, you may ignore some parts of this documentation and use your own implementation (i.e. using API routes vs. Server Actions). What's important is you replace the clients provided by `auth-helpers` with the utility functions created using clients provided by `@supabase/ssr`.
+Depending on your implementation, you may ignore some parts of this documentation and use your own implementation (that is, using API routes vs. Server Actions). What's important is you replace the clients provided by `auth-helpers` with the utility functions created using clients provided by `@supabase/ssr`.
 
 ### 1. Uninstall Supabase Auth helpers and install the Supabase SSR package
 
@@ -215,7 +215,7 @@ export async function signup(formData: FormData) {
 }
 ```
 
-### 5. Utilize the server actions in your login page UI
+### 5. Use the server actions in your login page UI
 
 ```
 // app/login/page.tsx

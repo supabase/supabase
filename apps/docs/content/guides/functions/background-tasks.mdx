@@ -9,7 +9,7 @@ Edge Function instances can process background tasks outside of the request hand
 
 This allows you to:
 
-- Respond quickly to users while processing continues
+- Respond to users while processing continues
 - Handle async operations without blocking the response
 
 ---
@@ -69,7 +69,7 @@ export default {
 
 ## Handling errors
 
-We recommend using `try`/`catch` blocks within your background task function to handle errors.
+We recommend using `try`/`catch` blocks within your background task function to view and resolve errors.
 
 You can also add an event listener to [`unhandledrejection`](https://developer.mozilla.org/en-US/docs/Web/API/Window/unhandledrejection_event) to handle any promises without a rejection handler.
 
