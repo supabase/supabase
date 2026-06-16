@@ -330,7 +330,7 @@ val data = supabase.postgrest.rpc(
 
 ![Searching within a bounding box of a map](/docs/img/guides/database/extensions/postgis/map.png)
 
-When you are working on a map-based application where the user scrolls through your map, you might want to load the data that lies within the bounding box of the map every time your users scroll. PostGIS can return the rows that are within the bounding box just by supplying the bottom left and the top right coordinates. The function looks like this:
+When you are working on a map-based application where the user scrolls through your map, you might want to load the data that lies within the bounding box of the map every time your users scroll. PostGIS can return the rows that are within the bounding box by supplying the bottom left and the top right coordinates. The function looks like this:
 
 ```sql
 create or replace function restaurants_in_view(min_lat float, min_long float, max_lat float, max_long float)
