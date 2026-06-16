@@ -1,6 +1,14 @@
 import { useParams } from 'common'
 import { toast } from 'sonner'
-import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import {
+  Tabs_Shadcn_,
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
 import { ChartConfig } from './ChartConfig'
 import { UtilityActions } from './UtilityActions'
@@ -59,9 +67,12 @@ export const UtilityPanel = ({
   const snippet = snapV2.snippets[id]?.snippet
   const result = snapV2.results[id]?.[0]
 
+  const hasSql = (snippet?.content?.unchecked_sql ?? '').trim().length > 0
+
   const handleTabChange = (tab: string) => {
     // When switching to the explain tab, trigger the explain query
     if (tab === 'explain') {
+      if (!hasSql) return
       executeExplainQuery()
     }
     onActiveTabChange?.(tab)
@@ -136,9 +147,18 @@ export const UtilityPanel = ({
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
             <span className="translate-y-px">Results</span>
           </TabsTrigger_Shadcn_>
-          <TabsTrigger_Shadcn_ className="py-3 text-xs" value="explain">
-            <span className="translate-y-px">Explain</span>
-          </TabsTrigger_Shadcn_>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span>
+                <TabsTrigger_Shadcn_ className="py-3 text-xs" value="explain" disabled={!hasSql}>
+                  <span className="translate-y-px">Explain</span>
+                </TabsTrigger_Shadcn_>
+              </span>
+            </TooltipTrigger>
+            {!hasSql && (
+              <TooltipContent side="bottom">Add a query to view its execution plan</TooltipContent>
+            )}
+          </Tooltip>
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="chart">
             <span className="translate-y-px">Chart</span>
           </TabsTrigger_Shadcn_>
