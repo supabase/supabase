@@ -1,5 +1,6 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
@@ -22,6 +23,8 @@ import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useTrack } from '@/lib/telemetry/track'
+
+dayjs.extend(utc)
 
 // The homepage usage cards only surface this subset of the services returned by
 // the shared service-health endpoint, and the telemetry events are typed to match.
@@ -158,15 +161,18 @@ export const ProjectUsageSectionDeltas = () => {
     (logRoute: string, serviceKey: HomeServiceKey) => (datum: LogsBarChartDatum) => {
       if (!datum?.timestamp) return
 
-      // datum.timestamp is the UTC bucket boundary from the endpoint, so scope the
-      // log view to exactly that bucket's width.
+      // datum.timestamp is already the UTC bucket boundary from the endpoint, so
+      // use it directly (parsed as UTC) to scope the log view to that bucket's
+      // width. The logs explorer reads its query range from the `its`/`ite`
+      // params, so send those (not iso_timestamp_start/end, which only drive the
+      // date-picker label).
       const unit = interval === '1hr' ? 'minute' : interval === '1day' ? 'hour' : 'day'
       const start = datum.timestamp
-      const end = dayjs(datum.timestamp).add(1, unit).toISOString()
+      const end = dayjs.utc(datum.timestamp).add(1, unit).toISOString()
 
       const queryParams = new URLSearchParams({
-        iso_timestamp_start: start,
-        iso_timestamp_end: end,
+        its: start,
+        ite: end,
       })
 
       router.push(`/project/${projectRef}${logRoute}?${queryParams.toString()}`)
