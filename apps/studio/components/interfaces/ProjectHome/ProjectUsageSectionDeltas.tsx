@@ -140,12 +140,11 @@ export const ProjectUsageSectionDeltas = () => {
   const totalErrors = services.reduce((sum, s) => sum + s.err, 0)
   const totalWarnings = services.reduce((sum, s) => sum + s.warn, 0)
 
-  const { successRate, nonSuccessRate } = computeSuccessAndNonSuccessRates(
+  const { successRate } = computeSuccessAndNonSuccessRates(
     totalRequests,
     totalWarnings,
     totalErrors
   )
-  const nonSuccessClass = nonSuccessRate > 0 ? 'text-destructive' : 'text-brand-link'
 
   const handleBarClick =
     (logRoute: string, serviceKey: HomeServiceKey) => (datum: LogsBarChartDatum) => {
@@ -181,9 +180,6 @@ export const ProjectUsageSectionDeltas = () => {
           <div className="flex items-start gap-2 heading-section text-foreground-light">
             <span className="text-foreground">{successRate.toFixed(1)}%</span>
             <span>Success Rate</span>
-            <span className={cn('text-sm', nonSuccessClass)}>
-              {nonSuccessRate.toFixed(1)}% errors
-            </span>
           </div>
         </div>
         <ChartIntervalDropdown
