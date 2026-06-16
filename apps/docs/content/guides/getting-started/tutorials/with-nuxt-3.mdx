@@ -385,7 +385,7 @@ export default defineHandler({
     const { data, error } = await supabase
       .from('profiles')
       .select('username, website, avatar_url')
-      .eq('id', userClaims.sub)
+      .eq('id', userClaims.id)
       .single()
 
     if (error) {
