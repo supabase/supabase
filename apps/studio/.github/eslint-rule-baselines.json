@@ -3,10 +3,10 @@
     "react-hooks/exhaustive-deps": 174,
     "import/no-anonymous-default-export": 57,
     "@tanstack/query/exhaustive-deps": 9,
-    "@typescript-eslint/no-explicit-any": 968,
+    "@typescript-eslint/no-explicit-any": 966,
     "no-restricted-imports": 0,
     "no-restricted-exports": 240,
-    "react/no-unstable-nested-components": 47
+    "react/no-unstable-nested-components": 42
   },
   "ruleFiles": {
     "react-hooks/exhaustive-deps": {
@@ -366,7 +366,6 @@
       "components/interfaces/SQLEditor/UtilityPanel/UtilityPanel.tsx": 1,
       "components/interfaces/SQLEditor/hooks.ts": 1,
       "components/interfaces/SQLEditor/useAddDefinitions.ts": 1,
-      "components/interfaces/Settings/Database/DatabaseSettings/ResetDbPassword.tsx": 2,
       "components/interfaces/Settings/Database/NetworkRestrictions/AddRestrictionModal.tsx": 1,
       "components/interfaces/Settings/Database/NetworkRestrictions/NetworkRestrictions.utils.ts": 2,
       "components/interfaces/Settings/Infrastructure/InfrastructureActivity.tsx": 1,
@@ -888,7 +887,6 @@
       "components/interfaces/Settings/Logs/LogSelection.tsx": 1,
       "components/interfaces/Settings/Logs/LogsFormatters.tsx": 2,
       "components/interfaces/Settings/Logs/PreviewFilterPanelWithUniversal.tsx": 1,
-      "components/interfaces/UnifiedLogs/components/LogTypeIcon.tsx": 5,
       "components/layouts/Navigation/LayoutHeader/FeedbackDropdown/FeedbackWidget.tsx": 1,
       "components/layouts/Navigation/NavigationBar/NavigationIconLink.tsx": 1,
       "components/layouts/SQLEditorLayout/SQLEditorNavV2/SQLEditorNav.tsx": 3,

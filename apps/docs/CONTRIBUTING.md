@@ -345,7 +345,7 @@ Here are some exceptions and Supabase-specific guidelines.
 
 ### General word usage
 
-- **Filler words**: You can often make your writing more concise by removing these words. (Some of these words can also sound patronizing.)
+- **Filler words**: You can often make your writing more concise by removing these words. (Some of these words can also sound patronizing.) Most filler, marketing, and vague-verb phrases are flagged by `supa-mdx-lint` as warnings, with suggested alternatives where a direct replacement exists. Run `pnpm lint:mdx` in `apps/docs` to check your changes.
   - Actually
   - Easy, easily
   - Just
@@ -360,8 +360,8 @@ Here are some exceptions and Supabase-specific guidelines.
 
 ### Word list
 
-- `Backend` isn't hyphenated (not `back-end`).
 - `Frontend` isn't hyphenated (not `front-end`).
+- `Backend` isn't hyphenated (not `back-end`).
 - `Login` is a noun. `Log in` is a verb.
 - `Postgres` is capitalized, except in code, and used instead of `PostgreSQL`.
 - `Setup` is a noun. `Set up` is a verb.
@@ -370,6 +370,6 @@ Here are some exceptions and Supabase-specific guidelines.
 
 ## Search
 
-Search is handled using a Supabase instance. During CI, [a script](https://github.com/supabase/supabase/blob/master/apps/docs/scripts/search/generate-embeddings.ts) aggregates all content sources (eg. guides, reference docs, etc), indexes them using OpenAI embeddings, and stores them in a Supabase database.
+Search is handled using a Supabase instance. During CI, [a script](https://github.com/supabase/supabase/blob/master/apps/docs/scripts/search/generate-embeddings.ts) aggregates all content sources (for example, guides, reference docs, etc), indexes them using OpenAI embeddings, and stores them in a Supabase database.
 
 Search uses a hybrid of native Postgres FTS and embedding similarity search based on [`pgvector`](https://github.com/pgvector/pgvector). At runtime, a PostgREST call triggers the RPC that runs the weighted FTS search, and an [Edge Function](https://github.com/supabase/supabase/tree/master/supabase/functions) is executed to perform the embedding search.

@@ -3,8 +3,8 @@ import { QueryClient, useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { privilegeKeys } from './keys'
-import { executeSql, ExecuteSqlError } from '@/data/sql/execute-sql-query'
-import { UseCustomQueryOptions } from '@/types'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type TablePrivilegesVariables = {
   projectRef?: string
@@ -16,7 +16,7 @@ export type PgTablePrivileges = z.infer<typeof pgMeta.tablePrivileges.zod>
 
 const pgMetaTablePrivilegesList = pgMeta.tablePrivileges.list()
 export type TablePrivilegesData = z.infer<typeof pgMetaTablePrivilegesList.zod>
-export type TablePrivilegesError = ExecuteSqlError
+export type TablePrivilegesError = ResponseError
 
 async function getTablePrivileges(
   { projectRef, connectionString, includedSchemas }: TablePrivilegesVariables,
