@@ -11,6 +11,7 @@ export const FUNCTIONS_OVERVIEW_SHORTCUT_IDS = {
   FUNCTION_OVERVIEW_INTERVAL_1HR: 'functions-overview.interval-1hr',
   FUNCTION_OVERVIEW_INTERVAL_3HR: 'functions-overview.interval-3hr',
   FUNCTION_OVERVIEW_INTERVAL_1DAY: 'functions-overview.interval-1day',
+  FUNCTION_OVERVIEW_TOGGLE_INTERVAL_PICKER: 'functions-overview.toggle-interval-picker',
   FUNCTION_OVERVIEW_REFRESH: 'functions-overview.refresh',
   FUNCTION_OVERVIEW_OPEN_LOGS: 'functions-overview.open-logs',
 }
@@ -46,6 +47,13 @@ export const functionsOverviewRegistry: RegistryDefinations<FunctionsOverviewSho
     sequence: ['I', 'D'],
     showInSettings: false,
     options: { ignoreInputs: true, registerInCommandMenu: true },
+  },
+  [FUNCTIONS_OVERVIEW_SHORTCUT_IDS.FUNCTION_OVERVIEW_TOGGLE_INTERVAL_PICKER]: {
+    id: FUNCTIONS_OVERVIEW_SHORTCUT_IDS.FUNCTION_OVERVIEW_TOGGLE_INTERVAL_PICKER,
+    label: 'Open time picker',
+    sequence: ['Shift+P'],
+    showInSettings: false,
+    options: { ignoreInputs: true, registerInCommandMenu: true, conflictBehavior: 'allow' },
   },
   [FUNCTIONS_OVERVIEW_SHORTCUT_IDS.FUNCTION_OVERVIEW_REFRESH]: {
     id: FUNCTIONS_OVERVIEW_SHORTCUT_IDS.FUNCTION_OVERVIEW_REFRESH,

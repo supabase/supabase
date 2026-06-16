@@ -31,6 +31,13 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import {
   PageSection,
   PageSectionContent,
   PageSectionMeta,
@@ -142,247 +149,262 @@ export const EdgeFunctionDetails = () => {
   }, [selectedFunction])
 
   return (
-    <PageContainer size="small">
-      <PageSection>
-        <PageSectionMeta>
-          <PageSectionSummary>
-            <PageSectionTitle>Function configuration</PageSectionTitle>
-          </PageSectionSummary>
-        </PageSectionMeta>
-        <PageSectionContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onUpdateFunction)}>
-              <Card>
-                <CardContent>
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItemLayout
-                        label="Name"
-                        layout="flex-row-reverse"
-                        description="Your slug and endpoint URL will remain the same"
-                      >
-                        <FormControl>
-                          <Input {...field} className="w-64" disabled={!canUpdateEdgeFunction} />
-                        </FormControl>
-                      </FormItemLayout>
-                    )}
-                  />
-                </CardContent>
-                {IS_PLATFORM && (
-                  <>
-                    <CardContent>
-                      <FormField
-                        control={form.control}
-                        name="verify_jwt"
-                        render={({ field }) => (
-                          <FormItemLayout
-                            label="Verify JWT with legacy secret"
-                            layout="flex-row-reverse"
-                            description={
-                              <>
-                                <p className="mb-2">
-                                  Requires a JWT signed{' '}
-                                  <em className="text-foreground not-italic">
-                                    only by the legacy secret
-                                  </em>{' '}
-                                  in the{' '}
-                                  <code className="text-code-inline break-keep!">
-                                    Authorization
-                                  </code>{' '}
-                                  header. The <code className="text-code-inline">anon</code> key
-                                  satisfies this.
-                                </p>
-                                <p>
-                                  Recommended: OFF with JWT and custom auth logic in your function
-                                  code.
-                                </p>
-                              </>
-                            }
-                          >
-                            <FormControl>
-                              <Switch
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                                disabled={!canUpdateEdgeFunction}
-                              />
-                            </FormControl>
-                          </FormItemLayout>
-                        )}
-                      />
-                    </CardContent>
+    <>
+      <PageHeader size="small" className="pb-12">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Settings</PageHeaderTitle>
+            <PageHeaderDescription>
+              Configure function behavior, security, and deployment options.
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
 
-                    <CardFooter className="flex justify-end space-x-2">
-                      {form.formState.isDirty && (
-                        <Button type="default" onClick={() => form.reset()}>
-                          Cancel
-                        </Button>
+      <PageContainer size="small">
+        <PageSection className="pt-0">
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>Function configuration</PageSectionTitle>
+            </PageSectionSummary>
+          </PageSectionMeta>
+          <PageSectionContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onUpdateFunction)}>
+                <Card>
+                  <CardContent>
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItemLayout
+                          label="Name"
+                          layout="flex-row-reverse"
+                          description="Your slug and endpoint URL will remain the same"
+                        >
+                          <FormControl>
+                            <Input {...field} className="w-64" disabled={!canUpdateEdgeFunction} />
+                          </FormControl>
+                        </FormItemLayout>
                       )}
-                      <Button
-                        type="primary"
-                        htmlType="submit"
-                        loading={isUpdating}
-                        disabled={!canUpdateEdgeFunction || !form.formState.isDirty}
-                      >
-                        Save changes
-                      </Button>
-                    </CardFooter>
-                  </>
-                )}
-              </Card>
-            </form>
-          </Form>
-        </PageSectionContent>
-      </PageSection>
+                    />
+                  </CardContent>
+                  {IS_PLATFORM && (
+                    <>
+                      <CardContent>
+                        <FormField
+                          control={form.control}
+                          name="verify_jwt"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              label="Verify JWT with legacy secret"
+                              layout="flex-row-reverse"
+                              description={
+                                <>
+                                  <p className="mb-2">
+                                    Requires a JWT signed{' '}
+                                    <em className="text-foreground not-italic">
+                                      only by the legacy secret
+                                    </em>{' '}
+                                    in the{' '}
+                                    <code className="text-code-inline break-keep!">
+                                      Authorization
+                                    </code>{' '}
+                                    header. The <code className="text-code-inline">anon</code> key
+                                    satisfies this.
+                                  </p>
+                                  <p>
+                                    Recommended: OFF with JWT and custom auth logic in your function
+                                    code.
+                                  </p>
+                                </>
+                              }
+                            >
+                              <FormControl>
+                                <Switch
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                  disabled={!canUpdateEdgeFunction}
+                                />
+                              </FormControl>
+                            </FormItemLayout>
+                          )}
+                        />
+                      </CardContent>
 
-      <PageSection>
-        <PageSectionMeta>
-          <PageSectionSummary>
-            <PageSectionTitle>Invoke function</PageSectionTitle>
-          </PageSectionSummary>
-        </PageSectionMeta>
-        <PageSectionContent>
-          <Card>
-            <CardContent className="px-0">
-              <Tabs
-                className="w-full"
-                defaultValue="curl"
-                value={selectedTab}
-                onValueChange={setSelectedTab}
-              >
-                <TabsList className="flex flex-wrap gap-4 px-6">
-                  {invocationTabs.map((tab) => (
-                    <TabsTrigger key={tab.id} value={tab.id}>
-                      {tab.label}
-                    </TabsTrigger>
-                  ))}
-                  {selectedTab === 'curl' && (
-                    <Button
-                      type="default"
-                      className="ml-auto -translate-y-2 translate-x-3"
-                      onClick={() => setShowKey(!showKey)}
-                    >
-                      {showKey ? 'Hide' : 'Show'} anon key
-                    </Button>
-                  )}
-                </TabsList>
-                {invocationTabs.map((tab) => {
-                  const code = tab.code({
-                    showKey,
-                    functionUrl,
-                    functionName: selectedFunction?.name ?? '',
-                    apiKey,
-                  })
-
-                  return (
-                    <TabsContent key={tab.id} value={tab.id}>
-                      <CodeBlock
-                        value={code}
-                        wrapperClassName="[&>div]:top-0 [&>div]:right-3 px-6"
-                        className={cn(
-                          'p-0 text-xs mt-0! border-none ',
-                          showKey ? '[&>code]:break-all' : '[&>code]:wrap-break-word'
+                      <CardFooter className="flex justify-end space-x-2">
+                        {form.formState.isDirty && (
+                          <Button type="default" onClick={() => form.reset()}>
+                            Cancel
+                          </Button>
                         )}
-                        language={tab.language}
-                        wrapLines={false}
-                        hideLineNumbers={tab.hideLineNumbers}
-                        handleCopy={() => {
-                          copyToClipboard(
-                            tab.code({
-                              showKey: true,
-                              functionUrl,
-                              functionName: selectedFunction?.name ?? '',
-                              apiKey,
-                            })
-                          )
-                        }}
-                      />
-                    </TabsContent>
-                  )
-                })}
-              </Tabs>
-            </CardContent>
-          </Card>
-        </PageSectionContent>
-      </PageSection>
+                        <Button
+                          type="primary"
+                          htmlType="submit"
+                          loading={isUpdating}
+                          disabled={!canUpdateEdgeFunction || !form.formState.isDirty}
+                        >
+                          Save changes
+                        </Button>
+                      </CardFooter>
+                    </>
+                  )}
+                </Card>
+              </form>
+            </Form>
+          </PageSectionContent>
+        </PageSection>
 
-      {IS_PLATFORM && (
-        <>
-          <PageSection>
-            <PageSectionMeta>
-              <PageSectionSummary>
-                <PageSectionTitle>Develop locally</PageSectionTitle>
-              </PageSectionSummary>
-            </PageSectionMeta>
-            <PageSectionContent>
-              <div className="rounded-sm border bg-surface-100 px-6 py-4 drop-shadow-xs">
-                <div className="space-y-6">
-                  <CommandRender
-                    commands={[
-                      {
-                        command: `supabase functions download ${selectedFunction?.slug}`,
-                        description: 'Download the function to your local machine',
-                        jsx: () => (
-                          <>
-                            <span className="text-brand">supabase</span> functions download{' '}
-                            {selectedFunction?.slug}
-                          </>
-                        ),
-                        comment: '1. Download the function',
-                      },
-                    ]}
-                  />
-                  <CommandRender commands={[managementCommands[0]]} />
-                  <CommandRender commands={[managementCommands[1]]} />
+        <PageSection>
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>Invoke function</PageSectionTitle>
+            </PageSectionSummary>
+          </PageSectionMeta>
+          <PageSectionContent>
+            <Card>
+              <CardContent className="px-0">
+                <Tabs
+                  className="w-full"
+                  defaultValue="curl"
+                  value={selectedTab}
+                  onValueChange={setSelectedTab}
+                >
+                  <TabsList className="flex flex-wrap gap-4 px-6">
+                    {invocationTabs.map((tab) => (
+                      <TabsTrigger key={tab.id} value={tab.id}>
+                        {tab.label}
+                      </TabsTrigger>
+                    ))}
+                    {selectedTab === 'curl' && (
+                      <Button
+                        type="default"
+                        className="ml-auto -translate-y-2 translate-x-3"
+                        onClick={() => setShowKey(!showKey)}
+                      >
+                        {showKey ? 'Hide' : 'Show'} anon key
+                      </Button>
+                    )}
+                  </TabsList>
+                  {invocationTabs.map((tab) => {
+                    const code = tab.code({
+                      showKey,
+                      functionUrl,
+                      functionName: selectedFunction?.name ?? '',
+                      apiKey,
+                    })
+
+                    return (
+                      <TabsContent key={tab.id} value={tab.id}>
+                        <CodeBlock
+                          value={code}
+                          wrapperClassName="[&>div]:top-0 [&>div]:right-3 px-6"
+                          className={cn(
+                            'p-0 text-xs mt-0! border-none ',
+                            showKey ? '[&>code]:break-all' : '[&>code]:wrap-break-word'
+                          )}
+                          language={tab.language}
+                          wrapLines={false}
+                          hideLineNumbers={tab.hideLineNumbers}
+                          handleCopy={() => {
+                            copyToClipboard(
+                              tab.code({
+                                showKey: true,
+                                functionUrl,
+                                functionName: selectedFunction?.name ?? '',
+                                apiKey,
+                              })
+                            )
+                          }}
+                        />
+                      </TabsContent>
+                    )
+                  })}
+                </Tabs>
+              </CardContent>
+            </Card>
+          </PageSectionContent>
+        </PageSection>
+
+        {IS_PLATFORM && (
+          <>
+            <PageSection>
+              <PageSectionMeta>
+                <PageSectionSummary>
+                  <PageSectionTitle>Develop locally</PageSectionTitle>
+                </PageSectionSummary>
+              </PageSectionMeta>
+              <PageSectionContent>
+                <div className="rounded-sm border bg-surface-100 px-6 py-4 drop-shadow-xs">
+                  <div className="space-y-6">
+                    <CommandRender
+                      commands={[
+                        {
+                          command: `supabase functions download ${selectedFunction?.slug}`,
+                          description: 'Download the function to your local machine',
+                          jsx: () => (
+                            <>
+                              <span className="text-brand">supabase</span> functions download{' '}
+                              {selectedFunction?.slug}
+                            </>
+                          ),
+                          comment: '1. Download the function',
+                        },
+                      ]}
+                    />
+                    <CommandRender commands={[managementCommands[0]]} />
+                    <CommandRender commands={[managementCommands[1]]} />
+                  </div>
                 </div>
-              </div>
-            </PageSectionContent>
-          </PageSection>
-          <PageSection>
-            <PageSectionMeta>
-              <PageSectionSummary>
-                <PageSectionTitle>Delete function</PageSectionTitle>
-              </PageSectionSummary>
-            </PageSectionMeta>
-            <PageSectionContent>
-              <Alert variant="destructive">
-                <CriticalIcon />
-                <AlertTitle>Once your function is deleted, it can no longer be restored</AlertTitle>
-                <AlertDescription>
-                  Make sure you have made a backup if you want to restore your edge function
-                </AlertDescription>
-                <AlertDescription className="mt-3">
-                  <Button
-                    type="danger"
-                    disabled={!canUpdateEdgeFunction}
-                    loading={selectedFunction?.id === undefined}
-                    onClick={() => setShowDeleteModal(true)}
-                  >
-                    Delete edge function
-                  </Button>
-                </AlertDescription>
-              </Alert>
-            </PageSectionContent>
-          </PageSection>
-          <ConfirmationModal
-            visible={showDeleteModal}
-            loading={isDeleting}
-            variant="destructive"
-            confirmLabel="Delete"
-            confirmLabelLoading="Deleting"
-            title={`Confirm to delete ${selectedFunction?.name}`}
-            onCancel={() => setShowDeleteModal(false)}
-            onConfirm={onConfirmDelete}
-            alert={{
-              base: { variant: 'destructive' },
-              title: 'This action cannot be undone',
-              description:
-                'Ensure that you have made a backup if you want to restore your edge function',
-            }}
-          />
-        </>
-      )}
-    </PageContainer>
+              </PageSectionContent>
+            </PageSection>
+            <PageSection>
+              <PageSectionMeta>
+                <PageSectionSummary>
+                  <PageSectionTitle>Delete function</PageSectionTitle>
+                </PageSectionSummary>
+              </PageSectionMeta>
+              <PageSectionContent>
+                <Alert variant="destructive">
+                  <CriticalIcon />
+                  <AlertTitle>
+                    Once your function is deleted, it can no longer be restored
+                  </AlertTitle>
+                  <AlertDescription>
+                    Make sure you have made a backup if you want to restore your edge function
+                  </AlertDescription>
+                  <AlertDescription className="mt-3">
+                    <Button
+                      type="danger"
+                      disabled={!canUpdateEdgeFunction}
+                      loading={selectedFunction?.id === undefined}
+                      onClick={() => setShowDeleteModal(true)}
+                    >
+                      Delete edge function
+                    </Button>
+                  </AlertDescription>
+                </Alert>
+              </PageSectionContent>
+            </PageSection>
+            <ConfirmationModal
+              visible={showDeleteModal}
+              loading={isDeleting}
+              variant="destructive"
+              confirmLabel="Delete"
+              confirmLabelLoading="Deleting"
+              title={`Confirm to delete ${selectedFunction?.name}`}
+              onCancel={() => setShowDeleteModal(false)}
+              onConfirm={onConfirmDelete}
+              alert={{
+                base: { variant: 'destructive' },
+                title: 'This action cannot be undone',
+                description:
+                  'Ensure that you have made a backup if you want to restore your edge function',
+              }}
+            />
+          </>
+        )}
+      </PageContainer>
+    </>
   )
 }
