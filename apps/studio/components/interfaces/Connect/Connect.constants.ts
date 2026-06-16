@@ -366,6 +366,13 @@ export const ORMS: ConnectionType[] = [
     children: [],
   },
   {
+    key: 'prisma-legacy',
+    label: 'Prisma (Legacy)',
+    icon: 'prisma',
+    guideLink: 'https://supabase.com/partners/integrations/prisma',
+    children: [],
+  },
+  {
     key: 'drizzle',
     label: 'Drizzle',
     icon: 'drizzle',
