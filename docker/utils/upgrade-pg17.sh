@@ -724,7 +724,7 @@ apply_role_migrations() {
     # Mirror what update_extensions.sql does, but against the running target image
     # and for every installed extension: ALTER EXTENSION ... UPDATE brings each one
     # up to the image's default version. This is generic on purpose - it tracks the
-    # image (matching platform behaviour) and stays correct across future image
+    # image (matching platform behavior) and stays correct across future image
     # bumps without maintaining a hardcoded list. ALTER ... UPDATE is a no-op when
     # already at the default. Per-extension exceptions are caught so one extension
     # with no update path (e.g. pg_cron 1.6 -> 1.6.4, handled below) does not abort

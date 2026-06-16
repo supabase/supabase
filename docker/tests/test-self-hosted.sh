@@ -206,13 +206,23 @@ check "REST API query" "200" \
 # ---------------------------------------------
 
 echo ""
-echo "--- GraphQL ---"
+echo "--- GraphQL (disabled by default) ---"
+# As of the Postgres 17 image, pg_graphql is OFF by default (the image drops the
+# extension on init, matching platform behavior for new projects). The endpoint
+# stays wired up, but introspection should NOT return data until a user enables
+# the extension - e.g. via Studio's database extensions UI, or
+# CREATE EXTENSION pg_graphql. Success here is that GraphQL is disabled.
 gql_resp=$(http_body "$BASE_URL/graphql/v1" \
     -H "apikey: $ANON_KEY" \
     -H "Content-Type: application/json" \
     -d '{"query":"{ __typename }"}')
-gql_has_data=$(echo "$gql_resp" | jq -r 'if .data then "true" else "false" end' 2>/dev/null)
-check "GraphQL introspection" "true" "$gql_has_data"
+# .data present => extension enabled; no data (or an error body) => disabled
+if echo "$gql_resp" | jq -e '.data' >/dev/null 2>&1; then
+    gql_state="enabled"
+else
+    gql_state="disabled"
+fi
+check "GraphQL disabled by default" "disabled" "$gql_state"
 
 # ---------------------------------------------
 # 6. Storage: create bucket, upload >6MB file, download, cleanup
