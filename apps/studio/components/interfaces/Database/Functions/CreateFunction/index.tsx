@@ -45,6 +45,7 @@ import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-
 import { useDatabaseFunctionCreateMutation } from '@/data/database-functions/database-functions-create-mutation'
 import type { SavedDatabaseFunction } from '@/data/database-functions/database-functions-query'
 import { useDatabaseFunctionUpdateMutation } from '@/data/database-functions/database-functions-update-mutation'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
@@ -60,6 +61,7 @@ interface CreateFunctionProps {
 
 const FormSchema = z.object({
   name: z.string().trim().min(1),
+  type: z.enum(['function', 'procedure']),
   schema: z.string().trim().min(1),
   args: z.array(z.object({ name: z.string().trim().min(1), type: z.string().trim() })),
   behavior: z.enum(['IMMUTABLE', 'STABLE', 'VOLATILE']),
@@ -78,7 +80,9 @@ export const CreateFunction = ({
   isDuplicating = false,
   onClose,
 }: CreateFunctionProps) => {
+  const { selectedSchema } = useQuerySchemaState()
   const { data: project } = useSelectedProjectQuery()
+
   const [advancedSettingsShown, setAdvancedSettingsShown] = useState(false)
   const [focusedEditor, setFocusedEditor] = useState(false)
 
@@ -87,7 +91,7 @@ export const CreateFunction = ({
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   })
-  const language = form.watch('language')
+  const { type, language } = form.watch()
 
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: () => form.formState.isDirty,
@@ -147,10 +151,12 @@ export const CreateFunction = ({
   useEffect(() => {
     if (visible) {
       setFocusedEditor(false)
+      const type = func?.type ?? 'function'
       form.reset({
+        type,
         name: func?.name ?? '',
-        schema: func?.schema ?? 'public',
-        args: convertArgumentTypes(func?.argument_types || '').value,
+        schema: func?.schema ?? selectedSchema,
+        args: convertArgumentTypes({ type, value: func?.argument_types || '' }).value,
         behavior: func?.behavior ?? 'VOLATILE',
         definition: func?.definition ?? '',
         language: func?.language ?? 'plpgsql',
@@ -167,20 +173,46 @@ export const CreateFunction = ({
   return (
     <Sheet open={visible} onOpenChange={handleOpenChange}>
       <SheetContent
-        showClose={false}
-        size={'default'}
-        className={'p-0 flex flex-row gap-0 min-w-screen! lg:min-w-[600px]!'}
+        size="default"
+        className="p-0 flex flex-row gap-0 min-w-screen! lg:min-w-[600px]!"
       >
         <div className="flex flex-col grow w-full">
           <CreateFunctionHeader selectedFunction={func?.name} isDuplicating={isDuplicating} />
+
           <Separator />
+
           <Form {...form}>
             <form
               id={FORM_ID}
               className="grow overflow-auto"
               onSubmit={form.handleSubmit(onSubmit)}
             >
-              <SheetSection className={focusedEditor ? 'hidden' : ''}>
+              <SheetSection className={cn(focusedEditor ? 'hidden' : '', 'flex flex-col gap-y-4')}>
+                <FormField
+                  control={form.control}
+                  name="schema"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label="Schema"
+                      description={
+                        <>
+                          Tables made in the table editor will be in{' '}
+                          <code className="text-code-inline">public</code>
+                        </>
+                      }
+                      layout="horizontal"
+                    >
+                      <FormControl>
+                        <SchemaSelector
+                          selectedSchemaName={field.value}
+                          excludedSchemas={protectedSchemas?.map((s) => s.name)}
+                          size="small"
+                          onSelectSchema={(name) => field.onChange(name)}
+                        />
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name="name"
@@ -197,36 +229,53 @@ export const CreateFunction = ({
                   )}
                 />
               </SheetSection>
+
               <Separator className={focusedEditor ? 'hidden' : ''} />
-              <SheetSection className={focusedEditor ? 'hidden' : 'space-y-4'}>
+
+              <SheetSection className={focusedEditor ? 'hidden' : 'flex flex-col gap-y-4'}>
                 <FormField
                   control={form.control}
-                  name="schema"
+                  name="type"
                   render={({ field }) => (
-                    <FormItemLayout
-                      label="Schema"
-                      description="Tables made in the table editor will be in 'public'"
-                      layout="horizontal"
-                    >
-                      <FormControl>
-                        <SchemaSelector
-                          selectedSchemaName={field.value}
-                          excludedSchemas={protectedSchemas?.map((s) => s.name)}
-                          size="small"
-                          onSelectSchema={(name) => field.onChange(name)}
-                        />
-                      </FormControl>
+                    <FormItemLayout label="Type" layout="horizontal">
+                      <Select
+                        disabled={isEditing}
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <SelectTrigger className="col-span-8">
+                          {field.value === 'function' ? 'Function' : 'Stored procedure'}
+                        </SelectTrigger>
+                        <SelectContent align="end">
+                          <SelectItem value="function">
+                            <p>Function</p>
+                            <p className="text-foreground-lighter">
+                              For query logic, triggers, and RPC calls
+                            </p>
+                          </SelectItem>
+                          <SelectItem value="procedure">
+                            <p>Stored procedure</p>
+                            <p className="text-foreground-lighter">
+                              For batch or multi-step tasks that manages transactions
+                            </p>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     </FormItemLayout>
                   )}
                 />
-                {!isEditing && (
+                {type === 'function' && (
                   <FormField
                     control={form.control}
                     name="return_type"
                     render={({ field }) => (
                       <FormItemLayout label="Return type" layout="horizontal">
                         {/* Form selects don't need form controls, otherwise the CSS gets weird */}
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select
+                          disabled={isEditing}
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
                           <SelectTrigger className="col-span-8">
                             <SelectValue />
                           </SelectTrigger>
@@ -247,11 +296,15 @@ export const CreateFunction = ({
                   />
                 )}
               </SheetSection>
+
               <Separator className={focusedEditor ? 'hidden' : ''} />
+
               <SheetSection className={focusedEditor ? 'hidden' : ''}>
                 <FormFieldArgs readonly={isEditing} />
               </SheetSection>
+
               <Separator className={focusedEditor ? 'hidden' : ''} />
+
               <SheetSection className={`${focusedEditor ? 'h-full' : ''} px-0!`}>
                 <FormField
                   control={form.control}
@@ -288,9 +341,7 @@ export const CreateFunction = ({
                 />
               </SheetSection>
               <Separator className={focusedEditor ? 'hidden' : ''} />
-              {isEditing ? (
-                <></>
-              ) : (
+              {isEditing ? null : (
                 <>
                   <SheetSection className={focusedEditor ? 'hidden' : ''}>
                     <div className="space-y-8 rounded-sm bg-studio py-4 px-6 border border-overlay">
@@ -314,31 +365,33 @@ export const CreateFunction = ({
                     <>
                       <SheetSection className={focusedEditor ? 'hidden' : 'space-y-2 pt-0'}>
                         <FormFieldLanguage />
-                        <FormField
-                          control={form.control}
-                          name="behavior"
-                          render={({ field }) => (
-                            <FormItemLayout label="Behavior" layout="horizontal">
-                              {/* Form selects don't need form controls, otherwise the CSS gets weird */}
-                              <Select defaultValue={field.value} onValueChange={field.onChange}>
-                                <SelectTrigger className="col-span-8">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="IMMUTABLE" key="IMMUTABLE">
-                                    immutable
-                                  </SelectItem>
-                                  <SelectItem value="STABLE" key="STABLE">
-                                    stable
-                                  </SelectItem>
-                                  <SelectItem value="VOLATILE" key="VOLATILE">
-                                    volatile
-                                  </SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </FormItemLayout>
-                          )}
-                        />
+                        {type === 'function' && (
+                          <FormField
+                            control={form.control}
+                            name="behavior"
+                            render={({ field }) => (
+                              <FormItemLayout label="Behavior" layout="horizontal">
+                                {/* Form selects don't need form controls, otherwise the CSS gets weird */}
+                                <Select defaultValue={field.value} onValueChange={field.onChange}>
+                                  <SelectTrigger className="col-span-8">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="IMMUTABLE" key="IMMUTABLE">
+                                      immutable
+                                    </SelectItem>
+                                    <SelectItem value="STABLE" key="STABLE">
+                                      stable
+                                    </SelectItem>
+                                    <SelectItem value="VOLATILE" key="VOLATILE">
+                                      volatile
+                                    </SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </FormItemLayout>
+                            )}
+                          />
+                        )}
                       </SheetSection>
                       <Separator className={focusedEditor ? 'hidden' : ''} />
                       <SheetSection className={focusedEditor ? 'hidden' : ''}>
@@ -457,26 +510,24 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
                       {readonly ? (
                         <Input value={field.value} disabled readOnly className="h-auto" />
                       ) : (
-                        <>
-                          <Select
-                            disabled={readonly}
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <SelectTrigger className="h-[38px]">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <ScrollArea className="h-52">
-                                {['integer', ...POSTGRES_DATA_TYPES].map((option) => (
-                                  <SelectItem value={option} key={option}>
-                                    {option}
-                                  </SelectItem>
-                                ))}
-                              </ScrollArea>
-                            </SelectContent>
-                          </Select>
-                        </>
+                        <Select
+                          disabled={readonly}
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <SelectTrigger className="h-[38px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <ScrollArea className="h-52">
+                              {['integer', ...POSTGRES_DATA_TYPES].map((option) => (
+                                <SelectItem value={option} key={option}>
+                                  {option}
+                                </SelectItem>
+                              ))}
+                            </ScrollArea>
+                          </SelectContent>
+                        </Select>
                       )}
                     </FormControl>
                     <FormMessage />

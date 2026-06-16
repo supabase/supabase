@@ -26,7 +26,7 @@ export type SavedDatabaseFunction = Omit<
   identity_argument_types: SafeSqlFragment
   return_type: SafeSqlFragment
   config_params: Record<string, SafeSqlFragment> | null
-  type: 'function' | 'procedure' | 'aggregate' | 'window'
+  type: 'function' | 'procedure'
 }
 
 export async function getDatabaseFunctions(

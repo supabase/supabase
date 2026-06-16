@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -15,6 +16,7 @@ import {
   TableRow,
 } from 'ui'
 
+import { stripInArgModePrefixes } from '../Functions.utils'
 import { getDatabaseTriggersHref } from './FunctionList.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -70,10 +72,12 @@ export const FunctionList = ({
       (securityFilter.includes('invoker') && !x.security_definer)
     return matchesName && matchesReturnType && matchesSecurity
   })
+
   const _functions = sortBy(
     filteredFunctions.filter((x) => x.schema == schema),
     (func) => func.name.toLocaleLowerCase()
   )
+
   const { can: canUpdateFunctions } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'functions'
@@ -108,7 +112,9 @@ export const FunctionList = ({
   return (
     <>
       {_functions.map((x) => {
-        const isApiDocumentAvailable = schema == 'public' && x.return_type !== 'trigger'
+        const isApiDocumentAvailable = schema === 'public' && x.return_type !== 'trigger'
+        const argumentTypes =
+          x.type === 'procedure' ? stripInArgModePrefixes(x.argument_types) : x.argument_types
 
         return (
           <TableRow key={x.id}>
@@ -126,10 +132,10 @@ export const FunctionList = ({
             <TableCell className="table-cell text-foreground-light capitalize">{x.type}</TableCell>
             <TableCell className="table-cell">
               <p
-                title={x.argument_types}
-                className={`truncate ${x.argument_types ? 'text-foreground-light' : 'text-foreground-muted'}`}
+                title={argumentTypes}
+                className={`truncate ${argumentTypes ? 'text-foreground-light' : 'text-foreground-muted'}`}
               >
-                {x.argument_types || '–'}
+                {argumentTypes || '–'}
               </p>
             </TableCell>
             <TableCell className="table-cell">
@@ -142,8 +148,14 @@ export const FunctionList = ({
                   {x.return_type}
                 </Link>
               ) : (
-                <p title={x.return_type} className="truncate text-foreground-light">
-                  {x.return_type === null ? '—' : x.return_type}
+                <p
+                  title={x.return_type}
+                  className={cn(
+                    'truncate',
+                    x.return_type === null ? 'text-foreground-muted' : 'text-foreground-light'
+                  )}
+                >
+                  {x.return_type === null ? '–' : x.return_type}
                 </p>
               )}
             </TableCell>
@@ -167,15 +179,19 @@ export const FunctionList = ({
                       </DropdownMenuTrigger>
                       <DropdownMenuContent side="left" className="w-52">
                         {isApiDocumentAvailable && (
-                          <DropdownMenuItem
-                            className="space-x-2"
-                            onClick={() => router.push(`/project/${projectRef}/api?rpc=${x.name}`)}
-                          >
-                            <FileText size={14} />
-                            <p>Client API docs</p>
-                          </DropdownMenuItem>
+                          <>
+                            <DropdownMenuItem
+                              className="space-x-2"
+                              onClick={() =>
+                                router.push(`/project/${projectRef}/api?rpc=${x.name}`)
+                              }
+                            >
+                              <FileText size={14} />
+                              <p>Client API docs</p>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                          </>
                         )}
-                        <DropdownMenuSeparator />
                         <DropdownMenuItem className="space-x-2" onClick={() => editFunction(x)}>
                           <Edit2 size={14} />
                           <p>Edit function</p>

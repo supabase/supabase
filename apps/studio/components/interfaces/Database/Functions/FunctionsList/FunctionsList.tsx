@@ -421,7 +421,7 @@ export const FunctionsList = () => {
       />
 
       <TextConfirmModal
-        variant={'warning'}
+        variant="destructive"
         visible={!!functionToDelete}
         onCancel={() => setSelectedFunctionToDelete(null)}
         onConfirm={onDeleteFunction}
