@@ -3,7 +3,17 @@ import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Filter, Plus } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Button, Checkbox, Label, Popover, PopoverContent, PopoverTrigger } from 'ui'
+import {
+  Button,
+  Checkbox,
+  Label,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import {
   InnerSideBarEmptyPanel,
   InnerSideBarFilters,
@@ -240,11 +250,17 @@ export const TableEditorMenu = () => {
             </InnerSideBarFilterSearchInput>
             <Popover>
               <PopoverTrigger asChild>
-                <Button
-                  type={visibleTypes.length !== 5 ? 'default' : 'dashed'}
-                  className="h-[32px] md:h-[28px] px-1.5"
-                  icon={<Filter />}
-                />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type={visibleTypes.length !== 5 ? 'default' : 'dashed'}
+                      className="h-[32px] md:h-[28px] px-1.5"
+                      icon={<Filter />}
+                      aria-label="Filter"
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Filter</TooltipContent>
+                </Tooltip>
               </PopoverTrigger>
               <PopoverContent className="p-0 w-56" side="bottom" align="center">
                 <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
