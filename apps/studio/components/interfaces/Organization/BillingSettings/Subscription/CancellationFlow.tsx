@@ -113,7 +113,7 @@ export const CancellationFlow = (props: CancellationFlowProps) => {
 
 type InitiateCancellationFlowButtonProps = Pick<
   ComponentProps<typeof ButtonTooltip>,
-  'children' | 'type'
+  'children' | 'variant'
 >
 
 export const InitiateCancellationFlowButton = (props: InitiateCancellationFlowButtonProps) => {
@@ -145,7 +145,7 @@ export const InitiateCancellationFlowButton = (props: InitiateCancellationFlowBu
   return (
     <>
       <ButtonTooltip
-        type={props.type}
+        variant={props.variant}
         disabled={!isDowngradeablePlan || !canUpdateSubscription || isAwsManaged}
         tooltip={{
           content: {

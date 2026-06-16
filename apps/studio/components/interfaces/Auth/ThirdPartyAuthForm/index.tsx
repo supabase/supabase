@@ -120,7 +120,7 @@ export const ThirdPartyAuthForm = () => {
             >
               <AddIntegrationDropdown
                 align="center"
-                type="default"
+                variant="default"
                 onSelectIntegrationType={setSelectedIntegration}
               />
             </EmptyStatePresentational>

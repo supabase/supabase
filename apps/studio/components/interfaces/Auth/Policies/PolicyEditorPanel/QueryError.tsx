@@ -53,7 +53,7 @@ export const QueryError = ({
               <CollapsibleTrigger asChild>
                 <Button
                   size="tiny"
-                  type="outline"
+                  variant="outline"
                   className={cn('group', styles['ai-icon__container--allow-hover-effect'])}
                 >
                   {open ? 'Hide error details' : 'Show error details'}

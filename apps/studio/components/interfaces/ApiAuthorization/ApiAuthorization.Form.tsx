@@ -299,7 +299,7 @@ function FormFooter({
         onApprove={onApprove}
       />
       <Button
-        type="text"
+        variant="text"
         block
         loading={approvalState === 'declining'}
         disabled={approvalState !== 'indeterminate'}
@@ -333,7 +333,7 @@ function ApprovalButton({
 }: ApprovalButtonProps): ReactNode {
   return (
     <Button
-      type="primary"
+      variant="primary"
       block
       loading={approvalState === 'approving'}
       disabled={disabled}

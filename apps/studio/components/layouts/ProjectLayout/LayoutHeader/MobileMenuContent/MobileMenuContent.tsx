@@ -142,7 +142,7 @@ export function MobileMenuContent({
           )}
         >
           <Button
-            type="text"
+            variant="text"
             className="p-1! justify-start"
             icon={<ChevronLeft size={20} />}
             onClick={handleBackToTop}

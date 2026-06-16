@@ -1,9 +1,10 @@
+import staticContent from '.generated/staticContent/_index.json'
+import { kFormatter } from '~/lib/helpers'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 import Link from 'next/link'
 import { Button } from 'ui'
+
 import SectionContainer from './Layouts/SectionContainer'
-import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { kFormatter } from '~/lib/helpers'
-import staticContent from '.generated/staticContent/_index.json'
 
 const OpenSourceSection = () => {
   const sendTelemetryEvent = useSendTelemetryEvent()
@@ -30,7 +31,7 @@ const OpenSourceSection = () => {
           }
           asChild
           size="small"
-          type="default"
+          variant="default"
           className="pl-2.5!"
         >
           <Link

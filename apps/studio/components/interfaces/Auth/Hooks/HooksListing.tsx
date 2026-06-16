@@ -143,7 +143,7 @@ export const HooksListing = () => {
             description="Use Postgres functions or HTTP endpoints to customize your authentication flow."
           >
             <AddHookDropdown
-              type="default"
+              variant="default"
               align="center"
               buttonText="Add a new hook"
               open={addHookEmptyOpen}

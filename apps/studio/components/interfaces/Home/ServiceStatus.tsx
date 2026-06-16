@@ -303,7 +303,7 @@ export const ServiceStatus = () => {
     <Popover modal={false} open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          type="default"
+          variant="default"
           icon={
             isLoadingChecks || (!allServicesOperational && isProjectNew && isMigrationLoading) ? (
               <LoaderIcon />

@@ -57,11 +57,11 @@ const StoragePoliciesReview = ({
       </DialogSection>
       <DialogSectionSeparator />
       <DialogFooter>
-        <Button type="default" onClick={onSelectBack}>
+        <Button variant="default" onClick={onSelectBack}>
           Back to edit
         </Button>
         {policyStatements.length > 0 && (
-          <Button type="primary" onClick={onSavePolicy} loading={isSaving}>
+          <Button variant="primary" onClick={onSavePolicy} loading={isSaving}>
             Save policy
           </Button>
         )}

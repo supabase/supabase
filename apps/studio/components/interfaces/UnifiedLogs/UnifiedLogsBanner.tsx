@@ -31,7 +31,7 @@ export function UnifiedLogsBanner({
           <p className="truncate text-xs text-foreground-light">Use the traditional interface</p>
         </div>
         <ButtonTooltip
-          type="default"
+          variant="default"
           className="shrink-0 px-1.5"
           icon={<Undo2 />}
           onClick={onSwitchBack}
@@ -47,11 +47,11 @@ export function UnifiedLogsBanner({
         Try Unified Logs
       </p>
       <div className="flex shrink-0 items-center gap-x-2">
-        <Button size="tiny" type="default" onClick={onEnable}>
+        <Button size="tiny" variant="default" onClick={onEnable}>
           Enable
         </Button>
         <ButtonTooltip
-          type="default"
+          variant="default"
           className="px-1.5"
           icon={<CircleHelpIcon />}
           onClick={onMoreInfo}

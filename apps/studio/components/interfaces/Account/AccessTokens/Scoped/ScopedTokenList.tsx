@@ -126,7 +126,7 @@ export const ScopedTokenList = ({ searchString = '', onDeleteSuccess }: ScopedTo
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
-                      type="default"
+                      variant="default"
                       title="More options"
                       className="w-7"
                       icon={<MoreVertical />}

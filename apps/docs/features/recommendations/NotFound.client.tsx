@@ -14,7 +14,7 @@ function SearchButton() {
   const setCommandMenuOpen = useSetCommandMenuOpen()
 
   return (
-    <Button type="primary" size="small" onClick={() => setCommandMenuOpen(true)}>
+    <Button variant="primary" size="small" onClick={() => setCommandMenuOpen(true)}>
       Search for page
     </Button>
   )

@@ -520,7 +520,7 @@ export const PolicyEditorPanel = memo(function ({
                     )}
                     <SheetFooter className="flex items-center justify-end! px-5 py-4 w-full border-t">
                       <Button
-                        type="default"
+                        variant="default"
                         disabled={isExecuting || isUpdating}
                         onClick={confirmOnClose}
                       >
@@ -529,7 +529,7 @@ export const PolicyEditorPanel = memo(function ({
 
                       <ButtonTooltip
                         form={FORM_ID}
-                        htmlType="submit"
+                        type="submit"
                         loading={isExecuting || isUpdating}
                         disabled={!canUpdatePolicies || isExecuting || isUpdating}
                         tooltip={{

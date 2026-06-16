@@ -93,7 +93,7 @@ export const LayoutHeader = ({
     selectedProject?.inserted_at !== undefined &&
     dayjs(selectedProject.inserted_at).isAfter(dayjs().subtract(5, 'day'))
 
-  const connectButtonType = isNewProject ? 'primary' : 'default'
+  const connectButtonVariant = isNewProject ? 'primary' : 'default'
 
   // show org selection if we are on a project page or on a explicit org route
   const showOrgSelection = slug || (selectedOrganization && projectRef)
@@ -216,7 +216,7 @@ export const LayoutHeader = ({
                   }}
                 >
                   {IS_PLATFORM && <MergeRequestButton />}
-                  <ConnectButton buttonType={connectButtonType} />
+                  <ConnectButton buttonVariant={connectButtonVariant} />
                 </motion.div>
               )}
             </AnimatePresence>
