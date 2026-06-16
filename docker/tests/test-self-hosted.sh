@@ -206,23 +206,25 @@ check "REST API query" "200" \
 # ---------------------------------------------
 
 echo ""
-echo "--- GraphQL (disabled by default) ---"
-# As of the Postgres 17 image, pg_graphql is OFF by default (the image drops the
-# extension on init, matching platform behavior for new projects). The endpoint
-# stays wired up, but introspection should NOT return data until a user enables
-# the extension - e.g. via Studio's database extensions UI, or
-# CREATE EXTENSION pg_graphql. Success here is that GraphQL is disabled.
+echo "--- GraphQL (optional; off by default) ---"
+# pg_graphql is OFF by default since the PG17 image (the image drops the extension
+# on init, matching platform behavior for new projects), but users may enable it
+# (Studio extensions UI / CREATE EXTENSION pg_graphql). Both are valid states, so
+# assert only that the endpoint is wired up and responding, and report which one.
 gql_resp=$(http_body "$BASE_URL/graphql/v1" \
     -H "apikey: $ANON_KEY" \
     -H "Content-Type: application/json" \
     -d '{"query":"{ __typename }"}')
-# .data present => extension enabled; no data (or an error body) => disabled
 if echo "$gql_resp" | jq -e '.data' >/dev/null 2>&1; then
-    gql_state="enabled"
+    gql_state="enabled"        # introspection returned data
+elif echo "$gql_resp" | jq -e '.' >/dev/null 2>&1; then
+    gql_state="disabled"       # endpoint answered with JSON, extension just isn't on
 else
-    gql_state="disabled"
+    gql_state="unreachable"    # no / non-JSON response => routing or service is broken
 fi
-check "GraphQL disabled by default" "disabled" "$gql_state"
+[ "$gql_state" = "unreachable" ] && gql_actual="unreachable" || gql_actual="responding"
+check "GraphQL endpoint responding" "responding" "$gql_actual"
+echo "  (GraphQL is $gql_state)"
 
 # ---------------------------------------------
 # 6. Storage: create bucket, upload >6MB file, download, cleanup
