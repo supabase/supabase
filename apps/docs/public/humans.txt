@@ -40,6 +40,7 @@ Brendan Stephens
 Brent Newson
 Brian Cullen
 Brent Schroeter
+Bruno Kilian
 Carel de Waal
 Cameron Blackwood
 Cameron Michie
@@ -89,6 +90,7 @@ Eduardo Gurgel
 Eleftheria Trivyzaki
 Eliot Whalan
 Emmett Folger
+Erfi Anugrah
 Eric Kharitonashvili
 Etienne Stalmans
 Eyal Ehrlich
@@ -205,6 +207,7 @@ Nick Littman
 Nick Nowlan
 Nicola Ferraro
 Nicolas Nosenzo
+Nik Richers
 Noah Moss
 Nyannyacha
 Oli R

@@ -16,7 +16,7 @@ import {
   QueryPerformanceSQLParams,
 } from './QueryPerformance.types'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import useDbQuery from '@/hooks/analytics/useDbQuery'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'

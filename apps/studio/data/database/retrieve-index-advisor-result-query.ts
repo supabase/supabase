@@ -4,7 +4,7 @@ import { z } from 'zod'
 
 import { databaseKeys } from './keys'
 import { filterProtectedSchemaIndexAdvisorResult } from '@/components/interfaces/QueryPerformance/IndexAdvisor/index-advisor.utils'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type GetIndexAdvisorResultVariables = {
