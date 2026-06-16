@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, cn, Loading } from 'ui'
 import { Row } from 'ui-patterns'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
@@ -60,25 +60,30 @@ export const ProjectUsageSectionDeltas = () => {
     'project_storage:all',
   ])
   const { isEnabled: dataApiEnabled } = useIsDataApiEnabled({ projectRef })
-  const { getEntitlementMax } = useCheckEntitlements('log.retention_days')
+  const { getEntitlementMax, isLoading: isLoadingEntitlements } =
+    useCheckEntitlements('log.retention_days')
   const retentionDays = getEntitlementMax()
 
-  const DEFAULT_INTERVAL: ChartIntervalKey =
-    retentionDays !== undefined && retentionDays < 7 ? '1hr' : '1day'
-  const [interval, setSelectedInterval] = useState<ChartIntervalKey>(DEFAULT_INTERVAL)
-
-  useEffect(() => {
-    setSelectedInterval(retentionDays !== undefined && retentionDays < 7 ? '1hr' : '1day')
-  }, [retentionDays])
+  // Default interval is derived from retention. Once the user picks one it
+  // sticks. We avoid a post-mount setState that would flip the interval after
+  // entitlements resolve, which would re-key the query and refetch.
+  const [userInterval, setUserInterval] = useState<ChartIntervalKey | undefined>(undefined)
+  const interval: ChartIntervalKey =
+    userInterval ?? (retentionDays !== undefined && retentionDays < 7 ? '1hr' : '1day')
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
   const datetimeFormat = selectedInterval.format || 'MMM D, ha'
 
-  const { services: serviceData, isLoading } = useServiceHealthMetrics(
-    projectRef ?? '',
+  // Hold off fetching until entitlements have resolved, otherwise we fetch once
+  // with the provisional interval and immediately refetch with the corrected
+  // one (visible as a double load on page refresh).
+  const ready = !isLoadingEntitlements
+  const { services: serviceData, isLoading: isLoadingMetrics } = useServiceHealthMetrics(
+    ready ? (projectRef ?? '') : '',
     interval,
     0
   )
+  const isLoading = !ready || isLoadingMetrics
 
   // Functions is included here (and absent from the V2 chart) because the
   // service-health endpoint exposes per-function metrics that the legacy
@@ -199,7 +204,7 @@ export const ProjectUsageSectionDeltas = () => {
         <ChartIntervalDropdown
           value={interval}
           onChange={(next) => {
-            if (isChartIntervalKey(next)) setSelectedInterval(next)
+            if (isChartIntervalKey(next)) setUserInterval(next)
           }}
           organizationSlug={organization?.slug}
           dropdownAlign="end"
