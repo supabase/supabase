@@ -735,6 +735,18 @@
         "title": "List organization members",
         "slug": "v1-list-organization-members",
         "type": "operation"
+      },
+      {
+        "id": "v2-list-organization-members",
+        "title": "List organization members",
+        "slug": "v2-list-organization-members",
+        "type": "operation"
+      },
+      {
+        "id": "v2-list-organization-roles",
+        "title": "List organization roles",
+        "slug": "v2-list-organization-roles",
+        "type": "operation"
       }
     ]
   },
@@ -884,6 +896,12 @@
         "id": "v2-preview-a-project-transfer",
         "title": "Preview a project transfer",
         "slug": "v2-preview-a-project-transfer",
+        "type": "operation"
+      },
+      {
+        "id": "v1-restart-a-project",
+        "title": "Restart a project",
+        "slug": "v1-restart-a-project",
         "type": "operation"
       },
       {

@@ -101,6 +101,18 @@ const PITR = () => {
     )
   }
 
+  if (project?.high_availability) {
+    return (
+      <Admonition
+        type="default"
+        title="Database backups are not available for High Availability projects"
+        description="High Availability projects do not support Point-in-Time Recovery (PITR) backups"
+      >
+        <DocsButton abbrev={false} className="mt-2" href={DOCS_URL} />
+      </Admonition>
+    )
+  }
+
   return (
     <>
       {isLoading && <GenericSkeletonLoader />}
