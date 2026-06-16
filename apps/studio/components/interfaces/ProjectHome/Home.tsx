@@ -1,6 +1,6 @@
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { useFlag, useParams } from 'common'
+import { useFeatureFlags, useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { useEffect, useRef } from 'react'
 import { cn } from 'ui'
@@ -28,6 +28,11 @@ export const ProjectHome = () => {
   const track = useTrack()
 
   const showHomepageUsageDeltas = useFlag('newHomepageUsageDeltas')
+  // useFlag returns false until ConfigCat has loaded, which would render the
+  // fallback usage section first and then swap (remount + refetch) once the
+  // flag resolves. Hold the section until flags have loaded so only the
+  // correct component ever mounts.
+  const { hasLoaded: featureFlagsLoaded } = useFeatureFlags()
 
   const isMatureProject = dayjs(project?.inserted_at).isBefore(dayjs().subtract(10, 'day'))
 
@@ -109,7 +114,7 @@ export const ProjectHome = () => {
                           className={cn(isComingUp && 'opacity-60 pointer-events-none')}
                         >
                           <SortableSection id={id}>
-                            <UsageSection />
+                            {featureFlagsLoaded ? <UsageSection /> : null}
                           </SortableSection>
                         </div>
                       )
