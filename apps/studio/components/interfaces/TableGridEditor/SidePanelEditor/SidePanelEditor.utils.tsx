@@ -89,6 +89,27 @@ export function getRowFromSidePanel(
   }
 }
 
+/**
+ * Builds the update payload when a foreign key cell is edited via the foreign row selector.
+ *
+ * For composite foreign keys the selector returns a value for every column in the relation, but
+ * editing a single cell should only update the column the user actually clicked. Persisting the
+ * full set would silently rewrite the sibling columns (e.g. moving a row to a different tenant)
+ * and bypass the database's composite FK validation, which is inconsistent with how editing those
+ * columns individually behaves. When the edited column is unknown the original value is returned
+ * unchanged.
+ */
+export function getForeignKeyUpdatePayload({
+  value,
+  columnName,
+}: {
+  value?: { [key: string]: any }
+  columnName?: string
+}): { [key: string]: any } | undefined {
+  if (!value || !columnName) return value
+  return { [columnName]: value[columnName] }
+}
+
 const addPrimaryKey = async (
   projectRef: string,
   connectionString: string | undefined | null,
