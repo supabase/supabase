@@ -12,7 +12,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import type { CategoricalChartState } from 'recharts/types/chart/types'
+import type { MouseHandlerDataParam } from 'recharts'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
 
 const CHART_COLORS = {
@@ -47,7 +47,7 @@ export interface ChartBarProps {
   data: ChartBarTick[]
   dataKey: string
   config?: ChartConfig
-  onBarClick?: (datum: ChartBarTick, tooltipData?: CategoricalChartState) => void
+  onBarClick?: (datum: ChartBarTick, tooltipData?: MouseHandlerDataParam) => void
   DateTimeFormat?: string
   isFullHeight?: boolean
   className?: string
@@ -172,8 +172,11 @@ export const ChartBar = ({
             }
           }}
           onClick={(tooltipData) => {
-            const datum = tooltipData?.activePayload?.[0]?.payload
-            if (onBarClick) onBarClick(datum, tooltipData)
+            // recharts v3 no longer exposes `activePayload` on the click handler arg;
+            // derive the clicked datum from the active index instead.
+            const index = tooltipData?.activeTooltipIndex
+            const datum = index != null ? data[Number(index)] : undefined
+            if (onBarClick && datum) onBarClick(datum, tooltipData)
           }}
         >
           {showGrid && <CartesianGrid vertical={false} stroke={CHART_COLORS.AXIS} />}
@@ -189,7 +192,7 @@ export const ChartBar = ({
             content={
               <ChartTooltipContent
                 className="text-foreground-light -mt-5"
-                labelFormatter={(v: string) => dayjs(v).format(DateTimeFormat)}
+                labelFormatter={(v) => dayjs(v as string).format(DateTimeFormat)}
               />
             }
           />

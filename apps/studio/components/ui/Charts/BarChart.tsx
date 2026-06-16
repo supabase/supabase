@@ -9,7 +9,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import type { CategoricalChartState } from 'recharts/types/chart/types'
+import type { MouseHandlerDataParam } from 'recharts'
 
 import { ChartHeader } from './ChartHeader'
 import type { CommonChartProps, Datum } from './Charts.types'
@@ -24,7 +24,7 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   xAxisKey: string
   customDateFormat?: string
   displayDateInUtc?: boolean
-  onBarClick?: (datum: D, tooltipData?: CategoricalChartState) => void
+  onBarClick?: (datum: D, tooltipData?: MouseHandlerDataParam) => void
   emptyStateMessage?: string
   showLegend?: boolean
   xAxisIsDate?: boolean
@@ -159,8 +159,11 @@ function BarChart<D extends Datum = Datum>({
             clearHover()
           }}
           onClick={(tooltipData) => {
-            const datum = tooltipData?.activePayload?.[0]?.payload
-            if (onBarClick) onBarClick(datum, tooltipData)
+            // recharts v3 no longer exposes `activePayload` on the click handler arg;
+            // derive the clicked datum from the active index instead.
+            const index = tooltipData?.activeTooltipIndex
+            const datum = index != null ? transformedData[Number(index)] : undefined
+            if (onBarClick && datum) onBarClick(datum, tooltipData)
           }}
         >
           {showLegend && <Legend />}

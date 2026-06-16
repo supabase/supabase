@@ -103,11 +103,13 @@ export function TimelineChart<TChart extends BaseChartSchema>({
           margin={{ top: 0, left: 0, right: 0, bottom: 0 }}
           onMouseDown={({ activeLabel, activeTooltipIndex }) => {
             if (activeTooltipIndex === undefined || activeTooltipIndex === null) return
-            chartHighlight.handleMouseDown({ activeLabel, coordinates: activeLabel })
+            const label = activeLabel?.toString()
+            chartHighlight.handleMouseDown({ activeLabel: label, coordinates: label })
           }}
           onMouseMove={({ activeLabel, activeTooltipIndex }) => {
             if (activeTooltipIndex === undefined || activeTooltipIndex === null) return
-            chartHighlight.handleMouseMove({ activeLabel, coordinates: activeLabel })
+            const label = activeLabel?.toString()
+            chartHighlight.handleMouseMove({ activeLabel: label, coordinates: label })
           }}
           onMouseUp={chartHighlight.handleMouseUp}
           style={{ cursor: 'crosshair' }}

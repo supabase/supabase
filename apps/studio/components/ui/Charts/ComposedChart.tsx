@@ -14,7 +14,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { CategoricalChartState } from 'recharts/types/chart/types'
+import type { MouseHandlerDataParam } from 'recharts'
 import { cn } from 'ui'
 
 import { ChartHeader } from './ChartHeader'
@@ -52,7 +52,7 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string
   xAxisKey: string
   displayDateInUtc?: boolean
-  onBarClick?: (datum: Datum, tooltipData?: CategoricalChartState) => void
+  onBarClick?: (datum: Datum, tooltipData?: MouseHandlerDataParam) => void
   emptyStateMessage?: string
   showLegend?: boolean
   xAxisIsDate?: boolean
@@ -191,9 +191,12 @@ export function ComposedChart({
     const needsTopPadding = normalizeVisibleStackToPercent && chartStyle !== 'bar'
     if (!needsTopPadding) return _YAxisProps.padding
 
+    // recharts v3 widened the YAxis `padding` type to `{ top?, bottom? } | 'gap' | 'no-gap'`,
+    // so only spread/read it when it's the object form.
+    const basePadding = typeof _YAxisProps.padding === 'object' ? _YAxisProps.padding : undefined
     return {
-      ..._YAxisProps.padding,
-      top: Math.max(8, _YAxisProps.padding?.top ?? 0),
+      ...basePadding,
+      top: Math.max(8, basePadding?.top ?? 0),
     }
   }, [_YAxisProps.padding, chartStyle, normalizeVisibleStackToPercent])
 
@@ -469,29 +472,30 @@ export function ComposedChart({
           style={{ cursor: 'crosshair' }}
           onMouseMove={({ activeLabel, activeTooltipIndex }) => {
             if (activeTooltipIndex === undefined || activeTooltipIndex === null) return
+            // recharts v3 types `activeTooltipIndex` as `number | string`; coerce to number.
+            const index = Number(activeTooltipIndex)
 
             setIsActiveHoveredChart(true)
-            if (activeTooltipIndex !== focusDataIndex) {
-              setFocusDataIndex(activeTooltipIndex)
+            if (index !== focusDataIndex) {
+              setFocusDataIndex(index)
             }
 
-            setHover(activeTooltipIndex)
+            setHover(index)
 
-            const activeTimestamp =
-              data[activeTooltipIndex]?.[xAxisKey] ?? data[activeTooltipIndex]?.timestamp
+            const activeTimestamp = data[index]?.[xAxisKey] ?? data[index]?.timestamp
             chartHighlight?.handleMouseMove({
               activeLabel: activeTimestamp?.toString(),
-              coordinates: activeLabel,
+              coordinates: activeLabel?.toString(),
             })
           }}
           onMouseDown={({ activeLabel, activeTooltipIndex }) => {
             if (activeTooltipIndex === undefined || activeTooltipIndex === null) return
+            const index = Number(activeTooltipIndex)
 
-            const activeTimestamp =
-              data[activeTooltipIndex]?.[xAxisKey] ?? data[activeTooltipIndex]?.timestamp
+            const activeTimestamp = data[index]?.[xAxisKey] ?? data[index]?.timestamp
             chartHighlight?.handleMouseDown({
               activeLabel: activeTimestamp?.toString(),
-              coordinates: activeLabel,
+              coordinates: activeLabel?.toString(),
             })
           }}
           onMouseUp={chartHighlight?.handleMouseUp}
@@ -502,8 +506,11 @@ export function ComposedChart({
             clearHover()
           }}
           onClick={(tooltipData) => {
-            const datum = tooltipData?.activePayload?.[0]?.payload
-            if (onBarClick) onBarClick(datum, tooltipData)
+            // recharts v3 no longer exposes `activePayload` on the click handler arg;
+            // derive the clicked datum from the active index instead.
+            const index = tooltipData?.activeTooltipIndex
+            const datum = index != null ? displayData[Number(index)] : undefined
+            if (onBarClick && datum) onBarClick(datum, tooltipData)
           }}
         >
           {showGrid && <CartesianGrid stroke={CHART_COLORS.AXIS} />}
@@ -627,6 +634,9 @@ export function ComposedChart({
               showTooltip && !showHighlightActions ? (
                 <CustomTooltip
                   {...props}
+                  // recharts v3 payload is a readonly array; copy it to the mutable
+                  // `any[]` the tooltip util expects.
+                  payload={props.payload ? [...props.payload] : undefined}
                   data={data}
                   format={format}
                   isPercentage={isPercentage}
