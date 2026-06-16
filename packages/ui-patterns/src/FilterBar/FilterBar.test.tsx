@@ -521,4 +521,69 @@ describe('FilterBar', () => {
     expect(screen.getByDisplayValue('active')).toBeInTheDocument()
     expect(screen.queryByText('AND')).not.toBeInTheDocument()
   })
+
+  it('selects a column named "group" without creating a nested group', async () => {
+    const user = userEvent.setup()
+    const propertiesWithGroup: FilterProperty[] = [
+      {
+        label: 'group',
+        name: 'group',
+        type: 'string',
+        operators: ['=', '!=', 'CONTAINS'],
+      },
+      {
+        label: 'Name',
+        name: 'name',
+        type: 'string',
+        operators: ['=', '!='],
+      },
+    ]
+
+    let currentFilters: FilterGroup = initialFilters
+    const handleFilterChange = vi.fn((filters) => {
+      currentFilters = filters
+    })
+
+    const { rerender } = render(
+      <FilterBar
+        filterProperties={propertiesWithGroup}
+        filters={currentFilters}
+        onFilterChange={handleFilterChange}
+        freeformText=""
+        onFreeformTextChange={mockOnFreeformTextChange}
+      />
+    )
+
+    const freeform = screen.getByPlaceholderText('Filter by group, Name')
+    await user.click(freeform)
+
+    expect(await screen.findByText('group')).toBeInTheDocument()
+
+    await user.click(screen.getByText('group'))
+
+    await waitFor(() => {
+      expect(handleFilterChange).toHaveBeenCalled()
+    })
+
+    rerender(
+      <FilterBar
+        filterProperties={propertiesWithGroup}
+        filters={currentFilters}
+        onFilterChange={handleFilterChange}
+        freeformText=""
+        onFreeformTextChange={mockOnFreeformTextChange}
+      />
+    )
+
+    // Should create a filter condition for the "group" column, NOT a nested filter group
+    expect(currentFilters.conditions).toHaveLength(1)
+    const condition = currentFilters.conditions[0]
+    expect('logicalOperator' in condition).toBe(false)
+    expect((condition as { propertyName: string }).propertyName).toBe('group')
+
+    // Should show the operator input for the "group" column
+    await waitFor(() => {
+      expect(screen.getByLabelText('Operator for group')).toBeInTheDocument()
+    })
+  })
 })

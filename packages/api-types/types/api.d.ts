@@ -1821,6 +1821,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/restart': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Restarts the given project */
+    post: operations['v1-restart-a-project']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/restore': {
     parameters: {
       query?: never
@@ -2165,6 +2182,7 @@ export interface components {
         | 'auth_mfa_phone'
         | 'auth_mfa_web_authn'
         | 'log_drain'
+        | 'etl_pipeline'
       addon_variant:
         | (
             | 'ci_micro'
@@ -3239,6 +3257,7 @@ export interface components {
           | 'auth_mfa_phone'
           | 'auth_mfa_web_authn'
           | 'log_drain'
+          | 'etl_pipeline'
         variants: {
           id:
             | (
@@ -3267,6 +3286,7 @@ export interface components {
             | 'auth_mfa_phone_default'
             | 'auth_mfa_web_authn_default'
             | 'log_drain_default'
+            | 'etl_pipeline_default'
           /** @description Any JSON-serializable value */
           meta?: unknown
           name: string
@@ -3290,6 +3310,7 @@ export interface components {
           | 'auth_mfa_phone'
           | 'auth_mfa_web_authn'
           | 'log_drain'
+          | 'etl_pipeline'
         variant: {
           id:
             | (
@@ -3318,6 +3339,7 @@ export interface components {
             | 'auth_mfa_phone_default'
             | 'auth_mfa_web_authn_default'
             | 'log_drain_default'
+            | 'etl_pipeline_default'
           /** @description Any JSON-serializable value */
           meta?: unknown
           name: string
@@ -12188,7 +12210,7 @@ export interface operations {
       }
     }
     responses: {
-      201: {
+      204: {
         headers: {
           [name: string]: unknown
         }
@@ -12240,7 +12262,7 @@ export interface operations {
       }
     }
     responses: {
-      201: {
+      204: {
         headers: {
           [name: string]: unknown
         }
@@ -12374,6 +12396,47 @@ export interface operations {
       }
       /** @description Failed to disable project's readonly mode */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-restart-a-project': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
         headers: {
           [name: string]: unknown
         }

@@ -36,6 +36,14 @@ const ATTR = {
   path: safeSql`log_attributes['request.path']`,
 } as const
 
+// The HTTP status code lives under different OTEL attribute keys per service:
+// gateway rows (edge / postgrest / storage / edge function) expose it as
+// `response.status_code`, while auth-service rows expose it as `status`. This
+// normalizes the two so both the displayed status and the derived severity are
+// correct for auth logs (which would otherwise have an empty status and fall
+// back to their `severity_text` of INFO, classifying every 4xx/5xx as success).
+const HTTP_STATUS_EXPR: SafeLogSqlFragment = safeSql`if(source = 'auth_logs', log_attributes['status'], ${ATTR.status})`
+
 /**
  * Predicate that matches rows belonging to a given log_type. Mirrors the
  * shape of the original BigQuery unified-logs CTEs: edge gateway traffic
@@ -72,25 +80,26 @@ const LOG_TYPE_EXPR: SafeLogSqlFragment = safeSql`CASE
       ELSE source
     END`
 
-// Status code is sourced from the HTTP response for gateway-style rows and
-// from the Postgres `parsed.sql_state_code` (e.g. `42P01`) for postgres rows.
+// Status code is sourced from the HTTP response for gateway-style rows, the
+// auth-service `status` attribute for auth rows, and the Postgres
+// `parsed.sql_state_code` (e.g. `42P01`) for postgres rows.
 const STATUS_EXPR: SafeLogSqlFragment = safeSql`CASE
       WHEN source = 'postgres_logs' THEN toString(log_attributes['parsed.sql_state_code'])
-      ELSE toString(${ATTR.status})
+      ELSE toString((${HTTP_STATUS_EXPR}))
     END`
 
 // SQL expression for derived `level`. Used inline (not as alias reference)
 // because the OTEL endpoint can't resolve aliases inside countIf when the
 // alias is not in GROUP BY.
 //
-// HTTP status is checked first so gateway rows (which always carry an
+// HTTP status is checked first so gateway and auth rows (which carry a
 // `severity_text` of `INFO` regardless of response code) bucket as
 // success/warning/error by status. Postgres-style severity is the
 // fallback for rows without a status code.
 const LEVEL_EXPR: SafeLogSqlFragment = safeSql`CASE
-      WHEN ${ATTR.status} != '' AND toInt32OrZero(${ATTR.status}) >= 500 THEN 'error'
-      WHEN ${ATTR.status} != '' AND toInt32OrZero(${ATTR.status}) BETWEEN 400 AND 499 THEN 'warning'
-      WHEN ${ATTR.status} != '' AND toInt32OrZero(${ATTR.status}) BETWEEN 200 AND 299 THEN 'success'
+      WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) >= 500 THEN 'error'
+      WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) BETWEEN 400 AND 499 THEN 'warning'
+      WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) BETWEEN 200 AND 299 THEN 'success'
       WHEN severity_text IN ('ERROR','FATAL','CRITICAL','ALERT','EMERGENCY') THEN 'error'
       WHEN severity_text IN ('WARN','WARNING') THEN 'warning'
       WHEN severity_text IN ('TRACE','DEBUG','INFO','LOG','NOTICE') THEN 'success'

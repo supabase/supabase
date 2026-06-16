@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { invalidateRolesQuery } from './database-roles-query'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type UpdateRoleBody = Parameters<typeof pgMeta.roles.update>[1]

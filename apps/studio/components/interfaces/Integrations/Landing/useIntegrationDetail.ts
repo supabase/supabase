@@ -2,6 +2,7 @@ import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo } from 'react'
 
+import { useProjectOAuthIntegrationData } from './Landing.utils'
 import { useAvailableIntegrations } from './useAvailableIntegrations'
 import { useInstalledIntegrations } from './useInstalledIntegrations'
 import {
@@ -42,6 +43,14 @@ export const useIntegrationDetail = () => {
   const installation = useMemo(
     () => installedIntegrations.find((i) => i.id === id),
     [installedIntegrations, id]
+  )
+
+  // There does exist a mgmt-api endpoint to get a single status by integration-id, but the bulk results are likely already cached so go ahead and use them.
+  const { data: projectData, isLoading: isIntegrationStatusLoading } =
+    useProjectOAuthIntegrationData(project?.ref, { enabled: integration?.type === 'oauth' })
+  const integrationStatus = useMemo(
+    () => projectData.partnerIntegrations.find((i) => i.listing_slug === id),
+    [projectData, id]
   )
 
   const isInstalled = !!integration && !!installation
@@ -140,12 +149,14 @@ export const useIntegrationDetail = () => {
     integrationsWrappers,
     integration,
     installation,
+    integrationStatus,
     isInstalled,
     areRequiredExtensionsInstalled,
     installActionType,
     wrappersTabHref,
     isAvailableLoading,
     isInstalledLoading,
+    isIntegrationStatusLoading,
     Component,
   }
 }
