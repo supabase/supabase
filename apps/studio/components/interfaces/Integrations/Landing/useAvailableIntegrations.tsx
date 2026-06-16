@@ -1,9 +1,9 @@
-import { FeatureFlagContext, getFlags, IS_PLATFORM, useFlag, useUser } from 'common'
+import { FeatureFlagContext, IS_PLATFORM, useFlag } from 'common'
 import { fullImageUrl } from 'common/marketplace-client'
 import { Boxes } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
-import { useContext, useEffect, useMemo, useState } from 'react'
+import { useContext, useMemo } from 'react'
 import { cn } from 'ui'
 
 import { INTEGRATIONS, Loading, type IntegrationDefinition } from './Integrations.constants'
