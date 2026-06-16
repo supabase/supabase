@@ -309,7 +309,7 @@ function FormFooter({
       </Button>
       {redirectUrl && (
         <div className="mt-3 border-t border-muted pt-5">
-          <p className="text-center text-xs text-foreground-lighter">
+          <p className="text-center text-xs text-foreground-lighter text-balance">
             Authorizing will redirect you to <span className="text-foreground">{redirectUrl}</span>
           </p>
         </div>

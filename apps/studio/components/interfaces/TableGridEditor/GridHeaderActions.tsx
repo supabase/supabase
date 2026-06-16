@@ -101,10 +101,14 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const showHeaderActions = snap.selectedRows.size === 0
 
   const projectRef = project?.ref
-  const { data } = useDatabasePoliciesQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const { data } = useDatabasePoliciesQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      schema: table.schema,
+    },
+    { enabled: !!table }
+  )
   const policies = (data ?? []).filter(
     (policy) => policy.schema === table.schema && policy.table === table.name
   )

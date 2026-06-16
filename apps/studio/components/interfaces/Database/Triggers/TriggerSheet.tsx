@@ -39,6 +39,7 @@ import FormBoxEmpty from '@/components/ui/FormBoxEmpty'
 import { useDatabaseTriggerCreateMutation } from '@/data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from '@/data/database-triggers/database-trigger-update-mutation'
 import { useTablesQuery } from '@/data/tables/tables-query'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
@@ -89,6 +90,7 @@ export const TriggerSheet = ({
   onClose,
 }: TriggerSheetProps) => {
   const { data: project } = useSelectedProjectQuery()
+  const { selectedSchema } = useQuerySchemaState()
 
   const [showFunctionSelector, setShowFunctionSelector] = useState(false)
 
@@ -118,6 +120,7 @@ export const TriggerSheet = ({
   const { data = [], isSuccess: isSuccessTables } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+    schema: selectedSchema,
   })
   const { data: protectedSchemas, isSuccess: isSuccessProtectedSchemas } = useProtectedSchemas()
   const isSuccess = isSuccessTables && isSuccessProtectedSchemas

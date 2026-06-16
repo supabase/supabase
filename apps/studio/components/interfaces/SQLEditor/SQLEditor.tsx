@@ -118,7 +118,7 @@ export const SQLEditor = () => {
   const snapV2 = useSqlEditorV2StateSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
-  const { isHipaaProjectDisallowed } = useOrgAiOptInLevel()
+  const { aiOptInLevel } = useOrgAiOptInLevel()
   const showPrettyExplain = useFlag('ShowPrettyExplain')
 
   const {
@@ -392,7 +392,9 @@ export const SQLEditor = () => {
       }
 
       if (
-        !isHipaaProjectDisallowed &&
+        // Don't auto-generate a title when the org has disabled AI or is a HIPAA project,
+        // as that would silently forward the query to the AI provider without consent
+        aiOptInLevel !== 'disabled' &&
         snippet?.snippet.name.startsWith(untitledSnippetTitle) &&
         IS_PLATFORM
       ) {
@@ -440,7 +442,7 @@ export const SQLEditor = () => {
       id,
       isExecuting,
       project,
-      isHipaaProjectDisallowed,
+      aiOptInLevel,
       execute,
       getImpersonatedRoleState,
       setAiTitle,

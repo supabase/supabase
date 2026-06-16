@@ -31,6 +31,9 @@ const {
   sdkKotlin: sdkKotlinEnabled,
   sdkPython: sdkPythonEnabled,
   sdkSwift: sdkSwiftEnabled,
+  docsAgentPlugin: agentPluginEnabled,
+  docsAgentSkills: agentSkillsEnabled,
+  docsPrompts: promptsEnabled,
 } = isFeatureEnabled([
   'authentication:show_providers',
   'billing:all',
@@ -56,6 +59,9 @@ const {
   'sdk:kotlin',
   'sdk:python',
   'sdk:swift',
+  'docs:agent_plugin',
+  'docs:agent_skills',
+  'docs:prompts',
 ])
 
 const aiToolsEnabled = true
@@ -1727,6 +1733,10 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/logging' as `/${string}`,
         },
         {
+          name: 'Error codes',
+          url: '/guides/functions/error-codes' as `/${string}`,
+        },
+        {
           name: 'Troubleshooting',
           url: '/guides/functions/troubleshooting' as `/${string}`,
         },
@@ -1743,10 +1753,6 @@ export const functions: NavMenuConstant = {
         {
           name: 'Status codes',
           url: '/guides/functions/status-codes' as `/${string}`,
-        },
-        {
-          name: 'Error codes',
-          url: '/guides/functions/error-codes' as `/${string}`,
         },
         {
           name: 'Recursive/Nested function calls',
@@ -2395,6 +2401,7 @@ export const ai_tools: NavMenuConstant = {
     {
       name: 'Agent Plugin',
       url: '/guides/ai-tools/plugins' as `/${string}`,
+      enabled: agentPluginEnabled,
     },
     {
       name: 'MCP server',
@@ -2403,10 +2410,12 @@ export const ai_tools: NavMenuConstant = {
     {
       name: 'Agent Skills',
       url: '/guides/ai-tools/ai-skills' as `/${string}`,
+      enabled: agentSkillsEnabled,
     },
     {
       name: 'Prompts',
       url: '/guides/ai-tools/ai-prompts' as `/${string}`,
+      enabled: promptsEnabled,
     },
 
     {

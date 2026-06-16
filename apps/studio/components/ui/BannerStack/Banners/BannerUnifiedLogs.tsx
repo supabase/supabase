@@ -52,7 +52,11 @@ export const BannerUnifiedLogs = () => {
             <Button variant="default" size="tiny" asChild>
               <Link
                 href={`/project/${ref}/logs`}
-                onClick={() => track('unified_logs_banner_cta_button_clicked')}
+                onClick={() => {
+                  track('unified_logs_banner_cta_button_clicked', { is_enabled: true })
+                  setIsDismissed(true)
+                  dismissBanner('unified-logs-banner')
+                }}
               >
                 Explore Unified Logs
               </Link>
@@ -62,7 +66,7 @@ export const BannerUnifiedLogs = () => {
               variant="default"
               size="tiny"
               onClick={() => {
-                track('unified_logs_banner_cta_button_clicked')
+                track('unified_logs_banner_cta_button_clicked', { is_enabled: false })
                 selectFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS)
               }}
             >
