@@ -1,6 +1,6 @@
 import { safeSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Search } from 'lucide-react'
+import { Database, Plus, Search } from 'lucide-react'
 import { parseAsBoolean, parseAsJson, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+import { EmptyStatePresentational } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -26,7 +27,6 @@ import {
   selectFilterSchema,
 } from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import ProductEmptyState from '@/components/to-be-cleaned/ProductEmptyState'
 import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import SchemaSelector from '@/components/ui/SchemaSelector'
@@ -130,8 +130,6 @@ export const FunctionsList = () => {
   )
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
-
-  const canAddFunctions = canCreateFunctions && !isSchemaLocked
 
   useShortcut(
     SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
@@ -304,31 +302,7 @@ export const FunctionsList = () => {
           <div className="flex items-center gap-x-2">
             {!isSchemaLocked && (
               <>
-                {canAddFunctions ? (
-                  <Shortcut
-                    id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
-                    label="Create new function"
-                    onTrigger={() => createFunction()}
-                    side="bottom"
-                  >
-                    <Button className="grow" onClick={() => createFunction()}>
-                      Create a new function
-                    </Button>
-                  </Shortcut>
-                ) : (
-                  <ButtonTooltip
-                    disabled
-                    className="grow"
-                    tooltip={{
-                      content: {
-                        side: 'bottom',
-                        text: 'You need additional permissions to create functions',
-                      },
-                    }}
-                  >
-                    Create a new function
-                  </ButtonTooltip>
-                )}
+                <CreateFunctionButton createFunction={createFunction} />
                 <ButtonTooltip
                   type="default"
                   disabled={!canCreateFunctions}
@@ -358,23 +332,15 @@ export const FunctionsList = () => {
         {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="functions" />}
 
         {functions.length === 0 ? (
-          <div className="flex h-full w-full items-center justify-center">
-            <ProductEmptyState
-              title="Functions"
-              ctaButtonLabel="Create a new function"
-              onClickCta={() => createFunction()}
-              disabled={!canAddFunctions}
-              disabledMessage="You need additional permissions to create functions"
+          <>
+            <EmptyStatePresentational
+              icon={Database}
+              title="Add your first function"
+              description="PostgreSQL functions are a set of SQL and procedural commands such as declarations, assignments, loops, or flow-of-control."
             >
-              <p className="text-sm text-foreground-light">
-                PostgreSQL functions are a set of SQL and procedural commands such as declarations,
-                assignments, loops, flow-of-control, etc.
-              </p>
-              <p className="text-sm text-foreground-light">
-                It's stored on the database server and can be invoked using the SQL interface.
-              </p>
-            </ProductEmptyState>
-          </div>
+              <CreateFunctionButton hideIcon type="default" createFunction={createFunction} />
+            </EmptyStatePresentational>
+          </>
         ) : (
           <Card>
             <Table className="table-fixed overflow-x-auto">
@@ -443,4 +409,59 @@ export const FunctionsList = () => {
       />
     </>
   )
+}
+
+const CreateFunctionButton = ({
+  type = 'primary',
+  hideIcon = false,
+  createFunction,
+}: {
+  type?: 'default' | 'primary'
+  hideIcon?: boolean
+  createFunction: () => void
+}) => {
+  const { selectedSchema } = useQuerySchemaState()
+  const { can: canCreateFunctions } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'functions'
+  )
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
+  const canAddFunctions = canCreateFunctions && !isSchemaLocked
+
+  if (canAddFunctions) {
+    return (
+      <Shortcut
+        id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+        label="Create new function"
+        onTrigger={() => createFunction()}
+        side="bottom"
+      >
+        <Button
+          type={type}
+          className="grow"
+          onClick={() => createFunction()}
+          icon={hideIcon ? null : <Plus />}
+        >
+          New function
+        </Button>
+      </Shortcut>
+    )
+  } else {
+    return (
+      <ButtonTooltip
+        disabled
+        type={type}
+        className="grow"
+        icon={hideIcon ? null : <Plus />}
+        tooltip={{
+          content: {
+            side: 'bottom',
+            text: 'You need additional permissions to create functions',
+          },
+        }}
+      >
+        New function
+      </ButtonTooltip>
+    )
+  }
 }
