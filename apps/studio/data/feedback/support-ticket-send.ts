@@ -1,6 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { z } from 'zod'
 
 // End of third-party imports
 
@@ -27,10 +26,7 @@ export type sendSupportTicketVariables = {
   dashboardStudioVersion?: string
 }
 
-const RateLimitErrorSchema = z.object({
-  code: z.number().optional(),
-  retryAfter: z.number().optional(),
-})
+const RATE_LIMIT_FALLBACK_SECONDS = 60
 
 export async function sendSupportTicket({
   subject,
@@ -49,7 +45,7 @@ export async function sendSupportTicket({
   dashboardLogs,
   dashboardStudioVersion,
 }: sendSupportTicketVariables) {
-  const { data, error } = await post('/platform/feedback/send', {
+  const { data, error, response } = await post('/platform/feedback/send', {
     body: {
       subject,
       message,
@@ -72,11 +68,12 @@ export async function sendSupportTicket({
   })
 
   if (error) {
-    const parsedError = RateLimitErrorSchema.safeParse(error)
-    const { code, retryAfter } = parsedError.success ? parsedError.data : {}
-
-    if (code === 429) {
-      const waitSeconds = retryAfter ?? 60
+    const httpResponse: unknown = response
+    if (httpResponse instanceof Response && httpResponse.status === 429) {
+      const resetHeader =
+        httpResponse.headers.get('Retry-After') ?? httpResponse.headers.get('X-RateLimit-Reset')
+      const parsedReset = resetHeader ? parseInt(resetHeader, 10) : NaN
+      const waitSeconds = Number.isFinite(parsedReset) ? parsedReset : RATE_LIMIT_FALLBACK_SECONDS
       throw new ResponseError(
         `You have submitted too many support requests. Please try again in ${waitSeconds} second${waitSeconds === 1 ? '' : 's'}.`,
         429,
