@@ -251,130 +251,131 @@ export const FunctionsList = () => {
 
   return (
     <>
-      {(functions ?? []).length === 0 ? (
-        <div className="flex h-full w-full items-center justify-center">
-          <ProductEmptyState
-            title="Functions"
-            ctaButtonLabel="Create a new function"
-            onClickCta={() => createFunction()}
-            disabled={!canCreateFunctions}
-            disabledMessage="You need additional permissions to create functions"
-          >
-            <p className="text-sm text-foreground-light">
-              PostgreSQL functions are a set of SQL and procedural commands such as declarations,
-              assignments, loops, flow-of-control, etc.
-            </p>
-            <p className="text-sm text-foreground-light">
-              It's stored on the database server and can be invoked using the SQL interface.
-            </p>
-          </ProductEmptyState>
-        </div>
-      ) : (
-        <div className="w-full space-y-4">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
-            <div className="flex flex-col lg:flex-row lg:items-center gap-2">
-              <Shortcut
-                id={SHORTCUT_IDS.LIST_PAGE_FOCUS_SCHEMA}
-                onTrigger={() => setSchemaSelectorOpen(true)}
-                side="bottom"
-                tooltipOpen={schemaSelectorOpen ? false : undefined}
-              >
-                <SchemaSelector
-                  className="w-full lg:w-[180px]"
-                  size="tiny"
-                  showError={false}
-                  selectedSchemaName={selectedSchema}
-                  onSelectSchema={(schema) => {
-                    setFilterString('')
-                    setSelectedSchema(schema)
-                  }}
-                  open={schemaSelectorOpen}
-                  onOpenChange={setSchemaSelectorOpen}
-                />
-              </Shortcut>
-              <Input
-                ref={searchInputRef}
-                placeholder="Search for a function"
+      <div className="w-full space-y-4">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-2">
+            <Shortcut
+              id={SHORTCUT_IDS.LIST_PAGE_FOCUS_SCHEMA}
+              onTrigger={() => setSchemaSelectorOpen(true)}
+              side="bottom"
+              tooltipOpen={schemaSelectorOpen ? false : undefined}
+            >
+              <SchemaSelector
+                className="w-full lg:w-[180px]"
                 size="tiny"
-                icon={<Search />}
-                value={filterString}
-                className="w-full lg:w-52"
-                onChange={(e) => setFilterString(e.target.value)}
-                onKeyDown={onSearchInputEscape(filterString, setFilterString)}
+                showError={false}
+                selectedSchemaName={selectedSchema}
+                onSelectSchema={(schema) => {
+                  setFilterString('')
+                  setSelectedSchema(schema)
+                }}
+                open={schemaSelectorOpen}
+                onOpenChange={setSchemaSelectorOpen}
               />
-              <ReportsSelectFilter
-                label="Return Type"
-                options={uniqueReturnTypes.map((type) => ({
-                  label: type,
-                  value: type,
-                }))}
-                value={returnTypeFilter ?? []}
-                onChange={setReturnTypeFilter}
-                showSearch
-              />
-              <ReportsSelectFilter
-                label="Security"
-                options={securityOptions}
-                value={securityFilter ?? []}
-                onChange={setSecurityFilter}
-              />
-            </div>
+            </Shortcut>
+            <Input
+              ref={searchInputRef}
+              placeholder="Search for a function"
+              size="tiny"
+              icon={<Search />}
+              value={filterString}
+              className="w-full lg:w-52"
+              onChange={(e) => setFilterString(e.target.value)}
+              onKeyDown={onSearchInputEscape(filterString, setFilterString)}
+            />
+            <ReportsSelectFilter
+              label="Return Type"
+              options={uniqueReturnTypes.map((type) => ({
+                label: type,
+                value: type,
+              }))}
+              value={returnTypeFilter ?? []}
+              onChange={setReturnTypeFilter}
+              showSearch
+            />
+            <ReportsSelectFilter
+              label="Security"
+              options={securityOptions}
+              value={securityFilter ?? []}
+              onChange={setSecurityFilter}
+            />
+          </div>
 
-            <div className="flex items-center gap-x-2">
-              {!isSchemaLocked && (
-                <>
-                  {canAddFunctions ? (
-                    <Shortcut
-                      id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
-                      label="Create new function"
-                      onTrigger={() => createFunction()}
-                      side="bottom"
-                    >
-                      <Button className="grow" onClick={() => createFunction()}>
-                        Create a new function
-                      </Button>
-                    </Shortcut>
-                  ) : (
-                    <ButtonTooltip
-                      disabled
-                      className="grow"
-                      tooltip={{
-                        content: {
-                          side: 'bottom',
-                          text: 'You need additional permissions to create functions',
-                        },
-                      }}
-                    >
+          <div className="flex items-center gap-x-2">
+            {!isSchemaLocked && (
+              <>
+                {canAddFunctions ? (
+                  <Shortcut
+                    id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+                    label="Create new function"
+                    onTrigger={() => createFunction()}
+                    side="bottom"
+                  >
+                    <Button className="grow" onClick={() => createFunction()}>
                       Create a new function
-                    </ButtonTooltip>
-                  )}
+                    </Button>
+                  </Shortcut>
+                ) : (
                   <ButtonTooltip
-                    type="default"
-                    disabled={!canCreateFunctions}
-                    className="px-1 pointer-events-auto"
-                    icon={<AiIconAnimation size={16} />}
-                    onClick={() => {
-                      openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-                      aiSnap.newChat({
-                        name: 'Create new function',
-                        initialInput: `Create a new function for the schema ${selectedSchema} that does ...`,
-                      })
-                    }}
+                    disabled
+                    className="grow"
                     tooltip={{
                       content: {
                         side: 'bottom',
-                        text: !canCreateFunctions
-                          ? 'You need additional permissions to create functions'
-                          : 'Create with Supabase Assistant',
+                        text: 'You need additional permissions to create functions',
                       },
                     }}
-                  />
-                </>
-              )}
-            </div>
+                  >
+                    Create a new function
+                  </ButtonTooltip>
+                )}
+                <ButtonTooltip
+                  type="default"
+                  disabled={!canCreateFunctions}
+                  className="px-1 pointer-events-auto"
+                  icon={<AiIconAnimation size={16} />}
+                  onClick={() => {
+                    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+                    aiSnap.newChat({
+                      name: 'Create new function',
+                      initialInput: `Create a new function for the schema ${selectedSchema} that does ...`,
+                    })
+                  }}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: !canCreateFunctions
+                        ? 'You need additional permissions to create functions'
+                        : 'Create with Supabase Assistant',
+                    },
+                  }}
+                />
+              </>
+            )}
           </div>
+        </div>
 
-          {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="functions" />}
+        {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="functions" />}
+
+        {functions.length === 0 ? (
+          <div className="flex h-full w-full items-center justify-center">
+            <ProductEmptyState
+              title="Functions"
+              ctaButtonLabel="Create a new function"
+              onClickCta={() => createFunction()}
+              disabled={!canAddFunctions}
+              disabledMessage="You need additional permissions to create functions"
+            >
+              <p className="text-sm text-foreground-light">
+                PostgreSQL functions are a set of SQL and procedural commands such as declarations,
+                assignments, loops, flow-of-control, etc.
+              </p>
+              <p className="text-sm text-foreground-light">
+                It's stored on the database server and can be invoked using the SQL interface.
+              </p>
+            </ProductEmptyState>
+          </div>
+        ) : (
           <Card>
             <Table className="table-fixed overflow-x-auto">
               <TableHeader>
@@ -406,8 +407,8 @@ export const FunctionsList = () => {
               </TableBody>
             </Table>
           </Card>
-        </div>
-      )}
+        )}
+      </div>
 
       <CreateFunction
         func={functionToEdit || functionToDuplicate}
