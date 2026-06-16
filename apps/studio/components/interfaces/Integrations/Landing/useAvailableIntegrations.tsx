@@ -42,7 +42,7 @@ function parsePreviewListingsFlag(flagVal: string | false): (slug: string) => bo
   if (flagVal === false) {
     return (_slug) => false
   }
-  const slugs = flagVal.split(",").map((s) => s.trim())
+  const slugs = flagVal.split(',').map((s) => s.trim())
   if (slugs.includes('*')) {
     return (_slug) => true
   } else {
@@ -63,16 +63,30 @@ export const useAvailableIntegrations = () => {
   const { data: cliData } = useCLIReleaseVersionQuery()
   const isCLI = !!cliData?.current
 
-  const { data: marketplaceData, error } = useMarketplaceIntegrationsQuery({ enabled: isMarketplaceEnabled })
-  const isPending = IS_PLATFORM && (!hasLoaded || (isMarketplaceEnabled && !marketplaceData && !error))
-  const isSuccess = !IS_PLATFORM || (hasLoaded && (!isMarketplaceEnabled || (!!marketplaceData && !error)))
+  const { data: marketplaceData, error } = useMarketplaceIntegrationsQuery({
+    enabled: isMarketplaceEnabled,
+  })
+  const isPending =
+    IS_PLATFORM && (!hasLoaded || (isMarketplaceEnabled && !marketplaceData && !error))
+  const isSuccess =
+    !IS_PLATFORM || (hasLoaded && (!isMarketplaceEnabled || (!!marketplaceData && !error)))
   const isError = IS_PLATFORM && isMarketplaceEnabled && !!error
 
   const previewListingsEnabled = useFlag<string>('previewMarketplaceListings')
-  const isPreviewEnabled = useMemo(() => parsePreviewListingsFlag(previewListingsEnabled), [previewListingsEnabled])
+  const isPreviewEnabled = useMemo(
+    () => parsePreviewListingsFlag(previewListingsEnabled),
+    [previewListingsEnabled]
+  )
 
-  const enabledMarketplaceListings = useMemo(() => (marketplaceData ?? []).filter((integration) => (integration.review_status === 'approved' || (integration.review_status === 'preview' && isPreviewEnabled(integration.slug)))),
-    [marketplaceData, isPreviewEnabled])
+  const enabledMarketplaceListings = useMemo(
+    () =>
+      (marketplaceData ?? []).filter(
+        (integration) =>
+          integration.review_status === 'approved' ||
+          (integration.review_status === 'preview' && isPreviewEnabled(integration.slug))
+      ),
+    [marketplaceData, isPreviewEnabled]
+  )
 
   // [Joshen] Format marketplace integrations into existing ones for now
   // Likely that we might need to change, but can look into separately
@@ -163,10 +177,10 @@ export const useAvailableIntegrations = () => {
   // (marketplace uses dash-separated slugs, studio uses underscore-separated ids).
   const marketplaceWrappers = useMemo(() => {
     const map: Record<string, MarketplaceIntegration> = {}
-      ; enabledMarketplaceListings.forEach((integration) => {
-        if (!isForeignDataWrapper(integration)) return
-        map[integration.slug.replaceAll('-', '_')] = integration
-      })
+    enabledMarketplaceListings.forEach((integration) => {
+      if (!isForeignDataWrapper(integration)) return
+      map[integration.slug.replaceAll('-', '_')] = integration
+    })
     return map
   }, [enabledMarketplaceListings])
 
@@ -224,8 +238,9 @@ export const useAvailableIntegrations = () => {
   }, [integrationsWrappers, isCLI, marketplaceWrappers])
 
   const dataWithMarketplace = useMemo(() => {
-    return [...marketplaceIntegrations, ...allIntegrations]
-      .sort((a, b) => a.name.localeCompare(b.name))
+    return [...marketplaceIntegrations, ...allIntegrations].sort((a, b) =>
+      a.name.localeCompare(b.name)
+    )
   }, [marketplaceIntegrations, allIntegrations])
 
   return {
