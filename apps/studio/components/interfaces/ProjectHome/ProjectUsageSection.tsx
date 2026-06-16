@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle, CriticalIcon, Loading } from 'ui'
+import { Card, CardContent, CardHeader, CardTitle, Loading, WarningIcon } from 'ui'
 import { Row } from 'ui-patterns'
 import { ChartEmptyState } from 'ui-patterns/Chart'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
@@ -105,6 +105,7 @@ export const ProjectUsageSection = () => {
           minPointsToFill: 5,
         })
       },
+      refetchOnWindowFocus: false,
     }
   )
 
@@ -265,9 +266,9 @@ export const ProjectUsageSection = () => {
                   }}
                   ErrorState={
                     <ChartEmptyState
-                      icon={<CriticalIcon />}
-                      title="Failed to get project's usage api counts"
-                      description="Please try again later."
+                      icon={<WarningIcon />}
+                      title="Failed to load project usage"
+                      description="Check our Status Page or try again later."
                     />
                   }
                   EmptyState={
