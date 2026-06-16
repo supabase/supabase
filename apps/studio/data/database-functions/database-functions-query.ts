@@ -63,9 +63,9 @@ export const useDatabaseFunctionsQuery = <TData = DatabaseFunctionsData>(
     ...options
   }: UseCustomQueryOptions<DatabaseFunctionsData, DatabaseFunctionsError, TData> = {}
 ) => {
-  const { projectRef } = vars
+  const { projectRef, schema } = vars
   return useQuery<DatabaseFunctionsData, DatabaseFunctionsError, TData>({
-    queryKey: databaseKeys.databaseFunctions(projectRef),
+    queryKey: databaseKeys.databaseFunctions(projectRef, schema),
     queryFn: ({ signal }) => getDatabaseFunctions(vars, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     ...options,
