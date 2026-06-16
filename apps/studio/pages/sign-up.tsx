@@ -1,4 +1,6 @@
 import Link from 'next/link'
+import { useState } from 'react'
+import { Button, cn } from 'ui'
 
 import { SignInWithExternalProvider } from '@/components/interfaces/SignIn/SignInWithExternalProvider'
 import { SignUpForm } from '@/components/interfaces/SignIn/SignUpForm'
@@ -7,50 +9,78 @@ import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useEnabledIdentityProviders } from '@/hooks/misc/useEnabledIdentityProviders'
 import { useInboundBranding } from '@/hooks/misc/useInboundBranding'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import type { ExternalIdentityProviderConfig } from '@/lib/external-identity-providers'
 import type { NextPageWithLayout } from '@/types'
 
 const SignUpPage: NextPageWithLayout = () => {
+  const [showOtherOptions, setShowOtherOptions] = useState(false)
   const { dashboardAuthSignUp: signUpEnabled } = useIsFeatureEnabled(['dashboard_auth:sign_up'])
   const branding = useInboundBranding('sign-up')
   const signUpProviders = useEnabledIdentityProviders().filter((provider) => provider.showOnSignUp)
-  const showOAuthProviders = signUpProviders.length > 0
 
   if (!signUpEnabled) {
     return <UnknownInterface fullHeight={false} urlBack="/sign-in" />
   }
 
-  // Inbound link focused us on a single provider — offer only that one (SignInLayout renders the
-  // matching interstitial frame around it).
+  // The sign-up options we offer besides a focused provider: other external providers and the email
+  // form. Rendered both on the full screen and when the user expands "other options" from the
+  // focused screen. The "or" pill's background matches the surface behind it: the page
+  // (`bg-studio`) on the full screen, or the interstitial card (`bg-surface-100`) when revealed.
+  const renderAuthOptions = (
+    providers: ExternalIdentityProviderConfig[],
+    dividerBgClass = 'bg-studio'
+  ) => (
+    <>
+      {providers.length > 0 && (
+        <>
+          {providers.map((provider) => (
+            <SignInWithExternalProvider key={provider.id} provider={provider} />
+          ))}
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-strong" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className={cn('px-2 text-sm text-foreground', dividerBgClass)}>or</span>
+            </div>
+          </div>
+        </>
+      )}
+
+      <SignUpForm />
+    </>
+  )
+
+  // Inbound link focused us on a single provider — lead with that one (SignInLayout renders the
+  // matching interstitial frame around it), but let the user reveal the rest of our options.
   if (branding.focusProvider) {
+    const focusProvider = branding.focusProvider
+    const otherProviders = signUpProviders.filter((provider) => provider.id !== focusProvider.id)
+
     return (
       <div className="flex flex-col gap-5">
-        <SignInWithExternalProvider provider={branding.focusProvider} label="Continue" />
+        <SignInWithExternalProvider provider={focusProvider} label="Continue" />
+        {showOtherOptions ? (
+          renderAuthOptions(otherProviders, 'bg-surface-100')
+        ) : (
+          <Button
+            block
+            type="text"
+            size="large"
+            className="-mt-2 text-foreground-light"
+            onClick={() => setShowOtherOptions(true)}
+          >
+            Show other options
+          </Button>
+        )}
       </div>
     )
   }
 
   return (
     <>
-      <div className="flex flex-col gap-5">
-        {showOAuthProviders && (
-          <>
-            {signUpProviders.map((provider) => (
-              <SignInWithExternalProvider key={provider.id} provider={provider} />
-            ))}
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-strong" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="bg-studio px-2 text-sm text-foreground">or</span>
-              </div>
-            </div>
-          </>
-        )}
-
-        <SignUpForm />
-      </div>
+      <div className="flex flex-col gap-5">{renderAuthOptions(signUpProviders)}</div>
 
       <div className="my-8 self-center text-sm">
         <span className="text-foreground-light">Have an account?</span>{' '}
