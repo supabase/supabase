@@ -19,7 +19,17 @@ export const ProductMenuItem = ({
   hoverText = '',
   onClick,
 }: ProductMenuItemProps) => {
-  const { name = '', url = '', icon, rightIcon, isExternal, label, disabled, shortcutId } = item
+  const {
+    name = '',
+    url = '',
+    icon,
+    rightIcon,
+    isExternal,
+    label,
+    disabled,
+    shortcutId,
+    isLoading,
+  } = item
 
   const menuItem = (
     <Menu.Item icon={icon} active={isActive} onClick={onClick}>
@@ -44,6 +54,12 @@ export const ProductMenuItem = ({
       </div>
     </Menu.Item>
   )
+
+  // When data necessary to check whether an item should be disabled is not yet available, override the styles to avoid
+  // showing the disabled state just for a moment
+  if (isLoading) {
+    return <div className="pointer-events-none">{menuItem}</div>
+  }
 
   if (disabled) {
     return <div className="opacity-50 pointer-events-none">{menuItem}</div>
