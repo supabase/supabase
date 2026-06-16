@@ -90,7 +90,7 @@ function Feedback({ className }: { className?: string }) {
       : undefined
   )
   const isLoggedIn = useIsLoggedIn()
-  const feedbackIdRef = useRef<number | null>(null)
+  const feedbackInsertRef = useRef<Promise<number | null> | null>(null)
 
   const unanswered = state.type === 'unanswered'
   const isYes = 'response' in state && state.response === 'yes'
@@ -98,20 +98,25 @@ function Feedback({ className }: { className?: string }) {
   const showYes = unanswered || isYes
   const showNo = unanswered || isNo
 
-  async function sendFeedbackVote(response: Response) {
-    if (!supabase) return
+  // Returns the new row's id for logged-in users (who can read their own row
+  // back) so an optional comment can be attached afterwards. Anonymous votes are
+  // insert-only and resolve to null.
+  async function sendFeedbackVote(response: Response): Promise<number | null> {
+    if (!supabase) return null
 
     const row = { vote: response, page: pathname, metadata: { query: getSanitizedTabParams() } }
 
-    // Logged-in users can read their own row back, so capture its id to attach an
-    // optional comment afterwards. Anonymous votes are insert-only.
     if (isLoggedIn) {
       const { data, error } = await supabase.from('feedback').insert(row).select('id').single()
-      if (error) console.error(error)
-      else feedbackIdRef.current = data.id
+      if (error) {
+        console.error(error)
+        return null
+      }
+      return data.id
     } else {
       const { error } = await supabase.from('feedback').insert(row)
       if (error) console.error(error)
+      return null
     }
   }
 
@@ -120,7 +125,7 @@ function Feedback({ className }: { className?: string }) {
       action: 'docs_feedback_clicked',
       properties: { response },
     })
-    sendFeedbackVote(response)
+    feedbackInsertRef.current = sendFeedbackVote(response)
     dispatch({ event: 'VOTED', response })
     // Focus so screen reader users are aware of the new element
     setTimeout(() => {
@@ -137,12 +142,11 @@ function Feedback({ className }: { className?: string }) {
   }
 
   async function handleSubmit({ comment, title }: FeedbackFields) {
-    if (supabase && feedbackIdRef.current !== null) {
-      const { error } = await updateDocsFeedbackComment(supabase, {
-        id: feedbackIdRef.current,
-        title,
-        comment,
-      })
+    // Wait for the vote insert so the comment update can't run before the row
+    // (and its id) exists.
+    const id = await feedbackInsertRef.current
+    if (supabase && id !== null) {
+      const { error } = await updateDocsFeedbackComment(supabase, { id, title, comment })
       if (error) console.error(error)
     }
     setModalOpen(false)
