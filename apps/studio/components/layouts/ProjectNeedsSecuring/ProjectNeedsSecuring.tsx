@@ -2,6 +2,7 @@ import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useMemo } from 'react'
+import { cn } from 'ui'
 
 import type {
   ProjectSecurityActionDetails,
@@ -37,7 +38,7 @@ const ProjectNeedsSecuringGate = ({ children }: PropsWithChildren) => {
 
   const isProjectHomeRoute = router.pathname === PROJECT_HOME_PATHNAME
 
-  const { data: lints = [], isPending: isLoadingLints } = useProjectLintsQuery(
+  const { data: lints = [] } = useProjectLintsQuery(
     { projectRef },
     { enabled: isProjectHomeRoute && !!projectRef }
   )
@@ -146,44 +147,46 @@ const ProjectNeedsSecuringGate = ({ children }: PropsWithChildren) => {
     )
   }, [rlsIssueKeys, tablePrivileges, tables])
 
-  if (!isProjectHomeRoute || !projectRef || isLoadingLints || !hasRlsIssues) {
-    return <>{children}</>
-  }
-
+  // IMPORTANT: keep `children` mounted in a single, stable React position across
+  // every state (lints loading, not gating, and gating). Previously the loading
+  // state returned `<>{children}</>` while the resolved state nested children
+  // inside `AnimatePresence > motion.div`. When the lints query resolved (the same
+  // query the Advisor section uses), that structural switch changed the element
+  // type at the children slot and remounted the entire homepage subtree, tearing
+  // down and recreating the usage charts. That remount read as a "loading flash"
+  // even when React Query served cached data and never refetched.
+  //
+  // We now always render children in the same position and only hide them (rather
+  // than unmount) when the securing gate takes over, so the homepage subtree is
+  // reconciled in place rather than unmounted and remounted.
   return (
-    <AnimatePresence mode="wait">
-      {shouldRenderGate ? (
-        <motion.div
-          key="project-needs-securing"
-          className="flex flex-1 min-h-0 w-full"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
-        >
-          <ProjectNeedsSecuringView
-            projectRef={projectRef}
-            issueCount={rlsIssueKeys.size}
-            tables={tableRows}
-            isLoading={isLoadingTables || isLoadingPostgrestConfig || isLoadingTablePrivileges}
-            error={tablesError ?? postgrestConfigError ?? tablePrivilegesError}
-            onDismiss={() => setSecurityDismissedAt(new Date().toISOString())}
-            onTrackAction={handleTrackAction}
-          />
-        </motion.div>
-      ) : (
-        <motion.div
-          key="project-needs-securing-children"
-          className="flex flex-1 min-h-0 w-full"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
-        >
-          {children}
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <>
+      <div className={cn('flex flex-1 min-h-0 w-full', shouldRenderGate && 'hidden')}>
+        {children}
+      </div>
+      <AnimatePresence>
+        {shouldRenderGate ? (
+          <motion.div
+            key="project-needs-securing"
+            className="flex flex-1 min-h-0 w-full"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+          >
+            <ProjectNeedsSecuringView
+              projectRef={projectRef}
+              issueCount={rlsIssueKeys.size}
+              tables={tableRows}
+              isLoading={isLoadingTables || isLoadingPostgrestConfig || isLoadingTablePrivileges}
+              error={tablesError ?? postgrestConfigError ?? tablePrivilegesError}
+              onDismiss={() => setSecurityDismissedAt(new Date().toISOString())}
+              onTrackAction={handleTrackAction}
+            />
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+    </>
   )
 }
 
