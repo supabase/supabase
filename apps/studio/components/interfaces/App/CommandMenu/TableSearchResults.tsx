@@ -13,11 +13,10 @@ import { useInfiniteTablesQuery } from '@/data/tables/tables-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface TableSearchResultsProps {
-  query: string
   debouncedFilterString: string
 }
 
-export function TableSearchResults({ query, debouncedFilterString }: TableSearchResultsProps) {
+export function TableSearchResults({ debouncedFilterString }: TableSearchResultsProps) {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
@@ -25,7 +24,6 @@ export function TableSearchResults({ query, debouncedFilterString }: TableSearch
     threshold: 0,
     rootMargin: '200px 0px 200px 0px',
   })
-  const trimmedQuery = query.trim()
 
   const {
     data: tablesData,
@@ -48,23 +46,7 @@ export function TableSearchResults({ query, debouncedFilterString }: TableSearch
   const tableResults: SearchResult[] = useMemo(() => {
     if (!tables) return []
 
-    const filtered = trimmedQuery
-      ? tables.filter((table) => {
-          const searchLower = trimmedQuery.toLowerCase()
-          const tableName = table.name?.toLowerCase() || ''
-          const schemaName = table.schema?.toLowerCase() || ''
-          const fullName = `${schemaName}.${tableName}`
-
-          return (
-            tableName.includes(searchLower) ||
-            schemaName.includes(searchLower) ||
-            fullName.includes(searchLower)
-          )
-        })
-      : tables
-
-    // Limit results for performance
-    return filtered.slice(0, 20).map((table) => {
+    return tables.map((table) => {
       const displayName =
         table.schema && table.schema !== 'public'
           ? `${table.schema}.${table.name}`
@@ -82,7 +64,7 @@ export function TableSearchResults({ query, debouncedFilterString }: TableSearch
         description,
       }
     })
-  }, [tables, trimmedQuery])
+  }, [tables])
 
   const totalTables = tables?.length ?? 0
 
@@ -103,6 +85,8 @@ export function TableSearchResults({ query, debouncedFilterString }: TableSearch
     fetchNextTablesPage,
   ])
 
+  console.log({ tableResults })
+
   return (
     <div className="relative h-full flex flex-col">
       <div className="flex-1 min-h-0 overflow-hidden">
@@ -114,7 +98,7 @@ export function TableSearchResults({ query, debouncedFilterString }: TableSearch
             <p className="text-sm">Failed to load tables</p>
           </div>
         ) : tableResults.length === 0 ? (
-          <EmptyState icon={Database} label="Database Tables" query={query} />
+          <EmptyState icon={Database} label="Database Tables" query={debouncedFilterString} />
         ) : (
           <>
             <ResultsList
@@ -127,7 +111,7 @@ export function TableSearchResults({ query, debouncedFilterString }: TableSearch
                 const schemaParam = table.schema ? `?schema=${table.schema}` : ''
                 return `/project/${projectRef}/editor/${table.id}${schemaParam}` as `/${string}`
               }}
-              infiniteLoadingObserver={<div ref={sentinelRef} />}
+              infiniteLoadingObserverRef={sentinelRef}
               className="pb-9"
             />
             <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between min-h-9 h-9 px-4 border-t bg-surface-200 text-xs text-foreground-light z-10">

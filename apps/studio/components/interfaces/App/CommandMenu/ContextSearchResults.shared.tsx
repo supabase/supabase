@@ -1,6 +1,3 @@
-'use client'
-
-import { ReactNode } from 'react'
 import { cn, CommandList } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
 import { TextHighlighter } from 'ui-patterns/CommandMenu'
@@ -54,7 +51,7 @@ interface ResultsListProps {
   onResultClick?: (result: SearchResult) => void
   getRoute?: (result: SearchResult) => `/${string}` | `http${string}`
   className?: string
-  infiniteLoadingObserver?: ReactNode
+  infiniteLoadingObserverRef?: (node: Element | null) => void
 }
 
 export function ResultsList({
@@ -64,7 +61,7 @@ export function ResultsList({
   onResultClick,
   getRoute,
   className,
-  infiniteLoadingObserver,
+  infiniteLoadingObserverRef,
 }: ResultsListProps) {
   const commands = results.map((result): IRouteCommand | IActionCommand => {
     const ResultIcon = getIcon ? getIcon(result) : Icon
@@ -95,7 +92,7 @@ export function ResultsList({
         className
       )}
     >
-      <CommandMenuGroup>
+      <CommandMenuGroup className="py-2">
         {commands.map((command) => (
           <CommandMenuItem key={command.id} command={command}>
             <div className="flex flex-col min-w-0 text-foreground-light">
@@ -109,7 +106,7 @@ export function ResultsList({
           </CommandMenuItem>
         ))}
       </CommandMenuGroup>
-      {infiniteLoadingObserver}
+      {infiniteLoadingObserverRef && <div ref={infiniteLoadingObserverRef} />}
     </CommandList>
   )
 }

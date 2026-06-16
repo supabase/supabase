@@ -352,12 +352,12 @@ function TableSelector() {
           onValueChange={setFilterString}
         />
       </CommandHeader>
-      <CommandList className="pb-10">
+      <CommandList className="pb-9">
         {isLoading && <LoadingState />}
         {isError && <ErrorState />}
         {isSuccess && (
           <>
-            <CommandGroup>
+            <CommandGroup className="py-2">
               {tables?.map((table) => (
                 <CommandItem
                   key={table.id}
