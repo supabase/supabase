@@ -97,7 +97,7 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
   return (
     <>
       <Sheet open={visible} onOpenChange={onClose}>
-        <SheetContent size="default" showClose={false} className="md:w-[850px]!">
+        <SheetContent size="lg" showClose={false}>
           <div className="flex flex-col h-full" tabIndex={-1}>
             <SheetHeader>
               <SheetTitle>{editMode ? 'Edit destination' : 'Create a new destination'}</SheetTitle>
