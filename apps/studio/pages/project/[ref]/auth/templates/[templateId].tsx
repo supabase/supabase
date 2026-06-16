@@ -37,6 +37,7 @@ import * as z from 'zod'
 
 import { TEMPLATES_SCHEMAS } from '@/components/interfaces/Auth/EmailTemplates/AuthTemplatesValidation'
 import { CustomEmailTemplateRestrictionAdmonition } from '@/components/interfaces/Auth/EmailTemplates/CustomEmailTemplateRestrictionAdmonition'
+import { EMAIL_TEMPLATE_DOCS_ANCHORS } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.constants'
 import {
   isCustomEmailTemplateEditingRestricted,
   isCustomEmailTemplateRestrictionStatusKnown,
@@ -105,10 +106,6 @@ const RedirectToTemplates = () => {
     templateId && typeof templateId === 'string'
       ? TEMPLATES_SCHEMAS.find((template) => slugifyTitle(template.title) === templateId)
       : null
-
-  // Convert templateId slug to one lowercase word to match docs anchor tag
-  const templateIdForDocs =
-    typeof templateId === 'string' ? templateId.replace(/-/g, '').toLowerCase() : ''
 
   // Determine if this is a security notification template
   const isSecurityTemplate = template?.misc?.emailTemplateType === 'security'
@@ -205,7 +202,7 @@ const RedirectToTemplates = () => {
           </PageHeaderSummary>
           <PageHeaderAside>
             <DocsButton
-              href={`${DOCS_URL}/guides/local-development/customizing-email-templates#${isSecurityTemplate ? 'security' : 'auth'}emailtemplate${templateIdForDocs}`}
+              href={`${DOCS_URL}/guides/local-development/customizing-email-templates#${EMAIL_TEMPLATE_DOCS_ANCHORS[template.id]}`}
             />
           </PageHeaderAside>
         </PageHeaderMeta>

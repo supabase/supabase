@@ -191,16 +191,25 @@ const convertInputDatetimeToPostgresDatetime = (
 export const generateRowObjectFromFields = ({
   fields,
   includeUndefinedValues = false,
+  useDefaultForEmptyValues = false,
 }: {
   fields: RowField[]
   includeUndefinedValues?: boolean
+  useDefaultForEmptyValues?: boolean
 }): object => {
   const rowObject = {} as any
   fields.forEach((field) => {
     const isArray = field.format.startsWith('_')
     const value = field.value
+    const shouldUseDefaultValue =
+      useDefaultForEmptyValues &&
+      value === '' &&
+      (field.isIdentity || field.defaultValue !== null) &&
+      !TEXT_TYPES.includes(field.format)
 
-    if (isArray && value !== null) {
+    if (shouldUseDefaultValue) {
+      rowObject[field.name] = undefined
+    } else if (isArray && value !== null) {
       rowObject[field.name] = tryParseJson(value)
     } else if (field.format.includes('json')) {
       if (typeof field.value === 'object') {

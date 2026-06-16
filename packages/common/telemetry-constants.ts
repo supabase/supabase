@@ -1246,6 +1246,33 @@ export interface MetricsAPIBannerDismissButtonClickedEvent {
 }
 
 /**
+ * User clicks on the Unified Logs banner CTA button in studio project pages.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/*
+ */
+export interface UnifiedLogsBannerCtaButtonClickedEvent {
+  action: 'unified_logs_banner_cta_button_clicked'
+  properties: {
+    is_enabled: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the dismiss button on the Unified Logs banner in studio project pages.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/*
+ */
+export interface UnifiedLogsBannerDismissButtonClickedEvent {
+  action: 'unified_logs_banner_dismiss_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the enable button for Index Advisor, either from the banner or the confirmation dialog.
  *
  * @group Events
@@ -3466,6 +3493,8 @@ export type TelemetryEvent =
   | ReportsDatabaseGrafanaBannerClickedEvent
   | MetricsAPIBannerCtaButtonClickedEvent
   | MetricsAPIBannerDismissButtonClickedEvent
+  | UnifiedLogsBannerCtaButtonClickedEvent
+  | UnifiedLogsBannerDismissButtonClickedEvent
   | IndexAdvisorEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
   | IndexAdvisorTabClickedEvent

@@ -70,6 +70,16 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).toMatch(/END\) NOT IN \('401'\)/)
     })
 
+    it('reads the HTTP status from log_attributes[status] for auth rows', () => {
+      // Auth-service logs expose their status under `status`, not the gateway's
+      // `response.status_code`, so without this their 4xx/5xx classify as
+      // success and the severity filter returns nothing.
+      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:auth'))
+      expect(sql).toContain(
+        `if(source = 'auth_logs', log_attributes['status'], log_attributes['response.status_code'])`
+      )
+    })
+
     it('flips LIKE to NOT LIKE when the pathname/host operator is `<>`', () => {
       const sql = getUnifiedLogsQuery(withFilters('pathname:neq:/health', 'host:neq:cdn.foo'))
       expect(sql).toContain(`log_attributes['request.path'] NOT LIKE '%/health%'`)
@@ -170,6 +180,13 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
         date: [new Date('2026-05-01T00:00:00Z'), new Date('2026-05-08T00:00:00Z')],
       } as any)
       expect(sql).toContain('toStartOfDay(timestamp)')
+    })
+
+    it('buckets auth rows by their log_attributes[status] so 4xx/5xx are not counted as success', () => {
+      const sql = getLogsChartQuery(baseSearch)
+      expect(sql).toContain(
+        `if(source = 'auth_logs', log_attributes['status'], log_attributes['response.status_code'])`
+      )
     })
   })
 

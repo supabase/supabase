@@ -16,7 +16,7 @@ import { DEFAULT_CHART_CONFIG, QueryBlock } from '@/components/ui/QueryBlock/Que
 import { AnalyticsInterval } from '@/data/analytics/constants'
 import { useContentIdQuery } from '@/data/content/content-id-query'
 import { usePrimaryDatabase } from '@/data/read-replicas/replicas-query'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { sqlKeys } from '@/data/sql/keys'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'

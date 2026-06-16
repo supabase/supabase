@@ -84,12 +84,12 @@ const PrivilegesPage: NextPageWithLayout = () => {
   } = useTablePrivilegesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+    includedSchemas: [selectedSchema],
   })
 
   const tablePrivilege = useMemo(() => {
     const tablePrivilege = allTablePrivileges?.find(
-      (tablePrivilege) =>
-        tablePrivilege.schema === selectedSchema && tablePrivilege.name === selectedTable
+      (tablePrivilege) => tablePrivilege.name === selectedTable
     )
 
     if (tablePrivilege) {
@@ -100,7 +100,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
         ),
       }
     }
-  }, [allTablePrivileges, selectedRole, selectedSchema, selectedTable])
+  }, [allTablePrivileges, selectedRole, selectedTable])
 
   const {
     data: allColumnPrivileges,
@@ -110,6 +110,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
   } = useColumnPrivilegesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+    schema: selectedSchema,
   })
 
   const columnPrivileges = useMemo(
