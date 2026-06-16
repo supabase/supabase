@@ -75,11 +75,7 @@ export function FilterSideBar({
       </div>
 
       {isUnifiedLogsEligible && (
-        <UnifiedLogsBanner
-          variant="utility"
-          className="mx-4 mt-4"
-          onSwitchBack={handleGoBackToOldLogs}
-        />
+        <UnifiedLogsBanner variant="utility" onSwitchBack={handleGoBackToOldLogs} />
       )}
 
       <div className="flex-1 p-2 sm:overflow-y-scroll">

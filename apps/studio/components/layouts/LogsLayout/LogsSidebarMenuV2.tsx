@@ -243,7 +243,6 @@ export function LogsSidebarMenuV2() {
       {isUnifiedLogsEligible && (
         <UnifiedLogsBanner
           variant="promo"
-          className="mx-4 mt-4"
           onEnable={() => {
             enableUnifiedLogs()
             router.push(`/project/${ref}/logs`)
