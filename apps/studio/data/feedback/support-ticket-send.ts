@@ -75,8 +75,6 @@ export async function sendSupportTicket({
     const parsedError = RateLimitErrorSchema.safeParse(error)
     const { code, retryAfter } = parsedError.success ? parsedError.data : {}
 
-    // 429s are expected and recoverable, so we skip the Sentry capture below and
-    // fall back to the endpoint's 60 second window when no retryAfter is provided.
     if (code === 429) {
       const waitSeconds = retryAfter ?? 60
       throw new ResponseError(

@@ -32,7 +32,6 @@ export type SupportFormState =
   | {
       type: 'error'
       message: string
-      /** HTTP status code from the failed request, when available. */
       code?: number
     }
 
