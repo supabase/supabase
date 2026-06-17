@@ -85,7 +85,6 @@ function Feedback({ className }: { className?: string }) {
         )
       : undefined
   )
-  const isLoggedIn = useIsLoggedIn()
 
   const unanswered = state.type === 'unanswered'
   const isYes = 'response' in state && state.response === 'yes'
