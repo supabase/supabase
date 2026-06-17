@@ -14,7 +14,7 @@ Passkey support is experimental. The API may change without notice. You must exp
 
 <Admonition type="note">
 
-**Requires `@supabase/supabase-js` v2.105.0 and later.** Upgrade your client library to use passkey authentication.
+**Requires `@supabase/supabase-js` v2.105.0 and later, or `supabase_flutter` v2.15.0 and later.** Upgrade your client library to use passkey authentication.
 
 </Admonition>
 
@@ -23,7 +23,7 @@ Passkey support is experimental. The API may change without notice. You must exp
 Each sign-in or registration is a WebAuthn ceremony with three steps:
 
 1. **Options**: the client requests a challenge from Supabase Auth.
-2. **Ceremony**: the browser invokes `navigator.credentials.create()` (registration) or `navigator.credentials.get()` (authentication), prompting the user for biometrics or a security key.
+2. **Ceremony**: the platform's passkey API (`navigator.credentials.create()` / `get()` on web, or a passkey plugin on iOS, Android, and macOS) prompts the user for biometrics or a security key.
 3. **Verify**: the signed response is sent back to Supabase Auth, which validates the challenge and either stores the new credential or issues a session.
 
 Supabase Auth uses [discoverable credentials](https://www.w3.org/TR/webauthn-3/#discoverable-credential) for sign-in. The user does not need to provide an email, phone, or username — the authenticator resolves the account from the credential it stores.
@@ -99,6 +99,15 @@ Passkey support is currently experimental and requires explicit opt-in as the AP
 
 </Admonition>
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
 ```ts
 import { createClient } from '@supabase/supabase-js'
 
@@ -109,11 +118,40 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 })
 ```
 
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+The Dart SDK does not require an opt-in flag — the methods are annotated `@experimental` so the analyzer surfaces them as preview API. The server independently rejects calls with `passkey_disabled` when the dashboard toggle is off.
+
+```dart
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+await Supabase.initialize(
+  url: supabaseUrl,
+  anonKey: supabaseAnonKey,
+);
+final supabase = Supabase.instance.client;
+```
+
+Platform setup that the library cannot do for you (Associated Domains on iOS/macOS, Digital Asset Links on Android, and including the [`passkeys`](https://pub.dev/packages/passkeys) web SDK in `index.html` on web) is documented in the `supabase_flutter` package README.
+
+</TabPanel>
+</Tabs>
+
 ## Register a passkey
 
 A user must be signed in before they can register a passkey. Typically, you call this from a security settings page, or directly after sign-up.
 
-`auth.registerPasskey()` runs the full WebAuthn ceremony. It fetches a challenge, invokes the browser API, and verifies the response with Supabase Auth.
+`auth.registerPasskey()` runs the full WebAuthn ceremony. It fetches a challenge, invokes the platform passkey API, and verifies the response with Supabase Auth.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```ts
 const { data, error } = await supabase.auth.registerPasskey()
@@ -126,11 +164,30 @@ if (error) {
 }
 ```
 
-The returned `data` contains the new passkey's metadata:
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+try {
+  final Passkey passkey = await supabase.auth.registerPasskey();
+  print('Registered passkey ${passkey.id}');
+} on AuthException catch (e) {
+  // The Supabase server rejected the credential.
+  print(e);
+} catch (e) {
+  // User cancelled or the platform ceremony failed.
+  print(e);
+}
+```
+
+</TabPanel>
+</Tabs>
+
+The returned passkey contains the new credential's metadata:
 
 ```ts
 {
-  id: string            // UUID — use this to update or delete the passkey
+  id: string             // UUID — use this to update or delete the passkey
   friendly_name?: string // Derived from the authenticator's AAGUID
   created_at: string
 }
@@ -138,11 +195,20 @@ The returned `data` contains the new passkey's metadata:
 
 A friendly name is automatically derived from the authenticator's Authenticator Attestation GUID (AAGUID). For example, `iCloud Keychain`, `Google Password Manager`, `1Password`. Users can rename their passkey afterwards — see [Manage passkeys](#manage-passkeys).
 
-See the [`registerPasskey` reference](/docs/reference/javascript/auth-registerpasskey) for the full API.
+See the `registerPasskey` reference ([JavaScript](/docs/reference/javascript/auth-registerpasskey) · [Dart](/docs/reference/dart/auth-registerpasskey)) for the full API.
 
 ## Sign in with a passkey
 
 `auth.signInWithPasskey()` runs the full discoverable-credential authentication ceremony. The user picks an account from the authenticator's UI — your app does not need to ask for an email or phone number upfront.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```ts
 const { data, error } = await supabase.auth.signInWithPasskey()
@@ -155,11 +221,36 @@ if (error) {
 }
 ```
 
-See the [`signInWithPasskey` reference](/docs/reference/javascript/auth-signinwithpasskey) for the full API.
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+try {
+  final AuthResponse res = await supabase.auth.signInWithPasskey();
+  // res.session and res.user are set; the client also fires AuthChangeEvent.signedIn
+  print('Signed in as ${res.user?.email}');
+} on AuthException catch (e) {
+  print(e);
+}
+```
+
+</TabPanel>
+</Tabs>
+
+See the `signInWithPasskey` reference ([JavaScript](/docs/reference/javascript/auth-signinwithpasskey) · [Dart](/docs/reference/dart/auth-signinwithpasskey)) for the full API.
 
 ## Two-step API
 
 For native flows, custom UI, or full control over the WebAuthn ceremony, use the lower-level `auth.passkey` namespace. Each operation is split into "start" and "verify".
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 
 Registration:
 
@@ -185,13 +276,56 @@ const { data } = await supabase.auth.passkey.verifyAuthentication({
 })
 ```
 
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+Registration:
+
+```dart
+final registration = await supabase.auth.passkey.startRegistration();
+// Run the platform ceremony yourself (e.g. using a passkey plugin).
+final Map<String, dynamic> credential = await runRegistrationCeremony(
+  registration.options,
+);
+final passkey = await supabase.auth.passkey.verifyRegistration(
+  challengeId: registration.challengeId,
+  credential: credential,
+);
+```
+
+Authentication:
+
+```dart
+final authentication = await supabase.auth.passkey.startAuthentication();
+// Run the platform ceremony yourself (e.g. using a passkey plugin).
+final Map<String, dynamic> credential = await runAuthenticationCeremony(
+  authentication.options,
+);
+final AuthResponse res = await supabase.auth.passkey.verifyAuthentication(
+  challengeId: authentication.challengeId,
+  credential: credential,
+);
+```
+
+</TabPanel>
+</Tabs>
+
 The `options` field returned from `startRegistration` and `startAuthentication` matches the [WebAuthn `PublicKeyCredentialCreationOptions`](https://www.w3.org/TR/webauthn-3/#dictdef-publickeycredentialcreationoptions) and [`PublicKeyCredentialRequestOptions`](https://www.w3.org/TR/webauthn-3/#dictdef-publickeycredentialrequestoptions) shapes (with `ArrayBuffer` fields encoded as base64url).
 
-See the [`auth.passkey` reference](/docs/reference/javascript/auth-passkey-api) for the full API.
+See the `auth.passkey` reference ([JavaScript](/docs/reference/javascript/auth-passkey-api) · [Dart](/docs/reference/dart/auth-passkey-api)) for the full API.
 
 ## Manage passkeys
 
 List, rename, and delete the current user's passkeys:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```ts
 // List
@@ -208,13 +342,42 @@ await supabase.auth.passkey.update({
 await supabase.auth.passkey.delete({ passkeyId: passkeys[0].id })
 ```
 
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+// List
+final List<Passkey> passkeys = await supabase.auth.passkey.list();
+
+// Rename
+await supabase.auth.passkey.update(
+  passkeyId: passkeys.first.id,
+  friendlyName: 'Work laptop',
+);
+
+// Delete
+await supabase.auth.passkey.delete(passkeyId: passkeys.first.id);
+```
+
+</TabPanel>
+</Tabs>
+
 `friendlyName` is limited to 120 characters. `last_used_at` is updated each time the passkey is used to sign in.
 
-See the [`auth.passkey` reference](/docs/reference/javascript/auth-passkey-api) for the full API.
+See the `auth.passkey` reference ([JavaScript](/docs/reference/javascript/auth-passkey-api) · [Dart](/docs/reference/dart/auth-passkey-api)) for the full API.
 
 ## Admin API
 
 Server-side admin endpoints let you inspect and revoke a user's passkeys. These require the project's secret key and must only be called from a trusted server.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```ts
 import { createClient } from '@supabase/supabase-js'
@@ -228,7 +391,26 @@ const { data } = await supabase.auth.admin.passkey.listPasskeys({ userId })
 await supabase.auth.admin.passkey.deletePasskey({ userId, passkeyId })
 ```
 
-See the [`auth.admin.passkey` reference](/docs/reference/javascript/auth-admin-passkey-api) for the full API.
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final supabase = SupabaseClient(supabaseUrl, secretKey);
+
+final List<Passkey> passkeys = await supabase.auth.admin.passkey.listPasskeys(
+  userId: userId,
+);
+
+await supabase.auth.admin.passkey.deletePasskey(
+  userId: userId,
+  passkeyId: passkeyId,
+);
+```
+
+</TabPanel>
+</Tabs>
+
+See the `auth.admin.passkey` reference ([JavaScript](/docs/reference/javascript/auth-admin-passkey-api) · [Dart](/docs/reference/dart/auth-admin-passkey-api)) for the full API.
 
 ## Error codes
 
