@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   computeSuccessAndNonSuccessRates,
+  getBucketLogRange,
   isServiceDisabled,
   sortServicesByTraffic,
   sumErrors,
@@ -76,6 +77,35 @@ describe('ProjectUsage.metrics', () => {
 
     it('is not disabled when there is traffic', () => {
       expect(isServiceDisabled(42, false)).toBe(false)
+    })
+  })
+
+  describe('getBucketLogRange', () => {
+    const timestamp = '2024-01-15T12:00:00.000Z'
+
+    it('returns the bucket start unchanged and a one-minute window for 1hr', () => {
+      expect(getBucketLogRange(timestamp, '1hr')).toEqual({
+        start: timestamp,
+        end: '2024-01-15T12:01:00.000Z',
+      })
+    })
+
+    it('returns a one-hour window for 1day', () => {
+      expect(getBucketLogRange(timestamp, '1day')).toEqual({
+        start: timestamp,
+        end: '2024-01-15T13:00:00.000Z',
+      })
+    })
+
+    it('returns a one-day window for 7day', () => {
+      expect(getBucketLogRange(timestamp, '7day')).toEqual({
+        start: timestamp,
+        end: '2024-01-16T12:00:00.000Z',
+      })
+    })
+
+    it('parses a timestamp without a timezone designator as UTC', () => {
+      expect(getBucketLogRange('2024-01-15T12:00:00', '1hr').end).toBe('2024-01-15T12:01:00.000Z')
     })
   })
 })

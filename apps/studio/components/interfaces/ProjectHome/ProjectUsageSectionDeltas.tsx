@@ -1,6 +1,4 @@
 import { useParams } from 'common'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
@@ -10,8 +8,10 @@ import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
 import {
   computeSuccessAndNonSuccessRates,
+  getBucketLogRange,
   isServiceDisabled,
   sortServicesByTraffic,
+  type ChartIntervalKey,
   type LogsBarChartDatum,
 } from './ProjectUsage.metrics'
 import { useServiceHealthMetrics } from '@/components/interfaces/Observability/useServiceHealthMetrics'
@@ -24,13 +24,9 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useTrack } from '@/lib/telemetry/track'
 
-dayjs.extend(utc)
-
 // The homepage usage cards only surface this subset of the services returned by
 // the shared service-health endpoint, and the telemetry events are typed to match.
 type HomeServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime' | 'data_api'
-
-type ChartIntervalKey = '1hr' | '1day' | '7day'
 
 const isChartIntervalKey = (value: string): value is ChartIntervalKey =>
   value === '1hr' || value === '1day' || value === '7day'
@@ -166,14 +162,9 @@ export const ProjectUsageSectionDeltas = () => {
     (logRoute: string, serviceKey: HomeServiceKey) => (datum: LogsBarChartDatum) => {
       if (!datum?.timestamp) return
 
-      // datum.timestamp is already the UTC bucket boundary from the endpoint, so
-      // use it directly (parsed as UTC) to scope the log view to that bucket's
-      // width. The logs explorer reads its query range from the `its`/`ite`
-      // params, so send those (not iso_timestamp_start/end, which only drive the
-      // date-picker label).
-      const unit = interval === '1hr' ? 'minute' : interval === '1day' ? 'hour' : 'day'
-      const start = datum.timestamp
-      const end = dayjs.utc(datum.timestamp).add(1, unit).toISOString()
+      // The logs explorer reads its query range from the `its`/`ite` params (not
+      // iso_timestamp_start/end, which only drive the date-picker label).
+      const { start, end } = getBucketLogRange(datum.timestamp, interval)
 
       const queryParams = new URLSearchParams({
         its: start,

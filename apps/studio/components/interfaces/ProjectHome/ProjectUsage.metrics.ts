@@ -1,9 +1,16 @@
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+
+dayjs.extend(utc)
+
 export type LogsBarChartDatum = {
   timestamp: string
   error_count: number
   ok_count: number
   warning_count: number
 }
+
+export type ChartIntervalKey = '1hr' | '1day' | '7day'
 
 export const sumTotal = (data: LogsBarChartDatum[]): number =>
   data.reduce((acc, r) => acc + r.ok_count + r.warning_count + r.error_count, 0)
@@ -39,3 +46,19 @@ export const sortServicesByTraffic = <T extends { total: number }>(services: T[]
  */
 export const isServiceDisabled = (total: number, isLoading: boolean): boolean =>
   !isLoading && total <= 0
+
+/**
+ * Time window for the logs explorer when a usage chart bucket is clicked. The
+ * timestamp is the UTC bucket boundary from the endpoint, so the window spans
+ * exactly one bucket of the interval's granularity.
+ */
+export const getBucketLogRange = (
+  timestamp: string,
+  interval: ChartIntervalKey
+): { start: string; end: string } => {
+  const unit = interval === '1hr' ? 'minute' : interval === '1day' ? 'hour' : 'day'
+  return {
+    start: timestamp,
+    end: dayjs.utc(timestamp).add(1, unit).toISOString(),
+  }
+}
