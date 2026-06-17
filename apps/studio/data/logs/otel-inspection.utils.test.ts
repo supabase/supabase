@@ -60,6 +60,8 @@ const pgRow: OtelLogRow = {
     'parsed.transaction_id': '0',
     'parsed.virtual_transaction_id': '3/0',
     'parsed.sql_state_code': '00000',
+    'parsed.query': 'select * from test_broken limit 10000;',
+    'parsed.detail': 'Key (id)=(1) is not present in table "parent".',
   },
 }
 
@@ -101,6 +103,8 @@ describe('flattenOtelInspectionRow', () => {
     expect(e.transaction_id).toBe('0')
     expect(e.error_severity).toBe('LOG')
     expect(e.sql_state_code).toBe('00000')
+    expect(e.query).toBe('select * from test_broken limit 10000;')
+    expect(e.detail).toBe('Key (id)=(1) is not present in table "parent".')
     expect(e.level).toBe('success')
   })
 
