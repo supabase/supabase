@@ -65,8 +65,11 @@ export const PublicationsComboBox = ({
       onOpenChange={(open) => {
         setDropdownOpen(open)
         if (open) {
-          refetchPublications()
+          if (typeof projectRef !== 'undefined' && typeof sourceId !== 'undefined') {
+            refetchPublications()
+          }
         }
+
         if (!open && field?.onBlur) {
           field.onBlur()
         }

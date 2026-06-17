@@ -566,10 +566,14 @@ export const DestinationForm = ({
 
       // Open the confirmation dialog when validation is clean, or when warnings are unchanged on
       // resubmit. New/changed warnings are shown inline so the user can review and submit again.
-      if (hasWarnings && warningsUnchanged) {
-        setPendingFormValues(data)
-        setShowValidationWarningsDialog(true)
-        return
+      if (hasWarnings) {
+        if (warningsUnchanged) {
+          setPendingFormValues(data)
+          setShowValidationWarningsDialog(true)
+          return
+        } else {
+          return
+        }
       }
     }
 
