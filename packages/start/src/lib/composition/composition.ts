@@ -1,7 +1,12 @@
 import JSZip from 'jszip'
-import { createCompositionManifest, type MergeResult, type Template } from 'templates'
+import { createCompositionManifest, type MergeResult, type Template } from 'template-composer'
 
-export type { CompositionManifest, DependencyResolution, MergeResult, MergedFile } from 'templates'
+export type {
+  CompositionManifest,
+  DependencyResolution,
+  MergeResult,
+  MergedFile,
+} from 'template-composer'
 
 export {
   canRemoveTemplate,
@@ -10,7 +15,7 @@ export {
   getTemplatesRequiringDependency,
   mergeTemplates,
   resolveTemplateDependencies,
-} from 'templates'
+} from 'template-composer'
 
 export async function createZipBlob(mergeResult: MergeResult): Promise<Blob> {
   const zip = new JSZip()

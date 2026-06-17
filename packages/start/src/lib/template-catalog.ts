@@ -1,29 +1,43 @@
 import {
-  categories,
-  templates as embeddedTemplates,
   getDefaultEnabledTemplateIds as getDefaultEnabledTemplateIdsFromPackage,
   groupTemplatesByCategory as groupTemplatesByCategoryFromPackage,
+  parseCategoriesManifest,
   sortCategories as sortCategoriesFromPackage,
   sortTemplates as sortTemplatesFromPackage,
   type Template as PackageTemplate,
   type TemplateSummary,
-} from 'templates'
+} from 'template-composer'
 
-export type { Template, TemplateDependencies, TemplateFile, TemplateSummary } from 'templates'
+export type {
+  Template,
+  TemplateDependencies,
+  TemplateFile,
+  TemplateSummary,
+} from 'template-composer'
 
 export interface TemplateSource {
   listTemplates: () => Promise<PackageTemplate[]>
 }
 
-export const mockTemplates: PackageTemplate[] = embeddedTemplates
+const categories = parseCategoriesManifest({
+  categories: [
+    'Core',
+    'Auth',
+    'Security',
+    'API',
+    'Storage',
+    'Realtime',
+    'Database',
+    'AI',
+    'Ecommerce',
+    'Integrations',
+    'Analytics',
+    'Observability',
+  ],
+  featuredTemplates: ['database', 'functions', 'storage', 'auth', 'api'],
+})
 
-export function getStartTemplates(): PackageTemplate[] {
-  return embeddedTemplates
-}
-
-export function createMockTemplateSource(
-  templates: PackageTemplate[] = mockTemplates
-): TemplateSource {
+export function createMockTemplateSource(templates: PackageTemplate[]): TemplateSource {
   return {
     async listTemplates() {
       return templates

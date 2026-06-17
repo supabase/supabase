@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { testTemplates } from '../../../../packages/start/src/lib/test-template-fixtures'
 import { buildStartAgentHtml, buildStartAgentMarkdown } from './StartAgentMarkdown'
 
 describe('buildStartAgentMarkdown', () => {
@@ -7,7 +8,8 @@ describe('buildStartAgentMarkdown', () => {
     const markdown = buildStartAgentMarkdown(
       new URL(
         'https://supabase.com/docs/start?framework=vite&shadcn=false&primitives=database,auth,storage&orm=drizzle&connection=local&agent=codex&templates=storage-avatars'
-      )
+      ),
+      testTemplates
     )
 
     expect(markdown).toContain('## Current configuration')
@@ -21,6 +23,11 @@ describe('buildStartAgentMarkdown', () => {
     expect(markdown).toContain('## Customize via query params')
     expect(markdown).toContain('`primitives`: comma-separated values')
     expect(markdown).toContain('`agent`: `claude`, `codex`')
+    expect(markdown).toContain('## Template registry')
+    expect(markdown).toContain('[SaxonF/templates](https://github.com/SaxonF/templates)')
+    expect(markdown).toContain('npx shadcn@latest list SaxonF/templates')
+    expect(markdown).toContain('npx shadcn@latest add SaxonF/templates/<template-id>')
+    expect(markdown).toContain('Template dependencies are declared in the registry')
     expect(markdown).toContain('## Generated prompt.plan')
     expect(markdown).toContain('# Set up Supabase in my Vite + React app')
     expect(markdown).toContain('- Tooling: Codex plugin (MCP + skills), Supabase CLI')
@@ -31,7 +38,8 @@ describe('buildStartAgentMarkdown', () => {
     const markdown = buildStartAgentMarkdown(
       new URL(
         'https://supabase.com/docs/start?framework=unknown&primitives=missing&templates=not-real'
-      )
+      ),
+      testTemplates
     )
 
     expect(markdown).toContain('- Framework: Next.js (App Router)')

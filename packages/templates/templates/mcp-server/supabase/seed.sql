@@ -1,6 +1,0 @@
--- MCP server notes:
--- 1. The MCP server is implemented as an Edge Function at supabase/functions/mcp-server.
--- 2. Tools are registered via the registry in functions/mcp-server/registry.ts.
---    Add new tools under functions/mcp-server/tools/ and import them in tools/index.ts.
--- 3. Local endpoint: http://127.0.0.1:54321/functions/v1/mcp-server
--- 4. Configure your MCP client (e.g. Cursor) to point at that URL.

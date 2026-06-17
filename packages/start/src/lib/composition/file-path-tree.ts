@@ -1,2 +1,2 @@
-export { buildFilePathTree } from 'templates'
-export type { FileTreeNode } from 'templates'
+export { buildFilePathTree } from 'template-composer'
+export type { FileTreeNode } from 'template-composer'

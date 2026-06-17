@@ -1,10 +1,11 @@
+import { BASE_PATH } from '~/lib/constants'
 import {
   AGENTS,
   buildAgentPlan,
+  buildProjectCodePlan,
   buildStartComposition,
   DEFAULT_START_SEARCH_PARAMS,
   FRAMEWORKS,
-  getStartTemplates,
   ORMS,
   parseStartConfigFromSearchParams,
   PRIM_ORDER,
@@ -16,8 +17,7 @@ import {
   type StartSearchParams,
   type Template,
 } from 'start'
-
-import { BASE_PATH } from '~/lib/constants'
+import { getStartTemplateRepository } from 'start/server'
 
 import { START_AGENT_FORMAT_PARAM } from './StartAgent.constants'
 
@@ -29,11 +29,12 @@ const CONNECTION_LABELS = {
   local: 'local Supabase stack (Docker)',
 } satisfies Record<StartConfig['connection'], string>
 
-export function buildStartAgentMarkdown(url: URL): string {
-  const templates = getStartTemplates()
+export function buildStartAgentMarkdown(url: URL, templates: Template[]): string {
   const cfg = parseStartConfigFromSearchParams(readStartSearchParams(url.searchParams), templates)
   const composition = buildStartComposition(cfg, templates)
   const plan = buildAgentPlan(cfg, composition)
+  const projectCodePlan = buildProjectCodePlan(cfg, composition)
+  const templateRepository = getStartTemplateRepository()
   const normalizedUrl = `${BASE_PATH}/start?${formatStartSearchParams(startConfigToSearchParams(cfg))}`
   const services = selectedPrimitives(cfg, composition).map(
     (primitive) => PRIMITIVES[primitive].label
@@ -81,6 +82,24 @@ export function buildStartAgentMarkdown(url: URL): string {
     '```text',
     `${BASE_PATH}/start?project=existing&framework=vite&shadcn=false&primitives=database,auth,storage&orm=drizzle&connection=local&agent=codex&templates=storage-avatars`,
     '```',
+    '',
+    '## Template registry',
+    '',
+    `Supabase Start templates are read from the [${templateRepository}](${templateRepositoryUrl(templateRepository)}) shadcn registry. Use the IDs below in the \`templates\` query param, or install templates directly into a project with the shadcn CLI.`,
+    '',
+    'List available templates:',
+    '',
+    '```bash',
+    projectCodePlan.listCommand,
+    '```',
+    '',
+    'Add a template to a project:',
+    '',
+    '```bash',
+    projectCodePlan.addExampleCommand,
+    '```',
+    '',
+    'Template dependencies are declared in the registry and resolved automatically.',
     '',
     '## Available template IDs',
     '',
@@ -170,6 +189,13 @@ function templateListItem(template: Template): string {
     : ''
 
   return `- \`${template.id}\`: ${template.name} - ${template.description}.${dependencies}`
+}
+
+function templateRepositoryUrl(repository: string): string {
+  const trimmed = repository.trim().replace(/\/+$/, '')
+  if (trimmed.startsWith('https://github.com/')) return trimmed
+
+  return `https://github.com/${trimmed}`
 }
 
 function formatStartSearchParams(params: StartSearchParams): string {

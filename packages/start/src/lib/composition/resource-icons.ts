@@ -14,7 +14,7 @@ import {
 import type { CompositionResource } from './resources'
 
 /**
- * Maps the `iconKey` set by resource extractors (in packages/templates) to a
+ * Maps the `iconKey` set by resource extractors (in packages/template-composer) to a
  * Lucide icon component. Extractors choose the key; the app chooses the icon.
  * That keeps icon imports out of the shared package while still letting new
  * resource kinds light up the diagram without editing this file's consumers.

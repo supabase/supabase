@@ -1,0 +1,29 @@
+{
+  "name": "template-composer",
+  "version": "0.0.0",
+  "description": "Supabase template composition and shadcn-compatible registry utilities",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./node": "./node.ts"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "clean": "rimraf node_modules .turbo tsconfig.tsbuildinfo",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest --run"
+  },
+  "dependencies": {
+    "smol-toml": "^1.3.4"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "tsconfig": "workspace:*",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "license": "MIT"
+}

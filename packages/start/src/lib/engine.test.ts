@@ -8,9 +8,9 @@ import {
 } from './composition/start-composition'
 import { DEFAULT_CONFIG, type StartConfig } from './config'
 import { buildSteps } from './steps'
-import { getStartTemplates } from './template-catalog'
+import { testTemplates } from './test-template-fixtures'
 
-const templates = getStartTemplates()
+const templates = testTemplates
 
 function config(overrides: Partial<StartConfig> = {}): StartConfig {
   return { ...DEFAULT_CONFIG, ...overrides }
@@ -34,8 +34,8 @@ function stepText(step: ReturnType<typeof buildSteps>[number]): string {
     .join('\n')
 }
 
-describe('getStartTemplates', () => {
-  it('exposes the full embedded template list', () => {
+describe('test template fixtures', () => {
+  it('includes the core and feature templates used by the start engine', () => {
     expect(templates.length).toBeGreaterThan(0)
     expect(templates.map((template) => template.id)).toEqual(
       expect.arrayContaining(['database', 'todos', 'auth', 'storage', 'functions'])
@@ -143,6 +143,33 @@ describe('buildSteps', () => {
   it('always includes the CLI step', () => {
     expect(stepIds(config({ connection: 'remote' }))).toContain('cli')
     expect(stepIds(config({ connection: 'local' }))).toContain('cli')
+  })
+
+  it('starts local Supabase after template schemas have been turned into migrations', () => {
+    const cfg = config({ connection: 'local' })
+    const steps = buildSteps(cfg, composition(cfg))
+    const cli = steps.find((s) => s.id === 'cli')!
+    const supabaseCode = steps.find((s) => s.id === 'supabase-code')!
+    const ids = steps.map((step) => step.id)
+
+    expect(ids.indexOf('supabase-code')).toBeLessThan(ids.indexOf('keys'))
+    expect(stepText(cli)).not.toContain('npx supabase start')
+    expect(stepText(cli)).toContain('generate the first migration before starting')
+    expect(stepText(supabaseCode)).toContain('npx supabase db diff -f initial_schema')
+    expect(stepText(supabaseCode)).toContain('npx supabase start')
+    expect(stepText(supabaseCode)).toContain('npx supabase db reset')
+  })
+
+  it('uses supabase status for local keys, ports and Mailpit guidance', () => {
+    const cfg = config({ connection: 'local' })
+    const steps = buildSteps(cfg, composition(cfg))
+    const keys = steps.find((s) => s.id === 'keys')!
+    const connect = steps.find((s) => s.id === 'connect-app')!
+
+    expect(stepText(keys)).toContain('npx supabase status')
+    expect(stepText(keys)).toContain('Mailpit')
+    expect(stepText(connect)).toContain('Mailpit URL')
+    expect(stepText(connect)).toContain('localhost and 127.0.0.1')
   })
 
   it('backend-only skips bootstrap, install and client steps', () => {
@@ -257,14 +284,51 @@ describe('buildSteps', () => {
     expect(stepIds(cfg)).not.toContain('functions')
   })
 
+  it('serves selected Edge Function templates locally and points secrets at functions env', () => {
+    const cfg = config({
+      connection: 'local',
+      primitives: ['functions'],
+      templateIds: ['functions-stripe-webhook'],
+    })
+    const supabaseCode = buildSteps(cfg, composition(cfg)).find((s) => s.id === 'supabase-code')!
+    const text = stepText(supabaseCode)
+
+    expect(text).toContain('npx supabase functions serve stripe-webhook')
+    expect(text).not.toContain('npx supabase functions deploy stripe-webhook')
+    expect(text).toContain('supabase/functions/.env')
+  })
+
+  it('keeps the hosted path on link, db push and function deploy commands', () => {
+    const cfg = config({
+      connection: 'remote',
+      primitives: ['database', 'auth', 'functions'],
+      templateIds: ['functions-stripe-webhook'],
+    })
+    const steps = buildSteps(cfg, composition(cfg))
+    const ids = steps.map((step) => step.id)
+    const keys = steps.find((s) => s.id === 'keys')!
+    const supabaseCode = steps.find((s) => s.id === 'supabase-code')!
+    const text = stepText(supabaseCode)
+
+    expect(ids.indexOf('keys')).toBeLessThan(ids.indexOf('supabase-code'))
+    expect(stepText(keys)).toContain('npx supabase link --project-ref <your-project-ref>')
+    expect(stepText(keys)).not.toContain('npx supabase status')
+    expect(text).toContain('npx supabase db push')
+    expect(text).toContain('npx supabase functions deploy stripe-webhook')
+    expect(text).not.toContain('npx supabase start')
+    expect(text).not.toContain('npx supabase db reset')
+    expect(text).not.toContain('npx supabase functions serve stripe-webhook')
+    expect(text).not.toContain('supabase/functions/.env')
+  })
+
   it('includes top-level selected registry commands in the Supabase code step', () => {
     const cfg = config()
     const supabaseCode = buildSteps(cfg, composition(cfg)).find((s) => s.id === 'supabase-code')!
     const text = stepText(supabaseCode)
 
-    expect(text).toContain('npx shadcn@latest add supabase/supabase/database')
-    expect(text).toContain('npx shadcn@latest add supabase/supabase/todos')
-    expect(text).toContain('npx shadcn@latest add supabase/supabase/auth')
+    expect(text).toContain('npx shadcn@latest add SaxonF/templates/database')
+    expect(text).toContain('npx shadcn@latest add SaxonF/templates/todos')
+    expect(text).toContain('npx shadcn@latest add SaxonF/templates/auth')
   })
 })
 
@@ -294,11 +358,11 @@ describe('buildAgentPlan', () => {
     expect(plan).toContain('Add your Supabase code')
     expect(plan).toContain('Connect to your app')
     expect(plan).not.toContain('## Registry workflow')
-    expect(plan).not.toContain('npx shadcn@latest list supabase/supabase')
-    expect(plan).not.toContain('npx shadcn@latest view supabase/supabase/multi-tenant-rbac')
-    expect(plan).toContain('npx shadcn@latest add supabase/supabase/multi-tenant-rbac')
-    expect(plan).not.toContain('npx shadcn@latest add supabase/supabase/auth')
-    expect(plan).not.toContain('npx shadcn@latest add supabase/supabase/database')
+    expect(plan).not.toContain('npx shadcn@latest list SaxonF/templates')
+    expect(plan).not.toContain('npx shadcn@latest view SaxonF/templates/multi-tenant-rbac')
+    expect(plan).toContain('npx shadcn@latest add SaxonF/templates/multi-tenant-rbac')
+    expect(plan).not.toContain('npx shadcn@latest add SaxonF/templates/auth')
+    expect(plan).not.toContain('npx shadcn@latest add SaxonF/templates/database')
     expect(plan).toContain('The registry pulls required dependencies automatically')
     expect(plan).toContain('Auth')
     expect(plan).toContain('Database')
@@ -311,6 +375,20 @@ describe('buildAgentPlan', () => {
     expect(plan).toContain('supabase/schemas/todos.sql')
     expect(plan).not.toContain('create table "todos"')
     expect(plan).not.toContain('Build all tables, columns and policies in Supabase Studio')
+  })
+
+  it('adds local declarative schema, port and function secret rules to the agent prompt', () => {
+    const cfg = config({
+      connection: 'local',
+      primitives: ['database', 'auth', 'functions'],
+      templateIds: ['functions-stripe-webhook'],
+    })
+    const plan = buildAgentPlan(cfg, composition(cfg))
+
+    expect(plan).toContain('before the first local start')
+    expect(plan).toContain('supabase db reset')
+    expect(plan).toContain('read API, Studio and Mailpit ports from `supabase status`')
+    expect(plan).toContain('supabase/functions/.env')
   })
 
   it('does not ask the agent to scaffold hello when a function template is selected', () => {

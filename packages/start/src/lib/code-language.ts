@@ -1,4 +1,4 @@
-import { inferLanguage } from 'templates'
+import { inferLanguage } from 'template-composer'
 
 /**
  * Maps template language ids onto the languages the shared CodeBlock has

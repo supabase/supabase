@@ -1,7 +1,7 @@
 import { BASE_PATH } from '~/lib/constants'
 import { type Metadata } from 'next'
 import { Suspense } from 'react'
-import { getStartTemplates } from 'start'
+import { getStartTemplates } from 'start/server'
 
 import { StartPageClient } from './StartPageClient'
 
@@ -17,8 +17,8 @@ export const metadata: Metadata = {
   },
 }
 
-export default function StartPage() {
-  const templates = getStartTemplates()
+export default async function StartPage() {
+  const templates = await getStartTemplates()
 
   return (
     <div className="h-[calc(100dvh-var(--header-height))] min-h-0 overflow-hidden">

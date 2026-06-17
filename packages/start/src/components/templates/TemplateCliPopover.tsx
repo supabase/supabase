@@ -2,8 +2,10 @@
 
 import { Check, Copy, Terminal } from 'lucide-react'
 import { useState } from 'react'
-import { getRegistryAddCommand, getRegistrySearchCommand } from 'templates'
+import { getRegistryAddCommand, getRegistrySearchCommand } from 'template-composer'
 import { Button_Shadcn_, cn, copyToClipboard, Popover, PopoverContent, PopoverTrigger } from 'ui'
+
+import { getStartTemplateRegistryCommandOptions } from '../../lib/template-registry-config'
 
 interface TemplateCliPopoverProps {
   command: string
@@ -109,9 +111,9 @@ export const templateAddCliDescription =
   'Agents can use this command to install this template from the Supabase GitHub registry into a project.'
 
 export function getTemplateSearchCommand(search: string): string {
-  return getRegistrySearchCommand(search)
+  return getRegistrySearchCommand(search, getStartTemplateRegistryCommandOptions())
 }
 
 export function getTemplateAddCommand(templateId: string): string {
-  return getRegistryAddCommand(templateId)
+  return getRegistryAddCommand(templateId, getStartTemplateRegistryCommandOptions())
 }

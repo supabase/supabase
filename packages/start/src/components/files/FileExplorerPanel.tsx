@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
-import { inferLanguage } from 'templates'
+import { inferLanguage } from 'template-composer'
 import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 
 import { FileTreeSidebar } from './FileTreeSidebar'

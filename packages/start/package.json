@@ -6,7 +6,8 @@
   "main": "./index.ts",
   "types": "./index.ts",
   "exports": {
-    ".": "./index.ts"
+    ".": "./index.ts",
+    "./server": "./server.ts"
   },
   "sideEffects": ["**/*.css"],
   "scripts": {
@@ -24,7 +25,7 @@
     "react-markdown": "^10.1.0",
     "react-syntax-highlighter": "^15.6.6",
     "remark-gfm": "^4.0.1",
-    "templates": "workspace:*",
+    "template-composer": "workspace:*",
     "ui": "workspace:*",
     "ui-patterns": "workspace:*"
   },

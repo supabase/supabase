@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest'
 
 import { DEFAULT_CONFIG } from './config'
 import { parseStartConfigFromSearchParams, startConfigToSearchParams } from './start-search-params'
-import { getStartTemplates } from './template-catalog'
+import { testTemplates } from './test-template-fixtures'
 
-const templates = getStartTemplates()
+const templates = testTemplates
 
 describe('startSearchParams', () => {
   it('round-trips the default config', () => {

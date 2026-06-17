@@ -532,9 +532,6 @@ importers:
       start:
         specifier: workspace:*
         version: link:../../packages/start
-      templates:
-        specifier: workspace:*
-        version: link:../../packages/templates
       ui:
         specifier: workspace:*
         version: link:../../packages/ui
@@ -1818,9 +1815,6 @@ importers:
       swiper:
         specifier: ^12.1.2
         version: 12.1.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-      templates:
-        specifier: workspace:*
-        version: link:../../packages/templates
       typed.js:
         specifier: ^2.0.16
         version: 2.0.16
@@ -2423,9 +2417,9 @@ importers:
       remark-gfm:
         specifier: ^4.0.1
         version: 4.0.1(supports-color@8.1.1)
-      templates:
+      template-composer:
         specifier: workspace:*
-        version: link:../templates
+        version: link:../template-composer
       ui:
         specifier: workspace:*
         version: link:../ui
@@ -2452,7 +2446,7 @@ importers:
         specifier: 'catalog:'
         version: 4.1.4(@opentelemetry/api@1.9.0)(@types/node@22.13.14)(@vitest/coverage-v8@4.1.4)(@vitest/ui@4.1.4)(jsdom@28.1.0(@noble/hashes@1.8.0)(supports-color@8.1.1))(msw@2.11.3(@types/node@22.13.14)(typescript@6.0.2))(vite@8.0.14(@types/node@22.13.14)(esbuild@0.25.2)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.9.0))
 
-  packages/templates:
+  packages/template-composer:
     dependencies:
       smol-toml:
         specifier: ^1.3.4

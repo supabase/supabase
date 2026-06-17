@@ -1,4 +1,0 @@
-[edge_runtime]
-enabled = true
-policy = "oneshot"
-inspector_port = 8083

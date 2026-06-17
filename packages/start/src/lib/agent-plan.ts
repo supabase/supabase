@@ -7,7 +7,10 @@ function schemaRule(cfg: StartConfig): string {
   if (cfg.orm === 'drizzle')
     return 'edit src/db/schema.ts then `drizzle-kit generate` + `drizzle-kit migrate`'
   if (cfg.orm === 'prisma') return 'edit prisma/schema.prisma then `prisma migrate dev`'
-  return 'declare tables in supabase/schemas/*.sql then `supabase db diff -f <name>`'
+  if (cfg.connection === 'local') {
+    return 'declare tables in supabase/schemas/*.sql, run `supabase db diff -f <name>` before the first local start, then use `supabase db reset` to replay migrations and seed.sql'
+  }
+  return 'declare tables in supabase/schemas/*.sql then `supabase db diff -f <name>` and `supabase db push`'
 }
 
 function codeBlock(lang: string, code: string): string[] {
@@ -72,7 +75,19 @@ export function buildAgentPlan(cfg: StartConfig, composition: StartComposition):
   })
 
   out.push('## Rules')
-  out.push(`- Keep all secrets in ${fw.envFile}; never hardcode keys.`)
+  out.push(`- Keep app environment variables in ${fw.envFile}; never hardcode keys.`)
+  if (!remote) {
+    out.push(
+      '- For local development, read API, Studio and Mailpit ports from `supabase status`; do not assume the default 5432x ports are free.'
+    )
+  }
+  if (ctx.prims.includes('functions')) {
+    out.push(
+      remote
+        ? '- Store hosted Edge Function secrets with `supabase secrets set` or in the Dashboard, not in client env files.'
+        : '- Store local Edge Function secrets in `supabase/functions/.env` or pass `--env-file` to `supabase functions serve`; restart function serving after secret changes.'
+    )
+  }
   out.push(
     "- When the plugin asks, I'll give you an access token — use it but never print it back or commit it."
   )

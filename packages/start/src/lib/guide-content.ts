@@ -247,12 +247,15 @@ function buildPrimitiveAppBlocks(ctx: GuideContext, primitive: PrimitiveId): Gui
 }
 
 function buildAuthAppBlocks(ctx: GuideContext): GuideBlock[] {
+  const localAuthNote = getLocalAuthNote(ctx)
+
   if (ctx.newNext) {
     return [
       {
         type: 'note',
         text: 'Email sign-in already works in the with-supabase starter. Tweak providers in Dashboard -> Authentication -> Providers; the login UI lives in app/login.',
       },
+      ...localAuthNote,
     ]
   }
 
@@ -262,6 +265,7 @@ function buildAuthAppBlocks(ctx: GuideContext): GuideBlock[] {
         type: 'note',
         text: 'Use the password-based auth block for sign-in, sign-up and reset flows. Restyle it like any shadcn component.',
       },
+      ...localAuthNote,
     ]
   }
 
@@ -274,6 +278,18 @@ function buildAuthAppBlocks(ctx: GuideContext): GuideBlock[] {
         '  email, password,',
         '})',
       ]),
+    },
+    ...localAuthNote,
+  ]
+}
+
+function getLocalAuthNote(ctx: GuideContext): GuideBlock[] {
+  if (ctx.cfg.connection !== 'local') return []
+
+  return [
+    {
+      type: 'note',
+      text: 'For local email auth, open the Mailpit URL from npx supabase status. If email confirmations are disabled, no confirmation email is sent; keep the signup UI and redirect URLs aligned with supabase/config.toml, including localhost and 127.0.0.1 variants when your app may use both.',
     },
   ]
 }

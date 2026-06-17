@@ -1,1 +1,1 @@
-export { filterTemplates } from 'templates'
+export { filterTemplates } from 'template-composer'

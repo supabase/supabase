@@ -1,7 +1,12 @@
-import { getRegistryAddCommand, getRegistrySearchCommand, getRegistryViewCommand } from 'templates'
+import {
+  getRegistryAddCommand,
+  getRegistrySearchCommand,
+  getRegistryViewCommand,
+} from 'template-composer'
 
 import type { StartComposition } from './composition/start-composition'
 import { listEnglish, ORMS, type StartConfig } from './config'
+import { getStartTemplateRegistryCommandOptions } from './template-registry-config'
 
 export type ProjectCodeFileGroupId = 'config' | 'schema' | 'seed' | 'edge-functions' | 'other'
 
@@ -26,6 +31,7 @@ export interface ProjectCodePlan {
   hasProjectCode: boolean
   listCommand: string
   searchExampleCommand: string
+  addExampleCommand: string
   selectedTemplates: ProjectCodeTemplate[]
   dependencyTemplates: ProjectCodeTemplate[]
   addCommands: ProjectCodeTemplateCommand[]
@@ -54,6 +60,7 @@ export function buildProjectCodePlan(
   cfg: StartConfig,
   composition: StartComposition
 ): ProjectCodePlan {
+  const registryCommandOptions = getStartTemplateRegistryCommandOptions()
   const resolvedById = new Map(
     composition.resolution.resolved.map((template) => [template.id, template])
   )
@@ -81,17 +88,18 @@ export function buildProjectCodePlan(
 
   return {
     hasProjectCode: selectedTemplates.length > 0 || filePaths.length > 0,
-    listCommand: getRegistrySearchCommand(),
-    searchExampleCommand: 'npx shadcn@latest search supabase/supabase -q <query>',
+    listCommand: getRegistrySearchCommand('', registryCommandOptions),
+    searchExampleCommand: getRegistrySearchCommand('<query>', registryCommandOptions),
+    addExampleCommand: getRegistryAddCommand('<template-id>', registryCommandOptions),
     selectedTemplates,
     dependencyTemplates,
     addCommands: selectedTemplates.map((template) => ({
       ...template,
-      command: getRegistryAddCommand(template.id),
+      command: getRegistryAddCommand(template.id, registryCommandOptions),
     })),
     viewCommands: selectedTemplates.map((template) => ({
       ...template,
-      command: getRegistryViewCommand(template.id),
+      command: getRegistryViewCommand(template.id, registryCommandOptions),
     })),
     fileGroups,
     filePaths,
@@ -102,7 +110,7 @@ export function buildProjectCodePlan(
     edgeFunctionNames,
     ormConversionNote: schemaFiles.length > 0 ? getOrmConversionNote(cfg, schemaFiles) : null,
     migrationCommands: getMigrationCommands(cfg, schemaFiles),
-    deployCommands: edgeFunctionNames.map((name) => `npx supabase functions deploy ${name}`),
+    deployCommands: getFunctionCommands(cfg, edgeFunctionNames),
   }
 }
 
@@ -153,12 +161,25 @@ function getOrmConversionNote(cfg: StartConfig, schemaFiles: string[]): string |
 function getMigrationCommands(cfg: StartConfig, schemaFiles: string[]): string[] {
   if (schemaFiles.length === 0) return []
 
+  const applyTemplateSqlCommand =
+    cfg.connection === 'local'
+      ? 'npx supabase start                 # first run: applies migrations and then seed.sql'
+      : 'npx supabase db push               # apply pending migrations to the linked project'
+
+  const replayLocalSeedCommand =
+    cfg.connection === 'local'
+      ? [
+          'npx supabase db reset             # after later schema or seed edits, replay migrations + seed.sql',
+        ]
+      : []
+
   if (cfg.orm === 'drizzle') {
     return [
       'npx drizzle-kit generate   # after porting ORM-owned schema to src/db/schema.ts',
       'npx drizzle-kit migrate    # apply generated ORM migrations',
       'npx supabase db diff -f preserve_template_sql   # after keeping only non-ORM SQL in supabase/schemas/*.sql',
-      'npx supabase migration up',
+      applyTemplateSqlCommand,
+      ...replayLocalSeedCommand,
     ]
   }
 
@@ -166,14 +187,28 @@ function getMigrationCommands(cfg: StartConfig, schemaFiles: string[]): string[]
     return [
       'npx prisma migrate dev --name update_schema   # after porting ORM-owned schema to prisma/schema.prisma',
       'npx supabase db diff -f preserve_template_sql   # after keeping only non-ORM SQL in supabase/schemas/*.sql',
-      'npx supabase migration up',
+      applyTemplateSqlCommand,
+      ...replayLocalSeedCommand,
     ]
   }
 
   return [
-    'npx supabase db diff -f update_schema   # generate the migration',
-    'npx supabase migration up               # apply locally',
+    `npx supabase db diff -f ${
+      cfg.connection === 'local' ? 'initial_schema' : 'update_schema'
+    }   # generate the migration from supabase/schemas/*.sql`,
+    applyTemplateSqlCommand,
+    ...replayLocalSeedCommand,
   ]
+}
+
+function getFunctionCommands(cfg: StartConfig, edgeFunctionNames: string[]): string[] {
+  if (cfg.connection === 'local') {
+    return edgeFunctionNames.map(
+      (name) => `npx supabase functions serve ${name}   # local hot reload`
+    )
+  }
+
+  return edgeFunctionNames.map((name) => `npx supabase functions deploy ${name}`)
 }
 
 function isSchemaFile(path: string): boolean {

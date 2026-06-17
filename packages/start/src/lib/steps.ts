@@ -46,14 +46,17 @@ export function buildSteps(cfg: StartConfig, composition: StartComposition): Set
   // C) install the CLI (always — code-first migrations run through it)
   steps.push(cliStep(cfg))
 
-  // D) keys / project / link
-  steps.push(keysStep(cfg, fw, newNext, remote))
+  // D) keys / project / link. Local keys are printed after the local stack
+  // starts, which happens after template files and an initial migration exist.
+  if (remote) steps.push(keysStep(cfg, fw, newNext, remote))
 
   // E) ORM packages
   if (cfg.orm !== 'none') steps.push(ormInstallStep(cfg))
 
   const supabaseCode = supabaseCodeStep(ctx)
   if (supabaseCode) steps.push(supabaseCode)
+
+  if (!remote) steps.push(keysStep(cfg, fw, newNext, remote))
 
   const appConnection = connectAppStep(ctx)
   if (appConnection) steps.push(appConnection)
@@ -124,11 +127,7 @@ function pluginStep(cfg: StartConfig): SetupStep {
 
 function cliStep(cfg: StartConfig): SetupStep {
   const local = cfg.connection === 'local'
-  const code = lines(
-    ['npm install supabase --save-dev', 'npx supabase init'].concat(
-      local ? ['npx supabase start'] : []
-    )
-  )
+  const code = lines(['npm install supabase --save-dev', 'npx supabase init'])
   return {
     id: 'cli',
     key: true,
@@ -141,7 +140,7 @@ function cliStep(cfg: StartConfig): SetupStep {
       {
         type: 'note',
         text: local
-          ? 'supabase start prints your local API URL and anon key — keep them for the keys step below.'
+          ? 'Install templates and generate the first migration before starting the local stack. That keeps seed.sql from running before its tables exist.'
           : "You'll run supabase db diff / db push here to version your schema against your hosted project.",
       },
     ],
@@ -187,8 +186,19 @@ function keysStep(
   return {
     id: 'keys',
     title: 'Add your local keys',
-    desc: `Copy the API URL and anon key that supabase start printed into ${fw.envFile}.`,
-    blocks: [envBlock],
+    desc: `Run supabase status after the local stack starts, then copy the API URL and anon key into ${fw.envFile}.`,
+    blocks: [
+      {
+        type: 'code',
+        lang: 'terminal',
+        code: 'npx supabase status',
+      },
+      envBlock,
+      {
+        type: 'note',
+        text: 'Use the exact ports from supabase status for API, Studio and Mailpit. Local projects can be remapped when another Supabase stack is already using the defaults.',
+      },
+    ],
   }
 }
 
@@ -397,11 +407,28 @@ function supabaseCodeStep(ctx: GuideContext): SetupStep | null {
   if (plan.configFiles.length > 0) {
     blocks.push({
       type: 'note',
-      text: 'After editing supabase/config.toml locally, restart Supabase: npx supabase stop && npx supabase start',
+      text:
+        cfg.connection === 'local'
+          ? 'After editing supabase/config.toml locally, restart Supabase: npx supabase stop && npx supabase start. If ports collide, remap the full local stack in config.toml and re-check them with npx supabase status.'
+          : 'Review supabase/config.toml before linking or pushing so the generated local settings match the hosted project you intend to deploy to.',
     })
   }
 
   blocks.push(...buildProjectCodeGuidanceBlocks(ctx))
+
+  if (cfg.connection === 'local' && plan.seedFiles.length > 0 && plan.schemaFiles.length > 0) {
+    blocks.push({
+      type: 'note',
+      text: 'Seed files run during supabase start and db reset. Generate the initial migration from supabase/schemas/*.sql before the first local start/reset so seed data can reference the tables it inserts into.',
+    })
+  }
+
+  if (cfg.connection === 'local' && plan.edgeFunctionFiles.length > 0) {
+    blocks.push({
+      type: 'note',
+      text: 'For local Edge Function secrets, use supabase/functions/.env or pass --env-file to supabase functions serve. Hosted secrets still belong in the Dashboard or supabase secrets set.',
+    })
+  }
 
   if (plan.ormConversionNote) {
     blocks.push({
@@ -415,6 +442,12 @@ function supabaseCodeStep(ctx: GuideContext): SetupStep | null {
       type: 'code',
       lang: 'terminal',
       code: lines(plan.migrationCommands),
+    })
+  } else if (cfg.connection === 'local') {
+    blocks.push({
+      type: 'code',
+      lang: 'terminal',
+      code: 'npx supabase start',
     })
   }
 
