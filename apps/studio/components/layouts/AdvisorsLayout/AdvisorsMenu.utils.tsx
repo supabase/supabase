@@ -29,6 +29,13 @@ export const useGenerateAdvisorsMenu = (): ProductMenuGroup[] => {
           shortcutId: SHORTCUT_IDS.NAV_ADVISORS_PERFORMANCE,
         },
         {
+          name: 'Database Scan',
+          key: 'debugger',
+          url: `/project/${ref}/advisors/debugger`,
+          items: [],
+          shortcutId: SHORTCUT_IDS.NAV_ADVISORS_DEBUGGER,
+        },
+        {
           name: 'Query Performance',
           key: 'query-performance',
           url: `/project/${ref}/observability/query-performance`,
