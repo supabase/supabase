@@ -120,7 +120,7 @@ export const SQLEditor = () => {
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
   const { aiOptInLevel } = useOrgAiOptInLevel()
   const showPrettyExplain = useFlag('ShowPrettyExplain')
-  
+
   // [Ali] Kill switch to hide the SQL Editor Explain tab and its entry points
   const disablePrettyExplain = useFlag('DisablePrettyExplainOnSqlEditor')
 
