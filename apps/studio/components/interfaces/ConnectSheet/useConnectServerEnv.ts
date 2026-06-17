@@ -43,7 +43,6 @@ export interface UseConnectServerEnvResult {
   buildEnv: () => Promise<string>
 }
 
-
 export function useConnectServerEnv(): UseConnectServerEnvResult {
   const { ref: projectRef } = useParams()
 
