@@ -1274,7 +1274,8 @@ test.describe('Database Functions', () => {
     await page.waitForLoadState('networkidle')
 
     // create a new function button exists in public schema
-    await expect(page.getByRole('button', { name: 'Create a new function' })).toBeVisible()
+    const newFunctionButton = page.getByRole('button', { name: 'New function' }).first()
+    await expect(newFunctionButton).toBeVisible()
 
     // change schema -> auth
     await page.getByTestId('schema-selector').click()
@@ -1283,7 +1284,7 @@ test.describe('Database Functions', () => {
     await expect(page.getByText('email')).toBeVisible()
     await expect(page.getByText('jwt')).toBeVisible()
     // create a new function button does not exist in other schemas
-    await expect(page.getByRole('button', { name: 'Create a new function' })).not.toBeVisible()
+    await expect(page.getByRole('button', { name: 'New function' })).not.toBeVisible()
 
     // filter by querying
     await page.getByRole('textbox', { name: 'Search for a function' }).fill('email')
@@ -1311,7 +1312,7 @@ test.describe('Database Functions', () => {
     await page.waitForLoadState('networkidle')
 
     // create new function
-    await page.getByRole('button', { name: 'Create a new function' }).click()
+    await page.getByRole('button', { name: 'New function' }).first().click()
     await page.getByRole('textbox', { name: 'Name of function' }).fill(databaseFunctionName)
     const editor = page.getByRole('presentation')
     await editor.click()

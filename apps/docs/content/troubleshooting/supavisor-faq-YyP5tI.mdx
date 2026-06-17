@@ -66,7 +66,7 @@ postgresql://postgres.ajrbwkcuthywfddihrmflo:[YOUR-PASSWORD]@aws-0-us-east-1.poo
 
 ### Supavisor: Transaction mode vs. Session mode?
 
-When a client forms a direct connection with Postgres, it usually will make a few queries, but may not utilize the connection the entire time. In transaction mode, a client is allowed to make a single query before being sent back to the figurative "waiting room". This prevents greedy or sedentary clients from hoarding connections. In most cases, this increases query throughput and is optimal.
+When a client forms a direct connection with Postgres, it usually makes a few queries but may not use the connection the entire time. In transaction mode, a client is allowed to make a single query before being sent back to the figurative "waiting room". This prevents greedy or sedentary clients from hoarding connections. In most cases, this increases query throughput and is optimal.
 
 In session mode, once the pooler assigns a direct connection, it stays with that client until voluntarily surrendered.
 

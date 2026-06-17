@@ -165,15 +165,25 @@ const PERMISSION_GROUPS: PermissionGroup[] = [
   },
 ]
 
-export const RequesterLogo = ({ icon, name }: { icon: string | null; name: string }) => (
-  <LogoBox>
-    {icon ? (
-      <img alt={name} src={icon} className="size-full object-cover" />
-    ) : (
-      <span className="text-lg font-medium text-foreground-light">{name.slice(0, 1)}</span>
-    )}
-  </LogoBox>
-)
+export const RequesterLogo = ({ icon, name }: { icon: string | null; name: string }) => {
+  const [failedIcon, setFailedIcon] = useState<string | null>(null)
+  const showLetter = !icon || failedIcon === icon
+
+  return (
+    <LogoBox>
+      {showLetter ? (
+        <span className="text-lg font-medium text-foreground-light">{name.slice(0, 1)}</span>
+      ) : (
+        <img
+          alt={name}
+          src={icon}
+          className="size-full object-cover"
+          onError={() => setFailedIcon(icon)}
+        />
+      )}
+    </LogoBox>
+  )
+}
 
 export const AuthorizeRequesterDetails = ({
   name,
