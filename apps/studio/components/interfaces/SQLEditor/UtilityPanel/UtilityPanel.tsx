@@ -9,8 +9,7 @@ import { UtilityTabResults } from './UtilityTabResults'
 import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 import { Snippet } from '@/data/content/sql-folders-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 export type UtilityPanelProps = {
@@ -54,7 +53,7 @@ export const UtilityPanel = ({
   onActiveTabChange,
 }: UtilityPanelProps) => {
   const { ref } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const snippet = snapV2.snippets[id]?.snippet
@@ -67,8 +66,6 @@ export const UtilityPanel = ({
     }
     onActiveTabChange?.(tab)
   }
-
-  const { mutate: sendEvent } = useSendEventMutation()
 
   const { mutate: upsertContent } = useContentUpsertMutation({
     invalidateQueriesOnSuccess: false,
@@ -137,44 +134,24 @@ export const UtilityPanel = ({
       <TabsList_Shadcn_ className="flex justify-between gap-2 px-4 overflow-x-auto min-h-[42px]">
         <div className="flex items-center gap-4">
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
-            <span className="translate-y-[1px]">Results</span>
+            <span className="translate-y-px">Results</span>
           </TabsTrigger_Shadcn_>
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="explain">
-            <span className="translate-y-[1px]">Explain</span>
+            <span className="translate-y-px">Explain</span>
           </TabsTrigger_Shadcn_>
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="chart">
-            <span className="translate-y-[1px]">Chart</span>
+            <span className="translate-y-px">Chart</span>
           </TabsTrigger_Shadcn_>
 
           {result?.rows && (
             <DownloadResultsButton
-              type="text"
+              variant="text"
               results={result.rows as any[]}
               fileName={`Supabase Snippet ${snippet.name}`}
-              onDownloadAsCSV={() =>
-                sendEvent({
-                  action: 'sql_editor_result_download_csv_clicked',
-                  groups: { project: ref ?? '', organization: org?.slug ?? '' },
-                })
-              }
-              onCopyAsMarkdown={() => {
-                sendEvent({
-                  action: 'sql_editor_result_copy_markdown_clicked',
-                  groups: { project: ref ?? '', organization: org?.slug ?? '' },
-                })
-              }}
-              onCopyAsJSON={() => {
-                sendEvent({
-                  action: 'sql_editor_result_copy_json_clicked',
-                  groups: { project: ref ?? '', organization: org?.slug ?? '' },
-                })
-              }}
-              onCopyAsCSV={() => {
-                sendEvent({
-                  action: 'sql_editor_result_copy_csv_clicked',
-                  groups: { project: ref ?? '', organization: org?.slug ?? '' },
-                })
-              }}
+              onDownloadAsCSV={() => track('sql_editor_result_download_csv_clicked')}
+              onCopyAsMarkdown={() => track('sql_editor_result_copy_markdown_clicked')}
+              onCopyAsJSON={() => track('sql_editor_result_copy_json_clicked')}
+              onCopyAsCSV={() => track('sql_editor_result_copy_csv_clicked')}
             />
           )}
         </div>

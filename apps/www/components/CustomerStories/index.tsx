@@ -19,7 +19,7 @@ const CutomsersSliderDesktop = dynamic(() => import('./CutomsersSliderDesktop'))
 
 const CustomerStories = () => (
   <div id="customers" className="overflow-hidden pb-16 md:pb-24">
-    <SectionContainer className="!pb-8 w-full flex gap-4 justify-between flex-col xl:flex-row xl:items-end">
+    <SectionContainer className="pb-8! w-full flex gap-4 justify-between flex-col xl:flex-row xl:items-end">
       <SectionHeader
         title="Trusted by the world’s"
         title_alt=" most innovative companies."
@@ -31,7 +31,7 @@ const CustomerStories = () => (
         <Button asChild>
           <Link href="/customers">View all stories</Link>
         </Button>
-        <Button asChild type="default">
+        <Button asChild variant="default">
           <Link href="/events">View events</Link>
         </Button>
       </div>

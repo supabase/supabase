@@ -173,7 +173,7 @@ export const AuditLogsForm = () => {
                         </InlineLink>
                         . You are responsible for backing up, copying, or migrating existing data
                         from the{' '}
-                        <code className="text-code-inline !break-keep">
+                        <code className="text-code-inline break-keep!">
                           {AUDIT_LOG_ENTRIES_TABLE}
                         </code>{' '}
                         table if needed.
@@ -185,13 +185,13 @@ export const AuditLogsForm = () => {
 
               <CardFooter className="justify-end space-x-2">
                 {isDirty && (
-                  <Button type="default" onClick={() => form.reset()}>
+                  <Button variant="default" onClick={() => form.reset()}>
                     Cancel
                   </Button>
                 )}
                 <Button
-                  type="primary"
-                  htmlType="submit"
+                  variant="primary"
+                  type="submit"
                   disabled={!canUpdateConfig || isUpdatingConfig || !isDirty}
                   loading={isUpdatingConfig}
                 >

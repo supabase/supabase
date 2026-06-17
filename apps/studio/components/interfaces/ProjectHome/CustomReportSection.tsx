@@ -338,7 +338,7 @@ export function CustomReportSection() {
         <div className="flex items-center gap-x-2">
           {layout.length > 0 && (
             <ButtonTooltip
-              type="default"
+              variant="default"
               icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
               className="w-7"
               disabled={isRefreshing}
@@ -351,7 +351,7 @@ export function CustomReportSection() {
               projectRef={ref}
               onSelect={addSnippetToReport}
               trigger={
-                <Button type="default" icon={<Plus />}>
+                <Button variant="default" icon={<Plus />}>
                   Add block
                 </Button>
               }
@@ -364,11 +364,11 @@ export function CustomReportSection() {
       </div>
       <div className="relative">
         {isDraggingOver && (
-          <div className="absolute inset-0 rounded bg-brand/10 pointer-events-none z-10" />
+          <div className="absolute inset-0 rounded-sm bg-brand/10 pointer-events-none z-10" />
         )}
         {layout.length === 0 ? (
           <div
-            className="h-64 flex flex-col items-center justify-center rounded border-2 border-dashed p-16 transition-colors"
+            className="h-64 flex flex-col items-center justify-center rounded-sm border-2 border-dashed p-16 transition-colors"
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -382,7 +382,7 @@ export function CustomReportSection() {
                 projectRef={ref}
                 onSelect={addSnippetToReport}
                 trigger={
-                  <Button type="default" iconRight={<Plus size={14} />}>
+                  <Button variant="default" iconRight={<Plus size={14} />}>
                     Add your first block
                   </Button>
                 }

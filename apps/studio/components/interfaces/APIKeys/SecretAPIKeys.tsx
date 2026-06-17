@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useFlag, useParams } from 'common'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef } from 'react'
@@ -130,7 +130,7 @@ export const SecretAPIKeys = () => {
       <FormHeader
         title="Secret keys"
         description="These API keys allow privileged access to your project's APIs. Use in servers, functions, workers or other backend components of your application."
-        actions={<CreateSecretAPIKeyDialog />}
+        actions={IS_PLATFORM ? <CreateSecretAPIKeyDialog /> : null}
       />
 
       {!canReadAPIKeys && !isLoadingPermissions ? (
@@ -141,7 +141,7 @@ export const SecretAPIKeys = () => {
         <AlertError error={error} subject="Failed to load secret API keys" />
       ) : empty ? (
         <Card>
-          <div className="!rounded-b-md overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
+          <div className="rounded-b-md! overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
             <p className="text-sm text-foreground">No secret API keys found</p>
             <p className="text-sm text-foreground-light">
               Your project is not accessible via secret keys—there are no active secret keys
@@ -159,7 +159,7 @@ export const SecretAPIKeys = () => {
                 {showApiKeysLastUsed && (
                   <TableHead className="hidden lg:table-cell">Last Used</TableHead>
                 )}
-                <TableHead />
+                {IS_PLATFORM && <TableHead />}
               </TableRow>
             </TableHeader>
             <TableBody>

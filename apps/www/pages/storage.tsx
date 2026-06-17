@@ -1,6 +1,7 @@
 import { ArrowUpRight, Shuffle, Wifi, X } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
+import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PRODUCT_NAMES } from 'shared-data/products'
@@ -18,6 +19,8 @@ import Solutions from '@/data/MainProducts'
 import ApiExamples from '@/data/products/storage/api-examples'
 import DashboardViewData from '@/data/products/storage/dashboard-carousel.json'
 import StoragePermissionsData from '@/data/products/storage/permissions-examples'
+import { breadcrumbs } from '@/lib/breadcrumbs'
+import { breadcrumbListSchema, serializeJsonLd, softwareApplicationSchema } from '@/lib/json-ld'
 
 const APISection = dynamic(() => import('~/components/Sections/APISection'))
 const SingleQuote = dynamic(() => import('~/components/Sections/SingleQuote'))
@@ -53,6 +56,27 @@ function StoragePage() {
           ],
         }}
       />
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(
+              softwareApplicationSchema({
+                name: 'Supabase Storage',
+                description: meta_description,
+                url: 'https://supabase.com/storage',
+                image: `https://supabase.com${basePath}/images/product/storage/storage-og.jpg`,
+              })
+            ),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.storage)),
+          }}
+        />
+      </Head>
       <DefaultLayout>
         <ProductsNav activePage={PRODUCT_NAMES.STORAGE} />
         <ProductHeader
@@ -214,7 +238,13 @@ function StoragePage() {
                 archives, and more, then serve them fast from a global CDN with fine-grained access
                 controls.
               </p>
-              <Button asChild size="small" type="default" className="mt-4" icon={<ArrowUpRight />}>
+              <Button
+                asChild
+                size="small"
+                variant="default"
+                className="mt-4"
+                icon={<ArrowUpRight />}
+              >
                 <Link href="/docs/guides/storage">Read the docs</Link>
               </Button>
             </div>
@@ -226,10 +256,10 @@ function StoragePage() {
                 is efficient to query, partition, and transform, and optionally expose via Postgres.
               </p>
               <div className="mt-4 flex gap-2">
-                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+                <Button asChild size="small" variant="default" icon={<ArrowUpRight />}>
                   <Link href="/docs/guides/storage/analytics/introduction">Read the docs</Link>
                 </Button>
-                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+                <Button asChild size="small" variant="default" icon={<ArrowUpRight />}>
                   <Link href="/blog/analytics-buckets">Read the blog post</Link>
                 </Button>
               </div>
@@ -243,10 +273,10 @@ function StoragePage() {
                 search, and more.
               </p>
               <div className="mt-4 flex gap-2">
-                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+                <Button asChild size="small" variant="default" icon={<ArrowUpRight />}>
                   <Link href="/docs/guides/storage/vector/introduction">Read the docs</Link>
                 </Button>
-                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+                <Button asChild size="small" variant="default" icon={<ArrowUpRight />}>
                   <Link href="/blog/vector-buckets">Read the blog post</Link>
                 </Button>
               </div>
@@ -274,7 +304,7 @@ function StoragePage() {
                   <Button
                     asChild
                     size="small"
-                    type="default"
+                    variant="default"
                     className="mt-4"
                     icon={<ArrowUpRight />}
                   >
@@ -290,7 +320,7 @@ function StoragePage() {
                   <Button
                     asChild
                     size="small"
-                    type="default"
+                    variant="default"
                     className="mt-4"
                     icon={<ArrowUpRight />}
                   >
@@ -331,7 +361,7 @@ function StoragePage() {
                       <Button
                         asChild
                         size="small"
-                        type="default"
+                        variant="default"
                         className="mt-4"
                         icon={<ArrowUpRight />}
                       >

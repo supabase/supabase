@@ -15,9 +15,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 import { z } from 'zod'
 
@@ -53,11 +53,11 @@ export default function CalendarForm() {
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Date of birth</FormLabel>
-              <Popover_Shadcn_>
-                <PopoverTrigger_Shadcn_ asChild>
+              <Popover>
+                <PopoverTrigger asChild>
                   <FormControl>
                     <Button
-                      type={'outline'}
+                      variant="outline"
                       className={cn(
                         'w-[240px] pl-3 text-left font-normal',
                         !field.value && 'text-muted-foreground'
@@ -67,8 +67,8 @@ export default function CalendarForm() {
                       <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                     </Button>
                   </FormControl>
-                </PopoverTrigger_Shadcn_>
-                <PopoverContent_Shadcn_ className="w-auto p-0" align="start">
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
                     selected={field.value}
@@ -76,14 +76,14 @@ export default function CalendarForm() {
                     disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
                     initialFocus
                   />
-                </PopoverContent_Shadcn_>
-              </Popover_Shadcn_>
+                </PopoverContent>
+              </Popover>
               <FormDescription>Your date of birth is used to calculate your age.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button htmlType="submit">Submit</Button>
+        <Button type="submit">Submit</Button>
       </form>
     </Form>
   )

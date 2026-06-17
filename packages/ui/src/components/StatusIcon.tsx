@@ -38,7 +38,7 @@ const InfoIcon: React.FC<SVGProps<SVGSVGElement> & StatusIconProps> = ({
       {...props}
       className={cn(
         !hideBackground
-          ? 'w-4 h-4 p-0.5 bg-foreground-lighter text-background-surface-200 rounded'
+          ? 'w-4 h-4 p-0.5 bg-foreground-lighter text-background-surface-200 rounded-sm'
           : 'w-3 h-3 text-foreground-lighter',
         props.className
       )}
@@ -64,7 +64,7 @@ const CriticalIcon: React.FC<SVGProps<SVGSVGElement> & StatusIconProps> = ({
       {...props}
       className={cn(
         !hideBackground
-          ? 'w-4 h-4 p-0.5 bg-destructive-600 text-destructive-200 rounded'
+          ? 'w-4 h-4 p-0.5 bg-destructive-600 text-destructive-200 rounded-sm'
           : 'w-3 h-3 text-destructive-600',
         props.className
       )}
@@ -90,7 +90,7 @@ const WarningIcon: React.FC<SVGProps<SVGSVGElement> & StatusIconProps> = ({
       {...props}
       className={cn(
         !hideBackground
-          ? 'w-4 h-4 p-0.5 bg-warning-600 text-warning-200 rounded'
+          ? 'w-4 h-4 p-0.5 bg-warning-600 text-warning-200 rounded-sm'
           : 'w-3 h-3 text-warning',
         props.className
       )}
@@ -117,7 +117,7 @@ const CheckIcon: React.FC<SVGProps<SVGSVGElement> & StatusIconProps> = ({
       {...props}
       className={cn(
         !hideBackground
-          ? 'w-4 h-4 p-0.5 bg-foreground text-background rounded'
+          ? 'w-4 h-4 p-0.5 bg-foreground text-background rounded-sm'
           : 'w-3 h-3 text-success-600',
         props.className
       )}
@@ -150,7 +150,7 @@ const EyeIcon: React.FC<SVGProps<SVGSVGElement> & StatusIconProps> = ({
       {...props}
       className={cn(
         !hideBackground
-          ? 'w-4 h-4 p-0.5 bg-warning-600 text-warning-200 rounded'
+          ? 'w-4 h-4 p-0.5 bg-warning-600 text-warning-200 rounded-sm'
           : 'w-3 h-3 text-warning',
         props.className
       )}
@@ -179,7 +179,7 @@ const EyeOffIcon: React.FC<SVGProps<SVGSVGElement> & StatusIconProps> = ({
       {...props}
       className={cn(
         !hideBackground
-          ? 'w-4 h-4 p-0.5 bg-foreground-light text-background rounded'
+          ? 'w-4 h-4 p-0.5 bg-foreground-light text-background rounded-sm'
           : 'w-3 h-3 text-warning',
         props.className
       )}

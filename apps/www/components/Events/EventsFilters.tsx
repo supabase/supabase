@@ -15,7 +15,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
 } from 'ui'
 
 interface Props {
@@ -146,7 +149,7 @@ function EventFilters({ allEvents, setEvents, categories, onDemandEvents }: Prop
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  type="outline"
+                  variant="outline"
                   size="medium"
                   iconRight={<ChevronDown />}
                   className="w-full min-w-[200px] flex [&_span]:flex [&_span]:items-center [&_span]:gap-2 justify-between items-center py-2"
@@ -190,7 +193,7 @@ function EventFilters({ allEvents, setEvents, categories, onDemandEvents }: Prop
           {Object.entries(categories).map(([category, count]) => (
             <Button
               key={category}
-              type={
+              variant={
                 category === 'all' && !searchTerm && !activeCategory
                   ? 'default'
                   : category === activeCategory
@@ -212,7 +215,7 @@ function EventFilters({ allEvents, setEvents, categories, onDemandEvents }: Prop
           {!!onDemandEvents?.length && (
             <Button
               key="on-demand"
-              type="outline"
+              variant="outline"
               size={is2XL ? 'tiny' : 'small'}
               className="rounded-full"
               iconRight={
@@ -237,7 +240,7 @@ function EventFilters({ allEvents, setEvents, categories, onDemandEvents }: Prop
           <Button
             className="px-2 w-9 h-9"
             size="large"
-            type="default"
+            variant="default"
             onClick={() => setShowSearchInput(true)}
           >
             <Search size="14" />
@@ -251,32 +254,31 @@ function EventFilters({ allEvents, setEvents, categories, onDemandEvents }: Prop
           exit={{ opacity: 0, transition: { duration: 0.05 } }}
           className="w-full h-[38px] flex justify-end gap-2 items-stretch lg:max-w-[240px] xl:max-w-[280px]"
         >
-          <Input
-            inputRef={inputRef}
-            icon={<Search size="14" />}
-            size="small"
-            layout="vertical"
-            autoComplete="off"
-            type="search"
-            placeholder="Search event"
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className="w-full"
-            actions={
-              isMobile && (
-                <Button
-                  type="link"
+          <InputGroup className="w-full">
+            <InputGroupInput
+              size="small"
+              autoComplete="off"
+              type="search"
+              placeholder="Search event"
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+            <InputGroupAddon>
+              <Search />
+            </InputGroupAddon>
+            {isMobile && (
+              <InputGroupAddon align="inline-end">
+                <InputGroupButton
                   onClick={() => {
-                    setSearchTerm('')
+                    handleSearchByText('')
                     setShowSearchInput(false)
                   }}
-                  className="text-foreground-light hover:text-foreground bg-control/100 hover:bg-selection"
                 >
                   <CloseIcon size="14" />
-                </Button>
-              )
-            }
-          />
+                </InputGroupButton>
+              </InputGroupAddon>
+            )}
+          </InputGroup>
         </motion.div>
       )}
     </div>

@@ -15,6 +15,7 @@ import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/L
 import { useProjectLintsQuery } from '@/data/lint/lint-query'
 import { Notification, useNotificationsV2Query } from '@/data/notifications/notifications-v2-query'
 import { useNotificationsV2UpdateMutation } from '@/data/notifications/notifications-v2-update-mutation'
+import { useProjectsInfiniteQuery } from '@/data/projects/projects-infinite-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
@@ -95,6 +96,18 @@ export const AdvisorPanel = () => {
     return notificationsData?.pages.flatMap((page) => page) ?? []
   }, [notificationsData?.pages])
 
+  const { data: projectsData } = useProjectsInfiniteQuery({}, { enabled: shouldLoadNotifications })
+
+  const projectNameByRef = useMemo(() => {
+    const map = new Map<string, string>()
+    projectsData?.pages.forEach((page) => {
+      page.projects.forEach((project) => {
+        if (project.ref) map.set(project.ref, project.name)
+      })
+    })
+    return map
+  }, [projectsData?.pages])
+
   const markNotificationsRead = () => {
     if (markedRead.current.length > 0) {
       updateNotifications({ ids: markedRead.current, status: 'seen' })
@@ -102,7 +115,7 @@ export const AdvisorPanel = () => {
   }
 
   const lintItems = useMemo<AdvisorItem[]>(() => {
-    return createAdvisorLintItems(lintData)
+    return createAdvisorLintItems(lintData ?? [])
   }, [lintData])
 
   const notificationItems = useMemo<AdvisorItem[]>(() => {
@@ -240,6 +253,7 @@ export const AdvisorPanel = () => {
                 item={selectedItem}
                 projectRef={project?.ref ?? ''}
                 onUpdateNotificationStatus={handleUpdateNotificationStatus}
+                onAfterLintAction={handleBackToList}
               />
             ) : (
               <div className="px-6 py-8">
@@ -281,6 +295,7 @@ export const AdvisorPanel = () => {
               hiddenItemsCount={hiddenItemsCount}
               hasAnyFilters={hasAnyFilters}
               hasProjectRef={hasProjectRef}
+              projectNameByRef={projectNameByRef}
             />
           </div>
         </>

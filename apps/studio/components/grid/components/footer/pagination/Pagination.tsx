@@ -41,7 +41,7 @@ const RowCountSelector = ({
       side="top"
       align="start"
     >
-      <Button asChild type="outline" style={{ padding: '3px 10px' }}>
+      <Button asChild variant="outline" style={{ padding: '3px 10px' }}>
         <span>{`${tableEditorSnap.rowsPerPage} rows`}</span>
       </Button>
     </DropdownControl>
@@ -197,7 +197,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
         <Button
           aria-label="Previous page"
           icon={<ArrowLeft />}
-          type="outline"
+          variant="outline"
           className="px-1.5"
           disabled={page <= 1}
           onClick={onPreviousPage}
@@ -223,7 +223,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
         <Button
           aria-label="Next page"
           icon={<ArrowRight />}
-          type="outline"
+          variant="outline"
           className="px-1.5"
           disabled={isLastPage || !enableForeignRowsQuery}
           loading={isLoadingRows && enableForeignRowsQuery}
@@ -235,12 +235,12 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
   }
 
   return (
-    <div className="flex items-center gap-x-4">
+    <div className="flex items-center gap-x-4 min-w-fit">
       <div className="flex items-center gap-x-2">
         <Button
           aria-label="Previous page"
           icon={<ArrowLeft />}
-          type="outline"
+          variant="outline"
           className="px-1.5"
           disabled={page <= 1 || isLoading}
           onClick={onPreviousPage}
@@ -274,7 +274,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
         <Button
           aria-label="Next page"
           icon={<ArrowRight />}
-          type="outline"
+          variant="outline"
           className="px-1.5"
           disabled={isLastPage}
           onClick={onNextPage}
@@ -284,13 +284,17 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
       </div>
 
       {isLoading ? (
-        <Button type="text" className="w-7" icon={<Loader2 size={12} className="animate-spin" />} />
+        <Button
+          variant="text"
+          className="w-7"
+          icon={<Loader2 size={12} className="animate-spin" />}
+        />
       ) : isError ? (
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
               size="tiny"
-              type="text"
+              variant="text"
               className="w-7"
               loading={isFetching}
               icon={<AlertCircle />}
@@ -312,7 +316,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
               <TooltipTrigger asChild>
                 <Button
                   size="tiny"
-                  type="text"
+                  variant="text"
                   className="w-7"
                   loading={isFetching}
                   icon={<HelpCircle />}

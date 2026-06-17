@@ -32,6 +32,25 @@ export const DestinationPanelFormSchema = z.object({
   s3AccessKeyId: z.string().optional(),
   s3SecretAccessKey: z.string().optional(),
   s3Region: z.string().optional(),
+  // DuckLake fields
+  ducklakeCatalogUrl: z.string().optional(),
+  ducklakeDataPath: z.string().optional(),
+  ducklakePoolSize: z.number().int().min(1).max(6).optional(),
+  ducklakeS3AccessKeyId: z.string().optional(),
+  ducklakeS3SecretAccessKey: z.string().optional(),
+  ducklakeS3Region: z.string().optional(),
+  ducklakeS3Endpoint: z.string().optional(),
+  ducklakeS3UrlStyle: z.enum(['path', 'vhost']).optional(),
+  ducklakeS3UseSsl: z.boolean().optional(),
+  ducklakeMetadataSchema: z.string().optional(),
+  // Snowflake fields
+  snowflakeAccountId: z.string().optional(),
+  snowflakeUser: z.string().optional(),
+  snowflakePrivateKey: z.string().optional(),
+  snowflakePrivateKeyPassphrase: z.string().optional(),
+  snowflakeDatabase: z.string().optional(),
+  snowflakeSchema: z.string().optional(),
+  snowflakeRole: z.string().optional(),
 })
 
 export type DestinationPanelSchemaType = z.infer<typeof DestinationPanelFormSchema>

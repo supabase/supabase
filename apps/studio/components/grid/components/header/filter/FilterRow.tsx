@@ -39,7 +39,7 @@ const FilterRow = ({ filter, filterIdx, onChange, onDelete, onKeyDown }: FilterR
       >
         <Button
           asChild
-          type="outline"
+          variant="outline"
           icon={
             <div className="text-foreground-lighter">
               <ChevronDown strokeWidth={1.5} />
@@ -62,7 +62,7 @@ const FilterRow = ({ filter, filterIdx, onChange, onDelete, onKeyDown }: FilterR
       >
         <Button
           asChild
-          type="outline"
+          variant="outline"
           icon={
             <div className="text-foreground-lighter">
               <ChevronDown strokeWidth={1.5} />
@@ -74,7 +74,7 @@ const FilterRow = ({ filter, filterIdx, onChange, onDelete, onKeyDown }: FilterR
       </DropdownControl>
       <Input
         size="tiny"
-        className="w-full"
+        className="bg-control w-full"
         placeholder={placeholder}
         value={filter.value}
         onChange={(event) =>
@@ -86,7 +86,7 @@ const FilterRow = ({ filter, filterIdx, onChange, onDelete, onKeyDown }: FilterR
         onKeyDown={onKeyDown}
       />
       <Button
-        type="text"
+        variant="text"
         className="px-1"
         icon={<X strokeWidth={1.5} />}
         onClick={() => onDelete(filterIdx)}

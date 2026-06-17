@@ -6,11 +6,17 @@ import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
-  Modal,
+  Input,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -59,13 +65,18 @@ const AddRestrictionModal = ({
     type === 'IPv4' ? IPV4_MAX_CIDR_BLOCK_SIZE : IPV6_MAX_CIDR_BLOCK_SIZE
   }`
   const formSchema = z.object({
-    cidrBlockSize: z.coerce
-      .number()
-      .min(0, cidrBlockSizeValidationMessage)
-      .max(
-        type === 'IPv4' ? IPV4_MAX_CIDR_BLOCK_SIZE : IPV6_MAX_CIDR_BLOCK_SIZE,
-        cidrBlockSizeValidationMessage
-      ),
+    cidrBlockSize: z
+      .union([
+        z.literal(''),
+        z.coerce
+          .number()
+          .min(0, cidrBlockSizeValidationMessage)
+          .max(
+            type === 'IPv4' ? IPV4_MAX_CIDR_BLOCK_SIZE : IPV6_MAX_CIDR_BLOCK_SIZE,
+            cidrBlockSizeValidationMessage
+          ),
+      ])
+      .refine((value) => value !== '', 'Size is required'),
     ipAddress: z
       .string()
       .min(1, `Please enter a valid IP address`)
@@ -140,125 +151,129 @@ const AddRestrictionModal = ({
     : `${ipAddress}/${cidrBlockSize}`
 
   return (
-    <Modal
-      hideFooter
-      size="medium"
-      visible={type !== undefined}
-      onCancel={onClose}
-      header={`Add a new ${type} restriction`}
-    >
-      <Form {...form}>
-        <Modal.Content className="space-y-4">
-          <p className="text-sm text-foreground-light">
-            This will add an IP address range to a list of allowed ranges that can access your
-            database.
-          </p>
-          <InformationBox
-            title="Note: Restrictions only apply to direct connections to your database and connection pooler"
-            description="They do not currently apply to APIs offered over HTTPS, such as PostgREST, Storage, or Authentication."
-            urlLabel="Learn more"
-            url={`${DOCS_URL}/guides/platform/network-restrictions#limitations`}
-          />
-          <form
-            id={formId}
-            onSubmit={form.handleSubmit(onSubmit)}
-            noValidate
-            className="flex space-x-4"
-          >
-            <div className="w-[55%]">
-              <FormField
-                control={form.control}
-                name="ipAddress"
-                render={({ field }) => (
-                  <FormItemLayout layout="vertical" label={`${type} address`}>
-                    <FormControl>
-                      <Input_Shadcn_ {...field} placeholder={type === 'IPv4' ? '0.0.0.0' : '::0'} />
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
-            </div>
-            <div className="grow">
-              <FormField
-                control={form.control}
-                name="cidrBlockSize"
-                render={({ field }) => (
-                  <FormItemLayout
-                    layout="vertical"
-                    label={
-                      <div className="flex items-center space-x-2">
-                        <p>CIDR Block Size</p>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <HelpCircle size="14" strokeWidth={2} />
-                          </TooltipTrigger>
-                          <TooltipContent side="bottom" className="w-80">
-                            Classless inter-domain routing (CIDR) notation is the notation used to
-                            identify networks and hosts in the networks. The block size tells us how
-                            many bits we need to take for the network prefix, and is a value between
-                            0 to{' '}
-                            {type === 'IPv4' ? IPV4_MAX_CIDR_BLOCK_SIZE : IPV6_MAX_CIDR_BLOCK_SIZE}.
-                          </TooltipContent>
-                        </Tooltip>
-                      </div>
-                    }
-                  >
-                    <FormControl>
-                      <Input_Shadcn_
-                        {...field}
-                        type="number"
-                        min={0}
-                        max={type === 'IPv4' ? IPV4_MAX_CIDR_BLOCK_SIZE : IPV6_MAX_CIDR_BLOCK_SIZE}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                        placeholder={
-                          type === 'IPv4'
-                            ? IPV4_MAX_CIDR_BLOCK_SIZE.toString()
-                            : IPV6_MAX_CIDR_BLOCK_SIZE.toString()
-                        }
-                      />
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
-            </div>
-          </form>
-        </Modal.Content>
-        <Modal.Separator />
-        {isValidCIDR ? (
-          <Modal.Content className="space-y-1">
-            <p className="text-sm">
-              The address range <code className="text-code-inline">{normalizedAddress}</code> will
-              be restricted
-            </p>
+    <Dialog open={type !== undefined} onOpenChange={onClose}>
+      <DialogContent size="medium">
+        <DialogHeader>
+          <DialogTitle>{`Add a new ${type} restriction`}</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <Form {...form}>
+          <DialogSection className="space-y-4">
             <p className="text-sm text-foreground-light">
-              Selected address space: <code className="text-code-inline">{addressRange.start}</code>{' '}
-              to <code className="text-code-inline">{addressRange.end}</code>{' '}
+              This will add an IP address range to a list of allowed ranges that can access your
+              database.
             </p>
-            <p className="text-sm text-foreground-light">
-              Number of addresses: {availableAddresses}
-            </p>
-          </Modal.Content>
-        ) : (
-          <Modal.Content>
-            <div className="h-[68px] flex items-center">
-              <p className="text-sm text-foreground-light">
-                A summary of your restriction will be shown here after entering a valid IP address
-                and CIDR block size. IP addresses will also be normalized.
+            <InformationBox
+              title="Note: Restrictions only apply to direct connections to your database and connection pooler"
+              description="They do not currently apply to APIs offered over HTTPS, such as PostgREST, Storage, or Authentication."
+              urlLabel="Learn more"
+              url={`${DOCS_URL}/guides/platform/network-restrictions#limitations`}
+            />
+            <form
+              id={formId}
+              onSubmit={form.handleSubmit(onSubmit)}
+              noValidate
+              className="flex space-x-4"
+            >
+              <div className="w-[55%]">
+                <FormField
+                  control={form.control}
+                  name="ipAddress"
+                  render={({ field }) => (
+                    <FormItemLayout layout="vertical" label={`${type} address`}>
+                      <FormControl>
+                        <Input {...field} placeholder={type === 'IPv4' ? '0.0.0.0' : '::0'} />
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
+              </div>
+              <div className="grow">
+                <FormField
+                  control={form.control}
+                  name="cidrBlockSize"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="vertical"
+                      label={
+                        <div className="flex items-center space-x-2">
+                          <p>CIDR Block Size</p>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <HelpCircle size="14" strokeWidth={2} />
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom" className="w-80">
+                              Classless inter-domain routing (CIDR) notation is the notation used to
+                              identify networks and hosts in the networks. The block size tells us
+                              how many bits we need to take for the network prefix, and is a value
+                              between 0 to{' '}
+                              {type === 'IPv4'
+                                ? IPV4_MAX_CIDR_BLOCK_SIZE
+                                : IPV6_MAX_CIDR_BLOCK_SIZE}
+                              .
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                      }
+                    >
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="number"
+                          min={0}
+                          max={
+                            type === 'IPv4' ? IPV4_MAX_CIDR_BLOCK_SIZE : IPV6_MAX_CIDR_BLOCK_SIZE
+                          }
+                          placeholder={
+                            type === 'IPv4'
+                              ? IPV4_MAX_CIDR_BLOCK_SIZE.toString()
+                              : IPV6_MAX_CIDR_BLOCK_SIZE.toString()
+                          }
+                        />
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
+              </div>
+            </form>
+          </DialogSection>
+          <DialogSectionSeparator />
+          {isValidCIDR ? (
+            <DialogSection className="space-y-1">
+              <p className="text-sm">
+                The address range <code className="text-code-inline">{normalizedAddress}</code> will
+                be restricted
               </p>
-            </div>
-          </Modal.Content>
-        )}
-        <Modal.Separator />
-        <Modal.Content className="flex items-center justify-end space-x-2">
-          <Button type="default" disabled={isApplying} onClick={() => onClose()}>
-            Cancel
-          </Button>
-          <Button form={formId} htmlType="submit" loading={isApplying} disabled={isApplying}>
-            Save restriction
-          </Button>
-        </Modal.Content>
-      </Form>
-    </Modal>
+              <p className="text-sm text-foreground-light">
+                Selected address space:{' '}
+                <code className="text-code-inline">{addressRange.start}</code> to{' '}
+                <code className="text-code-inline">{addressRange.end}</code>{' '}
+              </p>
+              <p className="text-sm text-foreground-light">
+                Number of addresses: {availableAddresses}
+              </p>
+            </DialogSection>
+          ) : (
+            <DialogSection>
+              <div className="h-[68px] flex items-center">
+                <p className="text-sm text-foreground-light">
+                  A summary of your restriction will be shown here after entering a valid IP address
+                  and CIDR block size. IP addresses will also be normalized.
+                </p>
+              </div>
+            </DialogSection>
+          )}
+          <DialogFooter>
+            <Button variant="default" disabled={isApplying} onClick={() => onClose()}>
+              Cancel
+            </Button>
+            <Button form={formId} type="submit" loading={isApplying} disabled={isApplying}>
+              Save restriction
+            </Button>
+          </DialogFooter>
+        </Form>
+      </DialogContent>
+    </Dialog>
   )
 }
 

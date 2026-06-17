@@ -5,7 +5,7 @@ import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { getOrgAIDetails } from '@/lib/ai/ai-details'
 import { getModel } from '@/lib/ai/model'
@@ -165,7 +165,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const {
       modelParams,
       error: modelError,
-      promptProviderOptions,
+      systemProviderOptions,
     } = await getModel({
       provider: 'openai',
       modelEntry: DEFAULT_COMPLETION_MODEL,
@@ -257,7 +257,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       {
         role: 'system',
         content: system,
-        ...(promptProviderOptions && { providerOptions: promptProviderOptions }),
+        ...(systemProviderOptions && { providerOptions: systemProviderOptions }),
       },
       {
         role: 'user',

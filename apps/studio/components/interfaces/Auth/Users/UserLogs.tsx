@@ -62,7 +62,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
           </p>
         </div>
 
-        <Button asChild type="default" className="w-min">
+        <Button asChild variant="default" className="w-min">
           <Link
             href={`/project/${ref}/logs/explorer?q=${encodeURIComponent(API_LOGS_QUERY(user.id ?? ''))}`}
           >
@@ -85,7 +85,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <Button
-              type={'status_code' in filters ? 'default' : 'secondary'}
+              variant={'status_code' in filters ? 'default' : 'secondary'}
               className="rounded-r-none border-r-0"
               disabled={isLoadingAuthLogs}
               onClick={() => setFilters({ search_query: user.id })}
@@ -94,7 +94,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
             </Button>
             <div className="border-button border border-l-0 py-3" />
             <Button
-              type={'status_code' in filters ? 'secondary' : 'default'}
+              variant={'status_code' in filters ? 'secondary' : 'default'}
               className="rounded-l-none border-l-0"
               disabled={isLoadingAuthLogs}
               onClick={() =>
@@ -108,7 +108,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
             </Button>
           </div>
           <Button
-            type="default"
+            variant="default"
             loading={isLoadingAuthLogs}
             disabled={isLoadingAuthLogs}
             icon={<RefreshCw />}
@@ -146,7 +146,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
                       <div
                         className={cn(
                           'flex items-center justify-center gap-x-1',
-                          !!log.status && 'border px-1 py-0.5 rounded',
+                          !!log.status && 'border px-1 py-0.5 rounded-sm',
                           is400
                             ? 'text-warning border-warning bg-warning-300'
                             : is500
@@ -164,7 +164,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
                       {`${log.path} | ${log.msg}`}
 
                       <ButtonTooltip
-                        type="outline"
+                        variant="outline"
                         asChild
                         tooltip={{ content: { text: 'Open in logs' } }}
                         className="px-1.5 absolute right-0 top-0 opacity-0 group-hover:opacity-100 transition bg-background focus-visible:opacity-100"
@@ -181,7 +181,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
             <Button
               block
               asChild
-              type="outline"
+              variant="outline"
               className="transition rounded-t-none text-foreground-light hover:text-foreground"
             >
               <Link href={`/project/${ref}/logs/auth-logs?s=${user.id}`}>See more logs</Link>

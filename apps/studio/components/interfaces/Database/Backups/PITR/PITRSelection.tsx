@@ -3,11 +3,20 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertTitle,
   Button,
-  Modal,
+  DialogSection,
+  DialogSectionSeparator,
   WarningIcon,
 } from 'ui'
 
@@ -43,11 +52,7 @@ export const PITRSelection = () => {
 
   const hasReadReplicas = (databases ?? []).length > 1
 
-  const {
-    mutate: restoreFromPitr,
-    isPending: isRestoring,
-    isSuccess: isSuccessPITR,
-  } = usePitrRestoreMutation({
+  const { mutateAsync: restoreFromPitr } = usePitrRestoreMutation({
     onSuccess: (_, variables) => {
       setTimeout(() => {
         setShowConfirmation(false)
@@ -66,7 +71,7 @@ export const PITRSelection = () => {
     if (!selectedRecoveryPoint?.recoveryTimeTargetUnix)
       return console.error('Recovery time target unix is required')
 
-    restoreFromPitr({
+    await restoreFromPitr({
       ref,
       recovery_time_target_unix: selectedRecoveryPoint.recoveryTimeTargetUnix,
     })
@@ -84,24 +89,24 @@ export const PITRSelection = () => {
       ) : (
         <>
           {hasReadReplicas && (
-            <Alert_Shadcn_ variant="warning">
+            <Alert variant="warning">
               <WarningIcon />
-              <AlertTitle_Shadcn_>
+              <AlertTitle>
                 Unable to restore from PITR as project has read replicas enabled
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+              </AlertTitle>
+              <AlertDescription>
                 You will need to remove all read replicas first from your project's infrastructure
                 settings prior to starting a PITR restore.
-              </AlertDescription_Shadcn_>
+              </AlertDescription>
               <div className="flex items-center gap-x-2 mt-2">
                 {/* [Joshen] Ideally we have some links to a docs to explain why so */}
-                <Button type="default">
+                <Button variant="default">
                   <Link href={`/project/${ref}/settings/infrastructure`}>
                     Infrastructure settings
                   </Link>
                 </Button>
               </div>
-            </Alert_Shadcn_>
+            </Alert>
           )}
           {!showConfiguration ? (
             <PITRStatus
@@ -122,68 +127,53 @@ export const PITRSelection = () => {
         </>
       )}
 
-      <Modal
-        size="medium"
-        visible={showConfirmation}
-        onCancel={() => setShowConfirmation(false)}
-        header="Point in time recovery review"
-        customFooter={
-          <div className="flex items-center justify-end space-x-2">
-            <Button
-              type="default"
-              disabled={isRestoring || isSuccessPITR}
-              onClick={() => setShowConfirmation(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="warning"
-              disabled={isRestoring || isSuccessPITR}
-              loading={isRestoring || isSuccessPITR}
-              onClick={onConfirmRestore}
-            >
-              I understand, begin restore
-            </Button>
-          </div>
-        }
-      >
-        <Modal.Content>
-          <div className="py-2 space-y-1">
-            <p className="text-sm text-foreground-light">Your database will be restored to:</p>
-          </div>
-          <div className="py-2 flex flex-col gap-3">
-            <div>
-              <p className="text-sm font-mono text-foreground-lighter">Local Time</p>
-              <p className="text-2xl">{selectedRecoveryPoint?.recoveryTimeString}</p>
-            </div>
-            <div>
-              <p className="text-sm font-mono text-foreground-lighter">(UTC+00:00)</p>
-              <p className="text-2xl">{selectedRecoveryPoint?.recoveryTimeStringUtc}</p>
-            </div>
-          </div>
-        </Modal.Content>
-        <Modal.Separator />
-        <Modal.Content>
-          <Alert_Shadcn_ variant="warning">
-            <WarningIcon />
-            <AlertTitle_Shadcn_>
-              This action cannot be undone, not canceled once started
-            </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              Any changes made to your database after this point in time will be lost. This includes
-              any changes to your project's storage and authentication.
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
-        </Modal.Content>
-        <Modal.Separator />
-        <Modal.Content>
-          <p className="text-sm text-foreground-light">
-            Restores may take from a few minutes up to several hours depending on the size of your
-            database. During this period, your project will not be available, until the restoration
-            is completed.
-          </p>
-        </Modal.Content>
-      </Modal>
+      <AlertDialog open={showConfirmation} onOpenChange={(open) => setShowConfirmation(open)}>
+        <AlertDialogContent size="medium">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Point in time recovery review</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="flex flex-col space-y-2">
+                <p className="text-sm text-foreground-light">Your database will be restored to:</p>
+                <div className="py-2 flex flex-col gap-3">
+                  <div>
+                    <p className="text-sm font-mono text-foreground-lighter">Local Time</p>
+                    <p className="text-2xl">{selectedRecoveryPoint?.recoveryTimeString}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-mono text-foreground-lighter">(UTC+00:00)</p>
+                    <p className="text-2xl">{selectedRecoveryPoint?.recoveryTimeStringUtc}</p>
+                  </div>
+                </div>
+              </div>
+            </AlertDialogDescription>
+            <DialogSectionSeparator />
+            <DialogSection>
+              <Alert variant="warning">
+                <WarningIcon />
+                <AlertTitle>This action cannot be undone, not canceled once started</AlertTitle>
+                <AlertDescription>
+                  Any changes made to your database after this point in time will be lost. This
+                  includes any changes to your project's storage and authentication.
+                </AlertDescription>
+              </Alert>
+            </DialogSection>
+            <DialogSectionSeparator />
+            <DialogSection>
+              <p className="text-sm text-foreground-light">
+                Restores may take from a few minutes up to several hours depending on the size of
+                your database. During this period, your project will not be available, until the
+                restoration is completed.
+              </p>
+            </DialogSection>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction variant="warning" onClick={onConfirmRestore}>
+                I understand, begin restore
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogHeader>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }

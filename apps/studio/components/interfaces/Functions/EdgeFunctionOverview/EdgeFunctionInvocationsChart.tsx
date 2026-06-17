@@ -38,7 +38,7 @@ export const EdgeFunctionInvocationsChart = ({
   return (
     <div className="flex flex-col gap-1">
       <div className="relative h-40 w-full overflow-visible">
-        <ChartContainer config={INVOCATION_CHART_CONFIG} className="!aspect-auto !h-full !w-full">
+        <ChartContainer config={INVOCATION_CHART_CONFIG} className="aspect-auto! h-full! w-full!">
           <RechartBarChart
             data={chartData}
             margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
@@ -95,7 +95,7 @@ export const EdgeFunctionInvocationsChart = ({
         </ChartContainer>
         {updateAnnotation && (
           <span
-            className="pointer-events-none absolute bottom-0 z-10 flex h-6 w-6 -translate-x-1/2 translate-y-1/2 items-center justify-center rounded-full border border-foreground/20 bg-background text-foreground shadow-sm"
+            className="pointer-events-none absolute bottom-0 z-10 flex h-6 w-6 -translate-x-1/2 translate-y-1/2 items-center justify-center rounded-full border border-foreground/20 bg-background text-foreground shadow-xs"
             style={{ left: `${updateAnnotation.position}%` }}
             title={`Updated ${formatChartTimestamp(updateAnnotation.updatedAt, dateTimeFormat)}`}
           >

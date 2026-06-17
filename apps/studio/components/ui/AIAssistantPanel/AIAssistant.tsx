@@ -1,6 +1,6 @@
 import type { UIMessage as MessageType } from '@ai-sdk/react'
 import { useChat } from '@ai-sdk/react'
-import { lastAssistantMessageIsCompleteWithToolCalls } from 'ai'
+import { lastAssistantMessageIsCompleteWithApprovalResponses } from 'ai'
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { useParams, useSearchParamsShallow } from 'common/hooks'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -15,7 +15,11 @@ import { ButtonTooltip } from '../ButtonTooltip'
 import { ErrorBoundary } from '../ErrorBoundary/ErrorBoundary'
 import { ASSISTANT_ERRORS } from './AiAssistant.constants'
 import type { SqlSnippet } from './AIAssistant.types'
-import { onErrorChat } from './AIAssistant.utils'
+import {
+  hasPendingToolApproval,
+  onErrorChat,
+  resolvePendingToolApprovalsAsDenied,
+} from './AIAssistant.utils'
 import { AIAssistantHeader } from './AIAssistantHeader'
 import { AIOnboarding } from './AIOnboarding'
 import { AssistantChatForm } from './AssistantChatForm'
@@ -35,6 +39,7 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { getParallelApprovalIdsToReject } from '@/lib/ai/message-utils'
 import {
   DEFAULT_ASSISTANT_BASE_MODEL_ID,
   defaultAssistantModelId,
@@ -127,7 +132,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const isInSQLEditor = router.pathname.includes('/sql/[id]')
   const snippet = snippets[entityId ?? '']
-  const snippetContent = snippet?.snippet?.content?.sql
+  const snippetContent = snippet?.snippet?.content?.unchecked_sql
 
   const { data: tables } = useTablesQuery(
     {
@@ -158,7 +163,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     error,
     sendMessage,
     setMessages,
-    addToolResult,
+    addToolApprovalResponse,
     stop,
     regenerate,
   } = useChat({
@@ -166,11 +171,13 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     ...(snap.activeChatId && snap.chatInstances[snap.activeChatId]
       ? { chat: snap.chatInstances[snap.activeChatId] }
       : {}),
-    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
+    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses,
     onError: onErrorChat,
   })
 
   const isChatLoading = chatStatus === 'submitted' || chatStatus === 'streaming'
+  const hasPendingApproval = hasPendingToolApproval(chatMessages)
+  const isChatInputDisabled = !isApiKeySet || disablePrompts || isLoadingOrganization
 
   const deleteMessageFromHere = useCallback(
     (messageId: string) => {
@@ -281,7 +288,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             message={message}
             isLoading={chatStatus === 'submitted' || chatStatus === 'streaming'}
             readOnly={message.role === 'user'}
-            addToolResult={addToolResult}
+            addToolApprovalResponse={addToolApprovalResponse}
             onDelete={deleteMessageFromHere}
             onEdit={editMessage}
             isAfterEditedMessage={isAfterEditedMessage}
@@ -300,7 +307,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       cancelEdit,
       editingMessageId,
       chatStatus,
-      addToolResult,
+      addToolApprovalResponse,
       handleRateMessage,
       messageRatings,
     ]
@@ -326,6 +333,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
     snap.clearSqlSnippets()
     lastUserMessageRef.current = payload
+    if (hasPendingApproval && !editingMessageId) {
+      setMessages(resolvePendingToolApprovalsAsDenied(chatMessages))
+    }
     sendMessage(payload, {
       body: {
         schema: currentSchema,
@@ -356,6 +366,18 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       setIsResubmitting(false)
     }
   }, [isResubmitting, chatStatus, error])
+
+  useEffect(() => {
+    // Approval-required tools can't run in parallel. Auto-deny extras so the model reissues them sequentially.
+    for (const id of getParallelApprovalIdsToReject(chatMessages)) {
+      addToolApprovalResponse?.({
+        id,
+        approved: false,
+        reason:
+          'Only one approval-required tool call is allowed per turn. Please reissue this tool call after the current one completes.',
+      })
+    }
+  }, [chatMessages, addToolApprovalResponse])
 
   useEffect(() => {
     setValue(snap.initialInput || '')
@@ -392,7 +414,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         },
       ]}
     >
-      <div className={cn('flex flex-col h-full w-full md:h-full max-h-[100dvh]', className)}>
+      <div className={cn('flex flex-col h-full w-full md:h-full max-h-dvh', className)}>
         <AIAssistantHeader
           isChatLoading={isChatLoading}
           onNewChat={snap.newChat}
@@ -423,7 +445,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                       <div className="flex items-center gap-x-2 mr-auto">
                         {isContextExceededError ? (
                           <Button
-                            type="default"
+                            variant="default"
                             size="tiny"
                             onClick={() => snap.newChat()}
                             className="text-xs"
@@ -433,7 +455,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                         ) : (
                           <>
                             <Button
-                              type="default"
+                              variant="default"
                               size="tiny"
                               onClick={() => regenerate()}
                               className="text-xs"
@@ -441,7 +463,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                               Retry
                             </Button>
                             <ButtonTooltip
-                              type="default"
+                              variant="default"
                               size="tiny"
                               onClick={handleClearMessages}
                               className="w-7 h-7"
@@ -489,7 +511,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               exit={{ opacity: 0 }}
               className="pointer-events-none z-10 -mt-24"
             >
-              <div className="h-24 w-full bg-gradient-to-t from-background to-transparent relative">
+              <div className="h-24 w-full bg-linear-to-t from-background to-transparent relative">
                 <motion.div
                   className="absolute left-1/2 z-20 bottom-8 pointer-events-auto"
                   variants={{
@@ -507,7 +529,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                       <span>Editing message</span>
                     </div>
                     <ButtonTooltip
-                      type="outline"
+                      variant="outline"
                       size="tiny"
                       icon={<X size={14} />}
                       onClick={cancelEdit}
@@ -552,11 +574,11 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           <AssistantChatForm
             textAreaRef={inputRef}
             className={cn(
-              'z-20 [&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border-1 [&>form>textarea]:rounded-md [&>form>textarea]:!outline-none [&>form>textarea]:!ring-offset-0 [&>form>textarea]:!ring-0'
+              'z-20 [&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border [&>form>textarea]:rounded-md [&>form>textarea]:outline-hidden! [&>form>textarea]:ring-offset-0! [&>form>textarea]:ring-0!'
             )}
             loading={isChatLoading}
             isEditing={!!editingMessageId}
-            disabled={!isApiKeySet || disablePrompts || isLoadingOrganization}
+            disabled={isChatInputDisabled}
             placeholder={
               hasMessages
                 ? 'Ask a follow up question...'
@@ -592,3 +614,5 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     </ErrorBoundary>
   )
 }
+
+export { SupportAssistantSuccessCardContent } from './SupportAssistantSuccessCardContent'

@@ -120,7 +120,7 @@ export const QueryPerformanceGrid = ({
         return (
           <div className="flex items-center justify-between text-xs w-full">
             <div className="flex items-center gap-x-2">
-              <p className="!text-foreground font-medium">{col.name}</p>
+              <p className="text-foreground! font-medium">{col.name}</p>
               {col.description && (
                 <p className="text-foreground-lighter font-normal">{col.description}</p>
               )}
@@ -130,7 +130,7 @@ export const QueryPerformanceGrid = ({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    type="text"
+                    variant="text"
                     size="tiny"
                     className="p-1 h-5 w-5 shrink-0"
                     icon={<ChevronDown size={14} className="text-foreground-muted" />}
@@ -187,11 +187,11 @@ export const QueryPerformanceGrid = ({
               </div>
               <CodeBlock
                 language="pgsql"
-                className="!bg-transparent !p-0 !m-0 !border-none !whitespace-nowrap [&>code]:!whitespace-nowrap [&>code]:break-words !overflow-visible !truncate !w-full !pr-20 pointer-events-none"
-                wrapperClassName="!max-w-full flex-1"
+                className="bg-transparent! p-0! m-0! border-none! truncate! whitespace-nowrap! w-full! pr-20! pointer-events-none"
+                wrapperClassName="flex-1 min-w-0 max-w-full overflow-hidden!"
                 hideLineNumbers
                 hideCopy
-                value={value.replace(/\s+/g, ' ').trim() as string}
+                value={typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() : ''}
                 wrapLines={false}
               />
               {onCurrentSelectQuery && (
@@ -199,7 +199,7 @@ export const QueryPerformanceGrid = ({
                   tooltip={{ content: { text: 'Query details' } }}
                   icon={<ArrowRight size={14} />}
                   size="tiny"
-                  type="default"
+                  variant="default"
                   onClick={(e) => {
                     e.stopPropagation()
                     setSelectedRow(props.rowIdx)
@@ -488,7 +488,7 @@ export const QueryPerformanceGrid = ({
           >
             {onRetry && (
               <div className="mt-4">
-                <Button type="default" onClick={onRetry}>
+                <Button variant="default" onClick={onRetry}>
                   Try again
                 </Button>
               </div>
@@ -509,7 +509,7 @@ export const QueryPerformanceGrid = ({
         <DataGrid
           ref={gridRef}
           style={{ height: '100%' }}
-          className={cn('flex-1 grow h-full')}
+          className={cn('flex-1 grow h-full border-t-0! border-b-0!')}
           rowHeight={44}
           headerRowHeight={36}
           columns={columns}
@@ -526,10 +526,10 @@ export const QueryPerformanceGrid = ({
 
             return [
               `${isSelected ? (hasRecommendations ? 'bg-warning/10 hover:bg-warning/20' : 'bg-surface-300 dark:bg-surface-300') : hasRecommendations ? 'bg-warning/10 hover:bg-warning/20' : 'bg-200 hover:bg-surface-200'} cursor-pointer`,
-              `${isSelected ? (hasRecommendations ? '[&>div:first-child]:border-l-4 border-l-warning [&>div]:border-l-warning' : '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:!border-l-foreground') : ''}`,
+              `${isSelected ? (hasRecommendations ? '[&>div:first-child]:border-l-4 border-l-warning [&>div]:border-l-warning' : '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground!') : ''}`,
               `${isCharted ? 'bg-surface-200 dark:bg-surface-200' : ''}`,
               `${isCharted ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-brand' : ''}`,
-              '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+              '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
               '[&>.rdg-cell.column-prop_total_time]:relative',
             ].join(' ')
           }}
@@ -596,7 +596,7 @@ export const QueryPerformanceGrid = ({
         </SheetDescription>
         <SheetContent
           side="right"
-          className="flex flex-col h-full bg-studio border-l lg:!w-[calc(100vw-802px)] max-w-[700px] w-full"
+          className="flex flex-col h-full bg-studio border-l lg:w-[calc(100vw-802px)]! max-w-[700px] w-full"
           hasOverlay={false}
           onInteractOutside={(event) => {
             if (dataGridContainerRef.current?.contains(event.target as Node)) {
@@ -613,14 +613,14 @@ export const QueryPerformanceGrid = ({
               <TabsList_Shadcn_ className="px-0 flex gap-x-4 min-h-[46px] border-b-0 [&>button]:h-[47px]">
                 <TabsTrigger_Shadcn_
                   value="details"
-                  className="px-0 pb-0 data-[state=active]:bg-transparent !shadow-none"
+                  className="px-0 pb-0 data-[state=active]:bg-transparent shadow-none!"
                 >
                   Query details
                 </TabsTrigger_Shadcn_>
                 {selectedRow !== undefined && canShowIndexesTab && (
                   <TabsTrigger_Shadcn_
                     value="suggestion"
-                    className="px-0 pb-0 data-[state=active]:bg-transparent !shadow-none"
+                    className="px-0 pb-0 data-[state=active]:bg-transparent shadow-none!"
                   >
                     Indexes
                   </TabsTrigger_Shadcn_>

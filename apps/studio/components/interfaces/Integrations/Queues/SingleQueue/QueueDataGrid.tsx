@@ -117,7 +117,7 @@ const columns = messagesCols.map((col) => {
             col.id === 'id' && 'ml-8'
           )}
         >
-          <p className="!text-foreground">{col.name}</p>
+          <p className="text-foreground!">{col.name}</p>
         </div>
       )
     },
@@ -154,7 +154,7 @@ export const QueueMessagesDataGrid = ({
     <div className="relative h-full">
       <DataGrid
         ref={gridRef}
-        className="h-full"
+        className="h-full border-t-0! border-b-0!"
         rowHeight={44}
         headerRowHeight={36}
         columns={columns}
@@ -163,7 +163,7 @@ export const QueueMessagesDataGrid = ({
         rowClass={() => {
           return cn(
             'cursor-pointer',
-            '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+            '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
             '[&>.rdg-cell:first-child>div]:ml-8'
           )
         }}

@@ -5,16 +5,16 @@ import {
   Badge,
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
 
@@ -48,7 +48,7 @@ export const PublicationsComboBox = ({
   }, [field?.value])
 
   return (
-    <Popover_Shadcn_
+    <Popover
       modal={false}
       open={dropdownOpen}
       onOpenChange={(open) => {
@@ -58,9 +58,9 @@ export const PublicationsComboBox = ({
         }
       }}
     >
-      <PopoverTrigger_Shadcn_ asChild>
+      <PopoverTrigger asChild>
         <Button
-          type="default"
+          variant="default"
           size="medium"
           className={cn(
             'w-full [&>span]:w-full text-left',
@@ -72,22 +72,17 @@ export const PublicationsComboBox = ({
         >
           {selectedPublication || 'Select publication'}
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ sameWidthAsTrigger className="p-0" align="start">
-        <Command_Shadcn_>
-          <CommandInput_Shadcn_
+      </PopoverTrigger>
+      <PopoverContent sameWidthAsTrigger className="p-0" align="start">
+        <Command>
+          <CommandInput
             placeholder="Find publication..."
             className="text-xs"
             value={searchTerm}
             onValueChange={setSearchTerm}
           />
-          <div className="px-2 pt-2 pb-1">
-            <p className="text-xs text-foreground-lighter">
-              Publications with no tables are hidden
-            </p>
-          </div>
-          <CommandList_Shadcn_>
-            <CommandEmpty_Shadcn_>
+          <CommandList>
+            <CommandEmpty>
               {isLoadingPublications ? (
                 <div className="flex items-center gap-2 text-center justify-center">
                   <Loader2 size={12} className="animate-spin" />
@@ -96,17 +91,21 @@ export const PublicationsComboBox = ({
               ) : (
                 'No publications found'
               )}
-            </CommandEmpty_Shadcn_>
+            </CommandEmpty>
 
-            <CommandGroup_Shadcn_>
+            <CommandGroup>
               {publications.length === 0 && (
-                <p className="text-foreground-lighter text-xs py-3 px-2">
-                  No publications available
-                </p>
+                <div className="text-foreground-lighter text-xs py-3 px-2 space-y-0.5">
+                  <p>No publications available</p>
+                  <p className="text-foreground-muted">Publications with no tables are hidden</p>
+                </div>
               )}
-              <ScrollArea className={publications.length > 7 ? 'h-[210px]' : ''}>
+              <ScrollArea
+                className={publications.length > 7 ? 'h-[210px]' : ''}
+                onWheel={(e) => e.stopPropagation()}
+              >
                 {publications.map((pub) => (
-                  <CommandItem_Shadcn_
+                  <CommandItem
                     key={pub.name}
                     className="cursor-pointer flex items-center justify-between space-x-2 w-full"
                     onSelect={() => {
@@ -128,26 +127,26 @@ export const PublicationsComboBox = ({
                         <Check className="text-brand" strokeWidth={2} size={13} />
                       )}
                     </div>
-                  </CommandItem_Shadcn_>
+                  </CommandItem>
                 ))}
               </ScrollArea>
-            </CommandGroup_Shadcn_>
+            </CommandGroup>
 
-            <CommandSeparator_Shadcn_ />
+            <CommandSeparator />
 
-            <CommandGroup_Shadcn_>
-              <CommandItem_Shadcn_
+            <CommandGroup>
+              <CommandItem
                 className="cursor-pointer w-full"
                 onSelect={onNewPublicationClick}
                 onClick={onNewPublicationClick}
               >
                 <Plus size={14} strokeWidth={1.5} className="mr-2" />
                 <p>New publication</p>
-              </CommandItem_Shadcn_>
-            </CommandGroup_Shadcn_>
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+              </CommandItem>
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }

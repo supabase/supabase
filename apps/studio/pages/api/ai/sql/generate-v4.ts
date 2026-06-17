@@ -5,7 +5,7 @@ import { IS_PLATFORM } from 'common'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { getOrgAIDetails, getProjectAIDetails } from '@/lib/ai/ai-details'
 import { isTracingAllowed } from '@/lib/ai/braintrust-logger'
@@ -151,7 +151,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
   const {
     modelParams,
     error: modelError,
-    promptProviderOptions,
+    systemProviderOptions,
   } = await getModel({
     provider: 'openai',
     modelEntry: getAssistantModelEntry(effectiveModel),
@@ -217,7 +217,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       orgId,
       planId,
       requestedModel,
-      promptProviderOptions,
+      systemProviderOptions,
       abortSignal: abortController.signal,
       onSpanCreated: (spanId) => {
         res.setHeader('x-braintrust-span-id', spanId)

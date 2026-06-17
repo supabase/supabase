@@ -4,7 +4,7 @@ import { useBreakpoint } from 'common/hooks/useBreakpoint'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { useEffect } from 'react'
-import { Accordion } from 'ui'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from 'ui'
 
 import {
   AccordionHeader,
@@ -163,11 +163,11 @@ export default function LW7Releases() {
 
   return (
     <>
-      <SectionContainer className="!py-0 w-full !px-0 !max-w-none">
+      <SectionContainer className="py-0! w-full px-0! max-w-none!">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 scroll-mt-[105px]" id="hackathon">
           <SmallCard
             bgGradient
-            className={[isHackathonLive && '!from-[#4635A7] !to-[#A69DC920]'].join(' ')}
+            className={[isHackathonLive && 'from-[#4635A7]! to-[#A69DC920]!'].join(' ')}
           >
             <div className="relative z-10 flex items-center mb-4 sm:mb-0">
               <div
@@ -204,7 +204,7 @@ export default function LW7Releases() {
               </ChipLink>
             </div>
             {isHackathonLive && (
-              <div className="absolute opacity-pulse inset-0 w-full h-full bg-gradient-to-b from-[#1C1C1C80] to-[#1C1C1C] rounded-2xl overflow-hidden shadow-lg pointer-events-none" />
+              <div className="absolute opacity-pulse inset-0 w-full h-full bg-linear-to-b from-[#1C1C1C80] to-[#1C1C1C] rounded-2xl overflow-hidden shadow-lg pointer-events-none" />
             )}
           </SmallCard>
           <SmallCard bgGradient>
@@ -236,39 +236,29 @@ export default function LW7Releases() {
               </div>
             </div>
             <div className="flex w-full sm:w-auto justify-center gap-2 z-10">
-              <ChipLink href="#lw-7-prizes" className="!pr-3 !justify-center">
+              <ChipLink href="#lw-7-prizes" className="pr-3! justify-center!">
                 More info
               </ChipLink>
             </div>
           </SmallCard>
         </div>
       </SectionContainer>
-      <SectionContainer className="!pt-0 !w-full !px-0 !max-w-none">
-        <Accordion
-          type="default"
-          openBehaviour="multiple"
-          size="large"
-          className="text-white"
-          justified={false}
-          // bordered={false}
-          chevronAlign="right"
-          defaultValue={publishedSections}
-        >
-          <div className="border-b border-[#232323] pb-3">
-            <Accordion.Item
-              header={
-                <AccordionHeader
-                  date={preRelease.date}
-                  day={preRelease.dd}
-                  title={preRelease.title}
-                  shipped={prereleaseShipped}
-                />
-              }
-              key={preRelease.dd}
-              disabled={!prereleaseShipped}
-              className="h-[79px]"
-              id={preRelease.d.toString()}
-            >
+      <SectionContainer className="pt-0! w-full! px-0! max-w-none!">
+        <Accordion type="multiple" className="text-white" defaultValue={publishedSections}>
+          <AccordionItem
+            key={preRelease.dd}
+            disabled={!prereleaseShipped}
+            value={preRelease.d.toString()}
+          >
+            <AccordionTrigger className="py-8 font-normal hover:no-underline">
+              <AccordionHeader
+                date={preRelease.date}
+                day={preRelease.dd}
+                title={preRelease.title}
+                shipped={prereleaseShipped}
+              />
+            </AccordionTrigger>
+            <AccordionContent>
               {preRelease.steps.length > 0 && (
                 <div className="h-[800px] lg:h-[400px] flex flex-col gap-5 lg:flex-row">
                   <motion.div
@@ -372,22 +362,18 @@ export default function LW7Releases() {
                   </motion.div>
                 </div>
               )}
-            </Accordion.Item>
-          </div>
-          <div className="border-b border-[#232323] pb-3">
-            <Accordion.Item
-              header={
-                <AccordionHeader
-                  date={day1.date}
-                  day={day1.dd}
-                  title={day1.title}
-                  shipped={day1Shipped}
-                />
-              }
-              disabled={!day1Shipped}
-              className="h-[79px]"
-              id={day1.d.toString()}
-            >
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem disabled={!day1Shipped} value={day1.d.toString()}>
+            <AccordionTrigger className="py-8 font-normal hover:no-underline">
+              <AccordionHeader
+                date={day1.date}
+                day={day1.dd}
+                title={day1.title}
+                shipped={day1Shipped}
+              />
+            </AccordionTrigger>
+            <AccordionContent>
               {day1.steps.length > 0 && (
                 <div className="h-[400px] flex flex-col gap-5 lg:flex-row">
                   <motion.div
@@ -415,7 +401,7 @@ export default function LW7Releases() {
                             <motion.div
                               className={[
                                 'absolute inset-0 w-full h-full -z-10',
-                                i === 3 && '!mix-blend-overlay blur-2xl',
+                                i === 3 && 'mix-blend-overlay! blur-2xl',
                               ].join(' ')}
                               variants={getDay1Motion(i)}
                             >
@@ -446,22 +432,18 @@ export default function LW7Releases() {
                   </motion.div>
                 </div>
               )}
-            </Accordion.Item>
-          </div>
-          <div className="border-b border-[#232323] pb-3">
-            <Accordion.Item
-              header={
-                <AccordionHeader
-                  date={day2.date}
-                  day={day2.dd}
-                  title={day2.title}
-                  shipped={day2Shipped}
-                />
-              }
-              disabled={!day2Shipped}
-              className="h-[79px]"
-              id={day2.d.toString()}
-            >
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem disabled={!day2Shipped} value={day2.d.toString()}>
+            <AccordionTrigger className="py-8 font-normal hover:no-underline">
+              <AccordionHeader
+                date={day2.date}
+                day={day2.dd}
+                title={day2.title}
+                shipped={day2Shipped}
+              />
+            </AccordionTrigger>
+            <AccordionContent>
               {day2.steps.length > 0 && (
                 <div className="h-[400px] flex flex-col gap-5 lg:flex-row">
                   <motion.div
@@ -489,7 +471,7 @@ export default function LW7Releases() {
                             <motion.div
                               className={[
                                 'absolute inset-0 w-full h-full -z-10',
-                                i === 3 && '!mix-blend-overlay blur-2xl',
+                                i === 3 && 'mix-blend-overlay! blur-2xl',
                               ].join(' ')}
                               variants={getDay2Motion(i)}
                             >
@@ -520,22 +502,18 @@ export default function LW7Releases() {
                   </motion.div>
                 </div>
               )}
-            </Accordion.Item>
-          </div>
-          <div className="border-b border-[#232323] pb-3">
-            <Accordion.Item
-              header={
-                <AccordionHeader
-                  date={day3.date}
-                  day={day3.dd}
-                  title={day3.title}
-                  shipped={day3Shipped}
-                />
-              }
-              disabled={!day3Shipped}
-              className="h-[79px]"
-              id={day3.d.toString()}
-            >
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem disabled={!day3Shipped} value={day3.d.toString()}>
+            <AccordionTrigger className="py-8 font-normal hover:no-underline">
+              <AccordionHeader
+                date={day3.date}
+                day={day3.dd}
+                title={day3.title}
+                shipped={day3Shipped}
+              />
+            </AccordionTrigger>
+            <AccordionContent>
               {day3.steps.length > 0 && (
                 <div className="h-[400px] flex flex-col gap-5 lg:flex-row">
                   <motion.div
@@ -563,7 +541,7 @@ export default function LW7Releases() {
                             <motion.div
                               className={[
                                 'absolute inset-0 w-full h-full -z-10',
-                                i === 2 && '!mix-blend-overlay blur-2xl',
+                                i === 2 && 'mix-blend-overlay! blur-2xl',
                               ].join(' ')}
                               variants={getDay3Motion(i)}
                             >
@@ -594,22 +572,18 @@ export default function LW7Releases() {
                   </motion.div>
                 </div>
               )}
-            </Accordion.Item>
-          </div>
-          <div className="border-b border-[#232323] pb-3">
-            <Accordion.Item
-              header={
-                <AccordionHeader
-                  date={day4.date}
-                  day={day4.dd}
-                  title={day4.title}
-                  shipped={day4Shipped}
-                />
-              }
-              disabled={!day4Shipped}
-              className="h-[79px]"
-              id={day4.d.toString()}
-            >
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem disabled={!day4Shipped} value={day4.d.toString()}>
+            <AccordionTrigger className="py-8 font-normal hover:no-underline">
+              <AccordionHeader
+                date={day4.date}
+                day={day4.dd}
+                title={day4.title}
+                shipped={day4Shipped}
+              />
+            </AccordionTrigger>
+            <AccordionContent>
               {day4.steps.length > 0 && (
                 <div className="h-[400px] flex flex-col gap-5 lg:flex-row">
                   <motion.div
@@ -666,25 +640,21 @@ export default function LW7Releases() {
                   </motion.div>
                 </div>
               )}
-            </Accordion.Item>
-          </div>
-          <div className="border-b border-[#232323] pb-3" id="currentDay">
-            <Accordion.Item
-              header={
-                <AccordionHeader
-                  date={day5.date}
-                  day={day5.dd}
-                  title={day5.title}
-                  shipped={day5Shipped}
-                />
-              }
-              disabled={!day5Shipped}
-              className="h-[79px]"
-              id={day5.d.toString()}
-            >
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem disabled={!day5Shipped} value={day5.d.toString()}>
+            <AccordionTrigger className="py-8 font-normal hover:no-underline">
+              <AccordionHeader
+                date={day5.date}
+                day={day5.dd}
+                title={day5.title}
+                shipped={day5Shipped}
+              />
+            </AccordionTrigger>
+            <AccordionContent>
               <Day5 day={day5} />
-            </Accordion.Item>
-          </div>
+            </AccordionContent>
+          </AccordionItem>
         </Accordion>
       </SectionContainer>
     </>

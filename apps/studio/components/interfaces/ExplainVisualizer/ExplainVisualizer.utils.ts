@@ -173,7 +173,7 @@ export function getScanBarColor(operation: string): string {
   }
 
   // Default neutral color for other operations
-  return 'bg-foreground/[0.06]'
+  return 'bg-foreground/6'
 }
 
 export function getScanBorderColor(operation: string): string {

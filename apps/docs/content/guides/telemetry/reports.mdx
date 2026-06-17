@@ -119,23 +119,62 @@ height={650}
 | **Used**            | RAM actively used by Postgres and the operating system |
 | **Cache + buffers** | Memory used for page cache and OS buffers              |
 | **Free**            | Available unallocated memory                           |
+| **Swap**            | Disk overflow used when physical RAM is exhausted      |
+
+The **Swap** series only appears when the system is swapping. Swap is disk space the operating system uses as an overflow when physical RAM is full. Because disk is much slower than RAM, sustained swap activity indicates memory pressure and can significantly degrade database performance.
 
 How it helps debug issues:
 
-| Issue                          | Description                                      |
-| ------------------------------ | ------------------------------------------------ |
-| Memory pressure detection      | Identify when free memory is consistently low    |
-| Cache effectiveness monitoring | Monitor cache performance for query optimization |
-| Memory leak detection          | Detect inefficient memory usage patterns         |
+| Issue                          | Description                                                                               |
+| ------------------------------ | ----------------------------------------------------------------------------------------- |
+| Memory pressure detection      | Identify when free memory is consistently low                                             |
+| Cache effectiveness monitoring | Monitor cache performance for query optimization                                          |
+| Memory leak detection          | Detect inefficient memory usage patterns                                                  |
+| Swap activity monitoring       | Sustained swap usage signals RAM is exhausted and paging to disk is degrading performance |
 
 Actions you can take:
 
 | Action                                                                      | Description                                    |
 | --------------------------------------------------------------------------- | ---------------------------------------------- |
 | [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size) | Increase available memory resources            |
-| [Optimize queries](/docs/content/guides/database/query-optimization)        | Reduce memory consumption of expensive queries |
+| [Optimize queries](/docs/guides/database/query-optimization)                | Reduce memory consumption of expensive queries |
 | [Tune Postgres configuration](https://pgtune.leopard.in.ua)                 | Improve memory management settings             |
 | Implement application caching                                               | Add query result caching to reduce memory load |
+
+### Memory commitment
+
+The Memory commitment chart shows how much memory the Linux kernel has promised to processes (`Committed_AS`) against the maximum it is willing to promise (`CommitLimit`). It is a leading indicator of out-of-memory risk that is not visible on the Memory usage chart.
+
+Memory is committed when a process asks the kernel for an allocation (for example via `malloc`, a stack growth, or `mmap`). The kernel records the promise immediately, but only assigns physical pages when a page is first written. Committed memory is therefore the sum of every outstanding promise across every process, regardless of whether those pages have been touched yet.
+
+| Component        | Description                                                                                                                                                             |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Committed**    | Total memory the kernel has promised to processes (`Committed_AS`). Includes promises that have not yet been backed by physical pages.                                  |
+| **Commit limit** | Maximum memory the kernel will commit (`CommitLimit`). Derived from physical RAM, swap, and the kernel's overcommit ratio. Acts as the danger threshold for this chart. |
+
+How to read it:
+
+| Pattern                                          | What it means                                                                                                                                  |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Flat Committed well below the Commit limit       | Healthy. Connections and queries are sized for the compute tier.                                                                               |
+| Committed gradually rising over days or weeks    | Organic growth or a memory leak. Investigate connection counts, long-lived prepared statements, and extensions before usage outgrows the tier. |
+| Committed spiking near or above the Commit limit | Dangerous. Usually a connection storm or several large concurrent queries. The next spike may trigger the OOM killer and crash Postgres.       |
+| Committed sustained above the Commit limit       | The instance is on borrowed time. Plan an upgrade or fix the workload before the next out-of-memory event.                                     |
+
+Why this matters for Postgres:
+
+- Each new connection is a `fork()` of the postmaster, which inflates Committed_AS by roughly the size of `shared_buffers` until copy-on-write pages diverge. Connection bursts can therefore blow past the Commit limit long before physical memory is exhausted.
+- Each query can allocate up to `work_mem` per sort or hash node. A handful of expensive concurrent queries can push commit far above what the Memory usage chart reports as "used".
+- When the kernel cannot honor its promises, the OOM killer terminates a process. On a database server that is usually a Postgres backend or, worse, the postmaster, which takes the whole database down.
+
+Actions you can take:
+
+| Action                                                                                              | Description                                                                             |
+| --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| [Use connection pooling](/docs/guides/database/connecting-to-postgres#how-connection-pooling-works) | Route clients through Supavisor or PgBouncer to cap fork-driven commit pressure.        |
+| Lower `max_connections` or per-pool sizes                                                           | Reduce the upper bound on concurrent backends so spikes cannot exceed the Commit limit. |
+| [Tune `work_mem`](https://pgtune.leopard.in.ua)                                                     | Reduce per-operation memory allocations on workloads with many concurrent queries.      |
+| [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size)                         | Raise both physical RAM and the Commit limit so the workload fits with headroom.        |
 
 ### CPU usage
 
@@ -169,12 +208,12 @@ How it helps debug issues:
 
 Actions you can take:
 
-| Action                                                                             | Description                                     |
-| ---------------------------------------------------------------------------------- | ----------------------------------------------- |
-| [Optimize CPU-intensive queries](/docs/content/guides/database/query-optimization) | Target queries causing high User CPU usage      |
-| Address IO bottlenecks                                                             | Resolve disk/network issues when IOWait is high |
-| [Upgrade compute size](/docs/guides/platform/compute-and-disk)                     | Increase available CPU capacity                 |
-| [Implement proper indexing](/docs/guides/database/postgres/indexes)                | Use query optimization techniques               |
+| Action                                                                     | Description                                     |
+| -------------------------------------------------------------------------- | ----------------------------------------------- |
+| [Optimize CPU-intensive queries](/docs/guides/database/query-optimization) | Target queries causing high User CPU usage      |
+| Address IO bottlenecks                                                     | Resolve disk/network issues when IOWait is high |
+| [Upgrade compute size](/docs/guides/platform/compute-and-disk)             | Increase available CPU capacity                 |
+| [Implement proper indexing](/docs/guides/database/postgres/indexes)        | Use query optimization techniques               |
 
 ### Disk input/output operations per second (IOPS)
 
@@ -227,7 +266,7 @@ Actions you can take:
 
 | Action                                                                               | Description                                                   |
 | ------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
-| [Optimize disk-intensive queries](/docs/content/guides/database/query-optimization)  | Reduce queries that perform excessive reads/writes            |
+| [Optimize disk-intensive queries](/docs/guides/database/query-optimization)          | Reduce queries that perform excessive reads/writes            |
 | Tune caching and batching                                                            | Minimize repeated disk access and improve throughput headroom |
 | [Upgrade compute size](/docs/guides/platform/compute-and-disk)                       | Increase throughput limits for sustained workloads            |
 | Review database design                                                               | Optimize schema and query patterns for efficiency             |
@@ -452,7 +491,7 @@ The Realtime API Gateway reports focus on API requests related to Realtime funct
 
 ## Storage
 
-The Storage report provides visibility into how your Supabase Storage is being utilized, including request patterns, performance characteristics, and caching effectiveness.
+The Storage report provides visibility into how your Supabase Storage is being used, including request patterns, performance characteristics, and caching effectiveness.
 
 | Chart           | Description                                | Key Insights                                                                 |
 | --------------- | ------------------------------------------ | ---------------------------------------------------------------------------- |

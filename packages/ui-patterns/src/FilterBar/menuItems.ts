@@ -70,9 +70,22 @@ export function buildPropertyItems(params: {
   inputValue: string
   supportsOperators?: boolean
   actions?: FilterBarAction[]
+  freeformDefaultProperty?: FilterProperty
 }): MenuItem[] {
-  const { filterProperties, inputValue, supportsOperators, actions } = params
+  const { filterProperties, inputValue, supportsOperators, actions, freeformDefaultProperty } =
+    params
   const items: MenuItem[] = []
+
+  const trimmedInput = inputValue.trim()
+  if (freeformDefaultProperty && trimmedInput.length > 0) {
+    items.push({
+      value: '__freeform_search__',
+      label: `Search ${freeformDefaultProperty.label.toLowerCase()}: "${trimmedInput}"`,
+      isFreeformSearch: true,
+      freeformPropertyName: freeformDefaultProperty.name,
+      freeformValue: trimmedInput,
+    })
+  }
 
   items.push(
     ...filterProperties
@@ -81,10 +94,9 @@ export function buildPropertyItems(params: {
   )
 
   if (supportsOperators) {
-    items.push({ value: 'group', label: 'New Group' })
+    items.push({ value: '__new_group__', label: 'New Group' })
   }
 
-  const trimmedInput = inputValue.trim()
   if (actions && trimmedInput.length > 0) {
     actions.forEach((action) => {
       items.push({

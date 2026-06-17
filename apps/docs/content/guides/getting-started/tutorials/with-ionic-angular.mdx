@@ -87,7 +87,7 @@ meta="name=src/app/account/account.page.ts"
 
 <$CodeSample
 path="/user-management/ionic-angular-user-management/src/app/account/account.page.html"
-lines={[[1, -1]]}
+lines={[[1, 7], [13, -1]]}
 meta="name=src/app/account/account.page.html"
 />
 
@@ -125,7 +125,7 @@ Every Supabase project is configured with [Storage](/docs/guides/storage) for ma
 
 ### Create an upload widget
 
-Let's create an avatar for the user so that they can upload a profile photo.
+Create an avatar so the user can upload a profile photo.
 
 First, install two packages in order to interact with the user's camera.
 
@@ -167,6 +167,16 @@ meta="name=src/app/avatar/avatar.component.html"
 path="/user-management/ionic-angular-user-management/src/app/avatar/avatar.component.scss"
 lines={[[1, -1]]}
 meta="name=src/app/avatar/avatar.component.scss"
+/>
+
+### Update the account page
+
+With the Avatar component created, update the account page template to include it:
+
+<$CodeSample
+path="/user-management/ionic-angular-user-management/src/app/account/account.page.html"
+lines={[[1, -1]]}
+meta="name=src/app/account/account.page.html"
 />
 
 At this stage, you have a fully functional application!

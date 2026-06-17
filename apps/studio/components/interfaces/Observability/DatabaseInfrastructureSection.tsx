@@ -169,16 +169,16 @@ export const DatabaseInfrastructureSection = ({
         <Link href={databaseReportUrl} className="block group">
           <MetricCard isLoading={infraLoading}>
             <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
-              <MetricCardLabel tooltip="Active database connections (current/max). Monitor to avoid connection exhaustion">
-                Connections
+              <MetricCardLabel tooltip="Highest concurrent database connections observed in the selected window, against the connection limit. Monitor to avoid connection exhaustion.">
+                Peak Connections
               </MetricCardLabel>
             </MetricCardHeader>
             <MetricCardContent>
               {infraError ? (
-                <div className="text-xs text-destructive break-words">{errorMessage}</div>
+                <div className="text-xs text-destructive wrap-break-word">{errorMessage}</div>
               ) : connections.max > 0 ? (
                 <MetricCardValue>
-                  {connections.current}/{connections.max}
+                  {connections.peak}/{connections.max}
                 </MetricCardValue>
               ) : (
                 <MetricCardValue>--</MetricCardValue>
@@ -196,7 +196,7 @@ export const DatabaseInfrastructureSection = ({
             </MetricCardHeader>
             <MetricCardContent>
               {infraError ? (
-                <div className="text-xs text-destructive break-words">{errorMessage}</div>
+                <div className="text-xs text-destructive wrap-break-word">{errorMessage}</div>
               ) : metrics ? (
                 <MetricCardValue>{metrics.disk.current.toFixed(0)}%</MetricCardValue>
               ) : (
@@ -215,7 +215,7 @@ export const DatabaseInfrastructureSection = ({
             </MetricCardHeader>
             <MetricCardContent>
               {infraError ? (
-                <div className="text-xs text-destructive break-words">{errorMessage}</div>
+                <div className="text-xs text-destructive wrap-break-word">{errorMessage}</div>
               ) : metrics ? (
                 <MetricCardValue>{metrics.diskIo.current.toFixed(0)}%</MetricCardValue>
               ) : (
@@ -234,7 +234,7 @@ export const DatabaseInfrastructureSection = ({
             </MetricCardHeader>
             <MetricCardContent>
               {infraError ? (
-                <div className="text-xs text-destructive break-words">{errorMessage}</div>
+                <div className="text-xs text-destructive wrap-break-word">{errorMessage}</div>
               ) : metrics ? (
                 <MetricCardValue>{metrics.ram.current.toFixed(0)}%</MetricCardValue>
               ) : (
@@ -253,7 +253,7 @@ export const DatabaseInfrastructureSection = ({
             </MetricCardHeader>
             <MetricCardContent>
               {infraError ? (
-                <div className="text-xs text-destructive break-words">{errorMessage}</div>
+                <div className="text-xs text-destructive wrap-break-word">{errorMessage}</div>
               ) : metrics ? (
                 <MetricCardValue>{metrics.cpu.current.toFixed(0)}%</MetricCardValue>
               ) : (

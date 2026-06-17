@@ -2,7 +2,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { GripVertical, Trash } from 'lucide-react'
 import type { Control, FieldPath, FieldValues } from 'react-hook-form'
-import { Button, FormControl, FormField, FormItem, FormLabel, FormMessage, Input_Shadcn_ } from 'ui'
+import { Button, FormControl, FormField, FormItem, FormLabel, FormMessage, Input } from 'ui'
 
 interface EnumeratedTypeValueRowProps<
   TFieldValues extends FieldValues = FieldValues,
@@ -49,16 +49,16 @@ const EnumeratedTypeValueRow = <TFieldValues extends FieldValues>({
                 {...attributes}
                 {...listeners}
                 className={`opacity-50 hover:opacity-100 disabled:hover:opacity-50 transition cursor-grab ${
-                  isDisabled ? 'text-foreground-lighter !cursor-default' : 'text-foreground'
+                  isDisabled ? 'text-foreground-lighter cursor-default!' : 'text-foreground'
                 }`}
                 type="button"
                 disabled={isDisabled}
               >
                 <GripVertical size={16} strokeWidth={1.5} />
               </button>
-              <Input_Shadcn_ {...inputField} className="w-full" />
+              <Input {...inputField} className="w-full" />
               <Button
-                type="default"
+                variant="default"
                 size="small"
                 disabled={isDisabled}
                 icon={<Trash strokeWidth={1.5} size={16} />}

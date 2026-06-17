@@ -229,7 +229,7 @@ export const AnalyticBucketDetails = () => {
                       <Admonition
                         type="note"
                         layout="horizontal"
-                        className="[&>div]:pl-[2.5rem] [&>div]:-translate-y-[3px]"
+                        className="[&>div]:pl-10 [&>div]:translate-y-[-3px]"
                         childProps={{ title: { className: 'block capitalize-sentence' } }}
                         showIcon={isPipelineStopped}
                         title={
@@ -244,7 +244,7 @@ export const AnalyticBucketDetails = () => {
                         }
                         actions={
                           <div className="flex items-center gap-x-2">
-                            <Button asChild type="default">
+                            <Button asChild variant="default">
                               <Link
                                 href={`/project/${projectRef}/database/replication/${pipeline.replicator_id}`}
                               >
@@ -253,7 +253,7 @@ export const AnalyticBucketDetails = () => {
                             </Button>
                             {isPipelineStopped && (
                               <Button
-                                type="default"
+                                variant="default"
                                 loading={isStartingPipeline}
                                 onClick={async () => {
                                   if (projectRef) {
@@ -308,7 +308,7 @@ export const AnalyticBucketDetails = () => {
                   </p>
                 </div>
                 <Button
-                  type="danger"
+                  variant="danger"
                   disabled={!bucket?.name || !isSuccessBucket}
                   onClick={() => setShowDeleteModal(true)}
                 >
@@ -361,7 +361,7 @@ const ExtensionNotInstalled = ({
               Learn more
             </InlineLink>
           </p>
-          <Button type="default" asChild className="mt-2" onClick={() => {}}>
+          <Button variant="default" asChild className="mt-2" onClick={() => {}}>
             <Link
               href={
                 databaseNeedsUpgrading
@@ -410,7 +410,7 @@ const ExtensionNeedsUpgrade = ({
             Before reinstalling the wrapper extension, you must first remove all existing wrappers.
             Afterward, you can recreate the wrappers.
           </p>
-          <Button asChild type="default">
+          <Button asChild variant="default">
             <Link
               href={
                 databaseNeedsUpgrading
@@ -442,7 +442,7 @@ const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
       <ScaffoldSection isFullWidth>
         <Admonition type="warning" title="Missing integration">
           <p>The Iceberg Wrapper integration is required in order to query analytics tables.</p>
-          <Button type="default" loading={isCreatingIcebergWrapper} onClick={onSetupWrapper}>
+          <Button variant="default" loading={isCreatingIcebergWrapper} onClick={onSetupWrapper}>
             Install wrapper
           </Button>
         </Admonition>

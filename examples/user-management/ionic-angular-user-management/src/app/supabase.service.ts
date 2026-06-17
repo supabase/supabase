@@ -19,7 +19,7 @@ export class SupabaseService {
     private loadingCtrl: LoadingController,
     private toastCtrl: ToastController
   ) {
-    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey)
+    this.supabase = createClient(environment.supabaseUrl, environment.supabasePublishableKey)
   }
 
   get user() {

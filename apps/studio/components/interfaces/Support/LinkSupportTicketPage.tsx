@@ -38,7 +38,7 @@ function LinkSupportTicketPageContent() {
   return (
     <div
       className={cn(
-        'min-w-full w-full space-y-12 rounded border bg-panel-body-light shadow-md border-default'
+        'min-w-full w-full space-y-12 rounded-sm border bg-panel-body-light shadow-md border-default'
       )}
     >
       {isSuccess ? (
@@ -72,7 +72,7 @@ function LinkSupportTicketSuccess() {
       </div>
       <DialogSectionSeparator />
       <div className="w-full py-4 px-4 flex items-center justify-end">
-        <Button asChild type="default">
+        <Button asChild variant="default">
           <Link href="/">Finish</Link>
         </Button>
       </div>

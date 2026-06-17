@@ -10,7 +10,7 @@ import { Button, cn, SidePanel } from 'ui'
 import { ActionBar } from '../ActionBar'
 import { isValueTruncated } from './RowEditor.utils'
 import { Markdown } from '@/components/interfaces/Markdown'
-import TwoOptionToggle from '@/components/ui/TwoOptionToggle'
+import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from '@/data/table-rows/get-cell-value-mutation'
@@ -111,7 +111,7 @@ export const TextEditor = ({
               options={['view', 'edit']}
               activeOption={view}
               borderOverride="border-muted"
-              onClickOption={setView}
+              onClickOption={(value) => setView(value as 'view' | 'edit')}
             />
           )}
         </div>
@@ -184,7 +184,7 @@ export const TextEditor = ({
                 performance issues
               </p>
             </div>
-            <Button type="default" loading={isPending} onClick={loadFullValue}>
+            <Button variant="default" loading={isPending} onClick={loadFullValue}>
               Load full text data
             </Button>
           </div>

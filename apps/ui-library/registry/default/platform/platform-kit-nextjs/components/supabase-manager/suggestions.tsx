@@ -87,11 +87,11 @@ export function SuggestionsManager({ projectRef }: { projectRef: string }) {
                         components={{
                           code({ inline, children, ...props }: any) {
                             return inline ? (
-                              <code className="bg-muted px-1 rounded" {...props}>
+                              <code className="bg-muted px-1 rounded-sm" {...props}>
                                 {children}
                               </code>
                             ) : (
-                              <pre className="bg-muted p-2 rounded overflow-x-auto" {...props}>
+                              <pre className="bg-muted p-2 rounded-sm overflow-x-auto" {...props}>
                                 <code>{children}</code>
                               </pre>
                             )

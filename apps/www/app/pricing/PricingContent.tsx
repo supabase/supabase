@@ -13,16 +13,6 @@ import HashAnchorScroll from './HashAnchorScroll'
 import PricingComparisonSection from './PricingComparisonSection'
 import PricingPlansSection from './PricingPlansSection'
 
-export type PricingPageExperimentVariant =
-  | 'control'
-  // GROWTH-694: flexibility/hourly billing
-  | 'flexibility' // concrete FAQ example as section between cards and buttons
-  | 'flexibility_card' // "no lock-in" messaging on Pro card warning
-  | 'hourly_rate' // actual hourly compute rate on Pro card warning
-  // GROWTH-697: pro project cost visibility
-  | 'multi_project' // "first project included, additional from $10/mo" on Pro card
-  | 'estimate_cta' // "estimate your cost" link on Pro card scrolling to calculator
-
 export default function PricingContent() {
   return (
     <DefaultLayout>
@@ -46,11 +36,16 @@ export default function PricingContent() {
       <div className="text-center mt-10 xl:mt-16 mx-auto max-w-lg flex flex-col gap-8">
         <div className="flex justify-center gap-2">
           <a href="#compare-plans">
-            <Button size="tiny" type="secondary" iconRight={<ArrowDownIcon className="w-3" />}>
+            <Button size="tiny" variant="secondary" iconRight={<ArrowDownIcon className="w-3" />}>
               Compare Plans
             </Button>
           </a>
-          <Button size="tiny" type="default" asChild iconRight={<ArrowUpRight className="w-4" />}>
+          <Button
+            size="tiny"
+            variant="default"
+            asChild
+            iconRight={<ArrowUpRight className="w-4" />}
+          >
             <a
               href="/docs/guides/platform/billing-on-supabase#organization-based-billing"
               target="_blank"

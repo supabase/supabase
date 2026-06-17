@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 import { Button, cn } from 'ui'
 
 import { useDataTable } from './providers/DataTableProvider'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -18,7 +19,7 @@ interface LiveButtonProps {
 export function LiveButton({ fetchPreviousPage, searchParamsParser }: LiveButtonProps) {
   const [{ live, date, sort }, setSearch] = useQueryStates(searchParamsParser)
   const { table } = useDataTable()
-  useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_LIVE, handleClick)
+  useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_LIVE, handleClick, { registerInCommandMenu: true })
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout
@@ -59,14 +60,20 @@ export function LiveButton({ fetchPreviousPage, searchParamsParser }: LiveButton
   }
 
   return (
-    <Button
-      className={cn(live && 'border-info text-info hover:text-info')}
-      onClick={handleClick}
-      type={live ? 'primary' : 'default'}
-      size="tiny"
-      icon={live ? <CirclePause className="h-4 w-4" /> : <CirclePlay className="h-4 w-4" />}
+    <ShortcutTooltip
+      shortcutId={SHORTCUT_IDS.DATA_TABLE_TOGGLE_LIVE}
+      label={live ? 'Pause live mode' : 'Start live mode'}
+      side="bottom"
     >
-      Live
-    </Button>
+      <Button
+        className={cn(live && 'border-info text-info hover:text-info')}
+        onClick={handleClick}
+        variant={live ? 'primary' : 'default'}
+        size="tiny"
+        icon={live ? <CirclePause className="h-4 w-4" /> : <CirclePlay className="h-4 w-4" />}
+      >
+        Live
+      </Button>
+    </ShortcutTooltip>
   )
 }

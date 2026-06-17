@@ -33,10 +33,10 @@ export function ExplainHeader({ mode, onToggleMode, summary, id, rows }: Explain
   const getPromptData = () => {
     if (!id) return null
     const snippet = snapV2.snippets[id]?.snippet
-    if (!snippet?.content?.sql) return null
+    if (!snippet?.content?.unchecked_sql) return null
 
     return buildExplainPrompt({
-      sql: snippet.content.sql,
+      sql: snippet.content.unchecked_sql,
       explainPlanRows: (rows as QueryPlanRow[]) ?? [],
     })
   }
@@ -129,11 +129,11 @@ export function ExplainHeader({ mode, onToggleMode, summary, id, rows }: Explain
               onOpenAssistant={handleExplainWithAI}
               telemetrySource="explain_visualizer"
               size="tiny"
-              type="default"
+              variant="default"
             />
           )}
           <Button
-            type="default"
+            variant="default"
             size="tiny"
             icon={isVisual ? <Code size={14} /> : <Eye size={14} />}
             onClick={onToggleMode}

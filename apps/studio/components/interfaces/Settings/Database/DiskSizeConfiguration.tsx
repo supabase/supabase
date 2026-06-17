@@ -4,7 +4,7 @@ import { ExternalLink, Info } from 'lucide-react'
 import Link from 'next/link'
 import { SetStateAction } from 'react'
 import { toast } from 'sonner'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button, InfoIcon } from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button, InfoIcon } from 'ui'
 import {
   PageSection,
   PageSectionContent,
@@ -92,7 +92,7 @@ export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfiguratio
         <PageSectionContent>
           {organization?.usage_billing_enabled === true ? (
             <div className="flex flex-col gap-3">
-              <Panel className="!m-0">
+              <Panel className="m-0!">
                 <Panel.Content>
                   <div>
                     <div>
@@ -108,7 +108,7 @@ export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfiguratio
                         </p>
                         {!isAwsNimbus && (
                           <ButtonTooltip
-                            type="default"
+                            variant="default"
                             className="w-min ml-auto"
                             disabled={!canUpdateDiskSizeConfig || disabled}
                             onClick={() => setShowIncreaseDiskSizeModal(true)}
@@ -141,7 +141,11 @@ export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfiguratio
 
                           {reportsAll && (
                             <div className="col-span-2 mt-4">
-                              <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
+                              <Button
+                                asChild
+                                variant="default"
+                                iconRight={<ExternalLink size={14} />}
+                              >
                                 <Link
                                   href={`/project/${projectRef}/reports/database#database-size-report`}
                                 >
@@ -153,10 +157,10 @@ export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfiguratio
                         </div>
 
                         <div className="col-span-8">
-                          <Alert_Shadcn_>
+                          <Alert>
                             <Info size={16} />
-                            <AlertTitle_Shadcn_>Importing a lot of data?</AlertTitle_Shadcn_>
-                            <AlertDescription_Shadcn_>
+                            <AlertTitle>Importing a lot of data?</AlertTitle>
+                            <AlertDescription>
                               <Markdown
                                 className="max-w-full"
                                 content={`
@@ -168,8 +172,8 @@ manually increase the size here.
 Read more about [disk management](${DOCS_URL}/guides/platform/database-size#disk-management) and how to [free up storage space](${DOCS_URL}/guides/platform/database-size#vacuum-operations).
 `}
                               />
-                            </AlertDescription_Shadcn_>
-                          </Alert_Shadcn_>
+                            </AlertDescription>
+                          </Alert>
                         </div>
                       </div>
                     </div>
@@ -178,14 +182,14 @@ Read more about [disk management](${DOCS_URL}/guides/platform/database-size#disk
               </Panel>
             </div>
           ) : (
-            <Alert_Shadcn_>
+            <Alert>
               <InfoIcon />
-              <AlertTitle_Shadcn_>
+              <AlertTitle>
                 {hasAccessToDiskSizeConfig === false
                   ? 'Disk size configuration is not available for projects on the Free Plan'
                   : 'Disk size configuration is only available when the spend cap has been disabled'}
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+              </AlertTitle>
+              <AlertDescription>
                 {hasAccessToDiskSizeConfig === false ? (
                   <p>
                     If you are intending to use more than 500MB of disk space, then you will need to
@@ -197,7 +201,7 @@ Read more about [disk management](${DOCS_URL}/guides/platform/database-size#disk
                     disable your spend cap.
                   </p>
                 )}
-                <Button asChild type="default" className="mt-3">
+                <Button asChild variant="default" className="mt-3">
                   <Link
                     href={`/org/${organization?.slug}/billing?panel=${
                       hasAccessToDiskSizeConfig === false ? 'subscriptionPlan' : 'costControl'
@@ -209,8 +213,8 @@ Read more about [disk management](${DOCS_URL}/guides/platform/database-size#disk
                       : 'Disable spend cap'}
                   </Link>
                 </Button>
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
+              </AlertDescription>
+            </Alert>
           )}
         </PageSectionContent>
       </PageSection>

@@ -44,7 +44,7 @@ export const SqlMonacoBlock = ({
         className={className}
         wrapperProps={{
           className:
-            '[&_.monaco-editor]:!bg-transparent [&_.monaco-editor-background]:!bg-transparent [&_.monaco-editor]:!outline-transparent [&_.cursor]:!hidden',
+            '[&_.monaco-editor]:bg-transparent! [&_.monaco-editor-background]:bg-transparent! [&_.monaco-editor]:outline-transparent! [&_.cursor]:hidden!',
         }}
         options={{
           readOnly: true,
@@ -73,7 +73,7 @@ export const SqlMonacoBlock = ({
       {!hideCopy && (
         <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <Button
-            type="default"
+            variant="default"
             className="px-1.5"
             icon={copied ? <Check /> : <Copy />}
             onClick={() => handleCopy(content)}

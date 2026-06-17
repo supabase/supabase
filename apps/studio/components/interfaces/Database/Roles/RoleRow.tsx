@@ -7,6 +7,8 @@ import {
   Button,
   cn,
   Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -45,7 +47,6 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
   const { data: project } = useSelectedProjectQuery()
   const [isExpanded, setIsExpanded] = useState(false)
   const { mutate: updateDatabaseRole, isPending: isUpdating } = useDatabaseRoleUpdateMutation()
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: role,
@@ -103,17 +104,17 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
         'data-open:border-strong',
         'data-open:pb-px col-span-12 mx-auto',
         '-space-y-px overflow-hidden',
-        'border border-t-0 first:border-t first:!mt-0 hover:border-t hover:-mt-[1px] shadow transition hover:z-50',
+        'border border-t-0 first:border-t first:mt-0! hover:border-t hover:-mt-px shadow-sm transition hover:z-50',
         'first:rounded-tl first:rounded-tr',
         'last:rounded-bl last:rounded-br'
       )}
     >
-      <div className={cn('flex items-center relative', !disabled && 'pr-[--card-padding-x]')}>
-        <Collapsible.Trigger asChild>
+      <div className={cn('flex items-center relative', !disabled && 'pr-(--card-padding-x)')}>
+        <CollapsibleTrigger asChild>
           <button
             id={`collapsible-trigger-${role.id}`}
             type="button"
-            className="group flex w-full items-center justify-between rounded py-3 px-card text-foreground"
+            className="group flex w-full items-center justify-between rounded-sm py-3 px-card text-foreground"
             onClick={(event) => {
               event.preventDefault()
               event.stopPropagation()
@@ -150,12 +151,12 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
               </p>
             </div>
           </button>
-        </Collapsible.Trigger>
+        </CollapsibleTrigger>
         {!disabled && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                type="default"
+                variant="default"
                 className="px-1"
                 icon={<MoreVertical />}
                 aria-label={`${role.name} actions`}
@@ -176,7 +177,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
           </DropdownMenu>
         )}
       </div>
-      <Collapsible.Content>
+      <CollapsibleContent>
         <Form {...form}>
           <form
             id={formId}
@@ -213,12 +214,12 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
             </div>
             {!disabled && (
               <div className="py-4 flex items-center space-x-2 justify-end">
-                <Button type="default" disabled={!isDirty || isUpdating} onClick={() => reset()}>
+                <Button variant="default" disabled={!isDirty || isUpdating} onClick={() => reset()}>
                   Cancel
                 </Button>
                 <Button
-                  type="primary"
-                  htmlType="submit"
+                  variant="primary"
+                  type="submit"
                   disabled={!isDirty || isUpdating}
                   loading={isUpdating}
                 >
@@ -228,7 +229,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
             )}
           </form>
         </Form>
-      </Collapsible.Content>
+      </CollapsibleContent>
     </Collapsible>
   )
 }

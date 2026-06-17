@@ -1,20 +1,20 @@
 'use client'
 
+import { useBreakpoint } from 'common'
+import { InfoIcon, XIcon } from 'lucide-react'
 import React, {
-  type PropsWithChildren,
   useCallback,
   useEffect,
   useId,
   useRef,
   useState,
+  type PropsWithChildren,
 } from 'react'
-import { InfoIcon, XIcon } from 'lucide-react'
 import { ErrorBoundary } from 'react-error-boundary'
-import { useBreakpoint } from 'common'
 import {
   Button,
   cn,
-  CommandEmpty_Shadcn_,
+  CommandEmpty,
   Sheet,
   SheetContent,
   SheetHeader,
@@ -31,7 +31,7 @@ interface PopUpProps extends PropsWithChildren {
 
 const buttonClassName = cn(
   'relative px-1 py-0 -my-px',
-  'rounded bg-surface-200 border border-dashed',
+  'rounded-sm bg-surface-200 border border-dashed',
   'transition-colors hover:border-strong group/inline-popup'
 )
 
@@ -83,7 +83,7 @@ const InfoTooltip = ({
             {children}
             <InfoIcon
               aria-hidden={true}
-              className="absolute p-[1px] bg-background rounded-full -left-1.5 -top-1.5 w-3 h-3 text-foreground-lighter group-hover/inline-popup:text-foreground-light transition-colors"
+              className="absolute p-px bg-background rounded-full -left-1.5 -top-1.5 w-3 h-3 text-foreground-lighter group-hover/inline-popup:text-foreground-light transition-colors"
             />
           </span>
         </TooltipTrigger>
@@ -105,13 +105,13 @@ const InfoTooltip = ({
               'w-full h-fit min-h-[200px] py-2 px-4'
             )}
           >
-            <ErrorBoundary FallbackComponent={() => <CommandEmpty_Shadcn_ />}>
+            <ErrorBoundary FallbackComponent={() => <CommandEmpty />}>
               <SheetHeader className="flex items-center justify-between gap-2 px-0 py-2 mb-2 max-w-full">
                 <div className="flex items-center gap-2 max-w-[90%]">
-                  <InfoIcon className="p-[1px] min-w-4 min-h-4 text-foreground-lighter" />
+                  <InfoIcon className="p-px min-w-4 min-h-4 text-foreground-lighter" />
                   <p className="italic text-foreground-light truncate">{children}</p>
                 </div>
-                <Button type="text" onClick={() => setMobileSheetOpen(false)} className="px-1">
+                <Button variant="text" onClick={() => setMobileSheetOpen(false)} className="px-1">
                   <XIcon className="w-4 h-4 text-foreground-lighter" />
                 </Button>
               </SheetHeader>

@@ -96,12 +96,25 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
         sentProjectRef: variables.projectRef,
         sentOrgSlug: variables.organizationSlug,
         sentCategory: variables.category,
+        submittedRequest: {
+          organizationSlug: variables.organizationSlug,
+          projectRef: variables.projectRef,
+          category: variables.category,
+          severity: variables.severity,
+          subject: variables.subject,
+          message: variables.message,
+          affectedServices: variables.affectedServices ?? '',
+          library: variables.library,
+          allowSupportAccess: variables.allowSupportAccess,
+          dashboardLogs: variables.dashboardLogs,
+        },
       })
     },
     onError: (error) => {
       dispatch({
         type: 'ERROR',
         message: error.message,
+        code: error.code,
       })
     },
   })
@@ -236,14 +249,14 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
 
         {DASHBOARD_LOG_CATEGORIES.includes(category) && (
           <>
-            <DashboardLogsToggle form={form} sanitizedLog={sanitizedLogSnapshot} />
+            <DashboardLogsToggle form={form} sanitizedLog={sanitizedLogSnapshot} className="px-6" />
             <DialogSectionSeparator />
           </>
         )}
 
         {!!category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(category) && (
           <>
-            <SupportAccessToggle form={form} />
+            <SupportAccessToggle form={form} className="px-6" />
             <DialogSectionSeparator />
           </>
         )}

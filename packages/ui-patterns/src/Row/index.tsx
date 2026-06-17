@@ -145,7 +145,7 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
     <div ref={ref} className={cn('relative w-full', className)} {...rest}>
       {showArrows && canScrollLeft && (
         <Button
-          type="default"
+          variant="default"
           onClick={scrollLeft}
           className="absolute w-8 h-8 left-0 top-1/2 -translate-y-1/2 z-10 rounded-full p-2"
           aria-label="Scroll left"
@@ -156,7 +156,7 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
 
       {showArrows && canScrollRight && hasContentToScroll && (
         <Button
-          type="default"
+          variant="default"
           onClick={scrollRight}
           className="absolute w-8 h-8 right-0 top-1/2 -translate-y-1/2 z-10 rounded-full p-2"
           aria-label="Scroll right"
@@ -167,7 +167,7 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
 
       <div
         ref={containerRef}
-        className="w-full overflow-visible focus:outline-none"
+        className="w-full overflow-visible focus:outline-hidden"
         tabIndex={0}
         role="region"
         aria-roledescription="carousel"

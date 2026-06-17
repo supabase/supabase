@@ -29,14 +29,14 @@ export const FunctionEditor = ({
       </FormControl>
       <div
         className={cn(
-          'absolute top-0 right-2 bg-surface-300 border border-strong rounded h-[28px]',
+          'absolute top-0 right-2 bg-surface-300 border border-strong rounded-sm h-[28px]',
           'opacity-0 group-hover:opacity-100 group-hover:top-2 transition-all'
         )}
       >
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              type="text"
+              variant="text"
               size="tiny"
               className={cn(
                 'px-1.5 text-foreground-lighter hover:text-foreground',

@@ -78,6 +78,10 @@
       "import": "./src/CodeBlock/index.tsx",
       "types": "./src/CodeBlock/index.tsx"
     },
+    "./CollapsibleCardSection": {
+      "import": "./src/CollapsibleCardSection.tsx",
+      "types": "./src/CollapsibleCardSection.tsx"
+    },
     "./CommandMenu/api/Badges": {
       "import": "./src/CommandMenu/api/Badges.tsx",
       "types": "./src/CommandMenu/api/Badges.tsx"
@@ -86,13 +90,13 @@
       "import": "./src/CommandMenu/api/CommandHeader.tsx",
       "types": "./src/CommandMenu/api/CommandHeader.tsx"
     },
-    "./CommandMenu/api/CommandInput": {
-      "import": "./src/CommandMenu/api/CommandInput.tsx",
-      "types": "./src/CommandMenu/api/CommandInput.tsx"
+    "./CommandMenu/api/CommandMenuInput": {
+      "import": "./src/CommandMenu/api/CommandMenuInput.tsx",
+      "types": "./src/CommandMenu/api/CommandMenuInput.tsx"
     },
-    "./CommandMenu/api/CommandList": {
-      "import": "./src/CommandMenu/api/CommandList.tsx",
-      "types": "./src/CommandMenu/api/CommandList.tsx"
+    "./CommandMenu/api/CommandMenuList": {
+      "import": "./src/CommandMenu/api/CommandMenuList.tsx",
+      "types": "./src/CommandMenu/api/CommandMenuList.tsx"
     },
     "./CommandMenu/api/CommandMenu": {
       "import": "./src/CommandMenu/api/CommandMenu.tsx",
@@ -162,17 +166,17 @@
       "import": "./src/CommandMenu/index.tsx",
       "types": "./src/CommandMenu/index.tsx"
     },
-    "./CommandMenu/internal/Command": {
-      "import": "./src/CommandMenu/internal/Command.tsx",
-      "types": "./src/CommandMenu/internal/Command.tsx"
+    "./CommandMenu/internal/CommandMenuItem": {
+      "import": "./src/CommandMenu/internal/CommandMenuItem.tsx",
+      "types": "./src/CommandMenu/internal/CommandMenuItem.tsx"
     },
-    "./CommandMenu/internal/CommandEmpty": {
-      "import": "./src/CommandMenu/internal/CommandEmpty.tsx",
-      "types": "./src/CommandMenu/internal/CommandEmpty.tsx"
+    "./CommandMenu/internal/CommandMenuEmpty": {
+      "import": "./src/CommandMenu/internal/CommandMenuEmpty.tsx",
+      "types": "./src/CommandMenu/internal/CommandMenuEmpty.tsx"
     },
-    "./CommandMenu/internal/CommandGroup": {
-      "import": "./src/CommandMenu/internal/CommandGroup.tsx",
-      "types": "./src/CommandMenu/internal/CommandGroup.tsx"
+    "./CommandMenu/internal/CommandMenuGroup": {
+      "import": "./src/CommandMenu/internal/CommandMenuGroup.tsx",
+      "types": "./src/CommandMenu/internal/CommandMenuGroup.tsx"
     },
     "./CommandMenu/internal/CommandSection": {
       "import": "./src/CommandMenu/internal/CommandSection.tsx",
@@ -309,6 +313,10 @@
     "./DataInputs/Input": {
       "import": "./src/DataInputs/Input.tsx",
       "types": "./src/DataInputs/Input.tsx"
+    },
+    "./DatePicker": {
+      "import": "./src/DatePicker/index.ts",
+      "types": "./src/DatePicker/index.ts"
     },
     "./Dialogs/ConfirmationModal": {
       "import": "./src/Dialogs/ConfirmationModal.tsx",
@@ -558,6 +566,14 @@
       "import": "./src/PageHeader/index.tsx",
       "types": "./src/PageHeader/index.tsx"
     },
+    "./PageBreadcrumbs": {
+      "import": "./src/PageBreadcrumbs/index.tsx",
+      "types": "./src/PageBreadcrumbs/index.tsx"
+    },
+    "./PageNav": {
+      "import": "./src/PageNav/index.tsx",
+      "types": "./src/PageNav/index.tsx"
+    },
     "./PageSection": {
       "import": "./src/PageSection/index.tsx",
       "types": "./src/PageSection/index.tsx"
@@ -714,6 +730,10 @@
       "import": "./src/consent.tsx",
       "types": "./src/consent.tsx"
     },
+    "./collapsible-alert": {
+      "import": "./src/collapsible-alert.tsx",
+      "types": "./src/collapsible-alert.tsx"
+    },
     "./form/FormItemLayout/FormItemLayout": {
       "import": "./src/form/FormItemLayout/FormItemLayout.tsx",
       "types": "./src/form/FormItemLayout/FormItemLayout.tsx"
@@ -783,26 +803,26 @@
     "@hookform/resolvers": "^3.1.1",
     "@monaco-editor/react": "^4.6.0",
     "@std/toml": "jsr:^1.0.11",
-    "@tanstack/react-table": "^8.21.3",
     "@supabase/sql-to-rest": "^0.1.6",
     "@supabase/supabase-js": "catalog:",
-    "class-variance-authority": "^0.6.0",
-    "clsx": "^1.2.1",
+    "@tanstack/react-table": "^8.21.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "common": "workspace:*",
     "common-tags": "^1.8.2",
     "dayjs": "^1.11.13",
     "framer-motion": "^11.18.2",
     "github-slugger": "^2.0.0",
-    "icons": "workspace:*",
     "highlightjs-curl": "^1.3.0",
+    "icons": "workspace:*",
     "js-yaml": "^3.14.1",
     "lodash": "catalog:",
     "lucide-react": "*",
-    "mermaid": "^11.12.1",
     "mdast": "^3.0.0",
+    "mermaid": "^11.12.1",
     "monaco-editor": "*",
-    "next-themes": "*",
+    "next-themes": "catalog:",
     "openai": "^4.75.1",
     "prism-react-renderer": "^2.3.1",
     "radix-ui": "catalog:",
@@ -844,7 +864,9 @@
     "@types/react-syntax-highlighter": "^15.5.13",
     "@vitest/coverage-v8": "catalog:",
     "api-types": "workspace:*",
+    "config": "workspace:*",
     "next-router-mock": "^0.9.13",
+    "tailwindcss": "^4.2.4",
     "tsx": "catalog:",
     "typescript": "catalog:",
     "unified": "^11.0.5",

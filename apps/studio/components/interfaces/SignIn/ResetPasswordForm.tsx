@@ -92,7 +92,7 @@ export const ResetPasswordForm = () => {
                     actions={
                       <Button
                         icon={currentPasswordHidden ? <Eye /> : <EyeOff />}
-                        type="default"
+                        variant="default"
                         className="w-7"
                         onClick={() => setCurrentPasswordHidden((prev) => !prev)}
                       />
@@ -124,7 +124,7 @@ export const ResetPasswordForm = () => {
                   actions={
                     <Button
                       icon={passwordHidden ? <Eye /> : <EyeOff />}
-                      type="default"
+                      variant="default"
                       className="w-7"
                       onClick={() => setPasswordHidden((prev) => !prev)}
                     />
@@ -142,7 +142,7 @@ export const ResetPasswordForm = () => {
 
         <div
           className={cn(
-            showConditions ? 'max-h-[500px]' : 'max-h-[0px]',
+            showConditions ? 'max-h-[500px]' : 'max-h-0',
             'transition-all duration-400 overflow-y-hidden'
           )}
         >
@@ -153,7 +153,7 @@ export const ResetPasswordForm = () => {
 
         <Button
           block
-          htmlType="submit"
+          type="submit"
           size="medium"
           disabled={form.formState.isSubmitting}
           loading={form.formState.isSubmitting}

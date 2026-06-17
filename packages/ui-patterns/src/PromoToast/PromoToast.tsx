@@ -32,7 +32,7 @@ const PromoToast = () => {
   return (
     <div
       className={cn(
-        'opacity-0 translate-y-3 transition-all grid gap-2 fixed z-50 bottom-4 right-4 sm:bottom-8 sm:right-8 w-[calc(100vw-2rem)] sm:w-[320px] bg-alternative hover:bg-alternative border border-default rounded p-6 shadow-lg overflow-hidden',
+        'opacity-0 translate-y-3 transition-all grid gap-2 fixed z-50 bottom-4 right-4 sm:bottom-8 sm:right-8 w-[calc(100vw-2rem)] sm:w-[320px] bg-alternative hover:bg-alternative border border-default rounded-sm p-6 shadow-lg overflow-hidden',
         visible && 'opacity-100 translate-y-0'
       )}
     >
@@ -53,12 +53,12 @@ const PromoToast = () => {
       </div>
 
       <div className="relative z-10 flex items-center space-x-2">
-        <Button asChild type="secondary">
+        <Button asChild variant="secondary">
           <Link target="_blank" rel="noreferrer" href={`https://supabase.com${announcement.link}`}>
             Claim your ticket
           </Link>
         </Button>
-        <Button type="default" onClick={handleHide}>
+        <Button variant="default" onClick={handleHide}>
           Dismiss
         </Button>
       </div>

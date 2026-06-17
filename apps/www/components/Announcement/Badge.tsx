@@ -48,7 +48,7 @@ const AnnouncementBadge = ({
           hover:border-foreground-muted/30
           shadow-md
           overflow-hidden
-          focus-visible:outline-none focus-visible:ring-brand-600 focus-visible:ring-2 focus-visible:rounded-full
+          focus-visible:outline-hidden focus-visible:ring-brand-600 focus-visible:ring-2 focus-visible:rounded-full
           `,
         !badge && 'pl-5'
       )}
@@ -76,7 +76,7 @@ const AnnouncementBadge = ({
         <ChevronRightIcon className="announcement-icon h-4 ml-2 -translate-x-1 text-foreground transition-transform group-hover/announcement:translate-x-0" />
       )}
       <div
-        className="announcement-overlay absolute inset-0 -z-10 bg-gradient-to-br
+        className="announcement-overlay absolute inset-0 -z-10 bg-linear-to-br
             opacity-70
             group-hover/announcement:opacity-100
             transition-opacity

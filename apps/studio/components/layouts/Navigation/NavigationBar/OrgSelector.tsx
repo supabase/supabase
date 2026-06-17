@@ -4,16 +4,16 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
   SidebarMenu,
   SidebarMenuButton,
@@ -59,10 +59,10 @@ export function OrgSelector() {
   const triggerButton = (
     <SidebarMenuButton
       size="lg"
-      className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground gap-2 h-auto text-left group px-1.5 py-1 touch-manipulation"
+      className="data-open:bg-sidebar-accent data-open:text-sidebar-accent-foreground gap-2 h-auto text-left group px-1.5 py-1 touch-manipulation"
       onClick={isMobile ? () => setOpen(true) : undefined}
     >
-      <span className="flex w-8 aspect-square shrink-0 items-center justify-center rounded border bg-surface-100 text-xs font-medium text-foreground-lighter">
+      <span className="flex w-8 aspect-square shrink-0 items-center justify-center rounded-sm border bg-surface-100 text-xs font-medium text-foreground-lighter">
         {selectedOrgInitial}
       </span>
       <div className="flex min-w-0 flex-1 flex-col text-left -mb-0.5">
@@ -78,7 +78,7 @@ export function OrgSelector() {
       </div>
       <ChevronsUpDown
         strokeWidth={1}
-        className="ml-auto text-foreground-light md:hidden md:group-hover:block !w-4 !h-4"
+        className="ml-auto text-foreground-light md:hidden md:group-hover:block w-4! h-4!"
       />
     </SidebarMenuButton>
   )
@@ -104,14 +104,14 @@ export function OrgSelector() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-          <PopoverTrigger_Shadcn_ asChild>{triggerButton}</PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
-            <Command_Shadcn_>
-              <CommandInput_Shadcn_ placeholder="Find organization..." />
-              <CommandList_Shadcn_>
-                <CommandEmpty_Shadcn_>No organizations found</CommandEmpty_Shadcn_>
-                <CommandGroup_Shadcn_>
+        <Popover open={open} onOpenChange={setOpen} modal={false}>
+          <PopoverTrigger asChild>{triggerButton}</PopoverTrigger>
+          <PopoverContent className="p-0" side="bottom" align="start">
+            <Command>
+              <CommandInput placeholder="Find organization..." />
+              <CommandList>
+                <CommandEmpty>No organizations found</CommandEmpty>
+                <CommandGroup>
                   <ScrollArea
                     className={(organizations || []).length > 7 ? 'h-full md:h-[210px]' : ''}
                   >
@@ -126,10 +126,10 @@ export function OrgSelector() {
                       />
                     ))}
                   </ScrollArea>
-                </CommandGroup_Shadcn_>
-                <CommandSeparator_Shadcn_ />
-                <CommandGroup_Shadcn_>
-                  <CommandItem_Shadcn_
+                </CommandGroup>
+                <CommandSeparator />
+                <CommandGroup>
+                  <CommandItem
                     className="cursor-pointer w-full"
                     onSelect={() => {
                       setOpen(false)
@@ -140,13 +140,13 @@ export function OrgSelector() {
                     <Link href="/organizations" className="flex items-center gap-2 w-full">
                       <p>All Organizations</p>
                     </Link>
-                  </CommandItem_Shadcn_>
-                </CommandGroup_Shadcn_>
+                  </CommandItem>
+                </CommandGroup>
                 {organizationCreationEnabled && (
                   <>
-                    <CommandSeparator_Shadcn_ />
-                    <CommandGroup_Shadcn_>
-                      <CommandItem_Shadcn_
+                    <CommandSeparator />
+                    <CommandGroup>
+                      <CommandItem
                         className="cursor-pointer w-full"
                         onSelect={() => {
                           setOpen(false)
@@ -158,14 +158,14 @@ export function OrgSelector() {
                           <Plus size={14} strokeWidth={1.5} />
                           <p>New organization</p>
                         </Link>
-                      </CommandItem_Shadcn_>
-                    </CommandGroup_Shadcn_>
+                      </CommandItem>
+                    </CommandGroup>
                   </>
                 )}
-              </CommandList_Shadcn_>
-            </Command_Shadcn_>
-          </PopoverContent_Shadcn_>
-        </Popover_Shadcn_>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
       </SidebarMenuItem>
     </SidebarMenu>
   )

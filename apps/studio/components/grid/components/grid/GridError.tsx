@@ -11,7 +11,7 @@ import AlertError from '@/components/ui/AlertError'
 import { HighCostError } from '@/components/ui/HighQueryCost'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
-import { COST_THRESHOLD_ERROR } from '@/data/sql/execute-sql-query'
+import { COST_THRESHOLD_ERROR } from '@/data/sql/execute-sql-mutation'
 import { tableRowKeys } from '@/data/table-rows/keys'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
@@ -121,11 +121,11 @@ const FilterError = ({ removeAllFilters }: { removeAllFilters: () => void }) => 
       className="pointer-events-auto"
       title="No results found — check your filter values"
     >
-      <p className="!mb-4">
+      <p className="mb-4!">
         One or more of your filters may have a value or operator that doesn't match the column's
         data type. Try updating or removing the filter.
       </p>
-      <Button type="default" onClick={removeAllFilters}>
+      <Button variant="default" onClick={removeAllFilters}>
         Remove filters
       </Button>
     </Admonition>
@@ -143,22 +143,22 @@ const InvalidOrderingOperatorError = ({ error }: { error: ResponseError }) => {
     <Admonition
       type="warning"
       className="pointer-events-auto"
-      title={`Sorting is not supporting on ${sorts.length > 1 ? 'one of the selected columns' : 'the selected column'}`}
+      title={`Sorting is not supported on ${sorts.length > 1 ? 'one of the selected columns' : 'the selected column'}`}
     >
-      <p className="!mb-0">
+      <p className="mb-0!">
         Unable to retrieve results as sorting is not supported on{' '}
         {sorts.length > 1 ? 'one of the selected columns' : 'the selected column'} due to its data
         type. ({formattedInvalidDataType})
       </p>
-      <p className="!mb-2">
+      <p className="mb-2!">
         Remove any sorts on columns with the data type {formattedInvalidDataType} applying the sorts
         again.
       </p>
-      <p className="text-sm text-foreground-lighter prose max-w-full !mb-4">
+      <p className="text-sm text-foreground-lighter prose max-w-full mb-4!">
         Error: <code className="text-code-inline">{error.message}</code>
       </p>
 
-      <Button type="default" onClick={() => onApplySorts([])}>
+      <Button variant="default" onClick={() => onApplySorts([])}>
         Remove sorts
       </Button>
     </Admonition>

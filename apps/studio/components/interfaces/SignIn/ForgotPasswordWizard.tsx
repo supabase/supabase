@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form, FormControl, FormField, Input_Shadcn_ } from 'ui'
+import { Button, Form, FormControl, FormField, Input } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
@@ -90,12 +90,7 @@ const ConfirmResetCodeForm = ({ email }: { email: string }) => {
           render={({ field }) => (
             <FormItemLayout label="Code">
               <FormControl>
-                <Input_Shadcn_
-                  {...field}
-                  placeholder="123456"
-                  autoComplete="off"
-                  disabled={isLoading}
-                />
+                <Input {...field} placeholder="123456" autoComplete="off" disabled={isLoading} />
               </FormControl>
             </FormItemLayout>
           )}
@@ -103,7 +98,7 @@ const ConfirmResetCodeForm = ({ email }: { email: string }) => {
 
         <div className="border-t border-overlay-border" />
 
-        <Button block form="code-input-form" htmlType="submit" size="medium" loading={isLoading}>
+        <Button block form="code-input-form" type="submit" size="medium" loading={isLoading}>
           Confirm reset code
         </Button>
       </form>
@@ -162,7 +157,7 @@ const ForgotPasswordForm = ({ onSuccess }: { onSuccess: (email: string) => void 
           render={({ field }) => (
             <FormItemLayout label="Email">
               <FormControl>
-                <Input_Shadcn_
+                <Input
                   {...field}
                   type="email"
                   placeholder="you@example.com"
@@ -193,7 +188,7 @@ const ForgotPasswordForm = ({ onSuccess }: { onSuccess: (email: string) => void 
         <Button
           block
           form="forgot-password-form"
-          htmlType="submit"
+          type="submit"
           size="medium"
           disabled={isPending}
           loading={isPending}

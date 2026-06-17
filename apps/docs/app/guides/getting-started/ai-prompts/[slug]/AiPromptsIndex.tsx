@@ -1,5 +1,4 @@
 import Link from 'next/link'
-
 import { GlassPanel } from 'ui-patterns'
 
 import { getAiPrompts } from './AiPrompts.utils'
@@ -12,7 +11,7 @@ export async function AiPromptsIndex() {
       {prompts.map((prompt) => (
         <Link
           key={prompt.filename}
-          href={`/guides/getting-started/ai-prompts/${prompt.filename}`}
+          href={`/guides/ai-tools/ai-prompts/${prompt.filename}`}
           passHref
         >
           <GlassPanel

@@ -13,6 +13,7 @@ import {
   Table2,
 } from 'lucide-react'
 import { useRouter } from 'next/router'
+import { memo } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -41,16 +42,18 @@ import { formatSql } from '@/lib/formatSql'
 export const TABLE_NODE_WIDTH = 320
 export const TABLE_NODE_ROW_HEIGHT = 40
 
-export const TableNode = ({
+type TableNodeOwnProps = NodeProps<Node<TableNodeData>> & { placeholder?: boolean }
+
+const TableNodeComponent = ({
   id,
   data,
   targetPosition,
   sourcePosition,
   placeholder,
-}: NodeProps<Node<TableNodeData>> & { placeholder?: boolean }) => {
+}: TableNodeOwnProps) => {
   // Important styles is a nasty hack to use Handles (required for edges calculations), but do not show them in the UI.
   // ref: https://github.com/wbkd/react-flow/discussions/2698
-  const hiddenNodeConnector = '!h-px !w-px !min-w-0 !min-h-0 !cursor-grab !border-0 !opacity-0'
+  const hiddenNodeConnector = 'h-px! w-px! min-w-0! min-h-0! cursor-grab! border-0! opacity-0!'
   const schemaGraphContext = useSchemaGraphContext()
   const { data: project } = useSelectedProjectQuery()
   const { can: canUpdateColumns } = useAsyncCheckPermissions(
@@ -85,7 +88,7 @@ export const TableNode = ({
       ) : (
         <div
           className={cn(
-            'border-[0.5px] overflow-hidden rounded-[4px] shadow-sm',
+            'border-[0.5px] overflow-hidden rounded-[4px] shadow-xs',
             hasEdgesSelected ? 'outline outline-1 outline-brand' : undefined
           )}
           style={{ width: TABLE_NODE_WIDTH / 2 }}
@@ -118,7 +121,10 @@ export const TableNode = ({
                   {!placeholder && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button type="text" className="px-0 w-[16px] h-[16px] rounded nodrag nopan">
+                        <Button
+                          variant="text"
+                          className="px-0 w-[16px] h-[16px] rounded-sm nodrag nopan"
+                        >
                           <MoreVertical size={10} />
                           <span className="sr-only">{data.name} actions</span>
                         </Button>
@@ -307,9 +313,9 @@ export const TableNode = ({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    type="text"
+                    variant="text"
                     // Use opacity to hide the button so that it remains accessible (users can tab to it)
-                    className="opacity-0 focus:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100 absolute right-0 top-1/2 -translate-y-1/2 px-0 mr-1 w-[16px] h-[16px] rounded"
+                    className="opacity-0 focus:opacity-100 group-hover:opacity-100 data-open:opacity-100 absolute right-0 top-1/2 -translate-y-1/2 px-0 mr-1 w-[16px] h-[16px] rounded-sm"
                   >
                     <MoreVertical size={10} />
                     <span className="sr-only">
@@ -355,3 +361,17 @@ export const TableNode = ({
     </article>
   )
 }
+
+// Custom comparator: xyflow re-renders nodes on selection/drag with new prop
+// objects; only the listed props affect rendered output. Selection-driven styling
+// (highlighted edges) is read from context inside the component, so we can safely
+// ignore xyflow's `selected`/`dragging`/etc. here.
+export const TableNode = memo(
+  TableNodeComponent,
+  (prev, next) =>
+    prev.id === next.id &&
+    prev.data === next.data &&
+    prev.targetPosition === next.targetPosition &&
+    prev.sourcePosition === next.sourcePosition &&
+    prev.placeholder === next.placeholder
+)

@@ -1,3 +1,9 @@
+import {
+  ident,
+  joinSqlFragments,
+  safeSql,
+  type SafeSqlFragment,
+} from '@supabase/pg-meta/src/pg-format'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -5,31 +11,37 @@ import { UseFormReturn } from 'react-hook-form'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-  Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   RadioGroup,
   RadioGroupLargeItem,
   ScrollArea,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
 } from 'ui'
-import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
+import {
+  MultiSelector,
+  MultiSelectorContent,
+  MultiSelectorItem,
+  MultiSelectorList,
+  MultiSelectorTrigger,
+} from 'ui-patterns/multi-select'
 
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
@@ -49,6 +61,7 @@ interface PolicyDetailsV2Props {
     roles: string
   }>
   onUpdateCommand: (command: string) => void
+  onRolesChange?: (fragment: SafeSqlFragment) => void
   authContext: 'database' | 'realtime'
 }
 
@@ -59,6 +72,7 @@ export const PolicyDetailsV2 = ({
   isEditing,
   form,
   onUpdateCommand,
+  onRolesChange,
   authContext,
 }: PolicyDetailsV2Props) => {
   const { data: project } = useSelectedProjectQuery()
@@ -117,7 +131,7 @@ export const PolicyDetailsV2 = ({
               <FormItem className="col-span-6 flex flex-col gap-y-1">
                 <FormLabel>Policy Name</FormLabel>
                 <FormControl>
-                  <Input_Shadcn_
+                  <Input
                     {...field}
                     disabled={!canUpdatePolicies}
                     className="bg-control border-control"
@@ -140,10 +154,10 @@ export const PolicyDetailsV2 = ({
                 </FormLabel>
                 {authContext === 'database' && (
                   <FormControl>
-                    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-                      <PopoverTrigger_Shadcn_ asChild>
+                    <Popover open={open} onOpenChange={setOpen} modal={false}>
+                      <PopoverTrigger asChild>
                         <Button
-                          type="default"
+                          variant="default"
                           disabled={!canUpdatePolicies}
                           className="w-full [&>span]:w-full h-[38px] text-sm"
                           iconRight={
@@ -160,22 +174,22 @@ export const PolicyDetailsV2 = ({
                             </span>
                           </div>
                         </Button>
-                      </PopoverTrigger_Shadcn_>
+                      </PopoverTrigger>
 
-                      <PopoverContent_Shadcn_
+                      <PopoverContent
                         className="p-0"
                         side="bottom"
                         align="start"
                         sameWidthAsTrigger
                       >
-                        <Command_Shadcn_>
-                          <CommandInput_Shadcn_ placeholder="Find a table..." />
-                          <CommandList_Shadcn_ onWheel={(event) => event.stopPropagation()}>
-                            <CommandEmpty_Shadcn_>No tables found</CommandEmpty_Shadcn_>
-                            <CommandGroup_Shadcn_>
+                        <Command>
+                          <CommandInput placeholder="Find a table..." />
+                          <CommandList onWheel={(event) => event.stopPropagation()}>
+                            <CommandEmpty>No tables found</CommandEmpty>
+                            <CommandGroup>
                               <ScrollArea className={(tables ?? []).length > 7 ? 'h-[200px]' : ''}>
                                 {(tables ?? []).map((table) => (
-                                  <CommandItem_Shadcn_
+                                  <CommandItem
                                     key={table.id}
                                     className="cursor-pointer flex items-center justify-between space-x-2 w-full"
                                     onSelect={() => {
@@ -191,19 +205,19 @@ export const PolicyDetailsV2 = ({
                                       {field.value === table.name ? <Check size={13} /> : ''}
                                       {table.name}
                                     </span>
-                                  </CommandItem_Shadcn_>
+                                  </CommandItem>
                                 ))}
                               </ScrollArea>
-                            </CommandGroup_Shadcn_>
-                          </CommandList_Shadcn_>
-                        </Command_Shadcn_>
-                      </PopoverContent_Shadcn_>
-                    </Popover_Shadcn_>
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                   </FormControl>
                 )}
                 {authContext === 'realtime' && (
                   <FormControl>
-                    <Input_Shadcn_
+                    <Input
                       disabled
                       value="messages.realtime"
                       className="bg-control border-control"
@@ -225,31 +239,29 @@ export const PolicyDetailsV2 = ({
                   Policy Behavior <code className="text-code-inline">as</code> clause
                 </FormLabel>
                 <FormControl>
-                  <Select_Shadcn_
+                  <Select
                     disabled={isEditing}
                     value={field.value}
                     onValueChange={(value) => form.setValue('behavior', value)}
                   >
-                    <SelectTrigger_Shadcn_ className="text-sm h-10 capitalize">
-                      {field.value}
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
-                      <SelectGroup_Shadcn_>
-                        <SelectItem_Shadcn_ value="permissive" className="text-sm">
+                    <SelectTrigger className="text-sm h-10 capitalize">{field.value}</SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="permissive" className="text-sm">
                           <p>Permissive</p>
                           <p className="text-foreground-light text-xs">
                             Policies are combined using the "OR" Boolean operator
                           </p>
-                        </SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="restrictive" className="text-sm">
+                        </SelectItem>
+                        <SelectItem value="restrictive" className="text-sm">
                           <p>Restrictive</p>
                           <p className="text-foreground-light text-xs">
                             Policies are combined using the "AND" Boolean operator
                           </p>
-                        </SelectItem_Shadcn_>
-                      </SelectGroup_Shadcn_>
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -298,18 +310,53 @@ export const PolicyDetailsV2 = ({
             name="roles"
             render={({ field }) => (
               <FormItem className="col-span-12 flex flex-col gap-y-1">
-                <FormLabel>
+                <FormLabel htmlFor="roles">
                   Target Roles <code className="text-code-inline">to</code> clause
                 </FormLabel>
                 <FormControl>
-                  <MultiSelectV2
+                  <MultiSelector
+                    onValuesChange={(roles) => {
+                      field.onChange(roles.join(', '))
+                      onRolesChange?.(
+                        roles.length === 0
+                          ? safeSql`public`
+                          : joinSqlFragments(
+                              roles.map((r) => ident(r)),
+                              ', '
+                            )
+                      )
+                    }}
                     disabled={!canUpdatePolicies}
-                    options={formattedRoles}
-                    value={field.value.length === 0 ? [] : field.value?.split(', ')}
-                    placeholder="Defaults to all (public) roles if none selected"
-                    searchPlaceholder="Search for a role"
-                    onChange={(roles) => form.setValue('roles', roles.join(', '))}
-                  />
+                    values={field.value.length === 0 ? [] : field.value?.split(', ')}
+                    size="small"
+                  >
+                    <MultiSelectorTrigger
+                      id="roles"
+                      mode="inline-combobox"
+                      label={
+                        field.value.length === 0
+                          ? 'Defaults to all (public) roles if none selected'
+                          : 'Search for a role'
+                      }
+                      badgeLimit="wrap"
+                      showIcon={false}
+                      deletableBadge
+                      className="w-full"
+                    />
+                    <MultiSelectorContent>
+                      <MultiSelectorList>
+                        {formattedRoles.map((role) => (
+                          <MultiSelectorItem
+                            key={role.id}
+                            value={role.value}
+                            disabled={role.disabled}
+                          >
+                            {role.name}
+                          </MultiSelectorItem>
+                        ))}
+                      </MultiSelectorList>
+                    </MultiSelectorContent>
+                  </MultiSelector>
                 </FormControl>
                 <FormMessage />
               </FormItem>

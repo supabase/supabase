@@ -13,10 +13,10 @@ import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import {
   cn,
-  ContextMenu_Shadcn_,
-  ContextMenuContent_Shadcn_,
-  ContextMenuItem_Shadcn_,
-  ContextMenuTrigger_Shadcn_,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
   Tabs_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
@@ -146,7 +146,7 @@ export const EditorTabs = () => {
         <TabsList_Shadcn_
           ref={tabsListRef}
           className={cn(
-            'rounded-b-none gap-0 min-h-[var(--header-height)] flex items-center w-full z-[1]',
+            'rounded-b-none gap-0 min-h-(--header-height) flex items-center w-full z-1',
             'bg-surface-200 dark:bg-alternative border-none text-clip overflow-x-auto'
           )}
         >
@@ -155,8 +155,8 @@ export const EditorTabs = () => {
             strategy={horizontalListSortingStrategy}
           >
             {editorTabs.map((tab, index) => (
-              <ContextMenu_Shadcn_ key={tab.id}>
-                <ContextMenuTrigger_Shadcn_>
+              <ContextMenu key={tab.id}>
+                <ContextMenuTrigger>
                   <SortableTab
                     key={tab.id}
                     tab={tab}
@@ -164,22 +164,18 @@ export const EditorTabs = () => {
                     openTabs={openTabs}
                     onClose={() => handleClose(tab.id)}
                   />
-                </ContextMenuTrigger_Shadcn_>
-                <ContextMenuContent_Shadcn_>
-                  <ContextMenuItem_Shadcn_ onClick={() => handleClose(tab.id)}>
-                    Close
-                  </ContextMenuItem_Shadcn_>
-                  <ContextMenuItem_Shadcn_ onClick={() => handleCloseOthers(tab.id)}>
+                </ContextMenuTrigger>
+                <ContextMenuContent>
+                  <ContextMenuItem onClick={() => handleClose(tab.id)}>Close</ContextMenuItem>
+                  <ContextMenuItem onClick={() => handleCloseOthers(tab.id)}>
                     Close Others
-                  </ContextMenuItem_Shadcn_>
-                  <ContextMenuItem_Shadcn_ onClick={() => handleCloseRight(tab.id)}>
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => handleCloseRight(tab.id)}>
                     Close to the Right
-                  </ContextMenuItem_Shadcn_>
-                  <ContextMenuItem_Shadcn_ onClick={handleCloseAll}>
-                    Close All
-                  </ContextMenuItem_Shadcn_>
-                </ContextMenuContent_Shadcn_>
-              </ContextMenu_Shadcn_>
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={handleCloseAll}>Close All</ContextMenuItem>
+                </ContextMenuContent>
+              </ContextMenu>
             ))}
           </SortableContext>
 
@@ -191,7 +187,7 @@ export const EditorTabs = () => {
                 'flex items-center gap-2 px-3 text-xs',
                 'bg-dash-sidebar/50 dark:bg-surface-100/50',
                 'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
-                'relative group h-full border-t-2 !border-b-0',
+                'relative group h-full border-t-2 border-b-0!',
                 'hover:bg-surface-300 dark:hover:bg-surface-100'
               )}
             >
@@ -205,7 +201,7 @@ export const EditorTabs = () => {
                   e.preventDefault()
                   e.stopPropagation()
                 }}
-                className="ml-1 opacity-0 group-hover:opacity-100 hover:bg-200 rounded-sm cursor-pointer"
+                className="ml-1 opacity-0 group-hover:opacity-100 hover:bg-200 rounded-xs cursor-pointer"
                 onMouseDown={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
@@ -218,14 +214,14 @@ export const EditorTabs = () => {
               >
                 <X size={12} className="text-foreground-light" />
               </span>{' '}
-              <div className="absolute w-full -bottom-[1px] left-0 right-0 h-px bg-dash-sidebar dark:bg-surface-100 opacity-0 group-data-[state=active]:opacity-100" />
+              <div className="absolute w-full -bottom-px left-0 right-0 h-px bg-dash-sidebar dark:bg-surface-100 opacity-0 group-data-[state=active]:opacity-100" />
             </TabsTrigger_Shadcn_>
           )}
 
           <AnimatePresence initial={false}>
             {!hasNewTab && (
               <motion.button
-                className="flex items-center justify-center w-10 min-h-[var(--header-height)] hover:bg-surface-100 shrink-0 border-b"
+                className="flex items-center justify-center w-10 min-h-(--header-height) hover:bg-surface-100 shrink-0 border-b"
                 onClick={() =>
                   router.push(
                     `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new?skip=true`

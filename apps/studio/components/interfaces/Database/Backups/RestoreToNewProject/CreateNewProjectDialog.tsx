@@ -15,8 +15,8 @@ import {
   FormControl,
   FormField,
   Input,
-  Input_Shadcn_,
 } from 'ui'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
@@ -140,7 +140,7 @@ export const CreateNewProjectDialog = ({
                 render={({ field }) => (
                   <FormItemLayout label="New Project Name">
                     <FormControl>
-                      <Input_Shadcn_ placeholder="Enter a name" type="text" {...field} />
+                      <Input placeholder="Enter a name" type="text" {...field} />
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -149,15 +149,25 @@ export const CreateNewProjectDialog = ({
                 control={form.control}
                 name="password"
                 render={({ field }) => (
-                  <FormItemLayout>
+                  <FormItemLayout
+                    label="Database password"
+                    description={
+                      <PasswordStrengthBar
+                        passwordStrengthScore={passwordStrengthScore as PasswordStrengthScore}
+                        password={field.value}
+                        passwordStrengthMessage={passwordStrengthMessage}
+                        generateStrongPassword={generatePassword}
+                      />
+                    }
+                  >
                     <FormControl>
-                      <Input
+                      <PasswordInput
                         id="db-password"
-                        label="Database password"
                         type="password"
                         placeholder="Type in a strong password"
                         value={field.value}
                         copy={field.value?.length > 0}
+                        reveal
                         onChange={(e) => {
                           const value = e.target.value
                           field.onChange(value)
@@ -166,14 +176,6 @@ export const CreateNewProjectDialog = ({
                             setPasswordStrengthMessage('')
                           } else checkPasswordStrength(value)
                         }}
-                        descriptionText={
-                          <PasswordStrengthBar
-                            passwordStrengthScore={passwordStrengthScore as PasswordStrengthScore}
-                            password={field.value}
-                            passwordStrengthMessage={passwordStrengthMessage}
-                            generateStrongPassword={generatePassword}
-                          />
-                        }
                       />
                     </FormControl>
                   </FormItemLayout>
@@ -182,10 +184,10 @@ export const CreateNewProjectDialog = ({
             </DialogSection>
             <AdditionalMonthlySpend additionalMonthlySpend={additionalMonthlySpend} />
             <DialogFooter>
-              <Button htmlType="reset" type="outline" onClick={() => onOpenChange(false)}>
+              <Button type="reset" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button htmlType="submit" loading={cloneMutationLoading}>
+              <Button type="submit" loading={cloneMutationLoading}>
                 Restore to new project
               </Button>
             </DialogFooter>

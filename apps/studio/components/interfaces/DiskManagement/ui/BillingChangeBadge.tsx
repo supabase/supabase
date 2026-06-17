@@ -33,7 +33,7 @@ export const BillingChangeBadge = ({
           <Badge
             variant="default"
             className={cn(
-              free ? `bg-violet-200/100 border-violet-900` : 'bg-alternative/100',
+              free ? `bg-violet-200 border-violet-900` : 'bg-alternative',
               `text-warning`,
               className
             )}

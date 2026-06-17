@@ -1,3 +1,4 @@
+import { safeSql, type DisplayableSqlFragment } from '@supabase/pg-meta'
 import { proxy, snapshot, useSnapshot } from 'valtio'
 
 type Template = {
@@ -13,18 +14,18 @@ export type SqlError = {
 }
 
 type EditorPanelState = {
-  value: string
+  value: DisplayableSqlFragment
   templates: Template[]
   results: Record<string, unknown>[] | undefined
   error: SqlError | undefined
   initialPrompt: string
-  onChange: ((value: string) => void) | undefined
+  onChange: ((value: DisplayableSqlFragment) => void) | undefined
   activeSnippetId: string | null
   pendingReset: boolean
 }
 
 const initialState: EditorPanelState = {
-  value: '',
+  value: safeSql``,
   templates: [],
   results: undefined,
   error: undefined,
@@ -36,7 +37,7 @@ const initialState: EditorPanelState = {
 
 export const editorPanelState = proxy({
   ...initialState,
-  setValue(value: string) {
+  setValue(value: DisplayableSqlFragment) {
     editorPanelState.value = value
     editorPanelState.onChange?.(value)
     editorPanelState.setResults(undefined)
@@ -58,7 +59,7 @@ export const editorPanelState = proxy({
     editorPanelState.activeSnippetId = id
   },
   openAsNew() {
-    editorPanelState.value = ''
+    editorPanelState.value = safeSql``
     editorPanelState.results = undefined
     editorPanelState.error = undefined
     editorPanelState.pendingReset = true

@@ -1,3 +1,4 @@
+import type { SafeSqlFragment } from '@supabase/pg-meta'
 import React from 'react'
 
 import type { Datum } from '@/components/ui/Charts/Charts.types'
@@ -27,6 +28,7 @@ export interface LogsEndpointParams {
 }
 
 export interface CustomLogData {
+  query?: SafeSqlFragment | undefined
   [other: string]: unknown
 }
 
@@ -94,6 +96,7 @@ export type QueryType =
   | 'pg_cron'
   | 'pgbouncer'
   | 'etl'
+  | 'multigres'
 
 export type Mode = 'simple' | 'custom'
 

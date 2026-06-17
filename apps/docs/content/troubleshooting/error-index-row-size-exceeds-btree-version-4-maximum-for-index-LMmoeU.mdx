@@ -36,7 +36,7 @@ This can be if the index is built on text, JSON column etc. It's not prohibited 
 
 One of the measures of index efficiency is the ratio of index entries to the width of all possible values space for this datatype. If we have say 100000 distinct values of int32 in the index then the ratio is 1/40000. If we have text with length of 2704 bytes (maximum for B-tree index) we can hardly imagine the number of distinct values that gives us even a comparable ratio. That said indexing of that long values stores much redundancy in the index.
 
-The solution is simple: use some king of hashing to transfer the values to much narrower space. I.e. md5. The solution is simple, you build a functional index (=index by expression):
+The solution: use some kind of hashing to transfer the values to much narrower space. I.e. md5. Build a functional index (=index by expression):
 
 ```sql
 create index on table_name (MD5(column_name));

@@ -1,12 +1,12 @@
-import Image from 'next/image'
-import { useRouter } from 'next/router'
-import { NextSeo } from 'next-seo'
-import { cn } from 'ui'
-
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
 import EnterpriseFormQuotes from '~/components/EnterpriseFormQuotes'
 import RequestADemoForm from '~/components/Forms/RequestADemoForm'
+import DefaultLayout from '~/components/Layouts/Default'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import { NextSeo } from 'next-seo'
+import Head from 'next/head'
+import Image from 'next/image'
+import { useRouter } from 'next/router'
+import { cn } from 'ui'
 
 const data = {
   meta_title: 'Contact Sales & Request a Demo | Supabase',
@@ -27,11 +27,19 @@ const ContactSales = () => {
           url: `https://supabase.com/${router.pathname}`,
         }}
       />
-      <DefaultLayout className="!min-h-fit">
+      {/* Default.com snippet — enriches HubSpot enterprise form submissions and routes them to instant call scheduling for Sales. */}
+      <Head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `!function(e,t){var _=0;e.__default__=e.__default__||{},e.__default__.form_id=879120,e.__default__.team_id=715,e.__default__.listenToIds=["support-form"],function e(){var o=t.createElement("script");o.async=!0,o.src="https://import-cdn.default.com",o.onload=function(){!0,console.info("[Default.com] Powered by Default.com")},o.onerror=function(){++_<=3&&setTimeout(e,1e3*_)},t.head.appendChild(o)}()}(window,document);`,
+          }}
+        />
+      </Head>
+      <DefaultLayout className="min-h-fit!">
         <SectionContainer className="text grid gap-8 lg:gap-12 md:grid-cols-2">
           <div className="md:px-4 lg:pb-8 md:h-full w-full flex flex-col justify-between gap-2">
             <div className="flex flex-col gap-2 md:max-w-md">
-              <h1 className="h1 !m-0">Talk to our Sales team</h1>
+              <h1 className="h1 m-0!">Talk to our Sales team</h1>
               <p className="md:text-lg text-foreground-lighter">
                 Book a demo and set up a trial Enterprise account to see how Supabase's scalable
                 features can accelerate your business growth and app development.
@@ -147,9 +155,9 @@ export const CustomerLogo = ({ title, logo }: { title: string; logo: string }) =
       className="
         bg-no-repeat m-0
         object-left object-contain
-        [[data-theme*=dark]_&]:brightness-200
-        [[data-theme*=dark]_&]:contrast-0
-        [[data-theme*=dark]_&]:filter
+        in-data-[theme*=dark]:brightness-200
+        in-data-[theme*=dark]:contrast-0
+        in-data-[theme*=dark]:filter
       "
     />
   </div>

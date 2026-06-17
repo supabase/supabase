@@ -10,7 +10,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   SheetFooter,
   SheetSection,
 } from 'ui'
@@ -29,10 +29,9 @@ import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/d
 import { useAnalyticsBucketCreateMutation } from '@/data/storage/analytics-bucket-create-mutation'
 import { useAnalyticsBucketsQuery } from '@/data/storage/analytics-buckets-query'
 import { useIcebergWrapperCreateMutation } from '@/data/storage/iceberg-wrapper-create-mutation'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 const FormSchema = z
   .object({
@@ -119,7 +118,6 @@ export const CreateAnalyticsBucketForm = ({
   onOpenChange,
 }: CreateAnalyticsBucketFormProps) => {
   const { ref } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
   const { data: project } = useSelectedProjectQuery()
   const { extension: wrappersExtension, state: wrappersExtensionState } =
     useIcebergWrapperExtension()
@@ -127,7 +125,7 @@ export const CreateAnalyticsBucketForm = ({
   const { data: buckets = [] } = useAnalyticsBucketsQuery({ projectRef: ref })
   const wrappersExtensionNeedsUpgrading = wrappersExtensionState === 'needs-upgrade'
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const { mutateAsync: createAnalyticsBucket, isPending: isCreatingAnalyticsBucket } =
     useAnalyticsBucketCreateMutation({
@@ -174,11 +172,7 @@ export const CreateAnalyticsBucketForm = ({
 
       await createIcebergWrapper({ bucketName: values.name })
 
-      sendEvent({
-        action: 'storage_bucket_created',
-        properties: { bucketType: 'analytics' },
-        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-      })
+      track('storage_bucket_created', { bucketType: 'analytics' })
 
       form.reset()
       toast.success(`Created bucket “${values.name}”`)
@@ -193,7 +187,7 @@ export const CreateAnalyticsBucketForm = ({
 
   return (
     <>
-      <Section className="flex flex-col !p-0 grow">
+      <Section className="flex flex-col p-0! grow">
         <Form {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
             <FormField
@@ -209,7 +203,7 @@ export const CreateAnalyticsBucketForm = ({
                   description="Must be between 3 – 63 characters. Only lowercase letters, numbers, and hyphens are allowed."
                 >
                   <FormControl>
-                    <Input_Shadcn_
+                    <Input
                       id="name"
                       data-1p-ignore
                       data-lpignore="true"
@@ -229,7 +223,7 @@ export const CreateAnalyticsBucketForm = ({
                 className={cn('border-x-0 rounded-none', type === 'dialog' && 'border-b-0')}
                 title="Wrappers extension must be updated for Iceberg Wrapper support"
               >
-                <p className="prose max-w-full text-sm !leading-normal">
+                <p className="prose max-w-full text-sm leading-normal!">
                   Update the <code className="text-code-inline">wrappers</code> extension by
                   upgrading your project from your{' '}
                   <InlineLink href={`/project/${ref}/settings/infrastructure`}>
@@ -247,7 +241,7 @@ export const CreateAnalyticsBucketForm = ({
                 type="default"
                 className={cn('border-x-0 rounded-none', type === 'dialog' && 'border-b-0')}
               >
-                <p className="!leading-normal">
+                <p className="leading-normal!">
                   Supabase will install the{' '}
                   {wrappersExtensionState !== 'installed' ? 'Wrappers extension and ' : ''}
                   Iceberg Wrapper integration on your behalf.{' '}
@@ -263,12 +257,12 @@ export const CreateAnalyticsBucketForm = ({
       </Section>
 
       <Footer>
-        <Button type="default" disabled={isCreating} onClick={() => onOpenChange(false)}>
+        <Button variant="default" disabled={isCreating} onClick={() => onOpenChange(false)}>
           Cancel
         </Button>
         <Button
           form={formId}
-          htmlType="submit"
+          type="submit"
           loading={isCreating}
           disabled={wrappersExtensionNeedsUpgrading || isCreating}
         >

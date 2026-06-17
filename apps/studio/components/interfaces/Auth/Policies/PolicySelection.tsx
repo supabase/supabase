@@ -1,6 +1,6 @@
 import { noop } from 'lodash'
 import { Edit, ExternalLink, FlaskConical, Grid } from 'lucide-react'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button, Modal } from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button, DialogSection } from 'ui'
 
 import CardButton from '@/components/ui/CardButton'
 
@@ -20,7 +20,7 @@ const PolicySelection = ({
   onToggleFeaturePreviewModal,
 }: PolicySelectionProps) => {
   return (
-    <Modal.Content className="space-y-4 py-4">
+    <DialogSection>
       <div className="flex flex-col gap-y-2">
         <p className="text-sm text-foreground-light">{description}</p>
         <div className="grid grid-cols-1 gap-2 lg:grid-cols-1">
@@ -33,7 +33,7 @@ const PolicySelection = ({
                   className="
                   flex h-8 w-8 items-center
                   justify-center
-                  rounded bg-foreground text-background
+                  rounded-sm bg-foreground text-background
                 "
                 >
                   <Grid size={14} strokeWidth={2} />
@@ -51,7 +51,7 @@ const PolicySelection = ({
                   className="
                   flex h-8 w-8 items-center
                   justify-center
-                  rounded bg-foreground text-background
+                  rounded-sm bg-foreground text-background
                 "
                 >
                   <Edit size={14} strokeWidth={2} />
@@ -64,17 +64,17 @@ const PolicySelection = ({
       </div>
 
       {showAssistantPreview && onToggleFeaturePreviewModal !== undefined && (
-        <Alert_Shadcn_>
+        <Alert>
           <FlaskConical />
-          <AlertTitle_Shadcn_>Try the new Supabase Assistant for RLS policies</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
+          <AlertTitle>Try the new Supabase Assistant for RLS policies</AlertTitle>
+          <AlertDescription>
             Create RLS policies for your tables with the help of AI
-          </AlertDescription_Shadcn_>
+          </AlertDescription>
           <div className="flex items-center gap-x-2 mt-3">
-            <Button type="default" onClick={onToggleFeaturePreviewModal}>
+            <Button variant="default" onClick={onToggleFeaturePreviewModal}>
               Toggle feature preview
             </Button>
-            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+            <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
               <a
                 href="https://supabase.com/blog/studio-introducing-assistant#introducing-the-supabase-assistant"
                 target="_blank"
@@ -84,9 +84,9 @@ const PolicySelection = ({
               </a>
             </Button>
           </div>
-        </Alert_Shadcn_>
+        </Alert>
       )}
-    </Modal.Content>
+    </DialogSection>
   )
 }
 

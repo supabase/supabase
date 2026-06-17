@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/nextjs'
-import type { PostgresColumn } from '@supabase/postgres-meta'
+import type { PGColumn } from '@supabase/pg-meta'
 import { useConstant } from 'common'
 import { createContext, PropsWithChildren, useContext } from 'react'
 import { proxy, useSnapshot } from 'valtio'
@@ -20,6 +20,7 @@ import { generateTableChangeKey } from '@/components/grid/utils/queueOperationUt
 import { ForeignKey } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.types'
 import type { EditValue } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import type { TableField } from '@/components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
+import type { SafePostgresColumn } from '@/lib/postgres-types'
 import type { Dictionary } from '@/types'
 
 export const TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE = 100
@@ -27,13 +28,13 @@ export const TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE = 100
 type ForeignKeyState = {
   foreignKey: ForeignKey
   row: Dictionary<any>
-  column: PostgresColumn
+  column: PGColumn
 }
 
 export type SidePanel =
   | { type: 'cell'; value?: { column: string; row: Dictionary<any> } }
   | { type: 'row'; row?: Dictionary<any> }
-  | { type: 'column'; column?: PostgresColumn }
+  | { type: 'column'; column?: SafePostgresColumn }
   | { type: 'table'; mode: 'new' | 'edit' | 'duplicate'; templateData?: Partial<TableField> }
   | { type: 'schema'; mode: 'new' | 'edit' }
   | { type: 'json'; jsonValue: EditValue }
@@ -46,7 +47,9 @@ export type SidePanel =
 
 export type ConfirmationDialog =
   | { type: 'table'; isDeleteWithCascade: boolean }
-  | { type: 'column'; column: PostgresColumn; isDeleteWithCascade: boolean }
+  | { type: 'view'; isDeleteWithCascade: boolean }
+  | { type: 'materialized-view'; isDeleteWithCascade: boolean }
+  | { type: 'column'; column: SafePostgresColumn; isDeleteWithCascade: boolean }
   // [Joshen] Just FYI callback, numRows, allRowsSelected is a temp workaround so that
   // DeleteConfirmationDialog can trigger dispatch methods after the successful deletion of rows.
   // Once we deprecate react tracked and move things to valtio, we can remove this.
@@ -134,6 +137,18 @@ export const createTableEditorState = () => {
         confirmationDialog: { type: 'table', isDeleteWithCascade: false },
       }
     },
+    onDeleteView: () => {
+      state.ui = {
+        open: 'confirmation-dialog',
+        confirmationDialog: { type: 'view', isDeleteWithCascade: false },
+      }
+    },
+    onDeleteMaterializedView: () => {
+      state.ui = {
+        open: 'confirmation-dialog',
+        confirmationDialog: { type: 'materialized-view', isDeleteWithCascade: false },
+      }
+    },
 
     /* Columns */
     onAddColumn: () => {
@@ -142,13 +157,13 @@ export const createTableEditorState = () => {
         sidePanel: { type: 'column' },
       }
     },
-    onEditColumn: (column: PostgresColumn) => {
+    onEditColumn: (column: SafePostgresColumn) => {
       state.ui = {
         open: 'side-panel',
         sidePanel: { type: 'column', column },
       }
     },
-    onDeleteColumn: (column: PostgresColumn) => {
+    onDeleteColumn: (column: SafePostgresColumn) => {
       state.ui = {
         open: 'confirmation-dialog',
         confirmationDialog: { type: 'column', column, isDeleteWithCascade: false },
@@ -224,7 +239,9 @@ export const createTableEditorState = () => {
       if (
         state.ui.open === 'confirmation-dialog' &&
         (state.ui.confirmationDialog.type === 'column' ||
-          state.ui.confirmationDialog.type === 'table')
+          state.ui.confirmationDialog.type === 'table' ||
+          state.ui.confirmationDialog.type === 'view' ||
+          state.ui.confirmationDialog.type === 'materialized-view')
       ) {
         state.ui.confirmationDialog.isDeleteWithCascade =
           overrideIsDeleteWithCascade ?? !state.ui.confirmationDialog.isDeleteWithCascade

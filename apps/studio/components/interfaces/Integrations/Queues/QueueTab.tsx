@@ -4,18 +4,11 @@ import Link from 'next/link'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import {
-  Button,
-  cn,
-  LoadingLine,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Separator,
-} from 'ui'
+import { Button, cn, LoadingLine, Popover, PopoverContent, PopoverTrigger, Separator } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { pgmqQueueTable } from './Queues.utils'
 import { DeleteQueue } from '@/components/interfaces/Integrations/Queues/SingleQueue/DeleteQueue'
 import { PurgeQueue } from '@/components/interfaces/Integrations/Queues/SingleQueue/PurgeQueue'
 import { QUEUE_MESSAGE_TYPE } from '@/components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
@@ -51,7 +44,8 @@ export const QueueTab = () => {
     connectionString: project?.connectionString,
     schema: 'pgmq',
   })
-  const queueTable = tables?.find((x) => x.name === `q_${queueName}`)
+  const queueRelname = queueName ? pgmqQueueTable(queueName) : undefined
+  const queueTable = tables?.find((x) => x.name === queueRelname)
   const isRlsEnabled = queueTable?.rls_enabled ?? false
 
   const { data: policies } = useDatabasePoliciesQuery({
@@ -59,7 +53,7 @@ export const QueueTab = () => {
     connectionString: project?.connectionString,
     schema: 'pgmq',
   })
-  const queuePolicies = (policies ?? []).filter((policy) => policy.table === `q_${queueName}`)
+  const queuePolicies = (policies ?? []).filter((policy) => policy.table === queueRelname)
 
   const { data: isExposed } = useQueuesExposePostgrestStatusQuery({
     projectRef: project?.ref,
@@ -116,7 +110,7 @@ export const QueueTab = () => {
           <QueueSettings />
 
           <ButtonTooltip
-            type="text"
+            variant="text"
             className="px-1.5"
             onClick={() => setPurgeQueueModalShown(true)}
             icon={<Paintbrush />}
@@ -126,7 +120,7 @@ export const QueueTab = () => {
           />
 
           <ButtonTooltip
-            type="text"
+            variant="text"
             className="px-1.5"
             onClick={() => setDeleteQueueModalShown(true)}
             icon={<Trash2 />}
@@ -144,7 +138,7 @@ export const QueueTab = () => {
               {queuePolicies.length === 0 ? (
                 <ButtonTooltip
                   asChild
-                  type="default"
+                  variant="default"
                   className="group"
                   icon={<PlusCircle strokeWidth={1.5} className="text-foreground-muted" />}
                   tooltip={{
@@ -165,7 +159,7 @@ export const QueueTab = () => {
               ) : (
                 <Button
                   asChild
-                  type="default"
+                  variant="default"
                   className="group"
                   icon={
                     <div
@@ -190,17 +184,20 @@ export const QueueTab = () => {
               )}
             </>
           ) : (
-            <Popover_Shadcn_
+            <Popover
               modal={false}
               open={openRlsPopover}
               onOpenChange={() => setOpenRlsPopover(!openRlsPopover)}
             >
-              <PopoverTrigger_Shadcn_ asChild>
-                <Button type={isExposed ? 'warning' : 'default'} icon={<Lock strokeWidth={1.5} />}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={isExposed ? 'warning' : 'default'}
+                  icon={<Lock strokeWidth={1.5} />}
+                >
                   RLS disabled
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="w-80 text-sm" align="end">
+              </PopoverTrigger>
+              <PopoverContent className="w-80 text-sm" align="end">
                 <h3 className="text-xs flex items-center gap-x-2">
                   <Lock size={14} /> Row Level Security (RLS)
                 </h3>
@@ -213,7 +210,7 @@ export const QueueTab = () => {
                       </p>
                       <p>With RLS enabled, anonymous users will not have access to this queue.</p>
                       <Button
-                        type="default"
+                        variant="default"
                         className="w-min"
                         onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
                       >
@@ -223,14 +220,14 @@ export const QueueTab = () => {
                   ) : (
                     <>
                       <Markdown
-                        className="[&>p]:!leading-normal text-xs [&>p]:!m-0 flex flex-col gap-y-2"
+                        className="[&>p]:leading-normal! text-xs [&>p]:m-0! flex flex-col gap-y-2"
                         content={`
 RLS for queues is only relevant if exposure through PostgREST has been enabled, in which you can restrict and control who can manage this queue using Row Level Security.
 
 You may opt to manage your queues via any Supabase client libraries or PostgREST endpoints by enabling this in the [queues settings](/project/${project?.ref}/integrations/queues/settings).`}
                       />
                       <Button
-                        type="default"
+                        variant="default"
                         className="w-min"
                         onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
                       >
@@ -239,11 +236,11 @@ You may opt to manage your queues via any Supabase client libraries or PostgREST
                     </>
                   )}
                 </div>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
           )}
 
-          <Button type="primary" onClick={() => setSendMessageModalShown(true)}>
+          <Button variant="primary" onClick={() => setSendMessageModalShown(true)}>
             Add message
           </Button>
 

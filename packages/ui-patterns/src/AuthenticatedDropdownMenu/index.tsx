@@ -53,7 +53,7 @@ export const AuthenticatedDropdownMenu = ({ user, menu, site }: Props) => {
         <button
           title="Menu dropdown button"
           className={cn(
-            buttonVariants({ type: 'default' }),
+            buttonVariants({ variant: 'default' }),
             'text-foreground-light border-default w-[30px] min-w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30 hover:border-strong data-[state=open]:border-stronger hover:!bg-overlay-hover/50 bg-transparent',
             'rounded-full overflow-hidden opacity-0 transition-opacity animate-fade-in'
           )}
@@ -85,7 +85,7 @@ export const AuthenticatedDropdownMenu = ({ user, menu, site }: Props) => {
                   return (
                     <div
                       key={`${site}-auth-dropdown-${sectionItem.label}-${sectionIdx}-${itemIdx}`}
-                      className="flex cursor-text items-center text-foreground rounded-sm px-2 py-1.5 text-xs outline-none space-x-2"
+                      className="flex cursor-text items-center text-foreground rounded-xs px-2 py-1.5 text-xs outline-hidden space-x-2"
                       {...sectionItem.otherProps}
                     >
                       <DropdownItemContent {...sectionItem} />

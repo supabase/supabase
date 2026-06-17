@@ -91,7 +91,7 @@ export const ProjectTableRow = ({
                     handleCopyProjectRef(e)
                   }
                 }}
-                className="inline-flex items-center gap-x-1 cursor-pointer border border-transparent border-dashed rounded transition-colors hover:bg-surface-100 hover:border hover:border-strong group font-mono text-xs text-foreground-lighter hover:text-foreground-light px-1 -ml-1"
+                className="inline-flex items-center gap-x-1 cursor-pointer border border-transparent border-dashed rounded-sm transition-colors hover:bg-surface-100 hover:border hover:border-strong group font-mono text-xs text-foreground-lighter hover:text-foreground-light px-1 -ml-1"
               >
                 {projectRef}
                 {isCopied ? (
@@ -173,7 +173,7 @@ export const ProjectTableRow = ({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  type="default"
+                  variant="default"
                   icon={<MoreVertical />}
                   aria-label="More actions"
                   className="w-7"

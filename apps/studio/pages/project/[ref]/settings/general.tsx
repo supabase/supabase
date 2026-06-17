@@ -1,6 +1,4 @@
 import { IS_PLATFORM } from 'common'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -32,15 +30,11 @@ const ProjectSettings: NextPageWithLayout = () => {
   const isBranch = !!project?.parent_project_ref
   const { projectsTransfer: projectTransferEnabled, projectSettingsCustomDomains } =
     useIsFeatureEnabled(['projects:transfer', 'project_settings:custom_domains'])
-  const router = useRouter()
 
-  useEffect(() => {
-    if (!IS_PLATFORM) {
-      router.push(`/project/default/settings/log-drains`)
-    }
-  }, [router])
-
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
+  const { data: subscription } = useOrgSubscriptionQuery(
+    { orgSlug: selectedOrganization?.slug },
+    { enabled: IS_PLATFORM }
+  )
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
   return (
@@ -57,12 +51,16 @@ const ProjectSettings: NextPageWithLayout = () => {
       </PageHeader>
       <PageContainer size="small">
         <General />
-        <Project />
-        {/* this is only settable on compliance orgs, currently that means HIPAA orgs */}
-        {!isBranch && hasHipaaAddon && <ComplianceConfig />}
-        {projectSettingsCustomDomains && <CustomDomainConfig />}
-        {!isBranch && projectTransferEnabled && <TransferProjectPanel />}
-        {!isBranch && <DeleteProjectPanel />}
+        {IS_PLATFORM && (
+          <>
+            <Project />
+            {/* this is only settable on compliance orgs, currently that means HIPAA orgs */}
+            {!isBranch && hasHipaaAddon && <ComplianceConfig />}
+            {projectSettingsCustomDomains && <CustomDomainConfig />}
+            {!isBranch && projectTransferEnabled && <TransferProjectPanel />}
+            {!isBranch && <DeleteProjectPanel />}
+          </>
+        )}
       </PageContainer>
     </>
   )

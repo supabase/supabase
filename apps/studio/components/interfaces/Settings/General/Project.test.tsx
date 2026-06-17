@@ -4,17 +4,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { Project } from './Project'
 
-const {
-  mockUseIsFeatureEnabled,
-  mockUseProjectPauseStatusQuery,
-  mockUseSelectedOrganizationQuery,
-  mockUseSelectedProjectQuery,
-} = vi.hoisted(() => ({
-  mockUseIsFeatureEnabled: vi.fn(),
-  mockUseProjectPauseStatusQuery: vi.fn(),
-  mockUseSelectedOrganizationQuery: vi.fn(),
-  mockUseSelectedProjectQuery: vi.fn(),
-}))
+const { mockUseIsFeatureEnabled, mockUseProjectPauseStatusQuery, mockUseSelectedProjectQuery } =
+  vi.hoisted(() => ({
+    mockUseIsFeatureEnabled: vi.fn(),
+    mockUseProjectPauseStatusQuery: vi.fn(),
+    mockUseSelectedProjectQuery: vi.fn(),
+  }))
 
 vi.mock('next/link', () => ({
   default: ({ href, children }: { href: string; children: ReactNode }) => (
@@ -68,10 +63,6 @@ vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
   useIsFeatureEnabled: mockUseIsFeatureEnabled,
 }))
 
-vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
-  useSelectedOrganizationQuery: mockUseSelectedOrganizationQuery,
-}))
-
 vi.mock('@/hooks/misc/useSelectedProject', () => ({
   useSelectedProjectQuery: mockUseSelectedProjectQuery,
 }))
@@ -82,10 +73,6 @@ describe('Project settings availability', () => {
 
     mockUseIsFeatureEnabled.mockReturnValue({
       projectSettingsRestartProject: true,
-    })
-
-    mockUseSelectedOrganizationQuery.mockReturnValue({
-      data: { slug: 'supabase' },
     })
 
     mockUseProjectPauseStatusQuery.mockReturnValue({

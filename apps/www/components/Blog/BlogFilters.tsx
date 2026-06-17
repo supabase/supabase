@@ -13,7 +13,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
 } from 'ui'
 
 interface Props {
@@ -155,7 +158,7 @@ function BlogFilters({ onFilterChange, view, setView }: Props) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                type="outline"
+                variant="outline"
                 iconRight={<ChevronDown />}
                 className="w-full min-w-[200px] flex justify-between items-center py-2"
               >
@@ -187,7 +190,7 @@ function BlogFilters({ onFilterChange, view, setView }: Props) {
         {allCategories.map((category: string) => (
           <Button
             key={category}
-            type={
+            variant={
               category === 'all' && !searchTerm && !activeCategory
                 ? 'default'
                 : category === activeCategory
@@ -209,7 +212,7 @@ function BlogFilters({ onFilterChange, view, setView }: Props) {
           <Button
             className="px-2 h-full"
             size="medium"
-            type="default"
+            variant="default"
             onClick={() => setShowSearchInput(true)}
           >
             <Search size="14" />
@@ -219,35 +222,35 @@ function BlogFilters({ onFilterChange, view, setView }: Props) {
 
       {showSearchInput && (
         <div className="w-full h-auto flex justify-end gap-2 items-stretch lg:max-w-[240px] xl:max-w-[280px]">
-          <Input
-            icon={<Search size="14" />}
-            size="small"
-            layout="vertical"
-            autoComplete="off"
-            type="search"
-            placeholder="Search blog"
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className="w-full"
-            actions={
-              isMobile && (
-                <Button
-                  type="link"
+          <InputGroup className="w-full">
+            <InputGroupInput
+              size="small"
+              autoComplete="off"
+              type="search"
+              placeholder="Search blog"
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+            <InputGroupAddon>
+              <Search />
+            </InputGroupAddon>
+            {isMobile && (
+              <InputGroupAddon align="inline-end">
+                <InputGroupButton
                   onClick={() => {
                     setSearchTerm('')
                     setShowSearchInput(false)
                   }}
-                  className="text-foreground-light hover:text-foreground hover:bg-selection"
                 >
                   <CloseIcon size="14" />
-                </Button>
-              )
-            }
-          />
+                </InputGroupButton>
+              </InputGroupAddon>
+            )}
+          </InputGroup>
         </div>
       )}
       <Button
-        type="default"
+        variant="default"
         title={isList ? 'Grid View' : 'List View'}
         onClick={handleViewSelection}
         className="h-full p-2 text-foreground-light"
