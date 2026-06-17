@@ -53,7 +53,7 @@ Seq Scan on persons  (cost=0.00..22.75 rows=x width=y)
 Filter: (age = 32)
 ```
 
-To add a simple B-Tree index you can run:
+To add a basic B-Tree index you can run:
 
 ```sql
 create index idx_persons_age on persons (age);

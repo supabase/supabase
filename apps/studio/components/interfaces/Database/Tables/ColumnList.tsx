@@ -363,7 +363,7 @@ export const ColumnList = ({
                         {!isSchemaLocked && isTableEntity && (
                           <div className="flex justify-end gap-2">
                             <ButtonTooltip
-                              type="default"
+                              variant="default"
                               disabled={!canUpdateColumns}
                               onClick={() => onEditColumn(column)}
                               tooltip={{
@@ -379,7 +379,11 @@ export const ColumnList = ({
                             </ButtonTooltip>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button type="default" className="px-1" icon={<MoreVertical />} />
+                                <Button
+                                  variant="default"
+                                  className="px-1"
+                                  icon={<MoreVertical />}
+                                />
                               </DropdownMenuTrigger>
                               <DropdownMenuContent side="bottom" align="end" className="w-32">
                                 <DropdownMenuItemTooltip

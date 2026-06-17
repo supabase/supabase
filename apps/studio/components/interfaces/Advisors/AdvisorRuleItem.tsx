@@ -123,7 +123,7 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
               <div className="flex items-center gap-x-2">
                 <DocsButton href={lint.docsLink} />
                 <Button
-                  type="default"
+                  variant="default"
                   onClick={(e) => {
                     e.stopPropagation()
                     setOpen(true)
@@ -187,7 +187,7 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
                           tooltip={{ content: { side: 'bottom', text: 'Edit rule' } }}
                         /> */}
                         <ButtonTooltip
-                          type="default"
+                          variant="default"
                           icon={<Trash />}
                           className="w-7"
                           onClick={() => setSelectedRuleToDelete(rule.id)}

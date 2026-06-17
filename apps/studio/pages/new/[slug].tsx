@@ -625,7 +625,7 @@ const Wizard: NextPageWithLayout = () => {
                             </p>
 
                             <div>
-                              <Button asChild type="default">
+                              <Button asChild variant="default">
                                 <Link href={`/org/${slug}/billing#invoices`}>View invoices</Link>
                               </Button>
                             </div>

@@ -158,7 +158,7 @@ function BlogFilters({ onFilterChange, view, setView }: Props) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                type="outline"
+                variant="outline"
                 iconRight={<ChevronDown />}
                 className="w-full min-w-[200px] flex justify-between items-center py-2"
               >
@@ -190,7 +190,7 @@ function BlogFilters({ onFilterChange, view, setView }: Props) {
         {allCategories.map((category: string) => (
           <Button
             key={category}
-            type={
+            variant={
               category === 'all' && !searchTerm && !activeCategory
                 ? 'default'
                 : category === activeCategory
@@ -212,7 +212,7 @@ function BlogFilters({ onFilterChange, view, setView }: Props) {
           <Button
             className="px-2 h-full"
             size="medium"
-            type="default"
+            variant="default"
             onClick={() => setShowSearchInput(true)}
           >
             <Search size="14" />
@@ -250,7 +250,7 @@ function BlogFilters({ onFilterChange, view, setView }: Props) {
         </div>
       )}
       <Button
-        type="default"
+        variant="default"
         title={isList ? 'Grid View' : 'List View'}
         onClick={handleViewSelection}
         className="h-full p-2 text-foreground-light"

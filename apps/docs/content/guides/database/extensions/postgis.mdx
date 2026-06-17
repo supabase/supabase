@@ -9,7 +9,7 @@ tocVideo: 'agFsGDJxjwA'
 
 ## Overview
 
-While you may be able to store simple lat/long geographic coordinates as a set of decimals, it does not scale very well when you try to query through a large data set. PostGIS comes with special data types that are efficient, and indexable for high scalability.
+While you may be able to store lat/long geographic coordinates as a set of decimals, it does not scale very well when you try to query through a large data set. PostGIS comes with special data types that are efficient, and indexable for high scalability.
 
 The additional data types that PostGIS provides include [Point](https://postgis.net/docs/using_postgis_dbmanagement.html#Point), [Polygon](https://postgis.net/docs/using_postgis_dbmanagement.html#Polygon), [LineString](https://postgis.net/docs/using_postgis_dbmanagement.html#LineString), and many more to represent different types of geographical data. In this guide, we will mainly focus on how to interact with `Point` type, which represents a single set of latitude and longitude. If you are interested in digging deeper, you can learn more about different data types on the [data management section of PostGIS docs](https://postgis.net/docs/using_postgis_dbmanagement.html).
 
@@ -47,7 +47,7 @@ drop extension if exists postgis;
 
 ## Examples
 
-Now that we are ready to get started with PostGIS, let’s create a table and see how we can utilize PostGIS for some typical use cases. Let’s imagine we are creating a simple restaurant-searching app.
+Now that we are ready to get started with PostGIS, let’s create a table and see how we can use PostGIS for some typical use cases. Imagine we are creating a basic restaurant-searching app.
 
 Let’s create our table. Each row represents a restaurant with its location stored in `location` column as a `Point` type.
 

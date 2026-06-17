@@ -77,7 +77,7 @@ export const WrappersTab = () => {
         <>
           <div className="max-w-5xl flex items-center gap-x-2 justify-end mb-4">
             <DocsButton href={wrapperMeta.docsUrl} />
-            <AddWrapperButton type="primary" onClick={() => setIsCreating(true)} />
+            <AddWrapperButton variant="primary" onClick={() => setIsCreating(true)} />
           </div>
           <WrapperTable />
         </>

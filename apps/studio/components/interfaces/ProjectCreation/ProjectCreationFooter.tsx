@@ -172,7 +172,7 @@ export const ProjectCreationFooter = ({
 
       <div className="flex items-end col-span-8 space-x-2 ml-auto">
         <Button
-          type="default"
+          variant="default"
           disabled={isCreatingNewProject || isSuccessNewProject}
           onClick={() => {
             if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
@@ -182,7 +182,7 @@ export const ProjectCreationFooter = ({
           Cancel
         </Button>
         <Button
-          htmlType="submit"
+          type="submit"
           loading={isCreatingNewProject || isSuccessNewProject}
           disabled={!canCreateProject}
         >

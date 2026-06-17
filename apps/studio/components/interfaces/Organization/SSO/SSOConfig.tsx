@@ -382,7 +382,7 @@ export const SSOConfig = () => {
                     <div>
                       {!!ssoConfig && (
                         <Button
-                          type="danger"
+                          variant="danger"
                           icon={<Trash />}
                           onClick={() => setIsDeleteModalVisible(true)}
                           disabled={isCreating || isUpdating || isDeleting}
@@ -394,7 +394,7 @@ export const SSOConfig = () => {
                     <div className="flex space-x-2">
                       {form.formState.isDirty && (
                         <Button
-                          type="default"
+                          variant="default"
                           disabled={isCreating || isUpdating}
                           onClick={() => form.reset()}
                         >
@@ -402,8 +402,8 @@ export const SSOConfig = () => {
                         </Button>
                       )}
                       <Button
-                        type="primary"
-                        htmlType="submit"
+                        variant="primary"
+                        type="submit"
                         loading={isCreating || isUpdating}
                         disabled={!form.formState.isDirty || isCreating || isUpdating}
                       >

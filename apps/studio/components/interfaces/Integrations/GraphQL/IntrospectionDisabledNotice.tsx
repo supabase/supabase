@@ -45,11 +45,11 @@ export const IntrospectionDisabledNotice = ({
             GraphQL introspection is disabled — docs explorer and autocomplete are unavailable.
           </span>
           <div className="flex items-center gap-1">
-            <Button type="default" size="tiny" onClick={() => setShowConfirm(true)}>
+            <Button variant="default" size="tiny" onClick={() => setShowConfirm(true)}>
               Enable introspection
             </Button>
             <Button
-              type="text"
+              variant="text"
               size="tiny"
               icon={<ChevronDown />}
               onClick={() => setIsCollapsed(false)}
@@ -75,14 +75,14 @@ export const IntrospectionDisabledNotice = ({
               .
             </p>
             <div className="mt-3">
-              <Button type="default" onClick={() => setShowConfirm(true)}>
+              <Button variant="default" onClick={() => setShowConfirm(true)}>
                 Enable introspection
               </Button>
             </div>
           </Admonition>
           <Button
             className="absolute right-2 top-2"
-            type="text"
+            variant="text"
             size="tiny"
             icon={<ChevronUp />}
             onClick={() => setIsCollapsed(true)}

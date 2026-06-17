@@ -42,7 +42,7 @@ export function DataTableToolbar({
           <TooltipTrigger asChild>
             <Button
               size="tiny"
-              type="default"
+              variant="default"
               icon={isFilterBarOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
               onClick={() => setIsFilterBarOpen((prev) => !prev)}
               className="hidden sm:flex"

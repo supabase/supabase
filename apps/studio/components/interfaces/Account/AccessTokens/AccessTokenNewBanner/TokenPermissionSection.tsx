@@ -26,7 +26,7 @@ export const TokenPermissionsSection = ({
         <Collapsible open={permissionsOpen} onOpenChange={setPermissionsOpen}>
           <CollapsibleTrigger asChild>
             <Button
-              type="text"
+              variant="text"
               size="tiny"
               className="w-full justify-start px-0.5 h-auto text-sm font-medium text-foreground-light hover:text-foreground"
             >

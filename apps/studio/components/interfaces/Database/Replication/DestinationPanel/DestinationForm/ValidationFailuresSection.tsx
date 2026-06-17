@@ -41,10 +41,14 @@ export const ValidationFailuresSection = ({
         <Accordion type="multiple">
           {validationIssues.map((failure, idx) => (
             <AccordionItem key={idx} value={`${failure.name}+${idx}`} className="last:border-b-0">
-              <AccordionTrigger className="text-sm px-3 text-foreground decoration-foreground-lighter">
+              <AccordionTrigger className="cursor-pointer text-sm px-3 text-foreground decoration-foreground-lighter [&>p]:mb-0!">
                 <p className="flex items-center gap-x-2">
                   {failure.name}
-                  {failure.failure_type === 'critical' && <Badge variant="warning">Required</Badge>}
+                  {failure.failure_type === 'critical' ? (
+                    <Badge variant="warning">Required</Badge>
+                  ) : (
+                    <Badge variant="default">Warning</Badge>
+                  )}
                 </p>
               </AccordionTrigger>
               <AccordionContent className="px-3">
