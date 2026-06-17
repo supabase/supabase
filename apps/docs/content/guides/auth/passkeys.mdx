@@ -14,7 +14,7 @@ Passkey support is experimental. The API may change without notice. You must exp
 
 <Admonition type="note">
 
-**Requires `@supabase/supabase-js` v2.105.0 and later, or `supabase_flutter` v2.15.0 and later.** Upgrade your client library to use passkey authentication.
+**Requires `@supabase/supabase-js` v2.105.0 and later, `supabase_flutter` v2.15.0 and later, or `supabase-swift` v2.48.0 and later.** Upgrade your client library to use passkey authentication.
 
 </Admonition>
 
@@ -136,6 +136,19 @@ final supabase = Supabase.instance.client;
 Platform setup that the library cannot do for you (Associated Domains on iOS/macOS, Digital Asset Links on Android, and including the [`passkeys`](https://pub.dev/packages/passkeys) web SDK in `index.html` on web) is documented in the `supabase_flutter` package README.
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+The Swift SDK gates passkey support behind `@_spi(Experimental)`. Add this import to every file that uses passkey APIs:
+
+```swift
+@_spi(Experimental) import Supabase
+```
+
+The `SupabaseClient` itself needs no extra configuration — the experimental SPI is enabled at the import site, not at client initialization.
+
+Platform setup the library cannot perform for you (Associated Domains entitlement and a relying-party server with HTTPS) must be configured in your Xcode project. Refer to [Apple's documentation on passkeys](https://developer.apple.com/documentation/authenticationservices/public-private_key_authentication/supporting_passkeys) for details.
+
+</TabPanel>
 </Tabs>
 
 ## Register a passkey
@@ -181,6 +194,25 @@ try {
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Available on iOS 16+, macOS 13+, and visionOS 1+. Requires `@_spi(Experimental) import Supabase`.
+
+```swift
+do {
+  let passkey = try await supabase.auth.registerPasskey(
+    presentationAnchor: view.window!
+  )
+  print("Registered passkey \(passkey.id)")
+} catch {
+  // AuthError from the server, or user cancelled the native UI.
+  print(error)
+}
+```
+
+For lower-level control (or on tvOS/watchOS), use `getPasskeyRegistrationOptions()` + `verifyPasskeyRegistration(challengeId:credentialResponse:)` from the [Auth Passkey](/docs/reference/swift/auth-passkey-api) reference.
+
+</TabPanel>
 </Tabs>
 
 The returned passkey contains the new credential's metadata:
@@ -195,7 +227,7 @@ The returned passkey contains the new credential's metadata:
 
 A friendly name is automatically derived from the authenticator's Authenticator Attestation GUID (AAGUID). For example, `iCloud Keychain`, `Google Password Manager`, `1Password`. Users can rename their passkey afterwards — see [Manage passkeys](#manage-passkeys).
 
-See the `registerPasskey` reference ([JavaScript](/docs/reference/javascript/auth-registerpasskey) · [Dart](/docs/reference/dart/auth-registerpasskey)) for the full API.
+See the `registerPasskey` reference ([JavaScript](/docs/reference/javascript/auth-registerpasskey) · [Dart](/docs/reference/dart/auth-registerpasskey) · [Swift](/docs/reference/swift/auth-registerpasskey)) for the full API.
 
 ## Sign in with a passkey
 
@@ -235,9 +267,28 @@ try {
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Available on iOS 16+, macOS 13+, and visionOS 1+. Requires `@_spi(Experimental) import Supabase`.
+
+```swift
+do {
+  let response = try await supabase.auth.signInWithPasskey(
+    presentationAnchor: view.window!
+  )
+  // response.session and response.user are set; the client also fires a signedIn event.
+  print("Signed in as \(response.user?.email ?? "")")
+} catch {
+  print(error)
+}
+```
+
+For lower-level control (or on tvOS/watchOS), use `getPasskeyAuthenticationOptions()` + `verifyPasskeyAuthentication(challengeId:credentialResponse:)` from the [Auth Passkey](/docs/reference/swift/auth-passkey-api) reference.
+
+</TabPanel>
 </Tabs>
 
-See the `signInWithPasskey` reference ([JavaScript](/docs/reference/javascript/auth-signinwithpasskey) · [Dart](/docs/reference/dart/auth-signinwithpasskey)) for the full API.
+See the `signInWithPasskey` reference ([JavaScript](/docs/reference/javascript/auth-signinwithpasskey) · [Dart](/docs/reference/dart/auth-signinwithpasskey) · [Swift](/docs/reference/swift/auth-signinwithpasskey)) for the full API.
 
 ## Two-step API
 
@@ -308,11 +359,40 @@ final AuthResponse res = await supabase.auth.passkey.verifyAuthentication(
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Requires `@_spi(Experimental) import Supabase`. Works on all Apple platforms (iOS, macOS, tvOS, watchOS, visionOS).
+
+Registration:
+
+```swift
+let options = try await supabase.auth.getPasskeyRegistrationOptions()
+// Run the platform authenticator yourself (e.g. via ASAuthorizationController).
+let credential: AnyJSON = try await runRegistrationCeremony(options.options)
+let passkey = try await supabase.auth.verifyPasskeyRegistration(
+  challengeId: options.challengeId,
+  credentialResponse: credential
+)
+```
+
+Authentication:
+
+```swift
+let options = try await supabase.auth.getPasskeyAuthenticationOptions()
+// Run the platform authenticator yourself (e.g. via ASAuthorizationController).
+let credential: AnyJSON = try await runAuthenticationCeremony(options.options)
+let response = try await supabase.auth.verifyPasskeyAuthentication(
+  challengeId: options.challengeId,
+  credentialResponse: credential
+)
+```
+
+</TabPanel>
 </Tabs>
 
-The `options` field returned from `startRegistration` and `startAuthentication` matches the [WebAuthn `PublicKeyCredentialCreationOptions`](https://www.w3.org/TR/webauthn-3/#dictdef-publickeycredentialcreationoptions) and [`PublicKeyCredentialRequestOptions`](https://www.w3.org/TR/webauthn-3/#dictdef-publickeycredentialrequestoptions) shapes (with `ArrayBuffer` fields encoded as base64url).
+The `options` field returned from the start methods matches the [WebAuthn `PublicKeyCredentialCreationOptions`](https://www.w3.org/TR/webauthn-3/#dictdef-publickeycredentialcreationoptions) and [`PublicKeyCredentialRequestOptions`](https://www.w3.org/TR/webauthn-3/#dictdef-publickeycredentialrequestoptions) shapes (with `ArrayBuffer` fields encoded as base64url).
 
-See the `auth.passkey` reference ([JavaScript](/docs/reference/javascript/auth-passkey-api) · [Dart](/docs/reference/dart/auth-passkey-api)) for the full API.
+See the `auth.passkey` reference ([JavaScript](/docs/reference/javascript/auth-passkey-api) · [Dart](/docs/reference/dart/auth-passkey-api) · [Swift](/docs/reference/swift/auth-passkey-api)) for the full API.
 
 ## Manage passkeys
 
@@ -360,11 +440,30 @@ await supabase.auth.passkey.delete(passkeyId: passkeys.first.id);
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Requires `@_spi(Experimental) import Supabase`.
+
+```swift
+// List
+let passkeys: [PasskeyListItem] = try await supabase.auth.listPasskeys()
+
+// Rename
+let updated = try await supabase.auth.renamePasskey(
+  id: passkeys.first!.id,
+  friendlyName: "Work laptop"
+)
+
+// Delete
+try await supabase.auth.deletePasskey(id: passkeys.first!.id)
+```
+
+</TabPanel>
 </Tabs>
 
-`friendlyName` is limited to 120 characters. `last_used_at` is updated each time the passkey is used to sign in.
+`friendlyName` is limited to 120 characters. `lastUsedAt` is updated each time the passkey is used to sign in.
 
-See the `auth.passkey` reference ([JavaScript](/docs/reference/javascript/auth-passkey-api) · [Dart](/docs/reference/dart/auth-passkey-api)) for the full API.
+See the `auth.passkey` reference ([JavaScript](/docs/reference/javascript/auth-passkey-api) · [Dart](/docs/reference/dart/auth-passkey-api) · [Swift](/docs/reference/swift/auth-passkey-api)) for the full API.
 
 ## Admin API
 
@@ -410,7 +509,7 @@ await supabase.auth.admin.passkey.deletePasskey(
 </TabPanel>
 </Tabs>
 
-See the `auth.admin.passkey` reference ([JavaScript](/docs/reference/javascript/auth-admin-passkey-api) · [Dart](/docs/reference/dart/auth-admin-passkey-api)) for the full API.
+See the `auth.admin.passkey` reference ([JavaScript](/docs/reference/javascript/auth-admin-passkey-api) · [Dart](/docs/reference/dart/auth-admin-passkey-api)) for the full API. The Swift SDK does not expose admin passkey methods.
 
 ## Error codes
 
