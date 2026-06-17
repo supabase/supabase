@@ -24,7 +24,7 @@ const buttonVariants = cva(
   outline-0
   focus-visible:outline-solid
   focus-visible:outline-4
-  focus-visible:outline-offset-0
+  focus-visible:outline-offset-1
   border
   `,
   {
@@ -46,7 +46,7 @@ const buttonVariants = cva(
           border-strong hover:border-stronger
           focus-visible:outline-border-strong
           data-[state=open]:bg-selection
-          data-[state=open]:outline-border-stronger
+          data-[state=open]:outline-border-strong
           data-[state=open]:border-button-hover
           `,
         secondary: `
