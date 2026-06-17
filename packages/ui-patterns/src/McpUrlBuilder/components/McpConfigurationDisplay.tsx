@@ -73,7 +73,7 @@ export function McpConfigurationDisplay({
           <div className="text-xs text-foreground-light">
             {selectedClient.deepLinkDescription ?? 'Install in one click:'}
           </div>
-          <Button type="secondary" size="small" asChild>
+          <Button variant="secondary" size="small" asChild>
             <a
               href={mcpButtonData.deepLink}
               target="_blank"

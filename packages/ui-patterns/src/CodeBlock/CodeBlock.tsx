@@ -260,7 +260,7 @@ export const CodeBlock = ({
               ].join(' ')}
             >
               <Button
-                type="default"
+                variant="default"
                 className="px-1.5"
                 icon={copied ? <Check /> : <Copy />}
                 onClick={() => onSelectCopy(value || children)}

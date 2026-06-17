@@ -126,7 +126,7 @@ export const Overview = ({
                   environments.
                 </p>
               </div>
-              <Button type="primary" asChild>
+              <Button variant="primary" asChild>
                 <Link href={`/org/${selectedOrg?.slug}/billing?panel=subscriptionPlan`}>
                   Upgrade
                 </Link>
@@ -329,7 +329,7 @@ const PreviewBranchActions = ({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            type="text"
+            variant="text"
             icon={<MoreVertical />}
             className="px-1"
             onClick={(e) => e.stopPropagation()}
@@ -602,7 +602,7 @@ const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) =
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="text" icon={<MoreVertical />} className="px-1" />
+          <Button variant="text" icon={<MoreVertical />} className="px-1" />
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" side="bottom" align="end">
           {repo ? (

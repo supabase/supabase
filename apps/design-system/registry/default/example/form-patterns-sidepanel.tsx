@@ -143,7 +143,7 @@ export default function FormPatternsSidePanel() {
 
   return (
     <>
-      <Button type="primary" onClick={() => setOpen(true)}>
+      <Button variant="primary" onClick={() => setOpen(true)}>
         Open form panel
       </Button>
       <Sheet open={open} onOpenChange={setOpen}>
@@ -325,7 +325,7 @@ export default function FormPatternsSidePanel() {
                           </button>
                           <div className="flex gap-2 items-center">
                             <Button
-                              type="default"
+                              variant="default"
                               size="tiny"
                               icon={<Upload size={14} />}
                               onClick={() => uploadButtonRef.current?.click()}
@@ -334,7 +334,7 @@ export default function FormPatternsSidePanel() {
                             </Button>
                             {logoUrl && (
                               <Button
-                                type="default"
+                                variant="default"
                                 size="tiny"
                                 icon={<Trash size={12} />}
                                 onClick={() => {
@@ -440,7 +440,7 @@ export default function FormPatternsSidePanel() {
                                       {file.name}
                                     </span>
                                     <Button
-                                      type="default"
+                                      variant="default"
                                       size="tiny"
                                       icon={<Trash size={12} />}
                                       onClick={() => {
@@ -676,7 +676,7 @@ export default function FormPatternsSidePanel() {
                         <Popover>
                           <PopoverTrigger asChild>
                             <Button
-                              type="outline"
+                              variant="outline"
                               className="bg-control w-full justify-start text-left font-normal px-3 py-4"
                               icon={<CalendarIcon className="h-4 w-4" />}
                             >
@@ -769,13 +769,13 @@ export default function FormPatternsSidePanel() {
                 >
                   <div className="col-span-6 flex gap-2 items-center">
                     <Button
-                      type="default"
+                      variant="default"
                       icon={<ExternalLink size={14} />}
                       onClick={() => console.log('Action performed')}
                     >
                       View documentation
                     </Button>
-                    <Button type="default" onClick={() => console.log('Reset action')}>
+                    <Button variant="default" onClick={() => console.log('Reset action')}>
                       Reset API key
                     </Button>
                   </div>
@@ -785,7 +785,7 @@ export default function FormPatternsSidePanel() {
           </Form>
           <SheetFooter>
             <Button
-              type="default"
+              variant="default"
               onClick={() => {
                 form.reset()
                 setOpen(false)
@@ -793,7 +793,7 @@ export default function FormPatternsSidePanel() {
             >
               Cancel
             </Button>
-            <Button type="primary" form={formId} htmlType="submit">
+            <Button variant="primary" form={formId} type="submit">
               Create
             </Button>
           </SheetFooter>

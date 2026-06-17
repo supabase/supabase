@@ -91,7 +91,7 @@ export const LintDetail = ({
           onAfterAction={onAfterAction}
         />
 
-        <Button asChild type="text">
+        <Button asChild variant="text">
           <Link
             href={
               lintInfoMap.find((item) => item.name === lint.name)?.docsLink ||

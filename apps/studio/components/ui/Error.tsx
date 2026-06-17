@@ -22,7 +22,7 @@ export default function EmptyPageState({ error }: any) {
         <Button asChild>
           <Link href="/projects">Head back</Link>
         </Button>
-        <Button asChild type="secondary">
+        <Button asChild variant="secondary">
           <SupportLink>Submit a support request</SupportLink>
         </Button>
       </div>

@@ -126,13 +126,13 @@ const SiteUrl = () => {
 
               <CardFooter className="justify-end space-x-2">
                 {isDirty && (
-                  <Button type="default" onClick={() => siteUrlForm.reset()}>
+                  <Button variant="default" onClick={() => siteUrlForm.reset()}>
                     Cancel
                   </Button>
                 )}
                 <Button
-                  type="primary"
-                  htmlType="submit"
+                  variant="primary"
+                  type="submit"
                   disabled={!canUpdateConfig || isUpdatingSiteUrl || !isDirty}
                   loading={isUpdatingSiteUrl}
                 >

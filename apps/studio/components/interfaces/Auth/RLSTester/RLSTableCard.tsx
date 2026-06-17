@@ -170,7 +170,7 @@ const TableAccessPolicySummary = ({
               </p>
             </div>
             <ButtonTooltip
-              type="text"
+              variant="text"
               icon={<Edit />}
               className="w-7"
               tooltip={{ content: { side: 'bottom', text: 'Edit policy' } }}

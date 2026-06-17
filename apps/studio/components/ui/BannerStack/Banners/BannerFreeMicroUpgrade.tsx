@@ -49,7 +49,7 @@ export const BannerFreeMicroUpgrade = () => {
         </div>
         <div className="flex gap-2">
           <Button
-            type="primary"
+            variant="primary"
             size="tiny"
             asChild
             onClick={() => {

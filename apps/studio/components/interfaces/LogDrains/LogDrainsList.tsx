@@ -146,7 +146,7 @@ export function LogDrainsList({
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
-                          type="text"
+                          variant="text"
                           className="px-1 opacity-50 hover:opacity-100 bg-transparent! shrink-0"
                           icon={<MoreHorizontal />}
                         />

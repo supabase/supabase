@@ -119,7 +119,7 @@ const WrapperTableEditor = ({
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <Button
-                  type="default"
+                  variant="default"
                   role="combobox"
                   aria-expanded={open}
                   aria-controls={listboxId}
@@ -488,7 +488,7 @@ const TableForm = ({
                   enumTypes={[]}
                 />
                 <Button
-                  type="outline"
+                  variant="outline"
                   icon={<XIcon strokeWidth={1.5} />}
                   onClick={() => removeColumn(columnIndex)}
                   className="self-end -translate-y-1.5 px-1.5"
@@ -498,7 +498,7 @@ const TableForm = ({
               </div>
             ))}
             <Button
-              type="default"
+              variant="default"
               onClick={() => appendColumn({ name: '', type: 'text' })}
               className="self-start"
             >

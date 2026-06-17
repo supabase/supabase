@@ -97,11 +97,11 @@ export const ServiceHealthCard = ({
 
       <CardFooter className="border-t pt-3 pb-4 px-card flex gap-2">
         {reportUrl && (
-          <Button type="default" size="tiny" asChild className="flex-1">
+          <Button variant="default" size="tiny" asChild className="flex-1">
             <Link href={reportUrl}>View Report</Link>
           </Button>
         )}
-        <Button type="default" size="tiny" asChild className="flex-1">
+        <Button variant="default" size="tiny" asChild className="flex-1">
           <Link href={logsUrl}>View Logs</Link>
         </Button>
       </CardFooter>

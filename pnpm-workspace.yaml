@@ -8,11 +8,11 @@ blockExoticSubdeps: true
 
 catalog:
   '@sentry/nextjs': ^10.26.0
-  '@supabase/auth-js': 2.108.0
-  '@supabase/postgrest-js': 2.108.0
-  '@supabase/realtime-js': 2.108.0
+  '@supabase/auth-js': 2.108.2
+  '@supabase/postgrest-js': 2.108.2
+  '@supabase/realtime-js': 2.108.2
   '@supabase/ssr': 0.10.2
-  '@supabase/supabase-js': 2.108.0
+  '@supabase/supabase-js': 2.108.2
   '@types/node': ^22.0.0
   '@types/react': ^19.2.14
   '@types/react-dom': ^19.2.3
@@ -56,6 +56,7 @@ minimumReleaseAgeExclude:
   - '@supabase/*'
   - '@supabase-labs/*'
   # The following are excluded to fix vulnerablities.
+  - react-use
 
 onlyBuiltDependencies:
   - node-pty
@@ -64,6 +65,10 @@ onlyBuiltDependencies:
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3
   '@mapbox/node-pre-gyp>tar': ^7.5.11
+  '@sentry/webpack-plugin>uuid': ^11.1.1
+  '@usercentrics/cmp-browser-sdk>uuid': ^11.1.1
+  'braintrust>uuid': ^11.1.1
+  'mdx-bundler>uuid': ^11.1.1
   cacache>tar: ^7.5.11
   dompurify: ^3.3.2
   esbuild: ^0.25.2

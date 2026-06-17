@@ -152,7 +152,7 @@ function Feedback({ className }: { className?: string }) {
           className="relative flex gap-2 items-center"
         >
           <Button
-            type="outline"
+            variant="outline"
             rounded
             className={cn(
               'px-1 w-7 h-7',
@@ -171,7 +171,7 @@ function Feedback({ className }: { className?: string }) {
             <span className="sr-only">No</span>
           </Button>
           <Button
-            type="outline"
+            variant="outline"
             rounded
             className={cn(
               'px-1 w-7 h-7',

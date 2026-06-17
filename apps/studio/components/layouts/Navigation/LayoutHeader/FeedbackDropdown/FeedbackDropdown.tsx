@@ -49,7 +49,7 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
             setIsOpen((isOpen) => !isOpen)
             setStage('select')
           }}
-          type="text"
+          variant="text"
           className="rounded-full h-[32px] text-foreground-light hover:text-foreground"
         >
           <span className={className}>Feedback</span>
@@ -65,7 +65,7 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
           <div className="flex flex-col gap-4 p-4">
             <div className="font-medium text-sm">What would you like to share?</div>
             <div className="grid grid-cols-2 gap-3">
-              <Button type="default" className="h-32" onClick={() => setStage('issue-options')}>
+              <Button variant="default" className="h-32" onClick={() => setStage('issue-options')}>
                 <div className="grid gap-1.5 text-center">
                   <TriangleAlert size="28" className="mx-auto text-destructive-600" />
                   <div className="flex flex-col items-center">
@@ -74,7 +74,7 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
                   </div>
                 </div>
               </Button>
-              <Button type="default" className="h-32" onClick={() => setStage('widget')}>
+              <Button variant="default" className="h-32" onClick={() => setStage('widget')}>
                 <div className="grid gap-1.5 text-center">
                   <Lightbulb size="28" className="mx-auto text-warning" />
                   <div className="flex flex-col items-center">
@@ -104,7 +104,7 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
             </div>
             <PopoverSeparator />
             <div className="px-4 pt-4 pb-4">
-              <Button type="default" size="tiny" onClick={() => setStage('widget')}>
+              <Button variant="default" size="tiny" onClick={() => setStage('widget')}>
                 Leave feedback instead
               </Button>
             </div>

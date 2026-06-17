@@ -61,7 +61,7 @@ const SortRow = ({ index, columnName, sort, onDelete, onToggle }: SortRowProps) 
       <Button
         icon={<X strokeWidth={1.5} />}
         size="tiny"
-        type="text"
+        variant="text"
         className="w-7"
         onClick={() => onDelete(columnName)}
       />
