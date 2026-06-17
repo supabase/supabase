@@ -844,7 +844,7 @@ export interface AskAIEvent {
  * @group Events
  * @source docs
  */
-export interface DocsRecommendationClickedEvent {
+export interface DocsRecommendation404ClickedEvent {
   action: 'docs_404_recommendation_clicked'
   properties: {
     /**
