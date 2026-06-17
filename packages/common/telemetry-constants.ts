@@ -839,6 +839,26 @@ export interface AskAIEvent {
 }
 
 /**
+ * User clicked a recommended page card shown on a docs "not found" page.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsRecommendation404ClickedEvent {
+  action: 'docs_404_recommendation_clicked'
+  properties: {
+    /**
+     * The path of the recommended page that was clicked.
+     */
+    destinationPath: string
+    /**
+     * The path of the "not found" page where the recommendation was shown.
+     */
+    sourcePath: string
+  }
+}
+
+/**
  * User clicked the framework quickstart card on the homepage, leading to the specific framework documentation.
  *
  * @group Events
@@ -3460,6 +3480,7 @@ export type TelemetryEvent =
   | DocsFeedbackClickedEvent
   | CopyAsMarkdownEvent
   | AskAIEvent
+  | DocsRecommendation404ClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
   | HomepageProductCardClickedEvent
   | WwwPricingPlanCtaClickedEvent

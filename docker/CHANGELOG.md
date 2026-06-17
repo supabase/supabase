@@ -12,10 +12,50 @@ See per-service updates below for details. Only the most important changes relev
 
 ## Unreleased
 
-⚠️ **Upcoming changes:** Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions/categories/changelog?discussions_q=is%3Aopen+category%3AChangelog+label%3Aself-hosted) for updates:
+⚠️ **Upcoming changes:** Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions/categories/changelog?discussions_q=is%3Aopen+category%3AChangelog+label%3Aself-hosted) for updates.
 
-- [Upgrading from PG 15 to 17 (breaking change)](https://github.com/orgs/supabase/discussions/46080)
-- [Switching Studio from `supabase_admin` to `postgres` (breaking change)](https://github.com/orgs/supabase/discussions/46081)
+---
+
+## [2026-06-17]
+
+⚠️ **Note:** This update contains **breaking changes**. Make sure to read the **important** details below:
+- **Postgres 17 is now the default**. Do not start Postgres 17 on an existing Postgres 15 data directory. See the [Upgrade to Postgres 17](https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17) guide. Check the **Configuration** and **Postgres** sections for additional information
+- API gateway configuration includes a **security fix** for Realtime routes - it is **strongly recommended** to add this update to any self-hosted Supabase instance running Realtime
+- Studio and Postgres Meta configuration now use `postgres` and not `supabase_admin` to connect to Postgres
+
+### Configuration
+- ⚠️ Changed the default Postgres image to `supabase/postgres:17.6.1.136` - PR [#46981](https://github.com/supabase/supabase/pull/46981)
+- ⚠️ Added `docker-compose.pg15.yml` - for deployments not yet upgraded, and as the rollback target for `utils/upgrade-pg17.sh` - PR [#46981](https://github.com/supabase/supabase/pull/46981)
+- Updated `docker-compose.pg17.yml` to match the new default - PR [#46981](https://github.com/supabase/supabase/pull/46981)
+
+### Documentation
+- Updated the [Upgrade to Postgres 17](https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17) how-to - PR [#46989](https://github.com/supabase/supabase/pull/46989)
+- Updated the [New API Keys](https://supabase.com/docs/guides/self-hosting/self-hosted-auth-keys) and [Envoy API Gateway](https://supabase.com/docs/guides/self-hosting/self-hosted-envoy) how-to guides - PR [#46856](https://github.com/supabase/supabase/pull/46856)
+- Updated [CONFIG.md](CONFIG.md) - PR [#47022](https://github.com/supabase/supabase/pull/47022)
+
+### Utils and tests
+- Updated `utils/upgrade-pg17.sh` (bumped Postgres image, added additional migrations), and `tests/test-pg17-upgrade.sh` (added tests for pg_cron) - PR [#46981](https://github.com/supabase/supabase/pull/46981)
+- Updated `tests/test-self-hosted.sh` (added tests for resumable upload, modified tests for Realtime and GraphQL) - PR [#46731](https://github.com/supabase/supabase/pull/46731), PR [#46856](https://github.com/supabase/supabase/pull/46856), PR [#46981](https://github.com/supabase/supabase/pull/46981)
+- Updated `tests/test-auth-keys.sh` (modified tests for Realtime) - PR [#46856](https://github.com/supabase/supabase/pull/46856)
+
+### API gateway
+- ⚠️ Updated Kong and Envoy configuration to block access to Realtime `/api/tenants` and `/api/openapi` endpoints. This is a **security fix** (requires `volumes/api/kong.yml` and `volumes/api/envoy` update) - PR [#46856](https://github.com/supabase/supabase/pull/46856)
+- Updated entrypoint for Kong to use `/bin/sh` (requires `docker-compose.yml` update) - PR [#46873](https://github.com/supabase/supabase/pull/46873)
+
+### Studio
+- ⚠️ Updated `studio` configuration to use `postgres` instead of `supabase_admin` to connect to Postgres (requires `docker-compose.yml` update). See discussion [#46081](https://github.com/orgs/supabase/discussions/46081) and the [how-to guide](https://supabase.com/docs/guides/self-hosting/remove-superuser-access) for important information - PR [#47022](https://github.com/supabase/supabase/pull/47022)
+
+### PostgREST
+- Added healthcheck for `rest` (requires `docker-compose.yml` update) - PR [#46658](https://github.com/supabase/supabase/pull/46658)
+
+### Postgres Meta
+- ⚠️ Updated `meta` configuration to use `postgres` instead of `supabase_admin` to connect to Postgres (requires `docker-compose.yml` update) - PR [#47022](https://github.com/supabase/supabase/pull/47022)
+
+### Edge Runtime
+- Added healthcheck for `functions` (requires `docker-compose.yml` update) - PR [#46655](https://github.com/supabase/supabase/pull/46655)
+
+### Postgres
+- ⚠️ Updated the default image to `17.6.1.136` (from `15.8.1.085`). `pg_graphql` is now **disabled by default** on fresh installs. Databases that already use GraphQL keep it after an upgrade. See discussion [#46080](https://github.com/orgs/supabase/discussions/46080) and the [how-to guide](https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17) for more information - PR [#46981](https://github.com/supabase/supabase/pull/46981)
 
 ---
 

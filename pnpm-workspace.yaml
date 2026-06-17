@@ -29,10 +29,10 @@ catalog:
   react-dom: ^19.2.6
   recharts: ^2.15.4
   tailwindcss: ^4.2.4
-  tsx: 4.20.3
+  tsx: ^4.22.0
   typescript: ~6.0.0
   valtio: ^1.12.0
-  vite: ^8.0.8
+  vite: ^8.0.16
   vite-tsconfig-paths: ^6.1.1
   vitest: ^4.1.4
   zod: 3.25.76
@@ -69,9 +69,9 @@ overrides:
   '@usercentrics/cmp-browser-sdk>uuid': ^11.1.1
   'braintrust>uuid': ^11.1.1
   'mdx-bundler>uuid': ^11.1.1
+  braintrust>esbuild: ^0.28.1
   cacache>tar: ^7.5.11
   dompurify: ^3.3.2
-  esbuild: ^0.25.2
   express-rate-limit>ip-address: ^10.1.1
   lodash: 'catalog:'
   lodash-es: 'catalog:'
@@ -82,6 +82,7 @@ overrides:
   refractor>prismjs: ^1.30.0
   supabase>tar: ^7.5.11
   tmp: ^0.2.7
+  vite>esbuild: ^0.28.1
   webpack: ^5.104.1
 
 patchedDependencies:

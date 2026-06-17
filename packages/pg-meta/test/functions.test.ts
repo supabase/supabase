@@ -71,6 +71,7 @@ withTestDatabase('list functions', async ({ executeQuery }) => {
       "return_type_relation_id": null,
       "schema": "public",
       "security_definer": false,
+      "type": "function",
     }
     `
   )
@@ -183,6 +184,7 @@ withTestDatabase('retrieve, create, update, delete', async ({ executeQuery }) =>
         "return_type_relation_id": null,
         "schema": "public",
         "security_definer": true,
+        "type": "function",
       },
       "error": null,
     }
@@ -245,6 +247,7 @@ withTestDatabase('retrieve, create, update, delete', async ({ executeQuery }) =>
         "return_type_relation_id": null,
         "schema": "test_schema",
         "security_definer": true,
+        "type": "function",
       },
       "error": null,
     }
@@ -302,6 +305,7 @@ withTestDatabase('retrieve set-returning function', async ({ executeQuery }) => 
       "return_type_relation_id": Any<Number>,
       "schema": "public",
       "security_definer": false,
+      "type": "function",
     }
   `
   )
