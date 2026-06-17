@@ -11,6 +11,11 @@ export type FeaturePreview = {
   isDefaultOptIn: boolean
   /** Visibility in the feature preview modal (For feature flagging a feature preview) */
   enabled: boolean
+  /**
+   * Where to send the user after enabling, to try the feature out. Omit if the
+   * feature has no single destination (e.g. a global layout change).
+   */
+  getRoute?: (ref?: string) => string
 }
 
 export const useFeaturePreviews = (): FeaturePreview[] => {
@@ -28,6 +33,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isNew: true,
       isPlatformOnly: false,
       isDefaultOptIn: false,
+      getRoute: (ref?: string) => `/project/${ref}/auth/policies`,
     },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
@@ -37,6 +43,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isNew: true,
       isPlatformOnly: true,
       isDefaultOptIn: false,
+      getRoute: (ref?: string) => `/project/${ref}/logs`,
     },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES,
@@ -46,6 +53,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isNew: false,
       isPlatformOnly: true,
       isDefaultOptIn: false,
+      getRoute: (ref?: string) => `/project/${ref}/advisors/rules`,
     },
 
     {
@@ -65,6 +73,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isPlatformOnly: true,
       isDefaultOptIn: false,
       enabled: platformWebhooksEnabled,
+      getRoute: (ref?: string) => `/project/${ref}/settings/webhooks`,
     },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS,
@@ -74,6 +83,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isPlatformOnly: true,
       isDefaultOptIn: false,
       enabled: jitDbAccessEnabled,
+      getRoute: (ref?: string) => `/project/${ref}/database/settings`,
     },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
@@ -83,6 +93,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isNew: false,
       isPlatformOnly: false,
       isDefaultOptIn: false,
+      getRoute: (ref?: string) => `/project/${ref}/database/column-privileges`,
     },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE,
