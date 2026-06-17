@@ -62,7 +62,7 @@ function ServerEnvContent() {
       <Admonition
         variant="default"
         title="On Supabase Edge Functions these are injected automatically"
-        description="No setup is needed for Edge Functions. For other runtimes, copy the values above into your environment — SUPABASE_JWKS_URL is used to verify user JWTs. Need a secret key? Create or manage them in API Keys settings."
+        description="No setup is needed for Edge Functions. For other runtimes, copy the values above into your environment. Need a secret key? Create or manage them in API Keys settings."
         actions={
           ref
             ? [
