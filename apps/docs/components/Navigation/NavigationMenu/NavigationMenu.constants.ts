@@ -1139,7 +1139,7 @@ export const database: NavMenuConstant = {
         },
         {
           name: 'Postgres log configuration',
-          url: '/guides/database/postgres-log-config' as `/${string}`,
+          url: '/guides/database/postgres/postgres-log-config' as `/${string}`,
         }
       ],
     },

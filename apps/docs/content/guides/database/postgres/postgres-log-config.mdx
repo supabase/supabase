@@ -1,0 +1,696 @@
+---
+id: 'postgres-log-configuration'
+title: 'Postgres log configurations'
+slug: 'postgres-log-configuration'
+description: 'Customizing Postgres log configurations'
+subtitle: 'Modify logs to better suit your observability and compliance requirements'
+---
+
+<Admonition type="caution">
+
+High-volume log settings (labeled) can degrade database performance and increase costs. Enable them with caution for debugging or mandatory compliance.
+
+</Admonition>
+
+# Available log settings:
+
+The table outlines **configurable** log settings. For more information about each one, check its respective section.
+
+| Setting | Category | Type | Default |
+| :--- | :--- | :--- | :---: |
+| [`log_min_messages`](#logminmessages) | Global log management | `SQL` | `warning` |
+| [`log_connections`](#logconnections) | Network Monitoring | `API` | `false` |
+| [`log_disconnections`](#logdisconnections) | Network Monitoring | `API` | `false` |
+| [`log_lock_waits`](#loglockwaits) | Background Activity | `API` + `SQL` | `true` |
+| [`log_checkpoints`](#logcheckpoints) | Background Activity | `API` | `true` |
+| [`log_autovacuum_min_duration`](#logautovacuumminduration) | Background Activity | `API` | `60000ms` |
+| [`log_temp_files`](#logtempfiles) | Background Activity | `API` + `SQL` | `-1` |
+| [`log_startup_progress_interval`](#logstartupprogressinterval) | Background Activity | `API` | `10000ms` |
+| [`log_recovery_conflict_waits`](#logrecoveryconflictwaits) | Background Activity | `API` | `false` |
+| [`auto_explain.*`](#autoexplain) | Query Activity | `SQL` | `10000ms` |
+| [`log_min_duration_statement`](#logmindurationstatement) | Query Activity | `SQL` | `-1` |
+| [`log_duration`](#logduration) | Query Activity | `SQL` | `false` |
+| [`log_statement`](#logstatement) | Query Activity | `SQL` | `ddl` |
+| [`log_min_error_statement`](#logminerrorstatement) | Query Activity | `SQL` | `error` |
+| [`log_min_error_statement`](#logminerrorstatement) | Query Activity | `SQL` | `error` |
+| [`pgaudit.*`](#pgaudit) | Query Activity | `SQL` | `N/A` |
+| [`cron.log_statement`](#cronlogstatement) | Extension Activity | `API` | `true` |
+
+To view log settings for your project, you can run:
+```sql
+select * from pg_settings
+where 
+  category = 'Reporting and Logging / When to Log'
+    or
+  category = 'Reporting and Logging / What to Log'
+  or
+  -- show extension enabled log settings
+  (
+    name like 
+      'auto_explain.%'
+      or
+    name like
+      'pgaudit.%'
+      or
+    name = 'cron.log_statement'
+  );
+```
+
+To view settings targetting a specific database role, you can run:
+```sql
+select
+  rolname,
+  rolconfig
+from pg_roles
+where
+  rolname in (
+    'anon',
+    'authenticated',
+    'postgres',
+    'service_role',
+    -- ,<ANY CUSTOM ROLES>
+  );
+```
+
+# Configuring log settings
+
+There are two ways to change log settings:
+- [Supabase Management API](/docs/reference/api/v1-update-postgres-config): change settings for individual projects or at the fleet level
+- **SQL commands**: change settings for a specific database
+
+### Configure logging with the Management API
+
+Before using the API, generate an account [access token](/dashboard/account/tokens), then update the desired setting:
+
+
+```sh
+curl https://api.supabase.com/v1/projects/PROJECT_REF/config/database/postgres \
+  --request PUT \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer ACCESS_TOKEN' \
+  --data '{
+  "LOG_SETTING": VALUE
+}'
+```
+
+Internally, these settings are changed by the Postgres superuser `supabase_admin` at the system level.
+
+### Configure logging with SQL
+
+<Admonition type="caution">
+
+Log settings configured directly with SQL take precedence over values set by the Management API.
+
+</Admonition>
+
+Supabase projects include the [supautils extension](/blog/roles-postgres-hooks), which grants the postgres role authority over superuser-only settings.
+
+You can configure _certain_ log settings directly with SQL at the `role` level:
+
+```sql
+alter role anon set log_statement = 'none';
+```
+
+With the help of the [supautils extension](/blog/roles-postgres-hooks), when a setting is applied to the `postgres` role, it becomes the default for the entire database:
+
+```sql
+-- When a log setting targets the postgres role
+alter role "postgres" set log_statement = 'none';
+
+-- it is equivalent to the database-level configuration:
+alter database "postgres" set log_statement = 'none';
+```
+
+## Global Log Management Settings
+
+Determines what events are recorded at the global level based on severity. Overrides other log settings.
+
+### `log_min_messages`
+
+<Admonition type="caution">
+
+Setting `log_min_messages` to severity levels above `warning` (e.g., `notice`, `info`) can generate excessive logs that degrade database performance. These permissive levels are often intended for temporary debugging or internal development visibility, not general production observability.
+
+</Admonition>
+
+Postgres logs have severity levels.
+
+| Severity | Description | Example log |
+| :--- | :--- | :--- |
+| **debug1 ... debug5** | Successively detailed debugging info, mainly used by developers and extension maintainers. | `DEBUG1: rehashing catalog cache id 6...` |
+| **info** | Information explicitly requested by the user during an operation. | `INFO: analyzing "public.example..."` <br/><br/> Example returned by the `analyzing verbose` command|
+| **notice** | Helpful, non-essential information about automatic background actions. | `NOTICE: table "old_logs" does not exist, skipping` <br/><br/> Example returned by the `drop table if exists` commands |
+| **warning** | A query completed, but skipped requested actions. | `WARNING: no privileges were granted for "some_user"` <br/><br/> Example returned by the `grant` command|
+| **error** | A specific query failed, but the overall database connection remains alive. | `ERROR: duplicate key value violates unique constraint "example_pkey"` |
+| **log** | Operational events. Usually generated by explicit log settings or by database functions | `LOG: connection received...` |
+| **fatal** | An error that causes a database connection to abruptly terminate. | `FATAL: terminating connection due to administrator command` |
+| **panic** | A critical, system-wide failure that forces the database to shut down and crash-recover. | `PANIC: could not locate a valid checkpoint record at 0/61013608` |
+
+By changing the `log_min_messages`, you can force postgres to disregard logs at weaker severities rather than recording them.
+
+Setting the log level to a higher rank includes all logs below. If you were to set the value to `INFO`, it would also log activity for `NOTICE`, `WARNING`, ...
+
+<Admonition type="tip">
+
+Note: `LOG` is considered more servere than `WARNING` and `ERROR`.
+
+</Admonition>
+
+
+**Useful for:**
+
+- Controlling what logs are recorded overall
+
+**Configuration:**
+
+```sql name=SQL
+alter role "postgres" set "log_min_messages" to 'log';
+```
+
+
+## Networking Log Settings
+
+Logs information about clients connecting/disconnecting from the database. Some insightful values captured includes when a client first authenticated, how long they were connected for, and their IP address. 
+
+### `log_connections`
+
+<Admonition type="caution">
+
+Can produce high levels of log activty, especially for servers with frequent connects/disconnects. 
+
+</Admonition>
+
+Logs when a client establishes a new database connection, including connection receipt, authentication, and authorization.
+
+**Useful for:**
+
+- Monitoring successful authentication attempts
+- Auditing database access
+
+**Example logs:**
+```sh
+connection received: host=127.0.0.1
+connection authorized: user=postgres database=postgres application_name=Supavisor auth_query
+connection authenticated: identity="pgbouncer" method=scram-sha-256 
+```
+
+<Admonition type="tip">
+
+The logged IP address is the client directly communicating with Postgres. If you connect through Supavisor, the dedicated pooler, or the Data API, those service IPs will appear instead of the original client.
+
+</Admonition>
+
+**Configuring:**
+
+
+```sh name=API
+curl https://api.supabase.com/v1/projects/PROJECT_REF/config/database/postgres \
+  --request PUT \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer ACCESS_TOKEN' \
+  --data '{
+  "log_connections": true
+}'
+```
+
+### `log_disconnections`
+
+<Admonition type="caution">
+
+Can produce high levels of log activty, especially for servers with frequent connects/disconnects. 
+
+</Admonition>
+
+Logs when a database connection gracefully closes.
+
+**Useful for:**
+
+- Monitoring how long connections persist
+
+**Example logs:**
+```sh
+disconnection: session time: 0:00:01.492 user=postgres database=postgres host=127.0.0.1
+```
+
+<Admonition type="tip">
+
+The logged IP address is the client directly communicating with Postgres. If you connect through Supavisor, the dedicated pooler, or the Data API, those service IPs will appear instead of the original client.
+
+</Admonition>
+
+**Configuring:**
+
+```sh name=API
+curl https://api.supabase.com/v1/projects/PROJECT_REF/config/database/postgres \
+  --request PUT \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer ACCESS_TOKEN' \
+  --data '{
+  "log_disconnections": true
+}'
+```
+
+## Background Activity Log Settings
+
+Logs the activity of PostgreSQL background processes and utilities. Helps diagnose and detect performance and operational issues.
+
+### `log_lock_waits`
+
+Logs when operations are blocked by database locks for more than `1s`. For more information on lock management, reference [postgreslocksexplained.com](https://postgreslocksexplained.com/locks/concept). 
+
+**Useful for:**
+
+- Identifying queries that blocked by locks 
+- Identifying which queries are causing the blocks
+- Measuring how long queries remain blocked
+
+**Example logs:**
+```sh
+# records when a process is waiting on a lock for 1+s
+process 1017208 still waiting for "lock_type" on relation 75874 of database 5 after 1001.872 ms 
+```
+```sh
+# records when a process is finally able to claim its lock
+process 1007982 acquired "lock_type" on transaction 445264 after 2000.880 ms
+```
+
+**Configuring:**
+
+```sh name=API
+curl https://api.supabase.com/v1/projects/PROJECT_REF/config/database/postgres \
+  --request PUT \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer ACCESS_TOKEN' \
+  --data '{
+  "log_lock_waits": false
+}'
+```
+
+```sql name=SQL
+alter role "postgres" set log_lock_waits to true;
+```
+
+
+
+### `log_checkpoints`
+
+Logs checkpoint activity. Checkpoints are background, batch operations that write modified data from memory to disk. It enables Postgres to discard WAL files that otherwise must be retained for data recovery and read replicas.
+
+**Useful for:**
+
+- Measuring checkpoint write volume
+- Identifying excessive checkpoint-related disk activity
+- Detecting read-replica issues
+- Deciding whether checkpoint settings should be adjusted
+
+**Example logs:**
+```sh
+# Monitoring checkpointer activity
+checkpoint starting: time
+checkpoint complete: wrote 405563 buffers (6.4%); 0 WAL file(s) added, 0 removed, 465 recycled; write=269.656 s, sync=3.570 s, total=274.133 s; sync files=2393, longest=0.375 s, average=0.002 s; distance=6635965 kB, estimate=7953512 kB
+```
+
+```sh
+# Monitoring replay activity from read replicas
+restartpoint starting: time
+recovery restart point at 0/B837D6F0
+restartpoint complete: wrote 266 buffers (0.4%); 0 WAL file(s) added, 1 removed, 0 recycled; write=25.760 s, sync=0.004 s, total=25.773 s; sync files=20, longest=0.003 s, average=0.001 s; distance=19779 kB, estimate=565114 kB; lsn=0/B837D748, redo lsn=0/B837D6F0
+```
+
+**Configuring:**
+
+```sh name=API
+curl https://api.supabase.com/v1/projects/PROJECT_REF/config/database/postgres \
+  --request PUT \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer ACCESS_TOKEN' \
+  --data '{
+  "log_checkpoints": false
+}'
+```
+
+### `log_autovacuum_min_duration`
+
+`update` and `delete` commands leave behind obsolete row versions to support rollbacks and concurrent queries. A background process called the Autovacuum permanently removes the rows in batch jobs at a later point. The setting logs Autovacuum executions if they run for longer than the limit.
+
+**Useful for:**
+
+- Monitoring vacuum activity
+- Identifying disk strain caused by vacuums
+
+**Example logs:**
+```sh
+# records tables vacuumed
+automatic vacuum of table "postgres.public.vac_test": index scans: 0
+automatic analyze of table "postgres.public.vac_test"
+```
+
+**Configuring:**
+
+
+```sh name=API
+curl https://api.supabase.com/v1/projects/PROJECT_REF/config/database/postgres \
+  --request PUT \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer ACCESS_TOKEN' \
+  --data '{
+  "log_autovacuum_min_duration": "0ms"
+}'
+```
+
+### `log_temp_files`
+
+Some queries require sorting, hashing, or other memory-intensive operations. When memory usage exceeds configured limits, Postgres continues the operation with the support of temp files on disk. This setting logs temp files larger than a specified size, helping identify queries that may benefit from tuning.
+
+**Useful for:**
+
+- Determining when the memory constraint settings should be adjusted 
+- Identifying disk strain caused by temp files
+
+**Example logs:**
+```sh
+# records the creation of a temp file that is 8.33MB in size
+temporary file: path "base/pgsql_tmp/pgsql_tmp306918.0", size 8331264
+```
+
+**Configuring:**
+
+```sh name=API
+curl https://api.supabase.com/v1/projects/PROJECT_REF/config/database/postgres \
+  --request PUT \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer ACCESS_TOKEN' \
+  --data '{
+  "log_temp_files": "10kB"
+}'
+```
+
+```sql  name=SQL
+alter role "postgres" set log_temp_files to '10kB';
+```
+
+
+### `log_startup_progress_interval`
+
+For large servers, recovery after a crash may take an extended period. To provide more clarity about a recovery's progress, the setting causes Postgres to log its current startup task if it takes longer than the interval. 
+
+
+**Useful for:**
+
+- Determining if a server is responsive during startup/recovery
+
+**Example logs:**
+```sh
+syncing data directory (pre-fsync), elapsed time: 0.00 s, current path: ./base/4/13456
+```
+
+**Configuring:**
+
+```sh name='Management API'
+curl https://api.supabase.com/v1/projects/PROJECT_REF/config/database/postgres \
+  --request PUT \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer ACCESS_TOKEN' \
+  --data '{
+  "log_startup_progress_interval": "1s"
+}'
+```
+
+
+
+### `log_recovery_conflict_waits`
+
+If a read-replca is acting on data that is being modified/discarded by the primary, then it may wait to determine if the data should be readable or not. The setting `log_recovery_conflict_waits` determines if the replica should report what it is waiting on after a second.
+
+**Useful for:**
+
+- Detecting operations that interfere with replica queries
+- Detecting operations that may cause replication lag
+
+**Example logs:**
+```sh
+recovery still waiting after 1000.156 ms: recovery conflict on lock 
+```
+
+**Configuring:**
+
+
+```sh name=API
+curl https://api.supabase.com/v1/projects/PROJECT_REF/config/database/postgres \
+  --request PUT \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer ACCESS_TOKEN' \
+  --data '{
+  "log_recovery_conflict_waits": true
+}'
+```
+
+
+## Query Activity Log Settings
+
+Records queries or metadata about queries. 
+
+### `auto_explain.*`
+
+<Admonition type="caution">
+
+To avoid excessive logging and performance penalties, it is not advised to configure `auto_explain.log_min_duration` below `2s` except for brief periods around debugging.
+
+</Admonition>
+
+[auto_explain](https://www.postgresql.org/docs/current/auto-explain.html) is a Postgres Module that is preinstalled on all Supabase projects. It logs the statements and [explain plans](postgresql.org/docs/current/sql-explain.html) of queries that took more than setting's limit.
+
+**Useful for:**
+
+- Monitoring and optimizing slow queries
+
+**Example logs:**
+```sh
+duration: 1661.934 ms plan: Query Text: SELECT * FROM example;
+Seq Scan on example (cost=0.00..1443.00 rows=100000 width=36) 
+```
+
+**Configuring**
+
+<Admonition type="tip">
+
+`auto_explain` is a family of configurations. The primary one is `auto_explain.log_min_duration`. However, there are other configs of note, such as `auto_explain.log_analyze` and `auto_explain.log_buffers` that control the details of the query plan recorded. Reference the module's [official docs](https://www.postgresql.org/docs/current/auto-explain.html) for more details.
+
+
+</Admonition>
+
+```sql name=SQL
+alter role "postgres" set auto_explain.log_min_duration to '2s';
+```
+
+### `log_min_duration_statement`
+
+<Admonition type="caution">
+
+To avoid excessive logging and performance penalties, it is not advised to configure `log_min_duration_statement` below `1s` except for brief periods to help with optimization and debugging.
+
+</Admonition>
+
+A limited version of `auto_explain.log_min_duration`. It only logs query statements that run longer than the setting's limit.
+
+**Useful for:**
+
+- Monitoring and optimizing slow queries
+
+**Example logs:**
+```sh
+duration: 1.097 ms statement: SELECT * FROM example_table limit 100; 
+```
+
+**Configuring:**
+
+```sql name=SQL
+alter role "postgres" set log_min_duration_statement to '2s';
+```
+
+### `log_duration`
+
+<Admonition type="caution">
+
+To avoid excessive logging and performance penalties, it is not advised to configure `log_duration` globally.
+
+</Admonition>
+
+It logs the duration of all queries, but not the queries themself. 
+
+**Useful for:**
+
+- Monitoring query duration
+
+**Example logs:**
+```sh
+duration: 0.599 ms
+```
+Note, even though the query will not be logged, the primary command associated with the query will be recorded as a subfield:
+```sh
+...other subfields
+command_tag: "SELECT"
+```
+
+**Configuring:**
+
+```sql name=SQL
+alter role "postgres" set log_duration to true;
+```
+
+
+### `log_statement`
+
+<Admonition type="caution">
+
+To avoid excessive logging and performance penalties, it is not advised to configure `log_statement` globally with the configs the `mod` and `all`. Consider using `pg_audit` over `log_statement` for more granular control over query logging.
+
+</Admonition>
+
+Logs queries that match the below types:
+- `ddl`: Log all `alter`, `drop`, and `create` commands
+- `all`: Log all queries
+- `mod`: Log `update`, `insert`, `delete`, and `merge` commands
+- `none`: Log nothing (disables the setting)
+
+**Useful for:**
+
+- Monitoring queries on your platform
+
+**Example log:**
+
+```sh
+# Logging a select query
+statement: SELECT * FROM testing WHERE id = 5 limit 100; 
+```
+
+**Configuring:**
+
+SQL:
+
+```sql
+alter role "postgres" set "log_statement" to 'none';
+```
+
+### `pgaudit.*`
+
+<Admonition type="caution">
+
+To avoid excessive logging and performance penalties, it is not advised to configure `pg_audit` globally, instead, it is better to target specific roles, operations, and tables.
+
+</Admonition>
+
+An suite of log settings enabled by the pgaudit extension. Unlike `log_statement`, it allows you to monitor queries against specific tables, with a higher degree of granularity.
+
+**Useful for:**
+
+- Monitoring queries on your platform
+
+**Example log:**
+
+```sh
+# Logging a DDL queries
+AUDIT: SESSION,1,1,DDL,CREATE TABLE,TABLE,public.account,create table account(
+  id int,
+  name text,
+  description text
+); <not logged>
+```
+
+**Configuring:**
+
+Review the [pgaudit docs](/docs/guides/database/extensions/pgaudit) for more configuration details.
+
+
+### `log_min_error_statement`
+
+Determines if a log event should record the query that induced it as a subfield if possible. By default all `ERROR` level and below logs record the query that induced them. To view the serverity levels, reference [log_min_messages](#log_min_messages).
+
+**Useful for:**
+
+- Detecting what queries induced specific logs
+- Detecting what queries induced a specific error
+
+**Example logs:**
+
+```sh
+duplicate key value violates unique constraint "example_pkey"
+...
+# affiliated subfield
+query: "insert into example (id) values (1), (1); 
+```
+
+**Configuring**
+
+```sql name=SQL
+alter role "postgres" set "log_min_error_statement" to 'error';
+```
+
+
+# Log subfields
+
+The Log Dashboard prioritizes showing users a log's `event_message`. The logging infrastructure, will also capture the below table of information:
+
+| Column | Description |
+| :--- | :--- |
+| `event_message` | The log's message |
+| `timestamp` | Time event was recorded |
+| `identifier` | Machine ID (used for identifying primaries and replicas) |
+| `id` | Log's unique ID |
+| `metadata.parsed` | Contains metadata about event |
+
+Postgres may capture extra information in the `metadata.parsed` section. The below sections list the categories of subfields.
+
+### Query subfields
+
+| Field | Description | Example |
+| :--- | :--- | :--- |
+| `parsed.query` | The SQL query executed | `select * from some_table;` |
+| `parsed.command_tag` | Tag identifying the type of command | `select`, `insert`, `update`... |
+| `parsed.internal_query` | An internal query used to facilitate a primary query (often used by Realtime) | `select to_jsonb()` |
+
+#### Suggested Use Cases
+* Identifying slow queries
+* Identifying failing queries
+
+### Error context subfields
+
+| Field | Description | Example |
+| :--- | :--- | :--- |
+| `parsed.error_severity` | Event severity level | `log`, `warning`, `error`... |
+| `parsed.detail` | Postgres-provided explanation of the event | `"Key (fk_table)=(553585367) already exists."` |
+| `parsed.sql_state_code` | Error code that maps to [Postgres's error table](https://www.postgresql.org/docs/current/errcodes-appendix.html) | `42501` |
+| `parsed.hint` | Contextual hint on how to resolve the error | `"No function matches the given name and argument types. You might need to add explicit type casts."` |
+| `parsed.context` | Provides insight into exactly where an error occurred (e.g., function line numbers) | `"PL/pgSQL function public.find_text(public.vector,integer) line 3 at IF..."` |
+
+#### Suggested Use Cases
+* Filter by error severity or sql code
+* Get hints, details, and context about error events
+
+### Transaction identifer subfields
+
+| Field | Description | Example |
+| :--- | :--- | :--- |
+| `parsed.session_id` | The session ID | `12345` |
+| `parsed.session_start_time` | Timestamp indicating when the session began | `2024-05-08 15:30:00` |
+| `parsed.connection_from` | The connection IP | `192.165.1.100` |
+| `parsed.user_name` | The database user that formed the connection | `postgres` |
+| `parsed.application_name` | The name of the application volunteered by the client | `Supavisor`, `postgREST` |
+| `parsed.database_name` | The name of the database | `postgres` |
+| `parsed.process_id` | The operating system process ID (`PID`) | `1234` |
+| `parsed.backend_type` | Identifies if the event originated internally (e.g., background workers like `pg_cron`, `pg_net`) or externally (`client backend`) | `client backend` |
+
+### Suggested Use Cases
+* Identify events by server/API
+* Filter connections by IP
+* Identify connections to specific databases
+* Filter connections by sessions for debugging
+* identify extension events
+
+
+## Resources
+- [Advanced Log Filtering](/docs/guides/telemetry/advanced-log-filtering)
+- [Official `PGAudit` documentation](https://www.pgaudit.org)
+- [Database Function Logging](/docs/guides/database/functions#general-logging)
+- [Supabase Logging](/docs/guides/telemetry/logs)
+- [Self-Hosting Logs](/docs/reference/self-hosting-analytics/introduction)
