@@ -318,7 +318,7 @@ export default function FormPatternsSidePanel() {
                           <button
                             type="button"
                             onClick={() => uploadButtonRef.current?.click()}
-                            className="flex items-center justify-center h-10 w-10 shrink-0 text-foreground-lighter hover:text-foreground-light overflow-hidden rounded-full bg-cover border hover:border-strong"
+                            className="flex items-center justify-center h-10 w-10 shrink-0 text-foreground-lighter hover:text-foreground-light overflow-hidden rounded-full bg-cover border hover:border-strong focus-visible:outline-brand-600"
                             style={{
                               backgroundImage: logoUrl ? `url("${logoUrl}")` : 'none',
                             }}
@@ -327,7 +327,8 @@ export default function FormPatternsSidePanel() {
                           </button>
                           <div className="flex gap-2 items-center">
                             <Button
-                              variant="default"
+                              type="button"
+                              variant="outline"
                               size="tiny"
                               icon={<Upload size={14} />}
                               onClick={() => uploadButtonRef.current?.click()}
