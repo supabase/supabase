@@ -26,6 +26,10 @@ export const IS_STAGING_OR_LOCAL =
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging' ||
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
 
+export const IS_LOCAL =
+  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' &&
+  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'staging'
+
 export const API_URL = (() => {
   if (process.env.NODE_ENV === 'test') return 'http://localhost:3000/api'
   //  If running in platform, use API_URL from the env var
