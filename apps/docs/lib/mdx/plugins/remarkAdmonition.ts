@@ -1,4 +1,4 @@
-import type { Content, Paragraph, Root } from 'mdast'
+import type { BlockContent, Content, Paragraph, Root } from 'mdast'
 import type { MdxJsxFlowElement } from 'mdast-util-mdx'
 import type { AdmonitionProps } from 'ui-patterns/admonition'
 import type { Node } from 'unist'
@@ -41,7 +41,7 @@ const remarkMkDocsAdmonition = function () {
         })
 
         // Wrap inline content in a single paragraph so MDX does not emit one <p> per node.
-        const children: Content[] = [
+        const children: MdxJsxFlowElement['children'] = [
           ...(inlineChildren.length > 0
             ? [{ type: 'paragraph' as const, children: inlineChildren }]
             : []),
@@ -88,7 +88,12 @@ const remarkMkDocsAdmonition = function () {
  *
  * Splices the discovered siblings out of the original parent and returns them.
  */
-function extractLinkedSiblings(parent: Root, node: Node, index: number, indentAmount = 4) {
+function extractLinkedSiblings(
+  parent: Root,
+  node: Node,
+  index: number,
+  indentAmount = 4
+): BlockContent[] {
   const { column } = node.position?.start || { column: 0 }
 
   let nextSibling: Content
@@ -98,7 +103,7 @@ function extractLinkedSiblings(parent: Root, node: Node, index: number, indentAm
     nextSibling = parent.children[++i]
   } while (nextSibling?.position && nextSibling.position.start.column === column + indentAmount)
 
-  return parent.children.splice(index + 1, i - index - 1)
+  return parent.children.splice(index + 1, i - index - 1) as BlockContent[]
 }
 
 /**
