@@ -43,7 +43,7 @@ export const Success = ({
   ) : null
 
   return (
-    <div className="flex w-full flex-col items-center gap-4 px-4 pt-4 text-center">
+    <div className="flex w-full flex-col items-center gap-4 px-4 pt-4 pb-8 text-center">
       <Check strokeWidth={1.5} size={24} className="text-brand" />
 
       <div className="flex max-w-[620px] flex-col items-center gap-2">
