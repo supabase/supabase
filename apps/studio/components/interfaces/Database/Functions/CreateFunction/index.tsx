@@ -477,16 +477,16 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
   })
 
   return (
-    <>
-      <div className="flex flex-col">
+    <div className="flex flex-col gap-y-4">
+      <div>
         <h5 className="text-base text-foreground">Arguments</h5>
         <p className="text-sm text-foreground-light">
           Arguments can be referenced in the function body using either names or numbers.
         </p>
       </div>
-      <div className="space-y-2 pt-4">
+      <div className="space-y-2">
         {readonly && isEmpty(fields) && (
-          <span className="text-foreground-lighter">No argument for this function</span>
+          <span className="text-sm text-foreground-lighter">No argument for this function</span>
         )}
         {fields.map((field, index) => {
           return (
@@ -515,7 +515,7 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                         >
-                          <SelectTrigger className="h-[38px]">
+                          <SelectTrigger className="h-[34px]">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -537,10 +537,10 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
 
               {!readonly && (
                 <Button
-                  variant="danger"
+                  variant="default"
                   icon={<Trash size={12} />}
                   onClick={() => remove(index)}
-                  className="h-[38px] w-[38px]"
+                  className="h-[34px] w-[34px]"
                 />
               )}
             </div>
@@ -558,7 +558,7 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
           </Button>
         )}
       </div>
-    </>
+    </div>
   )
 }
 
