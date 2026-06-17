@@ -53,7 +53,10 @@ export type ServiceCard<Entry> = Entry & {
 }
 
 /** Maps enabled services to card data and orders them by traffic. */
-export const buildSortedServiceCards = <Key extends string, Entry extends { key: Key; enabled: boolean }>(
+export const buildSortedServiceCards = <
+  Key extends string,
+  Entry extends { key: Key; enabled: boolean },
+>(
   services: Entry[],
   statsByKey: Record<Key, ServiceCardStats>
 ): ServiceCard<Entry>[] =>
