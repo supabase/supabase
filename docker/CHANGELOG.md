@@ -19,22 +19,23 @@ See per-service updates below for details. Only the most important changes relev
 ## [2026-06-17]
 
 ⚠️ **Note:** This update contains **breaking changes**. Make sure to read the **important** details below:
-- **Postgres 17 is now the default**. Do not start Postgres 17 on an existing Postgres 15 data directory. See the [Upgrade to Postgres 17](https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17) guide. Check the Configuration and Postgres sections for additional information
+- **Postgres 17 is now the default**. Do not start Postgres 17 on an existing Postgres 15 data directory. See the [Upgrade to Postgres 17](https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17) guide. Check the **Configuration** and **Postgres** sections for additional information
 - API gateway configuration includes a **security fix** for Realtime routes - it is **strongly recommended** to add this update to any self-hosted Supabase instance running Realtime
-- Studio and postgres-meta configuration now use `postgres` and not `supabase_admin` to connect to Postgres
+- Studio and Postgres Meta configuration now use `postgres` and not `supabase_admin` to connect to Postgres
 
 ### Configuration
-- ⚠️ Changed the default database image to `supabase/postgres:17.6.1.136` - PR [#46981](https://github.com/supabase/supabase/pull/46981)
+- ⚠️ Changed the default Postgres image to `supabase/postgres:17.6.1.136` - PR [#46981](https://github.com/supabase/supabase/pull/46981)
 - ⚠️ Added `docker-compose.pg15.yml` - for deployments not yet upgraded, and as the rollback target for `utils/upgrade-pg17.sh` - PR [#46981](https://github.com/supabase/supabase/pull/46981)
 - Updated `docker-compose.pg17.yml` to match the new default - PR [#46981](https://github.com/supabase/supabase/pull/46981)
 
 ### Documentation
 - Updated the [Upgrade to Postgres 17](https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17) how-to - PR [#46989](https://github.com/supabase/supabase/pull/46989)
 - Updated the [New API Keys](https://supabase.com/docs/guides/self-hosting/self-hosted-auth-keys) and [Envoy API Gateway](https://supabase.com/docs/guides/self-hosting/self-hosted-envoy) how-to guides - PR [#46856](https://github.com/supabase/supabase/pull/46856)
+- Updated [CONFIG.md][CONFIG.md] - PR [#47022](https://github.com/supabase/supabase/pull/47022)
 
 ### Utils and tests
-- Updated `utils/upgrade-pg17.sh` (bumped Postgres image, added additional migrations), `tests/test-pg17-upgrade.sh` (added tests for pg_cron) - PR [#46981](https://github.com/supabase/supabase/pull/46981)
-- Updated `tests/test-self-hosted.sh` (modified tests for GraphQL and Realtime, added tests for resumable upload) - PR [#46856](https://github.com/supabase/supabase/pull/46856), PR [#46981](https://github.com/supabase/supabase/pull/46981), PR [#46731](https://github.com/supabase/supabase/pull/46731)
+- Updated `utils/upgrade-pg17.sh` (bumped Postgres image, added additional migrations), and `tests/test-pg17-upgrade.sh` (added tests for pg_cron) - PR [#46981](https://github.com/supabase/supabase/pull/46981)
+- Updated `tests/test-self-hosted.sh` (added tests for resumable upload, modified tests for Realtime and GraphQL) - PR [#46731](https://github.com/supabase/supabase/pull/46731), PR [#46856](https://github.com/supabase/supabase/pull/46856), PR [#46981](https://github.com/supabase/supabase/pull/46981)
 - Updated `tests/test-auth-keys.sh` (modified tests for Realtime) - PR [#46856](https://github.com/supabase/supabase/pull/46856)
 
 ### API gateway
