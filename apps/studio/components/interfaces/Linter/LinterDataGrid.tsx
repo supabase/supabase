@@ -16,8 +16,10 @@ import {
   lintInfoMap,
   NoIssuesFound,
 } from '@/components/interfaces/Linter/Linter.utils'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { Lint } from '@/data/lint/lint-query'
 import { useTrack } from '@/lib/telemetry/track'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface LinterDataGridProps {
   isLoading: boolean
@@ -129,7 +131,7 @@ export const LinterDataGrid = ({
         <DataGrid
           ref={gridRef}
           style={{ height: '100%' }}
-          className={cn('flex-1 grow h-full')}
+          className={cn('flex-1 grow h-full border-t-0! border-b-0!')}
           rowHeight={44}
           headerRowHeight={36}
           columns={columns}
@@ -193,7 +195,9 @@ export const LinterDataGrid = ({
                 </h3>
                 <LintCategoryBadge category={selectedLint.categories[0]} />
               </div>
-              <Button type="text" icon={<X />} onClick={handleSidepanelClose} />
+              <ShortcutTooltip shortcutId={SHORTCUT_IDS.ADVISORS_CLOSE_DETAIL} side="left">
+                <Button variant="text" icon={<X />} onClick={handleSidepanelClose} />
+              </ShortcutTooltip>
             </div>
             <div className="p-6 flex-grow min-h-0 overflow-y-auto">
               <LintDetail

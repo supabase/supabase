@@ -7,6 +7,14 @@ subtitle: 'Understand HTTP status codes returned by Edge Functions to properly d
 
 {/* supa-mdx-lint-disable Rule001HeadingCase */}
 
+When invoking an Edge Function, the response may return a variety of HTTP status codes. The most common status codes are listed below.
+
+<Admonition type="note">
+
+Error responses may also include an `sb-error-code` header that identifies the specific error condition. See [Error Codes](/docs/guides/functions/error-codes) for a complete list of error codes and their meanings.
+
+</Admonition>
+
 ## Success Responses
 
 ### 2XX Success
@@ -109,7 +117,7 @@ You can see the output in the [Edge Function Logs](/docs/guides/functions/loggin
 
 ### 546 Resource Limit (Custom Error Code)
 
-**Cause:** Your Edge Function execution was stopped due to exceeding resource limits (`WORKER_LIMIT`). Edge Function logs should provide which [resource limit](/docs/guides/functions/limits) was exceeded.
+**Cause:** Your Edge Function execution was stopped due to exceeding resource limits (`WORKER_RESOURCE_LIMIT`, previously it was `WORKER_LIMIT`). Edge Function logs should provide which [resource limit](/docs/guides/functions/limits) was exceeded.
 
 **Common causes:**
 

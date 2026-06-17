@@ -7,14 +7,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { pricing } from 'shared-data/pricing'
 import { toast } from 'sonner'
-import {
-  Button,
-  cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  SidePanel,
-} from 'ui'
+import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
 import Table from '@/components/to-be-cleaned/Table'
@@ -113,7 +106,7 @@ const SpendCapSidePanel = () => {
       header={
         <div className="flex items-center justify-between w-full">
           <h4>Spend cap</h4>
-          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+          <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
               href={`${DOCS_URL}/guides/platform/cost-control#spend-cap`}
               target="_blank"
@@ -133,8 +126,8 @@ const SpendCapSidePanel = () => {
             exceed the included quota allowance of any billed line item in a billing cycle
           </p>
 
-          <Collapsible_Shadcn_ open={showUsageCosts} onOpenChange={setShowUsageCosts}>
-            <CollapsibleTrigger_Shadcn_ asChild>
+          <Collapsible open={showUsageCosts} onOpenChange={setShowUsageCosts}>
+            <CollapsibleTrigger asChild>
               <div className="flex items-center space-x-2 cursor-pointer">
                 <ChevronRight
                   strokeWidth={1.5}
@@ -145,8 +138,8 @@ const SpendCapSidePanel = () => {
                   How are each resource charged after exceeding the included quota?
                 </p>
               </div>
-            </CollapsibleTrigger_Shadcn_>
-            <CollapsibleContent_Shadcn_ asChild>
+            </CollapsibleTrigger>
+            <CollapsibleContent asChild>
               <Table
                 className="mt-4"
                 head={
@@ -191,8 +184,8 @@ const SpendCapSidePanel = () => {
                   )
                 })}
               />
-            </CollapsibleContent_Shadcn_>
-          </Collapsible_Shadcn_>
+            </CollapsibleContent>
+          </Collapsible>
 
           {isFreePlan && (
             <Admonition
@@ -201,7 +194,7 @@ const SpendCapSidePanel = () => {
               title="Toggling of the spend cap is only available on the Pro Plan"
               description="Upgrade your plan to disable the spend cap"
               actions={
-                <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
+                <Button variant="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
                   View available plans
                 </Button>
               }

@@ -7,16 +7,16 @@ import {
   Badge,
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 
 import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
@@ -231,7 +231,7 @@ const ProjectLinker = ({
                 renderTrigger={() => {
                   return (
                     <Button
-                      type="default"
+                      variant="default"
                       block
                       disabled={defaultSupabaseProjectRef !== undefined || loadingSupabaseProjects}
                       loading={loadingSupabaseProjects}
@@ -262,8 +262,8 @@ const ProjectLinker = ({
                 renderActions={() => {
                   return (
                     projectCreationEnabled && (
-                      <CommandGroup_Shadcn_>
-                        <CommandItem_Shadcn_
+                      <CommandGroup>
+                        <CommandItem
                           className="cursor-pointer w-full"
                           onSelect={() => {
                             setOpenProjectsDropdown(false)
@@ -281,8 +281,8 @@ const ProjectLinker = ({
                             <Plus size={14} strokeWidth={1.5} />
                             <p>Create a new project</p>
                           </Link>
-                        </CommandItem_Shadcn_>
-                      </CommandGroup_Shadcn_>
+                        </CommandItem>
+                      </CommandGroup>
                     )
                   )
                 }}
@@ -296,13 +296,13 @@ const ProjectLinker = ({
                 {integrationIcon}
               </div>
 
-              <Popover_Shadcn_
+              <Popover
                 open={openForeignProjectsComboBox}
                 onOpenChange={setOpenForeignProjectsComboBox}
               >
-                <PopoverTrigger_Shadcn_ asChild>
+                <PopoverTrigger asChild>
                   <Button
-                    type="default"
+                    variant="default"
                     block
                     disabled={loadingForeignProjects}
                     loading={loadingForeignProjects}
@@ -322,21 +322,16 @@ const ProjectLinker = ({
                   >
                     {(selectedForeignProject && selectedForeignProject.name) ?? choosePrompt}
                   </Button>
-                </PopoverTrigger_Shadcn_>
-                <PopoverContent_Shadcn_
-                  className="p-0"
-                  side="bottom"
-                  align="center"
-                  sameWidthAsTrigger
-                >
-                  <Command_Shadcn_>
-                    <CommandInput_Shadcn_ placeholder="Search for a project" />
-                    <CommandList_Shadcn_ className="max-h-[170px]!">
-                      <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
-                      <CommandGroup_Shadcn_>
+                </PopoverTrigger>
+                <PopoverContent className="p-0" side="bottom" align="center" sameWidthAsTrigger>
+                  <Command>
+                    <CommandInput placeholder="Search for a project" />
+                    <CommandList className="max-h-[170px]!">
+                      <CommandEmpty>No results found.</CommandEmpty>
+                      <CommandGroup>
                         {foreignProjects.map((project, i) => {
                           return (
-                            <CommandItem_Shadcn_
+                            <CommandItem
                               key={project.id}
                               value={`${project.name.replaceAll('"', '')}-${i}`}
                               className="flex gap-2 items-center"
@@ -349,31 +344,31 @@ const ProjectLinker = ({
                               <span className="truncate" title={project.name}>
                                 {project.name}
                               </span>
-                            </CommandItem_Shadcn_>
+                            </CommandItem>
                           )
                         })}
                         {foreignProjects.length === 0 && (
-                          <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
+                          <CommandEmpty>No results found.</CommandEmpty>
                         )}
-                      </CommandGroup_Shadcn_>
+                      </CommandGroup>
                       {mode === 'GitHub' && (
                         <>
-                          <CommandSeparator_Shadcn_ />
-                          <CommandGroup_Shadcn_>
-                            <CommandItem_Shadcn_
+                          <CommandSeparator />
+                          <CommandGroup>
+                            <CommandItem
                               className="flex gap-2 items-center cursor-pointer"
                               onSelect={() => openInstallGitHubIntegrationWindow('install')}
                             >
                               <PlusIcon size={16} />
                               Add GitHub Repositories
-                            </CommandItem_Shadcn_>
-                          </CommandGroup_Shadcn_>
+                            </CommandItem>
+                          </CommandGroup>
                         </>
                       )}
-                    </CommandList_Shadcn_>
-                  </Command_Shadcn_>
-                </PopoverContent_Shadcn_>
-              </Popover_Shadcn_>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </Panel>
           </div>
         )}
@@ -383,7 +378,7 @@ const ProjectLinker = ({
         {onSkip !== undefined && (
           <Button
             size="medium"
-            type="default"
+            variant="default"
             onClick={() => {
               onSkip()
             }}

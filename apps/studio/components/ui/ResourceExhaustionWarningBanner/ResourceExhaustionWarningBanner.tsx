@@ -4,9 +4,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { COMPUTE_DISK } from 'shared-data'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   cn,
   DropdownMenu,
@@ -224,7 +224,7 @@ export const ResourceExhaustionWarningBanner = () => {
   }
 
   return (
-    <Alert_Shadcn_
+    <Alert
       variant={isCritical ? 'destructive' : 'warning'}
       className={cn(
         'flex items-center justify-between',
@@ -233,15 +233,15 @@ export const ResourceExhaustionWarningBanner = () => {
     >
       <AlertTriangle />
       <div className="">
-        <AlertTitle_Shadcn_>{title}</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{description}</AlertDescription_Shadcn_>
+        <AlertTitle>{title}</AlertTitle>
+        <AlertDescription>{description}</AlertDescription>
       </div>
       <div className="flex items-center gap-x-2">
         {learnMoreUrl !== undefined && aiPrompt !== undefined ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                type="default"
+                variant="default"
                 icon={<Wrench size={14} />}
                 iconRight={<ChevronDown size={14} />}
               >
@@ -278,20 +278,20 @@ export const ResourceExhaustionWarningBanner = () => {
             </DropdownMenuContent>
           </DropdownMenu>
         ) : learnMoreUrl !== undefined ? (
-          <Button asChild type="default" icon={<BookOpen size={14} />}>
+          <Button asChild variant="default" icon={<BookOpen size={14} />}>
             <a href={learnMoreUrl} target="_blank" rel="noreferrer">
               Learn more
             </a>
           </Button>
         ) : aiPrompt !== undefined ? (
-          <Button type="default" onClick={handleAskAI}>
+          <Button variant="default" onClick={handleAskAI}>
             Ask AI Assistant
           </Button>
         ) : null}
         {correctionUrl !== undefined && (
           <Button
             asChild
-            type="primary"
+            variant="primary"
             disabled={isComputeUpgradeMetric && isOrgLoading}
             onClick={() =>
               track('resource_exhaustion_banner_upgrade_clicked', {
@@ -304,6 +304,6 @@ export const ResourceExhaustionWarningBanner = () => {
           </Button>
         )}
       </div>
-    </Alert_Shadcn_>
+    </Alert>
   )
 }

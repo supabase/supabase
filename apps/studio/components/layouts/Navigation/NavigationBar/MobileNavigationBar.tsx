@@ -5,7 +5,6 @@ import { useState } from 'react'
 import { Button, cn } from 'ui'
 import { MobileSheetNav } from 'ui-patterns'
 
-import { HeaderUpgradeButton } from '../LayoutHeader/HeaderUpgradeButton'
 import { HomeIcon } from '../LayoutHeader/HomeIcon'
 import { useMobileSheet } from './MobileSheetContext'
 import { OrgSelector } from './OrgSelector'
@@ -71,12 +70,11 @@ const MobileNavigationBar = ({
           )}
         </div>
         <div className="flex shrink-0 gap-2">
-          {IS_PLATFORM && <HeaderUpgradeButton />}
           {IS_PLATFORM ? <UserDropdown /> : <LocalDropdown />}
           {!hideMobileMenu && (
             <Button
               title="Menu dropdown button"
-              type="default"
+              variant="default"
               className="flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-open:bg-overlay-hover/30"
               icon={<Menu />}
               onClick={() => openMenu()}

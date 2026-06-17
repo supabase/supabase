@@ -6,9 +6,9 @@ import {
   Badge,
   Button,
   cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -152,7 +152,7 @@ export const ConnectionPanel = ({
               title="Transaction pooler is unavailable as pool mode is set to Session"
               description="If you'd like to use transaction mode, update your pool mode to Transaction for the connection pooler in your project's Database Settings."
             >
-              <Button asChild type="default" className="mt-2">
+              <Button asChild variant="default" className="mt-2">
                 <Link
                   href={`/project/${projectRef}/database/settings#connection-pooler`}
                   className="text-xs text-light hover:text-foreground"
@@ -206,7 +206,7 @@ export const ConnectionPanel = ({
                 {links.length > 0 && (
                   <div className="flex items-center gap-x-2 mt-2">
                     {links.map((link) => (
-                      <Button key={link.text} asChild type="default" size="tiny">
+                      <Button key={link.text} asChild variant="default" size="tiny">
                         <Link href={link.url} className="text-xs text-light hover:text-foreground">
                           {link.text}
                         </Link>
@@ -234,13 +234,13 @@ export const ConnectionPanel = ({
           )}
 
           {IS_PLATFORM && ipv4Status.type === 'error' && (
-            <Collapsible_Shadcn_ className="group -space-y-px">
-              <CollapsibleTrigger_Shadcn_
+            <Collapsible className="group -space-y-px">
+              <CollapsibleTrigger
                 asChild
                 className="group/collapse w-full justify-start rounded-t-none !last:rounded-b group-data-open:rounded-b-none border-muted"
               >
                 <Button
-                  type="default"
+                  variant="default"
                   size="tiny"
                   className="text-foreground-lighter bg-dash-sidebar!"
                   icon={
@@ -253,8 +253,8 @@ export const ConnectionPanel = ({
                 >
                   Some platforms are IPv4-only:
                 </Button>
-              </CollapsibleTrigger_Shadcn_>
-              <CollapsibleContent_Shadcn_ className="bg-dash-sidebar rounded-b border px-3 py-2">
+              </CollapsibleTrigger>
+              <CollapsibleContent className="bg-dash-sidebar rounded-b border px-3 py-2">
                 <div className="flex flex-col gap-2">
                   <p className="text-xs text-foreground-light max-w-xs">
                     A few major platforms are IPv4-only and may not work with a Direct Connection:
@@ -282,8 +282,8 @@ export const ConnectionPanel = ({
                     a IPv4 network.
                   </p>
                 </div>
-              </CollapsibleContent_Shadcn_>
-            </Collapsible_Shadcn_>
+              </CollapsibleContent>
+            </Collapsible>
           )}
         </div>
         {children}

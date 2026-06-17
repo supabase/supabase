@@ -41,10 +41,10 @@ export const DeleteMessageConfirmModal = ({
         </DialogSection>
 
         <DialogFooter padding="small">
-          <Button type="default" onClick={onCancel}>
+          <Button variant="default" onClick={onCancel}>
             Cancel
           </Button>
-          <Button type="danger" onClick={onConfirm}>
+          <Button variant="danger" onClick={onConfirm}>
             Delete
           </Button>
         </DialogFooter>

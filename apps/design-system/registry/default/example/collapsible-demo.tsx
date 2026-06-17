@@ -2,12 +2,7 @@
 
 import { ChevronsUpDown } from 'lucide-react'
 import * as React from 'react'
-import { Button } from 'ui'
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from 'ui/src/components/shadcn/ui/collapsible'
+import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
 export default function CollapsibleDemo() {
   const [isOpen, setIsOpen] = React.useState(false)
@@ -17,7 +12,7 @@ export default function CollapsibleDemo() {
       <div className="flex items-center justify-between space-x-4 px-4">
         <h4 className="text-sm font-semibold">@peduarte starred 3 repositories</h4>
         <CollapsibleTrigger asChild>
-          <Button type="outline" size="medium" className="w-9 p-0">
+          <Button variant="outline" size="medium" className="w-9 p-0">
             <ChevronsUpDown className="h-4 w-4" />
             <span className="sr-only">Toggle</span>
           </Button>

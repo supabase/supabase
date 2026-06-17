@@ -12,8 +12,8 @@ import {
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import type { LogData, QueryType } from './Logs.types'
-import { apiKey, role as extractRole, jwtAPIKey } from './Logs.utils'
+import type { LogData, PreviewLogData, QueryType } from './Logs.types'
+import { apiKey, role as extractRole, jwtAPIKey, parseMultigresEventMessage } from './Logs.utils'
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
@@ -70,6 +70,16 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
 
         return <DefaultPreviewSelectionRenderer log={apiLog} />
 
+      case 'multigres': {
+        const parsedMultigresMessage = parseMultigresEventMessage(log.event_message)
+        // Spread the log last so its canonical fields (id, timestamp, event_message)
+        // always win over any same-named keys inside the parsed event_message.
+        const multigresLog = (
+          parsedMultigresMessage ? { ...parsedMultigresMessage, ...log } : log
+        ) as PreviewLogData
+        return <DefaultPreviewSelectionRenderer log={multigresLog} />
+      }
+
       case 'database':
         const hint = log?.metadata?.[0]?.parsed?.[0]?.hint
         const detail = log?.metadata?.[0]?.parsed?.[0]?.detail
@@ -101,7 +111,7 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
             <div className="*:px-1.5 *:text-foreground-lighter ml-auto flex gap-1 absolute right-2 top-2">
               <ButtonTooltip
                 disabled={!log || isLoading}
-                type="text"
+                variant="text"
                 tooltip={{
                   content: {
                     side: 'left',
@@ -115,7 +125,7 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
                 }}
               />
 
-              <Button type="text" onClick={onClose}>
+              <Button variant="text" onClick={onClose}>
                 <X size={14} strokeWidth={2} />
               </Button>
             </div>

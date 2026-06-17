@@ -10,7 +10,6 @@ import { CommandMenuTriggerInput } from 'ui-patterns'
 
 import { BreadcrumbsView } from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
-import { HeaderUpgradeButton } from './HeaderUpgradeButton'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import { MergeRequestButton } from './MergeRequestButton'
@@ -94,7 +93,7 @@ export const LayoutHeader = ({
     selectedProject?.inserted_at !== undefined &&
     dayjs(selectedProject.inserted_at).isAfter(dayjs().subtract(5, 'day'))
 
-  const connectButtonType = isNewProject ? 'primary' : 'default'
+  const connectButtonVariant = isNewProject ? 'primary' : 'default'
 
   // show org selection if we are on a project page or on a explicit org route
   const showOrgSelection = slug || (selectedOrganization && projectRef)
@@ -217,7 +216,7 @@ export const LayoutHeader = ({
                   }}
                 >
                   {IS_PLATFORM && <MergeRequestButton />}
-                  <ConnectButton buttonType={connectButtonType} />
+                  <ConnectButton buttonVariant={connectButtonVariant} />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -253,7 +252,6 @@ export const LayoutHeader = ({
                     )}
                   </AnimatePresence>
                 </div>
-                <HeaderUpgradeButton className="hidden md:flex" />
                 <UserDropdown triggerClassName="hidden md:flex" />
               </>
             ) : (

@@ -18,23 +18,18 @@ export function useTableSort() {
   const tableName = useMemo(() => snap.table?.name || '', [snap])
 
   const sorts = useMemo(() => {
-    return formatSortURLParams(tableName, urlSorts)
-  }, [tableName, urlSorts])
+    if (!snap.originalTable) return []
+    return formatSortURLParams(snap.originalTable, urlSorts)
+  }, [snap.originalTable, urlSorts])
 
   const onApplySorts = useCallback(
     (appliedSorts: Sort[]) => {
-      if (!tableName) {
-        return console.warn(
-          '[useTableSort] Table name missing in callback, cannot apply sort correctly.'
-        )
-      }
-
-      const sortsWithTable = appliedSorts.map((sort) => ({ ...sort, table: tableName }))
+      const sortsWithTable = appliedSorts.map((sort) => ({ ...sort }))
       const newUrlSorts = sortsToUrlParams(sortsWithTable)
 
       setParams((prevParams) => ({ ...prevParams, sort: newUrlSorts }))
     },
-    [snap, setParams]
+    [setParams]
   )
 
   /**

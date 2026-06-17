@@ -7,11 +7,11 @@ import { toast } from 'sonner'
 import {
   Button,
   cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   DropdownMenuSeparator,
-  Input_Shadcn_ as Input,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
@@ -253,7 +253,11 @@ export const UserImpersonationSelector = () => {
                   </InputGroupAddon>
                   <InputGroupAddon align="inline-end">
                     {searchText && (
-                      <InputGroupButton size="tiny" type="text" onClick={() => setSearchText('')}>
+                      <InputGroupButton
+                        size="tiny"
+                        variant="text"
+                        onClick={() => setSearchText('')}
+                      >
                         <span className="sr-only">Clear search</span>
                         <X size={12} />
                       </InputGroupButton>
@@ -297,8 +301,8 @@ export const UserImpersonationSelector = () => {
                     <div>
                       {previousSearches.length > 0 ? (
                         <>
-                          <Collapsible_Shadcn_ className="relative">
-                            <CollapsibleTrigger_Shadcn_ className="group font-normal p-0 [&[data-state=open]>div>svg]:-rotate-180!">
+                          <Collapsible className="relative">
+                            <CollapsibleTrigger className="group font-normal p-0 [&[data-state=open]>div>svg]:-rotate-180!">
                               <div className="flex items-center gap-x-1 w-full">
                                 <p className="text-xs text-foreground-light group-hover:text-foreground transition">
                                   Recents
@@ -309,12 +313,12 @@ export const UserImpersonationSelector = () => {
                                   size={14}
                                 />
                               </div>
-                            </CollapsibleTrigger_Shadcn_>
+                            </CollapsibleTrigger>
 
-                            <CollapsibleContent_Shadcn_ className="mt-1 flex flex-col gap-y-4">
+                            <CollapsibleContent className="mt-1 flex flex-col gap-y-4">
                               <Button
                                 size="tiny"
-                                type="text"
+                                variant="text"
                                 className="absolute right-0 top-0 py-2 hover:bg-muted flex items-center text"
                                 onClick={clearSearchHistory}
                               >
@@ -331,8 +335,8 @@ export const UserImpersonationSelector = () => {
                                   ))}
                                 </ul>
                               </ScrollArea>
-                            </CollapsibleContent_Shadcn_>
-                          </Collapsible_Shadcn_>
+                            </CollapsibleContent>
+                          </Collapsible>
                         </>
                       ) : (
                         <div className="p-4 text-center text-muted-foreground">
@@ -375,7 +379,7 @@ export const UserImpersonationSelector = () => {
                 </FormItemLayout>
                 <div className="flex items-center justify-end">
                   <Button
-                    type="default"
+                    variant="default"
                     disabled={!externalUserId}
                     onClick={impersonateExternalUser}
                   >
@@ -393,8 +397,8 @@ export const UserImpersonationSelector = () => {
         <>
           <DropdownMenuSeparator className="m-0" />
           <div className="px-5 py-2 flex flex-col gap-2 relative">
-            <Collapsible_Shadcn_>
-              <CollapsibleTrigger_Shadcn_ className="group font-normal p-0 [&[data-state=open]>div>svg]:-rotate-180!">
+            <Collapsible>
+              <CollapsibleTrigger className="group font-normal p-0 [&[data-state=open]>div>svg]:-rotate-180!">
                 <div className="flex items-center gap-x-1 w-full">
                   <p className="text-xs text-foreground-light group-hover:text-foreground transition">
                     Advanced options
@@ -405,8 +409,8 @@ export const UserImpersonationSelector = () => {
                     size={14}
                   />
                 </div>
-              </CollapsibleTrigger_Shadcn_>
-              <CollapsibleContent_Shadcn_ className="mt-1 flex flex-col gap-y-4">
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-1 flex flex-col gap-y-4">
                 <div className="flex flex-row items-center gap-x-4 text-sm text-foreground-light">
                   <div className="flex items-center gap-x-1">
                     <h3>MFA assurance level</h3>
@@ -424,8 +428,8 @@ export const UserImpersonationSelector = () => {
                     <p className={aal === 'aal2' ? undefined : 'text-foreground-lighter'}>AAL2</p>
                   </div>
                 </div>
-              </CollapsibleContent_Shadcn_>
-            </Collapsible_Shadcn_>
+              </CollapsibleContent>
+            </Collapsible>
           </div>
         </>
       ) : null}
@@ -471,7 +475,7 @@ const BaseImpersonatingRow = ({
         </span>
       </div>
 
-      <Button type="default" onClick={onClick} disabled={isLoading} loading={isLoading}>
+      <Button variant="default" onClick={onClick} disabled={isLoading} loading={isLoading}>
         {isImpersonating ? 'Stop' : 'Impersonate'}
       </Button>
     </div>
@@ -567,7 +571,12 @@ const UserRow = ({ user, onClick, isImpersonating = false, isLoading = false }: 
         </span>
       </div>
 
-      <Button type="default" onClick={() => onClick(user)} disabled={isLoading} loading={isLoading}>
+      <Button
+        variant="default"
+        onClick={() => onClick(user)}
+        disabled={isLoading}
+        loading={isLoading}
+      >
         {isImpersonating ? 'Stop' : 'Impersonate'}
       </Button>
     </div>

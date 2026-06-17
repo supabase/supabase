@@ -72,7 +72,6 @@ import { constructHeaders, isValidConnString } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { isError } from '@/data/utils/error-check'
 import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -83,6 +82,7 @@ import { formatSql } from '@/lib/formatSql'
 import { detectOS } from '@/lib/helpers'
 import { useProfile } from '@/lib/profile'
 import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
+import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import {
@@ -118,7 +118,7 @@ export const SQLEditor = () => {
   const snapV2 = useSqlEditorV2StateSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
-  const { isHipaaProjectDisallowed } = useOrgAiOptInLevel()
+  const { aiOptInLevel } = useOrgAiOptInLevel()
   const showPrettyExplain = useFlag('ShowPrettyExplain')
 
   const {
@@ -217,7 +217,7 @@ export const SQLEditor = () => {
 
   /* React query mutations */
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { mutate: execute, isPending: isExecuting } = useExecuteSqlMutation({
     onSuccess(data, vars) {
       if (id) {
@@ -392,7 +392,9 @@ export const SQLEditor = () => {
       }
 
       if (
-        !isHipaaProjectDisallowed &&
+        // Don't auto-generate a title when the org has disabled AI or is a HIPAA project,
+        // as that would silently forward the query to the AI provider without consent
+        aiOptInLevel !== 'disabled' &&
         snippet?.snippet.name.startsWith(untitledSnippetTitle) &&
         IS_PLATFORM
       ) {
@@ -431,10 +433,7 @@ export const SQLEditor = () => {
         },
       })
 
-      sendEvent({
-        action: 'sql_editor_query_run_button_clicked',
-        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-      })
+      track('sql_editor_query_run_button_clicked')
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
@@ -443,7 +442,7 @@ export const SQLEditor = () => {
       id,
       isExecuting,
       project,
-      isHipaaProjectDisallowed,
+      aiOptInLevel,
       execute,
       getImpersonatedRoleState,
       setAiTitle,
@@ -451,6 +450,7 @@ export const SQLEditor = () => {
       databases,
       eventTriggers,
       limit,
+      track,
     ]
   )
 
@@ -638,11 +638,7 @@ export const SQLEditor = () => {
         ])
       }
 
-      sendEvent({
-        action: 'assistant_sql_diff_handler_evaluated',
-        properties: { handlerAccepted: true },
-        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-      })
+      track('assistant_sql_diff_handler_evaluated', { handlerAccepted: true })
 
       setSelectedDiffType(DiffType.Modification)
       resetPrompt()
@@ -651,17 +647,13 @@ export const SQLEditor = () => {
       setIsAcceptDiffLoading(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sourceSqlDiff, selectedDiffType, handleNewQuery, generateSqlTitle, router, id, snapV2])
+  }, [sourceSqlDiff, selectedDiffType, handleNewQuery, generateSqlTitle, router, id, snapV2, track])
 
   const discardAiHandler = useCallback(() => {
-    sendEvent({
-      action: 'assistant_sql_diff_handler_evaluated',
-      properties: { handlerAccepted: false },
-      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-    })
+    track('assistant_sql_diff_handler_evaluated', { handlerAccepted: false })
     resetPrompt()
     closeDiff()
-  }, [closeDiff, resetPrompt, sendEvent])
+  }, [closeDiff, resetPrompt, track])
 
   const [isCompletionLoading, setIsCompletionLoading] = useState<boolean>(false)
 
@@ -1069,7 +1061,7 @@ export const SQLEditor = () => {
                 {results.autoLimit !== undefined && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button type="default" iconRight={<ChevronUp size={14} />}>
+                      <Button variant="default" iconRight={<ChevronUp size={14} />}>
                         Limit results to:{' '}
                         {ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === snapV2.limit)?.label}
                       </Button>

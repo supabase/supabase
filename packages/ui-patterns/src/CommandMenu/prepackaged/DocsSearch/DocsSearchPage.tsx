@@ -8,13 +8,13 @@ import {
 } from 'common'
 import { Book, ChevronRight, Github, Hash, Loader2, MessageSquare, Search } from 'lucide-react'
 import { useCallback, useEffect, useRef } from 'react'
-import { Button, cn, CommandGroup_Shadcn_, CommandItem_Shadcn_, CommandList_Shadcn_ } from 'ui'
+import { Button, cn, CommandGroup, CommandItem, CommandList } from 'ui'
 import { StatusIcon } from 'ui/src/components/StatusIcon'
 
 import {
   Breadcrumb,
   CommandHeader,
-  CommandInput,
+  CommandMenuInput,
   CommandWrapper,
   escapeAttributeSelector,
   generateCommandClassNames,
@@ -191,20 +191,20 @@ const DocsSearchPage = () => {
     <CommandWrapper>
       <CommandHeader>
         <Breadcrumb />
-        <CommandInput placeholder="Search..." ref={inputRef} />
+        <CommandMenuInput placeholder="Search..." ref={inputRef} />
       </CommandHeader>
-      <CommandList_Shadcn_ className="max-h-[initial]">
+      <CommandList className="max-h-[initial]">
         {hasResults &&
           ('results' in state ? state.results : state.staleResults).map((page, i) => {
             return (
-              <CommandGroup_Shadcn_
+              <CommandGroup
                 heading=""
                 key={`${page.path}-group`}
                 value={`${escapeAttributeSelector(page.title)}-group-index-${i}`}
                 forceMount={true}
                 className="overflow-hidden py-3 px-2 text-border-strong **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:pb-1.5 **:[[cmdk-group-heading]]:text-sm **:[[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted"
               >
-                <CommandItem_Shadcn_
+                <CommandItem
                   key={`${page.path}-item`}
                   value={`${escapeAttributeSelector(page.title)}-item-index-${i}`}
                   onSelect={() => {
@@ -227,11 +227,11 @@ const DocsSearchPage = () => {
                   </div>
 
                   <ChevronArrow />
-                </CommandItem_Shadcn_>
+                </CommandItem>
                 {page.sections.length > 0 && (
                   <div className="border-l border-muted ml-3 pt-3">
                     {page.sections.map((section, i) => (
-                      <CommandItem_Shadcn_
+                      <CommandItem
                         className={cn(
                           generateCommandClassNames(true),
                           'border border-overlay/90',
@@ -262,19 +262,19 @@ const DocsSearchPage = () => {
                           </div>
                         </div>
                         <ChevronArrow />
-                      </CommandItem_Shadcn_>
+                      </CommandItem>
                     ))}
                   </div>
                 )}
-              </CommandGroup_Shadcn_>
+              </CommandGroup>
             )
           })}
         {state.status === 'initial' && (
-          <CommandGroup_Shadcn_ className="overflow-hidden py-3 px-2 text-border-strong **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:pb-1.5 **:[[cmdk-group-heading]]:text-sm **:[[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted">
+          <CommandGroup className="overflow-hidden py-3 px-2 text-border-strong **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:pb-1.5 **:[[cmdk-group-heading]]:text-sm **:[[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted">
             {questions.map((question) => {
               const key = question.replace(/\s+/g, '_')
               return (
-                <CommandItem_Shadcn_
+                <CommandItem
                   className={generateCommandClassNames(false)}
                   disabled={hasResults}
                   onSelect={() => {
@@ -287,10 +287,10 @@ const DocsSearchPage = () => {
                 >
                   <Search />
                   {question}
-                </CommandItem_Shadcn_>
+                </CommandItem>
               )
             })}
-          </CommandGroup_Shadcn_>
+          </CommandGroup>
         )}
         {state.status === 'loading' && state.staleResults.length === 0 && (
           <div className="flex items-center gap-3 my-4 justify-center">
@@ -302,7 +302,7 @@ const DocsSearchPage = () => {
           <div className="p-6 flex flex-col items-center gap-6 mt-4 text-foreground-light">
             <StatusIcon variant="default" />
             <p className="text-sm text-foreground-light text-center">No results found.</p>
-            <Button size="tiny" type="default" onClick={handleResetPrompt}>
+            <Button size="tiny" variant="default" onClick={handleResetPrompt}>
               Try again?
             </Button>
           </div>
@@ -314,12 +314,12 @@ const DocsSearchPage = () => {
               Sorry, looks like we&apos;re having some issues with search!
             </p>
             <p className="text-sm text-foreground-lighter">Please try again in a bit.</p>
-            <Button size="tiny" type="default" onClick={handleResetPrompt}>
+            <Button size="tiny" variant="default" onClick={handleResetPrompt}>
               Try again?
             </Button>
           </div>
         )}
-      </CommandList_Shadcn_>
+      </CommandList>
     </CommandWrapper>
   )
 }

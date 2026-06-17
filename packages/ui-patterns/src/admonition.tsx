@@ -1,6 +1,6 @@
 import { cva } from 'class-variance-authority'
 import { ComponentProps, forwardRef, ReactNode } from 'react'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, cn } from 'ui'
+import { Alert, AlertDescription, AlertTitle, cn } from 'ui'
 
 export type AdmonitionType =
   | 'note'
@@ -16,14 +16,12 @@ export type AdmonitionType =
 export interface AdmonitionProps {
   type?: AdmonitionType
   title?: string
-  /** @deprecated Prefer title for new usage. label remains supported for existing MDX content. */
-  label?: string
   description?: ReactNode
   children?: ReactNode
   showIcon?: boolean
   childProps?: {
-    title?: ComponentProps<typeof AlertTitle_Shadcn_>
-    description?: ComponentProps<typeof AlertDescription_Shadcn_>
+    title?: ComponentProps<typeof AlertTitle>
+    description?: ComponentProps<typeof AlertDescription>
   }
   layout?: 'horizontal' | 'vertical' | 'responsive'
   actions?: ReactNode
@@ -103,8 +101,8 @@ const admonitionBodyClassName =
   '[&_p]:!mt-0 [&_p]:!mb-1.5 [&_p:last-child]:!mb-0 [&_p:only-child]:!mb-0 [&_ul]:!my-1.5 [&_ol]:!my-1.5 [&_li]:!my-0.5'
 
 export const Admonition = forwardRef<
-  React.ElementRef<typeof Alert_Shadcn_>,
-  Omit<React.ComponentPropsWithoutRef<typeof Alert_Shadcn_>, keyof AdmonitionProps | 'children'> &
+  React.ElementRef<typeof Alert>,
+  Omit<React.ComponentPropsWithoutRef<typeof Alert>, keyof AdmonitionProps | 'children'> &
     AdmonitionProps
 >(
   (
@@ -112,7 +110,6 @@ export const Admonition = forwardRef<
       type = 'note',
       variant,
       showIcon = true,
-      label,
       title,
       description,
       children,
@@ -126,10 +123,10 @@ export const Admonition = forwardRef<
   ) => {
     const typeMapped = variant ? admonitionToAlertMapping[variant] : admonitionToAlertMapping[type]
     const typeStyle = type === 'success' ? 'success' : typeMapped
-    const heading = title ?? label
+    const heading = title
 
     return (
-      <Alert_Shadcn_
+      <Alert
         ref={ref}
         variant={typeMapped}
         {...props}
@@ -163,19 +160,18 @@ export const Admonition = forwardRef<
         >
           <div>
             {heading && (
-              <AlertTitle_Shadcn_
+              <AlertTitle
                 {...childProps.title}
                 className={cn(
-                  'text mt-0.5 flex gap-3 text-sm',
-                  !label && 'flex-col',
+                  'text mt-0.5 flex flex-col gap-3 text-sm',
                   childProps.title?.className
                 )}
               >
                 {heading}
-              </AlertTitle_Shadcn_>
+              </AlertTitle>
             )}
             {description && (
-              <AlertDescription_Shadcn_
+              <AlertDescription
                 {...childProps.description}
                 className={cn(
                   admonitionBodyClassName,
@@ -184,11 +180,11 @@ export const Admonition = forwardRef<
                 )}
               >
                 {description}
-              </AlertDescription_Shadcn_>
+              </AlertDescription>
             )}
             {/* // children is to handle Docs and MDX issues with children and <p> elements */}
             {children && (
-              <AlertDescription_Shadcn_
+              <AlertDescription
                 {...childProps.description}
                 className={cn(
                   admonitionBodyClassName,
@@ -197,7 +193,7 @@ export const Admonition = forwardRef<
                 )}
               >
                 {children}
-              </AlertDescription_Shadcn_>
+              </AlertDescription>
             )}
           </div>
           {actions && (
@@ -213,7 +209,7 @@ export const Admonition = forwardRef<
             </div>
           )}
         </div>
-      </Alert_Shadcn_>
+      </Alert>
     )
   }
 )

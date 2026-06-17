@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@ui/components/shadcn/ui/select'
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { Code, ExternalLink } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import {
@@ -35,6 +35,7 @@ import { type ParseQueryResults } from './RLSTester.types'
 import { RLSTesterEmptyState } from './RLSTesterEmptyState'
 import { RLSTesterResults } from './RLSTesterResults'
 import { RoleSelector } from './RoleSelector'
+import { SandboxManagement } from './SandboxManagement'
 import { UserSelector } from './UserSelector'
 import { UserSqlEditor } from './UserSqlEditor'
 import { useTestQueryRLS } from './useTestQueryRLS'
@@ -44,6 +45,7 @@ import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { PostgresSandboxProvider } from '@/state/postgres-sandbox/sandbox'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
@@ -51,11 +53,20 @@ interface RLSTesterSheetProps {
   handleSelectEditPolicy: (policy: Policy) => void
 }
 
-export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) => {
+export const RLSTesterSheet = (props: RLSTesterSheetProps) => {
+  return (
+    <PostgresSandboxProvider>
+      <RLSTesterSheetContents {...props} />
+    </PostgresSandboxProvider>
+  )
+}
+
+const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps) => {
   const track = useTrack()
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
   const { setRole } = useRoleImpersonationStateSnapshot()
+  const sandboxEnabled = useFlag('rlsTesterSandbox')
 
   const [open, setOpen] = useState(false)
   const [selectedOption, setSelectedOption] = useState<'anon' | 'authenticated'>('anon')
@@ -132,17 +143,18 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
   }
 
   useEffect(() => {
-    setRole({ type: 'postgrest', role: 'anon' })
-    // Flip back to service role
-    return () => {
+    if (open) {
+      setRole({ type: 'postgrest', role: 'anon' })
+    } else {
+      // Flip back to service role
       setRole(undefined)
     }
-  }, [setRole])
+  }, [open, setRole])
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button type="default" icon={<Code />}>
+        <Button variant="default" icon={<Code />}>
           Test
         </Button>
       </SheetTrigger>
@@ -159,7 +171,9 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
         </SheetHeader>
 
         <div className="grow overflow-y-auto flex flex-col">
-          <SheetSection className="px-0 py-0">
+          {sandboxEnabled && <SandboxManagement />}
+
+          <SheetSection className="px-0 py-0 border-t">
             <div className="flex flex-col p-5 pt-4 gap-y-4">
               <RoleSelector onSelectRole={setSelectedOption} />
               {selectedOption === 'authenticated' && <UserSelector />}
@@ -276,7 +290,7 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
         </div>
 
         <SheetFooter className="sm:justify-between">
-          <Button asChild type="default" icon={<ExternalLink />}>
+          <Button asChild variant="default" icon={<ExternalLink />}>
             <a
               target="_blank"
               rel="noopener noreferrer"
@@ -286,11 +300,11 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
             </a>
           </Button>
           <div className="flex items-center gap-x-2">
-            <Button type="default" disabled={isLoading} onClick={() => setOpen(false)}>
+            <Button variant="default" disabled={isLoading} onClick={() => setOpen(false)}>
               Cancel
             </Button>
             <Button
-              type="primary"
+              variant="primary"
               loading={isInferring || isLoading}
               disabled={format === 'lib' && !inferredSQL}
               onClick={onRunQuery}

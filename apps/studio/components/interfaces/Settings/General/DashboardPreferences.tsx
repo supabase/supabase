@@ -96,7 +96,7 @@ export const DashboardPreferences = () => {
         {/* [Joshen] Ideally we're able to persist this for all users in the project, but will need support in our middleware */}
         <Admonition
           type="note"
-          title="These preferences control only your experience in the dashboard. Other members of this project will not be affected"
+          description="These preferences control only your experience in the dashboard. Other members of this project will not be affected."
         />
 
         {isLoading ? (
@@ -148,14 +148,14 @@ export const DashboardPreferences = () => {
                 <CardFooter className="justify-end space-x-2">
                   {form.formState.isDirty && (
                     <Button
-                      type="default"
-                      htmlType="button"
+                      variant="default"
+                      type="button"
                       onClick={() => form.reset(dashboardPreferences)}
                     >
                       Cancel
                     </Button>
                   )}
-                  <Button type="primary" htmlType="submit" disabled={!form.formState.isDirty}>
+                  <Button variant="primary" type="submit" disabled={!form.formState.isDirty}>
                     Save changes
                   </Button>
                 </CardFooter>
@@ -197,7 +197,7 @@ const DashboardQueriesDialog = () => {
 
         <DialogFooter>
           <DialogClose asChild className="opacity-100">
-            <Button type="default">Understood</Button>
+            <Button variant="default">Understood</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

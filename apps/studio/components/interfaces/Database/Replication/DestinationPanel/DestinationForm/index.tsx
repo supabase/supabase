@@ -13,6 +13,7 @@ import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLDucklakePrivateAlpha,
   useIsETLIcebergPrivateAlpha,
+  useIsETLSnowflakePrivateAlpha,
 } from '../../useIsETLPrivateAlpha'
 import { DestinationType } from '../DestinationPanel.types'
 import { AdvancedSettings } from './AdvancedSettings'
@@ -22,16 +23,22 @@ import {
   buildDestinationConfig,
   buildDestinationConfigForValidation,
   getDucklakeValidationIssues,
+  getSnowflakeValidationIssues,
 } from './DestinationForm.utils'
 import { DestinationNameInput } from './DestinationNameInput'
-import { AnalyticsBucketFields, BigQueryFields, DuckLakeFields } from './DestinationPanelFields'
+import {
+  AnalyticsBucketFields,
+  BigQueryFields,
+  DuckLakeFields,
+  SnowflakeFields,
+} from './DestinationPanelFields'
 import { NewPublicationPanel } from './NewPublicationPanel'
 import { NoDestinationsAvailable } from './NoDestinationsAvailable'
 import { PublicationSelection } from './PublicationSelection'
-import { ReplicationDisclaimerDialog } from './ReplicationDisclaimerDialog'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
+import { ValidationWarningsDialog } from './ValidationWarningsDialog'
 import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import {
   BatchConfig,
@@ -84,7 +91,16 @@ type DucklakeApiConfig = {
   s3_url_style?: 'path' | 'vhost'
   s3_use_ssl?: boolean
   metadata_schema?: string
-  expire_snapshots_older_than?: string
+}
+
+type SnowflakeApiConfig = {
+  account_id: string
+  user: string
+  private_key: string
+  private_key_passphrase?: string
+  database: string
+  schema: string
+  role?: string
 }
 
 export const DestinationForm = ({
@@ -99,10 +115,11 @@ export const DestinationForm = ({
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
+  const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
 
   const [isFormInteracting, setIsFormInteracting] = useState(false)
-  const [showDisclaimerDialog, setShowDisclaimerDialog] = useState(false)
+  const [showValidationWarningsDialog, setShowValidationWarningsDialog] = useState(false)
   const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
   const [newBucketSheetVisible, setNewBucketSheetVisible] = useState(false)
   const [pendingFormValues, setPendingFormValues] = useState<z.infer<typeof FormSchema> | null>(
@@ -127,8 +144,9 @@ export const DestinationForm = ({
     if (etlEnableIceberg)
       destinations.push({ value: 'Analytics Bucket', label: 'Analytics Bucket' })
     if (etlEnableDucklake) destinations.push({ value: 'DuckLake', label: 'DuckLake' })
+    if (etlEnableSnowflake) destinations.push({ value: 'Snowflake', label: 'Snowflake' })
     return destinations
-  }, [etlEnableBigQuery, etlEnableDucklake, etlEnableIceberg])
+  }, [etlEnableBigQuery, etlEnableDucklake, etlEnableIceberg, etlEnableSnowflake])
   const hasNoAvailableDestinations = availableDestinations.length === 0
 
   const { data: sourcesData } = useReplicationSourcesQuery({ projectRef })
@@ -150,11 +168,12 @@ export const DestinationForm = ({
     pipelineId: existingDestination?.pipelineId,
   })
 
-  const { data: apiKeys } = useAPIKeysQuery(
+  const { data: apiKeysData } = useAPIKeys(
     { projectRef, reveal: true },
     { enabled: canReadAPIKeys }
   )
-  const { serviceKey } = getKeys(apiKeys)
+  const { serviceKey } = apiKeysData ?? {}
+
   const catalogToken = serviceKey?.api_key ?? ''
 
   const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
@@ -198,6 +217,14 @@ export const DestinationForm = ({
       ducklakeConfigValue && typeof ducklakeConfigValue === 'object'
         ? (ducklakeConfigValue as DucklakeApiConfig)
         : undefined
+    const snowflakeConfigValue =
+      config && 'snowflake' in (config as Record<string, unknown>)
+        ? (config as Record<string, unknown>).snowflake
+        : undefined
+    const snowflakeConfig =
+      snowflakeConfigValue && typeof snowflakeConfigValue === 'object'
+        ? (snowflakeConfigValue as SnowflakeApiConfig)
+        : undefined
 
     return {
       // Common fields
@@ -237,7 +264,14 @@ export const DestinationForm = ({
       ducklakeS3UrlStyle: ducklakeConfig?.s3_url_style ?? 'path',
       ducklakeS3UseSsl: ducklakeConfig?.s3_use_ssl ?? true,
       ducklakeMetadataSchema: ducklakeConfig?.metadata_schema ?? 'ducklake',
-      ducklakeExpireSnapshotsOlderThan: ducklakeConfig?.expire_snapshots_older_than ?? '',
+      // Snowflake fields
+      snowflakeAccountId: snowflakeConfig?.account_id ?? '',
+      snowflakeUser: snowflakeConfig?.user ?? '',
+      snowflakePrivateKey: snowflakeConfig?.private_key ?? '',
+      snowflakePrivateKeyPassphrase: snowflakeConfig?.private_key_passphrase ?? '',
+      snowflakeDatabase: snowflakeConfig?.database ?? '',
+      snowflakeSchema: snowflakeConfig?.schema ?? '',
+      snowflakeRole: snowflakeConfig?.role ?? '',
     }
   }, [destinationData, pipelineData, catalogToken, projectSettings])
 
@@ -287,6 +321,10 @@ export const DestinationForm = ({
           getDucklakeValidationIssues(data).forEach(({ path, message }) => {
             addRequiredFieldError(path, message)
           })
+        } else if (selectedType === 'Snowflake') {
+          getSnowflakeValidationIssues(data).forEach(({ path, message }) => {
+            addRequiredFieldError(path, message)
+          })
         }
       })
     ),
@@ -301,6 +339,7 @@ export const DestinationForm = ({
 
   const allValidationFailures = [...destinationValidationFailures, ...pipelineValidationFailures]
   const hasValidationFailures = allValidationFailures.some((f) => f.failure_type === 'critical')
+  const validationWarnings = allValidationFailures.filter((f) => f.failure_type === 'warning')
 
   const isSaving =
     creatingDestinationPipeline ||
@@ -339,7 +378,7 @@ export const DestinationForm = ({
 
   // Helper function to validate configuration
   const validateConfiguration = async (data: z.infer<typeof FormSchema>) => {
-    if (!projectRef || !sourceId) return false
+    if (!projectRef || !sourceId) return { canContinue: false, warnings: [] }
 
     setHasRunValidation(true)
 
@@ -349,6 +388,12 @@ export const DestinationForm = ({
       validateDestination({
         projectRef,
         destinationConfig: buildDestinationConfigForValidation({ projectRef, selectedType, data }),
+        sourceId,
+        publicationName: data.publicationName,
+        maxFillMs: data.maxFillMs,
+        maxTableSyncWorkers: data.maxTableSyncWorkers,
+        maxCopyConnectionsPerTable: data.maxCopyConnectionsPerTable,
+        invalidatedSlotBehavior: data.invalidatedSlotBehavior,
       }),
       validatePipeline({
         projectRef,
@@ -375,7 +420,7 @@ export const DestinationForm = ({
         rejected?.reason instanceof Error ? rejected.reason.message : 'Please try again.'
       toast.error(`Failed to validate configuration: ${reason}`)
       setHasRunValidation(false)
-      return false
+      return { canContinue: false, warnings: [] }
     }
 
     // Both requests succeeded, extract validation failures
@@ -394,15 +439,16 @@ export const DestinationForm = ({
     ]
     const hasCriticalFailures = allFailures.some((f) => f.failure_type === 'critical')
     const hasAnyFailures = allFailures.length > 0
+    const warnings = allFailures.filter((f) => f.failure_type === 'warning')
 
-    // Scroll to validation section if there are any failures
+    // Scroll to validation section so the user sees failures (both critical and warnings) inline
     if (hasAnyFailures) {
       setTimeout(() => {
         validationSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
       }, 100)
     }
 
-    return !hasCriticalFailures
+    return { canContinue: !hasCriticalFailures, warnings }
   }
 
   const submitPipeline = async (data: z.infer<typeof FormSchema>) => {
@@ -491,39 +537,48 @@ export const DestinationForm = ({
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     if (!editMode) {
-      // For new pipelines, validate configuration first if not already validated
-      // OR if user has critical failures and clicks "Validate again"
       if (!hasRunValidation || isValidating || hasValidationFailures) {
-        const isValid = await validateConfiguration(data)
-        if (!isValid) {
-          // Validation failed with critical errors, show inline and stop
+        const validationResult = await validateConfiguration(data)
+        if (!validationResult.canContinue) {
+          // Critical failures shown inline — stop so user can fix them
           return
         }
-        // Validation passed or only has warnings, continue to disclaimer
+        if (validationResult.warnings.length > 0) {
+          // Warnings shown inline — stop so user can review, then re-submit to confirm
+          return
+        }
+        await submitPipeline(data)
+        return
       }
 
-      // Validation passed or only warnings, proceed to disclaimer
-      setPendingFormValues(data)
-      setShowDisclaimerDialog(true)
+      // Validation already passed; warnings are visible inline — ask user to confirm
+      if (validationWarnings.length > 0) {
+        setPendingFormValues(data)
+        setShowValidationWarningsDialog(true)
+        return
+      }
+
+      await submitPipeline(data)
       return
     }
 
     await submitPipeline(data)
   }
 
-  const handleDisclaimerDialogChange = (open: boolean) => {
-    setShowDisclaimerDialog(open)
+  const handleValidationWarningsDialogChange = (open: boolean) => {
+    setShowValidationWarningsDialog(open)
     if (!open) {
       setPendingFormValues(null)
+      setHasRunValidation(false)
     }
   }
 
-  const handleDisclaimerConfirm = async () => {
+  const handleValidationWarningsConfirm = async () => {
     if (!pendingFormValues) return
 
     const values = pendingFormValues
     setPendingFormValues(null)
-    setShowDisclaimerDialog(false)
+    setShowValidationWarningsDialog(false)
     await submitPipeline(values)
   }
 
@@ -584,6 +639,8 @@ export const DestinationForm = ({
                 />
               ) : selectedType === 'DuckLake' && etlEnableDucklake ? (
                 <DuckLakeFields form={form} />
+              ) : selectedType === 'Snowflake' && etlEnableSnowflake ? (
+                <SnowflakeFields form={form} />
               ) : null}
 
               <DialogSectionSeparator />
@@ -629,10 +686,10 @@ export const DestinationForm = ({
           )}
         </AnimatePresence>
         <div className="flex items-center gap-x-2">
-          <Button disabled={isSaving} type="default" onClick={onClose}>
+          <Button disabled={isSaving} variant="default" onClick={onClose}>
             Cancel
           </Button>
-          <Button disabled={isSubmitDisabled} loading={isSaving} form={formId} htmlType="submit">
+          <Button disabled={isSubmitDisabled} loading={isSaving} form={formId} type="submit">
             {getSubmitButtonText()}
           </Button>
         </div>
@@ -649,11 +706,12 @@ export const DestinationForm = ({
         onOpenChange={setNewBucketSheetVisible}
       />
 
-      <ReplicationDisclaimerDialog
-        open={showDisclaimerDialog}
-        onOpenChange={handleDisclaimerDialogChange}
+      <ValidationWarningsDialog
+        open={showValidationWarningsDialog}
+        onOpenChange={handleValidationWarningsDialogChange}
         isLoading={isSaving}
-        onConfirm={handleDisclaimerConfirm}
+        warningCount={validationWarnings.length}
+        onConfirm={handleValidationWarningsConfirm}
       />
     </>
   )

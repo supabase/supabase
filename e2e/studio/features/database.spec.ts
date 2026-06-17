@@ -1,4 +1,4 @@
-import { expect } from '@playwright/test'
+import { expect, type Page } from '@playwright/test'
 
 import { env } from '../env.config.js'
 import { expectClipboardValue } from '../utils/clipboard.js'
@@ -10,7 +10,14 @@ import {
   createApiResponseWaiter,
   waitForApiResponse,
   waitForDatabaseToLoad,
+  waitForSchemaVisualizerToLoad,
 } from '../utils/wait-for-response.js'
+
+async function focusTableInVisualizer(page: Page, tableName: string) {
+  await page.getByTestId('find-table-selector').click()
+  await page.getByPlaceholder('Find table…').fill(tableName)
+  await page.getByRole('option', { name: tableName, exact: true }).click()
+}
 
 test.describe('Database', () => {
   test.describe('Schema Visualizer', () => {
@@ -25,14 +32,18 @@ test.describe('Database', () => {
           await dropTable(databaseTableName)
         }
       )
+
       const wait = createApiResponseWaiter(
         page,
         'pg-meta',
         ref,
-        'tables?include_columns=true&included_schemas=public'
+        'query?key=project:default-schema:public-infinite_tables'
       )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/schemas?schema=public`))
       await wait
+
+      // focus the test table so it mounts inside the viewport
+      await focusTableInVisualizer(page, databaseTableName)
 
       // validates table and column exists
       await expect(page.getByText(databaseTableName, { exact: true })).toBeVisible()
@@ -41,15 +52,26 @@ test.describe('Database', () => {
       // copies schema definition to clipboard
       await page.getByRole('button', { name: 'Copy as SQL' }).click()
       await expect(page.getByTestId('copy-sql-ready')).toBeVisible()
-      await expectClipboardValue({
-        page,
-        value: `CREATE TABLE public.${databaseTableName} (
-  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
-  created_at timestamp with time zone DEFAULT now(),
-  ${databaseColumnName} text,
-  CONSTRAINT ${databaseTableName}_pkey PRIMARY KEY (id)
-);`,
-      })
+      //pg-meta does not guarantee column order within a table. So isolate this table's CREATE TABLE block and
+      // assert each line is present regardless of column order.
+      const expectedTableLines = [
+        `CREATE TABLE public.${databaseTableName} (`,
+        `  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,`,
+        `  created_at timestamp with time zone DEFAULT now(),`,
+        `  ${databaseColumnName} text,`,
+        `  CONSTRAINT ${databaseTableName}_pkey PRIMARY KEY (id)`,
+      ]
+      await expect(async () => {
+        await using handle = await page.evaluateHandle(() => navigator.clipboard.readText())
+        const clipboard = await handle.jsonValue()
+        // The trailing " (" disambiguates from tables sharing this name as a prefix.
+        const start = clipboard.indexOf(`CREATE TABLE public.${databaseTableName} (`)
+        expect(start, 'clipboard should contain the table definition').toBeGreaterThanOrEqual(0)
+        const block = clipboard.slice(start, clipboard.indexOf(');', start) + 2)
+        for (const line of expectedTableLines) {
+          expect(block).toContain(line)
+        }
+      }).toPass({ timeout: 2000 })
 
       await expect(page.getByText('Successfully copied as SQL')).toBeVisible({ timeout: 15000 })
       await dismissToastsIfAny(page)
@@ -69,10 +91,12 @@ test.describe('Database', () => {
       // changing schema -> auth
       await page.getByTestId('schema-selector').click()
       await page.getByRole('option', { name: 'auth' }).click()
-      await waitForDatabaseToLoad(page, ref, 'auth')
-      await expect(page.getByText('users', { exact: true })).toBeVisible()
-      await expect(page.getByText('sso_providers', { exact: true })).toBeVisible()
-      await expect(page.getByText('saml_providers', { exact: true })).toBeVisible()
+      await waitForSchemaVisualizerToLoad(page, ref, 'auth')
+
+      for (const tableName of ['users', 'sso_providers', 'saml_providers']) {
+        await focusTableInVisualizer(page, tableName)
+        await expect(page.getByText(tableName, { exact: true })).toBeVisible()
+      }
     })
 
     test('table actions work as expected', async ({ page, ref }) => {
@@ -90,10 +114,13 @@ test.describe('Database', () => {
         page,
         'pg-meta',
         ref,
-        'tables?include_columns=true&included_schemas=public'
+        'query?key=project:default-schema:public-infinite_tables'
       )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/schemas?schema=public`))
       await wait
+
+      // focus the test table so it mounts inside the viewport
+      await focusTableInVisualizer(page, databaseTableName)
 
       // validates table and column exists
       await expect(page.getByText(databaseTableName, { exact: true })).toBeVisible()
@@ -158,10 +185,13 @@ test.describe('Database', () => {
         page,
         'pg-meta',
         ref,
-        'tables?include_columns=true&included_schemas=public'
+        'query?key=project:default-schema:public-infinite_tables'
       )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/schemas?schema=public`))
       await wait
+
+      // focus the test table so it mounts inside the viewport
+      await focusTableInVisualizer(page, databaseTableName)
 
       // validates table and column exists
       await expect(page.getByText(databaseTableName, { exact: true })).toBeVisible()
@@ -213,7 +243,7 @@ test.describe('Database', () => {
         page,
         'pg-meta',
         ref,
-        'tables?include_columns=true&included_schemas=public'
+        'query?key=project:default-schema:public-infinite_tables'
       )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/tables?schema=public`))
       await wait
@@ -237,7 +267,7 @@ test.describe('Database', () => {
         page,
         'pg-meta',
         ref,
-        'tables?include_columns=true&included_schemas=auth'
+        'query?key=project:default-schema:auth-infinite_tables'
       )
       await page.getByRole('option', { name: 'auth' }).click()
       await authSchemaWait
@@ -274,7 +304,7 @@ test.describe('Database', () => {
         page,
         'pg-meta',
         ref,
-        'tables?include_columns=true&included_schemas=public'
+        'query?key=project:default-schema:public-infinite_tables'
       )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/tables?schema=public`))
       // Wait for database tables to be populated
@@ -282,6 +312,7 @@ test.describe('Database', () => {
 
       // create a new table
       await page.getByRole('button', { name: 'New table' }).click()
+      await expect(page.getByRole('dialog')).toBeVisible()
       await page.getByLabel('Name', { exact: true }).fill(databaseTableNameNew)
       const createTableWait = createApiResponseWaiter(
         page,
@@ -293,13 +324,23 @@ test.describe('Database', () => {
 
       // validate table creation
       await createTableWait
-      await waitForDatabaseToLoad(page, ref)
+      await expect(page.getByRole('dialog')).not.toBeVisible()
+
       await expect(page.getByText(databaseTableNameNew, { exact: true })).toBeVisible()
+      await expect(page.getByText('Table pw_database_table_crud_new is good to go!')).toBeVisible()
+      await page.getByRole('button', { name: 'Close toast' }).click()
 
       // edit a new table
-      await page.getByRole('row', { name: databaseTableNameNew }).getByRole('button').last().click()
+      await page
+        .getByRole('row', { name: databaseTableNameNew })
+        .getByRole('button', { name: `Table ${databaseTableNameNew} actions` })
+        .click()
       await page.getByRole('menuitem', { name: 'Edit table' }).click()
-      await page.getByTestId('table-name-input').fill(databaseTableNameUpdated)
+      await expect(page.getByRole('dialog')).toBeVisible()
+      await expect(page.getByText(`Update table ${databaseTableNameNew}`)).toBeVisible()
+      // Ensure table data is loaded
+      await expect(page.getByLabel('Name', { exact: true })).toHaveValue(databaseTableNameNew)
+      await page.getByLabel('Name', { exact: true }).fill(databaseTableNameUpdated)
       const updateTableWait = createApiResponseWaiter(
         page,
         'pg-meta',
@@ -312,14 +353,19 @@ test.describe('Database', () => {
       await updateTableWait
       await waitForDatabaseToLoad(page, ref)
       await expect(page.getByText(databaseTableNameUpdated, { exact: true })).toBeVisible()
+      await expect(
+        page.getByText(`Successfully updated ${databaseTableNameUpdated}!`)
+      ).toBeVisible()
+      await page.getByRole('button', { name: 'Close toast' }).click()
+      await expect(page.getByRole('dialog')).not.toBeVisible()
 
       // duplicate table
       await page
         .getByRole('row', { name: databaseTableNameUpdated })
-        .getByRole('button')
-        .last()
+        .getByRole('button', { name: `Table ${databaseTableNameUpdated} actions` })
         .click()
       await page.getByRole('menuitem', { name: 'Duplicate Table' }).click()
+      await expect(page.getByRole('dialog')).toBeVisible()
       await page.getByLabel('Name').fill(databaseTableNameDuplicate)
       await page.getByLabel('Description').fill('')
       const duplicateTableWait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=')
@@ -329,14 +375,21 @@ test.describe('Database', () => {
       await duplicateTableWait
       await waitForDatabaseToLoad(page, ref)
       await expect(page.getByText(databaseTableNameDuplicate, { exact: true })).toBeVisible()
+      await expect(
+        page.getByText(
+          `Table ${databaseTableNameUpdated} has been successfully duplicated into ${databaseTableNameDuplicate}!`
+        )
+      ).toBeVisible()
+      await page.getByRole('button', { name: 'Close toast' }).click()
+      await expect(page.getByRole('dialog')).not.toBeVisible()
 
       // delete tables
       await page
-        .getByRole('row', { name: `${databaseTableNameDuplicate}` })
-        .getByRole('button')
-        .last()
+        .getByRole('row', { name: databaseTableNameUpdated })
+        .getByRole('button', { name: `Table ${databaseTableNameUpdated} actions` })
         .click()
       await page.getByRole('menuitem', { name: 'Delete table' }).click()
+      await expect(page.getByRole('dialog')).toBeVisible()
       await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).check()
       const deleteDuplicateWait = createApiResponseWaiter(
         page,
@@ -346,13 +399,14 @@ test.describe('Database', () => {
       )
       await page.getByRole('button', { name: 'Delete' }).click()
       await deleteDuplicateWait
+      await expect(page.getByRole('dialog')).not.toBeVisible()
 
       await page
-        .getByRole('row', { name: `${databaseTableNameUpdated}` })
-        .getByRole('button')
-        .last()
+        .getByRole('row', { name: databaseTableNameDuplicate })
+        .getByRole('button', { name: `Table ${databaseTableNameDuplicate} actions` })
         .click()
       await page.getByRole('menuitem', { name: 'Delete table' }).click()
+      await expect(page.getByRole('dialog')).toBeVisible()
       await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).check()
       const deleteUpdatedWait = createApiResponseWaiter(
         page,
@@ -362,6 +416,7 @@ test.describe('Database', () => {
       )
       await page.getByRole('button', { name: 'Delete' }).click()
       await deleteUpdatedWait
+      await expect(page.getByRole('dialog')).not.toBeVisible()
 
       // validate navigating to table editor from database table page
       await page.getByRole('row', { name: databaseTableName }).getByRole('button').last().click()
@@ -390,7 +445,7 @@ test.describe('Database', () => {
         page,
         'pg-meta',
         ref,
-        'tables?include_columns=true&included_schemas=public'
+        'query?key=project:default-schema:public-infinite_tables'
       )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/tables?schema=public`))
 
@@ -430,12 +485,15 @@ test.describe('Database', () => {
       // wait for response + validate
       await columnCreateWait
       await columnCreateRefreshWait
+      await expect(page.getByRole('dialog')).not.toBeVisible()
+
       const columnDatabase2Row = page.getByRole('row', { name: databaseColumnName2 })
       await expect(columnDatabase2Row).toContainText(databaseColumnName2)
       await expect(columnDatabase2Row).toContainText('numeric')
 
       // update table column
       await columnDatabase2Row.getByRole('button', { name: 'Edit' }).click()
+      await expect(page.getByRole('dialog')).toBeVisible()
       await page.getByLabel('name').fill(databaseColumnName3)
       const columnUpdateWait = createApiResponseWaiter(
         page,
@@ -454,6 +512,7 @@ test.describe('Database', () => {
       // wait for response + validate
       await columnUpdateWait
       await columnUpdateRefreshWait
+      await expect(page.getByRole('dialog')).not.toBeVisible()
 
       // delete table column
       const columnDatabase3Row = page.getByRole('row', { name: databaseColumnName3 })
@@ -682,7 +741,7 @@ test.describe('Database', () => {
 
       // create new index
       await page.getByRole('button', { name: 'Create index' }).click()
-      await page.getByRole('button', { name: 'Choose a table' }).click()
+      await page.getByRole('button', { name: 'Select a table' }).click()
 
       const columnsWait = waitForApiResponse(
         page,
@@ -1215,7 +1274,8 @@ test.describe('Database Functions', () => {
     await page.waitForLoadState('networkidle')
 
     // create a new function button exists in public schema
-    await expect(page.getByRole('button', { name: 'Create a new function' })).toBeVisible()
+    const newFunctionButton = page.getByRole('button', { name: 'New function' }).first()
+    await expect(newFunctionButton).toBeVisible()
 
     // change schema -> auth
     await page.getByTestId('schema-selector').click()
@@ -1224,7 +1284,7 @@ test.describe('Database Functions', () => {
     await expect(page.getByText('email')).toBeVisible()
     await expect(page.getByText('jwt')).toBeVisible()
     // create a new function button does not exist in other schemas
-    await expect(page.getByRole('button', { name: 'Create a new function' })).not.toBeVisible()
+    await expect(page.getByRole('button', { name: 'New function' })).not.toBeVisible()
 
     // filter by querying
     await page.getByRole('textbox', { name: 'Search for a function' }).fill('email')
@@ -1252,7 +1312,7 @@ test.describe('Database Functions', () => {
     await page.waitForLoadState('networkidle')
 
     // create new function
-    await page.getByRole('button', { name: 'Create a new function' }).click()
+    await page.getByRole('button', { name: 'New function' }).first().click()
     await page.getByRole('textbox', { name: 'Name of function' }).fill(databaseFunctionName)
     const editor = page.getByRole('presentation')
     await editor.click()

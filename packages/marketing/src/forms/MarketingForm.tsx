@@ -5,22 +5,31 @@ import ReactMarkdown from 'react-markdown'
 import {
   Button,
   Checkbox,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-  TextArea_Shadcn_,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  TextArea,
 } from 'ui'
 import type { z } from 'zod'
 
 import { submitFormAction } from '../go/actions/submitForm'
-import { formCrmConfigSchema, formFieldSchema, type GoFormFieldShowWhen } from '../go/schemas'
+import { formFieldSchema, type GoFormFieldShowWhen } from '../go/schemas'
 
 /** Input-shape field type — fields with Zod defaults (`half`, `required`) are optional here. */
 export type MarketingFormField = z.input<typeof formFieldSchema>
-export type MarketingFormCrmConfig = z.input<typeof formCrmConfigSchema>
+
+/**
+ * Opaque reference the client posts back to the server action. The server
+ * resolves this to the trusted CRM config from the page registry; the client
+ * never sees or controls the actual CRM target (database id, form GUID, etc.).
+ */
+export interface MarketingFormRef {
+  slug: string
+  formId: string
+}
 
 /**
  * Evaluate a `showWhen` rule against the current form values. All supplied
@@ -52,8 +61,13 @@ export interface MarketingFormProps {
   successMessage?: string
   /** URL to redirect the user to after a successful submission. Overrides `successMessage`. */
   successRedirect?: string
-  /** CRM fan-out config — submits to HubSpot, Customer.io, and/or Notion in parallel. */
-  crm?: MarketingFormCrmConfig
+  /**
+   * Server-side form reference. When set, submissions are posted to
+   * `submitFormAction` with this ref; the server looks up the trusted CRM
+   * config from the page registry. When omitted, the form logs values in dev
+   * and does nothing in production (useful for previews).
+   */
+  formRef?: MarketingFormRef
   /** Wraps the form in a styled card (border + padding). Defaults to `true`. */
   card?: boolean
   /** Extra class names applied to the outer wrapper. */
@@ -63,10 +77,9 @@ export interface MarketingFormProps {
 type SubmitState = 'idle' | 'loading' | 'success' | 'error'
 
 /** Build the sessionStorage key used to block double-submits of the same email to the same form. */
-function dedupeKey(crm: MarketingFormCrmConfig | undefined, email: string): string | null {
-  const formId = crm?.hubspot?.formGuid ?? crm?.notion?.database_id
-  if (!formId || !email) return null
-  return `marketing-form-submitted:${formId}:${email.trim().toLowerCase()}`
+function dedupeKey(formRef: MarketingFormRef | undefined, email: string): string | null {
+  if (!formRef || !email) return null
+  return `marketing-form-submitted:${formRef.slug}:${formRef.formId}:${email.trim().toLowerCase()}`
 }
 
 function FieldInput({
@@ -83,7 +96,7 @@ function FieldInput({
     case 'email':
     case 'url':
       return (
-        <Input_Shadcn_
+        <Input
           type={field.type}
           placeholder={field.placeholder}
           required={field.required}
@@ -93,7 +106,7 @@ function FieldInput({
       )
     case 'textarea':
       return (
-        <TextArea_Shadcn_
+        <TextArea
           placeholder={field.placeholder}
           required={field.required}
           rows={field.rows}
@@ -103,18 +116,18 @@ function FieldInput({
       )
     case 'select':
       return (
-        <Select_Shadcn_ value={value} onValueChange={onChange} required={field.required}>
-          <SelectTrigger_Shadcn_>
-            <SelectValue_Shadcn_ placeholder={field.placeholder} />
-          </SelectTrigger_Shadcn_>
-          <SelectContent_Shadcn_>
+        <Select value={value} onValueChange={onChange} required={field.required}>
+          <SelectTrigger>
+            <SelectValue placeholder={field.placeholder} />
+          </SelectTrigger>
+          <SelectContent>
             {field.options.map((opt) => (
-              <SelectItem_Shadcn_ key={opt.value} value={opt.value}>
+              <SelectItem key={opt.value} value={opt.value}>
                 {opt.label}
-              </SelectItem_Shadcn_>
+              </SelectItem>
             ))}
-          </SelectContent_Shadcn_>
-        </Select_Shadcn_>
+          </SelectContent>
+        </Select>
       )
     case 'checkbox':
       return null
@@ -166,7 +179,7 @@ export default function MarketingForm({
   disclaimer,
   successMessage,
   successRedirect,
-  crm,
+  formRef,
   card = true,
   className,
 }: MarketingFormProps) {
@@ -210,9 +223,9 @@ export default function MarketingForm({
       Object.entries(values).filter(([name]) => visibleFieldNames.has(name))
     )
 
-    if (!crm) {
+    if (!formRef) {
       if (process.env.NODE_ENV === 'development') {
-        console.log('[marketing/form] No CRM configured — form values:', submittedValues)
+        console.log('[marketing/form] No formRef configured — form values:', submittedValues)
       }
       return
     }
@@ -226,7 +239,7 @@ export default function MarketingForm({
       submittedValues['emailAddress'] ??
       submittedValues['email_address'] ??
       ''
-    const sessionKey = dedupeKey(crm, emailValue)
+    const sessionKey = dedupeKey(formRef, emailValue)
     if (sessionKey && typeof window !== 'undefined') {
       try {
         if (window.sessionStorage.getItem(sessionKey)) {
@@ -250,7 +263,7 @@ export default function MarketingForm({
     const honeypot = honeypotRef.current?.value ?? ''
 
     try {
-      const result = await submitFormAction(crm, submittedValues, {
+      const result = await submitFormAction(formRef, submittedValues, {
         pageUri,
         pageName,
         honeypot,
@@ -396,8 +409,8 @@ export default function MarketingForm({
         <hr className="border-muted" />
 
         <Button
-          htmlType="submit"
-          type="primary"
+          type="submit"
+          variant="primary"
           size="large"
           block
           loading={submitState === 'loading'}

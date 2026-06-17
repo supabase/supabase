@@ -14,7 +14,7 @@ import { formatPercentage, numberFormatter } from './Charts.utils'
 import { useChartHoverState } from './useChartHoverState'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { formatDateTime, useFormatDateTime } from '@/lib/datetime'
-import { formatBytes } from '@/lib/helpers'
+import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
 
 export interface ChartHeaderProps {
   title?: string
@@ -41,6 +41,7 @@ export interface ChartHeaderProps {
   valuePrecision?: number
   shouldFormatBytes?: boolean
   isNetworkChart?: boolean
+  isMemoryChart?: boolean
   attributes?: any[]
   sql?: string
   titleTooltip?: string
@@ -76,6 +77,7 @@ export const ChartHeader = ({
   sql,
   titleTooltip,
   showNewBadge,
+  isMemoryChart,
 }: ChartHeaderProps) => {
   const { ref } = useParams()
   const { hoveredIndex, isHovered } = useChartHoverState(syncId || 'default')
@@ -97,7 +99,9 @@ export const ChartHeader = ({
 
     if (shouldFormatBytes) {
       const bytesValue = isNetworkChart ? Math.abs(value) : value
-      return formatBytes(bytesValue, valuePrecision)
+      return isMemoryChart
+        ? formatBytesMinMB(bytesValue, valuePrecision)
+        : formatBytes(bytesValue, valuePrecision)
     }
 
     if (format === '%') {
@@ -211,7 +215,7 @@ export const ChartHeader = ({
       </div>
       {!titleTooltip && docsUrl && (
         <ButtonTooltip
-          type="text"
+          variant="text"
           className="px-1"
           asChild
           tooltip={{
@@ -275,7 +279,7 @@ export const ChartHeader = ({
       <div className="flex items-center gap-2">
         {sql ? (
           <ButtonTooltip
-            type="default"
+            variant="default"
             className="px-1.5"
             asChild
             tooltip={{
@@ -293,7 +297,7 @@ export const ChartHeader = ({
 
         {!hideChartType && onChartStyleChange && (
           <ButtonTooltip
-            type="default"
+            variant="default"
             className="px-1.5"
             icon={chartStyle === 'bar' ? <Activity /> : <BarChartIcon />}
             onClick={() => onChartStyleChange(chartStyle === 'bar' ? 'line' : 'bar')}
@@ -307,7 +311,7 @@ export const ChartHeader = ({
         )}
         {setShowMaxValue && (
           <ButtonTooltip
-            type={showMaxValue ? 'default' : 'dashed'}
+            variant={showMaxValue ? 'default' : 'dashed'}
             className="px-1.5"
             icon={
               <GitCommitHorizontalIcon

@@ -6,7 +6,7 @@ import { Check, ChevronsUpDown, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import type { UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, cn, CommandGroup_Shadcn_, CommandItem_Shadcn_, FormControl, FormField } from 'ui'
+import { Button, cn, CommandGroup, CommandItem, FormControl, FormField } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
@@ -40,7 +40,9 @@ export function ProjectAndPlanInfo({
       <ProjectSelector form={form} orgSlug={orgSlug} projectRef={projectRef} />
       <ProjectRefHighlighted projectRef={projectRef} />
 
-      {!hasProjectSelected && <Admonition type="default" title="No project has been selected" />}
+      {!hasProjectSelected && (
+        <Admonition type="default" description="No project has been selected." />
+      )}
     </div>
   )
 }
@@ -52,7 +54,7 @@ interface ProjectSelectorProps {
 }
 
 function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
-  const { projectRef: urlProjectRef } = useParams()
+  const { ref: routeProjectRef } = useParams()
 
   return (
     <FormField
@@ -69,15 +71,20 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
               slug={!orgSlug || orgSlug === NO_ORG_MARKER ? undefined : orgSlug}
               selectedRef={field.value}
               onInitialLoad={(projects) => {
-                if (!urlProjectRef && (!projectRef || projectRef === NO_PROJECT_MARKER))
+                const hasSelectedProject = !!projectRef && projectRef !== NO_PROJECT_MARKER
+                const hasRouteProjectInList =
+                  !!routeProjectRef && projects.some((project) => project.ref === routeProjectRef)
+
+                if (!hasRouteProjectInList && !hasSelectedProject) {
                   field.onChange(projects[0]?.ref ?? NO_PROJECT_MARKER)
+                }
               }}
               onSelect={(project) => field.onChange(project.ref)}
               renderTrigger={({ isLoading, project, listboxId, open }) => {
                 return (
                   <Button
                     block
-                    type="default"
+                    variant="default"
                     role="combobox"
                     aria-label="Select a project"
                     aria-expanded={open}
@@ -97,8 +104,8 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
                 )
               }}
               renderActions={(setOpen) => (
-                <CommandGroup_Shadcn_>
-                  <CommandItem_Shadcn_
+                <CommandGroup>
+                  <CommandItem
                     className="w-full gap-x-2"
                     onSelect={() => {
                       field.onChange(NO_PROJECT_MARKER)
@@ -109,8 +116,8 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
                     <p className={cn(field.value !== NO_PROJECT_MARKER && 'ml-6')}>
                       No specific project
                     </p>
-                  </CommandItem_Shadcn_>
-                </CommandGroup_Shadcn_>
+                  </CommandItem>
+                </CommandGroup>
               )}
             />
           </FormControl>
@@ -143,7 +150,7 @@ function ProjectRefHighlighted({ projectRef }: ProjectRefHighlightedProps) {
           </p>
           <CopyButton
             iconOnly
-            type="text"
+            variant="text"
             text={projectRef}
             onClick={() => toast.success('Copied project ID to clipboard')}
           />
@@ -200,7 +207,7 @@ export const PlanExpectationInfoContent = ({
               Upgrade plan
             </Link>
           </Button>
-          <Button asChild type="default" size="tiny" icon={<ExternalLink />}>
+          <Button asChild variant="default" size="tiny" icon={<ExternalLink />}>
             <Link href="https://supabase.com/contact/enterprise" target="_blank" rel="noreferrer">
               Enquire about Enterprise
             </Link>

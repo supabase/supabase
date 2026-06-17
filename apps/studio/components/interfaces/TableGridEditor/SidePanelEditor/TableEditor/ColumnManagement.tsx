@@ -13,14 +13,13 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import { useParams } from 'common'
 import { isEmpty, noop, partition } from 'lodash'
 import { Edit, ExternalLink, HelpCircle, Key, Trash } from 'lucide-react'
 import { useState } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   Tooltip,
   TooltipContent,
@@ -37,9 +36,8 @@ import { Column } from './Column'
 import type { ImportContent, TableField } from './TableEditor.types'
 import InformationBox from '@/components/ui/InformationBox'
 import type { EnumeratedType } from '@/data/enumerated-types/enumerated-types-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface ColumnManagementProps {
   table: TableField
@@ -66,14 +64,11 @@ export const ColumnManagement = ({
   onClearImportContent = noop,
   onUpdateFkRelations,
 }: ColumnManagementProps) => {
-  const { ref: projectRef } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
 
   const [open, setOpen] = useState(false)
   const [selectedColumn, setSelectedColumn] = useState<ColumnField>()
   const [selectedFk, setSelectedFk] = useState<ForeignKey>()
-
-  const { mutate: sendEvent } = useSendEventMutation()
 
   const hasImportContent = !isEmpty(importContent)
   const [primaryKeyColumns, otherColumns] = partition(
@@ -160,7 +155,7 @@ export const ColumnManagement = ({
         <div className="flex items-center justify-between w-full">
           <h5>Columns</h5>
           <div className="flex items-center gap-x-2">
-            <Button asChild type="default" icon={<ExternalLink size={12} strokeWidth={2} />}>
+            <Button asChild variant="default" icon={<ExternalLink size={12} strokeWidth={2} />}>
               <a
                 href={`${DOCS_URL}/guides/database/tables#data-types`}
                 target="_blank"
@@ -174,26 +169,19 @@ export const ColumnManagement = ({
                 <div className="py-3 border-r" />
                 {hasImportContent ? (
                   <div className="flex items-center gap-x-2">
-                    <Button type="default" icon={<Edit />} onClick={onSelectImportData}>
+                    <Button variant="default" icon={<Edit />} onClick={onSelectImportData}>
                       Edit content
                     </Button>
-                    <Button type="danger" icon={<Trash />} onClick={onClearImportContent}>
+                    <Button variant="danger" icon={<Trash />} onClick={onClearImportContent}>
                       Remove content
                     </Button>
                   </div>
                 ) : (
                   <Button
-                    type="default"
+                    variant="default"
                     onClick={() => {
                       onSelectImportData()
-                      sendEvent({
-                        action: 'import_data_button_clicked',
-                        properties: { tableType: 'New Table' },
-                        groups: {
-                          project: projectRef ?? 'Unknown',
-                          organization: org?.slug ?? 'Unknown',
-                        },
-                      })
+                      track('import_data_button_clicked', { tableType: 'New Table' })
                     }}
                   >
                     Import data from CSV
@@ -212,14 +200,14 @@ export const ColumnManagement = ({
         )}
 
         {primaryKeyColumns.length === 0 && (
-          <Alert_Shadcn_ variant="warning">
+          <Alert variant="warning">
             <WarningIcon />
-            <AlertTitle_Shadcn_>Warning: No primary keys selected</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
+            <AlertTitle>Warning: No primary keys selected</AlertTitle>
+            <AlertDescription>
               Tables should have at least one column as the primary key to identify each row.
               Without a primary key, you will not be able to update or delete rows from the table.
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+            </AlertDescription>
+          </Alert>
         )}
 
         {primaryKeyColumns.length > 1 && (
@@ -344,7 +332,7 @@ export const ColumnManagement = ({
 
         {!hasImportContent && (
           <div className="flex items-center justify-center rounded-sm border border-strong border-dashed py-3">
-            <Button type="default" onClick={() => onAddColumn()}>
+            <Button variant="default" onClick={() => onAddColumn()}>
               Add column
             </Button>
           </div>

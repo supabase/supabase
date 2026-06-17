@@ -36,11 +36,16 @@ export default function PricingContent() {
       <div className="text-center mt-10 xl:mt-16 mx-auto max-w-lg flex flex-col gap-8">
         <div className="flex justify-center gap-2">
           <a href="#compare-plans">
-            <Button size="tiny" type="secondary" iconRight={<ArrowDownIcon className="w-3" />}>
+            <Button size="tiny" variant="secondary" iconRight={<ArrowDownIcon className="w-3" />}>
               Compare Plans
             </Button>
           </a>
-          <Button size="tiny" type="default" asChild iconRight={<ArrowUpRight className="w-4" />}>
+          <Button
+            size="tiny"
+            variant="default"
+            asChild
+            iconRight={<ArrowUpRight className="w-4" />}
+          >
             <a
               href="/docs/guides/platform/billing-on-supabase#organization-based-billing"
               target="_blank"

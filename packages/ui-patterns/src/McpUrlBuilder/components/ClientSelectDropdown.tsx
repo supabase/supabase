@@ -5,15 +5,15 @@ import { useState } from 'react'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 
 import type { McpClient } from '../types'
@@ -50,7 +50,7 @@ export const ClientSelectDropdown = ({
 
   function renderClient(client: McpClient) {
     return (
-      <CommandItem_Shadcn_
+      <CommandItem
         key={client.key}
         value={client.key}
         onSelect={() => onSelectClient(client.key)}
@@ -71,20 +71,20 @@ export const ClientSelectDropdown = ({
           size={15}
           className={cn('ml-auto', client.key === selectedClient.key ? 'opacity-100' : 'opacity-0')}
         />
-      </CommandItem_Shadcn_>
+      </CommandItem>
     )
   }
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
       <div className="flex">
         <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
           {label}
         </span>
-        <PopoverTrigger_Shadcn_ asChild>
+        <PopoverTrigger asChild>
           <Button
             size="small"
-            type="default"
+            variant="default"
             className="gap-0 rounded-l-none"
             iconRight={
               <ChevronDown
@@ -106,25 +106,25 @@ export const ClientSelectDropdown = ({
               {selectedClient?.label}
             </div>
           </Button>
-        </PopoverTrigger_Shadcn_>
+        </PopoverTrigger>
       </div>
-      <PopoverContent_Shadcn_ className="mt-0 p-0 max-w-48" side="bottom" align="start">
-        <Command_Shadcn_>
-          <CommandInput_Shadcn_ placeholder="Search..." />
-          <CommandList_Shadcn_>
-            <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
+      <PopoverContent className="mt-0 p-0 max-w-48" side="bottom" align="start">
+        <Command>
+          <CommandInput placeholder="Search..." />
+          <CommandList>
+            <CommandEmpty>No results found.</CommandEmpty>
             {groups ? (
               groups.map((group) => (
-                <CommandGroup_Shadcn_ key={group.heading} heading={group.heading}>
+                <CommandGroup key={group.heading} heading={group.heading}>
                   {group.clients.map(renderClient)}
-                </CommandGroup_Shadcn_>
+                </CommandGroup>
               ))
             ) : (
-              <CommandGroup_Shadcn_>{clients.map(renderClient)}</CommandGroup_Shadcn_>
+              <CommandGroup>{clients.map(renderClient)}</CommandGroup>
             )}
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }

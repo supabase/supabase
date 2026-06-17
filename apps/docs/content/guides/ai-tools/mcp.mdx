@@ -28,9 +28,17 @@ After you log in, check that the MCP server is connected. For instance, in Curso
 
 To verify the client has access to the MCP server tools, try asking it to query your project or database using natural language. For example: "What tables are there in the database? Use MCP tools."
 
+<$Show if="docs:prompts">
+
 For curated, ready-to-use prompts that work well with IDEs and AI agents, see our [AI Prompts](/docs/guides/getting-started/ai-prompts) collection.
 
+</$Show>
+
+<$Show if="docs:agent_skills">
+
 Additionally, you can install Supabase agent skills alongside the MCP server, use the [Supabase Plugin for AI Coding Agents](/docs/guides/getting-started/plugins) for a combined one-step setup.
+
+</$Show>
 
 ## Available tools
 
@@ -52,7 +60,7 @@ The Supabase MCP server provides tools organized into feature groups. All groups
 ### Development
 
 - `get_project_url` - Get the API URL for a project
-- `get_publishable_keys` - Get anon/public keys
+- `get_publishable_keys` - Get publishable and legacy anon API keys for a project
 - `generate_typescript_types` - Generate TypeScript types from schema
 
 ### Edge Functions
@@ -197,4 +205,4 @@ We recommend the following best practices to mitigate security risks when using 
 
 ## On GitHub
 
-The MCP server repository is available at [github.com/supabase-community/supabase-mcp](https://github.com/supabase-community/supabase-mcp).
+The MCP server repository is available at [github.com/supabase/mcp](https://github.com/supabase/mcp).

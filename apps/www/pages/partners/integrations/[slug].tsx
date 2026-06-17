@@ -40,7 +40,7 @@ function mdxComponents(callback: Dispatch<SetStateAction<string | null>>) {
     img: (
       props: React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>
     ) => {
-      return <img {...props} onClick={() => callback(props.src!)} />
+      return <img {...props} onClick={() => callback(props.src!.toString())} />
     },
   }
 
@@ -192,6 +192,7 @@ function Partner({ partner, overview }: PartnerData) {
                   {'error' in overview ? (
                     <p>Error rendering integration page: {overview.error.message}</p>
                   ) : (
+                    // @ts-expect-error: Gildas - This is because CodeHide put its components under the CH namespace. It works but the MDXClient types are stricter
                     <MDXClient {...overview} components={mdxComponents(setFocusedImage)} />
                   )}
                 </div>
@@ -206,7 +207,7 @@ function Partner({ partner, overview }: PartnerData) {
                     Get started with {partner.title} and Supabase.
                   </h1>
                   <a href={partner.installUrl} target="_blank" rel="noreferrer">
-                    <Button size="medium" type="secondary">
+                    <Button size="medium" variant="secondary">
                       Add integration
                     </Button>
                   </a>
@@ -245,7 +246,7 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
           {partner.type === 'technology' && (
             <div className="flex items-center justify-between py-2">
               <span className="text-foreground-lighter">Developer</span>
-              <span className="text-foreground">{partner.partnerName}</span>
+              <span className="text-foreground">{partner.builtBy}</span>
             </div>
           )}
 

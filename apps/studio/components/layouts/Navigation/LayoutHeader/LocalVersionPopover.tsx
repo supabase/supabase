@@ -8,10 +8,10 @@ import {
   DialogSection,
   DialogTitle,
   DialogTrigger,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverSeparator_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverSeparator,
+  PopoverTrigger,
   Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
@@ -24,12 +24,14 @@ import { getSemver, semverGte, semverLte } from './LocalVersionPopover.utils'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useCLIReleaseVersionQuery } from '@/data/misc/cli-release-version-query'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
 export const LocalVersionPopover = () => {
   const track = useTrack()
-  const { data, isSuccess } = useCLIReleaseVersionQuery()
+  const { isCli } = useDeploymentMode()
+  const { data, isSuccess } = useCLIReleaseVersionQuery({ enabled: isCli })
   const { current: currentCliVersion, latest: latestCliVersion } = data || {}
   const hasLatestCLIVersion = isSuccess && !!latestCliVersion
 
@@ -50,17 +52,17 @@ export const LocalVersionPopover = () => {
   if (!isSuccess || !currentCliVersion) return null
 
   return (
-    <Popover_Shadcn_
+    <Popover
       onOpenChange={(open) => {
         if (open) track('header_local_version_popover_opened')
       }}
     >
-      <PopoverTrigger_Shadcn_ className="flex items-center">
+      <PopoverTrigger className="flex items-center">
         <Badge variant={isBeta ? 'warning' : hasUpdate ? 'success' : 'default'}>
           {isBeta ? 'Beta' : hasUpdate ? 'Update available' : 'Latest'}
         </Badge>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ align="end" className="w-80 px-0">
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-80 px-0">
         {hasLatestCLIVersion ? (
           !isBeta && hasUpdate ? (
             <div className="px-4 mb-3">
@@ -126,7 +128,7 @@ export const LocalVersionPopover = () => {
         <div className="flex items-center gap-x-2 mt-3 px-4">
           <Dialog>
             <DialogTrigger asChild>
-              <Button type="default">Release schedule</Button>
+              <Button variant="default">Release schedule</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader className="border-b">
@@ -172,7 +174,7 @@ export const LocalVersionPopover = () => {
               </DialogSection>
             </DialogContent>
           </Dialog>
-          <Button type="default" asChild>
+          <Button variant="default" asChild>
             <a
               target="_blank"
               rel="noreferrer noopener"
@@ -182,7 +184,7 @@ export const LocalVersionPopover = () => {
             </a>
           </Button>
         </div>
-        <PopoverSeparator_Shadcn_ className="my-4" />
+        <PopoverSeparator className="my-4" />
         <div className="flex items-center gap-x-4 px-4">
           <div className="flex flex-col gap-y-1">
             <p className="text-xs">Current version:</p>
@@ -195,7 +197,7 @@ export const LocalVersionPopover = () => {
             </div>
           )}
         </div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

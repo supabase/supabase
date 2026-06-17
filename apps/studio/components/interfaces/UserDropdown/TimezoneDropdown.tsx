@@ -2,12 +2,12 @@ import { CheckIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import {
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   DropdownMenuPortal,
   DropdownMenuSub,
   DropdownMenuSubContent,
@@ -59,13 +59,13 @@ export const TimezoneDropdown = () => {
       </DropdownMenuSubTrigger>
       <DropdownMenuPortal>
         <DropdownMenuSubContent className="p-0 w-[320px]" sideOffset={4}>
-          <Command_Shadcn_>
-            <CommandInput_Shadcn_ placeholder="Search timezone..." className="h-9" />
-            <CommandList_Shadcn_>
-              <CommandEmpty_Shadcn_>No timezones found</CommandEmpty_Shadcn_>
-              <CommandGroup_Shadcn_>
+          <Command>
+            <CommandInput placeholder="Search timezone..." className="h-9" />
+            <CommandList>
+              <CommandEmpty>No timezones found</CommandEmpty>
+              <CommandGroup>
                 <ScrollArea className="h-72">
-                  <CommandItem_Shadcn_
+                  <CommandItem
                     key={AUTO_OPTION_VALUE}
                     value={`Auto detect ${browserTimezone}`}
                     onSelect={() => handleSelect('')}
@@ -80,12 +80,25 @@ export const TimezoneDropdown = () => {
                         isAutoDetected ? 'opacity-100' : 'opacity-0'
                       )}
                     />
-                  </CommandItem_Shadcn_>
+                  </CommandItem>
+                  <CommandItem
+                    key="UTC"
+                    value="UTC Coordinated Universal Time"
+                    onSelect={() => handleSelect('UTC')}
+                  >
+                    {'(UTC) Coordinated Universal Time'}
+                    <CheckIcon
+                      className={cn(
+                        'ml-auto h-4 w-4',
+                        !isAutoDetected && storedTimezone === 'UTC' ? 'opacity-100' : 'opacity-0'
+                      )}
+                    />
+                  </CommandItem>
                   {TIMEZONES_BY_IANA.map((entry) => {
                     const ianaName = entry.utc[0]
                     const isSelected = !isAutoDetected && storedTimezone === ianaName
                     return (
-                      <CommandItem_Shadcn_
+                      <CommandItem
                         key={ianaName}
                         // CommandItem matches against the `value` prop for the input filter — include
                         // both the human label and the IANA name so search works for either.
@@ -99,13 +112,13 @@ export const TimezoneDropdown = () => {
                             isSelected ? 'opacity-100' : 'opacity-0'
                           )}
                         />
-                      </CommandItem_Shadcn_>
+                      </CommandItem>
                     )
                   })}
                 </ScrollArea>
-              </CommandGroup_Shadcn_>
-            </CommandList_Shadcn_>
-          </Command_Shadcn_>
+              </CommandGroup>
+            </CommandList>
+          </Command>
         </DropdownMenuSubContent>
       </DropdownMenuPortal>
     </DropdownMenuSub>

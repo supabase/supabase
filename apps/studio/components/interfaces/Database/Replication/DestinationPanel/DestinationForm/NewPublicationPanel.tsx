@@ -7,7 +7,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Sheet,
   SheetContent,
   SheetDescription,
@@ -102,7 +102,7 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
                     render={({ field }) => (
                       <FormItemLayout label="Name" layout="vertical">
                         <FormControl>
-                          <Input_Shadcn_ {...field} placeholder="Name" />
+                          <Input {...field} placeholder="Name" />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -147,10 +147,10 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
               </Form>
             </SheetSection>
             <SheetFooter>
-              <Button type="default" disabled={creatingPublication} onClick={onClose}>
+              <Button variant="default" disabled={creatingPublication} onClick={onClose}>
                 Cancel
               </Button>
-              <Button type="primary" disabled={creatingPublication} form={formId} htmlType="submit">
+              <Button variant="primary" disabled={creatingPublication} form={formId} type="submit">
                 Create publication
               </Button>
             </SheetFooter>

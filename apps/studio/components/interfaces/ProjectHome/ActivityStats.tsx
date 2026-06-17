@@ -97,7 +97,7 @@ export const ActivityStats = () => {
           icon={<Cpu size={18} strokeWidth={1.5} className="text-foreground" />}
           label={<span>Compute</span>}
           value={
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-x-2 gap-y-1 flex-wrap">
               {project?.infra_compute_size ? (
                 <ComputeBadgeWrapper
                   projectRef={project?.ref}
@@ -123,7 +123,7 @@ export const ActivityStats = () => {
               <Skeleton className="h-6 w-24" />
             ) : (
               <p
-                className={cn('truncate', !githubConnection && 'text-foreground-lighter')}
+                className={cn('truncate min-w-0', !githubConnection && 'text-foreground-lighter')}
                 title={githubLabelText}
               >
                 {githubLabelText}
@@ -146,8 +146,8 @@ export const ActivityStats = () => {
             ) : isDefaultProject ? (
               <p
                 className={cn(
-                  'truncate',
-                  !latestNonDefaultBranch && 'text-foreground-lighter truncate'
+                  'truncate min-w-0',
+                  !latestNonDefaultBranch && 'text-foreground-lighter'
                 )}
                 title={latestNonDefaultBranch?.name ?? 'No branches'}
               >
@@ -177,7 +177,13 @@ export const ActivityStats = () => {
             isLoadingMigrations ? (
               <Skeleton className="h-6 w-24" />
             ) : (
-              <p className={!!latestMigration ? 'text-foreground' : 'text-foreground-lighter'}>
+              <p
+                className={cn(
+                  'truncate min-w-0',
+                  !!latestMigration ? 'text-foreground' : 'text-foreground-lighter'
+                )}
+                title={migrationLabelText}
+              >
                 {migrationLabelText}
               </p>
             )

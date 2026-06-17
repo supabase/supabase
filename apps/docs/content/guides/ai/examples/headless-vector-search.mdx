@@ -84,7 +84,7 @@ const onSubmit = (e: Event) => {
 
   const query = new URLSearchParams({ query: inputRef.current!.value })
   const projectUrl = `https://your-project-ref.supabase.co/functions/v1`
-  const queryURL = `${projectURL}/${query}`
+  const queryURL = `${projectUrl}/${query}`
   const eventSource = new EventSource(queryURL)
 
   eventSource.addEventListener("error", (err) => {

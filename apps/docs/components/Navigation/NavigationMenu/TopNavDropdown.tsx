@@ -1,10 +1,13 @@
 'use client'
 
-import React, { Fragment } from 'react'
-import Link from 'next/link'
-import { useTheme } from 'next-themes'
+import { isFeatureEnabled } from 'common'
 import { Menu } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import Link from 'next/link'
+import React, { Fragment } from 'react'
 import {
+  buttonVariants,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -15,12 +18,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   Theme,
-  buttonVariants,
-  cn,
   themes,
 } from 'ui'
+
 import MenuIconPicker from './MenuIconPicker'
-import { isFeatureEnabled } from 'common'
 
 const menu = [
   [
@@ -69,7 +70,7 @@ const TopNavDropdown = () => {
         <button
           title="Menu dropdown button"
           className={cn(
-            buttonVariants({ type: 'default' }),
+            buttonVariants({ variant: 'default' }),
             'text-foreground-light border-default w-[30px] min-w-[30px] h-[30px] data-open:bg-overlay-hover/30 hover:border-strong data-open:border-stronger hover:bg-overlay-hover/50! bg-transparent'
           )}
         >

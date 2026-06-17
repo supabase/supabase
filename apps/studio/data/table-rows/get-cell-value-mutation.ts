@@ -3,7 +3,9 @@ import { Query } from '@supabase/pg-meta/src/query'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
+import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type GetCellValueVariables = {
@@ -12,6 +14,7 @@ export type GetCellValueVariables = {
   table: { schema: string; name: string }
   column: string
   pkMatch: { [key: string]: any }
+  roleImpersonationState?: RoleImpersonationState
 }
 
 export function getCellValueSql({
@@ -32,9 +35,18 @@ export async function getCellValue({
   table,
   column,
   pkMatch,
+  roleImpersonationState,
 }: GetCellValueVariables) {
-  const sql = getCellValueSql({ table, column, pkMatch })
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const sql = wrapWithRoleImpersonation(
+    getCellValueSql({ table, column, pkMatch }),
+    roleImpersonationState
+  )
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+  })
   return result?.[0][column]
 }
 

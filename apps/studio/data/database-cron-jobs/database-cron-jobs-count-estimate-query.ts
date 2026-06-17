@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import type { ConnectionVars } from '@/data/common.types'
 import { getLiveTupleEstimateKey } from '@/data/database/keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { UseCustomQueryOptions } from '@/types'
 
 type DatabaseCronJobsCountEstimateVariables = ConnectionVars

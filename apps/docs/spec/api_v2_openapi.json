@@ -1,0 +1,1217 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/v2/projects/{ref}/analytics/log-drains": {
+      "get": {
+        "operationId": "v2-list-log-drains",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ListLogDrainsResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to fetch log drains" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["analytics_config_read"] }],
+        "summary": "List project log drains",
+        "tags": ["Analytics"],
+        "x-badges": [{ "name": "OAuth scope: analytics_config:read", "position": "after" }],
+        "x-endpoint-owners": ["analytics"],
+        "x-oauth-scope": "analytics_config:read"
+      },
+      "post": {
+        "operationId": "v2-create-log-drain",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateLogDrainRequestOpenApi" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/LogDrainResponse" } }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "402": {
+            "description": "This feature requires the Pro, Team, or Enterprise organization plan."
+          },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to create a log drain" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["analytics_config_write"] }],
+        "summary": "Create a log drain for a project",
+        "tags": ["Analytics"],
+        "x-allowed-plans": ["Pro", "Team", "Enterprise"],
+        "x-badges": [
+          { "name": "Only available on Pro, Team, Enterprise", "position": "before" },
+          { "name": "OAuth scope: analytics_config:write", "position": "after" }
+        ],
+        "x-endpoint-owners": ["analytics"],
+        "x-oauth-scope": "analytics_config:write"
+      }
+    },
+    "/v2/projects/{ref}/analytics/log-drains/{id}": {
+      "put": {
+        "operationId": "v2-update-log-drain",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Log drains identifier",
+            "schema": { "format": "uuid", "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateLogDrainRequestOpenApi" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/LogDrainResponse" } }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to update log drain" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["analytics_config_write"] }],
+        "summary": "Update a project log drain",
+        "tags": ["Analytics"],
+        "x-badges": [{ "name": "OAuth scope: analytics_config:write", "position": "after" }],
+        "x-endpoint-owners": ["analytics"],
+        "x-oauth-scope": "analytics_config:write"
+      },
+      "delete": {
+        "operationId": "v2-delete-log-drain",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Log drains identifier",
+            "schema": { "format": "uuid", "type": "string" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to delete a log drain" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["analytics_config_write"] }],
+        "summary": "Delete a project log drain",
+        "tags": ["Analytics"],
+        "x-badges": [{ "name": "OAuth scope: analytics_config:write", "position": "after" }],
+        "x-endpoint-owners": ["analytics"],
+        "x-oauth-scope": "analytics_config:write"
+      }
+    },
+    "/v2/projects/{ref}/transfers/previews": {
+      "post": {
+        "operationId": "v2-preview-a-project-transfer",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/V2TransferProjectBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V2PreviewProjectTransferResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["project_admin_read"] }],
+        "summary": "Previews transferring a project to a different organizations, shows eligibility and impact",
+        "tags": ["Projects"],
+        "x-endpoint-owners": ["management-api"]
+      }
+    },
+    "/v2/projects/{ref}/transfers": {
+      "post": {
+        "operationId": "v2-transfer-a-project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/V2TransferProjectBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["organization_admin_write"] }],
+        "summary": "Transfers a project to a different organization",
+        "tags": ["Projects"],
+        "x-endpoint-owners": ["management-api"]
+      }
+    },
+    "/v2/organizations/{slug}/members": {
+      "get": {
+        "description": "Returns a cursor-paginated list of organization members including their roles and project-scoped permissions.",
+        "operationId": "v2-list-organization-members",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "description": "Organization slug",
+            "schema": {
+              "pattern": "^[\\w-]+$",
+              "example": "tsrqponmlkjihgfedcba",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "properties": {
+                "size": { "type": "integer", "minimum": 1, "maximum": 100, "required": false },
+                "after": { "type": "string", "format": "uuid", "required": false },
+                "before": { "type": "string", "format": "uuid", "required": false }
+              },
+              "type": "object"
+            }
+          },
+          {
+            "name": "filter",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "properties": {
+                "username": { "type": "string", "required": false },
+                "primary_email": { "type": "string", "format": "email", "required": false }
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V2ListMembersResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["members_read"] }],
+        "summary": "List members of an organization",
+        "tags": ["Organizations"],
+        "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
+        "x-endpoint-owners": ["management-api"],
+        "x-oauth-scope": "organizations:read"
+      }
+    },
+    "/v2/organizations/{slug}/roles": {
+      "get": {
+        "description": "Returns a cursor-paginated list of organization roles including both org-scoped and project-scoped roles.",
+        "operationId": "v2-list-organization-roles",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "description": "Organization slug",
+            "schema": {
+              "pattern": "^[\\w-]+$",
+              "example": "tsrqponmlkjihgfedcba",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "properties": {
+                "size": { "type": "integer", "minimum": 1, "maximum": 100, "required": false },
+                "after": { "type": "string", "required": false },
+                "before": { "type": "string", "required": false }
+              },
+              "type": "object"
+            }
+          },
+          {
+            "name": "filter",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "properties": {
+                "scope": {
+                  "type": "string",
+                  "enum": ["organization", "project"],
+                  "required": false
+                }
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V2ListRolesResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["members_read"] }],
+        "summary": "List roles of an organization",
+        "tags": ["Organizations"],
+        "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
+        "x-endpoint-owners": ["management-api"],
+        "x-oauth-scope": "organizations:read"
+      }
+    }
+  },
+  "info": {
+    "title": "Supabase API (v2)",
+    "description": "Supabase API generated from the OpenAPI specification.<br>Visit [https://supabase.com/docs](https://supabase.com/docs) for a complete documentation.",
+    "version": "1.0.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": { "bearer": { "scheme": "bearer", "bearerFormat": "JWT", "type": "http" } },
+    "schemas": {
+      "ListLogDrainsResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["log_drain"],
+                  "description": "Resource type."
+                },
+                "id": { "type": "string" },
+                "attributes": {
+                  "type": "object",
+                  "properties": {
+                    "name": { "type": "string" },
+                    "description": { "type": "string" },
+                    "config": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "url": { "type": "string", "nullable": true },
+                            "schema": { "type": "string" },
+                            "username": { "type": "string", "nullable": true },
+                            "password": { "type": "string", "nullable": true },
+                            "port": { "type": "number", "nullable": true },
+                            "hostname": { "type": "string" }
+                          },
+                          "additionalProperties": false,
+                          "title": "postgres"
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "url": { "type": "string" },
+                            "http": { "type": "string", "enum": ["http1", "http2"] },
+                            "gzip": { "type": "boolean" },
+                            "headers": {
+                              "type": "object",
+                              "additionalProperties": { "type": "string" }
+                            }
+                          },
+                          "additionalProperties": false,
+                          "title": "webhook"
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "project_id": { "type": "string" },
+                            "dataset_id": { "type": "string" }
+                          },
+                          "additionalProperties": false,
+                          "title": "bigquery"
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "api_key": { "type": "string" },
+                            "region": { "type": "string" }
+                          },
+                          "additionalProperties": false,
+                          "title": "datadog"
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "url": { "type": "string" },
+                            "username": { "type": "string", "nullable": true },
+                            "password": { "type": "string", "nullable": true },
+                            "headers": {
+                              "type": "object",
+                              "additionalProperties": { "type": "string" }
+                            }
+                          },
+                          "additionalProperties": false,
+                          "title": "loki"
+                        },
+                        {
+                          "type": "object",
+                          "properties": { "dsn": { "type": "string" } },
+                          "additionalProperties": false,
+                          "title": "sentry"
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "domain": { "type": "string" },
+                            "api_token": { "type": "string" },
+                            "dataset_name": { "type": "string" }
+                          },
+                          "additionalProperties": false,
+                          "title": "axiom"
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "host": { "type": "string" },
+                            "port": { "type": "integer", "minimum": 0, "maximum": 65535 },
+                            "tls": { "default": false, "type": "boolean" },
+                            "structured_data": { "type": "string" },
+                            "cipher_key": { "type": "string" },
+                            "ca_cert": { "type": "string" },
+                            "client_cert": { "type": "string" },
+                            "client_key": { "type": "string" }
+                          },
+                          "additionalProperties": false,
+                          "title": "syslog"
+                        }
+                      ]
+                    },
+                    "backend_type": {
+                      "type": "string",
+                      "enum": [
+                        "postgres",
+                        "bigquery",
+                        "clickhouse",
+                        "webhook",
+                        "datadog",
+                        "loki",
+                        "sentry",
+                        "s3",
+                        "axiom",
+                        "last9",
+                        "otlp",
+                        "syslog"
+                      ]
+                    }
+                  },
+                  "required": ["name", "config", "backend_type"]
+                }
+              },
+              "required": ["type", "id", "attributes"]
+            }
+          }
+        },
+        "required": ["data"]
+      },
+      "CreateLogDrainRequestOpenApi": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string", "enum": ["log_drain"], "description": "Resource type." },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "config": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "url": { "type": "string", "nullable": true },
+                          "schema": { "type": "string" },
+                          "username": { "type": "string", "nullable": true },
+                          "password": { "type": "string", "nullable": true },
+                          "port": { "type": "number", "nullable": true },
+                          "hostname": { "type": "string" }
+                        },
+                        "additionalProperties": false,
+                        "title": "postgres"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "url": { "type": "string" },
+                          "http": { "type": "string", "enum": ["http1", "http2"] },
+                          "gzip": { "type": "boolean" },
+                          "headers": {
+                            "type": "object",
+                            "additionalProperties": { "type": "string" }
+                          }
+                        },
+                        "additionalProperties": false,
+                        "title": "webhook"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "project_id": { "type": "string" },
+                          "dataset_id": { "type": "string" }
+                        },
+                        "additionalProperties": false,
+                        "title": "bigquery"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "api_key": { "type": "string" },
+                          "region": { "type": "string" }
+                        },
+                        "additionalProperties": false,
+                        "title": "datadog"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "url": { "type": "string" },
+                          "username": { "type": "string", "nullable": true },
+                          "password": { "type": "string", "nullable": true },
+                          "headers": {
+                            "type": "object",
+                            "additionalProperties": { "type": "string" }
+                          }
+                        },
+                        "additionalProperties": false,
+                        "title": "loki"
+                      },
+                      {
+                        "type": "object",
+                        "properties": { "dsn": { "type": "string" } },
+                        "additionalProperties": false,
+                        "title": "sentry"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "domain": { "type": "string" },
+                          "api_token": { "type": "string" },
+                          "dataset_name": { "type": "string" }
+                        },
+                        "additionalProperties": false,
+                        "title": "axiom"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "host": { "type": "string" },
+                          "port": { "type": "integer", "minimum": 0, "maximum": 65535 },
+                          "tls": { "default": false, "type": "boolean" },
+                          "structured_data": { "type": "string" },
+                          "cipher_key": { "type": "string" },
+                          "ca_cert": { "type": "string" },
+                          "client_cert": { "type": "string" },
+                          "client_key": { "type": "string" }
+                        },
+                        "additionalProperties": false,
+                        "title": "syslog"
+                      }
+                    ]
+                  },
+                  "backend_type": {
+                    "type": "string",
+                    "enum": [
+                      "postgres",
+                      "bigquery",
+                      "clickhouse",
+                      "webhook",
+                      "datadog",
+                      "loki",
+                      "sentry",
+                      "s3",
+                      "axiom",
+                      "last9",
+                      "otlp",
+                      "syslog"
+                    ]
+                  }
+                },
+                "required": ["name", "config", "backend_type"]
+              }
+            },
+            "required": ["type", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
+      "LogDrainResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string", "enum": ["log_drain"], "description": "Resource type." },
+              "id": { "type": "string" },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "config": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "url": { "type": "string", "nullable": true },
+                          "schema": { "type": "string" },
+                          "username": { "type": "string", "nullable": true },
+                          "password": { "type": "string", "nullable": true },
+                          "port": { "type": "number", "nullable": true },
+                          "hostname": { "type": "string" }
+                        },
+                        "additionalProperties": false,
+                        "title": "postgres"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "url": { "type": "string" },
+                          "http": { "type": "string", "enum": ["http1", "http2"] },
+                          "gzip": { "type": "boolean" },
+                          "headers": {
+                            "type": "object",
+                            "additionalProperties": { "type": "string" }
+                          }
+                        },
+                        "additionalProperties": false,
+                        "title": "webhook"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "project_id": { "type": "string" },
+                          "dataset_id": { "type": "string" }
+                        },
+                        "additionalProperties": false,
+                        "title": "bigquery"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "api_key": { "type": "string" },
+                          "region": { "type": "string" }
+                        },
+                        "additionalProperties": false,
+                        "title": "datadog"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "url": { "type": "string" },
+                          "username": { "type": "string", "nullable": true },
+                          "password": { "type": "string", "nullable": true },
+                          "headers": {
+                            "type": "object",
+                            "additionalProperties": { "type": "string" }
+                          }
+                        },
+                        "additionalProperties": false,
+                        "title": "loki"
+                      },
+                      {
+                        "type": "object",
+                        "properties": { "dsn": { "type": "string" } },
+                        "additionalProperties": false,
+                        "title": "sentry"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "domain": { "type": "string" },
+                          "api_token": { "type": "string" },
+                          "dataset_name": { "type": "string" }
+                        },
+                        "additionalProperties": false,
+                        "title": "axiom"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "host": { "type": "string" },
+                          "port": { "type": "integer", "minimum": 0, "maximum": 65535 },
+                          "tls": { "default": false, "type": "boolean" },
+                          "structured_data": { "type": "string" },
+                          "cipher_key": { "type": "string" },
+                          "ca_cert": { "type": "string" },
+                          "client_cert": { "type": "string" },
+                          "client_key": { "type": "string" }
+                        },
+                        "additionalProperties": false,
+                        "title": "syslog"
+                      }
+                    ]
+                  },
+                  "backend_type": {
+                    "type": "string",
+                    "enum": [
+                      "postgres",
+                      "bigquery",
+                      "clickhouse",
+                      "webhook",
+                      "datadog",
+                      "loki",
+                      "sentry",
+                      "s3",
+                      "axiom",
+                      "last9",
+                      "otlp",
+                      "syslog"
+                    ]
+                  }
+                },
+                "required": ["name", "config", "backend_type"]
+              }
+            },
+            "required": ["type", "id", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
+      "UpdateLogDrainRequestOpenApi": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string", "enum": ["log_drain"], "description": "Resource type." },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "config": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "url": { "type": "string", "nullable": true },
+                          "schema": { "type": "string" },
+                          "username": { "type": "string", "nullable": true },
+                          "password": { "type": "string", "nullable": true },
+                          "port": { "type": "number", "nullable": true },
+                          "hostname": { "type": "string" }
+                        },
+                        "additionalProperties": false,
+                        "title": "postgres"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "url": { "type": "string" },
+                          "http": { "type": "string", "enum": ["http1", "http2"] },
+                          "gzip": { "type": "boolean" },
+                          "headers": {
+                            "type": "object",
+                            "additionalProperties": { "type": "string" }
+                          }
+                        },
+                        "additionalProperties": false,
+                        "title": "webhook"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "project_id": { "type": "string" },
+                          "dataset_id": { "type": "string" }
+                        },
+                        "additionalProperties": false,
+                        "title": "bigquery"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "api_key": { "type": "string" },
+                          "region": { "type": "string" }
+                        },
+                        "additionalProperties": false,
+                        "title": "datadog"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "url": { "type": "string" },
+                          "username": { "type": "string", "nullable": true },
+                          "password": { "type": "string", "nullable": true },
+                          "headers": {
+                            "type": "object",
+                            "additionalProperties": { "type": "string" }
+                          }
+                        },
+                        "additionalProperties": false,
+                        "title": "loki"
+                      },
+                      {
+                        "type": "object",
+                        "properties": { "dsn": { "type": "string" } },
+                        "additionalProperties": false,
+                        "title": "sentry"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "domain": { "type": "string" },
+                          "api_token": { "type": "string" },
+                          "dataset_name": { "type": "string" }
+                        },
+                        "additionalProperties": false,
+                        "title": "axiom"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "host": { "type": "string" },
+                          "port": { "type": "integer", "minimum": 0, "maximum": 65535 },
+                          "tls": { "default": false, "type": "boolean" },
+                          "structured_data": { "type": "string" },
+                          "cipher_key": { "type": "string" },
+                          "ca_cert": { "type": "string" },
+                          "client_cert": { "type": "string" },
+                          "client_key": { "type": "string" }
+                        },
+                        "additionalProperties": false,
+                        "title": "syslog"
+                      }
+                    ]
+                  },
+                  "backend_type": {
+                    "type": "string",
+                    "enum": [
+                      "postgres",
+                      "bigquery",
+                      "clickhouse",
+                      "webhook",
+                      "datadog",
+                      "loki",
+                      "sentry",
+                      "s3",
+                      "axiom",
+                      "last9",
+                      "otlp",
+                      "syslog"
+                    ]
+                  }
+                },
+                "required": ["backend_type"]
+              }
+            },
+            "required": ["type", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
+      "V2TransferProjectBody": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["project_transfer_input"],
+                "description": "Resource type."
+              },
+              "attributes": {
+                "type": "object",
+                "properties": { "target_organization_slug": { "type": "string" } },
+                "required": ["target_organization_slug"]
+              }
+            },
+            "required": ["type", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
+      "V2PreviewProjectTransferResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["project_transfer_result"],
+                "description": "Resource type."
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "valid": { "type": "boolean" },
+                  "warnings": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "key": { "type": "string" },
+                        "message": { "type": "string" }
+                      },
+                      "required": ["key", "message"]
+                    }
+                  },
+                  "errors": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "key": { "type": "string" },
+                        "message": { "type": "string" }
+                      },
+                      "required": ["key", "message"]
+                    }
+                  },
+                  "info": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "key": { "type": "string" },
+                        "message": { "type": "string" }
+                      },
+                      "required": ["key", "message"]
+                    }
+                  }
+                },
+                "required": ["valid", "warnings", "errors", "info"]
+              }
+            },
+            "required": ["type", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
+      "V2ListMembersResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["organization_member"],
+                  "description": "Resource type."
+                },
+                "id": { "type": "string", "format": "uuid" },
+                "attributes": {
+                  "type": "object",
+                  "properties": {
+                    "username": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Member's username"
+                    },
+                    "primary_email": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Member's primary email"
+                    },
+                    "mfa_enabled": {
+                      "type": "boolean",
+                      "description": "Whether Multi-Factor Authentication is enabled for this member"
+                    },
+                    "is_sso_user": {
+                      "type": "boolean",
+                      "description": "Whether this member is a Single Sign-On user"
+                    },
+                    "roles": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "integer", "description": "Role ID." },
+                          "name": {
+                            "type": "string",
+                            "description": "Role name. For project-scoped roles this is the base role name.",
+                            "example": "Developer"
+                          },
+                          "scope": {
+                            "type": "string",
+                            "enum": ["organization", "project"],
+                            "description": "Whether this role applies org-wide or is scoped to specific projects for the user."
+                          },
+                          "projects": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "ref": { "type": "string" },
+                                "name": { "type": "string" }
+                              },
+                              "required": ["ref", "name"]
+                            },
+                            "description": "Project refs this role is scoped to. Empty array for org-level roles."
+                          }
+                        },
+                        "required": ["id", "name", "scope", "projects"]
+                      },
+                      "description": "Roles assigned to this member. Includes both org-level and project-scoped roles."
+                    }
+                  },
+                  "required": ["username", "primary_email", "mfa_enabled", "is_sso_user", "roles"]
+                }
+              },
+              "required": ["type", "id", "attributes"]
+            }
+          },
+          "links": {
+            "type": "object",
+            "properties": {
+              "first": {
+                "type": "string",
+                "nullable": true,
+                "description": "URL path to the first page if available.",
+                "example": "/v2/organizations/my-org/members?page[size]=10"
+              },
+              "prev": {
+                "type": "string",
+                "nullable": true,
+                "description": "URL path to the previous page.",
+                "example": "/v2/organizations/my-org/members?page[size]=10&page[before]=019adf7d-4513-74c5-bb9a-f1bc0f7a95d7"
+              },
+              "next": {
+                "type": "string",
+                "nullable": true,
+                "description": "URL path to the next page.",
+                "example": "/v2/organizations/my-org/members?page[size]=10&page[after]=019adf7d-4513-7062-b292-78b86cc470a4"
+              },
+              "last": {
+                "type": "string",
+                "nullable": true,
+                "description": "URL path to the last page if available.",
+                "example": "/v2/organizations/my-org/members?page[size]=10&page[after]=019adf7d-4513-71ba-b264-21900edb4295"
+              }
+            },
+            "required": ["prev", "next"]
+          }
+        },
+        "required": ["data", "links"]
+      },
+      "V2ListRolesResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["organization_role"],
+                  "description": "Resource type."
+                },
+                "id": { "type": "string" },
+                "attributes": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Role name. For project-scoped roles this is the base role name.",
+                      "example": "Developer"
+                    },
+                    "scope": {
+                      "type": "string",
+                      "enum": ["organization", "project"],
+                      "description": "Whether this role applies org-wide or is scoped to specific projects for the user."
+                    },
+                    "base_role_id": {
+                      "type": "integer",
+                      "nullable": true,
+                      "description": "null for org-level roles; the base role ID for project-scoped roles."
+                    },
+                    "projects": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": { "ref": { "type": "string" }, "name": { "type": "string" } },
+                        "required": ["ref", "name"]
+                      },
+                      "description": "Project refs this role is scoped to. Empty array for org-level roles."
+                    }
+                  },
+                  "required": ["name", "scope", "base_role_id", "projects"]
+                }
+              },
+              "required": ["type", "id", "attributes"]
+            }
+          },
+          "links": {
+            "type": "object",
+            "properties": {
+              "first": {
+                "type": "string",
+                "nullable": true,
+                "description": "URL path to the first page if available.",
+                "example": "/v2/organizations/my-org/roles?page[size]=10"
+              },
+              "prev": {
+                "type": "string",
+                "nullable": true,
+                "description": "URL path to the previous page.",
+                "example": "/v2/organizations/my-org/roles?page[size]=10&page[before]=019adf7d-4513-74c5-bb9a-f1bc0f7a95d7"
+              },
+              "next": {
+                "type": "string",
+                "nullable": true,
+                "description": "URL path to the next page.",
+                "example": "/v2/organizations/my-org/roles?page[size]=10&page[after]=019adf7d-4513-7062-b292-78b86cc470a4"
+              },
+              "last": {
+                "type": "string",
+                "nullable": true,
+                "description": "URL path to the last page if available.",
+                "example": "/v2/organizations/my-org/roles?page[size]=10&page[after]=019adf7d-4513-71ba-b264-21900edb4295"
+              }
+            },
+            "required": ["prev", "next"]
+          }
+        },
+        "required": ["data", "links"]
+      }
+    }
+  }
+}

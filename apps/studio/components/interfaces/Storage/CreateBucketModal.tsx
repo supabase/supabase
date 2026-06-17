@@ -16,12 +16,12 @@ import {
   FormControl,
   FormField,
   FormMessage,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -34,9 +34,8 @@ import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSetting
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { useBucketCreateMutation } from '@/data/storage/bucket-create-mutation'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 const FormSchema = z
   .object({
@@ -85,8 +84,6 @@ interface CreateBucketModalProps {
 
 export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps) => {
   const { ref } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
-
   const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.MB)
   const [hasAllowedMimeTypes, setHasAllowedMimeTypes] = useState(false)
 
@@ -94,7 +91,7 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { mutateAsync: createBucket, isPending: isCreatingBucket } = useBucketCreateMutation({
     // [Joshen] Silencing the error here as it's being handled in onSubmit
     onError: () => {},
@@ -144,11 +141,7 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
         file_size_limit: fileSizeLimit,
         allowed_mime_types: allowedMimeTypes,
       })
-      sendEvent({
-        action: 'storage_bucket_created',
-        properties: { bucketType: 'STANDARD' },
-        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-      })
+      track('storage_bucket_created', { bucketType: 'STANDARD' })
 
       toast.success(`Successfully created bucket ${values.name}`)
       form.reset()
@@ -210,7 +203,7 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
                     labelOptional="Cannot be changed after creation"
                   >
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         id="name"
                         data-1p-ignore
                         data-lpignore="true"
@@ -301,7 +294,7 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
                         <div className="grid grid-cols-12 gap-x-2">
                           <div className="col-span-8">
                             <FormControl>
-                              <Input_Shadcn_
+                              <Input
                                 id="formatted_size_limit"
                                 aria-label="File size limit"
                                 type="number"
@@ -312,18 +305,18 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
                             </FormControl>
                           </div>
                           <div className="col-span-4">
-                            <Select_Shadcn_ value={selectedUnit} onValueChange={setSelectedUnit}>
-                              <SelectTrigger_Shadcn_ aria-label="File size limit unit" size="small">
-                                <SelectValue_Shadcn_>{selectedUnit}</SelectValue_Shadcn_>
-                              </SelectTrigger_Shadcn_>
-                              <SelectContent_Shadcn_>
+                            <Select value={selectedUnit} onValueChange={setSelectedUnit}>
+                              <SelectTrigger aria-label="File size limit unit" size="small">
+                                <SelectValue>{selectedUnit}</SelectValue>
+                              </SelectTrigger>
+                              <SelectContent>
                                 {Object.values(StorageSizeUnits).map((unit: string) => (
-                                  <SelectItem_Shadcn_ key={unit} value={unit} className="text-xs">
+                                  <SelectItem key={unit} value={unit} className="text-xs">
                                     {unit}
-                                  </SelectItem_Shadcn_>
+                                  </SelectItem>
                                 ))}
-                              </SelectContent_Shadcn_>
-                            </Select_Shadcn_>
+                              </SelectContent>
+                            </Select>
                           </div>
                         </div>
                       </FormItemLayout>
@@ -391,7 +384,7 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
                       description="Wildcards are allowed, e.g. image/*."
                     >
                       <FormControl>
-                        <Input_Shadcn_
+                        <Input
                           id="allowed_mime_types"
                           {...field}
                           placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
@@ -406,12 +399,12 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
         </Form>
 
         <DialogFooter>
-          <Button type="default" disabled={isCreatingBucket} onClick={() => onOpenChange(false)}>
+          <Button variant="default" disabled={isCreatingBucket} onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button
             form={formId}
-            htmlType="submit"
+            type="submit"
             loading={isCreatingBucket}
             disabled={isCreatingBucket}
           >

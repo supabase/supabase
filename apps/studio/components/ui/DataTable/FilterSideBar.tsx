@@ -1,10 +1,9 @@
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { useEffect } from 'react'
-import { Button, cn, ResizablePanel, usePanelRef } from 'ui'
+import React, { useEffect, type ReactNode } from 'react'
+import { Badge, Button, cn, ResizablePanel, usePanelRef } from 'ui'
 
-import { FeaturePreviewBadge } from '../FeaturePreviewBadge'
 import { FeaturePreviewSidebarPanel } from '../FeaturePreviewSidebarPanel'
 import { DateRangeDisabled } from './DataTable.types'
 import { DataTableFilterControls } from './DataTableFilters/DataTableFilterControls'
@@ -12,27 +11,26 @@ import { DataTableResetButton } from './DataTableResetButton'
 import { useDataTable } from './providers/DataTableProvider'
 import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
+import { UnifiedLogsBanner } from '@/components/interfaces/UnifiedLogs/UnifiedLogsBanner'
 
 interface FilterSideBarProps {
   isFilterBarOpen: boolean
   setIsFilterBarOpen: React.Dispatch<React.SetStateAction<boolean>>
   dateRangeDisabled?: DateRangeDisabled
+  afterFilters?: ReactNode
 }
 
 export function FilterSideBar({
   isFilterBarOpen,
   setIsFilterBarOpen,
   dateRangeDisabled,
+  afterFilters,
 }: FilterSideBarProps) {
   const router = useRouter()
   const { ref } = useParams()
   const { table } = useDataTable()
 
-  const {
-    disable: disableUnifiedLogs,
-    isEligible: isUnifiedLogsEligible,
-    isEnabled: isUnifiedLogsEnabled,
-  } = useUnifiedLogsPreview()
+  const { disable: disableUnifiedLogs, isEligible: isUnifiedLogsEligible } = useUnifiedLogsPreview()
 
   const handleGoBackToOldLogs = () => {
     disableUnifiedLogs()
@@ -52,8 +50,9 @@ export function FilterSideBar({
   return (
     <ResizablePanel
       panelRef={panelRef}
-      maxSize={512}
       minSize={256}
+      defaultSize={265}
+      maxSize={512}
       id="panel-left"
       collapsible
       onResize={(size) => {
@@ -67,30 +66,25 @@ export function FilterSideBar({
     >
       <div className="border-b border-border px-4 md:top-0">
         <div className="flex h-[48px] items-center justify-between gap-3">
-          <p className="text-foreground text-lg">Logs</p>
+          <div className="flex items-center gap-2">
+            <p className="text-foreground text-lg">Logs</p>
+            {isUnifiedLogsEligible && <Badge variant="default">Beta</Badge>}
+          </div>
           {table.getState().columnFilters.length ? <DataTableResetButton /> : null}
         </div>
       </div>
 
+      {isUnifiedLogsEligible && (
+        <UnifiedLogsBanner
+          variant="utility"
+          className="mx-4 mt-4"
+          onSwitchBack={handleGoBackToOldLogs}
+        />
+      )}
+
       <div className="flex-1 p-2 sm:overflow-y-scroll">
-        {isUnifiedLogsEligible && (
-          <FeaturePreviewSidebarPanel
-            className="mx-2 mt-2 mb-3"
-            title="Go back to old logs"
-            description="Use the traditional interface"
-            illustration={
-              isUnifiedLogsEnabled ? (
-                <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS} />
-              ) : undefined
-            }
-            actions={
-              <Button type="default" size="tiny" onClick={handleGoBackToOldLogs}>
-                Switch back
-              </Button>
-            }
-          />
-        )}
         <DataTableFilterControls dateRangeDisabled={dateRangeDisabled} />
+        {afterFilters}
         <FeaturePreviewSidebarPanel
           className="mx-2 my-4"
           title="Capture your logs"
@@ -105,7 +99,7 @@ export function FilterSideBar({
             </div>
           }
           actions={
-            <Button asChild type="default">
+            <Button asChild variant="default">
               <Link href={`/project/${ref}/settings/log-drains`}>Go to Log Drains</Link>
             </Button>
           }

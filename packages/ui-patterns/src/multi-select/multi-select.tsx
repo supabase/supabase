@@ -4,22 +4,20 @@ import { cva, VariantProps } from 'class-variance-authority'
 import { Check, ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
 // @ts-ignore Required to avoid TS error: The inferred type of MultiSelectorContent cannot be named without a reference to @radix-ui
 import type { Popover as PopoverPrimitive } from 'radix-ui'
-import React, { useEffect } from 'react'
+import React, { isValidElement, ReactElement, useEffect } from 'react'
 import {
   Badge,
   cn,
-  Popover_Shadcn_ as Popover,
-  PopoverAnchor_Shadcn_ as PopoverAnchor,
-  PopoverContent_Shadcn_ as PopoverContent,
-  PopoverContentProps_Shadcn_ as PopoverContentProps,
-} from 'ui'
-import {
   Command,
   CommandEmpty,
   CommandInput,
   CommandItem,
   CommandList,
-} from 'ui/src/components/shadcn/ui/command'
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+  PopoverContentProps,
+} from 'ui'
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from 'ui/src/lib/constants'
 
 interface MultiSelectContextProps {
@@ -296,7 +294,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
             'flex w-full min-w-[200px] min-h-[40px] items-center justify-between rounded-md border',
             'border-alternative bg-control px-3 py-2 text-sm',
             'ring-offset-background placeholder:text-muted-foreground',
-            'focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2',
+            'focus:outline-hidden focus:ring-2 focus:ring-background-control focus:ring-offset-2 focus-visible:ring-offset-foreground-muted',
             'disabled:cursor-not-allowed disabled:opacity-50',
             'hover:border-primary transition-colors duration-200',
             className
@@ -511,7 +509,9 @@ const MultiSelectorList = React.forwardRef<
   const options = !!children
     ? Array.isArray(children)
       ? (children as React.ReactNode[])
-      : typeof children === 'object' && 'props' in children
+      : typeof children === 'object' &&
+          'props' in children &&
+          isValidElement<{ children: ReactElement[] }>(children)
         ? children.props.children
         : []
     : []

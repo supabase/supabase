@@ -6,15 +6,15 @@ import { toast } from 'sonner'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
@@ -67,11 +67,11 @@ export const UserSelector = () => {
 
   return (
     <FormItemLayout isReactForm={false} label="Select which user to test as">
-      <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal>
-        <PopoverTrigger_Shadcn_ asChild>
+      <Popover open={open} onOpenChange={setOpen} modal>
+        <PopoverTrigger asChild>
           <Button
             block
-            type="default"
+            variant="default"
             role="combobox"
             size="small"
             aria-expanded={open}
@@ -80,10 +80,10 @@ export const UserSelector = () => {
           >
             {impersonatingUser?.email ?? 'Select a user'}
           </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ sameWidthAsTrigger className="p-0" side="bottom" align="start">
-          <Command_Shadcn_ shouldFilter={false}>
-            <CommandInput_Shadcn_
+        </PopoverTrigger>
+        <PopoverContent sameWidthAsTrigger className="p-0" side="bottom" align="start">
+          <Command shouldFilter={false}>
+            <CommandInput
               showResetIcon
               placeholder="Search for a user"
               className="text-xs"
@@ -96,10 +96,10 @@ export const UserSelector = () => {
                 Failed to fetch users: {error.message}
               </Admonition>
             ) : (
-              <CommandEmpty_Shadcn_>No user found</CommandEmpty_Shadcn_>
+              <CommandEmpty>No user found</CommandEmpty>
             )}
 
-            <CommandList_Shadcn_>
+            <CommandList>
               {isPending && (
                 <div className="p-2">
                   <GenericSkeletonLoader />
@@ -107,11 +107,11 @@ export const UserSelector = () => {
               )}
 
               {isSuccess && (
-                <CommandGroup_Shadcn_>
+                <CommandGroup>
                   <ScrollArea className={users.length > 7 ? 'h-full md:h-[210px]' : ''}>
                     {users.map((user) => {
                       return (
-                        <CommandItem_Shadcn_
+                        <CommandItem
                           key={user.id}
                           value={user.email}
                           className="cursor-pointer w-full"
@@ -129,16 +129,16 @@ export const UserSelector = () => {
                             </p>
                             {impersonatingUser?.id === user.id && <Check size={16} />}
                           </div>
-                        </CommandItem_Shadcn_>
+                        </CommandItem>
                       )
                     })}
                   </ScrollArea>
-                </CommandGroup_Shadcn_>
+                </CommandGroup>
               )}
-            </CommandList_Shadcn_>
-          </Command_Shadcn_>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
     </FormItemLayout>
   )
 }

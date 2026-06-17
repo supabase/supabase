@@ -291,7 +291,11 @@ test.describe('SQL Editor', () => {
   })
 
   test('warns on CREATE TABLE without RLS and "Run and enable RLS" enables it', async ({ ref }) => {
-    const tableName = 'pw_rls_smoke_test'
+    // Suffix with parallel worker index so parallel workers don't collide
+    // on the same table name — when they do, one worker's `dropTable`
+    // races another's "Run and enable RLS" and the post-action query
+    // sometimes finds the table missing.
+    const tableName = `pw_rls_smoke_test_${test.info().parallelIndex}`
 
     // Drop any leftover table from a previous failed run, and ensure cleanup
     // after the test regardless of pass/fail.
@@ -782,11 +786,11 @@ hello world`)
     await expect(page.getByText('result found')).toBeVisible()
     await searchBar.fill('') // clear search bar
 
-    // download as migration file
+    // export query as migration file
     await privateSnippetSection
       .getByTitle(sqlSnippetName, { exact: true })
       .click({ button: 'right' })
-    await page.getByRole('menuitem', { name: 'Download as migration file' }).click()
+    await page.getByRole('menuitem', { name: 'Export query' }).click()
     await expect(page.getByText('supabase migration new')).toBeVisible()
     await page.getByRole('button', { name: 'Close' }).click()
 

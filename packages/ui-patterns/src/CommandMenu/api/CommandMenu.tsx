@@ -10,7 +10,7 @@ import { ErrorBoundary } from 'react-error-boundary'
 import {
   Button,
   cn,
-  Command_Shadcn_,
+  Command,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -50,11 +50,11 @@ function Breadcrumb({ className }: { className?: string }) {
 }
 
 const CommandWrapper = forwardRef<
-  React.ElementRef<typeof Command_Shadcn_>,
-  React.ComponentPropsWithoutRef<typeof Command_Shadcn_>
+  React.ElementRef<typeof Command>,
+  React.ComponentPropsWithoutRef<typeof Command>
 >(({ children, className, ...props }, ref) => {
   return (
-    <Command_Shadcn_
+    <Command
       ref={ref}
       className={cn(
         'h-full w-full flex flex-col overflow-hidden',
@@ -71,10 +71,10 @@ const CommandWrapper = forwardRef<
       {...props}
     >
       {children}
-    </Command_Shadcn_>
+    </Command>
   )
 })
-CommandWrapper.displayName = Command_Shadcn_.displayName
+CommandWrapper.displayName = Command.displayName
 
 function CommandError({ resetErrorBoundary }: { resetErrorBoundary: () => void }) {
   return (
@@ -85,7 +85,7 @@ function CommandError({ resetErrorBoundary }: { resetErrorBoundary: () => void }
           Sorry, looks like we&apos;re having some issues with the command menu!
         </p>
         <p className="text-sm text-center">Please try again in a bit.</p>
-        <Button size="tiny" type="secondary" onClick={resetErrorBoundary}>
+        <Button size="tiny" variant="secondary" onClick={resetErrorBoundary}>
           Try again?
         </Button>
       </div>

@@ -15,7 +15,11 @@ import { ButtonTooltip } from '../ButtonTooltip'
 import { ErrorBoundary } from '../ErrorBoundary/ErrorBoundary'
 import { ASSISTANT_ERRORS } from './AiAssistant.constants'
 import type { SqlSnippet } from './AIAssistant.types'
-import { onErrorChat } from './AIAssistant.utils'
+import {
+  hasPendingToolApproval,
+  onErrorChat,
+  resolvePendingToolApprovalsAsDenied,
+} from './AIAssistant.utils'
 import { AIAssistantHeader } from './AIAssistantHeader'
 import { AIOnboarding } from './AIOnboarding'
 import { AssistantChatForm } from './AssistantChatForm'
@@ -35,6 +39,7 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { getParallelApprovalIdsToReject } from '@/lib/ai/message-utils'
 import {
   DEFAULT_ASSISTANT_BASE_MODEL_ID,
   defaultAssistantModelId,
@@ -171,6 +176,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   })
 
   const isChatLoading = chatStatus === 'submitted' || chatStatus === 'streaming'
+  const hasPendingApproval = hasPendingToolApproval(chatMessages)
+  const isChatInputDisabled = !isApiKeySet || disablePrompts || isLoadingOrganization
 
   const deleteMessageFromHere = useCallback(
     (messageId: string) => {
@@ -326,6 +333,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
     snap.clearSqlSnippets()
     lastUserMessageRef.current = payload
+    if (hasPendingApproval && !editingMessageId) {
+      setMessages(resolvePendingToolApprovalsAsDenied(chatMessages))
+    }
     sendMessage(payload, {
       body: {
         schema: currentSchema,
@@ -356,6 +366,18 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       setIsResubmitting(false)
     }
   }, [isResubmitting, chatStatus, error])
+
+  useEffect(() => {
+    // Approval-required tools can't run in parallel. Auto-deny extras so the model reissues them sequentially.
+    for (const id of getParallelApprovalIdsToReject(chatMessages)) {
+      addToolApprovalResponse?.({
+        id,
+        approved: false,
+        reason:
+          'Only one approval-required tool call is allowed per turn. Please reissue this tool call after the current one completes.',
+      })
+    }
+  }, [chatMessages, addToolApprovalResponse])
 
   useEffect(() => {
     setValue(snap.initialInput || '')
@@ -423,7 +445,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                       <div className="flex items-center gap-x-2 mr-auto">
                         {isContextExceededError ? (
                           <Button
-                            type="default"
+                            variant="default"
                             size="tiny"
                             onClick={() => snap.newChat()}
                             className="text-xs"
@@ -433,7 +455,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                         ) : (
                           <>
                             <Button
-                              type="default"
+                              variant="default"
                               size="tiny"
                               onClick={() => regenerate()}
                               className="text-xs"
@@ -441,7 +463,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                               Retry
                             </Button>
                             <ButtonTooltip
-                              type="default"
+                              variant="default"
                               size="tiny"
                               onClick={handleClearMessages}
                               className="w-7 h-7"
@@ -507,7 +529,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                       <span>Editing message</span>
                     </div>
                     <ButtonTooltip
-                      type="outline"
+                      variant="outline"
                       size="tiny"
                       icon={<X size={14} />}
                       onClick={cancelEdit}
@@ -556,7 +578,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             )}
             loading={isChatLoading}
             isEditing={!!editingMessageId}
-            disabled={!isApiKeySet || disablePrompts || isLoadingOrganization}
+            disabled={isChatInputDisabled}
             placeholder={
               hasMessages
                 ? 'Ask a follow up question...'
@@ -592,3 +614,5 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     </ErrorBoundary>
   )
 }
+
+export { SupportAssistantSuccessCardContent } from './SupportAssistantSuccessCardContent'

@@ -2,14 +2,7 @@ import dayjs from 'dayjs'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Button,
-  CriticalIcon,
-  WarningIcon,
-} from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button, CriticalIcon, WarningIcon } from 'ui'
 
 import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import { VIOLATION_TYPE_LABELS } from '@/data/usage/constants'
@@ -66,13 +59,11 @@ export const Restriction = () => {
   return (
     <>
       {shownAlert === 'exceededLimits' && (
-        <Alert_Shadcn_ variant="destructive">
+        <Alert variant="destructive">
           <CriticalIcon />
 
-          <AlertTitle_Shadcn_>
-            Your organization's usage has exceeded its included quota
-          </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
+          <AlertTitle>Your organization's usage has exceeded its included quota</AlertTitle>
+          <AlertDescription>
             <p>
               Your projects can become unresponsive or enter read-only mode.{' '}
               {org.plan.id === 'free'
@@ -80,7 +71,7 @@ export const Restriction = () => {
                 : 'Please disable spend cap to ensure that your projects remain available.'}
             </p>
             <div className="flex items-center gap-x-2 mt-3">
-              <Button key="upgrade-button" asChild type="default">
+              <Button key="upgrade-button" asChild variant="default">
                 <Link
                   href={`/org/${org?.slug}/billing?panel=${
                     org.plan.id === 'free' ? 'subscriptionPlan' : 'costControl'
@@ -90,22 +81,22 @@ export const Restriction = () => {
                 </Link>
               </Button>
               {!isUsagePage && (
-                <Button key="view-usage-button" asChild type="default">
+                <Button key="view-usage-button" asChild variant="default">
                   <Link href={`/org/${org?.slug}/usage`}>View usage</Link>
                 </Button>
               )}
-              <Button asChild type="default" icon={<ExternalLink />}>
+              <Button asChild variant="default" icon={<ExternalLink />}>
                 <a href={`${DOCS_URL}/guides/platform/cost-control#spend-cap`}>About spend cap</a>
               </Button>
             </div>
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+          </AlertDescription>
+        </Alert>
       )}
       {shownAlert === 'gracePeriod' && (
-        <Alert_Shadcn_ variant="warning">
+        <Alert variant="warning">
           <WarningIcon />
-          <AlertTitle_Shadcn_>Your grace period has started.</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
+          <AlertTitle>Your grace period has started.</AlertTitle>
+          <AlertDescription>
             <p className="leading-tight">
               Your organization went over its quota in the previous billing cycle
               {violationLabels && ` ${violationLabels}`}. You can continue with your projects until
@@ -119,7 +110,7 @@ export const Restriction = () => {
               402 status code.
             </p>
             <div className="flex items-center gap-x-2 mt-3">
-              <Button asChild key="upgrade-button" type="default">
+              <Button asChild key="upgrade-button" variant="default">
                 <Link
                   href={`/org/${org?.slug}/billing?panel=${
                     org.plan.id === 'free'
@@ -132,25 +123,25 @@ export const Restriction = () => {
               </Button>
 
               {!isUsagePage && (
-                <Button key="view-usage-button" asChild type="default">
+                <Button key="view-usage-button" asChild variant="default">
                   <Link href={`/org/${org?.slug}/usage`}>View usage</Link>
                 </Button>
               )}
 
-              <Button asChild type="default" icon={<ExternalLink />}>
+              <Button asChild variant="default" icon={<ExternalLink />}>
                 <a href={`${DOCS_URL}/guides/platform/billing-faq#fair-use-policy`}>
                   About Fair Use Policy
                 </a>
               </Button>
             </div>
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+          </AlertDescription>
+        </Alert>
       )}
       {shownAlert === 'gracePeriodOver' && (
-        <Alert_Shadcn_ variant="warning">
+        <Alert variant="warning">
           <WarningIcon />
-          <AlertTitle_Shadcn_>Your grace period is over.</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
+          <AlertTitle>Your grace period is over.</AlertTitle>
+          <AlertDescription>
             <p>
               Your grace period ended on{' '}
               <span className="text-foreground">
@@ -161,7 +152,7 @@ export const Restriction = () => {
               exceed it. If you exceed your quota, requests will respond with a 402 status code.
             </p>
             <div className="flex items-center gap-x-2 mt-3">
-              <Button key="upgrade-button" asChild type="default">
+              <Button key="upgrade-button" asChild variant="default">
                 <Link
                   href={`/org/${org?.slug}/billing?panel=${
                     org.plan.id === 'free'
@@ -173,24 +164,24 @@ export const Restriction = () => {
                 </Link>
               </Button>
               {!isUsagePage && (
-                <Button key="view-usage-button" asChild type="default">
+                <Button key="view-usage-button" asChild variant="default">
                   <Link href={`/org/${org?.slug}/usage`}>View usage</Link>
                 </Button>
               )}
-              <Button asChild type="default" icon={<ExternalLink />}>
+              <Button asChild variant="default" icon={<ExternalLink />}>
                 <a href={`${DOCS_URL}/guides/platform/billing-faq#fair-use-policy`}>
                   About Fair Use Policy
                 </a>
               </Button>
             </div>
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+          </AlertDescription>
+        </Alert>
       )}
       {shownAlert === 'restricted' && (
-        <Alert_Shadcn_ variant="destructive">
+        <Alert variant="destructive">
           <CriticalIcon />
-          <AlertTitle_Shadcn_>All services are restricted.</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
+          <AlertTitle>All services are restricted.</AlertTitle>
+          <AlertDescription>
             <p>
               Fair Use Policy applies and your service is restricted. Your projects are not able to
               serve requests and will respond with a 402 status code. You have exceeded your plan's
@@ -201,7 +192,7 @@ export const Restriction = () => {
               before restrictions are fully lifted.
             </p>
             <div className="flex items-center gap-x-2 mt-3">
-              <Button key="upgrade-button" asChild type="default">
+              <Button key="upgrade-button" asChild variant="default">
                 <Link
                   href={`/org/${org?.slug}/billing?panel=${
                     org.plan.id === 'free'
@@ -213,18 +204,18 @@ export const Restriction = () => {
                 </Link>
               </Button>
               {!isUsagePage && (
-                <Button key="view-usage-button" asChild type="default">
+                <Button key="view-usage-button" asChild variant="default">
                   <Link href={`/org/${org?.slug}/usage`}>View usage</Link>
                 </Button>
               )}
-              <Button asChild type="default" icon={<ExternalLink />}>
+              <Button asChild variant="default" icon={<ExternalLink />}>
                 <a href={`${DOCS_URL}/guides/platform/billing-faq#fair-use-policy`}>
                   About Fair Use Policy
                 </a>
               </Button>
             </div>
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+          </AlertDescription>
+        </Alert>
       )}
     </>
   )

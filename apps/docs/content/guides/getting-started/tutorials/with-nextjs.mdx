@@ -182,7 +182,7 @@ Before proceeding, change the email template to support a server-side authentica
 - Select the **Confirm signup** template.
 - Change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email`.
 
-<Admonition type="tip" label="Did you know?">
+<Admonition type="tip" title="Did you know?">
 
 You can customize other emails sent out to new users, including the email's looks, content, and query parameters from [the **Authentication > Email**](/dashboard/project/_/auth/templates) section of the Dashboard.
 
@@ -268,7 +268,7 @@ npm run dev
 
 And then open the browser to [localhost:3000/login](http://localhost:3000/login) and you should see the completed app.
 
-When you enter your email and password, you will receive an email with the title **Confirm Your Signup**. Congrats 🎉!!!
+When you enter your email and password, you will receive an email with the title **Confirm your email**. Congrats 🎉!!!
 
 At this stage you have a fully functional application!
 

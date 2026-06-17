@@ -9,8 +9,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   Button,
-  Input_Shadcn_ as Input,
-  Label_Shadcn_ as Label,
+  Input,
+  Label,
   Separator,
   Sheet,
   SheetContent,
@@ -168,7 +168,7 @@ export default function SheetConfirmOnCloseDemo() {
 
   return (
     <>
-      <Button type="default" onClick={openSheet}>
+      <Button variant="default" onClick={openSheet}>
         Open endpoint sheet
       </Button>
 
@@ -210,7 +210,7 @@ export default function SheetConfirmOnCloseDemo() {
           </SheetSection>
           <Separator />
           <SheetFooter>
-            <Button type="default" onClick={confirmOnClose}>
+            <Button variant="default" onClick={confirmOnClose}>
               Cancel
             </Button>
             <Button onClick={saveChanges} disabled={!isDirty}>

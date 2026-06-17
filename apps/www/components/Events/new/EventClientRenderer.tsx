@@ -9,7 +9,8 @@ import { EventGallery } from './EventGallery'
 import { EventsContainer } from './EventsContainer'
 
 function EventBannerSection() {
-  const { isLoading, featuredEvent } = useEvents()
+  const { isLoading, featuredEvent, selectedCategories } = useEvents()
+  if (selectedCategories.includes('on-demand')) return null
   if (!isLoading && !featuredEvent) return null
 
   return (
@@ -19,21 +20,39 @@ function EventBannerSection() {
   )
 }
 
+function EventsPageSubtitle() {
+  const { selectedCategories } = useEvents()
+
+  return (
+    <p className="text-foreground-light">
+      {selectedCategories.includes('on-demand')
+        ? 'Watch recordings from past webinars and sessions.'
+        : 'Explore upcoming events and on-demand recordings.'}
+    </p>
+  )
+}
+
 export function EventClientRenderer({
   notionEvents,
   mdxEvents,
+  onDemandMdxEvents,
 }: {
   notionEvents: SupabaseEvent[]
   mdxEvents: SupabaseEvent[]
+  onDemandMdxEvents: SupabaseEvent[]
 }) {
   return (
-    <EventsProvider notionEvents={notionEvents} mdxEvents={mdxEvents}>
+    <EventsProvider
+      notionEvents={notionEvents}
+      mdxEvents={mdxEvents}
+      onDemandMdxEvents={onDemandMdxEvents}
+    >
       <DefaultLayout className="flex flex-col">
         <EventsContainer className="border-x border-b py-8">
           <h1 className="h3 p-0! m-0!">
             <span className="sr-only">Supabase</span> Events
           </h1>
-          <p className="text-foreground-light">Join us at the following upcoming events</p>
+          <EventsPageSubtitle />
         </EventsContainer>
 
         <EventBannerSection />

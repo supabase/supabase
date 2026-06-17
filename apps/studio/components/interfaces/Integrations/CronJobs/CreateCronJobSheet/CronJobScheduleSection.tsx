@@ -2,10 +2,10 @@ import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import {
-  Accordion_Shadcn_,
-  AccordionContent_Shadcn_,
-  AccordionItem_Shadcn_,
-  AccordionTrigger_Shadcn_,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
   Button,
   cn,
   FormControl,
@@ -13,11 +13,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input_Shadcn_,
+  Input,
   SheetSection,
   Switch,
 } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
 import { useDebounce } from 'use-debounce'
 
 import { formatScheduleString, getScheduleMessage } from '../CronJobs.utils'
@@ -103,7 +102,7 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
                     onChange={(e) => setInputValue(e.target.value)}
                   />
                 ) : (
-                  <Input_Shadcn_
+                  <Input
                     {...field}
                     autoComplete="off"
                     placeholder="* * * * *"
@@ -132,7 +131,7 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
                   {PRESETS.map((preset) => (
                     <li key={preset.name}>
                       <Button
-                        type="outline"
+                        variant="outline"
                         onClick={() => {
                           if (useNaturalLanguage) {
                             setUseNaturalLanguage(false)
@@ -149,16 +148,16 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
                     </li>
                   ))}
                 </ul>
-                <Accordion_Shadcn_ type="single" collapsible>
-                  <AccordionItem_Shadcn_ value="item-1" className="border-none">
-                    <AccordionTrigger_Shadcn_ className="text-xs text-foreground-light font-normal gap-2 justify-start py-1 ">
+                <Accordion type="single" collapsible>
+                  <AccordionItem value="item-1" className="border-none">
+                    <AccordionTrigger className="text-xs text-foreground-light font-normal gap-2 justify-start py-1 ">
                       View syntax chart
-                    </AccordionTrigger_Shadcn_>
-                    <AccordionContent_Shadcn_ asChild className="pb-0!">
+                    </AccordionTrigger>
+                    <AccordionContent asChild className="pb-0!">
                       <CronSyntaxChart />
-                    </AccordionContent_Shadcn_>
-                  </AccordionItem_Shadcn_>
-                </Accordion_Shadcn_>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </div>
               <div className="bg-surface-100 p-4 rounded-sm grid gap-y-4 border">
                 <h4 className="text-sm text-foreground">

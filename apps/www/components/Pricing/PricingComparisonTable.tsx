@@ -11,12 +11,12 @@ import { pricing } from 'shared-data/pricing'
 import {
   Button,
   cn,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 
 import UpgradePlan from './UpgradePlan'
@@ -41,6 +41,7 @@ const MobileHeader = ({
   hasExistingOrganizations?: boolean
 }) => {
   const sendTelemetryEvent = useSendTelemetryEvent()
+  const orgSlug = organizations?.[0]?.slug
 
   const selectedPlan = plans.find((p) => p.name === plan)!
   const isUpgradablePlan = selectedPlan.name === 'Pro' || selectedPlan.name === 'Team'
@@ -74,13 +75,14 @@ const MobileHeader = ({
                 section: 'comparison_table',
                 tableMode: 'mobile',
               },
+              ...(orgSlug && { groups: { organization: orgSlug } }),
             })
           }
           size="medium"
           planId={selectedPlan.planId}
         />
       ) : (
-        <Button asChild size="medium" type={plan === 'Enterprise' ? 'default' : 'primary'} block>
+        <Button asChild size="medium" variant={plan === 'Enterprise' ? 'default' : 'primary'} block>
           <Link
             href={selectedPlan.href}
             onClick={() =>
@@ -92,6 +94,7 @@ const MobileHeader = ({
                   section: 'comparison_table',
                   tableMode: 'mobile',
                 },
+                ...(orgSlug && { groups: { organization: orgSlug } }),
               })
             }
           >
@@ -115,6 +118,7 @@ const PricingComparisonTable = ({
   const [activeMobilePlan, setActiveMobilePlan] = useState('Free')
 
   const sendTelemetryEvent = useSendTelemetryEvent()
+  const orgSlug = organizations?.[0]?.slug
 
   return (
     <div
@@ -127,23 +131,23 @@ const PricingComparisonTable = ({
         <div className="bg-background p-2 sticky top-14 z-10 pt-4">
           <div className="bg-surface-100 rounded-lg border py-2 px-4 flex justify-between items-center">
             <label className="text-foreground-lighter grow">Change plan</label>
-            <Select_Shadcn_
+            <Select
               name="Change plan"
               value={activeMobilePlan}
               onValueChange={(value) => setActiveMobilePlan(value)}
             >
-              <SelectTrigger_Shadcn_ id="change-plan" className="w-auto min-w-[120px]">
-                <SelectValue_Shadcn_ />
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
-                <SelectGroup_Shadcn_>
-                  <SelectItem_Shadcn_ value="Free">Free</SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="Pro">Pro</SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="Team">Team</SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="Enterprise">Enterprise</SelectItem_Shadcn_>
-                </SelectGroup_Shadcn_>
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
+              <SelectTrigger id="change-plan" className="w-auto min-w-[120px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="Free">Free</SelectItem>
+                  <SelectItem value="Pro">Pro</SelectItem>
+                  <SelectItem value="Team">Team</SelectItem>
+                  <SelectItem value="Enterprise">Enterprise</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
         </div>
         {activeMobilePlan === 'Free' && (
@@ -428,6 +432,7 @@ const PricingComparisonTable = ({
                                   section: 'comparison_table',
                                   tableMode: 'desktop',
                                 },
+                                ...(orgSlug && { groups: { organization: orgSlug } }),
                               })
                             }
                             size="tiny"
@@ -437,7 +442,7 @@ const PricingComparisonTable = ({
                           <Button
                             asChild
                             size="tiny"
-                            type={plan.name === 'Enterprise' ? 'default' : 'primary'}
+                            variant={plan.name === 'Enterprise' ? 'default' : 'primary'}
                             block
                           >
                             <Link
@@ -451,6 +456,7 @@ const PricingComparisonTable = ({
                                     section: 'comparison_table',
                                     tableMode: 'desktop',
                                   },
+                                  ...(orgSlug && { groups: { organization: orgSlug } }),
                                 })
                               }
                             >

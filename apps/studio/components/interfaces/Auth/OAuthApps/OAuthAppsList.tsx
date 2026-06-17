@@ -241,7 +241,7 @@ export const OAuthAppsList = () => {
             title="OAuth Server is disabled"
             description="Enable OAuth Server to make your project act as an identity provider for third-party applications."
             actions={
-              <Button asChild type="default">
+              <Button asChild variant="default">
                 <Link href={`/project/${projectRef}/auth/oauth-server`}>OAuth Server Settings</Link>
               </Button>
             }
@@ -288,7 +288,7 @@ export const OAuthAppsList = () => {
             />
             {hasActiveFilters && (
               <Button
-                type="default"
+                variant="default"
                 size="tiny"
                 className="px-1"
                 icon={<X />}
@@ -305,7 +305,7 @@ export const OAuthAppsList = () => {
                 side="bottom"
               >
                 <Button
-                  type="primary"
+                  variant="primary"
                   icon={<Plus />}
                   onClick={() => setShowCreateSheet(true)}
                   className="grow"
@@ -388,7 +388,7 @@ export const OAuthAppsList = () => {
                     <TableRow key={app.client_id} className="w-full">
                       <TableCell title={app.client_name}>
                         <Button
-                          type="text"
+                          variant="text"
                           className="text-link-table-cell text-sm p-0 hover:bg-transparent title [&>span]:w-full!"
                           onClick={() => setSelectedAppToEdit(app.client_id)}
                           title={app.client_name}
@@ -412,7 +412,7 @@ export const OAuthAppsList = () => {
                         <div className="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center border-l @[944px]:border-l-0">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button type="default" className="px-1" icon={<MoreVertical />} />
+                              <Button variant="default" className="px-1" icon={<MoreVertical />} />
                             </DropdownMenuTrigger>
                             <DropdownMenuContent side="bottom" align="end" className="w-48">
                               <DropdownMenuItem

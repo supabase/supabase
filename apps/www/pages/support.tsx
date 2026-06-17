@@ -1,17 +1,16 @@
-import { NextSeo } from 'next-seo'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useEffect, useRef } from 'react'
-import Typed from 'typed.js'
-import { Button, ButtonProps, cn } from 'ui'
-import { CommandMenuTrigger } from 'ui-patterns/CommandMenu'
-
-import { questions } from 'shared-data'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '~/components/Panel'
 import data from '~/data/support'
-import { Search, Command } from 'lucide-react'
+import { Command, Search } from 'lucide-react'
+import { NextSeo } from 'next-seo'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useRef } from 'react'
+import { questions } from 'shared-data'
+import Typed from 'typed.js'
+import { Button, ButtonProps, cn } from 'ui'
+import { CommandMenuTrigger } from 'ui-patterns/CommandMenu'
 
 const Index = () => {
   const router = useRouter()
@@ -70,7 +69,7 @@ const Index = () => {
                   border
                   border-control
                   hover:bg-surface-100
-                  transition 
+                  transition
                   rounded-sm"
               >
                 <div className="flex items-center flex-1 space-x-2">
@@ -107,7 +106,7 @@ const Index = () => {
                 {card.links.map((link) => (
                   <Button
                     size="small"
-                    type={(link.type as ButtonProps['type']) ?? 'default'}
+                    variant={(link.type as ButtonProps['variant']) ?? 'default'}
                     iconRight={link.icon}
                     asChild
                   >
@@ -132,7 +131,7 @@ const Index = () => {
                   {data.banner.links.map((link) => (
                     <Button
                       size="tiny"
-                      type={(link.type as ButtonProps['type']) ?? 'default'}
+                      variant={(link.type as ButtonProps['variant']) ?? 'default'}
                       iconRight={link.icon}
                       asChild
                     >

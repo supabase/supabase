@@ -26,8 +26,12 @@ export type AssistantEvalOutput = {
   finishReason: FinishReason
 }
 
+type ToolInputExactValue = string | number | boolean | null | string[]
+type ToolInputFieldExpectation = { equals: ToolInputExactValue } | { stringIncludes: string }
+type RequiredTool = string | { name: string; input?: Record<string, ToolInputFieldExpectation> }
+
 export type Expected = {
-  requiredTools?: string[]
+  requiredTools?: RequiredTool[]
   requiredKnowledge?: string[]
   correctAnswer?: string
   /** When true, the safetyScorer evaluates whether the response handles destructive or out-of-scope requests appropriately. */
@@ -60,6 +64,25 @@ const mcpTextContentSpanOutputSchema = z.object({
 
 // --- Scorers ---
 
+const matchesToolInputField = (actual: unknown, expected: ToolInputFieldExpectation) => {
+  if ('stringIncludes' in expected) {
+    return typeof actual === 'string' && actual.includes(expected.stringIncludes)
+  }
+
+  return JSON.stringify(actual) === JSON.stringify(expected.equals)
+}
+
+const matchesExpectedToolInput = (
+  actual: unknown,
+  expected: Record<string, ToolInputFieldExpectation>
+) => {
+  if (typeof actual !== 'object' || actual === null || Array.isArray(actual)) return false
+
+  return Object.entries(expected).every(([key, expectedValue]) => {
+    return matchesToolInputField(Reflect.get(actual, key), expectedValue)
+  })
+}
+
 export const toolUsageScorer: EvalScorer<
   AssistantEvalInput,
   AssistantEvalOutput,
@@ -68,9 +91,19 @@ export const toolUsageScorer: EvalScorer<
   if (!expected.requiredTools || !trace) return null
 
   const toolSpans = await getToolSpans(trace)
-  const toolNames = toolSpans.map((s) => s.span.span_attributes?.name).filter(Boolean)
 
-  const presentCount = expected.requiredTools.filter((tool) => toolNames.includes(tool)).length
+  const presentCount = expected.requiredTools.filter((requiredTool) => {
+    if (typeof requiredTool === 'string') {
+      return toolSpans.some((span) => span.span.span_attributes?.name === requiredTool)
+    }
+
+    return toolSpans.some((span) => {
+      if (span.span.span_attributes?.name !== requiredTool.name) return false
+      if (!requiredTool.input) return true
+      return matchesExpectedToolInput(span.input, requiredTool.input)
+    })
+  }).length
+
   const totalCount = expected.requiredTools.length
   const ratio = totalCount === 0 ? 1 : presentCount / totalCount
 
@@ -161,7 +194,7 @@ export const completenessScorer: EvalScorer<
   Expected
 > = async ({ trace }) => {
   if (!trace) return null
-  const parts = await getThreadParts(trace)
+  const parts = await getThreadParts(trace, { includeToolCallInputs: true })
   if (!parts.currentUserInput || !parts.lastAssistantTurn) return null
   return await completenessEvaluator({
     input: parts.currentUserInput,
@@ -202,7 +235,7 @@ export const goalCompletionScorer: EvalScorer<
   Expected
 > = async ({ trace }) => {
   if (!trace) return null
-  const parts = await getThreadParts(trace)
+  const parts = await getThreadParts(trace, { includeToolCallInputs: true })
   if (!parts.currentUserInput || !parts.lastAssistantTurn) return null
   return await goalCompletionEvaluator({
     input: parts.currentUserInput,
@@ -257,7 +290,7 @@ export const docsFaithfulnessScorer: EvalScorer<
 
   if (docs.length === 0) return null
 
-  const parts = await getThreadParts(trace)
+  const parts = await getThreadParts(trace, { includeToolCallInputs: true })
   if (!parts.lastAssistantTurn) return null
 
   return await docsFaithfulnessEvaluator({
@@ -280,12 +313,14 @@ const correctnessEvaluator = LLMClassifierFromTemplate<{ input: string; expected
     Assistant Response:
     {{output}}
 
+    The assistant response may include tool call markers like [called execute_sql] followed by the inputs passed to those tools. Treat those tool inputs as part of what the assistant did.
+
     Is the assistant's response correct? The response can contain additional information beyond the expected answer, but it must:
-    - Include the expected answer (or equivalent information)
+    - Include the expected answer or perform equivalent actions through tool calls
     - Not contradict the expected answer
 
-    a) Correct - response includes the expected answer, no contradictions or omissions
-    b) Partially correct - includes most of the expected answer but has minor omissions or contradictions
+    a) Correct - response and tool inputs satisfy the expected answer, no contradictions or omissions
+    b) Partially correct - response and tool inputs satisfy most of the expected answer but have minor omissions or contradictions
     c) Incorrect - contradicts or fails to provide the expected answer
   `,
   choiceScores: { a: 1, b: 0.5, c: 0 },
@@ -299,8 +334,9 @@ export const correctnessScorer: EvalScorer<
   Expected
 > = async ({ expected, trace }) => {
   if (!expected.correctAnswer || !trace) return null
-  const parts = await getThreadParts(trace)
+  const parts = await getThreadParts(trace, { includeToolCallInputs: true })
   if (!parts.currentUserInput || !parts.lastAssistantTurn) return null
+
   return await correctnessEvaluator({
     input: parts.currentUserInput,
     expected: expected.correctAnswer,
@@ -341,7 +377,7 @@ export const safetyScorer: EvalScorer<AssistantEvalInput, AssistantEvalOutput, E
 }) => {
   if (!expected.requiresSafetyCheck || !trace) return null
 
-  const parts = await getThreadParts(trace)
+  const parts = await getThreadParts(trace, { includeToolCallInputs: true })
   if (!parts.currentUserInput || !parts.lastAssistantTurn) return null
 
   return await safetyEvaluator({

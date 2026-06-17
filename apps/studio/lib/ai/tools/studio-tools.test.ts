@@ -1,10 +1,11 @@
+import { safeSql } from '@supabase/pg-meta'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getStudioTools } from './studio-tools'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { NO_DATA_PERMISSIONS } from '@/lib/ai/tools/tool-sanitizer'
 
-vi.mock('@/data/sql/execute-sql-query', () => ({
+vi.mock('@/data/sql/execute-sql-mutation', () => ({
   executeSql: vi.fn(),
 }))
 
@@ -101,7 +102,7 @@ describe('ai/tools/studio-tools', () => {
       if ('safeParse' in schema) {
         // Valid input
         const validInput = {
-          sql: 'SELECT * FROM users',
+          sql: safeSql`SELECT * FROM users`,
           label: 'Get users',
           chartConfig: { view: 'table' as const },
           isWriteQuery: false,
@@ -110,7 +111,7 @@ describe('ai/tools/studio-tools', () => {
 
         // Valid chart config
         const validChartInput = {
-          sql: 'SELECT count(*) FROM users',
+          sql: safeSql`SELECT count(*) FROM users`,
           label: 'User count',
           chartConfig: { view: 'chart' as const, xAxis: 'date', yAxis: 'count' },
           isWriteQuery: false,
@@ -119,7 +120,7 @@ describe('ai/tools/studio-tools', () => {
 
         // Missing required field
         const invalidInput = {
-          sql: 'SELECT * FROM users',
+          sql: safeSql`SELECT * FROM users`,
           // missing label, chartConfig, isWriteQuery
         }
         expect(schema.safeParse(invalidInput).success).toBe(false)
@@ -135,8 +136,9 @@ describe('ai/tools/studio-tools', () => {
       expect(tools.execute_sql.needsApproval).toBe(true)
     })
 
-    it('should sanitize execute_sql output without data opt-in', async () => {
-      vi.mocked(executeSql).mockResolvedValue({ result: [{ email: 'test@example.com' }] })
+    it('should return execute_sql rows to the UI and sanitize model output without data opt-in', async () => {
+      const rows = [{ email: 'test@example.com' }]
+      vi.mocked(executeSql).mockResolvedValue({ result: rows })
 
       const tools = getStudioTools({
         projectRef: 'test-project',
@@ -164,7 +166,11 @@ describe('ai/tools/studio-tools', () => {
         undefined,
         undefined
       )
-      expect(result).toBe(NO_DATA_PERMISSIONS)
+      expect(result).toEqual(rows)
+      expect((tools.execute_sql as any).toModelOutput({ output: result })).toEqual({
+        type: 'text',
+        value: NO_DATA_PERMISSIONS,
+      })
     })
 
     it('should return execute_sql rows with data opt-in', async () => {
@@ -198,6 +204,10 @@ describe('ai/tools/studio-tools', () => {
         undefined
       )
       expect(result).toEqual(rows)
+      expect((tools.execute_sql as any).toModelOutput({ output: result })).toEqual({
+        type: 'json',
+        value: rows,
+      })
     })
 
     it('should validate rename_chat input schema correctly', () => {

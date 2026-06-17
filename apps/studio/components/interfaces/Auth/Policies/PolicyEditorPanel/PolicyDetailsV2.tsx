@@ -11,29 +11,29 @@ import { UseFormReturn } from 'react-hook-form'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-  Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   RadioGroup,
   RadioGroupLargeItem,
   ScrollArea,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
 } from 'ui'
 import {
   MultiSelector,
@@ -131,7 +131,7 @@ export const PolicyDetailsV2 = ({
               <FormItem className="col-span-6 flex flex-col gap-y-1">
                 <FormLabel>Policy Name</FormLabel>
                 <FormControl>
-                  <Input_Shadcn_
+                  <Input
                     {...field}
                     disabled={!canUpdatePolicies}
                     className="bg-control border-control"
@@ -154,10 +154,10 @@ export const PolicyDetailsV2 = ({
                 </FormLabel>
                 {authContext === 'database' && (
                   <FormControl>
-                    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-                      <PopoverTrigger_Shadcn_ asChild>
+                    <Popover open={open} onOpenChange={setOpen} modal={false}>
+                      <PopoverTrigger asChild>
                         <Button
-                          type="default"
+                          variant="default"
                           disabled={!canUpdatePolicies}
                           className="w-full [&>span]:w-full h-[38px] text-sm"
                           iconRight={
@@ -174,22 +174,22 @@ export const PolicyDetailsV2 = ({
                             </span>
                           </div>
                         </Button>
-                      </PopoverTrigger_Shadcn_>
+                      </PopoverTrigger>
 
-                      <PopoverContent_Shadcn_
+                      <PopoverContent
                         className="p-0"
                         side="bottom"
                         align="start"
                         sameWidthAsTrigger
                       >
-                        <Command_Shadcn_>
-                          <CommandInput_Shadcn_ placeholder="Find a table..." />
-                          <CommandList_Shadcn_ onWheel={(event) => event.stopPropagation()}>
-                            <CommandEmpty_Shadcn_>No tables found</CommandEmpty_Shadcn_>
-                            <CommandGroup_Shadcn_>
+                        <Command>
+                          <CommandInput placeholder="Find a table..." />
+                          <CommandList onWheel={(event) => event.stopPropagation()}>
+                            <CommandEmpty>No tables found</CommandEmpty>
+                            <CommandGroup>
                               <ScrollArea className={(tables ?? []).length > 7 ? 'h-[200px]' : ''}>
                                 {(tables ?? []).map((table) => (
-                                  <CommandItem_Shadcn_
+                                  <CommandItem
                                     key={table.id}
                                     className="cursor-pointer flex items-center justify-between space-x-2 w-full"
                                     onSelect={() => {
@@ -205,19 +205,19 @@ export const PolicyDetailsV2 = ({
                                       {field.value === table.name ? <Check size={13} /> : ''}
                                       {table.name}
                                     </span>
-                                  </CommandItem_Shadcn_>
+                                  </CommandItem>
                                 ))}
                               </ScrollArea>
-                            </CommandGroup_Shadcn_>
-                          </CommandList_Shadcn_>
-                        </Command_Shadcn_>
-                      </PopoverContent_Shadcn_>
-                    </Popover_Shadcn_>
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                   </FormControl>
                 )}
                 {authContext === 'realtime' && (
                   <FormControl>
-                    <Input_Shadcn_
+                    <Input
                       disabled
                       value="messages.realtime"
                       className="bg-control border-control"
@@ -239,31 +239,29 @@ export const PolicyDetailsV2 = ({
                   Policy Behavior <code className="text-code-inline">as</code> clause
                 </FormLabel>
                 <FormControl>
-                  <Select_Shadcn_
+                  <Select
                     disabled={isEditing}
                     value={field.value}
                     onValueChange={(value) => form.setValue('behavior', value)}
                   >
-                    <SelectTrigger_Shadcn_ className="text-sm h-10 capitalize">
-                      {field.value}
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
-                      <SelectGroup_Shadcn_>
-                        <SelectItem_Shadcn_ value="permissive" className="text-sm">
+                    <SelectTrigger className="text-sm h-10 capitalize">{field.value}</SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="permissive" className="text-sm">
                           <p>Permissive</p>
                           <p className="text-foreground-light text-xs">
                             Policies are combined using the "OR" Boolean operator
                           </p>
-                        </SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="restrictive" className="text-sm">
+                        </SelectItem>
+                        <SelectItem value="restrictive" className="text-sm">
                           <p>Restrictive</p>
                           <p className="text-foreground-light text-xs">
                             Policies are combined using the "AND" Boolean operator
                           </p>
-                        </SelectItem_Shadcn_>
-                      </SelectGroup_Shadcn_>
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </FormControl>
                 <FormMessage />
               </FormItem>

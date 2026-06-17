@@ -6,19 +6,19 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Input_Shadcn_ as Input,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
   InputGroupTextarea,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-  TextArea_Shadcn_ as TextArea,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  TextArea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -91,25 +91,25 @@ export const InputField = ({
           description={field.comment}
           className="[&>div:first-child>span]:text-foreground-lighter"
         >
-          <Select_Shadcn_
+          <Select
             value={field.value ?? ''}
             onValueChange={(value: string) => onUpdateField({ [field.name]: value })}
             disabled={!isEditable}
           >
-            <SelectTrigger_Shadcn_>
-              <SelectValue_Shadcn_ placeholder="---" />
-            </SelectTrigger_Shadcn_>
-            <SelectContent_Shadcn_>
-              <SelectGroup_Shadcn_>
-                <SelectItem_Shadcn_ value={null as any}>---</SelectItem_Shadcn_>
+            <SelectTrigger>
+              <SelectValue placeholder="---" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value={null as any}>---</SelectItem>
                 {field.enums.map((value) => (
-                  <SelectItem_Shadcn_ key={value} value={value}>
+                  <SelectItem key={value} value={value}>
                     {value}
-                  </SelectItem_Shadcn_>
+                  </SelectItem>
                 ))}
-              </SelectGroup_Shadcn_>
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </FormItemLayout>
       )
     }
@@ -154,7 +154,7 @@ export const InputField = ({
             {isEditable && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <InputGroupButton type="default" icon={<Edit />} className="px-1.5" />
+                  <InputGroupButton variant="default" icon={<Edit />} className="px-1.5" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-28">
                   {field.isNullable && (
@@ -173,7 +173,7 @@ export const InputField = ({
   }
 
   if (includes(TEXT_TYPES, field.format)) {
-    const isTruncated = isValueTruncated(field.value)
+    const isTruncated = isValueTruncated(field.value, field.format)
 
     /**
      * Handle `undefined` as the default value of the input field
@@ -216,7 +216,7 @@ export const InputField = ({
               <DropdownMenuTrigger asChild>
                 <InputGroupButton
                   data-testid={`${field.name}-field-actions`}
-                  type="default"
+                  variant="default"
                   icon={<Edit />}
                   className="ml-auto px-1.5"
                 />
@@ -250,7 +250,7 @@ export const InputField = ({
   }
 
   if (includes(JSON_TYPES, field.format)) {
-    const isTruncated = isValueTruncated(field.value)
+    const isTruncated = isValueTruncated(field.value, field.format)
 
     return (
       <FormItemLayout
@@ -276,8 +276,8 @@ export const InputField = ({
           />
           <InputGroupAddon align="inline-end">
             <InputGroupButton
-              type="default"
-              htmlType="button"
+              variant="default"
+              type="button"
               onClick={() => onEditJson({ column: field.name, value: field.value })}
               icon={isEditable ? <Edit /> : <Eye />}
             >
@@ -325,24 +325,24 @@ export const InputField = ({
         labelOptional={field.format}
         description={field.comment}
       >
-        <Select_Shadcn_
+        <Select
           value={defaultValue === null ? 'null' : defaultValue}
           onValueChange={(value) => onUpdateField({ [field.name]: value })}
           disabled={!isEditable}
         >
-          <SelectTrigger_Shadcn_>
-            <SelectValue_Shadcn_ placeholder="Select a value" />
-          </SelectTrigger_Shadcn_>
-          <SelectContent_Shadcn_>
-            <SelectGroup_Shadcn_>
+          <SelectTrigger>
+            <SelectValue placeholder="Select a value" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
               {options.map((option) => (
-                <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                <SelectItem key={option.value} value={option.value}>
                   {option.label}
-                </SelectItem_Shadcn_>
+                </SelectItem>
               ))}
-            </SelectGroup_Shadcn_>
-          </SelectContent_Shadcn_>
-        </Select_Shadcn_>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
       </FormItemLayout>
     )
   }
@@ -373,7 +373,7 @@ export const InputField = ({
     )
   }
 
-  const isTruncated = isValueTruncated(field.value)
+  const isTruncated = isValueTruncated(field.value, field.format)
 
   return (
     <FormItemLayout
@@ -406,8 +406,8 @@ export const InputField = ({
         <InputGroupAddon align="inline-end">
           {isTruncated ? (
             <InputGroupButton
-              type="default"
-              htmlType="button"
+              variant="default"
+              type="button"
               onClick={() => onEditJson({ column: field.name, value: field.value })}
               icon={isEditable ? <Edit /> : <Eye />}
             >

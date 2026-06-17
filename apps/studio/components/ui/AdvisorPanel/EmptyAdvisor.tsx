@@ -48,7 +48,7 @@ export const EmptyAdvisor = ({ activeTab, hasFilters, onClearFilters }: EmptyAdv
         <p className="text-foreground-light text-sm text-balance">{getMessage()}</p>
       </div>
       {hasFilters && (
-        <Button type="outline" onClick={onClearFilters}>
+        <Button variant="outline" onClick={onClearFilters}>
           Clear filters
         </Button>
       )}
