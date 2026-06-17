@@ -422,9 +422,7 @@ deno test supabase/functions/tests/process-ticket/index.test.ts --allow-env
 
 ---
 
-## Why this mocking approach is powerful
-
-By mocking `globalThis.fetch`, you:
+## Why this mocking approach is By mocking `globalThis.fetch`, you:
 - Test the **real** Edge Function code path (no dependency injection needed in production code)
 - Simulate database responses, auth failures, network errors, etc.
 - Keep your production Edge Function clean and focused
