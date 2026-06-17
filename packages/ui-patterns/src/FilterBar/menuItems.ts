@@ -94,7 +94,7 @@ export function buildPropertyItems(params: {
   )
 
   if (supportsOperators) {
-    items.push({ value: 'group', label: 'New Group' })
+    items.push({ value: '__new_group__', label: 'New Group' })
   }
 
   if (actions && trimmedInput.length > 0) {

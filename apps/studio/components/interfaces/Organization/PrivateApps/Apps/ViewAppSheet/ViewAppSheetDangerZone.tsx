@@ -13,7 +13,7 @@ export function ViewAppSheetDangerZone({ onDelete }: ViewAppSheetDangerZoneProps
         <AlertTitle>Delete app</AlertTitle>
         <AlertDescription>Permanently delete this app and all its installations.</AlertDescription>
         <div className="mt-2">
-          <Button type="danger" onClick={onDelete}>
+          <Button variant="danger" onClick={onDelete}>
             Delete app
           </Button>
         </div>

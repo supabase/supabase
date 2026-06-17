@@ -23,7 +23,7 @@ function SkillsInstallContent(_props: StepContentProps) {
       </div>
       <div className="absolute right-2 top-1/2 -translate-y-1/2">
         <Button
-          type="default"
+          variant="default"
           size="tiny"
           icon={<Copy size={14} />}
           onClick={handleCopy}

@@ -299,7 +299,7 @@ function FormFooter({
         onApprove={onApprove}
       />
       <Button
-        type="text"
+        variant="text"
         block
         loading={approvalState === 'declining'}
         disabled={approvalState !== 'indeterminate'}
@@ -309,7 +309,7 @@ function FormFooter({
       </Button>
       {redirectUrl && (
         <div className="mt-3 border-t border-muted pt-5">
-          <p className="text-center text-xs text-foreground-lighter">
+          <p className="text-center text-xs text-foreground-lighter text-balance">
             Authorizing will redirect you to <span className="text-foreground">{redirectUrl}</span>
           </p>
         </div>
@@ -333,7 +333,7 @@ function ApprovalButton({
 }: ApprovalButtonProps): ReactNode {
   return (
     <Button
-      type="primary"
+      variant="primary"
       block
       loading={approvalState === 'approving'}
       disabled={disabled}

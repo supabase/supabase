@@ -469,6 +469,57 @@ export interface paths {
     patch: operations['LinkConversationController_updateConversationCustomFields']
     trace?: never
   }
+  '/platform/feedback/conversations/escalation': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Escalate an AI support conversation in Front */
+    post: operations['ConversationSyncController_escalateConversation']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/feedback/conversations/messages': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Sync AI support chat messages to Front */
+    post: operations['ConversationSyncController_syncConversationMessages']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/feedback/conversations/resolve': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Resolve an AI support conversation in Front */
+    post: operations['ConversationSyncController_resolveConversation']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/feedback/docs': {
     parameters: {
       query?: never
@@ -2577,6 +2628,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/projects/{ref}/analytics/endpoints/project.metrics.otel': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets a project's metrics from the OTel/ClickHouse backend */
+    get: operations['ProjectMetricsOtelController_getProjectMetricsOtel']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/projects/{ref}/analytics/endpoints/service-health': {
     parameters: {
       query?: never
@@ -3566,6 +3634,23 @@ export interface paths {
     put?: never
     /** Previews transferring a project to a different organizations, shows eligibility and impact. */
     post: operations['ProjectTransferController_previewTransfer']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/projects/{ref}/wake': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Wakes a specific project that belongs to the authenticated user */
+    post: operations['ProjectWakeController_wakeUpProject']
     delete?: never
     options?: never
     head?: never
@@ -5761,6 +5846,33 @@ export interface components {
             }
           }
         | {
+            clickhouse: {
+              /**
+               * @description ClickHouse target database
+               * @example analytics
+               */
+              database: string
+              /**
+               * @description Table engine used for replicated tables. Defaults to `replacing_merge_tree` server-side when omitted.
+               * @example replacing_merge_tree
+               * @enum {string}
+               */
+              engine?: 'merge_tree' | 'replacing_merge_tree'
+              /** @description ClickHouse password. Omit for passwordless access. */
+              password?: string
+              /**
+               * @description ClickHouse HTTPS endpoint URL
+               * @example https://clickhouse.example.com:8443
+               */
+              url: string
+              /**
+               * @description ClickHouse user name
+               * @example default
+               */
+              user: string
+            }
+          }
+        | {
             iceberg: {
               supabase: {
                 /**
@@ -5856,6 +5968,39 @@ export interface components {
                * @example false
                */
               s3_use_ssl?: boolean
+            }
+          }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id: string
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database: string
+              /** @description Snowflake RSA private key PEM contents */
+              private_key: string
+              /** @description Optional passphrase for encrypted private keys */
+              private_key_passphrase?: string
+              /**
+               * @description Optional Snowflake role
+               * @example ETL_ROLE
+               */
+              role?: string
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema: string
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example ETL_USER
+               */
+              user: string
             }
           }
       /**
@@ -5894,6 +6039,33 @@ export interface components {
             }
           }
         | {
+            clickhouse: {
+              /**
+               * @description ClickHouse target database
+               * @example analytics
+               */
+              database: string
+              /**
+               * @description Table engine used for replicated tables. Defaults to `replacing_merge_tree` server-side when omitted.
+               * @example replacing_merge_tree
+               * @enum {string}
+               */
+              engine?: 'merge_tree' | 'replacing_merge_tree'
+              /** @description ClickHouse password. Omit for passwordless access. */
+              password?: string
+              /**
+               * @description ClickHouse HTTPS endpoint URL
+               * @example https://clickhouse.example.com:8443
+               */
+              url: string
+              /**
+               * @description ClickHouse user name
+               * @example default
+               */
+              user: string
+            }
+          }
+        | {
             iceberg: {
               supabase: {
                 /**
@@ -5989,6 +6161,39 @@ export interface components {
                * @example false
                */
               s3_use_ssl?: boolean
+            }
+          }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id: string
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database: string
+              /** @description Snowflake RSA private key PEM contents */
+              private_key: string
+              /** @description Optional passphrase for encrypted private keys */
+              private_key_passphrase?: string
+              /**
+               * @description Optional Snowflake role
+               * @example ETL_ROLE
+               */
+              role?: string
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema: string
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example ETL_USER
+               */
+              user: string
             }
           }
       /**
@@ -6662,6 +6867,10 @@ export interface components {
       scope?: string
       token_endpoint_auth_method?: string
     }
+    EscalateConversationBody: {
+      chatId: string
+      conversationId: string
+    }
     GetArchiveResponse: {
       archive_empty: boolean
       file_url: string
@@ -6747,6 +6956,7 @@ export interface components {
       expires_at: string
       icon?: string
       name: string
+      redirect_uri: string
       /** @enum {string} */
       registration_type: 'manual' | 'dynamic'
       scopes?: (
@@ -7151,6 +7361,7 @@ export interface components {
             | 'auth_mfa_phone'
             | 'auth_mfa_web_authn'
             | 'log_drain'
+            | 'etl_pipeline'
           variant: {
             /** @enum {string} */
             identifier:
@@ -7180,6 +7391,7 @@ export interface components {
               | 'auth_mfa_phone_default'
               | 'auth_mfa_web_authn_default'
               | 'log_drain_default'
+              | 'etl_pipeline_default'
             /** @description Any JSON-serializable value */
             meta?: unknown
             name: string
@@ -8362,6 +8574,7 @@ export interface components {
           | 'PITR_28'
           | 'IPV4'
           | 'LOG_DRAIN'
+          | 'ETL_PIPELINE'
           | 'LOG_INGESTION'
           | 'LOG_QUERYING'
           | 'LOG_STORAGE'
@@ -8426,6 +8639,7 @@ export interface components {
           | 'PITR_28'
           | 'IPV4'
           | 'LOG_DRAIN'
+          | 'ETL_PIPELINE'
           | 'LOG_INGESTION'
           | 'LOG_QUERYING'
           | 'LOG_STORAGE'
@@ -9046,6 +9260,7 @@ export interface components {
           | 'auth_mfa_phone'
           | 'auth_mfa_web_authn'
           | 'log_drain'
+          | 'etl_pipeline'
         variants: {
           /** @enum {string} */
           identifier:
@@ -9075,6 +9290,7 @@ export interface components {
             | 'auth_mfa_phone_default'
             | 'auth_mfa_web_authn_default'
             | 'log_drain_default'
+            | 'etl_pipeline_default'
           /** @description Any JSON-serializable value */
           meta?: unknown
           name: string
@@ -9097,6 +9313,7 @@ export interface components {
           | 'auth_mfa_phone'
           | 'auth_mfa_web_authn'
           | 'log_drain'
+          | 'etl_pipeline'
         variant: {
           /** @enum {string} */
           identifier:
@@ -9126,6 +9343,7 @@ export interface components {
             | 'auth_mfa_phone_default'
             | 'auth_mfa_web_authn_default'
             | 'log_drain_default'
+            | 'etl_pipeline_default'
           /** @description Any JSON-serializable value */
           meta?: unknown
           name: string
@@ -9200,6 +9418,7 @@ export interface components {
       inserted_at: string
       integration_source: string | null
       is_branch_enabled: boolean
+      is_hibernating?: boolean
       is_physical_backups_enabled: boolean
       lastDatabaseResizeAt?: string
       maxDatabasePreprovisionGb?: number
@@ -9303,6 +9522,10 @@ export interface components {
       }[]
       ssl_enforced: boolean
       status: string
+    }
+    ProjectWakeResponse: {
+      connection_string: string | null
+      connection_string_read_only: string | null
     }
     PublicUrlResponse: {
       publicUrl: string
@@ -9456,6 +9679,33 @@ export interface components {
             }
           }
         | {
+            clickhouse: {
+              /**
+               * @description ClickHouse target database
+               * @example analytics
+               */
+              database: string
+              /**
+               * @description Table engine used for replicated tables. Defaults to `replacing_merge_tree` server-side when omitted.
+               * @example replacing_merge_tree
+               * @enum {string}
+               */
+              engine?: 'merge_tree' | 'replacing_merge_tree'
+              /** @description ClickHouse password. Omit for passwordless access. */
+              password?: string
+              /**
+               * @description ClickHouse HTTPS endpoint URL
+               * @example https://clickhouse.example.com:8443
+               */
+              url: string
+              /**
+               * @description ClickHouse user name
+               * @example default
+               */
+              user: string
+            }
+          }
+        | {
             iceberg: {
               supabase: {
                 /**
@@ -9553,6 +9803,39 @@ export interface components {
               s3_use_ssl?: boolean
             }
           }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id: string
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database: string
+              /** @description Snowflake RSA private key PEM contents */
+              private_key: string
+              /** @description Optional passphrase for encrypted private keys */
+              private_key_passphrase?: string
+              /**
+               * @description Optional Snowflake role
+               * @example ETL_ROLE
+               */
+              role?: string
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema: string
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example ETL_USER
+               */
+              user: string
+            }
+          }
       /**
        * @description Destination id
        * @example 2001
@@ -9598,6 +9881,33 @@ export interface components {
                 project_id: string
                 /** @description BigQuery service account key */
                 service_account_key: string
+              }
+            }
+          | {
+              clickhouse: {
+                /**
+                 * @description ClickHouse target database
+                 * @example analytics
+                 */
+                database: string
+                /**
+                 * @description Table engine used for replicated tables. Defaults to `replacing_merge_tree` server-side when omitted.
+                 * @example replacing_merge_tree
+                 * @enum {string}
+                 */
+                engine?: 'merge_tree' | 'replacing_merge_tree'
+                /** @description ClickHouse password. Omit for passwordless access. */
+                password?: string
+                /**
+                 * @description ClickHouse HTTPS endpoint URL
+                 * @example https://clickhouse.example.com:8443
+                 */
+                url: string
+                /**
+                 * @description ClickHouse user name
+                 * @example default
+                 */
+                user: string
               }
             }
           | {
@@ -9698,6 +10008,39 @@ export interface components {
                 s3_use_ssl?: boolean
               }
             }
+          | {
+              snowflake: {
+                /**
+                 * @description Snowflake account identifier
+                 * @example MYORG-MYACCOUNT
+                 */
+                account_id: string
+                /**
+                 * @description Snowflake target database
+                 * @example ANALYTICS
+                 */
+                database: string
+                /** @description Snowflake RSA private key PEM contents */
+                private_key: string
+                /** @description Optional passphrase for encrypted private keys */
+                private_key_passphrase?: string
+                /**
+                 * @description Optional Snowflake role
+                 * @example ETL_ROLE
+                 */
+                role?: string
+                /**
+                 * @description Snowflake target schema
+                 * @example PUBLIC
+                 */
+                schema: string
+                /**
+                 * @description Snowflake user configured for key-pair authentication
+                 * @example ETL_USER
+                 */
+                user: string
+              }
+            }
         /**
          * @description Destination id
          * @example 2001
@@ -9719,6 +10062,11 @@ export interface components {
       /** @description Stats about apply worker lag */
       apply_lag?: {
         /**
+         * @description Whether the slot currently has an active replication connection.
+         * @example true
+         */
+        active: boolean
+        /**
          * @description Bytes between the current WAL location and the confirmed flush LSN.
          * @example 2048
          */
@@ -9729,15 +10077,26 @@ export interface components {
          */
         flush_lag?: number
         /**
+         * @description Milliseconds elapsed since the walsender last received client feedback. This can be present even when write and flush lag are unavailable.
+         * @example 5000
+         */
+        reply_time_lag?: number
+        /**
          * @description Bytes between the current WAL location and the slot restart LSN.
          * @example 1024
          */
         restart_lsn_bytes: number
         /**
-         * @description How many bytes of WAL are still safe to build up before the limit of the slot is reached.
+         * @description How many bytes of WAL are still safe to build up before the limit of the slot is reached. `null` means Postgres reports unlimited slot WAL retention.
          * @example 8192
          */
-        safe_wal_size_bytes: number
+        safe_wal_size_bytes: number | null
+        /**
+         * @description WAL availability status reported by Postgres for the slot.
+         * @example reserved
+         * @enum {string}
+         */
+        wal_status?: 'reserved' | 'extended' | 'unreserved' | 'lost' | 'unknown'
         /**
          * @description Write lag expressed in milliseconds.
          * @example 1500
@@ -9806,6 +10165,11 @@ export interface components {
         /** @description Stats about table sync worker lag */
         table_sync_lag?: {
           /**
+           * @description Whether the slot currently has an active replication connection.
+           * @example true
+           */
+          active: boolean
+          /**
            * @description Bytes between the current WAL location and the confirmed flush LSN.
            * @example 2048
            */
@@ -9816,15 +10180,26 @@ export interface components {
            */
           flush_lag?: number
           /**
+           * @description Milliseconds elapsed since the walsender last received client feedback. This can be present even when write and flush lag are unavailable.
+           * @example 5000
+           */
+          reply_time_lag?: number
+          /**
            * @description Bytes between the current WAL location and the slot restart LSN.
            * @example 1024
            */
           restart_lsn_bytes: number
           /**
-           * @description How many bytes of WAL are still safe to build up before the limit of the slot is reached.
+           * @description How many bytes of WAL are still safe to build up before the limit of the slot is reached. `null` means Postgres reports unlimited slot WAL retention.
            * @example 8192
            */
-          safe_wal_size_bytes: number
+          safe_wal_size_bytes: number | null
+          /**
+           * @description WAL availability status reported by Postgres for the slot.
+           * @example reserved
+           * @enum {string}
+           */
+          wal_status?: 'reserved' | 'extended' | 'unreserved' | 'lost' | 'unknown'
           /**
            * @description Write lag expressed in milliseconds.
            * @example 1500
@@ -10109,6 +10484,12 @@ export interface components {
     ResizeBody: {
       volume_size_gb: number
     }
+    ResolveConversationBody: {
+      /** @enum {string} */
+      aiSupportStatus: 'user_resolved' | 'bot_resolved'
+      chatId: string
+      conversationId: string
+    }
     RestartProjectBody: {
       database_identifier?: string
     }
@@ -10325,10 +10706,12 @@ export interface components {
       siteUrl?: string
       subject?: string
       tags: string[]
+      threadRef?: string
       urlToAirTable?: string
       verified?: boolean
     }
     SendFeedbackResponse: {
+      conversationId?: string
       result: string
     }
     SendUpgradeSurveyBody: {
@@ -10517,6 +10900,32 @@ export interface components {
       max_client_conn: number | null
       /** @enum {string} */
       pool_mode: 'transaction' | 'session'
+    }
+    SyncConversationMessagesBody: {
+      affectedServices?: string
+      allowSupportAccess?: boolean
+      browserInformation?: string
+      category?: string
+      chatId: string
+      conversationId?: string
+      /** @default false */
+      isInitial?: boolean
+      library?: string
+      messages: {
+        content: string
+        id: string
+        /** @enum {string} */
+        role: 'user' | 'assistant'
+      }[]
+      organizationSlug?: string
+      projectRef?: string
+      severity?: string
+      subject: string
+    }
+    SyncConversationMessagesResponse: {
+      conversationId?: string
+      /** @enum {string} */
+      result: 'success'
     }
     TaxIdResponse: {
       tax_id: {
@@ -10727,6 +11136,7 @@ export interface components {
           | 'PITR_28'
           | 'IPV4'
           | 'LOG_DRAIN'
+          | 'ETL_PIPELINE'
           | 'LOG_INGESTION'
           | 'LOG_QUERYING'
           | 'LOG_STORAGE'
@@ -10754,6 +11164,7 @@ export interface components {
         | 'auth_mfa_phone'
         | 'auth_mfa_web_authn'
         | 'log_drain'
+        | 'etl_pipeline'
       /** @enum {string} */
       addon_variant:
         | 'ci_micro'
@@ -10782,6 +11193,7 @@ export interface components {
         | 'auth_mfa_phone_default'
         | 'auth_mfa_web_authn_default'
         | 'log_drain_default'
+        | 'etl_pipeline_default'
     }
     UpdateBackendParamsOpenapi: {
       config?:
@@ -10866,6 +11278,13 @@ export interface components {
       project_ref?: string
     }
     UpdateConversationCustomFieldsResponse: {
+      /** @enum {string} */
+      result: 'success'
+    }
+    UpdateConversationLifecycleResponse: {
+      /** @enum {string} */
+      aiSupportStatus: 'bot_active' | 'escalated' | 'user_resolved' | 'bot_resolved'
+      conversationId: string
       /** @enum {string} */
       result: 'success'
     }
@@ -11437,6 +11856,33 @@ export interface components {
             }
           }
         | {
+            clickhouse: {
+              /**
+               * @description ClickHouse target database
+               * @example analytics
+               */
+              database: string
+              /**
+               * @description Table engine used for replicated tables. Defaults to `replacing_merge_tree` server-side when omitted.
+               * @example replacing_merge_tree
+               * @enum {string}
+               */
+              engine?: 'merge_tree' | 'replacing_merge_tree'
+              /** @description ClickHouse password. Omit for passwordless access. */
+              password?: string
+              /**
+               * @description ClickHouse HTTPS endpoint URL
+               * @example https://clickhouse.example.com:8443
+               */
+              url: string
+              /**
+               * @description ClickHouse user name
+               * @example default
+               */
+              user: string
+            }
+          }
+        | {
             iceberg: {
               supabase: {
                 /**
@@ -11532,6 +11978,39 @@ export interface components {
                * @example false
                */
               s3_use_ssl?: boolean
+            }
+          }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id: string
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database: string
+              /** @description Snowflake RSA private key PEM contents */
+              private_key: string
+              /** @description Optional passphrase for encrypted private keys */
+              private_key_passphrase?: string
+              /**
+               * @description Optional Snowflake role
+               * @example ETL_ROLE
+               */
+              role?: string
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema: string
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example ETL_USER
+               */
+              user: string
             }
           }
       /**
@@ -11570,6 +12049,33 @@ export interface components {
             }
           }
         | {
+            clickhouse: {
+              /**
+               * @description ClickHouse target database
+               * @example analytics
+               */
+              database: string
+              /**
+               * @description Table engine used for replicated tables. Defaults to `replacing_merge_tree` server-side when omitted.
+               * @example replacing_merge_tree
+               * @enum {string}
+               */
+              engine?: 'merge_tree' | 'replacing_merge_tree'
+              /** @description ClickHouse password. Omit for passwordless access. */
+              password?: string
+              /**
+               * @description ClickHouse HTTPS endpoint URL
+               * @example https://clickhouse.example.com:8443
+               */
+              url: string
+              /**
+               * @description ClickHouse user name
+               * @example default
+               */
+              user: string
+            }
+          }
+        | {
             iceberg: {
               supabase: {
                 /**
@@ -11665,6 +12171,39 @@ export interface components {
                * @example false
                */
               s3_use_ssl?: boolean
+            }
+          }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id: string
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database: string
+              /** @description Snowflake RSA private key PEM contents */
+              private_key: string
+              /** @description Optional passphrase for encrypted private keys */
+              private_key_passphrase?: string
+              /**
+               * @description Optional Snowflake role
+               * @example ETL_ROLE
+               */
+              role?: string
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema: string
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example ETL_USER
+               */
+              user: string
             }
           }
       /**
@@ -12122,6 +12661,33 @@ export interface components {
             }
           }
         | {
+            clickhouse: {
+              /**
+               * @description ClickHouse target database
+               * @example analytics
+               */
+              database: string
+              /**
+               * @description Table engine used for replicated tables. Defaults to `replacing_merge_tree` server-side when omitted.
+               * @example replacing_merge_tree
+               * @enum {string}
+               */
+              engine?: 'merge_tree' | 'replacing_merge_tree'
+              /** @description ClickHouse password. Omit for passwordless access. */
+              password?: string
+              /**
+               * @description ClickHouse HTTPS endpoint URL
+               * @example https://clickhouse.example.com:8443
+               */
+              url: string
+              /**
+               * @description ClickHouse user name
+               * @example default
+               */
+              user: string
+            }
+          }
+        | {
             iceberg: {
               supabase: {
                 /**
@@ -12219,6 +12785,70 @@ export interface components {
               s3_use_ssl?: boolean
             }
           }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id: string
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database: string
+              /** @description Snowflake RSA private key PEM contents */
+              private_key: string
+              /** @description Optional passphrase for encrypted private keys */
+              private_key_passphrase?: string
+              /**
+               * @description Optional Snowflake role
+               * @example ETL_ROLE
+               */
+              role?: string
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema: string
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example ETL_USER
+               */
+              user: string
+            }
+          }
+      /** @description Pipeline configuration */
+      pipeline_config?: {
+        /** @description Batch configuration */
+        batch?: {
+          /**
+           * @description Maximum fill time in milliseconds
+           * @example 200
+           */
+          max_fill_ms?: number
+        }
+        /**
+         * @description Behavior when the replication slot is invalidated
+         * @example error
+         * @enum {string}
+         */
+        invalidated_slot_behavior?: 'error' | 'recreate'
+        /** @description Maximum number of copy connections per table */
+        max_copy_connections_per_table?: number
+        /** @description Maximum number of table sync workers */
+        max_table_sync_workers?: number
+        /**
+         * @description Publication name
+         * @example pub_orders
+         */
+        publication_name: string
+      }
+      /**
+       * @description Source id
+       * @example 1
+       */
+      source_id?: number
     }
     ValidateReplicationPipelineBody: {
       /** @description Pipeline configuration */
@@ -13733,6 +14363,117 @@ export interface operations {
         }
       }
       /** @description Failed to update conversation custom fields */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ConversationSyncController_escalateConversation: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['EscalateConversationBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['UpdateConversationLifecycleResponse']
+        }
+      }
+      /** @description User is not a participant in the conversation */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update conversation status */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ConversationSyncController_syncConversationMessages: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SyncConversationMessagesBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SyncConversationMessagesResponse']
+        }
+      }
+      /** @description Supplied conversationId does not match the imported messages */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to sync messages */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ConversationSyncController_resolveConversation: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ResolveConversationBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['UpdateConversationLifecycleResponse']
+        }
+      }
+      /** @description User is not a participant in the conversation */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update conversation status */
       500: {
         headers: {
           [name: string]: unknown
@@ -21092,6 +21833,58 @@ export interface operations {
       }
     }
   }
+  ProjectMetricsOtelController_getProjectMetricsOtel: {
+    parameters: {
+      query: {
+        interval: '15min' | '1hr' | '3hr' | '1day' | '3day' | '7day'
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AnalyticsResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get project's metrics (otel) */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   UsageApiController_getProjectServiceHealth: {
     parameters: {
       query: {
@@ -21858,6 +22651,7 @@ export interface operations {
           | 'auth_mfa_phone_default'
           | 'auth_mfa_web_authn_default'
           | 'log_drain_default'
+          | 'etl_pipeline_default'
         /** @description Project ref */
         ref: string
       }
@@ -25026,6 +25820,49 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['PreviewProjectTransferResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ProjectWakeController_wakeUpProject: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ProjectWakeResponse']
         }
       }
       /** @description Unauthorized */

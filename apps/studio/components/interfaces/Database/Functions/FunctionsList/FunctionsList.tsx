@@ -346,7 +346,7 @@ export const FunctionsList = () => {
                     </ButtonTooltip>
                   )}
                   <ButtonTooltip
-                    type="default"
+                    variant="default"
                     disabled={!canCreateFunctions}
                     className="px-1 pointer-events-auto"
                     icon={<AiIconAnimation size={16} />}

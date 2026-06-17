@@ -47,6 +47,7 @@ const usageBillingDocsLink: { [K in PricingMetric]?: string } = {
   [PricingMetric.DISK_IOPS_IO2]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-iops`,
   [PricingMetric.DISK_THROUGHPUT_GP3]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-throughput`,
   [PricingMetric.LOG_DRAIN]: `${DOCS_URL}/guides/platform/manage-your-usage/log-drains`,
+  [PricingMetric.ETL_PIPELINE]: `${DOCS_URL}/guides/platform/manage-your-usage/etl`,
 }
 
 export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {

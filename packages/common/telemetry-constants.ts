@@ -1246,6 +1246,33 @@ export interface MetricsAPIBannerDismissButtonClickedEvent {
 }
 
 /**
+ * User clicks on the Unified Logs banner CTA button in studio project pages.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/*
+ */
+export interface UnifiedLogsBannerCtaButtonClickedEvent {
+  action: 'unified_logs_banner_cta_button_clicked'
+  properties: {
+    is_enabled: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the dismiss button on the Unified Logs banner in studio project pages.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/*
+ */
+export interface UnifiedLogsBannerDismissButtonClickedEvent {
+  action: 'unified_logs_banner_dismiss_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the enable button for Index Advisor, either from the banner or the confirmation dialog.
  *
  * @group Events
@@ -3112,6 +3139,40 @@ export interface AccessTokenRemovedEvent {
 }
 
 /**
+ * User clicked the "Upgrade to Pro" CTA in one of the experiment placement surfaces.
+ * GROWTH experiment: `upgradeCtaPlacement` (user_dropdown / org_projects_list).
+ *
+ * @group Events
+ * @source studio
+ */
+export interface UpgradeCtaClickedEvent {
+  action: 'upgrade_cta_clicked'
+  properties: {
+    placement: 'user_dropdown' | 'org_projects_list'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User was exposed to the upgrade CTA placement experiment.
+ * Fires once per session per free-plan user enrolled in any variant (including control),
+ * so the conversion analysis has a baseline cohort.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface UpgradeCtaPlacementExperimentExposedEvent {
+  action: 'upgrade_cta_placement_experiment_exposed'
+  properties: {
+    /**
+     * The experiment variant shown to the user
+     */
+    variant: 'control' | 'user_dropdown' | 'org_projects_list'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * User clicked the primary CTA on a resource exhaustion warning banner.
  *
  * @group Events
@@ -3432,6 +3493,8 @@ export type TelemetryEvent =
   | ReportsDatabaseGrafanaBannerClickedEvent
   | MetricsAPIBannerCtaButtonClickedEvent
   | MetricsAPIBannerDismissButtonClickedEvent
+  | UnifiedLogsBannerCtaButtonClickedEvent
+  | UnifiedLogsBannerDismissButtonClickedEvent
   | IndexAdvisorEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
   | IndexAdvisorTabClickedEvent
@@ -3520,6 +3583,8 @@ export type TelemetryEvent =
   | ComputeBadgeUpgradeClickedEvent
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
+  | UpgradeCtaClickedEvent
+  | UpgradeCtaPlacementExperimentExposedEvent
   | AccessTokenCreatedEvent
   | AccessTokenRemovedEvent
   | ResourceExhaustionBannerUpgradeClickedEvent

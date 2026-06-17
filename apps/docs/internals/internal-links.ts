@@ -1,3 +1,21 @@
+const DOCS_BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '/docs'
+
+/**
+ * Prepend the docs basePath to a root-relative href, mirroring what Next.js
+ * `<Link>` does at render time. Used when extracting an `href` attribute out
+ * of MDX `<Link>` components into plain markdown — without this, links like
+ * `/guides/foo` lose the `/docs` prefix the deployed site adds.
+ *
+ * Returns the href unchanged when it's already prefixed, external, anchor-
+ * only, or relative (`./`, `../`).
+ */
+export function withDocsBasePath(href: string): string {
+  if (!href.startsWith('/')) return href
+  if (href.startsWith('//')) return href
+  if (href === DOCS_BASE_PATH || href.startsWith(`${DOCS_BASE_PATH}/`)) return href
+  return `${DOCS_BASE_PATH}${href}`
+}
+
 /**
  * Returns the absolute base URL to prepend to root-relative markdown links
  * (e.g. `/dashboard/...`). Empty when no rewrite should happen — typically

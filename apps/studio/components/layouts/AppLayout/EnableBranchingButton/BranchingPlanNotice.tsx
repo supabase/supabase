@@ -18,7 +18,7 @@ export const BranchingPlanNotice = () => {
         this project
       </AlertDescription>
       <AlertDescription>
-        <Button size="tiny" type="default" className="mt-4">
+        <Button size="tiny" variant="default" className="mt-4">
           <Link
             href={`/org/${selectedOrg?.slug}/billing?panel=subscriptionPlan&source=enableBranchingButton`}
             onClick={() => snap.setShowCreateBranchModal(false)}
