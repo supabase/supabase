@@ -314,9 +314,9 @@ testRunner('table editor', () => {
     }
 
     // verify row content
-    expect(await page.getByRole('gridcell').nth(3).textContent()).toBe('789')
-    expect(await page.getByRole('gridcell').nth(8).textContent()).toBe('456')
-    expect(await page.getByRole('gridcell').nth(13).textContent()).toBe('123')
+    await expect(page.getByRole('gridcell').nth(3)).toHaveText('789')
+    await expect(page.getByRole('gridcell').nth(8)).toHaveText('456')
+    await expect(page.getByRole('gridcell').nth(13)).toHaveText('123')
 
     // edit table (rename table, rename column name)
     await page
@@ -565,9 +565,9 @@ testRunner('table editor', () => {
 
     // Verify sorted row content asc lexicographically for strings
     await page.waitForTimeout(500)
-    expect(await page.getByRole('gridcell').nth(3).textContent()).toBe('123')
-    expect(await page.getByRole('gridcell').nth(8).textContent()).toBe('456')
-    expect(await page.getByRole('gridcell').nth(13).textContent()).toBe('789')
+    await expect(page.getByRole('gridcell').nth(3)).toHaveText('123')
+    await expect(page.getByRole('gridcell').nth(8)).toHaveText('456')
+    await expect(page.getByRole('gridcell').nth(13)).toHaveText('789')
   })
 
   test('column actions works as expected', async ({ page, ref }) => {
