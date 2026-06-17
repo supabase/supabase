@@ -32,7 +32,7 @@ export const DiskIOBandwidthWarnings = ({
               performance. If you need consistent disk performance, consider upgrading to a larger
               compute add-on.
             </p>
-            <Button asChild type="danger">
+            <Button asChild variant="danger">
               <Link href={upgradeUrl}>
                 {hasAccessToComputeSizes ? 'Change compute add-on' : 'Upgrade project'}
               </Link>
@@ -56,7 +56,7 @@ export const DiskIOBandwidthWarnings = ({
               If you need consistent disk performance, consider upgrading to a larger compute
               add-on.
             </p>
-            <Button asChild type="danger">
+            <Button asChild variant="danger">
               <Link href={upgradeUrl}>
                 {hasAccessToComputeSizes ? 'Change compute add-on' : 'Upgrade project'}
               </Link>
@@ -79,7 +79,7 @@ export const DiskIOBandwidthWarnings = ({
               at least once during this billing cycle. If you need consistent disk performance,
               consider upgrading to a larger compute add-on.
             </p>
-            <Button asChild type="warning">
+            <Button asChild variant="warning">
               <Link href={upgradeUrl}>
                 {hasAccessToComputeSizes ? 'Change compute add-on' : 'Upgrade project'}
               </Link>
@@ -103,7 +103,7 @@ export const DiskIOBandwidthWarnings = ({
               to baseline performance. If you need consistent disk performance, consider upgrading
               to a larger compute add-on.
             </p>
-            <Button asChild type="warning">
+            <Button asChild variant="warning">
               <Link href={upgradeUrl}>
                 {hasAccessToComputeSizes ? 'Change compute add-on' : 'Upgrade project'}
               </Link>

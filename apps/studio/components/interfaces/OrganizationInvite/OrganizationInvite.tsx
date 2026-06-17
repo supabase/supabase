@@ -108,11 +108,11 @@ export const OrganizationInvite = () => {
   if (isSignedOut) {
     return withLayout(
       <div className="flex flex-col gap-2">
-        <Button asChild type="primary" block>
+        <Button asChild variant="primary" block>
           <Link href={loginRedirectLink}>Sign in</Link>
         </Button>
         {isSignUpEnabled && (
-          <Button asChild type="default" block>
+          <Button asChild variant="default" block>
             <Link href={signupRedirectLink}>Create an account</Link>
           </Button>
         )}
@@ -147,7 +147,7 @@ export const OrganizationInvite = () => {
           type="warning"
           description="This invite has already been accepted or declined."
         />
-        <Button type="default" block asChild>
+        <Button variant="default" block asChild>
           <Link href="/">Back to dashboard</Link>
         </Button>
       </div>
@@ -171,7 +171,7 @@ export const OrganizationInvite = () => {
 
       <div className="flex flex-col gap-2">
         <Button
-          type="primary"
+          variant="primary"
           block
           loading={isJoining}
           disabled={isJoining}
@@ -179,7 +179,7 @@ export const OrganizationInvite = () => {
         >
           Accept invite
         </Button>
-        <Button asChild type="text" block>
+        <Button asChild variant="text" block>
           <Link href="/projects">Decline</Link>
         </Button>
       </div>

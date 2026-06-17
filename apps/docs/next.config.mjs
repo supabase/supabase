@@ -61,7 +61,7 @@ const nextConfig = {
   ],
   outputFileTracingIncludes: {
     '/api/crawlers': ['./features/docs/generated/**/*', './docs/ref/**/*'],
-    '/api/guides-md/**/*': ['./public/docs/guides/**/*'],
+    '/api/guides-md/**/*': ['./public/markdown/guides/**/*'],
     '/guides/**/*': ['./content/guides/**/*', './content/troubleshooting/**/*', './examples/**/*'],
     '/reference/**/*': ['./features/docs/generated/**/*', './docs/ref/**/*'],
   },

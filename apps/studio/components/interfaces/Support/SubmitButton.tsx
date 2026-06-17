@@ -21,7 +21,7 @@ export function SubmitButton({
   return (
     <div className={cn('flex flex-col gap-3', className)}>
       <Button
-        htmlType="submit"
+        type="submit"
         size="small"
         block
         disabled={isSubmitting}

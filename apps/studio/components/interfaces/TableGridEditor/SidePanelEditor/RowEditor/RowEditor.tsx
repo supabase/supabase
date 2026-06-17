@@ -133,7 +133,7 @@ export const RowEditor = ({
       updateEditorDirty()
 
       const payload = isNewRecord
-        ? generateRowObjectFromFields({ fields: rowFields })
+        ? generateRowObjectFromFields({ fields: rowFields, useDefaultForEmptyValues: true })
         : generateUpdateRowPayload(row, rowFields)
 
       const configuration = { identifiers: {}, rowIdx: -1 }

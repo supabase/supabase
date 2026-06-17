@@ -67,7 +67,7 @@ die()  { printf "ERROR: %s\n" "$*" >&2; exit 1; }
 # Falls back to the default with -y or when no controlling terminal exists.
 ask() {
     # ask <prompt> <default>  -> echoes chosen value
-    if [ "$ASSUME_YES" = "1" ] || ! { : > /dev/tty; } 2>/dev/null; then
+    if [ "$ASSUME_YES" = "1" ] || ! ( : < /dev/tty ) 2>/dev/null; then
         printf '%s' "$2"
         return
     fi
@@ -281,8 +281,8 @@ current_site_url=$(read_env SITE_URL)
 [ -z "$current_api_url" ]    && current_api_url="$current_public_url"
 [ -z "$current_site_url" ]   && current_site_url="http://localhost:3000"
 
-if [ "$ASSUME_YES" = "1" ] || ! { : > /dev/tty; } 2>/dev/null; then
-    log "Non-interactive: keeping default URLs (edit .env to change)"
+if [ "$ASSUME_YES" = "1" ] || ! ( : < /dev/tty ) 2>/dev/null; then
+    log "Non-interactive: using default URLs (edit .env to change)"
 else
     echo ""
     echo "Configure the main URLs (press Enter to accept the default)."

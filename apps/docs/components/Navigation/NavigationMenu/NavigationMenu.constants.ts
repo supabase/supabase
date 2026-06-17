@@ -31,6 +31,9 @@ const {
   sdkKotlin: sdkKotlinEnabled,
   sdkPython: sdkPythonEnabled,
   sdkSwift: sdkSwiftEnabled,
+  docsAgentPlugin: agentPluginEnabled,
+  docsAgentSkills: agentSkillsEnabled,
+  docsPrompts: promptsEnabled,
 } = isFeatureEnabled([
   'authentication:show_providers',
   'billing:all',
@@ -56,6 +59,9 @@ const {
   'sdk:kotlin',
   'sdk:python',
   'sdk:swift',
+  'docs:agent_plugin',
+  'docs:agent_skills',
+  'docs:prompts',
 ])
 
 const aiToolsEnabled = true
@@ -338,8 +344,12 @@ export const gettingstarted: NavMenuConstant = {
   items: [
     { name: 'Build with AI tools', url: '/guides/ai-tools' },
     { name: 'API Keys', url: '/guides/getting-started/api-keys' },
-    { name: 'Local Development', url: '/guides/cli/getting-started' },
+    { name: 'Local Development', url: '/guides/local-development/cli/getting-started' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
+    {
+      name: 'Migrating to new API keys',
+      url: '/guides/getting-started/migrating-to-new-api-keys',
+    },
     {
       name: 'Framework Quickstarts',
       enabled: frameworkQuickstartsEnabled,
@@ -1611,6 +1621,16 @@ export const api: NavMenuConstant = {
         },
       ],
     },
+    {
+      name: 'Debugging',
+      url: undefined,
+      items: [
+        {
+          name: 'Handling Errors in supabase-js',
+          url: '/guides/api/handling-errors-in-supabase-js',
+        },
+      ],
+    },
   ],
 }
 
@@ -1711,6 +1731,10 @@ export const functions: NavMenuConstant = {
         {
           name: 'Logging',
           url: '/guides/functions/logging' as `/${string}`,
+        },
+        {
+          name: 'Error codes',
+          url: '/guides/functions/error-codes' as `/${string}`,
         },
         {
           name: 'Troubleshooting',
@@ -2176,6 +2200,11 @@ export const storage: NavMenuConstant = {
           url: '/guides/storage/vector/querying-vectors' as `/${string}`,
         },
         {
+          name: 'Local Development',
+          url: '/guides/storage/vector/local-development' as `/${string}`,
+          enabled: billingEnabled,
+        },
+        {
           name: 'Limits',
           url: '/guides/storage/vector/limits' as `/${string}`,
           enabled: billingEnabled,
@@ -2372,6 +2401,7 @@ export const ai_tools: NavMenuConstant = {
     {
       name: 'Agent Plugin',
       url: '/guides/ai-tools/plugins' as `/${string}`,
+      enabled: agentPluginEnabled,
     },
     {
       name: 'MCP server',
@@ -2380,10 +2410,12 @@ export const ai_tools: NavMenuConstant = {
     {
       name: 'Agent Skills',
       url: '/guides/ai-tools/ai-skills' as `/${string}`,
+      enabled: agentSkillsEnabled,
     },
     {
       name: 'Prompts',
       url: '/guides/ai-tools/ai-prompts' as `/${string}`,
+      enabled: promptsEnabled,
     },
 
     {

@@ -11,7 +11,7 @@ export const DocsButton = ({ href, abbrev = true, className }: DocsButtonProps) 
   return (
     <Button
       asChild
-      type="default"
+      variant="default"
       className={className}
       icon={<BookOpen />}
       onClick={(e) => e.stopPropagation()}

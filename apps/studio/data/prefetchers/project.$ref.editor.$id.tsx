@@ -7,7 +7,6 @@ import {
   formatFilterURLParams,
   formatSortURLParams,
   loadTableEditorStateFromLocalStorage,
-  parseSupaTable,
 } from '@/components/grid/SupabaseGrid.utils'
 import { Filter, Sort } from '@/components/grid/types'
 import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
@@ -45,8 +44,6 @@ export function prefetchEditorTablePage({
     id,
   }).then((entity) => {
     if (entity) {
-      const supaTable = parseSupaTable(entity)
-
       const { sorts: localSorts = [], filters: localFilters = [] } =
         loadTableEditorStateFromLocalStorage(projectRef, entity.id) ?? {}
 
@@ -55,7 +52,7 @@ export function prefetchEditorTablePage({
         connectionString,
         readReplicaIdentifier,
         tableId: id,
-        sorts: sorts ?? formatSortURLParams(supaTable.name, localSorts),
+        sorts: sorts ?? formatSortURLParams(entity, localSorts),
         filters: filters ?? formatFilterURLParams(localFilters),
         page: 1,
         limit: TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE,

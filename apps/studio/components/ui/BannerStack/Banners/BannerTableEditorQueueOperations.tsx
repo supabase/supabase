@@ -61,7 +61,7 @@ export const BannerTableEditorQueueOperations = () => {
             Batch multiple row edits and review them before saving to your database
           </p>
         </div>
-        <Button asChild type="default" className="w-min">
+        <Button asChild variant="default" className="w-min">
           <Link href={DASHBOARD_SETTINGS_URL}>
             {isQueueOperationsEnabled ? 'View' : 'Enable in'} preferences
           </Link>

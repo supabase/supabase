@@ -65,7 +65,7 @@ const testClientCreation = async () => {
   if (!supabaseUrl) throw new Error('supabaseUrl is required.')
   if (!supabaseKey) throw new Error('supabaseKey is required.')
 
-  // Test a simple query to the database
+  // Test a query to the database
   const { data: table_data, error: table_error } = await client
     .from('my_table')
     .select('*')

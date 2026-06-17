@@ -274,7 +274,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
                 <div className="flex items-center justify-center">
                   <ButtonTooltip
                     asChild
-                    type="default"
+                    variant="default"
                     disabled={!canManageReplicas || isOrioleDb}
                     className={cn(replicas.length > 0 ? 'rounded-r-none' : '')}
                     tooltip={{
@@ -294,7 +294,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
-                          type="default"
+                          variant="default"
                           icon={<ChevronDown size={16} />}
                           className="px-1 rounded-l-none border-l-0"
                         />
@@ -316,7 +316,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
                 {isAws && (
                   <div className="flex items-center justify-center">
                     <Button
-                      type="default"
+                      variant="default"
                       icon={<Network size={15} />}
                       className={`rounded-r-none transition ${
                         view === 'flow' ? 'opacity-100' : 'opacity-50'
@@ -324,7 +324,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
                       onClick={() => setView('flow')}
                     />
                     <Button
-                      type="default"
+                      variant="default"
                       icon={<Globe2 size={15} />}
                       className={`rounded-l-none transition ${
                         view === 'map' ? 'opacity-100' : 'opacity-50'

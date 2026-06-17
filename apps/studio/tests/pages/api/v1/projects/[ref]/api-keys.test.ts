@@ -103,7 +103,7 @@ describe('/api/v1/projects/[ref]/api-keys', () => {
       vi.stubEnv('SUPABASE_ANON_KEY', 'anon-key-value')
       vi.stubEnv('SUPABASE_SERVICE_KEY', 'service-key-value')
       vi.stubEnv('SUPABASE_PUBLISHABLE_KEY', '')
-      vi.stubEnv('SUPABASE_SECRET_KEY', 'sb_secret_xyz')
+      vi.stubEnv('SUPABASE_SECRET_KEY', 'sb_secret_abcdefghijklmnop')
 
       const { req, res } = createMocks({ method: 'GET', query: { ref: 'default' } })
       await handler(req, res)
@@ -112,21 +112,55 @@ describe('/api/v1/projects/[ref]/api-keys', () => {
       expect(data).toHaveLength(3)
       expect(data[2]).toEqual({
         name: 'secret',
-        api_key: 'sb_secret_xyz',
+        api_key: 'sb_secret_abcde',
         id: 'secret',
         type: 'secret',
         hash: '',
-        prefix: '',
+        prefix: 'sb_secret_abcde',
         description: 'Secret API key (service_role)',
       })
       expect(data.find((k: { type: string }) => k.type === 'publishable')).toBeUndefined()
+    })
+
+    it('fully masks a short secret key so the unrevealed list never leaks it', async () => {
+      vi.stubEnv('SUPABASE_ANON_KEY', 'anon-key-value')
+      vi.stubEnv('SUPABASE_SERVICE_KEY', 'service-key-value')
+      vi.stubEnv('SUPABASE_PUBLISHABLE_KEY', '')
+      // <= 15 chars: the prefix would otherwise equal the whole secret.
+      vi.stubEnv('SUPABASE_SECRET_KEY', 'sb_secret_xyz')
+
+      const { req, res } = createMocks({ method: 'GET', query: { ref: 'default' } })
+      await handler(req, res)
+
+      const data = JSON.parse(res._getData())
+      const secret = data.find((k: { id: string }) => k.id === 'secret')
+      expect(secret.api_key).toBe('')
+      expect(secret.prefix).toBe('')
+    })
+
+    it('returns the full secret key in the list when reveal=true', async () => {
+      vi.stubEnv('SUPABASE_ANON_KEY', 'anon-key-value')
+      vi.stubEnv('SUPABASE_SERVICE_KEY', 'service-key-value')
+      vi.stubEnv('SUPABASE_PUBLISHABLE_KEY', '')
+      vi.stubEnv('SUPABASE_SECRET_KEY', 'sb_secret_abcdefghijklmnop')
+
+      const { req, res } = createMocks({
+        method: 'GET',
+        query: { ref: 'default', reveal: 'true' },
+      })
+      await handler(req, res)
+
+      const data = JSON.parse(res._getData())
+      expect(data.find((k: { id: string }) => k.id === 'secret')?.api_key).toBe(
+        'sb_secret_abcdefghijklmnop'
+      )
     })
 
     it('appends both new entries when both env vars are set, in publishable-then-secret order', async () => {
       vi.stubEnv('SUPABASE_ANON_KEY', 'anon-key-value')
       vi.stubEnv('SUPABASE_SERVICE_KEY', 'service-key-value')
       vi.stubEnv('SUPABASE_PUBLISHABLE_KEY', 'sb_publishable_abc')
-      vi.stubEnv('SUPABASE_SECRET_KEY', 'sb_secret_xyz')
+      vi.stubEnv('SUPABASE_SECRET_KEY', 'sb_secret_abcdefghijklmnop')
 
       const { req, res } = createMocks({ method: 'GET', query: { ref: 'default' } })
       await handler(req, res)

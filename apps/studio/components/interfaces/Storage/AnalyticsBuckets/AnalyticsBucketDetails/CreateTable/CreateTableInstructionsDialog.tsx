@@ -28,7 +28,7 @@ export const CreateTableInstructionsDialog = () => {
     <>
       <div className="flex items-center">
         <Button
-          type="primary"
+          variant="primary"
           icon={<Plus />}
           className={cn(enableCreationOfTablesFromDashboard && 'rounded-r-none hover:z-10')}
           onClick={() => {
@@ -41,7 +41,11 @@ export const CreateTableInstructionsDialog = () => {
         {enableCreationOfTablesFromDashboard && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button type="primary" className="w-7 rounded-l-none -ml-px" icon={<ChevronDown />} />
+              <Button
+                variant="primary"
+                className="w-7 rounded-l-none -ml-px"
+                icon={<ChevronDown />}
+              />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-48" align="end">
               <DropdownMenuItem onClick={() => setShowModal(true)}>Via Pyiceberg</DropdownMenuItem>

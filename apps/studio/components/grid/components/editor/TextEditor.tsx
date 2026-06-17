@@ -160,7 +160,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
-                          type="default"
+                          variant="default"
                           className="px-1"
                           onClick={() => onSelectExpand()}
                           icon={<Maximize size={12} strokeWidth={2} />}
@@ -172,8 +172,8 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                     {isNullable && (
                       <Button
                         size="tiny"
-                        type="default"
-                        htmlType="button"
+                        variant="default"
+                        type="button"
                         onClick={() => {
                           // Skip confirmation when queue mode is enabled - changes can be reviewed/cancelled
                           if (isQueueEnabled) {

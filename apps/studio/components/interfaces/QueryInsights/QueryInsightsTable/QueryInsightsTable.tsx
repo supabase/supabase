@@ -408,7 +408,7 @@ export const QueryInsightsTable = ({
                     <Button
                       key="clear"
                       size="tiny"
-                      type="text"
+                      variant="text"
                       icon={<X className="h-4 w-4" />}
                       onClick={() => setSearchQuery('')}
                       className="p-0 h-5 w-5"
@@ -435,7 +435,7 @@ export const QueryInsightsTable = ({
           ].join(' ')}
         >
           <Button
-            type="default"
+            variant="default"
             size="tiny"
             className="rounded-full shadow-md"
             onClick={() => onCurrentSelectQuery?.(null)}

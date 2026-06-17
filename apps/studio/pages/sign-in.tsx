@@ -55,7 +55,7 @@ const SignInPage: NextPageWithLayout = () => {
               asChild
               block
               size="large"
-              type="outline"
+              variant="outline"
               icon={<Lock width={18} height={18} />}
             >
               <Link
