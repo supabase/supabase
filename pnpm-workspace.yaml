@@ -71,7 +71,6 @@ overrides:
   'mdx-bundler>uuid': ^11.1.1
   cacache>tar: ^7.5.11
   dompurify: ^3.3.2
-  esbuild: ^0.25.2
   express-rate-limit>ip-address: ^10.1.1
   lodash: 'catalog:'
   lodash-es: 'catalog:'
