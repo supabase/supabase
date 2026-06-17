@@ -96,8 +96,11 @@ export function getRowFromSidePanel(
  * editing a single cell should only update the column the user actually clicked. Persisting the
  * full set would silently rewrite the sibling columns (e.g. moving a row to a different tenant)
  * and bypass the database's composite FK validation, which is inconsistent with how editing those
- * columns individually behaves. When the edited column is unknown the original value is returned
- * unchanged.
+ * columns individually behaves.
+ *
+ * Returns `undefined` to signal an invalid save when there is no value or the edited column is
+ * unknown — falling back to the full value would reintroduce the sibling-column rewrite this helper
+ * exists to prevent, so it fails closed instead.
  */
 export function getForeignKeyUpdatePayload({
   value,
@@ -106,7 +109,8 @@ export function getForeignKeyUpdatePayload({
   value?: { [key: string]: any }
   columnName?: string
 }): { [key: string]: any } | undefined {
-  if (!value || !columnName) return value
+  if (!value) return undefined
+  if (!columnName || !(columnName in value)) return undefined
   return { [columnName]: value[columnName] }
 }
 

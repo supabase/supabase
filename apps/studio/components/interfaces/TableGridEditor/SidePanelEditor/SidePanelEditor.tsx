@@ -361,6 +361,9 @@ export const SidePanelEditor = ({
       // returns a value for every column in the relation, and saving all of them would silently
       // rewrite the sibling columns instead of letting the database validate the composite FK.
       const payload = getForeignKeyUpdatePayload({ value, columnName: column?.name })
+      if (payload === undefined) {
+        return toast.error('Failed to save row: could not determine the edited foreign key column')
+      }
 
       await saveRow(payload, isNewRecord, configuration, (error) => {
         if (error) {

@@ -231,9 +231,14 @@ describe('getRowFromSidePanel', () => {
     expect(getForeignKeyUpdatePayload({ value, columnName: 'role_id' })).toEqual({ role_id: null })
   })
 
-  test('getForeignKeyUpdatePayload returns the value unchanged when the column is unknown', () => {
+  test('getForeignKeyUpdatePayload fails closed when the column is unknown', () => {
     const value = { role_id: 'role-2', tenant_id: 'tenant-B' }
-    expect(getForeignKeyUpdatePayload({ value, columnName: undefined })).toEqual(value)
+    expect(getForeignKeyUpdatePayload({ value, columnName: undefined })).toBeUndefined()
+  })
+
+  test('getForeignKeyUpdatePayload fails closed when the column is not in the value', () => {
+    const value = { role_id: 'role-2', tenant_id: 'tenant-B' }
+    expect(getForeignKeyUpdatePayload({ value, columnName: 'missing_id' })).toBeUndefined()
   })
 
   test('getForeignKeyUpdatePayload returns undefined when there is no value', () => {
