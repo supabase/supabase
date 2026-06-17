@@ -183,7 +183,9 @@ export const FunctionList = ({
                             <DropdownMenuItem
                               className="space-x-2"
                               onClick={() =>
-                                router.push(`/project/${projectRef}/api?rpc=${x.name}`)
+                                router.push(
+                                  `/project/${projectRef}/api?rpc=${encodeURIComponent(x.name)}`
+                                )
                               }
                             >
                               <FileText size={14} />
