@@ -9,9 +9,10 @@ export const CUSTOM_EXPIRY_VALUE = 'custom'
 
 export const EXPIRES_AT_OPTIONS = {
   hour: { value: 'hour', label: '1 hour' },
-  day: { value: 'day', label: '1 day' },
+  day: { value: 'day', label: '24 hours' },
   week: { value: 'week', label: '7 days' },
   month: { value: 'month', label: '30 days' },
+  quarter: { value: 'quarter', label: '90 days' },
   never: { value: NON_EXPIRING_TOKEN_VALUE, label: 'Never' },
   custom: { value: CUSTOM_EXPIRY_VALUE, label: 'Custom' },
 } as const

@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { z } from 'zod'
 
 export const PermissionRowSchema = z.object({
@@ -13,11 +14,21 @@ export const TokenSchema = z
     resourceAccess: z.enum(['all-orgs', 'selected-orgs', 'selected-projects']),
     selectedOrganizations: z.array(z.string()).optional(),
     selectedProjects: z.array(z.string()).optional(),
-    permissionRows: z.array(PermissionRowSchema).min(1, 'Please configure at least one permission'),
+    permissionRows: z.array(PermissionRowSchema).optional().default([]),
   })
   .refine((data) => !(data.expiresAt === 'custom' && !data.customExpiryDate), {
     message: 'Please select a custom expiry date',
     path: ['expiresAt'],
   })
+  .refine(
+    (data) =>
+      data.expiresAt !== 'custom' ||
+      !data.customExpiryDate ||
+      dayjs(data.customExpiryDate).valueOf() <= dayjs().add(1, 'year').valueOf(),
+    {
+      message: 'Custom expiry must be within 1 year',
+      path: ['expiresAt'],
+    }
+  )
 
 export type TokenFormValues = z.infer<typeof TokenSchema>

@@ -1,5 +1,6 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 import dayjs, { type Dayjs } from 'dayjs'
+import advancedFormat from 'dayjs/plugin/advancedFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
@@ -13,6 +14,9 @@ import { guessLocalTimezone } from '@/lib/dayjs'
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
+// advancedFormat enables the `z` token (timezone abbreviation) when formatting
+// a timezone-pinned dayjs instance, e.g. "23 Jun 2026, 14:00:00 GMT+8".
+dayjs.extend(advancedFormat)
 
 export type DateInput = string | number | Date | Dayjs
 
@@ -57,6 +61,12 @@ const DEFAULT_DATETIME_FORMAT = 'DD MMM YYYY HH:mm:ss'
 const DEFAULT_DATE_FORMAT = 'DD MMM YYYY'
 const DEFAULT_TIME_FORMAT = 'HH:mm:ss'
 
+/**
+ * Full local timestamp down to the second, including the timezone abbreviation,
+ * e.g. "23 Jun 2026, 14:00:00 GMT+8".
+ */
+const DATETIME_TZ_FORMAT = 'DD MMM YYYY, HH:mm:ss z'
+
 interface FormatOptions {
   /** IANA timezone (e.g. 'Asia/Tokyo'). Falls back to guessed local. */
   tz?: string
@@ -68,6 +78,13 @@ export const formatDateTime = (input: DateInput, opts: FormatOptions = {}): stri
   normalize(input)
     .tz(resolveTimezone(opts.tz))
     .format(opts.format ?? DEFAULT_DATETIME_FORMAT)
+
+/**
+ * Convenience wrapper for the standard full timestamp + timezone label,
+ * e.g. "23 Jun 2026, 14:00:00 GMT+8".
+ */
+export const formatTzTimestamp = (input: DateInput, opts: Pick<FormatOptions, 'tz'> = {}): string =>
+  formatDateTime(input, { ...opts, format: DATETIME_TZ_FORMAT })
 
 export const formatDate = (input: DateInput, opts: FormatOptions = {}): string =>
   normalize(input)

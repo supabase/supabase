@@ -1,6 +1,10 @@
 import dayjs from 'dayjs'
 
-import { PERMISSION_LIST, ScopedAccessTokenPermission } from './AccessToken.constants'
+import {
+  CUSTOM_EXPIRY_VALUE,
+  PERMISSION_LIST,
+  ScopedAccessTokenPermission,
+} from './AccessToken.constants'
 import {
   AccessTokenSort,
   AccessTokenSortColumn,
@@ -141,9 +145,21 @@ export const getExpirationDate = (key: string): string | undefined => {
       return dayjs().add(7, 'days').toISOString()
     case 'month':
       return dayjs().add(30, 'days').toISOString()
+    case 'quarter':
+      return dayjs().add(90, 'days').toISOString()
     case 'never':
       return undefined
     default:
       return undefined
   }
 }
+
+/**
+ * Resolves the chosen expiry to an ISO timestamp (or undefined for non-expiring):
+ * the custom date when "custom" is selected, otherwise the preset window.
+ */
+export const resolveExpiry = (
+  expiresAt: string | undefined,
+  customExpiryDate: string | undefined
+): string | undefined =>
+  expiresAt === CUSTOM_EXPIRY_VALUE ? customExpiryDate : getExpirationDate(expiresAt ?? '')

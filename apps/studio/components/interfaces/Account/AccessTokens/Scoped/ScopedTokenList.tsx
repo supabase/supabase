@@ -9,7 +9,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { TableCell, TableRow } from 'ui/src/components/shadcn/ui/table'
 
 import {
@@ -21,6 +20,7 @@ import { filterAndSortTokens, handleSortChange } from '../AccessToken.utils'
 import { RowLoading } from '../AccessTokenTable/RowLoading'
 import { TableContainer } from '../AccessTokenTable/TableContainer'
 import { ExpiresCell, LastUsedCell, TokenNameCell } from '../AccessTokenTable/TokenCells'
+import { DeleteTokenConfirmModal } from '../DeleteTokenConfirmModal'
 import { ViewTokenSheet } from './ViewTokenSheet'
 import AlertError from '@/components/ui/AlertError'
 import {
@@ -50,7 +50,7 @@ export const ScopedTokenList = ({ searchString = '', onDeleteSuccess }: ScopedTo
 
   const tokens = tokensData?.tokens
 
-  const { mutate: deleteToken } = useScopedAccessTokenDeleteMutation({
+  const { mutate: deleteToken, isPending: isDeleting } = useScopedAccessTokenDeleteMutation({
     onSuccess: (_, vars) => {
       track('access_token_removed', { tokenType: 'scoped' })
       onDeleteSuccess(vars.id)
@@ -161,21 +161,15 @@ export const ScopedTokenList = ({ searchString = '', onDeleteSuccess }: ScopedTo
         ))}
       </TableContainer>
 
-      <ConfirmationModal
+      <DeleteTokenConfirmModal
         visible={isOpen}
-        variant="destructive"
-        title="Confirm to delete"
-        confirmLabel="Delete"
-        confirmLabelLoading="Deleting"
+        tokenName={token?.name}
+        loading={isDeleting}
         onCancel={() => setIsOpen(false)}
         onConfirm={() => {
           if (token) deleteToken({ id: token.id as string })
         }}
-      >
-        <p className="py-4 text-sm text-foreground-light">
-          This action cannot be undone. Are you sure you want to delete "{token?.name}" token?
-        </p>
-      </ConfirmationModal>
+      />
 
       <ViewTokenSheet
         visible={isViewSheetOpen}

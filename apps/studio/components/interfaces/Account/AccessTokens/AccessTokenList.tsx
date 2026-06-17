@@ -9,7 +9,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { TableCell, TableRow } from 'ui/src/components/shadcn/ui/table'
 
 import {
@@ -21,6 +20,7 @@ import { filterAndSortTokens, handleSortChange } from './AccessToken.utils'
 import { RowLoading } from './AccessTokenTable/RowLoading'
 import { TableContainer } from './AccessTokenTable/TableContainer'
 import { ExpiresCell, LastUsedCell, TokenNameCell } from './AccessTokenTable/TokenCells'
+import { DeleteTokenConfirmModal } from './DeleteTokenConfirmModal'
 import AlertError from '@/components/ui/AlertError'
 import { useAccessTokenDeleteMutation } from '@/data/access-tokens/access-tokens-delete-mutation'
 import { AccessToken, useAccessTokensQuery } from '@/data/access-tokens/access-tokens-query'
@@ -42,7 +42,7 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
 
   const { data: tokens, error, isPending: isLoading, isError } = useAccessTokensQuery()
 
-  const { mutate: deleteToken } = useAccessTokenDeleteMutation({
+  const { mutate: deleteToken, isPending: isDeleting } = useAccessTokenDeleteMutation({
     onSuccess: (_, vars) => {
       track('access_token_removed', { tokenType: 'classic' })
       onDeleteSuccess(vars.id)
@@ -143,21 +143,15 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
         ))}
       </TableContainer>
 
-      <ConfirmationModal
+      <DeleteTokenConfirmModal
         visible={isOpen}
-        variant="destructive"
-        title="Confirm to delete"
-        confirmLabel="Delete"
-        confirmLabelLoading="Deleting"
+        tokenName={token?.name}
+        loading={isDeleting}
         onCancel={() => setIsOpen(false)}
         onConfirm={() => {
           if (token) deleteToken({ id: token.id })
         }}
-      >
-        <p className="py-4 text-sm text-foreground-light">
-          This action cannot be undone. Are you sure you want to delete "{token?.name}" token?
-        </p>
-      </ConfirmationModal>
+      />
     </>
   )
 }

@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { describe, expect, it } from 'vitest'
 
 import { PermissionRowSchema, TokenSchema } from './AccessToken.schemas'
@@ -76,12 +77,11 @@ describe('TokenSchema', () => {
     expect(result.success).toBe(false)
   })
 
-  it('should fail when permissionRows is empty', () => {
+  it('should allow empty permissionRows', () => {
     const result = TokenSchema.safeParse({ ...validTokenData, permissionRows: [] })
-    expect(result.success).toBe(false)
-    if (!result.success) {
-      const permError = result.error.issues.find((i) => i.path.includes('permissionRows'))
-      expect(permError?.message).toBe('Please configure at least one permission')
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.permissionRows).toEqual([])
     }
   })
 
@@ -151,6 +151,19 @@ describe('TokenSchema', () => {
         customExpiryDate: '2026-12-31T00:00:00Z',
       })
       expect(result.success).toBe(true)
+    })
+
+    it('should fail when customExpiryDate is more than 1 year out', () => {
+      const result = TokenSchema.safeParse({
+        ...validTokenData,
+        expiresAt: 'custom',
+        customExpiryDate: dayjs().add(1, 'year').add(1, 'day').toISOString(),
+      })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        const customError = result.error.issues.find((i) => i.path.includes('expiresAt'))
+        expect(customError?.message).toBe('Custom expiry must be within 1 year')
+      }
     })
 
     it('should pass when expiresAt is not "custom" even without customExpiryDate', () => {
