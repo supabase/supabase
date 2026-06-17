@@ -12,8 +12,7 @@ import { timeout } from '@/lib/helpers'
 import '@xyflow/react/dist/style.css'
 
 import { SmoothstepEdge } from './Edges'
-import { ETL_NOT_SET_UP_ERROR } from '@/data/replication/utils'
-import { IS_LOCAL } from '@/lib/constants'
+import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 
 export const ReplicationDiagram = () => {
   return (
@@ -53,8 +52,8 @@ const ReplicationDiagramContent = () => {
     projectRef,
   })
   const destinations = useMemo(() => data?.destinations ?? [], [data])
-  const localETLSetupError = IS_LOCAL && destinationsError?.message.includes(ETL_NOT_SET_UP_ERROR)
-  const skipRenderingDestinations = isErrorDestinations && localETLSetupError
+  const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
+  const skipRenderingDestinations = isErrorDestinations && isLocalETLNotSetUp
 
   const nodes = useMemo(() => {
     return [

@@ -43,9 +43,9 @@ import { replicationKeys } from '@/data/replication/keys'
 import { fetchReplicationPipelineVersion } from '@/data/replication/pipeline-version-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
-import { ETL_NOT_SET_UP_ERROR } from '@/data/replication/utils'
+import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { DOCS_URL, IS_LOCAL } from '@/lib/constants'
+import { DOCS_URL } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -146,8 +146,8 @@ export const Destinations = () => {
 
   const isLoading = isDestinationsLoading || isDatabasesLoading
 
-  const localETLSetupError = IS_LOCAL && destinationsError?.message.includes(ETL_NOT_SET_UP_ERROR)
-  const hasErrorsFetchingData = (!localETLSetupError && isDestinationsError) || isDatabasesError
+  const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
+  const hasErrorsFetchingData = (!isLocalETLNotSetUp && isDestinationsError) || isDatabasesError
 
   const openDestinationPanel = () => {
     if (!newDestinationDefaultType) return
@@ -273,7 +273,7 @@ export const Destinations = () => {
           />
         )}
 
-        {localETLSetupError && (
+        {isLocalETLNotSetUp && (
           <Admonition
             type="default"
             title="ETL API not set up locally — destinations cannot be managed"

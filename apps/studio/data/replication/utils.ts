@@ -1,7 +1,19 @@
 import { MAX_RETRY_FAILURE_COUNT } from '@/data/query-client'
 import { ResponseError } from '@/types'
 
-export const ETL_NOT_SET_UP_ERROR = 'replication API URL is not configured'
+const isLocal =
+  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' &&
+  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'staging'
+
+export const checkLocalETLNotSetUp = (error: ResponseError | null) => {
+  if (error === null) return false
+
+  const isETLAPINotRunning =
+    error.code === undefined && error.message.includes('API error happened')
+  const isETLNotSetUp =
+    error.code === 503 && error.message.includes('replication API URL is not configured')
+  return isLocal && (isETLAPINotRunning || isETLNotSetUp)
+}
 
 export const checkReplicationFeatureFlagRetry = (
   failureCount: number,
@@ -12,11 +24,9 @@ export const checkReplicationFeatureFlagRetry = (
     error.code === 503 &&
     error.message.includes('feature flag is required')
 
-  const isETLAPINotRunning =
-    error.code === undefined && error.message.includes('API error happened')
-  const isETLNotSetUp = error.code === 503 && error.message.includes(ETL_NOT_SET_UP_ERROR)
+  const isLocalETLNotSetUp = checkLocalETLNotSetUp(error)
 
-  if (isFeatureFlagRequiredError || isETLAPINotRunning || isETLNotSetUp) {
+  if (isFeatureFlagRequiredError || isLocalETLNotSetUp) {
     return false
   }
 
