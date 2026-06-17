@@ -136,7 +136,7 @@ export const Policies = ({
             RLS Policies control per-user access to table rows. Create a table in this schema first
             before creating a policy.
           </p>
-          <Button asChild type="default">
+          <Button asChild variant="default">
             <Link href={`/project/${ref}/editor`}>Create a table</Link>
           </Button>
         </CardContent>

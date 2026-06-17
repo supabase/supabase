@@ -422,13 +422,13 @@ export const MfaAuthSettingsForm = () => {
 
                 <CardFooter className="justify-end space-x-2">
                   {totpForm.formState.isDirty && (
-                    <Button type="default" onClick={() => totpForm.reset()}>
+                    <Button variant="default" onClick={() => totpForm.reset()}>
                       Cancel
                     </Button>
                   )}
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     disabled={!canUpdateConfig || isUpdatingTotpForm || !totpForm.formState.isDirty}
                     loading={isUpdatingTotpForm}
                   >
@@ -569,13 +569,13 @@ export const MfaAuthSettingsForm = () => {
 
                 <CardFooter className="justify-end space-x-2">
                   {phoneForm.formState.isDirty && (
-                    <Button type="default" onClick={() => phoneForm.reset()}>
+                    <Button variant="default" onClick={() => phoneForm.reset()}>
                       Cancel
                     </Button>
                   )}
                   <Button
-                    type={promptProPlanUpgrade ? 'default' : 'primary'}
-                    htmlType="submit"
+                    variant={promptProPlanUpgrade ? 'default' : 'primary'}
+                    type="submit"
                     disabled={
                       !canUpdateConfig ||
                       isUpdatingPhoneForm ||
@@ -658,13 +658,13 @@ export const MfaAuthSettingsForm = () => {
                 )}
                 <CardFooter className="justify-end space-x-2">
                   {securityForm.formState.isDirty && (
-                    <Button type="default" onClick={() => securityForm.reset()}>
+                    <Button variant="default" onClick={() => securityForm.reset()}>
                       Cancel
                     </Button>
                   )}
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     disabled={
                       !canUpdateConfig || isUpdatingSecurityForm || !securityForm.formState.isDirty
                     }

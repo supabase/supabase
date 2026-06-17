@@ -69,7 +69,7 @@ const Error500: NextPage = () => {
         ) : (
           <Button onClick={onClickLogout}>Head back</Button>
         )}
-        <Button type="secondary" asChild>
+        <Button variant="secondary" asChild>
           <SupportLink>Submit a support request</SupportLink>
         </Button>
       </div>

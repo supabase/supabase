@@ -157,7 +157,7 @@ const DiskSizeConfigurationModal = ({
                     You cannot manually expand the disk size any more than {maxDiskSize}GB. If you
                     need more than this, contact us via support for help.
                   </p>
-                  <Button asChild type="default" className="mt-3">
+                  <Button asChild variant="default" className="mt-3">
                     <SupportLink
                       queryParams={{
                         projectRef,
@@ -186,7 +186,7 @@ const DiskSizeConfigurationModal = ({
                               'DD MMM YYYY, HH:mm (ZZ)'
                             )}. You can resize your database again in approximately ${formattedTimeTillNextAvailableResize}`}
                       </div>
-                      <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
+                      <Button asChild variant="default" iconRight={<ExternalLink size={14} />}>
                         <Link href={`${DOCS_URL}/guides/platform/database-size#disk-management`}>
                           Read more about disk management
                         </Link>
@@ -220,13 +220,13 @@ const DiskSizeConfigurationModal = ({
                   </Form>
                 </DialogSection>
                 <DialogFooter>
-                  <Button type="default" onClick={() => hideModal(false)}>
+                  <Button variant="default" onClick={() => hideModal(false)}>
                     Cancel
                   </Button>
                   <Button
                     form={formId}
-                    htmlType="submit"
-                    type="primary"
+                    type="submit"
+                    variant="primary"
                     disabled={!isAbleToResizeDatabase || isUpdatingDiskSize || !isDirty || loading}
                     loading={isUpdatingDiskSize || loading}
                   >
@@ -256,7 +256,7 @@ const DiskSizeConfigurationModal = ({
                   disable your spend cap.
                 </p>
               )}
-              <Button asChild type="default" className="mt-3">
+              <Button asChild variant="default" className="mt-3">
                 <Link
                   href={`/org/${organization?.slug}/billing?panel=${
                     hasAccessToDiskModifications === false ? 'subscriptionPlan' : 'costControl'

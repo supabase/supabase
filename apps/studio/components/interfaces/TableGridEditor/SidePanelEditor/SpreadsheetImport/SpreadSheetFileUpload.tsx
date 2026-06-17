@@ -122,7 +122,7 @@ function FileDetails({ file, parseProgress, removeFile }: FileDetailsProps) {
         <p className="text-sm text-foreground">{file.name}</p>
       </div>
       {parseProgress === 100 ? (
-        <Button type="outline" onClick={removeFile}>
+        <Button variant="outline" onClick={removeFile}>
           Remove File
         </Button>
       ) : (

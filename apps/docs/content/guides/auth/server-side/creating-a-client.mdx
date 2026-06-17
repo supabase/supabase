@@ -609,7 +609,7 @@ export default defineEventHandler(async (event) => {
     }
   )
 
-  await supabase.auth.getUser()
+  await supabase.auth.getClaims()
 
   return { ok: true }
 })

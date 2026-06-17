@@ -96,7 +96,7 @@ export const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainA
             <DocsButton href={`${DOCS_URL}/guides/platform/custom-domains`} />
             <div className="flex items-center space-x-2">
               <Button
-                type="default"
+                variant="default"
                 className="self-end"
                 onClick={onCancelCustomDomain}
                 loading={isDeleting}

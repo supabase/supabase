@@ -14,11 +14,11 @@ const PolicyEditorFooter = ({
 }: PolicyEditorFooterProps) => (
   <DialogFooter>
     {showTemplates && (
-      <Button type="default" onClick={onViewTemplates}>
+      <Button variant="default" onClick={onViewTemplates}>
         View templates
       </Button>
     )}
-    <Button type="primary" onClick={onReviewPolicy}>
+    <Button variant="primary" onClick={onReviewPolicy}>
       Review
     </Button>
   </DialogFooter>

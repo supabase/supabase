@@ -82,7 +82,7 @@ export const ProjectCard = ({
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
-                          type="text"
+                          variant="text"
                           icon={<MoreVertical size={14} />}
                           className="w-6 h-6 px-0"
                           onClick={(e) => {

@@ -40,7 +40,7 @@ const Hero = () => {
                       Start your project
                     </Link>
                   </Button>
-                  <Button asChild size="medium" type="default">
+                  <Button asChild size="medium" variant="default">
                     <Link
                       href="/contact/sales"
                       as="/contact/sales"

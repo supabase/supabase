@@ -173,7 +173,7 @@ export default () => {
       heading: 'Join the community',
       subheading: 'Discover what our community has to say about their Supabase experience.',
       ctas: (
-        <Button asChild type="default" size="small" icon={<IconDiscord />}>
+        <Button asChild variant="default" size="small" icon={<IconDiscord />}>
           <Link
             href={'https://discord.supabase.com/'}
             target="_blank"

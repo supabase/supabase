@@ -69,7 +69,7 @@ export const WorkflowLogs = ({ branch }: WorkflowLogsProps) => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button
-          type="default"
+          variant="default"
           icon={
             showStatusIcon ? (
               <StatusIcon variant={isUnhealthy ? 'destructive' : 'default'} hideBackground />
@@ -145,7 +145,7 @@ export const WorkflowLogs = ({ branch }: WorkflowLogsProps) => {
             <div className="px-4 flex flex-col gap-2 py-2">
               <Button
                 onClick={() => setSelectedWorkflowRun(undefined)}
-                type="text"
+                variant="text"
                 icon={<ArrowLeft />}
                 className="self-start"
               >
