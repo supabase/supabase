@@ -18,7 +18,7 @@
     "clsx": "^2.1.1",
     "h3": "^1.15.10",
     "lucide-vue-next": "^0.562.0",
-    "nuxt": "^4.4.6",
+    "nuxt": "^4.4.7",
     "tailwind-merge": "^3.5.0",
     "vue": "^3.5.35",
     "vue-router": "^4.5.1"
@@ -26,6 +26,6 @@
   "devDependencies": {
     "shadcn": "^3.3.1",
     "tsconfig": "workspace:*",
-    "vite": "^7.3.2"
+    "vite": "^7.3.5"
   }
 }
