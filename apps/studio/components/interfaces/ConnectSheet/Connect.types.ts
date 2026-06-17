@@ -65,6 +65,7 @@ export interface ModeDefinition {
   label: string
   description: string
   icon?: string
+  prompt?: string
   fields: string[] // References to field IDs
 }
 
