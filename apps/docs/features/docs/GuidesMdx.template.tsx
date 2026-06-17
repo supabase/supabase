@@ -10,7 +10,7 @@ import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 import { ExternalLink } from 'lucide-react'
 import { type ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { cn } from 'ui'
+import { cn, Heading } from 'ui'
 
 const EDIT_LINK_SYMBOL = Symbol('edit link')
 interface EditLink {
@@ -97,9 +97,9 @@ const GuideTemplate = ({
             id="sb-docs-guide-main-article"
             className="prose max-w-none"
           >
-            <h1 className="mb-0 [&>p]:m-0">
+            <Heading tag="h1" className="mb-0 [&>p]:m-0">
               <ReactMarkdown>{meta?.title || 'Supabase Docs'}</ReactMarkdown>
-            </h1>
+            </Heading>
             {meta?.subtitle && (
               <h2 className="mt-3 text-xl text-foreground-light">
                 <ReactMarkdown>{meta.subtitle}</ReactMarkdown>

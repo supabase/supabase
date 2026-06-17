@@ -100,6 +100,11 @@ const components = {
   TabPanel,
   InfoTooltip,
   a: MdxAnchor,
+  h1: (props: any) => (
+    <Heading tag="h1" {...props}>
+      {props.children}
+    </Heading>
+  ),
   h2: (props: any) => (
     <Heading tag="h2" {...props}>
       {props.children}

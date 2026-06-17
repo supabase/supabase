@@ -1,6 +1,8 @@
 'use client'
 
 import ReactMarkdown from 'react-markdown'
+import { Heading } from 'ui'
+
 import { useGuide } from './Guide'
 
 interface GuideHeaderProps {
@@ -12,9 +14,9 @@ export function GuideHeader({ className }: GuideHeaderProps) {
 
   return (
     <div className={className}>
-      <h1 className="mb-0 [&>p]:m-0">
+      <Heading tag="h1" className="mb-0 [&>p]:m-0">
         <ReactMarkdown>{meta?.title || 'Supabase Docs'}</ReactMarkdown>
-      </h1>
+      </Heading>
       {meta?.subtitle && (
         <h2 className="mt-3 text-xl text-foreground-light">
           <ReactMarkdown>{meta.subtitle}</ReactMarkdown>
