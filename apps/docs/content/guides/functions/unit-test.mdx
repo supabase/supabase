@@ -5,161 +5,469 @@ description: 'Writing Unit Tests for Edge Functions using Deno Test'
 subtitle: 'Writing Unit Tests for Edge Functions using Deno Test'
 ---
 
-Testing is an essential step in the development process to ensure the correctness and performance of your Edge Functions.
+# Testing your Edge Functions
+
+Testing is an essential step in the development process to ensure the correctness, reliability, and performance of your Edge Functions. Because Edge Functions often combine HTTP handling, authentication, database access, and business logic, a good testing strategy gives you fast feedback and high confidence before deploying to production.
+
+In this guide you will learn how to write:
+
+- **Unit tests** for pure business logic (pricing rules, calculations, etc.)
+- **Integration tests** for the full Edge Function by mocking at the network layer
+
+The examples and patterns shown here come directly from the reference implementation in the [play.supabase.unit-tests](https://github.com/kallebysantos/play.supabase.unit-tests) repository and follow the same approaches used internally by Supabase's Edge Functions team.
+
+Deno ships with a fast, native test runner and excellent mocking utilities in `@std/testing`. See the [official Deno testing documentation](https://docs.deno.com/runtime/manual/basics/testing/) for more background.
 
 ---
 
-## Testing in Deno
+## The example scenario
 
-Deno has a built-in test runner that you can use for testing JavaScript or TypeScript code. You can read the [official documentation](https://docs.deno.com/runtime/manual/basics/testing/) for more information and details about the available testing functions.
+We will use a realistic Edge Function called `process-ticket` that calculates the final price of a ticket based on the authenticated user's age (loaded from the `profiles` table).
+
+**Business rules:**
+
+- Children aged 8 and under → free (`0`)
+- Young people aged 9–17 → 20% discount
+- Adults aged 18 and over → full price
+
+The function receives a JSON payload with a `price` field and returns `{ result: finalPrice }`.
+
+This example demonstrates common real-world requirements:
+- Request validation
+- Authenticated database access via `withSupabase`
+- Business rule application
+- Proper error handling
 
 ---
 
-## Folder structure
+## Recommended project structure
 
-We recommend creating your testing in a `supabase/functions/tests` directory, using the same name as the Function followed by `-test.ts`:
+```
+supabase/
+├── functions/
+│   ├── _shared/
+│   │   └── types.ts                 # Database types
+│   ├── process-ticket/
+│   │   ├── index.ts                 # Edge Function (uses withSupabase)
+│   │   └── pricing.ts               # Pure business logic (co-located)
+│   └── tests/
+│       ├── utils/
+│       │   └── supabase_env.ts      # Test helpers (env + JWT)
+│       └── process-ticket/
+│           ├── pricing.test.ts      # Unit tests for pricing
+│           └── index.test.ts        # Integration tests with fetch mocking
+├── config.toml
+└── deno.json
+```
+
+> **Note:** In this reference implementation the pricing logic lives inside the function folder (`process-ticket/pricing.ts`). You can also move it to `_shared/` if you want to reuse it across multiple functions.
+
+See the [Development Environment](/docs/guides/functions/development-environment) and [Managing dependencies](/docs/guides/functions/dependencies) guides for recommended `deno.json` and editor setup.
+
+---
+
+## Unit tests: testing pure business logic
+
+The pricing rules are pure functions with no side effects, so they are perfect candidates for fast, isolated unit tests.
+
+### The pricing module (`process-ticket/pricing.ts`)
+
+```ts
+// supabase/functions/process-ticket/pricing.ts
+export const AGE_TIERS = {
+  CHILDREN: 1,      // free access
+  YOUNG: 0.20,      // 20% off (ages 9-17)
+  ADULT: 0,         // no discount
+};
+
+export function getAgeDiscount(age: number) {
+  if (age <= 8) {
+    return AGE_TIERS.CHILDREN;
+  }
+
+  if (age > 8 && age < 18) {
+    return AGE_TIERS.YOUNG;
+  }
+
+  return AGE_TIERS.ADULT;
+}
+
+export function applyTicketDiscount(price: number, age: number) {
+  const discount = getAgeDiscount(age);
+  return price - price * discount;
+}
+```
+
+### Unit tests (`tests/process-ticket/pricing.test.ts`)
+
+The reference implementation uses the BDD-style API from `@std/testing/bdd`:
+
+```ts
+// supabase/functions/tests/process-ticket/pricing.test.ts
+import { describe, it } from "jsr:@std/testing/bdd";
+import { assertEquals } from "jsr:@std/assert";
+
+import {
+  AGE_TIERS,
+  applyTicketDiscount,
+  getAgeDiscount,
+} from "../../process-ticket/pricing.ts";
+
+describe("getAgeDiscount", () => {
+  it("should return valid discount for children", () => {
+    const ages = [0, 5, 8];
+    ages.forEach((age) => {
+      const discount = getAgeDiscount(age);
+      assertEquals(discount, AGE_TIERS.CHILDREN);
+    });
+  });
+
+  it("should return valid discount for young people (9-17)", () => {
+    const ages = [9, 12, 17];
+    ages.forEach((age) => {
+      const discount = getAgeDiscount(age);
+      assertEquals(discount, AGE_TIERS.YOUNG);
+    });
+  });
+
+  it("should return valid discount for adults", () => {
+    const ages = [18, 35, 80];
+    ages.forEach((age) => {
+      const discount = getAgeDiscount(age);
+      assertEquals(discount, AGE_TIERS.ADULT);
+    });
+  });
+});
+
+describe("applyTicketDiscount", () => {
+  it("kids have free access", () => {
+    const price = applyTicketDiscount(10, 8);
+    assertEquals(price, 0);
+  });
+
+  it("young people get 20% off", () => {
+    const ages = [9, 12, 17];
+    ages.forEach((age) => {
+      const price = applyTicketDiscount(10, age);
+      assertEquals(price, 8); // 10 - 20% = 8
+    });
+  });
+
+  it("adults pay full price", () => {
+    const ages = [18, 35, 80];
+    ages.forEach((age) => {
+      const price = applyTicketDiscount(10, age);
+      assertEquals(price, 10);
+    });
+  });
+});
+```
+
+Run the unit tests:
 
 ```bash
-└── supabase
-    ├── functions
-    │   ├── function-one
-    │   │   └── index.ts
-    │   └── function-two
-    │   │   └── index.ts
-    │   └── tests
-    │       └── function-one-test.ts  # Tests for function-one
-    │       └── function-two-test.ts  # Tests for function-two
-    └── config.toml
+deno test supabase/functions/tests/process-ticket/pricing.test.ts
 ```
+
+These tests run in milliseconds and give you immediate safety when changing discount rules.
 
 ---
 
-## Example
+## Integration tests: testing the full Edge Function
 
-The following script is a good example to get started with testing your Edge Functions:
+The reference implementation uses a powerful pattern: **mocking `globalThis.fetch`** to intercept the Supabase REST calls made by the Edge Function. This approach requires **zero changes** to your production code for testability.
 
-```typescript function-one-test.ts
-// Import required libraries and modules
-import { assert, assertEquals } from 'jsr:@std/assert@1'
-import { createClient, SupabaseClient } from 'npm:@supabase/supabase-js@2'
+### The Edge Function (`process-ticket/index.ts`)
 
-// Will load the .env file to Deno.env
-import 'jsr:@std/dotenv/load'
+```ts
+// supabase/functions/process-ticket/index.ts
+import "@supabase/functions-js/edge-runtime.d.ts";
+import { withSupabase } from "@supabase/server";
+import { Database } from "../_shared/types.ts";
+import { applyTicketDiscount } from "./pricing.ts";
 
-// Set up the configuration for the Supabase client
-const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
-const supabaseKey = Deno.env.get('SUPABASE_PUBLISHABLE_KEY') ?? ''
-const options = {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false,
-    detectSessionInUrl: false,
+console.log("Hello from Functions!");
+
+export type Payload = {
+  price: number;
+};
+
+export default {
+  fetch: withSupabase<Database>({ auth: ["user"] }, async (req, ctx) => {
+    const { price } = await req.json() as Payload;
+    if (!price) {
+      return Response.json({ error: "missing price field" }, { status: 400 });
+    }
+
+    const { data, error: getAgeError } = await ctx.supabase
+      .from("profiles")
+      .select("age")
+      .limit(1)
+      .single();
+
+    if (getAgeError || !Number.isInteger(data.age)) {
+      return Response.json({ error: "could not process" }, { status: 500 });
+    }
+
+    const result = applyTicketDiscount(price, data.age);
+
+    return Response.json({ result });
+  }),
+} satisfies Deno.ServeDefaultExport;
+```
+
+Key points:
+- Uses the high-level `withSupabase` helper from `@supabase/server`
+- Automatically provides an authenticated `ctx.supabase` client
+- Business logic is delegated to the co-located `pricing.ts`
+
+### Integration test setup (`tests/utils/supabase_env.ts`)
+
+This helper sets up a mock Supabase environment and generates valid RS256 JWTs for authenticated requests:
+
+```ts
+// supabase/functions/tests/utils/supabase_env.ts
+import {
+  exportJWK,
+  generateKeyPair,
+  GenerateKeyPairResult,
+  SignJWT,
+} from "jsr:@panva/jose@6";
+
+const jwk: GenerateKeyPairResult = await generateKeyPair("RS256");
+const publicJwk = await exportJWK(jwk.publicKey);
+publicJwk.alg = "RS256";
+publicJwk.use = "sig";
+
+export const env = {
+  url: "http://mocksupabase",
+  publishableKeys: { default: "sb_publishable_xy" },
+  secretKeys: { default: "sb_secret_xy" },
+  jwks: {
+    keys: [publicJwk],
   },
+};
+
+export function exportEnv() {
+  Deno.env.set("SUPABASE_URL", env.url);
+  Deno.env.set(
+    "SUPABASE_PUBLISHABLE_KEYS",
+    JSON.stringify(env.publishableKeys),
+  );
+  Deno.env.set("SUPABASE_SECRET_KEYS", JSON.stringify(env.secretKeys));
+  Deno.env.set("SUPABASE_JWKS", JSON.stringify(env.jwks));
 }
 
-// Test the creation and functionality of the Supabase client
-const testClientCreation = async () => {
-  var client: SupabaseClient = createClient(supabaseUrl, supabaseKey, options)
-
-  // Verify if the Supabase URL and key are provided
-  if (!supabaseUrl) throw new Error('supabaseUrl is required.')
-  if (!supabaseKey) throw new Error('supabaseKey is required.')
-
-  // Test a query to the database
-  const { data: table_data, error: table_error } = await client
-    .from('my_table')
-    .select('*')
-    .limit(1)
-  if (table_error) {
-    throw new Error('Invalid Supabase client: ' + table_error.message)
-  }
-  assert(table_data, 'Data should be returned from the query.')
-}
-
-// Test the 'hello-world' function
-const testHelloWorld = async () => {
-  var client: SupabaseClient = createClient(supabaseUrl, supabaseKey, options)
-
-  // Invoke the 'hello-world' function with a parameter
-  const { data: func_data, error: func_error } = await client.functions.invoke('hello-world', {
-    body: { name: 'bar' },
+export async function generateUserToken() {
+  const token = await new SignJWT({
+    sub: "user-123",
+    role: "authenticated",
+    email: "test@example.com",
   })
+    .setProtectedHeader({ alg: "RS256" })
+    .setIssuedAt()
+    .setExpirationTime("1h")
+    .sign(jwk.privateKey);
 
-  // Check for errors from the function invocation
-  if (func_error) {
-    throw new Error('Invalid response: ' + func_error.message)
-  }
-
-  // Log the response from the function
-  console.log(JSON.stringify(func_data, null, 2))
-
-  // Assert that the function returned the expected result
-  assertEquals(func_data.message, 'Hello bar!')
+  return token;
 }
-
-// Register and run the tests
-Deno.test('Client Creation Test', testClientCreation)
-Deno.test('Hello-world Function Test', testHelloWorld)
 ```
 
-This test case consists of two parts.
+### Full integration tests (`tests/process-ticket/index.test.ts`)
 
-1. The first part tests the client library and verifies that the database can be connected to and returns values from a table (`my_table`).
-2. The second part tests the edge function and checks if the received value matches the expected value. Here's a brief overview of the code:
-   - We import various testing functions from the Deno standard library, including `assert`, `assertExists`, and `assertEquals`.
-   - We import the `createClient` and `SupabaseClient` classes from the `@supabase/supabase-js` library to interact with the Supabase client.
-   - We define the necessary configuration for the Supabase client, including the Supabase URL, API key, and authentication options.
-   - The `testClientCreation` function tests the creation of a Supabase client instance and queries the database for data from a table. It verifies that data is returned from the query.
-   - The `testHelloWorld` function tests the "Hello-world" Edge Function by invoking it using the Supabase client's `functions.invoke` method. It checks if the response message matches the expected greeting.
-   - We run the tests using the `Deno.test` function, providing a descriptive name for each test case and the corresponding test function.
+```ts
+// supabase/functions/tests/process-ticket/index.test.ts
+import { afterEach, beforeEach, describe, it } from "jsr:@std/testing/bdd";
+import { assertSpyCalls, spy } from "jsr:@std/testing/mock";
+import { assertEquals } from "jsr:@std/assert";
 
-<Admonition type="note">
+import EdgeFunction from "../../process-ticket/index.ts";
+import { env, exportEnv, generateUserToken } from "../utils/supabase_env.ts";
 
-Make sure to replace the placeholders (`supabaseUrl`, `supabaseKey`, `my_table`) with the actual values relevant to your Supabase setup.
+const FUNCTION_URL = `${env.url}/functions/v1/process-ticket`;
 
-</Admonition>
+function mockTableRequest(restQuery: string, result: object, status = 200) {
+  return spy(
+    async (input: RequestInfo | URL): Promise<Response> => {
+      const url = input.toString();
+      if (url === `${env.url}/rest/v1/${restQuery}`) {
+        const res = Response.json(result, { status });
+        return await Promise.resolve(res);
+      }
+      return await Promise.resolve(new Response(null, { status: 404 }));
+    },
+  );
+}
+
+describe("requests for /process-ticket endpoint", () => {
+  const originalFetch = globalThis.fetch;
+  const originalEnv = Deno.env;
+  const mockEnv = new Map<string, string>();
+
+  beforeEach(() => {
+    // @ts-ignore
+    Deno.env = {
+      has: (key) => mockEnv.has(key),
+      get: (key) => mockEnv.get(key),
+      set: (key, value) => mockEnv.set(key, value),
+      delete: (key) => mockEnv.delete(key),
+      toObject: () => Object.fromEntries(mockEnv),
+    } satisfies Deno.Env;
+
+    mockEnv.clear();
+    exportEnv();
+  });
+
+  afterEach(() => {
+    // @ts-ignore
+    Deno.env = originalEnv;
+    globalThis.fetch = originalFetch;
+  });
+
+  it("should return the correct price based on user age", async () => {
+    const expects = [
+      { age: 8, result: 0 },   // Free
+      { age: 15, result: 8 },  // 20% off
+      { age: 18, result: 10 }, // No discount
+    ];
+
+    for (const { age, result } of expects) {
+      const token = await generateUserToken();
+
+      const req = new Request(FUNCTION_URL, {
+        method: "POST",
+        headers: {
+          "apikey": env.publishableKeys.default,
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({ price: 10 }),
+      });
+
+      const mockProfiles = mockTableRequest("profiles?select=age&limit=1", { age });
+      globalThis.fetch = mockProfiles;
+
+      const res = await EdgeFunction.fetch(req);
+
+      assertEquals(res.status, 200);
+      assertEquals(await res.json(), { result });
+      assertSpyCalls(mockProfiles, 1);
+    }
+  });
+
+  it("should return 400 when price is missing", async () => {
+    const token = await generateUserToken();
+    const req = new Request(FUNCTION_URL, {
+      method: "POST",
+      headers: {
+        "apikey": env.publishableKeys.default,
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify({}),
+    });
+
+    const res = await EdgeFunction.fetch(req);
+    assertEquals(res.status, 400);
+    assertEquals(await res.json(), { error: "missing price field" });
+  });
+
+  it("should return 500 when age is missing or invalid", async () => {
+    const token = await generateUserToken();
+    const req = new Request(FUNCTION_URL, {
+      method: "POST",
+      headers: {
+        "apikey": env.publishableKeys.default,
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify({ price: 15 }),
+    });
+
+    const mockProfiles = mockTableRequest("profiles?select=age&limit=1", {});
+    globalThis.fetch = mockProfiles;
+
+    const res = await EdgeFunction.fetch(req);
+    assertEquals(res.status, 500);
+    assertEquals(await res.json(), { error: "could not process" });
+  });
+
+  it("should handle database errors gracefully", async () => {
+    const token = await generateUserToken();
+    const req = new Request(FUNCTION_URL, {
+      method: "POST",
+      headers: {
+        "apikey": env.publishableKeys.default,
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify({ price: 15 }),
+    });
+
+    const mockProfiles = mockTableRequest(
+      "profiles?select=age&limit=1",
+      { code: "PGRST303", message: "JWT expired" },
+      401
+    );
+    globalThis.fetch = mockProfiles;
+
+    const res = await EdgeFunction.fetch(req);
+    assertEquals(res.status, 500);
+    assertEquals(await res.json(), { error: "could not process" });
+  });
+});
+```
+
+Run the integration tests:
+
+```bash
+deno test supabase/functions/tests/process-ticket/index.test.ts --allow-env
+```
 
 ---
 
-## Running Edge Functions locally
+## Why this mocking approach is powerful
 
-To locally test and debug Edge Functions, use the Supabase CLI to run Edge Functions locally:
+By mocking `globalThis.fetch`, you:
+- Test the **real** Edge Function code path (no dependency injection needed in production code)
+- Simulate database responses, auth failures, network errors, etc.
+- Keep your production Edge Function clean and focused
+- Still get fast, deterministic tests that don't require a running Supabase instance
 
-1. Ensure that the Supabase server is running by executing the following command:
+This pattern is especially useful when using higher-level helpers like `withSupabase` that create the Supabase client internally.
 
-   ```bash
-   supabase start
-   ```
+---
 
-2. In your terminal, use the following command to serve the Edge Functions locally:
+## Running all tests
 
-   ```bash
-   supabase functions serve
-   ```
+Add to your `deno.json`:
 
-   This command starts a local server that runs your Edge Functions, enabling you to test and debug them in a development environment.
+```json
+{
+  "tasks": {
+    "test": "deno test supabase/functions/tests/ --allow-env"
+  }
+}
+```
 
-3. Create the environment variables file:
+Then:
 
-   ```bash
-   # creates the file
-   touch .env
-   # adds the SUPABASE_URL secret
-   echo "SUPABASE_URL=http://localhost:54321" >> .env
-   # adds the SUPABASE_PUBLISHABLE_KEY secret
-   echo "SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0" >> .env
-   # Alternatively, you can open it in your editor:
-   open .env
-   ```
+```bash
+deno task test
+```
 
-4. To run the tests, use the following command in your terminal:
+---
 
-   ```bash
-   deno test --allow-all supabase/functions/tests/function-one-test.ts
-   ```
+## Best practices demonstrated in this guide
+
+- Keep pure business logic in separate modules (even if co-located with the function)
+- Use `withSupabase` + typed `Database` for clean, authenticated access
+- Prefer mocking at the `fetch` boundary for integration tests when you don't want to modify production code
+- Use `@std/testing/bdd` + `@std/testing/mock` for expressive, maintainable tests
+- Generate realistic JWTs in tests when your function relies on authenticated Supabase clients
+- Test both happy paths and error conditions (missing input, DB failures, invalid data)
 
 ---
 
 ## Resources
 
-- Full guide on Testing Supabase Edge Functions on [Mansueli's tips](https://blog.mansueli.com/testing-supabase-edge-functions-with-deno-test)
+- Explore the full reference implementation: [github.com/kallebysantos/play.supabase.unit-tests](https://github.com/kallebysantos/play.supabase.unit-tests)
+- Read the [Deno testing guide](https://docs.deno.com/runtime/manual/basics/testing/)
+- Learn more about [`withSupabase` and `@supabase/server`](https://supabase.com/docs)
+- See the other Edge Functions guides: [Development Environment](/docs/guides/functions/development-environment), [Managing dependencies](/docs/guides/functions/dependencies), [Deploy to Production](/docs/guides/functions/deploy)
