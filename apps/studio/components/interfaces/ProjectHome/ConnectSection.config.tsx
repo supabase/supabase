@@ -25,7 +25,7 @@ export const CONNECT_ACTIONS: ConnectAction[] = [
     id: 'server',
     mode: 'server',
     heading: 'Server',
-    subheading: '@supabase/server',
+    subheading: 'Build APIs',
     icon: <Server size={16} strokeWidth={1.5} />,
   },
   {
