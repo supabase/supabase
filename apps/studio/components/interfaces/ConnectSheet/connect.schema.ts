@@ -239,7 +239,7 @@ export const connectSchema: ConnectSchema = {
     {
       id: 'server',
       label: 'Server',
-      description: '@supabase/server',
+      description: 'Build APIs',
       fields: [],
       prompt: serverConnectPrompt,
     },
