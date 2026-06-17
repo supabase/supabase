@@ -266,7 +266,7 @@ export function UnansweredThreadsTable({
             return (
               <Button
                 key={tab.id}
-                type={isActive ? 'default' : 'dashed'}
+                variant={isActive ? 'default' : 'dashed'}
                 size="tiny"
                 onClick={() => handleTabChange(tab.id)}
                 icon={
@@ -307,7 +307,7 @@ export function UnansweredThreadsTable({
             />
             {searchInput && (
               <Button
-                type="text"
+                variant="text"
                 size="tiny"
                 icon={<X className="h-4 w-4" />}
                 onClick={handleClearSearch}
@@ -322,7 +322,7 @@ export function UnansweredThreadsTable({
             allProductAreas={allProductAreas}
             allStacks={allStacks}
             trigger={
-              <Button type="default" icon={<Filter size={12} />}>
+              <Button variant="default" icon={<Filter size={12} />}>
                 <span className="flex items-center gap-2">
                   Filters
                   {activeFilterCount > 0 && (
@@ -340,7 +340,7 @@ export function UnansweredThreadsTable({
       {hasMore && (
         <div className="flex justify-center mt-4">
           <Button
-            type="default"
+            variant="default"
             size="tiny"
             onClick={handleLoadMore}
             loading={isLoadingMore}

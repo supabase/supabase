@@ -167,7 +167,7 @@ export const ReportBlock = ({
           isWriteQuery={isWriteQuery}
           actions={
             <ButtonTooltip
-              type="text"
+              variant="text"
               icon={<X />}
               className="w-7 h-7"
               onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
@@ -187,7 +187,7 @@ export const ReportBlock = ({
           actions={
             !disableUpdate ? (
               <ButtonTooltip
-                type="text"
+                variant="text"
                 icon={<X />}
                 className="h-7 w-7"
                 onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
@@ -203,7 +203,7 @@ export const ReportBlock = ({
           actions={
             !disableUpdate ? (
               <ButtonTooltip
-                type="text"
+                variant="text"
                 icon={<X />}
                 className="w-7 h-7"
                 onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
@@ -226,7 +226,7 @@ export const ReportBlock = ({
           actions={
             !disableUpdate ? (
               <ButtonTooltip
-                type="text"
+                variant="text"
                 icon={<X />}
                 className="w-7 h-7"
                 onClick={() => onRemoveChart({ metric: { key: item.attribute } })}

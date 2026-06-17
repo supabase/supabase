@@ -20,7 +20,7 @@ export const SqlRunButton = ({
     <Button
       onClick={onClick}
       disabled={isDisabled}
-      type="primary"
+      variant="primary"
       size="tiny"
       data-testid="sql-run-button"
       iconRight={

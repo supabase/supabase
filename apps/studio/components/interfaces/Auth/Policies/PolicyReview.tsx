@@ -54,10 +54,15 @@ export const PolicyReview = ({
         </div>
       </DialogSection>
       <DialogFooter>
-        <Button type="default" onClick={onSelectBack}>
+        <Button variant="default" onClick={onSelectBack}>
           Back to edit
         </Button>
-        <Button type="primary" disabled={isEmpty(policy)} onClick={onSavePolicy} loading={isSaving}>
+        <Button
+          variant="primary"
+          disabled={isEmpty(policy)}
+          onClick={onSavePolicy}
+          loading={isSaving}
+        >
           Save policy
         </Button>
       </DialogFooter>

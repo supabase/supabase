@@ -139,12 +139,12 @@ export const AccountIdentities = () => {
                     </div>
                     <div className="flex items-center gap-x-1">
                       {provider === 'email' && (
-                        <Button asChild type="default">
+                        <Button asChild variant="default">
                           <Link href="/reset-password?type=change">Change password</Link>
                         </Button>
                       )}
                       <ButtonTooltip
-                        type="text"
+                        variant="text"
                         icon={<Edit />}
                         className="w-7"
                         onClick={() => setSelectedProviderUpdateEmail(provider)}
@@ -152,7 +152,7 @@ export const AccountIdentities = () => {
                       />
                       {identities.length > 1 && (
                         <ButtonTooltip
-                          type="text"
+                          variant="text"
                           icon={<Unlink />}
                           className="w-7"
                           onClick={() => setSelectedProviderUnlink(provider)}

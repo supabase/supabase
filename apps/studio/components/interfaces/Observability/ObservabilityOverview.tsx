@@ -168,7 +168,7 @@ export const ObservabilityOverview = () => {
             label="Refresh report"
             side="bottom"
           >
-            <Button type="outline" icon={<RefreshCw size={14} />} onClick={handleRefresh}>
+            <Button variant="outline" icon={<RefreshCw size={14} />} onClick={handleRefresh}>
               Refresh
             </Button>
           </ShortcutTooltip>

@@ -260,7 +260,7 @@ export const InviteMemberButton = () => {
           tooltipOpen={isOpen ? false : undefined}
         >
           <ButtonTooltip
-            type="primary"
+            variant="primary"
             disabled={!canInviteMembers}
             icon={<UserPlus size={14} />}
             className="pointer-events-auto grow md:grow-0"
@@ -467,7 +467,7 @@ export const InviteMemberButton = () => {
           </Form>
         </SheetSection>
         <SheetFooter>
-          <Button type="default" onClick={confirmOnClose}>
+          <Button variant="default" onClick={confirmOnClose}>
             Cancel
           </Button>
           <Shortcut
@@ -477,9 +477,9 @@ export const InviteMemberButton = () => {
             side="top"
           >
             <Button
-              type="primary"
+              variant="primary"
               form="organization-invitation"
-              htmlType="submit"
+              type="submit"
               loading={isInviting}
             >
               {emailCount >= 2 ? 'Send invitations' : 'Send invitation'}

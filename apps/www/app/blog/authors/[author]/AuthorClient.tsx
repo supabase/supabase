@@ -117,7 +117,7 @@ export default function AuthorClient({ author, authorId, blogs }: AuthorClientPr
               </InputGroup>
             </div>
             <Button
-              type="default"
+              variant="default"
               title={isList ? 'Grid View' : 'List View'}
               onClick={handleViewSelection}
               className="h-full p-2 text-foreground-light"

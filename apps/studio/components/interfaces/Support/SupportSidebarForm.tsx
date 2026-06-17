@@ -132,7 +132,7 @@ export function SupportFormStatusButton() {
       <TooltipTrigger asChild>
         <Button
           asChild
-          type="default"
+          variant="default"
           size="tiny"
           icon={
             isLoading ? (

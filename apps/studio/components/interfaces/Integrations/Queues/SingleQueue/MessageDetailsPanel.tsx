@@ -89,7 +89,7 @@ export const MessageDetailsPanel = ({
       className="bg-studio border-t pointer-events-auto"
     >
       <Button
-        type="text"
+        variant="text"
         className="absolute top-3 right-3 px-1"
         icon={<X />}
         onClick={() => setSelectedMessage(null)}
@@ -172,7 +172,7 @@ export const MessageDetailsPanel = ({
                     icon: <Archive />,
                     text: 'Archive',
                     isLoading: isLoadingArchive,
-                    type: 'warning',
+                    variant: 'warning',
                     onClick: () => {
                       archiveMessage({
                         projectRef: project!.ref,
@@ -197,7 +197,7 @@ export const MessageDetailsPanel = ({
                   button={{
                     icon: <Trash2 />,
                     text: 'Delete',
-                    type: 'danger',
+                    variant: 'danger',
                     isLoading: isLoadingDelete,
                     onClick: () => {
                       deleteMessage({

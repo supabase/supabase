@@ -21,7 +21,7 @@ export function CopyButton({ value, className, src, ...props }: CopyButtonProps)
   return (
     <Button
       size="small"
-      type="outline"
+      variant="outline"
       className={cn(
         'relative z-10 h-6 w-6 text-foreground-muted hover:bg-surface-100 hover:text-foreground p-0',
         className

@@ -90,7 +90,7 @@ export const DatabaseSelector = ({
             </span>
           )}
           <Button
-            type="default"
+            variant="default"
             icon={isLoading && <Loader2 className="animate-spin" />}
             iconRight={<ChevronDown strokeWidth={1.5} size={12} />}
             {...buttonProps}

@@ -288,7 +288,7 @@ export const RealtimeSettings = () => {
                                       table. No messages will be received by users.
                                     </p>
 
-                                    <Button asChild type="default" className="mt-2">
+                                    <Button asChild variant="default" className="mt-2">
                                       <Link href={`/project/${projectRef}/realtime/policies`}>
                                         Create policy
                                       </Link>
@@ -552,13 +552,13 @@ export const RealtimeSettings = () => {
                 </div>
                 <div className="flex items-center gap-x-2">
                   {form.formState.isDirty && (
-                    <Button type="default" onClick={() => form.reset(data as any)}>
+                    <Button variant="default" onClick={() => form.reset(data as any)}>
                       Cancel
                     </Button>
                   )}
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     form={formId}
                     disabled={!canUpdateConfig || isUpdatingConfig || !form.formState.isDirty}
                     loading={isUpdatingConfig}
