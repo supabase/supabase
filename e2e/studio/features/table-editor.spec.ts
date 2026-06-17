@@ -564,7 +564,6 @@ testRunner('table editor', () => {
     await page.getByRole('button', { name: 'Sorted by 1 rule' }).click()
 
     // Verify sorted row content asc lexicographically for strings
-    await page.waitForTimeout(500)
     await expect(page.getByRole('gridcell').nth(3)).toHaveText('123')
     await expect(page.getByRole('gridcell').nth(8)).toHaveText('456')
     await expect(page.getByRole('gridcell').nth(13)).toHaveText('789')
