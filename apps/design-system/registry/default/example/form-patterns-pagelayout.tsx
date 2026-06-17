@@ -670,7 +670,7 @@ export default function FormPatternsPageLayout() {
                   <FormField
                     control={form.control}
                     name="expiryDate"
-                    render={({ field }) => (
+                    render={({ field, fieldState }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
                         label="Date Picker"
@@ -679,7 +679,7 @@ export default function FormPatternsPageLayout() {
                         <FormControl>
                           <DatePicker>
                             <DatePickerTrigger asChild>
-                              <DatePickerButton>
+                              <DatePickerButton isInvalid={fieldState.invalid}>
                                 {field.value ? format(field.value, 'PPP') : 'Pick a date'}
                               </DatePickerButton>
                             </DatePickerTrigger>

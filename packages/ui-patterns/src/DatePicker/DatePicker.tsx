@@ -1,6 +1,6 @@
 import { CalendarIcon } from 'lucide-react'
 import { ComponentProps } from 'react'
-import { Button, cn, Popover, PopoverContent, PopoverTrigger, useFormField } from 'ui'
+import { Button, cn, Popover, PopoverContent, PopoverTrigger } from 'ui'
 
 export const DatePicker = (props: ComponentProps<typeof Popover>) => {
   return <Popover {...props} />
@@ -14,14 +14,17 @@ export const DatePickerTrigger = ({
 }
 
 const DatePickerIcon = <CalendarIcon className="h-4 w-4" />
+
+export type DatePickerButtonProps = ComponentProps<typeof Button> & { isInvalid?: boolean }
+
 export const DatePickerButton = ({
   className,
   variant = 'default',
   block = true,
   icon = DatePickerIcon,
+  isInvalid = false,
   ...props
-}: ComponentProps<typeof Button>) => {
-  const field = useFormField()
+}: DatePickerButtonProps) => {
   return (
     <Button
       variant={variant}
@@ -30,7 +33,7 @@ export const DatePickerButton = ({
         'justify-start text-left font-normal px-3 py-4',
         {
           'bg-destructive-200! border-destructive-400 focus:border-destructive focus-visible:border-destructive focus-visible:outline-amber-700':
-            field.invalid,
+            isInvalid,
         },
         className
       )}

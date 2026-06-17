@@ -672,7 +672,7 @@ export default function FormPatternsSidePanel() {
                 <FormField
                   control={form.control}
                   name="expiryDate"
-                  render={({ field }) => (
+                  render={({ field, fieldState }) => (
                     <FormItemLayout
                       layout="horizontal"
                       label="Date Picker"
@@ -681,7 +681,7 @@ export default function FormPatternsSidePanel() {
                       <FormControl className="col-span-6">
                         <DatePicker>
                           <DatePickerTrigger asChild>
-                            <DatePickerButton>
+                            <DatePickerButton isInvalid={fieldState.invalid}>
                               {field.value ? format(field.value, 'PPP') : 'Pick a date'}
                             </DatePickerButton>
                           </DatePickerTrigger>
