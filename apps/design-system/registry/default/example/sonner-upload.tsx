@@ -60,7 +60,7 @@ export default function SonnerUpload() {
   return (
     <div className="flex flex-col gap-3">
       <Button
-        type="default"
+        variant="default"
         onClick={async () => {
           // random id
           const toastId = Math.random()

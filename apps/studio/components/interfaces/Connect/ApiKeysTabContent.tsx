@@ -66,7 +66,7 @@ export function ApiKeysTabContent({ projectKeys }: { projectKeys: projectKeys })
       <div className="gap-5 lg:grid lg:grid-cols-12">
         <div className="col-start-5 col-span-8 pl-2 flex items-center justify-between">
           <p className="text-xs text-foreground-lighter">For secret keys, see API settings.</p>
-          <Button asChild type="default" icon={<ExternalLink size={14} />}>
+          <Button asChild variant="default" icon={<ExternalLink size={14} />}>
             <Link href={`/project/${projectRef}/settings/api-keys`}>API settings</Link>
           </Button>
         </div>

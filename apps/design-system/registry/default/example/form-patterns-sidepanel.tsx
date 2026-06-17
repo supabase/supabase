@@ -149,7 +149,7 @@ export default function FormPatternsSidePanel() {
 
   return (
     <>
-      <Button type="primary" onClick={() => setOpen(true)}>
+      <Button variant="primary" onClick={() => setOpen(true)}>
         Open form panel
       </Button>
       <Sheet open={open} onOpenChange={setOpen}>
@@ -331,7 +331,7 @@ export default function FormPatternsSidePanel() {
                           </button>
                           <div className="flex gap-2 items-center">
                             <Button
-                              type="default"
+                              variant="default"
                               size="tiny"
                               icon={<Upload size={14} />}
                               onClick={() => uploadButtonRef.current?.click()}
@@ -340,7 +340,7 @@ export default function FormPatternsSidePanel() {
                             </Button>
                             {logoUrl && (
                               <Button
-                                type="default"
+                                variant="default"
                                 size="tiny"
                                 icon={<Trash size={12} />}
                                 onClick={() => {
@@ -446,7 +446,7 @@ export default function FormPatternsSidePanel() {
                                       {file.name}
                                     </span>
                                     <Button
-                                      type="default"
+                                      variant="default"
                                       size="tiny"
                                       icon={<Trash size={12} />}
                                       onClick={() => {
@@ -681,7 +681,7 @@ export default function FormPatternsSidePanel() {
                       <FormControl className="col-span-6">
                         <DatePicker>
                           <DatePickerTrigger asChild>
-                            <DatePickerButton type="default">
+                            <DatePickerButton>
                               {field.value ? format(field.value, 'PPP') : 'Pick a date'}
                             </DatePickerButton>
                           </DatePickerTrigger>
@@ -771,13 +771,13 @@ export default function FormPatternsSidePanel() {
                 >
                   <div className="col-span-6 flex gap-2 items-center">
                     <Button
-                      type="default"
+                      variant="default"
                       icon={<ExternalLink size={14} />}
                       onClick={() => console.log('Action performed')}
                     >
                       View documentation
                     </Button>
-                    <Button type="default" onClick={() => console.log('Reset action')}>
+                    <Button variant="default" onClick={() => console.log('Reset action')}>
                       Reset API key
                     </Button>
                   </div>
@@ -787,7 +787,7 @@ export default function FormPatternsSidePanel() {
           </Form>
           <SheetFooter>
             <Button
-              type="default"
+              variant="default"
               onClick={() => {
                 form.reset()
                 setOpen(false)
@@ -795,7 +795,7 @@ export default function FormPatternsSidePanel() {
             >
               Cancel
             </Button>
-            <Button type="primary" form={formId} htmlType="submit">
+            <Button variant="primary" form={formId} type="submit">
               Create
             </Button>
           </SheetFooter>

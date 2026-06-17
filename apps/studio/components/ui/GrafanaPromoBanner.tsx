@@ -53,7 +53,7 @@ const GrafanaBannerActions = ({ className }: { className?: string }) => {
 
   return (
     <div className={cn('flex gap-2', className)}>
-      <Button type="outline" className="bg-alternative" size="tiny" icon={<BookOpen />} asChild>
+      <Button variant="outline" className="bg-alternative" size="tiny" icon={<BookOpen />} asChild>
         <Link
           href={`${DOCS_URL}/guides/telemetry/metrics`}
           target="_blank"
@@ -62,7 +62,7 @@ const GrafanaBannerActions = ({ className }: { className?: string }) => {
           Docs
         </Link>
       </Button>
-      <Button type="default" size="tiny" asChild>
+      <Button variant="default" size="tiny" asChild>
         <Link
           href="https://github.com/supabase/supabase-grafana"
           target="_blank"

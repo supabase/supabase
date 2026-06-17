@@ -114,7 +114,7 @@ export default function Home() {
                                       {course.chapters} chapters
                                     </span>
                                   </div>
-                                  <Button type="text" size="small" asChild>
+                                  <Button variant="text" size="small" asChild>
                                     <Link href="/...">Start course ➔</Link>
                                   </Button>
                                 </div>

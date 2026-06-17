@@ -77,12 +77,12 @@ export function AppsList({ onCreateApp, createShortcutId }: AppsListProps) {
         >
           {createShortcutId ? (
             <Shortcut id={createShortcutId} onTrigger={onCreateApp} side="bottom">
-              <Button type="primary" icon={<Plus size={14} />} onClick={onCreateApp}>
+              <Button variant="primary" icon={<Plus size={14} />} onClick={onCreateApp}>
                 Create app
               </Button>
             </Shortcut>
           ) : (
-            <Button type="primary" icon={<Plus size={14} />} onClick={onCreateApp}>
+            <Button variant="primary" icon={<Plus size={14} />} onClick={onCreateApp}>
               Create app
             </Button>
           )}

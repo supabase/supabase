@@ -1,4 +1,4 @@
-import { ArrowUpRight, BookOpen } from 'lucide-react'
+import { ArrowUpRight, BookOpen, Gauge, Settings } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { Button, cn } from 'ui'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
@@ -29,18 +29,20 @@ export const MarketplaceDetail = () => {
     pageTitle,
     pageSubTitle,
     integration,
+    integrationStatus,
     isInstalled,
     installActionType,
     wrappersTabHref,
     isAvailableLoading,
     isInstalledLoading,
+    isIntegrationStatusLoading,
     Component,
   } = useIntegrationDetail()
 
   if (!isReady) return null
   if (isWrapperBlocked) return <UnknownInterface urlBack={`/project/${ref}/integrations`} />
 
-  if (isAvailableLoading || isInstalledLoading) {
+  if (isAvailableLoading || isInstalledLoading || isIntegrationStatusLoading) {
     return (
       <>
         <MarketplaceDetailBreadrumbs isLoading />
@@ -77,7 +79,7 @@ export const MarketplaceDetail = () => {
       case 'add-wrapper':
         return (
           <AddWrapperButton
-            type="primary"
+            variant="primary"
             onClick={() => {
               if (wrappersTabHref) router.push(`${wrappersTabHref}?new=true`)
             }}
@@ -85,7 +87,7 @@ export const MarketplaceDetail = () => {
         )
       case 'installed':
         return (
-          <Button type="outline" disabled>
+          <Button variant="outline" disabled>
             Installed
           </Button>
         )
@@ -106,9 +108,39 @@ export const MarketplaceDetail = () => {
         isInstalled={isInstalled}
         actions={
           <>
+            {isInstalled && integrationStatus?.partner_links?.dashboard && (
+              <Button
+                variant="text"
+                size="tiny"
+                icon={<Gauge size={13} />}
+                iconRight={<ArrowUpRight size={13} />}
+                asChild
+              >
+                <a
+                  href={integrationStatus.partner_links.dashboard}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Dashboard
+                </a>
+              </Button>
+            )}
+            {isInstalled && integrationStatus?.partner_links?.manage && (
+              <Button
+                variant="text"
+                size="tiny"
+                icon={<Settings size={13} />}
+                iconRight={<ArrowUpRight size={13} />}
+                asChild
+              >
+                <a href={integrationStatus.partner_links.manage} target="_blank" rel="noreferrer">
+                  Manage
+                </a>
+              </Button>
+            )}
             {integration.docsUrl && (
               <Button
-                type="text"
+                variant="text"
                 size="tiny"
                 icon={<BookOpen size={13} />}
                 iconRight={<ArrowUpRight size={13} />}

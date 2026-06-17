@@ -7,7 +7,7 @@ export const IndexAdvisorPopover = () => {
   return (
     <Popover modal={false}>
       <PopoverTrigger asChild>
-        <Button type="default" icon={<Lightbulb strokeWidth={1.5} />}>
+        <Button variant="default" icon={<Lightbulb strokeWidth={1.5} />}>
           Index Advisor
         </Button>
       </PopoverTrigger>

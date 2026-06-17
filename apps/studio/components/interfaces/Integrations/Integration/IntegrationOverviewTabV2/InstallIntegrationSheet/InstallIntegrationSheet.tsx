@@ -214,7 +214,7 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button type="primary">Install integration</Button>
+        <Button variant="primary">Install integration</Button>
       </SheetTrigger>
 
       <Form {...form}>
@@ -261,14 +261,14 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
 
             <SheetFooter>
               <SheetClose asChild>
-                <Button type="default" disabled={isInstalling}>
+                <Button variant="default" disabled={isInstalling}>
                   Cancel
                 </Button>
               </SheetClose>
               <Button
                 form={formId}
-                htmlType="submit"
-                type="primary"
+                type="submit"
+                variant="primary"
                 loading={isInstalling}
                 disabled={hasMissingExtensions}
               >

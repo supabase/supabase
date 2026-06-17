@@ -7,7 +7,7 @@ import {
   isQueueNameValid,
   pgmqQueueTable,
 } from '@/components/interfaces/Integrations/Queues/Queues.utils'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { tableKeys } from '@/data/tables/keys'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 

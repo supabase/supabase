@@ -278,7 +278,7 @@ export const MobileMenu = ({ open, setOpen, menu }: Props) => {
                           })
                         }
                       >
-                        <Button block type="default" asChild>
+                        <Button block variant="default" asChild>
                           <a type={undefined} className="h-10 py-4">
                             Sign in
                           </a>

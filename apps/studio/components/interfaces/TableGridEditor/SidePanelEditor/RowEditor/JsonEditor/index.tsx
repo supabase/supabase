@@ -141,7 +141,7 @@ export const JsonEditor = ({
             <div className="flex items-center gap-x-2">
               {view === 'edit' && (
                 <ButtonTooltip
-                  type="default"
+                  variant="default"
                   icon={<AlignLeft />}
                   className="px-1"
                   onClick={() => prettify()}
@@ -198,7 +198,7 @@ export const JsonEditor = ({
                 performance issues
               </p>
             </div>
-            <Button type="default" loading={isPending} onClick={loadFullValue}>
+            <Button variant="default" loading={isPending} onClick={loadFullValue}>
               Load full JSON data
             </Button>
           </div>

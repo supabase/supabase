@@ -233,7 +233,7 @@ export default function AboutPage() {
               Ready to start contributing?
             </h2>
 
-            <Button asChild type="primary" size="small">
+            <Button asChild variant="primary" size="small">
               <Link
                 href="https://supabase.notion.site/2ce5004b775f80a38acdc3ca5df7b9d3"
                 target="_blank"

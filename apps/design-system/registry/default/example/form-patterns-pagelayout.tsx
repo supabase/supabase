@@ -342,7 +342,7 @@ export default function FormPatternsPageLayout() {
                             </button>
                             <div className="flex gap-2 items-center">
                               <Button
-                                type="default"
+                                variant="default"
                                 size="tiny"
                                 icon={<Upload size={14} />}
                                 onClick={() => uploadButtonRef.current?.click()}
@@ -351,7 +351,7 @@ export default function FormPatternsPageLayout() {
                               </Button>
                               {logoUrl && (
                                 <Button
-                                  type="default"
+                                  variant="default"
                                   size="tiny"
                                   icon={<Trash size={12} />}
                                   onClick={() => {
@@ -455,7 +455,7 @@ export default function FormPatternsPageLayout() {
                                         {file.name}
                                       </span>
                                       <Button
-                                        type="default"
+                                        variant="default"
                                         size="tiny"
                                         icon={<Trash size={12} />}
                                         onClick={() => {
@@ -679,7 +679,7 @@ export default function FormPatternsPageLayout() {
                         <FormControl>
                           <DatePicker>
                             <DatePickerTrigger asChild>
-                              <DatePickerButton type="default">
+                              <DatePickerButton>
                                 {field.value ? format(field.value, 'PPP') : 'Pick a date'}
                               </DatePickerButton>
                             </DatePickerTrigger>
@@ -759,13 +759,13 @@ export default function FormPatternsPageLayout() {
                   >
                     <div className="flex gap-2 items-center justify-end">
                       <Button
-                        type="default"
+                        variant="default"
                         icon={<ExternalLink size={14} />}
                         onClick={() => console.log('Action performed')}
                       >
                         View documentation
                       </Button>
-                      <Button type="default" onClick={() => console.log('Reset action')}>
+                      <Button variant="default" onClick={() => console.log('Reset action')}>
                         Reset API key
                       </Button>
                     </div>
@@ -773,11 +773,11 @@ export default function FormPatternsPageLayout() {
                 </CardContent>
                 <CardFooter className="justify-end space-x-2">
                   {form.formState.isDirty && (
-                    <Button type="default" onClick={() => form.reset()}>
+                    <Button variant="default" onClick={() => form.reset()}>
                       Cancel
                     </Button>
                   )}
-                  <Button type="primary" htmlType="submit" disabled={!form.formState.isDirty}>
+                  <Button variant="primary" type="submit" disabled={!form.formState.isDirty}>
                     Save changes
                   </Button>
                 </CardFooter>

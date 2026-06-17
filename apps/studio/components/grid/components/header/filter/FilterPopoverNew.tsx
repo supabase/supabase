@@ -77,10 +77,10 @@ function DatePickerOption({ onChange, onCancel, search }: CustomOptionProps) {
         className="w-full"
       />
       <div className="flex justify-end gap-2 py-3 px-4 border-t">
-        <Button type="default" onClick={onCancel}>
+        <Button variant="default" onClick={onCancel}>
           Cancel
         </Button>
-        <Button type="primary" onClick={() => onChange(date ? format(date, 'yyyy-MM-dd') : '')}>
+        <Button variant="primary" onClick={() => onChange(date ? format(date, 'yyyy-MM-dd') : '')}>
           Apply
         </Button>
       </div>

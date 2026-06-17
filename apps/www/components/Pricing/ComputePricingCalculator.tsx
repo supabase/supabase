@@ -234,7 +234,7 @@ const ComputePricingCalculator = ({
         <div className="text-right w-full">
           <Button
             size="tiny"
-            type="primary"
+            variant="primary"
             icon={<Plus />}
             onClick={() => {
               if (disableInteractivity) return

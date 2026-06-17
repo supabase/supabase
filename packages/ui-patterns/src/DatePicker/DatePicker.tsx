@@ -16,7 +16,7 @@ export const DatePickerTrigger = ({
 const DatePickerIcon = <CalendarIcon className="h-4 w-4" />
 export const DatePickerButton = ({
   className,
-  type = 'default',
+  variant = 'default',
   block = true,
   icon = DatePickerIcon,
   ...props
@@ -24,7 +24,7 @@ export const DatePickerButton = ({
   const field = useFormField()
   return (
     <Button
-      type={type}
+      variant={variant}
       block={block}
       className={cn(
         'justify-start text-left font-normal px-3 py-4',

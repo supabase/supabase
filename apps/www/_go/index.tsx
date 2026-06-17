@@ -10,6 +10,12 @@ import pgconfDev2026Contest from './events/pgconf-dev-2026/contest'
 import pgconfDev2026ContestThankYou from './events/pgconf-dev-2026/contest-thank-you'
 import postgresconfContest from './events/postgresconf-sjc-2026/contest'
 import postgresconfContestThankYou from './events/postgresconf-sjc-2026/contest-thank-you'
+import selectPartnerDay from './events/select-2026/partner-day'
+import selectPartnerDayThankYou from './events/select-2026/partner-day-thank-you'
+import selectVipDinner from './events/select-2026/vip-dinner'
+import selectVipDinnerThankYou from './events/select-2026/vip-dinner-thank-you'
+import selectVipExperience from './events/select-2026/vip-experience'
+import selectVipExperienceThankYou from './events/select-2026/vip-experience-thank-you'
 import startupGrindContest from './events/startup-grind-2026/contest'
 import stripeSessionsContest from './events/stripe-sessions-2026/contest'
 import stripeExecDinner from './events/stripe-sessions-2026/exec-dinner'
@@ -46,6 +52,12 @@ const pages: GoPageInput[] = [
   datadogDinner, // remove after June 30, 2026
   aiEngineerEuropeContest,
   aiEngineerEuropeContestThankYou,
+  selectVipDinner, // remove after Select 2026
+  selectVipDinnerThankYou, // remove after Select 2026
+  selectVipExperience, // remove after Select 2026
+  selectVipExperienceThankYou, // remove after Select 2026
+  selectPartnerDay, // remove after Select 2026
+  selectPartnerDayThankYou, // remove after Select 2026
   startupGrindContest, // remove after May 31, 2026
   supabaseStripeProjects,
 ]

@@ -733,7 +733,7 @@ export const CHAT_PROMPT = `
 - On execution error, explain succinctly and attempt to correct if possible, validating each outcome briefly (1–2 lines) after execution.
 - If a user skips execution, acknowledge and suggest alternatives.
 - Use markdown code blocks (\`\`\`sql\`\`\`) for illustrative SQL only if requested by the user or when providing non-executable examples.
-- Execute multiple queries separately via \`execute_sql\` and briefly validate outcomes.
+- Never call \`execute_sql\` or \`deploy_edge_function\` in parallel within the same step. Each requires user approval, so issue one per step and wait for its result before calling the next.
 - After execution, summarize outcomes concisely without duplicating results, as the client will present these.
 ## Edge Functions
 - Deploy Edge Functions by calling \`deploy_edge_function\` directly with \`name\` and \`code\`; the client handles confirmation and result presentation.

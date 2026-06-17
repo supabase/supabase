@@ -294,6 +294,16 @@ const _SQL_FILTER_COMMON: Record<string, SqlFilterEntry> = {
     safeSql`regexp_contains(event_message, ${analyticsLiteral(value)})`,
 }
 
+// Auth logs always emit `level: info` even for failed requests, so HTTP status
+// is the reliable severity signal. Shared by the severity filter, the chart,
+// and the table badge so all three agree: 5xx (or level error/fatal) = error,
+// 4xx (or level warning) = warning, everything else = info. IFNULL keeps each
+// condition strictly boolean (never NULL) so the info condition can safely
+// negate the other two when a row has no status or no level.
+export const AUTH_LOG_ERROR_CONDITION: SafeLogSqlFragment = safeSql`IFNULL(metadata.level, '') IN ('error', 'fatal') OR IFNULL(SAFE_CAST(metadata.status AS INT64), 0) >= 500`
+export const AUTH_LOG_WARNING_CONDITION: SafeLogSqlFragment = safeSql`IFNULL(metadata.level, '') = 'warning' OR IFNULL(SAFE_CAST(metadata.status AS INT64), 0) BETWEEN 400 AND 499`
+export const AUTH_LOG_INFO_CONDITION: SafeLogSqlFragment = safeSql`NOT (${AUTH_LOG_ERROR_CONDITION}) AND NOT (${AUTH_LOG_WARNING_CONDITION})`
+
 export const SQL_FILTER_TEMPLATES: Record<string, Record<string, SqlFilterEntry>> = {
   postgres_logs: {
     ..._SQL_FILTER_COMMON,
@@ -338,9 +348,9 @@ export const SQL_FILTER_TEMPLATES: Record<string, Record<string, SqlFilterEntry>
   },
   auth_logs: {
     ..._SQL_FILTER_COMMON,
-    'severity.error': safeSql`metadata.level = 'error' or metadata.level = 'fatal'`,
-    'severity.warning': safeSql`metadata.level = 'warning'`,
-    'severity.info': safeSql`metadata.level = 'info'`,
+    'severity.error': AUTH_LOG_ERROR_CONDITION,
+    'severity.warning': AUTH_LOG_WARNING_CONDITION,
+    'severity.info': AUTH_LOG_INFO_CONDITION,
     'status_code.server_error': safeSql`cast(metadata.status as int64) between 500 and 599`,
     'status_code.client_error': safeSql`cast(metadata.status as int64) between 400 and 499`,
     'status_code.redirection': safeSql`cast(metadata.status as int64) between 300 and 399`,
