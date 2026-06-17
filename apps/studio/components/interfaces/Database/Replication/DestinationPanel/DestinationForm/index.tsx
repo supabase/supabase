@@ -570,10 +570,8 @@ export const DestinationForm = ({
         if (warningsUnchanged) {
           setPendingFormValues(data)
           setShowValidationWarningsDialog(true)
-          return
-        } else {
-          return
         }
+        return
       }
     }
 
