@@ -18,24 +18,28 @@ import {
   ScrollArea,
 } from 'ui'
 
+import type { DestinationPanelSchemaType } from './DestinationForm.schema'
 import type { ReplicationPublication } from '@/data/replication/publications-query'
 
 interface PublicationsComboBoxProps {
   publications: ReplicationPublication[]
   isLoadingPublications: boolean
+  onOpen: () => void
   onNewPublicationClick: () => void
-  field: ControllerRenderProps<any, 'publicationName'>
+  field: ControllerRenderProps<DestinationPanelSchemaType, 'publicationName'>
 }
 
 export const PublicationsComboBox = ({
   publications,
   isLoadingPublications,
+  onOpen,
   onNewPublicationClick,
   field,
 }: PublicationsComboBoxProps) => {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [selectedPublication, setSelectedPublication] = useState<string>(field?.value || '')
   const [searchTerm, setSearchTerm] = useState('')
+  const showLoadingState = isLoadingPublications && publications.length === 0
 
   function handlePublicationSelect(pub: string) {
     setSelectedPublication(pub)
@@ -53,6 +57,9 @@ export const PublicationsComboBox = ({
       open={dropdownOpen}
       onOpenChange={(open) => {
         setDropdownOpen(open)
+        if (open) {
+          onOpen()
+        }
         if (!open && field?.onBlur) {
           field.onBlur()
         }
@@ -66,7 +73,13 @@ export const PublicationsComboBox = ({
             'w-full [&>span]:w-full text-left',
             !selectedPublication && 'text-foreground-muted'
           )}
-          iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
+          iconRight={
+            showLoadingState ? (
+              <Loader2 className="text-foreground-muted animate-spin" strokeWidth={2} size={14} />
+            ) : (
+              <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
+            )
+          }
           name={field.name}
           onBlur={field.onBlur}
         >
@@ -83,7 +96,7 @@ export const PublicationsComboBox = ({
           />
           <CommandList>
             <CommandEmpty>
-              {isLoadingPublications ? (
+              {showLoadingState ? (
                 <div className="flex items-center gap-2 text-center justify-center">
                   <Loader2 size={12} className="animate-spin" />
                   Loading...
@@ -94,7 +107,7 @@ export const PublicationsComboBox = ({
             </CommandEmpty>
 
             <CommandGroup>
-              {publications.length === 0 && (
+              {publications.length === 0 && !showLoadingState && (
                 <div className="text-foreground-lighter text-xs py-3 px-2 space-y-0.5">
                   <p>No publications available</p>
                   <p className="text-foreground-muted">Publications with no tables are hidden</p>

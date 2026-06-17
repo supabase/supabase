@@ -27,7 +27,9 @@ export const PublicationSelection = ({
   const {
     data: publications = [],
     isPending: isLoadingPublications,
+    isFetching: isFetchingPublications,
     isSuccess: isSuccessPublications,
+    refetch: refetchPublications,
   } = useReplicationPublicationsQuery({ projectRef, sourceId })
 
   const publicationNames = useMemo(() => publications?.map((pub) => pub.name) ?? [], [publications])
@@ -47,8 +49,13 @@ export const PublicationSelection = ({
           <FormControl>
             <PublicationsComboBox
               publications={publications}
-              isLoadingPublications={isLoadingPublications}
+              isLoadingPublications={isLoadingPublications || isFetchingPublications}
               field={field}
+              onOpen={() => {
+                if (projectRef && sourceId) {
+                  void refetchPublications()
+                }
+              }}
               onNewPublicationClick={() => onSelectNewPublication()}
             />
           </FormControl>
