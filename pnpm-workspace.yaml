@@ -29,7 +29,7 @@ catalog:
   react-dom: ^19.2.6
   recharts: ^2.15.4
   tailwindcss: ^4.2.4
-  tsx: 4.20.3
+  tsx: ^4.22.0
   typescript: ~6.0.0
   valtio: ^1.12.0
   vite: ^8.0.16
