@@ -195,19 +195,80 @@ export type ConnectedResource =
     }
   | { kind: 'smtp'; key: string; title: string; description: string }
 
+export type ConnectedResourceKind = ConnectedResource['kind']
+
+/**
+ * Integration-specific copy that explains how a particular partner uses a kind of connected
+ * resource. When present it replaces the generic, kind-level copy shown on the integration's
+ * settings tab so users understand what the resource does for that integration specifically
+ * (e.g. that Grafana uses a secret API key to read project metrics).
+ */
+export type ConnectedResourceUsage = {
+  /** Explains how this integration uses the resource. Overrides the generic section description. */
+  description?: string
+  /** Describes the impact of removing the resource. Overrides the generic section note. */
+  note?: string
+}
+
+type IntegrationResourceOverride = {
+  secretKeyPrefix?: string
+  edgeFunctionSecretName?: string
+  resendSmtp?: boolean
+  /** Per-resource-kind explanations of how this integration uses each connected resource. */
+  usage?: Partial<Record<ConnectedResourceKind, ConnectedResourceUsage>>
+}
+
 /**
  * Temporary manual overrides for specific integrations.
  * TODO(integrations-team) to move logic to database
  * Complements the special-case logic in {@link isOAuthInstalled}.
  */
-const INTEGRATION_RESOURCE_OVERRIDES: Record<
-  string,
-  { secretKeyPrefix?: string; edgeFunctionSecretName?: string; resendSmtp?: boolean }
-> = {
-  grafana: { secretKeyPrefix: 'grafana_cloud_integration_' },
-  doppler: { edgeFunctionSecretName: 'DOPPLER_CONFIG' },
-  resend: { resendSmtp: true },
+const INTEGRATION_RESOURCE_OVERRIDES: Record<string, IntegrationResourceOverride> = {
+  grafana: {
+    secretKeyPrefix: 'grafana_cloud_integration_',
+    usage: {
+      api_key: {
+        description:
+          'Grafana uses this secret API key to read your project metrics from the Prometheus-compatible metrics endpoint.',
+        note: 'Removing this key stops Grafana from collecting metrics from your project until a new key is connected.',
+      },
+    },
+  },
+  doppler: {
+    edgeFunctionSecretName: 'DOPPLER_CONFIG',
+    usage: {
+      edge_function_secret: {
+        description:
+          'Doppler syncs your managed secrets into this Edge Function secret so they are available to your functions at runtime.',
+        note: 'Connected secrets that are removed while this integration is active may be resynced if still present in Doppler.',
+      },
+    },
+  },
+  resend: {
+    resendSmtp: true,
+    usage: {
+      smtp: {
+        description:
+          'Resend is configured as the custom SMTP relay your project uses to deliver authentication and transactional emails.',
+      },
+      oauth_app: {
+        description:
+          'Grants Resend access to manage the custom SMTP configuration used to send your project emails.',
+      },
+    },
+  },
 }
+
+/**
+ * Returns the integration-specific usage copy for a connected resource kind, if one has been
+ * defined in {@link INTEGRATION_RESOURCE_OVERRIDES}. Callers fall back to generic, kind-level
+ * copy when this returns `undefined`.
+ */
+export const getConnectedResourceUsage = (
+  integrationId: string,
+  kind: ConnectedResourceKind
+): ConnectedResourceUsage | undefined =>
+  INTEGRATION_RESOURCE_OVERRIDES[integrationId]?.usage?.[kind]
 
 /**
  * Collects every resource an OAuth integration has provisioned on the current project/organization

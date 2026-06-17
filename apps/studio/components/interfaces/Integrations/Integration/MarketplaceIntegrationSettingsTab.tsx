@@ -10,8 +10,10 @@ import { defaultDisabledSmtpFormValues } from '@/components/interfaces/Auth/Smtp
 import { ConstrainedIntegrationTabScaffold } from '@/components/interfaces/Integrations/ConstrainedIntegrationTabScaffold'
 import {
   getConnectedResources,
+  getConnectedResourceUsage,
   useProjectOAuthIntegrationData,
   type ConnectedResource,
+  type ConnectedResourceUsage,
 } from '@/components/interfaces/Integrations/Landing/Landing.utils'
 import { useIntegrationDetail } from '@/components/interfaces/Integrations/Landing/useIntegrationDetail'
 import { RevokeAppModal } from '@/components/interfaces/Organization/OAuthApps/RevokeAppModal'
@@ -91,12 +93,15 @@ const getGroupContent = ({
   integrationName,
   orgSlug,
   projectRef,
+  usage,
 }: {
   kind: ResourceKind
   count: number
   integrationName: string
   orgSlug?: string
   projectRef?: string
+  /** Integration-specific copy that overrides the generic, kind-level description and note. */
+  usage?: ConnectedResourceUsage
 }): Omit<ResourceGroup, 'kind' | 'items'> => {
   const name = <span className="text-foreground">{integrationName}</span>
   const plural = count > 1
@@ -106,12 +111,14 @@ const getGroupContent = ({
       return {
         title: 'OAuth application',
         badge: 'Connected',
-        description: (
+        description: usage?.description ?? (
           <>
             Grants {name} access to your organization and its projects through a scoped OAuth grant.
           </>
         ),
-        note: 'Removing this OAuth app will remove it for all projects and members of your organization.',
+        note:
+          usage?.note ??
+          'Removing this OAuth app will remove it for all projects and members of your organization.',
         manageAction: orgSlug
           ? { label: 'Manage access', href: `/org/${orgSlug}/apps` }
           : undefined,
@@ -119,32 +126,45 @@ const getGroupContent = ({
     case 'api_key':
       return {
         title: plural ? 'Secret API keys' : 'Secret API key',
-        description: plural ? (
-          <>Secret API keys that {name} uses to authenticate to your project&apos;s API.</>
-        ) : (
-          <>A secret API key that {name} uses to authenticate to your project&apos;s API.</>
-        ),
-        note: `Removing ${plural ? 'a key' : 'this key'} takes effect immediately and can interrupt the integration.`,
+        description:
+          usage?.description ??
+          (plural ? (
+            <>Secret API keys that {name} uses to authenticate to your project&apos;s API.</>
+          ) : (
+            <>A secret API key that {name} uses to authenticate to your project&apos;s API.</>
+          )),
+        note:
+          usage?.note ??
+          `Removing ${plural ? 'a key' : 'this key'} takes effect immediately and can interrupt the integration.`,
       }
     case 'edge_function_secret':
       return {
         title: plural ? 'Edge Function secrets' : 'Edge Function secret',
-        description: plural ? (
-          <>
-            Secrets synced by {name} and exposed to your project&apos;s Edge Functions at runtime.
-          </>
-        ) : (
-          <>
-            A secret synced by {name} and exposed to your project&apos;s Edge Functions at runtime.
-          </>
-        ),
-        note: `Removing ${plural ? 'a secret' : 'this secret'} takes effect immediately and can interrupt the integration.`,
+        description:
+          usage?.description ??
+          (plural ? (
+            <>
+              Secrets synced by {name} and exposed to your project&apos;s Edge Functions at runtime.
+            </>
+          ) : (
+            <>
+              A secret synced by {name} and exposed to your project&apos;s Edge Functions at
+              runtime.
+            </>
+          )),
+        note:
+          usage?.note ??
+          `Removing ${plural ? 'a secret' : 'this secret'} takes effect immediately and can interrupt the integration.`,
       }
     case 'smtp':
       return {
         title: 'SMTP settings',
-        description: <>A custom SMTP relay so your project sends emails through {name}.</>,
-        note: 'Removing this relay reverts your project to the default email service. Auth emails may be rate-limited until SMTP is configured again.',
+        description: usage?.description ?? (
+          <>A custom SMTP relay so your project sends emails through {name}.</>
+        ),
+        note:
+          usage?.note ??
+          'Removing this relay reverts your project to the default email service. Auth emails may be rate-limited until SMTP is configured again.',
         manageAction: projectRef
           ? { label: 'Manage settings', href: `/project/${projectRef}/auth/smtp` }
           : undefined,
@@ -257,6 +277,7 @@ export const MarketplaceIntegrationSettingsTab = () => {
           integrationName,
           orgSlug: organization?.slug,
           projectRef: ref,
+          usage: integration ? getConnectedResourceUsage(integration.id, kind) : undefined,
         }),
         items: kindResources.map((resource) => ({
           resource,
