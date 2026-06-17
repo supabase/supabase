@@ -15,9 +15,7 @@ import {
 export const calculateDateRange = (
   interval: '1hr' | '1day' | '7day'
 ): { startDate: string; endDate: string } => {
-  // Snap to the current minute so the query key stays stable across remounts. A
-  // raw now() would re-key on every mount and reload the charts.
-  const now = dayjs().startOf('minute')
+  const now = dayjs()
   const end = now.toISOString()
   let start: string
 

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  buildSortedServiceCards,
   computeSuccessAndNonSuccessRates,
   getBucketLogRange,
   isServiceDisabled,
@@ -106,6 +107,29 @@ describe('ProjectUsage.metrics', () => {
 
     it('parses a timestamp without a timezone designator as UTC', () => {
       expect(getBucketLogRange('2024-01-15T12:00:00', '1hr').end).toBe('2024-01-15T12:01:00.000Z')
+    })
+  })
+
+  describe('buildSortedServiceCards', () => {
+    const stats = (total: number, warningCount = 0, errorCount = 0) => ({
+      eventChartData: [],
+      total,
+      warningCount,
+      errorCount,
+    })
+
+    it('drops disabled services, maps stats, and sorts by traffic', () => {
+      const cards = buildSortedServiceCards(
+        [
+          { key: 'a', enabled: true },
+          { key: 'b', enabled: false },
+          { key: 'c', enabled: true },
+        ],
+        { a: stats(10, 1, 2), b: stats(999), c: stats(50) }
+      )
+
+      expect(cards.map((c) => c.key)).toEqual(['c', 'a'])
+      expect(cards[1]).toMatchObject({ key: 'a', total: 10, warn: 1, err: 2, data: [] })
     })
   })
 })

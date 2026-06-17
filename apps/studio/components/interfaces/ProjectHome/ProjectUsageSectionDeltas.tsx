@@ -7,10 +7,10 @@ import { Row } from 'ui-patterns'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
 import {
+  buildSortedServiceCards,
   computeSuccessAndNonSuccessRates,
   getBucketLogRange,
   isServiceDisabled,
-  sortServicesByTraffic,
   type ChartIntervalKey,
   type LogsBarChartDatum,
 } from './ProjectUsage.metrics'
@@ -38,13 +38,6 @@ type ServiceEntry = {
   enabled: boolean
 }
 
-type ServiceComputed = ServiceEntry & {
-  data: LogsBarChartDatum[]
-  total: number
-  warn: number
-  err: number
-}
-
 export const ProjectUsageSectionDeltas = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
@@ -55,12 +48,9 @@ export const ProjectUsageSectionDeltas = () => {
     'project_storage:all',
   ])
   const { isEnabled: dataApiEnabled } = useIsDataApiEnabled({ projectRef })
-  const { getEntitlementMax, isLoading: isLoadingEntitlements } =
-    useCheckEntitlements('log.retention_days')
+  const { getEntitlementMax } = useCheckEntitlements('log.retention_days')
   const retentionDays = getEntitlementMax()
 
-  // Derived so a late entitlements load can't flip the interval and refetch. A
-  // user pick overrides it.
   const [userInterval, setUserInterval] = useState<ChartIntervalKey | undefined>(undefined)
   const interval: ChartIntervalKey =
     userInterval ?? (retentionDays !== undefined && retentionDays < 7 ? '1hr' : '1day')
@@ -68,17 +58,12 @@ export const ProjectUsageSectionDeltas = () => {
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
   const datetimeFormat = selectedInterval.format || 'MMM D, ha'
 
-  // Wait for entitlements so we don't fetch with the wrong interval then refetch.
-  const ready = !isLoadingEntitlements
-  const { services: serviceData, isLoading: isLoadingMetrics } = useServiceHealthMetrics(
-    ready ? (projectRef ?? '') : '',
+  const { services: serviceData, isLoading } = useServiceHealthMetrics(
+    projectRef ?? '',
     interval,
     0
   )
-  const isLoading = !ready || isLoadingMetrics
 
-  // Functions shows here but not in V2: service-health has its data, the legacy
-  // endpoint did not.
   const serviceBase: ServiceEntry[] = useMemo(
     () => [
       {
@@ -124,23 +109,10 @@ export const ProjectUsageSectionDeltas = () => {
     [projectRef, authEnabled, storageEnabled, dataApiEnabled]
   )
 
-  // Busiest services first; empty ones sink to the end and render disabled.
-  const services: ServiceComputed[] = useMemo(() => {
-    const computed = serviceBase
-      .filter((s) => s.enabled)
-      .map((s) => {
-        const stats = serviceData[s.key]
-        return {
-          ...s,
-          data: stats.eventChartData,
-          total: stats.total,
-          warn: stats.warningCount,
-          err: stats.errorCount,
-        }
-      })
-
-    return sortServicesByTraffic(computed)
-  }, [serviceBase, serviceData])
+  const services = useMemo(
+    () => buildSortedServiceCards(serviceBase, serviceData),
+    [serviceBase, serviceData]
+  )
 
   const totalRequests = services.reduce((sum, s) => sum + s.total, 0)
   const totalErrors = services.reduce((sum, s) => sum + s.err, 0)
@@ -259,7 +231,6 @@ export const ProjectUsageSectionDeltas = () => {
                       ok_count: { label: 'Requests' },
                     }}
                     EmptyState={
-                      // Blank while loading so the spinner isn't over the "No data" text.
                       isLoading ? (
                         <></>
                       ) : (
