@@ -166,6 +166,22 @@ const ormConfigureStep: StepDefinition = {
   content: '{{orm}}',
 }
 
+const serverInstallStep: StepDefinition = {
+  id: 'server-install',
+  title: 'Install package',
+  description:
+    'Add @supabase/server to your project. On Supabase Edge Functions you can import it directly — no install needed.',
+  content: 'server/install',
+}
+
+const serverEnvStep: StepDefinition = {
+  id: 'server-env',
+  title: 'Set environment variables',
+  description:
+    'Copy these into your environment. On Supabase Edge Functions they are injected automatically.',
+  content: 'server/env',
+}
+
 const skillsInstallStep: StepDefinition = {
   id: 'install-skills',
   title: 'Install Agent Skills (Optional)',
@@ -206,6 +222,12 @@ export const connectSchema: ConnectSchema = {
       label: 'MCP',
       description: 'Connect your agent',
       fields: ['mcpClient', 'mcpReadonly', 'mcpFeatures'],
+    },
+    {
+      id: 'server',
+      label: 'Server',
+      description: '@supabase/server',
+      fields: [],
     },
   ],
 
@@ -386,6 +408,7 @@ export const connectSchema: ConnectSchema = {
           DEFAULT: [mcpConfigureStep, skillsInstallStep],
         },
       },
+      server: [serverInstallStep, serverEnvStep, skillsInstallStep],
       DEFAULT: [skillsInstallStep],
     },
   },
