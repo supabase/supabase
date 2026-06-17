@@ -170,7 +170,7 @@ const serverInstallStep: StepDefinition = {
   id: 'server-install',
   title: 'Install package',
   description:
-    'Add @supabase/server to your project. On Supabase Edge Functions you can import it directly — no install needed.',
+    'Add @supabase/server to your backend or API framework of choice. On Supabase Edge Functions you can import it directly, no install needed.',
   content: 'server/install',
 }
 
@@ -178,7 +178,7 @@ const serverEnvStep: StepDefinition = {
   id: 'server-env',
   title: 'Set environment variables',
   description:
-    'Copy these into your environment. On Supabase Edge Functions they are injected automatically.',
+    'Copy these into your environment so you can verify users and use the client/admin supabase-js library from the context of your handler. On Supabase Edge Functions they are injected automatically.',
   content: 'server/env',
 }
 
