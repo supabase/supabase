@@ -52,7 +52,7 @@ If you are upgrading from a significantly older version, you will need to consid
 
 1. Make sure to discuss with your teams a suitable maintenance window as upgrading involves downtime, this will be crucial for minimising the impact.
 2. For smaller databases, we recommend taking a logical backup of the data using [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) utility. This is to ensure you have sufficient backup before upgrading.
-3. For larger databases, ensure that a recent backup is in the [Backups](https://supabase.com/dashboard/project/_/database/backups/scheduled) page in the Dashboard.
+3. For larger databases, ensure that a recent backup is in the [Backups](/dashboard/project/_/database/backups/scheduled) page in the Dashboard.
 4. Reduce the size of the data and the number of objects in the database. The time to upgrade highly depends on these factors, and can influence downtime. For example: Archiving data which is not actively used, dropping unused indexes, running vacuum etc. See the [Inspect](/docs/reference/cli/supabase-inspect-db) command in the Supabase CLI for a detailed report on space that can be gained, as well as the [pg_repack](/docs/guides/database/extensions/pg_repack) documentation.
 
 ## Post-upgrade best practices
