@@ -5,7 +5,7 @@ import CopyButton from '@/components/ui/CopyButton'
 const INSTALL_OPTIONS = [
   { name: 'npm', command: 'npm install @supabase/server' },
   { name: 'pnpm', command: 'pnpm add @supabase/server' },
-  { name: 'bun', command: 'bun add @supabase/server'},
+  { name: 'bun', command: 'bun add @supabase/server' },
   { name: 'Deno', command: 'import { withSupabase } from "npm:@supabase/server"' },
 ]
 
