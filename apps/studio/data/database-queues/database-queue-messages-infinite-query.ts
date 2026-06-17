@@ -36,9 +36,11 @@ export async function getDatabaseQueue({
   projectRef,
   connectionString,
   queueName,
-  afterTimestamp,
+  afterMessage,
   status,
-}: DatabaseQueueVariables & { afterTimestamp: string | undefined }) {
+}: DatabaseQueueVariables & {
+  afterMessage: { enqueuedAt: string; msgId: number } | undefined
+}) {
   if (!projectRef) throw new Error('Project ref is required')
   if (!isQueueNameValid(queueName)) {
     throw new Error(
@@ -76,8 +78,8 @@ export async function getDatabaseQueue({
     safeSql``
   )
 
-  const whereClause = afterTimestamp
-    ? safeSql` WHERE enqueued_at > ${literal(afterTimestamp)}`
+  const whereClause = afterMessage
+    ? safeSql` WHERE (enqueued_at, msg_id) > (${literal(afterMessage.enqueuedAt)}::timestamp with time zone, ${literal(afterMessage.msgId)}::bigint)`
     : safeSql``
 
   const sql = safeSql`SELECT
@@ -85,7 +87,7 @@ export async function getDatabaseQueue({
     FROM
       (
         ${unionFragment}
-      ) AS combined${whereClause} order by enqueued_at LIMIT ${literal(QUEUE_MESSAGES_PAGE_SIZE)}`
+      ) AS combined${whereClause} order by enqueued_at, msg_id LIMIT ${literal(QUEUE_MESSAGES_PAGE_SIZE)}`
 
   const { result } = await executeSql({
     projectRef,
@@ -108,7 +110,7 @@ export const useQueueMessagesInfiniteQuery = <TData = DatabaseQueueData>(
     DatabaseQueueError,
     InfiniteData<TData>,
     readonly unknown[],
-    string | undefined
+    { enqueuedAt: string; msgId: number } | undefined
   > = {}
 ) =>
   useInfiniteQuery({
@@ -118,7 +120,7 @@ export const useQueueMessagesInfiniteQuery = <TData = DatabaseQueueData>(
         projectRef,
         connectionString,
         queueName,
-        afterTimestamp: pageParam,
+        afterMessage: pageParam,
         status,
       })
     },
@@ -128,7 +130,9 @@ export const useQueueMessagesInfiniteQuery = <TData = DatabaseQueueData>(
     getNextPageParam(lastPage) {
       const hasNextPage = lastPage.length >= QUEUE_MESSAGES_PAGE_SIZE
       if (!hasNextPage) return undefined
-      return last(lastPage)?.enqueued_at
+      const lastMsg = last(lastPage)
+      if (!lastMsg) return undefined
+      return { enqueuedAt: lastMsg.enqueued_at, msgId: lastMsg.msg_id }
     },
     ...options,
   })
