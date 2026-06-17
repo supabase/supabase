@@ -81,7 +81,10 @@ describe('buildSteps', () => {
     const connect = buildSteps(cfg, composition(cfg)).find((s) => s.id === 'connect-app')!
 
     expect(connect.title).toBe('Connect to your app')
-    expect(stepText(connect)).toContain('npx shadcn@latest init -d')
+    expect(stepText(connect)).toContain('test -f components.json || npx shadcn@latest init -d')
+    expect(stepText(connect)).toContain(
+      'Do not run shadcn init when components.json already exists'
+    )
     expect(stepText(connect)).toContain(
       'npx shadcn@latest add @supabase/password-based-auth-nextjs'
     )
@@ -187,7 +190,7 @@ describe('buildSteps', () => {
     const connect = steps.find((s) => s.id === 'connect-app')!
     expect(steps.some((s) => s.id === 'add')).toBe(false)
     expect(connect.title).toBe('Connect to your app')
-    expect(stepText(connect)).toContain('npx shadcn@latest init -d')
+    expect(stepText(connect)).toContain('test -f components.json || npx shadcn@latest init -d')
   })
 
   it('existing + no shadcn uses the Supabase code step instead of a file tree step', () => {
@@ -329,6 +332,17 @@ describe('buildSteps', () => {
     expect(text).toContain('npx shadcn@latest add SaxonF/templates/database')
     expect(text).toContain('npx shadcn@latest add SaxonF/templates/todos')
     expect(text).toContain('npx shadcn@latest add SaxonF/templates/auth')
+  })
+
+  it('points to template readmes for config.toml merge guidance', () => {
+    const cfg = config()
+    const supabaseCode = buildSteps(cfg, composition(cfg)).find((s) => s.id === 'supabase-code')!
+    const text = stepText(supabaseCode)
+
+    expect(text).toContain("Follow the instructions in each installed template's readme")
+    expect(text).toContain('supabase/config.toml')
+    expect(text).not.toContain('--dry-run --diff')
+    expect(text).not.toContain('The Start composer has already merged overlapping files')
   })
 })
 

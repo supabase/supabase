@@ -296,11 +296,15 @@ function connectAppStep(ctx: GuideContext): SetupStep | null {
       type: 'code',
       lang: 'terminal',
       code: lines([
-        "npx shadcn@latest init -d   # if shadcn isn't set up yet",
+        'test -f components.json || npx shadcn@latest init -d   # skip init when shadcn/ui is already configured',
         ...blockPrims.map(
           (p) => `npx shadcn@latest add @supabase/${getShadcnBlockName(p)}-${fw.shadcnTag}`
         ),
       ]),
+    })
+    blocks.push({
+      type: 'note',
+      text: 'Do not run shadcn init when components.json already exists; the Next.js with-supabase starter and many existing apps already include it.',
     })
 
     const missing = getMissingShadcnPrimitiveLabels(ctx)
@@ -390,6 +394,11 @@ function supabaseCodeStep(ctx: GuideContext): SetupStep | null {
   }
 
   if (plan.addCommands.length > 0) {
+    blocks.push({
+      type: 'note',
+      text: "Follow the instructions in each installed template's readme, especially when merging changes into supabase/config.toml.",
+    })
+
     blocks.push({
       type: 'code',
       lang: 'terminal',

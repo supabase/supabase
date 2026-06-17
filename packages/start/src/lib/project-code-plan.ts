@@ -1,8 +1,4 @@
-import {
-  getRegistryAddCommand,
-  getRegistrySearchCommand,
-  getRegistryViewCommand,
-} from 'template-composer'
+import { getRegistryAddCommand, getRegistrySearchCommand } from 'template-composer'
 
 import type { StartComposition } from './composition/start-composition'
 import { listEnglish, ORMS, type StartConfig } from './config'
@@ -35,7 +31,6 @@ export interface ProjectCodePlan {
   selectedTemplates: ProjectCodeTemplate[]
   dependencyTemplates: ProjectCodeTemplate[]
   addCommands: ProjectCodeTemplateCommand[]
-  viewCommands: ProjectCodeTemplateCommand[]
   fileGroups: ProjectCodeFileGroup[]
   filePaths: string[]
   schemaFiles: string[]
@@ -85,7 +80,6 @@ export function buildProjectCodePlan(
     .filter((resource) => resource.kind === 'edge-function')
     .map((resource) => resource.label)
     .sort((a, b) => a.localeCompare(b))
-
   return {
     hasProjectCode: selectedTemplates.length > 0 || filePaths.length > 0,
     listCommand: getRegistrySearchCommand('', registryCommandOptions),
@@ -96,10 +90,6 @@ export function buildProjectCodePlan(
     addCommands: selectedTemplates.map((template) => ({
       ...template,
       command: getRegistryAddCommand(template.id, registryCommandOptions),
-    })),
-    viewCommands: selectedTemplates.map((template) => ({
-      ...template,
-      command: getRegistryViewCommand(template.id, registryCommandOptions),
     })),
     fileGroups,
     filePaths,
