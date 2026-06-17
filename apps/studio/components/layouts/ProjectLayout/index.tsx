@@ -347,7 +347,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                       </AlertDescription>
                     </div>
                     <ButtonTooltip
-                      type="text"
+                      variant="text"
                       icon={<XIcon size={14} />}
                       className="h-7 w-7 p-0"
                       onClick={() => setIsProjectIntegrationBannerDismissed(true)}

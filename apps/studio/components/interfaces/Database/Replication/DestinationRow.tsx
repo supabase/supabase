@@ -226,7 +226,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
                   </TooltipContent>
                 </Tooltip>
               )}
-              <Button asChild type="default" className="relative">
+              <Button asChild variant="default" className="relative">
                 <Link href={`/project/${projectRef}/database/replication/${pipeline?.id}`}>
                   View replication
                 </Link>

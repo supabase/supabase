@@ -225,7 +225,7 @@ export const VectorBucketDetails = () => {
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <Button
-                                      type="default"
+                                      variant="default"
                                       className="w-7"
                                       icon={<MoreVertical />}
                                       onClick={(e) => e.stopPropagation()}
@@ -305,7 +305,7 @@ export const VectorBucketDetails = () => {
                   </p>
                 </div>
                 <Button
-                  type="danger"
+                  variant="danger"
                   disabled={!isSuccessBucket}
                   onClick={() => setShowDeleteModal(true)}
                 >

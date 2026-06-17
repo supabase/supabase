@@ -81,8 +81,8 @@ const SignInPage: NextPageWithLayout = () => {
               asChild
               block
               size="large"
-              type="outline"
-              icon={<Lock width={18} height={18} className="text-foreground" />}
+              variant="outline"
+              icon={<Lock width={18} height={18} />}
             >
               <Link href={{ pathname: '/sign-in-sso', query: router.query }}>
                 Continue with SSO
@@ -116,7 +116,7 @@ const SignInPage: NextPageWithLayout = () => {
           ) : (
             <Button
               block
-              type="text"
+              variant="text"
               size="large"
               className="-mt-2 text-foreground-light"
               onClick={() => setShowOtherOptions(true)}

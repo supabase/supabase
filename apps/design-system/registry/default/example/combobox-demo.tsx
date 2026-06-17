@@ -48,7 +48,7 @@ export default function ComboboxDemo() {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          type="default"
+          variant="default"
           role="combobox"
           size={'small'}
           aria-expanded={open}

@@ -1042,7 +1042,7 @@ export function LogDrainDestinationSheetForm({
               options={{ enabled: open && !isLoading }}
               side="top"
             >
-              <Button form={FORM_ID} loading={isLoading} htmlType="submit" type="primary">
+              <Button form={FORM_ID} loading={isLoading} type="submit" variant="primary">
                 Save destination
               </Button>
             </Shortcut>

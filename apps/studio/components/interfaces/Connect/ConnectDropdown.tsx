@@ -53,7 +53,7 @@ export const ConnectDropdown = ({
         <PopoverTrigger asChild>
           <Button
             size="small"
-            type="default"
+            variant="default"
             className="gap-0 rounded-l-none"
             iconRight={<ChevronDown strokeWidth={1.5} />}
           >

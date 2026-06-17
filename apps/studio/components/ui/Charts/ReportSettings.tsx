@@ -17,7 +17,7 @@ export const ReportSettings = ({ chartId }: ReportSettingsProps) => {
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <ButtonTooltip
-          type="default"
+          variant="default"
           icon={<Settings />}
           className="w-7"
           tooltip={{ content: { side: 'bottom', text: 'Report settings' } }}

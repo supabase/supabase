@@ -332,11 +332,11 @@ export function JitDbAccessRuleSheet({
           </Form>
 
           <SheetFooter className="mt-auto w-full border-t py-4">
-            <Button type="default" onClick={confirmOnClose} disabled={isSubmitting}>
+            <Button variant="default" onClick={confirmOnClose} disabled={isSubmitting}>
               Cancel
             </Button>
             <Button
-              type="primary"
+              variant="primary"
               onClick={form.handleSubmit(handleSaveRule)}
               loading={isSubmitting}
             >

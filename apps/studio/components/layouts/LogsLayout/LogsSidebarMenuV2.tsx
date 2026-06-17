@@ -1,5 +1,5 @@
 import { IS_PLATFORM, useFlag, useParams } from 'common'
-import { ChevronRight, CircleHelpIcon, Plus } from 'lucide-react'
+import { ChevronRight, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
@@ -29,7 +29,7 @@ import { useIsETLPrivateAlpha } from '@/components/interfaces/Database/Replicati
 import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
 import SavedQueriesItem from '@/components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
 import { LogsSidebarItem } from '@/components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { UnifiedLogsBanner } from '@/components/interfaces/UnifiedLogs/UnifiedLogsBanner'
 import { useContentQuery } from '@/data/content/content-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
@@ -233,7 +233,7 @@ export function LogsSidebarMenuV2() {
           description="Get early access"
           actions={
             <Link href="https://forms.supabase.com/unified-logs-signup" target="_blank">
-              <Button type="default" size="tiny">
+              <Button variant="default" size="tiny">
                 Early access
               </Button>
             </Link>
@@ -241,32 +241,13 @@ export function LogsSidebarMenuV2() {
         />
       )}
       {isUnifiedLogsEligible && (
-        <FeaturePreviewSidebarPanel
-          className="mx-4 mt-4"
-          title="Introducing unified logs"
-          description="A unified view across all services with improved filtering and real-time updates."
-          illustration={<Badge variant="success">New</Badge>}
-          actions={
-            <>
-              <Button
-                size="tiny"
-                type="default"
-                onClick={() => {
-                  enableUnifiedLogs()
-                  router.push(`/project/${ref}/logs`)
-                }}
-              >
-                Enable preview
-              </Button>
-              <ButtonTooltip
-                type="default"
-                className="px-1.5"
-                icon={<CircleHelpIcon />}
-                onClick={() => selectFeaturePreview('supabase-ui-preview-unified-logs')}
-                tooltip={{ content: { side: 'bottom', text: 'More information' } }}
-              />
-            </>
-          }
+        <UnifiedLogsBanner
+          variant="promo"
+          onEnable={() => {
+            enableUnifiedLogs()
+            router.push(`/project/${ref}/logs`)
+          }}
+          onMoreInfo={() => selectFeaturePreview('supabase-ui-preview-unified-logs')}
         />
       )}
 
@@ -287,7 +268,7 @@ export function LogsSidebarMenuV2() {
         </InnerSideBarFilters>
 
         <Button
-          type="default"
+          variant="default"
           icon={<Plus className="text-foreground" />}
           className="w-[26px]"
           onClick={() => router.push(`/project/${ref}/logs/explorer`)}
@@ -353,7 +334,7 @@ export function LogsSidebarMenuV2() {
               IS_PLATFORM ? 'Create and save your queries to use them in the explorer' : undefined
             }
             actions={
-              <Button asChild type="default">
+              <Button asChild variant="default">
                 <Link href={`/project/${ref}/logs/explorer`}>Create query</Link>
               </Button>
             }
@@ -380,7 +361,7 @@ export function LogsSidebarMenuV2() {
           </div>
         }
         actions={
-          <Button asChild type="default">
+          <Button asChild variant="default">
             <Link href={`/project/${ref}/settings/log-drains`}>Go to Log Drains</Link>
           </Button>
         }

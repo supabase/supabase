@@ -196,7 +196,7 @@ function TemplatesPage({ onNavigateToSmtp }: { onNavigateToSmtp: () => void }) {
             layout="horizontal"
             className="mb-4"
             actions={
-              <Button type="default" size="tiny" onClick={onNavigateToSmtp}>
+              <Button variant="default" size="tiny" onClick={onNavigateToSmtp}>
                 Set up SMTP
               </Button>
             }
@@ -272,13 +272,13 @@ function TemplatesPage({ onNavigateToSmtp }: { onNavigateToSmtp: () => void }) {
                   })}
                   <CardFooter className="justify-end space-x-2">
                     {notificationsForm.formState.isDirty && (
-                      <Button type="default" onClick={() => notificationsForm.reset()}>
+                      <Button variant="default" onClick={() => notificationsForm.reset()}>
                         Cancel
                       </Button>
                     )}
                     <Button
-                      type="primary"
-                      htmlType="submit"
+                      variant="primary"
+                      type="submit"
                       disabled={!notificationsForm.formState.isDirty}
                     >
                       Save changes
@@ -485,11 +485,11 @@ function SmtpPage() {
 
                   <CardFooter className="justify-end space-x-2">
                     {form.formState.isDirty && (
-                      <Button type="default" onClick={() => form.reset()}>
+                      <Button variant="default" onClick={() => form.reset()}>
                         Cancel
                       </Button>
                     )}
-                    <Button type="primary" htmlType="submit" disabled={!form.formState.isDirty}>
+                    <Button variant="primary" type="submit" disabled={!form.formState.isDirty}>
                       Save changes
                     </Button>
                   </CardFooter>

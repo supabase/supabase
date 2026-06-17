@@ -20,7 +20,7 @@ export default function DatePickerWithRange({ className }: React.HTMLAttributes<
         <PopoverTrigger asChild>
           <Button
             id="date"
-            type={'outline'}
+            variant="outline"
             className={cn(
               'w-[300px] justify-start text-left font-normal',
               !date && 'text-muted-foreground'

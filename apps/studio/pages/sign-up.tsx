@@ -66,7 +66,7 @@ const SignUpPage: NextPageWithLayout = () => {
         ) : (
           <Button
             block
-            type="text"
+            variant="text"
             size="large"
             className="-mt-2 text-foreground-light"
             onClick={() => setShowOtherOptions(true)}

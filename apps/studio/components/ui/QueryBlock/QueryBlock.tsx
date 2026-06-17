@@ -166,7 +166,7 @@ export const QueryBlock = ({
           {!disabled && (
             <>
               <ButtonTooltip
-                type="text"
+                variant="text"
                 size="tiny"
                 className="w-7 h-7"
                 icon={<Code size={14} strokeWidth={1.5} />}
@@ -196,7 +196,7 @@ export const QueryBlock = ({
 
               <EditQueryButton id={id} title={label} sql={sql} />
               <ButtonTooltip
-                type="text"
+                variant="text"
                 size="tiny"
                 className="w-7 h-7"
                 icon={<Play size={14} strokeWidth={1.5} />}
@@ -373,7 +373,7 @@ export const QueryBlock = ({
                 Queries that involve any mutation will not be run in reports
               </p>
               {!!onRemoveChart && (
-                <Button type="default" className="mt-2" onClick={() => onRemoveChart()}>
+                <Button variant="default" className="mt-2" onClick={() => onRemoveChart()}>
                   Remove chart
                 </Button>
               )}

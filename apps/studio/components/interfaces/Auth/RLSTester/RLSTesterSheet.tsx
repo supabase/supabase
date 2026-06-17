@@ -154,7 +154,7 @@ const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps)
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button type="default" icon={<Code />}>
+        <Button variant="default" icon={<Code />}>
           Test
         </Button>
       </SheetTrigger>
@@ -290,7 +290,7 @@ const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps)
         </div>
 
         <SheetFooter className="sm:justify-between">
-          <Button asChild type="default" icon={<ExternalLink />}>
+          <Button asChild variant="default" icon={<ExternalLink />}>
             <a
               target="_blank"
               rel="noopener noreferrer"
@@ -300,11 +300,11 @@ const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps)
             </a>
           </Button>
           <div className="flex items-center gap-x-2">
-            <Button type="default" disabled={isLoading} onClick={() => setOpen(false)}>
+            <Button variant="default" disabled={isLoading} onClick={() => setOpen(false)}>
               Cancel
             </Button>
             <Button
-              type="primary"
+              variant="primary"
               loading={isInferring || isLoading}
               disabled={format === 'lib' && !inferredSQL}
               onClick={onRunQuery}

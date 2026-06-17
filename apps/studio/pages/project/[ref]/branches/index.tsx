@@ -202,7 +202,7 @@ BranchesPage.getLayout = (page) => {
 
     const primaryActions = (
       <ButtonTooltip
-        type="primary"
+        variant="primary"
         disabled={!canCreateBranches}
         onClick={() => snap.setShowCreateBranchModal(true)}
         tooltip={{
@@ -220,7 +220,11 @@ BranchesPage.getLayout = (page) => {
 
     const secondaryActions = (
       <div className="flex items-center gap-x-2">
-        <Button asChild type="text" icon={<MessageCircle className="text-muted" strokeWidth={1} />}>
+        <Button
+          asChild
+          variant="text"
+          icon={<MessageCircle className="text-muted" strokeWidth={1} />}
+        >
           <a
             target="_blank"
             rel="noreferrer"
