@@ -377,6 +377,7 @@ allow_list = [
     "Solana",
     "Sonatype",
     "SolidJS",
+    "SolidStart",
     "Spotify",
     "Sqitch",
     "Supabase",
