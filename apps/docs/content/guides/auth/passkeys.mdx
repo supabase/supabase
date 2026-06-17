@@ -39,7 +39,10 @@ Open the [Passkeys settings](/dashboard/project/_/auth/passkeys) from the **Auth
 
 - **Relying Party Display Name**: a human-readable name for your application shown during the passkey prompt (for example, "My App").
 - **Relying Party ID**: the bare domain name for your application (for example, "example.com"). Do not include a scheme, port, or path. This determines which passkeys can be used.
-- **Relying Party Origins**: comma-separated list of allowed origins (for example "https://example.com,https://app.example.com"). HTTPS is required except for loopback addresses ("localhost", "127.0.0.1", "[::1]"). Each origin's hostname must match or be a subdomain of the Relying Party ID. Up to 5 origins.
+- **Relying Party Origins**: comma-separated list of allowed origins (for example "https://example.com,https://app.example.com"). Up to 5 origins.
+  - HTTPS is required except for loopback addresses ("localhost", "127.0.0.1", "[::1]").
+  - Each origin's hostname must match or be a subdomain of the Relying Party ID.
+  - Android native apps can use an app origin of the form `android:apk-key-hash:<base64url SHA-256 of the signing certificate>`.
 
 The dashboard pre-fills these from your project's Site URL and project name. Adjust them if your production app is served from a different domain.
 
