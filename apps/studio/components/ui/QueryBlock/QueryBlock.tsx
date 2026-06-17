@@ -50,6 +50,7 @@ export interface QueryBlockProps {
   blockWriteQueries?: boolean
   /** Render the chart tooltip in a portal so it isn't clipped by overflow-hidden ancestors (e.g. report cards). */
   portalTooltip?: boolean
+  autoLimit?: boolean
   onExecute?: (queryType: 'select' | 'mutation') => void
   onRemoveChart?: () => void
   onUpdateChartConfig?: ({ chartConfig }: { chartConfig: Partial<ChartConfig> }) => void
@@ -73,6 +74,7 @@ export const QueryBlock = ({
   disabled = false,
   blockWriteQueries = false,
   portalTooltip = false,
+  autoLimit = false,
   onExecute,
   onRemoveChart,
   onUpdateChartConfig,
@@ -390,6 +392,11 @@ export const QueryBlock = ({
                 )}
               >
                 <Results rows={results} />
+                {autoLimit && (
+                  <p className="text-xs font-mono px-2 py-1 border-t text-foreground-light">
+                    Limited to only 100 rows
+                  </p>
+                )}
               </div>
             )
           )}
