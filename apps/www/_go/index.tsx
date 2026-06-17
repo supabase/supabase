@@ -28,12 +28,16 @@ import amoe from './legal/amoe'
 import amoeThankYou from './legal/amoe-thankyou'
 import contestRules from './legal/contest-rules'
 import byocEarlyAccess from './pre-release/byoc-early-access'
+import externalReplicationDestinations from './pre-release/external-replication-destinations'
+import externalReplicationDestinationsThankYou from './pre-release/external-replication-destinations-thank-you'
 import supabaseStripeProjects from './stripe-projects/supabase-stripe-projects'
 
 const pages: GoPageInput[] = [
   awsActivateOffer, // maintain forever
   exampleLeadGen, // sample lead gen page
   byocEarlyAccess, // maintain until PM says to remove
+  externalReplicationDestinations, // maintain while destination early access is active
+  externalReplicationDestinationsThankYou, // maintain while destination early access is active
   amoe, // maintain forever
   amoeThankYou, // maintain forever
   contestRules, // maintain forever
