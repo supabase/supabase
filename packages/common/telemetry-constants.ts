@@ -3480,7 +3480,7 @@ export type TelemetryEvent =
   | DocsFeedbackClickedEvent
   | CopyAsMarkdownEvent
   | AskAIEvent
-  | DocsRecommendationClickedEvent
+  | DocsRecommendation404ClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
   | HomepageProductCardClickedEvent
   | WwwPricingPlanCtaClickedEvent
