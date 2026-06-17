@@ -33,7 +33,7 @@ export const ValidationWarningsDialog = ({
           <AlertDialogTitle>
             {hasWarnings
               ? `Create destination with ${warningCount} ${warningCount === 1 ? 'warning' : 'warnings'}?`
-              : 'Create destination?'}
+              : 'Confirm to create destination'}
           </AlertDialogTitle>
           <AlertDialogDescription>
             {hasWarnings

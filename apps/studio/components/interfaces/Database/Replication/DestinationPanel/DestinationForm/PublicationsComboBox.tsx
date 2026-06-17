@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { Check, ChevronsUpDown, Loader2, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { ControllerRenderProps } from 'react-hook-form'
@@ -19,26 +20,32 @@ import {
 } from 'ui'
 
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
-import type { ReplicationPublication } from '@/data/replication/publications-query'
+import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
 
 interface PublicationsComboBoxProps {
-  publications: ReplicationPublication[]
-  isLoadingPublications: boolean
-  onOpen: () => void
-  onNewPublicationClick: () => void
+  sourceId?: number
   field: ControllerRenderProps<DestinationPanelSchemaType, 'publicationName'>
+  onNewPublicationClick: () => void
 }
 
 export const PublicationsComboBox = ({
-  publications,
-  isLoadingPublications,
-  onOpen,
-  onNewPublicationClick,
+  sourceId,
   field,
+  onNewPublicationClick,
 }: PublicationsComboBoxProps) => {
+  const { ref: projectRef } = useParams()
+
+  const [searchTerm, setSearchTerm] = useState('')
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [selectedPublication, setSelectedPublication] = useState<string>(field?.value || '')
-  const [searchTerm, setSearchTerm] = useState('')
+
+  const {
+    data: publications = [],
+    isPending,
+    isFetching,
+    refetch: refetchPublications,
+  } = useReplicationPublicationsQuery({ projectRef, sourceId })
+  const isLoadingPublications = isPending || isFetching
   const showLoadingState = isLoadingPublications && publications.length === 0
 
   function handlePublicationSelect(pub: string) {
@@ -58,7 +65,7 @@ export const PublicationsComboBox = ({
       onOpenChange={(open) => {
         setDropdownOpen(open)
         if (open) {
-          onOpen()
+          refetchPublications()
         }
         if (!open && field?.onBlur) {
           field.onBlur()

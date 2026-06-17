@@ -53,7 +53,7 @@ export const ValidationFailuresSection = ({
                 </p>
               </AccordionTrigger>
               <AccordionContent className="px-3">
-                <Markdown className="text-sm text-foreground-light [&>p]:mb-0!">
+                <Markdown className="text-sm text-foreground-light [&>p]:mb-2!">
                   {failure.reason}
                 </Markdown>
               </AccordionContent>

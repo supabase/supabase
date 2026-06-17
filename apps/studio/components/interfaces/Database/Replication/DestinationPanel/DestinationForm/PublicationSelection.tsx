@@ -24,13 +24,10 @@ export const PublicationSelection = ({
   const { ref: projectRef } = useParams()
   const { publicationName } = form.watch()
 
-  const {
-    data: publications = [],
-    isPending: isLoadingPublications,
-    isFetching: isFetchingPublications,
-    isSuccess: isSuccessPublications,
-    refetch: refetchPublications,
-  } = useReplicationPublicationsQuery({ projectRef, sourceId })
+  const { data: publications, isSuccess: isSuccessPublications } = useReplicationPublicationsQuery({
+    projectRef,
+    sourceId,
+  })
 
   const publicationNames = useMemo(() => publications?.map((pub) => pub.name) ?? [], [publications])
   const isSelectedPublicationMissing =
@@ -48,14 +45,8 @@ export const PublicationSelection = ({
         >
           <FormControl>
             <PublicationsComboBox
-              publications={publications}
-              isLoadingPublications={isLoadingPublications || isFetchingPublications}
               field={field}
-              onOpen={() => {
-                if (projectRef && sourceId) {
-                  void refetchPublications()
-                }
-              }}
+              sourceId={sourceId}
               onNewPublicationClick={() => onSelectNewPublication()}
             />
           </FormControl>

@@ -20,6 +20,7 @@ import { AdvancedSettings } from './AdvancedSettings'
 import { CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
 import { DestinationPanelFormSchema as FormSchema } from './DestinationForm.schema'
 import {
+  areValidationFailuresEqual,
   buildDestinationConfig,
   buildDestinationConfigForValidation,
   getDucklakeValidationIssues,
@@ -66,25 +67,6 @@ import {
 import { type ResponseError } from '@/types'
 
 const formId = 'destination-editor'
-
-const getValidationFailureKey = (failure: ValidationFailure) =>
-  JSON.stringify([failure.failure_type, failure.name, failure.reason])
-
-const getSortedValidationFailureKeys = (failures: ValidationFailure[]) =>
-  failures.map(getValidationFailureKey).sort((a, b) => a.localeCompare(b))
-
-const areValidationFailuresEqual = (
-  previousFailures: ValidationFailure[],
-  nextFailures: ValidationFailure[]
-) => {
-  const previousKeys = getSortedValidationFailureKeys(previousFailures)
-  const nextKeys = getSortedValidationFailureKeys(nextFailures)
-
-  return (
-    previousKeys.length === nextKeys.length &&
-    previousKeys.every((key, index) => key === nextKeys[index])
-  )
-}
 
 interface DestinationFormProps {
   selectedType: DestinationType
@@ -200,11 +182,13 @@ export const DestinationForm = ({
   const { mutateAsync: createDestinationPipeline, isPending: creatingDestinationPipeline } =
     useCreateDestinationPipelineMutation({
       onSuccess: () => form.reset(defaultValues),
+      onError: () => {},
     })
 
   const { mutateAsync: updateDestinationPipeline, isPending: updatingDestinationPipeline } =
     useUpdateDestinationPipelineMutation({
       onSuccess: () => form.reset(defaultValues),
+      onError: () => {},
     })
 
   const { mutateAsync: startPipeline, isPending: startingPipeline } = useStartPipelineMutation()
@@ -575,22 +559,18 @@ export const DestinationForm = ({
         return
       }
 
-      if (validationResult.warnings.length > 0) {
-        if (
-          previousFailuresAreOnlyWarnings &&
-          areValidationFailuresEqual(previousWarnings, validationResult.warnings)
-        ) {
-          setPendingFormValues(data)
-          setShowValidationWarningsDialog(true)
-        }
-        // Warnings are shown inline. The user can submit again to confirm if unchanged.
+      const hasWarnings = validationResult.warnings.length > 0
+      const warningsUnchanged =
+        previousFailuresAreOnlyWarnings &&
+        areValidationFailuresEqual(previousWarnings, validationResult.warnings)
+
+      // Open the confirmation dialog when validation is clean, or when warnings are unchanged on
+      // resubmit. New/changed warnings are shown inline so the user can review and submit again.
+      if (hasWarnings && warningsUnchanged) {
+        setPendingFormValues(data)
+        setShowValidationWarningsDialog(true)
         return
       }
-
-      // Validation passed cleanly — still ask for confirmation before creating the pipeline.
-      setPendingFormValues(data)
-      setShowValidationWarningsDialog(true)
-      return
     }
 
     await submitPipeline(data)
