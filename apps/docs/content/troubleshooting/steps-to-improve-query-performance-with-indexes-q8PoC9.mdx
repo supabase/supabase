@@ -10,13 +10,13 @@ database_id = "fb1cbd42-e172-44b2-af2b-fda5aecde5c2"
 cli = [ "supabase-inspect-db" ]
 ---
 
-# Optimizing your database
+## Optimizing your database
 
 This is an intermediate and actionable guide for Postgres optimization within the Supabase ecosystem.
 
 > Consider checking out [Index_advisor](/docs/guides/database/extensions/index_advisor) and the [performance advisor](/dashboard/project/_/database/performance-advisor) now available in the Dashboard!
 
-## Installing Supabase Grafana
+### Installing Supabase Grafana
 
 Supabase has an [open-source Grafana Repo](https://github.com/supabase/supabase-grafana) that displays real-time metrics of your database. Although the [Observability Dashboard](/dashboard/project/_/observability) provides similar metrics, it averages the data by the hour or day. Having visibility over how your database responds to changes helps to ensure that the database is not stressed by the index-building process.
 
@@ -25,7 +25,7 @@ _Visual of Grafana Dashboard_
 
 It can be run locally within Docker or can be deployed for free to fly.io. Installation instructions can be found in [Supabase's metrics docs](/docs/guides/telemetry/metrics/grafana-self-hosted)
 
-## Query optimization through indexes
+### Query optimization through indexes
 
 Disk (storage) is relatively slow compared to memory, so Postgres will take frequently accessed data and cache it in memory for fast access.
 

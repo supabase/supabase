@@ -9,7 +9,7 @@ database_id = "ef05da0a-f8bc-44a4-9719-5ae811dba104"
 
 > [Guide](/docs/guides/monitoring-troubleshooting/metrics#deploying-supabase-grafana) for setting up Supabase Grafana
 
-# CPU
+## CPU
 
 Here are examples of unhealthy CPU utilization:
 
@@ -25,13 +25,13 @@ The CPU chart shows 4 distinct metrics of interest:
 
 As the CPU peaks towards 100%, queries and database tasks will begin to throttle, as they won't have enough time or access to the CPU.
 
-### Other useful Supabase Grafana guides:
+#### Other useful Supabase Grafana guides:
 
 - [Connections](https://github.com/orgs/supabase/discussions/27141)
 - [Disk](https://github.com/orgs/supabase/discussions/27003)
 - [Memory](https://github.com/orgs/supabase/discussions/27021)
 
-### Optimizing:
+#### Optimizing:
 
 1. [Optimize your queries](/docs/guides/database/query-optimization).
 2. [Add indexes](https://github.com/orgs/supabase/discussions/22449) if possible.
