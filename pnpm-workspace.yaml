@@ -69,6 +69,7 @@ overrides:
   '@usercentrics/cmp-browser-sdk>uuid': ^11.1.1
   'braintrust>uuid': ^11.1.1
   'mdx-bundler>uuid': ^11.1.1
+  braintrust>esbuild: ^0.28.1
   cacache>tar: ^7.5.11
   dompurify: ^3.3.2
   express-rate-limit>ip-address: ^10.1.1
@@ -81,6 +82,7 @@ overrides:
   refractor>prismjs: ^1.30.0
   supabase>tar: ^7.5.11
   tmp: ^0.2.7
+  vite>esbuild: ^0.28.1
   webpack: ^5.104.1
 
 patchedDependencies:
