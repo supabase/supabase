@@ -35,7 +35,18 @@ const remarkMkDocsAdmonition = function () {
         // Extract sibling nodes that should be linked to this admonition
         const siblingsToNest = extractLinkedSiblings(parent, paragraph, index)
 
-        const children: any[] = [...paragraph.children, ...siblingsToNest]
+        const inlineChildren = paragraph.children.filter((child) => {
+          if (child.type === 'text') return child.value.trim().length > 0
+          return true
+        })
+
+        // Wrap inline content in a single paragraph so MDX does not emit one <p> per node.
+        const children: Content[] = [
+          ...(inlineChildren.length > 0
+            ? [{ type: 'paragraph' as const, children: inlineChildren }]
+            : []),
+          ...siblingsToNest,
+        ]
 
         // Generate a Supabase Admonition JSX element
         const admonitionElement: MdxJsxFlowElement = {
