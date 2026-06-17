@@ -206,7 +206,7 @@ export const CliLoginScreen = ({
               isPlural ? 's' : ''
             }: ${status.missingParameters.join(', ')}.`}
           />
-          <Button type="default" block asChild>
+          <Button variant="default" block asChild>
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>
@@ -234,7 +234,7 @@ export const CliLoginScreen = ({
               </>
             }
           />
-          <Button type="default" block asChild>
+          <Button variant="default" block asChild>
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>
@@ -270,7 +270,7 @@ export const CliLoginScreen = ({
             text={status.deviceCode}
             copyLabel="Copy code"
             copiedLabel="Copied"
-            type="primary"
+            variant="primary"
             size="tiny"
             className="w-full"
           />

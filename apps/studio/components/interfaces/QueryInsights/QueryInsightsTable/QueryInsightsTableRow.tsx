@@ -127,7 +127,7 @@ export const QueryInsightsTableRow = ({
 
       <div className="flex items-center gap-2 shrink-0 justify-end w-[260px]">
         <Button
-          type="default"
+          variant="default"
           size="tiny"
           onClick={(e) => {
             e.stopPropagation()
@@ -139,7 +139,7 @@ export const QueryInsightsTableRow = ({
 
         {(item.issueType === 'index' || item.issueType === 'slow') && (
           <Button
-            type="default"
+            variant="default"
             size="tiny"
             icon={isExplainLoading ? <Loader2 size={12} className="animate-spin" /> : undefined}
             onClick={(e) => {
@@ -153,7 +153,7 @@ export const QueryInsightsTableRow = ({
 
         {item.issueType === 'index' && (
           <Button
-            type="primary"
+            variant="primary"
             size="tiny"
             onClick={(e) => {
               e.stopPropagation()
@@ -166,7 +166,7 @@ export const QueryInsightsTableRow = ({
 
         {(item.issueType === 'error' || item.issueType === 'slow') && (
           <Button
-            type="default"
+            variant="default"
             size="tiny"
             icon={<AiIconAnimation size={14} />}
             onClick={(e) => {

@@ -104,7 +104,7 @@ const InputWithSuggestions = ({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <ButtonTooltip
-                    type="text"
+                    variant="text"
                     size="tiny"
                     tooltip={{
                       content: { text: suggestionsTooltip || 'Suggestions', side: 'bottom' },

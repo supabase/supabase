@@ -281,7 +281,7 @@ export const MarketplaceIndex = () => {
 
             {filtered.length === 0 && (
               <EmptyStatePresentational title="No results found">
-                <Button type="default" onClick={clearAll}>
+                <Button variant="default" onClick={clearAll}>
                   Clear filters
                 </Button>
               </EmptyStatePresentational>

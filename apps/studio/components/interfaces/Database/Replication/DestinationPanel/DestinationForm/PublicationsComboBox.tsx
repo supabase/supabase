@@ -60,7 +60,7 @@ export const PublicationsComboBox = ({
     >
       <PopoverTrigger asChild>
         <Button
-          type="default"
+          variant="default"
           size="medium"
           className={cn(
             'w-full [&>span]:w-full text-left',
@@ -81,11 +81,6 @@ export const PublicationsComboBox = ({
             value={searchTerm}
             onValueChange={setSearchTerm}
           />
-          <div className="px-2 pt-2 pb-1">
-            <p className="text-xs text-foreground-lighter">
-              Publications with no tables are hidden
-            </p>
-          </div>
           <CommandList>
             <CommandEmpty>
               {isLoadingPublications ? (
@@ -100,11 +95,15 @@ export const PublicationsComboBox = ({
 
             <CommandGroup>
               {publications.length === 0 && (
-                <p className="text-foreground-lighter text-xs py-3 px-2">
-                  No publications available
-                </p>
+                <div className="text-foreground-lighter text-xs py-3 px-2 space-y-0.5">
+                  <p>No publications available</p>
+                  <p className="text-foreground-muted">Publications with no tables are hidden</p>
+                </div>
               )}
-              <ScrollArea className={publications.length > 7 ? 'h-[210px]' : ''}>
+              <ScrollArea
+                className={publications.length > 7 ? 'h-[210px]' : ''}
+                onWheel={(e) => e.stopPropagation()}
+              >
                 {publications.map((pub) => (
                   <CommandItem
                     key={pub.name}

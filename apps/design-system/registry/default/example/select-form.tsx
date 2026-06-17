@@ -73,7 +73,7 @@ export default function SelectForm() {
             </FormItem>
           )}
         />
-        <Button htmlType="submit" type="secondary">
+        <Button type="submit" variant="secondary">
           Submit
         </Button>
       </form>

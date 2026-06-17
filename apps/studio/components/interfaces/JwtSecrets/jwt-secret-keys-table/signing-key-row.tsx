@@ -123,7 +123,7 @@ export const SigningKeyRow = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              type="text"
+              variant="text"
               className="px-1.5"
               loading={isLoading}
               icon={<MoreVertical className="size-4" />}

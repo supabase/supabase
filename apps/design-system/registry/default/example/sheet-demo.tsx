@@ -17,7 +17,7 @@ export default function SheetDemo() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button type="outline">Show Sheet</Button>
+        <Button variant="outline">Show Sheet</Button>
       </SheetTrigger>
       <SheetContent className="flex flex-col gap-0">
         <SheetHeader>
@@ -44,7 +44,7 @@ export default function SheetDemo() {
         </div>
         <SheetFooter>
           <SheetClose asChild>
-            <Button type="primary">Save changes</Button>
+            <Button variant="primary">Save changes</Button>
           </SheetClose>
         </SheetFooter>
       </SheetContent>

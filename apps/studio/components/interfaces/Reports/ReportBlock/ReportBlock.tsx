@@ -5,6 +5,7 @@ import { X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { checkIfAppendLimitRequired, suffixWithLimit } from '../../SQLEditor/SQLEditor.utils'
 import { BURSTABLE_IO_METRIC_KEYS, DEPRECATED_REPORTS } from '../Reports.constants'
 import { ChartBlock } from './ChartBlock'
 import { DeprecatedChartBlock } from './DeprecatedChartBlock'
@@ -78,7 +79,10 @@ export const ReportBlock = ({
     }
   )
 
+  const autoLimit = 100
   const sql = isSnippet ? (data?.content as SqlSnippets.Content)?.unchecked_sql : undefined
+  const { appendAutoLimit } = checkIfAppendLimitRequired(sql ?? '', autoLimit)
+
   const chartConfig = { ...DEFAULT_CHART_CONFIG, ...(item.chartConfig ?? {}) }
   const isDeprecatedChart = DEPRECATED_REPORTS.includes(item.attribute)
   const snippetMissing = contentError?.message.includes('Content not found')
@@ -98,6 +102,7 @@ export const ReportBlock = ({
       sql,
       readOnlyConnectionString,
       postgresConnectionString,
+      autoLimit,
     ]),
     queryFn: async () => {
       if (!projectRef || !sql) return null
@@ -109,13 +114,15 @@ export const ReportBlock = ({
         return null
       }
 
+      const formattedSql = suffixWithLimit(acceptUntrustedSql(sql), autoLimit)
+
       return executeSql({
         projectRef,
         connectionString,
         // acceptUntrustedSql is usually not allowed in an auto-run position,
         // but in this case we are explicitly allowing it because adding a block
         // to a report is an explicit user action.
-        sql: acceptUntrustedSql(sql),
+        sql: formattedSql,
       })
     },
     enabled: !isLoadingContent && contentError == null,
@@ -167,7 +174,7 @@ export const ReportBlock = ({
           isWriteQuery={isWriteQuery}
           actions={
             <ButtonTooltip
-              type="text"
+              variant="text"
               icon={<X />}
               className="w-7 h-7"
               onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
@@ -180,6 +187,7 @@ export const ReportBlock = ({
           onUpdateChartConfig={onUpdateChart}
           onRemoveChart={() => onRemoveChart({ metric: { key: item.attribute } })}
           disabled={isLoadingContent || snippetMissing || !sql}
+          autoLimit={appendAutoLimit}
         />
       ) : isUnavailableBurstChart ? (
         <UnavailableChartBlock
@@ -187,7 +195,7 @@ export const ReportBlock = ({
           actions={
             !disableUpdate ? (
               <ButtonTooltip
-                type="text"
+                variant="text"
                 icon={<X />}
                 className="h-7 w-7"
                 onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
@@ -203,7 +211,7 @@ export const ReportBlock = ({
           actions={
             !disableUpdate ? (
               <ButtonTooltip
-                type="text"
+                variant="text"
                 icon={<X />}
                 className="w-7 h-7"
                 onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
@@ -226,7 +234,7 @@ export const ReportBlock = ({
           actions={
             !disableUpdate ? (
               <ButtonTooltip
-                type="text"
+                variant="text"
                 icon={<X />}
                 className="w-7 h-7"
                 onClick={() => onRemoveChart({ metric: { key: item.attribute } })}

@@ -65,7 +65,7 @@ const CurrentPaymentMethod = () => {
         />
       )}
 
-      <Button type="outline" asChild>
+      <Button variant="outline" asChild>
         {subscription?.payment_method_type === 'invoice' ? (
           <SupportLink
             queryParams={{

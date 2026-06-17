@@ -48,7 +48,7 @@ export const SignInWithGitHub = () => {
         // set the width to 20 so that it matches the loading spinner and don't push the text when loading
         icon={<Github width={20} height={18} />}
         size="large"
-        type="default"
+        variant="default"
         loading={loading}
       >
         Continue with GitHub

@@ -105,7 +105,7 @@ export function IPv4StatusPanel({ method, ipv4Status, projectRef }: IPv4StatusPa
               {links.length > 0 && (
                 <div className="flex items-center gap-x-2 mt-2">
                   {links.map((link) => (
-                    <Button key={link.text} asChild type="default" size="tiny">
+                    <Button key={link.text} asChild variant="default" size="tiny">
                       <Link href={link.url} className="text-xs text-light hover:text-foreground">
                         {link.text}
                       </Link>
@@ -123,7 +123,7 @@ export function IPv4StatusPanel({ method, ipv4Status, projectRef }: IPv4StatusPa
                 className="group/collapse w-full justify-start rounded-t-none !last:rounded-b group-data-open:rounded-b-none border-muted"
               >
                 <Button
-                  type="default"
+                  variant="default"
                   size="tiny"
                   className="text-foreground-lighter bg-dash-sidebar!"
                   icon={

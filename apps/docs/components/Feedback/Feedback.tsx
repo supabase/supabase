@@ -2,9 +2,8 @@
 
 import { createClient } from '@supabase/supabase-js'
 import { IS_PLATFORM } from '~/lib/constants'
-import { useSendFeedbackMutation } from '~/lib/fetch/feedback'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { useConstant, useIsLoggedIn, type Database } from 'common'
+import { gotrueClient, useConstant, useIsLoggedIn, type Database } from 'common'
 import { Check, MessageSquareQuote, X } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import {
@@ -17,7 +16,7 @@ import {
 } from 'react'
 import { Button, cn } from 'ui'
 
-import { getLinearTeam, getSanitizedTabParams } from './Feedback.utils'
+import { getSanitizedTabParams, updateDocsFeedbackComment } from './Feedback.utils'
 import { FeedbackModal, type FeedbackFields } from './FeedbackModal'
 
 const FeedbackButton = forwardRef<
@@ -78,15 +77,20 @@ function Feedback({ className }: { className?: string }) {
 
   const pathname = usePathname() ?? ''
   const sendTelemetryEvent = useSendTelemetryEvent()
-  const { mutate: sendFeedbackComment } = useSendFeedbackMutation()
   const supabase = useConstant(() =>
     IS_PLATFORM
       ? createClient<Database>(
           process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+          {
+            accessToken: async () =>
+              (await gotrueClient.getSession()).data.session?.access_token ?? null,
+          }
         )
       : undefined
   )
+  const isLoggedIn = useIsLoggedIn()
+  const feedbackInsertRef = useRef<Promise<number | null> | null>(null)
 
   const unanswered = state.type === 'unanswered'
   const isYes = 'response' in state && state.response === 'yes'
@@ -94,17 +98,26 @@ function Feedback({ className }: { className?: string }) {
   const showYes = unanswered || isYes
   const showNo = unanswered || isNo
 
-  async function sendFeedbackVote(response: Response) {
-    if (!supabase) return
+  // Returns the new row's id for logged-in users (who can read their own row
+  // back) so an optional comment can be attached afterwards. Anonymous votes are
+  // insert-only and resolve to null.
+  async function sendFeedbackVote(response: Response): Promise<number | null> {
+    if (!supabase) return null
 
-    const { error } = await supabase.from('feedback').insert({
-      vote: response,
-      page: pathname,
-      metadata: {
-        query: getSanitizedTabParams(),
-      },
-    })
-    if (error) console.error(error)
+    const row = { vote: response, page: pathname, metadata: { query: getSanitizedTabParams() } }
+
+    if (isLoggedIn) {
+      const { data, error } = await supabase.from('feedback').insert(row).select('id').single()
+      if (error) {
+        console.error(error)
+        return null
+      }
+      return data.id
+    } else {
+      const { error } = await supabase.from('feedback').insert(row)
+      if (error) console.error(error)
+      return null
+    }
   }
 
   function handleVote(response: Response) {
@@ -112,7 +125,7 @@ function Feedback({ className }: { className?: string }) {
       action: 'docs_feedback_clicked',
       properties: { response },
     })
-    sendFeedbackVote(response)
+    feedbackInsertRef.current = sendFeedbackVote(response)
     dispatch({ event: 'VOTED', response })
     // Focus so screen reader users are aware of the new element
     setTimeout(() => {
@@ -128,15 +141,14 @@ function Feedback({ className }: { className?: string }) {
     }, 100)
   }
 
-  async function handleSubmit({ page, comment, title }: FeedbackFields) {
-    sendFeedbackComment({
-      message: comment,
-      pathname: page,
-      title,
-      // @ts-expect-error -- can't click this button without having a state.response
-      isHelpful: state.response === 'yes',
-      team: getLinearTeam(pathname),
-    })
+  async function handleSubmit({ comment, title }: FeedbackFields) {
+    // Wait for the vote insert so the comment update can't run before the row
+    // (and its id) exists.
+    const id = await feedbackInsertRef.current
+    if (supabase && id !== null) {
+      const { error } = await updateDocsFeedbackComment(supabase, { id, title, comment })
+      if (error) console.error(error)
+    }
     setModalOpen(false)
     refocusButton()
   }
@@ -152,7 +164,7 @@ function Feedback({ className }: { className?: string }) {
           className="relative flex gap-2 items-center"
         >
           <Button
-            type="outline"
+            variant="outline"
             rounded
             className={cn(
               'px-1 w-7 h-7',
@@ -171,7 +183,7 @@ function Feedback({ className }: { className?: string }) {
             <span className="sr-only">No</span>
           </Button>
           <Button
-            type="outline"
+            variant="outline"
             rounded
             className={cn(
               'px-1 w-7 h-7',

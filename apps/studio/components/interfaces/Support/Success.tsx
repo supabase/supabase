@@ -32,11 +32,11 @@ export const Success = ({
 
   const finishAction = showFinishAction ? (
     onFinish ? (
-      <Button type="default" onClick={onFinish}>
+      <Button variant="default" onClick={onFinish}>
         {finishLabel}
       </Button>
     ) : (
-      <Button asChild type="default">
+      <Button asChild variant="default">
         <Link href="/">{finishLabel}</Link>
       </Button>
     )
@@ -64,7 +64,7 @@ export const Success = ({
         {finishAction}
         <Button
           asChild
-          type="default"
+          variant="default"
           icon={<IconDiscord size={16} fill="hsl(var(--background-default))" />}
         >
           <Link href="https://discord.supabase.com/" target="_blank">

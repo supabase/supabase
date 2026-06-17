@@ -249,7 +249,7 @@ type AlertDialogActionProps = Omit<
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Action>,
   'onClick'
 > & {
-  variant?: NonNullable<ButtonVariantProps['type']>
+  variant?: NonNullable<ButtonVariantProps['variant']>
   loading?: boolean
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => unknown
 }
@@ -319,7 +319,7 @@ const AlertDialogAction = React.forwardRef<
         <AlertDialogPrimitive.Action
           ref={ref}
           asChild
-          className={cn(buttonVariants({ type: variant, size: 'tiny' }), className)}
+          className={cn(buttonVariants({ variant: variant, size: 'tiny' }), className)}
           disabled={isDisabled}
           onClick={handleClick}
           type={type}
@@ -336,9 +336,9 @@ const AlertDialogAction = React.forwardRef<
           ref={ref}
           className={className}
           disabled={isDisabled}
-          htmlType={type}
+          type={type}
           loading={loading}
-          type={variant}
+          variant={variant}
         >
           {children}
         </Button>
@@ -357,7 +357,11 @@ const AlertDialogCancel = React.forwardRef<
   return (
     <AlertDialogPrimitive.Cancel
       ref={ref}
-      className={cn(buttonVariants({ type: 'default', size: 'tiny' }), 'mt-2 sm:mt-0', className)}
+      className={cn(
+        buttonVariants({ variant: 'default', size: 'tiny' }),
+        'mt-2 sm:mt-0',
+        className
+      )}
       disabled={disabled || alertDialogContext?.loading}
       {...props}
     />

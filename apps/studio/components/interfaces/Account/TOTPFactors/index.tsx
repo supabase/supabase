@@ -54,7 +54,7 @@ export const TOTPFactors = () => {
                         </p>
                         <Button
                           size="tiny"
-                          type="default"
+                          variant="default"
                           onClick={() => setFactorToBeDeleted(factor.id)}
                         >
                           Remove

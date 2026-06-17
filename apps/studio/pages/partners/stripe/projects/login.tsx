@@ -130,7 +130,7 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
                   </>
                 }
               />
-              <Button type="default" block onClick={() => signOut()}>
+              <Button variant="default" block onClick={() => signOut()}>
                 Sign out
               </Button>
             </div>
@@ -148,10 +148,10 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
                 }
               />
               <div className="flex flex-col gap-2">
-                <Button type="primary" block loading={isConfirming} onClick={handleApprove}>
+                <Button variant="primary" block loading={isConfirming} onClick={handleApprove}>
                   Authorize Stripe Projects
                 </Button>
-                <Button type="text" block onClick={() => router.push('/')}>
+                <Button variant="text" block onClick={() => router.push('/')}>
                   Cancel
                 </Button>
               </div>
@@ -165,7 +165,7 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
                 displayName={displayName}
                 action={
                   <ButtonTooltip
-                    type="text"
+                    variant="text"
                     size="small"
                     className="h-8 w-8 px-0"
                     onClick={() => signOut()}
@@ -184,14 +184,14 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
 
               <div className="flex flex-col gap-2">
                 <Button
-                  type="primary"
+                  variant="primary"
                   loading={isConfirming}
                   disabled={isConfirming}
                   onClick={handleApprove}
                 >
                   Create organization
                 </Button>
-                <Button type="text" onClick={() => router.push('/')}>
+                <Button variant="text" onClick={() => router.push('/')}>
                   Cancel
                 </Button>
               </div>
@@ -205,7 +205,7 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
                 title="Unable to load authorization"
                 description={error?.message}
               />
-              <Button type="default" block onClick={() => signOut()}>
+              <Button variant="default" block onClick={() => signOut()}>
                 Sign out
               </Button>
             </div>

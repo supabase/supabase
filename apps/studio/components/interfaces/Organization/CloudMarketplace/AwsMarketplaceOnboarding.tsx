@@ -155,7 +155,7 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
               </p>
             }
           />
-          <Button type="default" block asChild>
+          <Button variant="default" block asChild>
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>
@@ -191,7 +191,7 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
               </>
             }
           />
-          <Button type="default" block asChild>
+          <Button variant="default" block asChild>
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>
@@ -206,7 +206,7 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
       <AwsMarketplaceInterstitial description={getContractIneligibilityDescription(reason)}>
         <div className="flex flex-col gap-3">
           <ContractIneligibilityNotice reason={reason} />
-          <Button type="default" block asChild>
+          <Button variant="default" block asChild>
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>
@@ -227,7 +227,7 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
                 : 'The selected organization will be billed through AWS Marketplace.'
             }
           />
-          <Button type="primary" block asChild>
+          <Button variant="primary" block asChild>
             <Link href={`/org/${linkedOrganization?.slug ?? linkedOrgSlug}`}>
               Go to organization
             </Link>
@@ -292,7 +292,7 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
 
           <div className="flex flex-col gap-5">
             <Button
-              type="primary"
+              variant="primary"
               block
               loading={isLinking}
               disabled={hasLinkableOrganizations && (!selectedOrgSlug || isLinking)}

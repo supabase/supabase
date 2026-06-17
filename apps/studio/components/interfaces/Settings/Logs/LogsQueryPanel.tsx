@@ -114,7 +114,7 @@ const LogsQueryPanel = ({
           <div className="flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button type="default" iconRight={<ChevronDown />}>
+                <Button variant="default" iconRight={<ChevronDown />}>
                   Insert source
                 </Button>
               </DropdownMenuTrigger>
@@ -139,7 +139,7 @@ const LogsQueryPanel = ({
             {logsTemplates && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button type="default" iconRight={<ChevronDown />}>
+                  <Button variant="default" iconRight={<ChevronDown />}>
                     Templates
                   </Button>
                 </DropdownMenuTrigger>
@@ -226,7 +226,7 @@ const LogsQueryPanel = ({
               <div className="flex flex-row justify-between items-center">
                 <h3>Field Reference</h3>
                 <Button
-                  type="text"
+                  variant="text"
                   className="px-1"
                   onClick={() => setShowReference(false)}
                   icon={<X />}
@@ -239,7 +239,7 @@ const LogsQueryPanel = ({
             hideFooter
             triggerElement={
               <Button
-                type="text"
+                variant="text"
                 onClick={() => setShowReference(true)}
                 icon={<BookOpen />}
                 className="px-2"
@@ -276,7 +276,7 @@ const LogsQueryPanel = ({
               <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
                   <Button
-                    type="default"
+                    variant="default"
                     role="combobox"
                     size={'small'}
                     aria-expanded={open}

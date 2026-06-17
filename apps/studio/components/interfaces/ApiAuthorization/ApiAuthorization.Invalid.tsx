@@ -27,7 +27,7 @@ export function ApiAuthorizationInvalidScreen({
             isPlural ? 's' : ''
           }: ${missingParameters.join(', ')}.`}
         />
-        <Button type="default" block asChild>
+        <Button variant="default" block asChild>
           <Link href="/">Back to dashboard</Link>
         </Button>
       </div>
