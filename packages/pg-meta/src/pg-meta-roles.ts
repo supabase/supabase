@@ -79,6 +79,12 @@ where
 
 type RoleIdentifier = Pick<PGRole, 'id'> | Pick<PGRole, 'name'>
 
+/**
+ * Generates the SQL WHERE clause to identify a role by either its OID (id) or name.
+ *
+ * @param identifier - The identifier object containing the role's id or name.
+ * @returns The SQL fragment containing the comparison.
+ */
 function getIdentifierWhereClause(identifier: RoleIdentifier): SafeSqlFragment {
   if ('id' in identifier && identifier.id) {
     return safeSql`${ident('id')} = ${literal(identifier.id)}`

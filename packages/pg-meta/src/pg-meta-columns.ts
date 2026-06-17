@@ -102,6 +102,12 @@ where
 
 type ColumnIdentifier = Pick<PGColumn, 'id'> | Pick<PGColumn, 'name' | 'schema' | 'table'>
 
+/**
+ * Generates the SQL WHERE clause to identify a column by either its compound key or ID.
+ *
+ * @param identifier - The unique identifier of the column.
+ * @returns The SafeSqlFragment representing the WHERE condition.
+ */
 function getIdentifierWhereClause(identifier: ColumnIdentifier): SafeSqlFragment {
   if ('id' in identifier && identifier.id) {
     return safeSql`${ident('id')} = ${literal(identifier.id)}`
@@ -231,6 +237,12 @@ function create({
   }
 }
 
+/**
+ * Formats a Postgres column type reference into a safe SQL fragment, appending `[]` if the type is an array.
+ *
+ * @param type - The column type reference containing optional schema, type name, and array flag.
+ * @returns The formatted SQL identifier fragment.
+ */
 function typeIdent(type: ColumnTypeRef): SafeSqlFragment {
   const base =
     type.schema !== undefined
