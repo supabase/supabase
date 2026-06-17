@@ -141,7 +141,7 @@ export const DeleteOrganizationButton = () => {
     <>
       <div className="mt-2">
         <ButtonTooltip
-          type="danger"
+          variant="danger"
           disabled={!canDeleteOrganization || !orgSlug}
           loading={!orgSlug}
           onClick={() => {

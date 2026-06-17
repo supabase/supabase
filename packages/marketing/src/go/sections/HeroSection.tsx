@@ -56,7 +56,7 @@ export default function HeroSection({
                 <Button
                   key={cta.href}
                   asChild
-                  type={cta.variant === 'secondary' ? 'default' : 'primary'}
+                  variant={cta.variant === 'secondary' ? 'default' : 'primary'}
                   size="medium"
                 >
                   <a href={cta.href}>{cta.label}</a>

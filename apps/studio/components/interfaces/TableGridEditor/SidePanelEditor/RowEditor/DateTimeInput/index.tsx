@@ -69,7 +69,7 @@ export const DateTimeInput = ({
           {!disabled && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <InputGroupButton type="default" icon={<Edit />} className="px-1.5" />
+                <InputGroupButton variant="default" icon={<Edit />} className="px-1.5" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-28 pointer-events-auto">
                 {isNullable && (

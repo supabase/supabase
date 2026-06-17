@@ -126,7 +126,7 @@ const PostgrestReport = () => {
                 side="bottom"
               >
                 <Button
-                  type="default"
+                  variant="default"
                   disabled={isRefetching}
                   icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
                   className="w-7"

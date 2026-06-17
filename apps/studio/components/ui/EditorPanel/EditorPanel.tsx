@@ -305,7 +305,7 @@ export const EditorPanel = () => {
           {activeSnippet && (
             <ButtonTooltip
               size="tiny"
-              type="text"
+              variant="text"
               className="w-7 h-7 p-0"
               icon={<PlusIcon size={14} />}
               tooltip={{ content: { side: 'bottom', text: 'New snippet' } }}
@@ -316,7 +316,7 @@ export const EditorPanel = () => {
             <PopoverTrigger asChild>
               <ButtonTooltip
                 size="tiny"
-                type="text"
+                variant="text"
                 role="combobox"
                 aria-expanded={isSnippetsOpen}
                 className="w-7 h-7 p-0"
@@ -369,7 +369,7 @@ export const EditorPanel = () => {
               <PopoverTrigger asChild>
                 <Button
                   size="tiny"
-                  type="default"
+                  variant="default"
                   role="combobox"
                   className="mr-2"
                   aria-expanded={isTemplatesOpen}
@@ -425,7 +425,7 @@ export const EditorPanel = () => {
             </Popover>
           )}
           <ButtonTooltip
-            type="text"
+            variant="text"
             className="w-7 h-7 p-0"
             icon={<Maximize2 strokeWidth={1.5} />}
             tooltip={{
@@ -462,7 +462,7 @@ export const EditorPanel = () => {
           />
 
           <ButtonTooltip
-            type="text"
+            variant="text"
             className="w-7 h-7 p-0"
             onClick={handleClosePanel}
             icon={<X strokeWidth={1.5} />}
@@ -577,7 +577,7 @@ export const EditorPanel = () => {
               </span>
               <Button
                 size="tiny"
-                type="default"
+                variant="default"
                 className="ml-2"
                 onClick={() => setShowResults((prev) => !prev)}
               >
@@ -617,7 +617,7 @@ export const EditorPanel = () => {
             </div>
           )}
           <Button
-            type="default"
+            variant="default"
             size="tiny"
             disabled={
               !currentValue ||

@@ -304,7 +304,7 @@ export const FunctionsList = () => {
               <>
                 <CreateFunctionButton createFunction={createFunction} />
                 <ButtonTooltip
-                  type="default"
+                  variant="default"
                   disabled={!canCreateFunctions}
                   className="px-1 pointer-events-auto"
                   icon={<AiIconAnimation size={16} />}
@@ -338,7 +338,7 @@ export const FunctionsList = () => {
               title="Add your first function"
               description="PostgreSQL functions are a set of SQL and procedural commands such as declarations, assignments, loops, or flow-of-control."
             >
-              <CreateFunctionButton hideIcon type="default" createFunction={createFunction} />
+              <CreateFunctionButton hideIcon variant="default" createFunction={createFunction} />
             </EmptyStatePresentational>
           </>
         ) : (
@@ -412,11 +412,11 @@ export const FunctionsList = () => {
 }
 
 const CreateFunctionButton = ({
-  type = 'primary',
+  variant = 'primary',
   hideIcon = false,
   createFunction,
 }: {
-  type?: 'default' | 'primary'
+  variant?: 'default' | 'primary'
   hideIcon?: boolean
   createFunction: () => void
 }) => {
@@ -437,7 +437,7 @@ const CreateFunctionButton = ({
         side="bottom"
       >
         <Button
-          type={type}
+          variant={variant}
           className="grow"
           onClick={() => createFunction()}
           icon={hideIcon ? null : <Plus />}
@@ -450,7 +450,7 @@ const CreateFunctionButton = ({
     return (
       <ButtonTooltip
         disabled
-        type={type}
+        variant={variant}
         className="grow"
         icon={hideIcon ? null : <Plus />}
         tooltip={{

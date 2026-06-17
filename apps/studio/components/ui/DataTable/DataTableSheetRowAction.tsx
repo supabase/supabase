@@ -224,5 +224,5 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
     )
   }
 
-  return <CopyButton iconOnly type="text" text={String(value)} className="px-1" />
+  return <CopyButton iconOnly variant="text" text={String(value)} className="px-1" />
 }

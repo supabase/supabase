@@ -157,7 +157,7 @@ export const FeaturePreviewModal = () => {
                   <p>{selectedFeature?.name}</p>
                   <div className="flex items-center gap-x-2">
                     {selectedFeature?.discussionsUrl !== undefined && (
-                      <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+                      <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
                         <Link
                           href={selectedFeature.discussionsUrl}
                           target="_blank"
@@ -167,7 +167,7 @@ export const FeaturePreviewModal = () => {
                         </Link>
                       </Button>
                     )}
-                    <Button type="default" onClick={() => toggleFeature()}>
+                    <Button variant="default" onClick={() => toggleFeature()}>
                       {isSelectedFeatureEnabled ? 'Disable' : 'Enable'} feature
                     </Button>
                   </div>
@@ -186,7 +186,7 @@ export const FeaturePreviewModal = () => {
                   Have an idea for the dashboard? Let us know via GitHub Discussions!
                 </p>
               </div>
-              <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+              <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
                 <Link
                   href="https://github.com/orgs/supabase/discussions/categories/feature-requests"
                   target="_blank"

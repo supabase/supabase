@@ -74,7 +74,7 @@ export const LeaveTeamButton = () => {
   return (
     <>
       <ButtonTooltip
-        type="default"
+        variant="default"
         disabled={!canLeave || !organizationMembersDeletionEnabled || isLeaving}
         onClick={() => setIsLeaveTeamModalOpen(true)}
         tooltip={{

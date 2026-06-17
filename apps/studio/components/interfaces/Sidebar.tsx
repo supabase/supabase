@@ -95,7 +95,7 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    type="text"
+                    variant="text"
                     className={`w-min px-1.5 mx-0.5 ${sidebarBehaviour === 'open' ? 'px-2!' : ''}`}
                     icon={<PanelLeftDashed size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
                     aria-label="Sidebar control"
@@ -159,6 +159,7 @@ export function SideBarNavLink({
   route,
   active,
   onClick,
+  isLoading,
   ...props
 }: {
   route: Route
@@ -183,6 +184,7 @@ export function SideBarNavLink({
   const buttonProps = {
     disabled: route.disabled,
     isActive: active,
+    isLoading,
     className: cn('text-sm', sidebarBehaviour === 'open' ? 'px-2!' : ''),
     size: 'default' as const,
     onClick: onClick,
@@ -237,7 +239,7 @@ const ActiveDot = ({ hasErrors, hasWarnings }: { hasErrors: boolean; hasWarnings
 const ProjectLinks = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const { data: project } = useSelectedProjectQuery()
+  const { data: project, isPending: isProjectPending } = useSelectedProjectQuery()
   const { securityLints, errorLints } = useLints()
   const showReports = useIsFeatureEnabled('reports:all')
   const showLogs = useIsFeatureEnabled('logs:all')
@@ -295,6 +297,7 @@ const ProjectLinks = () => {
             key={`tools-routes-${i}`}
             route={route}
             active={activeRoute === route.key}
+            isLoading={isProjectPending}
           />
         ))}
       </SidebarGroup>
@@ -305,6 +308,7 @@ const ProjectLinks = () => {
             key={`product-routes-${i}`}
             route={route}
             active={activeRoute === route.key}
+            isLoading={isProjectPending}
           />
         ))}
       </SidebarGroup>
@@ -320,12 +324,22 @@ const ProjectLinks = () => {
                     hasWarnings={securityLints.length > 0}
                   />
                 )}
-                <SideBarNavLink key={route.key} route={route} active={activeRoute === route.key} />
+                <SideBarNavLink
+                  key={route.key}
+                  route={route}
+                  active={activeRoute === route.key}
+                  isLoading={isProjectPending}
+                />
               </div>
             )
           } else {
             return (
-              <SideBarNavLink key={route.key} route={route} active={activeRoute === route.key} />
+              <SideBarNavLink
+                key={route.key}
+                route={route}
+                active={activeRoute === route.key}
+                isLoading={isProjectPending}
+              />
             )
           }
         })}
@@ -338,6 +352,7 @@ const ProjectLinks = () => {
             key={`settings-routes-${i}`}
             route={route}
             active={activeRoute === route.key}
+            isLoading={isProjectPending}
           />
         ))}
       </SidebarGroup>

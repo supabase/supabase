@@ -50,6 +50,7 @@ export interface QueryBlockProps {
   blockWriteQueries?: boolean
   /** Render the chart tooltip in a portal so it isn't clipped by overflow-hidden ancestors (e.g. report cards). */
   portalTooltip?: boolean
+  autoLimit?: boolean
   onExecute?: (queryType: 'select' | 'mutation') => void
   onRemoveChart?: () => void
   onUpdateChartConfig?: ({ chartConfig }: { chartConfig: Partial<ChartConfig> }) => void
@@ -73,6 +74,7 @@ export const QueryBlock = ({
   disabled = false,
   blockWriteQueries = false,
   portalTooltip = false,
+  autoLimit = false,
   onExecute,
   onRemoveChart,
   onUpdateChartConfig,
@@ -166,7 +168,7 @@ export const QueryBlock = ({
           {!disabled && (
             <>
               <ButtonTooltip
-                type="text"
+                variant="text"
                 size="tiny"
                 className="w-7 h-7"
                 icon={<Code size={14} strokeWidth={1.5} />}
@@ -196,7 +198,7 @@ export const QueryBlock = ({
 
               <EditQueryButton id={id} title={label} sql={sql} />
               <ButtonTooltip
-                type="text"
+                variant="text"
                 size="tiny"
                 className="w-7 h-7"
                 icon={<Play size={14} strokeWidth={1.5} />}
@@ -373,7 +375,7 @@ export const QueryBlock = ({
                 Queries that involve any mutation will not be run in reports
               </p>
               {!!onRemoveChart && (
-                <Button type="default" className="mt-2" onClick={() => onRemoveChart()}>
+                <Button variant="default" className="mt-2" onClick={() => onRemoveChart()}>
                   Remove chart
                 </Button>
               )}
@@ -390,6 +392,11 @@ export const QueryBlock = ({
                 )}
               >
                 <Results rows={results} />
+                {autoLimit && (
+                  <p className="text-xs font-mono px-2 py-1 border-t text-foreground-light">
+                    Limited to only 100 rows
+                  </p>
+                )}
               </div>
             )
           )}

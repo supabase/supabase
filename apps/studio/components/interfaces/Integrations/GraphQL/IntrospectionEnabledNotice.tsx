@@ -33,7 +33,7 @@ export const IntrospectionEnabledNotice = ({
           GraphQL introspection is enabled for this project, so schemas are discoverable through the
           API.
         </span>
-        <Button type="default" size="tiny" onClick={() => setShowConfirm(true)}>
+        <Button variant="default" size="tiny" onClick={() => setShowConfirm(true)}>
           Disable introspection
         </Button>
       </div>

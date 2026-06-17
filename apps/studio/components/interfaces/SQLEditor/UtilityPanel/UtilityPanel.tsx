@@ -145,7 +145,7 @@ export const UtilityPanel = ({
 
           {result?.rows && (
             <DownloadResultsButton
-              type="text"
+              variant="text"
               results={result.rows as any[]}
               fileName={`Supabase Snippet ${snippet.name}`}
               onDownloadAsCSV={() => track('sql_editor_result_download_csv_clicked')}

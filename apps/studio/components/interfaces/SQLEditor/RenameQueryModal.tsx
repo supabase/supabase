@@ -192,7 +192,7 @@ export const RenameQueryModal = ({
               />
               <div className="flex w-full justify-end mt-2">
                 <ButtonTooltip
-                  type="default"
+                  variant="default"
                   onClick={() => generateTitle()}
                   size="tiny"
                   disabled={
@@ -241,15 +241,10 @@ export const RenameQueryModal = ({
               />
             </DialogSection>
             <DialogFooter>
-              <Button
-                htmlType="reset"
-                type="default"
-                onClick={handleCancel}
-                disabled={isSubmitting}
-              >
+              <Button type="reset" variant="default" onClick={handleCancel} disabled={isSubmitting}>
                 Cancel
               </Button>
-              <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting || !isDirty}>
+              <Button type="submit" loading={isSubmitting} disabled={isSubmitting || !isDirty}>
                 Rename query
               </Button>
             </DialogFooter>

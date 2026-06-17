@@ -224,7 +224,7 @@ export const ChartBlock = ({
       actions={
         <>
           <ButtonTooltip
-            type="text"
+            variant="text"
             size="tiny"
             disabled={loading}
             className="w-7 h-7"
@@ -243,7 +243,7 @@ export const ChartBlock = ({
             }}
           />
           <ButtonTooltip
-            type={logScale ? 'default' : 'text'}
+            variant={logScale ? 'default' : 'text'}
             size="tiny"
             disabled={loading}
             className="h-7 px-1.5 font-mono text-[10px]"

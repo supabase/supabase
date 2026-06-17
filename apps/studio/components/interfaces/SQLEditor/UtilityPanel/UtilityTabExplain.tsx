@@ -57,7 +57,7 @@ export function UtilityTabExplain({ id, isExecuting }: UtilityTabExplainProps) {
             {formattedError.length > 0 && (
               <Tooltip>
                 <TooltipTrigger>
-                  <CopyButton iconOnly type="default" text={formattedError.join('\n')} />
+                  <CopyButton iconOnly variant="default" text={formattedError.join('\n')} />
                 </TooltipTrigger>
                 <TooltipContent side="bottom" align="center">
                   <span>Copy error</span>
