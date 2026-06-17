@@ -67,6 +67,25 @@ import { type ResponseError } from '@/types'
 
 const formId = 'destination-editor'
 
+const getValidationFailureKey = (failure: ValidationFailure) =>
+  JSON.stringify([failure.failure_type, failure.name, failure.reason])
+
+const getSortedValidationFailureKeys = (failures: ValidationFailure[]) =>
+  failures.map(getValidationFailureKey).sort((a, b) => a.localeCompare(b))
+
+const areValidationFailuresEqual = (
+  previousFailures: ValidationFailure[],
+  nextFailures: ValidationFailure[]
+) => {
+  const previousKeys = getSortedValidationFailureKeys(previousFailures)
+  const nextKeys = getSortedValidationFailureKeys(nextFailures)
+
+  return (
+    previousKeys.length === nextKeys.length &&
+    previousKeys.every((key, index) => key === nextKeys[index])
+  )
+}
+
 interface DestinationFormProps {
   selectedType: DestinationType
   visible: boolean
@@ -356,6 +375,10 @@ export const DestinationForm = ({
     if (editMode) {
       return existingDestination?.enabled ? 'Apply and restart' : 'Apply and start'
     } else {
+      if (hasRunValidation && validationWarnings.length > 0 && !hasValidationFailures) {
+        return 'Create and start anyway'
+      }
+
       return 'Create and start'
     }
   }
@@ -537,28 +560,36 @@ export const DestinationForm = ({
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     if (!editMode) {
-      if (!hasRunValidation || isValidating || hasValidationFailures) {
-        const validationResult = await validateConfiguration(data)
-        if (!validationResult.canContinue) {
-          // Critical failures shown inline — stop so user can fix them
-          return
-        }
-        if (validationResult.warnings.length > 0) {
-          // Warnings shown inline — stop so user can review, then re-submit to confirm
-          return
-        }
-        await submitPipeline(data)
+      const previousValidationFailures = allValidationFailures
+      const previousWarnings = previousValidationFailures.filter(
+        (f) => f.failure_type === 'warning'
+      )
+      const previousFailuresAreOnlyWarnings =
+        hasRunValidation &&
+        previousValidationFailures.length > 0 &&
+        previousValidationFailures.every((f) => f.failure_type === 'warning')
+
+      const validationResult = await validateConfiguration(data)
+      if (!validationResult.canContinue) {
+        // Critical failures shown inline — stop so user can fix them
         return
       }
 
-      // Validation already passed; warnings are visible inline — ask user to confirm
-      if (validationWarnings.length > 0) {
-        setPendingFormValues(data)
-        setShowValidationWarningsDialog(true)
+      if (validationResult.warnings.length > 0) {
+        if (
+          previousFailuresAreOnlyWarnings &&
+          areValidationFailuresEqual(previousWarnings, validationResult.warnings)
+        ) {
+          setPendingFormValues(data)
+          setShowValidationWarningsDialog(true)
+        }
+        // Warnings are shown inline. The user can submit again to confirm if unchanged.
         return
       }
 
-      await submitPipeline(data)
+      // Validation passed cleanly — still ask for confirmation before creating the pipeline.
+      setPendingFormValues(data)
+      setShowValidationWarningsDialog(true)
       return
     }
 
@@ -569,7 +600,6 @@ export const DestinationForm = ({
     setShowValidationWarningsDialog(open)
     if (!open) {
       setPendingFormValues(null)
-      setHasRunValidation(false)
     }
   }
 
