@@ -1,7 +1,5 @@
 import fs from 'fs'
 import path from 'path'
-import { expect, Page } from '@playwright/test'
-
 import { env } from '../env.config.js'
 import { expectClipboardValue } from '../utils/clipboard.js'
 import { dropTable, query } from '../utils/db/index.js'
@@ -16,6 +14,7 @@ import {
   waitForGridDataToLoad,
   waitForTableToLoad,
 } from '../utils/wait-for-response.js'
+import { expect, Page } from '@playwright/test'
 
 const deleteTable = async (page: Page, ref: string, tableName: string) => {
   const viewLocator = page.getByLabel(`View ${tableName}`)
@@ -156,7 +155,7 @@ testRunner('table editor', () => {
   })
 
   test('protected schema empty tables do not expose CSV import actions', async ({ page, ref }) => {
-    const [{ relname: tableName }] = await query<{ relname: string }>(`
+    const emptyAuthTables = await query<{ relname: string }>(`
       select relname
       from pg_stat_user_tables
       where schemaname = 'auth'
@@ -165,6 +164,8 @@ testRunner('table editor', () => {
       order by relname
       limit 1;
     `)
+    test.skip(emptyAuthTables.length === 0, 'Requires an empty auth table in the test dataset')
+    const [{ relname: tableName }] = emptyAuthTables
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
 
