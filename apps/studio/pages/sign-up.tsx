@@ -4,7 +4,7 @@ import { Button, cn } from 'ui'
 
 import { SignInWithExternalProvider } from '@/components/interfaces/SignIn/SignInWithExternalProvider'
 import { SignUpForm } from '@/components/interfaces/SignIn/SignUpForm'
-import SignInLayout from '@/components/layouts/SignInLayout/SignInLayout'
+import { SignInLayout } from '@/components/layouts/SignInLayout/SignInLayout'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useEnabledIdentityProviders } from '@/hooks/misc/useEnabledIdentityProviders'
 import { useInboundBranding } from '@/hooks/misc/useInboundBranding'
@@ -15,7 +15,8 @@ import type { NextPageWithLayout } from '@/types'
 const SignUpPage: NextPageWithLayout = () => {
   const [showOtherOptions, setShowOtherOptions] = useState(false)
   const { dashboardAuthSignUp: signUpEnabled } = useIsFeatureEnabled(['dashboard_auth:sign_up'])
-  const branding = useInboundBranding('sign-up')
+
+  const { focusProvider } = useInboundBranding('sign-up')
   const signUpProviders = useEnabledIdentityProviders().filter((provider) => provider.showOnSignUp)
 
   if (!signUpEnabled) {
@@ -31,22 +32,18 @@ const SignUpPage: NextPageWithLayout = () => {
     dividerBgClass = 'bg-studio'
   ) => (
     <>
-      {providers.length > 0 && (
-        <>
-          {providers.map((provider) => (
-            <SignInWithExternalProvider key={provider.id} provider={provider} />
-          ))}
+      {providers.map((provider) => (
+        <SignInWithExternalProvider key={provider.id} provider={provider} />
+      ))}
 
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-strong" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className={cn('px-2 text-sm text-foreground', dividerBgClass)}>or</span>
-            </div>
-          </div>
-        </>
-      )}
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-strong" />
+        </div>
+        <div className="relative flex justify-center text-sm">
+          <span className={cn('px-2 text-sm text-foreground', dividerBgClass)}>or</span>
+        </div>
+      </div>
 
       <SignUpForm />
     </>
@@ -54,8 +51,7 @@ const SignUpPage: NextPageWithLayout = () => {
 
   // Inbound link focused us on a single provider — lead with that one (SignInLayout renders the
   // matching interstitial frame around it), but let the user reveal the rest of our options.
-  if (branding.focusProvider) {
-    const focusProvider = branding.focusProvider
+  if (focusProvider) {
     const otherProviders = signUpProviders.filter((provider) => provider.id !== focusProvider.id)
 
     return (

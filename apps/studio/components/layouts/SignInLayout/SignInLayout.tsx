@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { tweets } from 'shared-data'
+import { cn } from 'ui'
 
 import {
   DestinationLogo,
@@ -13,12 +14,20 @@ import {
   SupabaseLogo,
 } from '@/components/layouts/InterstitialLayout'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { IdentityProviderIcon } from '@/components/ui/ProviderIcon'
 import { useInboundBranding } from '@/hooks/misc/useInboundBranding'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 import { getProviderDisplay } from '@/lib/external-identity-providers'
 import { auth, buildPathWithParams, getReturnToPath } from '@/lib/gotrue'
+
+type Quote = {
+  text: string
+  url: string
+  handle: string
+  img_url: string
+}
 
 type SignInLayoutProps = {
   heading: string
@@ -33,7 +42,16 @@ type SignInLayoutProps = {
   inboundFlow?: 'sign-in' | 'sign-up'
 }
 
-const SignInLayout = ({
+const TermsText = () => (
+  <>
+    By continuing, you agree to Supabase’s{' '}
+    <InlineLink href="https://supabase.com/terms">Terms of Service</InlineLink> and{' '}
+    <InlineLink href="https://supabase.com/privacy">Privacy Policy</InlineLink>, and to receive
+    periodic emails with updates.
+  </>
+)
+
+export const SignInLayout = ({
   heading,
   subheading,
   showDisclaimer = true,
@@ -42,10 +60,17 @@ const SignInLayout = ({
   children,
 }: PropsWithChildren<SignInLayoutProps>) => {
   const router = useRouter()
-  const branding = useInboundBranding(inboundFlow)
-  const queryClient = useQueryClient()
   const { resolvedTheme } = useTheme()
+  const queryClient = useQueryClient()
   const ongoingIncident = useFlag('ongoingIncident')
+
+  const { destination, focusProvider } = useInboundBranding(inboundFlow)
+
+  // Addresses hydration issue with `resolvedTheme` as its undefined during SSR and the first (hydrating) client render
+  const [mounted, setMounted] = useState(false)
+  const [quote, setQuote] = useState<Quote | null>(null)
+
+  const verb = inboundFlow === 'sign-up' ? 'Sign up' : 'Sign in'
 
   const {
     dashboardAuthShowTestimonial: showTestimonial,
@@ -95,14 +120,9 @@ const SignInLayout = ({
       .catch(() => {}) // catch all errors thrown by auth methods
   }, [])
 
-  const [quote, setQuote] = useState<{
-    text: string
-    url: string
-    handle: string
-    img_url: string
-  } | null>(null)
-
   useEffect(() => {
+    setMounted(true)
+
     // Weighted random selection
     // Calculate total weight (default weight is fallbackWeight for tweets without weight specified)
     const fallbackWeight = 1
@@ -123,28 +143,10 @@ const SignInLayout = ({
     }
   }, [])
 
-  const verb = inboundFlow === 'sign-up' ? 'Sign up' : 'Sign in'
-
-  const termsText = (
-    <>
-      By continuing, you agree to Supabase’s{' '}
-      <Link href="https://supabase.com/terms" className="underline hover:text-foreground-light">
-        Terms of Service
-      </Link>{' '}
-      and{' '}
-      <Link href="https://supabase.com/privacy" className="underline hover:text-foreground-light">
-        Privacy Policy
-      </Link>
-      , and to receive periodic emails with updates.
-    </>
-  )
-
   // Focused provider: render a dedicated single-provider interstitial (same card layout as the
   // external-identity flows). When we also know the destination the inbound link is returning the
   // user to, frame the screen around it.
-  if (inboundFlow && branding.focusProvider) {
-    const { destination, focusProvider } = branding
-
+  if (inboundFlow && focusProvider) {
     return (
       <InterstitialLayout
         logo={
@@ -173,7 +175,9 @@ const SignInLayout = ({
         }
         footer={
           showDisclaimer && showTos ? (
-            <p className="text-xs text-foreground-lighter">{termsText}</p>
+            <p className="text-xs text-foreground-lighter">
+              <TermsText />
+            </p>
           ) : undefined
         }
       >
@@ -183,7 +187,7 @@ const SignInLayout = ({
   }
 
   // Destination known but no focused provider: keep the regular screen but brand its heading.
-  const brandedDestination = inboundFlow ? branding.destination : undefined
+  const brandedDestination = inboundFlow ? destination : undefined
   const brandedHeading = brandedDestination
     ? `${verb} to continue to ${brandedDestination.displayName}`
     : undefined
@@ -192,9 +196,10 @@ const SignInLayout = ({
     <>
       <div className="relative flex flex-col bg-alternative min-h-screen">
         <div
-          className={`absolute top-0 w-full px-8 mx-auto sm:px-6 lg:px-8 ${
+          className={cn(
+            'absolute top-0 w-full px-8 mx-auto sm:px-6 lg:px-8',
             ongoingIncident ? 'mt-14' : 'mt-6'
-          }`}
+          )}
         >
           <nav className="relative flex items-center justify-between sm:h-10">
             <div className="flex items-center grow shrink-0 lg:grow-0">
@@ -202,7 +207,7 @@ const SignInLayout = ({
                 <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/organizations'}>
                   <img
                     src={
-                      resolvedTheme?.includes('dark')
+                      mounted && resolvedTheme?.includes('dark')
                         ? `${BASE_PATH}/img/supabase-dark.svg`
                         : `${BASE_PATH}/img/supabase-light.svg`
                     }
@@ -248,7 +253,7 @@ const SignInLayout = ({
             {showDisclaimer && showTos && (
               <div className="text-center text-balance">
                 <p className="text-xs text-foreground-lighter sm:mx-auto sm:max-w-sm">
-                  {termsText}
+                  <TermsText />
                 </p>
               </div>
             )}
@@ -289,5 +294,3 @@ const SignInLayout = ({
     </>
   )
 }
-
-export default SignInLayout

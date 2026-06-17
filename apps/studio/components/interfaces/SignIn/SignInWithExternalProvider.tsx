@@ -59,8 +59,7 @@ export const SignInWithExternalProvider = ({
       <Button
         block
         onClick={handleSignIn}
-        // size 20 matches the loading spinner so the text doesn't shift while loading
-        icon={<IdentityProviderIcon display={getProviderDisplay(provider.id)} size={20} />}
+        icon={<IdentityProviderIcon display={getProviderDisplay(provider.id)} />}
         size="large"
         variant="outline"
         loading={loading}

@@ -18,7 +18,7 @@ export type SignInDestination = {
   icon?: ReactNode
 }
 
-export const CLI_DESTINATION: SignInDestination = {
+const CLI_DESTINATION: SignInDestination = {
   id: 'cli',
   displayName: 'Supabase CLI',
   icon: <Terminal className="size-6 text-foreground" strokeWidth={2} />,
@@ -27,7 +27,7 @@ export const CLI_DESTINATION: SignInDestination = {
 // Statically-branded sign-in destinations. To add a new one, declare its config above and add it
 // here. OAuth app consent screens brand themselves on `/authorize`, which runs post-auth and can
 // look the app up by `auth_id`.
-export const SIGN_IN_DESTINATIONS: SignInDestination[] = [CLI_DESTINATION]
+const SIGN_IN_DESTINATIONS: SignInDestination[] = [CLI_DESTINATION]
 
 /** Resolves the destination the `destination` query param refers to, if it's one we brand. */
 export function getDestinationById(id: string | undefined): SignInDestination | undefined {

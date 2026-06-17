@@ -1,7 +1,7 @@
 import mockRouter from 'next-router-mock'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useInboundBranding } from './useInboundBranding'
+import { useInboundBranding } from '../useInboundBranding'
 import {
   GITHUB_IDENTITY_PROVIDER,
   type ExternalIdentityProviderConfig,
@@ -12,7 +12,7 @@ vi.mock('next/router', () => import('next-router-mock'))
 
 const mockEnabledProviders = vi.hoisted(() => vi.fn<() => ExternalIdentityProviderConfig[]>())
 
-vi.mock('./useEnabledIdentityProviders', () => ({
+vi.mock('../useEnabledIdentityProviders', () => ({
   useEnabledIdentityProviders: mockEnabledProviders,
 }))
 

@@ -52,6 +52,7 @@ export const AccountIdentities = () => {
   const router = useRouter()
 
   const { data, isPending: isLoading, isSuccess } = useProfileIdentitiesQuery()
+
   const enabledProviders = useEnabledIdentityProviders()
   const connectableExternalProviders = useMemo(
     () => enabledProviders.filter((provider) => provider.showInAccountPreferences),
@@ -67,23 +68,27 @@ export const AccountIdentities = () => {
   const [selectedProviderUpdateEmail, setSelectedProviderUpdateEmail] = useState<string>()
   const [linkingProviderId, setLinkingProviderId] = useState<string>()
 
-  const getProviderName = (provider: string) => getProviderDisplay(provider).displayName
+  const [, message] = router.asPath.split('#message=')
+  const unlinkedExternalProviders = connectableExternalProviders.filter((provider) => {
+    return !identities.some(
+      (identity) => identity.provider === provider.authProvider || identity.provider === provider.id
+    )
+  })
+
+  const { mutate: unlinkIdentity, isPending: isUnlinking } = useUnlinkIdentityMutation({
+    onSuccess: () => {
+      toast.success(`Successfully unlinked ${getProviderName(selectedProviderUnlink)} identity!`)
+      setSelectedProviderUnlink(undefined)
+    },
+  })
+
+  const getProviderName = (provider?: string) =>
+    provider ? getProviderDisplay(provider).displayName : undefined
 
   const getConfiguredExternalProvider = (provider: string) =>
     connectableExternalProviders.find(
       ({ id, authProvider }) => provider === id || provider === authProvider
     )
-
-  const { mutate: unlinkIdentity, isPending: isUnlinking } = useUnlinkIdentityMutation({
-    onSuccess: () => {
-      toast.success(
-        `Successfully unlinked ${getProviderName(selectedProviderUnlink ?? '')} identity!`
-      )
-      setSelectedProviderUnlink(undefined)
-    },
-  })
-
-  const [, message] = router.asPath.split('#message=')
 
   const onConfirmUnlinkIdentity = async () => {
     const identity = identities.find((i) => i.provider === selectedProviderUnlink)
@@ -116,12 +121,6 @@ export const AccountIdentities = () => {
   useEffect(() => {
     if (message) toast.success(message.replaceAll('+', ' '))
   }, [message])
-
-  const unlinkedExternalProviders = connectableExternalProviders.filter((provider) => {
-    return !identities.some(
-      (identity) => identity.provider === provider.authProvider || identity.provider === provider.id
-    )
-  })
 
   return (
     <PageSection>
@@ -241,7 +240,7 @@ export const AccountIdentities = () => {
             <DialogHeader className="border-b">
               <DialogTitle>
                 {selectedProviderUpdateEmail !== 'email'
-                  ? `Updating email address for ${getProviderName(selectedProviderUpdateEmail ?? '')} identity`
+                  ? `Updating email address for ${getProviderName(selectedProviderUpdateEmail)} identity`
                   : 'Update email address'}
               </DialogTitle>
             </DialogHeader>
@@ -260,14 +259,14 @@ export const AccountIdentities = () => {
           size="small"
           loading={isUnlinking}
           visible={!!selectedProviderUnlink}
-          title={`Unlink ${getProviderName(selectedProviderUnlink ?? '')} identity`}
+          title={`Unlink ${getProviderName(selectedProviderUnlink)} identity`}
           onCancel={() => setSelectedProviderUnlink(undefined)}
           onConfirm={onConfirmUnlinkIdentity}
           confirmLabel="Unlink identity"
           confirmLabelLoading="Unlinking identity"
           alert={{
             base: { variant: 'warning' },
-            title: `Confirm to disconnect your ${getProviderName(selectedProviderUnlink ?? '')} identity`,
+            title: `Confirm to disconnect your ${getProviderName(selectedProviderUnlink)} identity`,
             description:
               'After disconnecting, you will only be able to sign in with your remaining identities.',
           }}

@@ -1,12 +1,12 @@
 import { renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
-import { useEnabledIdentityProviders } from './useEnabledIdentityProviders'
+import { useEnabledIdentityProviders } from '../useEnabledIdentityProviders'
 import { GITHUB_IDENTITY_PROVIDER } from '@/lib/external-identity-providers'
 
 const mockIsFeatureEnabled = vi.hoisted(() => vi.fn())
 
-vi.mock('./useIsFeatureEnabled', () => ({
+vi.mock('../useIsFeatureEnabled', () => ({
   useIsFeatureEnabled: mockIsFeatureEnabled,
 }))
 

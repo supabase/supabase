@@ -46,10 +46,10 @@ export const ProviderIcon = ({
  */
 export const IdentityProviderIcon = ({
   display,
-  size,
+  size = 20,
 }: {
   display: IdentityProviderDisplay
-  size: number
+  size?: number
 }) =>
   display.hasMonochromeIcon ? (
     <ProviderIcon src={display.iconPath} alt={`${display.displayName} icon`} size={size} />

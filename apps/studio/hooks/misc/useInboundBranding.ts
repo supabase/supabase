@@ -37,8 +37,11 @@ export function useInboundBranding(flow: 'sign-in' | 'sign-up' = 'sign-in'): Inb
   const enabledProviders = useEnabledIdentityProviders()
 
   const destinationId =
-    typeof router.query.destination === 'string' ? router.query.destination : undefined
-  const focusId = typeof router.query.method === 'string' ? router.query.method : undefined
+    router.isReady && typeof router.query.destination === 'string'
+      ? router.query.destination
+      : undefined
+  const focusId =
+    router.isReady && typeof router.query.method === 'string' ? router.query.method : undefined
 
   const focusProvider = useMemo(
     () =>

@@ -19,7 +19,7 @@ export type IdentityProviderDisplay = {
   hasMonochromeIcon?: boolean
 }
 
-export const BUILT_IN_IDENTITY_PROVIDERS: Record<string, IdentityProviderDisplay> = {
+const BUILT_IN_IDENTITY_PROVIDERS: Record<string, IdentityProviderDisplay> = {
   email: {
     id: 'email',
     displayName: 'Email',
@@ -42,7 +42,7 @@ export const GITHUB_IDENTITY_PROVIDER: ExternalIdentityProviderConfig = {
 
 // Registry of every known provider, independent of which are currently enabled. Used for config and
 // display lookups (e.g. resolving the provider that a mid-flow interstitial was reached with).
-export const IDENTITY_PROVIDERS: ExternalIdentityProviderConfig[] = [GITHUB_IDENTITY_PROVIDER]
+const IDENTITY_PROVIDERS: ExternalIdentityProviderConfig[] = [GITHUB_IDENTITY_PROVIDER]
 
 export function normalizeIconPath(iconPath: string): string {
   if (

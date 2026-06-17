@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 import { LogoLoader } from 'ui'
 
 import { SignInMfaForm } from '@/components/interfaces/SignIn/SignInMfaForm'
-import SignInLayout from '@/components/layouts/SignInLayout/SignInLayout'
+import { SignInLayout } from '@/components/layouts/SignInLayout/SignInLayout'
 import { useAddLoginEvent } from '@/data/misc/audit-login-mutation'
 import useLatest from '@/hooks/misc/useLatest'
 import { auth, buildPathWithParams, getReturnToPath } from '@/lib/gotrue'
