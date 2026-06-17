@@ -129,33 +129,24 @@ export type Database = {
     Tables: {
       feedback: {
         Row: {
-          comment: string | null
           date_created: string
           id: number
           metadata: Json | null
           page: string
-          title: string | null
-          user_id: string | null
           vote: Database['public']['Enums']['feedback_vote']
         }
         Insert: {
-          comment?: string | null
           date_created?: string
           id?: never
           metadata?: Json | null
           page: string
-          title?: string | null
-          user_id?: string | null
           vote: Database['public']['Enums']['feedback_vote']
         }
         Update: {
-          comment?: string | null
           date_created?: string
           id?: never
           metadata?: Json | null
           page?: string
-          title?: string | null
-          user_id?: string | null
           vote?: Database['public']['Enums']['feedback_vote']
         }
         Relationships: []
