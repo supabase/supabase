@@ -31,7 +31,7 @@ See per-service updates below for details. Only the most important changes relev
 ### Documentation
 - Updated the [Upgrade to Postgres 17](https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17) how-to - PR [#46989](https://github.com/supabase/supabase/pull/46989)
 - Updated the [New API Keys](https://supabase.com/docs/guides/self-hosting/self-hosted-auth-keys) and [Envoy API Gateway](https://supabase.com/docs/guides/self-hosting/self-hosted-envoy) how-to guides - PR [#46856](https://github.com/supabase/supabase/pull/46856)
-- Updated [CONFIG.md][CONFIG.md] - PR [#47022](https://github.com/supabase/supabase/pull/47022)
+- Updated [CONFIG.md](CONFIG.md) - PR [#47022](https://github.com/supabase/supabase/pull/47022)
 
 ### Utils and tests
 - Updated `utils/upgrade-pg17.sh` (bumped Postgres image, added additional migrations), and `tests/test-pg17-upgrade.sh` (added tests for pg_cron) - PR [#46981](https://github.com/supabase/supabase/pull/46981)
