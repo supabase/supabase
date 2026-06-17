@@ -343,7 +343,12 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
           {!snap.allRowsSelected ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button type="default" size="tiny" iconRight={<ChevronDown />} loading={isCopying}>
+                <Button
+                  variant="default"
+                  size="tiny"
+                  iconRight={<ChevronDown />}
+                  loading={isCopying}
+                >
                   Copy
                 </Button>
               </DropdownMenuTrigger>
@@ -356,7 +361,7 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
           ) : (
             <ButtonTooltip
               disabled
-              type="default"
+              variant="default"
               tooltip={{
                 content: {
                   side: 'bottom',
@@ -371,7 +376,12 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button type="default" size="tiny" iconRight={<ChevronDown />} loading={isExporting}>
+              <Button
+                variant="default"
+                size="tiny"
+                iconRight={<ChevronDown />}
+                loading={isExporting}
+              >
                 Export
               </Button>
             </DropdownMenuTrigger>
@@ -402,7 +412,7 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
                 options={{ registerInCommandMenu: true }}
                 side="bottom"
               >
-                <Button type="text" onClick={onToggleSelectAllInTable}>
+                <Button variant="text" onClick={onToggleSelectAllInTable}>
                   {snap.allRowsSelected ? 'Deselect all rows in table' : 'Select all rows in table'}
                 </Button>
               </Shortcut>
@@ -421,7 +431,7 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
             }}
           >
             <ButtonTooltip
-              type="danger"
+              variant="danger"
               size="tiny"
               icon={<Trash />}
               onClick={onRowsDelete}

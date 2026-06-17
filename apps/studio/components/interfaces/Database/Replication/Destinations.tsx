@@ -219,7 +219,7 @@ export const Destinations = () => {
               actions={
                 filterString.length > 0 && (
                   <Button
-                    type="text"
+                    variant="text"
                     icon={<X />}
                     className="p-0 h-5 w-5"
                     onClick={() => setFilterString('')}
@@ -237,7 +237,7 @@ export const Destinations = () => {
               side="bottom"
             >
               <Button
-                type="default"
+                variant="default"
                 icon={<Plus />}
                 disabled={!newDestinationDefaultType}
                 onClick={openDestinationPanel}
@@ -249,7 +249,7 @@ export const Destinations = () => {
             {canDisableExternalReplication && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button type="default" icon={<MoreVertical />} className="w-7" />
+                  <Button variant="default" icon={<MoreVertical />} className="w-7" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-52">
                   <DropdownMenuItem onClick={() => setShowDisableExternalReplicationDialog(true)}>

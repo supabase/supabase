@@ -148,7 +148,7 @@ export const RedeemCreditsScreen = () => {
           <div className="flex flex-col gap-2">
             <Button
               block
-              type="primary"
+              variant="primary"
               disabled={!selectedOrgSlug || organizationOptions.length === 0}
               onClick={openRedemption}
             >

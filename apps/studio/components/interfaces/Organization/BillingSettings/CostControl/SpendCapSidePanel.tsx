@@ -106,7 +106,7 @@ const SpendCapSidePanel = () => {
       header={
         <div className="flex items-center justify-between w-full">
           <h4>Spend cap</h4>
-          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+          <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
               href={`${DOCS_URL}/guides/platform/cost-control#spend-cap`}
               target="_blank"
@@ -194,7 +194,7 @@ const SpendCapSidePanel = () => {
               title="Toggling of the spend cap is only available on the Pro Plan"
               description="Upgrade your plan to disable the spend cap"
               actions={
-                <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
+                <Button variant="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
                   View available plans
                 </Button>
               }

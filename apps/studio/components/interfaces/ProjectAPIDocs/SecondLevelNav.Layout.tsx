@@ -96,7 +96,7 @@ const NavTitle = ({ title, category }: NavTitleProps) => {
 
   return (
     <div className="flex items-center space-x-2 mb-2">
-      <Button type="text" icon={<ChevronLeft />} className="px-1" onClick={handleBack} />
+      <Button variant="text" icon={<ChevronLeft />} className="px-1" onClick={handleBack} />
       <p className="text-sm text-foreground-light capitalize">{title}</p>
     </div>
   )
@@ -116,7 +116,7 @@ const ResourcePicker = ({ category, resource, renderResourceList }: ResourcePick
     <Popover open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger asChild>
         <Button
-          type="default"
+          variant="default"
           size="small"
           className="w-full justify-between gap-2"
           iconRight={<Code className="rotate-90" />}

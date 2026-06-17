@@ -129,7 +129,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                         <NavigationMenuItem className="text-sm font-medium" key={menuItem.title}>
                           <NavigationMenuTrigger
                             className={cn(
-                              buttonVariants({ type: 'text', size: 'small' }),
+                              buttonVariants({ variant: 'text', size: 'small' }),
                               'bg-transparent! hover:text-brand-link data-open:text-brand-link! data-radix-collection-item:focus-visible:ring-2 data-radix-collection-item:focus-visible:ring-foreground-lighter data-radix-collection-item:focus-visible:text-foreground px-2 h-auto'
                             )}
                           >
@@ -171,7 +171,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                     </>
                   ) : (
                     <>
-                      <Button type="default" className="hidden lg:block" asChild>
+                      <Button variant="default" className="hidden lg:block" asChild>
                         <Link
                           href="https://supabase.com/dashboard"
                           onClick={() =>

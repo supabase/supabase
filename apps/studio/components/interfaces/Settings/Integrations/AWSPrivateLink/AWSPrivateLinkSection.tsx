@@ -93,7 +93,7 @@ export const AWSPrivateLinkSection = () => {
             <div className={cn(promptPlanUpgrade && 'opacity-25 pointer-events-none')}>
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-medium text-foreground">AWS Accounts</h3>
-                <Button type="default" onClick={onAddAccount}>
+                <Button variant="default" onClick={onAddAccount}>
                   Add account
                 </Button>
               </div>

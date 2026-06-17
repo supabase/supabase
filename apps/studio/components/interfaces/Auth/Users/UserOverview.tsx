@@ -263,7 +263,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                     {providerName === 'SAML' ? 'SSO' : 'OAuth'}
                   </p>
                   {authenticationSignInProviders && (
-                    <Button asChild type="default" className="mt-2">
+                    <Button asChild variant="default" className="mt-2">
                       <Link
                         href={`/project/${projectRef}/auth/providers?provider=${provider.name === 'SAML' ? 'SAML 2.0' : provider.name}`}
                       >
@@ -420,7 +420,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
             description="User will no longer have access to the project"
             button={{
               icon: <Trash />,
-              type: 'danger',
+              variant: 'danger',
               text: 'Delete user',
               disabled: !canRemoveUser,
               onClick: () => setIsDeleteModalOpen(true),
@@ -505,7 +505,7 @@ export const RowData = ({ property, value }: { property: string; value?: string 
             {!!value && (
               <CopyButton
                 iconOnly
-                type="text"
+                variant="text"
                 icon={<Copy />}
                 className="transition opacity-0 group-hover:opacity-100 px-1"
                 text={value}
@@ -530,7 +530,7 @@ export const RowAction = ({
   description: string
   button: {
     icon: ReactNode
-    type?: ComponentProps<typeof Button>['type']
+    variant?: ComponentProps<typeof Button>['variant']
     text: string
     disabled?: boolean
     isLoading?: boolean
@@ -554,7 +554,7 @@ export const RowAction = ({
       </div>
 
       <ButtonTooltip
-        type={button?.type ?? 'default'}
+        variant={button?.variant ?? 'default'}
         icon={success ? <Check className="text-brand" /> : button.icon}
         loading={button.isLoading ?? false}
         onClick={button.onClick}

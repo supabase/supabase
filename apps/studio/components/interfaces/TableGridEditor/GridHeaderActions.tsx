@@ -204,7 +204,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                 {policies.length < 1 && !isSchemaLocked ? (
                   <ButtonTooltip
                     asChild
-                    type="default"
+                    variant="default"
                     className="group"
                     icon={<PlusCircle strokeWidth={1.5} className="text-foreground-muted" />}
                     tooltip={{
@@ -222,7 +222,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                 ) : (
                   <Button
                     asChild
-                    type={policies.length < 1 && !isSchemaLocked ? 'warning' : 'default'}
+                    variant={policies.length < 1 && !isSchemaLocked ? 'warning' : 'default'}
                     className="group"
                     icon={
                       isSchemaLocked || policies.length > 0 ? (
@@ -251,7 +251,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
             ) : tableHasLints ? (
               <Popover modal={false} open={showWarning} onOpenChange={setShowWarning}>
                 <PopoverTrigger asChild>
-                  <Button type="danger" icon={<Lock strokeWidth={1.5} />}>
+                  <Button variant="danger" icon={<Lock strokeWidth={1.5} />}>
                     RLS disabled
                   </Button>
                 </PopoverTrigger>
@@ -270,7 +270,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                     </p>
                     {!isSchemaLocked && (
                       <Button
-                        type="default"
+                        variant="default"
                         className="mt-2 w-min"
                         onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
                       >
@@ -299,7 +299,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
           {isForeignTable && table.schema === 'public' && (
             <Popover modal={false} open={showWarning} onOpenChange={setShowWarning}>
               <PopoverTrigger asChild>
-                <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
+                <Button variant="warning" icon={<Unlock strokeWidth={1.5} />}>
                   Unprotected Data API access
                 </Button>
               </PopoverTrigger>
@@ -315,7 +315,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                   </p>
 
                   <div className="mt-2">
-                    <Button type="default" asChild>
+                    <Button variant="default" asChild>
                       <Link
                         target="_blank"
                         href={`${DOCS_URL}/guides/database/extensions/wrappers/overview#security`}
@@ -334,7 +334,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                type="default"
+                variant="default"
                 icon={<MoreVertical />}
                 className="h-7 w-7"
                 aria-label="More actions"

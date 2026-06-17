@@ -49,7 +49,7 @@ export const CronJobsTabHeader = ({
             <Button
               key="clear-search"
               size="tiny"
-              type="text"
+              variant="text"
               icon={<X />}
               onClick={onClearSearch}
               className="p-0 h-5 w-5"
@@ -59,7 +59,7 @@ export const CronJobsTabHeader = ({
       />
 
       <div className="flex items-center gap-x-2">
-        <Button type="default" icon={<RefreshCw />} loading={isRefreshing} onClick={onRefresh}>
+        <Button variant="default" icon={<RefreshCw />} loading={isRefreshing} onClick={onRefresh}>
           Refresh
         </Button>
         <Button onClick={onCreateJob}>Create job</Button>

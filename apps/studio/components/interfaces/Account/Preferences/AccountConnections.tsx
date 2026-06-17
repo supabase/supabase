@@ -110,7 +110,7 @@ export const AccountConnections = () => {
                     <Badge variant="success">Connected</Badge>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button iconRight={<ChevronDown size={14} />} type="default">
+                        <Button iconRight={<ChevronDown size={14} />} variant="default">
                           <span>Manage</span>
                         </Button>
                       </DropdownMenuTrigger>
@@ -137,7 +137,7 @@ export const AccountConnections = () => {
                     </DropdownMenu>
                   </>
                 ) : (
-                  <Button type="primary" onClick={handleConnect}>
+                  <Button variant="primary" onClick={handleConnect}>
                     Connect
                   </Button>
                 )}
