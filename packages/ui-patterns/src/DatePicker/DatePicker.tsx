@@ -20,7 +20,6 @@ export type DatePickerButtonProps = ComponentProps<typeof Button> & { isInvalid?
 export const DatePickerButton = ({
   className,
   variant = 'default',
-  block = true,
   icon = DatePickerIcon,
   isInvalid = false,
   ...props
@@ -28,7 +27,6 @@ export const DatePickerButton = ({
   return (
     <Button
       variant={variant}
-      block={block}
       className={cn(
         'justify-start text-left font-normal px-3 py-4',
         {

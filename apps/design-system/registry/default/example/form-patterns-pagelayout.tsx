@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { format } from 'date-fns'
-import { CalendarIcon, ExternalLink, Trash, Upload } from 'lucide-react'
+import { ExternalLink, Trash, Upload } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -19,9 +19,6 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Select,
@@ -679,7 +676,7 @@ export default function FormPatternsPageLayout() {
                         <FormControl>
                           <DatePicker>
                             <DatePickerTrigger asChild>
-                              <DatePickerButton isInvalid={fieldState.invalid}>
+                              <DatePickerButton block isInvalid={fieldState.invalid}>
                                 {field.value ? format(field.value, 'PPP') : 'Pick a date'}
                               </DatePickerButton>
                             </DatePickerTrigger>
