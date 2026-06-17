@@ -32,26 +32,15 @@ export const computeSuccessAndNonSuccessRates = (
   return { successRate, nonSuccessRate }
 }
 
-/**
- * Orders services so the busiest (highest total requests) come first. Services
- * with no traffic sink to the end of the list, where the homepage renders them
- * as disabled.
- */
+/** Busiest services first; zero-traffic ones end up last. */
 export const sortServicesByTraffic = <T extends { total: number }>(services: T[]): T[] =>
   [...services].sort((a, b) => b.total - a.total)
 
-/**
- * A service card is disabled once loading has settled and the service still has
- * no traffic for the selected period.
- */
+/** Disabled once loading is done and there is still no traffic. */
 export const isServiceDisabled = (total: number, isLoading: boolean): boolean =>
   !isLoading && total <= 0
 
-/**
- * Time window for the logs explorer when a usage chart bucket is clicked. The
- * timestamp is the UTC bucket boundary from the endpoint, so the window spans
- * exactly one bucket of the interval's granularity.
- */
+/** Logs explorer window for a clicked bucket: one bucket wide, starting at the UTC bucket. */
 export const getBucketLogRange = (
   timestamp: string,
   interval: ChartIntervalKey

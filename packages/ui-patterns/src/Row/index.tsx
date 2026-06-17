@@ -105,11 +105,8 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
   const pendingDeltaRef = useRef(0)
 
   const handleWheel: React.WheelEventHandler<HTMLDivElement> = (e) => {
-    // Only handle the wheel event when horizontal intent clearly dominates.
-    // Trackpad vertical scrolls often report a small but non-zero deltaX due to
-    // scroll physics and inertia; checking deltaX === 0 alone misses those cases
-    // and hijacks the page's vertical scroll. Requiring |deltaX| > |deltaY|
-    // lets vertical scrolls propagate to the page normally.
+    // Only scroll sideways when horizontal intent wins. Trackpads report a small
+    // deltaX on vertical scrolls, so a deltaX === 0 check would hijack them.
     if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return
 
     const delta = Math.abs(e.deltaX) * 2 * (e.deltaX > 0 ? 1 : -1)

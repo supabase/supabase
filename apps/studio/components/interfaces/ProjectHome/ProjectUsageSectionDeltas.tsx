@@ -24,8 +24,7 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useTrack } from '@/lib/telemetry/track'
 
-// The homepage usage cards only surface this subset of the services returned by
-// the shared service-health endpoint, and the telemetry events are typed to match.
+// Services the homepage shows; matches the telemetry event types.
 type HomeServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime' | 'data_api'
 
 const isChartIntervalKey = (value: string): value is ChartIntervalKey =>
@@ -60,9 +59,8 @@ export const ProjectUsageSectionDeltas = () => {
     useCheckEntitlements('log.retention_days')
   const retentionDays = getEntitlementMax()
 
-  // Default interval is derived from retention. Once the user picks one it
-  // sticks. We avoid a post-mount setState that would flip the interval after
-  // entitlements resolve, which would re-key the query and refetch.
+  // Derived so a late entitlements load can't flip the interval and refetch. A
+  // user pick overrides it.
   const [userInterval, setUserInterval] = useState<ChartIntervalKey | undefined>(undefined)
   const interval: ChartIntervalKey =
     userInterval ?? (retentionDays !== undefined && retentionDays < 7 ? '1hr' : '1day')
@@ -70,9 +68,7 @@ export const ProjectUsageSectionDeltas = () => {
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
   const datetimeFormat = selectedInterval.format || 'MMM D, ha'
 
-  // Hold off fetching until entitlements have resolved, otherwise we fetch once
-  // with the provisional interval and immediately refetch with the corrected
-  // one (visible as a double load on page refresh).
+  // Wait for entitlements so we don't fetch with the wrong interval then refetch.
   const ready = !isLoadingEntitlements
   const { services: serviceData, isLoading: isLoadingMetrics } = useServiceHealthMetrics(
     ready ? (projectRef ?? '') : '',
@@ -81,9 +77,8 @@ export const ProjectUsageSectionDeltas = () => {
   )
   const isLoading = !ready || isLoadingMetrics
 
-  // Functions is included here (and absent from the V2 chart) because the
-  // service-health endpoint exposes per-function metrics that the legacy
-  // usage.api-counts endpoint does not.
+  // Functions shows here but not in V2: service-health has its data, the legacy
+  // endpoint did not.
   const serviceBase: ServiceEntry[] = useMemo(
     () => [
       {
@@ -129,8 +124,7 @@ export const ProjectUsageSectionDeltas = () => {
     [projectRef, authEnabled, storageEnabled, dataApiEnabled]
   )
 
-  // Build per-service stats, then order them so the busiest services come first
-  // and services with no data sink to the end (where they render disabled).
+  // Busiest services first; empty ones sink to the end and render disabled.
   const services: ServiceComputed[] = useMemo(() => {
     const computed = serviceBase
       .filter((s) => s.enabled)
@@ -162,8 +156,8 @@ export const ProjectUsageSectionDeltas = () => {
     (logRoute: string, serviceKey: HomeServiceKey) => (datum: LogsBarChartDatum) => {
       if (!datum?.timestamp) return
 
-      // The logs explorer reads its query range from the `its`/`ite` params (not
-      // iso_timestamp_start/end, which only drive the date-picker label).
+      // Logs explorer reads the range from `its`/`ite` (iso_timestamp_start/end
+      // only set the label).
       const { start, end } = getBucketLogRange(datum.timestamp, interval)
 
       const queryParams = new URLSearchParams({
@@ -265,8 +259,7 @@ export const ProjectUsageSectionDeltas = () => {
                       ok_count: { label: 'Requests' },
                     }}
                     EmptyState={
-                      // While loading, render a blank empty state so the loading
-                      // spinner doesn't sit on top of the "No data" placeholder.
+                      // Blank while loading so the spinner isn't over the "No data" text.
                       isLoading ? (
                         <></>
                       ) : (

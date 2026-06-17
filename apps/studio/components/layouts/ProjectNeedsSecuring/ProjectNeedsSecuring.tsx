@@ -146,19 +146,8 @@ const ProjectNeedsSecuringGate = ({ children }: PropsWithChildren) => {
     )
   }, [rlsIssueKeys, tablePrivileges, tables])
 
-  // Keep `children` at a single, stable React position across the non-gated
-  // states (lints loading and resolved-but-not-gating). Previously the loading
-  // state returned a bare `<>{children}</>` while the resolved non-gated state
-  // nested children inside `AnimatePresence > motion.div`. When the lints query
-  // resolved (the same query the Advisor section uses), that structural switch
-  // changed the element at the children slot and remounted the entire homepage
-  // subtree, tearing down and recreating the usage charts. That remount read as a
-  // "loading flash" even when React Query served cached data and never refetched.
-  //
-  // Children now always render in the same position whenever we are not gating
-  // (an empty AnimatePresence renders no DOM), so the loading-to-resolved
-  // transition reconciles in place. When the securing gate is active we
-  // intentionally render the gate instead of the children.
+  // Keep children in one stable position when not gating. Changing their wrapper
+  // once lints load used to remount the homepage and reload the charts.
   if (!isProjectHomeRoute || !projectRef) {
     return <>{children}</>
   }
