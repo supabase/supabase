@@ -14,7 +14,7 @@ In this guide you will learn how to write:
 - **Unit tests** for pure business logic (pricing rules, calculations, etc.)
 - **Integration tests** for the full Edge Function by mocking at the network layer
 
-The examples and patterns shown here come directly from the reference implementation in the [play.supabase.unit-tests](https://github.com/kallebysantos/play.supabase.unit-tests) repository and follow the same approaches used internally by Supabase's Edge Functions team.
+The examples and patterns shown here follow the same approaches used internally by Supabase's Edge Functions team.
 
 Deno ships with a fast, native test runner and excellent mocking utilities in `@std/testing`. See the [official Deno testing documentation](https://docs.deno.com/runtime/manual/basics/testing/) for more background.
 
@@ -192,7 +192,6 @@ deno task test
 
 ## Resources
 
-- Explore the full reference implementation: [github.com/kallebysantos/play.supabase.unit-tests](https://github.com/kallebysantos/play.supabase.unit-tests)
 - Read the [Deno testing guide](https://docs.deno.com/runtime/manual/basics/testing/)
 - Learn more about [`withSupabase` and `@supabase/server`](/docs)
 - See the other Edge Functions guides: [Development Environment](/docs/guides/functions/development-environment), [Managing dependencies](/docs/guides/functions/dependencies), [Deploy to Production](/docs/guides/functions/deploy)
