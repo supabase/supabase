@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
-import { LOCAL_STORAGE_KEYS } from 'common'
 import { useEffect, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -17,7 +16,6 @@ import { useMfaChallengeAndVerifyMutation } from '@/data/profile/mfa-challenge-a
 import { useMfaEnrollMutation } from '@/data/profile/mfa-enroll-mutation'
 import { useMfaUnenrollMutation } from '@/data/profile/mfa-unenroll-mutation'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 type TOTP = { qr_code: string; secret: string; uri: string }
 
