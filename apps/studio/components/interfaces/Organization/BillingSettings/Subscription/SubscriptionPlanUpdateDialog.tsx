@@ -513,7 +513,7 @@ export const SubscriptionPlanUpdateDialog = ({
                 <Button
                   loading={isUpdating || paymentConfirmationLoading || isConfirming}
                   disabled={subscriptionPreviewIsLoading || subscriptionPreviewIsFetching}
-                  type="primary"
+                  variant="primary"
                   onClick={onUpdateSubscription}
                   className="flex-1"
                   size="small"

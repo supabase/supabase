@@ -154,7 +154,7 @@ const EdgeFunctionsUsage = () => {
                 side="bottom"
               >
                 <Button
-                  type="default"
+                  variant="default"
                   disabled={isRefreshing}
                   icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
                   className="w-7"

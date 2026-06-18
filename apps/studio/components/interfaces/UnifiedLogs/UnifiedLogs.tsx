@@ -382,7 +382,7 @@ export const UnifiedLogs = () => {
                 <ShortcutTooltip shortcutId={SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS} side="bottom">
                   <Button
                     size="tiny"
-                    type="text"
+                    variant="text"
                     icon={isFilterBarOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
                     onClick={() => setIsFilterBarOpen((prev) => !prev)}
                     className="hidden w-[26px] sm:flex"

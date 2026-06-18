@@ -154,10 +154,10 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
               />
             </DialogSection>
             <DialogFooter>
-              <Button htmlType="reset" type="default" onClick={handleCancel} disabled={isCreating}>
+              <Button type="reset" variant="default" onClick={handleCancel} disabled={isCreating}>
                 Cancel
               </Button>
-              <Button htmlType="submit" loading={isCreating} disabled={isCreating || !isDirty}>
+              <Button type="submit" loading={isCreating} disabled={isCreating || !isDirty}>
                 Create report
               </Button>
             </DialogFooter>

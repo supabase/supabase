@@ -99,7 +99,7 @@ export const SimpleCodeBlock = ({
             </pre>
             {showCopy && (
               <div className="invisible absolute right-0 top-0 opacity-0 transition-opacity group-hover:visible group-hover:opacity-100">
-                <Button size="tiny" type="default" onClick={() => handleCopyCode(children)}>
+                <Button size="tiny" variant="default" onClick={() => handleCopyCode(children)}>
                   {showCopied ? 'Copied' : 'Copy'}
                 </Button>
               </div>

@@ -358,7 +358,7 @@ export const ProtectionAuthSettingsForm = () => {
                           {field.value ? 'Enabled' : 'Disabled'}
                         </Badge>
                         <Link href={`/project/${projectRef}/auth/providers?provider=Email`}>
-                          <Button type="default">Configure in email provider</Button>
+                          <Button variant="default">Configure in email provider</Button>
                         </Link>
                       </div>
                     </FormItemLayout>
@@ -368,13 +368,13 @@ export const ProtectionAuthSettingsForm = () => {
 
               <CardFooter className="justify-end space-x-2">
                 {isDirty && (
-                  <Button type="default" onClick={() => protectionForm.reset()}>
+                  <Button variant="default" onClick={() => protectionForm.reset()}>
                     Cancel
                   </Button>
                 )}
                 <Button
-                  type="primary"
-                  htmlType="submit"
+                  variant="primary"
+                  type="submit"
                   disabled={!canUpdateConfig || isUpdatingConfig || !isDirty}
                   loading={isUpdatingConfig}
                 >

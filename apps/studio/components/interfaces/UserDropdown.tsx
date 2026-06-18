@@ -1,5 +1,5 @@
 import { useFlag } from 'common'
-import { FlaskConical, Loader2, ScrollText, Settings } from 'lucide-react'
+import { FlaskConical, Loader2, ScrollText, User2 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -67,7 +67,7 @@ export function UserDropdown({
     >
       <DropdownMenuTrigger asChild className={cn('border shrink-0 px-3', triggerClassName)}>
         <ButtonTooltip
-          type="default"
+          variant="default"
           className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
           tooltip={{ content: { text: 'Account settings' } }}
         >
@@ -116,14 +116,13 @@ export function UserDropdown({
                     }
                   }}
                 >
-                  <Settings size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                  Account preferences
+                  <User2 size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                  Account
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="flex gap-2 cursor-pointer"
                 onClick={() => toggleFeaturePreviewModal(true)}
-                // onSelect={() => toggleFeaturePreviewModal(true)}
               >
                 <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                 Feature previews

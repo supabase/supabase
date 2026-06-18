@@ -13,7 +13,7 @@ export const RestorePaidPlanProjectNotice = () => {
         project.
       </AlertDescription>
       <AlertDescription className="mt-3">
-        <Button asChild type="default" icon={<ExternalLink />}>
+        <Button asChild variant="default" icon={<ExternalLink />}>
           <a
             href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
             target="_blank"

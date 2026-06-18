@@ -10,8 +10,9 @@
 #   sudo bash tests/test-pg17-upgrade.sh
 #
 # Prerequisites:
-#   - Running self-hosted Supabase with a clean, tests-only Postgres 15:
-#       docker compose up -d
+#   - Running self-hosted Supabase with a clean, tests-only Postgres 15.
+#     Postgres 17 is now the default, so start PG 15 explicitly via the override:
+#       docker compose -f docker-compose.yml -f docker-compose.pg15.yml up -d
 #   - .env file with POSTGRES_PASSWORD, ANON_KEY
 #
 
@@ -48,7 +49,7 @@ echo ""
 current_version=$(run_sql -A -t -c "SHOW server_version;" | head -1)
 case "$current_version" in
     15.*) echo "Starting version: PostgreSQL $current_version" ;;
-    17.*) echo "Error: Already on Postgres 17. Start with a PG15 stack."; exit 1 ;;
+    17.*) echo "Error: Already on Postgres 17. Start with a PG 15 stack."; exit 1 ;;
     *) echo "Error: Unexpected version: $current_version"; exit 1 ;;
 esac
 
@@ -88,6 +89,21 @@ $$;
 
 -- Grant access so PostgREST can read it
 GRANT SELECT ON public._upgrade_test TO anon, authenticated;
+
+-- pg_cron: created here as supabase_admin (the common manually-enabled case),
+-- so the extension is owned by supabase_admin, NOT postgres. complete.sh's
+-- drop+recreate only fires for postgres-owned pg_cron, so this exercises the
+-- version reconcile in the upgrade script: Supabase PG 15 registers pg_cron
+-- as '1.6', while the target image packages it as '1.6.4' with no update
+-- path between them.
+CREATE EXTENSION IF NOT EXISTS pg_cron;
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'upgrade_test_job') THEN
+        PERFORM cron.unschedule('upgrade_test_job');
+    END IF;
+END $$;
+SELECT cron.schedule('upgrade_test_job', '5 4 * * *', 'SELECT 1');
 EOSQL
 
 pre_count=$(run_sql -A -t -c "SELECT count(*) FROM public._upgrade_test;" | tr -d '[:space:]')
@@ -115,7 +131,7 @@ echo ""
 run_sql <<EOSQL
 CREATE EXTENSION IF NOT EXISTS pgtap;
 
-SELECT plan(11);
+SELECT plan(16);
 
 -- Version
 SELECT ok(version() LIKE 'PostgreSQL 17%', 'Running Postgres 17');
@@ -167,6 +183,37 @@ SELECT ok(
 SELECT ok(
     NOT (SELECT rolsuper FROM pg_roles WHERE rolname = 'postgres'),
     'postgres role is not superuser'
+);
+
+-- pg_cron: registered as 1.6 on PG 15; the upgrade must reconcile the version
+-- label to the target's packaged 1.6.4 and preserve scheduled jobs.
+SELECT ok(
+    EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_cron'),
+    'pg_cron extension exists'
+);
+SELECT is(
+    (SELECT extversion FROM pg_extension WHERE extname = 'pg_cron'),
+    '1.6.4',
+    'pg_cron version label reconciled to 1.6.4'
+);
+SELECT ok(
+    EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'upgrade_test_job'),
+    'pg_cron scheduled job survived the upgrade'
+);
+
+-- New predefined role (initdb-only migration; the target image's supautils.conf
+-- references it, so it must exist on an upgraded instance).
+SELECT ok(
+    EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'supabase_privileged_role'),
+    'supabase_privileged_role exists'
+);
+
+-- Extension version reconcile: complete.sh ran with .063 binaries, so the
+-- catalog should be reconciled to the target image's default version.
+SELECT is(
+    (SELECT extversion FROM pg_extension WHERE extname = 'pg_net'),
+    (SELECT default_version FROM pg_available_extensions WHERE name = 'pg_net'),
+    'pg_net version reconciled to image default'
 );
 
 SELECT * FROM finish(true);
@@ -222,6 +269,12 @@ run_sql <<'EOSQL' || true
 DROP FUNCTION IF EXISTS public._upgrade_test_fn(int);
 DROP TABLE IF EXISTS public._upgrade_test;
 DROP EXTENSION IF EXISTS pgtap;
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'upgrade_test_job') THEN
+        PERFORM cron.unschedule('upgrade_test_job');
+    END IF;
+END $$;
 EOSQL
 
 # --- Summary --------------------------------------------------------------

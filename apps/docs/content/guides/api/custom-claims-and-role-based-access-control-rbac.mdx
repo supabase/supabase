@@ -154,7 +154,7 @@ To learn more about Auth Hooks, see the [Auth Hooks docs](/docs/guides/auth/auth
 
 ## Accessing custom claims in RLS policies
 
-To utilize Role-Based Access Control (RBAC) in Row Level Security (RLS) policies, create an `authorize` method that reads the user's role from their JWT and checks the role's permissions:
+To use Role-Based Access Control (RBAC) in Row Level Security (RLS) policies, create an `authorize` method that reads the user's role from their JWT and checks the role's permissions:
 
 ```sql supabase/migrations/init.sql
 create or replace function public.authorize(

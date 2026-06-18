@@ -171,7 +171,7 @@ export const SecuritySettings = () => {
                     <CardFooter className="justify-end space-x-2">
                       {form.formState.isDirty && (
                         <Button
-                          type="default"
+                          variant="default"
                           disabled={isLoadingMfa || isUpdatingMfa}
                           onClick={() =>
                             form.reset({ enforceMfa: hasAccessToEnforceMfa ? mfaConfig : false })
@@ -181,8 +181,8 @@ export const SecuritySettings = () => {
                         </Button>
                       )}
                       <Button
-                        type="primary"
-                        htmlType="submit"
+                        variant="primary"
+                        type="submit"
                         disabled={
                           !hasAccessToEnforceMfa ||
                           !canUpdateMfaConfig ||

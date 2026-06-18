@@ -908,7 +908,9 @@ export const updateTable = async ({
     }),
     queryClient.invalidateQueries({ queryKey: databaseKeys.tableDefinition(projectRef, table.id) }),
     queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(projectRef) }),
-    queryClient.invalidateQueries({ queryKey: tableKeys.list(projectRef, table.schema, true) }),
+    queryClient.invalidateQueries({
+      queryKey: tableKeys.list(projectRef, table.schema, { includeColumns: true }),
+    }),
     queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
   ])
 

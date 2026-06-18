@@ -76,7 +76,7 @@ export const SendMessageModal = ({
           </div>
         </DialogSection>
         <DialogFooter>
-          <Button onClick={onSelectCancel} type="default">
+          <Button onClick={onSelectCancel} variant="default">
             Cancel
           </Button>
           <Button
@@ -88,7 +88,7 @@ export const SendMessageModal = ({
                 onSelectConfirm({ ...values, payload })
               }
             }}
-            type="primary"
+            variant="primary"
           >
             Confirm
           </Button>

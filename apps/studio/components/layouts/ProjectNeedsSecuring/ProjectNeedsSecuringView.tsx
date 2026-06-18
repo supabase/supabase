@@ -111,7 +111,7 @@ export const ProjectNeedsSecuringView = ({
             <PageHeaderDescription>{formatRlsDescription(issueCount)}</PageHeaderDescription>
           </PageHeaderSummary>
           <PageHeaderAside>
-            <Button asChild type="text" iconRight={<ArrowRight />}>
+            <Button asChild variant="text" iconRight={<ArrowRight />}>
               <Link
                 href={`/project/${projectRef}`}
                 onClick={() => {

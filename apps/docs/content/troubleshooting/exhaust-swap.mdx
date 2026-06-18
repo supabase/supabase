@@ -17,7 +17,7 @@ High Swap is usually not a problem unless other resources (such as RAM) are cons
 
 Every Supabase project runs on its own dedicated virtual machine. The machine's underlying specs and hardware depend on your [compute add-on](/docs/guides/platform/compute-add-ons). If your hardware isn't suitable for your workload, you might experience high Swap usage.
 
-Swap is a portion of your instance's disk that is reserved for the operating system to use when the available RAM has been utilized. As it uses the disk, Swap is slower to access and is generally used as a last resort.
+Swap is a portion of your instance's disk that is reserved for the operating system to use when the available RAM is used. As it uses the disk, Swap is slower to access and is generally used as a last resort.
 
 Swap can be used even if your instance has plenty of RAM. If this is the case, do not worry. Your instance might try to "preemptively swap" by swapping background processes to make space for your traffic in RAM.
 

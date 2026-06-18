@@ -487,7 +487,7 @@ export const DatabaseConnectionString = () => {
                           className="w-full justify-start !last:rounded-b group-data-open:rounded-b-none px-3"
                         >
                           <Button
-                            type="default"
+                            variant="default"
                             size="large"
                             iconRight={
                               <ChevronDown className="transition group-data-open:rotate-180" />

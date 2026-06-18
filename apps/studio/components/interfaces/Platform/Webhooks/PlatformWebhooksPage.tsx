@@ -342,7 +342,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
                 options={{ enabled: !isEndpointSheetOpen }}
               >
                 <Button
-                  type="default"
+                  variant="default"
                   icon={<Pencil size={14} />}
                   onClick={() => {
                     setEditEnabledOverride(null)
@@ -354,7 +354,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
               </Shortcut>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button type="default" icon={<EllipsisVertical />} className="w-7" />
+                  <Button variant="default" icon={<EllipsisVertical />} className="w-7" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" side="bottom" className="w-48">
                   <DropdownMenuItem
