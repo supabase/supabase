@@ -299,10 +299,10 @@ function Database() {
               </div>
 
               <div className="mt-4 flex gap-2">
-                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+                <Button asChild size="small" variant="default" icon={<ArrowUpRight />}>
                   <Link href="/docs/guides/database/replication">Read the docs</Link>
                 </Button>
-                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+                <Button asChild size="small" variant="default" icon={<ArrowUpRight />}>
                   <Link href="/blog/supabase-etl">Read the blog post</Link>
                 </Button>
               </div>
@@ -385,7 +385,7 @@ function Database() {
                 title="40+ preinstalled extensions"
                 text="We only show a few of the extensions supported by Supabase here, but we preinstall many more that you can use right away."
               />
-              <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+              <Button asChild size="small" variant="default" icon={<ArrowUpRight />}>
                 <Link href="/docs/guides/database">Explore documentation</Link>
               </Button>
             </div>

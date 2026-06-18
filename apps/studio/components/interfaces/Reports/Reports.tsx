@@ -12,7 +12,7 @@ import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
 import { GridResize } from './GridResize'
 import { MetricOptions } from './MetricOptions'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
-import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
 import { DateRangePicker } from '@/components/ui/DateRangePicker'
@@ -27,6 +27,7 @@ import {
 } from '@/data/content/content-upsert-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePreventNavigationOnUnsavedChanges } from '@/hooks/ui/usePreventNavigationOnUnsavedChanges'
 import { Metric, TIME_PERIODS_REPORTS } from '@/lib/constants/metrics'
 import { uuidv4 } from '@/lib/helpers'
 import { useProfile } from '@/lib/profile'
@@ -352,6 +353,11 @@ const Reports = () => {
     checkEditState()
   }, [config])
 
+  const { handleCancelNavigation, handleConfirmNavigation, shouldConfirmNavigation } =
+    usePreventNavigationOnUnsavedChanges({
+      hasChanges: hasEdits,
+    })
+
   if (isLoading || isLoadingPermissions) {
     return <LogoLoader />
   }
@@ -371,14 +377,14 @@ const Reports = () => {
           {hasEdits && (
             <div className="flex items-center gap-x-2">
               <Button
-                type="default"
+                variant="default"
                 disabled={isSaving}
                 onClick={() => setConfig(currentReportContent)}
               >
                 Cancel
               </Button>
               <Button
-                type="primary"
+                variant="primary"
                 icon={<Save />}
                 loading={isSaving}
                 onClick={() => onSaveReport()}
@@ -391,7 +397,7 @@ const Reports = () => {
         <div className={cn('mb-4 flex items-center gap-x-3 justify-between')}>
           <div className="flex items-center gap-x-2">
             <ButtonTooltip
-              type="default"
+              variant="default"
               icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
               className="w-7"
               disabled={isRefreshing}
@@ -420,7 +426,7 @@ const Reports = () => {
             {canUpdateReport ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button type="default" icon={<Plus />}>
+                  <Button variant="default" icon={<Plus />}>
                     <span>Add block</span>
                   </Button>
                 </DropdownMenuTrigger>
@@ -431,7 +437,7 @@ const Reports = () => {
             ) : (
               <ButtonTooltip
                 disabled
-                type="default"
+                variant="default"
                 icon={<Plus />}
                 tooltip={{
                   content: {
@@ -461,7 +467,7 @@ const Reports = () => {
             {canUpdateReport ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button type="default" iconRight={<Plus size={14} />}>
+                  <Button variant="default" iconRight={<Plus size={14} />}>
                     Add your first chart
                   </Button>
                 </DropdownMenuTrigger>
@@ -491,7 +497,11 @@ const Reports = () => {
           </div>
         )}
       </div>
-      <PreventNavigationOnUnsavedChanges hasChanges={hasEdits} />
+      <DiscardChangesConfirmationDialog
+        visible={shouldConfirmNavigation}
+        onCancel={handleCancelNavigation}
+        onClose={handleConfirmNavigation}
+      />
     </>
   )
 }

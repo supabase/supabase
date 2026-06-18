@@ -13,36 +13,38 @@ const pool = new Pool(
   1
 )
 
-Deno.serve(async (_req) => {
-  try {
-    // Grab a connection from the pool
-    const connection = await pool.connect()
-
+export default {
+  fetch: async (_req) => {
     try {
-      // Run a query
-      const result = await connection.queryObject`SELECT * FROM animals`
-      const animals = result.rows // [{ id: 1, name: "Lion" }, ...]
+      // Grab a connection from the pool
+      const connection = await pool.connect()
 
-      // Encode the result as pretty printed JSON
-      const body = JSON.stringify(
-        animals,
-        (_key, value) => (typeof value === 'bigint' ? value.toString() : value),
-        2
-      )
+      try {
+        // Run a query
+        const result = await connection.queryObject`SELECT * FROM animals`
+        const animals = result.rows // [{ id: 1, name: "Lion" }, ...]
 
-      // Return the response with the correct content type header
-      return new Response(body, {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8',
-        },
-      })
-    } finally {
-      // Release the connection back into the pool
-      connection.release()
+        // Encode the result as pretty printed JSON
+        const body = JSON.stringify(
+          animals,
+          (_key, value) => (typeof value === 'bigint' ? value.toString() : value),
+          2
+        )
+
+        // Return the response with the correct content type header
+        return new Response(body, {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8',
+          },
+        })
+      } finally {
+        // Release the connection back into the pool
+        connection.release()
+      }
+    } catch (err) {
+      console.error(err)
+      return new Response(String(err?.message ?? err), { status: 500 })
     }
-  } catch (err) {
-    console.error(err)
-    return new Response(String(err?.message ?? err), { status: 500 })
-  }
-})
+  },
+}

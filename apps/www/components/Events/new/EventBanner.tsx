@@ -51,7 +51,7 @@ export function EventBanner() {
 
           <div className="flex items-center md:justify-end gap-2">
             {featuredEvent.meetingLink && (
-              <Button type="secondary" size="medium" asChild>
+              <Button variant="secondary" size="medium" asChild>
                 <Link href={featuredEvent.meetingLink} target="_blank" rel="noopener noreferrer">
                   Meet with us
                 </Link>

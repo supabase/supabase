@@ -87,7 +87,7 @@ export const UtilityActions = ({
         <DropdownMenuTrigger asChild>
           <Button
             data-testid="sql-editor-utility-actions"
-            type="default"
+            variant="default"
             className={cn('px-1', isAiOpen ? 'block 2xl:hidden' : 'hidden')}
             icon={<MoreVertical className="text-foreground-light" />}
           />
@@ -135,7 +135,7 @@ export const UtilityActions = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              type="text"
+              variant="text"
               className="px-1"
               icon={<Keyboard className="text-foreground-light" />}
             />
@@ -153,7 +153,7 @@ export const UtilityActions = ({
             <TooltipTrigger asChild>
               {isFavorite ? (
                 <Button
-                  type="text"
+                  variant="text"
                   size="tiny"
                   onClick={removeFavorite}
                   className="px-1"
@@ -161,7 +161,7 @@ export const UtilityActions = ({
                 />
               ) : (
                 <Button
-                  type="text"
+                  variant="text"
                   size="tiny"
                   onClick={addFavorite}
                   className="px-1"
@@ -178,7 +178,7 @@ export const UtilityActions = ({
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              type="text"
+              variant="text"
               onClick={prettifyQuery}
               className="px-1"
               icon={<AlignLeft strokeWidth={2} className="text-foreground-light" />}

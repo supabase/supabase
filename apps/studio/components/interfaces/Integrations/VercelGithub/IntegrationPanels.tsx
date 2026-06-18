@@ -118,7 +118,7 @@ export const IntegrationInstallation = forwardRef<HTMLLIElement, IntegrationInst
           </div>
         </div>
 
-        <Button asChild disabled={disabled} type="default" iconRight={<ExternalLink />}>
+        <Button asChild disabled={disabled} variant="default" iconRight={<ExternalLink />}>
           {disabled ? (
             <p>Manage</p>
           ) : (
@@ -260,7 +260,7 @@ export const IntegrationConnectionOption = forwardRef<HTMLLIElement, Integration
           </span>
         </div>
 
-        <Button type="default">Connect</Button>
+        <Button variant="default">Connect</Button>
       </li>
     )
   }
@@ -296,7 +296,7 @@ export const EmptyIntegrationConnection = forwardRef<
         )}
       >
         <ButtonTooltip
-          type="default"
+          variant="default"
           disabled={disabled}
           onClick={() => onClick()}
           tooltip={{

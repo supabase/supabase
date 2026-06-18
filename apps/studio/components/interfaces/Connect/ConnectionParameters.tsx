@@ -30,7 +30,7 @@ export const ConnectionParameters = ({ parameters }: ConnectionParametersProps) 
         className="w-full justify-start rounded-t-none !last:rounded-b group-data-open:rounded-b-none px-3"
       >
         <Button
-          type="default"
+          variant="default"
           size="tiny"
           className="text-foreground-lighter bg-dash-sidebar!"
           icon={

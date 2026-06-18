@@ -39,9 +39,8 @@ import { ServiceFlowPanel } from './ServiceFlowPanel'
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
 import {
-  columnFiltersToLogsFilters,
-  groupLogsFiltersByColumn,
-  logsFiltersToUrlParams,
+  buildFilterSearchUpdate,
+  logsFiltersToColumnFilters,
   parseLogsFilterUrlParams,
 } from './UnifiedLogs.filters'
 import { useLiveMode, useResetFocus } from './UnifiedLogs.hooks'
@@ -92,12 +91,7 @@ export const UnifiedLogs = () => {
 
   const defaultColumnSorting = search.sort ? [search.sort] : []
   const defaultColumnVisibility = { uuid: false }
-  // Column filters are seeded from the repeatable `filter` URL param. Each entry
-  // (`col:opAbbrev:value`) is grouped per column into a wrapped { operator, values }
-  // shape that the query builder reads back.
-  const defaultColumnFilters = Object.entries(
-    groupLogsFiltersByColumn(parseLogsFilterUrlParams(search.filter))
-  ).map(([id, value]) => ({ id, value }))
+  const defaultColumnFilters = logsFiltersToColumnFilters(parseLogsFilterUrlParams(search.filter))
 
   const [topBarHeight, setTopBarHeight] = useState(0)
   const topBarRef = useRef<HTMLDivElement>(null)
@@ -294,21 +288,8 @@ export const UnifiedLogs = () => {
     })
   }, [facets])
 
-  // Debounced filter application to avoid too many API calls when user clicks multiple filters quickly.
-  // All equality/pattern column filters serialize into the repeatable `filter` URL param. Slider/timerange
-  // column filters keep their dedicated per-column URL keys so things like the timeline brush still
-  // round-trip — they have their own range semantics and aren't covered by eq/neq/like.
   const applyFilterSearch = () => {
-    const filterEntries = logsFiltersToUrlParams(columnFiltersToLogsFilters(columnFilters))
-    const update: Record<string, unknown> = {
-      filter: filterEntries.length > 0 ? filterEntries : null,
-    }
-    for (const field of filterFields) {
-      if (field.type !== 'timerange') continue
-      const current = columnFilters.find((c) => c.id === field.value)?.value
-      update[field.value] = current ?? null
-    }
-    setSearch(update)
+    setSearch(buildFilterSearchUpdate(columnFilters, filterFields))
   }
 
   const debouncedApplyFilterSearch = useDebounce(applyFilterSearch, 250)
@@ -342,7 +323,13 @@ export const UnifiedLogs = () => {
   const isMobile = useIsMobile()
   const [isFilterBarOpen, setIsFilterBarOpen] = useState(!isMobile)
 
-  useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS, () => setIsFilterBarOpen((prev) => !prev))
+  useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS, () => setIsFilterBarOpen((prev) => !prev), {
+    registerInCommandMenu: true,
+  })
+  useShortcut(SHORTCUT_IDS.UNIFIED_LOGS_CLEAR_FILTERS, () => table.resetColumnFilters(), {
+    enabled: columnFilters.length > 0,
+    registerInCommandMenu: true,
+  })
 
   useEffect(() => {
     if (isMobile) {
@@ -395,7 +382,7 @@ export const UnifiedLogs = () => {
                 <ShortcutTooltip shortcutId={SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS} side="bottom">
                   <Button
                     size="tiny"
-                    type="text"
+                    variant="text"
                     icon={isFilterBarOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
                     onClick={() => setIsFilterBarOpen((prev) => !prev)}
                     className="hidden w-[26px] sm:flex"
@@ -414,7 +401,11 @@ export const UnifiedLogs = () => {
                 </div>
 
                 <div className="ml-auto flex items-center gap-x-2">
-                  <RefreshButton isLoading={isRefetchingData} onRefresh={refetchAllData} />
+                  <RefreshButton
+                    isLoading={isRefetchingData}
+                    onRefresh={refetchAllData}
+                    shortcutId={SHORTCUT_IDS.UNIFIED_LOGS_REFRESH}
+                  />
                   <DataTableViewOptions />
                   <DownloadLogsButton searchParameters={searchParameters} />
                   {fetchPreviousPage ? (

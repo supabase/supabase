@@ -61,7 +61,7 @@ function ImageCarousel(props: ImageCarouselProps) {
         </p>
       </p>
       <p>
-        <Button type="outline" size="small" icon={<CornerRightUp />}>
+        <Button variant="outline" size="small" icon={<CornerRightUp />}>
           View documentation
         </Button>
       </p>
@@ -77,7 +77,7 @@ function ImageCarousel(props: ImageCarouselProps) {
               {props.content.map((content, i) => {
                 return (
                   <Button
-                    type="default"
+                    variant="default"
                     className={cn('shrink-0', { 'opacity-50': i !== imageSwiperActiveIndex })}
                     onClick={() => handleImageSwiperNav(i)}
                     key={i}

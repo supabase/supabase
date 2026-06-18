@@ -437,7 +437,7 @@ export const SQLEditorTreeViewItem = ({
           }}
         >
           <Button
-            type="outline"
+            variant="outline"
             size="tiny"
             block
             loading={isInFolder ? isFetchingNextPageInFolder : _isFetchingNextPage}

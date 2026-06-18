@@ -229,6 +229,18 @@
       "type": "boolean",
       "description": "Enable web apps getting started documentation"
     },
+    "docs:agent_plugin": {
+      "type": "boolean",
+      "description": "Enable documentation for the agent plugin"
+    },
+    "docs:agent_skills": {
+      "type": "boolean",
+      "description": "Enable documentation for agent skills"
+    },
+    "docs:prompts": {
+      "type": "boolean",
+      "description": "Enable documentation for prompts"
+    },
 
     "edge_functions:show_stripe_example": {
       "type": "boolean",

@@ -11,7 +11,7 @@ import { ConnectionIcon } from '@/components/interfaces/Connect/ConnectionIcon'
 import { ConnectButton } from '@/components/interfaces/ConnectButton/ConnectButton'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useLegacyAPIKeysStatusQuery } from '@/data/api-keys/legacy-api-keys-status-query'
 import { useJwtSecretUpdatingStatusQuery } from '@/data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
@@ -32,12 +32,12 @@ export const APIKeys = () => {
     useLegacyAPIKeysStatusQuery({ projectRef }, { enabled: canReadAPIKeys })
 
   const {
-    data: apiKeys,
+    data: apiKeysData,
     error: errorAPIKeys,
     isError: isErrorAPIKeys,
     isPending: isLoadingAPIKeys,
-  } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
-  const { anonKey, serviceKey, publishableKey, secretKey } = getKeys(apiKeys)
+  } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
+  const { anonKey, serviceKey, publishableKey, secretKey } = apiKeysData ?? {}
 
   const hasNewAPIKeys = !!publishableKey && !!secretKey
   const isLegacyKeysEnabled = legacyAPIKeysStatusData?.enabled ?? false

@@ -182,7 +182,7 @@ export const SignUpForm = () => {
                         disabled={isSubmitting}
                       />
                       <Button
-                        type="default"
+                        variant="default"
                         title={passwordHidden ? `Show password` : `Hide password`}
                         aria-label={passwordHidden ? `Show password` : `Hide password`}
                         className="absolute right-1 top-1 px-1.5"
@@ -217,7 +217,7 @@ export const SignUpForm = () => {
             <Button
               block
               form={formId}
-              htmlType="submit"
+              type="submit"
               size="large"
               disabled={password.length === 0 || isSubmitting}
               loading={isSubmitting}

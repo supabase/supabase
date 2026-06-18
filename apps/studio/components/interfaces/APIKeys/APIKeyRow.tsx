@@ -91,7 +91,7 @@ export const APIKeyRow = ({
               <DropdownMenu>
                 <DropdownMenuTrigger className="px-1 focus-visible:outline-hidden" asChild>
                   <Button
-                    type="text"
+                    variant="text"
                     size="tiny"
                     icon={
                       <MoreVertical

@@ -44,7 +44,7 @@ function APISection(props: Props) {
         <h2 className="h2">{props.title}</h2>
         <div className="p">{props.text}</div>
         {props.documentation_link && (
-          <Button asChild size="small" className="mt-4" type="default" icon={<ArrowUpRight />}>
+          <Button asChild size="small" className="mt-4" variant="default" icon={<ArrowUpRight />}>
             <Link href={props.documentation_link} as={props.documentation_link}>
               {props.ctaLabel ? props.ctaLabel : 'Explore documentation'}
             </Link>
@@ -57,7 +57,7 @@ function APISection(props: Props) {
           {props.content.map((extension, i) => {
             return (
               <Button
-                type="default"
+                variant="default"
                 className={cn('shrink-0', { 'opacity-50': i !== apiSwiperActiveIndex })}
                 onClick={() => handleApiSwiperNavChange(i)}
                 key={i}

@@ -63,10 +63,14 @@ export function DataTableInfinite<TData, TValue, TMeta>({
     [fetchNextPage, isFetching, totalRows, totalRowsFetched]
   )
 
-  useShortcut(SHORTCUT_IDS.DATA_TABLE_RESET_COLUMNS, () => {
-    setColumnOrder([])
-    setColumnVisibility(defaultColumnVisibility)
-  })
+  useShortcut(
+    SHORTCUT_IDS.DATA_TABLE_RESET_COLUMNS,
+    () => {
+      setColumnOrder([])
+      setColumnVisibility(defaultColumnVisibility)
+    },
+    { registerInCommandMenu: true }
+  )
 
   return (
     <Table
@@ -181,7 +185,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                     disabled={isFetching}
                     onClick={() => fetchNextPage()}
                     size="small"
-                    type="default"
+                    variant="default"
                     icon={
                       isFetching ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : null
                     }

@@ -150,7 +150,7 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
                         label="Copy event payload"
                       >
                         <Button
-                          type="text"
+                          variant="text"
                           icon={<Copy size={14} />}
                           onClick={() => onCopy(deliveryEventPayload, 'event payload')}
                         >
@@ -193,7 +193,7 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
                         label="Copy response payload"
                       >
                         <Button
-                          type="text"
+                          variant="text"
                           icon={<Copy size={14} />}
                           onClick={() => onCopy(deliveryResponsePayload, 'response payload')}
                         >
@@ -220,7 +220,7 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
               onTrigger={() => onRetryDelivery(retryableDelivery.id)}
             >
               <Button
-                type="default"
+                variant="default"
                 icon={<RotateCcw />}
                 onClick={() => onRetryDelivery(retryableDelivery.id)}
               >

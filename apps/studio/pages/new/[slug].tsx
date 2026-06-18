@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -64,7 +64,7 @@ import {
   useDataApiRevokeOnCreateDefaultEnabled,
 } from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { usePHFlag } from '@/hooks/ui/useFlag'
@@ -92,10 +92,7 @@ const Wizard: NextPageWithLayout = () => {
   const isFreePlan = currentOrg?.plan?.id === 'free'
   const canChooseInstanceSize = !isFreePlan
 
-  const [lastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
   const { can: isAdmin } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
   const { can: canCreateGitHubConnection } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
@@ -625,7 +622,7 @@ const Wizard: NextPageWithLayout = () => {
                             </p>
 
                             <div>
-                              <Button asChild type="default">
+                              <Button asChild variant="default">
                                 <Link href={`/org/${slug}/billing#invoices`}>View invoices</Link>
                               </Button>
                             </div>

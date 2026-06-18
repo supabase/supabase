@@ -9,7 +9,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
 import type { ContentProps } from './Content.types'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useTrack } from '@/lib/telemetry/track'
@@ -17,8 +17,10 @@ import { useTrack } from '@/lib/telemetry/track'
 export const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) => {
   const { ref } = useParams()
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef: ref }, { enabled: canReadAPIKeys })
+  const { data: apiKeysData } = useAPIKeys({ projectRef: ref }, { enabled: canReadAPIKeys })
   useProjectSettingsV2Query({ projectRef: ref })
+  const { anonKey, serviceKey } = apiKeysData ?? {}
+
   const track = useTrack()
 
   const [copied, setCopied] = useState<'anon' | 'service'>()
@@ -27,7 +29,6 @@ export const Introduction = ({ showKeys, language, apikey, endpoint }: ContentPr
     if (copied !== undefined) setTimeout(() => setCopied(undefined), 2000)
   }, [copied])
 
-  const { anonKey, serviceKey } = getKeys(apiKeys)
   const anonApiKey = anonKey?.api_key
   const serviceApiKey = serviceKey?.api_key ?? 'SUPABASE_CLIENT_SERVICE_KEY'
 
@@ -60,7 +61,7 @@ export const Introduction = ({ showKeys, language, apikey, endpoint }: ContentPr
                 actions={[
                   <Button
                     key="copy"
-                    type="default"
+                    variant="default"
                     icon={<Copy />}
                     onClick={() => {
                       setCopied('anon')
@@ -101,7 +102,7 @@ export const Introduction = ({ showKeys, language, apikey, endpoint }: ContentPr
                 actions={[
                   <Button
                     key="copy"
-                    type="default"
+                    variant="default"
                     icon={<Copy />}
                     onClick={() => {
                       setCopied('service')

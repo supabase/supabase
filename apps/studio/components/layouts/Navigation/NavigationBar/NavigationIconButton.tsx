@@ -15,7 +15,7 @@ export const NavigationIconButton = forwardRef<
   return (
     <Button
       ref={ref}
-      type="text"
+      variant="text"
       size="tiny"
       {...props}
       className={cn(

@@ -398,7 +398,7 @@ export const CreateBranchModal = () => {
                         Keep this preview branch in sync with a chosen GitHub branch
                       </p>
                     </div>
-                    <Button type="default" icon={<Github />} onClick={handleGitHubClick}>
+                    <Button variant="default" icon={<Github />} onClick={handleGitHubClick}>
                       Configure
                     </Button>
                   </div>
@@ -604,7 +604,7 @@ export const CreateBranchModal = () => {
 
             <DialogFooter className="justify-end gap-2" padding="medium">
               <Button
-                type="default"
+                variant="default"
                 disabled={isCreatingBranch}
                 onClick={() => setShowCreateBranchModal(false)}
               >
@@ -614,8 +614,8 @@ export const CreateBranchModal = () => {
                 form={formId}
                 disabled={isDisabled}
                 loading={isCreatingBranch}
-                type={promptPlanUpgrade ? 'default' : 'primary'}
-                htmlType="submit"
+                variant={promptPlanUpgrade ? 'default' : 'primary'}
+                type="submit"
                 tooltip={{
                   content: {
                     side: 'bottom',

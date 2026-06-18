@@ -128,7 +128,7 @@ export const LocalVersionPopover = () => {
         <div className="flex items-center gap-x-2 mt-3 px-4">
           <Dialog>
             <DialogTrigger asChild>
-              <Button type="default">Release schedule</Button>
+              <Button variant="default">Release schedule</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader className="border-b">
@@ -174,7 +174,7 @@ export const LocalVersionPopover = () => {
               </DialogSection>
             </DialogContent>
           </Dialog>
-          <Button type="default" asChild>
+          <Button variant="default" asChild>
             <a
               target="_blank"
               rel="noreferrer noopener"

@@ -47,7 +47,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
         {props.content.map((extension, i) => {
           return (
             <Button
-              type="default"
+              variant="default"
               className={cn('shrink-0', { 'opacity-50': i !== apiSwiperActiveIndex })}
               onClick={() => handleApiSwiperNavChange(i)}
               key={i}
@@ -88,7 +88,6 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
           spaceBetween={0}
           slidesPerView={1}
           direction="horizontal"
-          // style={{ overflow: 'hidden' }}
           speed={300}
           allowTouchMove={false}
         >
@@ -103,7 +102,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
                 <p className="p mb-6 block">{extension.detail_text}</p>
                 <div>
                   {extension.url && (
-                    <Button asChild type="default">
+                    <Button asChild variant="default">
                       <Link href={extension.url} as={extension.url} className="ml-px">
                         View documentation
                       </Link>

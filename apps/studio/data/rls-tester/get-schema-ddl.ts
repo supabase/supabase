@@ -7,7 +7,7 @@ import pgMeta, {
 } from '@supabase/pg-meta'
 import { z } from 'zod'
 
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
 
 export interface RlsTableStatus {
