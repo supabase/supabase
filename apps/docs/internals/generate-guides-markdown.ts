@@ -13,6 +13,7 @@ import { mdxjs } from 'micromark-extension-mdxjs'
 
 import { getInternalLinkBaseUrl, prefixInternalLinks } from './internal-links'
 import { Admonition } from './markdown-schema/Admonition'
+import { ComputeDiskLimitsTable } from './markdown-schema/ComputeDiskLimitsTable'
 import { Link } from './markdown-schema/Link'
 import { MetricsStackCards } from './markdown-schema/MetricsStackCards'
 import { Panel } from './markdown-schema/Panel'
@@ -132,6 +133,7 @@ function applySchema(parent: Parent, schema: ComponentSchema): void {
  */
 const SCHEMA: ComponentSchema = {
   Admonition,
+  ComputeDiskLimitsTable,
   Link,
   Price,
   GlassPanel: Panel,
