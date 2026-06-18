@@ -73,92 +73,23 @@ The pricing rules are pure functions with no side effects, so they are perfect c
 
 ### The pricing module (`process-ticket/pricing.ts`)
 
-```ts
-// supabase/functions/process-ticket/pricing.ts
-export const AGE_TIERS = {
-  CHILDREN: 1, // free access
-  YOUNG: 0.2, // 20% off (ages 9-17)
-  ADULT: 0, // no discount
-}
-
-export function getAgeDiscount(age: number) {
-  if (age <= 8) {
-    return AGE_TIERS.CHILDREN
-  }
-
-  if (age > 8 && age < 18) {
-    return AGE_TIERS.YOUNG
-  }
-
-  return AGE_TIERS.ADULT
-}
-
-export function applyTicketDiscount(price: number, age: number) {
-  const discount = getAgeDiscount(age)
-  return price - price * discount
-}
-```
+<$CodeSample
+path="/edge-functions/supabase/functions/unit-testing/process-ticket/pricing.ts"
+title="Testing pure business logic | Implementation"
+meta="supabase/functions/process-ticket/pricing.ts"
+language="typescript"
+/>
 
 ### Unit tests (`tests/process-ticket/pricing.test.ts`)
 
 The reference implementation uses the BDD-style API from `@std/testing/bdd`:
 
-```ts
-// supabase/functions/tests/process-ticket/pricing.test.ts
-import { assertEquals } from 'jsr:@std/assert'
-import { describe, it } from 'jsr:@std/testing/bdd'
-
-import { AGE_TIERS, applyTicketDiscount, getAgeDiscount } from '../../process-ticket/pricing.ts'
-
-describe('getAgeDiscount', () => {
-  it('should return valid discount for children', () => {
-    const ages = [0, 5, 8]
-    ages.forEach((age) => {
-      const discount = getAgeDiscount(age)
-      assertEquals(discount, AGE_TIERS.CHILDREN)
-    })
-  })
-
-  it('should return valid discount for young people (9-17)', () => {
-    const ages = [9, 12, 17]
-    ages.forEach((age) => {
-      const discount = getAgeDiscount(age)
-      assertEquals(discount, AGE_TIERS.YOUNG)
-    })
-  })
-
-  it('should return valid discount for adults', () => {
-    const ages = [18, 35, 80]
-    ages.forEach((age) => {
-      const discount = getAgeDiscount(age)
-      assertEquals(discount, AGE_TIERS.ADULT)
-    })
-  })
-})
-
-describe('applyTicketDiscount', () => {
-  it('kids have free access', () => {
-    const price = applyTicketDiscount(10, 8)
-    assertEquals(price, 0)
-  })
-
-  it('young people get 20% off', () => {
-    const ages = [9, 12, 17]
-    ages.forEach((age) => {
-      const price = applyTicketDiscount(10, age)
-      assertEquals(price, 8) // 10 - 20% = 8
-    })
-  })
-
-  it('adults pay full price', () => {
-    const ages = [18, 35, 80]
-    ages.forEach((age) => {
-      const price = applyTicketDiscount(10, age)
-      assertEquals(price, 10)
-    })
-  })
-})
-```
+<$CodeSample
+path="/edge-functions/supabase/functions/unit-testing/tests/process-ticket/pricing.test.ts"
+title="Testing pure business logic | Unit-Test"
+meta="supabase/functions/tests/process-ticket/pricing.test.ts"
+language="typescript"
+/>
 
 Run the unit tests:
 
@@ -176,44 +107,12 @@ The reference implementation uses a pattern: **mocking `globalThis.fetch`** to i
 
 ### The Edge Function (`process-ticket/index.ts`)
 
-```ts
-// supabase/functions/process-ticket/index.ts
-import '@supabase/functions-js/edge-runtime.d.ts'
-
-import { withSupabase } from '@supabase/server'
-
-import { Database } from '../_shared/types.ts'
-import { applyTicketDiscount } from './pricing.ts'
-
-console.log('Hello from Functions!')
-
-export type Payload = {
-  price: number
-}
-
-export default {
-  fetch: withSupabase<Database>({ auth: ['user'] }, async (req, ctx) => {
-    const { price } = (await req.json()) as Payload
-    if (!price) {
-      return Response.json({ error: 'missing price field' }, { status: 400 })
-    }
-
-    const { data, error: getAgeError } = await ctx.supabase
-      .from('profiles')
-      .select('age')
-      .limit(1)
-      .single()
-
-    if (getAgeError || !Number.isInteger(data.age)) {
-      return Response.json({ error: 'could not process' }, { status: 500 })
-    }
-
-    const result = applyTicketDiscount(price, data.age)
-
-    return Response.json({ result })
-  }),
-} satisfies Deno.ServeDefaultExport
-```
+<$CodeSample
+path="/edge-functions/supabase/functions/unit-testing/process-ticket/index.ts"
+title="Testing the full Edge Function | Implementation"
+meta="supabase/functions/process-ticket/index.ts"
+language="typescript"
+/>
 
 Key points:
 
@@ -225,184 +124,21 @@ Key points:
 
 This helper sets up a mock Supabase environment and generates valid RS256 JWTs for authenticated requests:
 
-```ts
-// supabase/functions/tests/utils/supabase_env.ts
-import { exportJWK, generateKeyPair, GenerateKeyPairResult, SignJWT } from 'jsr:@panva/jose@6'
-
-const jwk: GenerateKeyPairResult = await generateKeyPair('RS256')
-const publicJwk = await exportJWK(jwk.publicKey)
-publicJwk.alg = 'RS256'
-publicJwk.use = 'sig'
-
-export const env = {
-  url: 'http://mocksupabase',
-  publishableKeys: { default: 'sb_publishable_xy' },
-  secretKeys: { default: 'sb_secret_xy' },
-  jwks: {
-    keys: [publicJwk],
-  },
-}
-
-export function exportEnv() {
-  Deno.env.set('SUPABASE_URL', env.url)
-  Deno.env.set('SUPABASE_PUBLISHABLE_KEYS', JSON.stringify(env.publishableKeys))
-  Deno.env.set('SUPABASE_SECRET_KEYS', JSON.stringify(env.secretKeys))
-  Deno.env.set('SUPABASE_JWKS', JSON.stringify(env.jwks))
-}
-
-export async function generateUserToken() {
-  const token = await new SignJWT({
-    sub: 'user-123',
-    role: 'authenticated',
-    email: 'test@example.com',
-  })
-    .setProtectedHeader({ alg: 'RS256' })
-    .setIssuedAt()
-    .setExpirationTime('1h')
-    .sign(jwk.privateKey)
-
-  return token
-}
-```
+<$CodeSample
+path="/edge-functions/supabase/functions/unit-testing/tests/utils/supabase_env.ts"
+title="Testing the full Edge Function | Unit-Test Utils"
+meta="supabase/functions/tests/utils/supabase_env.ts"
+language="typescript"
+/>
 
 ### Full integration tests (`tests/process-ticket/index.test.ts`)
 
-```ts
-// supabase/functions/tests/process-ticket/index.test.ts
-import { assertEquals } from 'jsr:@std/assert'
-import { afterEach, beforeEach, describe, it } from 'jsr:@std/testing/bdd'
-import { assertSpyCalls, spy } from 'jsr:@std/testing/mock'
-
-import EdgeFunction from '../../process-ticket/index.ts'
-import { env, exportEnv, generateUserToken } from '../utils/supabase_env.ts'
-
-const FUNCTION_URL = `${env.url}/functions/v1/process-ticket`
-
-function mockTableRequest(restQuery: string, result: object, status = 200) {
-  return spy(async (input: RequestInfo | URL): Promise<Response> => {
-    const url = input.toString()
-    if (url === `${env.url}/rest/v1/${restQuery}`) {
-      const res = Response.json(result, { status })
-      return await Promise.resolve(res)
-    }
-    return await Promise.resolve(new Response(null, { status: 404 }))
-  })
-}
-
-describe('requests for /process-ticket endpoint', () => {
-  const originalFetch = globalThis.fetch
-  const originalEnv = Deno.env
-  const mockEnv = new Map<string, string>()
-
-  beforeEach(() => {
-    // @ts-ignore
-    Deno.env = {
-      has: (key) => mockEnv.has(key),
-      get: (key) => mockEnv.get(key),
-      set: (key, value) => mockEnv.set(key, value),
-      delete: (key) => mockEnv.delete(key),
-      toObject: () => Object.fromEntries(mockEnv),
-    } satisfies Deno.Env
-
-    mockEnv.clear()
-    exportEnv()
-  })
-
-  afterEach(() => {
-    // @ts-ignore
-    Deno.env = originalEnv
-    globalThis.fetch = originalFetch
-  })
-
-  it('should return the correct price based on user age', async () => {
-    const expects = [
-      { age: 8, result: 0 }, // Free
-      { age: 15, result: 8 }, // 20% off
-      { age: 18, result: 10 }, // No discount
-    ]
-
-    for (const { age, result } of expects) {
-      const token = await generateUserToken()
-
-      const req = new Request(FUNCTION_URL, {
-        method: 'POST',
-        headers: {
-          apikey: env.publishableKeys.default,
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ price: 10 }),
-      })
-
-      const mockProfiles = mockTableRequest('profiles?select=age&limit=1', { age })
-      globalThis.fetch = mockProfiles
-
-      const res = await EdgeFunction.fetch(req)
-
-      assertEquals(res.status, 200)
-      assertEquals(await res.json(), { result })
-      assertSpyCalls(mockProfiles, 1)
-    }
-  })
-
-  it('should return 400 when price is missing', async () => {
-    const token = await generateUserToken()
-    const req = new Request(FUNCTION_URL, {
-      method: 'POST',
-      headers: {
-        apikey: env.publishableKeys.default,
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({}),
-    })
-
-    const res = await EdgeFunction.fetch(req)
-    assertEquals(res.status, 400)
-    assertEquals(await res.json(), { error: 'missing price field' })
-  })
-
-  it('should return 500 when age is missing or invalid', async () => {
-    const token = await generateUserToken()
-    const req = new Request(FUNCTION_URL, {
-      method: 'POST',
-      headers: {
-        apikey: env.publishableKeys.default,
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ price: 15 }),
-    })
-
-    const mockProfiles = mockTableRequest('profiles?select=age&limit=1', {})
-    globalThis.fetch = mockProfiles
-
-    const res = await EdgeFunction.fetch(req)
-    assertEquals(res.status, 500)
-    assertEquals(await res.json(), { error: 'could not process' })
-  })
-
-  it('should handle database errors gracefully', async () => {
-    const token = await generateUserToken()
-    const req = new Request(FUNCTION_URL, {
-      method: 'POST',
-      headers: {
-        apikey: env.publishableKeys.default,
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ price: 15 }),
-    })
-
-    const mockProfiles = mockTableRequest(
-      'profiles?select=age&limit=1',
-      { code: 'PGRST303', message: 'JWT expired' },
-      401
-    )
-    globalThis.fetch = mockProfiles
-
-    const res = await EdgeFunction.fetch(req)
-    assertEquals(res.status, 500)
-    assertEquals(await res.json(), { error: 'could not process' })
-  })
-})
-```
+<$CodeSample
+path="/edge-functions/supabase/functions/unit-testing/tests/process-ticket/index.test.ts"
+title="Testing the full Edge Function | Unit-Test"
+meta="supabase/functions/tests/process-ticket/index.test.ts"
+language="typescript"
+/>
 
 Run the integration tests:
 
@@ -412,7 +148,7 @@ deno test supabase/functions/tests/process-ticket/index.test.ts --allow-env
 
 ---
 
-## Why this mocking approach is by mocking `globalThis.fetch`, you:
+## Why this mocking approach is by mocking `globalThis.fetch`, you
 
 - Test the **real** Edge Function code path (no dependency injection needed in production code)
 - Simulate database responses, auth failures, network errors, etc.
