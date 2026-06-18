@@ -1,15 +1,17 @@
 ---
-title = "Migrating Auth Users Between Supabase Projects"
-topics = [ "auth" ]
-keywords = [ "migration", "users" ]
-database_id = "7bd3de18-a4ab-4b76-85e4-b72924dacd2a"
+title: 'Migrating Auth Users Between Supabase Projects'
+subtitle: 'Learn how to migrate auth schema (users and passwords) between Supabase projects'
+breadcrumb: 'Migrations'
+topics: ['auth']
+keywords: ['migration', 'users']
+database_id: '7bd3de18-a4ab-4b76-85e4-b72924dacd2a'
 ---
 
 ## Which migration do I need?
 
 This guide covers migrating auth users between two Supabase projects. If you're looking for migration guidance, choose the guide that matches your use case:
 
-- [**Migrating within Supabase**](/docs/guides/platform/migrating-within-supabase) — Migrate data between two Supabase projects
+- [**Migrating within Supabase**](/docs/guides/platform/migrating-within-supabase) — Migrate data between two Supabase projects 
 - [**Migrating to Supabase**](/docs/guides/platform/migrating-to-supabase) — Migrate data from another database service (PostgreSQL, MySQL, Firebase, etc.) to Supabase
 - [**Database Migrations**](/docs/guides/deployment/database-migrations) — Manage versioned schema changes for your Supabase project using the CLI
 
@@ -29,7 +31,7 @@ Note: Updating the JWT secret will regenerate your anon and service_role API key
 
 ## How to migrate Auth data
 
-We don’t currently provide a one-size-fits-all script for migrating only the auth schema, but the process is covered in our general migration guide. You can use either:
+We don't currently provide a one-size-fits-all script for migrating only the auth schema, but the process is covered in our general migration guide. You can use either:
 
 - A full .backup file from the dashboard, or
 - SQL export/import via the Supabase CLI (e.g., pg_dump and psql)
