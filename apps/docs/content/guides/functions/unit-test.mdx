@@ -60,8 +60,9 @@ supabase/
 ```
 
 <Admonition type="note">
-In this reference implementation the pricing logic lives inside the function folder `process-ticket/pricing.ts`.
-You can also move it to `_shared/` if you want to reuse it across multiple functions.
+  In this reference implementation the pricing logic lives inside the function folder
+  `process-ticket/pricing.ts`. You can also move it to `_shared/` if you want to reuse it across
+  multiple functions.
 </Admonition>
 
 See the [Development Environment](/docs/guides/functions/development-environment) and [Managing dependencies](/docs/guides/functions/dependencies) guides for recommended `deno.json` and editor setup.
@@ -149,10 +150,12 @@ deno test supabase/functions/tests/process-ticket/index.test.ts --allow-env
 
 ---
 
-## Why this mocking approach is by mocking `globalThis.fetch`, you
+## Advantages of mocking approach
+
+This guide uses `fetch()` mock to demonstrate the following benefits:
 
 - Test the **real** Edge Function code path (no dependency injection needed in production code)
-- Simulate database responses, auth failures, network errors, etc.
+- Simulate database responses, auth failures, network errors
 - Keep your production Edge Function clean and focused
 - Still get fast, deterministic tests that don't require a running Supabase instance
 
