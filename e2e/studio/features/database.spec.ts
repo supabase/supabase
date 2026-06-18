@@ -33,16 +33,13 @@ test.describe('Database', () => {
         }
       )
 
-      const wait = createApiResponseWaiter(
-        page,
-        'pg-meta',
-        ref,
-        'query?key=project:default-schema:public-infinite_tables'
-      )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/schemas?schema=public`))
-      await wait
 
-      // focus the test table so it mounts inside the viewport
+      // Gate on the UI, not the pg-meta XHR: under the TanStack build the
+      // schema is delivered via the SSR stream, so a `waitForResponse` for the
+      // `public-infinite_tables` query never fires client-side and times out.
+      // Focusing the freshly-created table already auto-waits for the schema
+      // (including the new table) to load in the visualizer.
       await focusTableInVisualizer(page, databaseTableName)
 
       // validates table and column exists
@@ -110,16 +107,13 @@ test.describe('Database', () => {
           await dropTable(databaseTableName)
         }
       )
-      const wait = createApiResponseWaiter(
-        page,
-        'pg-meta',
-        ref,
-        'query?key=project:default-schema:public-infinite_tables'
-      )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/schemas?schema=public`))
-      await wait
 
-      // focus the test table so it mounts inside the viewport
+      // Gate on the UI, not the pg-meta XHR: under the TanStack build the
+      // schema is delivered via the SSR stream, so a `waitForResponse` for the
+      // `public-infinite_tables` query never fires client-side and times out.
+      // Focusing the freshly-created table already auto-waits for the schema
+      // (including the new table) to load in the visualizer.
       await focusTableInVisualizer(page, databaseTableName)
 
       // validates table and column exists
@@ -181,16 +175,13 @@ test.describe('Database', () => {
           await dropTable(databaseTableName)
         }
       )
-      const wait = createApiResponseWaiter(
-        page,
-        'pg-meta',
-        ref,
-        'query?key=project:default-schema:public-infinite_tables'
-      )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/schemas?schema=public`))
-      await wait
 
-      // focus the test table so it mounts inside the viewport
+      // Gate on the UI, not the pg-meta XHR: under the TanStack build the
+      // schema is delivered via the SSR stream, so a `waitForResponse` for the
+      // `public-infinite_tables` query never fires client-side and times out.
+      // Focusing the freshly-created table already auto-waits for the schema
+      // (including the new table) to load in the visualizer.
       await focusTableInVisualizer(page, databaseTableName)
 
       // validates table and column exists

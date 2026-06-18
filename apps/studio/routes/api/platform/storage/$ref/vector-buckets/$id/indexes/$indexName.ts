@@ -5,6 +5,8 @@ import nextHandler from '@/pages/api/platform/storage/[ref]/vector-buckets/[id]/
 
 const handler = toWebHandler(nextHandler)
 
-export const Route = createFileRoute('/api/platform/storage/$ref/vector-buckets/$id/indexes/$indexName')({
+export const Route = createFileRoute(
+  '/api/platform/storage/$ref/vector-buckets/$id/indexes/$indexName'
+)({
   server: { handlers: { DELETE: handler } },
 })
