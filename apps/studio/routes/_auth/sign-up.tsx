@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import SignInLayout from '@/components/layouts/SignInLayout/SignInLayout'
+import { SignInLayout } from '@/components/layouts/SignInLayout/SignInLayout'
 import SignUpPage from '@/pages/sign-up'
 
 export const Route = createFileRoute('/_auth/sign-up')({

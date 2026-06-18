@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { cn } from 'ui'
 
-import ForgotPasswordLayout from '@/components/layouts/SignInLayout/ForgotPasswordLayout'
+import { ForgotPasswordLayout } from '@/components/layouts/SignInLayout/ForgotPasswordLayout'
 import SignInPartnerPage from '@/pages/sign-in-partner'
 
 export const Route = createFileRoute('/_auth/sign-in-partner')({

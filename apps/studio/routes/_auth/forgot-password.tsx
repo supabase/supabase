@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import ForgotPasswordLayout from '@/components/layouts/SignInLayout/ForgotPasswordLayout'
+import { ForgotPasswordLayout } from '@/components/layouts/SignInLayout/ForgotPasswordLayout'
 import ForgotPasswordPage from '@/pages/forgot-password'
 
 export const Route = createFileRoute('/_auth/forgot-password')({
