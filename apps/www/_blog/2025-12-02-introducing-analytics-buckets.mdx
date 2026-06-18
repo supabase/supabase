@@ -115,9 +115,9 @@ Analytics Buckets require authentication with two services:
 
 You authenticate using your Supabase service key for the catalog and S3 credentials for storage.
 
-## Streaming data with Supabase ETL
+## Streaming data with Supabase Pipelines
 
-Analytics Buckets work hand in hand with [Supabase ETL](/blog/introducing-supabase-etl). ETL captures changes from your Postgres database and streams them to Analytics Buckets in near real time.
+Analytics Buckets work hand in hand with [Supabase Pipelines](/blog/introducing-supabase-pipelines). Supabase Pipelines captures changes from your Postgres database and streams them to Analytics Buckets in near real time.
 
 This gives you:
 
@@ -161,7 +161,7 @@ A common architecture is data tiering: keeping recent data in Postgres and archi
 
 1. Partition tables by time in Postgres, keeping a rolling window like the last 90 days
 
-2. Stream all data to Analytics Buckets using Supabase ETL
+2. Stream all data to Analytics Buckets using Supabase Pipelines
 
 3. Drop old partitions from Postgres
 
@@ -203,7 +203,7 @@ To request access, fill out the form at [forms.supabase.com/analytics-buckets](h
 
 3. Connect using PyIceberg, Spark, or your tool of choice
 
-4. Set up ETL to stream data from Postgres automatically
+4. Set up Supabase Pipelines to stream data from Postgres automatically
 
 Separate your transactional and analytical workloads. Keep Postgres fast. Store history at S3 prices. Query from any tool.
 

@@ -8,6 +8,7 @@ import {
   SelectGroup,
   SelectItem,
   SelectLabel,
+  SelectSeparator,
   SelectTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -74,17 +75,22 @@ export const DestinationTypeSelection = () => {
 
   const groups: DestinationTypeGroup[] = [
     {
-      label: 'Within Supabase',
+      label: 'Other',
       options: [
         {
           value: 'Read Replica',
-          label: 'Read Replica',
+          label: 'Read Replicas',
           description:
             'Deploy a read-only database in another region for lower latency and workload isolation',
           icon: Database,
           isAlpha: false,
           enabled: isOptionVisible('Read Replica', infrastructureReadReplicas),
         },
+      ],
+    },
+    {
+      label: 'Supabase Pipelines',
+      options: [
         {
           value: 'Analytics Bucket',
           label: 'Analytics Bucket',
@@ -93,11 +99,6 @@ export const DestinationTypeSelection = () => {
           isAlpha: true,
           enabled: isOptionVisible('Analytics Bucket', etlEnableIceberg),
         },
-      ],
-    },
-    {
-      label: 'Outside Supabase',
-      options: [
         {
           value: 'BigQuery',
           label: 'BigQuery',
@@ -173,8 +174,9 @@ export const DestinationTypeSelection = () => {
           )}
         </SelectTrigger>
         <SelectContent align="end">
-          {visibleGroups.map((group) => (
+          {visibleGroups.map((group, index) => (
             <SelectGroup key={group.label}>
+              {index > 0 && <SelectSeparator />}
               <SelectLabel>{group.label}</SelectLabel>
               {group.options.map((option) => (
                 <SelectItem key={option.value} value={option.value} className="py-2">

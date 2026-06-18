@@ -266,22 +266,22 @@ Read Replicas and compute upgrades are not the only tools:
 
 If you are hitting connection limits but CPU is fine, enable connection pooling. Supavisor multiplexes many client connections across fewer database connections. This is free and built into every Supabase project.
 
-### Supabase ETL and Analytics Buckets
+### Supabase Pipelines and Analytics Buckets
 
 Read Replicas isolate analytics from production, but the replica is still Postgres. It still uses row-based storage optimized for transactions. If your analytics queries scan tens of millions of rows, even a dedicated replica will feel slow.
 
-This is where [Supabase ETL](https://supabase.com/blog/introducing-supabase-etl) and [Analytics Buckets](https://supabase.com/blog/introducing-analytics-buckets) come in. They solve a different problem: not just isolating analytics, but running analytics on infrastructure designed for analytical workloads.
+This is where [Supabase Pipelines](https://supabase.com/blog/introducing-supabase-pipelines) and [Analytics Buckets](https://supabase.com/blog/introducing-analytics-buckets) come in. They solve a different problem: not just isolating analytics, but running analytics on infrastructure designed for analytical workloads.
 
 **How it works:**
 
-1. Supabase ETL captures changes from your Postgres tables using change-data-capture (CDC)
-2. Changes stream in near real-time to Analytics Buckets (or BigQuery)
+1. Supabase Pipelines captures changes from your Postgres tables using change-data-capture (CDC)
+2. Changes stream in near real time to Analytics Buckets (or BigQuery)
 3. Analytics Buckets store your data in columnar Parquet format on S3, built on Apache Iceberg
 4. You query the data with tools like DuckDB, PyIceberg, or Apache Spark
 
 Columnar storage is dramatically faster for analytical queries. A query that scans a single column across 100 million rows only reads that column, not the entire row. Compression ratios are higher. Query times drop from minutes to seconds.
 
-**When to use ETL and Analytics Buckets instead of Read Replicas:**
+**When to use Pipelines and Analytics Buckets instead of Read Replicas:**
 
 - Your analytical queries scan millions of rows regularly
 - You need to retain historical data for years without bloating your database
@@ -294,7 +294,7 @@ Columnar storage is dramatically faster for analytical queries. A query that sca
 - Your analytics queries are moderately heavy but not massive
 - You want your data team to use the same SQL they already know
 - You need the simplest possible setup with no new tools
-- You also need geo-distribution, which ETL does not provide
+- You also need geo-distribution, which Pipelines does not provide
 
 **A common pattern: use both.** Keep 90 days of data in Postgres for fast operational queries. Stream everything to Analytics Buckets for long-term retention and heavy analytics. Your application queries Postgres. Your data team queries Analytics Buckets for historical trends. You get speed where you need it and cost efficiency where you need that.
 

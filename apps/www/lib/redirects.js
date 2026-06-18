@@ -6,6 +6,26 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/blog/introducing-supabase-etl',
+    destination: '/blog/introducing-supabase-pipelines',
+  },
+  {
+    permanent: true,
+    source: '/blog/supabase-etl',
+    destination: '/blog/introducing-supabase-pipelines',
+  },
+  {
+    permanent: true,
+    source: '/blog/realtime-or-etl-how-to-choose-the-right-tool',
+    destination: '/blog/realtime-or-pipelines-how-to-choose-the-right-tool',
+  },
+  {
+    permanent: true,
+    source: '/features/supabase-etl',
+    destination: '/features/supabase-pipelines',
+  },
+  {
+    permanent: true,
     source: '/ui/docs/ai-editors-rules/prompts',
     destination: '/ui/docs/ai-editors-rules/skills',
   },

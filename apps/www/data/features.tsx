@@ -642,9 +642,9 @@ Foreign Data Wrappers simplify data integration by bringing external data into y
     },
   },
   {
-    title: 'Supabase ETL',
+    title: 'Supabase Pipelines',
     subtitle: 'Real-time data replication to analytical destinations.',
-    description: `Supabase ETL is a change-data-capture pipeline built in Rust that replicates your Postgres tables to analytical destinations in near real-time. Reading directly from the Postgres Write Ahead Log, ETL ensures your analytics data stays synchronized with your production database.
+    description: `Supabase Pipelines creates managed change-data-capture pipelines that replicate your Postgres tables to analytical destinations in near real time. Reading directly from the Postgres Write Ahead Log, each pipeline keeps your analytics data synchronized with your production database.
 
 ## Key benefits
 1. Real-time replication: Near real-time data synchronization using Postgres logical replication.
@@ -655,9 +655,9 @@ Foreign Data Wrappers simplify data integration by bringing external data into y
 6. Production isolation: Complete separation of analytics and production workloads.
 
 ## How it works
-ETL uses Postgres logical replication to capture changes. Each replicated table includes a \`cdc_operation\` column tracking the type of change. For Analytics Buckets, data is stored in append-only changelog format using Parquet files. For BigQuery, a view is created for each table backed by versioned tables.
+Supabase Pipelines uses Postgres logical replication to capture changes. For BigQuery, a view is created for each table backed by versioned tables.
 
-## Supabase ETL is valuable for:
+## Supabase Pipelines is valuable for:
 - Data warehousing and business intelligence
 - Historical analysis and audit trails
 - Large-scale analytics requiring separation from production
@@ -666,14 +666,14 @@ ETL uses Postgres logical replication to capture changes. Each replicated table 
 ## Limitations
 Tables require primary keys. DDL support (schema changes) is currently in development.
 
-Supabase ETL provides a powerful alternative to Read Replicas for analytics workloads, optimizing performance while reducing costs.`,
+Supabase Pipelines provides a powerful alternative to Read Replicas for analytics workloads, optimizing performance while reducing costs.`,
     icon: CloudCog,
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: '',
-    docsUrl: 'https://supabase.github.io/etl/',
-    slug: 'supabase-etl',
+    docsUrl: 'https://supabase.com/docs/guides/database/replication/supabase-pipelines',
+    slug: 'supabase-pipelines',
     status: {
-      stage: PRODUCT_STAGES.PRIVATE_ALPHA,
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
       availableOnSelfHosted: false,
     },
   },
@@ -1609,7 +1609,7 @@ Supabase Storage simplifies adding robust file management to your applications, 
 2. Automatic compaction: S3 Tables merges small files automatically for optimal performance.
 3. Built-in time travel: Query historical data using snapshots.
 4. Schema evolution: Evolve schema over time without breaking queries.
-5. Integrated with ETL: Real-time replication from Postgres via Supabase ETL.
+5. Integrated with Supabase Pipelines: Real-time replication from Postgres via Supabase Pipelines.
 6. Query from Postgres: Use Iceberg Foreign Data Wrapper to join with operational data.
 
 ## Query tools supported
@@ -2835,7 +2835,7 @@ OrioleDB is a PostgreSQL storage extension built on its pluggable storage framew
   {
     title: 'Replication',
     subtitle: 'Replicate database changes to external destinations.',
-    description: `Replication uses Postgres logical replication to replicate database changes to external destinations like Analytics Buckets and BigQuery. Changes are captured from the Write Ahead Log and delivered in near real-time to analytical systems.
+    description: `Replication uses Postgres logical replication to replicate database changes to external destinations like Analytics Buckets and BigQuery. Changes are captured from the Write Ahead Log and delivered in near real time to analytical systems.
 
 ## Key benefits
 1. Near real-time sync: Changes replicated as they occur using WAL reading.

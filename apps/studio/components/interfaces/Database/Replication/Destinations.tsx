@@ -336,8 +336,8 @@ export const Destinations = () => {
             >
               <h4>Replication keeps your data in sync across systems</h4>
               <p className="text-foreground-light text-sm text-balance text-center mt-1">
-                Deploy read replicas for lower latency and workload isolation, or add a destination
-                to create a managed replication pipeline.
+                Deploy Read Replicas for lower latency and workload isolation, or add a Supabase
+                Pipelines destination for analytics workloads.
               </p>
               <Button
                 icon={<Plus />}
