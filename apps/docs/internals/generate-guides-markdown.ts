@@ -12,11 +12,12 @@ import { gfm } from 'micromark-extension-gfm'
 import { mdxjs } from 'micromark-extension-mdxjs'
 
 import { getInternalLinkBaseUrl, prefixInternalLinks } from './internal-links'
+import { Admonition } from './markdown-schema/Admonition'
 import { Link } from './markdown-schema/Link'
+import { MetricsStackCards } from './markdown-schema/MetricsStackCards'
 import { Panel } from './markdown-schema/Panel'
 import { StepHike } from './markdown-schema/StepHike'
 import { TabPanel } from './markdown-schema/TabPanel'
-import { Admonition } from './markdown-schema/Admonition'
 import { Price } from './markdown-schema/Price'
 
 const PARTIALS_DIR = path.join(process.cwd(), 'content', '_partials')
@@ -136,6 +137,7 @@ const SCHEMA: ComponentSchema = {
   IconPanel: Panel,
   ...StepHike,
   TabPanel,
+  MetricsStackCards,
 }
 
 async function generateOne(filePath: string, linkBaseUrl: string): Promise<string> {

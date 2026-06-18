@@ -273,7 +273,7 @@ describe('AwsMarketplaceOnboardingScreen', () => {
     ]
 
     window.localStorage.setItem(
-      LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+      LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION(DEFAULT_PROFILE_CONTEXT.profile?.id),
       JSON.stringify('zeta-team')
     )
     mockAwsEndpoints({

@@ -1,4 +1,4 @@
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { AlertTriangleIcon } from 'lucide-react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
@@ -25,7 +25,7 @@ import { HomePageActions } from '@/components/interfaces/HomePageActions'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
 
 // [Joshen] I'd say we don't do route validation here, this page will act more
@@ -46,10 +46,7 @@ const GenericProjectPage: NextPage = () => {
       ? _splat.split('/')
       : undefined
 
-  const [lastVisitedOrgSlug] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
 
   const {
     data: organizations = [],
@@ -61,7 +58,7 @@ const GenericProjectPage: NextPage = () => {
   })
 
   const [selectedSlug, setSlug] = useState<string>(
-    slug || lastVisitedOrgSlug || organizations[0]?.slug
+    slug || lastVisitedOrganization || organizations[0]?.slug
   )
   const selectedOrganization = organizations.find((x) => x.slug === selectedSlug)
 
@@ -83,13 +80,13 @@ const GenericProjectPage: NextPage = () => {
   }
 
   useEffect(() => {
-    if (!!lastVisitedOrgSlug) {
-      setSlug(lastVisitedOrgSlug)
+    if (!!lastVisitedOrganization) {
+      setSlug(lastVisitedOrganization)
     } else if (isSuccessOrganizations) {
       setSlug(organizations[0]?.slug)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lastVisitedOrgSlug, isSuccessOrganizations])
+  }, [lastVisitedOrganization, isSuccessOrganizations])
 
   return (
     <div className="h-screen flex flex-col">
