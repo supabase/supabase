@@ -11,12 +11,14 @@ import { toMarkdown } from 'mdast-util-to-markdown'
 import { gfm } from 'micromark-extension-gfm'
 import { mdxjs } from 'micromark-extension-mdxjs'
 
+import { serializeContentListingsToMarkdown } from '../lib/content-listings.markdown'
+import { parseContentListings } from '../lib/content-listings.schema'
 import { getInternalLinkBaseUrl, prefixInternalLinks } from './internal-links'
+import { Admonition } from './markdown-schema/Admonition'
 import { Link } from './markdown-schema/Link'
 import { Panel } from './markdown-schema/Panel'
 import { StepHike } from './markdown-schema/StepHike'
 import { TabPanel } from './markdown-schema/TabPanel'
-import { Admonition } from './markdown-schema/Admonition'
 
 const PARTIALS_DIR = path.join(process.cwd(), 'content', '_partials')
 
@@ -154,7 +156,15 @@ async function generateOne(filePath: string, linkBaseUrl: string): Promise<strin
 
   const header = headerParts.join('\n\n')
 
-  return header ? `${header}\n\n${body}` : body
+  let output = header ? `${header}\n\n${body}` : body
+
+  const contentListings = parseContentListings(data.contentListings)
+  if (contentListings) {
+    const contentListingsMarkdown = serializeContentListingsToMarkdown(contentListings, linkBaseUrl)
+    output = `${output}\n\n${contentListingsMarkdown}`
+  }
+
+  return output
 }
 
 async function generate() {

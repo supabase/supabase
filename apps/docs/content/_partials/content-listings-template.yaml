@@ -1,0 +1,21 @@
+# Copy into page front matter. Orientation links are rendered below the MDX body
+# (or inline via <ContentListings listing="id" />) and exported to the page .md
+# alternate for machine consumers.
+#
+# See apps/docs/CONTRIBUTING.md — Overview pages and contentListings.
+
+contentListings:
+  - title: Get started
+    id: get-started
+    description: Optional intro sentence for this group.
+    type: list # list | grid (default list)
+    items:
+      - title: Connect to your database
+        href: /guides/database/connecting-to-postgres
+        description: Connection strings, pooler, and connection modes.
+  - title: Going further
+    type: list
+    items:
+      - title: Database functions
+        href: /guides/database/functions
+        description: Run logic inside Postgres.

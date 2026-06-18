@@ -6,6 +6,7 @@ import { AuthSmsProviderConfig } from '~/components/AuthSmsProviderConfig'
 import { CostWarning } from '~/components/AuthSmsProviderConfig/AuthSmsProviderConfig.Warnings'
 import ButtonCard from '~/components/ButtonCard'
 import { ComputeDiskLimitsTable } from '~/components/ComputeDiskLimitsTable'
+import { ContentListings } from '~/components/ContentListings'
 import { Extensions } from '~/components/Extensions'
 import Image, { type ImageProps } from '~/components/Image'
 import { Mermaid } from '~/components/Mermaid'
@@ -75,6 +76,7 @@ const components = {
   CodeSampleDummy,
   CodeSampleWrapper,
   ComputeDiskLimitsTable,
+  ContentListings,
   CostWarning,
   ErrorCodes,
   Extensions,

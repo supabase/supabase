@@ -114,6 +114,24 @@ The navigation is defined in [`NavigationMenu.constants.ts`](https://github.com/
 
 Add an entry with the `name`, `url`, and (optional) `icon` for your page.
 
+### Overview pages and `contentListings`
+
+Overview and index pages orient readers across a docs section. Use YAML `contentListings` front matter for **internal** "where to read next" links — not hand-rolled `## Get started`, `## Going further`, or `## Next steps` sections in the MDX body.
+
+| Section in the page body                         | Purpose                                                                               |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| **Orientation (`contentListings` front matter)** | Curated internal docs links with short descriptions (rendered after the article body) |
+| **Examples**                                     | Demos, sample apps, GitHub repositories                                               |
+| **Resources**                                    | External reference material (source repos, OpenAPI specs, upstream docs)              |
+
+Tutorial and guide pages may still end with `## Next steps` in the body for now; overview pages should use front matter only.
+
+Copy the template from [`content/_partials/content-listings-template.yaml`](content/_partials/content-listings-template.yaml). Each group has a `title`, optional `description`, optional `type` (`list` or `grid`, default `list`), optional `id`, and `items` with `title`, `href`, and required `description`. Internal `href` values must start with `/guides/`, `/docs/guides/`, or `/dashboard/`.
+
+Place a group in the body with `<ContentListings listing="id" />` when the group has an `id`. Groups with an `id` render only where embedded; groups without an `id` render after the article body.
+
+Run `pnpm lint:content-listings` in `apps/docs` to check registry coverage. Pilot overview pages must pass; other registry pages warn until migrated.
+
 ## Reference structure
 
 Reference docs are produced from the reference specs and library source code. A common spec file contains shared function and endpoint definitions, and library-specific spec files contain further details.
@@ -197,15 +215,19 @@ Keep code lines short to avoid scrolling. For example, you can split long shell 
 
 Optionally specify a filename for the codeblock by including it after the opening backticks and language specifier:
 
-```md
+````md
 ```ts environment.ts
+
 ```
+````
 
 Optionally highlight lines by using `mark=${lineNumber}`.
 
-```md
+````md
 ```js mark=12:13
+
 ```
+````
 
 ### Footnotes
 
@@ -284,7 +306,7 @@ Don't nest lists more than two deep.
 3. List item
    - List item
    - List item
-   <!-- DON'T ADD ANOTHER LEVEL OF NESTING -->
+     <!-- DON'T ADD ANOTHER LEVEL OF NESTING -->
      - Overly nested list item
 ```
 

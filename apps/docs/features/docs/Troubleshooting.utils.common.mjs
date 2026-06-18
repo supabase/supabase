@@ -98,6 +98,7 @@ export const TroubleshootingSchema = z
     database_id: z.string().default(`pseudo-${uuidv4()}`),
     github_url: z.string().url().optional(),
     date_created: z.date({ coerce: true }).optional(),
+    contentListings: z.any().optional(),
   })
   .strict()
 

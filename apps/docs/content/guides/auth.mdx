@@ -4,11 +4,44 @@ title: 'Auth'
 description: 'Use Supabase to Authenticate and Authorize your users.'
 subtitle: 'Use Supabase to authenticate and authorize your users.'
 tocVideo: '6ow_jW4epf8'
+contentListings:
+  - title: Get started
+    id: get-started
+    description: Start here if you're new to Supabase Auth.
+    type: grid
+    items:
+      - title: Auth with email and password
+        href: /guides/auth/passwords
+        description: Sign up and sign in users with email and password.
+      - title: Server-side rendering
+        href: /guides/auth/server-side
+        description: Create a Supabase client for SSR frameworks like Next.js and SvelteKit.
+      - title: Row Level Security
+        href: /guides/database/postgres/row-level-security
+        description: Use RLS policies to authorize data access from the client.
+  - title: Going further
+    id: going-further
+    type: list
+    items:
+      - title: Social login
+        href: /guides/auth/social-login
+        description: Sign in users with Google, GitHub, Apple, and other OAuth providers.
+      - title: Multi-factor authentication
+        href: /guides/auth/auth-mfa
+        description: Add a second factor to user sign-in with TOTP or phone.
+      - title: JWTs
+        href: /guides/auth/jwts
+        description: Understand how Supabase Auth issues and validates JWTs.
+      - title: Auth Hooks
+        href: /guides/auth/auth-hooks
+        description: Customize Auth behavior with Postgres functions at key lifecycle points.
 ---
 
 Supabase Auth makes it easy to implement authentication and authorization in your app. We provide client SDKs and API endpoints to help you create and manage users.
 
 Your users can use many popular Auth methods, including password, magic link, one-time password (OTP), social login, and single sign-on (SSO).
+
+<ContentListings listing="get-started" />
 
 ## About authentication and authorization
 
@@ -26,6 +59,8 @@ You can use Supabase Auth as a standalone product, but it's also built to integr
 Auth uses your project's Postgres database under the hood, storing user data and other Auth information in a special schema. You can connect this data to your own tables using triggers and foreign key references.
 
 Auth also enables access control to your database's automatically generated [REST API](/docs/guides/api). When using Supabase SDKs, your data requests are automatically sent with the user's Auth Token. The Auth Token scopes database access on a row-by-row level when used along with [RLS policies](/docs/guides/database/postgres/row-level-security).
+
+<ContentListings listing="going-further" />
 
 <$Show if="authentication:show_providers">
 <$Partial path="providers.mdx" />

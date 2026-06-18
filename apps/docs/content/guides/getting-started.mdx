@@ -3,38 +3,23 @@ id: 'getting-started'
 title: 'Getting Started'
 description: 'Resources for getting started with Supabase.'
 hideToc: true
+contentListings:
+  - title: Get started
+    id: get-started
+    type: grid
+    items:
+      - title: Build with AI tools
+        href: /guides/ai-tools
+        description: Develop with Supabase AI-first using plugins, MCP, and skills.
+      - title: API Keys
+        href: /guides/getting-started/api-keys
+        description: Learn about the different API keys in Supabase and how to use them.
+      - title: Local Development
+        href: /guides/local-development
+        description: Use the Supabase CLI to develop locally and collaborate between teams.
 ---
 
-<div className="flex flex-col gap-12 my-12">
-
-<div>
-
-<div className="grid grid-cols-12 gap-6 not-prose">
-  <Link href="/guides/ai-tools" className="col-span-12 md:col-span-4" passHref>
-    <GlassPanel
-      title="Build with AI tools"
-      hasLightIcon={true}
-      background={false}
-      showIconBg={true}
-    >
-      Develop with Supabase AI-first using plugins, MCP, and skills.
-    </GlassPanel>
-  </Link>
-  <Link href="/guides/getting-started/api-keys" className="col-span-12 md:col-span-4" passHref>
-    <GlassPanel title="API Keys" hasLightIcon={true} background={false} showIconBg={true}>
-      Learn about the different API keys in Supabase and how to use them.
-    </GlassPanel>
-  </Link>
-  <Link href="/guides/local-development" className="col-span-12 md:col-span-4" passHref>
-    <GlassPanel title="Local Development" hasLightIcon={true} background={false} showIconBg={true}>
-      Use the Supabase CLI to develop locally and collaborate between teams.
-    </GlassPanel>
-  </Link>
-</div>
-
-</div>
-
-</div>
+<ContentListings listing="get-started" />
 
 ### Use cases
 

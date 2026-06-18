@@ -106,3 +106,21 @@ jobs:
       - name: fail if linter fails (external)
         if: steps.filter.outputs.docs == 'true' && github.event.pull_request.head.repo.full_name != github.repository && steps.external_lint.outputs.LINT_EXIT_CODE != 0
         run: exit 1
+
+  content-listings-lint:
+    name: content-listings-lint
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@41ff72655975bd76d5b0cab876e4bae496bccc83 # v4.1.0
+      - uses: actions/setup-node@49933ea5286caeca8640d13c6c3a8f4f84e592e # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Lint contentListings front matter
+        working-directory: apps/docs
+        run: pnpm lint:content-listings

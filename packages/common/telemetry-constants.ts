@@ -839,6 +839,22 @@ export interface AskAIEvent {
 }
 
 /**
+ * User clicked a curated orientation link from contentListings front matter or MDX component.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsContentListingClickedEvent {
+  action: 'docs_content_listing_clicked'
+  properties: {
+    targetPath: string
+    linkTitle: string
+    groupTitle?: string
+    listingId?: string
+  }
+}
+
+/**
  * User clicked the framework quickstart card on the homepage, leading to the specific framework documentation.
  *
  * @group Events
@@ -3460,6 +3476,7 @@ export type TelemetryEvent =
   | DocsFeedbackClickedEvent
   | CopyAsMarkdownEvent
   | AskAIEvent
+  | DocsContentListingClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
   | HomepageProductCardClickedEvent
   | WwwPricingPlanCtaClickedEvent

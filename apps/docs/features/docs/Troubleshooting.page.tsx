@@ -1,9 +1,12 @@
+import Breadcrumbs from '~/components/Breadcrumbs'
+import { ContentListingsFooter, ContentListingsProvider } from '~/components/ContentListings'
+import { Feedback } from '~/components/Feedback'
+import { SidebarSkeleton } from '~/layouts/MainSkeleton'
+import { parseContentListings } from '~/lib/content-listings.schema'
 import { Github } from 'lucide-react'
 import Link from 'next/link'
 import { cn } from 'ui'
-import Breadcrumbs from '~/components/Breadcrumbs'
-import { Feedback } from '~/components/Feedback'
-import { SidebarSkeleton } from '~/layouts/MainSkeleton'
+
 import { MDXRemoteBase } from './MdxBase'
 import { getTroubleshootingUpdatedDates, type ITroubleshootingEntry } from './Troubleshooting.utils'
 import { formatError, serializeTroubleshootingSearchParams } from './Troubleshooting.utils.shared'
@@ -12,6 +15,14 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
   const dateUpdated = entry.data.database_id.startsWith('pseudo-')
     ? new Date()
     : (await getTroubleshootingUpdatedDates()).get(entry.data.database_id)
+  const contentListings = parseContentListings(entry.data.contentListings)
+
+  const articleBody = (
+    <>
+      <MDXRemoteBase source={entry.content} />
+      {contentListings && contentListings.length > 0 && <ContentListingsFooter />}
+    </>
+  )
 
   return (
     <SidebarSkeleton
@@ -30,7 +41,13 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
           <hr className="my-7" aria-hidden />
           <div className="grid gap-10 @3xl/troubleshooting-entry-layout:grid-cols-[1fr_250px]">
             <div className="min-w-0">
-              <MDXRemoteBase source={entry.content} />
+              {contentListings && contentListings.length > 0 ? (
+                <ContentListingsProvider groups={contentListings}>
+                  {articleBody}
+                </ContentListingsProvider>
+              ) : (
+                articleBody
+              )}
             </div>
             <aside aria-labelledby="heading--metadata" className="not-prose mt-5">
               <h2
