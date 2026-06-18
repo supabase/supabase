@@ -200,6 +200,100 @@ describe('DestinationForm.utils DuckLake', () => {
   })
 })
 
+const baseDucklakeSupabaseFormData = {
+  ...baseDucklakeFormData,
+  ducklakeMode: 'supabase' as const,
+  ducklakeCatalogProjectRef: 'catalog-ref',
+  ducklakeStorageProjectRef: 'storage-ref',
+  ducklakeStorageBucket: 'ducklake-data',
+}
+
+describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
+  it('builds DuckLake validation config from project refs in supabase mode', () => {
+    const config = buildDestinationConfigForValidation({
+      projectRef: 'project-ref',
+      selectedType: 'DuckLake',
+      data: baseDucklakeSupabaseFormData,
+    })
+
+    expect(config).toEqual({
+      ducklake: {
+        catalogProjectRef: 'catalog-ref',
+        storageProjectRef: 'storage-ref',
+        bucket: 'ducklake-data',
+        poolSize: 4,
+        metadataSchema: 'ducklake_metadata',
+      },
+    })
+  })
+
+  it('builds DuckLake submit config from project refs in supabase mode', async () => {
+    const createS3AccessKey = vi.fn()
+    const resolveNamespace = vi.fn()
+
+    const config = await buildDestinationConfig({
+      projectRef: 'project-ref',
+      selectedType: 'DuckLake',
+      data: baseDucklakeSupabaseFormData,
+      createS3AccessKey,
+      resolveNamespace,
+    })
+
+    expect(config).toEqual({
+      ducklake: {
+        catalogProjectRef: 'catalog-ref',
+        storageProjectRef: 'storage-ref',
+        bucket: 'ducklake-data',
+        poolSize: 4,
+        metadataSchema: 'ducklake_metadata',
+      },
+    })
+    expect(createS3AccessKey).not.toHaveBeenCalled()
+    expect(resolveNamespace).not.toHaveBeenCalled()
+  })
+
+  it('returns required-field errors for missing supabase selections, ignoring custom fields', () => {
+    const issues = getDucklakeValidationIssues({
+      ducklakeMode: 'supabase',
+      ducklakeCatalogProjectRef: '',
+      ducklakeStorageProjectRef: '',
+      ducklakeStorageBucket: '',
+      // Custom-mode fields are intentionally blank and must not be validated in supabase mode
+      ducklakeCatalogUrl: '',
+      ducklakeDataPath: '',
+      ducklakeS3AccessKeyId: '',
+      ducklakeS3SecretAccessKey: '',
+      ducklakeS3Region: '',
+      ducklakeS3Endpoint: '',
+      ducklakeMetadataSchema: '',
+    })
+
+    expect(issues).toEqual([
+      { path: 'ducklakeCatalogProjectRef', message: 'Catalog project is required' },
+      { path: 'ducklakeStorageProjectRef', message: 'Storage project is required' },
+      { path: 'ducklakeStorageBucket', message: 'Bucket is required' },
+    ])
+  })
+
+  it('accepts a complete supabase configuration', () => {
+    expect(
+      getDucklakeValidationIssues({
+        ducklakeMode: 'supabase',
+        ducklakeCatalogProjectRef: 'catalog-ref',
+        ducklakeStorageProjectRef: 'storage-ref',
+        ducklakeStorageBucket: 'ducklake-data',
+        ducklakeCatalogUrl: '',
+        ducklakeDataPath: '',
+        ducklakeS3AccessKeyId: '',
+        ducklakeS3SecretAccessKey: '',
+        ducklakeS3Region: '',
+        ducklakeS3Endpoint: '',
+        ducklakeMetadataSchema: '',
+      })
+    ).toEqual([])
+  })
+})
+
 describe('DestinationForm.utils Snowflake', () => {
   it('builds Snowflake validation config with identifiers trimmed and secrets preserved', () => {
     const config = buildDestinationConfigForValidation({

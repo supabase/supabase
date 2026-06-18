@@ -17,7 +17,12 @@ import {
 } from '../../useIsETLPrivateAlpha'
 import { DestinationType } from '../DestinationPanel.types'
 import { AdvancedSettings } from './AdvancedSettings'
-import { CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
+import {
+  CREATE_NEW_NAMESPACE,
+  DUCKLAKE_MODE_CUSTOM,
+  DUCKLAKE_MODE_SUPABASE,
+  type DucklakeMode,
+} from './DestinationForm.constants'
 import { DestinationPanelFormSchema as FormSchema } from './DestinationForm.schema'
 import {
   buildDestinationConfig,
@@ -254,6 +259,13 @@ export const DestinationForm = ({
       s3Region:
         projectSettings?.region ?? (isIcebergConfig ? config.iceberg.supabase.s3_region : ''),
       // DuckLake fields
+      // New destinations default to the managed "Use Supabase" mode with the current project
+      // pre-selected as both catalog and storage. Existing destinations always read back as the
+      // resolved/custom shape, so edit mode is locked to "Custom parameters".
+      ducklakeMode: (editMode ? DUCKLAKE_MODE_CUSTOM : DUCKLAKE_MODE_SUPABASE) as DucklakeMode,
+      ducklakeCatalogProjectRef: editMode ? '' : (projectRef ?? ''),
+      ducklakeStorageProjectRef: editMode ? '' : (projectRef ?? ''),
+      ducklakeStorageBucket: '',
       ducklakeCatalogUrl: ducklakeConfig?.catalog_url ?? '',
       ducklakeDataPath: ducklakeConfig?.data_path ?? '',
       ducklakePoolSize: ducklakeConfig?.pool_size,
@@ -273,7 +285,7 @@ export const DestinationForm = ({
       snowflakeSchema: snowflakeConfig?.schema ?? '',
       snowflakeRole: snowflakeConfig?.role ?? '',
     }
-  }, [destinationData, pipelineData, catalogToken, projectSettings])
+  }, [destinationData, pipelineData, catalogToken, projectSettings, projectRef, editMode])
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onChange',
@@ -638,7 +650,7 @@ export const DestinationForm = ({
                   onSelectNewBucket={() => setNewBucketSheetVisible(true)}
                 />
               ) : selectedType === 'DuckLake' && etlEnableDucklake ? (
-                <DuckLakeFields form={form} />
+                <DuckLakeFields form={form} editMode={editMode} />
               ) : selectedType === 'Snowflake' && etlEnableSnowflake ? (
                 <SnowflakeFields form={form} />
               ) : null}

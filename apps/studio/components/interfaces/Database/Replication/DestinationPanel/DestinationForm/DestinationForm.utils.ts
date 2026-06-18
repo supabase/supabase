@@ -3,7 +3,11 @@ import { snakeCase } from 'lodash'
 import z from 'zod'
 
 import { DestinationType } from '../DestinationPanel.types'
-import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
+import {
+  CREATE_NEW_KEY,
+  CREATE_NEW_NAMESPACE,
+  DUCKLAKE_MODE_SUPABASE,
+} from './DestinationForm.constants'
 import {
   DestinationPanelFormSchema,
   type DestinationPanelSchemaType,
@@ -12,6 +16,8 @@ import {
   BigQueryDestinationConfig,
   DestinationConfig,
   DucklakeDestinationConfig,
+  DucklakeManualDestinationConfig,
+  DucklakeSupabaseDestinationConfig,
   IcebergDestinationConfig,
   SnowflakeDestinationConfig,
 } from '@/data/replication/create-destination-pipeline-mutation'
@@ -40,24 +46,72 @@ type DucklakeFieldPath =
   | 'ducklakeS3Region'
   | 'ducklakeS3Endpoint'
   | 'ducklakeMetadataSchema'
+  | 'ducklakeCatalogProjectRef'
+  | 'ducklakeStorageProjectRef'
+  | 'ducklakeStorageBucket'
 
 export type DucklakeValidationIssue = {
   path: DucklakeFieldPath
   message: string
 }
 
-export const getDucklakeValidationIssues = (
-  data: Pick<
-    DestinationPanelSchemaType,
-    | 'ducklakeCatalogUrl'
-    | 'ducklakeDataPath'
-    | 'ducklakeS3AccessKeyId'
-    | 'ducklakeS3SecretAccessKey'
-    | 'ducklakeS3Region'
-    | 'ducklakeS3Endpoint'
-    | 'ducklakeMetadataSchema'
+type DucklakeValidationData = Pick<
+  DestinationPanelSchemaType,
+  | 'ducklakeCatalogUrl'
+  | 'ducklakeDataPath'
+  | 'ducklakeS3AccessKeyId'
+  | 'ducklakeS3SecretAccessKey'
+  | 'ducklakeS3Region'
+  | 'ducklakeS3Endpoint'
+  | 'ducklakeMetadataSchema'
+> &
+  Partial<
+    Pick<
+      DestinationPanelSchemaType,
+      | 'ducklakeMode'
+      | 'ducklakeCatalogProjectRef'
+      | 'ducklakeStorageProjectRef'
+      | 'ducklakeStorageBucket'
+    >
   >
+
+export const getDucklakeValidationIssues = (
+  data: DucklakeValidationData
 ): DucklakeValidationIssue[] => {
+  // "Use Supabase" mode only needs project refs + a bucket; the catalog URL and S3 credentials
+  // are resolved by the platform API.
+  if (data.ducklakeMode === DUCKLAKE_MODE_SUPABASE) {
+    const supabaseIssues: DucklakeValidationIssue[] = []
+
+    if (!data.ducklakeCatalogProjectRef?.length) {
+      supabaseIssues.push({
+        path: 'ducklakeCatalogProjectRef',
+        message: 'Catalog project is required',
+      })
+    }
+
+    if (!data.ducklakeStorageProjectRef?.length) {
+      supabaseIssues.push({
+        path: 'ducklakeStorageProjectRef',
+        message: 'Storage project is required',
+      })
+    }
+
+    if (!data.ducklakeStorageBucket?.length) {
+      supabaseIssues.push({ path: 'ducklakeStorageBucket', message: 'Bucket is required' })
+    }
+
+    // Catalog metadata schema is optional, but must be a valid Postgres identifier when set.
+    if (data.ducklakeMetadataSchema && !/^[A-Za-z0-9_]+$/.test(data.ducklakeMetadataSchema)) {
+      supabaseIssues.push({
+        path: 'ducklakeMetadataSchema',
+        message: 'DuckLake metadata schema must contain only letters, numbers, and underscores',
+      })
+    }
+
+    return supabaseIssues
+  }
+
   const issues: DucklakeValidationIssue[] = []
 
   if (!data.ducklakeCatalogUrl?.length) {
@@ -168,6 +222,37 @@ export const getSnowflakeValidationIssues = (
   return issues
 }
 
+// Builds the studio-side DuckLake config from form data, picking the right shape for the
+// selected mode. The create / update / validate mutations convert this to the API payload.
+const buildDucklakeConfig = (
+  data: z.infer<typeof DestinationPanelFormSchema>
+): DucklakeDestinationConfig => {
+  if (data.ducklakeMode === DUCKLAKE_MODE_SUPABASE) {
+    const supabaseConfig: DucklakeSupabaseDestinationConfig = {
+      catalogProjectRef: normalizeRequiredString(data.ducklakeCatalogProjectRef),
+      storageProjectRef: normalizeRequiredString(data.ducklakeStorageProjectRef),
+      bucket: normalizeRequiredString(data.ducklakeStorageBucket),
+      poolSize: data.ducklakePoolSize,
+      metadataSchema: normalizeOptionalString(data.ducklakeMetadataSchema),
+    }
+    return supabaseConfig
+  }
+
+  const manualConfig: DucklakeManualDestinationConfig = {
+    catalogUrl: data.ducklakeCatalogUrl ?? '',
+    dataPath: data.ducklakeDataPath ?? '',
+    poolSize: data.ducklakePoolSize,
+    s3AccessKeyId: normalizeRequiredString(data.ducklakeS3AccessKeyId),
+    s3SecretAccessKey: normalizeRequiredString(data.ducklakeS3SecretAccessKey),
+    s3Region: normalizeRequiredString(data.ducklakeS3Region),
+    s3Endpoint: normalizeRequiredString(data.ducklakeS3Endpoint),
+    s3UrlStyle: data.ducklakeS3UrlStyle,
+    s3UseSsl: data.ducklakeS3UseSsl,
+    metadataSchema: normalizeOptionalString(data.ducklakeMetadataSchema),
+  }
+  return manualConfig
+}
+
 // Helper function to build destination config for validation
 export const buildDestinationConfigForValidation = ({
   projectRef,
@@ -216,20 +301,7 @@ export const buildDestinationConfigForValidation = ({
       },
     }
   } else if (selectedType === 'DuckLake') {
-    return {
-      ducklake: {
-        catalogUrl: data.ducklakeCatalogUrl ?? '',
-        dataPath: data.ducklakeDataPath ?? '',
-        poolSize: data.ducklakePoolSize,
-        s3AccessKeyId: normalizeRequiredString(data.ducklakeS3AccessKeyId),
-        s3SecretAccessKey: normalizeRequiredString(data.ducklakeS3SecretAccessKey),
-        s3Region: normalizeRequiredString(data.ducklakeS3Region),
-        s3Endpoint: normalizeRequiredString(data.ducklakeS3Endpoint),
-        s3UrlStyle: data.ducklakeS3UrlStyle,
-        s3UseSsl: data.ducklakeS3UseSsl,
-        metadataSchema: normalizeOptionalString(data.ducklakeMetadataSchema),
-      },
-    }
+    return { ducklake: buildDucklakeConfig(data) }
   } else if (selectedType === 'Snowflake') {
     return {
       snowflake: {
@@ -307,19 +379,7 @@ export const buildDestinationConfig = async ({
     }
     destinationConfig = { iceberg: icebergConfig }
   } else if (selectedType === 'DuckLake') {
-    const ducklakeConfig: DucklakeDestinationConfig = {
-      catalogUrl: data.ducklakeCatalogUrl ?? '',
-      dataPath: data.ducklakeDataPath ?? '',
-      poolSize: data.ducklakePoolSize,
-      s3AccessKeyId: normalizeRequiredString(data.ducklakeS3AccessKeyId),
-      s3SecretAccessKey: normalizeRequiredString(data.ducklakeS3SecretAccessKey),
-      s3Region: normalizeRequiredString(data.ducklakeS3Region),
-      s3Endpoint: normalizeRequiredString(data.ducklakeS3Endpoint),
-      s3UrlStyle: data.ducklakeS3UrlStyle,
-      s3UseSsl: data.ducklakeS3UseSsl,
-      metadataSchema: normalizeOptionalString(data.ducklakeMetadataSchema),
-    }
-    destinationConfig = { ducklake: ducklakeConfig }
+    destinationConfig = { ducklake: buildDucklakeConfig(data) }
   } else if (selectedType === 'Snowflake') {
     const snowflakeConfig: SnowflakeDestinationConfig = {
       accountId: normalizeRequiredString(data.snowflakeAccountId),
