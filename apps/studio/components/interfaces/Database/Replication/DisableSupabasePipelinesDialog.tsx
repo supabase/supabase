@@ -16,15 +16,15 @@ import { Admonition } from 'ui-patterns/admonition'
 
 import { useDeleteReplicationTenantMutation } from '@/data/replication/delete-tenant-mutation'
 
-interface DisableExternalReplicationDialogProps {
+interface DisableSupabasePipelinesDialogProps {
   open: boolean
   setOpen: (value: boolean) => void
 }
 
-export const DisableExternalReplicationDialog = ({
+export const DisableSupabasePipelinesDialog = ({
   open,
   setOpen,
-}: DisableExternalReplicationDialogProps) => {
+}: DisableSupabasePipelinesDialogProps) => {
   const { ref: projectRef } = useParams()
   const [error, setError] = useState<string | null>(null)
 

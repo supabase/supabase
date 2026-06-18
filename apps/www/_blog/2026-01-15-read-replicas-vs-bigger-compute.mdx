@@ -281,7 +281,7 @@ This is where [Supabase Pipelines](https://supabase.com/blog/introducing-supabas
 
 Columnar storage is dramatically faster for analytical queries. A query that scans a single column across 100 million rows only reads that column, not the entire row. Compression ratios are higher. Query times drop from minutes to seconds.
 
-**When to use Pipelines and Analytics Buckets instead of Read Replicas:**
+**When to use Supabase Pipelines and Analytics Buckets instead of Read Replicas:**
 
 - Your analytical queries scan millions of rows regularly
 - You need to retain historical data for years without bloating your database
@@ -294,7 +294,7 @@ Columnar storage is dramatically faster for analytical queries. A query that sca
 - Your analytics queries are moderately heavy but not massive
 - You want your data team to use the same SQL they already know
 - You need the simplest possible setup with no new tools
-- You also need geo-distribution, which Pipelines does not provide
+- You also need geo-distribution, which Supabase Pipelines does not provide
 
 **A common pattern: use both.** Keep 90 days of data in Postgres for fast operational queries. Stream everything to Analytics Buckets for long-term retention and heavy analytics. Your application queries Postgres. Your data team queries Analytics Buckets for historical trends. You get speed where you need it and cost efficiency where you need that.
 

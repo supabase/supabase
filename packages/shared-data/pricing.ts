@@ -197,7 +197,7 @@ export const pricing: Pricing = {
       },
       {
         key: 'database.replication',
-        title: 'External Replication (ETL)',
+        title: 'Supabase Pipelines',
         plans: {
           free: false,
           pro: [
