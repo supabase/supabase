@@ -2,6 +2,7 @@ import { type ComparisonOperator } from '@/components/interfaces/Reports/v2/Repo
 import { AnalyticsInterval } from '@/data/analytics/constants'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
 import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
+import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
 import { safeSql, type SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
 
 export type Granularity = 'minute' | 'hour' | 'day'
@@ -85,11 +86,14 @@ export async function fetchLogs(
   projectRef: string,
   sql: SafeLogSqlFragment,
   startDate: string,
-  endDate: string
+  endDate: string,
+  // Pass true (with ClickHouse SQL) to route through the OTEL endpoint. Defaults
+  // to the BigQuery endpoint until the edge-functions report SQL is migrated.
+  useOtel = false
 ) {
   return await executeAnalyticsSql({
     projectRef,
-    endpoint: '/platform/projects/{ref}/analytics/endpoints/logs.all',
+    endpoint: logsAllEndpointUrl(useOtel),
     sql,
     iso_timestamp_start: startDate,
     iso_timestamp_end: endDate,

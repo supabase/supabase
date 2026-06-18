@@ -143,6 +143,68 @@ export function generateRegexpWhereSafe(
   return prepend ? safeLogSql`WHERE ${joined}` : safeLogSql`AND ${joined}`
 }
 
+/**
+ * OTEL/ClickHouse counterpart of `generateRegexpWhereSafe`. The OTEL `logs` table
+ * stores per-request fields in a `log_attributes` Map keyed by the same dotted path
+ * (e.g. `request.path`), so each filter key maps to a `log_attributes['<key>']`
+ * lookup. `matches` uses ClickHouse `match()` (re2), ordering comparisons cast the
+ * (string) value to an int, and equality compares string-to-string. Mirrors the
+ * BigQuery generator's key normalization and value lowercasing for parity.
+ */
+export function generateOtelWhereSafe(
+  filters: ReportFilterItem[],
+  prepend = true
+): SafeLogSqlFragment {
+  if (filters.length === 0) return safeLogSql``
+
+  const conditions = filters
+    .map((filter) => {
+      const splitKey = filter.key.split('.')
+      const normalizedKey = filter.key.includes('.')
+        ? [splitKey[splitKey.length - 2], splitKey[splitKey.length - 1]].join('.')
+        : filter.key
+
+      let col: SafeLogSqlFragment
+      try {
+        col = safeLogSql`log_attributes[${analyticsLiteral(normalizedKey)}]`
+      } catch {
+        return null
+      }
+
+      const valueIsNumber = !isNaN(Number(filter.value))
+      const stringLit = analyticsLiteral(String(filter.value).toLowerCase())
+
+      switch (filter.compare) {
+        case 'matches':
+          return safeLogSql`match(${col}, ${stringLit})`
+        case 'is':
+          return safeLogSql`${col} = ${stringLit}`
+        case '!=':
+          return safeLogSql`${col} != ${stringLit}`
+        case '>=':
+        case '<=':
+        case '>':
+        case '<': {
+          if (!valueIsNumber) return null
+          const num = analyticsLiteral(Number(filter.value))
+          const lhs = safeLogSql`toInt64OrZero(${col})`
+          if (filter.compare === '>=') return safeLogSql`${lhs} >= ${num}`
+          if (filter.compare === '<=') return safeLogSql`${lhs} <= ${num}`
+          if (filter.compare === '>') return safeLogSql`${lhs} > ${num}`
+          return safeLogSql`${lhs} < ${num}`
+        }
+        default:
+          return safeLogSql`${col} = ${stringLit}`
+      }
+    })
+    .filter((c) => c !== null)
+
+  if (conditions.length === 0) return safeLogSql``
+
+  const joined = joinSqlFragments(conditions, ' AND ')
+  return prepend ? safeLogSql`WHERE ${joined}` : safeLogSql`AND ${joined}`
+}
+
 export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
   [Presets.API]: {
     title: 'API',

@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { generateRegexpWhereSafe } from './Reports.constants'
+import { generateOtelWhereSafe, generateRegexpWhereSafe } from './Reports.constants'
 import type { ReportFilterItem } from './Reports.types'
+
+// Collapse whitespace so OTEL assertions are resilient to formatting.
+const sqlText = (fragment: string) => fragment.replace(/\s+/g, ' ').trim()
 
 describe('generateRegexpWhereSafe', () => {
   it('should return empty fragment when no filters provided', () => {
@@ -117,5 +120,68 @@ describe('generateRegexpWhereSafe', () => {
     ]
     const result = generateRegexpWhereSafe(filters, true)
     expect(result).toBe("WHERE `request`.`method` = 'get'")
+  })
+})
+
+describe('generateOtelWhereSafe', () => {
+  it('returns an empty fragment when no filters provided', () => {
+    expect(sqlText(generateOtelWhereSafe([]))).toBe('')
+  })
+
+  it('maps `matches` to ClickHouse match() over the log_attributes lookup', () => {
+    const filters: ReportFilterItem[] = [
+      { key: 'request.path', value: '/auth', compare: 'matches' },
+    ]
+    expect(sqlText(generateOtelWhereSafe(filters))).toBe(
+      "WHERE match(log_attributes['request.path'], '/auth')"
+    )
+  })
+
+  it('maps `is` to a lowercased string equality against the attribute', () => {
+    const filters: ReportFilterItem[] = [{ key: 'request.method', value: 'GET', compare: 'is' }]
+    expect(sqlText(generateOtelWhereSafe(filters))).toBe(
+      "WHERE log_attributes['request.method'] = 'get'"
+    )
+  })
+
+  it('casts the attribute to an int for ordering comparisons', () => {
+    const filters: ReportFilterItem[] = [
+      { key: 'response.status_code', value: '400', compare: '>=' },
+    ]
+    expect(sqlText(generateOtelWhereSafe(filters))).toBe(
+      "WHERE toInt64OrZero(log_attributes['response.status_code']) >= 400"
+    )
+  })
+
+  it('drops an ordering comparison whose value is not numeric', () => {
+    const filters: ReportFilterItem[] = [
+      { key: 'response.status_code', value: 'abc', compare: '>' },
+    ]
+    expect(sqlText(generateOtelWhereSafe(filters))).toBe('')
+  })
+
+  it('normalizes a deep key to its last two segments', () => {
+    const filters: ReportFilterItem[] = [
+      { key: 'metadata.request.path', value: '/rest', compare: 'matches' },
+    ]
+    expect(sqlText(generateOtelWhereSafe(filters))).toContain("log_attributes['request.path']")
+  })
+
+  it('escapes the key inside the log_attributes subscript so it cannot break out', () => {
+    const filters: ReportFilterItem[] = [{ key: "x'] = '1", value: 'info', compare: 'is' }]
+    // Single quotes in the key are doubled by the literal escaping, keeping the
+    // injection attempt confined to the string subscript.
+    expect(sqlText(generateOtelWhereSafe(filters))).toContain("log_attributes['x''] = ''1']")
+  })
+
+  it('joins multiple conditions with AND and supports the non-prepend form', () => {
+    const filters: ReportFilterItem[] = [
+      { key: 'request.path', value: '/auth', compare: 'matches' },
+      { key: 'request.method', value: 'POST', compare: 'is' },
+    ]
+    const result = sqlText(generateOtelWhereSafe(filters, false))
+    expect(result.startsWith('AND ')).toBe(true)
+    expect(result).toContain("match(log_attributes['request.path'], '/auth')")
+    expect(result).toContain("log_attributes['request.method'] = 'post'")
   })
 })
