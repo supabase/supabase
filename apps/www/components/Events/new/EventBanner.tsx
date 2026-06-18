@@ -143,7 +143,7 @@ const LocationWidget = ({ location, categories }: { location?: string; categorie
         </div>
 
         <div className="flex flex-col gap-0">
-          <p>Webinar</p>
+          <p>Supabase Live</p>
         </div>
       </div>
     )
