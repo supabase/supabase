@@ -2,7 +2,22 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { noop } from 'lodash'
-import { Check, Copy, Edit, Eye, Filter, MoreVertical, Plus, Search, Trash, X } from 'lucide-react'
+import {
+  Check,
+  Copy,
+  Edit,
+  Eye,
+  Filter,
+  Info,
+  MoreVertical,
+  Package,
+  PackagePlus,
+  PackageX,
+  Plus,
+  Search,
+  Trash,
+  X,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
@@ -33,8 +48,17 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { useSnapshot } from 'valtio'
 
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
+import { clearTableMode, warehouseDemoStore } from '../Warehouse/warehouseDemoStore'
+import { WarehouseDetailsDrawer } from '../Warehouse/WarehouseDetailsDrawer'
+import {
+  WarehouseEnablementModal,
+  type EnablementVariant,
+} from '../Warehouse/WarehouseEnablementModal'
+import { WarehouseModeChip } from '../Warehouse/WarehouseModeChip'
+import { WarehouseSyncChip } from '../Warehouse/WarehouseSyncChip'
 import { formatAllEntities } from './Tables.utils'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import AlertError from '@/components/ui/AlertError'
@@ -85,6 +109,15 @@ export const TableList = ({
   const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
   const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
+
+  const [warehouseModal, setWarehouseModal] = useState<{
+    variant: EnablementVariant
+    tableKey: string
+    tableName: string
+  } | null>(null)
+  const [drawerTable, setDrawerTable] = useState<{ key: string; name: string } | null>(null)
+
+  const warehouseSnap = useSnapshot(warehouseDemoStore)
 
   const { can: canUpdateTables } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -371,6 +404,7 @@ export const TableList = ({
                   <TableHead key="columns">Columns</TableHead>
                   <TableHead key="rows">Rows (Estimated)</TableHead>
                   <TableHead key="size">Size (Estimated)</TableHead>
+                  <TableHead key="warehouse">Warehouse</TableHead>
                   <TableHead key="realtime">Realtime</TableHead>
                   <TableHead key="buttons"></TableHead>
                 </TableRow>
@@ -379,7 +413,7 @@ export const TableList = ({
                 <>
                   {entities.length === 0 && filterString.length === 0 && (
                     <TableRow key={selectedSchema}>
-                      <TableCell colSpan={7}>
+                      <TableCell colSpan={8}>
                         {visibleTypes.length === 0 ? (
                           <>
                             <p className="text-sm text-foreground">
@@ -484,6 +518,42 @@ export const TableList = ({
                           )}
                         </TableCell>
                         <TableCell>
+                          {x.type === ENTITY_TYPE.TABLE ? (
+                            (() => {
+                              const tableKey = `${selectedSchema}.${x.name}`
+                              const wState = warehouseSnap.tables[tableKey] ?? { mode: 'postgres' }
+                              return (
+                                <div className="flex items-center gap-1.5">
+                                  <WarehouseModeChip
+                                    mode={
+                                      wState.mode as
+                                        | 'postgres'
+                                        | 'has_warehouse_copy'
+                                        | 'warehouse_backed'
+                                    }
+                                    onClick={
+                                      wState.mode !== 'postgres'
+                                        ? () =>
+                                            setDrawerTable({
+                                              key: tableKey,
+                                              name: `${selectedSchema}.${x.name}`,
+                                            })
+                                        : undefined
+                                    }
+                                  />
+                                  {wState.mode === 'has_warehouse_copy' && wState.syncState && (
+                                    <WarehouseSyncChip
+                                      syncState={wState.syncState as 'syncing' | 'live' | 'error'}
+                                    />
+                                  )}
+                                </div>
+                              )
+                            })()
+                          ) : (
+                            <p className="text-foreground-muted">–</p>
+                          )}
+                        </TableCell>
+                        <TableCell>
                           {(realtimePublication?.tables ?? []).find(
                             (table) => table.id === x.id
                           ) ? (
@@ -572,8 +642,86 @@ export const TableList = ({
                                         }}
                                       >
                                         <Copy size={12} />
-                                        <span>Duplicate Table</span>
+                                        <span>Duplicate table</span>
                                       </DropdownMenuItemTooltip>
+                                      <DropdownMenuSeparator />
+
+                                      {(() => {
+                                        const tableKey = `${selectedSchema}.${x.name}`
+                                        const wMode =
+                                          warehouseSnap.tables[tableKey]?.mode ?? 'postgres'
+                                        return (
+                                          <>
+                                            {wMode === 'postgres' && (
+                                              <>
+                                                <DropdownMenuItem
+                                                  className="flex items-center gap-x-2"
+                                                  onClick={() =>
+                                                    setWarehouseModal({
+                                                      variant: 'attach',
+                                                      tableKey,
+                                                      tableName: `${selectedSchema}.${x.name}`,
+                                                    })
+                                                  }
+                                                >
+                                                  <PackagePlus size={12} />
+                                                  <p>Copy to Warehouse</p>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                  className="flex items-center gap-x-2"
+                                                  onClick={() =>
+                                                    setWarehouseModal({
+                                                      variant: 'move',
+                                                      tableKey,
+                                                      tableName: `${selectedSchema}.${x.name}`,
+                                                    })
+                                                  }
+                                                >
+                                                  <Package size={12} />
+                                                  <p>Move to Warehouse</p>
+                                                </DropdownMenuItem>
+                                              </>
+                                            )}
+                                            {wMode === 'has_warehouse_copy' && (
+                                              <>
+                                                <DropdownMenuItem
+                                                  className="flex items-center gap-x-2"
+                                                  onClick={() =>
+                                                    setDrawerTable({
+                                                      key: tableKey,
+                                                      name: `${selectedSchema}.${x.name}`,
+                                                    })
+                                                  }
+                                                >
+                                                  <Info size={12} />
+                                                  <p>View Warehouse details</p>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                  className="flex items-center gap-x-2 text-destructive"
+                                                  onClick={() => clearTableMode(tableKey)}
+                                                >
+                                                  <PackageX size={12} />
+                                                  <p>Detach copy</p>
+                                                </DropdownMenuItem>
+                                              </>
+                                            )}
+                                            {wMode === 'warehouse_backed' && (
+                                              <DropdownMenuItem
+                                                className="flex items-center gap-x-2"
+                                                onClick={() =>
+                                                  setDrawerTable({
+                                                    key: tableKey,
+                                                    name: `${selectedSchema}.${x.name}`,
+                                                  })
+                                                }
+                                              >
+                                                <Info size={12} />
+                                                <p>View Warehouse details</p>
+                                              </DropdownMenuItem>
+                                            )}
+                                          </>
+                                        )
+                                      })()}
                                       <DropdownMenuSeparator />
                                       <DropdownMenuItemTooltip
                                         disabled={!canUpdateTables || isSchemaLocked}
@@ -606,7 +754,7 @@ export const TableList = ({
               </TableBody>
               <TableFooter className="font-normal">
                 <TableRow ref={sentinelRef} className="border-b-0">
-                  <TableCell colSpan={7} className="text-foreground-muted hover:bg-inherit">
+                  <TableCell colSpan={8} className="text-foreground-muted hover:bg-inherit">
                     {isFetchingNextTablesPage
                       ? 'Loading more tables…'
                       : `${footerCount} ${footerCount === 1 ? 'table' : 'tables'}${
@@ -618,6 +766,29 @@ export const TableList = ({
             </Table>
           </Card>
         </div>
+      )}
+
+      {warehouseModal && (
+        <WarehouseEnablementModal
+          open={true}
+          variant={warehouseModal.variant}
+          tableKey={warehouseModal.tableKey}
+          tableName={warehouseModal.tableName}
+          onOpenChange={(open) => {
+            if (!open) setWarehouseModal(null)
+          }}
+        />
+      )}
+
+      {drawerTable && (
+        <WarehouseDetailsDrawer
+          open={true}
+          tableKey={drawerTable.key}
+          tableName={drawerTable.name}
+          onOpenChange={(open) => {
+            if (!open) setDrawerTable(null)
+          }}
+        />
       )}
     </div>
   )

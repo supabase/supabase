@@ -269,6 +269,12 @@ export const connectSchema: ConnectSchema = {
       description: 'Connect your agent',
       fields: ['mcpClient', 'mcpReadonly', 'mcpFeatures'],
     },
+    {
+      id: 'warehouse',
+      label: 'Warehouse',
+      description: 'External catalog access',
+      fields: [],
+    },
   ],
 
   // -------------------------------------------------------------------------

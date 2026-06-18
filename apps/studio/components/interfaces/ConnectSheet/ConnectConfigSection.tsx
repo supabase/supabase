@@ -1,4 +1,4 @@
-import { Box, Cable, Database, Server, Sparkles } from 'lucide-react'
+import { Box, Cable, Database, Server, Sparkles, Warehouse } from 'lucide-react'
 import {
   cn,
   RadioGroupStacked,
@@ -28,6 +28,7 @@ const MODE_ICONS: Record<string, React.ReactNode> = {
   orm: <Cable size={16} strokeWidth={1.5} />,
   mcp: <Sparkles size={16} strokeWidth={1.5} />,
   server: <Server size={16} strokeWidth={1.5} />,
+  warehouse: <Warehouse size={16} strokeWidth={1.5} />,
 }
 
 interface ConnectConfigSectionProps {
