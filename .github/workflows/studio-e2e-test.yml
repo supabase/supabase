@@ -83,6 +83,13 @@ jobs:
         if: steps.filter.outputs.studio == 'true'
         run: rm -rf supabase && pnpm exec supabase init && mkdir supabase/functions
 
+      - name: Login to Docker Hub
+        uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
+        if: steps.filter.outputs.studio == 'true'
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
       - name: Pre-start diagnostics
         run: |
           docker ps -a
