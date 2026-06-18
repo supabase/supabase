@@ -105,8 +105,9 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
           discussionsUrl: undefined,
           enabled: isMarketplaceEnabled,
           isNew: true,
-          isPlatformOnly: false,
-          isDefaultOptIn: true,
+          isPlatformOnly: true,
+          isDefaultOptIn: false,
+          getRoute: (ref?: string) => `/project/${ref}/integrations`,
         },
       ].sort((a, b) => Number(b.isNew) - Number(a.isNew)),
     [
