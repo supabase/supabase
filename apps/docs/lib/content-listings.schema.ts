@@ -37,7 +37,7 @@ export const CONTENT_LISTING_GRID_ITEM_CLASS: Record<ContentListingGridColumns, 
   4: 'col-span-12 md:col-span-3',
 }
 
-export function getContentListingGridItemClassName(columns: ContentListingGridColumns = 2): string {
+export function getContentListingGridItemClassName(columns: ContentListingGridColumns = 3): string {
   return CONTENT_LISTING_GRID_ITEM_CLASS[columns]
 }
 

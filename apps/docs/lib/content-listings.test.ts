@@ -116,6 +116,24 @@ describe('parseContentListings', () => {
     expect(result?.[0].columns).toBe(3)
   })
 
+  it('leaves columns undefined when type is grid and columns is omitted', () => {
+    const result = parseContentListings([
+      {
+        id: 'get-started',
+        type: 'grid',
+        items: [
+          {
+            title: 'Quickstart',
+            href: '/guides/storage/quickstart',
+            description: 'Store and serve files.',
+          },
+        ],
+      },
+    ])
+
+    expect(result?.[0].columns).toBeUndefined()
+  })
+
   it('rejects columns when type is not grid', () => {
     expect(() =>
       parseContentListings([
@@ -148,6 +166,10 @@ describe('parseContentListings', () => {
 })
 
 describe('getContentListingGridItemClassName', () => {
+  it('defaults to 3 columns when no argument is provided', () => {
+    expect(getContentListingGridItemClassName()).toBe('col-span-12 md:col-span-4')
+  })
+
   it('maps column counts to tailwind grid spans', () => {
     expect(getContentListingGridItemClassName(2)).toBe('col-span-12 md:col-span-6')
     expect(getContentListingGridItemClassName(3)).toBe('col-span-12 md:col-span-4')

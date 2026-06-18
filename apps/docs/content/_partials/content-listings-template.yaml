@@ -10,7 +10,7 @@ contentListings:
     heading-level: '##' # optional: ## | ### | #### (default ##)
     description: Optional intro sentence for this group.
     type: grid # list | grid (default list)
-    columns: 3 # optional, grid only: 2 | 3 | 4 (default 2)
+    # columns: 2 # optional, grid only: 2 | 3 | 4 (default 3)
     items:
       - title: Connect to your database
         href: /guides/database/connecting-to-postgres

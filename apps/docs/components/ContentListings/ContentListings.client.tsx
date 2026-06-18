@@ -82,7 +82,7 @@ function ContentListingsListGroup({ group }: { group: ContentListingGroup }) {
 }
 
 function ContentListingsGridGroup({ group }: { group: ContentListingGroup }) {
-  const itemClassName = getContentListingGridItemClassName(group.columns ?? 2)
+  const itemClassName = getContentListingGridItemClassName(group.columns ?? 3)
   const groupLabel = getContentListingGroupLabel(group)
 
   return (

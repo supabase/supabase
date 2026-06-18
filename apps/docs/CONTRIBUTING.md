@@ -126,7 +126,7 @@ Overview and index pages orient readers across a docs section. Use YAML `content
 
 Tutorial and guide pages may still end with `## Next steps` in the body for now; overview pages should use front matter only.
 
-Copy the template from [`content/_partials/content-listings-template.yaml`](content/_partials/content-listings-template.yaml). Each group requires an `id` (first), optional `heading`, optional `heading-level` (`##`, `###`, or `####`, default `##`), optional `description`, optional `type` (`list` or `grid`, default `list`), optional `columns` (`2`, `3`, or `4` for grid groups, default `2`), and `items` with `title`, `href`, and required `description`. Internal `href` values must start with `/guides/`, `/docs/guides/`, or `/dashboard/`.
+Copy the template from [`content/_partials/content-listings-template.yaml`](content/_partials/content-listings-template.yaml). Each group requires an `id` (first), optional `heading`, optional `heading-level` (`##`, `###`, or `####`, default `##`), optional `description`, optional `type` (`list` or `grid`, default `list`), optional `columns` (`2`, `3`, or `4` for grid groups, default `3`), and `items` with `title`, `href`, and required `description`. Internal `href` values must start with `/guides/`, `/docs/guides/`, or `/dashboard/`.
 
 Place a group in the body with `<ContentListings listing="id" />`. Groups embedded in the body are omitted from the auto footer; groups without a body placement render after the article.
 
