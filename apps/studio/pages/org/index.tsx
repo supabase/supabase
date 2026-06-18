@@ -11,15 +11,21 @@ import type { NextPageWithLayout } from '@/types'
 
 const OrgIndexPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const [lastVisitedOrganization, _, { isSuccess }] = useLocalStorageQuery(
+  const [lastVisitedOrganization, setLastVisitedOrganization, { isSuccess }] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
     ''
   )
 
+  const isNewAccountSession = router.asPath.includes('access_token=')
+
   useEffect(() => {
     if (isSuccess) {
-      if (lastVisitedOrganization.length > 0) router.push(`/org/${lastVisitedOrganization}`)
-      else router.push('/organizations')
+      if (!isNewAccountSession && lastVisitedOrganization.length > 0) {
+        router.push(`/org/${lastVisitedOrganization}`)
+      } else {
+        if (isNewAccountSession) setLastVisitedOrganization('')
+        router.push('/organizations')
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccess])
