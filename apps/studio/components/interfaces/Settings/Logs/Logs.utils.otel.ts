@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 
-import { LogsTableName, SQL_FILTER_TEMPLATES, type SqlFilterEntry } from './Logs.constants'
+import { LogsTableName, type SqlFilterEntry } from './Logs.constants'
 import type { Filters, LogData, LogsEndpointParams, QueryType } from './Logs.types'
 import { buildWhereClauses } from './Logs.utils'
 import type { OtelLogRow } from '@/data/logs/otel-inspection.utils'
