@@ -10,7 +10,6 @@ import {
   createApiResponseWaiter,
   waitForApiResponse,
   waitForDatabaseToLoad,
-  waitForSchemaVisualizerToLoad,
 } from '../utils/wait-for-response.js'
 
 async function focusTableInVisualizer(page: Page, tableName: string) {
@@ -88,8 +87,12 @@ test.describe('Database', () => {
       // changing schema -> auth
       await page.getByTestId('schema-selector').click()
       await page.getByRole('option', { name: 'auth' }).click()
-      await waitForSchemaVisualizerToLoad(page, ref, 'auth')
 
+      // No waitForResponse for auth-infinite_tables here: it fires on the
+      // schema switch above and can resolve before a listener registered now
+      // attaches (and is SSR-streamed under TanStack) — the same race that
+      // flaked this test. focusTableInVisualizer below already auto-waits for
+      // the auth schema's tables to load.
       for (const tableName of ['users', 'sso_providers', 'saml_providers']) {
         await focusTableInVisualizer(page, tableName)
         await expect(page.getByText(tableName, { exact: true })).toBeVisible()
