@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useShowMultigresLogs } from './useShowMultigresLogs'
+import { useShowMultigresLogs } from '../useShowMultigresLogs'
 
 const mockUseFlag = vi.fn()
 const mockUseIsHighAvailability = vi.fn()
@@ -11,7 +11,7 @@ vi.mock('common', async (importOriginal) => ({
   useFlag: (name: string) => mockUseFlag(name),
 }))
 
-vi.mock('./useSelectedProject', () => ({
+vi.mock('../useSelectedProject', () => ({
   useIsHighAvailability: () => mockUseIsHighAvailability(),
 }))
 

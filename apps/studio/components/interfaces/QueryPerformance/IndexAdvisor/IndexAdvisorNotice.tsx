@@ -45,7 +45,7 @@ export const IndexAdvisorNotice = () => {
           </div>
           <div className="flex items-center gap-x-2">
             <Button
-              type="default"
+              variant="default"
               size="tiny"
               onClick={() => setIsDismissed(true)}
               aria-label="Dismiss notification"

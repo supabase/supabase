@@ -595,7 +595,7 @@ export const PostgrestConfig = () => {
                 description="Expose a custom schema instead of the public schema"
               >
                 <div className="flex gap-2 items-center justify-end">
-                  <Button type="default" icon={<Lock />} onClick={() => setShowModal(true)}>
+                  <Button variant="default" icon={<Lock />} onClick={() => setShowModal(true)}>
                     Harden Data API
                   </Button>
                 </div>

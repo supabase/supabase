@@ -3,7 +3,6 @@ import { Elements } from '@stripe/react-stripe-js'
 import type { PaymentIntentResult, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 import { useDebounce } from '@uidotdev/usehooks'
-import { LOCAL_STORAGE_KEYS } from 'common'
 import { groupBy } from 'lodash'
 import { HelpCircle } from 'lucide-react'
 import { useTheme } from 'next-themes'
@@ -55,7 +54,7 @@ import { useProjectsInfiniteQuery } from '@/data/projects/projects-infinite-quer
 import { SetupIntentResponse } from '@/data/stripe/setup-intent-mutation'
 import { useConfirmPendingSubscriptionCreateMutation } from '@/data/subscriptions/org-subscription-confirm-pending-create'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { PRICING_TIER_LABELS_ORG, STRIPE_PUBLIC_KEY } from '@/lib/constants'
 import { validateReturnTo } from '@/lib/gotrue'
 import { useProfile } from '@/lib/profile'
@@ -94,17 +93,13 @@ export const NewOrgForm = ({
   const router = useRouter()
   const user = useProfile()
   const { resolvedTheme } = useTheme()
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
 
   const isBillingEnabled = useIsFeatureEnabled('billing:all')
 
   const { data: organizations, isSuccess } = useOrganizationsQuery()
   const { data } = useProjectsInfiniteQuery({})
   const projects = useMemo(() => data?.pages.flatMap((page) => page.projects) ?? [], [data?.pages])
-
-  const [lastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
 
   const freeOrgs = (organizations || []).filter((it) => it.plan.id === 'free')
 
@@ -373,7 +368,7 @@ export const NewOrgForm = ({
           footer={
             <div key="panel-footer" className="flex w-full items-center justify-between">
               <Button
-                type="default"
+                variant="default"
                 disabled={newOrgLoading || paymentConfirmationLoading}
                 onClick={() => {
                   if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
@@ -385,8 +380,8 @@ export const NewOrgForm = ({
 
               <Button
                 form={FORM_ID}
-                htmlType="submit"
-                type="primary"
+                type="submit"
+                variant="primary"
                 loading={newOrgLoading}
                 disabled={newOrgLoading || creationPreviewIsFetching}
               >

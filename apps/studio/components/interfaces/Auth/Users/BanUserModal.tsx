@@ -146,10 +146,10 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
               </div>
             </DialogSection>
             <DialogFooter>
-              <Button type="default" disabled={isBanningUser} onClick={() => onClose()}>
+              <Button variant="default" disabled={isBanningUser} onClick={() => onClose()}>
                 Cancel
               </Button>
-              <Button type="warning" htmlType="submit" loading={isBanningUser}>
+              <Button variant="warning" type="submit" loading={isBanningUser}>
                 Confirm ban
               </Button>
             </DialogFooter>

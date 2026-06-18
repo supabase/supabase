@@ -33,16 +33,13 @@ test.describe('Database', () => {
         }
       )
 
-      const wait = createApiResponseWaiter(
-        page,
-        'pg-meta',
-        ref,
-        'query?key=project:default-schema:public-infinite_tables'
-      )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/schemas?schema=public`))
-      await wait
 
-      // focus the test table so it mounts inside the viewport
+      // Gate on the UI, not the pg-meta XHR: under the TanStack build the
+      // schema is delivered via the SSR stream, so a `waitForResponse` for the
+      // `public-infinite_tables` query never fires client-side and times out.
+      // Focusing the freshly-created table already auto-waits for the schema
+      // (including the new table) to load in the visualizer.
       await focusTableInVisualizer(page, databaseTableName)
 
       // validates table and column exists
@@ -110,16 +107,13 @@ test.describe('Database', () => {
           await dropTable(databaseTableName)
         }
       )
-      const wait = createApiResponseWaiter(
-        page,
-        'pg-meta',
-        ref,
-        'query?key=project:default-schema:public-infinite_tables'
-      )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/schemas?schema=public`))
-      await wait
 
-      // focus the test table so it mounts inside the viewport
+      // Gate on the UI, not the pg-meta XHR: under the TanStack build the
+      // schema is delivered via the SSR stream, so a `waitForResponse` for the
+      // `public-infinite_tables` query never fires client-side and times out.
+      // Focusing the freshly-created table already auto-waits for the schema
+      // (including the new table) to load in the visualizer.
       await focusTableInVisualizer(page, databaseTableName)
 
       // validates table and column exists
@@ -181,16 +175,13 @@ test.describe('Database', () => {
           await dropTable(databaseTableName)
         }
       )
-      const wait = createApiResponseWaiter(
-        page,
-        'pg-meta',
-        ref,
-        'query?key=project:default-schema:public-infinite_tables'
-      )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/schemas?schema=public`))
-      await wait
 
-      // focus the test table so it mounts inside the viewport
+      // Gate on the UI, not the pg-meta XHR: under the TanStack build the
+      // schema is delivered via the SSR stream, so a `waitForResponse` for the
+      // `public-infinite_tables` query never fires client-side and times out.
+      // Focusing the freshly-created table already auto-waits for the schema
+      // (including the new table) to load in the visualizer.
       await focusTableInVisualizer(page, databaseTableName)
 
       // validates table and column exists
@@ -1274,7 +1265,8 @@ test.describe('Database Functions', () => {
     await page.waitForLoadState('networkidle')
 
     // create a new function button exists in public schema
-    await expect(page.getByRole('button', { name: 'Create a new function' })).toBeVisible()
+    const newFunctionButton = page.getByRole('button', { name: 'New function' }).first()
+    await expect(newFunctionButton).toBeVisible()
 
     // change schema -> auth
     await page.getByTestId('schema-selector').click()
@@ -1283,7 +1275,7 @@ test.describe('Database Functions', () => {
     await expect(page.getByText('email')).toBeVisible()
     await expect(page.getByText('jwt')).toBeVisible()
     // create a new function button does not exist in other schemas
-    await expect(page.getByRole('button', { name: 'Create a new function' })).not.toBeVisible()
+    await expect(page.getByRole('button', { name: 'New function' })).not.toBeVisible()
 
     // filter by querying
     await page.getByRole('textbox', { name: 'Search for a function' }).fill('email')
@@ -1311,7 +1303,7 @@ test.describe('Database Functions', () => {
     await page.waitForLoadState('networkidle')
 
     // create new function
-    await page.getByRole('button', { name: 'Create a new function' }).click()
+    await page.getByRole('button', { name: 'New function' }).first().click()
     await page.getByRole('textbox', { name: 'Name of function' }).fill(databaseFunctionName)
     const editor = page.getByRole('presentation')
     await editor.click()

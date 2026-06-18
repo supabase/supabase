@@ -60,7 +60,7 @@ export const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLa
                 Availability project.
               </p>
             </div>
-            <Button asChild type="default" icon={<ExternalLink />}>
+            <Button asChild variant="default" icon={<ExternalLink />}>
               <a href="https://supabase.com/support" target="_blank" rel="noopener noreferrer">
                 Contact support
               </a>

@@ -44,7 +44,7 @@ const EnableReplicationModal = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button type="primary" className="w-min">
+        <Button variant="primary" className="w-min">
           Enable external replication
         </Button>
       </DialogTrigger>
@@ -70,10 +70,10 @@ const EnableReplicationModal = () => {
           </Admonition>
         </DialogSection>
         <DialogFooter>
-          <Button type="default" disabled={creatingTenantSource} onClick={() => setOpen(false)}>
+          <Button variant="default" disabled={creatingTenantSource} onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button type="primary" loading={creatingTenantSource} onClick={onEnableReplication}>
+          <Button variant="primary" loading={creatingTenantSource} onClick={onEnableReplication}>
             Enable external replication
           </Button>
         </DialogFooter>

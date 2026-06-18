@@ -20,6 +20,7 @@ import { AdvancedSettings } from './AdvancedSettings'
 import { CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
 import { DestinationPanelFormSchema as FormSchema } from './DestinationForm.schema'
 import {
+  areValidationFailuresEqual,
   buildDestinationConfig,
   buildDestinationConfigForValidation,
   getDucklakeValidationIssues,
@@ -181,11 +182,13 @@ export const DestinationForm = ({
   const { mutateAsync: createDestinationPipeline, isPending: creatingDestinationPipeline } =
     useCreateDestinationPipelineMutation({
       onSuccess: () => form.reset(defaultValues),
+      onError: () => {},
     })
 
   const { mutateAsync: updateDestinationPipeline, isPending: updatingDestinationPipeline } =
     useUpdateDestinationPipelineMutation({
       onSuccess: () => form.reset(defaultValues),
+      onError: () => {},
     })
 
   const { mutateAsync: startPipeline, isPending: startingPipeline } = useStartPipelineMutation()
@@ -356,6 +359,10 @@ export const DestinationForm = ({
     if (editMode) {
       return existingDestination?.enabled ? 'Apply and restart' : 'Apply and start'
     } else {
+      if (hasRunValidation && validationWarnings.length > 0 && !hasValidationFailures) {
+        return 'Create and start anyway'
+      }
+
       return 'Create and start'
     }
   }
@@ -537,29 +544,35 @@ export const DestinationForm = ({
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     if (!editMode) {
-      if (!hasRunValidation || isValidating || hasValidationFailures) {
-        const validationResult = await validateConfiguration(data)
-        if (!validationResult.canContinue) {
-          // Critical failures shown inline — stop so user can fix them
-          return
-        }
-        if (validationResult.warnings.length > 0) {
-          // Warnings shown inline — stop so user can review, then re-submit to confirm
-          return
-        }
-        await submitPipeline(data)
+      const previousValidationFailures = allValidationFailures
+      const previousWarnings = previousValidationFailures.filter(
+        (f) => f.failure_type === 'warning'
+      )
+      const previousFailuresAreOnlyWarnings =
+        hasRunValidation &&
+        previousValidationFailures.length > 0 &&
+        previousValidationFailures.every((f) => f.failure_type === 'warning')
+
+      const validationResult = await validateConfiguration(data)
+      if (!validationResult.canContinue) {
+        // Critical failures shown inline — stop so user can fix them
         return
       }
 
-      // Validation already passed; warnings are visible inline — ask user to confirm
-      if (validationWarnings.length > 0) {
-        setPendingFormValues(data)
-        setShowValidationWarningsDialog(true)
+      const hasWarnings = validationResult.warnings.length > 0
+      const warningsUnchanged =
+        previousFailuresAreOnlyWarnings &&
+        areValidationFailuresEqual(previousWarnings, validationResult.warnings)
+
+      // Open the confirmation dialog when validation is clean, or when warnings are unchanged on
+      // resubmit. New/changed warnings are shown inline so the user can review and submit again.
+      if (hasWarnings) {
+        if (warningsUnchanged) {
+          setPendingFormValues(data)
+          setShowValidationWarningsDialog(true)
+        }
         return
       }
-
-      await submitPipeline(data)
-      return
     }
 
     await submitPipeline(data)
@@ -569,7 +582,6 @@ export const DestinationForm = ({
     setShowValidationWarningsDialog(open)
     if (!open) {
       setPendingFormValues(null)
-      setHasRunValidation(false)
     }
   }
 
@@ -686,10 +698,10 @@ export const DestinationForm = ({
           )}
         </AnimatePresence>
         <div className="flex items-center gap-x-2">
-          <Button disabled={isSaving} type="default" onClick={onClose}>
+          <Button disabled={isSaving} variant="default" onClick={onClose}>
             Cancel
           </Button>
-          <Button disabled={isSubmitDisabled} loading={isSaving} form={formId} htmlType="submit">
+          <Button disabled={isSubmitDisabled} loading={isSaving} form={formId} type="submit">
             {getSubmitButtonText()}
           </Button>
         </div>

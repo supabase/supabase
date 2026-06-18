@@ -471,7 +471,7 @@ export const LogTable = ({
     >
       <div className="flex items-center gap-2">
         <DownloadResultsButton
-          type="text"
+          variant="text"
           text={`Results ${data && data.length ? `(${data.length})` : ''}`}
           results={data}
           fileName={`supabase-logs-${ref}.csv`}
@@ -482,7 +482,7 @@ export const LogTable = ({
       {showHistogramToggle && (
         <div className="flex items-center gap-2">
           <Button
-            type="default"
+            variant="default"
             icon={isHistogramShowing ? <Eye /> : <EyeOff />}
             onClick={onHistogramToggle}
           >
@@ -494,7 +494,7 @@ export const LogTable = ({
       <div className="gap-x-2 flex items-center">
         {IS_PLATFORM && (
           <ButtonTooltip
-            type="default"
+            variant="default"
             onClick={onSave}
             loading={isSaving}
             disabled={!canCreateLogQuery || !hasEditorValue}
@@ -512,7 +512,7 @@ export const LogTable = ({
         )}
         <Button
           title="run-logs-query"
-          type={hasEditorValue ? 'primary' : 'alternative'}
+          variant={hasEditorValue ? 'primary' : 'alternative'}
           disabled={!hasEditorValue}
           onClick={onRun}
           iconRight={<Play size={12} />}

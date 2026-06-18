@@ -76,12 +76,12 @@ export const IndexAdvisorDisabledState = () => {
       <AlertDescription className="mt-3">
         <div className="flex items-center gap-x-2">
           {indexAdvisor === undefined ? (
-            <Button asChild type="default">
+            <Button asChild variant="default">
               <Link href={`/project/${ref}/settings/infrastructure`}>Upgrade Postgres version</Link>
             </Button>
           ) : (
             <Button
-              type="default"
+              variant="default"
               disabled={isEnablingExtension}
               loading={isEnablingExtension}
               onClick={() => onEnableIndexAdvisor()}

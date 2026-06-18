@@ -72,7 +72,7 @@ function LinkSupportTicketSuccess() {
       </div>
       <DialogSectionSeparator />
       <div className="w-full py-4 px-4 flex items-center justify-end">
-        <Button asChild type="default">
+        <Button asChild variant="default">
           <Link href="/">Finish</Link>
         </Button>
       </div>

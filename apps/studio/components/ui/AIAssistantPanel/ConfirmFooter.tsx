@@ -30,10 +30,10 @@ export const ConfirmFooter = ({
     >
       <div className="flex-1 relative z-10">{message}</div>
       <div className="flex items-center gap-2 relative z-10">
-        <Button size="tiny" type="outline" onClick={onCancel} disabled={isLoading}>
+        <Button size="tiny" variant="outline" onClick={onCancel} disabled={isLoading}>
           {cancelLabel}
         </Button>
-        <Button size="tiny" type="primary" onClick={onConfirm} disabled={isLoading}>
+        <Button size="tiny" variant="primary" onClick={onConfirm} disabled={isLoading}>
           {isLoading ? confirmLabelLoading : confirmLabel}
         </Button>
       </div>

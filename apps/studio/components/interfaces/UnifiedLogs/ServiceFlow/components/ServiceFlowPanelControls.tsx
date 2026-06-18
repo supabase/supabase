@@ -66,7 +66,7 @@ export const ServiceFlowPanelControls = ({
       >
         <Button
           size="tiny"
-          type="text"
+          variant="text"
           disabled={!prevId}
           onClick={onPrev}
           className="px-1"
@@ -82,7 +82,7 @@ export const ServiceFlowPanelControls = ({
       >
         <Button
           size="tiny"
-          type="text"
+          variant="text"
           disabled={!nextId}
           onClick={onNext}
           className="px-1"
@@ -95,7 +95,7 @@ export const ServiceFlowPanelControls = ({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <ButtonTooltip
-            type="text"
+            variant="text"
             className="px-1"
             icon={dock === 'bottom' ? <PanelBottom /> : <PanelRight />}
             tooltip={{ content: { side: 'top', text: 'Dock side' } }}
@@ -125,7 +125,7 @@ export const ServiceFlowPanelControls = ({
         options={{ conflictBehavior: 'allow' }}
         side="top"
       >
-        <Button size="tiny" type="text" onClick={onClose} className="px-1" icon={<X />} />
+        <Button size="tiny" variant="text" onClick={onClose} className="px-1" icon={<X />} />
       </Shortcut>
     </div>
   )

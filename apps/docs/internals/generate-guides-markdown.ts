@@ -16,7 +16,9 @@ import { parseContentListings } from '../lib/content-listings.schema'
 import { getInternalLinkBaseUrl, prefixInternalLinks } from './internal-links'
 import { Admonition } from './markdown-schema/Admonition'
 import { Link } from './markdown-schema/Link'
+import { MetricsStackCards } from './markdown-schema/MetricsStackCards'
 import { Panel } from './markdown-schema/Panel'
+import { Price } from './markdown-schema/Price'
 import { StepHike } from './markdown-schema/StepHike'
 import { TabPanel } from './markdown-schema/TabPanel'
 
@@ -132,10 +134,12 @@ function applySchema(parent: Parent, schema: ComponentSchema): void {
 const SCHEMA: ComponentSchema = {
   Admonition,
   Link,
+  Price,
   GlassPanel: Panel,
   IconPanel: Panel,
   ...StepHike,
   TabPanel,
+  MetricsStackCards,
 }
 
 async function generateOne(filePath: string, linkBaseUrl: string): Promise<string> {
