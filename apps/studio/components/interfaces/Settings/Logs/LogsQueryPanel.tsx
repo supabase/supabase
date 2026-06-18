@@ -50,6 +50,8 @@ export interface LogsQueryPanelProps {
   onDateChange: (value: DatePickerValue) => void
   useOtel?: boolean
   onUseOtelChange?: (value: boolean) => void
+  /** When true, the OTEL endpoint is forced on by a feature flag and the manual toggle is locked. */
+  otelForced?: boolean
 }
 
 function DropdownMenuItemContent({ name, desc }: { name: ReactNode; desc?: string }) {
@@ -70,6 +72,7 @@ const LogsQueryPanel = ({
   onDateChange,
   useOtel = false,
   onUseOtelChange,
+  otelForced = false,
 }: LogsQueryPanelProps) => {
   const [showReference, setShowReference] = useState(false)
   const { logsTemplates } = useIsFeatureEnabled(['logs:templates'])
@@ -174,6 +177,7 @@ const LogsQueryPanel = ({
                     <Switch
                       id="logs-explorer-otel-toggle"
                       checked={useOtel}
+                      disabled={otelForced}
                       onCheckedChange={(checked) => onUseOtelChange?.(checked)}
                     />
                     <Label
@@ -185,8 +189,9 @@ const LogsQueryPanel = ({
                   </div>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="max-w-xs">
-                  Run this query against the new ClickHouse-backed OTEL endpoint instead of
-                  BigQuery. Use to validate ClickHouse SQL before relying on it.
+                  {otelForced
+                    ? 'This project is on the ClickHouse-backed OTEL endpoint via a feature flag, so the explorer always queries it.'
+                    : 'Run this query against the new ClickHouse-backed OTEL endpoint instead of BigQuery. Use to validate ClickHouse SQL before relying on it.'}
                 </TooltipContent>
               </Tooltip>
             )}

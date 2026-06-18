@@ -393,6 +393,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             warnings={warnings}
             useOtel={useOtelEndpoint}
             onUseOtelChange={setUseOtelEndpointPreference}
+            otelForced={otelLegacyLogsEnabled}
           />
           <ShimmerLine active={isLoading} />
           <CodeEditor
