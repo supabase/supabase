@@ -61,7 +61,7 @@ Queue names can only be lowercase and hyphens and underscores are permitted.
 - We recommend leaving Row Level Security (RLS) enabled. With it enabled, you don't need to set additional RLS on the queue tables.
 
 <Image
-  alt="Create a Queue from the Supabase Dashboard"
+  alt="A screenshot showing the process to create a Queue from the Supabase Dashboard"
   src={{
     dark: '/docs/img/queues-quickstart-create-dark.png',
     light: '/docs/img/queues-quickstart-create-light.png',
@@ -93,22 +93,11 @@ This is to prevent direct access to the `pgmq` schema and its tables (RLS is not
 
 To get started, navigate to the [**Queues > Settings**](/dashboard/project/_/integrations/queues/settings) section of the Dashboard and enable **Expose Queues via PostgREST**. Once enabled, Supabase creates and exposes a `pgmq_public` schema containing database function wrappers to a subset of `pgmq`'s database functions.
 
-### Enable RLS on your tables in `pgmq` schema
+### Add an RLS policy on your tables in `pgmq` schema [#enable-rls-on-your-tables-in-pgmq-schema]
 
-For security purposes, you must enable Row Level Security (RLS) on all Queue tables (all tables in `pgmq` schema that begin with `q_`) if the Data API is enabled.
+For security purposes, you must enable Row Level Security (RLS) on all Queue tables (all tables in `pgmq` schema that begin with `q_`) if you enable the Data API.
 
-You’ll want to create RLS policies for any Queues you want your client-side consumers to interact with.
-
-<Image
-  alt="Screenshot of creating an RLS policy from the Queues settings"
-  src={{
-    dark: '/docs/img/queues-quickstart-rls.png',
-    light: '/docs/img/queues-quickstart-rls.png',
-  }}
-
-width={2130}
-height={1508}
-/>
+Add an RLS policy for any Queues you want your client-side consumers to interact with, by clicking the _Add RLS Policy_ button on [the overview page of any Queue in the Dashboard](/dashboard/project/_/integrations/queues/queues).
 
 ### Grant permissions to `pgmq_public` database functions
 
@@ -122,13 +111,13 @@ The permissions required for each Queue API database function:
 | `read` `pop`        | `Select` `Update`        |
 | `archive` `delete`  | `Select` `Delete`        |
 
-To manage your queue permissions, click on the Queue Settings button.
+To manage your queue permissions, click on the Queue Settings cog button on [the overview page of any Queue in the Dashboard](/dashboard/project/_/integrations/queues/queues).
 
 <Image
-  alt="Screenshot of accessing queue settings"
+  alt="Screenshot highlighting the Queue Settings button on the Queues overview page in the Supabase Dashboard"
   src={{
-    dark: '/docs/img/queues-quickstart-queue-settings.png',
-    light: '/docs/img/queues-quickstart-queue-settings.png',
+    dark: '/docs/img/queues-quickstart-queue-settings-dark.png',
+    light: '/docs/img/queues-quickstart-queue-settings-light.png',
   }}
 
 width={2150}
@@ -137,26 +126,22 @@ height={1192}
 
 Then enable the required roles permissions.
 
-<Image
-  alt="Screenshot of configuring API access for roles from the Queues settings"
-  src={{
-    dark: '/docs/img/queues-quickstart-roles.png',
-    light: '/docs/img/queues-quickstart-roles-light.png',
-  }}
+| ROLE          | Select  | Insert  | Update  | Delete  |
+| ------------- | ------- | ------- | ------- | ------- |
+| anon          |         |         |         |         |
+| authenticated | enabled | enabled | enabled | enabled |
+| postgres      | enabled | enabled | enabled | enabled |
+| service_role  | enabled | enabled | enabled | enabled |
 
-width={1271}
-height={1315}
-/>
+<Admonition type="warning">
 
-<Admonition type="note">
-
-`postgres` and `service_role` roles should never be exposed client-side.
+You should never expose `postgres` and `service_role` roles client-side.
 
 </Admonition>
 
 ### Enqueueing and dequeueing messages
 
-Once your Queue has been created, you can begin enqueueing and dequeueing Messages.
+Once you have created your Queue, you can begin enqueueing and dequeueing Messages.
 
 <Tabs
   scrollable
