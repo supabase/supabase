@@ -14,11 +14,11 @@ The internet uses a system called the Internet Protocol (IP) to route communicat
 - **IPv4**: Introduced in 1980, it's the original version.
 - **IPv6**: Launched in 1999, it offers a much larger address space and is the preferred future-proof option.
 
-#### Supabase and IPv6:
+#### Supabase and IPv6
 
 All Supabase databases provide a direct connection string that maps to an IPv6 address.
 
-#### Working with IPv6 incompatible hosts:
+#### Working with IPv6 incompatible hosts
 
 Here are your options if your server platform doesn't support IPv6:
 
@@ -28,7 +28,7 @@ Here are your options if your server platform doesn't support IPv6:
 
 > Note: the IPv4 Add-On costs <Price price="0.0055" /> an hour, which equates to ~<Price price="4.00" /> if left on for a full month (~720 hours)
 
-#### Checking IPv6 support:
+#### Checking IPv6 support
 
 The majority of services are IPv6 compatible. However, there are a few prominent ones that only accept IPv4 connections:
 
@@ -45,7 +45,7 @@ curl -6 https://ifconfig.co/ip
 
 If the command returns an IPv6 address, the network is IPv6 compatible.
 
-#### Finding your database's IP address:
+#### Finding your database's IP address
 
 To determine your current IP address, you can use an IP address [lookup website](https://whatismyipaddress.com/hostname-ip) or the terminal command:
 
@@ -57,7 +57,7 @@ This command queries the domain name servers to find the IP address of the given
 
 Example IPv6 Address: `2a05:d014:1c06:5f0c:d7a9:8616:bee2:30df`
 
-#### Identifying your connections:
+#### Identifying your connections
 
 The pooler and direct connection strings can be found on the dashboard by clicking [Connect](/dashboard/project/_?showConnect=true).
 
