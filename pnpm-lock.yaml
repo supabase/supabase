@@ -1067,6 +1067,9 @@ importers:
       framer-motion:
         specifier: ^11.18.2
         version: 11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      fuse.js:
+        specifier: ^7.4.0
+        version: 7.4.2
       generate-password-browser:
         specifier: ^1.1.0
         version: 1.1.0
