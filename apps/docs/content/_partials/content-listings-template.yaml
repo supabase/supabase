@@ -8,7 +8,8 @@ contentListings:
   - title: Get started
     id: get-started
     description: Optional intro sentence for this group.
-    type: list # list | grid (default list)
+    type: grid # list | grid (default list)
+    columns: 3 # optional, grid only: 2 | 3 | 4 (default 2)
     items:
       - title: Connect to your database
         href: /guides/database/connecting-to-postgres

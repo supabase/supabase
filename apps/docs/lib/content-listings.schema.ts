@@ -8,10 +8,13 @@ export const contentListingItemSchema = z.object({
 
 export const contentListingGroupTypeSchema = z.enum(['list', 'grid'])
 
+export const contentListingGridColumnsSchema = z.union([z.literal(2), z.literal(3), z.literal(4)])
+
 export const contentListingGroupSchema = z.object({
   title: z.string().min(1),
   description: z.string().optional(),
   type: contentListingGroupTypeSchema.optional(),
+  columns: contentListingGridColumnsSchema.optional(),
   id: z.string().min(1).optional(),
   items: z.array(contentListingItemSchema).min(1),
 })
@@ -20,7 +23,19 @@ export const contentListingsSchema = z.array(contentListingGroupSchema).min(1)
 
 export type ContentListingItem = z.infer<typeof contentListingItemSchema>
 export type ContentListingGroup = z.infer<typeof contentListingGroupSchema>
+export type ContentListingGridColumns = z.infer<typeof contentListingGridColumnsSchema>
 export type ContentListings = z.infer<typeof contentListingsSchema>
+
+/** Tailwind grid item classes for each supported column count (12-column grid). */
+export const CONTENT_LISTING_GRID_ITEM_CLASS: Record<ContentListingGridColumns, string> = {
+  2: 'col-span-12 md:col-span-6',
+  3: 'col-span-12 md:col-span-4',
+  4: 'col-span-12 md:col-span-3',
+}
+
+export function getContentListingGridItemClassName(columns: ContentListingGridColumns = 2): string {
+  return CONTENT_LISTING_GRID_ITEM_CLASS[columns]
+}
 
 const INTERNAL_HREF_PATTERN = /^\/(docs\/)?(guides|dashboard)\//
 
@@ -49,6 +64,12 @@ export function parseContentListings(value: unknown): ContentListings | undefine
   }
 
   for (const group of parsed.data) {
+    if (group.columns !== undefined && group.type !== 'grid') {
+      throw new Error(
+        `Invalid contentListings group "${group.title}": columns is only valid when type is grid`
+      )
+    }
+
     for (const item of group.items) {
       if (!isValidContentListingHref(item.href)) {
         throw new Error(

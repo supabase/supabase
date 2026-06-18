@@ -1,6 +1,9 @@
 import { buildDocsContentListingClickedEvent } from '~/components/ContentListings/content-listings.telemetry'
 import { serializeContentListingsToMarkdown } from '~/lib/content-listings.markdown'
-import { parseContentListings } from '~/lib/content-listings.schema'
+import {
+  getContentListingGridItemClassName,
+  parseContentListings,
+} from '~/lib/content-listings.schema'
 import { describe, expect, it } from 'vitest'
 
 describe('parseContentListings', () => {
@@ -38,6 +41,44 @@ describe('parseContentListings', () => {
     ).toThrow(/Invalid contentListings href/)
   })
 
+  it('accepts grid columns when type is grid', () => {
+    const result = parseContentListings([
+      {
+        title: 'Get started',
+        type: 'grid',
+        columns: 3,
+        items: [
+          {
+            title: 'Quickstart',
+            href: '/guides/storage/quickstart',
+            description: 'Store and serve files.',
+          },
+        ],
+      },
+    ])
+
+    expect(result?.[0].columns).toBe(3)
+  })
+
+  it('rejects columns when type is not grid', () => {
+    expect(() =>
+      parseContentListings([
+        {
+          title: 'Get started',
+          type: 'list',
+          columns: 3,
+          items: [
+            {
+              title: 'Quickstart',
+              href: '/guides/storage/quickstart',
+              description: 'Store and serve files.',
+            },
+          ],
+        },
+      ])
+    ).toThrow(/columns is only valid when type is grid/)
+  })
+
   it('requires item descriptions', () => {
     expect(() =>
       parseContentListings([
@@ -47,6 +88,14 @@ describe('parseContentListings', () => {
         },
       ])
     ).toThrow(/Invalid contentListings front matter/)
+  })
+})
+
+describe('getContentListingGridItemClassName', () => {
+  it('maps column counts to tailwind grid spans', () => {
+    expect(getContentListingGridItemClassName(2)).toBe('col-span-12 md:col-span-6')
+    expect(getContentListingGridItemClassName(3)).toBe('col-span-12 md:col-span-4')
+    expect(getContentListingGridItemClassName(4)).toBe('col-span-12 md:col-span-3')
   })
 })
 

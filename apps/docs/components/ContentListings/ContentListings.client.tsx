@@ -1,6 +1,7 @@
 'use client'
 
 import {
+  getContentListingGridItemClassName,
   normalizeContentListingHref,
   resolveContentListingGroup,
   type ContentListingGroup,
@@ -64,13 +65,15 @@ function ContentListingsListGroup({ group }: { group: ContentListingGroup }) {
 }
 
 function ContentListingsGridGroup({ group }: { group: ContentListingGroup }) {
+  const itemClassName = getContentListingGridItemClassName(group.columns ?? 2)
+
   return (
     <section className="not-prose">
       <h2 className="text-xl font-medium scroll-mt-24">{group.title}</h2>
       {group.description && <p className="text-foreground-light">{group.description}</p>}
       <div className="grid md:grid-cols-12 gap-4">
         {group.items.map((item) => (
-          <div key={`${group.title}-${item.href}`} className="col-span-12 md:col-span-6">
+          <div key={`${group.title}-${item.href}`} className={itemClassName}>
             <ContentListingLink
               item={item}
               groupTitle={group.title}
