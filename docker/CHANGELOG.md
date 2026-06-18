@@ -12,11 +12,15 @@ See per-service updates below for details. Only the most important changes relev
 
 ## Unreleased
 
-⚠️ **Upcoming changes:** Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions/categories/changelog?discussions_q=is%3Aopen+category%3AChangelog+label%3Aself-hosted) for updates.
+⚠️ **Upcoming changes:**
+- ⚠️ **Breaking change** (week of July 6, 2026): Access to the OpenAPI spec at `/rest/v1/` via the anon (publishable) key will be removed. Requests using the service role or new secret keys are unaffected, and data access via `/rest/v1/your_table` or any client library continues to work as it does today. See discussion [#42949](https://github.com/orgs/supabase/discussions/42949).
+- ⚠️ **Breaking change** (week of July 6, 2026): `API_EXTERNAL_URL` will be updated to include the `/auth/v1` path prefix (e.g. `http://localhost:8000/auth/v1`), aligning self-hosted with the platform and CLI. This makes custom OAuth providers work out of the box and moves SAML SSO endpoints to `/auth/v1/sso/saml/*`. See discussion [#47093](https://github.com/orgs/supabase/discussions/47093).
+
+Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions/categories/changelog?discussions_q=is%3Aopen+category%3AChangelog+label%3Aself-hosted) for updates.
 
 ---
 
-## [2026-06-17]
+## [0.6.0](https://github.com/supabase/supabase/releases/tag/self-hosted/v0.6.0) - 2026-06-17
 
 ⚠️ **Note:** This update contains **breaking changes**. Make sure to read the **important** details below:
 - **Postgres 17 is now the default**. Do not start Postgres 17 on an existing Postgres 15 data directory. See the [Upgrade to Postgres 17](https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17) guide. Check the **Configuration** and **Postgres** sections for additional information
@@ -59,7 +63,7 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
-## [2026-06-03]
+## [0.5.0](https://github.com/supabase/supabase/releases/tag/self-hosted/v0.5.0) - 2026-06-03
 
 ⚠️ **Note:** This update includes **important changes**. Please check the details below.
 
