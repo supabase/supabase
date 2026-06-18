@@ -73,7 +73,7 @@ export const DatabaseSelector = ({
 
   const selectedAdditionalOption = additionalOptions.find((x) => x.id === selectedDatabaseId)
 
-  const newReplicaURL = `/project/${projectRef}/database/replication?type=Read+Replica`
+  const newReplicaURL = `/project/${projectRef}/database/replication?destinationType=Read+Replica`
 
   useEffect(() => {
     if (_selectedDatabaseId && !isForm) state.setSelectedDatabaseId(_selectedDatabaseId)
@@ -213,6 +213,7 @@ export const DatabaseSelector = ({
                 })}
               </ScrollArea>
             </CommandGroup>
+
             {IS_PLATFORM && infrastructureReadReplicas && (
               <CommandGroup className="border-t">
                 <CommandItem
