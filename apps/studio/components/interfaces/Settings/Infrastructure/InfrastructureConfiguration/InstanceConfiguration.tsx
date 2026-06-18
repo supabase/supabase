@@ -67,7 +67,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
 
   const isAws = useIsAwsCloudProvider()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
-  const newReplicaURL = `/project/${projectRef}/database/replication?type=Read+Replica`
+  const newReplicaURL = `/project/${projectRef}/database/replication?destinationType=Read+Replica`
 
   const [view, setView] = useState<'flow' | 'map'>('flow')
   const [showDeleteAllModal, setShowDeleteAllModal] = useState(false)

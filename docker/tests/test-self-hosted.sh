@@ -206,13 +206,36 @@ check "REST API query" "200" \
 # ---------------------------------------------
 
 echo ""
-echo "--- GraphQL ---"
-gql_resp=$(http_body "$BASE_URL/graphql/v1" \
+echo "--- GraphQL (optional; off by default) ---"
+# pg_graphql is OFF by default since the PG17 image (the image drops the extension
+# on init, matching platform behavior for new projects), but users may enable it
+# (Studio extensions UI / CREATE EXTENSION pg_graphql). Both are valid states. A
+# healthy endpoint returns HTTP 200 either way:
+#   enabled  => {"data": ...}
+#   disabled => {"errors":[{"message":"pg_graphql extension is not enabled."}]}
+# Assert the status AND the response shape, so a non-200, non-JSON, or empty body
+# (a real gateway/runtime failure) is not silently classified as "disabled".
+gql_status=$(http_status "$BASE_URL/graphql/v1" \
     -H "apikey: $ANON_KEY" \
     -H "Content-Type: application/json" \
     -d '{"query":"{ __typename }"}')
-gql_has_data=$(echo "$gql_resp" | jq -r 'if .data then "true" else "false" end' 2>/dev/null)
-check "GraphQL introspection" "true" "$gql_has_data"
+gql_body=$(http_body "$BASE_URL/graphql/v1" \
+    -H "apikey: $ANON_KEY" \
+    -H "Content-Type: application/json" \
+    -d '{"query":"{ __typename }"}')
+if [ "$gql_status" = "200" ] && echo "$gql_body" | jq -e '.data' >/dev/null 2>&1; then
+    gql_state="enabled"
+elif [ "$gql_status" = "200" ] && echo "$gql_body" | jq -e '.errors' >/dev/null 2>&1; then
+    gql_state="disabled"
+else
+    gql_state="unhealthy (HTTP $gql_status)"
+fi
+case "$gql_state" in
+    enabled | disabled) gql_health="healthy" ;;
+    *) gql_health="unhealthy" ;;
+esac
+check "GraphQL endpoint healthy" "healthy" "$gql_health"
+echo "  (GraphQL is $gql_state)"
 
 # ---------------------------------------------
 # 6. Storage: create bucket, upload >6MB file, download, cleanup
