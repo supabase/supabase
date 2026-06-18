@@ -59,6 +59,31 @@ describe('genDefaultQueryOtel', () => {
     const q = sql(genDefaultQueryOtel(LogsTableName.POSTGRES, { search_query: 'deadlock' }))
     expect(q).toContain("event_message ILIKE '%deadlock%'")
   })
+
+  it('uses the shared auth severity condition for the severity.error filter', () => {
+    const q = sql(genDefaultQueryOtel(LogsTableName.AUTH, { severity: { error: true } }))
+    expect(q).toContain(
+      "log_attributes['level'] IN ('error', 'fatal') OR toInt32OrZero(log_attributes['status']) >= 500"
+    )
+  })
+
+  it('falls back to a log_attributes equality for unknown filter keys', () => {
+    const q = sql(genDefaultQueryOtel(LogsTableName.AUTH, { trace_id: 'abc-123' }))
+    expect(q).toContain("log_attributes['trace_id'] = 'abc-123'")
+  })
+
+  it('combines multiple filters with AND alongside the source predicate', () => {
+    const q = sql(
+      genDefaultQueryOtel(LogsTableName.EDGE, {
+        status_code: { error: true },
+        method: { get: true },
+      })
+    )
+    expect(q).toContain("source = 'edge_logs'")
+    expect(q).toContain("toInt32OrZero(log_attributes['response.status_code']) BETWEEN 500 AND 599")
+    expect(q).toContain("log_attributes['request.method'] = 'GET'")
+    expect(q.match(/ AND /g)?.length).toBeGreaterThanOrEqual(2)
+  })
 })
 
 describe('genCountQueryOtel', () => {
@@ -100,6 +125,29 @@ describe('genChartQueryOtel', () => {
       )
     )
     expect(q).toContain('toStartOfHour(timestamp) AS timestamp')
+  })
+
+  it('classifies auth severity by level and status, matching the BigQuery conditions', () => {
+    const q = sql(genChartQueryOtel(LogsTableName.AUTH, params, {}))
+    expect(q).toContain(
+      "log_attributes['level'] IN ('error', 'fatal') OR toInt32OrZero(log_attributes['status']) >= 500"
+    )
+    expect(q).toContain(
+      "log_attributes['level'] = 'warning' OR toInt32OrZero(log_attributes['status']) BETWEEN 400 AND 499"
+    )
+  })
+
+  it('uses JSONExtractString for multigres severity (event_message is a JSON string)', () => {
+    const q = sql(genChartQueryOtel(LogsTableName.MULTIGRES, params, {}))
+    expect(q).toContain("JSONExtractString(event_message, 'level') IN ('ERROR', 'FATAL', 'PANIC')")
+  })
+
+  it('emits constant-false severity for tables without a severity concept', () => {
+    const q = sql(genChartQueryOtel(LogsTableName.STORAGE, params, {}))
+    expect(q).toContain("source = 'storage_logs'")
+    // No error/warning predicate, so every row counts as ok.
+    expect(q).toContain('countIf(NOT ((0) OR (0))) AS ok_count')
+    expect(q).toContain('countIf(0) AS error_count')
   })
 })
 
