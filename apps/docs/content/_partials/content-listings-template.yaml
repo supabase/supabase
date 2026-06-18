@@ -5,8 +5,9 @@
 # See apps/docs/CONTRIBUTING.md — Overview pages and contentListings.
 
 contentListings:
-  - title: Get started
-    id: get-started
+  - id: get-started
+    heading: Get started
+    heading-level: '##' # optional: ## | ### | #### (default ##)
     description: Optional intro sentence for this group.
     type: grid # list | grid (default list)
     columns: 3 # optional, grid only: 2 | 3 | 4 (default 2)
@@ -14,7 +15,8 @@ contentListings:
       - title: Connect to your database
         href: /guides/database/connecting-to-postgres
         description: Connection strings, pooler, and connection modes.
-  - title: Going further
+  - id: going-further
+    heading: Going further
     type: list
     items:
       - title: Database functions

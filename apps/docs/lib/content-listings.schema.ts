@@ -10,12 +10,15 @@ export const contentListingGroupTypeSchema = z.enum(['list', 'grid'])
 
 export const contentListingGridColumnsSchema = z.union([z.literal(2), z.literal(3), z.literal(4)])
 
+export const contentListingHeadingLevelSchema = z.enum(['##', '###', '####'])
+
 export const contentListingGroupSchema = z.object({
-  title: z.string().min(1),
+  id: z.string().min(1),
+  heading: z.string().min(1).optional(),
+  headingLevel: contentListingHeadingLevelSchema.optional(),
   description: z.string().optional(),
   type: contentListingGroupTypeSchema.optional(),
   columns: contentListingGridColumnsSchema.optional(),
-  id: z.string().min(1).optional(),
   items: z.array(contentListingItemSchema).min(1),
 })
 
@@ -24,6 +27,7 @@ export const contentListingsSchema = z.array(contentListingGroupSchema).min(1)
 export type ContentListingItem = z.infer<typeof contentListingItemSchema>
 export type ContentListingGroup = z.infer<typeof contentListingGroupSchema>
 export type ContentListingGridColumns = z.infer<typeof contentListingGridColumnsSchema>
+export type ContentListingHeadingLevel = z.infer<typeof contentListingHeadingLevelSchema>
 export type ContentListings = z.infer<typeof contentListingsSchema>
 
 /** Tailwind grid item classes for each supported column count (12-column grid). */
@@ -35,6 +39,23 @@ export const CONTENT_LISTING_GRID_ITEM_CLASS: Record<ContentListingGridColumns, 
 
 export function getContentListingGridItemClassName(columns: ContentListingGridColumns = 2): string {
   return CONTENT_LISTING_GRID_ITEM_CLASS[columns]
+}
+
+const HEADING_LEVEL_TAG: Record<ContentListingHeadingLevel, 'h2' | 'h3' | 'h4'> = {
+  '##': 'h2',
+  '###': 'h3',
+  '####': 'h4',
+}
+
+export function getContentListingHeadingTag(
+  headingLevel: ContentListingHeadingLevel = '##'
+): 'h2' | 'h3' | 'h4' {
+  return HEADING_LEVEL_TAG[headingLevel]
+}
+
+/** Label for telemetry and keys — prefers heading, falls back to id. */
+export function getContentListingGroupLabel(group: ContentListingGroup): string {
+  return group.heading ?? group.id
 }
 
 const INTERNAL_HREF_PATTERN = /^\/(docs\/)?(guides|dashboard)\//
@@ -53,12 +74,29 @@ export function normalizeContentListingHref(href: string): string {
   return href
 }
 
+function normalizeContentListingGroupInput(raw: unknown): unknown {
+  if (!raw || typeof raw !== 'object') {
+    return raw
+  }
+
+  const obj = { ...(raw as Record<string, unknown>) }
+
+  if ('heading-level' in obj && !('headingLevel' in obj)) {
+    obj.headingLevel = obj['heading-level']
+    delete obj['heading-level']
+  }
+
+  return obj
+}
+
 export function parseContentListings(value: unknown): ContentListings | undefined {
   if (value === undefined || value === null) {
     return undefined
   }
 
-  const parsed = contentListingsSchema.safeParse(value)
+  const normalized = Array.isArray(value) ? value.map(normalizeContentListingGroupInput) : value
+
+  const parsed = contentListingsSchema.safeParse(normalized)
   if (!parsed.success) {
     throw new Error(`Invalid contentListings front matter: ${parsed.error.message}`)
   }
@@ -66,7 +104,7 @@ export function parseContentListings(value: unknown): ContentListings | undefine
   for (const group of parsed.data) {
     if (group.columns !== undefined && group.type !== 'grid') {
       throw new Error(
-        `Invalid contentListings group "${group.title}": columns is only valid when type is grid`
+        `Invalid contentListings group "${group.id}": columns is only valid when type is grid`
       )
     }
 

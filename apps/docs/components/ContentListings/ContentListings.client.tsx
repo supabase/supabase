@@ -2,6 +2,8 @@
 
 import {
   getContentListingGridItemClassName,
+  getContentListingGroupLabel,
+  getContentListingHeadingTag,
   normalizeContentListingHref,
   resolveContentListingGroup,
   type ContentListingGroup,
@@ -11,20 +13,21 @@ import { useSendTelemetryEvent } from '~/lib/telemetry'
 import Link from 'next/link'
 import { useEffect, type ReactNode } from 'react'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
+import { Heading } from 'ui/src/components/CustomHTMLElements'
 
 import { buildDocsContentListingClickedEvent } from './content-listings.telemetry'
 import { useOptionalContentListingsContext } from './ContentListingsContext'
 
 function ContentListingLink({
   item,
-  groupTitle,
+  groupLabel,
   listingId,
   children,
   className,
 }: {
   item: ContentListingItem
-  groupTitle: string
-  listingId?: string
+  groupLabel: string
+  listingId: string
   children: ReactNode
   className?: string
 }) {
@@ -36,7 +39,7 @@ function ContentListingLink({
       href={href}
       className={className}
       onClick={() => {
-        sendTelemetryEvent(buildDocsContentListingClickedEvent({ item, groupTitle, listingId }))
+        sendTelemetryEvent(buildDocsContentListingClickedEvent({ item, groupLabel, listingId }))
       }}
     >
       {children}
@@ -44,15 +47,29 @@ function ContentListingLink({
   )
 }
 
+function ContentListingGroupHeading({ group }: { group: ContentListingGroup }) {
+  if (!group.heading) return null
+
+  const tag = getContentListingHeadingTag(group.headingLevel ?? '##')
+
+  return (
+    <Heading tag={tag} className="text-xl font-medium scroll-mt-24">
+      {group.heading}
+    </Heading>
+  )
+}
+
 function ContentListingsListGroup({ group }: { group: ContentListingGroup }) {
+  const groupLabel = getContentListingGroupLabel(group)
+
   return (
     <section className="not-prose">
-      <h2 className="text-xl font-medium scroll-mt-24">{group.title}</h2>
+      <ContentListingGroupHeading group={group} />
       {group.description && <p className="text-foreground-light">{group.description}</p>}
       <ul className="list-disc pl-6 space-y-2">
         {group.items.map((item) => (
-          <li key={`${group.title}-${item.href}`}>
-            <ContentListingLink item={item} groupTitle={group.title} listingId={group.id}>
+          <li key={`${group.id}-${item.href}`}>
+            <ContentListingLink item={item} groupLabel={groupLabel} listingId={group.id}>
               <span>
                 <strong>{item.title}</strong>: {item.description}
               </span>
@@ -66,17 +83,18 @@ function ContentListingsListGroup({ group }: { group: ContentListingGroup }) {
 
 function ContentListingsGridGroup({ group }: { group: ContentListingGroup }) {
   const itemClassName = getContentListingGridItemClassName(group.columns ?? 2)
+  const groupLabel = getContentListingGroupLabel(group)
 
   return (
     <section className="not-prose">
-      <h2 className="text-xl font-medium scroll-mt-24">{group.title}</h2>
+      <ContentListingGroupHeading group={group} />
       {group.description && <p className="text-foreground-light">{group.description}</p>}
       <div className="grid md:grid-cols-12 gap-4">
         {group.items.map((item) => (
-          <div key={`${group.title}-${item.href}`} className={itemClassName}>
+          <div key={`${group.id}-${item.href}`} className={itemClassName}>
             <ContentListingLink
               item={item}
-              groupTitle={group.title}
+              groupLabel={groupLabel}
               listingId={group.id}
               className="block h-full"
             >
@@ -102,9 +120,9 @@ function ContentListingsGroups({
     <div className={className}>
       {groups.map((group) =>
         group.type === 'grid' ? (
-          <ContentListingsGridGroup key={group.id ?? group.title} group={group} />
+          <ContentListingsGridGroup key={group.id} group={group} />
         ) : (
-          <ContentListingsListGroup key={group.id ?? group.title} group={group} />
+          <ContentListingsListGroup key={group.id} group={group} />
         )
       )}
     </div>
@@ -136,7 +154,7 @@ export function ContentListingsFooter() {
   const context = useOptionalContentListingsContext()
   if (!context?.groups.length) return null
 
-  const footerGroups = context.groups.filter((group) => !group.id)
+  const footerGroups = context.groups.filter((group) => !context.inlinePlacedIds.has(group.id))
 
   if (!footerGroups.length) return null
 

@@ -2,6 +2,7 @@ import { buildDocsContentListingClickedEvent } from '~/components/ContentListing
 import { serializeContentListingsToMarkdown } from '~/lib/content-listings.markdown'
 import {
   getContentListingGridItemClassName,
+  getContentListingHeadingTag,
   parseContentListings,
 } from '~/lib/content-listings.schema'
 import { describe, expect, it } from 'vitest'
@@ -10,7 +11,8 @@ describe('parseContentListings', () => {
   it('accepts valid grouped items', () => {
     const result = parseContentListings([
       {
-        title: 'Get started',
+        id: 'get-started',
+        heading: 'Get started',
         items: [
           {
             title: 'Connect',
@@ -22,13 +24,67 @@ describe('parseContentListings', () => {
     ])
 
     expect(result).toHaveLength(1)
+    expect(result?.[0].id).toBe('get-started')
+  })
+
+  it('accepts groups with id only and no heading', () => {
+    const result = parseContentListings([
+      {
+        id: 'get-started',
+        items: [
+          {
+            title: 'Connect',
+            href: '/guides/database/connecting-to-postgres',
+            description: 'Connection strings and pooler modes.',
+          },
+        ],
+      },
+    ])
+
+    expect(result?.[0].heading).toBeUndefined()
+  })
+
+  it('normalizes heading-level from kebab-case YAML', () => {
+    const result = parseContentListings([
+      {
+        id: 'get-started',
+        heading: 'Get started',
+        'heading-level': '###',
+        items: [
+          {
+            title: 'Connect',
+            href: '/guides/database/connecting-to-postgres',
+            description: 'Connection strings and pooler modes.',
+          },
+        ],
+      },
+    ])
+
+    expect(result?.[0].headingLevel).toBe('###')
+  })
+
+  it('requires group id', () => {
+    expect(() =>
+      parseContentListings([
+        {
+          heading: 'Get started',
+          items: [
+            {
+              title: 'Connect',
+              href: '/guides/database/connecting-to-postgres',
+              description: 'Connection strings and pooler modes.',
+            },
+          ],
+        },
+      ])
+    ).toThrow(/Invalid contentListings front matter/)
   })
 
   it('rejects external hrefs', () => {
     expect(() =>
       parseContentListings([
         {
-          title: 'Get started',
+          id: 'get-started',
           items: [
             {
               title: 'GitHub',
@@ -44,7 +100,7 @@ describe('parseContentListings', () => {
   it('accepts grid columns when type is grid', () => {
     const result = parseContentListings([
       {
-        title: 'Get started',
+        id: 'get-started',
         type: 'grid',
         columns: 3,
         items: [
@@ -64,7 +120,7 @@ describe('parseContentListings', () => {
     expect(() =>
       parseContentListings([
         {
-          title: 'Get started',
+          id: 'get-started',
           type: 'list',
           columns: 3,
           items: [
@@ -83,7 +139,7 @@ describe('parseContentListings', () => {
     expect(() =>
       parseContentListings([
         {
-          title: 'Get started',
+          id: 'get-started',
           items: [{ title: 'Connect', href: '/guides/database/connecting-to-postgres' }],
         },
       ])
@@ -99,12 +155,21 @@ describe('getContentListingGridItemClassName', () => {
   })
 })
 
+describe('getContentListingHeadingTag', () => {
+  it('maps markdown heading levels to html tags', () => {
+    expect(getContentListingHeadingTag('##')).toBe('h2')
+    expect(getContentListingHeadingTag('###')).toBe('h3')
+    expect(getContentListingHeadingTag('####')).toBe('h4')
+  })
+})
+
 describe('serializeContentListingsToMarkdown', () => {
   it('renders grouped items with absolute URLs and descriptions', () => {
     const markdown = serializeContentListingsToMarkdown(
       [
         {
-          title: 'Get started',
+          id: 'get-started',
+          heading: 'Get started',
           description: 'Read these first.',
           items: [
             {
@@ -124,6 +189,49 @@ describe('serializeContentListingsToMarkdown', () => {
       '**[Connect to your database](https://supabase.com/docs/guides/database/connecting-to-postgres):** Connection strings and pooler modes.'
     )
   })
+
+  it('respects heading-level in markdown export', () => {
+    const markdown = serializeContentListingsToMarkdown(
+      [
+        {
+          id: 'get-started',
+          heading: 'Get started',
+          headingLevel: '###',
+          items: [
+            {
+              title: 'Connect',
+              href: '/guides/database/connecting-to-postgres',
+              description: 'Connection strings.',
+            },
+          ],
+        },
+      ],
+      ''
+    )
+
+    expect(markdown).toContain('### Get started')
+  })
+
+  it('omits heading line when heading is not set', () => {
+    const markdown = serializeContentListingsToMarkdown(
+      [
+        {
+          id: 'get-started',
+          items: [
+            {
+              title: 'Connect',
+              href: '/guides/database/connecting-to-postgres',
+              description: 'Connection strings.',
+            },
+          ],
+        },
+      ],
+      ''
+    )
+
+    expect(markdown).not.toMatch(/^#+\s/m)
+    expect(markdown).toContain('**[Connect]')
+  })
 })
 
 describe('buildDocsContentListingClickedEvent', () => {
@@ -135,7 +243,7 @@ describe('buildDocsContentListingClickedEvent', () => {
           href: '/guides/auth',
           description: 'Supabase Auth overview.',
         },
-        groupTitle: 'Get started',
+        groupLabel: 'Get started',
         listingId: 'get-started',
       })
     ).toEqual({

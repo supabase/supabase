@@ -3,11 +3,11 @@ import type { DocsContentListingClickedEvent } from 'common/telemetry-constants'
 
 export function buildDocsContentListingClickedEvent({
   item,
-  groupTitle,
+  groupLabel,
   listingId,
 }: {
   item: ContentListingItem
-  groupTitle?: string
+  groupLabel?: string
   listingId?: string
 }): DocsContentListingClickedEvent {
   return {
@@ -15,7 +15,7 @@ export function buildDocsContentListingClickedEvent({
     properties: {
       targetPath: item.href,
       linkTitle: item.title,
-      ...(groupTitle ? { groupTitle } : {}),
+      ...(groupLabel ? { groupTitle: groupLabel } : {}),
       ...(listingId ? { listingId } : {}),
     },
   }

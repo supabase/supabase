@@ -10,13 +10,22 @@ export function serializeContentListingsToMarkdown(
   linkBaseUrl: string
 ): string {
   const sections = contentListings.map((group) => {
-    const lines: string[] = [`## ${group.title}`]
+    const lines: string[] = []
 
-    if (group.description) {
-      lines.push('', group.description)
+    if (group.heading) {
+      lines.push(`${group.headingLevel ?? '##'} ${group.heading}`)
     }
 
-    lines.push('')
+    if (group.description) {
+      if (lines.length) {
+        lines.push('')
+      }
+      lines.push(group.description)
+    }
+
+    if (lines.length) {
+      lines.push('')
+    }
 
     for (const item of group.items) {
       const href = linkBaseUrl
