@@ -4,7 +4,7 @@ import type { WarehouseMode } from './warehouseDemoStore'
 
 const MODE_LABELS: Record<WarehouseMode, string> = {
   postgres: 'Postgres',
-  has_warehouse_copy: 'Warehouse copy',
+  has_warehouse_copy: 'Postgres + Warehouse',
   warehouse_backed: 'Warehouse',
 }
 

@@ -38,11 +38,8 @@ export function WarehouseEditorPanel({ tableKey, tableName }: WarehouseEditorPan
   return (
     <>
       <div className="flex flex-col divide-y">
-        {/* Mode */}
-        <div className="py-5 flex flex-col gap-2">
-          <p className="text-xs text-foreground-light uppercase tracking-widest font-medium">
-            Storage mode
-          </p>
+        <div className="pb-5 flex flex-col gap-4">
+          <h5>Storage</h5>
           <WarehouseModeChip mode={state.mode} />
         </div>
 

@@ -87,7 +87,6 @@ export const TableEditor = ({
   const isNewRecord = table === undefined
   const visibleChanged = useChanged(visible)
 
-  const [activeTab, setActiveTab] = useState<'table' | 'warehouse'>('table')
   const [errors, setErrors] = useState<PlainObject>({})
   const [tableFields, setTableFields] = useState<TableField>()
   const [fkRelations, setFkRelations] = useState<ForeignKey[]>([])
@@ -294,7 +293,6 @@ export const TableEditor = ({
       setErrors({})
       setImportContent(undefined)
       setIsDuplicateRows(false)
-      setActiveTab('table')
       if (isNewRecord) {
         const tableFields = generateTableField()
         if (templateData) {
@@ -404,261 +402,243 @@ export const TableEditor = ({
         />
       }
     >
-      {!isNewRecord && !isDuplicating && (
-        <div className="border-b px-6">
-          <div className="flex">
-            {(['table', 'warehouse'] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={[
-                  'px-3 py-3 text-sm capitalize border-b-2 -mb-px transition-colors',
-                  activeTab === tab
-                    ? 'border-foreground text-foreground'
-                    : 'border-transparent text-foreground-light hover:text-foreground',
-                ].join(' ')}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {activeTab === 'warehouse' && !isNewRecord && !isDuplicating ? (
-        <SidePanel.Content className="py-6">
-          <WarehouseEditorPanel
-            tableKey={`${table?.schema ?? 'public'}.${table?.name ?? ''}`}
-            tableName={table?.name ?? ''}
-          />
-        </SidePanel.Content>
-      ) : (
-        <>
-          <SidePanel.Content className="space-y-10 py-6">
-            <FormItemLayout
+      <>
+        <SidePanel.Content className="space-y-10 py-6">
+          <FormItemLayout
+            id="name"
+            isReactForm={false}
+            layout="horizontal"
+            label="Name"
+            error={errors.name ? String(errors.name) : undefined}
+          >
+            <Input
+              data-testid="table-name-input"
               id="name"
-              isReactForm={false}
-              layout="horizontal"
-              label="Name"
-              error={errors.name ? String(errors.name) : undefined}
-            >
-              <Input
-                data-testid="table-name-input"
-                id="name"
-                type="text"
-                value={tableFields?.name}
-                onChange={(event) => onUpdateField({ name: event.target.value })}
-              />
-            </FormItemLayout>
-            <FormItemLayout
+              type="text"
+              value={tableFields?.name}
+              onChange={(event) => onUpdateField({ name: event.target.value })}
+            />
+          </FormItemLayout>
+          <FormItemLayout
+            id="description"
+            isReactForm={false}
+            layout="horizontal"
+            label="Description"
+          >
+            <Input
               id="description"
-              isReactForm={false}
-              layout="horizontal"
-              label="Description"
+              placeholder="Optional"
+              type="text"
+              value={tableFields?.comment ?? ''}
+              onChange={(event) => onUpdateField({ comment: event.target.value })}
+            />
+          </FormItemLayout>
+        </SidePanel.Content>
+
+        <SidePanel.Separator />
+
+        <SidePanel.Content className="space-y-10 py-6">
+          <div className="items-top flex space-x-2">
+            <Checkbox
+              id="enable-rls"
+              checked={tableFields.isRLSEnabled}
+              onCheckedChange={() => {
+                // if isEnabled, show confirm modal to turn off
+                // if not enabled, allow turning on without modal confirmation
+                tableFields.isRLSEnabled
+                  ? setRlsConfirmVisible(true)
+                  : onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
+              }}
+            />
+            <div className="grid gap-1.5 leading-none">
+              <label
+                htmlFor="enable-rls"
+                className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                <span>Enable Row Level Security (RLS)</span>
+                <Badge>Recommended</Badge>
+              </label>
+              <p className="text-sm text-foreground-muted">
+                Restrict access to your table by enabling RLS and writing Postgres policies.
+              </p>
+            </div>
+          </div>
+
+          {tableFields.isRLSEnabled ? (
+            <Admonition
+              type="default"
+              className="mt-3!"
+              title="Policies are required to query data"
+              description={
+                <>
+                  You need to create an access policy before you can query data from this table.
+                  Without a policy, querying this table will return an{' '}
+                  <u className="text-foreground">empty array</u> of results.{' '}
+                  {isNewRecord ? 'You can create policies after saving this table.' : ''}
+                </>
+              }
             >
-              <Input
-                id="description"
-                placeholder="Optional"
-                type="text"
-                value={tableFields?.comment ?? ''}
-                onChange={(event) => onUpdateField({ comment: event.target.value })}
+              <DocsButton
+                abbrev={false}
+                className="mt-2 w-min"
+                href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
               />
-            </FormItemLayout>
-          </SidePanel.Content>
+            </Admonition>
+          ) : (
+            <Admonition
+              type="warning"
+              className="mt-3!"
+              title="You are allowing anonymous access to your table"
+              description={
+                <>
+                  {tableFields.name ? `The table ${tableFields.name}` : 'Your table'} will be
+                  publicly writable and readable
+                </>
+              }
+            >
+              <DocsButton
+                abbrev={false}
+                className="mt-2 w-min"
+                href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
+              />
+            </Admonition>
+          )}
 
-          <SidePanel.Separator />
-
-          <SidePanel.Content className="space-y-10 py-6">
+          {realtimeEnabled && (
             <div className="items-top flex space-x-2">
               <Checkbox
-                id="enable-rls"
-                checked={tableFields.isRLSEnabled}
+                id="enable-realtime"
+                checked={tableFields.isRealtimeEnabled}
                 onCheckedChange={() => {
-                  // if isEnabled, show confirm modal to turn off
-                  // if not enabled, allow turning on without modal confirmation
-                  tableFields.isRLSEnabled
-                    ? setRlsConfirmVisible(true)
-                    : onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
+                  track('realtime_toggle_table_clicked', {
+                    newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
+                    origin: 'tableSidePanel',
+                  })
+                  onUpdateField({
+                    isRealtimeEnabled: !tableFields.isRealtimeEnabled,
+                  })
                 }}
               />
               <div className="grid gap-1.5 leading-none">
                 <label
-                  htmlFor="enable-rls"
+                  htmlFor="enable-realtime"
                   className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
-                  <span>Enable Row Level Security (RLS)</span>
-                  <Badge>Recommended</Badge>
+                  Enable Realtime
                 </label>
                 <p className="text-sm text-foreground-muted">
-                  Restrict access to your table by enabling RLS and writing Postgres policies.
+                  Broadcast changes on this table to authorized subscribers.
                 </p>
               </div>
             </div>
+          )}
+        </SidePanel.Content>
 
-            {tableFields.isRLSEnabled ? (
-              <Admonition
-                type="default"
-                className="mt-3!"
-                title="Policies are required to query data"
-                description={
-                  <>
-                    You need to create an access policy before you can query data from this table.
-                    Without a policy, querying this table will return an{' '}
-                    <u className="text-foreground">empty array</u> of results.{' '}
-                    {isNewRecord ? 'You can create policies after saving this table.' : ''}
-                  </>
-                }
-              >
-                <DocsButton
-                  abbrev={false}
-                  className="mt-2 w-min"
-                  href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
-                />
-              </Admonition>
-            ) : (
-              <Admonition
-                type="warning"
-                className="mt-3!"
-                title="You are allowing anonymous access to your table"
-                description={
-                  <>
-                    {tableFields.name ? `The table ${tableFields.name}` : 'Your table'} will be
-                    publicly writable and readable
-                  </>
-                }
-              >
-                <DocsButton
-                  abbrev={false}
-                  className="mt-2 w-min"
-                  href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
-                />
-              </Admonition>
-            )}
+        <SidePanel.Separator />
 
-            {realtimeEnabled && (
+        <SidePanel.Content className="space-y-10 py-6">
+          {!isDuplicating && (
+            <ColumnManagement
+              table={tableFields}
+              columns={tableFields?.columns}
+              relations={fkRelations}
+              enumTypes={enumTypes}
+              isNewRecord={isNewRecord}
+              importContent={importContent}
+              onColumnsUpdated={(columns) => onUpdateField({ columns })}
+              onSelectImportData={() => setIsImportingSpreadsheet(true)}
+              onClearImportContent={() => {
+                onUpdateField({ columns: DEFAULT_COLUMNS })
+                setImportContent(undefined)
+              }}
+              onUpdateFkRelations={onUpdateFkRelations}
+            />
+          )}
+          {isDuplicating && (
+            <>
               <div className="items-top flex space-x-2">
                 <Checkbox
-                  id="enable-realtime"
-                  checked={tableFields.isRealtimeEnabled}
-                  onCheckedChange={() => {
-                    track('realtime_toggle_table_clicked', {
-                      newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
-                      origin: 'tableSidePanel',
-                    })
-                    onUpdateField({
-                      isRealtimeEnabled: !tableFields.isRealtimeEnabled,
-                    })
-                  }}
+                  id="duplicate-rows"
+                  checked={isDuplicateRows}
+                  onCheckedChange={() => setIsDuplicateRows(!isDuplicateRows)}
                 />
                 <div className="grid gap-1.5 leading-none">
                   <label
-                    htmlFor="enable-realtime"
+                    htmlFor="duplicate-rows"
                     className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
-                    Enable Realtime
+                    Duplicate table entries
                   </label>
                   <p className="text-sm text-foreground-muted">
-                    Broadcast changes on this table to authorized subscribers.
+                    This will copy all the data in the table into the new table
                   </p>
                 </div>
               </div>
-            )}
-          </SidePanel.Content>
-
-          <SidePanel.Separator />
-
-          <SidePanel.Content className="space-y-10 py-6">
-            {!isDuplicating && (
-              <ColumnManagement
-                table={tableFields}
-                columns={tableFields?.columns}
-                relations={fkRelations}
-                enumTypes={enumTypes}
-                isNewRecord={isNewRecord}
-                importContent={importContent}
-                onColumnsUpdated={(columns) => onUpdateField({ columns })}
-                onSelectImportData={() => setIsImportingSpreadsheet(true)}
-                onClearImportContent={() => {
-                  onUpdateField({ columns: DEFAULT_COLUMNS })
-                  setImportContent(undefined)
-                }}
-                onUpdateFkRelations={onUpdateFkRelations}
-              />
-            )}
-            {isDuplicating && (
-              <>
-                <div className="items-top flex space-x-2">
-                  <Checkbox
-                    id="duplicate-rows"
-                    checked={isDuplicateRows}
-                    onCheckedChange={() => setIsDuplicateRows(!isDuplicateRows)}
-                  />
-                  <div className="grid gap-1.5 leading-none">
-                    <label
-                      htmlFor="duplicate-rows"
-                      className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      Duplicate table entries
-                    </label>
-                    <p className="text-sm text-foreground-muted">
-                      This will copy all the data in the table into the new table
-                    </p>
-                  </div>
-                </div>
-              </>
-            )}
-
-            <SpreadsheetImport
-              key={spreadsheetImportKey}
-              visible={isImportingSpreadsheet}
-              saveContent={(prefillData: ImportContent) => {
-                setImportContent(prefillData)
-                setIsImportingSpreadsheet(false)
-              }}
-              closePanel={() => setIsImportingSpreadsheet(false)}
-            />
-
-            <RLSToggleDialog
-              open={rlsConfirmVisible}
-              tableName={tableFields.name}
-              isEnabled={tableFields.isRLSEnabled}
-              onOpenChange={setRlsConfirmVisible}
-              onConfirm={() => {
-                onUpdateField({ isRLSEnabled: false })
-                setRlsConfirmVisible(false)
-              }}
-            />
-          </SidePanel.Content>
-
-          {!isDuplicating && (
-            <>
-              <SidePanel.Separator />
-              <SidePanel.Content className="py-6">
-                <ForeignKeysManagement
-                  table={tableFields}
-                  relations={fkRelations}
-                  closePanel={closePanel}
-                  setEditorDirty={() => updateEditorDirty()}
-                  onUpdateFkRelations={onUpdateFkRelations}
-                />
-              </SidePanel.Content>
             </>
           )}
 
-          <SidePanel.Separator />
-          <SidePanel.Content className="py-6 space-y-6">
-            <ApiAccessToggle
-              projectRef={project?.ref}
-              schemaName={isNewRecord ? selectedSchema : table?.schema}
-              tableName={
-                isNewRecord || isDuplicating ? tableFields.name : tableFields.name || table?.name
-              }
-              isNewRecord={isNewRecord || isDuplicating}
-              handler={apiAccessToggleHandler}
-            />
-          </SidePanel.Content>
-        </>
-      )}
+          <SpreadsheetImport
+            key={spreadsheetImportKey}
+            visible={isImportingSpreadsheet}
+            saveContent={(prefillData: ImportContent) => {
+              setImportContent(prefillData)
+              setIsImportingSpreadsheet(false)
+            }}
+            closePanel={() => setIsImportingSpreadsheet(false)}
+          />
+
+          <RLSToggleDialog
+            open={rlsConfirmVisible}
+            tableName={tableFields.name}
+            isEnabled={tableFields.isRLSEnabled}
+            onOpenChange={setRlsConfirmVisible}
+            onConfirm={() => {
+              onUpdateField({ isRLSEnabled: false })
+              setRlsConfirmVisible(false)
+            }}
+          />
+        </SidePanel.Content>
+
+        {!isDuplicating && (
+          <>
+            <SidePanel.Separator />
+            <SidePanel.Content className="py-6">
+              <ForeignKeysManagement
+                table={tableFields}
+                relations={fkRelations}
+                closePanel={closePanel}
+                setEditorDirty={() => updateEditorDirty()}
+                onUpdateFkRelations={onUpdateFkRelations}
+              />
+            </SidePanel.Content>
+          </>
+        )}
+
+        <SidePanel.Separator />
+        <SidePanel.Content className="py-6 space-y-6">
+          <ApiAccessToggle
+            projectRef={project?.ref}
+            schemaName={isNewRecord ? selectedSchema : table?.schema}
+            tableName={
+              isNewRecord || isDuplicating ? tableFields.name : tableFields.name || table?.name
+            }
+            isNewRecord={isNewRecord || isDuplicating}
+            handler={apiAccessToggleHandler}
+          />
+        </SidePanel.Content>
+
+        {!isNewRecord && !isDuplicating && (
+          <>
+            <SidePanel.Separator />
+            <SidePanel.Content className="py-6">
+              <WarehouseEditorPanel
+                tableKey={`${table?.schema ?? 'public'}.${table?.name ?? ''}`}
+                tableName={table?.name ?? ''}
+              />
+            </SidePanel.Content>
+          </>
+        )}
+      </>
     </SidePanel>
   )
 }

@@ -21,7 +21,7 @@ import {
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   Card,
@@ -44,6 +44,7 @@ import {
   TableFooter,
   TableHead,
   TableHeader,
+  TableHeadSort,
   TableRow,
   Tooltip,
   TooltipContent,
@@ -85,6 +86,9 @@ import type { SafePostgresTable } from '@/lib/postgres-types'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
+type TableListSortColumn = 'name' | 'columns' | 'rows' | 'storage' | 'realtime'
+type TableListSort = `${TableListSortColumn}:asc` | `${TableListSortColumn}:desc`
+
 interface TableListProps {
   onAddTable: () => void
   onEditTable: (table: SafePostgresTable) => void
@@ -110,6 +114,7 @@ export const TableList = ({
   const debouncedFilterString = useDebounce(filterString, 300)
   const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
   const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
+  const [sort, setSort] = useState<TableListSort>('name:asc')
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   const [warehouseModal, setWarehouseModal] = useState<{
@@ -238,6 +243,76 @@ export const TableList = ({
   const entities = formatAllEntities({ tables, views, materializedViews, foreignTables }).filter(
     (x) => visibleTypes.includes(x.type)
   )
+
+  const [sortColumn, sortDirection] = sort.split(':') as [TableListSortColumn, 'asc' | 'desc']
+
+  const getAriaSort = (column: TableListSortColumn) => {
+    if (sortColumn !== column) return 'none'
+    return sortDirection === 'asc' ? 'ascending' : 'descending'
+  }
+
+  const handleSortChange = (column: TableListSortColumn) => {
+    if (sortColumn !== column) {
+      setSort(`${column}:asc`)
+      return
+    }
+
+    setSort(`${column}:${sortDirection === 'asc' ? 'desc' : 'asc'}`)
+  }
+
+  const sortedEntities = useMemo(() => {
+    const items = [...entities]
+
+    const isRealtimeEnabled = (entity: (typeof entities)[number]) =>
+      (realtimePublication?.tables ?? []).some((table) => table.id === entity.id)
+
+    const getBytes = (entity: (typeof entities)[number]) =>
+      'bytes' in entity && typeof entity.bytes === 'number' ? entity.bytes : undefined
+
+    items.sort((a, b) => {
+      let comparison = 0
+
+      if (sortColumn === 'name') {
+        comparison = a.name.localeCompare(b.name)
+      } else if (sortColumn === 'columns') {
+        comparison = a.columns.length - b.columns.length
+      } else if (sortColumn === 'rows') {
+        if (a.rows === undefined && b.rows === undefined) {
+          comparison = 0
+        } else if (a.rows === undefined) {
+          return 1
+        } else if (b.rows === undefined) {
+          return -1
+        } else {
+          comparison = a.rows - b.rows
+        }
+      } else if (sortColumn === 'storage') {
+        const bytesA = getBytes(a)
+        const bytesB = getBytes(b)
+
+        if (bytesA === undefined && bytesB === undefined) {
+          comparison = 0
+        } else if (bytesA === undefined) {
+          return 1
+        } else if (bytesB === undefined) {
+          return -1
+        } else {
+          comparison = bytesA - bytesB
+        }
+      } else if (sortColumn === 'realtime') {
+        comparison = Number(isRealtimeEnabled(a)) - Number(isRealtimeEnabled(b))
+      }
+
+      if (comparison !== 0) {
+        return sortDirection === 'asc' ? comparison : -comparison
+      }
+
+      return a.name.localeCompare(b.name)
+    })
+
+    return items
+  }, [entities, sortColumn, sortDirection, realtimePublication])
+
   const footerCount = hasNextTablesPage ? tables.length : entities.length
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
@@ -398,13 +473,47 @@ export const TableList = ({
               <TableHeader>
                 <TableRow>
                   <TableHead key="icon" className="w-0 px-0!" />
-                  <TableHead key="name" className="max-w-[160px] sm:max-w-[280px]">
-                    Name
+                  <TableHead
+                    key="name"
+                    aria-sort={getAriaSort('name')}
+                    className="max-w-[160px] sm:max-w-[280px]"
+                  >
+                    <TableHeadSort column="name" currentSort={sort} onSortChange={handleSortChange}>
+                      Name
+                    </TableHeadSort>
                   </TableHead>
-                  <TableHead key="columns">Columns</TableHead>
-                  <TableHead key="rows">Rows (Est)</TableHead>
-                  <TableHead key="storage">Storage</TableHead>
-                  <TableHead key="realtime">Realtime</TableHead>
+                  <TableHead key="columns" aria-sort={getAriaSort('columns')}>
+                    <TableHeadSort
+                      column="columns"
+                      currentSort={sort}
+                      onSortChange={handleSortChange}
+                    >
+                      Columns
+                    </TableHeadSort>
+                  </TableHead>
+                  <TableHead key="rows" aria-sort={getAriaSort('rows')}>
+                    <TableHeadSort column="rows" currentSort={sort} onSortChange={handleSortChange}>
+                      Rows (Est)
+                    </TableHeadSort>
+                  </TableHead>
+                  <TableHead key="storage" aria-sort={getAriaSort('storage')}>
+                    <TableHeadSort
+                      column="storage"
+                      currentSort={sort}
+                      onSortChange={handleSortChange}
+                    >
+                      Storage
+                    </TableHeadSort>
+                  </TableHead>
+                  <TableHead key="realtime" aria-sort={getAriaSort('realtime')}>
+                    <TableHeadSort
+                      column="realtime"
+                      currentSort={sort}
+                      onSortChange={handleSortChange}
+                    >
+                      Realtime
+                    </TableHeadSort>
+                  </TableHead>
                   <TableHead key="buttons"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -455,8 +564,8 @@ export const TableList = ({
                       </TableCell>
                     </TableRow>
                   )}
-                  {entities.length > 0 &&
-                    entities.map((x) => (
+                  {sortedEntities.length > 0 &&
+                    sortedEntities.map((x) => (
                       <TableRow key={x.id}>
                         <TableCell className="w-0 pl-5! pr-1!">
                           <Tooltip>
@@ -521,7 +630,7 @@ export const TableList = ({
                                   <div className="flex flex-col gap-0.5">
                                     <p className="text-foreground-light text-sm">Postgres</p>
                                     {x.size !== undefined && (
-                                      <p className="text-foreground-muted text-xs">{x.size}</p>
+                                      <p className="text-foreground-muted text-sm">{x.size}</p>
                                     )}
                                   </div>
                                 )
@@ -542,9 +651,8 @@ export const TableList = ({
                                         />
                                       )}
                                     </div>
-                                    <p className="text-foreground-muted text-xs">
-                                      {x.size !== undefined ? `Postgres ${x.size}` : 'Postgres'} ·
-                                      Warehouse 184 GB
+                                    <p className="text-foreground-muted text-sm">
+                                      {x.size !== undefined ? ` ${x.size}` : ''} · 184 GB
                                     </p>
                                   </div>
                                 )
@@ -554,7 +662,7 @@ export const TableList = ({
                               return (
                                 <div className="flex flex-col gap-0.5">
                                   <p className="text-foreground-light text-sm">Warehouse</p>
-                                  <p className="text-foreground-muted text-xs">184 GB</p>
+                                  <p className="text-foreground-muted text-sm">184 GB</p>
                                 </div>
                               )
                             })()
