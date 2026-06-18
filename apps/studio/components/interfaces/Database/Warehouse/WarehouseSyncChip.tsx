@@ -15,5 +15,9 @@ const SYNC_VARIANTS: Record<SyncState, 'default' | 'success' | 'destructive'> = 
 }
 
 export function WarehouseSyncChip({ syncState }: { syncState: SyncState }) {
-  return <Badge variant={SYNC_VARIANTS[syncState]}>{SYNC_LABELS[syncState]}</Badge>
+  return (
+    <Badge variant={SYNC_VARIANTS[syncState]} className="w-fit">
+      {SYNC_LABELS[syncState]}
+    </Badge>
+  )
 }
