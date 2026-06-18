@@ -79,7 +79,7 @@ const Template = ({ projectRef, template }: { projectRef?: string; template: Log
             <PopoverTrigger asChild>
               <Button
                 asChild
-                type="default"
+                variant="default"
                 onClick={(e) => {
                   e.preventDefault()
                   setShowPreview(!showPreview)

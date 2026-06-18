@@ -157,7 +157,7 @@ const LegacyEdgeFunctionOverview = () => {
                 return (
                   <Button
                     key={`function-filter-${i}`}
-                    type={interval === item.key ? 'secondary' : 'default'}
+                    variant={interval === item.key ? 'secondary' : 'default'}
                     onClick={() => setInterval(item.key)}
                     className={classes.join(' ')}
                   >

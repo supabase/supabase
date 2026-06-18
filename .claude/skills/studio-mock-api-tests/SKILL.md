@@ -99,7 +99,7 @@ response: () => HttpResponse.json<MyResponse>({}, { status: 201 })
 
 ### 3. Submit buttons in Sheets/Modals need `fireEvent.click`
 
-The convention `<Button form={FORM_ID} htmlType="submit" />` (button
+The convention `<Button form={FORM_ID} type="submit" />` (button
 outside the form, associated by id) doesn't reliably trigger submission
 under `userEvent.click` in jsdom. Use `fireEvent.click` for the submit
 button. Continue to use `userEvent.type` for inputs.

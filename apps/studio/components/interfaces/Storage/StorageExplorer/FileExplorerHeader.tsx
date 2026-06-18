@@ -118,10 +118,10 @@ const NavigateDialog = ({
           </FieldDescription>
         </DialogSection>
         <DialogFooter>
-          <Button type="default" onClick={onCancel}>
+          <Button variant="default" onClick={onCancel}>
             Cancel
           </Button>
-          <Button type="primary" onClick={onSubmit}>
+          <Button variant="primary" onClick={onSubmit}>
             Navigate
           </Button>
         </DialogFooter>
@@ -303,7 +303,7 @@ export const FileExplorerHeader = ({
             {isListView && !isBucketRoot && (
               <Button
                 size="tiny"
-                type="outline"
+                variant="outline"
                 aria-label="Go up one level"
                 className="w-7 shrink-0 px-1"
                 icon={<ArrowLeft size={14} />}
@@ -324,7 +324,7 @@ export const FileExplorerHeader = ({
                       <Button
                         key="cancel"
                         size="tiny"
-                        type="text"
+                        variant="text"
                         icon={<X />}
                         onClick={onCancelSearch}
                         className="p-0 h-5 w-5"
@@ -346,7 +346,7 @@ export const FileExplorerHeader = ({
                 <Button
                   size="tiny"
                   icon={<Edit2 />}
-                  type="outline"
+                  variant="outline"
                   aria-label="Navigate"
                   className="w-7 px-1"
                   disabled={isPathDialogOpen || loading.isLoading}
@@ -357,7 +357,7 @@ export const FileExplorerHeader = ({
                 <Button
                   size="tiny"
                   icon={<RefreshCw />}
-                  type="outline"
+                  variant="outline"
                   aria-label="Reload"
                   className="w-7 px-1"
                   loading={isRefreshing}
@@ -368,7 +368,7 @@ export const FileExplorerHeader = ({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    type="outline"
+                    variant="outline"
                     size="tiny"
                     aria-label="View options"
                     className="w-7 px-1"
@@ -431,7 +431,7 @@ export const FileExplorerHeader = ({
               >
                 <ButtonTooltip
                   icon={<FolderPlus size={16} />}
-                  type="outline"
+                  variant="outline"
                   disabled={!canUpdateStorage || breadcrumbs.length === 0}
                   onClick={() => addNewFolderPlaceholder(-1)}
                   tooltip={{
@@ -453,7 +453,7 @@ export const FileExplorerHeader = ({
               >
                 <ButtonTooltip
                   icon={<Upload size={16} />}
-                  type="primary"
+                  variant="primary"
                   disabled={!canUpdateStorage || breadcrumbs.length === 0}
                   onClick={onSelectUpload}
                   tooltip={{

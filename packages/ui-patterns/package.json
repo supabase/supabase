@@ -314,6 +314,10 @@
       "import": "./src/DataInputs/Input.tsx",
       "types": "./src/DataInputs/Input.tsx"
     },
+    "./DatePicker": {
+      "import": "./src/DatePicker/index.ts",
+      "types": "./src/DatePicker/index.ts"
+    },
     "./Dialogs/ConfirmationModal": {
       "import": "./src/Dialogs/ConfirmationModal.tsx",
       "types": "./src/Dialogs/ConfirmationModal.tsx"

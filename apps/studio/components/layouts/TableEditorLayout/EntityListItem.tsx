@@ -238,7 +238,7 @@ export const EntityListItem = ({
               className="text-foreground-lighter transition-all text-transparent group-hover:text-foreground data-open:text-foreground"
             >
               <Button
-                type="text"
+                variant="text"
                 className="w-6 h-6"
                 icon={<MoreVertical size={14} strokeWidth={2} />}
                 onClick={(e) => e.preventDefault()}

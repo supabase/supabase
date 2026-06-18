@@ -3,7 +3,6 @@ import { AiSkillsIndex } from '~/app/guides/getting-started/ai-skills/AiSkillsIn
 import { AppleSecretGenerator } from '~/components/AppleSecretGenerator'
 import AuthProviders from '~/components/AuthProviders'
 import { AuthSmsProviderConfig } from '~/components/AuthSmsProviderConfig'
-import { CostWarning } from '~/components/AuthSmsProviderConfig/AuthSmsProviderConfig.Warnings'
 import ButtonCard from '~/components/ButtonCard'
 import { ComputeDiskLimitsTable } from '~/components/ComputeDiskLimitsTable'
 import { Extensions } from '~/components/Extensions'
@@ -19,6 +18,7 @@ import { SharedData } from '~/components/SharedData'
 import StepHikeCompact from '~/components/StepHikeCompact'
 import { CodeSampleDummy, CodeSampleWrapper } from '~/features/directives/CodeSample.client'
 import { NamedCodeBlock } from '~/features/directives/CodeTabs.components'
+import { MdxAnchor } from '~/features/docs/MdxAnchor'
 import { Accordion, AccordionItem } from '~/features/ui/Accordion'
 import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
 import InfoTooltip from '~/features/ui/InfoTooltip'
@@ -42,6 +42,22 @@ const AdmonitionWithMargin = (props: AdmonitionProps) => {
   return <Admonition {...props} className="mb-8" />
 }
 
+/**
+ * Route fenced ```mermaid blocks through the Mermaid component; everything else
+ * continues through `CodeBlock` for syntax highlighting.
+ */
+const Pre = (props: any) => {
+  const child = Array.isArray(props.children) ? props.children[0] : props.children
+  const className: unknown = child?.props?.className
+  if (typeof className === 'string' && className.split(' ').includes('language-mermaid')) {
+    const code = child.props.children
+    if (typeof code === 'string') {
+      return <Mermaid chart={code.trim()} />
+    }
+  }
+  return <CodeBlock {...props} />
+}
+
 const components = {
   Accordion,
   AccordionItem,
@@ -58,7 +74,6 @@ const components = {
   CodeSampleDummy,
   CodeSampleWrapper,
   ComputeDiskLimitsTable,
-  CostWarning,
   ErrorCodes,
   Extensions,
   GlassPanel,
@@ -84,6 +99,7 @@ const components = {
   Tabs,
   TabPanel,
   InfoTooltip,
+  a: MdxAnchor,
   h2: (props: any) => (
     <Heading tag="h2" {...props}>
       {props.children}
@@ -99,7 +115,7 @@ const components = {
       {props.children}
     </Heading>
   ),
-  pre: CodeBlock,
+  pre: Pre,
   /**
    * Force inline code tags to go sync, this prevents Heading anchor resolution fail due to
    * our CodeBlock component being async. We need to find a better solution for more future

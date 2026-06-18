@@ -75,7 +75,6 @@ export const PublicationsTableItem = ({
   return (
     <TableRow key={table.id}>
       <TableCell className="py-3 whitespace-nowrap">{table.name}</TableCell>
-      <TableCell className="py-3 whitespace-nowrap text-foreground-light">{table.schema}</TableCell>
       <TableCell className="py-3 whitespace-nowrap hidden lg:table-cell max-w-sm truncate text-foreground-light">
         {table.comment}
       </TableCell>

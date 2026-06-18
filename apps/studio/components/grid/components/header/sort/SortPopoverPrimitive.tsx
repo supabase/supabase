@@ -233,7 +233,7 @@ export const SortPopoverPrimitive = ({
     <>
       <Popover modal={false} open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button type={localSorts.length > 0 ? 'link' : 'text'} icon={<List />}>
+          <Button variant={localSorts.length > 0 ? 'link' : 'text'} icon={<List />}>
             {displayButtonText}
           </Button>
         </PopoverTrigger>
@@ -288,7 +288,7 @@ export const SortPopoverPrimitive = ({
                 >
                   <Button
                     asChild
-                    type="dashed"
+                    variant="dashed"
                     iconRight={<ChevronDown size="14" className="text-foreground-light" />}
                     className="sb-grid-dropdown__item-trigger"
                     data-testid="table-editor-pick-column-to-sort-button"
@@ -302,7 +302,7 @@ export const SortPopoverPrimitive = ({
               <div className="flex items-center">
                 <Button
                   disabled={!hasChanges}
-                  type="default"
+                  variant="default"
                   onClick={() => {
                     if (isLargeTable && localSorts.length > 0) {
                       // [Joshen] Note we're only checking PKs - unable to check indexes properly

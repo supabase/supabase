@@ -50,13 +50,11 @@ export type Database = {
           listing_logo: string | null
           listing_tsv: unknown
           marketplace_url: string | null
-          oauth_client_id: string | null
+          oauth_app_id: string | null
           partner_id: string | null
           partner_logo: string | null
           partner_name: string | null
           partner_slug: string | null
-          publish_dashboard: boolean | null
-          publish_marketplace: boolean | null
           published_in_catalog_at: string | null
           published_in_marketplace_at: string | null
           secret_key_prefix: string | null
@@ -127,22 +125,7 @@ export type Database = {
       }
     }
     Functions: {
-      get_redirect_url: {
-        Args: {
-          p_listing_id: string
-          p_organization_slug: string
-          p_project_id: string
-        }
-        Returns: Json
-      }
-      get_redirect_url_by_slug: {
-        Args: {
-          p_listing_slug: string
-          p_organization_slug: string
-          p_project_id: string
-        }
-        Returns: Json
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never

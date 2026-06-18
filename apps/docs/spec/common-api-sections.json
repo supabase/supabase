@@ -29,6 +29,18 @@
     "title": "Analytics",
     "items": [
       {
+        "id": "v2-create-log-drain",
+        "title": "Create log drain",
+        "slug": "v2-create-log-drain",
+        "type": "operation"
+      },
+      {
+        "id": "v2-delete-log-drain",
+        "title": "Delete log drain",
+        "slug": "v2-delete-log-drain",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-project-function-combined-stats",
         "title": "Get project function combined stats",
         "slug": "v1-get-project-function-combined-stats",
@@ -50,6 +62,18 @@
         "id": "v1-get-project-usage-request-count",
         "title": "Get project usage request count",
         "slug": "v1-get-project-usage-request-count",
+        "type": "operation"
+      },
+      {
+        "id": "v2-list-log-drains",
+        "title": "List log drains",
+        "slug": "v2-list-log-drains",
+        "type": "operation"
+      },
+      {
+        "id": "v2-update-log-drain",
+        "title": "Update log drain",
+        "slug": "v2-update-log-drain",
         "type": "operation"
       }
     ]
@@ -711,6 +735,18 @@
         "title": "List organization members",
         "slug": "v1-list-organization-members",
         "type": "operation"
+      },
+      {
+        "id": "v2-list-organization-members",
+        "title": "List organization members",
+        "slug": "v2-list-organization-members",
+        "type": "operation"
+      },
+      {
+        "id": "v2-list-organization-roles",
+        "title": "List organization roles",
+        "slug": "v2-list-organization-roles",
+        "type": "operation"
       }
     ]
   },
@@ -857,9 +893,27 @@
         "type": "operation"
       },
       {
+        "id": "v2-preview-a-project-transfer",
+        "title": "Preview a project transfer",
+        "slug": "v2-preview-a-project-transfer",
+        "type": "operation"
+      },
+      {
+        "id": "v1-restart-a-project",
+        "title": "Restart a project",
+        "slug": "v1-restart-a-project",
+        "type": "operation"
+      },
+      {
         "id": "v1-restore-a-project",
         "title": "Restore a project",
         "slug": "v1-restore-a-project",
+        "type": "operation"
+      },
+      {
+        "id": "v2-transfer-a-project",
+        "title": "Transfer a project",
+        "slug": "v2-transfer-a-project",
         "type": "operation"
       },
       {

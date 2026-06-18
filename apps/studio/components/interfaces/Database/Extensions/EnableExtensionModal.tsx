@@ -264,11 +264,11 @@ export const EnableExtensionModal = ({
         </DialogSection>
 
         <DialogFooter>
-          <Button type="default" disabled={isEnabling} onClick={() => onCancel()}>
+          <Button variant="default" disabled={isEnabling} onClick={() => onCancel()}>
             Cancel
           </Button>
           <Button
-            htmlType="submit"
+            type="submit"
             form="enable-extensions-form"
             loading={isEnabling}
             disabled={isLoading || isEnabling}

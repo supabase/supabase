@@ -338,7 +338,7 @@ export function CustomReportSection() {
         <div className="flex items-center gap-x-2">
           {layout.length > 0 && (
             <ButtonTooltip
-              type="default"
+              variant="default"
               icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
               className="w-7"
               disabled={isRefreshing}
@@ -351,7 +351,7 @@ export function CustomReportSection() {
               projectRef={ref}
               onSelect={addSnippetToReport}
               trigger={
-                <Button type="default" icon={<Plus />}>
+                <Button variant="default" icon={<Plus />}>
                   Add block
                 </Button>
               }
@@ -382,7 +382,7 @@ export function CustomReportSection() {
                 projectRef={ref}
                 onSelect={addSnippetToReport}
                 trigger={
-                  <Button type="default" iconRight={<Plus size={14} />}>
+                  <Button variant="default" iconRight={<Plus size={14} />}>
                     Add your first block
                   </Button>
                 }

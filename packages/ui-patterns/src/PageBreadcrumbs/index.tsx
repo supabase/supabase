@@ -36,6 +36,7 @@ PageBreadcrumbsActions.displayName = 'PageBreadcrumbsActions'
 export type PageBreadcrumbsProps = React.ComponentProps<typeof Breadcrumb> & {
   actions?: React.ReactNode
   containerClassName?: string
+  slotClassName?: string
 }
 
 /**
@@ -47,10 +48,11 @@ const PageBreadcrumbs = ({
   className,
   children,
   containerClassName,
+  slotClassName,
   ...props
 }: PageBreadcrumbsProps) => {
   return (
-    <div data-slot="page-breadcrumbs">
+    <div data-slot="page-breadcrumbs" className={cn(slotClassName)}>
       <PageContainer
         size="full"
         className={cn(

@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/nextjs'
-import { LOCAL_STORAGE_KEYS, PageTelemetry, posthogClient, useUser } from 'common'
+import { LOCAL_STORAGE_KEYS, PageTelemetry, posthogClient, safeLocalStorage, useUser } from 'common'
 import { useEffect, useRef } from 'react'
 import { useConsentToast } from 'ui-patterns/consent'
 
@@ -65,10 +65,10 @@ export function Telemetry() {
     }
 
     const setSentryId = async () => {
-      let sentryUserId = localStorage.getItem(LOCAL_STORAGE_KEYS.SENTRY_USER_ID)
+      let sentryUserId = safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.SENTRY_USER_ID)
       if (!sentryUserId) {
         sentryUserId = await getAnonId(user?.id)
-        localStorage.setItem(LOCAL_STORAGE_KEYS.SENTRY_USER_ID, sentryUserId)
+        safeLocalStorage.setItem(LOCAL_STORAGE_KEYS.SENTRY_USER_ID, sentryUserId)
       }
       Sentry.setUser({ id: sentryUserId })
     }

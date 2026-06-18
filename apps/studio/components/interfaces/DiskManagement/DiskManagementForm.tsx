@@ -525,7 +525,7 @@ export function DiskManagementForm() {
                           actions={
                             canUpdateDiskConfiguration ? (
                               <Button
-                                type="default"
+                                variant="default"
                                 onClick={() => {
                                   form.setValue('computeSize', 'ci_large')
                                 }}
@@ -552,7 +552,7 @@ export function DiskManagementForm() {
                           actions={
                             !disableDiskSizeInput ? (
                               <Button
-                                type="default"
+                                variant="default"
                                 onClick={() => {
                                   form.setValue('totalSize', suggestedDiskSizeForCustomIops, {
                                     shouldDirty: true,
@@ -611,7 +611,7 @@ export function DiskManagementForm() {
                 >
                   <FormFooterChangeBadge formState={formState} />
                   <Button
-                    type="default"
+                    variant="default"
                     onClick={() => form.reset()}
                     disabled={!isDirty}
                     size="medium"

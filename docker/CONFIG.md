@@ -90,8 +90,8 @@ The image tags below are pinned in `docker-compose.yml` at the time of this docu
 | `POSTGRES_HOST` | string | Self-hosted | Postgres host (service name in compose network). | Default: `db`. |
 | `POSTGRES_PASSWORD` | string | Both | Postgres password for the `POSTGRES_USER_READ_WRITE` role. | Supports `_FILE` suffix for Docker secrets. |
 | `POSTGRES_PORT` | integer | Self-hosted | Postgres TCP port. | Default: `5432`. |
-| `POSTGRES_USER_READ_ONLY` | string | | Postgres role used for read-only queries from the SQL editor. | Default: `supabase_read_only_user`. Only takes effect if you've manually created the role per the "remove superuser access" guide. |
-| `POSTGRES_USER_READ_WRITE` | string | Both | Postgres role used for read/write queries from the SQL editor. | Default: `supabase_admin`. Commented out in default compose. See "remove superuser access" guide. |
+| `POSTGRES_USER_READ_ONLY` | string | | Postgres role used by the local MCP server when running in read-only mode. | Default: `supabase_read_only_user`. This role has no password by default, so read-only MCP will fail to connect. To enable, assign a password matching `POSTGRES_PASSWORD`. |
+| `POSTGRES_USER_READ_WRITE` | string | Both | Postgres role used for read/write queries from the SQL editor. | Default: `postgres`. |
 | `STUDIO_PG_META_URL` | URL | Both | URL of the `postgres-meta` service used for schema introspection. | E.g. `http://meta:8080`. Required. |
 | `SUPABASE_PUBLIC_URL` | URL | Both | Public URL of the Supabase stack (Kong gateway) as seen by end users. | Used to construct REST API URLs and connection strings shown in the dashboard. |
 | `SUPABASE_URL` | URL | Both | Internal URL Studio uses to reach Kong from inside the Docker network. | E.g. `http://kong:8000`. |
@@ -138,7 +138,7 @@ Self-hosted Studio reads `ENABLED_FEATURES_*` env vars at container start time t
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
 | `ENABLED_FEATURES_*` | boolean | | Per-flag runtime override. Set to `true` or `false` (case-insensitive); other values are logged and ignored. | One env var per flag. Full key list: `packages/common/enabled-features/enabled-features.json`. No-op when `NEXT_PUBLIC_IS_PLATFORM=true`. |
-| `ENABLED_FEATURES_LOGS_ALL` | boolean | | Disable the entire Logs section of the dashboard. Maps to the `logs:all` feature flag. | Documented explicitly as the runtime replacement for the legacy build-time `NEXT_PUBLIC_ENABLE_LOGS`. |
+| `ENABLED_FEATURES_LOGS_ALL` | boolean | Self-hosted | Disable the entire Logs section of the dashboard. Maps to the `logs:all` feature flag. | Documented explicitly as the runtime replacement for the legacy build-time `NEXT_PUBLIC_ENABLE_LOGS`. |
 
 ### AI features
 
