@@ -6,7 +6,7 @@ sidebar_label: 'Overview'
 contentListings:
   - id: get-started
     heading: Get started
-    description: If you're new to the database section, these are the pages to read first.
+    description: "If you're new to the database section, these are the pages to read first:"
     type: grid
     items:
       - title: Connect to your database
@@ -29,7 +29,7 @@ contentListings:
         description: Use the Dashboard's SQL Editor for ad-hoc queries and saved snippets.
   - id: next-steps
     heading: Next steps
-    description: Once you've covered the basics, these guides help with other use cases and features.
+    description: "Once you've covered the basics, these guides help with other use cases and features:"
     type: grid
     items:
       - title: Database functions
@@ -55,21 +55,13 @@ contentListings:
         description: The Postgres roles Supabase ships with and how to add your own.
 ---
 
-Every Supabase project has a full [Postgres](https://www.postgresql.org/) database — not a Postgres abstraction.
+Every Supabase project has a full [Postgres](https://www.postgresql.org/) database, not a Postgres abstraction. 
 
-<Admonition type="tip" label="Working with your database">
-
-You can work with a project's database in several ways:
+This database is the foundation that Auth, Storage, Realtime, and Edge Functions are built on, and Supabase manages daily database backups and offers point-in-time recovery on paid plans. You can work with your project's database as follows:
 
 - Visually using the [**Table Editor**](/dashboard/project/_/editor) section of the Dashboard.
 - With query syntax using the [**SQL Editor**](/dashboard/project/_/sql) section of the Dashboard.
 - Programmatically using a variety of methods.
-
-Read the [Connect to your database](/docs/guides/database/connecting-to-postgres#how-to-connect-to-your-postgres-databases) guide for details on connection strings and options.
-
-</Admonition>
-
-The database is the foundation that Auth, Storage, Realtime, and Edge Functions are built on, and Supabase manages daily database backups and offers point-in-time recovery on paid plans.
 
 <ContentListings listing="get-started" />
 
