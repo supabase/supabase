@@ -161,7 +161,7 @@ export const OrganizationInvite = () => {
     return withLayout(
       <div className="flex flex-col gap-3">
         <Button variant="default" block asChild>
-          <Link href="/account/security">Head to account settings</Link>
+          <Link href="/account/security">Go to account settings</Link>
         </Button>
       </div>
     )
