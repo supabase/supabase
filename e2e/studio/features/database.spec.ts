@@ -6,11 +6,7 @@ import { createTable, dropTable, query } from '../utils/db/index.js'
 import { dismissToastsIfAny } from '../utils/dismiss-toast.js'
 import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
-import {
-  createApiResponseWaiter,
-  waitForApiResponse,
-  waitForDatabaseToLoad,
-} from '../utils/wait-for-response.js'
+import { createApiResponseWaiter, waitForApiResponse } from '../utils/wait-for-response.js'
 
 async function focusTableInVisualizer(page: Page, tableName: string) {
   await page.getByTestId('find-table-selector').click()
@@ -343,9 +339,9 @@ test.describe('Database', () => {
       )
       await page.getByRole('button', { name: 'Save' }).click()
 
-      // validate table update
+      // validate table update — the toBeVisible assertion below already waits
+      // for the list to refetch, so no racy post-mutation waitForResponse here.
       await updateTableWait
-      await waitForDatabaseToLoad(page, ref)
       await expect(page.getByText(databaseTableNameUpdated, { exact: true })).toBeVisible()
       await expect(
         page.getByText(`Successfully updated ${databaseTableNameUpdated}!`)
@@ -365,9 +361,9 @@ test.describe('Database', () => {
       const duplicateTableWait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=')
       await page.getByRole('button', { name: 'Save' }).click()
 
-      // validate table duplicate
+      // validate table duplicate — the toBeVisible assertion below already
+      // waits for the list to refetch, so no racy post-mutation wait here.
       await duplicateTableWait
-      await waitForDatabaseToLoad(page, ref)
       await expect(page.getByText(databaseTableNameDuplicate, { exact: true })).toBeVisible()
       await expect(
         page.getByText(
