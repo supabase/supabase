@@ -141,7 +141,7 @@ Before creating a managed replication pipeline, enable Supabase Pipelines for yo
 
 1. Navigate to the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard
 2. Click **Add destination** to show the replication side panel
-3. Select a pipeline destination, such as **BigQuery**
+3. Select a Supabase Pipelines destination, such as **BigQuery**
 4. Click **Enable Supabase Pipelines**
 
 <Image
@@ -183,7 +183,7 @@ Follow these steps to configure your destination. Each destination has its own s
 
    Use **Invalidated slot behavior** carefully. If **Recreate** is selected and the pipeline restarts after Postgres has invalidated the main replication slot, the pipeline creates a new slot and copies all replicated tables again. This full restart is required for consistency because the old slot can no longer provide every change the pipeline missed.
 
-6. Click **Add and start** to begin replication
+6. Click **Create and start** to begin replication
 
 Your replication pipeline now starts copying data from your database to your destination.
 

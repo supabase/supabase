@@ -32,13 +32,13 @@ export const ValidationWarningsDialog = ({
         <AlertDialogHeader>
           <AlertDialogTitle>
             {hasWarnings
-              ? `Add destination with ${warningCount} ${warningCount === 1 ? 'warning' : 'warnings'}?`
-              : 'Confirm destination'}
+              ? `Create destination with ${warningCount} ${warningCount === 1 ? 'warning' : 'warnings'}?`
+              : 'Create destination?'}
           </AlertDialogTitle>
           <AlertDialogDescription>
             {hasWarnings
               ? 'Replication can start, but the warnings listed above may affect how some changes are applied downstream. Review them before proceeding.'
-              : 'No validation issues were found. Confirm to add the destination and start the pipeline.'}
+              : 'No validation issues were found. Confirm to create the destination and start the pipeline.'}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -49,7 +49,7 @@ export const ValidationWarningsDialog = ({
             loading={isLoading}
             onClick={onConfirm}
           >
-            {hasWarnings ? 'Add and start anyway' : 'Add and start'}
+            {hasWarnings ? 'Create and start anyway' : 'Create and start'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

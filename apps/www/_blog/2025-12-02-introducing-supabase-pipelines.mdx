@@ -65,11 +65,11 @@ for tables in schema public;
 
 ### Step 2: Enable Supabase Pipelines
 
-Navigate to `Database` in your Supabase Dashboard. Select the `Replication` tab and click `Enable Supabase Pipelines`.
+Navigate to `Database` in your Supabase Dashboard. Select the `Replication` tab, click `Add destination`, choose a Supabase Pipelines destination, and click `Enable Supabase Pipelines`.
 
-### Step 3: Add a destination
+### Step 3: Configure the destination
 
-Click `Add destination` and choose your destination.
+Configure your destination details, choose a publication, and click `Create and start`.
 
 ### Step 4: Monitor your pipeline
 
@@ -128,11 +128,7 @@ We're working on schema change support and additional destinations, and evaluati
 
 ## Pricing
 
-Supabase Pipelines is usage-based:
-
-- **$25 per connector per month**
-- **$15 per GB** of change data processed after the initial sync
-- **Initial copy is free**
+Supabase Pipelines pricing is still being finalized during alpha. You can request access now; we'll announce pricing later and notify you before any charges apply.
 
 ## Get started
 
@@ -140,7 +136,7 @@ Supabase Pipelines is usage-based:
 
 If you want to dive into the code, **the underlying Supabase ETL engine is open source** and written in Rust. Check out the repository at [github.com/supabase/etl](https://github.com/supabase/etl).
 
-**Note:** Supabase ETL is now Supabase Pipelines. This video was recorded before the rename.
+**Note:** Supabase ETL is now Supabase Pipelines. This video was recorded before the rename; Supabase ETL now refers to the underlying engine that powers Supabase Pipelines.
 
 <div className="video-container">
   <iframe

@@ -8,8 +8,8 @@ export const NoDestinationsAvailable = () => {
       </div>
       <h3 className="text-lg font-medium text-foreground mb-2">No destinations available</h3>
       <p className="text-sm text-foreground-light max-w-lg">
-        Supabase Pipelines is not currently enabled for this project. Contact support to enable
-        managed replication pipelines.
+        No Supabase Pipelines destinations are available for this project yet. Request alpha access
+        to use managed replication pipelines.
       </p>
     </div>
   )

@@ -360,10 +360,10 @@ export const DestinationForm = ({
       return existingDestination?.enabled ? 'Apply and restart' : 'Apply and start'
     } else {
       if (hasRunValidation && validationWarnings.length > 0 && !hasValidationFailures) {
-        return 'Add and start anyway'
+        return 'Create and start anyway'
       }
 
-      return 'Add and start'
+      return 'Create and start'
     }
   }
 
@@ -690,7 +690,7 @@ export const DestinationForm = ({
               <p className="text-foreground-light text-sm">
                 {isValidating
                   ? 'Validating destination configuration...'
-                  : `${editMode ? 'Updating' : 'Adding'} destination...`}
+                  : `${editMode ? 'Updating' : 'Creating'} destination...`}
               </p>
             </motion.div>
           ) : (
