@@ -150,6 +150,20 @@ Pipeline failures occur during the streaming phase when an error happens while r
 
 See [Handling errors](/docs/guides/database/replication/supabase-pipelines-monitoring#handling-errors) for more details.
 
+## Why was my pipeline stopped?
+
+Supabase may automatically stop a pipeline if it encounters too many errors in a short period of time. This protects your source database, your destination, and the Supabase Pipelines system from a pipeline repeatedly retrying a failing operation.
+
+Automatic stopping is a safety mechanism. It prevents repeated pipeline errors from consuming resources or causing wider instability while preserving the pipeline's replication position so you can investigate the underlying issue.
+
+To recover:
+
+1. Check the pipeline error details and replication logs
+2. Fix the underlying issue, such as destination connectivity, schema mismatches, permissions, or rate limits
+3. Restart the pipeline manually from the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard
+
+If the same error continues after restart, the pipeline may stop again. Review [Monitor pipeline status](/docs/guides/database/replication/supabase-pipelines-monitoring) for troubleshooting steps.
+
 ## Why is replication lag increasing?
 
 Lag increases when Postgres produces WAL faster than the pipeline can confirm it has processed. Common causes include a slow or rate-limited destination, a pipeline issue, heavy source database activity, long transactions, network latency between the pipeline and source database, or a stopped/disconnected pipeline.
