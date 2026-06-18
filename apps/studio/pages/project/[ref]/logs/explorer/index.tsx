@@ -1,6 +1,6 @@
 import { useMonaco } from '@monaco-editor/react'
 import { useLocalStorage } from '@uidotdev/usehooks'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import type { editor } from 'monaco-editor'
 import { useRouter } from 'next/router'
@@ -105,10 +105,15 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     []
   )
 
-  const [useOtelEndpoint, setUseOtelEndpoint] = useLocalStorage<boolean>(
+  // The otelLegacyLogs flag forces the explorer onto the OTEL endpoint; the
+  // manual toggle (shown only behind showChToggleInLogExplorer) can additionally
+  // opt in when the flag is off.
+  const otelLegacyLogsEnabled = useFlag('otelLegacyLogs')
+  const [useOtelEndpointPreference, setUseOtelEndpointPreference] = useLocalStorage<boolean>(
     `logs-explorer-use-otel-endpoint-${projectRef}`,
     false
   )
+  const useOtelEndpoint = otelLegacyLogsEnabled || useOtelEndpointPreference
 
   const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
   const entitledToAuditLogDays = getEntitlementNumericValue()
@@ -387,7 +392,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             onSelectTemplate={onSelectTemplate}
             warnings={warnings}
             useOtel={useOtelEndpoint}
-            onUseOtelChange={setUseOtelEndpoint}
+            onUseOtelChange={setUseOtelEndpointPreference}
           />
           <ShimmerLine active={isLoading} />
           <CodeEditor
