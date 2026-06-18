@@ -43,10 +43,10 @@ export const LogsExplorerOtelBanner = ({ projectRef, sql }: LogsExplorerOtelBann
       description="This project's logs run on a new ClickHouse-backed engine, which uses a different SQL dialect than BigQuery. Existing saved queries may need to be rewritten."
       actions={
         <div className="flex items-center gap-2">
-          <Button type="default" size="tiny" onClick={openRewriteAssistant}>
+          <Button variant="default" size="tiny" onClick={openRewriteAssistant}>
             Rewrite with the Assistant
           </Button>
-          <Button type="text" size="tiny" onClick={() => setDismissed(true)}>
+          <Button variant="text" size="tiny" onClick={() => setDismissed(true)}>
             Dismiss
           </Button>
         </div>
