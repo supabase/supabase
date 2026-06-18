@@ -120,8 +120,8 @@ export default makeSource({
       () => (tree) => {
         visit(tree, (node) => {
           if (node?.type === 'element' && node?.tagName === 'pre') {
-            const [codeEl] = node.children
-            if (codeEl.tagName !== 'code') {
+            const [codeEl] = node.children || []
+            if (!codeEl || codeEl.tagName !== 'code') {
               return
             }
 
@@ -135,7 +135,7 @@ export default makeSource({
               }
             }
 
-            node.__rawString__ = codeEl.children?.[0].value
+            node.__rawString__ = codeEl.children?.[0]?.value
             node.__src__ = node.properties?.__src__
             node.__style__ = node.properties?.__style__
           }
@@ -166,17 +166,18 @@ export default makeSource({
       ],
       () => (tree) => {
         visit(tree, (node) => {
-          if (node?.type === 'element' && node?.tagName === 'div') {
+          if (node?.type === 'element' && node?.tagName === 'div' && node?.properties) {
             if (!('data-rehype-pretty-code-fragment' in node.properties)) {
               return
             }
 
-            const preElement = node.children.at(-1)
-            if (preElement.tagName !== 'pre') {
+            const preElement = node.children?.at(-1)
+            if (!preElement || preElement.tagName !== 'pre') {
               return
             }
 
-            preElement.properties['__withMeta__'] = node.children.at(0).tagName === 'div'
+            preElement.properties = preElement.properties || {}
+            preElement.properties['__withMeta__'] = node.children?.at(0)?.tagName === 'div'
             preElement.properties['__rawString__'] = node.__rawString__
 
             if (node.__src__) {
