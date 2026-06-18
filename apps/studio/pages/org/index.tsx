@@ -1,4 +1,3 @@
-import { LOCAL_STORAGE_KEYS } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
@@ -6,24 +5,19 @@ import { ShimmeringCard } from '@/components/interfaces/Home/ProjectList/Shimmer
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import OrganizationLayout from '@/components/layouts/OrganizationLayout'
 import { ScaffoldContainerLegacy } from '@/components/layouts/Scaffold'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import type { NextPageWithLayout } from '@/types'
 
 const OrgIndexPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const [lastVisitedOrganization, setLastVisitedOrganization, { isSuccess }] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
-
-  const isNewAccountSession = router.asPath.includes('access_token=')
+  const { lastVisitedOrganization, isSuccess } = useLastVisitedOrganization()
 
   useEffect(() => {
     if (isSuccess) {
-      if (!isNewAccountSession && lastVisitedOrganization.length > 0) {
+      console.log({ lastVisitedOrganization })
+      if (lastVisitedOrganization) {
         router.push(`/org/${lastVisitedOrganization}`)
       } else {
-        if (isNewAccountSession) setLastVisitedOrganization('')
         router.push('/organizations')
       }
     }

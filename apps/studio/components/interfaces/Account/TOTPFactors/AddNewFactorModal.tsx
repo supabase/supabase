@@ -16,6 +16,7 @@ import { organizationKeys } from '@/data/organizations/keys'
 import { useMfaChallengeAndVerifyMutation } from '@/data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaEnrollMutation } from '@/data/profile/mfa-enroll-mutation'
 import { useMfaUnenrollMutation } from '@/data/profile/mfa-unenroll-mutation'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 type TOTP = { qr_code: string; secret: string; uri: string }
@@ -140,10 +141,7 @@ const SecondStep = ({
   onClose,
 }: SecondStepProps) => {
   const queryClient = useQueryClient()
-  const [lastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
 
   const FormSchema = z.object({
     code: z.string().min(1, 'Please provide a code from your authenticator app'),

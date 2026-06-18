@@ -7,6 +7,7 @@ import {
   CreateOrganizationCard,
   OrganizationCard,
 } from '@/components/interfaces/Organization/OrganizationCard'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import type { Organization } from '@/types'
 
@@ -46,10 +47,7 @@ export const OrganizationSelector = ({
   unavailableReason?: ReactNode
 }) => {
   const [showMore, setShowMore] = useState(false)
-  const [lastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
 
   const { visibleOrganizations, overflowOrganizations } = useMemo(() => {
     const lastVisitedOrg = organizations.find(({ slug }) => slug === lastVisitedOrganization)
