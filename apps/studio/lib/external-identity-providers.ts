@@ -95,8 +95,8 @@ export function getProviderDisplay(provider: string): IdentityProviderDisplay {
  */
 export function buildProviderAuthRedirect(providerId: string, returnTo?: string): string {
   const origin =
-    process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
-      ? location.origin
+    typeof window !== 'undefined' && process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
+      ? window.location.origin
       : process.env.NEXT_PUBLIC_SITE_URL
 
   const params = new URLSearchParams({ method: providerId })
