@@ -190,6 +190,14 @@ const skillsInstallStep: StepDefinition = {
   content: 'steps/skills-install',
 }
 
+const serverSkillsInstallStep: StepDefinition = {
+  id: 'install-skills',
+  title: 'Install the Supabase Server skill (Optional)',
+  description:
+    'Gives AI coding tools ready-made instructions for building APIs with @supabase/server.',
+  content: 'steps/skills-install',
+}
+
 // ============================================================================
 // Mode Prompts
 // ============================================================================
@@ -440,7 +448,7 @@ export const connectSchema: ConnectSchema = {
           DEFAULT: [mcpConfigureStep, skillsInstallStep],
         },
       },
-      server: [serverInstallStep, serverEnvStep, skillsInstallStep],
+      server: [serverInstallStep, serverEnvStep, serverSkillsInstallStep],
       DEFAULT: [skillsInstallStep],
     },
   },
