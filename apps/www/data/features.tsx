@@ -1609,7 +1609,7 @@ Supabase Storage simplifies adding robust file management to your applications, 
 2. Automatic compaction: S3 Tables merges small files automatically for optimal performance.
 3. Built-in time travel: Query historical data using snapshots.
 4. Schema evolution: Evolve schema over time without breaking queries.
-5. Integrated with Supabase Pipelines: Real-time replication from Postgres via Supabase Pipelines.
+5. Open ingestion: Populate buckets with your own Iceberg-compatible ingestion pipeline.
 6. Query from Postgres: Use Iceberg Foreign Data Wrapper to join with operational data.
 
 ## Query tools supported

@@ -24,7 +24,7 @@ This post explains what each product does, how they differ, and when you should 
 Here is the simplest way to think about it:
 
 - **Supabase Realtime** sends database changes to your users' browsers and apps, right now, as they happen. It is built for live experiences.
-- **Supabase Pipelines** sends database changes in near real time to analytical destinations like BigQuery. It is built for reliable data movement.
+- **Supabase Pipelines** sends database changes in near real time to supported analytical destinations. It is built for reliable data movement.
 
 Supabase Realtime answers the question: "How do I show my users what just happened?"
 
@@ -62,7 +62,7 @@ If you need every change to arrive at its destination, no matter what, Supabase 
 
 ## What Supabase Pipelines does
 
-Supabase Pipelines creates managed change-data-capture (CDC) pipelines. A pipeline reads every INSERT, UPDATE, DELETE, and TRUNCATE from your Postgres tables and writes them to a destination. Right now, the supported managed destination is BigQuery.
+Supabase Pipelines creates managed change-data-capture (CDC) pipelines. A pipeline reads every INSERT, UPDATE, DELETE, and TRUNCATE from your Postgres tables and writes them to a supported destination.
 
 Supabase Pipelines replicates your data 1-to-1 in near real time. If your destination disconnects or has problems, the pipeline does not skip over data.
 
@@ -76,7 +76,7 @@ Changes are batched and written to your destination. If the pipeline crashes, it
 
 ### What Supabase Pipelines guarantees
 
-Supabase Pipelines provides at-least-once delivery. Every change that happens in your database will reach the destination at least once. In rare cases (like a crash during a long-running transaction), a change might be delivered more than once. Exactly-once processing is handled by the destination. Some destinations like BigQuery deduplicate automatically, while others may not.
+Supabase Pipelines provides at-least-once delivery. Every change that happens in your database will reach the destination at least once. In rare cases (like a crash during a long-running transaction), a change might be delivered more than once. Exactly-once processing is handled by the destination.
 
 Supabase Pipelines uses permanent replication slots. This means Postgres holds onto WAL data until the pipeline confirms it has been processed. If you stop the pipeline for maintenance and restart it later, it picks up exactly where it left off. Be aware that while the pipeline is paused, Postgres continues to retain WAL data. Extended pauses can lead to significant disk growth, and depending on your Postgres configuration, the pipeline may fail if the WAL retention limit is exceeded.
 
@@ -99,7 +99,7 @@ This is the most important difference. If you need every change to arrive, use S
 
 Supabase Realtime sends data to client applications over WebSocket connections. Your users' browsers and mobile apps are the destination.
 
-Supabase Pipelines sends data to analytical systems. BigQuery, and eventually other data warehouses, are the destinations.
+Supabase Pipelines sends data to supported analytical systems.
 
 These are fundamentally different targets with fundamentally different needs. Client apps need low latency. Analytical systems need completeness.
 
@@ -134,7 +134,7 @@ The common thread: a human is watching and needs to see changes as they happen.
 
 Use Supabase Pipelines when you need reliable data movement to analytical systems:
 
-- **Analytics and reporting.** Move production data to BigQuery for querying without impacting your production database.
+- **Analytics and reporting.** Move production data to an analytical destination for querying without impacting your production database.
 - **Audit trails.** Maintain a complete changelog of every INSERT, UPDATE, and DELETE. Nothing is lost.
 - **Data warehousing.** Replicate your operational data to a columnar format optimized for analytical queries.
 - **Compliance.** Maintain a complete, verifiable history of all data changes.
@@ -157,7 +157,7 @@ If you are piping database changes into another system and you need every change
 
 Yes. In fact, many applications should.
 
-Consider an e-commerce platform. You might use Supabase Realtime to push order status updates to customers in real time ("Your order has shipped!"). At the same time, you use Supabase Pipelines to replicate all order data to BigQuery for daily sales reports and trend analysis.
+Consider an e-commerce platform. You might use Supabase Realtime to push order status updates to customers in real time ("Your order has shipped!"). At the same time, you use Supabase Pipelines to replicate all order data to a supported analytical destination for daily sales reports and trend analysis.
 
 Same database. Same tables. Different tools for different jobs.
 
@@ -169,7 +169,7 @@ Supabase Realtime handles the live experience. Supabase Pipelines handles the an
 | ------------------- | -------------------------------------------------------------------- | ------------------------------------------------------ |
 | Purpose             | Live updates to client apps                                          | Reliable data movement to analytics                    |
 | Delivery            | Best effort                                                          | At-least-once                                          |
-| Destinations        | Browsers, mobile apps (WebSocket)                                    | BigQuery                                               |
+| Destinations        | Browsers, mobile apps (WebSocket)                                    | Supported analytical destinations                      |
 | Replication slot    | Temporary                                                            | Permanent                                              |
 | Resume on reconnect | No                                                                   | Yes                                                    |
 | Database required   | Only for Postgres Changes and Broadcast from Database                | Yes, always                                            |

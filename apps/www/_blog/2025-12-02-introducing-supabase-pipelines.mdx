@@ -23,7 +23,7 @@ Supabase Pipelines is powered by the open-source Supabase ETL engine. You can fi
 
 Postgres is excellent for transactional workloads like reading a single user record or inserting an order. But when you need to scan millions of rows for analytics, Postgres slows down.
 
-Column-oriented systems like BigQuery, or those built on open formats like Apache Iceberg, are designed for this. They can aggregate massive datasets **orders of magnitude faster**, compress data more efficiently, and handle complex analytical queries that would choke a transactional database.
+Analytical systems are designed for this. They can aggregate massive datasets **orders of magnitude faster**, compress data more efficiently, and handle complex analytical queries that would choke a transactional database.
 
 **Supabase Pipelines gives you the best of both worlds**: keep your app fast on Postgres while unlocking analytics on purpose-built systems.
 
@@ -77,11 +77,11 @@ The Dashboard shows pipeline status and lag. You can start, stop, restart, or de
 
 ## Available destinations
 
-Our goal with Supabase Pipelines is to let you connect your existing data systems to Supabase. We're actively expanding the list of supported destinations. Right now, the official destination is Google BigQuery.
+Our goal with Supabase Pipelines is to let you connect your existing data systems to Supabase. We're actively expanding the list of supported destinations. The first supported destination is Google BigQuery.
 
 BigQuery is Google's serverless data warehouse, built for large-scale analytics. It handles petabytes of data and integrates well with existing BI tools and data pipelines.
 
-When you replicate to BigQuery, Supabase Pipelines creates a view for each table and uses an underlying versioned table to support all operations efficiently. You query the view, and the pipeline handles the rest.
+When you replicate to BigQuery, Supabase Pipelines handles the ongoing change delivery so your analytical system stays up to date.
 
 ## Adding and removing tables
 

@@ -131,9 +131,9 @@ from market_analytics.prices;
 
 ## Writing to Analytics Buckets
 
-Writing is a work in progress. We're actively building [**Supabase Pipelines**](/blog/introducing-supabase-pipelines), which will allow you to write directly from Postgres into Iceberg-backed buckets. We'll also add write capability to the Supabase Iceberg Wrapper as soon as write support lands in the upstream [iceberg-rust client library](https://github.com/apache/iceberg-rust). This will complete the workflow of **write → store → query**, all inside Supabase.
+Writing is a work in progress. For now, populate Analytics Buckets with your own ingestion pipeline or Iceberg-compatible tooling. We'll also add write capability to the Supabase Iceberg Wrapper as soon as write support lands in the upstream [iceberg-rust client library](https://github.com/apache/iceberg-rust). This will complete the workflow of **write → store → query**, all inside Supabase.
 
-Once live, that enables bottomless Postgres storage through shifting records into Analytics Buckets, all using open formats. As a bonus, Iceberg gets us time travel for free.
+Once live, this gives you analytical storage using open formats. As a bonus, Iceberg gets us time travel for free.
 
 ## Alpha Launch Limits
 
