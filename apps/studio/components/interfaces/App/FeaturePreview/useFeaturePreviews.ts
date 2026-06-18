@@ -24,6 +24,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
   const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
   const platformWebhooksEnabled = useFlag('platformWebhooks')
   const jitDbAccessEnabled = useFlag('jitDbAccess')
+  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
 
   return useMemo(
     () =>
@@ -102,12 +103,19 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
           key: LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE,
           name: 'Integrations layout',
           discussionsUrl: undefined,
-          enabled: true,
+          enabled: isMarketplaceEnabled,
           isNew: true,
-          isPlatformOnly: false,
-          isDefaultOptIn: true,
+          isPlatformOnly: true,
+          isDefaultOptIn: false,
+          getRoute: (ref?: string) => `/project/${ref}/integrations`,
         },
       ].sort((a, b) => Number(b.isNew) - Number(a.isNew)),
-    [isUnifiedLogsPreviewAvailable, pgDeltaDiffEnabled, platformWebhooksEnabled, jitDbAccessEnabled]
+    [
+      isUnifiedLogsPreviewAvailable,
+      pgDeltaDiffEnabled,
+      platformWebhooksEnabled,
+      jitDbAccessEnabled,
+      isMarketplaceEnabled,
+    ]
   )
 }

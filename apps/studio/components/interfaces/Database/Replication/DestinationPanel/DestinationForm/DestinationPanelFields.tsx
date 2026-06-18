@@ -883,7 +883,7 @@ export const AnalyticsBucketFields = ({
                 <Button
                   variant="default"
                   icon={showSecretAccessKey ? <Eye /> : <EyeOff />}
-                  className="w-7 absolute right-6 top-[4px]"
+                  className="w-7 absolute right-1 top-[4px]"
                   onClick={() => setShowSecretAccessKey(!showSecretAccessKey)}
                 />
               </FormItemLayout>

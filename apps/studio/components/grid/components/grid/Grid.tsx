@@ -89,11 +89,12 @@ export const Grid = memo(
       const tableEntityType = snap.originalTable?.entity_type
       const isForeignTable = tableEntityType === ENTITY_TYPE.FOREIGN_TABLE
       const isTableEmpty = (rows ?? []).length === 0
+      const canImportData = snap.editable && !isForeignTable
 
       const track = useTrack()
 
       const { isDraggedOver, onDragOver, onFileDrop } = useCsvFileDrop({
-        enabled: isTableEmpty && !isForeignTable,
+        enabled: isTableEmpty && canImportData,
         onFileDropped: (file) => tableEditorSnap.onImportData(valtioRef(file)),
         onTelemetryEvent: (eventName) => track(eventName),
       })
@@ -322,7 +323,7 @@ export const Grid = memo(
                             started.
                           </p>
                         </div>
-                      ) : (
+                      ) : canImportData ? (
                         <div className="flex flex-col items-center gap-4 mt-4">
                           <Button
                             variant="default"
@@ -338,7 +339,7 @@ export const Grid = memo(
                             or drag and drop a CSV file here
                           </p>
                         </div>
-                      )}
+                      ) : null}
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center">
