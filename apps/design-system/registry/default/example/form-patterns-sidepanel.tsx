@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { format } from 'date-fns'
-import { CalendarIcon, ExternalLink, Trash, Upload } from 'lucide-react'
+import { ExternalLink, Trash, Upload } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -14,11 +14,7 @@ import {
   Input,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Select,
@@ -37,6 +33,12 @@ import {
   Textarea,
 } from 'ui'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
+import {
+  DatePicker,
+  DatePickerButton,
+  DatePickerContent,
+  DatePickerTrigger,
+} from 'ui-patterns/DatePicker'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
 import { getKeyValueFieldArrayValidationIssues } from 'ui-patterns/form/KeyValueFieldArray/validation'
@@ -70,7 +72,7 @@ const formSchema = z
     region: z.string().min(1, 'Region is required'),
     schemas: z.array(z.string()).min(1, 'At least one schema is required'),
     queueType: z.enum(['basic', 'partitioned']),
-    expiryDate: z.date().optional(),
+    expiryDate: z.date(),
     password: z.string().min(8, 'Password must be at least 8 characters'),
     duration: z
       .union([
@@ -316,7 +318,7 @@ export default function FormPatternsSidePanel() {
                           <button
                             type="button"
                             onClick={() => uploadButtonRef.current?.click()}
-                            className="flex items-center justify-center h-10 w-10 shrink-0 text-foreground-lighter hover:text-foreground-light overflow-hidden rounded-full bg-cover border hover:border-strong"
+                            className="flex items-center justify-center h-10 w-10 shrink-0 text-foreground-lighter hover:text-foreground-light overflow-hidden rounded-full bg-cover border hover:border-strong focus-visible:outline-brand-600"
                             style={{
                               backgroundImage: logoUrl ? `url("${logoUrl}")` : 'none',
                             }}
@@ -325,7 +327,8 @@ export default function FormPatternsSidePanel() {
                           </button>
                           <div className="flex gap-2 items-center">
                             <Button
-                              variant="default"
+                              type="button"
+                              variant="outline"
                               size="tiny"
                               icon={<Upload size={14} />}
                               onClick={() => uploadButtonRef.current?.click()}
@@ -666,32 +669,28 @@ export default function FormPatternsSidePanel() {
                 <FormField
                   control={form.control}
                   name="expiryDate"
-                  render={({ field }) => (
+                  render={({ field, fieldState }) => (
                     <FormItemLayout
                       layout="horizontal"
                       label="Date Picker"
                       description="Date selection with calendar popover"
                     >
                       <FormControl className="col-span-6">
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className="bg-control w-full justify-start text-left font-normal px-3 py-4"
-                              icon={<CalendarIcon className="h-4 w-4" />}
-                            >
+                        <DatePicker>
+                          <DatePickerTrigger asChild>
+                            <DatePickerButton block isInvalid={fieldState.invalid}>
                               {field.value ? format(field.value, 'PPP') : 'Pick a date'}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
+                            </DatePickerButton>
+                          </DatePickerTrigger>
+                          <DatePickerContent>
                             <Calendar
                               mode="single"
                               selected={field.value}
                               onSelect={field.onChange}
                               initialFocus
                             />
-                          </PopoverContent>
-                        </Popover>
+                          </DatePickerContent>
+                        </DatePicker>
                       </FormControl>
                     </FormItemLayout>
                   )}
