@@ -124,6 +124,8 @@ export function flattenOtelInspectionRow(
     database_name: attrs['parsed.database_name'] ?? null,
     database_user: attrs['parsed.user_name'] ?? null,
     process_id: attrs['parsed.process_id'] ?? null,
+    query: attrs['parsed.query'] ?? null,
+    detail: attrs['parsed.detail'] ?? null,
     query_id: attrs['parsed.query_id'] ?? null,
     session_id: attrs['parsed.session_id'] ?? null,
     session_start_time: attrs['parsed.session_start_time'] ?? null,
