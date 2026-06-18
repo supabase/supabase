@@ -1,6 +1,6 @@
 import { withDocsBasePath } from '~/internals/internal-links'
 
-import { type ContentListings } from './content-listings.schema'
+import { isExternalContentListingHref, type ContentListings } from './content-listings.schema'
 
 /**
  * Serialize contentListings front matter to markdown for .md exports and machine consumers.
@@ -28,9 +28,11 @@ export function serializeContentListingsToMarkdown(
     }
 
     for (const item of group.items) {
-      const href = linkBaseUrl
-        ? `${linkBaseUrl}${withDocsBasePath(item.href)}`
-        : withDocsBasePath(item.href)
+      const href = isExternalContentListingHref(item.href)
+        ? item.href
+        : linkBaseUrl
+          ? `${linkBaseUrl}${withDocsBasePath(item.href)}`
+          : withDocsBasePath(item.href)
       lines.push(`- **[${item.title}](${href}):** ${item.description}`)
     }
 

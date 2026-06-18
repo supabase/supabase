@@ -4,6 +4,7 @@ import {
   getContentListingGridItemClassName,
   getContentListingGroupLabel,
   getContentListingHeadingTag,
+  isExternalContentListingHref,
   normalizeContentListingHref,
   resolveContentListingGroup,
   type ContentListingGroup,
@@ -34,14 +35,26 @@ function ContentListingLink({
   const sendTelemetryEvent = useSendTelemetryEvent()
   const href = normalizeContentListingHref(item.href)
 
+  const onClick = () => {
+    sendTelemetryEvent(buildDocsContentListingClickedEvent({ item, groupLabel, listingId }))
+  }
+
+  if (isExternalContentListingHref(href)) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={className}
+        onClick={onClick}
+      >
+        {children}
+      </a>
+    )
+  }
+
   return (
-    <Link
-      href={href}
-      className={className}
-      onClick={() => {
-        sendTelemetryEvent(buildDocsContentListingClickedEvent({ item, groupLabel, listingId }))
-      }}
-    >
+    <Link href={href} className={className} onClick={onClick}>
       {children}
     </Link>
   )

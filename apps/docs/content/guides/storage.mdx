@@ -20,6 +20,28 @@ contentListings:
       - title: Vector buckets
         href: /guides/storage/vector/introduction
         description: Store embeddings and run similarity search for semantic matching, AI, and RAG. Use HNSW indexing, distance metrics, and metadata filtering.
+  - id: examples
+    heading: Examples
+    type: grid
+    items:
+      - title: Storage templates and examples
+        href: https://github.com/supabase/supabase/tree/master/examples/storage
+        description: Browse templates and sample apps in the Supabase GitHub repository.
+      - title: Resumable Uploads with Uppy
+        href: https://github.com/supabase/supabase/tree/master/examples/storage/resumable-upload-uppy
+        description: Use Uppy to upload files to Supabase Storage using the TUS protocol (resumable uploads).
+  - id: resources
+    heading: Resources
+    description: Find the source code and documentation in the Supabase GitHub repository.
+    type: grid
+    columns: 2
+    items:
+      - title: Supabase Storage API
+        href: https://github.com/supabase/storage-api
+        description: View the source code.
+      - title: OpenAPI Spec
+        href: https://supabase.github.io/storage/
+        description: See the Swagger Documentation for Supabase Storage.
 ---
 
 Supabase Storage is a robust, scalable solution for managing files of any size with fine-grained access controls and optimized delivery. Whether you're storing user-generated content, analytics data, or vector embeddings, Supabase Storage provides specialized bucket types to meet your specific needs.
@@ -34,42 +56,6 @@ Supabase Storage is a robust, scalable solution for managing files of any size w
 
 <ContentListings listing="get-started" />
 
-## Examples
+<ContentListings listing="examples" />
 
-Check out all of the Storage [templates and examples](https://github.com/supabase/supabase/tree/master/examples/storage) in our GitHub repository.
-
-<div className="grid md:grid-cols-12 gap-4 not-prose">
-  <div className="col-span-12">
-    <Link
-      href="https://github.com/supabase/supabase/tree/master/examples/storage/resumable-upload-uppy"
-      passHref
-    >
-      <GlassPanel
-        icon={'/docs/img/icons/github-icon'}
-        hasLightIcon={true}
-        title="Resumable Uploads with Uppy"
-      >
-        Use Uppy to upload files to Supabase Storage using the TUS protocol (resumable uploads).
-      </GlassPanel>
-    </Link>
-  </div>
-</div>
-
-## Resources
-
-Find the source code and documentation in the Supabase GitHub repository.
-
-<div className="grid md:grid-cols-12 gap-4 not-prose">
-  <div className="col-span-6">
-    <Link href="https://github.com/supabase/storage-api" passHref>
-      <GlassPanel title="Supabase Storage API">View the source code.</GlassPanel>
-    </Link>
-  </div>
-  <div className="col-span-6">
-    <Link href="https://supabase.github.io/storage/" passHref>
-      <GlassPanel title="OpenAPI Spec">
-        See the Swagger Documentation for Supabase Storage.
-      </GlassPanel>
-    </Link>
-  </div>
-</div>
+<ContentListings listing="resources" />

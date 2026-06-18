@@ -60,14 +60,22 @@ export function getContentListingGroupLabel(group: ContentListingGroup): string 
 
 const INTERNAL_HREF_PATTERN = /^\/(docs\/)?(guides|dashboard)\//
 
+export function isExternalContentListingHref(href: string): boolean {
+  return /^https?:\/\//i.test(href)
+}
+
 export function isValidContentListingHref(href: string): boolean {
-  return INTERNAL_HREF_PATTERN.test(href)
+  return INTERNAL_HREF_PATTERN.test(href) || isExternalContentListingHref(href)
 }
 
 /**
  * Normalize guide hrefs for Next.js Link (strip /docs prefix when present).
+ * External hrefs are returned unchanged.
  */
 export function normalizeContentListingHref(href: string): string {
+  if (isExternalContentListingHref(href)) {
+    return href
+  }
   if (href.startsWith('/docs/guides/')) {
     return href.replace(/^\/docs/, '')
   }
@@ -111,7 +119,7 @@ export function parseContentListings(value: unknown): ContentListings | undefine
     for (const item of group.items) {
       if (!isValidContentListingHref(item.href)) {
         throw new Error(
-          `Invalid contentListings href "${item.href}": must start with /guides/, /docs/guides/, or /dashboard/`
+          `Invalid contentListings href "${item.href}": must start with /guides/, /docs/guides/, /dashboard/, or https://`
         )
       }
     }

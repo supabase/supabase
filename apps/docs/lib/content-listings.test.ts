@@ -80,16 +80,33 @@ describe('parseContentListings', () => {
     ).toThrow(/Invalid contentListings front matter/)
   })
 
-  it('rejects external hrefs', () => {
+  it('accepts external hrefs', () => {
+    const result = parseContentListings([
+      {
+        id: 'examples',
+        items: [
+          {
+            title: 'GitHub',
+            href: 'https://github.com/supabase/supabase',
+            description: 'External link.',
+          },
+        ],
+      },
+    ])
+
+    expect(result?.[0].items[0].href).toBe('https://github.com/supabase/supabase')
+  })
+
+  it('rejects invalid hrefs', () => {
     expect(() =>
       parseContentListings([
         {
           id: 'get-started',
           items: [
             {
-              title: 'GitHub',
-              href: 'https://github.com/supabase/supabase',
-              description: 'External link.',
+              title: 'Bad link',
+              href: 'ftp://example.com',
+              description: 'Invalid protocol.',
             },
           ],
         },
@@ -209,6 +226,28 @@ describe('serializeContentListingsToMarkdown', () => {
     expect(markdown).toContain('Read these first.')
     expect(markdown).toContain(
       '**[Connect to your database](https://supabase.com/docs/guides/database/connecting-to-postgres):** Connection strings and pooler modes.'
+    )
+  })
+
+  it('preserves external hrefs in markdown export', () => {
+    const markdown = serializeContentListingsToMarkdown(
+      [
+        {
+          id: 'resources',
+          items: [
+            {
+              title: 'Storage API',
+              href: 'https://github.com/supabase/storage-api',
+              description: 'View the source code.',
+            },
+          ],
+        },
+      ],
+      'https://supabase.com'
+    )
+
+    expect(markdown).toContain(
+      '**[Storage API](https://github.com/supabase/storage-api):** View the source code.'
     )
   })
 
