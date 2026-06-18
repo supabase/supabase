@@ -112,7 +112,7 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> = ({
               asChild={type === 'pills'}
             >
               {type === 'pills' ? (
-                <Button type="default" iconLeft={tab.props.icon} iconRight={tab.props.iconRight}>
+                <Button variant="default" iconLeft={tab.props.icon} iconRight={tab.props.iconRight}>
                   <span>{tab.props.label}</span>
                 </Button>
               ) : (
