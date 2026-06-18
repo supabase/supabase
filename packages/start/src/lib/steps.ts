@@ -9,7 +9,9 @@ import type { StartComposition } from './composition/start-composition'
 import { AGENTS, listEnglish, ORMS, type FrameworkMeta, type StartConfig } from './config'
 import {
   buildAppPrimitiveBlocks,
+  buildAppTemplateBlocks,
   buildProjectCodeGuidanceBlocks,
+  buildSupabaseTemplateBlocks,
   createGuideContext,
   getMissingShadcnPrimitiveLabels,
   getShadcnBlockName,
@@ -128,6 +130,19 @@ function pluginStep(cfg: StartConfig): SetupStep {
 function cliStep(cfg: StartConfig): SetupStep {
   const local = cfg.connection === 'local'
   const code = lines(['npm install supabase --save-dev', 'npx supabase init'])
+  const blocks: StepBlock[] = [{ type: 'code', lang: 'terminal', code }]
+  blocks.push({
+    type: 'note',
+    text: local
+      ? 'Install templates and generate the first migration before starting the local stack. That keeps seed.sql from running before its tables exist.'
+      : "You'll run supabase db diff / db push here to version your schema against your hosted project.",
+  })
+  if (local) {
+    blocks.push({
+      type: 'note',
+      text: 'If supabase start fails with a Postgres version mismatch, your Docker volume may be from an older major version. Run npx supabase stop --no-backup, remove the old volume, or set db.major_version in config.toml to match existing data.',
+    })
+  }
   return {
     id: 'cli',
     key: true,
@@ -135,15 +150,22 @@ function cliStep(cfg: StartConfig): SetupStep {
     desc: local
       ? 'Run the full stack — Postgres, Auth, Storage and Studio — locally in Docker.'
       : 'Code-first migrations are generated and pushed through the CLI.',
-    blocks: [
-      { type: 'code', lang: 'terminal', code },
-      {
-        type: 'note',
-        text: local
-          ? 'Install templates and generate the first migration before starting the local stack. That keeps seed.sql from running before its tables exist.'
-          : "You'll run supabase db diff / db push here to version your schema against your hosted project.",
-      },
-    ],
+    blocks,
+  }
+}
+
+function appEnvBlock(fw: FrameworkMeta, newNext: boolean, remote: boolean): StepBlock {
+  const urlPlaceholder = remote ? 'https://<ref>.supabase.co' : 'http://127.0.0.1:54321'
+  const keyName = fw.id === 'nextjs' && newNext ? 'SUPABASE_PUBLISHABLE_KEY' : 'SUPABASE_ANON_KEY'
+  const keyPlaceholder = remote ? '<your-anon-key>' : '<local-anon-key>'
+
+  return {
+    type: 'code',
+    lang: fw.envFile,
+    code: lines([
+      `${fw.envPrefix}SUPABASE_URL=${urlPlaceholder}`,
+      `${fw.envPrefix}${keyName}=${keyPlaceholder}`,
+    ]),
   }
 }
 
@@ -153,14 +175,9 @@ function keysStep(
   newNext: boolean,
   remote: boolean
 ): SetupStep {
-  const envBlock: StepBlock = {
-    type: 'code',
-    lang: fw.envFile,
-    code: lines([
-      `${fw.envPrefix}SUPABASE_URL=https://<ref>.supabase.co`,
-      `${fw.envPrefix}SUPABASE_ANON_KEY=<your-anon-key>`,
-    ]),
-  }
+  const envBlock = appEnvBlock(fw, newNext, remote)
+  const keyLabel = fw.id === 'nextjs' && newNext ? 'publishable key' : 'anon key'
+
   if (remote) {
     const blocks: StepBlock[] = [
       {
@@ -179,19 +196,19 @@ function keysStep(
       title: 'Create a project & add your keys',
       desc:
         (newNext ? 'Rename .env.example to .env.local, then ' : '') +
-        `create a hosted project and copy its Project URL and anon key into ${fw.envFile}.`,
+        `create a hosted project and copy its Project URL and ${keyLabel} into ${fw.envFile}.`,
       blocks,
     }
   }
   return {
     id: 'keys',
     title: 'Add your local keys',
-    desc: `Run supabase status after the local stack starts, then copy the API URL and anon key into ${fw.envFile}.`,
+    desc: `Run supabase status after the local stack starts, then copy the API URL and ${keyLabel} into ${fw.envFile}.`,
     blocks: [
       {
         type: 'code',
         lang: 'terminal',
-        code: 'npx supabase status',
+        code: 'npx supabase status -o env   # copy-paste ready env vars',
       },
       envBlock,
       {
@@ -292,19 +309,25 @@ function connectAppStep(ctx: GuideContext): SetupStep | null {
   const blockPrims = getShadcnBlockPrimitives(ctx)
 
   if (cfg.shadcn) {
+    const shadcnOverwrite = cfg.project === 'existing' ? ' -y --overwrite' : ''
     blocks.push({
       type: 'code',
       lang: 'terminal',
       code: lines([
         'test -f components.json || npx shadcn@latest init -d   # skip init when shadcn/ui is already configured',
         ...blockPrims.map(
-          (p) => `npx shadcn@latest add @supabase/${getShadcnBlockName(p)}-${fw.shadcnTag}`
+          (p) =>
+            `npx shadcn@latest add @supabase/${getShadcnBlockName(p)}-${fw.shadcnTag}${shadcnOverwrite}`
         ),
       ]),
     })
     blocks.push({
       type: 'note',
-      text: 'Do not run shadcn init when components.json already exists; the Next.js with-supabase starter and many existing apps already include it.',
+      text:
+        'Do not run shadcn init when components.json already exists; the Next.js with-supabase starter and many existing apps already include it.' +
+        (cfg.project === 'existing'
+          ? ' Pass -y --overwrite when shadcn prompts to replace files that already exist.'
+          : ''),
     })
 
     const missing = getMissingShadcnPrimitiveLabels(ctx)
@@ -321,6 +344,7 @@ function connectAppStep(ctx: GuideContext): SetupStep | null {
   }
 
   blocks.push(...buildAppPrimitiveBlocks(ctx))
+  blocks.push(...buildAppTemplateBlocks(ctx))
 
   if (blocks.length === 0) return null
 
@@ -399,6 +423,13 @@ function supabaseCodeStep(ctx: GuideContext): SetupStep | null {
       text: "Follow the instructions in each installed template's readme, especially when merging changes into supabase/config.toml.",
     })
 
+    if (cfg.project === 'existing') {
+      blocks.push({
+        type: 'note',
+        text: 'Template install commands include -y --overwrite so shadcn does not hang on overwrite prompts in an existing project.',
+      })
+    }
+
     blocks.push({
       type: 'code',
       lang: 'terminal',
@@ -424,18 +455,12 @@ function supabaseCodeStep(ctx: GuideContext): SetupStep | null {
   }
 
   blocks.push(...buildProjectCodeGuidanceBlocks(ctx))
-
-  if (cfg.connection === 'local' && plan.seedFiles.length > 0 && plan.schemaFiles.length > 0) {
-    blocks.push({
-      type: 'note',
-      text: 'Seed files run during supabase start and db reset. Generate the initial migration from supabase/schemas/*.sql before the first local start/reset so seed data can reference the tables it inserts into.',
-    })
-  }
+  blocks.push(...buildSupabaseTemplateBlocks(ctx))
 
   if (cfg.connection === 'local' && plan.edgeFunctionFiles.length > 0) {
     blocks.push({
       type: 'note',
-      text: 'For local Edge Function secrets, use supabase/functions/.env or pass --env-file to supabase functions serve. Hosted secrets still belong in the Dashboard or supabase secrets set.',
+      text: 'supabase start serves Edge Functions locally — no separate functions serve step is needed unless you want hot reload. For secrets, use supabase/functions/.env and restart the stack after changes.',
     })
   }
 

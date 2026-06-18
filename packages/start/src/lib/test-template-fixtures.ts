@@ -108,6 +108,38 @@ export const testTemplates: Template[] = [
 );
 `,
       },
+      {
+        path: 'supabase/seed.sql',
+        content: "insert into public.role_permissions (permission) values ('projects.read');\n",
+      },
+    ],
+  },
+  {
+    id: 'agent',
+    name: 'Agent',
+    description: 'Edge Function agent with chat tools',
+    category: 'AI',
+    version: '1.0.0',
+    dependencies: { required: ['database', 'auth', 'functions'] },
+    files: [
+      {
+        path: 'supabase/functions/agent-chat/index.ts',
+        content: 'Deno.serve(() => new Response("ok"))\n',
+      },
+    ],
+  },
+  {
+    id: 'mcp-server',
+    name: 'MCP Server',
+    description: 'MCP server Edge Function with RLS-scoped tools',
+    category: 'AI',
+    version: '1.0.0',
+    dependencies: { required: ['database', 'auth', 'functions'] },
+    files: [
+      {
+        path: 'supabase/functions/mcp-server/index.ts',
+        content: 'Deno.serve(() => new Response("ok"))\n',
+      },
     ],
   },
   {

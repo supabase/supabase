@@ -111,6 +111,95 @@ export function buildProjectCodeGuidanceBlocks(ctx: GuideContext): GuideBlock[] 
   return blocks
 }
 
+export function hasResolvedTemplate(composition: StartComposition, templateId: string): boolean {
+  return composition.resolution.resolved.some((template) => template.id === templateId)
+}
+
+export function buildSupabaseTemplateBlocks(ctx: GuideContext): GuideBlock[] {
+  const { cfg, composition } = ctx
+  const blocks: GuideBlock[] = []
+
+  if (hasResolvedTemplate(composition, 'multi-tenant-rbac')) {
+    blocks.push({
+      type: 'note',
+      text: 'The RBAC template ships an example domain (projects). Replace the example tables, permissions and seed rows with your own resource — for example notes and notes.* permissions for a team notes app.',
+    })
+  }
+
+  if (hasResolvedTemplate(composition, 'agent')) {
+    blocks.push({
+      type: 'code',
+      lang: 'terminal',
+      code: lines([
+        'cp supabase/functions/.env.example supabase/functions/.env',
+        '# Set OPENAI_API_KEY (and any other provider secrets) in supabase/functions/.env',
+        'npx supabase stop && npx supabase start   # restart so Edge Functions pick up secrets',
+      ]),
+    })
+    blocks.push({
+      type: 'note',
+      text: 'The agent Edge Function fails silently without provider secrets. Never commit supabase/functions/.env.',
+    })
+  }
+
+  if (hasResolvedTemplate(composition, 'mcp-server')) {
+    blocks.push({
+      type: 'code',
+      lang: '~/.cursor/mcp.json',
+      code: lines([
+        '{',
+        '  "mcpServers": {',
+        '    "project-mcp": {',
+        '      "url": "http://127.0.0.1:54321/functions/v1/mcp-server",',
+        '      "headers": {',
+        '        "Authorization": "Bearer <user-jwt>"',
+        '      }',
+        '    }',
+        '  }',
+        '}',
+      ]),
+    })
+    blocks.push({
+      type: 'note',
+      text: 'Use a signed-in user JWT so MCP tools run with RLS. JWTs expire — refresh the token in mcp.json when tools start returning auth errors. Use the API URL and ports from npx supabase status if your local stack is remapped.',
+    })
+  }
+
+  if (cfg.project === 'existing' && cfg.prims.includes('database')) {
+    blocks.push({
+      type: 'note',
+      text: 'After installing templates, set [db.migrations] schema_paths = ["./schemas/*.sql"] in supabase/config.toml if it is still empty — declarative schemas and db diff expect this path.',
+    })
+  }
+
+  return blocks
+}
+
+export function buildAppTemplateBlocks(ctx: GuideContext): GuideBlock[] {
+  const blocks: GuideBlock[] = []
+
+  if (ctx.fw.id === 'nextjs' && ctx.prims.includes('functions')) {
+    blocks.push({
+      type: 'code',
+      lang: 'tsconfig.json',
+      code: lines(['{', '  "exclude": ["supabase/functions"]', '}']),
+    })
+    blocks.push({
+      type: 'note',
+      text: 'Merge the exclude entry into your existing tsconfig.json so Next.js does not type-check Deno Edge Function imports.',
+    })
+  }
+
+  if (ctx.newNext && ctx.prims.includes('auth')) {
+    blocks.push({
+      type: 'note',
+      text: 'Next.js 16 with cacheComponents enabled cannot use export const dynamic = "force-dynamic" on authenticated pages. Wrap async data fetching in <Suspense> boundaries (or split into server/client components) instead.',
+    })
+  }
+
+  return blocks
+}
+
 export function getShadcnBlockPrimitives(ctx: GuideContext): PrimitiveId[] {
   return ctx.prims.filter((primitive) => SHADCN_BLOCKS[primitive])
 }
@@ -157,6 +246,24 @@ export function buildAgentRules(ctx: GuideContext): string[] {
   if (ctx.prims.includes('auth')) {
     rules.push(
       'For Auth flows, read the current user on the server where the framework supports SSR.'
+    )
+  }
+
+  if (hasResolvedTemplate(ctx.composition, 'agent')) {
+    rules.push(
+      'Configure provider secrets in supabase/functions/.env before testing the agent Edge Function.'
+    )
+  }
+
+  if (hasResolvedTemplate(ctx.composition, 'mcp-server')) {
+    rules.push(
+      'Wire Cursor MCP with a fresh user JWT in Authorization headers; refresh it when tools return auth errors.'
+    )
+  }
+
+  if (hasResolvedTemplate(ctx.composition, 'multi-tenant-rbac')) {
+    rules.push(
+      'Adapt RBAC tables, permissions and seed data from the template example domain to match the product tables you actually ship.'
     )
   }
 

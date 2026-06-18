@@ -1,4 +1,5 @@
 import { getRegistryAddCommand, getRegistrySearchCommand } from 'template-composer'
+import type { RegistryCommandOptions } from 'template-composer'
 
 import type { StartComposition } from './composition/start-composition'
 import { listEnglish, ORMS, type StartConfig } from './config'
@@ -89,7 +90,7 @@ export function buildProjectCodePlan(
     dependencyTemplates,
     addCommands: selectedTemplates.map((template) => ({
       ...template,
-      command: getRegistryAddCommand(template.id, registryCommandOptions),
+      command: getTemplateAddCommand(template.id, cfg, registryCommandOptions),
     })),
     fileGroups,
     filePaths,
@@ -99,7 +100,7 @@ export function buildProjectCodePlan(
     edgeFunctionFiles,
     edgeFunctionNames,
     ormConversionNote: schemaFiles.length > 0 ? getOrmConversionNote(cfg, schemaFiles) : null,
-    migrationCommands: getMigrationCommands(cfg, schemaFiles),
+    migrationCommands: getMigrationCommands(cfg, schemaFiles, seedFiles.length > 0),
     deployCommands: getFunctionCommands(cfg, edgeFunctionNames),
   }
 }
@@ -148,12 +149,25 @@ function getOrmConversionNote(cfg: StartConfig, schemaFiles: string[]): string |
   )} into ${orm.schemaFile}. Keep RLS policies, SQL functions, triggers, extensions, Storage setup and seed data as SQL migrations, and avoid creating the same table in both the ORM schema and SQL files.`
 }
 
-function getMigrationCommands(cfg: StartConfig, schemaFiles: string[]): string[] {
+function getTemplateAddCommand(
+  templateId: string,
+  cfg: StartConfig,
+  registryCommandOptions: RegistryCommandOptions
+): string {
+  const command = getRegistryAddCommand(templateId, registryCommandOptions)
+  return cfg.project === 'existing' ? `${command} -y --overwrite` : command
+}
+
+function getMigrationCommands(
+  cfg: StartConfig,
+  schemaFiles: string[],
+  hasSeedFile: boolean
+): string[] {
   if (schemaFiles.length === 0) return []
 
   const applyTemplateSqlCommand =
     cfg.connection === 'local'
-      ? 'npx supabase start                 # first run: applies migrations and then seed.sql'
+      ? 'npx supabase start                 # applies migrations, then seed.sql'
       : 'npx supabase db push               # apply pending migrations to the linked project'
 
   const replayLocalSeedCommand =
@@ -163,22 +177,50 @@ function getMigrationCommands(cfg: StartConfig, schemaFiles: string[]): string[]
         ]
       : []
 
+  const localSeedBootstrap =
+    cfg.connection === 'local' && hasSeedFile
+      ? [
+          'mv supabase/seed.sql supabase/seed.sql.pending   # templates ship seed data — defer until tables exist',
+        ]
+      : []
+
+  const localSeedRestore =
+    cfg.connection === 'local' && hasSeedFile
+      ? [
+          'mv supabase/seed.sql.pending supabase/seed.sql',
+          'npx supabase db reset             # replay migrations and seed.sql',
+        ]
+      : []
+
   if (cfg.orm === 'drizzle') {
     return [
+      ...localSeedBootstrap,
       'npx drizzle-kit generate   # after porting ORM-owned schema to src/db/schema.ts',
       'npx drizzle-kit migrate    # apply generated ORM migrations',
       'npx supabase db diff -f preserve_template_sql   # after keeping only non-ORM SQL in supabase/schemas/*.sql',
       applyTemplateSqlCommand,
-      ...replayLocalSeedCommand,
+      ...localSeedRestore,
+      ...(localSeedRestore.length === 0 ? replayLocalSeedCommand : []),
     ]
   }
 
   if (cfg.orm === 'prisma') {
     return [
+      ...localSeedBootstrap,
       'npx prisma migrate dev --name update_schema   # after porting ORM-owned schema to prisma/schema.prisma',
       'npx supabase db diff -f preserve_template_sql   # after keeping only non-ORM SQL in supabase/schemas/*.sql',
       applyTemplateSqlCommand,
-      ...replayLocalSeedCommand,
+      ...localSeedRestore,
+      ...(localSeedRestore.length === 0 ? replayLocalSeedCommand : []),
+    ]
+  }
+
+  if (cfg.connection === 'local' && hasSeedFile) {
+    return [
+      ...localSeedBootstrap,
+      'npx supabase db diff -f initial_schema   # generate migration from supabase/schemas/*.sql',
+      applyTemplateSqlCommand,
+      ...localSeedRestore,
     ]
   }
 
@@ -192,11 +234,7 @@ function getMigrationCommands(cfg: StartConfig, schemaFiles: string[]): string[]
 }
 
 function getFunctionCommands(cfg: StartConfig, edgeFunctionNames: string[]): string[] {
-  if (cfg.connection === 'local') {
-    return edgeFunctionNames.map(
-      (name) => `npx supabase functions serve ${name}   # local hot reload`
-    )
-  }
+  if (cfg.connection === 'local') return []
 
   return edgeFunctionNames.map((name) => `npx supabase functions deploy ${name}`)
 }

@@ -8,7 +8,7 @@ function schemaRule(cfg: StartConfig): string {
     return 'edit src/db/schema.ts then `drizzle-kit generate` + `drizzle-kit migrate`'
   if (cfg.orm === 'prisma') return 'edit prisma/schema.prisma then `prisma migrate dev`'
   if (cfg.connection === 'local') {
-    return 'declare tables in supabase/schemas/*.sql, run `supabase db diff -f <name>` before the first local start, then use `supabase db reset` to replay migrations and seed.sql'
+    return 'declare tables in supabase/schemas/*.sql, defer seed.sql until after the first migration when templates ship seed data, run `supabase db diff -f <name>` before the first local start, then use `supabase db reset` to replay migrations and seed.sql'
   }
   return 'declare tables in supabase/schemas/*.sql then `supabase db diff -f <name>` and `supabase db push`'
 }

@@ -158,9 +158,19 @@ describe('buildSteps', () => {
     expect(ids.indexOf('supabase-code')).toBeLessThan(ids.indexOf('keys'))
     expect(stepText(cli)).not.toContain('npx supabase start')
     expect(stepText(cli)).toContain('generate the first migration before starting')
+    expect(stepText(cli)).toContain('Postgres version mismatch')
     expect(stepText(supabaseCode)).toContain('npx supabase db diff -f initial_schema')
     expect(stepText(supabaseCode)).toContain('npx supabase start')
     expect(stepText(supabaseCode)).toContain('npx supabase db reset')
+  })
+
+  it('defers seed.sql until after the first migration on local stacks', () => {
+    const cfg = config({ connection: 'local', templateIds: ['multi-tenant-rbac'] })
+    const supabaseCode = buildSteps(cfg, composition(cfg)).find((s) => s.id === 'supabase-code')!
+    const text = stepText(supabaseCode)
+
+    expect(text).toContain('mv supabase/seed.sql supabase/seed.sql.pending')
+    expect(text).toContain('mv supabase/seed.sql.pending supabase/seed.sql')
   })
 
   it('uses supabase status for local keys, ports and Mailpit guidance', () => {
@@ -169,7 +179,8 @@ describe('buildSteps', () => {
     const keys = steps.find((s) => s.id === 'keys')!
     const connect = steps.find((s) => s.id === 'connect-app')!
 
-    expect(stepText(keys)).toContain('npx supabase status')
+    expect(stepText(keys)).toContain('npx supabase status -o env')
+    expect(stepText(keys)).toContain('NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY')
     expect(stepText(keys)).toContain('Mailpit')
     expect(stepText(connect)).toContain('Mailpit URL')
     expect(stepText(connect)).toContain('localhost and 127.0.0.1')
@@ -287,7 +298,7 @@ describe('buildSteps', () => {
     expect(stepIds(cfg)).not.toContain('functions')
   })
 
-  it('serves selected Edge Function templates locally and points secrets at functions env', () => {
+  it('serves selected Edge Function templates locally via supabase start', () => {
     const cfg = config({
       connection: 'local',
       primitives: ['functions'],
@@ -296,9 +307,9 @@ describe('buildSteps', () => {
     const supabaseCode = buildSteps(cfg, composition(cfg)).find((s) => s.id === 'supabase-code')!
     const text = stepText(supabaseCode)
 
-    expect(text).toContain('npx supabase functions serve stripe-webhook')
+    expect(text).toContain('supabase start serves Edge Functions locally')
+    expect(text).not.toContain('npx supabase functions serve stripe-webhook')
     expect(text).not.toContain('npx supabase functions deploy stripe-webhook')
-    expect(text).toContain('supabase/functions/.env')
   })
 
   it('keeps the hosted path on link, db push and function deploy commands', () => {
@@ -343,6 +354,34 @@ describe('buildSteps', () => {
     expect(text).toContain('supabase/config.toml')
     expect(text).not.toContain('--dry-run --diff')
     expect(text).not.toContain('The Start composer has already merged overlapping files')
+  })
+
+  it('adds overwrite flags when installing templates into an existing project', () => {
+    const cfg = config({ project: 'existing' })
+    const supabaseCode = buildSteps(cfg, composition(cfg)).find((s) => s.id === 'supabase-code')!
+    const text = stepText(supabaseCode)
+
+    expect(text).toContain('npx shadcn@latest add SaxonF/templates/database -y --overwrite')
+    expect(text).toContain('-y --overwrite so shadcn does not hang')
+  })
+
+  it('adds template-specific guidance for RBAC, agent and MCP selections', () => {
+    const cfg = config({
+      connection: 'local',
+      primitives: ['database', 'auth', 'functions'],
+      templateIds: ['multi-tenant-rbac', 'agent', 'mcp-server'],
+    })
+    const steps = buildSteps(cfg, composition(cfg))
+    const supabaseCode = steps.find((s) => s.id === 'supabase-code')!
+    const connect = steps.find((s) => s.id === 'connect-app')!
+    const supabaseText = stepText(supabaseCode)
+    const connectText = stepText(connect)
+
+    expect(supabaseText).toContain('example domain (projects)')
+    expect(supabaseText).toContain('OPENAI_API_KEY')
+    expect(supabaseText).toContain('~/.cursor/mcp.json')
+    expect(connectText).toContain('"exclude": ["supabase/functions"]')
+    expect(connectText).toContain('cacheComponents')
   })
 })
 
