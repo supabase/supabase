@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Settings, Trash2 } from 'lucide-react'
+import { Settings, Trash2, TriangleAlert } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import { Badge, Button } from 'ui'
@@ -11,6 +11,7 @@ import { ConstrainedIntegrationTabScaffold } from '@/components/interfaces/Integ
 import {
   getConnectedResources,
   getConnectedResourceUsage,
+  getExpectedResourceKinds,
   useProjectOAuthIntegrationData,
   type ConnectedResource,
   type ConnectedResourceUsage,
@@ -40,8 +41,12 @@ type ResourceGroup = {
   badge?: string
   description: ReactNode
   note: string
+  /** Impact copy shown in the zero state when the resource is expected but absent. */
+  missingNote: string
   manageAction?: ManageAction
   items: ResourceItem[]
+  /** True when the integration expects this resource but none is currently connected. */
+  missing?: boolean
 }
 
 const KIND_ORDER: ResourceKind[] = ['oauth_app', 'api_key', 'edge_function_secret', 'smtp']
@@ -102,7 +107,7 @@ const getGroupContent = ({
   projectRef?: string
   /** Integration-specific copy that overrides the generic, kind-level description and note. */
   usage?: ConnectedResourceUsage
-}): Omit<ResourceGroup, 'kind' | 'items'> => {
+}): Omit<ResourceGroup, 'kind' | 'items' | 'missing'> => {
   const name = <span className="text-foreground">{integrationName}</span>
   const plural = count > 1
 
@@ -117,8 +122,11 @@ const getGroupContent = ({
           </>
         ),
         note:
-          usage?.note ??
+          usage?.removalWarning ??
           'Removing this OAuth app will remove it for all projects and members of your organization.',
+        missingNote:
+          usage?.noteWhenAbsent ??
+          `No OAuth app is connected for ${integrationName}. It does not have access to your organization or its projects.`,
         manageAction: orgSlug
           ? { label: 'Manage access', href: `/org/${orgSlug}/apps` }
           : undefined,
@@ -134,8 +142,11 @@ const getGroupContent = ({
             <>A secret API key that {name} uses to authenticate to your project&apos;s API.</>
           )),
         note:
-          usage?.note ??
+          usage?.removalWarning ??
           `Removing ${plural ? 'a key' : 'this key'} takes effect immediately and can interrupt the integration.`,
+        missingNote:
+          usage?.noteWhenAbsent ??
+          `No secret API key is connected for ${integrationName}. It cannot authenticate to your project's API.`,
       }
     case 'edge_function_secret':
       return {
@@ -153,8 +164,11 @@ const getGroupContent = ({
             </>
           )),
         note:
-          usage?.note ??
+          usage?.removalWarning ??
           `Removing ${plural ? 'a secret' : 'this secret'} takes effect immediately and can interrupt the integration.`,
+        missingNote:
+          usage?.noteWhenAbsent ??
+          `No Edge Function secret from ${integrationName} was detected. Functions that rely on it may fail at runtime.`,
       }
     case 'smtp':
       return {
@@ -163,8 +177,11 @@ const getGroupContent = ({
           <>A custom SMTP relay so your project sends emails through {name}.</>
         ),
         note:
-          usage?.note ??
+          usage?.removalWarning ??
           'Removing this relay reverts your project to the default email service. Auth emails may be rate-limited until SMTP is configured again.',
+        missingNote:
+          usage?.noteWhenAbsent ??
+          `SMTP settings for ${integrationName} were not detected. Authentication emails may not be sent through the integration's SMTP service.`,
         manageAction: projectRef
           ? { label: 'Manage settings', href: `/project/${projectRef}/auth/smtp` }
           : undefined,
@@ -184,49 +201,73 @@ const ResourceGroupSection = ({
       <div className="flex flex-col gap-y-2">
         <div className="flex items-center gap-x-2">
           <h3 className="text-base text-foreground">{group.title}</h3>
-          {group.badge && (
-            <Badge variant="success" className="gap-x-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-brand" />
-              {group.badge}
+          {group.missing ? (
+            <Badge variant="warning" className="gap-x-1.5">
+              <TriangleAlert size={12} strokeWidth={1.5} />
+              Not connected
             </Badge>
+          ) : (
+            group.badge && (
+              <Badge variant="success" className="gap-x-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-brand" />
+                {group.badge}
+              </Badge>
+            )
           )}
         </div>
         <p className="text-sm text-foreground-light max-w-2xl">{group.description}</p>
       </div>
 
-      <Admonition type="default" className="m-0 max-w-2xl">
-        {group.note}
+      <Admonition
+        type={group.missing ? 'warning' : 'default'}
+        className="m-0 max-w-2xl"
+        title={group.missing ? 'This resource is missing' : undefined}
+      >
+        {group.missing ? group.missingNote : group.note}
       </Admonition>
 
-      <div className="max-w-2xl divide-y rounded-md border bg-surface-100">
-        {group.items.map((item) => (
-          <div
-            key={item.resource.key}
-            className="flex items-center justify-between gap-x-4 px-4 py-3"
-          >
-            <div className="flex min-w-0 flex-col">
-              <code className="truncate font-mono text-sm text-foreground" title={item.identifier}>
-                {item.identifier}
-              </code>
-              {item.meta && <span className="text-xs text-foreground-lighter">{item.meta}</span>}
-            </div>
-            <div className="flex shrink-0 items-center gap-x-2">
-              {group.manageAction && (
-                <Button asChild type="default" icon={<Settings />}>
-                  <a href={group.manageAction.href}>{group.manageAction.label}</a>
-                </Button>
-              )}
-              <Button
-                type="default"
-                icon={<Trash2 className="text-foreground-light" />}
-                onClick={() => onRemove(item.resource)}
-              >
-                Remove
-              </Button>
-            </div>
+      {group.missing ? (
+        group.manageAction && (
+          <div className="max-w-2xl">
+            <Button asChild type="default" icon={<Settings />}>
+              <a href={group.manageAction.href}>{group.manageAction.label}</a>
+            </Button>
           </div>
-        ))}
-      </div>
+        )
+      ) : (
+        <div className="max-w-2xl divide-y rounded-md border bg-surface-100">
+          {group.items.map((item) => (
+            <div
+              key={item.resource.key}
+              className="flex items-center justify-between gap-x-4 px-4 py-3"
+            >
+              <div className="flex min-w-0 flex-col">
+                <code
+                  className="truncate font-mono text-sm text-foreground"
+                  title={item.identifier}
+                >
+                  {item.identifier}
+                </code>
+                {item.meta && <span className="text-xs text-foreground-lighter">{item.meta}</span>}
+              </div>
+              <div className="flex shrink-0 items-center gap-x-2">
+                {group.manageAction && (
+                  <Button asChild type="default" icon={<Settings />}>
+                    <a href={group.manageAction.href}>{group.manageAction.label}</a>
+                  </Button>
+                )}
+                <Button
+                  type="default"
+                  icon={<Trash2 className="text-foreground-light" />}
+                  onClick={() => onRemove(item.resource)}
+                >
+                  Remove
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </section>
   )
 }
@@ -264,21 +305,39 @@ export const MarketplaceIntegrationSettingsTab = () => {
   const resources =
     integration && projectData ? getConnectedResources({ integration, projectData }) : []
 
-  // Group resources by kind so e.g. multiple secret API keys render under one section.
+  // The kinds of resources this integration is expected to provision. Used to render a zero
+  // (missing) state for any expected resource that isn't currently present.
+  const expectedKinds = integration ? getExpectedResourceKinds(integration) : []
+
+  // Only surface missing zero-states when the integration is otherwise still connected (at least
+  // one resource present). A fully uninstalled integration falls through to the empty state below.
+  const hasAnyResource = resources.length > 0
+
+  // Group resources by kind so e.g. multiple secret API keys render under one section. Expected
+  // kinds with no present resources render as a missing zero-state instead of being skipped.
   const groups: ResourceGroup[] = KIND_ORDER.flatMap((kind) => {
     const kindResources = resources.filter((resource) => resource.kind === kind)
-    if (kindResources.length === 0) return []
+    const isExpected = expectedKinds.includes(kind)
+    const isMissing = kindResources.length === 0
+
+    // Skip kinds that are neither present nor expected, and missing kinds while nothing is
+    // connected. A missing OAuth app is communicated by the top-level orphaned-resources warning
+    // instead of its own section, so it's skipped here to avoid repeating the same message.
+    if (isMissing && (!isExpected || !hasAnyResource || kind === 'oauth_app')) return []
+
     return [
       {
         kind,
         ...getGroupContent({
           kind,
-          count: kindResources.length,
+          // The zero-state copy reads in the singular, so default the count to 1 when missing.
+          count: Math.max(kindResources.length, 1),
           integrationName,
           orgSlug: organization?.slug,
           projectRef: ref,
           usage: integration ? getConnectedResourceUsage(integration.id, kind) : undefined,
         }),
+        missing: isMissing,
         items: kindResources.map((resource) => ({
           resource,
           identifier: getItemIdentifier(resource),
@@ -287,6 +346,13 @@ export const MarketplaceIntegrationSettingsTab = () => {
       },
     ]
   })
+
+  // Generic warning for OAuth-connected integrations: the OAuth app is gone but other resources it
+  // provisioned are still associated with the project, leaving the integration in a broken state.
+  const isOAuthAppMissing =
+    expectedKinds.includes('oauth_app') && !resources.some((r) => r.kind === 'oauth_app')
+  const hasOtherResources = resources.some((r) => r.kind !== 'oauth_app')
+  const showOrphanedResourcesWarning = isOAuthAppMissing && hasOtherResources
 
   const removeResource = async (resource: ConnectedResource) => {
     switch (resource.kind) {
@@ -371,6 +437,14 @@ export const MarketplaceIntegrationSettingsTab = () => {
               />
             ) : (
               <>
+                {showOrphanedResourcesWarning && (
+                  <Admonition
+                    type="warning"
+                    title="OAuth application is missing"
+                    description={`No OAuth app is connected for ${integrationName}, but other resources associated with it are still present on your project. ${integrationName} may not work correctly without an OAuth app. Reconnect it, or remove the remaining resources below.`}
+                    className="mb-8 mt-0"
+                  />
+                )}
                 {groups.map((group) => (
                   <ResourceGroupSection key={group.kind} group={group} onRemove={onSelectRemove} />
                 ))}

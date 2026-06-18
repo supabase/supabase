@@ -207,7 +207,12 @@ export type ConnectedResourceUsage = {
   /** Explains how this integration uses the resource. Overrides the generic section description. */
   description?: string
   /** Describes the impact of removing the resource. Overrides the generic section note. */
-  note?: string
+  removalWarning?: string
+  /**
+   * Describes the impact of this resource being missing while the integration is otherwise still
+   * connected. Shown in the resource's zero (missing) state. Overrides the generic absent note.
+   */
+  noteWhenAbsent?: string
 }
 
 type IntegrationResourceOverride = {
@@ -227,36 +232,74 @@ const INTEGRATION_RESOURCE_OVERRIDES: Record<string, IntegrationResourceOverride
   grafana: {
     secretKeyPrefix: 'grafana_cloud_integration_',
     usage: {
+      oauth_app: {
+        description:
+          'Grants Grafana access to your organization so it can discover projects to monitor.',
+      },
       api_key: {
         description:
           'Grafana uses this secret API key to read your project metrics from the Prometheus-compatible metrics endpoint.',
-        note: 'Removing this key stops Grafana from collecting metrics from your project until a new key is connected.',
+        removalWarning:
+          'Removing this key stops Grafana from collecting metrics from your project until a new key is connected.',
+        noteWhenAbsent:
+          'No secret API key is connected for Grafana to read your project metrics. Dashboards will not receive data without one.',
       },
     },
   },
   doppler: {
     edgeFunctionSecretName: 'DOPPLER_CONFIG',
     usage: {
+      oauth_app: {
+        description:
+          'Grants Doppler access to your organization so it can update secrets in your projects.',
+        noteWhenAbsent:
+          'Doppler does not have access to update secrets in your project. Any changes you make to secrets in Doppler will not be reflected in your project until access is granted.',
+      },
       edge_function_secret: {
         description:
           'Doppler syncs your managed secrets into this Edge Function secret so they are available to your functions at runtime.',
-        note: 'Connected secrets that are removed while this integration is active may be resynced if still present in Doppler.',
+        removalWarning:
+          'Connected secrets that are removed while this integration is active may be resynced if still present in Doppler.',
+        noteWhenAbsent: 'No Edge Function secrets were found connected to this integration.',
       },
     },
   },
   resend: {
     resendSmtp: true,
     usage: {
-      smtp: {
-        description:
-          'Resend is configured as the custom SMTP relay your project uses to deliver authentication and transactional emails.',
-      },
       oauth_app: {
         description:
           'Grants Resend access to manage the custom SMTP configuration used to send your project emails.',
       },
+      smtp: {
+        description:
+          'Resend is configured as the custom SMTP relay your project uses to deliver authentication and transactional emails.',
+        noteWhenAbsent:
+          "SMTP settings for Resend were not detected. Authentication emails may not be sent through Resend's SMTP service.",
+      },
     },
   },
+}
+
+/**
+ * The connected resource kinds an integration is expected to provision, in display order. Derived
+ * from the same identifiers used by {@link getConnectedResources} and {@link isOAuthInstalled} so
+ * the settings tab can render a zero (missing) state for any expected resource that is absent.
+ */
+export const getExpectedResourceKinds = (
+  integration: IntegrationDefinition
+): ConnectedResourceKind[] => {
+  const overrides = INTEGRATION_RESOURCE_OVERRIDES[integration.id] ?? {}
+  const kinds: ConnectedResourceKind[] = []
+
+  if (integration.oauthAppId) kinds.push('oauth_app')
+  if (overrides.secretKeyPrefix ?? integration.secretKeyPrefix) kinds.push('api_key')
+  if (overrides.edgeFunctionSecretName ?? integration.edgeFunctionSecretName) {
+    kinds.push('edge_function_secret')
+  }
+  if (overrides.resendSmtp) kinds.push('smtp')
+
+  return kinds
 }
 
 /**
