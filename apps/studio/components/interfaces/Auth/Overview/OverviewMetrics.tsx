@@ -103,7 +103,7 @@ const LogsLink = ({ href }: { href: string }) => (
   <Tooltip>
     <TooltipTrigger asChild>
       <Button
-        type="text"
+        variant="text"
         size="tiny"
         className="p-1.5 text-foreground-lighter hover:text-foreground"
         asChild

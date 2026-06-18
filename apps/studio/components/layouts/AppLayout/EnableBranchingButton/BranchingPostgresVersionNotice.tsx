@@ -20,7 +20,7 @@ export const BranchingPostgresVersionNotice = () => {
         Postgres before enabling branching.
       </AlertDescription>
       <AlertDescription>
-        <Button size="tiny" type="default" className="mt-4">
+        <Button size="tiny" variant="default" className="mt-4">
           <Link
             href={`/project/${ref}/settings/infrastructure`}
             onClick={() => snap.setShowCreateBranchModal(false)}

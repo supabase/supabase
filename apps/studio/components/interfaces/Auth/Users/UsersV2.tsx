@@ -544,7 +544,7 @@ export const UsersV2 = () => {
                 icon={<WandSparklesIcon />}
                 onClick={() => setShowCreateIndexesModal(true)}
                 loading={isUpdatingAuthConfig}
-                type="default"
+                variant="default"
               >
                 Upgrade search
               </Button>
@@ -562,7 +562,7 @@ export const UsersV2 = () => {
                 on the number of users in your project.
               </div>
 
-              <Button type="link" iconRight={<ExternalLinkIcon />} asChild>
+              <Button variant="link" iconRight={<ExternalLinkIcon />} asChild>
                 <Link
                   href={`/project/${projectRef}/logs/explorer?q=${encodeURI(INDEX_WORKER_LOGS_SEARCH_STRING)}`}
                   target="_blank"
@@ -577,11 +577,11 @@ export const UsersV2 = () => {
         <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-start justify-between gap-2">
           {selectedUsers.size > 0 ? (
             <div className="flex items-center gap-x-2">
-              <Button type="default" icon={<Trash />} onClick={() => setShowDeleteModal(true)}>
+              <Button variant="default" icon={<Trash />} onClick={() => setShowDeleteModal(true)}>
                 Delete {selectedUsers.size} users
               </Button>
               <ButtonTooltip
-                type="default"
+                variant="default"
                 icon={<X />}
                 className="px-1.5"
                 onClick={() => setSelectedUsers(new Set([]))}
@@ -749,7 +749,7 @@ export const UsersV2 = () => {
                 <ButtonTooltip
                   size="tiny"
                   icon={<RefreshCw />}
-                  type="default"
+                  variant="default"
                   className="w-7"
                   loading={isRefetching && !isFetchingNextPage}
                   onClick={handleRefresh}

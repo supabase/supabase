@@ -40,12 +40,12 @@ const UserAccessTokens: NextPageWithLayout = () => {
             placeholder="Filter tokens"
           />
           <div className="flex items-center gap-x-2">
-            <Button asChild type="default" icon={<ExternalLink />}>
+            <Button asChild variant="default" icon={<ExternalLink />}>
               <a href={`${DOCS_URL}/reference/api/introduction`} target="_blank" rel="noreferrer">
                 API Docs
               </a>
             </Button>
-            <Button asChild type="default" icon={<ExternalLink />}>
+            <Button asChild variant="default" icon={<ExternalLink />}>
               <a href={`${DOCS_URL}/reference/cli/start`} target="_blank" rel="noreferrer">
                 CLI docs
               </a>

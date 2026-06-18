@@ -49,20 +49,24 @@ export const BannerUnifiedLogs = () => {
         </div>
         <div className="flex gap-2">
           {isEnabled ? (
-            <Button type="default" size="tiny" asChild>
+            <Button variant="default" size="tiny" asChild>
               <Link
                 href={`/project/${ref}/logs`}
-                onClick={() => track('unified_logs_banner_cta_button_clicked')}
+                onClick={() => {
+                  track('unified_logs_banner_cta_button_clicked', { is_enabled: true })
+                  setIsDismissed(true)
+                  dismissBanner('unified-logs-banner')
+                }}
               >
                 Explore Unified Logs
               </Link>
             </Button>
           ) : (
             <Button
-              type="default"
+              variant="default"
               size="tiny"
               onClick={() => {
-                track('unified_logs_banner_cta_button_clicked')
+                track('unified_logs_banner_cta_button_clicked', { is_enabled: false })
                 selectFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS)
               }}
             >

@@ -100,7 +100,7 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
                 {canUpdateWebhook ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button type="default" className="px-1" icon={<MoreVertical />} />
+                      <Button variant="default" className="px-1" icon={<MoreVertical />} />
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent side="left">
@@ -126,7 +126,7 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
                 ) : (
                   <ButtonTooltip
                     disabled
-                    type="default"
+                    variant="default"
                     className="px-1"
                     icon={<MoreVertical />}
                     tooltip={{

@@ -12818,6 +12818,37 @@ export interface components {
               user: string
             }
           }
+      /** @description Pipeline configuration */
+      pipeline_config?: {
+        /** @description Batch configuration */
+        batch?: {
+          /**
+           * @description Maximum fill time in milliseconds
+           * @example 200
+           */
+          max_fill_ms?: number
+        }
+        /**
+         * @description Behavior when the replication slot is invalidated
+         * @example error
+         * @enum {string}
+         */
+        invalidated_slot_behavior?: 'error' | 'recreate'
+        /** @description Maximum number of copy connections per table */
+        max_copy_connections_per_table?: number
+        /** @description Maximum number of table sync workers */
+        max_table_sync_workers?: number
+        /**
+         * @description Publication name
+         * @example pub_orders
+         */
+        publication_name: string
+      }
+      /**
+       * @description Source id
+       * @example 1
+       */
+      source_id?: number
     }
     ValidateReplicationPipelineBody: {
       /** @description Pipeline configuration */

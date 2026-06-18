@@ -1,4 +1,3 @@
-import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -15,14 +14,11 @@ import {
   Label,
 } from 'ui'
 
-import { subscriptionHasHipaaAddon } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
 import { useSqlTitleGenerateMutation } from '@/data/ai/sql-title-mutation'
-import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 interface SaveSnippetDialogProps {
   open: boolean
@@ -32,19 +28,15 @@ interface SaveSnippetDialogProps {
 }
 
 export const SaveSnippetDialog = ({ open, sql, onOpenChange, onSave }: SaveSnippetDialogProps) => {
-  const { ref } = useParams()
-  const { data: organization } = useSelectedOrganizationQuery()
-  const { data: subscription } = useOrgSubscriptionQuery(
-    { orgSlug: organization?.slug },
-    { enabled: open }
-  )
-  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: ref })
   const { data: check } = useCheckOpenAIKeyQuery()
 
   const [name, setName] = useState(generateSnippetTitle())
 
   const isApiKeySet = !!check?.hasKey
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
+
+  // Orgs on HIPAA plans or that have disabled AI should not have access to Supabase AI
+  const { aiOptInLevel, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
+  const isAiOptedOut = aiOptInLevel === 'disabled'
 
   const { mutate: generateTitle, isPending: isGenerating } = useSqlTitleGenerateMutation({
     onSuccess: ({ title }) => setName(title),
@@ -83,35 +75,37 @@ export const SaveSnippetDialog = ({ open, sql, onOpenChange, onSave }: SaveSnipp
               }}
             />
           </div>
-          {!hasHipaaAddon && (
-            <div className="flex justify-end">
-              <ButtonTooltip
-                type="default"
-                size="tiny"
-                disabled={isGenerating || !isApiKeySet}
-                onClick={() => generateTitle({ sql })}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: isApiKeySet
-                      ? undefined
-                      : 'Add your "OPENAI_API_KEY" to your environment variables to use this feature.',
-                  },
-                }}
-              >
-                <div className="flex items-center gap-1">
-                  <div className="scale-75">
-                    <AiIconAnimation loading={isGenerating} />
-                  </div>
-                  <span>Generate with AI</span>
+          <div className="flex justify-end">
+            <ButtonTooltip
+              variant="default"
+              size="tiny"
+              disabled={isGenerating || !isApiKeySet || isHipaaProjectDisallowed || isAiOptedOut}
+              onClick={() => generateTitle({ sql })}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: isHipaaProjectDisallowed
+                    ? 'This feature is not available for HIPAA projects.'
+                    : isAiOptedOut
+                      ? 'Your organization has opted out of AI features.'
+                      : isApiKeySet
+                        ? undefined
+                        : 'Add your "OPENAI_API_KEY" to your environment variables to use this feature.',
+                },
+              }}
+            >
+              <div className="flex items-center gap-1">
+                <div className="scale-75">
+                  <AiIconAnimation loading={isGenerating} />
                 </div>
-              </ButtonTooltip>
-            </div>
-          )}
+                <span>Generate with AI</span>
+              </div>
+            </ButtonTooltip>
+          </div>
         </DialogSection>
         <DialogSectionSeparator />
         <DialogFooter className="px-5 py-4">
-          <Button type="default" onClick={() => onOpenChange(false)}>
+          <Button variant="default" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button disabled={!name.trim()} onClick={handleSave}>

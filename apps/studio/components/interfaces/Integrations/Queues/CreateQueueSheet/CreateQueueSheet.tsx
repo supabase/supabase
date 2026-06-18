@@ -135,8 +135,8 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
           <SheetFooter>
             <Button
               size="tiny"
-              type="default"
-              htmlType="button"
+              variant="default"
+              type="button"
               onClick={confirmOnClose}
               disabled={isPending}
             >
@@ -144,9 +144,9 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
             </Button>
             <Button
               size="tiny"
-              type="primary"
+              variant="primary"
               form={FORM_ID}
-              htmlType="submit"
+              type="submit"
               loading={isPending}
               disabled={!project?.ref}
             >

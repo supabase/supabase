@@ -153,7 +153,7 @@ Binary payloads (`ArrayBuffer` / `ArrayBufferView`) are received automatically f
     // Join a room/topic. Can be anything except for 'realtime'.
     const myChannel = supabase.channel('test-channel')
 
-    // Simple function to log any messages we receive
+    // Function to log any messages we receive
     function messageReceived(payload) {
       console.log(payload)
     }
@@ -176,7 +176,7 @@ Binary payloads (`ArrayBuffer` / `ArrayBufferView`) are received automatically f
     ```dart
     final myChannel = supabase.channel('test-channel');
 
-    // Simple function to log any messages we receive
+    // Log any messages we receive
     void messageReceived(payload) {
       print(payload);
     }
@@ -241,7 +241,7 @@ Binary payloads (`ArrayBuffer` / `ArrayBufferView`) are received automatically f
     # Join a room/topic. Can be anything except for 'realtime'.
     my_channel = supabase.channel('test-channel')
 
-    # Simple function to log any messages we receive
+    # Function to log any messages we receive
     def message_received(payload):
       print(f"Broadcast received: {payload}")
 
@@ -413,7 +413,7 @@ Broadcast payloads can be binary (`ArrayBuffer` or `ArrayBufferView`, e.g. `Uint
 
     <Admonition type="note">
 
-    When an asynchronous method needs to be used within a synchronous context, such as the callback for `.subscribe()`, utilize `asyncio.create_task()` to schedule the coroutine. This is why the [initialize the client](#initialize-the-client) example includes an import of `asyncio`.
+    When an asynchronous method needs to be used within a synchronous context, such as the callback for `.subscribe()`, use `asyncio.create_task()` to schedule the coroutine. This is why the [initialize the client](#initialize-the-client) example includes an import of `asyncio`.
 
     </Admonition>
 
@@ -762,7 +762,7 @@ You can pass configuration options while initializing the Supabase Client.
 
     <Admonition type="note">
 
-    When an asynchronous method needs to be used within a synchronous context, such as the callback for `.subscribe()`, utilize `asyncio.create_task()` to schedule the coroutine. This is why the [initialize the client](#initialize-the-client) example includes an import of `asyncio`.
+    When an asynchronous method needs to be used within a synchronous context, such as the callback for `.subscribe()`, use `asyncio.create_task()` to schedule the coroutine. This is why the [initialize the client](#initialize-the-client) example includes an import of `asyncio`.
 
     </Admonition>
 
