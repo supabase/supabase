@@ -17,6 +17,7 @@ import { Panel } from './markdown-schema/Panel'
 import { StepHike } from './markdown-schema/StepHike'
 import { TabPanel } from './markdown-schema/TabPanel'
 import { Admonition } from './markdown-schema/Admonition'
+import { Price } from './markdown-schema/Price'
 
 const PARTIALS_DIR = path.join(process.cwd(), 'content', '_partials')
 
@@ -130,6 +131,7 @@ function applySchema(parent: Parent, schema: ComponentSchema): void {
 const SCHEMA: ComponentSchema = {
   Admonition,
   Link,
+  Price,
   GlassPanel: Panel,
   IconPanel: Panel,
   ...StepHike,

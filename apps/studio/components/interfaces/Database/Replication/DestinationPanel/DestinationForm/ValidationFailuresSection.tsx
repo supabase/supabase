@@ -1,6 +1,7 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Badge, Card } from 'ui'
 import { Admonition } from 'ui-patterns'
 
+import { Markdown } from '@/components/interfaces/Markdown'
 import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 
 interface ValidationFailuresSectionProps {
@@ -52,9 +53,9 @@ export const ValidationFailuresSection = ({
                 </p>
               </AccordionTrigger>
               <AccordionContent className="px-3">
-                <p className="whitespace-pre-wrap text-sm">
-                  {failure.reason.replaceAll('\n\n', '\n')}
-                </p>
+                <Markdown className="text-sm text-foreground-light [&>p]:mb-2!">
+                  {failure.reason}
+                </Markdown>
               </AccordionContent>
             </AccordionItem>
           ))}
