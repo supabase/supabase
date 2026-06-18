@@ -63,7 +63,7 @@ function ContentListingsListGroup({ group }: { group: ContentListingGroup }) {
   const groupLabel = getContentListingGroupLabel(group)
 
   return (
-    <section className="not-prose">
+    <section className="not-prose space-y-4">
       <ContentListingGroupHeading group={group} />
       {group.description && <p className="text-foreground-light">{group.description}</p>}
       <ul className="list-disc pl-6 space-y-2">
@@ -86,7 +86,7 @@ function ContentListingsGridGroup({ group }: { group: ContentListingGroup }) {
   const groupLabel = getContentListingGroupLabel(group)
 
   return (
-    <section className="not-prose">
+    <section className="not-prose space-y-4">
       <ContentListingGroupHeading group={group} />
       {group.description && <p className="text-foreground-light">{group.description}</p>}
       <div className="grid md:grid-cols-12 gap-4">
@@ -147,7 +147,7 @@ export function ContentListings({
 
   const resolvedGroups = resolveContentListingGroup(groups, listing)
 
-  return <ContentListingsGroups groups={resolvedGroups} className="space-y-10" />
+  return <ContentListingsGroups groups={resolvedGroups} className="my-10 space-y-10" />
 }
 
 export function ContentListingsFooter() {
