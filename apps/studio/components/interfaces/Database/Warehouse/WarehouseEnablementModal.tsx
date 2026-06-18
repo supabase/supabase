@@ -98,7 +98,7 @@ export function WarehouseEnablementModal({
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{isMove ? 'Move to Warehouse' : 'Copy to Warehouse'}</DialogTitle>
+          <DialogTitle>{isMove ? 'Move to Warehouse' : 'Create Warehouse copy'}</DialogTitle>
           <DialogDescription>
             {isMove
               ? 'Move analytical storage off the Postgres heap. Best for append-only tables like events and logs.'
@@ -114,16 +114,16 @@ export function WarehouseEnablementModal({
         ) : (
           <>
             <DialogSectionSeparator />
-            <DialogSection className="flex flex-col gap-4 p-0!">
+            <DialogSection className="flex flex-col gap-4">
               {!isMove && (
-                <div className="rounded-md border bg-surface-75 px-4 py-3 text-sm">
-                  <div className="flex items-center justify-between gap-4">
+                <div className="rounded-md border bg-surface-75 divide-y text-sm">
+                  <div className="flex items-center justify-between gap-4 px-4 py-2.5">
                     <span className="text-foreground-light">Table</span>
-                    <span className="font-mono text-foreground">{tableKey}</span>
+                    <code className="text-code-inline">{tableKey}</code>
                   </div>
-                  <div className="mt-2 flex items-center justify-between gap-4">
+                  <div className="flex items-center justify-between gap-4 px-4 py-2.5">
                     <span className="text-foreground-light">Warehouse copy</span>
-                    <span className="font-mono text-foreground">{warehouseCopyName}</span>
+                    <code className="text-code-inline">{warehouseCopyName}</code>
                   </div>
                 </div>
               )}
@@ -162,11 +162,7 @@ export function WarehouseEnablementModal({
               <Button variant="default" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button
-                variant="primary"
-                onClick={handleConfirm}
-                disabled={isMove && !acknowledged}
-              >
+              <Button variant="primary" onClick={handleConfirm} disabled={isMove && !acknowledged}>
                 {isMove ? 'Move to Warehouse' : 'Copy to Warehouse'}
               </Button>
             </DialogFooter>
