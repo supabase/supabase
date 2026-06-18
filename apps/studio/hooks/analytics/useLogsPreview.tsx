@@ -65,8 +65,10 @@ function useLogsPreview({
 
   // When enabled, route the legacy logs pages through the OTEL ClickHouse
   // endpoint (logs.all.otel) instead of the BigQuery-backed logs.all endpoint.
+  // `logsAllEndpointUrl(useOtel)` is inlined in each queryFn (rather than hoisted
+  // to a const) so the only query dependency is `useOtel`, which is already part
+  // of every query key — keeping @tanstack/query/exhaustive-deps satisfied.
   const useOtel = useFlag('otelLegacyLogs')
-  const endpoint = logsAllEndpointUrl(useOtel)
 
   const {
     timestampStart: urlTimestampStart,
@@ -131,7 +133,7 @@ function useLogsPreview({
     queryFn: async ({ signal, pageParam }) => {
       const data = await executeAnalyticsSql({
         projectRef,
-        endpoint,
+        endpoint: logsAllEndpointUrl(useOtel),
         sql: defaultSql,
         iso_timestamp_start: params.iso_timestamp_start ?? '',
         iso_timestamp_end: (pageParam || params.iso_timestamp_end) ?? '',
@@ -204,7 +206,7 @@ function useLogsPreview({
     queryFn: async ({ signal }) => {
       const data = await executeAnalyticsSql({
         projectRef,
-        endpoint,
+        endpoint: logsAllEndpointUrl(useOtel),
         sql: countQuerySql,
         iso_timestamp_start: latestRefresh,
         iso_timestamp_end: timestampEnd ?? '',
@@ -246,7 +248,7 @@ function useLogsPreview({
     queryFn: async ({ signal }) => {
       const data = await executeAnalyticsSql({
         projectRef,
-        endpoint,
+        endpoint: logsAllEndpointUrl(useOtel),
         sql: chartQuery,
         iso_timestamp_start: timestampStart,
         iso_timestamp_end: timestampEnd ?? '',
