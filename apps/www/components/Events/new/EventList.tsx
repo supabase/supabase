@@ -124,7 +124,7 @@ export function EventList() {
 
                 <div className="flex flex-wrap items-center justify-end gap-2 shrink-0 relative z-10">
                   {event.meetingLink && (
-                    <Button size="tiny" type="secondary" asChild>
+                    <Button size="tiny" variant="secondary" asChild>
                       <Link href={event.meetingLink} target="_blank" rel="noopener noreferrer">
                         Meet with us
                       </Link>

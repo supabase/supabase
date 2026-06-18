@@ -86,7 +86,7 @@ export const CreatePublishableAPIKeyDialog = () => {
         side="bottom"
         tooltipOpen={visible === 'publishable' ? false : undefined}
       >
-        <Button type="default" icon={<Plus />} onClick={openDialog}>
+        <Button variant="default" icon={<Plus />} onClick={openDialog}>
           New publishable key
         </Button>
       </Shortcut>
@@ -148,7 +148,7 @@ export const CreatePublishableAPIKeyDialog = () => {
             options={{ enabled: visible === 'publishable' && !isCreatingAPIKey }}
             side="top"
           >
-            <Button form={FORM_ID} htmlType="submit" loading={isCreatingAPIKey}>
+            <Button form={FORM_ID} type="submit" loading={isCreatingAPIKey}>
               Create Publishable API key
             </Button>
           </Shortcut>

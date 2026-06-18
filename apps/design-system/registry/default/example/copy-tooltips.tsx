@@ -13,7 +13,7 @@ export default function CopyTooltips() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  type="text"
+                  variant="text"
                   className="flex items-center px-1.5"
                   icon={<Info size={20} strokeWidth={1.5} />}
                   aria-label="More info"
@@ -33,7 +33,7 @@ export default function CopyTooltips() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  type="text"
+                  variant="text"
                   className="flex items-center px-1.5"
                   icon={<Info size={20} strokeWidth={1.5} />}
                   aria-label="More info"

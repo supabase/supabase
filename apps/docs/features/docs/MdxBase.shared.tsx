@@ -3,7 +3,6 @@ import { AiSkillsIndex } from '~/app/guides/getting-started/ai-skills/AiSkillsIn
 import { AppleSecretGenerator } from '~/components/AppleSecretGenerator'
 import AuthProviders from '~/components/AuthProviders'
 import { AuthSmsProviderConfig } from '~/components/AuthSmsProviderConfig'
-import { CostWarning } from '~/components/AuthSmsProviderConfig/AuthSmsProviderConfig.Warnings'
 import ButtonCard from '~/components/ButtonCard'
 import { ComputeDiskLimitsTable } from '~/components/ComputeDiskLimitsTable'
 import { Extensions } from '~/components/Extensions'
@@ -19,6 +18,7 @@ import { SharedData } from '~/components/SharedData'
 import StepHikeCompact from '~/components/StepHikeCompact'
 import { CodeSampleDummy, CodeSampleWrapper } from '~/features/directives/CodeSample.client'
 import { NamedCodeBlock } from '~/features/directives/CodeTabs.components'
+import { MdxAnchor } from '~/features/docs/MdxAnchor'
 import { Accordion, AccordionItem } from '~/features/ui/Accordion'
 import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
 import InfoTooltip from '~/features/ui/InfoTooltip'
@@ -74,7 +74,6 @@ const components = {
   CodeSampleDummy,
   CodeSampleWrapper,
   ComputeDiskLimitsTable,
-  CostWarning,
   ErrorCodes,
   Extensions,
   GlassPanel,
@@ -100,6 +99,7 @@ const components = {
   Tabs,
   TabPanel,
   InfoTooltip,
+  a: MdxAnchor,
   h2: (props: any) => (
     <Heading tag="h2" {...props}>
       {props.children}

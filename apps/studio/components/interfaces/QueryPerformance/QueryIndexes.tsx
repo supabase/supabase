@@ -435,7 +435,7 @@ export const QueryIndexes = ({
           <Button
             disabled={isExecuting}
             loading={isExecuting}
-            type="primary"
+            variant="primary"
             onClick={() => createIndex()}
           >
             Create index

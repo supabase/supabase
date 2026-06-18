@@ -302,7 +302,7 @@ const DocsSearchPage = () => {
           <div className="p-6 flex flex-col items-center gap-6 mt-4 text-foreground-light">
             <StatusIcon variant="default" />
             <p className="text-sm text-foreground-light text-center">No results found.</p>
-            <Button size="tiny" type="default" onClick={handleResetPrompt}>
+            <Button size="tiny" variant="default" onClick={handleResetPrompt}>
               Try again?
             </Button>
           </div>
@@ -314,7 +314,7 @@ const DocsSearchPage = () => {
               Sorry, looks like we&apos;re having some issues with search!
             </p>
             <p className="text-sm text-foreground-lighter">Please try again in a bit.</p>
-            <Button size="tiny" type="default" onClick={handleResetPrompt}>
+            <Button size="tiny" variant="default" onClick={handleResetPrompt}>
               Try again?
             </Button>
           </div>

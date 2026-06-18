@@ -99,7 +99,7 @@ export async function updateSession(request: NextRequest) {
   )
 
   // Do not run code between createServerClient and
-  // supabase.auth.getClaims(). A simple mistake could make it very hard to debug
+  // supabase.auth.getClaims(). A basic mistake could make it very hard to debug
   // issues with users being randomly logged out.
 
   // IMPORTANT: If you remove getClaims() and you use server-side rendering
@@ -215,7 +215,7 @@ export async function signup(formData: FormData) {
 }
 ```
 
-### 5. Utilize the server actions in your login page UI
+### 5. Use the server actions in your login page UI
 
 ```
 // app/login/page.tsx

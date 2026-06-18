@@ -175,7 +175,7 @@ export const ForeignRowSelector = ({
                 <p className="text-xs text-foreground-light">Saving</p>
               </div>
             )}
-            <Button type="text" icon={<X />} className="w-7" onClick={closePanel} />
+            <Button variant="text" icon={<X />} className="w-7" onClick={closePanel} />
           </div>
         </div>
       }
@@ -227,7 +227,7 @@ export const ForeignRowSelector = ({
                     {isNullable && (
                       <div className="pl-3">
                         <Button
-                          type="default"
+                          variant="default"
                           onClick={() => {
                             if (columns?.length === 1) onSelect({ [columns[0].source]: null })
                           }}

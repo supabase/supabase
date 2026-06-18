@@ -7,12 +7,13 @@ import CopyToClipboard from 'react-copy-to-clipboard'
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
 import bash from 'react-syntax-highlighter/dist/cjs/languages/hljs/bash'
 import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
+import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json'
 import kotlin from 'react-syntax-highlighter/dist/cjs/languages/hljs/kotlin'
 import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
 import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
 import yaml from 'react-syntax-highlighter/dist/cjs/languages/hljs/yaml'
-import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json'
 import { Button, cn } from 'ui'
+
 import monokaiCustomTheme, { codeHikeTheme } from './CodeBlock.utils'
 
 export type LANG = 'js' | 'sql' | 'py' | 'bash' | 'ts' | 'tsx' | 'kotlin' | 'yaml' | 'json'
@@ -157,7 +158,7 @@ function CodeBlock(props: CodeBlockProps) {
           <div className="absolute right-2 top-2">
             <CopyToClipboard text={props.children}>
               <Button
-                type="text"
+                variant="text"
                 icon={
                   copied ? (
                     <span className="text-brand">

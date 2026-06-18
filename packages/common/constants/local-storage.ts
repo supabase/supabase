@@ -87,7 +87,7 @@ export const LOCAL_STORAGE_KEYS = {
   // Shortcut preferences
   SHORTCUT_STORAGE_KEY: 'supabase-shortcut-preferences',
 
-  LAST_VISITED_ORGANIZATION: 'last-visited-organization',
+  LAST_VISITED_ORGANIZATION: (uid?: number) => `last-visited-organization-${uid}`,
 
   // user impersonation selector previous searches
   USER_IMPERSONATION_SELECTOR_PREVIOUS_SEARCHES: (ref: string) =>
@@ -116,6 +116,7 @@ export const LOCAL_STORAGE_KEYS = {
     `table-editor-queue-operations-banner-dismissed-${ref}`,
   FREE_MICRO_UPGRADE_BANNER_DISMISSED: (ref: string) =>
     `free-micro-upgrade-banner-dismissed-${ref}`,
+  UNIFIED_LOGS_BANNER_DISMISSED: 'unified-logs-banner-dismissed',
   STORAGE_PUBLIC_BUCKET_SELECT_POLICY_WARNING_DISMISSED: (ref: string, bucketId: string) =>
     `storage-public-bucket-select-policy-warning-dismissed-${ref}-${bucketId}`,
 

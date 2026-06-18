@@ -230,12 +230,16 @@ export const BillingCustomerData = () => {
                           </span>
                         )}
                         <div className="flex items-center gap-2">
-                          <Button type="default" onClick={handleReset} disabled={isSubmitDisabled}>
+                          <Button
+                            variant="default"
+                            onClick={handleReset}
+                            disabled={isSubmitDisabled}
+                          >
                             Cancel
                           </Button>
                           <Button
-                            type="primary"
-                            htmlType="submit"
+                            variant="primary"
+                            type="submit"
                             disabled={isSubmitDisabled}
                             loading={isSubmitting}
                           >

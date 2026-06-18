@@ -259,13 +259,13 @@ export const SessionsAuthSettingsForm = () => {
                 </CardContent>
                 <CardFooter className="justify-end space-x-2">
                   {refreshTokenForm.formState.isDirty && (
-                    <Button type="default" onClick={() => refreshTokenForm.reset()}>
+                    <Button variant="default" onClick={() => refreshTokenForm.reset()}>
                       Cancel
                     </Button>
                   )}
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     disabled={
                       !canUpdateConfig ||
                       isUpdatingRefreshTokens ||
@@ -389,13 +389,13 @@ export const SessionsAuthSettingsForm = () => {
 
                 <CardFooter className="justify-end space-x-2">
                   {userSessionsForm.formState.isDirty && (
-                    <Button type="default" onClick={() => userSessionsForm.reset()}>
+                    <Button variant="default" onClick={() => userSessionsForm.reset()}>
                       Cancel
                     </Button>
                   )}
                   <Button
-                    type={promptProPlanUpgrade ? 'default' : 'primary'}
-                    htmlType="submit"
+                    variant={promptProPlanUpgrade ? 'default' : 'primary'}
+                    type="submit"
                     disabled={
                       !canUpdateConfig ||
                       isUpdatingUserSessions ||

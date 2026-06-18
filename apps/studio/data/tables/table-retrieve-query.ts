@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { tableKeys } from './keys'
 import { getQueryClient } from '@/data/query-client'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { SafePostgresTable } from '@/lib/postgres-types'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 

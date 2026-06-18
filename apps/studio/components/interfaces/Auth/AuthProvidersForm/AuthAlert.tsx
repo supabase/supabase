@@ -46,7 +46,7 @@ export const AuthAlert = ({
             </AlertTitle>
             <AlertDescription className="flex flex-col gap-y-3">
               <p>The SMS hook will be used in place of the SMS provider configured</p>
-              <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
+              <Button asChild variant="default" className="w-min" icon={<ExternalLink />}>
                 <Link href={`/project/${ref}/auth/hooks`}>View auth hooks</Link>
               </Button>
             </AlertDescription>

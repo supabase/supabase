@@ -184,10 +184,10 @@ export const CreateNewProjectDialog = ({
             </DialogSection>
             <AdditionalMonthlySpend additionalMonthlySpend={additionalMonthlySpend} />
             <DialogFooter>
-              <Button htmlType="reset" type="outline" onClick={() => onOpenChange(false)}>
+              <Button type="reset" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button htmlType="submit" loading={cloneMutationLoading}>
+              <Button type="submit" loading={cloneMutationLoading}>
                 Restore to new project
               </Button>
             </DialogFooter>

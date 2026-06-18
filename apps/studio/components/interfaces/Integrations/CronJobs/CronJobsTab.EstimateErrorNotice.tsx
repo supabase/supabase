@@ -27,7 +27,7 @@ export const CronJobRunDetailsEstimateErrorNotice = ({
         )}
         {onRetry && (
           <Button
-            type="default"
+            variant="default"
             loading={isRetrying}
             disabled={isRetrying}
             className="mt-1"

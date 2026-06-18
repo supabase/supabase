@@ -13,10 +13,16 @@ admonition_types = ["note", "tip", "caution", "deprecation", "danger"]
 
 [Rule004ExcludeWords]
 rules.filler = "include('supa-mdx-lint/Rule004ExcludeWords/filler.toml')"
+rules.marketing = "include('supa-mdx-lint/Rule004ExcludeWords/marketing.toml')"
+rules.vague_verbs = "include('supa-mdx-lint/Rule004ExcludeWords/vague_verbs.toml')"
+rules.generic_phrases_apology = "include('supa-mdx-lint/Rule004ExcludeWords/generic_phrases_apology.toml')"
 rules.first_person = "include('supa-mdx-lint/Rule004ExcludeWords/first_person.toml')"
 rules.gender_neutral = "include('supa-mdx-lint/Rule004ExcludeWords/gender_neutral.toml')"
 rules.inclusive_wording = "include('supa-mdx-lint/Rule004ExcludeWords/inclusive_wording.toml')"
+rules.human_language = "include('supa-mdx-lint/Rule004ExcludeWords/human_language.toml')"
+rules.latin_phrases = "include('supa-mdx-lint/Rule004ExcludeWords/latin_phrases.toml')"
 rules.preferred_usage = "include('supa-mdx-lint/Rule004ExcludeWords/preferred_usage.toml')"
+rules.formal_corporate = "include('supa-mdx-lint/Rule004ExcludeWords/formal_corporate.toml')"
 rules.slang = "include('supa-mdx-lint/Rule004ExcludeWords/slang.toml')"
 
 [Rule006NoAbsoluteUrls]

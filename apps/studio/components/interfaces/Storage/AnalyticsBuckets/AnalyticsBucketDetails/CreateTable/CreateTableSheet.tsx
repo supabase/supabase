@@ -221,7 +221,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                     <div className="flex items-center justify-between">
                       <p className="text-sm">Columns</p>
                       <Button
-                        type="default"
+                        variant="default"
                         icon={<Plus />}
                         onClick={() => appendColumn({ name: '', type: 'string' })}
                       >
@@ -284,7 +284,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                                 />
                                 <div className="flex items-center justify-center">
                                   <Button
-                                    type="text"
+                                    variant="text"
                                     size="tiny"
                                     icon={<X strokeWidth={1.5} size={14} />}
                                     className="w-6 h-6"
@@ -344,7 +344,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
             <SheetFooter>
               <Button
                 disabled={isCreating}
-                type="default"
+                variant="default"
                 onClick={() => {
                   onOpenChange(false)
                   form.reset(defaultValues)
@@ -352,7 +352,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
               >
                 Cancel
               </Button>
-              <Button form={formId} htmlType="submit" loading={isCreating}>
+              <Button form={formId} type="submit" loading={isCreating}>
                 Create table
               </Button>
             </SheetFooter>

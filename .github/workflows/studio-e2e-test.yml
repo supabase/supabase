@@ -24,7 +24,6 @@ jobs:
 
     permissions:
       contents: write
-
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
@@ -87,7 +86,7 @@ jobs:
       - name: Pre-start diagnostics
         run: |
           docker ps -a
-          sudo ss -tlnp | grep 5432 || echo "5432 free"
+          sudo ss -tlnp | grep 54322 || echo "54322 free"
 
       - name: Start supabase
         if: steps.filter.outputs.studio == 'true'
@@ -97,7 +96,7 @@ jobs:
         if: failure()
         run: |
           docker ps -a
-          sudo ss -tlnp | grep 5432
+          sudo ss -tlnp | grep 54322 || echo "54322 not listening"
           docker logs $(docker ps -aq) 2>&1 || true
 
       - name: Build studio

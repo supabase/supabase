@@ -23,7 +23,7 @@ export const TABLE_EVENT_ACTIONS = {
 } as const satisfies {
   TableCreated: TableCreatedEvent['action']
   TableDataAdded: TableDataAddedEvent['action']
-  TableRLSEnabled: TableRLSEnabledEvent['action']
+  TableRLSEnabled: TableRlsEnabledEvent['action']
 }
 
 export type TableEventAction = (typeof TABLE_EVENT_ACTIONS)[keyof typeof TABLE_EVENT_ACTIONS]
@@ -782,7 +782,7 @@ export interface AssistantEditInSqlEditorClickedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/reports/{id}
  */
-export interface CustomReportAddSQLBlockClickedEvent {
+export interface CustomReportAddSqlBlockClickedEvent {
   action: 'custom_report_add_sql_block_clicked'
   groups: TelemetryGroups
 }
@@ -794,7 +794,7 @@ export interface CustomReportAddSQLBlockClickedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/reports/{id}
  */
-export interface CustomReportAssistantSQLBlockAddedEvent {
+export interface CustomReportAssistantSqlBlockAddedEvent {
   action: 'custom_report_assistant_sql_block_added'
   groups: TelemetryGroups
 }
@@ -821,7 +821,7 @@ export interface DocsFeedbackClickedEvent {
  * @group Events
  * @source docs
  */
-export interface CopyAsMarkdownEvent {
+export interface CopyAsMarkdownClickedEvent {
   action: 'copy_as_markdown_clicked'
 }
 
@@ -831,10 +831,30 @@ export interface CopyAsMarkdownEvent {
  * @group Events
  * @source docs
  */
-export interface AskAIEvent {
+export interface AskAiClickedEvent {
   action: 'ask_ai_clicked'
   properties: {
     agent: 'chatgpt' | 'claude'
+  }
+}
+
+/**
+ * User clicked a recommended page card shown on a docs "not found" page.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface Docs404RecommendationClickedEvent {
+  action: 'docs_404_recommendation_clicked'
+  properties: {
+    /**
+     * The path of the recommended page that was clicked.
+     */
+    destinationPath: string
+    /**
+     * The path of the "not found" page where the recommendation was shown.
+     */
+    sourcePath: string
   }
 }
 
@@ -905,7 +925,7 @@ export interface WwwPricingPlanCtaClickedEvent {
  * @source www
  * @page /events/*
  */
-export interface EventPageCtaClickedEvent {
+export interface WwwEventPageCtaClickedEvent {
   action: 'www_event_page_cta_clicked'
   properties: {
     /**
@@ -922,7 +942,7 @@ export interface EventPageCtaClickedEvent {
  * @source www
  * @page /
  */
-export interface HomepageGitHubButtonClickedEvent {
+export interface HomepageGithubButtonClickedEvent {
   action: 'homepage_github_button_clicked'
 }
 
@@ -1121,7 +1141,7 @@ export interface ImportDataButtonClickedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/editor
  */
-export interface ImportDataFileAddedEvent {
+export interface ImportDataDropzoneFileAddedEvent {
   action: 'import_data_dropzone_file_added'
   groups: TelemetryGroups
 }
@@ -1228,7 +1248,7 @@ export interface ReportsDatabaseGrafanaBannerClickedEvent {
  * @source studio
  * @page /observability/*
  */
-export interface MetricsAPIBannerCtaButtonClickedEvent {
+export interface MetricsApiBannerCtaButtonClickedEvent {
   action: 'metrics_api_banner_cta_button_clicked'
   groups: TelemetryGroups
 }
@@ -1240,8 +1260,35 @@ export interface MetricsAPIBannerCtaButtonClickedEvent {
  * @source studio
  * @page /observability/*
  */
-export interface MetricsAPIBannerDismissButtonClickedEvent {
+export interface MetricsApiBannerDismissButtonClickedEvent {
   action: 'metrics_api_banner_dismiss_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicks on the Unified Logs banner CTA button in studio project pages.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/*
+ */
+export interface UnifiedLogsBannerCtaButtonClickedEvent {
+  action: 'unified_logs_banner_cta_button_clicked'
+  properties: {
+    is_enabled: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the dismiss button on the Unified Logs banner in studio project pages.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/[ref]/*
+ */
+export interface UnifiedLogsBannerDismissButtonClickedEvent {
+  action: 'unified_logs_banner_dismiss_button_clicked'
   groups: TelemetryGroups
 }
 
@@ -1850,7 +1897,7 @@ export interface HomeProjectUsageServiceClickedEvent {
     /**
      * The service that was clicked
      */
-    service_type: 'db' | 'functions' | 'auth' | 'storage' | 'realtime'
+    service_type: 'db' | 'functions' | 'auth' | 'storage' | 'realtime' | 'data_api'
     /**
      * Total requests for this service
      */
@@ -1876,7 +1923,7 @@ export interface HomeProjectUsageChartClickedEvent {
     /**
      * The service type for this chart
      */
-    service_type: 'db' | 'functions' | 'auth' | 'storage' | 'realtime'
+    service_type: 'db' | 'functions' | 'auth' | 'storage' | 'realtime' | 'data_api'
     /**
      * Timestamp of the bar clicked
      */
@@ -2106,7 +2153,7 @@ export interface TableDataAddedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/editor or /dashboard/project/{ref}/sql
  */
-export interface TableRLSEnabledEvent {
+export interface TableRlsEnabledEvent {
   action: 'table_rls_enabled'
   properties: {
     /**
@@ -2132,7 +2179,7 @@ export interface TableRLSEnabledEvent {
  * @source studio
  * @page /dashboard/project/{ref}/editor
  */
-export interface RLSGeneratePoliciesClickedEvent {
+export interface RlsGeneratePoliciesClickedEvent {
   action: 'rls_generate_policies_clicked'
   groups: TelemetryGroups
 }
@@ -2144,7 +2191,7 @@ export interface RLSGeneratePoliciesClickedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/editor
  */
-export interface RLSGeneratedPolicyRemovedEvent {
+export interface RlsGeneratedPolicyRemovedEvent {
   action: 'rls_generated_policy_removed'
   groups: TelemetryGroups
 }
@@ -2156,7 +2203,7 @@ export interface RLSGeneratedPolicyRemovedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/editor
  */
-export interface RLSGeneratedPoliciesCreatedEvent {
+export interface RlsGeneratedPoliciesCreatedEvent {
   action: 'rls_generated_policies_created'
   groups: TelemetryGroups
 }
@@ -2649,7 +2696,7 @@ export interface AdvisorAssistantButtonClickedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/observability/query-performance
  */
-export interface QueryPerformanceAIExplanationButtonClickedEvent {
+export interface QueryPerformanceExplainWithAiButtonClickedEvent {
   action: 'query_performance_explain_with_ai_button_clicked'
   groups: TelemetryGroups
 }
@@ -3112,6 +3159,40 @@ export interface AccessTokenRemovedEvent {
 }
 
 /**
+ * User clicked the "Upgrade to Pro" CTA in one of the experiment placement surfaces.
+ * GROWTH experiment: `upgradeCtaPlacement` (user_dropdown / org_projects_list).
+ *
+ * @group Events
+ * @source studio
+ */
+export interface UpgradeCtaClickedEvent {
+  action: 'upgrade_cta_clicked'
+  properties: {
+    placement: 'user_dropdown' | 'org_projects_list'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User was exposed to the upgrade CTA placement experiment.
+ * Fires once per session per free-plan user enrolled in any variant (including control),
+ * so the conversion analysis has a baseline cohort.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface UpgradeCtaPlacementExperimentExposedEvent {
+  action: 'upgrade_cta_placement_experiment_exposed'
+  properties: {
+    /**
+     * The experiment variant shown to the user
+     */
+    variant: 'control' | 'user_dropdown' | 'org_projects_list'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * User clicked the primary CTA on a resource exhaustion warning banner.
  *
  * @group Events
@@ -3154,7 +3235,15 @@ export interface UnifiedLogsRowClickedEvent {
      * Server values are validated against this set by zod (UnifiedLogs.schema.ts) before
      * reaching the table; anything else is rejected upstream so the union here is exhaustive.
      */
-    logType: 'postgres' | 'postgrest' | 'auth' | 'storage' | 'edge function'
+    logType:
+      | 'postgres'
+      | 'postgrest'
+      | 'auth'
+      | 'storage'
+      | 'edge function'
+      | 'realtime'
+      | 'supavisor'
+      | 'pgbouncer'
   }
   groups: TelemetryGroups
 }
@@ -3336,7 +3425,7 @@ export interface HeaderLocalVersionPopoverOpenedEvent {
  * @group Events
  * @source studio
  */
-export interface RLSTesterRunQueryClickedEvent {
+export interface RlsTesterRunQueryClickedEvent {
   action: 'rls_tester_run_query_clicked'
   properties: { type: 'raw' | 'inferred' }
   groups: Partial<TelemetryGroups>
@@ -3389,18 +3478,19 @@ export type TelemetryEvent =
   | AssistantEditInSqlEditorClickedEvent
   | AssistantMessageRatingSubmittedEvent
   | DocsFeedbackClickedEvent
-  | CopyAsMarkdownEvent
-  | AskAIEvent
+  | CopyAsMarkdownClickedEvent
+  | AskAiClickedEvent
+  | Docs404RecommendationClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
   | HomepageProductCardClickedEvent
   | WwwPricingPlanCtaClickedEvent
-  | EventPageCtaClickedEvent
-  | HomepageGitHubButtonClickedEvent
+  | WwwEventPageCtaClickedEvent
+  | HomepageGithubButtonClickedEvent
   | HomepageDiscordButtonClickedEvent
   | HomepageCustomerStoryCardClickedEvent
   | HomepageProjectTemplateCardClickedEvent
-  | CustomReportAddSQLBlockClickedEvent
-  | CustomReportAssistantSQLBlockAddedEvent
+  | CustomReportAddSqlBlockClickedEvent
+  | CustomReportAssistantSqlBlockAddedEvent
   | OpenSourceRepoCardClickedEvent
   | StartProjectButtonClickedEvent
   | SeeDocumentationButtonClickedEvent
@@ -3409,7 +3499,7 @@ export type TelemetryEvent =
   | HelpButtonClickedEvent
   | ExampleProjectCardClickedEvent
   | ImportDataButtonClickedEvent
-  | ImportDataFileAddedEvent
+  | ImportDataDropzoneFileAddedEvent
   | ImportDataAddedEvent
   | SendFeedbackButtonClickedEvent
   | SqlEditorQueryRunButtonClickedEvent
@@ -3422,8 +3512,10 @@ export type TelemetryEvent =
   | StudioBillingCancelSubscriptionClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
-  | MetricsAPIBannerCtaButtonClickedEvent
-  | MetricsAPIBannerDismissButtonClickedEvent
+  | MetricsApiBannerCtaButtonClickedEvent
+  | MetricsApiBannerDismissButtonClickedEvent
+  | UnifiedLogsBannerCtaButtonClickedEvent
+  | UnifiedLogsBannerDismissButtonClickedEvent
   | IndexAdvisorEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
   | IndexAdvisorTabClickedEvent
@@ -3471,10 +3563,10 @@ export type TelemetryEvent =
   | HipaaRequestButtonClickedEvent
   | TableCreatedEvent
   | TableDataAddedEvent
-  | TableRLSEnabledEvent
-  | RLSGeneratePoliciesClickedEvent
-  | RLSGeneratedPolicyRemovedEvent
-  | RLSGeneratedPoliciesCreatedEvent
+  | TableRlsEnabledEvent
+  | RlsGeneratePoliciesClickedEvent
+  | RlsGeneratedPolicyRemovedEvent
+  | RlsGeneratedPoliciesCreatedEvent
   | AuthUsersSearchSubmittedEvent
   | CommandMenuOpenedEvent
   | CommandMenuClosedEvent
@@ -3489,7 +3581,7 @@ export type TelemetryEvent =
   | AuditLogDrainRemovedEvent
   | AdvisorDetailOpenedEvent
   | AdvisorAssistantButtonClickedEvent
-  | QueryPerformanceAIExplanationButtonClickedEvent
+  | QueryPerformanceExplainWithAiButtonClickedEvent
   | AiPromptCopiedEvent
   | AiAssistantDropdownButtonClickedEvent
   | AiExternalToolClickedEvent
@@ -3512,6 +3604,8 @@ export type TelemetryEvent =
   | ComputeBadgeUpgradeClickedEvent
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
+  | UpgradeCtaClickedEvent
+  | UpgradeCtaPlacementExperimentExposedEvent
   | AccessTokenCreatedEvent
   | AccessTokenRemovedEvent
   | ResourceExhaustionBannerUpgradeClickedEvent
@@ -3532,4 +3626,4 @@ export type TelemetryEvent =
   | HeaderUserDropdownOpenedEvent
   | HeaderLocalDropdownOpenedEvent
   | HeaderLocalVersionPopoverOpenedEvent
-  | RLSTesterRunQueryClickedEvent
+  | RlsTesterRunQueryClickedEvent

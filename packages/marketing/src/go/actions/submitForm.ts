@@ -256,8 +256,10 @@ export async function submitFormAction(
     let consent: string | undefined
     if (activeCrm.hubspot) {
       const fieldMap = activeCrm.hubspot.fieldMap ?? {}
+      const excludeFields = new Set(activeCrm.hubspot.excludeFields ?? [])
       hubspotFields = {}
       for (const [formField, value] of Object.entries(payloadValues)) {
+        if (excludeFields.has(formField)) continue
         const hsField = fieldMap[formField] ?? formField
         hubspotFields[hsField] = value
       }

@@ -19,7 +19,7 @@ export const StartUsingJwtSigningKeysBanner = ({
           new JWT signing keys, migrate your project's secret to the new set up.
         </p>
         <div className="mt-4">
-          <Button type="primary" icon={<Import />} onClick={onClick} loading={isLoading}>
+          <Button variant="primary" icon={<Import />} onClick={onClick} loading={isLoading}>
             Migrate JWT secret
           </Button>
         </div>
