@@ -122,7 +122,7 @@ Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions
 
 ---
 
-## [2026-04-27]
+## 2026-04-27
 
 ### Configuration
 - ⚠️ Added `docker-compose.envoy.yml` and `volumes/api/envoy`. See also the API gateway updates below - PR [#43838](https://github.com/supabase/supabase/pull/43838)
@@ -146,7 +146,7 @@ Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions
 - ⚠️ Added 4 new lints to the Security Advisor. Read more about lint rules 0026 - 0029 in the [Performance and Security Advisors](https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0026_pg_graphql_anon_table_exposed) section of the Supabase documentation - PR [#45253](https://github.com/supabase/supabase/pull/45253), PR [#45260](https://github.com/supabase/supabase/pull/45260)
 ---
 
-## [2026-04-08]
+## 2026-04-08
 
 ### Documentation
 - Added new how-to guides for configuring [custom email templates](https://supabase.com/docs/guides/self-hosting/custom-email-templates), setting up [SAML SSO](https://supabase.com/docs/guides/self-hosting/self-hosted-saml-sso), and [using Postgres 17](https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17) - PR [#42832](https://github.com/supabase/supabase/pull/42832), PR [#43386](https://github.com/supabase/supabase/pull/43386), PR [#44147](https://github.com/supabase/supabase/pull/44147)
@@ -182,7 +182,7 @@ Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions
 
 ---
 
-## [2026-03-16]
+## 2026-03-16
 
 ⚠️ **Note:** This update includes **important changes**. Please check the details below. The following configuration files have been added/updated: `utils/add-new-auth-keys.sh`, `utils/rotate-new-api-keys.sh`, `docker-compose.yml`, `.env.example`, `docker-compose.s3.yml`, `docker-compose.rustfs.yml`, `volumes/api/kong.yml`, `volumes/api/kong-entrypoint.sh`, `docker-compose.caddy.yml`, `docker-compose.nginx.yml`, `volumes/functions/main/index.ts`, and `volumes/proxy`.
 
@@ -228,7 +228,7 @@ Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions
 
 ---
 
-## [2026-02-18]
+## 2026-02-18
 
 ### Storage
 - Changed MinIO image to use Chainguard [minio](https://images.chainguard.dev/directory/image/minio/overview) and [minio-client](https://images.chainguard.dev/directory/image/minio-client/overview) (requires `docker-compose.s3.yml` update) - PR [#42942](https://github.com/supabase/supabase/pull/42942)
@@ -241,7 +241,7 @@ Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions
 
 ---
 
-## [2026-02-16]
+## 2026-02-16
 
 ⚠️ **Note:** This update includes several breaking changes, including a security fix for Analytics. Please check the details below. The following configuration files have been updated: `docker-compose.yml`, `.env.example`, `docker-compose.s3.yml`, `volumes/api/kong.yml`, and `volumes/logs/vector.yml`.
 
@@ -283,7 +283,7 @@ Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions
 
 ---
 
-## [2026-02-05]
+## 2026-02-05
 
 ### Storage
 - Updated to `v1.37.1` - [Release](https://github.com/supabase/storage/releases/tag/v1.37.1)
@@ -291,7 +291,7 @@ Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions
 
 ---
 
-## [2026-01-27]
+## 2026-01-27
 
 ### Studio
 - Updated to `2026.01.27-sha-6aa59ff`
@@ -332,7 +332,7 @@ Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions
 
 ---
 
-## [2025-12-18]
+## 2025-12-18
 
 ### Documentation
 - Updated self-hosting installation and configuration guide - PR [#40901](https://github.com/supabase/supabase/pull/40901), PR [#41438](https://github.com/supabase/supabase/pull/41438)
@@ -362,7 +362,7 @@ Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions
 
 ---
 
-## [2025-12-10]
+## 2025-12-10
 
 ### Studio
 - Updated to `2025.12.09-sha-434634f`
@@ -390,7 +390,7 @@ Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions
 
 ---
 
-## [2025-12-08]
+## 2025-12-08
 
 ### Realtime
 - No image update
@@ -399,7 +399,7 @@ Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions
 
 ---
 
-## [2025-11-26]
+## 2025-11-26
 
 ### Studio
 - Updated to `2025.11.26-sha-8f096b5`
@@ -416,7 +416,7 @@ Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions
 
 ---
 
-## [2025-11-25]
+## 2025-11-25
 
 ### Studio
 - Updated to `2025.11.24-sha-d990ae8` - [Dashboard updates](https://github.com/orgs/supabase/discussions/40734)
@@ -445,7 +445,7 @@ Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions
 
 ---
 
-## [2025-11-17]
+## 2025-11-17
 
 ### Storage
 - No image update
@@ -453,7 +453,7 @@ Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions
 
 ---
 
-## [2025-11-12]
+## 2025-11-12
 
 ### Studio
 - Updated to `2025.11.10-sha-5291fe3` - [Dashboard updates](https://github.com/orgs/supabase/discussions/40083)
@@ -477,7 +477,7 @@ Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions
 
 ---
 
-## [2025-11-05]
+## 2025-11-05
 
 ### Studio
 - No image update
@@ -489,7 +489,7 @@ Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions
 
 ---
 
-## [2025-10-28]
+## 2025-10-28
 
 ### Studio
 - Updated to `2025.10.27-sha-85b84e0` - [Dashboard updates](https://github.com/orgs/supabase/discussions/40083)
@@ -509,7 +509,7 @@ Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions
 
 ---
 
-## [2025-10-27]
+## 2025-10-27
 
 ### Studio
 - No image update
@@ -518,7 +518,7 @@ Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions
 
 ---
 
-## [2025-10-21]
+## 2025-10-21
 
 ### Studio
 - Updated to `2025.10.20-sha-5005fc6` - [Dashboard updates](https://github.com/orgs/supabase/discussions/39709)
@@ -541,14 +541,14 @@ Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions
 
 ---
 
-## [2025-10-13]
+## 2025-10-13
 
 ### Analytics (Logflare)
 - Updated to `1.22.6` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.22.6)
 
 ---
 
-## [2025-10-08]
+## 2025-10-08
 
 ### Studio
 - Updated to `2025.10.01-sha-8460121` - [Dashboard updates](https://github.com/orgs/supabase/discussions/39709)
