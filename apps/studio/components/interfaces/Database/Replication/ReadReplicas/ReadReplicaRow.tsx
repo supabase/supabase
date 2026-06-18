@@ -122,7 +122,7 @@ export const ReadReplicaRow = ({ replica, onUpdateReplica }: ReadReplicaRow) => 
               </Link>
             </Button>
             <DropdownMenu>
-              <DropdownMenuTrigger>
+              <DropdownMenuTrigger asChild>
                 <Button variant="default" icon={<MoreVertical />} className="w-7" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52">
