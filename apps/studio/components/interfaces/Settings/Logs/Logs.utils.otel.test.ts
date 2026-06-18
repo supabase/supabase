@@ -157,7 +157,8 @@ describe('mapOtelSingleLogToLegacy', () => {
       'request.search': '?select=*',
       'request.headers.user_agent': 'curl/8',
       'response.status_code': '200',
-      'response.headers.x_sb_error_code': 'none',
+      // Real OTEL gateway key is `sb_error_code` (BigQuery used `x_sb_error_code`).
+      'response.headers.sb_error_code': 'none',
     },
   }
 

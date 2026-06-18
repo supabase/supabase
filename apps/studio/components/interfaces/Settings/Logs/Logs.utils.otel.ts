@@ -386,6 +386,15 @@ export const mapOtelSingleLogToLegacy = (row: OtelLogRow, queryType?: QueryType)
   }
 
   if (queryType === 'api') {
+    // The OTEL gateway error-code header is stored as `response.headers.sb_error_code`
+    // (BigQuery exposed it as `x_sb_error_code`); coalesce both so the detail panel
+    // resolves it regardless of which the backend emits.
+    const sbErrorCode =
+      attrs['response.headers.sb_error_code'] ?? attrs['response.headers.x_sb_error_code'] ?? null
+    // Note: the OTEL edge `log_attributes` do not carry the JWT/apikey/`sb` subtree
+    // that BigQuery did, so the panel's API key / role rows (jwtAPIKey/apiKey/role,
+    // which read metadata[0].request[0].sb[0]...) are intentionally absent under the
+    // flag. They render as omitted rather than incorrect.
     return {
       ...base,
       metadata: [
@@ -401,7 +410,7 @@ export const mapOtelSingleLogToLegacy = (row: OtelLogRow, queryType?: QueryType)
           response: [
             {
               status_code: attrs['response.status_code'] ?? null,
-              headers: [{ x_sb_error_code: attrs['response.headers.x_sb_error_code'] ?? null }],
+              headers: [{ x_sb_error_code: sbErrorCode }],
             },
           ],
         },
