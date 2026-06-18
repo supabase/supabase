@@ -357,13 +357,15 @@ export const DestinationForm = ({
 
   const getSubmitButtonText = () => {
     if (editMode) {
-      return existingDestination?.enabled ? 'Apply and restart' : 'Apply and start'
+      return existingDestination?.enabled
+        ? 'Apply and restart pipeline'
+        : 'Apply and start pipeline'
     } else {
       if (hasRunValidation && validationWarnings.length > 0 && !hasValidationFailures) {
-        return 'Create and start anyway'
+        return 'Create and start pipeline anyway'
       }
 
-      return 'Create and start'
+      return 'Create and start pipeline'
     }
   }
 
@@ -532,13 +534,17 @@ export const DestinationForm = ({
         })
         // Set request status only right before starting, then fire and close
         setRequestStatus(pipelineId, PipelineStatusRequestStatus.StartRequested, undefined)
-        toast.success('Destination added. Starting the pipeline...')
+        toast.success('Pipeline created. Starting the pipeline...')
         startPipeline({ projectRef, pipelineId })
         onClose()
       }
     } catch (error) {
-      const action = editMode ? 'apply and run' : 'add and start'
-      toast.error(`Failed to ${action} destination: ${(error as ResponseError).message}`)
+      const action = editMode
+        ? existingDestination?.enabled
+          ? 'apply changes and restart pipeline'
+          : 'apply changes and start pipeline'
+        : 'create and start pipeline'
+      toast.error(`Failed to ${action}: ${(error as ResponseError).message}`)
     }
   }
 
@@ -690,7 +696,11 @@ export const DestinationForm = ({
               <p className="text-foreground-light text-sm">
                 {isValidating
                   ? 'Validating destination configuration...'
-                  : `${editMode ? 'Updating' : 'Creating'} destination...`}
+                  : editMode
+                    ? existingDestination?.enabled
+                      ? 'Updating destination and restarting pipeline...'
+                      : 'Updating destination and starting pipeline...'
+                    : 'Creating pipeline...'}
               </p>
             </motion.div>
           ) : (

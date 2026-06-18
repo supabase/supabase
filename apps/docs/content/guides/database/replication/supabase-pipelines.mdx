@@ -183,13 +183,13 @@ Follow these steps to configure your destination. Each destination has its own s
 
    Use **Invalidated slot behavior** carefully. If **Recreate** is selected and the pipeline restarts after Postgres has invalidated the main replication slot, the pipeline creates a new slot and copies all replicated tables again. This full restart is required for consistency because the old slot can no longer provide every change the pipeline missed.
 
-6. Click **Create and start** to begin replication
+6. Click **Create and start pipeline** to begin replication
 
 Your replication pipeline now starts copying data from your database to your destination.
 
 ### Step 4: Monitor your pipeline
 
-After adding a destination, the replication pipeline starts and appears in the destinations list. You can monitor the pipeline's status and performance from the Dashboard.
+After you create and start the pipeline, its destination appears in the destinations list. You can monitor the pipeline's status and performance from the Dashboard.
 
 <Image
   alt="Replication pipelines destinations list"
@@ -215,9 +215,9 @@ You can manage your pipeline from the destinations list using the actions menu.
 
 Available actions:
 
-- **Start**: Begin replication for a stopped pipeline
+- **Start pipeline**: Begin replication for a stopped pipeline
 - **Stop**: Pause replication (changes will queue up in the WAL)
-- **Restart**: Stop and start the pipeline (required after publication changes)
+- **Restart pipeline**: Stop and start the pipeline (required after publication changes)
 - **Edit destination**: Modify destination settings like credentials or advanced options
 - **Delete**: Remove the destination and permanently stop replication
 

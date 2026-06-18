@@ -79,7 +79,7 @@ export const DestinationTypeSelection = () => {
       options: [
         {
           value: 'Read Replica',
-          label: 'Read Replicas',
+          label: 'Read Replica',
           description:
             'Deploy a read-only database in another region for lower latency and workload isolation',
           icon: Database,

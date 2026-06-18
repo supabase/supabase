@@ -260,7 +260,7 @@ function StoragePage() {
                   <Link href="/docs/guides/storage/analytics/introduction">Read the docs</Link>
                 </Button>
                 <Button asChild size="small" variant="default" icon={<ArrowUpRight />}>
-                  <Link href="/blog/analytics-buckets">Read the blog post</Link>
+                  <Link href="/blog/introducing-analytics-buckets">Read the blog post</Link>
                 </Button>
               </div>
             </div>

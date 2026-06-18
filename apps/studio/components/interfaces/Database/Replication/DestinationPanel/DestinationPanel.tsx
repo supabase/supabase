@@ -103,8 +103,8 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
               <SheetTitle>{editMode ? 'Edit destination' : 'Add destination'}</SheetTitle>
               <SheetDescription>
                 {editMode
-                  ? 'Update the destination configuration for this replication pipeline.'
-                  : 'Choose where to replicate data. Read Replicas stay in Supabase; Supabase Pipelines destinations stream changes to analytics systems.'}
+                  ? 'Update the configuration for this destination.'
+                  : 'A destination can be a read replica or an external destination that receives replicated data in near real time.'}
               </SheetDescription>
             </SheetHeader>
 

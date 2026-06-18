@@ -648,8 +648,8 @@ Foreign Data Wrappers simplify data integration by bringing external data into y
 
 ## Key benefits
 1. Real-time replication: Near real-time data synchronization using Postgres logical replication.
-2. Analytics Buckets support: Replicate to Iceberg format for large-scale analytics.
-3. BigQuery integration: Direct replication to Google's data warehouse.
+2. BigQuery integration: Direct replication to Google's data warehouse.
+3. Managed destinations: Start with BigQuery while more destinations are evaluated.
 4. Complete change history: Captures INSERT, UPDATE, DELETE, and TRUNCATE operations.
 5. Optimized for analytics: Faster queries and lower storage costs through compression.
 6. Production isolation: Complete separation of analytics and production workloads.
@@ -2835,17 +2835,17 @@ OrioleDB is a PostgreSQL storage extension built on its pluggable storage framew
   {
     title: 'Replication',
     subtitle: 'Replicate database changes to external destinations.',
-    description: `Replication uses Postgres logical replication to replicate database changes to external destinations like Analytics Buckets and BigQuery. Changes are captured from the Write Ahead Log and delivered in near real time to analytical systems.
+    description: `Supabase Pipelines uses Postgres logical replication to replicate database changes to external destinations like BigQuery. Changes are captured from the Write Ahead Log and delivered in near real time to analytical systems.
 
 ## Key benefits
 1. Near real-time sync: Changes replicated as they occur using WAL reading.
-2. Analytics Buckets support: Append-only changelog format in Iceberg.
-3. BigQuery integration: Direct replication to Google's data warehouse.
+2. BigQuery integration: Direct replication to Google's data warehouse.
+3. Managed pipeline: Monitor status, lag, and errors in dashboard.
 4. Complete change capture: INSERT, UPDATE, DELETE, and TRUNCATE operations.
-5. Managed pipeline: Monitor status, lag, and errors in dashboard.
+5. Production isolation: Keep analytical workloads away from your primary database.
 
 ## Destinations
-Analytics Buckets create append-only changelog with \`cdc_operation\` column, preserving complete change history in Iceberg format. BigQuery creates views backed by versioned tables for efficient querying.
+BigQuery creates views backed by versioned tables for efficient querying. Additional managed destinations are being evaluated as Supabase Pipelines develops.
 
 ## Setup
 Create Postgres publication for tables to replicate. Add destination in Replication section of dashboard. Configure destination-specific settings. Monitor pipeline in dashboard.
@@ -2863,11 +2863,11 @@ Tables must have primary keys. Logical replication must be enabled.
 ## Limitations
 No DDL support yet (ALTER TABLE, ADD COLUMN). Destination-specific constraints may apply.
 
-Replication provides the real-time data pipeline required for modern analytics architectures.`,
+Supabase Pipelines provides the real-time data pipeline required for modern analytics architectures.`,
     icon: DatabaseZap,
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/database/replication/external-replication-setup',
+    docsUrl: 'https://supabase.com/docs/guides/database/replication/supabase-pipelines',
     slug: 'replication',
     status: {
       stage: PRODUCT_STAGES.PRIVATE_ALPHA,

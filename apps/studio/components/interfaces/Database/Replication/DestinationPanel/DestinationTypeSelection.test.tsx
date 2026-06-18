@@ -64,7 +64,7 @@ describe('DestinationTypeSelection', () => {
     expect(await screen.findByText('Select a destination type')).toBeInTheDocument()
   })
 
-  test('renders Read Replicas in the Other group when dropdown is opened', async () => {
+  test('renders Read Replica in the Other group when dropdown is opened', async () => {
     mockBigQueryEnabled.mockReturnValue(false)
     mockIcebergEnabled.mockReturnValue(false)
     mockDucklakeEnabled.mockReturnValue(false)
@@ -76,7 +76,7 @@ describe('DestinationTypeSelection', () => {
     fireEvent.click(await screen.findByRole('combobox'))
 
     expect(await screen.findByText('Other')).toBeInTheDocument()
-    expect(screen.getByText('Read Replicas')).toBeInTheDocument()
+    expect(screen.getByText('Read Replica')).toBeInTheDocument()
   })
 
   test('renders the Supabase Pipelines group with BigQuery when the flag is enabled', async () => {
@@ -106,7 +106,7 @@ describe('DestinationTypeSelection', () => {
     fireEvent.click(await screen.findByRole('combobox'))
 
     expect(await screen.findByText('Other')).toBeInTheDocument()
-    expect(screen.getByText('Read Replicas')).toBeInTheDocument()
+    expect(screen.getByText('Read Replica')).toBeInTheDocument()
     expect(screen.queryByText('BigQuery')).not.toBeInTheDocument()
     expect(screen.queryByText('DuckLake')).not.toBeInTheDocument()
     expect(screen.queryByText('Analytics Bucket')).not.toBeInTheDocument()
