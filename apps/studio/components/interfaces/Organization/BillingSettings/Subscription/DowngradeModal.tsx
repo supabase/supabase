@@ -4,9 +4,7 @@ import { plans as subscriptionsPlans } from 'shared-data/plans'
 import {
   Button,
   Dialog,
-  DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogSectionSeparator,
