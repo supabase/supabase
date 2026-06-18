@@ -266,52 +266,81 @@ export const IntegrationConnectionOption = forwardRef<HTMLLIElement, Integration
   }
 )
 
+type EmptyIntegrationConnectionProps = HTMLAttributes<HTMLDivElement> & {
+  showNode?: boolean
+  disabled?: boolean
+  icon?: ReactNode
+  disabledTooltip?: string
+} & ({ onClick: () => void; href?: never } | { href: string; onClick?: never })
+
 export const EmptyIntegrationConnection = forwardRef<
   HTMLDivElement,
-  HTMLAttributes<HTMLDivElement> & {
-    showNode?: boolean
-    onClick: () => void
-    disabled?: boolean
-  }
->(({ className, showNode = true, onClick, disabled, ...props }, ref) => {
-  return (
-    <div
-      ref={ref}
-      {...props}
-      className={cn(
-        showNode && 'ml-6 pl-8 mt-4 border-l',
-        'relative pb-2',
-        'last:border-l-transparent',
-        className
-      )}
-    >
-      {showNode && (
-        <div className="absolute w-8 rounded-bl-full border-b border-l border-muted h-14 -top-4 -left-px"></div>
-      )}
+  EmptyIntegrationConnectionProps
+>(
+  (
+    {
+      className,
+      showNode = true,
+      onClick,
+      href,
+      disabled,
+      icon,
+      disabledTooltip = 'Additional permissions required to add connection',
+      children,
+      ...props
+    },
+    ref
+  ) => {
+    const label = children ?? 'Add new project connection'
+
+    return (
       <div
+        ref={ref}
+        {...props}
         className={cn(
-          'w-full',
-          'border border-dashed bg-surface-100 border-overlay',
-          'flex h-20 px-10 rounded-lg justify-center items-center'
+          showNode && 'ml-6 pl-8 mt-4 border-l',
+          'relative pb-2',
+          'last:border-l-transparent',
+          className
         )}
       >
-        <ButtonTooltip
-          variant="default"
-          disabled={disabled}
-          onClick={() => onClick()}
-          tooltip={{
-            content: {
-              side: 'bottom',
-              text: disabled ? 'Additional permissions required to add connection' : undefined,
-            },
-          }}
+        {showNode && (
+          <div className="absolute w-8 rounded-bl-full border-b border-l border-muted h-14 -top-4 -left-px"></div>
+        )}
+        <div
+          className={cn(
+            'w-full',
+            'border border-dashed bg-surface-100 border-overlay',
+            'flex h-20 px-10 rounded-lg justify-center items-center'
+          )}
         >
-          Add new project connection
-        </ButtonTooltip>
+          {href && !disabled ? (
+            <Button icon={icon} asChild variant="default">
+              <Link href={href} target="_blank" rel="noreferrer">
+                {label}
+              </Link>
+            </Button>
+          ) : (
+            <ButtonTooltip
+              icon={icon}
+              variant="default"
+              disabled={disabled}
+              onClick={onClick ? () => onClick() : undefined}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: disabled ? disabledTooltip : undefined,
+                },
+              }}
+            >
+              {label}
+            </ButtonTooltip>
+          )}
+        </div>
       </div>
-    </div>
-  )
-})
+    )
+  }
+)
 
 interface IntegrationConnectionHeader extends React.HTMLAttributes<HTMLDivElement> {
   name?: string
