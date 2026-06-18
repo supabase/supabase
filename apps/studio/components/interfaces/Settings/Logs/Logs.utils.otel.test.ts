@@ -181,6 +181,11 @@ describe('otelTimestampToMicros', () => {
     const micros = otelTimestampToMicros(1704067200000000)
     expect(micros).toBe(1704067200000000)
   })
+
+  it('parses numeric microseconds supplied as a string', () => {
+    const micros = otelTimestampToMicros('1704067200000000')
+    expect(micros).toBe(1704067200000000)
+  })
 })
 
 describe('mapOtelPreviewRow', () => {
@@ -223,6 +228,20 @@ describe('mapOtelSingleLogToLegacy', () => {
     expect(log.metadata[0].response[0].status_code).toBe('200')
     expect(log.metadata[0].response[0].headers[0].x_sb_error_code).toBe('none')
     expect(log.timestamp).toBe(Date.UTC(2024, 0, 1) * 1000)
+  })
+
+  it('falls back to the legacy x_sb_error_code key when the OTEL key is absent', () => {
+    const row: OtelLogRow = {
+      ...baseRow,
+      log_attributes: {
+        'request.method': 'GET',
+        'response.status_code': '500',
+        // Only the legacy BigQuery-style key is present.
+        'response.headers.x_sb_error_code': 'pgrst_error',
+      },
+    }
+    const log = mapOtelSingleLogToLegacy(row, 'api') as any
+    expect(log.metadata[0].response[0].headers[0].x_sb_error_code).toBe('pgrst_error')
   })
 
   it('reconstructs the nested parsed metadata for the database panel', () => {
