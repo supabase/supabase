@@ -79,7 +79,7 @@ async function lintOverviewPage(relPath: string): Promise<LintIssue[]> {
   const bannedHeading = hasBannedOrientationSection(content)
   if (bannedHeading) {
     issues.push({
-      level: data.contentListings ? 'error' : isPilot ? 'error' : 'warning',
+      level: 'warning',
       file: relPath,
       message: `Hand-rolled orientation section "${bannedHeading}" must be moved to contentListings front matter`,
     })

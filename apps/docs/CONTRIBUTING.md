@@ -116,7 +116,7 @@ Add an entry with the `name`, `url`, and (optional) `icon` for your page.
 
 ### Overview pages and `contentListings`
 
-Overview and index pages orient readers across a docs section. Use YAML `contentListings` front matter for **internal** "where to read next" links — not hand-rolled `## Get started`, `## Going further`, or `## Next steps` sections in the MDX body.
+Overview and index pages orient readers across a docs section. Use YAML `contentListings` front matter for **internal** "where to read next" links — not hand-rolled `## Get started` or `## Next steps` sections in the MDX body.
 
 | Section in the page body                         | Purpose                                                                               |
 | ------------------------------------------------ | ------------------------------------------------------------------------------------- |
@@ -130,7 +130,7 @@ Copy the template from [`content/_partials/content-listings-template.yaml`](cont
 
 Place a group in the body with `<ContentListings listing="id" />`. Groups embedded in the body are omitted from the auto footer; groups without a body placement render after the article.
 
-Run `pnpm lint:content-listings` in `apps/docs` to check registry coverage. Pilot overview pages must pass; other registry pages warn until migrated.
+Run `pnpm lint:content-listings` in `apps/docs` to check registry coverage. Pilot overview pages must have valid `contentListings` (errors); other registry pages warn until migrated. Hand-rolled orientation headings in the body are warnings during migration.
 
 ## Reference structure
 

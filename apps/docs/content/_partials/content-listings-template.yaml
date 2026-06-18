@@ -15,8 +15,8 @@ contentListings:
       - title: Connect to your database
         href: /guides/database/connecting-to-postgres
         description: Connection strings, pooler, and connection modes.
-  - id: going-further
-    heading: Going further
+  - id: next-steps
+    heading: Next steps
     type: list
     items:
       - title: Database functions
