@@ -11,6 +11,7 @@ import {
   AUTH_LOG_WARNING_CONDITION,
   LogsTableName,
   SQL_FILTER_TEMPLATES,
+  type SqlFilterEntry,
 } from './Logs.constants'
 import type { Filters, LogData, LogsEndpointParams, QueryType } from './Logs.types'
 import { convertResultsToCSV } from '@/components/interfaces/SQLEditor/UtilityPanel/Results.utils'
@@ -67,42 +68,51 @@ const getDotKeys = (obj: { [k: string]: unknown }, parent?: string): string[] =>
 }
 
 /**
- * Root keys in the filter object are considered to be AND filters.
- * Nested keys under a root key are considered to be OR filters.
- *
- * For example:
- * ```
- * {my_value: 'something', nested: {id: 123, test: 123 }}
- * ```
- * This would be converted into `WHERE (my_value = 'something') and (id = 123 or test = 123)
- *
- * The template of the filter determines the actual filter statement. If no template is provided, a generic equality statement will be used.
- * This only applies for root keys of the filter.
- * For example:
- * ```
- * {'my.nested.value': 123}
- * ```
- * with no template, it will be converted into `WHERE (my.nested.value = 123)
- *
- * @returns a where statement with WHERE clause.
+ * Default resolver for filter keys that have no template entry — used for unknown
+ * filters coming from a filterOverride. Emits a generic BigQuery equality predicate
+ * and drops the clause on non-scalar / un-encodable input.
  */
-const buildWhereClauses = (table: LogsTableName, filters: Filters): SafeLogSqlFragment[] => {
+const defaultResolveUnknownClause = (dotKey: string, value: unknown): SafeLogSqlFragment | null => {
+  if (typeof value !== 'string' && typeof value !== 'number' && typeof value !== 'boolean') {
+    return null
+  }
+  try {
+    return safeSql`${quotedIdent(dotKey)} = ${analyticsLiteral(value)}`
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Builds the list of AND-joined WHERE clauses for a table's filters.
+ *
+ * Root keys in the filter object are considered to be AND filters; nested keys
+ * under a root key are considered to be OR filters. For example
+ * `{my_value: 'something', nested: {id: 123, test: 123 }}` becomes
+ * `WHERE (my_value = 'something') and (id = 123 or test = 123)`. The template of
+ * the filter determines the actual statement; if no template is provided, the
+ * `resolveUnknownClause` fallback is used (generic equality by default).
+ *
+ * `filterTemplates` and `resolveUnknownClause` are injectable so the OTEL/ClickHouse
+ * builders can reuse the exact same nested AND/OR grouping logic while swapping in
+ * their own dialect-specific predicates. Defaults preserve the BigQuery behavior.
+ */
+export const buildWhereClauses = (
+  table: LogsTableName,
+  filters: Filters,
+  filterTemplates: Record<string, SqlFilterEntry> = SQL_FILTER_TEMPLATES[table],
+  resolveUnknownClause: (
+    dotKey: string,
+    value: unknown
+  ) => SafeLogSqlFragment | null = defaultResolveUnknownClause
+): SafeLogSqlFragment[] => {
   const keys = Object.keys(filters)
-  const filterTemplates = SQL_FILTER_TEMPLATES[table]
   const _resolveTemplateToStatement = (dotKey: string): SafeLogSqlFragment | null => {
     const template = filterTemplates[dotKey]
     const value = get(filters, dotKey)
 
     if (template === undefined) {
-      // Unknown filter from a filter override — generic equality predicate; drop on bad input.
-      if (typeof value !== 'string' && typeof value !== 'number' && typeof value !== 'boolean') {
-        return null
-      }
-      try {
-        return safeSql`${quotedIdent(dotKey)} = ${analyticsLiteral(value)}`
-      } catch {
-        return null
-      }
+      return resolveUnknownClause(dotKey, value)
     }
 
     if (typeof template === 'function') {
@@ -141,8 +151,13 @@ const buildWhereClauses = (table: LogsTableName, filters: Filters): SafeLogSqlFr
     .filter((s) => s !== null)
 }
 
-const genWhereStatement = (table: LogsTableName, filters: Filters): SafeLogSqlFragment => {
-  const clauses = buildWhereClauses(table, filters)
+export const genWhereStatement = (
+  table: LogsTableName,
+  filters: Filters,
+  filterTemplates?: Record<string, SqlFilterEntry>,
+  resolveUnknownClause?: (dotKey: string, value: unknown) => SafeLogSqlFragment | null
+): SafeLogSqlFragment => {
+  const clauses = buildWhereClauses(table, filters, filterTemplates, resolveUnknownClause)
   return clauses.length > 0 ? safeSql`where ${joinSqlFragments(clauses, ' and ')}` : safeSql``
 }
 
