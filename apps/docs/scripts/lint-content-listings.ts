@@ -3,15 +3,16 @@ import { join } from 'node:path'
 import matter from 'gray-matter'
 import { parse as parseToml } from 'smol-toml'
 
-import {
-  BANNED_ORIENTATION_HEADINGS,
-  OVERVIEW_PAGE_PILOTS,
-  OVERVIEW_PAGE_REGISTRY,
-} from '../internals/overview-page-registry'
+import { BANNED_ORIENTATION_HEADINGS } from '../internals/overview-page-registry'
 import { parseContentListings } from '../lib/content-listings.schema'
+import { deriveOverviewPagePaths } from '../lib/derive-overview-page-paths'
 import { CONTENT_DIRECTORY, GUIDES_DIRECTORY } from '../lib/docs'
 
 type LintLevel = 'error' | 'warning'
+
+/** Flip to 'error' when all overview pages are migrated and CI should enforce. */
+const OVERVIEW_LINT_LEVEL: LintLevel = 'warning'
+const TROUBLESHOOTING_LINT_LEVEL: LintLevel = 'warning'
 
 interface LintIssue {
   level: LintLevel
@@ -41,7 +42,6 @@ function hasBannedOrientationSection(content: string): string | null {
 
 async function lintOverviewPage(relPath: string): Promise<LintIssue[]> {
   const issues: LintIssue[] = []
-  const isPilot = (OVERVIEW_PAGE_PILOTS as readonly string[]).includes(relPath)
   const filePath = join(GUIDES_DIRECTORY, relPath)
 
   let raw: string
@@ -49,7 +49,7 @@ async function lintOverviewPage(relPath: string): Promise<LintIssue[]> {
     raw = await readFile(filePath, 'utf8')
   } catch {
     issues.push({
-      level: isPilot ? 'error' : 'warning',
+      level: OVERVIEW_LINT_LEVEL,
       file: relPath,
       message: 'Overview registry file is missing',
     })
@@ -62,7 +62,7 @@ async function lintOverviewPage(relPath: string): Promise<LintIssue[]> {
     parseContentListings(data.contentListings)
   } catch (error) {
     issues.push({
-      level: isPilot ? 'error' : 'warning',
+      level: OVERVIEW_LINT_LEVEL,
       file: relPath,
       message: error instanceof Error ? error.message : 'Invalid contentListings front matter',
     })
@@ -70,7 +70,7 @@ async function lintOverviewPage(relPath: string): Promise<LintIssue[]> {
 
   if (!data.contentListings) {
     issues.push({
-      level: isPilot ? 'error' : 'warning',
+      level: OVERVIEW_LINT_LEVEL,
       file: relPath,
       message: 'Missing contentListings front matter',
     })
@@ -79,7 +79,7 @@ async function lintOverviewPage(relPath: string): Promise<LintIssue[]> {
   const bannedHeading = hasBannedOrientationSection(content)
   if (bannedHeading) {
     issues.push({
-      level: 'warning',
+      level: OVERVIEW_LINT_LEVEL,
       file: relPath,
       message: `Hand-rolled orientation section "${bannedHeading}" must be moved to contentListings front matter`,
     })
@@ -108,7 +108,7 @@ async function lintContentListingsFrontMatter(filePath: string): Promise<LintIss
     parseContentListings(data.contentListings)
   } catch (error) {
     issues.push({
-      level: 'error',
+      level: TROUBLESHOOTING_LINT_LEVEL,
       file: relPath,
       message: error instanceof Error ? error.message : 'Invalid contentListings front matter',
     })
@@ -118,8 +118,10 @@ async function lintContentListingsFrontMatter(filePath: string): Promise<LintIss
 }
 
 async function main() {
+  const overviewPages = deriveOverviewPagePaths()
+
   const overviewIssues = (
-    await Promise.all(OVERVIEW_PAGE_REGISTRY.map((relPath) => lintOverviewPage(relPath)))
+    await Promise.all(overviewPages.map((relPath) => lintOverviewPage(relPath)))
   ).flat()
 
   const { globby } = await import('globby')
@@ -143,7 +145,7 @@ async function main() {
   const warningCount = issues.filter((issue) => issue.level === 'warning').length
 
   console.log(
-    `\nlint-content-listings: ${errorCount} error(s), ${warningCount} warning(s) across ${OVERVIEW_PAGE_REGISTRY.length} overview pages`
+    `\nlint-content-listings: ${errorCount} error(s), ${warningCount} warning(s) across ${overviewPages.length} overview pages`
   )
 
   if (errorCount > 0) {

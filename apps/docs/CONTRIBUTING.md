@@ -130,7 +130,7 @@ Copy the template from [`content/_partials/content-listings-template.yaml`](cont
 
 Place a group in the body with `<ContentListings listing="id" />`. Groups embedded in the body are omitted from the auto footer; groups without a body placement render after the article.
 
-Run `pnpm lint:content-listings` in `apps/docs` to check registry coverage. Pilot overview pages must have valid `contentListings` (errors); other registry pages warn until migrated. Hand-rolled orientation headings in the body are warnings during migration.
+Run `pnpm lint:content-listings` in `apps/docs` to check overview coverage. Lint scope is **derived from navigation**: section root URLs and nav items named `Overview`, `Introduction`, or path-suffixed `Getting started` hubs (see `lib/derive-overview-page-paths.ts`). When adding a new overview page, add a matching nav entry in [`NavigationMenu.constants.ts`](components/Navigation/NavigationMenu/NavigationMenu.constants.ts). Unmigrated pages and hand-rolled orientation headings in the body emit **warnings** during rollout. Flip `OVERVIEW_LINT_LEVEL` and `TROUBLESHOOTING_LINT_LEVEL` in [`scripts/lint-content-listings.ts`](scripts/lint-content-listings.ts) to `'error'` when ready to enforce in CI.
 
 ## Reference structure
 
