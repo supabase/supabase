@@ -1,7 +1,15 @@
 import { THRESHOLD_COUNT } from '@supabase/pg-meta'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { AlertCircle, ArrowLeft, ArrowRight, HelpCircle, Loader2 } from 'lucide-react'
+import {
+  AlertCircle,
+  ArrowLeft,
+  ArrowRight,
+  ChevronFirst,
+  ChevronLast,
+  HelpCircle,
+  Loader2,
+} from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -238,6 +246,15 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
     <div className="flex items-center gap-x-4 min-w-fit">
       <div className="flex items-center gap-x-2">
         <Button
+          aria-label="First page"
+          icon={<ChevronFirst />}
+          variant="outline"
+          className="px-1.5"
+          disabled={page <= 1 || isLoading}
+          onClick={() => onPageChange(1)}
+        />
+
+        <Button
           aria-label="Previous page"
           icon={<ArrowLeft />}
           variant="outline"
@@ -278,6 +295,15 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
           className="px-1.5"
           disabled={isLastPage}
           onClick={onNextPage}
+        />
+
+        <Button
+          aria-label="Last page"
+          icon={<ChevronLast />}
+          variant="outline"
+          className="px-1.5"
+          disabled={page >= totalPages || isLoading}
+          onClick={() => onPageChange(totalPages)}
         />
 
         <RowCountSelector onRowsPerPageChange={onRowsPerPageChange} />
