@@ -250,7 +250,8 @@ export const genDefaultQueryOtel = (
   limit: number = 100
 ): SafeLogSqlFragment => {
   const where = genOtelWhere(table, filters)
-  return safeSql`SELECT ${genOtelSelectColumns(table)}
+  return safeSql`-- Logs Preview Query (otel) [${lit(table)}]
+SELECT ${genOtelSelectColumns(table)}
 FROM logs
 ${where}
 ORDER BY timestamp DESC
@@ -259,7 +260,8 @@ LIMIT ${lit(limit)}`
 
 export const genCountQueryOtel = (table: LogsTableName, filters: Filters): SafeLogSqlFragment => {
   const where = genOtelWhere(table, filters)
-  return safeSql`SELECT count() AS count FROM logs ${where}`
+  return safeSql`-- Logs Count Query (otel) [${lit(table)}]
+SELECT count() AS count FROM logs ${where}`
 }
 
 // Severity classification per source, mirroring the BigQuery
@@ -323,7 +325,8 @@ export const genChartQueryOtel = (
   const where = genOtelWhere(table, filters)
   const err = otelErrorCondition(table)
   const warn = otelWarningCondition(table)
-  return safeSql`SELECT
+  return safeSql`-- Logs Chart Query (otel) [${lit(table)}]
+SELECT
   ${truncFn}(timestamp) AS timestamp,
   countIf(NOT ((${err}) OR (${warn}))) AS ok_count,
   countIf(${err}) AS error_count,
@@ -340,7 +343,8 @@ export const genSingleLogQueryOtel = (id: string): SafeLogSqlFragment => {
   if (!/^[0-9a-fA-F-]{1,64}$/.test(id)) {
     throw new Error('Invalid logId')
   }
-  return safeSql`SELECT id, timestamp, event_message, source, severity_text, log_attributes
+  return safeSql`-- Single Log Query (otel)
+SELECT id, timestamp, event_message, source, severity_text, log_attributes
 FROM logs
 WHERE id = ${lit(id)}
 LIMIT 1`

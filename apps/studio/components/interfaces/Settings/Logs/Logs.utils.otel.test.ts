@@ -18,6 +18,7 @@ const sql = (fragment: string) => fragment.replace(/\s+/g, ' ').trim()
 describe('genDefaultQueryOtel', () => {
   it('targets the OTEL logs table by source and aliases postgres columns', () => {
     const q = sql(genDefaultQueryOtel(LogsTableName.POSTGRES, {}, 100))
+    expect(q).toContain('-- Logs Preview Query (otel)')
     expect(q).toContain('FROM logs')
     expect(q).toContain("source = 'postgres_logs'")
     expect(q).toContain("log_attributes['parsed.error_severity'] AS error_severity")
@@ -63,6 +64,7 @@ describe('genDefaultQueryOtel', () => {
 describe('genCountQueryOtel', () => {
   it('counts rows for the source with translated auth filters', () => {
     const q = sql(genCountQueryOtel(LogsTableName.AUTH, { status_code: { server_error: true } }))
+    expect(q).toContain('-- Logs Count Query (otel)')
     expect(q).toContain('SELECT count() AS count FROM logs')
     expect(q).toContain("source = 'auth_logs'")
     expect(q).toContain("toInt32OrZero(log_attributes['status']) BETWEEN 500 AND 599")
@@ -77,6 +79,7 @@ describe('genChartQueryOtel', () => {
 
   it('buckets by minute for short ranges and emits ok/error/warning counts', () => {
     const q = sql(genChartQueryOtel(LogsTableName.EDGE, params, {}))
+    expect(q).toContain('-- Logs Chart Query (otel)')
     expect(q).toContain('toStartOfMinute(timestamp) AS timestamp')
     expect(q).toContain('AS ok_count')
     expect(q).toContain('AS error_count')
@@ -103,6 +106,7 @@ describe('genChartQueryOtel', () => {
 describe('genSingleLogQueryOtel', () => {
   it('fetches a single row by id with raw attributes', () => {
     const q = sql(genSingleLogQueryOtel('123e4567-e89b-12d3-a456-426614174000'))
+    expect(q).toContain('-- Single Log Query (otel)')
     expect(q).toContain('FROM logs')
     expect(q).toContain("WHERE id = '123e4567-e89b-12d3-a456-426614174000'")
     expect(q).toContain('log_attributes')
