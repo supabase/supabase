@@ -3,6 +3,8 @@ import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { noop } from 'lodash'
 import {
+  ArrowRight,
+  Box,
   Check,
   Copy,
   Edit,
@@ -10,11 +12,10 @@ import {
   Filter,
   Info,
   MoreVertical,
-  Package,
-  PackagePlus,
-  PackageX,
   Plus,
   Search,
+  SquarePlus,
+  SquareX,
   Trash,
   X,
 } from 'lucide-react'
@@ -30,6 +31,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
   Label,
   Popover,
@@ -648,75 +652,88 @@ export const TableList = ({
 
                                       {(() => {
                                         const tableKey = `${selectedSchema}.${x.name}`
+                                        const tableName = `${selectedSchema}.${x.name}`
                                         const wMode =
                                           warehouseSnap.tables[tableKey]?.mode ?? 'postgres'
+
                                         return (
                                           <>
-                                            {wMode === 'postgres' && (
-                                              <>
-                                                <DropdownMenuItem
-                                                  className="flex items-center gap-x-2"
-                                                  onClick={() =>
-                                                    setWarehouseModal({
-                                                      variant: 'attach',
-                                                      tableKey,
-                                                      tableName: `${selectedSchema}.${x.name}`,
-                                                    })
-                                                  }
-                                                >
-                                                  <PackagePlus size={12} />
-                                                  <p>Copy to Warehouse</p>
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem
-                                                  className="flex items-center gap-x-2"
-                                                  onClick={() =>
-                                                    setWarehouseModal({
-                                                      variant: 'move',
-                                                      tableKey,
-                                                      tableName: `${selectedSchema}.${x.name}`,
-                                                    })
-                                                  }
-                                                >
-                                                  <Package size={12} />
-                                                  <p>Move to Warehouse</p>
-                                                </DropdownMenuItem>
-                                              </>
-                                            )}
-                                            {wMode === 'has_warehouse_copy' && (
-                                              <>
-                                                <DropdownMenuItem
-                                                  className="flex items-center gap-x-2"
-                                                  onClick={() =>
-                                                    setDrawerTable({
-                                                      key: tableKey,
-                                                      name: `${selectedSchema}.${x.name}`,
-                                                    })
-                                                  }
-                                                >
-                                                  <Info size={12} />
-                                                  <p>View Warehouse details</p>
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem
-                                                  className="flex items-center gap-x-2 text-destructive"
-                                                  onClick={() => clearTableMode(tableKey)}
-                                                >
-                                                  <PackageX size={12} />
-                                                  <p>Detach copy</p>
-                                                </DropdownMenuItem>
-                                              </>
+                                            {(wMode === 'postgres' ||
+                                              wMode === 'has_warehouse_copy') && (
+                                              <DropdownMenuSub>
+                                                <DropdownMenuSubTrigger className="gap-x-2">
+                                                  <Box size={12} className="shrink-0" />
+                                                  Storage
+                                                </DropdownMenuSubTrigger>
+                                                <DropdownMenuSubContent>
+                                                  {wMode === 'postgres' && (
+                                                    <>
+                                                      <DropdownMenuItem
+                                                        className="gap-x-2"
+                                                        onClick={() =>
+                                                          setWarehouseModal({
+                                                            variant: 'attach',
+                                                            tableKey,
+                                                            tableName,
+                                                          })
+                                                        }
+                                                      >
+                                                        <Plus size={12} />
+                                                        <span>Copy to Warehouse</span>
+                                                      </DropdownMenuItem>
+                                                      <DropdownMenuItem
+                                                        className="gap-x-2"
+                                                        onClick={() =>
+                                                          setWarehouseModal({
+                                                            variant: 'move',
+                                                            tableKey,
+                                                            tableName,
+                                                          })
+                                                        }
+                                                      >
+                                                        <ArrowRight size={12} />
+                                                        <span>Move to Warehouse</span>
+                                                      </DropdownMenuItem>
+                                                    </>
+                                                  )}
+                                                  {wMode === 'has_warehouse_copy' && (
+                                                    <>
+                                                      <DropdownMenuItem
+                                                        className="gap-x-2"
+                                                        onClick={() =>
+                                                          setDrawerTable({
+                                                            key: tableKey,
+                                                            name: tableName,
+                                                          })
+                                                        }
+                                                      >
+                                                        <Info size={12} />
+                                                        <span>View Warehouse details</span>
+                                                      </DropdownMenuItem>
+                                                      <DropdownMenuItem
+                                                        className="gap-x-2 text-destructive"
+                                                        onClick={() => clearTableMode(tableKey)}
+                                                      >
+                                                        <SquareX size={12} />
+                                                        <span>Detach copy</span>
+                                                      </DropdownMenuItem>
+                                                    </>
+                                                  )}
+                                                </DropdownMenuSubContent>
+                                              </DropdownMenuSub>
                                             )}
                                             {wMode === 'warehouse_backed' && (
                                               <DropdownMenuItem
-                                                className="flex items-center gap-x-2"
+                                                className="gap-x-2"
                                                 onClick={() =>
                                                   setDrawerTable({
                                                     key: tableKey,
-                                                    name: `${selectedSchema}.${x.name}`,
+                                                    name: tableName,
                                                   })
                                                 }
                                               >
                                                 <Info size={12} />
-                                                <p>View Warehouse details</p>
+                                                <span>View Warehouse details</span>
                                               </DropdownMenuItem>
                                             )}
                                           </>
