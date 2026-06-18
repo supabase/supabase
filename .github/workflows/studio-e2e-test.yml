@@ -23,7 +23,8 @@ jobs:
       tests_ran: ${{ steps.filter.outputs.studio == 'true' }}
 
     permissions:
-      contents: write
+      contents: read
+      id-token: write
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
