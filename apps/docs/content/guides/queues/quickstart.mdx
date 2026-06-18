@@ -95,7 +95,7 @@ To get started, navigate to the [**Queues > Settings**](/dashboard/project/_/int
 
 ### Add an RLS policy on your tables in `pgmq` schema [#enable-rls-on-your-tables-in-pgmq-schema]
 
-For security purposes, you must enable Row Level Security (RLS) on all Queue tables (all tables in `pgmq` schema that begin with `q_`) if you enable the Data API.
+If you expose your pgmq schema with the Data API, for security purposes, you must enable Row Level Security (RLS) on all Queue tables (all tables in `pgmq` schema that begin with `q_`) 
 
 Add an RLS policy for any Queues you want your client-side consumers to interact with, by clicking the _Add RLS Policy_ button on [the overview page of any Queue in the Dashboard](/dashboard/project/_/integrations/queues/queues).
 
