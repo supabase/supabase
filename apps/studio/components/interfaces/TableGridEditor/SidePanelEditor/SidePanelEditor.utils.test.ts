@@ -209,9 +209,18 @@ describe('import insert batching', () => {
   test('executeImportInsertBatch rejects when the SQL request is aborted by timeout', async () => {
     mockExecuteSql.mockImplementation((_args, signal) => {
       return new Promise((_resolve, reject) => {
-        signal?.addEventListener('abort', () => {
+        if (signal?.aborted) {
           reject(signal.reason ?? new Error('Import request timed out'))
-        })
+          return
+        }
+
+        signal?.addEventListener(
+          'abort',
+          () => {
+            reject(signal.reason ?? new Error('Import request timed out'))
+          },
+          { once: true }
+        )
       }) as any
     })
 
