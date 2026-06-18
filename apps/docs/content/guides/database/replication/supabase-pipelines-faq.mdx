@@ -1,26 +1,28 @@
 ---
-id: 'external-replication-faq'
-title: 'External replication (ETL) FAQ'
-description: 'Frequently asked questions about external replication (ETL).'
-subtitle: 'Common questions and answers about external replication (ETL).'
+id: 'supabase-pipelines-faq'
+title: 'Supabase Pipelines FAQ'
+description: 'Frequently asked questions about Supabase Pipelines.'
+subtitle: 'Common questions and answers about managed replication pipelines.'
 sidebar_label: 'FAQ'
 ---
 
-<Admonition type="caution" title="Private Alpha">
+<Admonition type="caution" title="Alpha">
 
-External replication (ETL) is currently in private alpha. Managed pipelines run through Supabase ETL. Access is limited and features may change.
+Supabase Pipelines is currently in alpha. Alpha features can be unstable and may introduce breaking changes while we evaluate the product direction, refine the feature set, and incorporate customer feedback.
 
 </Admonition>
 
 ## What destinations are supported?
 
-External replication (ETL) currently supports **BigQuery** as the managed destination. See the [BigQuery destination guide](/docs/guides/database/replication/bigquery) for configuration details.
+Supabase Pipelines currently supports **BigQuery** as the managed destination. See the [BigQuery destination guide](/docs/guides/database/replication/bigquery) for configuration details.
 
-We are working on new destinations. "External" means outside the source database, so supported destinations can be Supabase-managed or third-party systems as support expands. Availability may continue to vary based on the planned roll-out strategy.
+We are working on new destinations. Supported destinations can be Supabase-managed or third-party systems as support expands. Availability may continue to vary based on the planned roll-out strategy.
 
-## Which plans support external replication (ETL)? [#which-plans-support-external-replication]
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
-External replication (ETL) is available on the Pro, Team, and Enterprise plans.
+## Which plans support Supabase Pipelines?
+
+Supabase Pipelines is available on the Pro, Team, and Enterprise plans.
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
@@ -30,11 +32,13 @@ We are currently working on a new Supabase Warehouse product designed to address
 
 As a result, managed replication to Analytics Buckets is no longer available. Right now, **BigQuery** is the only supported managed destination, and we are actively working on expanding capabilities.
 
-## What does external replication (ETL) install in the database? [#what-does-external-replication-install-in-the-database]
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
-When you enable external replication (ETL), Supabase installs database objects that help Supabase ETL track replication state and support schema changes:
+## What does Supabase Pipelines install in the database?
 
-- An event trigger that runs on every `ALTER TABLE` statement. Supabase ETL uses this to support schema change handling.
+When you enable Supabase Pipelines, Supabase installs database objects that help track replication state and support schema changes:
+
+- An event trigger that runs on every `ALTER TABLE` statement. Supabase uses this to support schema change handling.
 - A set of tables in the `etl` schema. These tables track replication state for your pipelines.
 
 The replication state tables are not updated very often, especially after the initial copy phase is complete.
@@ -51,15 +55,17 @@ Supported schema changes:
 - Dropping a `NOT NULL` constraint
 - Setting or dropping supported column default metadata
 
-External replication (ETL) does not currently support changing column data types, adding `NOT NULL` with `SET NOT NULL`, or filling existing destination rows for `ADD COLUMN ... DEFAULT`. Supported defaults are applied as destination metadata for future rows where BigQuery can represent them. See [BigQuery schema change support](/docs/guides/database/replication/bigquery#schema-change-support) for details.
+Supabase Pipelines does not currently support changing column data types, adding `NOT NULL` with `SET NOT NULL`, or filling existing destination rows for `ADD COLUMN ... DEFAULT`. Supported defaults are applied as destination metadata for future rows where BigQuery can represent them. See [BigQuery schema change support](/docs/guides/database/replication/bigquery#schema-change-support) for details.
 
-## What happens when you disable external replication (ETL)? [#what-happens-when-you-disable-external-replication]
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
-Disabling external replication (ETL) removes the database objects that were installed in your source database, including the replication state tables in the `etl` schema and the DDL event trigger.
+## What happens when you disable Supabase Pipelines?
 
-To remove external replication (ETL) from a project, delete all replication pipelines first. After all pipelines are deleted, the disable action becomes available. For the Dashboard steps, see [Disabling external replication (ETL)](/docs/guides/database/replication/external-replication-setup#disabling-external-replication).
+Disabling Supabase Pipelines removes the database objects that were installed in your source database, including the replication state tables in the `etl` schema and the DDL event trigger.
 
-Disabling external replication (ETL) stops Supabase from managing replication for the project. It does not delete tables or data that were already written to your destination.
+To remove Supabase Pipelines from a project, delete all replication pipelines first. After all pipelines are deleted, the disable action becomes available. For the Dashboard steps, see [Disabling Supabase Pipelines](/docs/guides/database/replication/supabase-pipelines#disabling-supabase-pipelines).
+
+Disabling Supabase Pipelines stops Supabase from managing replication for the project. It does not delete tables or data that were already written to your destination.
 
 ## Why is a table not being replicated?
 
@@ -75,11 +81,11 @@ Custom data types replicate as strings. Check that your destination can interpre
 
 ## Why are partitioned tables replicated as separate tables?
 
-Postgres controls this with the publication's `publish_via_partition_root` setting. If the setting is `false`, or if you created the publication manually with SQL and did not set it, Postgres publishes changes from the leaf partitions. External replication (ETL) then creates destination tables for those leaf partitions. If `publish_via_partition_root = true`, Postgres publishes changes as the partition root, so the partition hierarchy is treated as the published partition root.
+Postgres controls this with the publication's `publish_via_partition_root` setting. If the setting is `false`, or if you created the publication manually with SQL and did not set it, Postgres publishes changes from the leaf partitions. Supabase Pipelines then creates destination tables for those leaf partitions. If `publish_via_partition_root = true`, Postgres publishes changes as the partition root, so the partition hierarchy is treated as the published partition root.
 
 Publications created from the Dashboard replication flow use `publish_via_partition_root = true`.
 
-See [Partitioned tables](/docs/guides/database/replication/external-replication-setup#partitioned-tables) for examples and the full behavior.
+See [Partitioned tables](/docs/guides/database/replication/supabase-pipelines#partitioned-tables) for examples and the full behavior.
 
 ## How does replica identity affect updates and deletes?
 
@@ -131,24 +137,24 @@ After changing replica identity, restart each pipeline that includes the affecte
 
 ## Why aren't publication changes reflected after adding or removing tables?
 
-After modifying your Postgres publication, you must restart the replication pipeline for changes to take effect. See [Adding or removing tables](/docs/guides/database/replication/external-replication-setup#adding-or-removing-tables) for instructions.
+After modifying your Postgres publication, you must restart the replication pipeline for changes to take effect. See [Adding or removing tables](/docs/guides/database/replication/supabase-pipelines#adding-or-removing-tables) for instructions.
 
 ## Why is a pipeline in failed state?
 
 Pipeline failures occur during the streaming phase when an error happens while replicating live data. This prevents data loss. To recover:
 
 1. Check the error message by hovering over the **Failed** status
-2. Click **View status** for detailed information
+2. Click **View pipeline** for detailed information
 3. Fix the underlying issue (e.g., schema mismatches, destination connectivity)
 4. Restart the pipeline
 
-See [Handling errors](/docs/guides/database/replication/external-replication-monitoring#handling-errors) for more details.
+See [Handling errors](/docs/guides/database/replication/supabase-pipelines-monitoring#handling-errors) for more details.
 
 ## Why is replication lag increasing?
 
 Lag increases when Postgres produces WAL faster than the pipeline can confirm it has processed. Common causes include a slow or rate-limited destination, a pipeline issue, heavy source database activity, long transactions, network latency between the pipeline and source database, or a stopped/disconnected pipeline.
 
-Open [**Database > Replication**](/dashboard/project/_/database/replication), click **View status**, and check **Waiting to sync**, **Room before pausing**, **Last check-in**, **Connected**, and **Slot status**. See [Dealing with replication lag](/docs/guides/database/replication/external-replication-monitoring#dealing-with-replication-lag) for the full investigation and response flow.
+Open [**Database > Replication**](/dashboard/project/_/database/replication), click **View pipeline**, and check **Waiting to sync**, **Room before pausing**, **Last check-in**, **Connected**, and **Slot status**. See [Dealing with replication lag](/docs/guides/database/replication/supabase-pipelines-monitoring#dealing-with-replication-lag) for the full investigation and response flow.
 
 ## What does a `Lost` slot status mean?
 
@@ -156,26 +162,26 @@ Open [**Database > Replication**](/dashboard/project/_/database/replication), cl
 
 You can recreate the pipeline, or open the pipeline's **Advanced settings**, set **Invalidated slot behavior** to **Recreate**, and restart the pipeline. On restart, the pipeline creates a new replication slot and starts replication from scratch for all tables. This is required for consistency because the old slot can no longer provide every change the pipeline missed.
 
-See [Slot statuses](/docs/guides/database/replication/external-replication-monitoring#slot-statuses) for all slot states and what to do next.
+See [Slot statuses](/docs/guides/database/replication/supabase-pipelines-monitoring#slot-statuses) for all slot states and what to do next.
 
 ## Why is a table in error state?
 
-Table errors occur during the copy phase. To recover, click **View status**, find the affected table, and reset the table state. This will restart the table copy from the beginning.
+Table errors occur during the copy phase. To recover, click **View pipeline**, find the affected table, and reset the table state. This will restart the table copy from the beginning.
 
 ## How to verify replication is working
 
 Check the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard:
 
 1. Verify your pipeline shows **Running** status
-2. Click **View status** to check table states
+2. Click **View pipeline** to check table states
 3. Ensure all tables show **Live** state (actively replicating)
 4. Monitor replication lag metrics
 
-See the [external replication (ETL) monitoring guide](/docs/guides/database/replication/external-replication-monitoring) for comprehensive monitoring instructions.
+See [Monitor pipeline status](/docs/guides/database/replication/supabase-pipelines-monitoring) for comprehensive monitoring instructions.
 
 ## How to stop or pause replication
 
-You can manage your pipeline using the actions menu in the destinations list. See [Managing your pipeline](/docs/guides/database/replication/external-replication-setup#managing-your-pipeline) for details on available actions.
+You can manage your pipeline using the actions menu in the destinations list. See [Managing your pipeline](/docs/guides/database/replication/supabase-pipelines#managing-your-pipeline) for details on available actions.
 
 <Admonition type="note">
 
@@ -185,13 +191,13 @@ Stopping replication causes changes to queue up in the WAL.
 
 ## What happens if a project becomes inactive?
 
-If your project becomes inactive, external replication (ETL) stops any running pipelines and does not automatically resume them after the project is restarted.
+If your project becomes inactive, Supabase Pipelines stops any running pipelines and does not automatically resume them after the project is restarted.
 
 After restarting the project, restart each replication pipeline manually from the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard.
 
 ## What happens after a downgrade to the free plan?
 
-When a project is downgraded to the Free Plan, all external replication (ETL) pipelines for that project are deleted.
+When a project is downgraded to the Free Plan, all Supabase Pipelines replication pipelines for that project are deleted.
 
 ## What happens if a table is deleted at the destination?
 
@@ -245,6 +251,6 @@ Navigate to the [**Logs > Replication**](/dashboard/project/_/logs/explorer) sec
 
 If you need assistance:
 
-1. Check the [external replication (ETL) setup guide](/docs/guides/database/replication/external-replication-setup) and [external replication (ETL) monitoring guide](/docs/guides/database/replication/external-replication-monitoring)
+1. Check [Set up Supabase Pipelines](/docs/guides/database/replication/supabase-pipelines) and [Monitor pipeline status](/docs/guides/database/replication/supabase-pipelines-monitoring)
 2. Review this FAQ for common issues
 3. Contact support with your error details and logs

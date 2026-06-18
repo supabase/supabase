@@ -253,7 +253,7 @@ export const Destinations = () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-52">
                   <DropdownMenuItem onClick={() => setShowDisableExternalReplicationDialog(true)}>
-                    Disable external replication
+                    Disable Supabase Pipelines
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -336,8 +336,8 @@ export const Destinations = () => {
             >
               <h4>Replication keeps your data in sync across systems</h4>
               <p className="text-foreground-light text-sm text-balance text-center mt-1">
-                Deploy read replicas for lower latency and better resource management, or capture
-                database changes to external destinations for real-time data pipelines.
+                Deploy read replicas for lower latency and workload isolation, or add a destination
+                to create a managed replication pipeline.
               </p>
               <Button
                 icon={<Plus />}

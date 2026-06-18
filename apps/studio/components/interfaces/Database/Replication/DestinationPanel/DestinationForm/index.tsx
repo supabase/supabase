@@ -360,10 +360,10 @@ export const DestinationForm = ({
       return existingDestination?.enabled ? 'Apply and restart' : 'Apply and start'
     } else {
       if (hasRunValidation && validationWarnings.length > 0 && !hasValidationFailures) {
-        return 'Create and start anyway'
+        return 'Add and start anyway'
       }
 
-      return 'Create and start'
+      return 'Add and start'
     }
   }
 
@@ -532,12 +532,12 @@ export const DestinationForm = ({
         })
         // Set request status only right before starting, then fire and close
         setRequestStatus(pipelineId, PipelineStatusRequestStatus.StartRequested, undefined)
-        toast.success('Destination created. Starting the pipeline...')
+        toast.success('Destination added. Starting the pipeline...')
         startPipeline({ projectRef, pipelineId })
         onClose()
       }
     } catch (error) {
-      const action = editMode ? 'apply and run' : 'create and start'
+      const action = editMode ? 'apply and run' : 'add and start'
       toast.error(`Failed to ${action} destination: ${(error as ResponseError).message}`)
     }
   }
@@ -690,7 +690,7 @@ export const DestinationForm = ({
               <p className="text-foreground-light text-sm">
                 {isValidating
                   ? 'Validating destination configuration...'
-                  : `${editMode ? 'Updating' : 'Creating'} destination...`}
+                  : `${editMode ? 'Updating' : 'Adding'} destination...`}
               </p>
             </motion.div>
           ) : (

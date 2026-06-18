@@ -100,11 +100,11 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
         <SheetContent size="lg" showClose={false}>
           <div className="flex flex-col h-full" tabIndex={-1}>
             <SheetHeader>
-              <SheetTitle>{editMode ? 'Edit destination' : 'Create a new destination'}</SheetTitle>
+              <SheetTitle>{editMode ? 'Edit destination' : 'Add destination'}</SheetTitle>
               <SheetDescription>
                 {editMode
-                  ? 'Update the configuration for this destination'
-                  : 'A destination can be a read replica or an external destination that receives your database changes in real time.'}
+                  ? 'Update the destination configuration for this replication pipeline.'
+                  : 'Choose where to replicate data. Read replicas stay in Supabase; other destinations create a managed replication pipeline.'}
               </SheetDescription>
             </SheetHeader>
 
@@ -118,11 +118,11 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
               <SheetSection>
                 <div className={cn('border rounded-md p-6 flex flex-col gap-y-4')}>
                   <div className="flex flex-col gap-y-1">
-                    <h4>Replicate data to external destinations in real time</h4>
+                    <h4>Request Supabase Pipelines access</h4>
                     <p className="text-sm text-foreground-light">
-                      External destinations are in <span className="text-foreground">alpha</span>{' '}
-                      and are being rolled out gradually. Request access below to join the waitlist.
-                      Read replicas are available now.
+                      Supabase Pipelines is in <span className="text-foreground">alpha</span> and
+                      being rolled out gradually. Request access below to join the waitlist. Read
+                      replicas are available now.
                     </p>
                   </div>
                   <div className="flex gap-x-2">
@@ -139,7 +139,9 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
                         Request alpha access
                       </Link>
                     </Button>
-                    <DocsButton href={`${DOCS_URL}/guides/database/replication#replication`} />
+                    <DocsButton
+                      href={`${DOCS_URL}/guides/database/replication#supabase-pipelines`}
+                    />
                   </div>
                 </div>
               </SheetSection>

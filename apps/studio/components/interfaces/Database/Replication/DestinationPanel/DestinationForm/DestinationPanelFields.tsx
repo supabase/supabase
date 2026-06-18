@@ -164,7 +164,7 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
             <FormItemLayout
               layout="horizontal"
               label="Pool size"
-              description="Optional number of concurrent DuckDB connections to use"
+              description="Optional number of concurrent catalog connections to use"
             >
               <FormControl>
                 <Input
@@ -386,7 +386,7 @@ export const SnowflakeFields = ({ form }: { form: UseFormReturn<DestinationPanel
               description="Snowflake user configured for key-pair authentication"
             >
               <FormControl>
-                <Input {...field} placeholder="ETL_USER" value={field.value ?? ''} />
+                <Input {...field} placeholder="PIPELINES_USER" value={field.value ?? ''} />
               </FormControl>
             </FormItemLayout>
           )}
@@ -434,7 +434,7 @@ export const SnowflakeFields = ({ form }: { form: UseFormReturn<DestinationPanel
               description="Optional Snowflake role to assume after connecting"
             >
               <FormControl>
-                <Input {...field} placeholder="ETL_ROLE" value={field.value ?? ''} />
+                <Input {...field} placeholder="PIPELINES_ROLE" value={field.value ?? ''} />
               </FormControl>
             </FormItemLayout>
           )}

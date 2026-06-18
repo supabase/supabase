@@ -31,7 +31,7 @@ export const DisableExternalReplicationDialog = ({
   const { mutateAsync: deleteReplicationTenant, isPending: isSubmitting } =
     useDeleteReplicationTenantMutation({
       onSuccess: () => {
-        toast.success('External replication has been disabled')
+        toast.success('Supabase Pipelines has been disabled')
         setOpen(false)
       },
       onError: () => {},
@@ -53,7 +53,7 @@ export const DisableExternalReplicationDialog = ({
     <AlertDialog open={open} onOpenChange={(open) => !isSubmitting && setOpen(open)}>
       <AlertDialogContent size="small">
         <AlertDialogHeader>
-          <AlertDialogTitle>Disable external replication</AlertDialogTitle>
+          <AlertDialogTitle>Disable Supabase Pipelines</AlertDialogTitle>
           <AlertDialogDescription className="space-y-2 text-sm">
             <p>
               This will remove the <code className="text-code-inline">etl</code> schema and all
@@ -67,7 +67,7 @@ export const DisableExternalReplicationDialog = ({
           <AlertDialogBody>
             <Admonition
               type="destructive"
-              title="Unable to disable external replication"
+              title="Unable to disable Supabase Pipelines"
               description={error}
             />
           </AlertDialogBody>

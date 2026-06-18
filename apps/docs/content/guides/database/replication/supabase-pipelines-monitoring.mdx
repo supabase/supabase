@@ -1,18 +1,18 @@
 ---
-id: 'external-replication-monitoring'
-title: 'External replication (ETL) monitoring'
-description: 'Monitor the status and health of your external replication (ETL) pipelines.'
+id: 'supabase-pipelines-monitoring'
+title: 'Monitor pipeline status'
+description: 'Monitor the status and health of pipelines created with Supabase Pipelines.'
 subtitle: 'Track replication status, view logs, and troubleshoot issues.'
 sidebar_label: 'Monitoring'
 ---
 
-<Admonition type="caution" title="Private Alpha">
+<Admonition type="caution" title="Alpha">
 
-External replication (ETL) is currently in private alpha. Managed pipelines run through Supabase ETL. Access is limited and features may change.
+Supabase Pipelines is currently in alpha. Alpha features can be unstable and may introduce breaking changes while we evaluate the product direction, refine the feature set, and incorporate customer feedback.
 
 </Admonition>
 
-After setting up external replication (ETL), you can monitor the status and health of your replication pipelines directly from the Dashboard. The pipeline is the active Postgres replication process that continuously streams changes from your database to your destination.
+After setting up Supabase Pipelines, you can monitor the status and health of your replication pipelines directly from the Dashboard. The pipeline is the active Postgres replication process that continuously streams changes from your database to your destination.
 
 ### Viewing pipeline status
 
@@ -43,7 +43,7 @@ Each destination shows its pipeline in one of these states:
 
 ### Viewing detailed pipeline metrics
 
-For detailed information about a specific pipeline, click **View status** on the destination. This opens the pipeline status page where you can monitor replication performance and table states.
+For detailed information about a specific pipeline, click **View pipeline** on the destination. This opens the pipeline status page where you can monitor replication performance and table states.
 
 <Image
   alt="Pipeline Status View"
@@ -69,7 +69,7 @@ The detailed status page shows:
 | **Connected**           | Whether the pipeline's replication slot is active and currently being used.                                                                                         | `Not connected` while the pipeline should be running usually means you should check pipeline status and logs.                                             |
 | **Slot status**         | How safely Postgres is keeping the WAL files the pipeline still needs.                                                                                              | `Unreserved` and `Lost` require action. See [Slot statuses](#slot-statuses).                                                                              |
 
-External replication (ETL) uses one main pipeline replication slot for ongoing changes. During the initial copy phase, it can also create temporary table-sync replication slots. These temporary slots let multiple tables copy in parallel, make large table copies faster, and allow individual tables to be retried or copied again without restarting the whole pipeline.
+Supabase Pipelines uses one main pipeline replication slot for ongoing changes. During the initial copy phase, it can also create temporary table-sync replication slots. These temporary slots let multiple tables copy in parallel, make large table copies faster, and allow individual tables to be retried or copied again without restarting the whole pipeline.
 
 Temporary table-sync slots show the same kind of lag and slot health metrics while they are active. After a table finishes copying and catches up, its temporary slot is removed and ongoing changes continue through the main pipeline slot. For overall replication health, focus first on the main pipeline slot.
 
@@ -125,7 +125,7 @@ After the affected table finishes copying and catches up, the temporary slot is 
 #### Investigate the lag
 
 1. Open [**Database > Replication**](/dashboard/project/_/database/replication) and check the destination's lag column.
-2. Click **View status** and check **Waiting to sync**, **Room before pausing**, **Last check-in**, **Connected**, and **Slot status**.
+2. Click **View pipeline** and check **Waiting to sync**, **Room before pausing**, **Last check-in**, **Connected**, and **Slot status**.
 3. Check table states. Tables in **Copying** can create temporary lag while the initial snapshot catches up to live changes. If a table-sync slot is **Unreserved** or **Lost**, tune copy parallelism and retry the affected table copy.
 4. Open [**Logs > Replication**](/dashboard/project/_/logs/explorer) and look for destination errors, retries, rate limits, schema errors, or repeated restarts.
 5. Compare the lag trend with recent database activity, such as imports, migrations, bulk updates, or long transactions.
@@ -136,7 +136,7 @@ After the affected table finishes copying and catches up, the temporary slot is 
 | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Reserved**   | If **Waiting to sync** is stable or decreasing, continue monitoring. If it keeps increasing, check destination write performance, logs, and whether the publication includes more tables or write volume than expected.                                                                                          |
 | **Extended**   | Treat it as an early warning. Confirm the pipeline is connected, check logs for retries or destination slowness, and reduce avoidable write bursts if possible until the pipeline catches up.                                                                                                                    |
-| **Unreserved** | Act quickly. The slot is at risk of losing required WAL. Check whether the pipeline is connected and making progress, fix destination or pipeline errors, and contact support if the lag continues to grow.                                                                                                      |
+| **Unreserved** | Act soon. The slot is at risk of losing required WAL. Check whether the pipeline is connected and making progress, fix destination or pipeline errors, and contact support if the lag continues to grow.                                                                                                         |
 | **Lost**       | The pipeline cannot continue from the existing slot because required WAL has been removed. Recreate the pipeline, or set **Invalidated slot behavior** to **Recreate** in the pipeline's advanced settings and restart the pipeline. This creates a new slot and starts replication from scratch for all tables. |
 | **Unknown**    | Check replication logs for errors or missing slot details. If the status remains unknown while the pipeline should be running, contact support with the pipeline ID and recent log details.                                                                                                                      |
 
@@ -166,7 +166,7 @@ height={2146}
 
 **Viewing table error details:**
 
-1. Click **View status** on your destination
+1. Click **View pipeline** on your destination
 2. Check the table states section to identify tables in **Error** state
 3. Review the error message for that specific table
 
@@ -195,7 +195,7 @@ height={2146}
 **Viewing pipeline error details:**
 
 1. Hover over the **Failed** status in the destinations list to see a quick error summary
-2. Click **View status** for comprehensive error information
+2. Click **View pipeline** for comprehensive error information
 3. Navigate to the [**Logs > Replication**](/dashboard/project/_/logs/explorer) section of the Dashboard for detailed error logs
 
 **Recovering from pipeline errors:**
@@ -233,7 +233,7 @@ Logs contain diagnostic information that may be too technical for most users. If
 
 1. Navigate to the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard
 2. Verify your destination shows a "Running" status
-3. Click **View status** to check replication lag and table states
+3. Click **View pipeline** to check replication lag and table states
 4. Ensure all tables show a "Live" state
 
 #### Investigating errors
@@ -241,7 +241,7 @@ Logs contain diagnostic information that may be too technical for most users. If
 If you see a **Failed** status:
 
 1. Hover over the status to see the error summary
-2. Click **View status** to see detailed error information
+2. Click **View pipeline** to see detailed error information
 3. Check table states to identify which tables are affected
 4. Navigate to the [**Logs > Replication**](/dashboard/project/_/logs/explorer) section of the Dashboard for full error details
 5. For table errors, attempt to reset the affected tables
@@ -265,9 +265,9 @@ If you notice issues with your replication:
 4. **Verify publication**: Ensure your Postgres publication is properly configured
 5. **Monitor replication lag**: High lag may indicate performance issues
 
-For more troubleshooting tips, see the [external replication (ETL) FAQ](/docs/guides/database/replication/external-replication-faq).
+For more troubleshooting tips, see the [Supabase Pipelines FAQ](/docs/guides/database/replication/supabase-pipelines-faq).
 
 ### Next steps
 
-- [Set up external replication (ETL)](/docs/guides/database/replication/external-replication-setup)
-- [View external replication (ETL) FAQ](/docs/guides/database/replication/external-replication-faq)
+- [Set up Supabase Pipelines](/docs/guides/database/replication/supabase-pipelines)
+- [View the Supabase Pipelines FAQ](/docs/guides/database/replication/supabase-pipelines-faq)
