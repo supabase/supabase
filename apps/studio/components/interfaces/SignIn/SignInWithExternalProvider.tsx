@@ -17,14 +17,9 @@ import { auth, buildPathWithParams } from '@/lib/gotrue'
 
 interface SignInWithExternalProviderProps {
   provider: ExternalIdentityProviderConfig
-  /** Overrides the default "Continue with {provider}" button label (e.g. a focused "Continue"). */
-  label?: string
 }
 
-export const SignInWithExternalProvider = ({
-  provider,
-  label,
-}: SignInWithExternalProviderProps) => {
+export const SignInWithExternalProvider = ({ provider }: SignInWithExternalProviderProps) => {
   const [loading, setLoading] = useState(false)
   const [, setLastSignInUsed] = useLastSignIn()
 
@@ -64,7 +59,7 @@ export const SignInWithExternalProvider = ({
         variant="outline"
         loading={loading}
       >
-        {label ?? `Continue with ${provider.displayName}`}
+        Continue with {provider.displayName}
       </Button>
     </LastSignInWrapper>
   )

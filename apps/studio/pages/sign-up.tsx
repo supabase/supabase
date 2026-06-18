@@ -56,7 +56,7 @@ const SignUpPage: NextPageWithLayout = () => {
 
     return (
       <div className="flex flex-col gap-5">
-        <SignInWithExternalProvider provider={focusProvider} label="Continue" />
+        <SignInWithExternalProvider provider={focusProvider} />
         {showOtherOptions ? (
           renderAuthOptions(otherProviders, 'bg-surface-100')
         ) : (
