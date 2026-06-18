@@ -222,7 +222,11 @@ export const BranchesPageWrapper = ({ children }: PropsWithChildren) => {
 
   const secondaryActions = (
     <div className="flex items-center gap-x-2">
-      <Button asChild variant="text" icon={<MessageCircle className="text-muted" strokeWidth={1} />}>
+      <Button
+        asChild
+        variant="text"
+        icon={<MessageCircle className="text-muted" strokeWidth={1} />}
+      >
         <a
           target="_blank"
           rel="noreferrer"

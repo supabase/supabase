@@ -247,7 +247,8 @@ export default defineConfig(({ command, mode }) => {
   // Vite's mode-based env resolution) while the bundle stays at
   // `NODE_ENV='production'`, mirroring Next.
   if (command === 'build') {
-    process.env.NODE_ENV = 'production'
+    // Next's types declare NODE_ENV as read-only, so cast to assign it.
+    ;(process.env as Record<string, string>).NODE_ENV = 'production'
   }
 
   // Inline NEXT_PUBLIC_* env vars at build time so `process.env.NEXT_PUBLIC_*`
