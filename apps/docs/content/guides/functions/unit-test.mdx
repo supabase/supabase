@@ -71,7 +71,7 @@ See the [Development Environment](/docs/guides/functions/development-environment
 
 The pricing rules are pure functions with no side effects, so they are perfect candidates for fast, isolated unit tests.
 
-### The pricing module (`process-ticket/pricing.ts`)
+### The pricing module
 
 <$CodeSample
 path="/edge-functions/supabase/functions/unit-testing/process-ticket/pricing.ts"
@@ -80,7 +80,7 @@ meta="supabase/functions/process-ticket/pricing.ts"
 language="typescript"
 />
 
-### Unit tests (`tests/process-ticket/pricing.test.ts`)
+### Unit tests
 
 The reference implementation uses the BDD-style API from `@std/testing/bdd`:
 
@@ -105,7 +105,7 @@ These tests run in milliseconds and give you immediate safety when changing disc
 
 The reference implementation uses a pattern: **mocking `globalThis.fetch`** to intercept the Supabase REST calls made by the Edge Function. This approach requires **zero changes** to your production code for testability.
 
-### The Edge Function (`process-ticket/index.ts`)
+### The Edge Function
 
 <$CodeSample
 path="/edge-functions/supabase/functions/unit-testing/process-ticket/index.ts"
@@ -120,7 +120,7 @@ Key points:
 - Automatically provides an authenticated `ctx.supabase` client
 - Business logic is delegated to the co-located `pricing.ts`
 
-### Integration test setup (`tests/utils/supabase_env.ts`)
+### Integration test setup
 
 This helper sets up a mock Supabase environment and generates valid RS256 JWTs for authenticated requests:
 
@@ -131,7 +131,7 @@ meta="supabase/functions/tests/utils/supabase_env.ts"
 language="typescript"
 />
 
-### Full integration tests (`tests/process-ticket/index.test.ts`)
+### Full integration tests
 
 <$CodeSample
 path="/edge-functions/supabase/functions/unit-testing/tests/process-ticket/index.test.ts"
