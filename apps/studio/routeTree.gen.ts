@@ -26,9 +26,11 @@ import { Route as OrgChar91_Char93RouteImport } from './routes/org.[_]'
 import { Route as NewSlugRouteImport } from './routes/new/$slug'
 import { Route as IntegrationsVercelRouteImport } from './routes/integrations/vercel'
 import { Route as ApiStatusOverrideRouteImport } from './routes/api/status-override'
+import { Route as ApiParseQueryRouteImport } from './routes/api/parse-query'
 import { Route as ApiIncidentStatusRouteImport } from './routes/api/incident-status'
 import { Route as ApiIncidentBannerRouteImport } from './routes/api/incident-banner'
 import { Route as ApiGetUtcTimeRouteImport } from './routes/api/get-utc-time'
+import { Route as ApiGetS3KeysRouteImport } from './routes/api/get-s3-keys'
 import { Route as ApiGetIpAddressRouteImport } from './routes/api/get-ip-address'
 import { Route as ApiGetDeploymentCommitRouteImport } from './routes/api/get-deployment-commit'
 import { Route as ApiGenerateAttachmentUrlRouteImport } from './routes/api/generate-attachment-url'
@@ -69,6 +71,7 @@ import { Route as ProjectRefAdvisorsRouteImport } from './routes/project/$ref/ad
 import { Route as OrgChar91_Char93SplatRouteImport } from './routes/org.[_].$'
 import { Route as IntegrationsVercelInstallRouteImport } from './routes/integrations/vercel/install'
 import { Route as IntegrationsGithubAuthorizeRouteImport } from './routes/integrations/github/authorize'
+import { Route as ApiPlatformDeploymentModeRouteImport } from './routes/api/platform/deployment-mode'
 import { Route as ApiIntegrationsStripeSyncRouteImport } from './routes/api/integrations/stripe-sync'
 import { Route as ApiEdgeFunctionsTestRouteImport } from './routes/api/edge-functions/test'
 import { Route as ApiContentGraphqlRouteImport } from './routes/api/content/graphql'
@@ -171,6 +174,7 @@ import { Route as ApiPlatformTelemetryEventRouteImport } from './routes/api/plat
 import { Route as ApiPlatformIntegrationsSlugRouteImport } from './routes/api/platform/integrations/$slug'
 import { Route as ApiAiSqlTitleV2RouteImport } from './routes/api/ai/sql/title-v2'
 import { Route as ApiAiSqlPolicyRouteImport } from './routes/api/ai/sql/policy'
+import { Route as ApiAiSqlParseClientCodeRouteImport } from './routes/api/ai/sql/parse-client-code'
 import { Route as ApiAiSqlGenerateV4RouteImport } from './routes/api/ai/sql/generate-v4'
 import { Route as ApiAiSqlFilterV1RouteImport } from './routes/api/ai/sql/filter-v1'
 import { Route as ApiAiSqlCronV2RouteImport } from './routes/api/ai/sql/cron-v2'
@@ -261,6 +265,7 @@ import { Route as AuthPartnersStripeProjectsLoginRouteImport } from './routes/_a
 import { Route as AppOrgSlugWebhooksEndpointIdRouteImport } from './routes/_app/org/$slug/webhooks/$endpointId'
 import { Route as ProjectRefIntegrationsIdPageIdIndexRouteImport } from './routes/project/$ref/integrations/$id/$pageId/index'
 import { Route as ApiV1ProjectsRefFunctionsIndexRouteImport } from './routes/api/v1/projects/$ref/functions/index'
+import { Route as ApiPlatformStorageRefVectorBucketsIndexRouteImport } from './routes/api/platform/storage/$ref/vector-buckets/index'
 import { Route as ApiPlatformStorageRefBucketsIndexRouteImport } from './routes/api/platform/storage/$ref/buckets/index'
 import { Route as ApiPlatformPropsProjectRefIndexRouteImport } from './routes/api/platform/props/project/$ref/index'
 import { Route as ApiPlatformProjectsRefContentIndexRouteImport } from './routes/api/platform/projects/$ref/content/index'
@@ -273,6 +278,7 @@ import { Route as ProjectRefStorageAnalyticsBucketsBucketIdRouteImport } from '.
 import { Route as ProjectRefDatabaseReplicationReplicaReplicaIdRouteImport } from './routes/project/$ref/database/replication/replica/$replicaId'
 import { Route as ApiV1ProjectsRefTypesTypescriptRouteImport } from './routes/api/v1/projects/$ref/types/typescript'
 import { Route as ApiV1ProjectsRefDatabaseMigrationsRouteImport } from './routes/api/v1/projects/$ref/database/migrations'
+import { Route as ApiV1ProjectsRefApiKeysIdRouteImport } from './routes/api/v1/projects/$ref/api-keys/$id'
 import { Route as ApiPlatformPropsProjectRefApiRouteImport } from './routes/api/platform/props/project/$ref/api'
 import { Route as ApiPlatformProjectsRefContentCountRouteImport } from './routes/api/platform/projects/$ref/content/count'
 import { Route as ApiPlatformProjectsRefConfigPostgrestRouteImport } from './routes/api/platform/projects/$ref/config/postgrest'
@@ -284,6 +290,7 @@ import { Route as ApiPlatformProjectsRefAnalyticsLogDrainsRouteImport } from './
 import { Route as ApiPlatformOrganizationsSlugBillingSubscriptionRouteImport } from './routes/api/platform/organizations/$slug/billing/subscription'
 import { Route as ProjectRefIntegrationsIdPageIdChildIdIndexRouteImport } from './routes/project/$ref/integrations/$id/$pageId/$childId/index'
 import { Route as ApiV1ProjectsRefFunctionsSlugIndexRouteImport } from './routes/api/v1/projects/$ref/functions/$slug/index'
+import { Route as ApiPlatformStorageRefVectorBucketsIdIndexRouteImport } from './routes/api/platform/storage/$ref/vector-buckets/$id/index'
 import { Route as ApiPlatformStorageRefBucketsIdIndexRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/index'
 import { Route as ApiPlatformProjectsRefContentFoldersIndexRouteImport } from './routes/api/platform/projects/$ref/content/folders/index'
 import { Route as ApiPlatformAuthRefUsersIdIndexRouteImport } from './routes/api/platform/auth/$ref/users/$id/index'
@@ -291,10 +298,15 @@ import { Route as ApiV1ProjectsRefFunctionsSlugBodyRouteImport } from './routes/
 import { Route as ApiPlatformStorageRefBucketsIdEmptyRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/empty'
 import { Route as ApiPlatformProjectsRefContentItemIdRouteImport } from './routes/api/platform/projects/$ref/content/item/$id'
 import { Route as ApiPlatformProjectsRefContentFoldersIdRouteImport } from './routes/api/platform/projects/$ref/content/folders/$id'
+import { Route as ApiPlatformProjectsRefConfigSecretsUpdateStatusRouteImport } from './routes/api/platform/projects/$ref/config/secrets/update-status'
 import { Route as ApiPlatformProjectsRefAnalyticsLogDrainsUuidRouteImport } from './routes/api/platform/projects/$ref/analytics/log-drains/$uuid'
 import { Route as ApiPlatformProjectsRefAnalyticsEndpointsNameRouteImport } from './routes/api/platform/projects/$ref/analytics/endpoints/$name'
 import { Route as ApiPlatformAuthRefUsersIdFactorsRouteImport } from './routes/api/platform/auth/$ref/users/$id/factors'
+import { Route as ApiV1ProjectsRefConfigAuthSigningKeysIndexRouteImport } from './routes/api/v1/projects/$ref/config/auth/signing-keys/index'
+import { Route as ApiPlatformStorageRefVectorBucketsIdIndexesIndexRouteImport } from './routes/api/platform/storage/$ref/vector-buckets/$id/indexes/index'
 import { Route as ApiPlatformStorageRefBucketsIdObjectsIndexRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/objects/index'
+import { Route as ApiV1ProjectsRefConfigAuthSigningKeysLegacyRouteImport } from './routes/api/v1/projects/$ref/config/auth/signing-keys/legacy'
+import { Route as ApiPlatformStorageRefVectorBucketsIdIndexesIndexNameRouteImport } from './routes/api/platform/storage/$ref/vector-buckets/$id/indexes/$indexName'
 import { Route as ApiPlatformStorageRefBucketsIdObjectsSignMultiRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/objects/sign-multi'
 import { Route as ApiPlatformStorageRefBucketsIdObjectsSignRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/objects/sign'
 import { Route as ApiPlatformStorageRefBucketsIdObjectsPublicUrlRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/objects/public-url'
@@ -386,6 +398,11 @@ const ApiStatusOverrideRoute = ApiStatusOverrideRouteImport.update({
   path: '/api/status-override',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiParseQueryRoute = ApiParseQueryRouteImport.update({
+  id: '/api/parse-query',
+  path: '/api/parse-query',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiIncidentStatusRoute = ApiIncidentStatusRouteImport.update({
   id: '/api/incident-status',
   path: '/api/incident-status',
@@ -399,6 +416,11 @@ const ApiIncidentBannerRoute = ApiIncidentBannerRouteImport.update({
 const ApiGetUtcTimeRoute = ApiGetUtcTimeRouteImport.update({
   id: '/api/get-utc-time',
   path: '/api/get-utc-time',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiGetS3KeysRoute = ApiGetS3KeysRouteImport.update({
+  id: '/api/get-s3-keys',
+  path: '/api/get-s3-keys',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiGetIpAddressRoute = ApiGetIpAddressRouteImport.update({
@@ -604,6 +626,12 @@ const IntegrationsGithubAuthorizeRoute =
   IntegrationsGithubAuthorizeRouteImport.update({
     id: '/integrations/github/authorize',
     path: '/integrations/github/authorize',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPlatformDeploymentModeRoute =
+  ApiPlatformDeploymentModeRouteImport.update({
+    id: '/api/platform/deployment-mode',
+    path: '/api/platform/deployment-mode',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiIntegrationsStripeSyncRoute =
@@ -1174,6 +1202,11 @@ const ApiAiSqlPolicyRoute = ApiAiSqlPolicyRouteImport.update({
   path: '/api/ai/sql/policy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAiSqlParseClientCodeRoute = ApiAiSqlParseClientCodeRouteImport.update({
+  id: '/api/ai/sql/parse-client-code',
+  path: '/api/ai/sql/parse-client-code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAiSqlGenerateV4Route = ApiAiSqlGenerateV4RouteImport.update({
   id: '/api/ai/sql/generate-v4',
   path: '/api/ai/sql/generate-v4',
@@ -1691,6 +1724,12 @@ const ApiV1ProjectsRefFunctionsIndexRoute =
     path: '/api/v1/projects/$ref/functions/',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPlatformStorageRefVectorBucketsIndexRoute =
+  ApiPlatformStorageRefVectorBucketsIndexRouteImport.update({
+    id: '/api/platform/storage/$ref/vector-buckets/',
+    path: '/api/platform/storage/$ref/vector-buckets/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPlatformStorageRefBucketsIndexRoute =
   ApiPlatformStorageRefBucketsIndexRouteImport.update({
     id: '/api/platform/storage/$ref/buckets/',
@@ -1763,6 +1802,12 @@ const ApiV1ProjectsRefDatabaseMigrationsRoute =
     path: '/api/v1/projects/$ref/database/migrations',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiV1ProjectsRefApiKeysIdRoute =
+  ApiV1ProjectsRefApiKeysIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => ApiV1ProjectsRefApiKeysRoute,
+  } as any)
 const ApiPlatformPropsProjectRefApiRoute =
   ApiPlatformPropsProjectRefApiRouteImport.update({
     id: '/api/platform/props/project/$ref/api',
@@ -1829,6 +1874,12 @@ const ApiV1ProjectsRefFunctionsSlugIndexRoute =
     path: '/api/v1/projects/$ref/functions/$slug/',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPlatformStorageRefVectorBucketsIdIndexRoute =
+  ApiPlatformStorageRefVectorBucketsIdIndexRouteImport.update({
+    id: '/api/platform/storage/$ref/vector-buckets/$id/',
+    path: '/api/platform/storage/$ref/vector-buckets/$id/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPlatformStorageRefBucketsIdIndexRoute =
   ApiPlatformStorageRefBucketsIdIndexRouteImport.update({
     id: '/api/platform/storage/$ref/buckets/$id/',
@@ -1871,6 +1922,12 @@ const ApiPlatformProjectsRefContentFoldersIdRoute =
     path: '/api/platform/projects/$ref/content/folders/$id',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPlatformProjectsRefConfigSecretsUpdateStatusRoute =
+  ApiPlatformProjectsRefConfigSecretsUpdateStatusRouteImport.update({
+    id: '/api/platform/projects/$ref/config/secrets/update-status',
+    path: '/api/platform/projects/$ref/config/secrets/update-status',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPlatformProjectsRefAnalyticsLogDrainsUuidRoute =
   ApiPlatformProjectsRefAnalyticsLogDrainsUuidRouteImport.update({
     id: '/$uuid',
@@ -1889,10 +1946,34 @@ const ApiPlatformAuthRefUsersIdFactorsRoute =
     path: '/api/platform/auth/$ref/users/$id/factors',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiV1ProjectsRefConfigAuthSigningKeysIndexRoute =
+  ApiV1ProjectsRefConfigAuthSigningKeysIndexRouteImport.update({
+    id: '/api/v1/projects/$ref/config/auth/signing-keys/',
+    path: '/api/v1/projects/$ref/config/auth/signing-keys/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPlatformStorageRefVectorBucketsIdIndexesIndexRoute =
+  ApiPlatformStorageRefVectorBucketsIdIndexesIndexRouteImport.update({
+    id: '/api/platform/storage/$ref/vector-buckets/$id/indexes/',
+    path: '/api/platform/storage/$ref/vector-buckets/$id/indexes/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPlatformStorageRefBucketsIdObjectsIndexRoute =
   ApiPlatformStorageRefBucketsIdObjectsIndexRouteImport.update({
     id: '/api/platform/storage/$ref/buckets/$id/objects/',
     path: '/api/platform/storage/$ref/buckets/$id/objects/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiV1ProjectsRefConfigAuthSigningKeysLegacyRoute =
+  ApiV1ProjectsRefConfigAuthSigningKeysLegacyRouteImport.update({
+    id: '/api/v1/projects/$ref/config/auth/signing-keys/legacy',
+    path: '/api/v1/projects/$ref/config/auth/signing-keys/legacy',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPlatformStorageRefVectorBucketsIdIndexesIndexNameRoute =
+  ApiPlatformStorageRefVectorBucketsIdIndexesIndexNameRouteImport.update({
+    id: '/api/platform/storage/$ref/vector-buckets/$id/indexes/$indexName',
+    path: '/api/platform/storage/$ref/vector-buckets/$id/indexes/$indexName',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPlatformStorageRefBucketsIdObjectsSignMultiRoute =
@@ -1959,9 +2040,11 @@ export interface FileRoutesByFullPath {
   '/api/generate-attachment-url': typeof ApiGenerateAttachmentUrlRoute
   '/api/get-deployment-commit': typeof ApiGetDeploymentCommitRoute
   '/api/get-ip-address': typeof ApiGetIpAddressRoute
+  '/api/get-s3-keys': typeof ApiGetS3KeysRoute
   '/api/get-utc-time': typeof ApiGetUtcTimeRoute
   '/api/incident-banner': typeof ApiIncidentBannerRoute
   '/api/incident-status': typeof ApiIncidentStatusRoute
+  '/api/parse-query': typeof ApiParseQueryRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/new/$slug': typeof NewSlugRoute
@@ -1978,6 +2061,7 @@ export interface FileRoutesByFullPath {
   '/api/content/graphql': typeof ApiContentGraphqlRoute
   '/api/edge-functions/test': typeof ApiEdgeFunctionsTestRoute
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
+  '/api/platform/deployment-mode': typeof ApiPlatformDeploymentModeRoute
   '/integrations/github/authorize': typeof IntegrationsGithubAuthorizeRoute
   '/integrations/vercel/install': typeof IntegrationsVercelInstallRoute
   '/org/_/$': typeof OrgChar91_Char93SplatRoute
@@ -2020,6 +2104,7 @@ export interface FileRoutesByFullPath {
   '/api/ai/sql/cron-v2': typeof ApiAiSqlCronV2Route
   '/api/ai/sql/filter-v1': typeof ApiAiSqlFilterV1Route
   '/api/ai/sql/generate-v4': typeof ApiAiSqlGenerateV4Route
+  '/api/ai/sql/parse-client-code': typeof ApiAiSqlParseClientCodeRoute
   '/api/ai/sql/policy': typeof ApiAiSqlPolicyRoute
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
@@ -2137,7 +2222,7 @@ export interface FileRoutesByFullPath {
   '/api/platform/projects/$ref/run-lints': typeof ApiPlatformProjectsRefRunLintsRoute
   '/api/platform/projects/$ref/settings': typeof ApiPlatformProjectsRefSettingsRoute
   '/api/platform/props/org/$slug': typeof ApiPlatformPropsOrgSlugRoute
-  '/api/v1/projects/$ref/api-keys': typeof ApiV1ProjectsRefApiKeysRoute
+  '/api/v1/projects/$ref/api-keys': typeof ApiV1ProjectsRefApiKeysRouteWithChildren
   '/integrations/vercel/$slug/deploy-button/new-project': typeof IntegrationsVercelSlugDeployButtonNewProjectRoute
   '/integrations/vercel/$slug/marketplace/choose-project': typeof IntegrationsVercelSlugMarketplaceChooseProjectRoute
   '/project/$ref/advisors/rules/performance': typeof ProjectRefAdvisorsRulesPerformanceRoute
@@ -2190,6 +2275,7 @@ export interface FileRoutesByFullPath {
   '/api/platform/projects/$ref/config/postgrest': typeof ApiPlatformProjectsRefConfigPostgrestRoute
   '/api/platform/projects/$ref/content/count': typeof ApiPlatformProjectsRefContentCountRoute
   '/api/platform/props/project/$ref/api': typeof ApiPlatformPropsProjectRefApiRoute
+  '/api/v1/projects/$ref/api-keys/$id': typeof ApiV1ProjectsRefApiKeysIdRoute
   '/api/v1/projects/$ref/database/migrations': typeof ApiV1ProjectsRefDatabaseMigrationsRoute
   '/api/v1/projects/$ref/types/typescript': typeof ApiV1ProjectsRefTypesTypescriptRoute
   '/project/$ref/database/replication/replica/$replicaId': typeof ProjectRefDatabaseReplicationReplicaReplicaIdRoute
@@ -2202,11 +2288,13 @@ export interface FileRoutesByFullPath {
   '/api/platform/projects/$ref/content/': typeof ApiPlatformProjectsRefContentIndexRoute
   '/api/platform/props/project/$ref/': typeof ApiPlatformPropsProjectRefIndexRoute
   '/api/platform/storage/$ref/buckets/': typeof ApiPlatformStorageRefBucketsIndexRoute
+  '/api/platform/storage/$ref/vector-buckets/': typeof ApiPlatformStorageRefVectorBucketsIndexRoute
   '/api/v1/projects/$ref/functions/': typeof ApiV1ProjectsRefFunctionsIndexRoute
   '/project/$ref/integrations/$id/$pageId/': typeof ProjectRefIntegrationsIdPageIdIndexRoute
   '/api/platform/auth/$ref/users/$id/factors': typeof ApiPlatformAuthRefUsersIdFactorsRoute
   '/api/platform/projects/$ref/analytics/endpoints/$name': typeof ApiPlatformProjectsRefAnalyticsEndpointsNameRoute
   '/api/platform/projects/$ref/analytics/log-drains/$uuid': typeof ApiPlatformProjectsRefAnalyticsLogDrainsUuidRoute
+  '/api/platform/projects/$ref/config/secrets/update-status': typeof ApiPlatformProjectsRefConfigSecretsUpdateStatusRoute
   '/api/platform/projects/$ref/content/folders/$id': typeof ApiPlatformProjectsRefContentFoldersIdRoute
   '/api/platform/projects/$ref/content/item/$id': typeof ApiPlatformProjectsRefContentItemIdRoute
   '/api/platform/storage/$ref/buckets/$id/empty': typeof ApiPlatformStorageRefBucketsIdEmptyRoute
@@ -2214,6 +2302,7 @@ export interface FileRoutesByFullPath {
   '/api/platform/auth/$ref/users/$id/': typeof ApiPlatformAuthRefUsersIdIndexRoute
   '/api/platform/projects/$ref/content/folders/': typeof ApiPlatformProjectsRefContentFoldersIndexRoute
   '/api/platform/storage/$ref/buckets/$id/': typeof ApiPlatformStorageRefBucketsIdIndexRoute
+  '/api/platform/storage/$ref/vector-buckets/$id/': typeof ApiPlatformStorageRefVectorBucketsIdIndexRoute
   '/api/v1/projects/$ref/functions/$slug/': typeof ApiV1ProjectsRefFunctionsSlugIndexRoute
   '/project/$ref/integrations/$id/$pageId/$childId/': typeof ProjectRefIntegrationsIdPageIdChildIdIndexRoute
   '/api/platform/storage/$ref/buckets/$id/objects/download': typeof ApiPlatformStorageRefBucketsIdObjectsDownloadRoute
@@ -2222,7 +2311,11 @@ export interface FileRoutesByFullPath {
   '/api/platform/storage/$ref/buckets/$id/objects/public-url': typeof ApiPlatformStorageRefBucketsIdObjectsPublicUrlRoute
   '/api/platform/storage/$ref/buckets/$id/objects/sign': typeof ApiPlatformStorageRefBucketsIdObjectsSignRoute
   '/api/platform/storage/$ref/buckets/$id/objects/sign-multi': typeof ApiPlatformStorageRefBucketsIdObjectsSignMultiRoute
+  '/api/platform/storage/$ref/vector-buckets/$id/indexes/$indexName': typeof ApiPlatformStorageRefVectorBucketsIdIndexesIndexNameRoute
+  '/api/v1/projects/$ref/config/auth/signing-keys/legacy': typeof ApiV1ProjectsRefConfigAuthSigningKeysLegacyRoute
   '/api/platform/storage/$ref/buckets/$id/objects/': typeof ApiPlatformStorageRefBucketsIdObjectsIndexRoute
+  '/api/platform/storage/$ref/vector-buckets/$id/indexes/': typeof ApiPlatformStorageRefVectorBucketsIdIndexesIndexRoute
+  '/api/v1/projects/$ref/config/auth/signing-keys/': typeof ApiV1ProjectsRefConfigAuthSigningKeysIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -2250,9 +2343,11 @@ export interface FileRoutesByTo {
   '/api/generate-attachment-url': typeof ApiGenerateAttachmentUrlRoute
   '/api/get-deployment-commit': typeof ApiGetDeploymentCommitRoute
   '/api/get-ip-address': typeof ApiGetIpAddressRoute
+  '/api/get-s3-keys': typeof ApiGetS3KeysRoute
   '/api/get-utc-time': typeof ApiGetUtcTimeRoute
   '/api/incident-banner': typeof ApiIncidentBannerRoute
   '/api/incident-status': typeof ApiIncidentStatusRoute
+  '/api/parse-query': typeof ApiParseQueryRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/new/$slug': typeof NewSlugRoute
@@ -2268,6 +2363,7 @@ export interface FileRoutesByTo {
   '/api/content/graphql': typeof ApiContentGraphqlRoute
   '/api/edge-functions/test': typeof ApiEdgeFunctionsTestRoute
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
+  '/api/platform/deployment-mode': typeof ApiPlatformDeploymentModeRoute
   '/integrations/github/authorize': typeof IntegrationsGithubAuthorizeRoute
   '/integrations/vercel/install': typeof IntegrationsVercelInstallRoute
   '/org/_/$': typeof OrgChar91_Char93SplatRoute
@@ -2303,6 +2399,7 @@ export interface FileRoutesByTo {
   '/api/ai/sql/cron-v2': typeof ApiAiSqlCronV2Route
   '/api/ai/sql/filter-v1': typeof ApiAiSqlFilterV1Route
   '/api/ai/sql/generate-v4': typeof ApiAiSqlGenerateV4Route
+  '/api/ai/sql/parse-client-code': typeof ApiAiSqlParseClientCodeRoute
   '/api/ai/sql/policy': typeof ApiAiSqlPolicyRoute
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
@@ -2417,7 +2514,7 @@ export interface FileRoutesByTo {
   '/api/platform/projects/$ref/run-lints': typeof ApiPlatformProjectsRefRunLintsRoute
   '/api/platform/projects/$ref/settings': typeof ApiPlatformProjectsRefSettingsRoute
   '/api/platform/props/org/$slug': typeof ApiPlatformPropsOrgSlugRoute
-  '/api/v1/projects/$ref/api-keys': typeof ApiV1ProjectsRefApiKeysRoute
+  '/api/v1/projects/$ref/api-keys': typeof ApiV1ProjectsRefApiKeysRouteWithChildren
   '/integrations/vercel/$slug/deploy-button/new-project': typeof IntegrationsVercelSlugDeployButtonNewProjectRoute
   '/integrations/vercel/$slug/marketplace/choose-project': typeof IntegrationsVercelSlugMarketplaceChooseProjectRoute
   '/project/$ref/advisors/rules/performance': typeof ProjectRefAdvisorsRulesPerformanceRoute
@@ -2470,6 +2567,7 @@ export interface FileRoutesByTo {
   '/api/platform/projects/$ref/config/postgrest': typeof ApiPlatformProjectsRefConfigPostgrestRoute
   '/api/platform/projects/$ref/content/count': typeof ApiPlatformProjectsRefContentCountRoute
   '/api/platform/props/project/$ref/api': typeof ApiPlatformPropsProjectRefApiRoute
+  '/api/v1/projects/$ref/api-keys/$id': typeof ApiV1ProjectsRefApiKeysIdRoute
   '/api/v1/projects/$ref/database/migrations': typeof ApiV1ProjectsRefDatabaseMigrationsRoute
   '/api/v1/projects/$ref/types/typescript': typeof ApiV1ProjectsRefTypesTypescriptRoute
   '/project/$ref/database/replication/replica/$replicaId': typeof ProjectRefDatabaseReplicationReplicaReplicaIdRoute
@@ -2482,11 +2580,13 @@ export interface FileRoutesByTo {
   '/api/platform/projects/$ref/content': typeof ApiPlatformProjectsRefContentIndexRoute
   '/api/platform/props/project/$ref': typeof ApiPlatformPropsProjectRefIndexRoute
   '/api/platform/storage/$ref/buckets': typeof ApiPlatformStorageRefBucketsIndexRoute
+  '/api/platform/storage/$ref/vector-buckets': typeof ApiPlatformStorageRefVectorBucketsIndexRoute
   '/api/v1/projects/$ref/functions': typeof ApiV1ProjectsRefFunctionsIndexRoute
   '/project/$ref/integrations/$id/$pageId': typeof ProjectRefIntegrationsIdPageIdIndexRoute
   '/api/platform/auth/$ref/users/$id/factors': typeof ApiPlatformAuthRefUsersIdFactorsRoute
   '/api/platform/projects/$ref/analytics/endpoints/$name': typeof ApiPlatformProjectsRefAnalyticsEndpointsNameRoute
   '/api/platform/projects/$ref/analytics/log-drains/$uuid': typeof ApiPlatformProjectsRefAnalyticsLogDrainsUuidRoute
+  '/api/platform/projects/$ref/config/secrets/update-status': typeof ApiPlatformProjectsRefConfigSecretsUpdateStatusRoute
   '/api/platform/projects/$ref/content/folders/$id': typeof ApiPlatformProjectsRefContentFoldersIdRoute
   '/api/platform/projects/$ref/content/item/$id': typeof ApiPlatformProjectsRefContentItemIdRoute
   '/api/platform/storage/$ref/buckets/$id/empty': typeof ApiPlatformStorageRefBucketsIdEmptyRoute
@@ -2494,6 +2594,7 @@ export interface FileRoutesByTo {
   '/api/platform/auth/$ref/users/$id': typeof ApiPlatformAuthRefUsersIdIndexRoute
   '/api/platform/projects/$ref/content/folders': typeof ApiPlatformProjectsRefContentFoldersIndexRoute
   '/api/platform/storage/$ref/buckets/$id': typeof ApiPlatformStorageRefBucketsIdIndexRoute
+  '/api/platform/storage/$ref/vector-buckets/$id': typeof ApiPlatformStorageRefVectorBucketsIdIndexRoute
   '/api/v1/projects/$ref/functions/$slug': typeof ApiV1ProjectsRefFunctionsSlugIndexRoute
   '/project/$ref/integrations/$id/$pageId/$childId': typeof ProjectRefIntegrationsIdPageIdChildIdIndexRoute
   '/api/platform/storage/$ref/buckets/$id/objects/download': typeof ApiPlatformStorageRefBucketsIdObjectsDownloadRoute
@@ -2502,7 +2603,11 @@ export interface FileRoutesByTo {
   '/api/platform/storage/$ref/buckets/$id/objects/public-url': typeof ApiPlatformStorageRefBucketsIdObjectsPublicUrlRoute
   '/api/platform/storage/$ref/buckets/$id/objects/sign': typeof ApiPlatformStorageRefBucketsIdObjectsSignRoute
   '/api/platform/storage/$ref/buckets/$id/objects/sign-multi': typeof ApiPlatformStorageRefBucketsIdObjectsSignMultiRoute
+  '/api/platform/storage/$ref/vector-buckets/$id/indexes/$indexName': typeof ApiPlatformStorageRefVectorBucketsIdIndexesIndexNameRoute
+  '/api/v1/projects/$ref/config/auth/signing-keys/legacy': typeof ApiV1ProjectsRefConfigAuthSigningKeysLegacyRoute
   '/api/platform/storage/$ref/buckets/$id/objects': typeof ApiPlatformStorageRefBucketsIdObjectsIndexRoute
+  '/api/platform/storage/$ref/vector-buckets/$id/indexes': typeof ApiPlatformStorageRefVectorBucketsIdIndexesIndexRoute
+  '/api/v1/projects/$ref/config/auth/signing-keys': typeof ApiV1ProjectsRefConfigAuthSigningKeysIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -2534,9 +2639,11 @@ export interface FileRoutesById {
   '/api/generate-attachment-url': typeof ApiGenerateAttachmentUrlRoute
   '/api/get-deployment-commit': typeof ApiGetDeploymentCommitRoute
   '/api/get-ip-address': typeof ApiGetIpAddressRoute
+  '/api/get-s3-keys': typeof ApiGetS3KeysRoute
   '/api/get-utc-time': typeof ApiGetUtcTimeRoute
   '/api/incident-banner': typeof ApiIncidentBannerRoute
   '/api/incident-status': typeof ApiIncidentStatusRoute
+  '/api/parse-query': typeof ApiParseQueryRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/new/$slug': typeof NewSlugRoute
@@ -2553,6 +2660,7 @@ export interface FileRoutesById {
   '/api/content/graphql': typeof ApiContentGraphqlRoute
   '/api/edge-functions/test': typeof ApiEdgeFunctionsTestRoute
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
+  '/api/platform/deployment-mode': typeof ApiPlatformDeploymentModeRoute
   '/integrations/github/authorize': typeof IntegrationsGithubAuthorizeRoute
   '/integrations/vercel/install': typeof IntegrationsVercelInstallRoute
   '/org/_/$': typeof OrgChar91_Char93SplatRoute
@@ -2595,6 +2703,7 @@ export interface FileRoutesById {
   '/api/ai/sql/cron-v2': typeof ApiAiSqlCronV2Route
   '/api/ai/sql/filter-v1': typeof ApiAiSqlFilterV1Route
   '/api/ai/sql/generate-v4': typeof ApiAiSqlGenerateV4Route
+  '/api/ai/sql/parse-client-code': typeof ApiAiSqlParseClientCodeRoute
   '/api/ai/sql/policy': typeof ApiAiSqlPolicyRoute
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
@@ -2712,7 +2821,7 @@ export interface FileRoutesById {
   '/api/platform/projects/$ref/run-lints': typeof ApiPlatformProjectsRefRunLintsRoute
   '/api/platform/projects/$ref/settings': typeof ApiPlatformProjectsRefSettingsRoute
   '/api/platform/props/org/$slug': typeof ApiPlatformPropsOrgSlugRoute
-  '/api/v1/projects/$ref/api-keys': typeof ApiV1ProjectsRefApiKeysRoute
+  '/api/v1/projects/$ref/api-keys': typeof ApiV1ProjectsRefApiKeysRouteWithChildren
   '/integrations/vercel/$slug/deploy-button/new-project': typeof IntegrationsVercelSlugDeployButtonNewProjectRoute
   '/integrations/vercel/$slug/marketplace/choose-project': typeof IntegrationsVercelSlugMarketplaceChooseProjectRoute
   '/project/$ref/advisors/rules/performance': typeof ProjectRefAdvisorsRulesPerformanceRoute
@@ -2765,6 +2874,7 @@ export interface FileRoutesById {
   '/api/platform/projects/$ref/config/postgrest': typeof ApiPlatformProjectsRefConfigPostgrestRoute
   '/api/platform/projects/$ref/content/count': typeof ApiPlatformProjectsRefContentCountRoute
   '/api/platform/props/project/$ref/api': typeof ApiPlatformPropsProjectRefApiRoute
+  '/api/v1/projects/$ref/api-keys/$id': typeof ApiV1ProjectsRefApiKeysIdRoute
   '/api/v1/projects/$ref/database/migrations': typeof ApiV1ProjectsRefDatabaseMigrationsRoute
   '/api/v1/projects/$ref/types/typescript': typeof ApiV1ProjectsRefTypesTypescriptRoute
   '/project/$ref/database/replication/replica/$replicaId': typeof ProjectRefDatabaseReplicationReplicaReplicaIdRoute
@@ -2777,11 +2887,13 @@ export interface FileRoutesById {
   '/api/platform/projects/$ref/content/': typeof ApiPlatformProjectsRefContentIndexRoute
   '/api/platform/props/project/$ref/': typeof ApiPlatformPropsProjectRefIndexRoute
   '/api/platform/storage/$ref/buckets/': typeof ApiPlatformStorageRefBucketsIndexRoute
+  '/api/platform/storage/$ref/vector-buckets/': typeof ApiPlatformStorageRefVectorBucketsIndexRoute
   '/api/v1/projects/$ref/functions/': typeof ApiV1ProjectsRefFunctionsIndexRoute
   '/project/$ref/integrations/$id/$pageId/': typeof ProjectRefIntegrationsIdPageIdIndexRoute
   '/api/platform/auth/$ref/users/$id/factors': typeof ApiPlatformAuthRefUsersIdFactorsRoute
   '/api/platform/projects/$ref/analytics/endpoints/$name': typeof ApiPlatformProjectsRefAnalyticsEndpointsNameRoute
   '/api/platform/projects/$ref/analytics/log-drains/$uuid': typeof ApiPlatformProjectsRefAnalyticsLogDrainsUuidRoute
+  '/api/platform/projects/$ref/config/secrets/update-status': typeof ApiPlatformProjectsRefConfigSecretsUpdateStatusRoute
   '/api/platform/projects/$ref/content/folders/$id': typeof ApiPlatformProjectsRefContentFoldersIdRoute
   '/api/platform/projects/$ref/content/item/$id': typeof ApiPlatformProjectsRefContentItemIdRoute
   '/api/platform/storage/$ref/buckets/$id/empty': typeof ApiPlatformStorageRefBucketsIdEmptyRoute
@@ -2789,6 +2901,7 @@ export interface FileRoutesById {
   '/api/platform/auth/$ref/users/$id/': typeof ApiPlatformAuthRefUsersIdIndexRoute
   '/api/platform/projects/$ref/content/folders/': typeof ApiPlatformProjectsRefContentFoldersIndexRoute
   '/api/platform/storage/$ref/buckets/$id/': typeof ApiPlatformStorageRefBucketsIdIndexRoute
+  '/api/platform/storage/$ref/vector-buckets/$id/': typeof ApiPlatformStorageRefVectorBucketsIdIndexRoute
   '/api/v1/projects/$ref/functions/$slug/': typeof ApiV1ProjectsRefFunctionsSlugIndexRoute
   '/project/$ref/integrations/$id/$pageId/$childId/': typeof ProjectRefIntegrationsIdPageIdChildIdIndexRoute
   '/api/platform/storage/$ref/buckets/$id/objects/download': typeof ApiPlatformStorageRefBucketsIdObjectsDownloadRoute
@@ -2797,7 +2910,11 @@ export interface FileRoutesById {
   '/api/platform/storage/$ref/buckets/$id/objects/public-url': typeof ApiPlatformStorageRefBucketsIdObjectsPublicUrlRoute
   '/api/platform/storage/$ref/buckets/$id/objects/sign': typeof ApiPlatformStorageRefBucketsIdObjectsSignRoute
   '/api/platform/storage/$ref/buckets/$id/objects/sign-multi': typeof ApiPlatformStorageRefBucketsIdObjectsSignMultiRoute
+  '/api/platform/storage/$ref/vector-buckets/$id/indexes/$indexName': typeof ApiPlatformStorageRefVectorBucketsIdIndexesIndexNameRoute
+  '/api/v1/projects/$ref/config/auth/signing-keys/legacy': typeof ApiV1ProjectsRefConfigAuthSigningKeysLegacyRoute
   '/api/platform/storage/$ref/buckets/$id/objects/': typeof ApiPlatformStorageRefBucketsIdObjectsIndexRoute
+  '/api/platform/storage/$ref/vector-buckets/$id/indexes/': typeof ApiPlatformStorageRefVectorBucketsIdIndexesIndexRoute
+  '/api/v1/projects/$ref/config/auth/signing-keys/': typeof ApiV1ProjectsRefConfigAuthSigningKeysIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -2828,9 +2945,11 @@ export interface FileRouteTypes {
     | '/api/generate-attachment-url'
     | '/api/get-deployment-commit'
     | '/api/get-ip-address'
+    | '/api/get-s3-keys'
     | '/api/get-utc-time'
     | '/api/incident-banner'
     | '/api/incident-status'
+    | '/api/parse-query'
     | '/api/status-override'
     | '/integrations/vercel'
     | '/new/$slug'
@@ -2847,6 +2966,7 @@ export interface FileRouteTypes {
     | '/api/content/graphql'
     | '/api/edge-functions/test'
     | '/api/integrations/stripe-sync'
+    | '/api/platform/deployment-mode'
     | '/integrations/github/authorize'
     | '/integrations/vercel/install'
     | '/org/_/$'
@@ -2889,6 +3009,7 @@ export interface FileRouteTypes {
     | '/api/ai/sql/cron-v2'
     | '/api/ai/sql/filter-v1'
     | '/api/ai/sql/generate-v4'
+    | '/api/ai/sql/parse-client-code'
     | '/api/ai/sql/policy'
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
@@ -3059,6 +3180,7 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/config/postgrest'
     | '/api/platform/projects/$ref/content/count'
     | '/api/platform/props/project/$ref/api'
+    | '/api/v1/projects/$ref/api-keys/$id'
     | '/api/v1/projects/$ref/database/migrations'
     | '/api/v1/projects/$ref/types/typescript'
     | '/project/$ref/database/replication/replica/$replicaId'
@@ -3071,11 +3193,13 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/content/'
     | '/api/platform/props/project/$ref/'
     | '/api/platform/storage/$ref/buckets/'
+    | '/api/platform/storage/$ref/vector-buckets/'
     | '/api/v1/projects/$ref/functions/'
     | '/project/$ref/integrations/$id/$pageId/'
     | '/api/platform/auth/$ref/users/$id/factors'
     | '/api/platform/projects/$ref/analytics/endpoints/$name'
     | '/api/platform/projects/$ref/analytics/log-drains/$uuid'
+    | '/api/platform/projects/$ref/config/secrets/update-status'
     | '/api/platform/projects/$ref/content/folders/$id'
     | '/api/platform/projects/$ref/content/item/$id'
     | '/api/platform/storage/$ref/buckets/$id/empty'
@@ -3083,6 +3207,7 @@ export interface FileRouteTypes {
     | '/api/platform/auth/$ref/users/$id/'
     | '/api/platform/projects/$ref/content/folders/'
     | '/api/platform/storage/$ref/buckets/$id/'
+    | '/api/platform/storage/$ref/vector-buckets/$id/'
     | '/api/v1/projects/$ref/functions/$slug/'
     | '/project/$ref/integrations/$id/$pageId/$childId/'
     | '/api/platform/storage/$ref/buckets/$id/objects/download'
@@ -3091,7 +3216,11 @@ export interface FileRouteTypes {
     | '/api/platform/storage/$ref/buckets/$id/objects/public-url'
     | '/api/platform/storage/$ref/buckets/$id/objects/sign'
     | '/api/platform/storage/$ref/buckets/$id/objects/sign-multi'
+    | '/api/platform/storage/$ref/vector-buckets/$id/indexes/$indexName'
+    | '/api/v1/projects/$ref/config/auth/signing-keys/legacy'
     | '/api/platform/storage/$ref/buckets/$id/objects/'
+    | '/api/platform/storage/$ref/vector-buckets/$id/indexes/'
+    | '/api/v1/projects/$ref/config/auth/signing-keys/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -3119,9 +3248,11 @@ export interface FileRouteTypes {
     | '/api/generate-attachment-url'
     | '/api/get-deployment-commit'
     | '/api/get-ip-address'
+    | '/api/get-s3-keys'
     | '/api/get-utc-time'
     | '/api/incident-banner'
     | '/api/incident-status'
+    | '/api/parse-query'
     | '/api/status-override'
     | '/integrations/vercel'
     | '/new/$slug'
@@ -3137,6 +3268,7 @@ export interface FileRouteTypes {
     | '/api/content/graphql'
     | '/api/edge-functions/test'
     | '/api/integrations/stripe-sync'
+    | '/api/platform/deployment-mode'
     | '/integrations/github/authorize'
     | '/integrations/vercel/install'
     | '/org/_/$'
@@ -3172,6 +3304,7 @@ export interface FileRouteTypes {
     | '/api/ai/sql/cron-v2'
     | '/api/ai/sql/filter-v1'
     | '/api/ai/sql/generate-v4'
+    | '/api/ai/sql/parse-client-code'
     | '/api/ai/sql/policy'
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
@@ -3339,6 +3472,7 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/config/postgrest'
     | '/api/platform/projects/$ref/content/count'
     | '/api/platform/props/project/$ref/api'
+    | '/api/v1/projects/$ref/api-keys/$id'
     | '/api/v1/projects/$ref/database/migrations'
     | '/api/v1/projects/$ref/types/typescript'
     | '/project/$ref/database/replication/replica/$replicaId'
@@ -3351,11 +3485,13 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/content'
     | '/api/platform/props/project/$ref'
     | '/api/platform/storage/$ref/buckets'
+    | '/api/platform/storage/$ref/vector-buckets'
     | '/api/v1/projects/$ref/functions'
     | '/project/$ref/integrations/$id/$pageId'
     | '/api/platform/auth/$ref/users/$id/factors'
     | '/api/platform/projects/$ref/analytics/endpoints/$name'
     | '/api/platform/projects/$ref/analytics/log-drains/$uuid'
+    | '/api/platform/projects/$ref/config/secrets/update-status'
     | '/api/platform/projects/$ref/content/folders/$id'
     | '/api/platform/projects/$ref/content/item/$id'
     | '/api/platform/storage/$ref/buckets/$id/empty'
@@ -3363,6 +3499,7 @@ export interface FileRouteTypes {
     | '/api/platform/auth/$ref/users/$id'
     | '/api/platform/projects/$ref/content/folders'
     | '/api/platform/storage/$ref/buckets/$id'
+    | '/api/platform/storage/$ref/vector-buckets/$id'
     | '/api/v1/projects/$ref/functions/$slug'
     | '/project/$ref/integrations/$id/$pageId/$childId'
     | '/api/platform/storage/$ref/buckets/$id/objects/download'
@@ -3371,7 +3508,11 @@ export interface FileRouteTypes {
     | '/api/platform/storage/$ref/buckets/$id/objects/public-url'
     | '/api/platform/storage/$ref/buckets/$id/objects/sign'
     | '/api/platform/storage/$ref/buckets/$id/objects/sign-multi'
+    | '/api/platform/storage/$ref/vector-buckets/$id/indexes/$indexName'
+    | '/api/v1/projects/$ref/config/auth/signing-keys/legacy'
     | '/api/platform/storage/$ref/buckets/$id/objects'
+    | '/api/platform/storage/$ref/vector-buckets/$id/indexes'
+    | '/api/v1/projects/$ref/config/auth/signing-keys'
   id:
     | '__root__'
     | '/'
@@ -3402,9 +3543,11 @@ export interface FileRouteTypes {
     | '/api/generate-attachment-url'
     | '/api/get-deployment-commit'
     | '/api/get-ip-address'
+    | '/api/get-s3-keys'
     | '/api/get-utc-time'
     | '/api/incident-banner'
     | '/api/incident-status'
+    | '/api/parse-query'
     | '/api/status-override'
     | '/integrations/vercel'
     | '/new/$slug'
@@ -3421,6 +3564,7 @@ export interface FileRouteTypes {
     | '/api/content/graphql'
     | '/api/edge-functions/test'
     | '/api/integrations/stripe-sync'
+    | '/api/platform/deployment-mode'
     | '/integrations/github/authorize'
     | '/integrations/vercel/install'
     | '/org/_/$'
@@ -3463,6 +3607,7 @@ export interface FileRouteTypes {
     | '/api/ai/sql/cron-v2'
     | '/api/ai/sql/filter-v1'
     | '/api/ai/sql/generate-v4'
+    | '/api/ai/sql/parse-client-code'
     | '/api/ai/sql/policy'
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
@@ -3633,6 +3778,7 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/config/postgrest'
     | '/api/platform/projects/$ref/content/count'
     | '/api/platform/props/project/$ref/api'
+    | '/api/v1/projects/$ref/api-keys/$id'
     | '/api/v1/projects/$ref/database/migrations'
     | '/api/v1/projects/$ref/types/typescript'
     | '/project/$ref/database/replication/replica/$replicaId'
@@ -3645,11 +3791,13 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/content/'
     | '/api/platform/props/project/$ref/'
     | '/api/platform/storage/$ref/buckets/'
+    | '/api/platform/storage/$ref/vector-buckets/'
     | '/api/v1/projects/$ref/functions/'
     | '/project/$ref/integrations/$id/$pageId/'
     | '/api/platform/auth/$ref/users/$id/factors'
     | '/api/platform/projects/$ref/analytics/endpoints/$name'
     | '/api/platform/projects/$ref/analytics/log-drains/$uuid'
+    | '/api/platform/projects/$ref/config/secrets/update-status'
     | '/api/platform/projects/$ref/content/folders/$id'
     | '/api/platform/projects/$ref/content/item/$id'
     | '/api/platform/storage/$ref/buckets/$id/empty'
@@ -3657,6 +3805,7 @@ export interface FileRouteTypes {
     | '/api/platform/auth/$ref/users/$id/'
     | '/api/platform/projects/$ref/content/folders/'
     | '/api/platform/storage/$ref/buckets/$id/'
+    | '/api/platform/storage/$ref/vector-buckets/$id/'
     | '/api/v1/projects/$ref/functions/$slug/'
     | '/project/$ref/integrations/$id/$pageId/$childId/'
     | '/api/platform/storage/$ref/buckets/$id/objects/download'
@@ -3665,7 +3814,11 @@ export interface FileRouteTypes {
     | '/api/platform/storage/$ref/buckets/$id/objects/public-url'
     | '/api/platform/storage/$ref/buckets/$id/objects/sign'
     | '/api/platform/storage/$ref/buckets/$id/objects/sign-multi'
+    | '/api/platform/storage/$ref/vector-buckets/$id/indexes/$indexName'
+    | '/api/v1/projects/$ref/config/auth/signing-keys/legacy'
     | '/api/platform/storage/$ref/buckets/$id/objects/'
+    | '/api/platform/storage/$ref/vector-buckets/$id/indexes/'
+    | '/api/v1/projects/$ref/config/auth/signing-keys/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -3686,9 +3839,11 @@ export interface RootRouteChildren {
   ApiGenerateAttachmentUrlRoute: typeof ApiGenerateAttachmentUrlRoute
   ApiGetDeploymentCommitRoute: typeof ApiGetDeploymentCommitRoute
   ApiGetIpAddressRoute: typeof ApiGetIpAddressRoute
+  ApiGetS3KeysRoute: typeof ApiGetS3KeysRoute
   ApiGetUtcTimeRoute: typeof ApiGetUtcTimeRoute
   ApiIncidentBannerRoute: typeof ApiIncidentBannerRoute
   ApiIncidentStatusRoute: typeof ApiIncidentStatusRoute
+  ApiParseQueryRoute: typeof ApiParseQueryRoute
   ApiStatusOverrideRoute: typeof ApiStatusOverrideRoute
   IntegrationsVercelRoute: typeof IntegrationsVercelRouteWithChildren
   NewSlugRoute: typeof NewSlugRoute
@@ -3699,6 +3854,7 @@ export interface RootRouteChildren {
   ApiContentGraphqlRoute: typeof ApiContentGraphqlRoute
   ApiEdgeFunctionsTestRoute: typeof ApiEdgeFunctionsTestRoute
   ApiIntegrationsStripeSyncRoute: typeof ApiIntegrationsStripeSyncRoute
+  ApiPlatformDeploymentModeRoute: typeof ApiPlatformDeploymentModeRoute
   IntegrationsGithubAuthorizeRoute: typeof IntegrationsGithubAuthorizeRoute
   ApiConnectIndexRoute: typeof ApiConnectIndexRoute
   ApiMcpIndexRoute: typeof ApiMcpIndexRoute
@@ -3710,6 +3866,7 @@ export interface RootRouteChildren {
   ApiAiSqlCronV2Route: typeof ApiAiSqlCronV2Route
   ApiAiSqlFilterV1Route: typeof ApiAiSqlFilterV1Route
   ApiAiSqlGenerateV4Route: typeof ApiAiSqlGenerateV4Route
+  ApiAiSqlParseClientCodeRoute: typeof ApiAiSqlParseClientCodeRoute
   ApiAiSqlPolicyRoute: typeof ApiAiSqlPolicyRoute
   ApiAiSqlTitleV2Route: typeof ApiAiSqlTitleV2Route
   ApiPlatformIntegrationsSlugRoute: typeof ApiPlatformIntegrationsSlugRoute
@@ -3740,7 +3897,7 @@ export interface RootRouteChildren {
   ApiPlatformProjectsRefRunLintsRoute: typeof ApiPlatformProjectsRefRunLintsRoute
   ApiPlatformProjectsRefSettingsRoute: typeof ApiPlatformProjectsRefSettingsRoute
   ApiPlatformPropsOrgSlugRoute: typeof ApiPlatformPropsOrgSlugRoute
-  ApiV1ProjectsRefApiKeysRoute: typeof ApiV1ProjectsRefApiKeysRoute
+  ApiV1ProjectsRefApiKeysRoute: typeof ApiV1ProjectsRefApiKeysRouteWithChildren
   ApiPlatformProjectsRefIndexRoute: typeof ApiPlatformProjectsRefIndexRoute
   ApiPlatformOrganizationsSlugBillingSubscriptionRoute: typeof ApiPlatformOrganizationsSlugBillingSubscriptionRoute
   ApiPlatformProjectsRefAnalyticsLogDrainsRoute: typeof ApiPlatformProjectsRefAnalyticsLogDrainsRouteWithChildren
@@ -3759,9 +3916,11 @@ export interface RootRouteChildren {
   ApiPlatformProjectsRefContentIndexRoute: typeof ApiPlatformProjectsRefContentIndexRoute
   ApiPlatformPropsProjectRefIndexRoute: typeof ApiPlatformPropsProjectRefIndexRoute
   ApiPlatformStorageRefBucketsIndexRoute: typeof ApiPlatformStorageRefBucketsIndexRoute
+  ApiPlatformStorageRefVectorBucketsIndexRoute: typeof ApiPlatformStorageRefVectorBucketsIndexRoute
   ApiV1ProjectsRefFunctionsIndexRoute: typeof ApiV1ProjectsRefFunctionsIndexRoute
   ApiPlatformAuthRefUsersIdFactorsRoute: typeof ApiPlatformAuthRefUsersIdFactorsRoute
   ApiPlatformProjectsRefAnalyticsEndpointsNameRoute: typeof ApiPlatformProjectsRefAnalyticsEndpointsNameRoute
+  ApiPlatformProjectsRefConfigSecretsUpdateStatusRoute: typeof ApiPlatformProjectsRefConfigSecretsUpdateStatusRoute
   ApiPlatformProjectsRefContentFoldersIdRoute: typeof ApiPlatformProjectsRefContentFoldersIdRoute
   ApiPlatformProjectsRefContentItemIdRoute: typeof ApiPlatformProjectsRefContentItemIdRoute
   ApiPlatformStorageRefBucketsIdEmptyRoute: typeof ApiPlatformStorageRefBucketsIdEmptyRoute
@@ -3769,6 +3928,7 @@ export interface RootRouteChildren {
   ApiPlatformAuthRefUsersIdIndexRoute: typeof ApiPlatformAuthRefUsersIdIndexRoute
   ApiPlatformProjectsRefContentFoldersIndexRoute: typeof ApiPlatformProjectsRefContentFoldersIndexRoute
   ApiPlatformStorageRefBucketsIdIndexRoute: typeof ApiPlatformStorageRefBucketsIdIndexRoute
+  ApiPlatformStorageRefVectorBucketsIdIndexRoute: typeof ApiPlatformStorageRefVectorBucketsIdIndexRoute
   ApiV1ProjectsRefFunctionsSlugIndexRoute: typeof ApiV1ProjectsRefFunctionsSlugIndexRoute
   ApiPlatformStorageRefBucketsIdObjectsDownloadRoute: typeof ApiPlatformStorageRefBucketsIdObjectsDownloadRoute
   ApiPlatformStorageRefBucketsIdObjectsListRoute: typeof ApiPlatformStorageRefBucketsIdObjectsListRoute
@@ -3776,7 +3936,11 @@ export interface RootRouteChildren {
   ApiPlatformStorageRefBucketsIdObjectsPublicUrlRoute: typeof ApiPlatformStorageRefBucketsIdObjectsPublicUrlRoute
   ApiPlatformStorageRefBucketsIdObjectsSignRoute: typeof ApiPlatformStorageRefBucketsIdObjectsSignRoute
   ApiPlatformStorageRefBucketsIdObjectsSignMultiRoute: typeof ApiPlatformStorageRefBucketsIdObjectsSignMultiRoute
+  ApiPlatformStorageRefVectorBucketsIdIndexesIndexNameRoute: typeof ApiPlatformStorageRefVectorBucketsIdIndexesIndexNameRoute
+  ApiV1ProjectsRefConfigAuthSigningKeysLegacyRoute: typeof ApiV1ProjectsRefConfigAuthSigningKeysLegacyRoute
   ApiPlatformStorageRefBucketsIdObjectsIndexRoute: typeof ApiPlatformStorageRefBucketsIdObjectsIndexRoute
+  ApiPlatformStorageRefVectorBucketsIdIndexesIndexRoute: typeof ApiPlatformStorageRefVectorBucketsIdIndexesIndexRoute
+  ApiV1ProjectsRefConfigAuthSigningKeysIndexRoute: typeof ApiV1ProjectsRefConfigAuthSigningKeysIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -3900,6 +4064,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiStatusOverrideRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/parse-query': {
+      id: '/api/parse-query'
+      path: '/api/parse-query'
+      fullPath: '/api/parse-query'
+      preLoaderRoute: typeof ApiParseQueryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/incident-status': {
       id: '/api/incident-status'
       path: '/api/incident-status'
@@ -3919,6 +4090,13 @@ declare module '@tanstack/react-router' {
       path: '/api/get-utc-time'
       fullPath: '/api/get-utc-time'
       preLoaderRoute: typeof ApiGetUtcTimeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/get-s3-keys': {
+      id: '/api/get-s3-keys'
+      path: '/api/get-s3-keys'
+      fullPath: '/api/get-s3-keys'
+      preLoaderRoute: typeof ApiGetS3KeysRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/get-ip-address': {
@@ -4199,6 +4377,13 @@ declare module '@tanstack/react-router' {
       path: '/integrations/github/authorize'
       fullPath: '/integrations/github/authorize'
       preLoaderRoute: typeof IntegrationsGithubAuthorizeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/platform/deployment-mode': {
+      id: '/api/platform/deployment-mode'
+      path: '/api/platform/deployment-mode'
+      fullPath: '/api/platform/deployment-mode'
+      preLoaderRoute: typeof ApiPlatformDeploymentModeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/integrations/stripe-sync': {
@@ -4915,6 +5100,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAiSqlPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/ai/sql/parse-client-code': {
+      id: '/api/ai/sql/parse-client-code'
+      path: '/api/ai/sql/parse-client-code'
+      fullPath: '/api/ai/sql/parse-client-code'
+      preLoaderRoute: typeof ApiAiSqlParseClientCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/ai/sql/generate-v4': {
       id: '/api/ai/sql/generate-v4'
       path: '/api/ai/sql/generate-v4'
@@ -5545,6 +5737,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1ProjectsRefFunctionsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/platform/storage/$ref/vector-buckets/': {
+      id: '/api/platform/storage/$ref/vector-buckets/'
+      path: '/api/platform/storage/$ref/vector-buckets'
+      fullPath: '/api/platform/storage/$ref/vector-buckets/'
+      preLoaderRoute: typeof ApiPlatformStorageRefVectorBucketsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/platform/storage/$ref/buckets/': {
       id: '/api/platform/storage/$ref/buckets/'
       path: '/api/platform/storage/$ref/buckets'
@@ -5629,6 +5828,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1ProjectsRefDatabaseMigrationsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/projects/$ref/api-keys/$id': {
+      id: '/api/v1/projects/$ref/api-keys/$id'
+      path: '/$id'
+      fullPath: '/api/v1/projects/$ref/api-keys/$id'
+      preLoaderRoute: typeof ApiV1ProjectsRefApiKeysIdRouteImport
+      parentRoute: typeof ApiV1ProjectsRefApiKeysRoute
+    }
     '/api/platform/props/project/$ref/api': {
       id: '/api/platform/props/project/$ref/api'
       path: '/api/platform/props/project/$ref/api'
@@ -5706,6 +5912,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1ProjectsRefFunctionsSlugIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/platform/storage/$ref/vector-buckets/$id/': {
+      id: '/api/platform/storage/$ref/vector-buckets/$id/'
+      path: '/api/platform/storage/$ref/vector-buckets/$id'
+      fullPath: '/api/platform/storage/$ref/vector-buckets/$id/'
+      preLoaderRoute: typeof ApiPlatformStorageRefVectorBucketsIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/platform/storage/$ref/buckets/$id/': {
       id: '/api/platform/storage/$ref/buckets/$id/'
       path: '/api/platform/storage/$ref/buckets/$id'
@@ -5755,6 +5968,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPlatformProjectsRefContentFoldersIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/platform/projects/$ref/config/secrets/update-status': {
+      id: '/api/platform/projects/$ref/config/secrets/update-status'
+      path: '/api/platform/projects/$ref/config/secrets/update-status'
+      fullPath: '/api/platform/projects/$ref/config/secrets/update-status'
+      preLoaderRoute: typeof ApiPlatformProjectsRefConfigSecretsUpdateStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/platform/projects/$ref/analytics/log-drains/$uuid': {
       id: '/api/platform/projects/$ref/analytics/log-drains/$uuid'
       path: '/$uuid'
@@ -5776,11 +5996,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPlatformAuthRefUsersIdFactorsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/projects/$ref/config/auth/signing-keys/': {
+      id: '/api/v1/projects/$ref/config/auth/signing-keys/'
+      path: '/api/v1/projects/$ref/config/auth/signing-keys'
+      fullPath: '/api/v1/projects/$ref/config/auth/signing-keys/'
+      preLoaderRoute: typeof ApiV1ProjectsRefConfigAuthSigningKeysIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/platform/storage/$ref/vector-buckets/$id/indexes/': {
+      id: '/api/platform/storage/$ref/vector-buckets/$id/indexes/'
+      path: '/api/platform/storage/$ref/vector-buckets/$id/indexes'
+      fullPath: '/api/platform/storage/$ref/vector-buckets/$id/indexes/'
+      preLoaderRoute: typeof ApiPlatformStorageRefVectorBucketsIdIndexesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/platform/storage/$ref/buckets/$id/objects/': {
       id: '/api/platform/storage/$ref/buckets/$id/objects/'
       path: '/api/platform/storage/$ref/buckets/$id/objects'
       fullPath: '/api/platform/storage/$ref/buckets/$id/objects/'
       preLoaderRoute: typeof ApiPlatformStorageRefBucketsIdObjectsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/projects/$ref/config/auth/signing-keys/legacy': {
+      id: '/api/v1/projects/$ref/config/auth/signing-keys/legacy'
+      path: '/api/v1/projects/$ref/config/auth/signing-keys/legacy'
+      fullPath: '/api/v1/projects/$ref/config/auth/signing-keys/legacy'
+      preLoaderRoute: typeof ApiV1ProjectsRefConfigAuthSigningKeysLegacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/platform/storage/$ref/vector-buckets/$id/indexes/$indexName': {
+      id: '/api/platform/storage/$ref/vector-buckets/$id/indexes/$indexName'
+      path: '/api/platform/storage/$ref/vector-buckets/$id/indexes/$indexName'
+      fullPath: '/api/platform/storage/$ref/vector-buckets/$id/indexes/$indexName'
+      preLoaderRoute: typeof ApiPlatformStorageRefVectorBucketsIdIndexesIndexNameRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/platform/storage/$ref/buckets/$id/objects/sign-multi': {
@@ -6469,6 +6717,20 @@ const ProjectChar91_Char93RouteChildren: ProjectChar91_Char93RouteChildren = {
 const ProjectChar91_Char93RouteWithChildren =
   ProjectChar91_Char93Route._addFileChildren(ProjectChar91_Char93RouteChildren)
 
+interface ApiV1ProjectsRefApiKeysRouteChildren {
+  ApiV1ProjectsRefApiKeysIdRoute: typeof ApiV1ProjectsRefApiKeysIdRoute
+}
+
+const ApiV1ProjectsRefApiKeysRouteChildren: ApiV1ProjectsRefApiKeysRouteChildren =
+  {
+    ApiV1ProjectsRefApiKeysIdRoute: ApiV1ProjectsRefApiKeysIdRoute,
+  }
+
+const ApiV1ProjectsRefApiKeysRouteWithChildren =
+  ApiV1ProjectsRefApiKeysRoute._addFileChildren(
+    ApiV1ProjectsRefApiKeysRouteChildren,
+  )
+
 interface ApiPlatformProjectsRefAnalyticsLogDrainsRouteChildren {
   ApiPlatformProjectsRefAnalyticsLogDrainsUuidRoute: typeof ApiPlatformProjectsRefAnalyticsLogDrainsUuidRoute
 }
@@ -6502,9 +6764,11 @@ const rootRouteChildren: RootRouteChildren = {
   ApiGenerateAttachmentUrlRoute: ApiGenerateAttachmentUrlRoute,
   ApiGetDeploymentCommitRoute: ApiGetDeploymentCommitRoute,
   ApiGetIpAddressRoute: ApiGetIpAddressRoute,
+  ApiGetS3KeysRoute: ApiGetS3KeysRoute,
   ApiGetUtcTimeRoute: ApiGetUtcTimeRoute,
   ApiIncidentBannerRoute: ApiIncidentBannerRoute,
   ApiIncidentStatusRoute: ApiIncidentStatusRoute,
+  ApiParseQueryRoute: ApiParseQueryRoute,
   ApiStatusOverrideRoute: ApiStatusOverrideRoute,
   IntegrationsVercelRoute: IntegrationsVercelRouteWithChildren,
   NewSlugRoute: NewSlugRoute,
@@ -6515,6 +6779,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiContentGraphqlRoute: ApiContentGraphqlRoute,
   ApiEdgeFunctionsTestRoute: ApiEdgeFunctionsTestRoute,
   ApiIntegrationsStripeSyncRoute: ApiIntegrationsStripeSyncRoute,
+  ApiPlatformDeploymentModeRoute: ApiPlatformDeploymentModeRoute,
   IntegrationsGithubAuthorizeRoute: IntegrationsGithubAuthorizeRoute,
   ApiConnectIndexRoute: ApiConnectIndexRoute,
   ApiMcpIndexRoute: ApiMcpIndexRoute,
@@ -6526,6 +6791,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAiSqlCronV2Route: ApiAiSqlCronV2Route,
   ApiAiSqlFilterV1Route: ApiAiSqlFilterV1Route,
   ApiAiSqlGenerateV4Route: ApiAiSqlGenerateV4Route,
+  ApiAiSqlParseClientCodeRoute: ApiAiSqlParseClientCodeRoute,
   ApiAiSqlPolicyRoute: ApiAiSqlPolicyRoute,
   ApiAiSqlTitleV2Route: ApiAiSqlTitleV2Route,
   ApiPlatformIntegrationsSlugRoute: ApiPlatformIntegrationsSlugRoute,
@@ -6563,7 +6829,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPlatformProjectsRefRunLintsRoute: ApiPlatformProjectsRefRunLintsRoute,
   ApiPlatformProjectsRefSettingsRoute: ApiPlatformProjectsRefSettingsRoute,
   ApiPlatformPropsOrgSlugRoute: ApiPlatformPropsOrgSlugRoute,
-  ApiV1ProjectsRefApiKeysRoute: ApiV1ProjectsRefApiKeysRoute,
+  ApiV1ProjectsRefApiKeysRoute: ApiV1ProjectsRefApiKeysRouteWithChildren,
   ApiPlatformProjectsRefIndexRoute: ApiPlatformProjectsRefIndexRoute,
   ApiPlatformOrganizationsSlugBillingSubscriptionRoute:
     ApiPlatformOrganizationsSlugBillingSubscriptionRoute,
@@ -6592,10 +6858,14 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPlatformPropsProjectRefIndexRoute: ApiPlatformPropsProjectRefIndexRoute,
   ApiPlatformStorageRefBucketsIndexRoute:
     ApiPlatformStorageRefBucketsIndexRoute,
+  ApiPlatformStorageRefVectorBucketsIndexRoute:
+    ApiPlatformStorageRefVectorBucketsIndexRoute,
   ApiV1ProjectsRefFunctionsIndexRoute: ApiV1ProjectsRefFunctionsIndexRoute,
   ApiPlatformAuthRefUsersIdFactorsRoute: ApiPlatformAuthRefUsersIdFactorsRoute,
   ApiPlatformProjectsRefAnalyticsEndpointsNameRoute:
     ApiPlatformProjectsRefAnalyticsEndpointsNameRoute,
+  ApiPlatformProjectsRefConfigSecretsUpdateStatusRoute:
+    ApiPlatformProjectsRefConfigSecretsUpdateStatusRoute,
   ApiPlatformProjectsRefContentFoldersIdRoute:
     ApiPlatformProjectsRefContentFoldersIdRoute,
   ApiPlatformProjectsRefContentItemIdRoute:
@@ -6609,6 +6879,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPlatformProjectsRefContentFoldersIndexRoute,
   ApiPlatformStorageRefBucketsIdIndexRoute:
     ApiPlatformStorageRefBucketsIdIndexRoute,
+  ApiPlatformStorageRefVectorBucketsIdIndexRoute:
+    ApiPlatformStorageRefVectorBucketsIdIndexRoute,
   ApiV1ProjectsRefFunctionsSlugIndexRoute:
     ApiV1ProjectsRefFunctionsSlugIndexRoute,
   ApiPlatformStorageRefBucketsIdObjectsDownloadRoute:
@@ -6623,8 +6895,16 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPlatformStorageRefBucketsIdObjectsSignRoute,
   ApiPlatformStorageRefBucketsIdObjectsSignMultiRoute:
     ApiPlatformStorageRefBucketsIdObjectsSignMultiRoute,
+  ApiPlatformStorageRefVectorBucketsIdIndexesIndexNameRoute:
+    ApiPlatformStorageRefVectorBucketsIdIndexesIndexNameRoute,
+  ApiV1ProjectsRefConfigAuthSigningKeysLegacyRoute:
+    ApiV1ProjectsRefConfigAuthSigningKeysLegacyRoute,
   ApiPlatformStorageRefBucketsIdObjectsIndexRoute:
     ApiPlatformStorageRefBucketsIdObjectsIndexRoute,
+  ApiPlatformStorageRefVectorBucketsIdIndexesIndexRoute:
+    ApiPlatformStorageRefVectorBucketsIdIndexesIndexRoute,
+  ApiV1ProjectsRefConfigAuthSigningKeysIndexRoute:
+    ApiV1ProjectsRefConfigAuthSigningKeysIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
