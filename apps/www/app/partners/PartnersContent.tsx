@@ -106,7 +106,7 @@ export default function PartnersContent({ featuredPartners }: Props) {
                       <Button
                         asChild
                         size="tiny"
-                        type="primary"
+                        variant="primary"
                         className="mt-4"
                         iconRight={tier.cta?.icon}
                       >
@@ -176,7 +176,7 @@ export default function PartnersContent({ featuredPartners }: Props) {
         <SectionContainer>
           <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
             <SectionHeading eyebrow="Get started" title={pageData.howToApply.title} />
-            <Button asChild size="small" type="default">
+            <Button asChild size="small" variant="default">
               <Link href={pageData.howToApply.cta.link}>{pageData.howToApply.cta.label}</Link>
             </Button>
           </div>
@@ -252,7 +252,7 @@ export default function PartnersContent({ featuredPartners }: Props) {
             ))}
           </div>
           <div className="mt-8 flex justify-center">
-            <Button asChild type="default" size="small" iconRight={<ArrowRight />}>
+            <Button asChild variant="default" size="small" iconRight={<ArrowRight />}>
               <Link href="/partners/catalog">Browse the Partner Catalog</Link>
             </Button>
           </div>

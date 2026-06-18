@@ -261,7 +261,7 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
                     Get started with {partner.title} and Supabase.
                   </h1>
                   <a href={installHref} target="_blank" rel="noreferrer">
-                    <Button size="medium" type="secondary">
+                    <Button size="medium" variant="secondary">
                       Add integration
                     </Button>
                   </a>

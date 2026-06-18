@@ -147,7 +147,11 @@ export default function IntegrationsContent({
       </div>
 
       {HAS_ACTIVE_FILTERS && (
-        <Button block type="dashed" onClick={() => setFilters({ cat: [], partner: false, q: '' })}>
+        <Button
+          block
+          variant="dashed"
+          onClick={() => setFilters({ cat: [], partner: false, q: '' })}
+        >
           Clear all filters
         </Button>
       )}
@@ -202,7 +206,7 @@ export default function IntegrationsContent({
                 {/* Mobile-only: opens bottom sheet with filters */}
                 <Sheet>
                   <SheetTrigger asChild>
-                    <Button type="default" size="small" className="shrink-0 md:hidden flex">
+                    <Button variant="default" size="small" className="shrink-0 md:hidden flex">
                       <div className="flex gap-1.5 items-center text-foreground-lighter hover:text-foreground">
                         <Filter size={14} />
                         {activeFilterCount > 0 && (
