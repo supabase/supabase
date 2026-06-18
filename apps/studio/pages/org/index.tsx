@@ -14,7 +14,6 @@ const OrgIndexPage: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      console.log({ lastVisitedOrganization })
       if (lastVisitedOrganization) {
         router.push(`/org/${lastVisitedOrganization}`)
       } else {
