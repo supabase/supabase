@@ -21,7 +21,7 @@ export function useAvailableConnectModes(): ConnectMode[] {
       { id: 'direct', enabled: true },
       { id: 'orm', enabled: showOrms },
       { id: 'mcp', enabled: true },
-      { id: 'warehouse', enabled: true },
+      { id: 'catalog', enabled: true },
     ]
     return allModes.filter((m) => m.enabled).map((m) => m.id)
   }, [showAppFrameworks, showMobileFrameworks, showOrms])

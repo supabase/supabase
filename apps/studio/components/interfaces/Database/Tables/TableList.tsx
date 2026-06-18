@@ -11,11 +11,11 @@ import {
   Edit,
   Eye,
   Filter,
-  Info,
   MoreVertical,
   Plus,
   Search,
   Trash,
+  Unlink,
   X,
 } from 'lucide-react'
 import Link from 'next/link'
@@ -57,6 +57,7 @@ import { useSnapshot } from 'valtio'
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { warehouseDemoStore } from '../Warehouse/warehouseDemoStore'
 import type { WarehouseMode } from '../Warehouse/warehouseDemoStore'
+import { WarehouseDetachModal } from '../Warehouse/WarehouseDetachModal'
 import {
   WarehouseEnablementModal,
   type EnablementVariant,
@@ -64,6 +65,7 @@ import {
 import { WarehouseSyncChip } from '../Warehouse/WarehouseSyncChip'
 import { formatAllEntities } from './Tables.utils'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
@@ -121,6 +123,14 @@ export const TableList = ({
     variant: EnablementVariant
     tableKey: string
     tableName: string
+  } | null>(null)
+  const [detachConfirm, setDetachConfirm] = useState<{
+    tableKey: string
+    copyName: string
+  } | null>(null)
+  const [detachProgress, setDetachProgress] = useState<{
+    tableKey: string
+    copyName: string
   } | null>(null)
   const warehouseSnap = useSnapshot(warehouseDemoStore)
 
@@ -761,70 +771,70 @@ export const TableList = ({
                                       <Copy size={12} />
                                       <span>Duplicate table</span>
                                     </DropdownMenuItemTooltip>
-                                    <DropdownMenuSeparator />
 
                                     {(() => {
                                       const tableKey = `${selectedSchema}.${x.name}`
-                                      const tableName = `${selectedSchema}.${x.name}`
                                       const wMode =
                                         warehouseSnap.tables[tableKey]?.mode ?? 'postgres'
+                                      const wState = warehouseSnap.tables[tableKey]
+                                      const copyName = wState?.copyName ?? `warehouse.${x.name}`
+
+                                      if (wMode === 'warehouse_backed') {
+                                        return null
+                                      }
 
                                       return (
                                         <>
-                                          {(wMode === 'postgres' ||
-                                            wMode === 'has_warehouse_copy' ||
-                                            wMode === 'warehouse_backed') && (
-                                            <DropdownMenuSub>
-                                              <DropdownMenuSubTrigger className="gap-x-2">
-                                                <Box size={12} className="shrink-0" />
-                                                Storage
-                                              </DropdownMenuSubTrigger>
-                                              <DropdownMenuSubContent>
-                                                {wMode === 'postgres' && (
-                                                  <>
-                                                    <DropdownMenuItem
-                                                      className="gap-x-2"
-                                                      onClick={() =>
-                                                        setWarehouseModal({
-                                                          variant: 'attach',
-                                                          tableKey,
-                                                          tableName,
-                                                        })
-                                                      }
-                                                    >
-                                                      <Plus size={12} />
+                                          <DropdownMenuSeparator />
+                                          <DropdownMenuSub>
+                                          <DropdownMenuSubTrigger className="gap-x-2">
+                                            <Box size={12} className="shrink-0" />
+                                            Storage
+                                          </DropdownMenuSubTrigger>
+                                          <DropdownMenuSubContent>
+                                            {wMode === 'postgres' && (
+                                              <>
+                                                <DropdownMenuItem
+                                                  className="gap-x-2"
+                                                  onClick={() =>
+                                                    setWarehouseModal({
+                                                      variant: 'attach',
+                                                      tableKey,
+                                                      tableName: x.name,
+                                                    })
+                                                  }
+                                                >
+                                                  <Plus size={12} />
                                                       <span>Copy to Warehouse</span>
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem
-                                                      className="gap-x-2"
-                                                      onClick={() =>
-                                                        setWarehouseModal({
-                                                          variant: 'move',
-                                                          tableKey,
-                                                          tableName,
-                                                        })
-                                                      }
-                                                    >
-                                                      <ArrowRight size={12} />
-                                                      <span>Move to Warehouse</span>
-                                                    </DropdownMenuItem>
-                                                  </>
-                                                )}
-                                                {(wMode === 'has_warehouse_copy' ||
-                                                  wMode === 'warehouse_backed') && (
-                                                  <DropdownMenuItem
-                                                    className="gap-x-2"
-                                                    onClick={() => {
-                                                      if (canUpdateTables) onEditTable(x as any)
-                                                    }}
-                                                  >
-                                                    <Info size={12} />
-                                                    <span>View Warehouse details</span>
-                                                  </DropdownMenuItem>
-                                                )}
-                                              </DropdownMenuSubContent>
-                                            </DropdownMenuSub>
-                                          )}
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                  className="gap-x-2"
+                                                  onClick={() =>
+                                                    setWarehouseModal({
+                                                      variant: 'move',
+                                                      tableKey,
+                                                      tableName: x.name,
+                                                    })
+                                                  }
+                                                >
+                                                  <ArrowRight size={12} />
+                                                  <span>Move to Warehouse</span>
+                                                </DropdownMenuItem>
+                                              </>
+                                            )}
+                                            {wMode === 'has_warehouse_copy' && (
+                                              <DropdownMenuItem
+                                                className="gap-x-2"
+                                                onClick={() =>
+                                                  setDetachConfirm({ tableKey, copyName })
+                                                }
+                                              >
+                                                <Unlink size={12} />
+                                                <span>Detach copy</span>
+                                              </DropdownMenuItem>
+                                            )}
+                                          </DropdownMenuSubContent>
+                                        </DropdownMenuSub>
                                         </>
                                       )
                                     })()}
@@ -881,6 +891,35 @@ export const TableList = ({
           tableName={warehouseModal.tableName}
           onOpenChange={(open) => {
             if (!open) setWarehouseModal(null)
+          }}
+        />
+      )}
+
+      <DiscardChangesConfirmationDialog
+        visible={detachConfirm !== null}
+        onCancel={() => setDetachConfirm(null)}
+        onClose={() => {
+          if (detachConfirm) setDetachProgress(detachConfirm)
+          setDetachConfirm(null)
+        }}
+        title="Detach Warehouse copy"
+        description={
+          <>
+            Drops the Warehouse copy of <strong>{detachConfirm?.copyName}</strong>. The source table
+            is unaffected and your data remains in Postgres.
+          </>
+        }
+        confirmLabel="Detach copy"
+        cancelLabel="Cancel"
+      />
+
+      {detachProgress && (
+        <WarehouseDetachModal
+          open={true}
+          tableKey={detachProgress.tableKey}
+          copyName={detachProgress.copyName}
+          onOpenChange={(open) => {
+            if (!open) setDetachProgress(null)
           }}
         />
       )}

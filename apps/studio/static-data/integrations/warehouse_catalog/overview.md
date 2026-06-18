@@ -1,0 +1,1 @@
+The Supabase Warehouse Catalog provides metadata and access controls for Warehouse tables. Connect analytics tools such as DuckDB, Spark, Trino, and PyIceberg directly to your Warehouse data without querying your primary database.

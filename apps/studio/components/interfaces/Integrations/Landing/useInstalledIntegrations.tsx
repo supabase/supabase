@@ -76,6 +76,7 @@ export const useInstalledIntegrations = () => {
       .filter((integration) => {
         if (integration.id === 'webhooks') return isHooksEnabled
         if (integration.id === 'data_api') return true
+        if (integration.id === 'warehouse_catalog') return true
         if (integration.id === 'stripe_sync_engine') {
           return isStripeSyncEngineInstalled(schemas)
         }

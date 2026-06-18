@@ -634,6 +634,7 @@ export const TableEditor = ({
               <WarehouseEditorPanel
                 tableKey={`${table?.schema ?? 'public'}.${table?.name ?? ''}`}
                 tableName={table?.name ?? ''}
+                postgresSize={table?.size}
               />
             </SidePanel.Content>
           </>

@@ -13,6 +13,7 @@ import { useConnectSheetParams } from './useConnectSheetParams'
 import { useConnectSheetShortcut } from './useConnectSheetShortcut'
 import { useConnectState } from './useConnectState'
 import { WarehouseCatalogPanel } from './WarehouseCatalogPanel'
+import type { WarehouseCatalogEngine } from '@/components/interfaces/Integrations/WarehouseCatalog/warehouseCatalog.constants'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -208,10 +209,12 @@ export const ConnectSheet = () => {
 
   return (
     <Sheet open={showConnect} onOpenChange={handleOpenChange}>
-      <SheetContent size="lg" className="flex flex-col gap-0 p-0 space-y-0" tabIndex={undefined}>
-        <SheetHeader className={cn('text-left border-b shrink-0 py-6 px-8')}>
+      <SheetContent
+        className="flex flex-col gap-0 p-0 space-y-0 w-[700px]! sm:w-[540px]"
+        tabIndex={undefined}
+      >
+        <SheetHeader>
           <SheetTitle>Connect to your project</SheetTitle>
-          <SheetDescription>Choose how you want to use Supabase</SheetDescription>
         </SheetHeader>
 
         <div className="flex flex-1 flex-col overflow-y-auto divide-y">
@@ -234,8 +237,10 @@ export const ConnectSheet = () => {
             </div>
           )}
 
-          {state.mode === 'warehouse' ? (
-            <WarehouseCatalogPanel />
+          {state.mode === 'catalog' ? (
+            <WarehouseCatalogPanel
+              queryEngine={(state.queryEngine as WarehouseCatalogEngine | undefined) ?? 'env'}
+            />
           ) : (
             <ConnectStepsSection steps={resolvedSteps} state={state} projectKeys={projectKeys} />
           )}

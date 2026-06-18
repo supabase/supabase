@@ -5,6 +5,7 @@ import { useMemo, useRef } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { useSnapshot } from 'valtio'
 
 import { connectSchema } from './connect.schema'
 import type {
@@ -19,6 +20,7 @@ import { ConnectSheetStep } from './ConnectSheetStep'
 import { CopyPromptAdmonition } from './CopyPromptAdmonition'
 import { buildConnectionStringPooler, getConnectionStrings } from './DatabaseSettings.utils'
 import { getAddons } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
+import { warehouseDemoStore } from '@/components/interfaces/Database/Warehouse/warehouseDemoStore'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
@@ -196,12 +198,33 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
 
   const showSelfHostedMcpNotice = deploymentMode.isSelfHosted && state.mode === 'mcp'
 
+  const { dataApiEnabled } = useSnapshot(warehouseDemoStore)
+  const showDataApiDisabledNotice = state.mode === 'framework' && !dataApiEnabled
+
   const customPrompt = useMemo(
     () => connectSchema.modes.find((m) => m.id === state.mode)?.prompt,
     [state.mode]
   )
 
   if (steps.length === 0) return null
+
+  if (showDataApiDisabledNotice) {
+    return (
+      <div className="bg-muted/50 flex-1 p-8">
+        <Admonition
+          type="warning"
+          layout="responsive"
+          title="Data API is disabled"
+          description="Enable the Data API to use client libraries."
+          actions={[
+            <Button asChild key="enable" variant="default">
+              <Link href={`/project/${ref}/integrations/data_api/settings`}>Enable Data API</Link>
+            </Button>,
+          ]}
+        />
+      </div>
+    )
+  }
 
   return (
     <div className="bg-muted/50 flex-1">
