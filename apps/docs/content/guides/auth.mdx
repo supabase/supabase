@@ -1,13 +1,13 @@
 ---
 id: 'auth'
 title: 'Auth'
-description: 'Use Supabase to Authenticate and Authorize your users.'
+description: 'Use Supabase to authenticate and authorize your users.'
 subtitle: 'Use Supabase to authenticate and authorize your users.'
 tocVideo: '6ow_jW4epf8'
 contentListings:
   - id: get-started
     heading: Get started
-    description: Start here if you're new to Supabase Auth.
+    description: "Start here if you're new to Supabase Auth:"
     type: grid
     items:
       - title: Auth with email and password
@@ -41,8 +41,6 @@ Supabase Auth makes it easy to implement authentication and authorization in you
 
 Your users can use many popular Auth methods, including password, magic link, one-time password (OTP), social login, and single sign-on (SSO).
 
-<ContentListings listing="get-started" />
-
 ## About authentication and authorization
 
 Authentication and authorization are the core responsibilities of any Auth system.
@@ -59,6 +57,8 @@ You can use Supabase Auth as a standalone product, but it's also built to integr
 Auth uses your project's Postgres database under the hood, storing user data and other Auth information in a special schema. You can connect this data to your own tables using triggers and foreign key references.
 
 Auth also enables access control to your database's automatically generated [REST API](/docs/guides/api). When using Supabase SDKs, your data requests are automatically sent with the user's Auth Token. The Auth Token scopes database access on a row-by-row level when used along with [RLS policies](/docs/guides/database/postgres/row-level-security).
+
+<ContentListings listing="get-started" />
 
 <ContentListings listing="next-steps" />
 
