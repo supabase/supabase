@@ -24,7 +24,7 @@ The upgrade process is as follows:
 4. Behind the scenes, a new instance is created running the latest version of Supabase.
 5. Your data is copied to the new instance and upgraded using `pg_upgrade`.
 6. If the upgrade should fail, your original database would be brought back up online and be able to service requests.
-7. When the upgrade succeeds, a [basebackup](https://www.postgresql.org/docs/current/app-pgbasebackup.html) is taken and, once complete, your project is available in the Dashboard.
+7. When the upgrade succeeds, a [pg_basebackup](https://www.postgresql.org/docs/current/app-pgbasebackup.html) is taken and, once complete, your project is available in the Dashboard.
 
 A Supabase project is deployed with a GP3 disk type by default, which will give ~100Mbps when upgrading. Changing the [disk type (or increasing IOPS/Throughput)](/docs/guides/platform/compute-and-disk) will reduce the time to upgrade.
 
