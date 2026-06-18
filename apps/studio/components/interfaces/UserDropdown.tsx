@@ -1,5 +1,5 @@
 import { useFlag } from 'common'
-import { FlaskConical, Loader2, ScrollText, Settings, User2 } from 'lucide-react'
+import { FlaskConical, Loader2, ScrollText, User2 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
