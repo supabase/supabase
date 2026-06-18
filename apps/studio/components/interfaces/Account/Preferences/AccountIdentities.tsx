@@ -52,6 +52,7 @@ export const AccountIdentities = () => {
   const router = useRouter()
 
   const { data, isPending: isLoading, isSuccess } = useProfileIdentitiesQuery()
+  console.log(data)
 
   const enabledProviders = useEnabledIdentityProviders()
   const connectableExternalProviders = useMemo(
@@ -142,8 +143,8 @@ export const AccountIdentities = () => {
           {isSuccess && (
             <div className="divide-y">
               {identities.map((identity) => {
-                const { identity_id, provider } = identity
-                const username = identity.identity_data?.user_name
+                const { identity_id, identity_data, provider } = identity
+                const username = identity_data?.user_name
                 const providerDisplay = getProviderDisplay(provider)
                 const providerName = providerDisplay.displayName
                 const configuredProvider = getConfiguredExternalProvider(provider)

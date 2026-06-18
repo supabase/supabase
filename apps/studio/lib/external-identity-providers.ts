@@ -70,6 +70,14 @@ export function getProviderDisplay(provider: string): IdentityProviderDisplay {
     }
   }
 
+  if (provider.startsWith('custom:')) {
+    return {
+      id: provider,
+      displayName: provider.replace('custom:', ''),
+      iconPath: `${BASE_PATH}/img/icons/saml-icon.svg`,
+    }
+  }
+
   if (provider.startsWith('sso')) {
     return {
       id: provider,
