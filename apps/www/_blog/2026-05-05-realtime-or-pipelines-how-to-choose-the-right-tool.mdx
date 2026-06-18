@@ -23,16 +23,16 @@ This post explains what each product does, how they differ, and when you should 
 
 Here is the simplest way to think about it:
 
-- **Realtime** sends database changes to your users' browsers and apps, right now, as they happen. It is built for live experiences.
+- **Supabase Realtime** sends database changes to your users' browsers and apps, right now, as they happen. It is built for live experiences.
 - **Supabase Pipelines** sends database changes in near real time to analytical destinations like BigQuery. It is built for reliable data movement.
 
-Realtime answers the question: "How do I show my users what just happened?"
+Supabase Realtime answers the question: "How do I show my users what just happened?"
 
 Supabase Pipelines answers the question: "How do I get my production data into my analytics warehouse?"
 
 If you mix these up, you will run into problems. We see it happen regularly, and the rest of this post will help you avoid that.
 
-## What Realtime does
+## What Supabase Realtime does
 
 [Supabase Realtime](https://supabase.com/docs/guides/realtime) is three features in one product:
 
@@ -40,25 +40,25 @@ If you mix these up, you will run into problems. We see it happen regularly, and
 2. [**Presence.**](https://supabase.com/docs/guides/realtime/presence) Track who is online and what they are doing. Also no database required. Think "3 users are editing this document" or "Jane is typing..."
 3. [**Postgres Changes.**](https://supabase.com/docs/guides/realtime/postgres-changes) Listen to INSERT, UPDATE, and DELETE events on your database tables and deliver them to subscribed clients over WebSocket.
 
-Two of these three features, Broadcast and Presence, can work without any database interaction. Client-to-client Broadcast sends messages purely over WebSocket with nothing stored. However, [Broadcast from Database](https://supabase.com/blog/realtime-broadcast-from-database) lets you trigger broadcasts from database changes using triggers, giving you control over which events reach which channels. This matters because Realtime is not just a database change listener. It is a real-time communication layer for your application.
+Two of these three features, Broadcast and Presence, can work without any database interaction. Client-to-client Broadcast sends messages purely over WebSocket with nothing stored. However, [Broadcast from Database](https://supabase.com/blog/realtime-broadcast-from-database) lets you trigger broadcasts from database changes using triggers, giving you control over which events reach which channels. This matters because Supabase Realtime is not just a database change listener. It is a real-time communication layer for your application.
 
 ### How Postgres Changes works
 
-When a client subscribes to a table, Realtime uses a PostgreSQL replication slot to read changes from the Write-Ahead Log (WAL). For each change, it checks [Row Level Security (RLS)](https://supabase.com/docs/guides/database/postgres/row-level-security) policies against every subscribed user. If a user is authorized to see the change, Realtime sends it over their WebSocket connection.
+When a client subscribes to a table, Supabase Realtime uses a PostgreSQL replication slot to read changes from the Write-Ahead Log (WAL). For each change, it checks [Row Level Security (RLS)](https://supabase.com/docs/guides/database/postgres/row-level-security) policies against every subscribed user. If a user is authorized to see the change, Supabase Realtime sends it over their WebSocket connection.
 
 This is designed for live UI updates. A user inserts a message into a chat table. Other users see it appear instantly. A row updates in a dashboard table. The chart refreshes automatically.
 
-### What Realtime does not guarantee
+### What Supabase Realtime does not guarantee
 
-Realtime's Postgres Changes feature does not guarantee delivery. If a client disconnects for 30 seconds and reconnects, the changes that happened during those 30 seconds are gone. Realtime does not queue them and does not track how far each client has read.
+Supabase Realtime's Postgres Changes feature does not guarantee delivery. If a client disconnects for 30 seconds and reconnects, the changes that happened during those 30 seconds are gone. Supabase Realtime does not queue them and does not track how far each client has read.
 
-[Broadcast Replay](https://supabase.com/blog/realtime-broadcast-replay) offers limited catch-up for Broadcast from Database messages: clients can request up to 25 messages from the last 3 days using a `since` timestamp. But this only works on private channels, only for database-sourced broadcasts, and is currently in public alpha. It is not a general-purpose replay mechanism for all Realtime events.
+[Broadcast Replay](https://supabase.com/blog/realtime-broadcast-replay) offers limited catch-up for Broadcast from Database messages: clients can request up to 25 messages from the last 3 days using a `since` timestamp. But this only works on private channels, only for database-sourced broadcasts, and is currently in public alpha. It is not a general-purpose replay mechanism for all Supabase Realtime events.
 
 Postgres Changes uses temporary replication slots. When no clients are subscribed, it stops replicating data entirely. When clients subscribe again, a new slot is created.
 
-The Realtime team built it this way on purpose. Guaranteed delivery requires persistent state tracking, message queuing, and acknowledgment protocols. Those things add latency and complexity that would make Realtime worse at its actual job: delivering live updates as fast as possible.
+The Supabase Realtime team built it this way on purpose. Guaranteed delivery requires persistent state tracking, message queuing, and acknowledgment protocols. Those things add latency and complexity that would make Supabase Realtime worse at its actual job: delivering live updates as fast as possible.
 
-If you need every change to arrive at its destination, no matter what, Realtime is not the right tool.
+If you need every change to arrive at its destination, no matter what, Supabase Realtime is not the right tool.
 
 ## What Supabase Pipelines does
 
@@ -80,24 +80,24 @@ Supabase Pipelines provides at-least-once delivery. Every change that happens in
 
 Supabase Pipelines uses permanent replication slots. This means Postgres holds onto WAL data until the pipeline confirms it has been processed. If you stop the pipeline for maintenance and restart it later, it picks up exactly where it left off. Be aware that while the pipeline is paused, Postgres continues to retain WAL data. Extended pauses can lead to significant disk growth, and depending on your Postgres configuration, the pipeline may fail if the WAL retention limit is exceeded.
 
-This is the opposite of Realtime's approach. Supabase Pipelines trades speed for reliability. It may not deliver changes to your warehouse in the same millisecond they happen, but it will deliver every single one.
+This is the opposite of Supabase Realtime's approach. Supabase Pipelines trades speed for reliability. It may not deliver changes to your warehouse in the same millisecond they happen, but it will deliver every single one.
 
 ## The key differences
 
 ### Delivery guarantees
 
-|                         | **Realtime** | **Supabase Pipelines** |
-| ----------------------- | ------------ | ---------------------- |
-| Guarantee               | Best effort  | At-least-once          |
-| Missed changes          | Lost forever | Replayed on reconnect  |
-| Replication slot        | Temporary    | Permanent              |
-| Resume after disconnect | No           | Yes                    |
+|                         | **Supabase Realtime** | **Supabase Pipelines** |
+| ----------------------- | --------------------- | ---------------------- |
+| Guarantee               | Best effort           | At-least-once          |
+| Missed changes          | Lost forever          | Replayed on reconnect  |
+| Replication slot        | Temporary             | Permanent              |
+| Resume after disconnect | No                    | Yes                    |
 
-This is the most important difference. If you need every change to arrive, use Supabase Pipelines. If you need changes to arrive fast and can tolerate occasional gaps, use Realtime.
+This is the most important difference. If you need every change to arrive, use Supabase Pipelines. If you need changes to arrive fast and can tolerate occasional gaps, use Supabase Realtime.
 
 ### Where data goes
 
-Realtime sends data to client applications over WebSocket connections. Your users' browsers and mobile apps are the destination.
+Supabase Realtime sends data to client applications over WebSocket connections. Your users' browsers and mobile apps are the destination.
 
 Supabase Pipelines sends data to analytical systems. BigQuery, and eventually other data warehouses, are the destinations.
 
@@ -105,21 +105,21 @@ These are fundamentally different targets with fundamentally different needs. Cl
 
 ### Database dependency
 
-Realtime's Broadcast and Presence features can work without touching the database. You can build an entire collaborative experience (cursors, presence indicators, ephemeral messaging) without writing a single database query. However, Postgres Changes and [Broadcast from Database](https://supabase.com/blog/realtime-broadcast-from-database) both require database interaction.
+Supabase Realtime's Broadcast and Presence features can work without touching the database. You can build an entire collaborative experience (cursors, presence indicators, ephemeral messaging) without writing a single database query. However, Postgres Changes and [Broadcast from Database](https://supabase.com/blog/realtime-broadcast-from-database) both require database interaction.
 
 Supabase Pipelines is entirely database-driven. Every byte of data it moves comes from your Postgres tables.
 
 ### Scale characteristics
 
-Realtime's Broadcast and Presence features are built for high throughput and low latency. They do not run per-subscriber database queries and scale well across many concurrent connections.
+Supabase Realtime's Broadcast and Presence features are built for high throughput and low latency. They do not run per-subscriber database queries and scale well across many concurrent connections.
 
 Postgres Changes works differently. It processes changes sequentially to maintain ordering. For each change, it runs an RLS authorization check against every subscribed client. With 100 subscribers watching a table, one INSERT generates 100 authorization queries. This is a deliberate design choice that prioritizes correctness and low latency for typical workloads over raw throughput.
 
 Supabase Pipelines processes changes in configurable batches with tunable parallelism. It does not need to authorize individual users because it is moving data to a system, not to end users.
 
-## When to use Realtime
+## When to use Supabase Realtime
 
-Use Realtime when you need to push live updates to your users:
+Use Supabase Realtime when you need to push live updates to your users:
 
 - **Chat applications.** Messages appear instantly for all participants.
 - **Collaborative editing.** See other users' cursors and changes in real time.
@@ -145,11 +145,11 @@ The common thread: a system needs a complete, reliable copy of your data.
 
 ## The mistake we see most often
 
-Some developers discover Realtime's Postgres Changes feature and think: "I can use this to replicate data from one system to another." They write 20 lines of code with supabase-js, subscribe to table changes, and pipe them into another system.
+Some developers discover Supabase Realtime's Postgres Changes feature and think: "I can use this to replicate data from one system to another." They write 20 lines of code with supabase-js, subscribe to table changes, and pipe them into another system.
 
 It works great in development. It even works fine in production for a while. Then a WebSocket connection drops for a few seconds and data goes missing. Or the subscribing process restarts and misses a batch of changes. Or load spikes and the sequential RLS authorization checks cannot keep up.
 
-The problem is not that Realtime is broken. The problem is that Realtime was not designed for this job.
+The problem is not that Supabase Realtime is broken. The problem is that Supabase Realtime was not designed for this job.
 
 If you are piping database changes into another system and you need every change to arrive, use Supabase Pipelines. That is exactly what it was built for.
 
@@ -157,15 +157,15 @@ If you are piping database changes into another system and you need every change
 
 Yes. In fact, many applications should.
 
-Consider an e-commerce platform. You might use Realtime to push order status updates to customers in real time ("Your order has shipped!"). At the same time, you use Supabase Pipelines to replicate all order data to BigQuery for daily sales reports and trend analysis.
+Consider an e-commerce platform. You might use Supabase Realtime to push order status updates to customers in real time ("Your order has shipped!"). At the same time, you use Supabase Pipelines to replicate all order data to BigQuery for daily sales reports and trend analysis.
 
 Same database. Same tables. Different tools for different jobs.
 
-Realtime handles the live experience. Supabase Pipelines handles the analytical pipeline. Each does what it was designed to do.
+Supabase Realtime handles the live experience. Supabase Pipelines handles the analytical pipeline. Each does what it was designed to do.
 
 ## Quick reference
 
-|                     | **Realtime**                                                         | **Supabase Pipelines**                                 |
+|                     | **Supabase Realtime**                                                | **Supabase Pipelines**                                 |
 | ------------------- | -------------------------------------------------------------------- | ------------------------------------------------------ |
 | Purpose             | Live updates to client apps                                          | Reliable data movement to analytics                    |
 | Delivery            | Best effort                                                          | At-least-once                                          |
@@ -181,6 +181,6 @@ Realtime handles the live experience. Supabase Pipelines handles the analytical 
 
 ## Getting started
 
-Supabase Realtime is available on all Supabase projects. Check out the [Realtime documentation](https://supabase.com/docs/guides/realtime) to get started.
+Supabase Realtime is available on all Supabase projects. Check out the [Supabase Realtime documentation](https://supabase.com/docs/guides/realtime) to get started.
 
 Supabase Pipelines is currently in alpha. Alpha features can be unstable and may introduce breaking changes while we evaluate the product direction, refine the feature set, and incorporate customer feedback. You can request access through the Supabase Dashboard or contact your account manager. Read the [Supabase Pipelines announcement](https://supabase.com/blog/introducing-supabase-pipelines) for more details on how it works.
