@@ -46,7 +46,7 @@ const buttonVariants = cva(
           border-strong hover:border-stronger
           focus-visible:outline-border-strong
           data-[state=open]:bg-selection
-          data-[state=open]:outline-brand-600
+          data-[state=open]:outline-border-strong
           data-[state=open]:border-button-hover
           `,
         secondary: `

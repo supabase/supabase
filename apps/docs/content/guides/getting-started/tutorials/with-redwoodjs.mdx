@@ -43,7 +43,7 @@ to how your Supabase `public` schema references the `auth.users`.
 
 ## Building the app
 
-Let's start building the RedwoodJS app from scratch.
+Build the RedwoodJS app from scratch.
 
 <Admonition type="note">
 
@@ -77,7 +77,7 @@ While the app is installing, you should see:
 Thanks for trying out Redwood!
 ```
 
-Then let's install the only additional dependency [supabase-js](https://github.com/supabase/supabase-js) by running the `setup auth` command:
+Then install the only additional dependency [supabase-js](https://github.com/supabase/supabase-js) by running the `setup auth` command:
 
 ```bash
 yarn redwood setup auth supabase
@@ -174,7 +174,7 @@ You can find the full contents of this file [in the example repository](https://
 
 ### Start RedwoodJS and your first page
 
-Let's test our setup at the moment by starting up the app:
+Test your setup by starting the app:
 
 ```bash
 yarn rw dev
@@ -188,7 +188,7 @@ yarn rw dev
 
 You should see a "Welcome to RedwoodJS" page and a message about not having any pages yet.
 
-So, let's create a "home" page:
+Create a "home" page:
 
 ```bash
 yarn rw generate page home /
@@ -232,7 +232,7 @@ export default Routes
 
 ### Set up a login component
 
-Let's set up a Redwood component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
+Set up a Redwood component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
 
 ```bash
 yarn rw g component auth
@@ -310,7 +310,7 @@ export default Auth
 
 After a user is signed in we can allow them to edit their profile details and manage their account.
 
-Let's create a new component for that called `Account.js`.
+Create a new component called `Account.js`.
 
 ```bash
 yarn rw g component account
@@ -495,7 +495,7 @@ Next, add a way for users to upload a profile photo. Supabase configures every p
 
 ### Create an upload widget
 
-Let's create an avatar for the user so that they can upload a profile photo. We can start by creating a new component:
+Create an avatar so the user can upload a profile photo. Start by creating a new component:
 
 ```bash
 yarn rw g component avatar

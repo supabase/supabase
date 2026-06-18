@@ -1,9 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { includes, noop, sortBy } from 'lodash'
+import { noop } from 'lodash'
 import { Copy, Edit, Edit2, FileText, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useMemo } from 'react'
 import {
   Button,
   cn,
@@ -17,7 +18,7 @@ import {
 } from 'ui'
 
 import { stripInArgModePrefixes } from '../Functions.utils'
-import { getDatabaseTriggersHref } from './FunctionList.utils'
+import { getDatabaseTriggersHref, getFilteredFunctions } from './FunctionList.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import {
@@ -62,20 +63,10 @@ export const FunctionList = ({
     schema,
   })
 
-  const filteredFunctions = (functions ?? []).filter((x) => {
-    const matchesName = includes(x.name.toLowerCase(), filterString.toLowerCase())
-    const matchesReturnType =
-      returnTypeFilter.length === 0 || returnTypeFilter.includes(x.return_type)
-    const matchesSecurity =
-      securityFilter.length === 0 ||
-      (securityFilter.includes('definer') && x.security_definer) ||
-      (securityFilter.includes('invoker') && !x.security_definer)
-    return matchesName && matchesReturnType && matchesSecurity
-  })
-
-  const _functions = sortBy(
-    filteredFunctions.filter((x) => x.schema == schema),
-    (func) => func.name.toLocaleLowerCase()
+  const _functions = useMemo(
+    () =>
+      getFilteredFunctions({ functions, filterString, returnTypeFilter, schema, securityFilter }),
+    [functions, filterString, returnTypeFilter, schema, securityFilter]
   )
 
   const { can: canUpdateFunctions } = useAsyncCheckPermissions(

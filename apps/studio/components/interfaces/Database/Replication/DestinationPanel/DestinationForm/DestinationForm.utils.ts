@@ -21,11 +21,12 @@ import {
   IcebergDestinationConfig,
   SnowflakeDestinationConfig,
 } from '@/data/replication/create-destination-pipeline-mutation'
+import { type ValidationFailure } from '@/data/replication/validate-destination-mutation'
 import {
   type CreateS3AccessKeyCredentialVariables,
   type S3AccessKeyCreateData,
 } from '@/data/storage/s3-access-key-create-mutation'
-import { ResponseError } from '@/types'
+import { type ResponseError } from '@/types'
 
 const normalizeOptionalString = (value?: string) => {
   const trimmed = value?.trim()
@@ -394,4 +395,23 @@ export const buildDestinationConfig = async ({
   }
 
   return destinationConfig
+}
+
+const getValidationFailureKey = (failure: ValidationFailure) =>
+  JSON.stringify([failure.failure_type, failure.name, failure.reason])
+
+const getSortedValidationFailureKeys = (failures: ValidationFailure[]) =>
+  failures.map(getValidationFailureKey).sort((a, b) => a.localeCompare(b))
+
+export const areValidationFailuresEqual = (
+  previousFailures: ValidationFailure[],
+  nextFailures: ValidationFailure[]
+) => {
+  const previousKeys = getSortedValidationFailureKeys(previousFailures)
+  const nextKeys = getSortedValidationFailureKeys(nextFailures)
+
+  return (
+    previousKeys.length === nextKeys.length &&
+    previousKeys.every((key, index) => key === nextKeys[index])
+  )
 }

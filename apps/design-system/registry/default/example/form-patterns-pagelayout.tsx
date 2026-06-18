@@ -327,16 +327,17 @@ export default function FormPatternsPageLayout() {
                       >
                         <FormControl>
                           <div className="flex gap-4 items-center">
-                            <button
+                            <Button
                               type="button"
+                              variant="outline"
                               onClick={() => uploadButtonRef.current?.click()}
-                              className="flex items-center justify-center h-10 w-10 shrink-0 text-foreground-lighter hover:text-foreground-light overflow-hidden rounded-full bg-cover border hover:border-strong"
+                              className="flex items-center justify-center h-10 w-10 shrink-0 overflow-hidden rounded-full"
                               style={{
                                 backgroundImage: logoUrl ? `url("${logoUrl}")` : 'none',
                               }}
                             >
                               {!logoUrl && <Upload size={14} />}
-                            </button>
+                            </Button>
                             <div className="flex gap-2 items-center">
                               <Button
                                 variant="default"

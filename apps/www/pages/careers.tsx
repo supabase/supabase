@@ -131,7 +131,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
           <p className="text-sm md:text-base text-foreground-lighter max-w-sm sm:max-w-md md:max-w-lg mx-auto">
             Explore remote opportunities and join our team to help us achieve it.
           </p>
-          <Button asChild variant="primary" className="mt-4">
+          <Button asChild variant="primary" className="mt-4 mx-auto w-fit">
             <Link href="#positions">Open positions</Link>
           </Button>
         </header>

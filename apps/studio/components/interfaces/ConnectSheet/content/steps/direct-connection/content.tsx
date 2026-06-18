@@ -194,14 +194,11 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
     if (!temporaryDatabasePassword) return redactedConnectionString
 
     if (connectionType === 'psql') {
-      return `psql "${buildConnectionStringWithPassword(
-        safeConnectionString,
-        temporaryDatabasePassword
-      )}"`
+      return redactedConnectionString
     }
 
     return buildConnectionStringWithPassword(redactedConnectionString, temporaryDatabasePassword)
-  }, [connectionType, redactedConnectionString, safeConnectionString, temporaryDatabasePassword])
+  }, [connectionType, redactedConnectionString, temporaryDatabasePassword])
 
   const trackCopy = () => {
     const typeConfig = DATABASE_CONNECTION_TYPES.find((t) => t.id === connectionType)
