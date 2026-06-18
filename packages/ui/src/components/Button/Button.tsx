@@ -209,7 +209,7 @@ export interface ButtonProps
     React.ButtonHTMLAttributes<HTMLButtonElement>,
     // omit 'disabled' as it is included in HTMLButtonElement
     Omit<ButtonVariantProps, 'disabled'>,
-    Omit<LoadingVariantProps, 'type'> {
+    LoadingVariantProps {
   asChild?: boolean
   variant?: ButtonVariantProps['variant']
   icon?: React.ReactNode
