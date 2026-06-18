@@ -158,7 +158,7 @@ export function OrganizationSelector({
                     setSearch('')
                     setShowAll(true)
                   }}
-                  type="default"
+                  variant="default"
                 >
                   Show all organizations
                 </Button>
@@ -172,7 +172,7 @@ export function OrganizationSelector({
           <CardHeader className="border-none">
             <CardTitle>Need a new organization?</CardTitle>
           </CardHeader>
-          <Button size="small" className="" asChild type="default">
+          <Button size="small" className="" asChild variant="default">
             <Link href={`/new?${searchParams.toString()}`}>New Organization</Link>
           </Button>
         </Card>

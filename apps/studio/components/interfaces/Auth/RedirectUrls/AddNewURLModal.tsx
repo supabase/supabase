@@ -137,7 +137,7 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
             <DialogFooter>
               <Button
                 block
-                htmlType="submit"
+                type="submit"
                 size="small"
                 disabled={isUpdatingConfig}
                 loading={isUpdatingConfig}

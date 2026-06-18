@@ -139,7 +139,7 @@ function SupportFormHeader() {
       </div>
 
       <div className="flex items-center gap-x-3">
-        <Button asChild type="default" icon={<Wrench />}>
+        <Button asChild variant="default" icon={<Wrench />}>
           <Link
             href={`${DOCS_URL}/guides/troubleshooting?products=platform`}
             target="_blank"
@@ -152,7 +152,7 @@ function SupportFormHeader() {
           <TooltipTrigger asChild>
             <Button
               asChild
-              type="default"
+              variant="default"
               icon={
                 isLoading ? (
                   <Loader2 className="animate-spin" />
@@ -213,7 +213,7 @@ function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoPr
                 </code>
               </a>
               <CopyButton
-                type="text"
+                variant="text"
                 text="support@supabase.com"
                 iconOnly
                 onClick={() => toast.success('Copied email address to clipboard')}
@@ -227,7 +227,7 @@ function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoPr
                 <code className="text-code-inline text-foreground-light!">{projectRef}</code>
                 <CopyButton
                   iconOnly
-                  type="text"
+                  variant="text"
                   text={projectRef}
                   onClick={() => toast.success('Copied project ID to clipboard')}
                 />

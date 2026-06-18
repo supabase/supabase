@@ -25,7 +25,7 @@ export const EnableIndexAdvisorButton = () => {
   return (
     <>
       <Button
-        type="primary"
+        variant="primary"
         onClick={() => {
           setIsDialogOpen(true)
           track('index_advisor_enable_button_clicked', { origin: 'banner' })

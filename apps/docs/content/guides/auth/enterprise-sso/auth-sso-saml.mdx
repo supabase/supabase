@@ -106,7 +106,7 @@ If you use [Multi-Factor Authentication](/docs/guides/auth/auth-mfa) with SSO, t
 
 A common use case with SSO is to use the UUID of the identity provider as the identifier for the organization the user belongs to -- frequently known as a tenant. By associating the identity provider's UUID with your tenants, you can use restrictive RLS policies to scope down actions and data that a user is able to access.
 
-For example, let's say you have a table like:
+For example, say you have a table like:
 
 ```sql
 create table organization_settings (

@@ -157,7 +157,7 @@ export const PolicyDetailsV2 = ({
                     <Popover open={open} onOpenChange={setOpen} modal={false}>
                       <PopoverTrigger asChild>
                         <Button
-                          type="default"
+                          variant="default"
                           disabled={!canUpdatePolicies}
                           className="w-full [&>span]:w-full h-[38px] text-sm"
                           iconRight={

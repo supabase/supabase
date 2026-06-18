@@ -79,7 +79,7 @@ export const MarketplaceDetail = () => {
       case 'add-wrapper':
         return (
           <AddWrapperButton
-            type="primary"
+            variant="primary"
             onClick={() => {
               if (wrappersTabHref) router.push(`${wrappersTabHref}?new=true`)
             }}
@@ -87,7 +87,7 @@ export const MarketplaceDetail = () => {
         )
       case 'installed':
         return (
-          <Button type="outline" disabled>
+          <Button variant="outline" disabled>
             Installed
           </Button>
         )
@@ -110,7 +110,7 @@ export const MarketplaceDetail = () => {
           <>
             {isInstalled && integrationStatus?.partner_links?.dashboard && (
               <Button
-                type="text"
+                variant="text"
                 size="tiny"
                 icon={<Gauge size={13} />}
                 iconRight={<ArrowUpRight size={13} />}
@@ -127,7 +127,7 @@ export const MarketplaceDetail = () => {
             )}
             {isInstalled && integrationStatus?.partner_links?.manage && (
               <Button
-                type="text"
+                variant="text"
                 size="tiny"
                 icon={<Settings size={13} />}
                 iconRight={<ArrowUpRight size={13} />}
@@ -140,7 +140,7 @@ export const MarketplaceDetail = () => {
             )}
             {integration.docsUrl && (
               <Button
-                type="text"
+                variant="text"
                 size="tiny"
                 icon={<BookOpen size={13} />}
                 iconRight={<ArrowUpRight size={13} />}

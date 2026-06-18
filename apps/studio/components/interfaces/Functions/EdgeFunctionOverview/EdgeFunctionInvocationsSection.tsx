@@ -102,7 +102,7 @@ export const EdgeFunctionInvocationsSection = ({
                     return (
                       <Button
                         key={`function-filter-${item.key}`}
-                        type={interval === item.key ? 'secondary' : 'default'}
+                        variant={interval === item.key ? 'secondary' : 'default'}
                         onClick={() => onIntervalChange(item.key)}
                         className={getSegmentedButtonClassName(
                           index,

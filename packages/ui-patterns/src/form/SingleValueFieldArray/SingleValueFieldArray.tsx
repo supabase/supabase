@@ -34,10 +34,10 @@ export interface SingleValueFieldArrayProps<
   rowClassName?: string
   inputClassName?: string
   addButtonClassName?: string
-  addButtonType?: React.ComponentProps<typeof Button>['type']
+  addButtonType?: React.ComponentProps<typeof Button>['variant']
   addButtonSize?: React.ComponentProps<typeof Button>['size']
   removeButtonClassName?: string
-  removeButtonType?: React.ComponentProps<typeof Button>['type']
+  removeButtonType?: React.ComponentProps<typeof Button>['variant']
   removeButtonSize?: React.ComponentProps<typeof Button>['size']
 }
 
@@ -110,9 +110,9 @@ export const SingleValueFieldArray = <
             />
 
             <Button
-              type={removeButtonType}
+              variant={removeButtonType}
               size={removeButtonSize}
-              htmlType="button"
+              type="button"
               icon={<Trash size={12} />}
               aria-label={removeLabel}
               disabled={disableRemove}
@@ -125,9 +125,9 @@ export const SingleValueFieldArray = <
 
       <div className="flex items-center">
         <Button
-          type={addButtonType}
+          variant={addButtonType}
           size={addButtonSize}
-          htmlType="button"
+          type="button"
           icon={<Plus strokeWidth={1.5} />}
           disabled={disabled}
           onClick={() => append(createEmptyRow())}

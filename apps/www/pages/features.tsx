@@ -209,7 +209,7 @@ function FeaturesPage() {
               <Button
                 tabIndex={HAS_ACTIVE_FILTERS ? 0 : -1}
                 block
-                type="dashed"
+                variant="dashed"
                 onClick={() => {
                   setSelectedProducts([])
                   setSearchTerm('')

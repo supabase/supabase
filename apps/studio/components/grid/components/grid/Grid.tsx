@@ -299,7 +299,7 @@ export const Grid = memo(
                       <p className="text-sm text-light">This page does not have any data</p>
                       <div className="flex items-center space-x-2 mt-4">
                         <Button
-                          type="default"
+                          variant="default"
                           className="pointer-events-auto"
                           onClick={() => snap.setPage(1)}
                         >
@@ -325,7 +325,7 @@ export const Grid = memo(
                       ) : (
                         <div className="flex flex-col items-center gap-4 mt-4">
                           <Button
-                            type="default"
+                            variant="default"
                             className="pointer-events-auto"
                             onClick={() => {
                               tableEditorSnap.onImportData()
@@ -347,7 +347,7 @@ export const Grid = memo(
                       </p>
                       <div className="flex items-center space-x-2 mt-4">
                         <Button
-                          type="default"
+                          variant="default"
                           className="pointer-events-auto"
                           onClick={() => removeAllFilters()}
                         >

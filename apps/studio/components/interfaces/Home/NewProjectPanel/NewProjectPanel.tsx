@@ -47,13 +47,13 @@ export const NewProjectPanel = () => {
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <Button asChild type="default" icon={<TableEditor strokeWidth={1.5} />}>
+                <Button asChild variant="default" icon={<TableEditor strokeWidth={1.5} />}>
                   <EditorIndexPageLink projectRef={ref}>Table Editor</EditorIndexPageLink>
                 </Button>
-                <Button asChild type="default" icon={<SqlEditor strokeWidth={1.5} />}>
+                <Button asChild variant="default" icon={<SqlEditor strokeWidth={1.5} />}>
                   <Link href={`/project/${ref}/sql/new`}>SQL Editor</Link>
                 </Button>
-                <Button asChild type="default" icon={<ExternalLink />}>
+                <Button asChild variant="default" icon={<ExternalLink />}>
                   <Link href={`${DOCS_URL}/guides/database`} target="_blank" rel="noreferrer">
                     About Database
                   </Link>
@@ -89,14 +89,14 @@ export const NewProjectPanel = () => {
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Button type="default" asChild>
+                      <Button variant="default" asChild>
                         <Link href={`/project/${ref}/auth/users`}>Explore Auth</Link>
                       </Button>
 
                       <Button
                         className="translate-y-px"
                         icon={<ExternalLink />}
-                        type="default"
+                        variant="default"
                         asChild
                       >
                         <Link href={`${DOCS_URL}/guides/auth`} target="_blank" rel="noreferrer">
@@ -121,14 +121,14 @@ export const NewProjectPanel = () => {
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Button type="default" asChild>
+                      <Button variant="default" asChild>
                         <Link href={`/project/${ref}/storage/buckets`}>Explore Storage</Link>
                       </Button>
 
                       <Button
                         className="translate-y-px"
                         icon={<ExternalLink />}
-                        type="default"
+                        variant="default"
                         asChild
                       >
                         <Link href={`${DOCS_URL}/guides/storage`} target="_blank" rel="noreferrer">
@@ -154,13 +154,13 @@ export const NewProjectPanel = () => {
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Button type="default" asChild>
+                      <Button variant="default" asChild>
                         <Link href={`/project/${ref}/functions`}>Explore Functions</Link>
                       </Button>
                       <Button
                         className="translate-y-px"
                         icon={<ExternalLink />}
-                        type="default"
+                        variant="default"
                         asChild
                       >
                         <Link
@@ -188,13 +188,13 @@ export const NewProjectPanel = () => {
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Button type="default" asChild>
+                      <Button variant="default" asChild>
                         <Link href={`/project/${ref}/realtime/inspector`}>Explore Realtime</Link>
                       </Button>
                       <Button
                         className="translate-y-px"
                         icon={<ExternalLink />}
-                        type="default"
+                        variant="default"
                         asChild
                       >
                         <Link href={`${DOCS_URL}/guides/realtime`} target="_blank" rel="noreferrer">
@@ -221,7 +221,7 @@ export const NewProjectPanel = () => {
             </p>
           </div>
           <div className="flex items-center space-x-2">
-            <Button asChild type="default" icon={<Settings size={16} strokeWidth={1.5} />}>
+            <Button asChild variant="default" icon={<Settings size={16} strokeWidth={1.5} />}>
               <Link href={`/project/${ref}/settings/api-keys`}>API Keys settings</Link>
             </Button>
             <DocsButton href={`${DOCS_URL}/guides/database/api`} />

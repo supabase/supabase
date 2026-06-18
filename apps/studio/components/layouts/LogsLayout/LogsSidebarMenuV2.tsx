@@ -233,7 +233,7 @@ export function LogsSidebarMenuV2() {
           description="Get early access"
           actions={
             <Link href="https://forms.supabase.com/unified-logs-signup" target="_blank">
-              <Button type="default" size="tiny">
+              <Button variant="default" size="tiny">
                 Early access
               </Button>
             </Link>
@@ -243,6 +243,7 @@ export function LogsSidebarMenuV2() {
       {isUnifiedLogsEligible && (
         <UnifiedLogsBanner
           variant="promo"
+          className="mx-4 mt-4"
           onEnable={() => {
             enableUnifiedLogs()
             router.push(`/project/${ref}/logs`)
@@ -268,7 +269,7 @@ export function LogsSidebarMenuV2() {
         </InnerSideBarFilters>
 
         <Button
-          type="default"
+          variant="default"
           icon={<Plus className="text-foreground" />}
           className="w-[26px]"
           onClick={() => router.push(`/project/${ref}/logs/explorer`)}
@@ -334,7 +335,7 @@ export function LogsSidebarMenuV2() {
               IS_PLATFORM ? 'Create and save your queries to use them in the explorer' : undefined
             }
             actions={
-              <Button asChild type="default">
+              <Button asChild variant="default">
                 <Link href={`/project/${ref}/logs/explorer`}>Create query</Link>
               </Button>
             }
@@ -361,7 +362,7 @@ export function LogsSidebarMenuV2() {
           </div>
         }
         actions={
-          <Button asChild type="default">
+          <Button asChild variant="default">
             <Link href={`/project/${ref}/settings/log-drains`}>Go to Log Drains</Link>
           </Button>
         }

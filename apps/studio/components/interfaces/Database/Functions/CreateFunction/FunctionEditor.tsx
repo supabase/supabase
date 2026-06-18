@@ -36,7 +36,7 @@ export const FunctionEditor = ({
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              type="text"
+              variant="text"
               size="tiny"
               className={cn(
                 'px-1.5 text-foreground-lighter hover:text-foreground',

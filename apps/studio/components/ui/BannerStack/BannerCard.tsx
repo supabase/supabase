@@ -30,9 +30,9 @@ export const BannerCard = ({ onDismiss, children, className }: BannerCardProps) 
         {onDismiss && (
           <div className="absolute top-4 right-4 z-20">
             <Button
-              type="text"
+              variant="text"
               size="tiny"
-              htmlType="button"
+              type="button"
               icon={<X size={16} strokeWidth={1.5} />}
               onClick={(e) => {
                 e.preventDefault()

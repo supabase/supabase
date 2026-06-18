@@ -398,7 +398,7 @@ export const FileExplorerAndEditor = ({
             Files
           </h3>
           {IS_PLATFORM && (
-            <Button size="tiny" type="default" icon={<Plus size={14} />} onClick={addNewFile}>
+            <Button size="tiny" variant="default" icon={<Plus size={14} />} onClick={addNewFile}>
               Add File
             </Button>
           )}

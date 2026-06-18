@@ -265,7 +265,7 @@ export const RestoreToNewProject = () => {
               The new project {(restoringClone?.target_project as any)?.name || ''} is currently
               being created. You'll be able to restore again once the project is ready.
             </p>
-            <Button asChild type="default" className="mt-2">
+            <Button asChild variant="default" className="mt-2">
               <Link href={`/project/${restoringClone?.target_project?.ref ?? '_'}`}>
                 Go to new project
               </Link>
