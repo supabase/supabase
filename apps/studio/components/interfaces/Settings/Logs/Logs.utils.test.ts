@@ -3,6 +3,7 @@ import { describe, expect, test } from 'vitest'
 import { LogsTableName } from './Logs.constants'
 import type { Filters, LogData } from './Logs.types'
 import {
+  buildClickhouseRewritePrompt,
   buildLogsPrompt,
   extractEdgeFunctionName,
   formatLogsAsCsv,
@@ -293,6 +294,21 @@ describe('Logs.utils', () => {
     test('info severity filter excludes error and warning rows', () => {
       const sql = queryFor({ info: true })
       expect(sql).toContain('NOT (')
+    })
+  })
+
+  describe('buildClickhouseRewritePrompt', () => {
+    test('embeds the query in a fenced block when SQL is provided', () => {
+      const prompt = buildClickhouseRewritePrompt('select count(*) from edge_logs')
+      expect(prompt).toContain('ClickHouse')
+      expect(prompt).toContain('```sql\nselect count(*) from edge_logs\n```')
+      expect(prompt.toLowerCase()).toContain('rewrite')
+    })
+
+    test('asks for general guidance when no SQL is provided', () => {
+      const prompt = buildClickhouseRewritePrompt('   ')
+      expect(prompt).not.toContain('```sql')
+      expect(prompt.toLowerCase()).toContain('how do i write queries')
     })
   })
 })

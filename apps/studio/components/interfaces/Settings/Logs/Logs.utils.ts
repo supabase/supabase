@@ -954,3 +954,18 @@ export function buildLogsPrompt(rows: LogData[], queryType?: string, sqlQuery?: 
     '\n\nWhat do these logs indicate? What steps can I take to resolve it? Keep your answer very concise and actionable. Max 2 or 3 bullet points.'
   )
 }
+
+/**
+ * Prompt for the AI Assistant to rewrite a Logs Explorer query from the old
+ * BigQuery dialect to the ClickHouse-backed OTEL logs schema. Includes the
+ * current query when present; otherwise asks for general guidance.
+ */
+export function buildClickhouseRewritePrompt(sql?: string): string {
+  const intro =
+    'The Logs Explorer now runs on a ClickHouse-backed engine instead of BigQuery, which uses a different SQL dialect and schema (a single `logs` table with fields in the `log_attributes` map, keyed by `source`).'
+  const trimmed = sql?.trim()
+  if (!trimmed) {
+    return `${intro}\n\nHow do I write queries against the new ClickHouse logs schema? Give a short overview of the key differences from the old BigQuery syntax.`
+  }
+  return `${intro}\n\nRewrite this query to valid ClickHouse SQL against the new logs schema, preserving its original intent:\n\n\`\`\`sql\n${trimmed}\n\`\`\``
+}

@@ -25,6 +25,7 @@ import {
   buildLogQueryParams,
   resolveLogDateRange,
 } from '@/components/interfaces/Settings/Logs/logsDateRange'
+import { LogsExplorerOtelBanner } from '@/components/interfaces/Settings/Logs/LogsExplorerOtelBanner'
 import LogsQueryPanel from '@/components/interfaces/Settings/Logs/LogsQueryPanel'
 import { LogTable } from '@/components/interfaces/Settings/Logs/LogTable'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
@@ -395,6 +396,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             onUseOtelChange={setUseOtelEndpointPreference}
             otelForced={otelLegacyLogsEnabled}
           />
+          {useOtelEndpoint && <LogsExplorerOtelBanner projectRef={projectRef} sql={editorValue} />}
           <ShimmerLine active={isLoading} />
           <CodeEditor
             // Ensure we reset the editor to the query content whenever the selected query changes
