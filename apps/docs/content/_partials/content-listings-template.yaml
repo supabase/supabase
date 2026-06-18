@@ -15,6 +15,7 @@ contentListings:
       - title: Connect to your database
         href: /guides/database/connecting-to-postgres
         description: Connection strings, pooler, and connection modes.
+        # icon: /docs/img/icons/github-icon  # optional, grid only; use icons with a -light.svg variant in public/img/icons/
   - id: next-steps
     heading: Next steps
     type: list

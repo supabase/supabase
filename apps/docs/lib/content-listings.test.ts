@@ -63,6 +63,25 @@ describe('parseContentListings', () => {
     expect(result?.[0].headingLevel).toBe('###')
   })
 
+  it('accepts optional icon on items', () => {
+    const result = parseContentListings([
+      {
+        id: 'examples',
+        type: 'grid',
+        items: [
+          {
+            title: 'Resumable Uploads with Uppy',
+            href: 'https://github.com/supabase/supabase/tree/master/examples/storage/resumable-upload-uppy',
+            description: 'Use Uppy to upload files with the TUS protocol.',
+            icon: '/docs/img/icons/github-icon',
+          },
+        ],
+      },
+    ])
+
+    expect(result?.[0].items[0].icon).toBe('/docs/img/icons/github-icon')
+  })
+
   it('requires group id', () => {
     expect(() =>
       parseContentListings([

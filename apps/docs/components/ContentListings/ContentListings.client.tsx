@@ -111,7 +111,9 @@ function ContentListingsGridGroup({ group }: { group: ContentListingGroup }) {
               listingId={group.id}
               className="block h-full"
             >
-              <GlassPanel title={item.title}>{item.description}</GlassPanel>
+              <GlassPanel title={item.title} icon={item.icon} hasLightIcon={Boolean(item.icon)}>
+                {item.description}
+              </GlassPanel>
             </ContentListingLink>
           </div>
         ))}
