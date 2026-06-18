@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion'
 import { CircleDotDashed, GitMerge, X } from 'lucide-react'
 import { useEffect, useRef } from 'react'
+import { Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
 
 import { ActionRun } from '@/data/actions/action-detail-query'
-import { Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
 
 interface WorkflowLogsCardProps {
   workflowRun: ActionRun | null | undefined
@@ -83,7 +83,7 @@ export const WorkflowLogsCard = ({
             {overrideAction}
             {onClose && (
               <Button
-                type="text"
+                variant="text"
                 size="tiny"
                 icon={<X size={12} strokeWidth={1.5} />}
                 onClick={onClose}
@@ -98,11 +98,11 @@ export const WorkflowLogsCard = ({
         className="overflow-hidden border-0 overflow-y-auto relative p-0"
       >
         {/* sticky gradient overlay */}
-        <div className="sticky top-0 -mb-8 h-8 bg-gradient-to-b from-background to-transparent pointer-events-none z-10" />
+        <div className="sticky top-0 -mb-8 h-8 bg-linear-to-b from-background to-transparent pointer-events-none z-10" />
         {logs ? (
-          <pre className="p-6 text-xs text-foreground-light p-0 rounded">{logs}</pre>
+          <pre className="p-6 text-xs text-foreground-light p-0 rounded-sm">{logs}</pre>
         ) : (
-          <pre className="p-6 text-sm text-foreground-light rounded">
+          <pre className="p-6 text-sm text-foreground-light rounded-sm">
             {isLoading || isPolling ? 'Initializing workflow...' : 'Waiting for logs...'}
           </pre>
         )}

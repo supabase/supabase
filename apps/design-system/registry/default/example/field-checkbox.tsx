@@ -1,4 +1,4 @@
-import { Checkbox_Shadcn_ as Checkbox } from 'ui'
+import { Checkbox } from 'ui'
 import {
   Field,
   FieldContent,

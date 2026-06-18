@@ -1,23 +1,26 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useFlag, useParams } from 'common'
-import ReportHeader from 'components/interfaces/Reports/ReportHeader'
-import ReportPadding from 'components/interfaces/Reports/ReportPadding'
-import { ChartIntervalDropdown } from 'components/ui/Logs/ChartIntervalDropdown'
-import { CHART_INTERVALS } from 'components/ui/Logs/logs.utils'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { RefreshCw } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useMemo, useState } from 'react'
 import { Badge, Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { DatabaseInfrastructureSection } from './DatabaseInfrastructureSection'
-import { ObservabilityOverviewFooter } from './ObservabilityOverviewFooter'
 import { useObservabilityOverviewData } from './ObservabilityOverview.utils'
+import { ObservabilityOverviewFooter } from './ObservabilityOverviewFooter'
 import { ServiceHealthTable } from './ServiceHealthTable'
 import { useSlowQueriesCount } from './useSlowQueriesCount'
+import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
+import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
+import { ChartIntervalDropdown } from '@/components/ui/Logs/ChartIntervalDropdown'
+import { CHART_INTERVALS } from '@/components/ui/Logs/logs.utils'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 type ChartIntervalKey = '1hr' | '1day' | '7day'
 
@@ -25,19 +28,15 @@ export const ObservabilityOverview = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { plan } = useCurrentOrgPlan()
   const queryClient = useQueryClient()
 
-  const authReportEnabled = useFlag('authreportv2')
-  const edgeFnReportEnabled = useFlag('edgefunctionreport')
-  const realtimeReportEnabled = useFlag('realtimeReport')
-  const storageReportEnabled = useFlag('storagereport')
-  const postgrestReportEnabled = useFlag('postgrestreport')
   const { projectStorageAll: storageSupported } = useIsFeatureEnabled(['project_storage:all'])
+  const { isEnabled: isDataApiEnabled } = useIsDataApiEnabled({ projectRef })
 
   const DEFAULT_INTERVAL: ChartIntervalKey = '1day'
   const [interval, setInterval] = useState<ChartIntervalKey>(DEFAULT_INTERVAL)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [showIntervalDropdown, setShowIntervalDropdown] = useState(false)
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
 
@@ -55,14 +54,27 @@ export const ObservabilityOverview = () => {
 
   const handleRefresh = useCallback(() => {
     setRefreshKey((prev) => prev + 1)
+    queryClient.invalidateQueries({ queryKey: ['projects', projectRef, 'service-health'] })
     queryClient.invalidateQueries({ queryKey: ['project-metrics'] })
-    queryClient.invalidateQueries({ queryKey: ['postgrest-overview-metrics'] })
     queryClient.invalidateQueries({ queryKey: ['infra-monitoring'] })
     queryClient.invalidateQueries({ queryKey: ['max-connections'] })
-  }, [queryClient])
+  }, [queryClient, projectRef])
+
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_REFRESH, handleRefresh)
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER, () => {
+    setShowIntervalDropdown((open) => !open)
+  })
 
   const serviceBase = useMemo(
     () => [
+      {
+        key: 'data_api' as const,
+        name: 'API Gateway',
+        reportUrl: undefined,
+        logsUrl: `/project/${projectRef}/logs/edge-logs`,
+        enabled: isDataApiEnabled,
+        hasReport: false,
+      },
       {
         key: 'db' as const,
         name: 'Database',
@@ -72,12 +84,20 @@ export const ObservabilityOverview = () => {
         hasReport: true,
       },
       {
+        key: 'postgrest' as const,
+        name: 'PostgREST',
+        reportUrl: `/project/${projectRef}/observability/postgrest`,
+        logsUrl: `/project/${projectRef}/logs/postgrest-logs`,
+        enabled: true,
+        hasReport: true,
+      },
+      {
         key: 'auth' as const,
         name: 'Auth',
         reportUrl: `/project/${projectRef}/observability/auth`,
         logsUrl: `/project/${projectRef}/logs/auth-logs`,
         enabled: true,
-        hasReport: authReportEnabled,
+        hasReport: true,
       },
       {
         key: 'functions' as const,
@@ -85,15 +105,7 @@ export const ObservabilityOverview = () => {
         reportUrl: `/project/${projectRef}/observability/edge-functions`,
         logsUrl: `/project/${projectRef}/logs/edge-functions-logs`,
         enabled: true,
-        hasReport: edgeFnReportEnabled,
-      },
-      {
-        key: 'realtime' as const,
-        name: 'Realtime',
-        reportUrl: `/project/${projectRef}/observability/realtime`,
-        logsUrl: `/project/${projectRef}/logs/realtime-logs`,
-        enabled: true,
-        hasReport: realtimeReportEnabled,
+        hasReport: true,
       },
       {
         key: 'storage' as const,
@@ -101,51 +113,39 @@ export const ObservabilityOverview = () => {
         reportUrl: `/project/${projectRef}/observability/storage`,
         logsUrl: `/project/${projectRef}/logs/storage-logs`,
         enabled: storageSupported,
-        hasReport: storageReportEnabled,
+        hasReport: true,
       },
       {
-        key: 'postgrest' as const,
-        name: 'Data API',
-        reportUrl: `/project/${projectRef}/observability/postgrest`,
-        logsUrl: `/project/${projectRef}/logs/postgrest-logs`,
+        key: 'realtime' as const,
+        name: 'Realtime',
+        reportUrl: `/project/${projectRef}/observability/realtime`,
+        logsUrl: `/project/${projectRef}/logs/realtime-logs`,
         enabled: true,
-        hasReport: postgrestReportEnabled,
+        hasReport: true,
       },
     ],
-    [
-      projectRef,
-      authReportEnabled,
-      edgeFnReportEnabled,
-      realtimeReportEnabled,
-      storageReportEnabled,
-      storageSupported,
-      postgrestReportEnabled,
-    ]
+    [projectRef, storageSupported, isDataApiEnabled]
   )
 
   const enabledServices = serviceBase.filter((s) => s.enabled)
 
   const dbServiceData = overviewData.services.db
 
-  // Creates a 1-hour time window for the clicked bar for log filtering
+  // Navigate to the log view scoped to the clicked bar's bucket window
   const handleBarClick = useCallback(
-    (serviceKey: string, logsUrl: string) => (datum: any) => {
+    (logsUrl: string) => (datum: any) => {
       if (!datum?.timestamp) return
 
-      const datumTimestamp = dayjs(datum.timestamp)
-      // Round down to the start of the hour
-      const start = datumTimestamp.startOf('hour').toISOString()
-      // Add 1 hour to get the end of the hour
-      const end = datumTimestamp.startOf('hour').add(1, 'hour').toISOString()
+      // datum.timestamp is already the UTC-truncated bucket boundary from timestamp_trunc(),
+      // so use it directly to avoid local-timezone startOf() misalignment (e.g. UTC+5:30).
+      const unit = interval === '1hr' ? 'minute' : 'hour'
+      const start = datum.timestamp
+      const end = dayjs.utc(datum.timestamp).add(1, unit).toISOString()
 
-      const queryParams = new URLSearchParams({
-        its: start,
-        ite: end,
-      })
-
+      const queryParams = new URLSearchParams({ its: start, ite: end })
       router.push(`${logsUrl}?${queryParams.toString()}`)
     },
-    [router]
+    [router, interval]
   )
 
   return (
@@ -162,18 +162,24 @@ export const ObservabilityOverview = () => {
             </TooltipContent>
           </Tooltip>
         </div>
-        <div className="flex items-center gap-3">
-          <Button type="outline" icon={<RefreshCw size={14} />} onClick={handleRefresh}>
-            Refresh
-          </Button>
+        <div className="flex items-center gap-2">
+          <ShortcutTooltip
+            shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
+            label="Refresh report"
+            side="bottom"
+          >
+            <Button variant="outline" icon={<RefreshCw size={14} />} onClick={handleRefresh}>
+              Refresh
+            </Button>
+          </ShortcutTooltip>
           <ChartIntervalDropdown
             value={interval}
             onChange={(interval) => setInterval(interval as ChartIntervalKey)}
-            planId={plan?.id}
-            planName={plan?.name}
             organizationSlug={organization?.slug}
             dropdownAlign="end"
             tooltipSide="left"
+            open={showIntervalDropdown}
+            onOpenChange={setShowIntervalDropdown}
           />
         </div>
       </div>
@@ -198,7 +204,6 @@ export const ObservabilityOverview = () => {
           }))}
           serviceData={overviewData.services}
           onBarClick={handleBarClick}
-          interval={interval}
           datetimeFormat={datetimeFormat}
         />
       </div>

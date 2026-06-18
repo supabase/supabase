@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
 import { Plus } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { parseAsString, useQueryState } from 'nuqs'
+import { useRef } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import {
   Button,
@@ -14,14 +14,17 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  DialogTrigger,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  Input,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
+
+import { Shortcut } from '@/components/ui/Shortcut'
+import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const FORM_ID = 'create-publishable-api-key'
 const SCHEMA = z.object({
@@ -36,6 +39,7 @@ export interface CreatePublishableAPIKeyDialogProps {
 export const CreatePublishableAPIKeyDialog = () => {
   const params = useParams()
   const projectRef = params?.ref as string
+  const formRef = useRef<HTMLFormElement>(null)
 
   const [visible, setVisible] = useQueryState('new', parseAsString.withDefault(''))
 
@@ -43,6 +47,7 @@ export const CreatePublishableAPIKeyDialog = () => {
     if (value) setVisible('publishable')
     else setVisible('')
   }
+  const openDialog = () => setVisible('publishable')
 
   const defaultValues = { name: '', description: '' }
 
@@ -75,11 +80,16 @@ export const CreatePublishableAPIKeyDialog = () => {
 
   return (
     <Dialog open={visible === 'publishable'} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
-        <Button type="default" icon={<Plus />}>
+      <Shortcut
+        id={SHORTCUT_IDS.API_KEYS_NEW_PUBLISHABLE}
+        onTrigger={openDialog}
+        side="bottom"
+        tooltipOpen={visible === 'publishable' ? false : undefined}
+      >
+        <Button variant="default" icon={<Plus />} onClick={openDialog}>
           New publishable key
         </Button>
-      </DialogTrigger>
+      </Shortcut>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create new publishable API key</DialogTitle>
@@ -91,13 +101,14 @@ export const CreatePublishableAPIKeyDialog = () => {
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection className="flex flex-col gap-4">
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form
+              ref={formRef}
               className="flex flex-col gap-4"
               id={FORM_ID}
               onSubmit={form.handleSubmit(onSubmit)}
             >
-              <FormField_Shadcn_
+              <FormField
                 key="name"
                 name="name"
                 control={form.control}
@@ -106,13 +117,13 @@ export const CreatePublishableAPIKeyDialog = () => {
                     label="Name"
                     description="A short name of lowercase alphanumeric characters and underscore, must start with letter or underscore."
                   >
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} />
-                    </FormControl_Shadcn_>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
-              <FormField_Shadcn_
+              <FormField
                 key="description"
                 name="description"
                 control={form.control}
@@ -121,19 +132,26 @@ export const CreatePublishableAPIKeyDialog = () => {
                     label="Description"
                     description="Provide a description about what this key is used for."
                   >
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} placeholder="(Optional)" />
-                    </FormControl_Shadcn_>
+                    <FormControl>
+                      <Input {...field} placeholder="(Optional)" />
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </form>
-          </Form_Shadcn_>
+          </Form>
         </DialogSection>
         <DialogFooter>
-          <Button form={FORM_ID} htmlType="submit" loading={isCreatingAPIKey}>
-            Create Publishable API key
-          </Button>
+          <Shortcut
+            id={SHORTCUT_IDS.API_KEYS_CREATE_PUBLISHABLE}
+            onTrigger={() => formRef.current?.requestSubmit()}
+            options={{ enabled: visible === 'publishable' && !isCreatingAPIKey }}
+            side="top"
+          >
+            <Button form={FORM_ID} type="submit" loading={isCreatingAPIKey}>
+              Create Publishable API key
+            </Button>
+          </Shortcut>
         </DialogFooter>
       </DialogContent>
     </Dialog>

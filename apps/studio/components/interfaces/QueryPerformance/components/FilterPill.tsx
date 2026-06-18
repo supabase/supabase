@@ -1,5 +1,4 @@
 import { X } from 'lucide-react'
-
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface FilterPillProps {

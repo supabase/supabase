@@ -1,15 +1,17 @@
+import { useParams } from 'common'
 import Link from 'next/link'
-
-import { ProjectUpgradeEligibilityValidationError } from '@/data/config/project-upgrade-eligibility-query'
-import { useFlag, useParams } from 'common'
-import { InlineLink } from 'components/ui/InlineLink'
-import { DOCS_URL } from 'lib/constants'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
+import { InlineLink } from '@/components/ui/InlineLink'
+import {
+  ProjectUpgradeEligibilityValidationError,
+  ProjectUpgradeEligibilityWarning,
+} from '@/data/config/project-upgrade-eligibility-query'
+import { DOCS_URL } from '@/lib/constants'
+
 export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: string }) => {
   const { ref } = useParams()
-  const unifiedReplication = useFlag('unifiedReplication')
 
   return (
     <Admonition
@@ -18,11 +20,9 @@ export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: stri
       title="A newer version of Postgres is available"
       description={`You will need to remove all read replicas prior to upgrading your Postgres version to the latest available (${latestPgVersion}).`}
       actions={
-        unifiedReplication ? (
-          <Button asChild type="default">
-            <Link href={`/project/${ref}/database/replication`}>Manage read replicas</Link>
-          </Button>
-        ) : undefined
+        <Button asChild variant="default">
+          <Link href={`/project/${ref}/database/replication`}>Manage read replicas</Link>
+        </Button>
       }
     />
   )
@@ -31,7 +31,7 @@ export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: stri
 const getValidationErrorTitle = (error: ProjectUpgradeEligibilityValidationError): string => {
   switch (error.type) {
     case 'objects_depending_on_pg_cron':
-      return error.dependents.join(', ')
+      return (error.dependents ?? []).join(', ') || 'Objects depending on pg_cron'
     case 'indexes_referencing_ll_to_earth':
       return `${error.schema_name}.${error.index_name}`
     case 'function_using_obsolete_lang':
@@ -46,6 +46,10 @@ const getValidationErrorTitle = (error: ProjectUpgradeEligibilityValidationError
       return `${error.schema_name}.${error.obj_name}`
     case 'active_replication_slot':
       return error.slot_name
+    case 'project_hibernating':
+      return 'Project is hibernating'
+    case 'x86_architecture':
+      return 'Project is running on x86 architecture'
   }
 }
 
@@ -67,6 +71,10 @@ const getValidationErrorDescription = (error: ProjectUpgradeEligibilityValidatio
       return `Move the ${error.obj_type} to your own schema`
     case 'active_replication_slot':
       return 'Drop the active replication slot'
+    case 'project_hibernating':
+      return 'The project is currently hibernating and will wake on next supported request'
+    case 'x86_architecture':
+      return 'The project is running on x86 architecture and cannot be upgraded'
   }
 }
 
@@ -116,7 +124,7 @@ const ValidationErrorItem = ({ error }: { error: ProjectUpgradeEligibilityValida
         <p className="text-foreground-lighter text-xs">{description}</p>
       </div>
       {manageLink && (
-        <Button size="tiny" type="default" asChild>
+        <Button size="tiny" variant="default" asChild>
           <Link href={manageLink}>Manage</Link>
         </Button>
       )}
@@ -129,6 +137,8 @@ export const ValidationErrorsWarning = ({
 }: {
   validationErrors: ProjectUpgradeEligibilityValidationError[]
 }) => {
+  if (validationErrors.length === 0) return null
+
   return (
     <Admonition type="note" showIcon={false} title="A newer version of Postgres is available">
       <div className="flex flex-col gap-3">
@@ -144,4 +154,48 @@ export const ValidationErrorsWarning = ({
       </div>
     </Admonition>
   )
+}
+
+const getWarningTitle = (warning: ProjectUpgradeEligibilityWarning): string => {
+  switch (warning.type) {
+    case 'pg_graphql_introspection_change':
+      return 'GraphQL introspection will be disabled by default after upgrade'
+  }
+}
+
+const getWarningDescription = (warning: ProjectUpgradeEligibilityWarning): string => {
+  switch (warning.type) {
+    case 'pg_graphql_introspection_change':
+      return 'After upgrading, queries to `__schema` and `__type` will return an error unless introspection is explicitly re-enabled on the schema. Regular data queries are not affected.'
+  }
+}
+
+const getWarningLink = (warning: ProjectUpgradeEligibilityWarning): string => {
+  switch (warning.type) {
+    case 'pg_graphql_introspection_change':
+      return `${DOCS_URL}/guides/platform/upgrading#upgrading-to-pg_graphql-160`
+  }
+}
+
+export const ValidationWarningsAdmonition = ({
+  warnings,
+}: {
+  warnings: ProjectUpgradeEligibilityWarning[]
+}) => {
+  if (warnings.length === 0) return null
+
+  return warnings.map((warning, idx) => (
+    <Admonition
+      key={`${warning.type}-${idx}`}
+      type="default"
+      title={getWarningTitle(warning)}
+      description={getWarningDescription(warning)}
+    >
+      <Button asChild variant="default" className="mt-2">
+        <Link href={getWarningLink(warning)} target="_blank" rel="noreferrer">
+          Read upgrade notes
+        </Link>
+      </Button>
+    </Admonition>
+  ))
 }

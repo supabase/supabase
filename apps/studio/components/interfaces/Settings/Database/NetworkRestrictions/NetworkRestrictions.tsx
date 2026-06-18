@@ -1,14 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { AlertCircle, ChevronDown, Globe, Lock } from 'lucide-react'
 import { useState } from 'react'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import {
   Badge,
   Button,
@@ -33,10 +26,17 @@ import {
   PageSectionTitle,
 } from 'ui-patterns'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import AddRestrictionModal from './AddRestrictionModal'
 import AllowAllModal from './AllowAllModal'
 import DisallowAllModal from './DisallowAllModal'
 import RemoveRestrictionModal from './RemoveRestrictionModal'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useNetworkRestrictionsQuery } from '@/data/network-restrictions/network-restrictions-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 interface AccessButtonProps {
   disabled: boolean
@@ -46,7 +46,7 @@ interface AccessButtonProps {
 const AllowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
   <Tooltip>
     <TooltipTrigger asChild>
-      <Button type="default" disabled={disabled} onClick={() => onClick(true)}>
+      <Button variant="default" disabled={disabled} onClick={() => onClick(true)}>
         Allow all access
       </Button>
     </TooltipTrigger>
@@ -61,7 +61,7 @@ const AllowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
 const DisallowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
   <ButtonTooltip
     disabled={disabled}
-    type="default"
+    variant="default"
     onClick={() => onClick(true)}
     tooltip={{
       content: {
@@ -84,7 +84,10 @@ export const NetworkRestrictions = () => {
   const [isDisallowingAll, setIsDisallowingAll] = useState(false)
   const [selectedRestrictionToRemove, setSelectedRestrictionToRemove] = useState<string>()
 
-  const { data, isPending: isLoading } = useNetworkRestrictionsQuery({ projectRef: ref })
+  const { data, isPending: isLoading } = useNetworkRestrictionsQuery(
+    { projectRef: ref },
+    { enabled: Boolean(project) }
+  )
   const { can: canUpdateNetworkRestrictions } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'projects',
@@ -114,14 +117,14 @@ export const NetworkRestrictions = () => {
       <PageSection id="network-restrictions">
         <PageSectionMeta>
           <PageSectionSummary>
-            <PageSectionTitle>Network Restrictions</PageSectionTitle>
+            <PageSectionTitle>Network restrictions</PageSectionTitle>
           </PageSectionSummary>
           <PageSectionAside className="flex items-center gap-x-2">
             <DocsButton href={`${DOCS_URL}/guides/platform/network-restrictions`} />
             {!canUpdateNetworkRestrictions ? (
               <ButtonTooltip
                 disabled
-                type="primary"
+                variant="primary"
                 tooltip={{
                   content: {
                     side: 'bottom',
@@ -135,7 +138,7 @@ export const NetworkRestrictions = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    type="primary"
+                    variant="primary"
                     disabled={!canUpdateNetworkRestrictions}
                     iconRight={<ChevronDown size={14} />}
                   >
@@ -206,8 +209,8 @@ export const NetworkRestrictions = () => {
               {isUninitialized || isAllowedAll ? (
                 <CardContent className="flex items-center justify-between">
                   <div className="flex items-start space-x-4">
-                    <div className="space-y-1">
-                      <p className="text-foreground-light text-sm">
+                    <div className="space-y-0.5">
+                      <p className="text-foreground text-sm">
                         Your database can be accessed by all IP addresses
                       </p>
                       <p className="text-foreground-light text-sm">
@@ -283,7 +286,7 @@ export const NetworkRestrictions = () => {
                               <p className="text-sm font-mono">{ip}</p>
                             </div>
                             <Button
-                              type="default"
+                              variant="default"
                               onClick={() => setSelectedRestrictionToRemove(ip)}
                             >
                               Remove

@@ -1,16 +1,13 @@
 import type { PropsWithChildren } from 'react'
-
 import { CommandProvider } from 'ui-patterns/CommandMenu'
-import { useStudioCommandMenuTelemetry } from 'hooks/misc/useStudioCommandMenuTelemetry'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { LOCAL_STORAGE_KEYS } from 'common'
+
+import { useStudioCommandMenuTelemetry } from '@/hooks/misc/useStudioCommandMenuTelemetry'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 
 export function StudioCommandProvider({ children }: PropsWithChildren) {
   const { onTelemetry } = useStudioCommandMenuTelemetry()
-  const [commandMenuHotkeyEnabled] = useLocalStorageQuery<boolean>(
-    LOCAL_STORAGE_KEYS.HOTKEY_COMMAND_MENU,
-    true
-  )
+  const commandMenuHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.COMMAND_MENU_OPEN)
 
   return (
     <CommandProvider

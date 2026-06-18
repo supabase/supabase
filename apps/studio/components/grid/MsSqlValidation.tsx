@@ -1,8 +1,8 @@
-import { isMsSqlForeignTable, type Entity } from 'data/table-editor/table-editor-types'
 import type { ComponentType, ReactNode } from 'react'
-
 import { Admonition } from 'ui-patterns'
+
 import type { Filter, Sort } from './types'
+import { isMsSqlForeignTable, type Entity } from '@/data/table-editor/table-editor-types'
 
 type ValidateMsSqlSortingParams = {
   filters: Filter[]

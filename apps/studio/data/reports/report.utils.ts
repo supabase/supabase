@@ -1,8 +1,36 @@
-import { AnalyticsInterval } from 'data/analytics/constants'
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { get } from 'data/fetchers'
+import { type ComparisonOperator } from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
+import { AnalyticsInterval } from '@/data/analytics/constants'
+import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
+import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
+import { safeSql, type SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
 
 export type Granularity = 'minute' | 'hour' | 'day'
+
+/**
+ * Pre-branded SQL fragments for the closed set of granularity tokens that
+ * `analyticsIntervalToGranularity` may return. Use to splice a granularity into
+ * a `safeSql` template without re-validating at the call site.
+ */
+export const SAFE_GRANULARITY_SQL: Record<Granularity, SafeLogSqlFragment> = {
+  minute: safeSql`minute`,
+  hour: safeSql`hour`,
+  day: safeSql`day`,
+}
+
+/**
+ * Pre-branded SQL fragments for the closed set of numeric comparison operators
+ * accepted by `ReportsNumericFilter`. Use to splice an operator into a
+ * `safeSql` template without re-validating at the call site.
+ */
+export const SAFE_COMPARISON_OPERATOR_SQL: Record<ComparisonOperator, SafeLogSqlFragment> = {
+  '=': safeSql`=`,
+  '>=': safeSql`>=`,
+  '<=': safeSql`<=`,
+  '>': safeSql`>`,
+  '<': safeSql`<`,
+  '!=': safeSql`!=`,
+}
+
 export function analyticsIntervalToGranularity(interval: AnalyticsInterval): Granularity {
   switch (interval) {
     case '1m':
@@ -55,22 +83,18 @@ export const useEdgeFnIdToName = ({ projectRef }: { projectRef: string }) => {
 
 export async function fetchLogs(
   projectRef: string,
-  sql: string,
+  sql: SafeLogSqlFragment,
   startDate: string,
   endDate: string
 ) {
-  const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-    params: {
-      path: { ref: projectRef },
-      query: {
-        sql,
-        iso_timestamp_start: startDate,
-        iso_timestamp_end: endDate,
-      },
-    },
+  return await executeAnalyticsSql({
+    projectRef,
+    endpoint: '/platform/projects/{ref}/analytics/endpoints/logs.all',
+    sql,
+    iso_timestamp_start: startDate,
+    iso_timestamp_end: endDate,
+    method: 'get',
   })
-  if (error) throw error
-  return data
 }
 
 export const STATUS_CODE_COLORS: { [key: string]: { light: string; dark: string } } = {

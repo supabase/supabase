@@ -38,7 +38,7 @@ const VideoWithHighlights = (props: Props) => {
           <source
             key={`${source.src}${i === 0 ? '.webm' : '.mp4'}`}
             src={`${source.src}${i === 0 ? '.webm' : '.mp4'}`}
-            type={source.type ?? i === 0 ? 'video/webm' : 'video/mp4'}
+            type={(source.type ?? i === 0) ? 'video/webm' : 'video/mp4'}
           />
         ))}
       </video>

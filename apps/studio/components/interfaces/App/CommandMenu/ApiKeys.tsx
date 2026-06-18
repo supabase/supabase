@@ -1,7 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Key } from 'lucide-react'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
@@ -18,6 +15,9 @@ import {
 
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import { orderCommandSectionsByPriority } from './ordering'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const API_KEYS_PAGE_NAME = 'API Keys'
 
@@ -29,18 +29,15 @@ export function useApiKeysCommands() {
   const { data: project } = useSelectedProjectQuery()
   const ref = project?.ref || '_'
 
-  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.SECRETS_READ,
-    '*'
-  )
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
 
-  const { data: apiKeys } = useAPIKeysQuery(
+  const { data: apiKeysData } = useAPIKeys(
     { projectRef: project?.ref, reveal: true },
     { enabled: canReadAPIKeys }
   )
   const commands = useMemo(() => {
     const { anonKey, serviceKey, publishableKey, allSecretKeys } = canReadAPIKeys
-      ? getKeys(apiKeys)
+      ? (apiKeysData ?? {})
       : {}
 
     return [
@@ -130,7 +127,7 @@ export function useApiKeysCommands() {
         icon: () => <Key />,
       },
     ].filter(Boolean) as ICommand[]
-  }, [apiKeys, canReadAPIKeys, project, ref, resetCommandMenu, setIsOpen])
+  }, [canReadAPIKeys, apiKeysData, project, ref, resetCommandMenu, setIsOpen])
 
   useRegisterPage(
     API_KEYS_PAGE_NAME,

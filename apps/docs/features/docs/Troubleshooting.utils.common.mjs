@@ -60,6 +60,7 @@ export const TroubleshootingSchema = z
     topics: z.array(
       z.enum([
         'ai',
+        'ai-tools',
         'auth',
         'branching',
         'cli',

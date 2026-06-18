@@ -1,20 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Info } from 'lucide-react'
-
 import { useParams } from 'common'
-import { BackupsList } from 'components/interfaces/Database/Backups/BackupsList'
-import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
-import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import AlertError from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import InformationBox from 'components/ui/InformationBox'
-import NoPermission from 'components/ui/NoPermission'
-import { useBackupsQuery } from 'data/database/backups-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsOrioleDbInAws } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
+import { Info } from 'lucide-react'
 import { Admonition } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -26,6 +12,20 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { BackupsList } from '@/components/interfaces/Database/Backups/BackupsList'
+import DatabaseBackupsNav from '@/components/interfaces/Database/Backups/DatabaseBackupsNav'
+import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import AlertError from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import InformationBox from '@/components/ui/InformationBox'
+import NoPermission from '@/components/ui/NoPermission'
+import { useBackupsQuery } from '@/data/database/backups-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsOrioleDbInAws } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
 
 const DatabaseScheduledBackups: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
@@ -94,9 +94,9 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
                         title="Point-In-Time-Recovery (PITR) enabled"
                         description={
                           <div>
-                            Your project uses PITR and full daily backups are no longer taken.
-                            They're not needed, as PITR supports a superset of functionality, in
-                            terms of the granular recovery that can be performed.{' '}
+                            Your project uses PITR and full daily backups are no longer taken. PITR
+                            lets you restore to a specific time (down to the second) within your
+                            selected PITR retention period.{' '}
                             <a
                               className="text-brand transition-colors hover:text-brand-600"
                               href={`${DOCS_URL}/guides/platform/backups`}
@@ -126,7 +126,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
 
 DatabaseScheduledBackups.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+    <DatabaseLayout title="Backups">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 

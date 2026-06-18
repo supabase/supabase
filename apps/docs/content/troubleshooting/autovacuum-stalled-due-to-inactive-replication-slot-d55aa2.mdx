@@ -2,6 +2,7 @@
 title = "Autovacuum Stalled Due to Inactive Replication Slot"
 topics = [ "database" ]
 keywords = []
+database_id = "a931b8af-3210-4188-bb03-87452923a498"
 ---
 
 If you observe that `supabase inspect db vacuum-stats` reports "Expect autovacuum? yes" for your tables, but autovacuum activity has been inactive for an extended period, leading to increasing database RAM usage, this typically indicates a stalled autovacuum process. One of the reasons for autovacuum to get stalled is an inactive replication slot for which this guide talks about.

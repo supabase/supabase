@@ -23,7 +23,7 @@ vi.mock('common', async () => {
   }
 })
 
-const originalEnv = process.env.NODE_ENV
+const originalEnv = process.env.NEXT_PUBLIC_ENVIRONMENT
 
 /**
  * Helper to render the full component tree as used in production.
@@ -35,12 +35,15 @@ async function renderFullToolbar() {
   const { DevToolbarProvider } = await import('./DevToolbarContext')
   const { DevToolbarTrigger } = await import('./DevToolbarTrigger')
   const { DevToolbar } = await import('./DevToolbar')
+  const { TooltipProvider } = await import('ui')
 
   return render(
-    <DevToolbarProvider apiUrl="http://localhost:3000">
-      <DevToolbarTrigger />
-      <DevToolbar />
-    </DevToolbarProvider>
+    <TooltipProvider>
+      <DevToolbarProvider apiUrl="http://localhost:3000">
+        <DevToolbarTrigger />
+        <DevToolbar />
+      </DevToolbarProvider>
+    </TooltipProvider>
   )
 }
 
@@ -76,14 +79,18 @@ describe('DevToolbar', () => {
   })
 
   afterEach(() => {
-    process.env.NODE_ENV = originalEnv
+    if (originalEnv === undefined) {
+      delete process.env.NEXT_PUBLIC_ENVIRONMENT
+    } else {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = originalEnv
+    }
     vi.resetModules()
     vi.restoreAllMocks()
   })
 
   describe('when not in local development', () => {
     beforeEach(() => {
-      process.env.NODE_ENV = 'production'
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'prod'
     })
 
     it('returns null and does not render anything', async () => {
@@ -104,7 +111,7 @@ describe('DevToolbar', () => {
 
   describe('when in local development but not enabled', () => {
     beforeEach(() => {
-      process.env.NODE_ENV = 'development'
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
     })
 
     it('does not render trigger when toolbar is not enabled', async () => {
@@ -126,7 +133,7 @@ describe('DevToolbar', () => {
 
   describe('when in local development and enabled', () => {
     beforeEach(() => {
-      process.env.NODE_ENV = 'development'
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
       localStorage.setItem('dev-telemetry-toolbar-enabled', 'true')
     })
 
@@ -149,7 +156,7 @@ describe('DevToolbar', () => {
 
       // Sheet should open with the title
       await waitFor(() => {
-        expect(screen.getByText('Dev Telemetry')).toBeInTheDocument()
+        expect(screen.getByText('Dev Toolbar')).toBeInTheDocument()
       })
     })
 
@@ -166,8 +173,22 @@ describe('DevToolbar', () => {
         expect(screen.getByRole('tab', { name: /Flags/i })).toBeInTheDocument()
       })
     })
+  })
 
-    it('shows "Local Only" badge in toolbar header', async () => {
+  describe('when in staging environment and enabled', () => {
+    beforeEach(() => {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'staging'
+      localStorage.setItem('dev-telemetry-toolbar-enabled', 'true')
+    })
+
+    it('renders the toolbar trigger', async () => {
+      vi.resetModules()
+      await renderFullToolbar()
+      const triggerButton = screen.getByRole('button')
+      expect(triggerButton).toBeInTheDocument()
+    })
+
+    it('shows server events notice in events tab', async () => {
       vi.resetModules()
       const user = userEvent.setup()
       await renderFullToolbar()
@@ -176,14 +197,30 @@ describe('DevToolbar', () => {
       await user.click(triggerButton)
 
       await waitFor(() => {
-        expect(screen.getByText('Local Only')).toBeInTheDocument()
+        expect(
+          screen.getByText(
+            'Server-side events are only visible when using the toolbar in local development'
+          )
+        ).toBeInTheDocument()
       })
+    })
+
+    it('does not connect to SSE in staging', async () => {
+      const EventSourceSpy = vi.fn()
+      vi.stubGlobal('EventSource', EventSourceSpy)
+
+      vi.resetModules()
+      await renderFullToolbar()
+
+      expect(EventSourceSpy).not.toHaveBeenCalled()
+
+      vi.unstubAllGlobals()
     })
   })
 
   describe('window.devTelemetry function', () => {
     beforeEach(() => {
-      process.env.NODE_ENV = 'development'
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
     })
 
     it('enables toolbar when called', async () => {
@@ -203,12 +240,15 @@ describe('DevToolbar', () => {
       const { DevToolbarProvider } = await import('./DevToolbarContext')
       const { DevToolbarTrigger } = await import('./DevToolbarTrigger')
       const { DevToolbar } = await import('./DevToolbar')
+      const { TooltipProvider } = await import('ui')
 
       rerender(
-        <DevToolbarProvider apiUrl="http://localhost:3000">
-          <DevToolbarTrigger />
-          <DevToolbar />
-        </DevToolbarProvider>
+        <TooltipProvider>
+          <DevToolbarProvider apiUrl="http://localhost:3000">
+            <DevToolbarTrigger />
+            <DevToolbar />
+          </DevToolbarProvider>
+        </TooltipProvider>
       )
 
       expect(localStorage.getItem('dev-telemetry-toolbar-enabled')).toBe('true')
@@ -217,7 +257,7 @@ describe('DevToolbar', () => {
 
   describe('cleanup', () => {
     it('removes window.devTelemetry on unmount', async () => {
-      process.env.NODE_ENV = 'development'
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
 
       vi.resetModules()
       const result = await renderFullToolbar()
@@ -232,7 +272,7 @@ describe('DevToolbar', () => {
 
   describe('EventCard keyboard accessibility', () => {
     beforeEach(() => {
-      process.env.NODE_ENV = 'development'
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
       localStorage.setItem('dev-telemetry-toolbar-enabled', 'true')
     })
 
@@ -246,7 +286,7 @@ describe('DevToolbar', () => {
       await user.click(triggerButton)
 
       await waitFor(() => {
-        expect(screen.getByText('Dev Telemetry')).toBeInTheDocument()
+        expect(screen.getByText('Dev Toolbar')).toBeInTheDocument()
       })
 
       // Events tab should be active by default and show empty state
@@ -256,7 +296,7 @@ describe('DevToolbar', () => {
 
   describe('Flag override UI', () => {
     beforeEach(() => {
-      process.env.NODE_ENV = 'development'
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
       localStorage.setItem('dev-telemetry-toolbar-enabled', 'true')
     })
 
@@ -277,8 +317,8 @@ describe('DevToolbar', () => {
       await user.click(flagsTab)
 
       await waitFor(() => {
-        expect(screen.getByRole('tab', { name: /PostHog/i })).toBeInTheDocument()
-        expect(screen.getByRole('tab', { name: /ConfigCat/i })).toBeInTheDocument()
+        expect(screen.getByRole('button', { name: /PostHog/i })).toBeInTheDocument()
+        expect(screen.getByRole('button', { name: /ConfigCat/i })).toBeInTheDocument()
       })
     })
   })

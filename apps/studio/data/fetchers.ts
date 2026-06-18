@@ -1,12 +1,14 @@
 import * as Sentry from '@sentry/nextjs'
 import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
-import { IS_PLATFORM, getAccessToken } from 'common'
-import { API_URL } from 'lib/constants'
-import { uuidv4 } from 'lib/helpers'
+import { getAccessToken, IS_PLATFORM } from 'common'
 import createClient from 'openapi-fetch'
-import { ResponseError } from 'types'
 
 import type { paths } from './api'
+import { ERROR_PATTERNS } from './error-patterns'
+import { API_URL } from '@/lib/constants'
+import { uuidv4 } from '@/lib/helpers'
+import { ResponseError } from '@/types'
+import { UnknownAPIResponseError } from '@/types/api-errors'
 import { ErrorMetadata } from '@/types/base'
 
 // generated from openapi-typescript
@@ -61,6 +63,35 @@ export async function constructHeaders(headersInit?: HeadersInit | undefined) {
   return headers
 }
 
+/**
+ * openapi-fetch only treats a response body as empty when `status === 204` or the
+ * response carries a `Content-Length: 0` header; otherwise it calls `response.json()`,
+ * which throws "Unexpected end of JSON input" on an empty body. HTTP/3 (and HEAD
+ * requests) may omit `Content-Length: 0` on empty-body responses — e.g. a `201` with
+ * no body — so a request that succeeds over HTTP/2 can fail over HTTP/3.
+ *
+ * Normalize empty-body success responses by setting `Content-Length: 0` so the parser
+ * short-circuits regardless of transport. Non-empty responses are returned untouched.
+ */
+export async function normalizeEmptyBodyResponse(response: Response): Promise<Response> {
+  if (response.status === 204 || response.headers.has('Content-Length')) {
+    return response
+  }
+
+  const body = await response.clone().text()
+  if (body.length > 0) {
+    return response
+  }
+
+  const headers = new Headers(response.headers)
+  headers.set('Content-Length', '0')
+  return new Response(null, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  })
+}
+
 function pgMetaGuard(request: Request) {
   // Only check for /platform/pg-meta/ endpoints
   if (request.url.includes('/platform/pg-meta/')) {
@@ -96,7 +127,7 @@ client.use(
     // Middleware to format errors
     async onResponse({ request, response }) {
       if (response.ok) {
-        return response
+        return normalizeEmptyBodyResponse(response)
       }
 
       // handle errors
@@ -109,7 +140,8 @@ client.use(
 
         body.requestId = request.headers.get('X-Request-Id')
 
-        const retryAfterHeader = response.headers.get('Retry-After')
+        const retryAfterHeader =
+          response.headers.get('Retry-After') ?? response.headers.get('X-RateLimit-Reset')
         body.retryAfter = retryAfterHeader ? parseInt(retryAfterHeader) : undefined
 
         const requestUrl = new URL(request.url)
@@ -170,16 +202,32 @@ export const handleError = (error: unknown, options: HandleErrorOptions = {}): n
       'metadata' in error && typeof error.metadata === 'object' && !!error.metadata
         ? (error.metadata as ErrorMetadata)
         : undefined
+    const formattedError =
+      'formattedError' in error && typeof error.formattedError === 'string'
+        ? error.formattedError
+        : undefined
 
     if (errorMessage) {
-      throw new ResponseError(
-        errorMessage,
-        errorCode,
-        requestId,
-        retryAfter,
-        requestPathname,
-        metadata
-      )
+      const matched = ERROR_PATTERNS.find(({ pattern }) => pattern.test(errorMessage))
+      throw matched
+        ? new matched.ErrorClass(
+            errorMessage,
+            errorCode,
+            requestId,
+            retryAfter,
+            requestPathname,
+            metadata,
+            formattedError
+          )
+        : new UnknownAPIResponseError(
+            errorMessage,
+            errorCode,
+            requestId,
+            retryAfter,
+            requestPathname,
+            metadata,
+            formattedError
+          )
     }
   }
 
@@ -193,7 +241,7 @@ export const handleError = (error: unknown, options: HandleErrorOptions = {}): n
 
   // throw a generic error if we don't know what the error is. The message is intentionally vague because it might show
   // up in the UI.
-  throw new ResponseError(undefined)
+  throw new UnknownAPIResponseError(undefined)
 }
 
 // [Joshen] The methods below are brought over from lib/common/fetch because we still need them
@@ -249,10 +297,11 @@ async function handleFetchError(response: unknown): Promise<ResponseError> {
     resJson.msg ??
     resJson.error ??
     `An error has occurred: ${status ?? 'Unknown error'}`
-  const retryAfter =
-    response instanceof Response && response.headers.get('Retry-After')
-      ? parseInt(response.headers.get('Retry-After')!)
-      : undefined
+  const retryAfterHeader =
+    response instanceof Response
+      ? (response.headers.get('Retry-After') ?? response.headers.get('X-RateLimit-Reset'))
+      : null
+  const retryAfter = retryAfterHeader ? parseInt(retryAfterHeader) : undefined
 
   let error = new ResponseError(message, status, undefined, retryAfter)
 

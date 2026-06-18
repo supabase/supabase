@@ -1,7 +1,7 @@
 ---
 id: 'pgaudit'
 title: 'PGAudit: Postgres Auditing'
-description: 'Session and object auditing via PostgreSQL standard logging'
+description: 'Session and object auditing via Postgres standard logging'
 ---
 
 [PGAudit](https://www.pgaudit.org) extends Postgres's built-in logging abilities. It can be used to selectively track activities within your database.
@@ -113,7 +113,7 @@ set pgaudit.log = 'none';
 
 ### User logging
 
-There are some cases where you may want to monitor a database user's actions. For instance, let's say you connected your database to [Zapier](/partners/integrations/zapier) and created a custom role for it to use:
+There are some cases where you may want to monitor a database user's actions. For instance, say you connected your database to [Zapier](/partners/integrations/zapier) and created a custom role for it to use:
 
 ```sql
 create user "zapier" with password '<new password>';
@@ -391,5 +391,5 @@ PGAudit's [official documentation](https://www.pgaudit.org) focuses on system an
 
 - [Official `PGAudit` documentation](https://www.pgaudit.org)
 - [Database Function Logging](/docs/guides/database/functions#general-logging)
-- [Supabase Logging](/docs/guides/platform/logs)
+- [Supabase Logging](/docs/guides/telemetry/logs)
 - [Self-Hosting Logs](/docs/reference/self-hosting-analytics/introduction)

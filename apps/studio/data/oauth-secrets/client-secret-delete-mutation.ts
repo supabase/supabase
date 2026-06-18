@@ -1,8 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { del, handleError } from 'data/fetchers'
 import { toast } from 'sonner'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { clientSecretKeys } from './keys'
+import { del, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type ClientSecretDeleteVariables = {
   slug: string

@@ -1,11 +1,11 @@
 import { usePrevious } from '@uidotdev/usehooks'
 import { AlertCircle, Check, Loader2, RefreshCcw } from 'lucide-react'
 import { useEffect, useState } from 'react'
-
-import { useProfile } from 'lib/profile'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import ReadOnlyBadge from './ReadOnlyBadge'
+import { useProfile } from '@/lib/profile'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 export type SavingIndicatorProps = { id: string }
 
@@ -42,7 +42,7 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
       <div className="mx-2 flex items-center gap-2">
         {isSnippetOwner && savingState === 'UPDATING_FAILED' && (
           <Button
-            type="text"
+            variant="text"
             size="tiny"
             icon={<RefreshCcw className="text-gray-1100" strokeWidth={2} />}
             onClick={retry}

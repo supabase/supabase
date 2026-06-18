@@ -10,14 +10,18 @@ import createSupabaseIcon from '../createSupabaseIcon';
  * @returns {JSX.Element} JSX Element
  *
  */
-const Logs = createSupabaseIcon('Logs', [
+const Logs = createSupabaseIcon(
+  'Logs',
   [
-    'path',
-    {
-      d: 'M4.5 5.20679H4.53713M7.46241 5.21707H19.5M4.5 9.65839H4.53713M7.46241 9.66868H19.5M4.52692 14.164H4.53713M7.46241 14.1742H19.5M4.52692 18.7068L4.53713 18.6965M7.46241 18.7068H19.5',
-      key: '2ab8w8',
-    },
+    [
+      'path',
+      {
+        d: 'M4.5 5.20679H4.53713M7.46241 5.21707H19.5M4.5 9.65839H4.53713M7.46241 9.66868H19.5M4.52692 14.164H4.53713M7.46241 14.1742H19.5M4.52692 18.7068L4.53713 18.6965M7.46241 18.7068H19.5',
+        key: '2ab8w8',
+      },
+    ],
   ],
-]);
+  { fill: 'none', stroke: 'currentColor', strokeWidth: '1' },
+);
 
 export default Logs;

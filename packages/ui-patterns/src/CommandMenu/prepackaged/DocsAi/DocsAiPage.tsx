@@ -5,21 +5,14 @@ import { User } from 'lucide-react'
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import {
-  AiIconAnimation,
-  Button,
-  cn,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  markdownComponents,
-} from 'ui'
+import { AiIconAnimation, Button, cn, CommandGroup, CommandItem, CommandList } from 'ui'
+import { markdownComponents } from 'ui-patterns/Markdown'
 import { StatusIcon } from 'ui/src/components/StatusIcon'
 
 import {
   Breadcrumb,
   CommandHeader,
-  CommandInput,
+  CommandMenuInput,
   CommandWrapper,
   generateCommandClassNames,
   useHistoryKeys,
@@ -72,7 +65,7 @@ const DocsAiPage = () => {
       className={cn(
         'flex flex-col',
         !isBelowSm &&
-          '[&_[cmdk-input-wrapper]]:border-b-0 [&_[cmdk-input-wrapper]]:border-t [&_[cmdk-input-wrapper]]:border-solid [&_[cmdk-input-wrapper]]:border-bg-control'
+          '**:[[cmdk-input-wrapper]]:border-b-0 **:[[cmdk-input-wrapper]]:border-t **:[[cmdk-input-wrapper]]:border-solid [&_[cmdk-input-wrapper]]:border-bg-control'
       )}
     >
       <CommandHeader>
@@ -87,7 +80,7 @@ const DocsAiPage = () => {
           />
         )}
       </CommandHeader>
-      <div className={cn('flex-grow min-h-0 overflow-auto')}>
+      <div className={cn('grow min-h-0 overflow-auto')}>
         {!hasError && messages.length > 0 && <AiMessages messages={messages} />}
         {!hasError && messages.length === 0 && <EmptyState handleSubmit={handleSubmit} />}
         {hasError && <ErrorState handleReset={handleReset} />}
@@ -154,10 +147,10 @@ function PromptInput({
   })
 
   return (
-    <CommandInput
+    <CommandMenuInput
       className={cn(
         'w-full h-11',
-        'border-none outline-none bg-transparent rounded-none rounded-t-md px-4 py-7',
+        'border-none outline-hidden bg-transparent rounded-none rounded-t-md px-4 py-7',
         'flex',
         'text-base text-foreground-light',
         'focus:ring-0 focus:shadow-none focus:ring-transparent',
@@ -195,11 +188,11 @@ function AiMessages({ messages }: { messages: Array<Message> }) {
       error. This display doesn't actually need the Command Menu, but it's
       needed for the empty state to work with the input, so this is a somewhat
       hacktastic way of making it not error. */}
-      <CommandList_Shadcn_ />
+      <CommandList />
       <div
         className={cn(
-          'flex-grow min-h-0 overflow-auto p-4',
-          'grid gap-6 md:grid-cols-[max-content,1fr] grid-rows-[max-content]'
+          'grow min-h-0 overflow-auto p-4',
+          'grid gap-6 md:grid-cols-[max-content_1fr] grid-rows-[max-content]'
         )}
       >
         {messages.map((message, index) => {
@@ -211,7 +204,7 @@ function AiMessages({ messages }: { messages: Array<Message> }) {
                     <div
                       className={cn(
                         'w-7 h-7',
-                        'border border-muted bg-background shadow-sm rounded-full',
+                        'border border-muted bg-background shadow-xs rounded-full',
                         'flex items-center justify-center',
                         'text-foreground-lighter'
                       )}
@@ -243,18 +236,19 @@ function AiMessages({ messages }: { messages: Array<Message> }) {
                   </div>
                   <div>
                     {message.status === MessageStatus.Pending && (
-                      <span className="inline-block h-[1lh] w-[0.8lh] mt-1 bg-border-strong animate-bounce" />
+                      <span className="inline-block h-lh w-[0.8lh] mt-1 bg-border-strong animate-bounce" />
                     )}
-                    <ReactMarkdown
-                      remarkPlugins={[remarkGfm]}
-                      components={{
-                        ...markdownComponents,
-                        a: (props) => <a {...props} target="_blank" rel="noopener noreferrer" />,
-                      }}
-                      className="prose dark:prose-dark break-words"
-                    >
-                      {message.content}
-                    </ReactMarkdown>
+                    <div className="prose dark:prose-dark wrap-break-word">
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          ...markdownComponents,
+                          a: (props) => <a {...props} target="_blank" rel="noopener noreferrer" />,
+                        }}
+                      >
+                        {message.content}
+                      </ReactMarkdown>
+                    </div>
                     {message.sources && message.sources.length > 0 && (
                       <div className="mt-4 pt-4 border-t border-border-muted">
                         <p className="text-sm text-foreground-muted mb-2">Sources:</p>
@@ -288,19 +282,19 @@ function EmptyState({ handleSubmit }: { handleSubmit: (message: string) => void 
   const query = useQuery()
 
   return (
-    <CommandList_Shadcn_ className="max-h-[unset]">
-      <CommandGroup_Shadcn_
+    <CommandList className="max-h-[unset]">
+      <CommandGroup
         heading="Examples"
         className={cn(
           'text-border-strong',
-          '[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5',
-          '[&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted'
+          '**:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:pb-1.5',
+          '**:[[cmdk-group-heading]]:text-sm **:[[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted'
         )}
       >
         {questions.map((question) => {
           const key = question.replace(/\s+/g, '_')
           return (
-            <CommandItem_Shadcn_
+            <CommandItem
               className={generateCommandClassNames(false)}
               onSelect={() => {
                 if (!query) {
@@ -311,11 +305,11 @@ function EmptyState({ handleSubmit }: { handleSubmit: (message: string) => void 
             >
               <AiIconAnimation />
               {question}
-            </CommandItem_Shadcn_>
+            </CommandItem>
           )
         })}
-      </CommandGroup_Shadcn_>
-    </CommandList_Shadcn_>
+      </CommandGroup>
+    </CommandList>
   )
 }
 
@@ -327,7 +321,7 @@ function ErrorState({ handleReset }: { handleReset: () => void }) {
         Sorry, looks like Supabase AI is having a hard time!
       </p>
       <p className="text-sm text-foreground-lighter text-center">Please try again in a bit.</p>
-      <Button size="tiny" type="default" onClick={handleReset}>
+      <Button size="tiny" variant="default" onClick={handleReset}>
         Try again?
       </Button>
     </div>

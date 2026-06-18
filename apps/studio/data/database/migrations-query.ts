@@ -1,7 +1,10 @@
+import { getMigrationsSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
-import { UseCustomQueryOptions } from 'types'
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+
 import { databaseKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { PROJECT_STATUS } from '@/lib/constants'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type DatabaseMigration = {
   version: string
@@ -9,19 +12,9 @@ export type DatabaseMigration = {
   statements?: string[]
 }
 
-export const getMigrationsSql = () => {
-  const sql = /* SQL */ `
-    select
-      *
-    from supabase_migrations.schema_migrations sm
-    order by sm.version desc
-  `.trim()
-
-  return sql
-}
-
 export type MigrationsVariables = {
   projectRef?: string
+  projectStatus?: string
   connectionString?: string | null
 }
 
@@ -40,7 +33,7 @@ export async function getMigrations(
     return result as DatabaseMigration[]
   } catch (error) {
     if (
-      (error as ExecuteSqlError).message.includes(
+      (error as ResponseError).message.includes(
         'relation "supabase_migrations.schema_migrations" does not exist'
       )
     ) {
@@ -52,15 +45,16 @@ export async function getMigrations(
 }
 
 export type MigrationsData = Awaited<ReturnType<typeof getMigrations>>
-export type MigrationsError = ExecuteSqlError
+export type MigrationsError = ResponseError
 
 export const useMigrationsQuery = <TData = MigrationsData>(
-  { projectRef, connectionString }: MigrationsVariables,
+  { projectRef, projectStatus, connectionString }: MigrationsVariables,
   { enabled = true, ...options }: UseCustomQueryOptions<MigrationsData, MigrationsError, TData> = {}
 ) =>
   useQuery<MigrationsData, MigrationsError, TData>({
     queryKey: databaseKeys.migrations(projectRef),
     queryFn: ({ signal }) => getMigrations({ projectRef, connectionString }, signal),
-    enabled: enabled && typeof projectRef !== 'undefined',
+    enabled:
+      enabled && typeof projectRef !== 'undefined' && projectStatus !== PROJECT_STATUS.COMING_UP,
     ...options,
   })

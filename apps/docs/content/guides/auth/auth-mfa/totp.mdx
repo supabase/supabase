@@ -19,6 +19,8 @@ Below is a flow chart illustrating how the Enrollment, Challenge, and Verify API
     dark: '/docs/img/guides/auth-mfa/auth-mfa-flow.svg',
   }}
   containerClassName="max-w-[700px]"
+  width={111}
+  height={150}
 />
 
 [TOTP MFA API](/docs/reference/javascript/auth-mfa-api) is free to use and is enabled on all Supabase projects by default.
@@ -73,7 +75,7 @@ Below is an example that creates a new `EnrollMFA` component that illustrates th
 
 ```tsx
 /**
- * EnrollMFA shows a simple enrollment dialog. When shown on screen it calls
+ * EnrollMFA shows an enrollment dialog. When shown on screen it calls
  * the `enroll` API. Each time a user clicks the Enable button it calls the
  * `challenge` and `verify` APIs to check if the code provided by the user is
  * valid.

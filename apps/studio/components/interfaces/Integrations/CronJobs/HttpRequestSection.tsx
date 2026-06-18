@@ -1,20 +1,24 @@
 import { UseFormReturn } from 'react-hook-form'
-
 import {
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
   Input,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   SheetSection,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { CreateCronJobForm } from './CreateCronJobSheet/CreateCronJobSheet.constants'
 
 interface HttpRequestSectionProps {
@@ -24,51 +28,51 @@ interface HttpRequestSectionProps {
 export const HttpRequestSection = ({ form }: HttpRequestSectionProps) => {
   return (
     <SheetSection className="flex flex-col gap-3">
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name="values.method"
         render={({ field }) => (
-          <FormItem_Shadcn_>
-            <FormLabel_Shadcn_>Method</FormLabel_Shadcn_>
-            <Select_Shadcn_ onValueChange={field.onChange} value={field.value}>
-              <FormControl_Shadcn_>
-                <SelectTrigger_Shadcn_>
-                  <SelectValue_Shadcn_ placeholder="Select a method for the HTTP request" />
-                </SelectTrigger_Shadcn_>
-              </FormControl_Shadcn_>
-              <SelectContent_Shadcn_>
-                <SelectItem_Shadcn_ value="GET">GET</SelectItem_Shadcn_>
-                <SelectItem_Shadcn_ value="POST">POST</SelectItem_Shadcn_>
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
-            <FormMessage_Shadcn_ />
-          </FormItem_Shadcn_>
+          <FormItem>
+            <FormLabel>Method</FormLabel>
+            <Select onValueChange={field.onChange} value={field.value}>
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a method for the HTTP request" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                <SelectItem value="GET">GET</SelectItem>
+                <SelectItem value="POST">POST</SelectItem>
+              </SelectContent>
+            </Select>
+            <FormMessage />
+          </FormItem>
         )}
       />
 
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name="values.endpoint"
         render={({ field: { ref, ...rest } }) => (
           <FormItemLayout label="Endpoint URL" className="gap-1">
-            <FormControl_Shadcn_>
+            <FormControl>
               <Input {...rest} placeholder="https://api.example.com/endpoint" />
-            </FormControl_Shadcn_>
+            </FormControl>
           </FormItemLayout>
         )}
       />
 
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name="values.timeoutMs"
         render={({ field: { ref, ...rest } }) => (
           <FormItemLayout label="Timeout" className="gap-1">
-            <Input
-              {...rest}
-              type="number"
-              placeholder="1000"
-              actions={<p className="text-foreground-light pr-2">ms</p>}
-            />
+            <InputGroup>
+              <InputGroupInput {...rest} type="number" placeholder="1000" />
+              <InputGroupAddon align="inline-end">
+                <InputGroupText> ms</InputGroupText>
+              </InputGroupAddon>
+            </InputGroup>
           </FormItemLayout>
         )}
       />

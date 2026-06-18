@@ -1,19 +1,19 @@
 import { Box, Check, ChevronDown } from 'lucide-react'
 import { useState } from 'react'
-
 import {
   Button,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Command_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   cn,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
+
 import { ConnectionType } from './Connect.constants'
 import { ConnectionIcon } from './ConnectionIcon'
 
@@ -45,15 +45,15 @@ export const ConnectDropdown = ({
   const selectedItem = items.find((item) => item.key === state)
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
       <div className="flex ">
         <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
           {label}
         </span>
-        <PopoverTrigger_Shadcn_ asChild>
+        <PopoverTrigger asChild>
           <Button
             size="small"
-            type="default"
+            variant="default"
             className="gap-0 rounded-l-none"
             iconRight={<ChevronDown strokeWidth={1.5} />}
           >
@@ -70,16 +70,16 @@ export const ConnectDropdown = ({
               {selectedItem?.label}
             </div>
           </Button>
-        </PopoverTrigger_Shadcn_>
+        </PopoverTrigger>
       </div>
-      <PopoverContent_Shadcn_ className="p-0 max-w-48" side="bottom" align="start">
-        <Command_Shadcn_>
-          <CommandInput_Shadcn_ placeholder="Search..." />
-          <CommandList_Shadcn_>
-            <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
-            <CommandGroup_Shadcn_>
+      <PopoverContent className="p-0 max-w-48" side="bottom" align="start">
+        <Command>
+          <CommandInput placeholder="Search..." />
+          <CommandList>
+            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandGroup>
               {items.map((item) => (
-                <CommandItem_Shadcn_
+                <CommandItem
                   key={item.key}
                   value={item.key}
                   onSelect={() => {
@@ -102,12 +102,12 @@ export const ConnectDropdown = ({
                     size={15}
                     className={cn('ml-auto  ', item.key === state ? 'opacity-100' : 'opacity-0')}
                   />
-                </CommandItem_Shadcn_>
+                </CommandItem>
               ))}
-            </CommandGroup_Shadcn_>
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }

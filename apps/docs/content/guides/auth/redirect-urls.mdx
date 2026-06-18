@@ -42,7 +42,7 @@ Supabase allows you to specify wildcards when adding redirect URLs to the [allow
 
 The separator characters in a URL are defined as `.` and `/`. Use [this tool](https://www.digitalocean.com/community/tools/glob?comments=true&glob=http%3A%2F%2Flocalhost%3A3000%2F%2A%2A&matches=false&tests=http%3A%2F%2Flocalhost%3A3000&tests=http%3A%2F%2Flocalhost%3A3000%2F&tests=http%3A%2F%2Flocalhost%3A3000%2F%3Ftest%3Dtest&tests=http%3A%2F%2Flocalhost%3A3000%2Ftest-test%3Ftest%3Dtest&tests=http%3A%2F%2Flocalhost%3A3000%2Ftest%2Ftest%3Ftest%3Dtest) to test your patterns.
 
-<Admonition type="note" label="Recommendation">
+<Admonition type="note" title="Recommendation">
 
 While the "globstar" (`**`) is useful for local development and preview URLs, we recommend setting the exact redirect URL path for your site URL in production.
 
@@ -102,11 +102,13 @@ For example, change the following:
 
 ```html
 <!-- Old -->
-<a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">Confirm your mail</a>
+<a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email"
+  >Confirm email address</a
+>
 
 <!-- New -->
 <a href="{{ .RedirectTo }}/auth/confirm?token_hash={{ .TokenHash }}&type=email"
-  >Confirm your mail</a
+  >Confirm email address</a
 >
 ```
 

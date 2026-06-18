@@ -18,3 +18,11 @@ Possible resolutions:
 - Restart the database in [Project Settings](/dashboard/project/_/settings/general) (this may be only a temporary fix if the project is undersized / unoptimized).
 - Increase project resources in [Compute and Disk](/dashboard/project/_/settings/compute-and-disk).
 - [Performance Tune](/docs/guides/platform/performance) the database.
+
+The "Edge Functions Unhealthy" indicator is based on a platform-level health check, not the project's own functions. Confirm the actual functions work by invoking them directly. If functions are working fine, this is likely a false positive.
+
+Check the following if only Edge Functions service reports unhealthy:
+
+- Verify actual function behavior by invoking the edge function directly (e.g., via cURL with a CORS request). If it responds correctly, the health indicator is likely a false positive.
+- Check invocation logs. Filter logs using the keyword `~"health"` to see if health check calls are failing and if any errors are presented.
+- Restart the database in [Project Settings](/dashboard/project/_/settings/general). This has resolved the unhealthy state in some cases, particularly when it's a transient issue.

@@ -1,10 +1,11 @@
-import { TeamSettings } from 'components/interfaces/Organization/TeamSettings/TeamSettings'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import type { NextPageWithLayout } from 'types'
 import { LogoLoader } from 'ui'
+
+import { TeamSettings } from '@/components/interfaces/Organization/TeamSettings/TeamSettings'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import OrganizationLayout from '@/components/layouts/OrganizationLayout'
+import { usePermissionsQuery } from '@/data/permissions/permissions-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import type { NextPageWithLayout } from '@/types'
 
 const OrgTeamSettings: NextPageWithLayout = () => {
   const { isPending: isLoadingPermissions } = usePermissionsQuery()
@@ -19,7 +20,7 @@ const OrgTeamSettings: NextPageWithLayout = () => {
 
 OrgTeamSettings.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout>{page}</OrganizationLayout>
+    <OrganizationLayout title="Team">{page}</OrganizationLayout>
   </DefaultLayout>
 )
 

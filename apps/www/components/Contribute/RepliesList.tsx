@@ -4,7 +4,8 @@ import Link from 'next/link'
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { Badge, Button, Card, CardContent, CardFooter } from 'ui'
+import { Badge, Button, Card, CardContent, CardFooter, CardHeader, CardTitle } from 'ui'
+
 import { markdownComponents } from './markdownComponents'
 
 interface Reply {
@@ -34,10 +35,13 @@ export function RepliesList({ replies, questionAuthor, totalReplyCount }: Replie
 
   return (
     <div className="flex flex-col gap-3">
-      <h3 className="text-sm font-medium text-muted-foreground">
-        {displayCount} {displayCount === 1 ? 'reply' : 'replies'}
-      </h3>
       <Card className="relative">
+        <CardHeader>
+          <CardTitle>
+            Replies{' '}
+            <span className="text-foreground-muted tabular-nums font-normal">({displayCount})</span>
+          </CardTitle>
+        </CardHeader>
         <CardContent className="flex flex-col p-0">
           {displayedReplies.map((reply, index) => {
             const timestamp = reply.ts ? new Date(reply.ts).toLocaleString() : null
@@ -85,7 +89,7 @@ export function RepliesList({ replies, questionAuthor, totalReplyCount }: Replie
         {hasMoreThanThree && (
           <CardFooter className="flex justify-center">
             <Button
-              type="default"
+              variant="default"
               size="tiny"
               onClick={() => setIsExpanded(!isExpanded)}
               className="w-min"

@@ -1,13 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
-import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import {
-  PlanRequest,
-  useSendUpgradeRequestMutation,
-} from 'data/organizations/request-upgrade-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useTrack } from 'lib/telemetry/track'
 import { PropsWithChildren, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -23,16 +14,26 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  TextArea_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  TextArea,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
+
+import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
+import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
+import {
+  PlanRequest,
+  useSendUpgradeRequestMutation,
+} from '@/data/organizations/request-upgrade-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 
 const FormSchema = z.object({
   note: z.string().optional(),
@@ -43,10 +44,11 @@ const formId = 'request-upgrade-form'
 interface RequestUpgradeToBillingOwnersProps {
   block?: boolean
   plan?: PlanRequest
-  addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
+  addon?: 'pitr' | 'customDomain' | 'ipv4' | 'spendCap' | 'computeSize'
   /** Used in the default message template, e.g: "Upgrade to ..." */
   featureProposition?: string
   className?: string
+  variant?: 'primary' | 'default'
 }
 
 export const RequestUpgradeToBillingOwners = ({
@@ -56,6 +58,7 @@ export const RequestUpgradeToBillingOwners = ({
   featureProposition,
   children,
   className,
+  variant = 'primary',
 }: PropsWithChildren<RequestUpgradeToBillingOwnersProps>) => {
   const [open, setOpen] = useState(false)
   const track = useTrack()
@@ -82,7 +85,13 @@ export const RequestUpgradeToBillingOwners = ({
   })
 
   const formattedAddonName =
-    addon === 'pitr' ? 'PITR' : addon === 'customDomain' ? 'Custom Domain' : ''
+    addon === 'pitr'
+      ? 'PITR'
+      : addon === 'customDomain'
+        ? 'Custom domain'
+        : addon === 'ipv4'
+          ? 'dedicated IPv4 address'
+          : ''
 
   const target = !!project
     ? `for the project "${project?.name}"`
@@ -114,10 +123,8 @@ export const RequestUpgradeToBillingOwners = ({
 
   const defaultValues = {
     note: !!addon
-      ? addon === 'spendCap'
-        ? `We'd like to ${isFreePlan ? 'upgrade to Pro and ' : ''}${action} ${target} so that we can ${featureProposition}`
-        : `We'd like to ${isFreePlan ? 'upgrade to Pro and ' : ''}${action} ${target} so that we can ${featureProposition}`
-      : `We'd like to upgrade to the ${plan} plan ${!!featureProposition ? ` to ${featureProposition} ` : ''}${target}`,
+      ? `We'd like to ${isFreePlan ? 'upgrade to Pro and ' : ''}${action} ${target} so that we can ${featureProposition}`
+      : `We'd like to upgrade to the ${plan} plan ${!!featureProposition ? `to ${featureProposition} ` : ''}${target}`,
   }
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -155,12 +162,12 @@ export const RequestUpgradeToBillingOwners = ({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button block={block} type="primary" className={className}>
+        <Button block={block} variant={variant} className={className}>
           {buttonText}
         </Button>
       </DialogTrigger>
       <DialogContent>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader>
               <DialogTitle>{titleText}</DialogTitle>
@@ -200,7 +207,7 @@ export const RequestUpgradeToBillingOwners = ({
                   )}
                 </div>
               </div>
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="note"
                 render={({ field }) => (
@@ -209,8 +216,8 @@ export const RequestUpgradeToBillingOwners = ({
                     label="Add a note to your request (optional)"
                     layout="vertical"
                   >
-                    <FormControl_Shadcn_>
-                      <TextArea_Shadcn_
+                    <FormControl>
+                      <TextArea
                         id="note"
                         {...field}
                         rows={3}
@@ -222,22 +229,22 @@ export const RequestUpgradeToBillingOwners = ({
                             : 'e.g. We need to upgrade to the Pro plan to use this feature'
                         }
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </DialogSection>
 
             <DialogFooter>
-              <Button type="default" disabled={isSubmitting} onClick={() => setOpen(false)}>
+              <Button variant="default" disabled={isSubmitting} onClick={() => setOpen(false)}>
                 Cancel
               </Button>
-              <Button htmlType="submit" form={formId} loading={isSubmitting}>
+              <Button type="submit" form={formId} loading={isSubmitting}>
                 Submit request
               </Button>
             </DialogFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </DialogContent>
     </Dialog>
   )
