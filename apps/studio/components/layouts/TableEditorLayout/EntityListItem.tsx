@@ -1,19 +1,7 @@
 import { useParams } from 'common'
-import {
-  Box,
-  Copy,
-  Download,
-  Edit,
-  Globe,
-  History,
-  Info,
-  Lock,
-  MoreVertical,
-  Trash,
-  Unlink,
-} from 'lucide-react'
+import { Columns2, Copy, Download, Edit, Globe, Lock, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
-import { useState, type CSSProperties } from 'react'
+import { type CSSProperties, type MouseEvent } from 'react'
 import { toast } from 'sonner'
 import {
   Badge,
@@ -33,21 +21,11 @@ import {
   TooltipTrigger,
   TreeViewItemVariant,
 } from 'ui'
-import { useSnapshot } from 'valtio'
 
 import { useExportAllRowsAsCsv, useExportAllRowsAsSql } from './ExportAllRows'
 import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
-import { warehouseDemoStore } from '@/components/interfaces/Database/Warehouse/warehouseDemoStore'
-import { WarehouseDetachModal } from '@/components/interfaces/Database/Warehouse/WarehouseDetachModal'
-import {
-  WarehouseEnablementModal,
-  type EnablementVariant,
-} from '@/components/interfaces/Database/Warehouse/WarehouseEnablementModal'
-import { WarehouseStorageDetailsDialog } from '@/components/interfaces/Database/Warehouse/WarehouseStorageDetailsDialog'
-import { WarehouseTimeTravelFlow } from '@/components/interfaces/Database/Warehouse/WarehouseTimeTravelFlow'
 import { getEntityLintDetails } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
-import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { getTableDefinition } from '@/data/database/table-definition-query'
@@ -199,19 +177,6 @@ export const EntityListItem = ({
     totalRows: rowCount,
   })
 
-  // Warehouse storage (demo). Storage is an infra operation, so the actions live
-  // here in the table's menu rather than in the Edit Table form.
-  const warehouseSnap = useSnapshot(warehouseDemoStore)
-  const warehouseKey = `${entity.schema}.${entity.name}`
-  const warehouseState = warehouseSnap.tables[warehouseKey]
-  const warehouseMode = warehouseState?.mode ?? 'postgres'
-  const warehouseCopyName = warehouseState?.copyName ?? `warehouse.${entity.name}`
-  const [warehouseModal, setWarehouseModal] = useState<EnablementVariant | null>(null)
-  const [detailsOpen, setDetailsOpen] = useState(false)
-  const [detachConfirm, setDetachConfirm] = useState(false)
-  const [detachProgress, setDetachProgress] = useState(false)
-  const [snapshotsOpen, setSnapshotsOpen] = useState(false)
-
   return (
     <EditorTablePageLink
       title={entity.name}
@@ -227,7 +192,7 @@ export const EntityListItem = ({
         }),
         'pl-4 pr-1'
       )}
-      onDoubleClick={(e) => {
+      onDoubleClick={(e: MouseEvent) => {
         e.preventDefault()
         const tabId = createTabId(entity.type, { id: entity.id })
         tabs.makeTabPermanent(tabId)
@@ -373,6 +338,13 @@ export const EntityListItem = ({
 
               {entity.type === ENTITY_TYPE.TABLE && (
                 <>
+                  <DropdownMenuItem key="table-details" className="space-x-2" asChild>
+                    <Link href={`/project/${projectRef}/database/tables/${entity.id}`}>
+                      <Columns2 size={12} className="shrink-0" />
+                      <span>Table details</span>
+                    </Link>
+                  </DropdownMenuItem>
+
                   <DropdownMenuSeparator />
 
                   <DropdownMenuItem
@@ -447,75 +419,6 @@ export const EntityListItem = ({
                   </DropdownMenuSub>
 
                   <DropdownMenuSeparator />
-                  {warehouseMode !== 'postgres' && (
-                    <DropdownMenuItem
-                      key="warehouse-details"
-                      className="gap-x-2"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setDetailsOpen(true)
-                      }}
-                    >
-                      <Info size={12} className="shrink-0" />
-                      <span>Storage details</span>
-                    </DropdownMenuItem>
-                  )}
-                  {warehouseMode === 'postgres' && (
-                    <DropdownMenuSub>
-                      <DropdownMenuSubTrigger className="gap-x-2">
-                        <Box size={12} className="shrink-0" />
-                        Storage
-                      </DropdownMenuSubTrigger>
-                      <DropdownMenuSubContent>
-                        <DropdownMenuItem
-                          key="warehouse-copy"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setWarehouseModal('attach')
-                          }}
-                        >
-                          <span>Copy to Warehouse</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          key="warehouse-move"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setWarehouseModal('move')
-                          }}
-                        >
-                          <span>Move to Warehouse</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuSubContent>
-                    </DropdownMenuSub>
-                  )}
-                  {warehouseMode === 'has_warehouse_copy' && (
-                    <DropdownMenuItem
-                      key="warehouse-detach"
-                      className="gap-x-2"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setDetachConfirm(true)
-                      }}
-                    >
-                      <Unlink size={12} className="shrink-0" />
-                      <span>Detach Warehouse copy</span>
-                    </DropdownMenuItem>
-                  )}
-                  {warehouseMode === 'warehouse_backed' && (
-                    <DropdownMenuItem
-                      key="warehouse-snapshots"
-                      className="gap-x-2"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setSnapshotsOpen(true)
-                      }}
-                    >
-                      <History size={12} className="shrink-0" />
-                      <span>View snapshots</span>
-                    </DropdownMenuItem>
-                  )}
-
-                  <DropdownMenuSeparator />
                   <DropdownMenuItem
                     key="delete-table"
                     className="gap-x-2"
@@ -532,6 +435,13 @@ export const EntityListItem = ({
 
               {entity.type === ENTITY_TYPE.VIEW && (
                 <>
+                  <DropdownMenuItem key="view-details" className="space-x-2" asChild>
+                    <Link href={`/project/${projectRef}/database/tables/${entity.id}`}>
+                      <Columns2 size={12} className="shrink-0" />
+                      <span>View details</span>
+                    </Link>
+                  </DropdownMenuItem>
+
                   <DropdownMenuSeparator />
 
                   <DropdownMenuSub>
@@ -580,6 +490,13 @@ export const EntityListItem = ({
 
               {entity.type === ENTITY_TYPE.MATERIALIZED_VIEW && (
                 <>
+                  <DropdownMenuItem key="view-details" className="space-x-2" asChild>
+                    <Link href={`/project/${projectRef}/database/tables/${entity.id}`}>
+                      <Columns2 size={12} className="shrink-0" />
+                      <span>View details</span>
+                    </Link>
+                  </DropdownMenuItem>
+
                   <DropdownMenuSeparator />
 
                   <DropdownMenuSub>
@@ -631,55 +548,6 @@ export const EntityListItem = ({
       </>
       {exportCsvConfirmationModal}
       {exportSqlConfirmationModal}
-
-      {warehouseModal && (
-        <WarehouseEnablementModal
-          open
-          variant={warehouseModal}
-          tableKey={warehouseKey}
-          tableName={entity.name}
-          onOpenChange={(open) => {
-            if (!open) setWarehouseModal(null)
-          }}
-        />
-      )}
-      <DiscardChangesConfirmationDialog
-        visible={detachConfirm}
-        onCancel={() => setDetachConfirm(false)}
-        onClose={() => {
-          setDetachConfirm(false)
-          setDetachProgress(true)
-        }}
-        size="small"
-        title="Detach Warehouse copy"
-        description={
-          <>
-            Detaching deletes the Warehouse copy{' '}
-            <code className="text-code-inline break-keep">{warehouseCopyName}</code>. Your source
-            table and its data in Postgres are unaffected.
-          </>
-        }
-        confirmLabel="Detach"
-        cancelLabel="Cancel"
-      />
-      <WarehouseDetachModal
-        open={detachProgress}
-        tableKey={warehouseKey}
-        copyName={warehouseCopyName}
-        onOpenChange={setDetachProgress}
-      />
-      {warehouseMode === 'warehouse_backed' && (
-        <WarehouseTimeTravelFlow
-          tableKey={warehouseKey}
-          sheetOpen={snapshotsOpen}
-          onSheetOpenChange={setSnapshotsOpen}
-        />
-      )}
-      <WarehouseStorageDetailsDialog
-        open={detailsOpen}
-        tableKey={warehouseKey}
-        onOpenChange={setDetailsOpen}
-      />
     </EditorTablePageLink>
   )
 }

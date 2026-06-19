@@ -3,26 +3,22 @@ import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { noop } from 'lodash'
 import {
-  Box,
   Check,
   Columns2,
   Copy,
   Edit,
   Eye,
   Filter,
-  History,
-  Info,
   MoreVertical,
   Plus,
   Search,
   Trash,
-  Unlink,
   X,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
 import {
   Button,
   Card,
@@ -31,9 +27,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
   Label,
   Popover,
@@ -56,19 +49,14 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { useSnapshot } from 'valtio'
 
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
-import { warehouseDemoStore } from '../Warehouse/warehouseDemoStore'
-import type { WarehouseMode } from '../Warehouse/warehouseDemoStore'
-import { WarehouseDetachModal } from '../Warehouse/WarehouseDetachModal'
 import {
-  WarehouseEnablementModal,
-  type EnablementVariant,
-} from '../Warehouse/WarehouseEnablementModal'
-import { WarehouseStorageDetailsDialog } from '../Warehouse/WarehouseStorageDetailsDialog'
+  formatWarehouseSize,
+  warehouseDemoStore,
+  type WarehouseMode,
+} from '../Warehouse/warehouseDemoStore'
 import { WarehouseSyncChip } from '../Warehouse/WarehouseSyncChip'
-import { WarehouseTimeTravelFlow } from '../Warehouse/WarehouseTimeTravelFlow'
 import { formatAllEntities } from './Tables.utils'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
-import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
@@ -87,6 +75,7 @@ import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { onSearchInputEscape } from '@/lib/keyboard'
+import { createNavigationHandler } from '@/lib/navigation'
 import type { SafePostgresTable } from '@/lib/postgres-types'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -122,24 +111,6 @@ export const TableList = ({
   const [sort, setSort] = useState<TableListSort>('name:asc')
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  const [warehouseModal, setWarehouseModal] = useState<{
-    variant: EnablementVariant
-    tableKey: string
-    tableName: string
-  } | null>(null)
-  const [detachConfirm, setDetachConfirm] = useState<{
-    tableKey: string
-    copyName: string
-  } | null>(null)
-  const [detachProgress, setDetachProgress] = useState<{
-    tableKey: string
-    copyName: string
-  } | null>(null)
-  const [timeTravelSheet, setTimeTravelSheet] = useState<{ tableKey: string } | null>(null)
-  const [detailsTarget, setDetailsTarget] = useState<{
-    tableKey: string
-    postgresSize?: string
-  } | null>(null)
   const warehouseSnap = useSnapshot(warehouseDemoStore)
   const { can: canUpdateTables } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -582,324 +553,231 @@ export const TableList = ({
                     </TableRow>
                   )}
                   {sortedEntities.length > 0 &&
-                    sortedEntities.map((x) => (
-                      <TableRow key={x.id}>
-                        <TableCell className="w-0 pl-5! pr-1!">
-                          <Tooltip>
-                            <TooltipTrigger asChild className="cursor-default">
-                              <div className="flex w-4 justify-center">
-                                <EntityTypeIcon type={x.type} />
-                              </div>
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom">
-                              {formatTooltipText(x.type)}
-                            </TooltipContent>
-                          </Tooltip>
-                        </TableCell>
-                        <TableCell className="max-w-[160px] sm:max-w-[280px]">
-                          <div className="flex min-w-0 flex-col">
-                            {/* only show tooltips if required, to reduce noise */}
-                            {x.name.length > 20 ? (
-                              <Tooltip disableHoverableContent={true}>
-                                <TooltipTrigger
-                                  asChild
-                                  className="max-w-[95%] overflow-hidden text-ellipsis whitespace-nowrap"
-                                >
-                                  <p>{x.name}</p>
-                                </TooltipTrigger>
+                    sortedEntities.map((x) => {
+                      const tableDetailUrl = `/project/${ref}/database/tables/${x.id}`
+                      const handleRowNavigation = createNavigationHandler(tableDetailUrl, router)
 
-                                <TooltipContent side="bottom">{x.name}</TooltipContent>
-                              </Tooltip>
-                            ) : (
-                              <p>{x.name}</p>
-                            )}
-                            {x.comment !== null ? (
-                              <span
-                                className="max-w-md truncate text-foreground-lighter"
-                                title={x.comment}
-                              >
-                                {x.comment}
-                              </span>
-                            ) : null}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <p className="text-foreground-light">
-                            {x.columns.length.toLocaleString()}
-                          </p>
-                        </TableCell>
-                        <TableCell>
-                          {x.rows !== undefined ? (
-                            <p className="text-foreground-light">{x.rows.toLocaleString()}</p>
-                          ) : (
-                            <p className="text-foreground-muted">–</p>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {x.type === ENTITY_TYPE.TABLE ? (
-                            (() => {
-                              const tableKey = `${selectedSchema}.${x.name}`
-                              const wState = warehouseSnap.tables[tableKey] ?? { mode: 'postgres' }
-                              const mode = wState.mode as WarehouseMode
-
-                              if (mode === 'postgres') {
-                                return (
-                                  <div className="flex flex-col gap-0.5">
-                                    <p className="text-foreground-light text-sm">Postgres</p>
-                                    {x.size !== undefined && (
-                                      <p className="text-foreground-muted text-sm">{x.size}</p>
-                                    )}
-                                  </div>
-                                )
-                              }
-
-                              if (mode === 'has_warehouse_copy') {
-                                return (
-                                  <div className="flex flex-col gap-0.5">
-                                    <div className="flex items-center gap-1.5">
-                                      <p className="text-foreground-light text-sm">
-                                        Postgres + Warehouse
-                                      </p>
-                                      {wState.syncState && (
-                                        <WarehouseSyncChip
-                                          syncState={
-                                            wState.syncState as 'syncing' | 'live' | 'error'
-                                          }
-                                        />
-                                      )}
-                                    </div>
-                                    <p className="text-foreground-muted text-sm">
-                                      {x.size !== undefined ? ` ${x.size}` : ''} · 184 GB
-                                    </p>
-                                  </div>
-                                )
-                              }
-
-                              // warehouse_backed
-                              return (
-                                <div className="flex flex-col gap-0.5">
-                                  <p className="text-foreground-light text-sm">Warehouse</p>
-                                  <p className="text-foreground-muted text-sm">184 GB</p>
+                      return (
+                        <TableRow
+                          key={x.id}
+                          className="group cursor-pointer hover:bg-surface-100 inset-focus"
+                          onClick={handleRowNavigation}
+                          onAuxClick={handleRowNavigation}
+                          onKeyDown={handleRowNavigation}
+                          tabIndex={0}
+                        >
+                          <TableCell className="w-0 pl-5! pr-1!">
+                            <Tooltip>
+                              <TooltipTrigger asChild className="cursor-default">
+                                <div className="flex w-4 justify-center">
+                                  <EntityTypeIcon type={x.type} />
                                 </div>
-                              )
-                            })()
-                          ) : (
-                            <p className="text-foreground-muted">–</p>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {(realtimePublication?.tables ?? []).find(
-                            (table) => table.id === x.id
-                          ) ? (
-                            <div className="flex items-center gap-x-2">
-                              <Check size={16} strokeWidth={2} className="text-brand-link" />
-                              <p className="text-foreground-light">Enabled</p>
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-x-2">
-                              <X size={16} strokeWidth={2} className="text-foreground-muted" />
-                              <p className="text-foreground-lighter">Disabled</p>
-                            </div>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex justify-end gap-2">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  variant="default"
-                                  // TODO: match height globally so it's square, apply to e.g. columns page too
-                                  className="w-7 hit-area-2 h-[28px]"
-                                  icon={<MoreVertical />}
-                                  aria-label={`Table ${x.name} actions`}
-                                />
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent side="bottom" align="end" className="w-48">
-                                <DropdownMenuItem className="flex items-center space-x-2" asChild>
-                                  <Link href={`/project/${ref}/database/tables/${x.id}`}>
-                                    <Columns2 size={12} />
-                                    <p>View columns</p>
-                                  </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  className="flex items-center space-x-2"
-                                  onClick={() =>
-                                    router.push(
-                                      buildTableEditorUrl({
-                                        projectRef: project?.ref,
-                                        tableId: x.id,
-                                        schema: x.schema,
-                                      })
-                                    )
-                                  }
-                                  onMouseEnter={() =>
-                                    prefetchEditorTablePage({
-                                      id: x.id ? String(x.id) : undefined,
-                                    })
-                                  }
+                              </TooltipTrigger>
+                              <TooltipContent side="bottom">
+                                {formatTooltipText(x.type)}
+                              </TooltipContent>
+                            </Tooltip>
+                          </TableCell>
+                          <TableCell className="max-w-[160px] sm:max-w-[280px]">
+                            <div className="flex min-w-0 flex-col">
+                              {/* only show tooltips if required, to reduce noise */}
+                              {x.name.length > 20 ? (
+                                <Tooltip disableHoverableContent={true}>
+                                  <TooltipTrigger
+                                    asChild
+                                    className="max-w-[95%] overflow-hidden text-ellipsis whitespace-nowrap"
+                                  >
+                                    <p>{x.name}</p>
+                                  </TooltipTrigger>
+
+                                  <TooltipContent side="bottom">{x.name}</TooltipContent>
+                                </Tooltip>
+                              ) : (
+                                <p>{x.name}</p>
+                              )}
+                              {x.comment !== null ? (
+                                <span
+                                  className="max-w-md truncate text-foreground-lighter"
+                                  title={x.comment}
                                 >
-                                  <Eye size={12} />
-                                  <p>View in Table Editor</p>
-                                </DropdownMenuItem>
+                                  {x.comment}
+                                </span>
+                              ) : null}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <p className="text-foreground-light">
+                              {x.columns.length.toLocaleString()}
+                            </p>
+                          </TableCell>
+                          <TableCell>
+                            {x.rows !== undefined ? (
+                              <p className="text-foreground-light">{x.rows.toLocaleString()}</p>
+                            ) : (
+                              <p className="text-foreground-muted">–</p>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {x.type === ENTITY_TYPE.TABLE ? (
+                              (() => {
+                                const tableKey = `${selectedSchema}.${x.name}`
+                                const wState = warehouseSnap.tables[tableKey] ?? {
+                                  mode: 'postgres',
+                                }
+                                const mode = wState.mode as WarehouseMode
+                                const warehouseSize = formatWarehouseSize(wState.warehouseSizeBytes)
+                                const showSyncChip =
+                                  wState.syncState === 'syncing' || wState.syncState === 'error'
 
-                                {x.type === ENTITY_TYPE.TABLE && (
-                                  <>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItemTooltip
-                                      className="gap-x-2"
-                                      disabled={!canUpdateTables}
-                                      onClick={() => {
-                                        if (canUpdateTables) onEditTable(x)
-                                      }}
-                                      tooltip={{
-                                        content: {
-                                          side: 'left',
-                                          text: 'You need additional permissions to edit this table',
-                                        },
-                                      }}
-                                    >
-                                      <Edit size={12} />
-                                      <p>Edit table</p>
-                                    </DropdownMenuItemTooltip>
-                                    <DropdownMenuItemTooltip
-                                      key="duplicate-table"
-                                      className="gap-x-2"
-                                      disabled={!canUpdateTables}
-                                      onClick={() => {
-                                        if (canUpdateTables) onDuplicateTable(x)
-                                      }}
-                                      tooltip={{
-                                        content: {
-                                          side: 'left',
-                                          text: 'You need additional permissions to duplicate tables',
-                                        },
-                                      }}
-                                    >
-                                      <Copy size={12} />
-                                      <span>Duplicate table</span>
-                                    </DropdownMenuItemTooltip>
+                                if (mode === 'postgres') {
+                                  return (
+                                    <p className="text-sm text-foreground-light">{x.size ?? '—'}</p>
+                                  )
+                                }
 
-                                    {(() => {
-                                      const tableKey = `${selectedSchema}.${x.name}`
-                                      const wMode =
-                                        warehouseSnap.tables[tableKey]?.mode ?? 'postgres'
-                                      const wState = warehouseSnap.tables[tableKey]
-                                      const copyName = wState?.copyName ?? `warehouse.${x.name}`
-
-                                      if (wMode === 'warehouse_backed') {
-                                        return (
-                                          <>
-                                            <DropdownMenuSeparator />
-                                            <DropdownMenuItem
-                                              className="gap-x-2"
-                                              onClick={() =>
-                                                setDetailsTarget({ tableKey, postgresSize: x.size })
-                                              }
-                                            >
-                                              <Info size={12} />
-                                              Storage details
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem
-                                              className="gap-x-2"
-                                              onClick={() => setTimeTravelSheet({ tableKey })}
-                                            >
-                                              <History size={12} />
-                                              View snapshots
-                                            </DropdownMenuItem>
-                                          </>
-                                        )
-                                      }
-
-                                      return (
-                                        <>
-                                          <DropdownMenuSeparator />
-                                          {wMode === 'postgres' && (
-                                            <DropdownMenuSub>
-                                              <DropdownMenuSubTrigger className="gap-x-2">
-                                                <Box size={12} className="shrink-0" />
-                                                Storage
-                                              </DropdownMenuSubTrigger>
-                                              <DropdownMenuSubContent>
-                                                <DropdownMenuItem
-                                                  onClick={() =>
-                                                    setWarehouseModal({
-                                                      variant: 'attach',
-                                                      tableKey,
-                                                      tableName: x.name,
-                                                    })
-                                                  }
-                                                >
-                                                  Copy to Warehouse
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem
-                                                  onClick={() =>
-                                                    setWarehouseModal({
-                                                      variant: 'move',
-                                                      tableKey,
-                                                      tableName: x.name,
-                                                    })
-                                                  }
-                                                >
-                                                  Move to Warehouse
-                                                </DropdownMenuItem>
-                                              </DropdownMenuSubContent>
-                                            </DropdownMenuSub>
-                                          )}
-                                          {wMode === 'has_warehouse_copy' && (
-                                            <>
-                                              <DropdownMenuItem
-                                                className="gap-x-2"
-                                                onClick={() =>
-                                                  setDetailsTarget({
-                                                    tableKey,
-                                                    postgresSize: x.size,
-                                                  })
-                                                }
-                                              >
-                                                <Info size={12} className="shrink-0" />
-                                                Storage details
-                                              </DropdownMenuItem>
-                                              <DropdownMenuItem
-                                                className="gap-x-2"
-                                                onClick={() =>
-                                                  setDetachConfirm({ tableKey, copyName })
-                                                }
-                                              >
-                                                <Unlink size={12} className="shrink-0" />
-                                                Detach Warehouse copy
-                                              </DropdownMenuItem>
-                                            </>
-                                          )}
-                                        </>
+                                return (
+                                  <Link
+                                    href={tableDetailUrl}
+                                    onClick={(event: MouseEvent) => event.stopPropagation()}
+                                    className="inline-flex max-w-full items-center gap-2 rounded-sm hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter"
+                                  >
+                                    <span className="text-sm text-foreground-light">
+                                      {mode === 'warehouse_backed'
+                                        ? `${warehouseSize} · Moved`
+                                        : `${x.size ?? '—'} · Copy · ${warehouseSize}`}
+                                    </span>
+                                    {showSyncChip && (
+                                      <WarehouseSyncChip syncState={wState.syncState!} />
+                                    )}
+                                  </Link>
+                                )
+                              })()
+                            ) : (
+                              <p className="text-foreground-muted">–</p>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {(realtimePublication?.tables ?? []).find(
+                              (table) => table.id === x.id
+                            ) ? (
+                              <div className="flex items-center gap-x-2">
+                                <Check size={16} strokeWidth={2} className="text-brand-link" />
+                                <p className="text-foreground-light">Enabled</p>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-x-2">
+                                <X size={16} strokeWidth={2} className="text-foreground-muted" />
+                                <p className="text-foreground-lighter">Disabled</p>
+                              </div>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <div
+                              className="flex justify-end gap-2"
+                              onClick={(event) => event.stopPropagation()}
+                            >
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="default"
+                                    className="h-[28px] w-7 hit-area-2"
+                                    icon={<MoreVertical />}
+                                    aria-label={`Table ${x.name} actions`}
+                                  />
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent side="bottom" align="end" className="w-48">
+                                  <DropdownMenuItem className="flex items-center space-x-2" asChild>
+                                    <Link href={tableDetailUrl}>
+                                      <Columns2 size={12} />
+                                      <p>Table details</p>
+                                    </Link>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    className="flex items-center space-x-2"
+                                    onClick={() =>
+                                      router.push(
+                                        buildTableEditorUrl({
+                                          projectRef: project?.ref,
+                                          tableId: x.id,
+                                          schema: x.schema,
+                                        })
                                       )
-                                    })()}
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItemTooltip
-                                      disabled={!canUpdateTables || isSchemaLocked}
-                                      className="gap-x-2"
-                                      onClick={() => {
-                                        if (canUpdateTables && !isSchemaLocked) {
-                                          onDeleteTable({ ...x, schema: selectedSchema })
-                                        }
-                                      }}
-                                      tooltip={{
-                                        content: {
-                                          side: 'left',
-                                          text: 'You need additional permissions to delete tables',
-                                        },
-                                      }}
-                                    >
-                                      <Trash size={12} />
-                                      <p>Delete table</p>
-                                    </DropdownMenuItemTooltip>
-                                  </>
-                                )}
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                                    }
+                                    onMouseEnter={() =>
+                                      prefetchEditorTablePage({
+                                        id: x.id ? String(x.id) : undefined,
+                                      })
+                                    }
+                                  >
+                                    <Eye size={12} />
+                                    <p>View in Table Editor</p>
+                                  </DropdownMenuItem>
+
+                                  {x.type === ENTITY_TYPE.TABLE && (
+                                    <>
+                                      <DropdownMenuSeparator />
+                                      <DropdownMenuItemTooltip
+                                        className="gap-x-2"
+                                        disabled={!canUpdateTables}
+                                        onClick={() => {
+                                          if (canUpdateTables) onEditTable(x)
+                                        }}
+                                        tooltip={{
+                                          content: {
+                                            side: 'left',
+                                            text: 'You need additional permissions to edit this table',
+                                          },
+                                        }}
+                                      >
+                                        <Edit size={12} />
+                                        <p>Edit table</p>
+                                      </DropdownMenuItemTooltip>
+                                      <DropdownMenuItemTooltip
+                                        key="duplicate-table"
+                                        className="gap-x-2"
+                                        disabled={!canUpdateTables}
+                                        onClick={() => {
+                                          if (canUpdateTables) onDuplicateTable(x)
+                                        }}
+                                        tooltip={{
+                                          content: {
+                                            side: 'left',
+                                            text: 'You need additional permissions to duplicate tables',
+                                          },
+                                        }}
+                                      >
+                                        <Copy size={12} />
+                                        <span>Duplicate table</span>
+                                      </DropdownMenuItemTooltip>
+
+                                      <DropdownMenuSeparator />
+                                      <DropdownMenuItemTooltip
+                                        disabled={!canUpdateTables || isSchemaLocked}
+                                        className="gap-x-2"
+                                        onClick={() => {
+                                          if (canUpdateTables && !isSchemaLocked) {
+                                            onDeleteTable({ ...x, schema: selectedSchema })
+                                          }
+                                        }}
+                                        tooltip={{
+                                          content: {
+                                            side: 'left',
+                                            text: 'You need additional permissions to delete tables',
+                                          },
+                                        }}
+                                      >
+                                        <Trash size={12} />
+                                        <p>Delete table</p>
+                                      </DropdownMenuItemTooltip>
+                                    </>
+                                  )}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
                 </>
               </TableBody>
               <TableFooter className="font-normal">
@@ -916,69 +794,6 @@ export const TableList = ({
             </Table>
           </Card>
         </div>
-      )}
-
-      {warehouseModal && (
-        <WarehouseEnablementModal
-          open={true}
-          variant={warehouseModal.variant}
-          tableKey={warehouseModal.tableKey}
-          tableName={warehouseModal.tableName}
-          onOpenChange={(open) => {
-            if (!open) setWarehouseModal(null)
-          }}
-        />
-      )}
-
-      <DiscardChangesConfirmationDialog
-        visible={detachConfirm !== null}
-        onCancel={() => setDetachConfirm(null)}
-        onClose={() => {
-          if (detachConfirm) setDetachProgress(detachConfirm)
-          setDetachConfirm(null)
-        }}
-        title="Detach Warehouse copy"
-        description={
-          <>
-            Detaching deletes the Warehouse copy{' '}
-            <code className="text-code-inline break-keep">{detachConfirm?.copyName}</code>. Your
-            source table and its data in Postgres are unaffected.
-          </>
-        }
-        confirmLabel="Detach"
-        cancelLabel="Cancel"
-      />
-
-      {detachProgress && (
-        <WarehouseDetachModal
-          open={true}
-          tableKey={detachProgress.tableKey}
-          copyName={detachProgress.copyName}
-          onOpenChange={(open) => {
-            if (!open) setDetachProgress(null)
-          }}
-        />
-      )}
-
-      {timeTravelSheet && (
-        <WarehouseTimeTravelFlow
-          tableKey={timeTravelSheet.tableKey}
-          sheetOpen={true}
-          onSheetOpenChange={(open) => {
-            if (!open) setTimeTravelSheet(null)
-          }}
-        />
-      )}
-
-      {detailsTarget && (
-        <WarehouseStorageDetailsDialog
-          open={true}
-          tableKey={detailsTarget.tableKey}
-          postgresSize={detailsTarget.postgresSize}
-          onOpenChange={(open) => {
-            if (!open) setDetailsTarget(null)
-          }}
-        />
       )}
     </div>
   )
