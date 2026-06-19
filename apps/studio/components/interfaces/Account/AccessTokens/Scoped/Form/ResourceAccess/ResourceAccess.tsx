@@ -1,4 +1,4 @@
-import { FormControl_Shadcn_, FormField_Shadcn_ } from 'ui'
+import { FormControl, FormField } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { ResourceAccessProps } from './ResourceAccess.types'
@@ -41,13 +41,13 @@ export const ResourceAccess = ({ control, resourceAccess, setValue }: ResourceAc
 
   return (
     <div className="space-y-4 px-5 sm:px-6 py-6">
-      <FormField_Shadcn_
+      <FormField
         key="resourceAccess"
         name="resourceAccess"
         control={control}
         render={({ field }) => (
           <FormItemLayout name="resourceAccess" label="Resource access">
-            <FormControl_Shadcn_>
+            <FormControl>
               <div className="space-y-3">
                 <fieldset className="flex gap-3">
                   <legend className="sr-only">Resource access level</legend>
@@ -69,13 +69,13 @@ export const ResourceAccess = ({ control, resourceAccess, setValue }: ResourceAc
                   {RESOURCE_OPTIONS.find((opt) => opt.value === field.value)?.description}
                 </p>
               </div>
-            </FormControl_Shadcn_>
+            </FormControl>
           </FormItemLayout>
         )}
       />
 
       {resourceAccess === 'selected-orgs' && (
-        <FormField_Shadcn_
+        <FormField
           key="selectedOrganizations"
           name="selectedOrganizations"
           control={control}
@@ -94,7 +94,7 @@ export const ResourceAccess = ({ control, resourceAccess, setValue }: ResourceAc
       )}
 
       {resourceAccess === 'selected-projects' && (
-        <FormField_Shadcn_
+        <FormField
           key="selectedProjects"
           name="selectedProjects"
           control={control}

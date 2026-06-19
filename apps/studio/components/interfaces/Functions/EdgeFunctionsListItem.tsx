@@ -1,4 +1,4 @@
-import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM, useFlag } from 'common'
 import { useParams } from 'common/hooks'
 import dayjs from 'dayjs'
 import { Check, Copy } from 'lucide-react'
@@ -15,7 +15,6 @@ import {
   type EdgeFunctionsResponse,
 } from '@/data/edge-functions/edge-functions-query'
 import { normalizeFunctionIds } from '@/data/edge-functions/keys'
-import { usePHFlag } from '@/hooks/ui/useFlag'
 import { createNavigationHandler } from '@/lib/navigation'
 
 interface EdgeFunctionsListItemProps {
@@ -27,14 +26,13 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
   const { ref } = useParams()
   const [isCopied, setIsCopied] = useState(false)
 
-  const showEdgeFunctionsRequestMetrics = usePHFlag<boolean>('edgeFunctionsRequestMetrics') === true
-  const showLastHourStats = IS_PLATFORM && showEdgeFunctionsRequestMetrics
+  const showLastHourStats = useFlag('edgeFunctionsRequestMetrics')
 
   const { data: endpoint } = useProjectApiUrl({ projectRef: ref })
   const functionUrl = `${endpoint}/functions/v1/${item.slug}`
 
   const handleNavigation = createNavigationHandler(
-    `/project/${ref}/functions/${item.slug}${IS_PLATFORM ? '' : `/details`}`,
+    `/project/${ref}/functions/${item.slug}${IS_PLATFORM ? '' : `/code`}`,
     router
   )
 
@@ -70,7 +68,7 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
       </TableCell>
       <TableCell>
         <div className="text-xs text-foreground-light flex gap-2 items-center truncate">
-          <p title={functionUrl} className="font-mono truncate hidden md:inline max-w-[30rem]">
+          <p title={functionUrl} className="font-mono truncate hidden md:inline max-w-120">
             {functionUrl}
           </p>
           <button
@@ -101,18 +99,26 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
         </div>
       </TableCell>
       <TableCell className="hidden 2xl:table-cell whitespace-nowrap">
-        <TimestampInfo
-          className="text-sm text-foreground-light whitespace-nowrap"
-          utcTimestamp={item.created_at}
-          label={dayjs(item.created_at).fromNow()}
-        />
+        {item.created_at ? (
+          <TimestampInfo
+            className="text-sm text-foreground-light whitespace-nowrap"
+            utcTimestamp={item.created_at}
+            label={dayjs(item.created_at).fromNow()}
+          />
+        ) : (
+          <span className="text-sm text-foreground-light">–</span>
+        )}
       </TableCell>
       <TableCell className="lg:table-cell">
-        <TimestampInfo
-          className="text-sm text-foreground-light whitespace-nowrap"
-          utcTimestamp={item.updated_at}
-          label={dayjs(item.updated_at).fromNow()}
-        />
+        {item.updated_at ? (
+          <TimestampInfo
+            className="text-sm text-foreground-light whitespace-nowrap"
+            utcTimestamp={item.updated_at}
+            label={dayjs(item.updated_at).fromNow()}
+          />
+        ) : (
+          <span className="text-sm text-foreground-light">–</span>
+        )}
       </TableCell>
       {showLastHourStats && (
         <>

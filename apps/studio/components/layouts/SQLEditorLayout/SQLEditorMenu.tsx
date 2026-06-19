@@ -86,7 +86,7 @@ export const SQLEditorMenu = () => {
 
   return (
     <div className="h-full flex flex-col justify-between">
-      <div className="flex flex-col gap-y-4 flex-grow">
+      <div className="flex flex-col gap-y-4 grow">
         <div className="mt-4 mx-4 flex items-center justify-between gap-x-2">
           <InnerSideBarFilters className="w-full p-0 gap-0">
             <InnerSideBarFilterSearchInput
@@ -138,7 +138,7 @@ export const SQLEditorMenu = () => {
             <DropdownMenuTrigger asChild>
               <Button
                 data-testid="sql-editor-new-query-button"
-                type="default"
+                variant="default"
                 icon={<Plus className="text-foreground" />}
                 className="w-[26px]"
               />
@@ -160,7 +160,7 @@ export const SQLEditorMenu = () => {
       </div>
 
       <div className="p-4 border-t sticky bottom-0 bg-studio">
-        <Button block type="default" onClick={() => appState.setOnGoingQueriesPanelOpen(true)}>
+        <Button block variant="default" onClick={() => appState.setOnGoingQueriesPanelOpen(true)}>
           View running queries
         </Button>
       </div>

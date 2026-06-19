@@ -11,15 +11,15 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Input_Shadcn_,
-  Label_Shadcn_,
+  Input,
+  Label,
 } from 'ui'
 
 export default function DialogCloseButton() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button type="default">Share</Button>
+        <Button variant="default">Share</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
@@ -30,16 +30,12 @@ export default function DialogCloseButton() {
         <DialogSection>
           <div className="flex items-center space-x-2">
             <div className="grid flex-1 gap-2">
-              <Label_Shadcn_ htmlFor="link" className="sr-only">
+              <Label htmlFor="link" className="sr-only">
                 Link
-              </Label_Shadcn_>
-              <Input_Shadcn_
-                id="link"
-                defaultValue="https://ui.shadcn.com/docs/installation"
-                readOnly
-              />
+              </Label>
+              <Input id="link" defaultValue="https://ui.shadcn.com/docs/installation" readOnly />
             </div>
-            <Button htmlType="submit" size="small" type="secondary" className="px-3">
+            <Button type="submit" size="small" variant="secondary" className="px-3">
               <span className="sr-only">Copy</span>
               <Copy className="h-4 w-4" />
             </Button>
@@ -47,7 +43,7 @@ export default function DialogCloseButton() {
         </DialogSection>
         <DialogFooter className="sm:justify-start">
           <DialogClose asChild>
-            <Button type="default" htmlType="button">
+            <Button variant="default" type="button">
               Custom Close Button
             </Button>
           </DialogClose>

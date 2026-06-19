@@ -3,6 +3,7 @@ import { Fragment } from 'react'
 import { CustomDocument } from './CustomDocument'
 import { DPA } from './DPA'
 import { HIPAA } from './HIPAA'
+import { ISO27001 } from './ISO27001'
 import { SecurityQuestionnaire } from './SecurityQuestionnaire'
 import { SOC2 } from './SOC2'
 import { TIA } from './TIA'
@@ -46,6 +47,12 @@ export const Documents = () => {
 
       <ScaffoldContainer id="soc2" className="px-6 xl:px-10">
         <SOC2 />
+      </ScaffoldContainer>
+
+      <ScaffoldDivider />
+
+      <ScaffoldContainer id="iso27001" className="px-6 xl:px-10">
+        <ISO27001 />
       </ScaffoldContainer>
 
       <ScaffoldDivider />

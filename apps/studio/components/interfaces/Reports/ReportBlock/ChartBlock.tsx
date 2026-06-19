@@ -1,15 +1,17 @@
 import dayjs from 'dayjs'
 import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts'
-import { ChartContainer, ChartTooltip, ChartTooltipContent, WarningIcon } from 'ui'
+import { ChartContainer, ChartTooltip, WarningIcon } from 'ui'
 
 import { METRIC_THRESHOLDS } from './ReportBlock.constants'
 import { ReportBlockContainer } from './ReportBlockContainer'
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { timestampFormatter } from '@/components/ui/Charts/Charts.utils'
 import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
+import { PortalChartTooltip } from '@/components/ui/Charts/PortalChartTooltip'
 import {
   checkHasNonPositiveValues,
   computeYAxisWidth,
@@ -27,6 +29,7 @@ import {
   useProjectDailyStatsQuery,
 } from '@/data/analytics/project-daily-stats-query'
 import { METRICS } from '@/lib/constants/metrics'
+import { useFormatDateTime } from '@/lib/datetime'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import type { Dashboards } from '@/types'
 
@@ -69,9 +72,18 @@ export const ChartBlock = ({
   const { ref } = router.query
 
   const state = useDatabaseSelectorStateSnapshot()
+  const chartRef = useRef<HTMLDivElement>(null)
   const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
   const logScale = useMemo(() => defaultLogScale, [defaultLogScale])
   const [latestValue, setLatestValue] = useState<string | undefined>()
+  const formatChartDate = useFormatDateTime()
+  const formatTooltipDate = useCallback(
+    (value: string | number, format: string) =>
+      /^\d{4}-\d{2}-\d{2}$/.test(String(value))
+        ? timestampFormatter(String(value), format, true)
+        : formatChartDate(value, format),
+    [formatChartDate]
+  )
 
   const databaseIdentifier = state.selectedDatabaseId
 
@@ -212,7 +224,7 @@ export const ChartBlock = ({
       actions={
         <>
           <ButtonTooltip
-            type="text"
+            variant="text"
             size="tiny"
             disabled={loading}
             className="w-7 h-7"
@@ -231,7 +243,7 @@ export const ChartBlock = ({
             }}
           />
           <ButtonTooltip
-            type={logScale ? 'default' : 'text'}
+            variant={logScale ? 'default' : 'text'}
             size="tiny"
             disabled={loading}
             className="h-7 px-1.5 font-mono text-[10px]"
@@ -253,19 +265,19 @@ export const ChartBlock = ({
       }
     >
       {loading ? (
-        <div className="flex flex-grow w-full flex-col items-center justify-center gap-y-2 px-4">
+        <div className="flex grow w-full flex-col items-center justify-center gap-y-2 px-4">
           <Loader2 size={18} className="animate-spin text-border-strong" />
           <p className="text-xs text-foreground-lighter text-center">Loading data for {label}</p>
         </div>
       ) : chartData === undefined ? (
-        <div className="flex flex-grow w-full flex-col items-center justify-center gap-y-2 px-4">
+        <div className="flex grow w-full flex-col items-center justify-center gap-y-2 px-4">
           <WarningIcon />
           <p className="text-xs text-foreground-lighter text-center">
             Unable to load data for {label}
           </p>
         </div>
       ) : data.length === 0 ? (
-        <div className="flex flex-grow w-full flex-col items-center justify-center gap-y-2">
+        <div className="flex grow w-full flex-col items-center justify-center gap-y-2">
           <NoDataPlaceholder
             size="small"
             className="border-0"
@@ -288,6 +300,7 @@ export const ChartBlock = ({
             </p>
           )}
           <ChartContainer
+            ref={chartRef}
             className="w-full aspect-auto px-3 py-2"
             style={{
               height: maxHeight ? `${maxHeight}px` : undefined,
@@ -313,10 +326,11 @@ export const ChartBlock = ({
                 />
                 <ChartTooltip
                   content={
-                    <ChartTooltipContent
+                    <PortalChartTooltip
+                      chartRef={chartRef}
                       className="min-w-[200px]"
                       labelSuffix={isPercentage ? '%' : ''}
-                      labelFormatter={(x) => dayjs(x).format('DD MMM YYYY')}
+                      labelFormatter={(x) => formatTooltipDate(x as string | number, 'DD MMM YYYY')}
                     />
                   }
                 />
@@ -341,9 +355,10 @@ export const ChartBlock = ({
                 />
                 <ChartTooltip
                   content={
-                    <ChartTooltipContent
+                    <PortalChartTooltip
+                      chartRef={chartRef}
                       labelSuffix={chartData?.format === '%' ? '%' : ''}
-                      labelFormatter={(x) => dayjs(x).format('DD MMM YYYY')}
+                      labelFormatter={(x) => formatTooltipDate(x as string | number, 'DD MMM YYYY')}
                     />
                   }
                 />

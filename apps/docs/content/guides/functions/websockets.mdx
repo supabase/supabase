@@ -13,6 +13,8 @@ This allows you to:
 - Create WebSocket relay servers for external APIs
 - Establish both incoming and outgoing WebSocket connections
 
+For a production-ready reconnect pattern with session persistence and replay, see [Resumable WebSockets with Edge Functions](/docs/guides/functions/examples/resumable-websockets).
+
 ---
 
 ## Creating WebSocket servers
@@ -29,26 +31,28 @@ Here are some basic examples of setting up WebSocket servers using Deno and Node
 <TabPanel id="deno" label="Deno">
 
 ```ts
-Deno.serve((req) => {
-  const upgrade = req.headers.get('upgrade') || ''
+export default {
+  fetch: (req) => {
+    const upgrade = req.headers.get('upgrade') || ''
 
-  if (upgrade.toLowerCase() != 'websocket') {
-    return new Response("request isn't trying to upgrade to WebSocket.", { status: 400 })
-  }
+    if (upgrade.toLowerCase() != 'websocket') {
+      return new Response("request isn't trying to upgrade to WebSocket.", { status: 400 })
+    }
 
-  const { socket, response } = Deno.upgradeWebSocket(req)
+    const { socket, response } = Deno.upgradeWebSocket(req)
 
-  socket.onopen = () => console.log('socket opened')
-  socket.onmessage = (e) => {
-    console.log('socket message:', e.data)
-    socket.send(new Date().toString())
-  }
+    socket.onopen = () => console.log('socket opened')
+    socket.onmessage = (e) => {
+      console.log('socket message:', e.data)
+      socket.send(new Date().toString())
+    }
 
-  socket.onerror = (e) => console.log('socket errored:', e.message)
-  socket.onclose = () => console.log('socket closed')
+    socket.onerror = (e) => console.log('socket errored:', e.message)
+    socket.onclose = () => console.log('socket closed')
 
-  return response
-})
+    return response
+  },
+}
 ```
 
 </TabPanel>
@@ -121,7 +125,7 @@ WebSocket browser clients don't have the option to send custom headers. Because 
 
 You can skip the default authorization header checks by explicitly providing `--no-verify-jwt` when serving and deploying functions.
 
-To authenticate the user making WebSocket requests, you can pass the JWT in URL query params or via a custom protocol.
+To authenticate the user making WebSocket requests, you can pass the JWT in URL query params or via a custom protocol. The [`withSupabase`](/docs/guides/functions/auth) wrapper validates credentials on request headers, so it can't authenticate WebSocket clients. Verify the JWT yourself, as shown below.
 
 <Tabs
   scrollable
@@ -135,51 +139,55 @@ To authenticate the user making WebSocket requests, you can pass the JWT in URL 
 ```ts
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
+const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL'),
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+  // If you want to use a different api key, change 'default' to your preferred key name
+  SUPABASE_SECRET_KEYS['default']
 )
 
-Deno.serve((req) => {
-  const upgrade = req.headers.get('upgrade') || ''
-  if (upgrade.toLowerCase() != 'WebSocket') {
-    return new Response("request isn't trying to upgrade to WebSocket.", { status: 400 })
-  }
+export default {
+  fetch: async (req) => {
+    const upgrade = req.headers.get('upgrade') || ''
+    if (upgrade.toLowerCase() != 'websocket') {
+      return new Response("request isn't trying to upgrade to WebSocket.", { status: 400 })
+    }
 
-  // Please be aware query params may be logged in some logging systems.
-  const url = new URL(req.url)
-  const jwt = url.searchParams.get('jwt')
+    // Please be aware query params may be logged in some logging systems.
+    const url = new URL(req.url)
+    const jwt = url.searchParams.get('jwt')
 
-  if (!jwt) {
-    console.error('Auth token not provided')
-    return new Response('Auth token not provided', { status: 403 })
-  }
+    if (!jwt) {
+      console.error('Auth token not provided')
+      return new Response('Auth token not provided', { status: 403 })
+    }
 
-  const { error, data } = await supabase.auth.getClaims()
+    const { error, data } = await supabase.auth.getUser(jwt)
 
-  if (error) {
-    console.error(error)
-    return new Response('Invalid token provided', { status: 403 })
-  }
+    if (error) {
+      console.error(error)
+      return new Response('Invalid token provided', { status: 403 })
+    }
 
-  if (!data.user) {
-    console.error('user is not authenticated')
-    return new Response('User is not authenticated', { status: 403 })
-  }
+    if (!data.user) {
+      console.error('user is not authenticated')
+      return new Response('User is not authenticated', { status: 403 })
+    }
 
-  const { socket, response } = Deno.upgradeWebSocket(req)
+    const { socket, response } = Deno.upgradeWebSocket(req)
 
-  socket.onopen = () => console.log('socket opened')
-  socket.onmessage = (e) => {
-    console.log('socket message:', e.data)
-    socket.send(new Date().toString())
-  }
+    socket.onopen = () => console.log('socket opened')
+    socket.onmessage = (e) => {
+      console.log('socket message:', e.data)
+      socket.send(new Date().toString())
+    }
 
-  socket.onerror = (e) => console.log('socket errored:', e.message)
-  socket.onclose = () => console.log('socket closed')
+    socket.onerror = (e) => console.log('socket errored:', e.message)
+    socket.onclose = () => console.log('socket closed')
 
-  return response
-})
+    return response
+  },
+}
 ```
 
 </TabPanel>
@@ -188,52 +196,57 @@ Deno.serve((req) => {
 ```ts
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
+const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL'),
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+  // If you want to use a different api key, change 'default' to your preferred key name
+  SUPABASE_SECRET_KEYS['default']
 )
 
-Deno.serve((req) => {
-  const upgrade = req.headers.get('upgrade') || ''
-  if (upgrade.toLowerCase() != 'WebSocket') {
-    return new Response("request isn't trying to upgrade to WebSocket.", { status: 400 })
-  }
+export default {
+  fetch: async (req) => {
+    const upgrade = req.headers.get('upgrade') || ''
+    if (upgrade.toLowerCase() != 'websocket') {
+      return new Response("request isn't trying to upgrade to WebSocket.", { status: 400 })
+    }
 
-  // Sec-WebScoket-Protocol may return multiple protocol values `jwt-TOKEN, value1, value 2`
-  const customProtocols = (req.headers.get('Sec-WebSocket-Protocol') ?? '')
-    .split(',')
-    .map((p) => p.trim())
-  const jwt = customProtocols.find((p) => p.startsWith('jwt')).replace('jwt-', '')
+    // Sec-WebScoket-Protocol may return multiple protocol values `jwt-TOKEN, value1, value 2`
+    const customProtocols = (req.headers.get('Sec-WebSocket-Protocol') ?? '')
+      .split(',')
+      .map((p) => p.trim())
+    const jwtProtocol = customProtocols.find((p) => p.startsWith('jwt-'))
+    const jwt = jwtProtocol ? jwtProtocol.replace('jwt-', '') : null
 
-  if (!jwt) {
-    console.error('Auth token not provided')
-    return new Response('Auth token not provided', { status: 403 })
-  }
+    if (!jwt) {
+      console.error('Auth token not provided')
+      return new Response('Auth token not provided', { status: 403 })
+    }
 
-  const { error, data } = await supabase.auth.getClaims()
-  if (error) {
-    console.error(error)
-    return new Response('Invalid token provided', { status: 403 })
-  }
+    const { error, data } = await supabase.auth.getUser(jwt)
+    if (error) {
+      console.error(error)
+      return new Response('Invalid token provided', { status: 403 })
+    }
 
-  if (!data.user) {
-    console.error('user is not authenticated')
-    return new Response('User is not authenticated', { status: 403 })
-  }
+    if (!data.user) {
+      console.error('user is not authenticated')
+      return new Response('User is not authenticated', { status: 403 })
+    }
 
-  const { socket, response } = Deno.upgradeWebSocket(req)
+    const { socket, response } = Deno.upgradeWebSocket(req)
 
-  socket.onopen = () => console.log('socket opened')
-  socket.onmessage = (e) => {
-    console.log('socket message:', e.data)
-    socket.send(new Date().toString())
-  }
+    socket.onopen = () => console.log('socket opened')
+    socket.onmessage = (e) => {
+      console.log('socket message:', e.data)
+      socket.send(new Date().toString())
+    }
 
-  socket.onerror = (e) => console.log('socket errored:', e.message)
-  socket.onclose = () => console.log('socket closed')
+    socket.onerror = (e) => console.log('socket errored:', e.message)
+    socket.onclose = () => console.log('socket closed')
 
-  return response
-})
+    return response
+  },
+}
 ```
 
 </TabPanel>
@@ -244,6 +257,8 @@ Deno.serve((req) => {
 The maximum duration is capped based on the wall-clock, CPU, and memory limits. The Function will shutdown when it reaches one of these [limits](/docs/guides/functions/limits).
 
 </Admonition>
+
+When using WebSockets, keep in mind that the HTTP request is considered complete after `Deno.upgradeWebSocket(req)` returns the response. To prevent early worker retirement while the socket is still open, keep an unresolved `EdgeRuntime.waitUntil()` promise that resolves in `socket.onclose`.
 
 ---
 

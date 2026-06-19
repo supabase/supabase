@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { uniq } from 'lodash'
-import { Loader2, SquarePlus } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
@@ -14,7 +14,6 @@ import { DeleteAnalyticsBucketModal } from '../DeleteAnalyticsBucketModal'
 import { useSelectedAnalyticsBucket } from '../useSelectedAnalyticsBucket'
 import { HIDE_REPLICATION_USER_FLOW } from './AnalyticsBucketDetails.constants'
 import { BucketHeader } from './BucketHeader'
-import { ConnectTablesDialog } from './ConnectTablesDialog'
 import { CreateTableInstructions } from './CreateTable/CreateTableInstructions'
 import { NamespaceWithTables } from './NamespaceWithTables'
 import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
@@ -202,13 +201,7 @@ export const AnalyticBucketDetails = () => {
           ) : state === 'added' && wrapperInstance ? (
             <>
               <ScaffoldSection isFullWidth>
-                <BucketHeader
-                  namespaces={namespaces}
-                  onSuccessConnectTables={() => {
-                    setPollIntervalNamespaces(4000)
-                    setPollIntervalNamespaceTables(4000)
-                  }}
-                />
+                <BucketHeader />
 
                 {isLoadingNamespaces || isLoadingWrapperInstance ? (
                   <GenericTableLoader headers={['Name']} />
@@ -228,20 +221,7 @@ export const AnalyticBucketDetails = () => {
                         title="Connecting table(s) to bucket"
                         description="Tables will be shown here once the connection is complete"
                       />
-                    ) : (
-                      <EmptyStatePresentational
-                        icon={SquarePlus}
-                        title="Connect database tables"
-                        description="Stream table data for continuous backups and analysis"
-                      >
-                        <ConnectTablesDialog
-                          onSuccessConnectTables={() => {
-                            setPollIntervalNamespaces(4000)
-                            setPollIntervalNamespaceTables(4000)
-                          }}
-                        />
-                      </EmptyStatePresentational>
-                    )}
+                    ) : null}
                   </>
                 ) : (
                   <>
@@ -249,7 +229,7 @@ export const AnalyticBucketDetails = () => {
                       <Admonition
                         type="note"
                         layout="horizontal"
-                        className="[&>div]:pl-[2.5rem] [&>div]:-translate-y-[3px]"
+                        className="[&>div]:pl-10 [&>div]:translate-y-[-3px]"
                         childProps={{ title: { className: 'block capitalize-sentence' } }}
                         showIcon={isPipelineStopped}
                         title={
@@ -264,7 +244,7 @@ export const AnalyticBucketDetails = () => {
                         }
                         actions={
                           <div className="flex items-center gap-x-2">
-                            <Button asChild type="default">
+                            <Button asChild variant="default">
                               <Link
                                 href={`/project/${projectRef}/database/replication/${pipeline.replicator_id}`}
                               >
@@ -273,7 +253,7 @@ export const AnalyticBucketDetails = () => {
                             </Button>
                             {isPipelineStopped && (
                               <Button
-                                type="default"
+                                variant="default"
                                 loading={isStartingPipeline}
                                 onClick={async () => {
                                   if (projectRef) {
@@ -328,7 +308,7 @@ export const AnalyticBucketDetails = () => {
                   </p>
                 </div>
                 <Button
-                  type="danger"
+                  variant="danger"
                   disabled={!bucket?.name || !isSuccessBucket}
                   onClick={() => setShowDeleteModal(true)}
                 >
@@ -381,7 +361,7 @@ const ExtensionNotInstalled = ({
               Learn more
             </InlineLink>
           </p>
-          <Button type="default" asChild className="mt-2" onClick={() => {}}>
+          <Button variant="default" asChild className="mt-2" onClick={() => {}}>
             <Link
               href={
                 databaseNeedsUpgrading
@@ -430,7 +410,7 @@ const ExtensionNeedsUpgrade = ({
             Before reinstalling the wrapper extension, you must first remove all existing wrappers.
             Afterward, you can recreate the wrappers.
           </p>
-          <Button asChild type="default">
+          <Button asChild variant="default">
             <Link
               href={
                 databaseNeedsUpgrading
@@ -462,7 +442,7 @@ const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
       <ScaffoldSection isFullWidth>
         <Admonition type="warning" title="Missing integration">
           <p>The Iceberg Wrapper integration is required in order to query analytics tables.</p>
-          <Button type="default" loading={isCreatingIcebergWrapper} onClick={onSetupWrapper}>
+          <Button variant="default" loading={isCreatingIcebergWrapper} onClick={onSetupWrapper}>
             Install wrapper
           </Button>
         </Admonition>

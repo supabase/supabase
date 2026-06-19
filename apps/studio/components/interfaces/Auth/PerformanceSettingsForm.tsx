@@ -8,18 +8,18 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -45,6 +45,23 @@ const FormSchema = z.object({
   DB_MAX_POOL_SIZE: z.coerce.number().min(1),
   DB_MAX_POOL_SIZE_UNIT: z.enum(['percent', 'connections']),
 })
+
+export const DatabaseFormSchema = z
+  .object({
+    DB_MAX_POOL_SIZE: z.coerce.number().min(1),
+    DB_MAX_POOL_SIZE_UNIT: z.enum(['percent', 'connections']),
+  })
+  .superRefine((data, ctx) => {
+    if (data.DB_MAX_POOL_SIZE_UNIT === 'percent') {
+      if (data.DB_MAX_POOL_SIZE < 1 || data.DB_MAX_POOL_SIZE > 100) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['DB_MAX_POOL_SIZE'],
+          message: 'Percentage must be between 1 and 100',
+        })
+      }
+    }
+  })
 
 export const PerformanceSettingsForm = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -77,7 +94,7 @@ export const PerformanceSettingsForm = () => {
 
   const promptUpgrade = IS_PLATFORM && !isLoadingEntitlement && !hasAccessToPerformance
 
-  const { mutate: updateAuthConfig, isPending: isSaving } = useAuthConfigUpdateMutation()
+  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
 
   const requestDurationForm = useForm({
     resolver: zodResolver(
@@ -87,12 +104,7 @@ export const PerformanceSettingsForm = () => {
   })
 
   const databaseForm = useForm({
-    resolver: zodResolver(
-      z.object({
-        DB_MAX_POOL_SIZE: FormSchema.shape.DB_MAX_POOL_SIZE,
-        DB_MAX_POOL_SIZE_UNIT: FormSchema.shape.DB_MAX_POOL_SIZE_UNIT,
-      })
-    ),
+    resolver: zodResolver(DatabaseFormSchema),
     defaultValues: {
       DB_MAX_POOL_SIZE: 10,
       DB_MAX_POOL_SIZE_UNIT: 'connections',
@@ -135,7 +147,7 @@ export const PerformanceSettingsForm = () => {
     updateAuthConfig(
       { projectRef: project?.ref, config },
       {
-        onError: (error) => {
+        onError: () => {
           setIsUpdatingDatabaseForm(false)
         },
         onSuccess: () => {
@@ -207,11 +219,11 @@ export const PerformanceSettingsForm = () => {
       <ScaffoldSection isFullWidth>
         <ScaffoldSectionTitle className="mb-4">Request duration</ScaffoldSectionTitle>
 
-        <Form_Shadcn_ {...requestDurationForm}>
+        <Form {...requestDurationForm}>
           <form onSubmit={requestDurationForm.handleSubmit(onSubmitRequestDurationForm)}>
             <Card>
               <CardContent className="pt-6">
-                <FormField_Shadcn_
+                <FormField
                   control={requestDurationForm.control}
                   name="API_MAX_REQUEST_DURATION"
                   render={({ field }) => (
@@ -227,7 +239,7 @@ export const PerformanceSettingsForm = () => {
                     >
                       <div className="flex flex-col gap-2">
                         <div className="relative">
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <InputGroup>
                               <FormInputGroupInput
                                 type="number"
@@ -240,7 +252,7 @@ export const PerformanceSettingsForm = () => {
                                 <InputGroupText>seconds</InputGroupText>
                               </InputGroupAddon>
                             </InputGroup>
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </div>
 
                         <p className="text-xs text-right text-foreground-muted">
@@ -254,13 +266,13 @@ export const PerformanceSettingsForm = () => {
 
               <CardFooter className="justify-end space-x-2">
                 {requestDurationForm.formState.isDirty && (
-                  <Button type="default" onClick={() => requestDurationForm.reset()}>
+                  <Button variant="default" onClick={() => requestDurationForm.reset()}>
                     Cancel
                   </Button>
                 )}
                 <Button
-                  type={promptUpgrade ? 'default' : 'primary'}
-                  htmlType="submit"
+                  variant={promptUpgrade ? 'default' : 'primary'}
+                  type="submit"
                   disabled={
                     !canUpdateConfig ||
                     isUpdatingRequestDurationForm ||
@@ -274,17 +286,17 @@ export const PerformanceSettingsForm = () => {
               </CardFooter>
             </Card>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </ScaffoldSection>
 
       <ScaffoldSection isFullWidth>
         <ScaffoldSectionTitle className="mb-4">Connection management</ScaffoldSectionTitle>
 
-        <Form_Shadcn_ {...databaseForm}>
+        <Form {...databaseForm}>
           <form onSubmit={databaseForm.handleSubmit(onSubmitDatabaseForm)} className="space-y-4">
             <Card>
               <CardContent className="pt-6 flex flex-col gap-4">
-                <FormField_Shadcn_
+                <FormField
                   control={databaseForm.control}
                   name="DB_MAX_POOL_SIZE_UNIT"
                   render={({ field }) => (
@@ -299,8 +311,8 @@ export const PerformanceSettingsForm = () => {
                         </p>
                       }
                     >
-                      <FormControl_Shadcn_>
-                        <Select_Shadcn_
+                      <FormControl>
+                        <Select
                           value={field.value}
                           onValueChange={(value) => {
                             const values = databaseForm.getValues()
@@ -328,30 +340,27 @@ export const PerformanceSettingsForm = () => {
                             }
                           }}
                         >
-                          <SelectTrigger_Shadcn_
-                            size="small"
-                            disabled={!canUpdateConfig || promptUpgrade}
-                          >
-                            <SelectValue_Shadcn_>
+                          <SelectTrigger size="small" disabled={!canUpdateConfig || promptUpgrade}>
+                            <SelectValue>
                               {field.value === 'percent' ? 'Percentage' : 'Absolute'}
-                            </SelectValue_Shadcn_>
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_ align="end">
-                            <SelectItem_Shadcn_ value="connections" className="text-xs">
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent align="end">
+                            <SelectItem value="connections" className="text-xs">
                               Absolute number of connections
-                            </SelectItem_Shadcn_>
-                            <SelectItem_Shadcn_ value="percent" className="text-xs">
+                            </SelectItem>
+                            <SelectItem value="percent" className="text-xs">
                               Percent of max connections
-                            </SelectItem_Shadcn_>
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
-                      </FormControl_Shadcn_>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
               </CardContent>
               <CardContent>
-                <FormField_Shadcn_
+                <FormField
                   control={databaseForm.control}
                   name="DB_MAX_POOL_SIZE"
                   render={({ field }) => (
@@ -370,17 +379,11 @@ export const PerformanceSettingsForm = () => {
                     >
                       <div className="flex flex-col gap-2">
                         <div className="relative">
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <InputGroup>
                               <FormInputGroupInput
                                 type="number"
                                 {...field}
-                                min={3}
-                                max={
-                                  chosenUnit === 'percent'
-                                    ? 80
-                                    : Math.floor(maxConnectionLimit * 0.8)
-                                }
                                 disabled={!canUpdateConfig || promptUpgrade}
                               />
                               <InputGroupAddon align="inline-end">
@@ -389,7 +392,7 @@ export const PerformanceSettingsForm = () => {
                                 </InputGroupText>
                               </InputGroupAddon>
                             </InputGroup>
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </div>
                         {isLoadingMaxConns ? (
                           <ShimmeringLoader className="py-2 w-16 ml-auto" />
@@ -413,13 +416,13 @@ export const PerformanceSettingsForm = () => {
 
               <CardFooter className="justify-end space-x-2">
                 {databaseForm.formState.isDirty && (
-                  <Button type="default" onClick={() => databaseForm.reset()}>
+                  <Button variant="default" onClick={() => databaseForm.reset()}>
                     Cancel
                   </Button>
                 )}
                 <Button
-                  type={promptUpgrade ? 'default' : 'primary'}
-                  htmlType="submit"
+                  variant={promptUpgrade ? 'default' : 'primary'}
+                  type="submit"
                   disabled={
                     !canUpdateConfig || isUpdatingDatabaseForm || !databaseForm.formState.isDirty
                   }
@@ -430,7 +433,7 @@ export const PerformanceSettingsForm = () => {
               </CardFooter>
             </Card>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </ScaffoldSection>
     </>
   )

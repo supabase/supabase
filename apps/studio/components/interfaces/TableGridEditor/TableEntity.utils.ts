@@ -24,6 +24,16 @@ export const getEntityLintDetails = (
   }
 }
 
+export const getTablePoliciesUrl = (
+  projectRef: string | undefined,
+  schema: string | undefined,
+  name: string | undefined
+): string => {
+  return `/project/${projectRef ?? ''}/auth/policies?search=${encodeURIComponent(
+    name ?? ''
+  )}&schema=${encodeURIComponent(schema ?? '')}`
+}
+
 export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
   if (rows.length === 0) return ''
 

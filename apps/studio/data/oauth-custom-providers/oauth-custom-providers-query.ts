@@ -16,7 +16,6 @@ export type OAuthCustomProvidersVariables = {
 export async function getOAuthCustomProviders({
   projectRef,
   clientEndpoint,
-  page = 1,
 }: OAuthCustomProvidersVariables & { clientEndpoint: string | undefined }) {
   if (!projectRef) throw new Error('Project reference is required')
   if (!clientEndpoint) throw new Error('Client endpoint is required')

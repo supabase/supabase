@@ -1,6 +1,5 @@
 import { Copy, RotateCcw } from 'lucide-react'
 import {
-  AlertDialog,
   Badge,
   Button,
   Card,
@@ -23,6 +22,10 @@ import type { WebhookDelivery } from './PlatformWebhooks.types'
 import { formatDeliveryStatus, statusBadgeVariant } from './PlatformWebhooksView.utils'
 import { getStatusLevel } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface PlatformWebhooksDeliveryDetailsSheetProps {
   deliveryAttempt: number | null
@@ -52,6 +55,18 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
   const retryableDelivery =
     selectedDelivery && selectedDelivery.status !== 'success' ? selectedDelivery : null
 
+  const activePayload =
+    deliveryDetailsTab === 'event' ? deliveryEventPayload : deliveryResponsePayload
+  const activePayloadLabel = deliveryDetailsTab === 'event' ? 'event payload' : 'response payload'
+  const copyPayloadShortcutLabel =
+    deliveryDetailsTab === 'event' ? 'Copy event payload' : 'Copy response payload'
+
+  useShortcut(
+    SHORTCUT_IDS.PLATFORM_WEBHOOKS_COPY_PAYLOAD,
+    () => onCopy(activePayload, activePayloadLabel),
+    { enabled: open, label: copyPayloadShortcutLabel }
+  )
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent size="default" className="flex flex-col gap-0">
@@ -68,7 +83,7 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
         <Separator />
 
         {selectedDelivery && (
-          <SheetSection className="overflow-auto flex-grow px-0 py-0">
+          <SheetSection className="overflow-auto grow px-0 py-0">
             <div className="space-y-6 p-5">
               <Card>
                 <CardContent className="grid grid-cols-1 gap-4 p-4 @md:grid-cols-2">
@@ -130,13 +145,18 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
                   <div className="space-y-2">
                     <div className="flex items-center justify-between gap-2">
                       <p className="text-sm text-foreground-light">Payload</p>
-                      <Button
-                        type="text"
-                        icon={<Copy size={14} />}
-                        onClick={() => onCopy(deliveryEventPayload, 'event payload')}
+                      <ShortcutTooltip
+                        shortcutId={SHORTCUT_IDS.PLATFORM_WEBHOOKS_COPY_PAYLOAD}
+                        label="Copy event payload"
                       >
-                        Copy
-                      </Button>
+                        <Button
+                          variant="text"
+                          icon={<Copy size={14} />}
+                          onClick={() => onCopy(deliveryEventPayload, 'event payload')}
+                        >
+                          Copy
+                        </Button>
+                      </ShortcutTooltip>
                     </div>
                     <div className="rounded-md border border-default bg-surface-200 p-3">
                       <pre className="whitespace-pre-wrap text-xs text-foreground">
@@ -168,13 +188,18 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
                   <div className="space-y-2">
                     <div className="flex items-center justify-between gap-2">
                       <p className="text-sm text-foreground-light">Response payload</p>
-                      <Button
-                        type="text"
-                        icon={<Copy size={14} />}
-                        onClick={() => onCopy(deliveryResponsePayload, 'response payload')}
+                      <ShortcutTooltip
+                        shortcutId={SHORTCUT_IDS.PLATFORM_WEBHOOKS_COPY_PAYLOAD}
+                        label="Copy response payload"
                       >
-                        Copy
-                      </Button>
+                        <Button
+                          variant="text"
+                          icon={<Copy size={14} />}
+                          onClick={() => onCopy(deliveryResponsePayload, 'response payload')}
+                        >
+                          Copy
+                        </Button>
+                      </ShortcutTooltip>
                     </div>
                     <div className="rounded-md border border-default bg-surface-200 p-3">
                       <pre className="whitespace-pre-wrap text-xs text-foreground">
@@ -190,13 +215,18 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
 
         {retryableDelivery && (
           <SheetFooter className="shrink-0">
-            <Button
-              type="default"
-              icon={<RotateCcw />}
-              onClick={() => onRetryDelivery(retryableDelivery.id)}
+            <Shortcut
+              id={SHORTCUT_IDS.PLATFORM_WEBHOOKS_RETRY_DELIVERY}
+              onTrigger={() => onRetryDelivery(retryableDelivery.id)}
             >
-              Retry delivery
-            </Button>
+              <Button
+                variant="default"
+                icon={<RotateCcw />}
+                onClick={() => onRetryDelivery(retryableDelivery.id)}
+              >
+                Retry delivery
+              </Button>
+            </Shortcut>
           </SheetFooter>
         )}
       </SheetContent>

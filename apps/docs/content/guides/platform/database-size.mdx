@@ -26,7 +26,7 @@ Database size is consumed primarily by your data, indexes, and materialized view
 
 <Admonition type="note">
 
-Depending on your billing plan, your database can go into read-only mode which can prevent you inserting and deleting data. There are instructions for managing read-only mode in the [Disk Management](#disk-management) section.
+Depending on your billing plan, your database can go into read-only mode which can prevent you inserting and deleting data. There are instructions for managing read-only mode in the [Read-Only Mode](#read-only-mode) section.
 
 </Admonition>
 
@@ -160,4 +160,4 @@ Disks don't automatically downsize during normal operation. Once you have [reduc
 
 In case you have a large WAL directory, you may [modify WAL settings](/docs/guides/database/custom-postgres-config) such as `max_wal_size`. Use at your own risk as changing these settings can have side effects. To query your current WAL size, use `SELECT SUM(size) FROM pg_ls_waldir()`.
 
-In the event that your project is already on the latest version of Postgres and cannot be upgraded, a new version of Postgres will be released approximately every week which you can then upgrade to once it becomes available.
+In the event that your project is already on the latest version of Postgres and waiting for the next release to allow upgrading is a concern, you can migrate your database to a new project as an alternative following the [Migrating within Supabase guide](/docs/guides/platform/migrating-within-supabase).

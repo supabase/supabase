@@ -1,9 +1,10 @@
-import { FlaskConical, Loader2, ScrollText, Settings } from 'lucide-react'
+import { useFlag } from 'common'
+import { FlaskConical, Loader2, ScrollText, User2 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 import {
-  Button,
   cn,
   DropdownMenu,
   DropdownMenuContent,
@@ -20,10 +21,14 @@ import {
 
 import { ButtonTooltip } from '../ui/ButtonTooltip'
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
+import { TimezoneDropdown } from './UserDropdown/TimezoneDropdown'
 import { ProfileImage } from '@/components/ui/ProfileImage'
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useUpgradeCtaExperiment } from '@/hooks/misc/useUpgradeCtaExperiment'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useProfileNameAndPicture } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 
 export function UserDropdown({
@@ -37,15 +42,32 @@ export function UserDropdown({
   const { theme, setTheme } = useTheme()
   const appStateSnapshot = useAppStateSnapshot()
   const profileShowEmailEnabled = useIsFeatureEnabled('profile:show_email')
+  const timezonePickerEnabled = useFlag('timezonePicker')
   const { username, avatarUrl, primaryEmail, isLoading } = useProfileNameAndPicture()
 
   const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
+  const track = useTrack()
+
+  const { variant: upgradeCtaVariant } = useUpgradeCtaExperiment()
+  // Per Slack feedback (Jonny): the upgrade CTA is org-scoped, so only show it on routes
+  // where an org is in scope. Excludes /account/*, /organizations, /new, marketing routes, etc.
+  const isOrgScopedRoute =
+    router.pathname.startsWith('/project/') || router.pathname.startsWith('/org/')
+  const showUpgradeCta = upgradeCtaVariant === 'user_dropdown' && isOrgScopedRoute
+
+  const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild className={cn('border flex-shrink-0 px-3', triggerClassName)}>
+    <DropdownMenu
+      open={isOpen}
+      onOpenChange={(open) => {
+        setIsOpen(open)
+        if (open) track('header_user_dropdown_opened')
+      }}
+    >
+      <DropdownMenuTrigger asChild className={cn('border shrink-0 px-3', triggerClassName)}>
         <ButtonTooltip
-          type="default"
+          variant="default"
           className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
           tooltip={{ content: { text: 'Account settings' } }}
         >
@@ -94,14 +116,13 @@ export function UserDropdown({
                     }
                   }}
                 >
-                  <Settings size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                  Account preferences
+                  <User2 size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                  Account
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="flex gap-2 cursor-pointer"
                 onClick={() => toggleFeaturePreviewModal(true)}
-                // onSelect={() => toggleFeaturePreviewModal(true)}
               >
                 <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                 Feature previews
@@ -139,6 +160,30 @@ export function UserDropdown({
             ))}
           </DropdownMenuRadioGroup>
         </DropdownMenuGroup>
+        {timezonePickerEnabled && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <TimezoneDropdown />
+            </DropdownMenuGroup>
+          </>
+        )}
+        {showUpgradeCta && (
+          <>
+            <DropdownMenuSeparator />
+            <div className="p-1">
+              <UpgradePlanButton
+                source="user_dropdown"
+                plan="Pro"
+                className="w-full justify-center"
+                onClick={() => {
+                  track('upgrade_cta_clicked', { placement: 'user_dropdown' })
+                  setIsOpen(false)
+                }}
+              />
+            </div>
+          </>
+        )}
         {IS_PLATFORM && (
           <>
             <DropdownMenuSeparator />

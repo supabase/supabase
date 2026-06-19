@@ -14,7 +14,6 @@ import {
 import {
   PageSection,
   PageSectionContent,
-  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
@@ -132,7 +131,7 @@ export const ProjectAccessSection = () => {
                       <p className="text-sm text-foreground-light">{projectAccessDescription}</p>
                     </div>
                     {!!organization?.slug && (
-                      <Button asChild type="default">
+                      <Button asChild variant="default">
                         <Link href={`/org/${organization.slug}/team`}>
                           {hasLimitedVisibility ? 'View team' : 'Manage members'}
                         </Link>

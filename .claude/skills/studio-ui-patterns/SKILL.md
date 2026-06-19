@@ -34,7 +34,7 @@ Docs: `apps/design-system/content/docs/ui-patterns/forms.mdx`
 
 - Use `react-hook-form` + `zod`
 - Use `FormItemLayout` instead of manually composing `FormItem`/`FormLabel`/`FormMessage`/`FormDescription`
-- Wrap inputs with `FormControl_Shadcn_`; use `_Shadcn_` imports from `ui` for primitives
+- Wrap inputs with `FormControl`; use `_Shadcn_` imports from `ui` for primitives
 
 Layout selection:
 

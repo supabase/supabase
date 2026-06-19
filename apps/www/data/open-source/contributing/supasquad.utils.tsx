@@ -1,7 +1,7 @@
 import { useBreakpoint } from 'common'
 import { LucideIcon } from 'lucide-react'
 import Link from 'next/link'
-import type { ComponentType, SVGProps } from 'react'
+import type { ComponentType, ReactNode, SVGProps } from 'react'
 import { cn } from 'ui'
 import z from 'zod'
 
@@ -43,9 +43,9 @@ export interface Metadata {
 export interface HeroSection {
   id: string
   title: string
-  h1: JSX.Element
-  subheader: JSX.Element[]
-  image: JSX.Element
+  h1: ReactNode
+  subheader: ReactNode
+  image: ReactNode
   className?: string
   sectionContainerClassName?: string
   icon?: string
@@ -66,7 +66,7 @@ export interface Quote {
   icon?: string
   author: string
   authorTitle?: string
-  quote: JSX.Element
+  quote: ReactNode
   avatar: string
 }
 
@@ -77,8 +77,8 @@ export interface Quotes {
 
 export interface Highlight {
   icon?: IconType
-  heading: string | JSX.Element
-  subheading: string | JSX.Element
+  heading: ReactNode
+  subheading: ReactNode
   url?: string
 }
 
@@ -86,16 +86,16 @@ export interface Feature {
   id?: string
   icon?: string
   iconNoStroke?: boolean
-  heading: string | JSX.Element
-  subheading: string | JSX.Element
-  img?: JSX.Element
+  heading: ReactNode
+  subheading: ReactNode
+  img?: ReactNode
 }
 
 export interface FeaturesSection {
   id: string
   label?: string
-  heading: JSX.Element
-  subheading?: string | JSX.Element
+  heading: ReactNode
+  subheading?: ReactNode
   features: Feature[]
   className?: string
   // {
@@ -106,7 +106,7 @@ export interface FeaturesSection {
 export interface Testimonials {
   id: string
   label: string
-  heading: JSX.Element
+  heading: ReactNode
   videos: {
     [key: string]: {
       url: string
@@ -117,7 +117,7 @@ export interface Testimonials {
 export interface CTASection {
   id: string
   label: string
-  heading: JSX.Element | string
+  heading: ReactNode
   subheading: string
   cta: {
     label: string

@@ -132,7 +132,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "publishable-or-anon-key"
+              supabaseKey = "your-publishable-key"
           ) {
               install(Auth)
               install(Postgrest)
@@ -145,7 +145,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "publishable-or-anon-key"
+              supabaseKey = "your-publishable-key"
           ) {
               install(Auth) {
                   alwaysAutoRefresh = false // default: true
@@ -202,7 +202,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "publishable-or-anon-key"
+              supabaseKey = "your-publishable-key"
           ) {
               install(Postgrest) {
                   defaultSchema = "schema" // default: "public"
@@ -228,7 +228,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "publishable-or-anon-key"
+              supabaseKey = "your-publishable-key"
           ) {
               install(Storage) {
                   transferTimeout = 90.seconds // Default: 120 seconds
@@ -255,7 +255,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "publishable-or-anon-key"
+              supabaseKey = "your-publishable-key"
           ) {
               install(Realtime) {
                   reconnectDelay = 5.seconds // Default: 7 seconds
@@ -282,7 +282,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "publishable-or-anon-key"
+              supabaseKey = "your-publishable-key"
           ) {
               install(Functions) {
                   //no custom settings
@@ -299,7 +299,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "publishable-or-anon-key"
+              supabaseKey = "your-publishable-key"
           ) {
               install(GraphQL) {
                   apolloConfiguration {
@@ -697,9 +697,9 @@ functions:
           }.decodeSingle<City>()
           ```
   - id: rpc
-    title: 'Stored Procedures: rpc()'
+    title: 'Database Functions: rpc()'
     description: |
-      You can call stored procedures as a "Remote Procedure Call".
+      You can call functions as a "Remote Procedure Call".
 
       That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
       It's especially useful when the logic rarely changes - like password resets and updates.
@@ -728,10 +728,10 @@ functions:
             type: String
             description: The schema to use for the function. Defaults to `public`
     examples:
-      - id: call-a-stored-procedure
-        name: Call a stored procedure
+      - id: call-a-database-function
+        name: Call a database function
         isSpotlight: true
-        description: This is an example invoking a stored procedure.
+        description: This is an example invoking a database function.
         code: |
           ```kotlin
           supabase.postgrest.rpc("hello_world")
@@ -2814,6 +2814,25 @@ functions:
         hideCodeBlock: true
         isSpotlight: true
 
+  - id: strip-nulls
+    title: stripNulls()
+    description: |
+      Strip null values from the response.
+    notes: |
+      - Requires PostgREST 11.2.0 or later.
+    examples:
+      - id: strip-nulls
+        name: Strip null values
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val data = supabase
+            .from("characters")
+            .select {
+              stripNulls()
+            }
+          ```
+
   - id: explain
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.explain'
     title: Using Explain
@@ -2892,7 +2911,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val supabase = createSupabaseClient(supabaseUrl = "https://xyzcompany.supabase.co'", supabaseKey = "publishable-or-anon-key") { ... }
+          val supabase = createSupabaseClient(supabaseUrl = "https://xyzcompany.supabase.co", supabaseKey = "your-publishable-key") { ... }
           val auth = supabase.auth
           ```
   - id: sign-up
@@ -3116,6 +3135,10 @@ functions:
             isOptional: true
             type: String?
             description: The captcha token when having captcha enabled.
+          - name: data
+            isOptional: true
+            type: JsonObject?
+            description: '**Deprecated** — use `extraData` or user metadata on the sign-up flow instead. Will be removed in a future release.'
 
     examples:
       - id: sign-in-with-id-token
@@ -3127,9 +3150,6 @@ functions:
               provider = Google //Also supported: Apple, Azure and Facebook
               //optional:
               nonce = "nonce"
-              data = buildJsonObject {
-                  //...
-              }
           }
           ```
   - id: sign-in-with-otp
@@ -4145,8 +4165,8 @@ functions:
   - id: admin-api
     title: 'Overview'
     notes: |
-      - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
-      - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the browser.
+      - Any method under the `supabase.auth.admin` namespace requires a `secret` key.
+      - These methods are considered admin methods and should be called on a trusted server. Never expose your `secret` key in the browser.
     examples:
       - id: create-auth-admin-client
         name: Create server-side auth client
@@ -4160,9 +4180,9 @@ functions:
               install(Auth) {
                   minimalConfig() //disables session saving and auto-refreshing
               }
-              // install other plugins (these will use the service role key)
+              // install other plugins (these will use the secret key)
           }
-          supabase.auth.importAuthToken("service_role")
+          supabase.auth.importAuthToken("your-secret-key")
 
           // Access auth admin api
           val adminAuthClient = supabase.auth.admin
@@ -4575,6 +4595,118 @@ functions:
         code: |
           ```kotlin
           supabase.auth.admin.deleteFactor(uid = "id", factorId = "factor_id")
+          ```
+  - id: oauth-admin-api
+    title: OAuth Admin API
+    notes: |
+      The OAuth Admin API allows you to manage OAuth clients programmatically.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+      These functions should only be called on a server. Never expose your `secret key` in the browser.
+  - id: admin-oauth-list-clients
+    title: 'admin.oauth.listClients()'
+    notes: |
+      Lists all OAuth 2.1 clients. Requires a `secret key`.
+    params:
+      - name: page
+        isOptional: true
+        type: Int?
+        description: The page number for pagination.
+      - name: perPage
+        isOptional: true
+        type: Int?
+        description: The number of results per page.
+    examples:
+      - id: list-oauth-clients
+        name: List all OAuth clients
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val clients = supabase.auth.admin.oauth.listClients()
+          ```
+  - id: admin-oauth-create-client
+    title: 'admin.oauth.createClient()'
+    notes: |
+      Creates a new OAuth 2.1 client. Requires a `secret key`.
+    examples:
+      - id: create-oauth-client
+        name: Create an OAuth client
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val client = supabase.auth.admin.oauth.createClient {
+              name = "My App"
+              redirectUris = listOf("https://example.com/callback")
+          }
+          ```
+  - id: admin-oauth-get-client
+    title: 'admin.oauth.getClient()'
+    notes: |
+      Retrieves an OAuth 2.1 client by ID. Requires a `secret key`.
+    params:
+      - name: clientId
+        isOptional: false
+        type: String
+        description: The ID of the OAuth client to retrieve.
+    examples:
+      - id: get-oauth-client
+        name: Get an OAuth client
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val client = supabase.auth.admin.oauth.getClient(clientId = "client_id")
+          ```
+  - id: admin-oauth-update-client
+    title: 'admin.oauth.updateClient()'
+    notes: |
+      Updates an existing OAuth 2.1 client. Requires a `secret key`.
+    params:
+      - name: clientId
+        isOptional: false
+        type: String
+        description: The ID of the OAuth client to update.
+    examples:
+      - id: update-oauth-client
+        name: Update an OAuth client
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val client = supabase.auth.admin.oauth.updateClient(clientId = "client_id") {
+              name = "Updated App Name"
+          }
+          ```
+  - id: admin-oauth-delete-client
+    title: 'admin.oauth.deleteClient()'
+    notes: |
+      Deletes an OAuth 2.1 client. Requires a `secret key`.
+    params:
+      - name: clientId
+        isOptional: false
+        type: String
+        description: The ID of the OAuth client to delete.
+    examples:
+      - id: delete-oauth-client
+        name: Delete an OAuth client
+        isSpotlight: true
+        code: |
+          ```kotlin
+          supabase.auth.admin.oauth.deleteClient(clientId = "client_id")
+          ```
+  - id: admin-oauth-regenerate-client-secret
+    title: 'admin.oauth.regenerateClientSecret()'
+    notes: |
+      Regenerates the client secret for an OAuth 2.1 client. Requires a `secret key`.
+    params:
+      - name: clientId
+        isOptional: false
+        type: String
+        description: The ID of the OAuth client whose secret should be regenerated.
+    examples:
+      - id: regenerate-client-secret
+        name: Regenerate client secret
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val client = supabase.auth.admin.oauth.regenerateClientSecret(clientId = "client_id")
           ```
   - id: invoke
     title: 'invoke()'

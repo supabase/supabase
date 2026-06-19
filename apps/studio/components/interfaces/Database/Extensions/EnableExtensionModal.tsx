@@ -11,16 +11,16 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectSeparator_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -168,7 +168,7 @@ export const EnableExtensionModal = ({
         )}
 
         <DialogSection>
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form id="enable-extensions-form" onSubmit={form.handleSubmit(onSubmit)}>
               {isLoading ? (
                 <div className="space-y-2">
@@ -183,7 +183,7 @@ export const EnableExtensionModal = ({
                     isReactForm={false}
                     label="Select a schema to enable the extension for"
                   >
-                    <Input_Shadcn_ disabled value={defaultSchema} />
+                    <Input disabled value={defaultSchema} />
                   </FormItemLayout>
                   <p className="text-sm text-foreground-light">
                     Extension must be installed in the "{defaultSchema}" schema.
@@ -191,7 +191,7 @@ export const EnableExtensionModal = ({
                 </div>
               ) : (
                 <div className="flex flex-col gap-y-2">
-                  <FormField_Shadcn_
+                  <FormField
                     key="schema"
                     name="schema"
                     control={form.control}
@@ -200,24 +200,24 @@ export const EnableExtensionModal = ({
                         name="schema"
                         label="Select a schema to enable the extension for"
                       >
-                        <FormControl_Shadcn_>
-                          <Select_Shadcn_
+                        <FormControl>
+                          <Select
                             value={field.value}
                             onValueChange={field.onChange}
                             disabled={!!defaultSchema}
                           >
-                            <SelectTrigger_Shadcn_>
-                              <SelectValue_Shadcn_ placeholder="Select a schema" />
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
-                              <SelectItem_Shadcn_ value="custom">
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a schema" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="custom">
                                 Create a new schema{' '}
                                 <code className="text-code-inline">{extension.name}</code>
-                              </SelectItem_Shadcn_>
-                              <SelectSeparator_Shadcn_ />
+                              </SelectItem>
+                              <SelectSeparator />
                               {availableSchemas.map((schema) => {
                                 return (
-                                  <SelectItem_Shadcn_ key={schema.id} value={schema.name}>
+                                  <SelectItem key={schema.id} value={schema.name}>
                                     {schema.name}
                                     {schema.name === recommendedSchema ? (
                                       <Badge className="ml-2" variant="success">
@@ -226,12 +226,12 @@ export const EnableExtensionModal = ({
                                     ) : !defaultSchema && schema.name === 'extensions' ? (
                                       <Badge className="ml-2">Default</Badge>
                                     ) : null}
-                                  </SelectItem_Shadcn_>
+                                  </SelectItem>
                                 )
                               })}
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
-                        </FormControl_Shadcn_>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -244,15 +244,15 @@ export const EnableExtensionModal = ({
                   )}
 
                   {schema === 'custom' && (
-                    <FormField_Shadcn_
+                    <FormField
                       key="name"
                       name="name"
                       control={form.control}
                       render={({ field }) => (
                         <FormItemLayout name="name" label="Schema name">
-                          <FormControl_Shadcn_>
-                            <Input_Shadcn_ {...field} />
-                          </FormControl_Shadcn_>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
@@ -260,15 +260,15 @@ export const EnableExtensionModal = ({
                 </div>
               )}
             </form>
-          </Form_Shadcn_>
+          </Form>
         </DialogSection>
 
         <DialogFooter>
-          <Button type="default" disabled={isEnabling} onClick={() => onCancel()}>
+          <Button variant="default" disabled={isEnabling} onClick={() => onCancel()}>
             Cancel
           </Button>
           <Button
-            htmlType="submit"
+            type="submit"
             form="enable-extensions-form"
             loading={isEnabling}
             disabled={isLoading || isEnabling}

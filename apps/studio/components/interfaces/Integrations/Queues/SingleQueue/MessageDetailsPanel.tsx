@@ -89,7 +89,7 @@ export const MessageDetailsPanel = ({
       className="bg-studio border-t pointer-events-auto"
     >
       <Button
-        type="text"
+        variant="text"
         className="absolute top-3 right-3 px-1"
         icon={<X />}
         onClick={() => setSelectedMessage(null)}
@@ -105,7 +105,7 @@ export const MessageDetailsPanel = ({
         <TabsList_Shadcn_ className="px-5 flex gap-x-4 min-h-[46px]">
           <TabsTrigger_Shadcn_
             value="details"
-            className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent !shadow-none"
+            className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent shadow-none!"
           >
             Overview
           </TabsTrigger_Shadcn_>
@@ -172,7 +172,7 @@ export const MessageDetailsPanel = ({
                     icon: <Archive />,
                     text: 'Archive',
                     isLoading: isLoadingArchive,
-                    type: 'warning',
+                    variant: 'warning',
                     onClick: () => {
                       archiveMessage({
                         projectRef: project!.ref,
@@ -197,7 +197,7 @@ export const MessageDetailsPanel = ({
                   button={{
                     icon: <Trash2 />,
                     text: 'Delete',
-                    type: 'danger',
+                    variant: 'danger',
                     isLoading: isLoadingDelete,
                     onClick: () => {
                       deleteMessage({

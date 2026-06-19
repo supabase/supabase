@@ -12,12 +12,6 @@ You can control client access to Realtime [Broadcast](/docs/guides/realtime/broa
 - Control which clients can publish their presence to a Channel
 - Control which clients can receive messages about the presence of other clients
 
-<Admonition type="caution">
-
-Realtime Authorization is in Public Beta. To use Authorization for your Realtime Channels, use `supabase-js` version `v2.44.0` or later.
-
-</Admonition>
-
 <Admonition type="note">
 
 To enforce private channels you need to disable the 'Allow public access' setting in [Realtime Settings](/dashboard/project/_/realtime/settings)
@@ -90,6 +84,8 @@ create table public.rooms (
     topic text not null unique
 );
 
+GRANT SELECT ON public.rooms TO anon;
+
 alter table public.rooms enable row level security;
 
 create table public.profiles (
@@ -99,6 +95,9 @@ create table public.profiles (
   primary key (id)
 );
 
+GRANT SELECT ON public.profiles TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO authenticated;
+
 alter table public.profiles enable row level security;
 
 create table public.rooms_users (
@@ -107,7 +106,15 @@ create table public.rooms_users (
   created_at timestamptz default current_timestamp
 );
 
+GRANT SELECT ON public.rooms_users TO authenticated;
+
 alter table public.rooms_users enable row level security;
+
+create policy "authenticated can read own room memberships"
+on public.rooms_users
+for select
+to authenticated
+using ((select auth.uid()) = user_id);
 ```
 
 ### Broadcast
@@ -374,9 +381,9 @@ with check (
 
 ## Interaction with Postgres Changes
 
-Realtime Postgres Changes are separate from Channel authorization. The `private` Channel option does not apply to Postgres Changes.
+When using Postgres Changes on tables with RLS, database records are sent only to clients who are allowed to read them based on your RLS policies.
 
-When using Postgres Changes with RLS, database records are sent only to clients who are allowed to read them based on your RLS policies.
+Private and public channels can subscribe to Postgres Changes.
 
 ## Updating RLS policies
 

@@ -3,11 +3,17 @@ import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import {
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
-  Modal,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Form,
+  FormControl,
+  FormField,
+  Input,
   Textarea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -53,46 +59,51 @@ export const UpdateSavedQueryModal = ({
   }
 
   return (
-    <Modal visible={visible} onCancel={handleCancel} hideFooter header={header} size="medium">
-      <Form_Shadcn_ {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
-          <Modal.Content>
-            <FormField_Shadcn_
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItemLayout layout="vertical" label="Name">
-                  <FormControl_Shadcn_>
-                    <Input_Shadcn_ {...field} placeholder="Enter text" />
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
-              )}
-            />
-          </Modal.Content>
-          <Modal.Content>
-            <FormField_Shadcn_
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItemLayout layout="vertical" label="Description">
-                  <FormControl_Shadcn_>
-                    <Textarea {...field} placeholder="Describe query" className="resize-none" />
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
-              )}
-            />
-          </Modal.Content>
-          <Modal.Separator />
-          <Modal.Content className="flex items-center justify-end gap-2">
-            <Button htmlType="reset" type="default" onClick={handleCancel} disabled={isSubmitting}>
-              Cancel
-            </Button>
-            <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting || !isDirty}>
-              Save query
-            </Button>
-          </Modal.Content>
-        </form>
-      </Form_Shadcn_>
-    </Modal>
+    <Dialog open={visible} onOpenChange={handleCancel}>
+      <DialogContent size="medium">
+        <DialogHeader>
+          <DialogTitle>{header}</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+            <DialogSection>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItemLayout layout="vertical" label="Name">
+                    <FormControl>
+                      <Input {...field} placeholder="Enter text" />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            </DialogSection>
+            <DialogSection>
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItemLayout layout="vertical" label="Description">
+                    <FormControl>
+                      <Textarea {...field} placeholder="Describe query" className="resize-none" />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            </DialogSection>
+            <DialogFooter>
+              <Button type="reset" variant="default" onClick={handleCancel} disabled={isSubmitting}>
+                Cancel
+              </Button>
+              <Button type="submit" loading={isSubmitting} disabled={isSubmitting || !isDirty}>
+                Save query
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   )
 }

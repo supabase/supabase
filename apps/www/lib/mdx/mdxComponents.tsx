@@ -1,45 +1,51 @@
-'use client'
-
-import { CH } from '@code-hike/mdx/components'
-import { ArrowUpRight, Triangle } from 'lucide-react'
-import dynamic from 'next/dynamic'
-import type { PropsWithChildren } from 'react'
 import {
-  Badge,
-  cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  Heading,
-} from 'ui'
+  Annotation,
+  annotations,
+  Code,
+  CodeSlot,
+  InlineCode,
+  Preview,
+  PreviewSlot,
+  Scrollycoding,
+  Section,
+  SectionCode,
+  SectionLink,
+  Slideshow,
+  Spotlight,
+} from '@code-hike/mdx/components'
+import Avatar from '~/components/Avatar'
+import BlogCollapsible from '~/components/Blog/BlogCollapsible'
+import DeveloperGrowthChart from '~/components/Charts/DeveloperGrowthChart'
+import Chart from '~/components/Charts/PGCharts'
+import CodeBlock from '~/components/CodeBlock/CodeBlock'
+import { NamedCodeBlock } from '~/components/CodeTabs'
+import ImageFadeStack from '~/components/ImageFadeStack'
+import ImageGrid from '~/components/ImageGrid'
+import InlineCodeTag from '~/components/InlineCode'
+import Quote from '~/components/Quote'
+import Tabs, { TabPanel } from '~/components/Tabs/Tabs'
+import { ArrowUpRight } from 'lucide-react'
+import type { PropsWithChildren } from 'react'
+import { Badge, cn, Heading } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Image, type ImageProps } from 'ui-patterns/Image'
 import { Mermaid } from 'ui-patterns/Mermaid'
 
-const Avatar = dynamic(() => import('~/components/Avatar'))
-const Chart = dynamic(() => import('~/components/Charts/PGCharts'))
-const DeveloperGrowthChart = dynamic(() => import('~/components/Charts/DeveloperGrowthChart'), {
-  ssr: false,
-})
-const CodeBlock = dynamic(() => import('~/components/CodeBlock/CodeBlock'))
-const Tabs = dynamic(() => import('~/components/Tabs/Tabs'), { ssr: false })
-const TabPanel = dynamic(
-  () => import('~/components/Tabs/Tabs').then((mod) => ({ default: mod.TabPanel })),
-  { ssr: false }
-)
-const NamedCodeBlock = dynamic(
-  () =>
-    import('~/components/CodeTabs').then((mod) => ({
-      default: mod.NamedCodeBlock,
-    })),
-  {
-    ssr: false,
-  }
-)
-const ImageFadeStack = dynamic(() => import('~/components/ImageFadeStack'))
-const ImageGrid = dynamic(() => import('~/components/ImageGrid'))
-const InlineCodeTag = dynamic(() => import('~/components/InlineCode'))
-const Quote = dynamic(() => import('~/components/Quote'))
+const CH = {
+  Annotation,
+  Code,
+  CodeSlot,
+  InlineCode,
+  Preview,
+  PreviewSlot,
+  Scrollycoding,
+  Section,
+  SectionCode,
+  SectionLink,
+  Slideshow,
+  Spotlight,
+  annotations,
+}
 
 // import all components used in blog articles here
 // to do: move this into a helper/utils, it is used elsewhere
@@ -56,36 +62,6 @@ const LinkComponent = (props: PropsWithChildren<HTMLAnchorElement>) => (
     {props.target === '_blank' && <ArrowUpRight className="absolute -right-3.5 w-3 top-0" />}
   </a>
 )
-
-const BlogCollapsible = ({
-  title,
-  containerClassName,
-  ...props
-}: {
-  title: string
-  containerClassName?: string
-}) => {
-  return (
-    <Collapsible_Shadcn_ className={containerClassName}>
-      <CollapsibleTrigger_Shadcn_
-        className="
-        data-[state=open]:text
-        hover:text-foreground-light
-        flex items-center gap-3
-        [&>svg]:fill-current
-        [&>svg]:rotate-90
-        [&>svg]:transition-transform
-        [&>svg]:data-[state='open']:rotate-180
-        [&>svg]:data-[state='open']:text
-        "
-      >
-        <Triangle size={10} />
-        <span>{title}</span>
-      </CollapsibleTrigger_Shadcn_>
-      <CollapsibleContent_Shadcn_ {...props} />
-    </Collapsible_Shadcn_>
-  )
-}
 
 export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
   const components = {

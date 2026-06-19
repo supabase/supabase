@@ -80,6 +80,29 @@ SUPABASE_PUBLISHABLE_KEY=supabase_publishable_key
 ```
 
 </TabPanel>
+<TabPanel id="nuxt" label="Nuxt">
+
+```bash .env
+NUXT_PUBLIC_SUPABASE_URL=supabase_project_url
+NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=supabase_publishable_key
+```
+
+In `nuxt.config.ts`, map these public env vars into runtime config keys used by the examples below:
+
+```ts nuxt.config.ts
+export default defineNuxtConfig({
+  runtimeConfig: {
+    public: {
+      // These defaults will be overridden by NUXT_PUBLIC_SUPABASE_URL and
+      // NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY environment variables at runtime.
+      supabaseUrl: '',
+      supabasePublishableKey: '',
+    },
+  },
+})
+```
+
+</TabPanel>
 <TabPanel id="react-router" label="React Router">
 
 ```bash .env
@@ -149,6 +172,8 @@ You need setup code to configure a Supabase client to use cookies. Once you have
 
 Use the browser client in code that runs on the browser, and the server client in code that runs on the server.
 
+<$Partial path="auth_methods.mdx" />
+
 <Tabs
   scrollable
   size="small"
@@ -172,6 +197,8 @@ The Proxy is responsible for:
 1. Refreshing the Auth token by calling `supabase.auth.getClaims()`.
 2. Passing the refreshed Auth token to Server Components, so they don't attempt to refresh the same token themselves. This is accomplished with `request.cookies.set`.
 3. Passing the refreshed Auth token to the browser, so it replaces the old token. This is accomplished with `response.cookies.set`.
+
+<$Partial path="auth_methods.mdx" />
 
 <Accordion>
 
@@ -235,6 +262,8 @@ It's safe to trust `getClaims()` because it validates the JWT signature against 
 
 </Admonition>
 
+<$Partial path="auth_methods.mdx" />
+
 <div className="mt-12">
   <$CodeTabs>
     <$CodeSample path="/auth/nextjs/proxy.ts" meta="name=proxy.ts" language="typescript" />
@@ -267,6 +296,8 @@ Set up server-side hooks in `src/hooks.server.ts`. The hooks:
 - Create a request-specific Supabase client, using the user credentials from the request cookie. This client is used for server-only code.
 - Check user authentication.
 - Guard protected pages.
+
+<$Partial path="auth_methods.mdx" />
 
 <$CodeSample
 path="/auth/sveltekit/src/hooks.server.ts"
@@ -551,6 +582,79 @@ You can now use any Supabase features from your client or server code!
 
 </TabPanel>
 
+<TabPanel id="nuxt" label="Nuxt">
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="nuxt-server"
+  queryGroup="environment"
+>
+<TabPanel id="nuxt-server" label="Server route">
+
+```ts server/api/hello.ts
+import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
+import { appendHeader, defineEventHandler, getHeader } from 'h3'
+
+export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig()
+
+  const supabase = createServerClient(
+    config.public.supabaseUrl,
+    config.public.supabasePublishableKey,
+    {
+      cookies: {
+        getAll() {
+          return parseCookieHeader(getHeader(event, 'Cookie') ?? '')
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            appendHeader(event, 'Set-Cookie', serializeCookieHeader(name, value, options))
+          })
+        },
+      },
+    }
+  )
+
+  await supabase.auth.getClaims()
+
+  return { ok: true }
+})
+```
+
+</TabPanel>
+
+<TabPanel id="nuxt-browser" label="Browser plugin">
+
+```ts plugins/supabase.client.ts
+import { createBrowserClient } from '@supabase/ssr'
+
+export default defineNuxtPlugin(() => {
+  const config = useRuntimeConfig()
+
+  const supabase = createBrowserClient(
+    config.public.supabaseUrl,
+    config.public.supabasePublishableKey
+  )
+
+  return {
+    provide: {
+      supabase,
+    },
+  }
+})
+```
+
+</TabPanel>
+</Tabs>
+
+## Congratulations
+
+You can now use any Supabase features from your client or server code!
+
+</TabPanel>
+
 <TabPanel id="react-router" label="React Router">
 
 <Tabs
@@ -746,6 +850,8 @@ language="typescript"
 <TabPanel id="hono-route" label="Route">
 
 You can now use this middleware in your Hono application to create a server Supabase client that can be used to make authenticated requests.
+
+<$Partial path="auth_methods.mdx" />
 
 <$CodeSample
 path="/auth/hono/src/index.tsx"

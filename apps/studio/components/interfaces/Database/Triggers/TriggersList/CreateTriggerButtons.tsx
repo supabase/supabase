@@ -29,10 +29,10 @@ export const CreateTriggerButtons = ({
   return (
     <div className="flex items-center gap-x-2">
       <ButtonTooltip
-        type={buttonType}
+        variant={buttonType}
         disabled={!hasTables || !canCreateTriggers}
         onClick={onCreateTrigger}
-        className="flex-grow"
+        className="grow"
         icon={showPlusIcon ? <Plus /> : undefined}
         tooltip={{
           content: {
@@ -50,7 +50,7 @@ export const CreateTriggerButtons = ({
 
       {hasTables && (
         <ButtonTooltip
-          type="default"
+          variant="default"
           disabled={!hasTables || !canCreateTriggers}
           className="px-1 pointer-events-auto"
           icon={<AiIconAnimation size={16} />}

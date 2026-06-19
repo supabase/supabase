@@ -12,28 +12,31 @@ import {
   type SetupIntent,
 } from '@stripe/stripe-js'
 import { Form } from '@ui/components/shadcn/ui/form'
-import { Check, ChevronsUpDown } from 'lucide-react'
+import { Check, ChevronsUpDown, HelpCircle } from 'lucide-react'
 import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
-  Command_Shadcn_ as Command,
-  CommandEmpty_Shadcn_ as CommandEmpty,
-  CommandGroup_Shadcn_ as CommandGroup,
-  CommandInput_Shadcn_ as CommandInput,
-  CommandItem_Shadcn_ as CommandItem,
-  CommandList_Shadcn_ as CommandList,
-  FormControl_Shadcn_ as FormControl,
-  FormField_Shadcn_ as FormField,
-  FormItem_Shadcn_,
-  FormMessage_Shadcn_ as FormMessage,
-  Input_Shadcn_ as Input,
-  Popover_Shadcn_ as Popover,
-  PopoverContent_Shadcn_ as PopoverContent,
-  PopoverTrigger_Shadcn_ as PopoverTrigger,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
@@ -337,7 +340,7 @@ export const NewPaymentMethodElement = forwardRef(
 
         {fullyLoaded && (
           <div className="flex items-center space-x-2 py-4">
-            <Checkbox_Shadcn_
+            <Checkbox
               id="business"
               checked={purchasingAsBusiness}
               onCheckedChange={() => setPurchasingAsBusiness(!purchasingAsBusiness)}
@@ -345,6 +348,20 @@ export const NewPaymentMethodElement = forwardRef(
             <label htmlFor="business" className="text-foreground text-sm leading-none">
               I’m purchasing as a business
             </label>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <HelpCircle
+                  size={14}
+                  className="text-foreground-lighter hover:text-foreground transition"
+                />
+              </TooltipTrigger>
+              <TooltipContent side="top" className="w-72">
+                Check this only if you need a tax ID (e.g. US EIN, VAT, GST) on your invoice. You’ll
+                be asked to enter it, and it’ll appear on a compliant business invoice. If you don’t
+                have a tax ID, or don’t need one shown, leave this unchecked. You’ll still receive a
+                receipt.
+              </TooltipContent>
+            </Tooltip>
           </div>
         )}
 
@@ -372,13 +389,13 @@ export const NewPaymentMethodElement = forwardRef(
               <FormField
                 name="tax_id_name"
                 control={form.control}
-                render={({ field }) => (
+                render={() => (
                   <FormItemLayout hideMessage layout="vertical">
                     <Popover open={showTaxIDsPopover} onOpenChange={setShowTaxIDsPopover}>
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
-                            type="default"
+                            variant="default"
                             role="combobox"
                             size="medium"
                             aria-expanded={showTaxIDsPopover}
@@ -446,12 +463,12 @@ export const NewPaymentMethodElement = forwardRef(
                   name="tax_id_value"
                   control={form.control}
                   render={({ field }) => (
-                    <FormItem_Shadcn_>
+                    <FormItem>
                       <FormControl>
                         <Input {...field} placeholder={selectedTaxId?.placeholder} />
                       </FormControl>
                       <FormMessage />
-                    </FormItem_Shadcn_>
+                    </FormItem>
                   )}
                 />
               )}

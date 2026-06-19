@@ -1,5 +1,5 @@
 import { InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
-import { components } from 'api-types'
+import { platformComponents as components } from 'api-types'
 import { useCallback } from 'react'
 
 import { INFINITE_PROJECTS_KEY_PREFIX, projectKeys } from './keys'

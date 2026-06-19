@@ -7,7 +7,7 @@ import { z } from 'zod'
 
 import { getDatabaseFunctions } from '@/data/database-functions/database-functions-query'
 import { getDatabasePolicies } from '@/data/database-policies/database-policies-query'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { executeQuery } from '@/lib/api/self-hosted/query'
 
 export const getFallbackTools = ({
@@ -37,7 +37,7 @@ export const getFallbackTools = ({
       }),
       execute: async ({ schemas }) => {
         try {
-          const result = includeSchemaMetadata
+          const { result } = includeSchemaMetadata
             ? await executeSql(
                 {
                   projectRef,

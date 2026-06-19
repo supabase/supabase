@@ -101,7 +101,7 @@ function StateOfStartupsPage() {
         <div className="relative">
           {/* Closed ToC */}
           <Button
-            type="default"
+            variant="default"
             size="small"
             onClick={() => setIsTocOpen(true)}
             className={cn(
@@ -174,10 +174,11 @@ function StateOfStartupsPage() {
       <NextSeo
         title={meta_title}
         description={meta_description}
+        canonical="https://supabase.com/state-of-startups-2025"
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/state-of-startups`,
+          url: `https://supabase.com/state-of-startups-2025`,
           images: [
             {
               url: `https://supabase.com/images/state-of-startups/state-of-startups-og.png`,
@@ -192,7 +193,7 @@ function StateOfStartupsPage() {
         <section ref={heroRef} className="w-full">
           <StateOfStartupsHeader />
           <SurveySectionBreak className="hidden md:block" />
-          <div className="grid grid-cols-1 md:grid-cols-3 max-w-[60rem] mx-auto md:border-x border-muted">
+          <div className="grid grid-cols-1 md:grid-cols-3 max-w-240 mx-auto md:border-x border-muted">
             {/* Intro text */}
             <div className="md:col-span-2 flex flex-col gap-4 px-8 py-10 border-b md:border-b-0 md:border-r border-muted text-foreground text-xl md:text-2xl text-balance">
               <p>{pageData.heroSection.subheader}</p>
@@ -323,7 +324,7 @@ const CTABanner = forwardRef<HTMLElement>((props, ref) => {
             Start your project
           </Link>
         </Button>
-        <Button asChild size="medium" type="default">
+        <Button asChild size="medium" variant="default">
           <Link
             href="/contact/sales"
             onClick={() =>

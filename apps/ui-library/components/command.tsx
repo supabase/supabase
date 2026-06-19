@@ -62,7 +62,7 @@ export function Command({ name, highlight, framework = 'react' }: CommandCopyPro
       <div className="w-full group relative rounded-lg bg-surface-200 dark:bg-surface-100 px-4 py-2 overflow-hidden">
         {highlight && (
           <motion.div
-            className="absolute inset-0 bg-gradient-to-l from-transparent via-[#bbb] dark:via-white to-transparent opacity-10 z-0"
+            className="absolute inset-0 bg-linear-to-l from-transparent via-[#bbb] dark:via-white to-transparent opacity-10 z-0"
             initial={{ x: '100%' }}
             animate={{ x: '-100%' }}
             transition={{

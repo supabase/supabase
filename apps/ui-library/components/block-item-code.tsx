@@ -75,7 +75,7 @@ export function BlockItemCode({ files }: BlockItemCodeProps) {
   return (
     <div className="flex mt-4 border rounded-lg overflow-hidden h-[652px] not-prose">
       {/* File browser sidebar */}
-      <div className="w-64 grow-0 shrink-0 flex-0 py-2 border-r bg-muted/30 overflow-y-auto">
+      <div className="w-64 py-2 border-r bg-muted/30 overflow-y-auto">
         <TreeView
           data={flattenedData}
           aria-label="file browser"
@@ -104,7 +104,7 @@ export function BlockItemCode({ files }: BlockItemCodeProps) {
       {selectedFile?.content ? (
         <CodeBlock
           wrapperClassName="w-full"
-          className="h-full max-w-none !w-full flex-1 font-mono text-xs rounded-none border-none"
+          className="h-full max-w-none w-full! flex-1 font-mono text-xs rounded-none border-none"
           language="ts"
         >
           {selectedFile?.content}

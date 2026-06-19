@@ -4,7 +4,20 @@ import { useParams } from 'common'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, cn, DialogSectionSeparator, Form_Shadcn_, Modal, ScrollArea } from 'ui'
+import {
+  Button,
+  cn,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Form,
+  ScrollArea,
+} from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
 import * as z from 'zod'
@@ -82,55 +95,59 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
   }, [visible])
 
   return (
-    <Modal
-      hideFooter
-      size="medium"
-      className="!max-w-[440px]"
-      visible={visible}
-      onCancel={() => {
+    <Dialog
+      open={visible}
+      onOpenChange={() => {
         form.reset(initialValues)
         onClose()
       }}
-      header="Add new redirect URLs"
-      description="This will add a URL to a list of allowed URLs that can interact with your Authentication services for this project."
     >
-      <Form_Shadcn_ {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <Modal.Content className="flex flex-col gap-y-2 px-0">
-            <Label className="px-5">URL</Label>
-            <ScrollArea className={cn(urls.length > 4 ? 'h-[220px]' : '')}>
-              <div className="px-5 py-1">
-                <FormItemLayout className="[&>div>div]:mt-0">
-                  <SingleValueFieldArray
-                    control={form.control}
-                    name="urls"
-                    valueFieldName="value"
-                    createEmptyRow={() => ({ value: '' })}
-                    placeholder="https://mydomain.com"
-                    addLabel="Add URL"
-                    removeLabel="Remove URL"
-                    minimumRows={1}
-                    rowsClassName="space-y-2"
-                    addButtonClassName="w-min"
-                  />
-                </FormItemLayout>
-              </div>
-            </ScrollArea>
-          </Modal.Content>
-          <DialogSectionSeparator />
-          <Modal.Content>
-            <Button
-              block
-              htmlType="submit"
-              size="small"
-              disabled={isUpdatingConfig}
-              loading={isUpdatingConfig}
-            >
-              Save URLs
-            </Button>
-          </Modal.Content>
-        </form>
-      </Form_Shadcn_>
-    </Modal>
+      <DialogContent size="medium" className="max-w-[440px]!">
+        <DialogHeader>
+          <DialogTitle>Add new redirect URLs</DialogTitle>
+          <DialogDescription>
+            This will add a URL to a list of allowed URLs that can interact with your Authentication
+            services for this project.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <DialogSection className="flex flex-col gap-y-2 px-0">
+              <Label className="px-5">URL</Label>
+              <ScrollArea className={cn(urls.length > 4 ? 'h-[220px]' : '')}>
+                <div className="px-5 py-1">
+                  <FormItemLayout className="[&>div>div]:mt-0">
+                    <SingleValueFieldArray
+                      control={form.control}
+                      name="urls"
+                      valueFieldName="value"
+                      createEmptyRow={() => ({ value: '' })}
+                      placeholder="https://mydomain.com"
+                      addLabel="Add URL"
+                      removeLabel="Remove URL"
+                      minimumRows={1}
+                      rowsClassName="space-y-2"
+                      addButtonClassName="w-min"
+                    />
+                  </FormItemLayout>
+                </div>
+              </ScrollArea>
+            </DialogSection>
+            <DialogFooter>
+              <Button
+                block
+                type="submit"
+                size="small"
+                disabled={isUpdatingConfig}
+                loading={isUpdatingConfig}
+              >
+                Save URLs
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   )
 }

@@ -47,13 +47,13 @@ export const NewProjectPanel = () => {
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <Button asChild type="default" icon={<TableEditor strokeWidth={1.5} />}>
+                <Button asChild variant="default" icon={<TableEditor strokeWidth={1.5} />}>
                   <EditorIndexPageLink projectRef={ref}>Table Editor</EditorIndexPageLink>
                 </Button>
-                <Button asChild type="default" icon={<SqlEditor strokeWidth={1.5} />}>
+                <Button asChild variant="default" icon={<SqlEditor strokeWidth={1.5} />}>
                   <Link href={`/project/${ref}/sql/new`}>SQL Editor</Link>
                 </Button>
-                <Button asChild type="default" icon={<ExternalLink />}>
+                <Button asChild variant="default" icon={<ExternalLink />}>
                   <Link href={`${DOCS_URL}/guides/database`} target="_blank" rel="noreferrer">
                     About Database
                   </Link>
@@ -78,25 +78,25 @@ export const NewProjectPanel = () => {
                 <Panel>
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-3">
-                      <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                      <div className="rounded-sm bg-surface-300 p-1.5 text-foreground-light shadow-xs">
                         <Auth size={16} strokeWidth={1.5} />
                       </div>
                       <h5>Authentication</h5>
                     </div>
-                    <div className="flex flex-grow md:min-h-[50px] xl:min-h-[75px]">
+                    <div className="flex grow md:min-h-[50px] xl:min-h-[75px]">
                       <p className="text-sm text-foreground-light">
                         A complete user management system that works without any additional tools.
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Button type="default" asChild>
+                      <Button variant="default" asChild>
                         <Link href={`/project/${ref}/auth/users`}>Explore Auth</Link>
                       </Button>
 
                       <Button
-                        className="translate-y-[1px]"
+                        className="translate-y-px"
                         icon={<ExternalLink />}
-                        type="default"
+                        variant="default"
                         asChild
                       >
                         <Link href={`${DOCS_URL}/guides/auth`} target="_blank" rel="noreferrer">
@@ -110,7 +110,7 @@ export const NewProjectPanel = () => {
                 <Panel>
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-3">
-                      <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                      <div className="rounded-sm bg-surface-300 p-1.5 text-foreground-light shadow-xs">
                         <Storage size={16} strokeWidth={1.5} />
                       </div>
                       <h5>Storage</h5>
@@ -121,14 +121,14 @@ export const NewProjectPanel = () => {
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Button type="default" asChild>
+                      <Button variant="default" asChild>
                         <Link href={`/project/${ref}/storage/buckets`}>Explore Storage</Link>
                       </Button>
 
                       <Button
-                        className="translate-y-[1px]"
+                        className="translate-y-px"
                         icon={<ExternalLink />}
-                        type="default"
+                        variant="default"
                         asChild
                       >
                         <Link href={`${DOCS_URL}/guides/storage`} target="_blank" rel="noreferrer">
@@ -142,7 +142,7 @@ export const NewProjectPanel = () => {
                 <Panel>
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-3">
-                      <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                      <div className="rounded-sm bg-surface-300 p-1.5 text-foreground-light shadow-xs">
                         <EdgeFunctions size={16} strokeWidth={1.5} />
                       </div>
                       <h5>Edge Functions</h5>
@@ -154,13 +154,13 @@ export const NewProjectPanel = () => {
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Button type="default" asChild>
+                      <Button variant="default" asChild>
                         <Link href={`/project/${ref}/functions`}>Explore Functions</Link>
                       </Button>
                       <Button
-                        className="translate-y-[1px]"
+                        className="translate-y-px"
                         icon={<ExternalLink />}
-                        type="default"
+                        variant="default"
                         asChild
                       >
                         <Link
@@ -177,7 +177,7 @@ export const NewProjectPanel = () => {
                 <Panel>
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-4">
-                      <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                      <div className="rounded-sm bg-surface-300 p-1.5 text-foreground-light shadow-xs">
                         <Realtime size={16} strokeWidth={1.5} />
                       </div>
                       <h5>Realtime</h5>
@@ -188,13 +188,13 @@ export const NewProjectPanel = () => {
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Button type="default" asChild>
+                      <Button variant="default" asChild>
                         <Link href={`/project/${ref}/realtime/inspector`}>Explore Realtime</Link>
                       </Button>
                       <Button
-                        className="translate-y-[1px]"
+                        className="translate-y-px"
                         icon={<ExternalLink />}
-                        type="default"
+                        variant="default"
                         asChild
                       >
                         <Link href={`${DOCS_URL}/guides/realtime`} target="_blank" rel="noreferrer">
@@ -221,7 +221,7 @@ export const NewProjectPanel = () => {
             </p>
           </div>
           <div className="flex items-center space-x-2">
-            <Button asChild type="default" icon={<Settings size={16} strokeWidth={1.5} />}>
+            <Button asChild variant="default" icon={<Settings size={16} strokeWidth={1.5} />}>
               <Link href={`/project/${ref}/settings/api-keys`}>API Keys settings</Link>
             </Button>
             <DocsButton href={`${DOCS_URL}/guides/database/api`} />

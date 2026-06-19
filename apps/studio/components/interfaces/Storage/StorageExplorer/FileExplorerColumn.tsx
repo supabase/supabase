@@ -7,14 +7,14 @@ import { toast } from 'sonner'
 import {
   Checkbox,
   cn,
-  ContextMenu_Shadcn_,
-  ContextMenuContent_Shadcn_,
-  ContextMenuItem_Shadcn_,
-  ContextMenuSeparator_Shadcn_,
-  ContextMenuSub_Shadcn_,
-  ContextMenuSubContent_Shadcn_,
-  ContextMenuSubTrigger_Shadcn_,
-  ContextMenuTrigger_Shadcn_,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuTrigger,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -57,7 +57,7 @@ const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) =>
                 className="w-3/4 h-32 border-2 border-dashed border-muted rounded-md flex flex-col items-center justify-center p-6 pointer-events-none"
                 style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
               >
-                <Upload className="text-white pointer-events-none" size={20} strokeWidth={2} />
+                <Upload className="text-white pointer-events-none" size={20} />
                 <p className="text-center text-sm  text-white mt-2 pointer-events-none">
                   Drop your files to upload to this folder
                 </p>
@@ -143,16 +143,6 @@ export const FileExplorerColumn = ({
     }
   }
 
-  const SelectAllCheckbox = () => (
-    <Checkbox
-      label=""
-      className="-mt-0.5"
-      checked={columnFiles.length !== 0 && selectedFilesFromColumn.length === columnFiles.length}
-      disabled={columnFiles.length === 0}
-      onChange={() => onSelectAllItemsInColumn(index)}
-    />
-  )
-
   const getItemKey = useCallback(
     (index: number) => {
       const item = columnItems[index]
@@ -191,14 +181,14 @@ export const FileExplorerColumn = ({
   }
 
   return (
-    <ContextMenu_Shadcn_ modal={false}>
-      <ContextMenuTrigger_Shadcn_ asChild>
+    <ContextMenu modal={false}>
+      <ContextMenuTrigger asChild>
         <div
           ref={fileExplorerColumnRef}
           className={cn(
             fullWidth ? 'w-full' : 'w-64 border-r border-overlay',
             view === STORAGE_VIEWS.LIST && 'h-full',
-            'hide-scrollbar relative flex flex-shrink-0 flex-col overflow-auto'
+            'hide-scrollbar relative flex shrink-0 flex-col overflow-auto'
           )}
           onDragOver={onDragOver}
           onDrop={onDrop}
@@ -210,7 +200,7 @@ export const FileExplorerColumn = ({
           {view === STORAGE_VIEWS.COLUMNS && (
             <div
               className={cn(
-                'sticky top-0 z-10 mb-0 flex items-center bg-table-header-light px-2.5 [[data-theme*=dark]_&]:bg-table-header-dark',
+                'sticky top-0 z-10 mb-0 flex items-center bg-table-header-light px-2.5 in-data-[theme*=dark]:bg-table-header-dark',
                 haveSelectedItems ? 'h-10 py-3 opacity-100' : 'h-0 py-0 opacity-0',
                 'transition-all duration-200'
               )}
@@ -218,10 +208,24 @@ export const FileExplorerColumn = ({
             >
               {columnFiles.length > 0 ? (
                 <>
-                  <SelectAllCheckbox />
-                  <p className="text-sm text-foreground-light">
-                    Select all {columnFiles.length} files
-                  </p>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="checkbox-select-all"
+                      className="-mt-0.5"
+                      checked={
+                        columnFiles.length !== 0 &&
+                        selectedFilesFromColumn.length === columnFiles.length
+                      }
+                      disabled={columnFiles.length === 0}
+                      onCheckedChange={() => onSelectAllItemsInColumn(index)}
+                    />
+                    <label
+                      htmlFor="checkbox-select-all"
+                      className="text-sm text-foreground-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Select all {columnFiles.length} files
+                    </label>
+                  </div>
                 </>
               ) : (
                 <p className="text-sm text-foreground-light">No files available for selection</p>
@@ -233,7 +237,24 @@ export const FileExplorerColumn = ({
           {view === STORAGE_VIEWS.LIST && (
             <div className="sticky top-0 py-2 z-10 flex min-w-min items-center border-b border-overlay bg-surface-100 px-2.5">
               <div className="flex w-[40%] min-w-[250px] items-center">
-                <SelectAllCheckbox />
+                <div className="relative w-[30px]" onClick={(event) => event.stopPropagation()}>
+                  <Checkbox
+                    id="checkbox-select-all"
+                    className="-mt-0.5"
+                    checked={
+                      columnFiles.length !== 0 &&
+                      selectedFilesFromColumn.length === columnFiles.length
+                    }
+                    disabled={columnFiles.length === 0}
+                    onCheckedChange={() => onSelectAllItemsInColumn(index)}
+                  />
+                  <label
+                    htmlFor="checkbox-select-all"
+                    className="sr-only text-sm text-foreground-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Select all {columnFiles.length} files
+                  </label>
+                </div>
                 <p className="text-sm">Name</p>
               </div>
               <p className="w-[11%] min-w-[100px] text-sm">Size</p>
@@ -248,7 +269,7 @@ export const FileExplorerColumn = ({
             <div
               className={`
                 ${fullWidth ? 'w-full' : 'w-64 border-r border-default'}
-                px-2 py-1 my-1 flex flex-shrink-0 flex-col space-y-2 overflow-auto
+                px-2 py-1 my-1 flex shrink-0 flex-col space-y-2 overflow-auto
               `}
             >
               <ShimmeringLoader />
@@ -314,77 +335,77 @@ export const FileExplorerColumn = ({
 
           {/* List interface footer */}
           {view === STORAGE_VIEWS.LIST && (
-            <div className="shrink-0 rounded-b-md z-10 flex min-w-min items-center bg-panel-footer-light px-2.5 py-2 [[data-theme*=dark]_&]:bg-panel-footer-dark w-full">
+            <div className="shrink-0 rounded-b-md z-10 flex min-w-min items-center bg-panel-footer-light px-2.5 py-2 in-data-[theme*=dark]:bg-panel-footer-dark w-full">
               <p className="text-sm">
                 {formatBytes(columnItemsSize)} for {columnItems.length} items
               </p>
             </div>
           )}
         </div>
-      </ContextMenuTrigger_Shadcn_>
-      <ContextMenuContent_Shadcn_>
+      </ContextMenuTrigger>
+      <ContextMenuContent>
         {canUpdateStorage && (
           <>
-            <ContextMenuItem_Shadcn_ className="gap-x-2" onSelect={onSelectCreateFolder}>
+            <ContextMenuItem className="gap-x-2" onSelect={onSelectCreateFolder}>
               <FolderPlus size={14} />
               <span className="text-xs">New folder</span>
-            </ContextMenuItem_Shadcn_>
-            <ContextMenuSeparator_Shadcn_ />
+            </ContextMenuItem>
+            <ContextMenuSeparator />
           </>
         )}
-        <ContextMenuItem_Shadcn_ className="gap-x-2" onSelect={onSelectAllItems}>
+        <ContextMenuItem className="gap-x-2" onSelect={onSelectAllItems}>
           <Copy size={14} />
           <span className="text-xs">Select all items</span>
-        </ContextMenuItem_Shadcn_>
-        <ContextMenuSub_Shadcn_>
-          <ContextMenuSubTrigger_Shadcn_ className="gap-x-2">
+        </ContextMenuItem>
+        <ContextMenuSub>
+          <ContextMenuSubTrigger className="gap-x-2">
             <Eye size={14} />
             <span className="text-xs">View</span>
-          </ContextMenuSubTrigger_Shadcn_>
-          <ContextMenuSubContent_Shadcn_>
-            <ContextMenuItem_Shadcn_ onSelect={() => setView(STORAGE_VIEWS.COLUMNS)}>
+          </ContextMenuSubTrigger>
+          <ContextMenuSubContent>
+            <ContextMenuItem onSelect={() => setView(STORAGE_VIEWS.COLUMNS)}>
               <span className="text-xs">As columns</span>
-            </ContextMenuItem_Shadcn_>
-            <ContextMenuItem_Shadcn_ onSelect={() => setView(STORAGE_VIEWS.LIST)}>
+            </ContextMenuItem>
+            <ContextMenuItem onSelect={() => setView(STORAGE_VIEWS.LIST)}>
               <span className="text-xs">As list</span>
-            </ContextMenuItem_Shadcn_>
-          </ContextMenuSubContent_Shadcn_>
-        </ContextMenuSub_Shadcn_>
-        <ContextMenuSub_Shadcn_>
-          <ContextMenuSubTrigger_Shadcn_ className="gap-x-2">
+            </ContextMenuItem>
+          </ContextMenuSubContent>
+        </ContextMenuSub>
+        <ContextMenuSub>
+          <ContextMenuSubTrigger className="gap-x-2">
             <ChevronsDown size={14} />
             <span className="text-xs">Sort by</span>
-          </ContextMenuSubTrigger_Shadcn_>
-          <ContextMenuSubContent_Shadcn_>
-            <ContextMenuItem_Shadcn_ onSelect={() => setSortBy(STORAGE_SORT_BY.NAME)}>
+          </ContextMenuSubTrigger>
+          <ContextMenuSubContent>
+            <ContextMenuItem onSelect={() => setSortBy(STORAGE_SORT_BY.NAME)}>
               <span className="text-xs">Name</span>
-            </ContextMenuItem_Shadcn_>
-            <ContextMenuItem_Shadcn_ onSelect={() => setSortBy(STORAGE_SORT_BY.CREATED_AT)}>
+            </ContextMenuItem>
+            <ContextMenuItem onSelect={() => setSortBy(STORAGE_SORT_BY.CREATED_AT)}>
               <span className="text-xs">Last created</span>
-            </ContextMenuItem_Shadcn_>
-            <ContextMenuItem_Shadcn_ onSelect={() => setSortBy(STORAGE_SORT_BY.UPDATED_AT)}>
+            </ContextMenuItem>
+            <ContextMenuItem onSelect={() => setSortBy(STORAGE_SORT_BY.UPDATED_AT)}>
               <span className="text-xs">Last modified</span>
-            </ContextMenuItem_Shadcn_>
-            <ContextMenuItem_Shadcn_ onSelect={() => setSortBy(STORAGE_SORT_BY.LAST_ACCESSED_AT)}>
+            </ContextMenuItem>
+            <ContextMenuItem onSelect={() => setSortBy(STORAGE_SORT_BY.LAST_ACCESSED_AT)}>
               <span className="text-xs">Last accessed</span>
-            </ContextMenuItem_Shadcn_>
-          </ContextMenuSubContent_Shadcn_>
-        </ContextMenuSub_Shadcn_>
-        <ContextMenuSub_Shadcn_>
-          <ContextMenuSubTrigger_Shadcn_ className="gap-x-2">
+            </ContextMenuItem>
+          </ContextMenuSubContent>
+        </ContextMenuSub>
+        <ContextMenuSub>
+          <ContextMenuSubTrigger className="gap-x-2">
             <ChevronsUp size={14} />
             <span className="text-xs">Sort by order</span>
-          </ContextMenuSubTrigger_Shadcn_>
-          <ContextMenuSubContent_Shadcn_>
-            <ContextMenuItem_Shadcn_ onSelect={() => setSortByOrder(STORAGE_SORT_BY_ORDER.ASC)}>
+          </ContextMenuSubTrigger>
+          <ContextMenuSubContent>
+            <ContextMenuItem onSelect={() => setSortByOrder(STORAGE_SORT_BY_ORDER.ASC)}>
               <span className="text-xs">Ascending</span>
-            </ContextMenuItem_Shadcn_>
-            <ContextMenuItem_Shadcn_ onSelect={() => setSortByOrder(STORAGE_SORT_BY_ORDER.DESC)}>
+            </ContextMenuItem>
+            <ContextMenuItem onSelect={() => setSortByOrder(STORAGE_SORT_BY_ORDER.DESC)}>
               <span className="text-xs">Descending</span>
-            </ContextMenuItem_Shadcn_>
-          </ContextMenuSubContent_Shadcn_>
-        </ContextMenuSub_Shadcn_>
-      </ContextMenuContent_Shadcn_>
-    </ContextMenu_Shadcn_>
+            </ContextMenuItem>
+          </ContextMenuSubContent>
+        </ContextMenuSub>
+      </ContextMenuContent>
+    </ContextMenu>
   )
 }

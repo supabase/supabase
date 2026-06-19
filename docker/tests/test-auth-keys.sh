@@ -144,17 +144,23 @@ check "No key -> 401" "401" \
 
 echo ""
 echo "--- Realtime REST (/realtime/v1/api/) ---"
-# Realtime REST API - expect 200 or other non-401 response with valid key
-check "Legacy ANON_KEY -> not 401" "true" \
-    "$([ "$(http_status "$BASE_URL/realtime/v1/api/tenants" -H "apikey: $ANON_KEY")" != "401" ] && echo true || echo false)"
+# Realtime REST API - use /api/ping to verify key auth (expect 200 with a valid key)
+check "Legacy ANON_KEY -> 200" "200" \
+    "$(http_status "$BASE_URL/realtime/v1/api/ping" -H "apikey: $ANON_KEY")"
 
 if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
-    check "New PUBLISHABLE_KEY -> not 401" "true" \
-        "$([ "$(http_status "$BASE_URL/realtime/v1/api/tenants" -H "apikey: $SUPABASE_PUBLISHABLE_KEY")" != "401" ] && echo true || echo false)"
+    check "New PUBLISHABLE_KEY -> 200" "200" \
+        "$(http_status "$BASE_URL/realtime/v1/api/ping" -H "apikey: $SUPABASE_PUBLISHABLE_KEY")"
 fi
 
 check "No key -> 401" "401" \
-    "$(http_status "$BASE_URL/realtime/v1/api/tenants")"
+    "$(http_status "$BASE_URL/realtime/v1/api/ping")"
+
+# Management endpoints must be blocked at the gateway (even with a valid key)
+check "/api/tenants blocked -> 403" "403" \
+    "$(http_status "$BASE_URL/realtime/v1/api/tenants" -H "apikey: $ANON_KEY")"
+check "/api/openapi blocked -> 403" "403" \
+    "$(http_status "$BASE_URL/realtime/v1/api/openapi" -H "apikey: $ANON_KEY")"
 
 echo ""
 echo "--- supabase-js style requests (apikey + Authorization) ---"

@@ -95,7 +95,7 @@ user = "env(SMTP_USER)"
 password = "env(SMTP_PASSWORD)"
 ```
 
-<Admonition type="note" label="Secrets are branch-specific">
+<Admonition type="note" title="Secrets are branch-specific">
 
 Secrets set for one branch are not automatically available in other branches. You'll need to set them separately for each branch that needs them.
 
@@ -152,7 +152,7 @@ client_id = "env(SUPABASE_AUTH_EXTERNAL_GITHUB_CLIENT_ID)"
 secret = "env(SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET)"
 ```
 
-<Admonition type="note" label="Secret fields">
+<Admonition type="note" title="Secret fields">
 
 The `encrypted:` syntax only works for designated "secret" fields in the configuration. Using encrypted values in other fields will not be automatically decrypted and may cause issues. For non-secret fields, use environment variables with the `env()` syntax instead.
 
@@ -172,8 +172,6 @@ The following fields support the `encrypted:` syntax:
 - `auth.publishable_key`
 - `auth.secret_key`
 - `auth.jwt_secret`
-- `auth.anon_key`
-- `auth.service_role_key`
 
 **Auth - Email (SMTP)**
 

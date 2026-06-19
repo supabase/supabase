@@ -18,7 +18,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
+const handleGetAll = async (_req: NextApiRequest, res: NextApiResponse) => {
   const project: any = {
     db_port: 6543,
     pool_mode: 'transaction',
@@ -28,6 +28,6 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   return res.status(200).json({ project })
 }
 
-const handlePatch = async (req: NextApiRequest, res: NextApiResponse) => {
+const handlePatch = async (_req: NextApiRequest, res: NextApiResponse) => {
   return res.status(200).json({})
 }

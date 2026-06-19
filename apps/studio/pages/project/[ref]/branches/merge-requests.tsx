@@ -31,11 +31,11 @@ import NoPermission from '@/components/ui/NoPermission'
 import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
 import { Branch, useBranchesQuery } from '@/data/branches/branches-query'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 import type { NextPageWithLayout } from '@/types'
 
 const MergeRequestsPage: NextPageWithLayout = () => {
@@ -88,7 +88,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
 
   const isGithubConnected = githubConnection !== undefined
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
     onError: () => {
@@ -111,18 +111,14 @@ const MergeRequestsPage: NextPageWithLayout = () => {
         onSuccess: () => {
           toast.success('Merge request created')
 
-          // Track merge request creation
-          sendEvent({
-            action: 'branch_create_merge_request_button_clicked',
-            properties: {
+          track(
+            'branch_create_merge_request_button_clicked',
+            {
               branchType: persistent ? 'persistent' : 'preview',
               origin: 'merge_page',
             },
-            groups: {
-              project: projectRef ?? 'Unknown',
-              organization: selectedOrg?.slug ?? 'Unknown',
-            },
-          })
+            { project: projectRef }
+          )
 
           router.push(`/project/${branchRef}/merge`)
         },
@@ -144,13 +140,8 @@ const MergeRequestsPage: NextPageWithLayout = () => {
         onSuccess: () => {
           toast.success('Merge request closed')
 
-          // Track merge request closed
-          sendEvent({
-            action: 'branch_close_merge_request_button_clicked',
-            groups: {
-              project: projectRef ?? 'Unknown',
-              organization: selectedOrg?.slug ?? 'Unknown',
-            },
+          track('branch_close_merge_request_button_clicked', undefined, {
+            project: projectRef,
           })
         },
       }
@@ -188,7 +179,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                 {!isError && (
                   <div className="space-y-4">
                     {isBranch && !isCurrentBranchReadyForReview && currentBranch && (
-                      <div className="rounded border rounded-lg bg-background px-6 py-4">
+                      <div className="rounded-sm border rounded-lg bg-background px-6 py-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2 text-sm text-foreground-light">
                             <GitMerge strokeWidth={1.5} size={16} className="text-brand" />
@@ -196,7 +187,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                             last viewed
                           </div>
                           <Button
-                            type="primary"
+                            variant="primary"
                             size="tiny"
                             loading={currentBranch && isUpdating}
                             onClick={() =>
@@ -261,7 +252,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                       <Button
-                                        type="text"
+                                        variant="text"
                                         icon={<MoreVertical />}
                                         className="px-1"
                                         onClick={(e) => e.stopPropagation()}
@@ -313,7 +304,6 @@ const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data: selectedOrg } = useSelectedOrganizationQuery()
 
   const isBranch = project?.parent_project_ref !== undefined
   const projectRef =
@@ -322,7 +312,7 @@ const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
   const { data: branches } = useBranchesQuery({ projectRef })
   const previewBranches = (branches || []).filter((b) => !b.is_default)
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
     onError: () => {
@@ -345,18 +335,14 @@ const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
         onSuccess: () => {
           toast.success('Merge request created')
 
-          // Track merge request creation
-          sendEvent({
-            action: 'branch_create_merge_request_button_clicked',
-            properties: {
+          track(
+            'branch_create_merge_request_button_clicked',
+            {
               branchType: persistent ? 'persistent' : 'preview',
               origin: 'branch_selector',
             },
-            groups: {
-              project: projectRef ?? 'Unknown',
-              organization: selectedOrg?.slug ?? 'Unknown',
-            },
-          })
+            { project: projectRef }
+          )
 
           router.push(`/project/${branchRef}/merge`)
         },
@@ -380,7 +366,7 @@ const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
         <div className="flex items-center gap-x-2">
           <Button
             asChild
-            type="text"
+            variant="text"
             icon={<MessageCircle className="text-muted" strokeWidth={1} />}
           >
             <a

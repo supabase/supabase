@@ -5,7 +5,7 @@ import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/Observ
 import type { NextPageWithLayout } from '@/types'
 
 const PageLayout: NextPageWithLayout = () => (
-  <div className="mx-auto flex flex-col gap-4 w-full flex-grow">
+  <div className="mx-auto flex flex-col gap-4 w-full grow">
     <ReportPadding>
       <Reports />
     </ReportPadding>

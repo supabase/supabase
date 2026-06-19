@@ -114,6 +114,19 @@ HNSW should be your default choice when creating a vector index. Add the index w
 
 Unlike IVFFlat indexes, you are safe to build an HNSW index immediately after the table is created. HNSW indexes are based on graphs which inherently are not affected by the same limitations as IVFFlat. As new data is added to the table, the index will be filled automatically and the index structure will remain optimal.
 
+## Filtering with HNSW indexes
+
+Adding a `where` clause to a vector query does not bypass the HNSW index. The Postgres planner picks between using the index and a sequential scan based on the selectivity of the filter and the size of the table. When the index is used, the filter is applied as the index returns candidates.
+
+The trade-off shows up when the filter is selective: an HNSW scan returns the top `k` rows by distance, and if most of those are filtered out you can end up with fewer rows than your `LIMIT`. From `pgvector` 0.8.0, the planner supports **iterative index scans** that automatically scan more of the index until enough results are found, controlled by the `hnsw.iterative_scan` GUC. The default is `off`. The two enabled modes are:
+
+- `strict_order` preserves exact distance ordering across iterations.
+- `relaxed_order` allows slight reordering across iterations for better recall.
+
+`hnsw.max_scan_tuples` (default 20,000) and `hnsw.scan_mem_multiplier` (default 1) bound how far the iterative scan goes. See the [pgvector iterative scans documentation](https://github.com/pgvector/pgvector#iterative-index-scans) for the full reference.
+
+For an end-to-end JavaScript example of filtering a vector search by another column, see [Filtering vector search by metadata](/docs/guides/ai/semantic-search#filtering-vector-search-by-metadata).
+
 ## Resources
 
 Read more about indexing on `pgvector`'s [GitHub page](https://github.com/pgvector/pgvector#indexing).

@@ -9,10 +9,10 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  Input,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
@@ -76,7 +76,7 @@ export const CustomDomainsConfigureHostname = () => {
   const isSubmitting = isCheckingRecord || isCreating
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onCreateCustomDomain)}>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 gap-4">
@@ -85,7 +85,7 @@ export const CustomDomainsConfigureHostname = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="domain"
                 render={({ field }) => (
@@ -95,14 +95,14 @@ export const CustomDomainsConfigureHostname = () => {
                     description="Enter the subdomain you want to use."
                     className="[&>div]:md:w-1/2"
                   >
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
+                    <FormControl>
+                      <Input
                         {...field}
                         placeholder="subdomain.example.com"
                         disabled={!canConfigureCustomDomain || isSubmitting}
                         autoComplete="off"
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -119,7 +119,7 @@ export const CustomDomainsConfigureHostname = () => {
                   <code className="text-code-inline">{endpoint}</code>
                   <CopyButton
                     iconOnly
-                    type="text"
+                    variant="text"
                     className="h-5 w-5 min-w-0 p-0 [&_svg]:h-3 [&_svg]:w-3"
                     text={endpoint}
                   />
@@ -146,7 +146,7 @@ export const CustomDomainsConfigureHostname = () => {
           <CardFooter className="justify-end space-x-2">
             {form.formState.isDirty && (
               <Button
-                type="default"
+                variant="default"
                 disabled={isSubmitting}
                 onClick={() => form.reset({ domain: '' })}
               >
@@ -154,8 +154,8 @@ export const CustomDomainsConfigureHostname = () => {
               </Button>
             )}
             <Button
-              type="primary"
-              htmlType="submit"
+              variant="primary"
+              type="submit"
               loading={isSubmitting}
               disabled={!form.formState.isDirty || isSubmitting || !canConfigureCustomDomain}
             >
@@ -170,6 +170,6 @@ export const CustomDomainsConfigureHostname = () => {
           </p>
         )}
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

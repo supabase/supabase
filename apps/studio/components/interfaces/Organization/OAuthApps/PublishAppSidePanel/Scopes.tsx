@@ -76,7 +76,7 @@ const Scope = ({
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="default" iconRight={<ChevronDown />}>
+          <Button variant="default" iconRight={<ChevronDown />}>
             <p>{accessDescription}</p>
           </Button>
         </DropdownMenuTrigger>
@@ -113,6 +113,14 @@ export const ScopesPanel = ({
         description={PERMISSIONS_DESCRIPTIONS.ANALYTICS}
         readScopeName={OAuthScope.ANALYTICS_READ}
         writeScopeName={OAuthScope.ANALYTICS_WRITE}
+        scopes={scopes}
+        setScopes={setScopes}
+      />
+      <Scope
+        title="Analytics Config"
+        description={PERMISSIONS_DESCRIPTIONS.ANALYTICS_CONFIG}
+        readScopeName={OAuthScope.ANALYTICS_CONFIG_READ}
+        writeScopeName={OAuthScope.ANALYTICS_CONFIG_WRITE}
         scopes={scopes}
         setScopes={setScopes}
       />

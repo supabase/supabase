@@ -1,16 +1,16 @@
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Check } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useQueryState } from 'nuqs'
-import { useEffect, useId, useMemo, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
+  Form,
   Sheet,
   SheetContent,
   SheetFooter,
@@ -36,7 +36,6 @@ import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useHasEntitlementAccess } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { BASE_PATH } from '@/lib/constants'
 
 interface ProviderFormProps {
@@ -84,10 +83,16 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
 
   const hasEntitlementAccess = useHasEntitlementAccess()
 
-  const getValuesForProvider = useStaticEffectEvent(
+  const getValuesForProvider = useCallback(
     (config: components['schemas']['GoTrueConfigResponse']) => {
       const values: { [x: string]: string | boolean } = {}
       Object.keys(provider.properties).forEach((key) => {
+        // This ensures the default value is visibly selected
+        if (key === 'PASSWORD_REQUIRED_CHARACTERS' && config.PASSWORD_REQUIRED_CHARACTERS === '') {
+          values[key] = NO_REQUIRED_CHARACTERS
+          return
+        }
+
         const isDoubleNegative = doubleNegativeKeys.includes(key)
         if (provider.title === 'SAML 2.0') {
           const configValue = (config as any)[key]
@@ -106,7 +111,8 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
         }
       })
       return values
-    }
+    },
+    [provider]
   )
 
   const INITIAL_VALUES = useMemo(() => {
@@ -158,8 +164,8 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
 
   const form = useForm({
     defaultValues: INITIAL_VALUES,
-    resolver: yupResolver(provider.validationSchema),
-    shouldUnregister: true,
+    resolver: zodResolver(provider.validationSchema),
+    shouldUnregister: false,
   })
 
   useEffect(() => {
@@ -210,11 +216,11 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
             />
             <SheetTitle>{provider.title}</SheetTitle>
           </SheetHeader>
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form
               id={formId}
               name={formId}
-              className="overflow-y-auto flex-grow px-0"
+              className="overflow-y-auto grow px-0"
               onSubmit={form.handleSubmit(onSubmit)}
             >
               <AuthAlert
@@ -267,14 +273,14 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                 </SheetSection>
               )}
             </form>
-          </Form_Shadcn_>
+          </Form>
           <SheetFooter className="shrink-0">
             <div className="flex items-center justify-between w-full">
               <DocsButton href={provider.link} />
               <div className="flex items-center gap-x-3">
                 <Button
-                  type="default"
-                  htmlType="reset"
+                  variant="default"
+                  type="reset"
                   onClick={() => {
                     setOpen(false)
                     setUrlProvider(null)
@@ -286,7 +292,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                 </Button>
                 <ButtonTooltip
                   form={formId}
-                  htmlType="submit"
+                  type="submit"
                   loading={isUpdatingConfig}
                   disabled={isUpdatingConfig || !canUpdateConfig || !form.formState.isDirty}
                   tooltip={{

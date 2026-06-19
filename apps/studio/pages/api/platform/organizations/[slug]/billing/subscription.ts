@@ -20,7 +20,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 type ResponseData =
   paths['/platform/organizations/{slug}/billing/subscription']['get']['responses']['200']['content']['application/json']
 
-const handleGet = async (req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
+const handleGet = async (_req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
   const response: ResponseData = {
     billing_cycle_anchor: 0,
     current_period_end: 0,

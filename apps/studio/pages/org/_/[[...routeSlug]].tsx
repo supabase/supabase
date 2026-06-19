@@ -40,11 +40,11 @@ const GenericOrganizationPage: NextPage = () => {
         <meta name="description" content="Supabase Studio" />
       </Head>
       <Header />
-      <PageLayout className="flex-grow min-h-0" title="Select an organization to continue">
+      <PageLayout className="grow min-h-0" title="Select an organization to continue">
         <ScaffoldContainer>
           <ScaffoldSection isFullWidth>
             <div
-              className="flex-grow overflow-y-auto"
+              className="grow overflow-y-auto"
               style={{ maxHeight: 'calc(100vh - 49px - 64px)' }}
             >
               <div className="w-full mx-auto flex flex-col gap-y-8">

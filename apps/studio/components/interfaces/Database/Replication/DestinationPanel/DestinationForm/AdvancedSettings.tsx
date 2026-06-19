@@ -1,21 +1,21 @@
 import type { ChangeEvent } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import {
-  Accordion_Shadcn_,
-  AccordionContent_Shadcn_,
-  AccordionItem_Shadcn_,
-  AccordionTrigger_Shadcn_,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
   Badge,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
+  FormField,
   FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -37,19 +37,19 @@ export const AdvancedSettings = ({
 
   return (
     <div className="px-5">
-      <Accordion_Shadcn_ type="single" collapsible>
-        <AccordionItem_Shadcn_ value="item-1" className="border-none">
-          <AccordionTrigger_Shadcn_ className="font-normal gap-2 justify-between text-sm py-3 hover:no-underline">
+      <Accordion type="single" collapsible>
+        <AccordionItem value="item-1" className="border-none">
+          <AccordionTrigger className="font-normal gap-2 justify-between text-sm py-3 hover:no-underline">
             <div className="flex flex-col items-start gap-0.5">
               <span className="text-sm font-medium">Advanced settings</span>
               <span className="text-sm text-foreground-lighter font-normal">
-                Optional performance tuning
+                Optional settings to control the pipeline in more depth
               </span>
             </div>
-          </AccordionTrigger_Shadcn_>
-          <AccordionContent_Shadcn_ className="!pb-0 pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4">
+          </AccordionTrigger>
+          <AccordionContent className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4">
             {/* Batch wait time - applies to all destinations */}
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="maxFillMs"
               render={({ field }) => (
@@ -69,7 +69,7 @@ export const AdvancedSettings = ({
                     </>
                   }
                 >
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <InputGroup>
                       <FormInputGroupInput
                         {...field}
@@ -82,12 +82,12 @@ export const AdvancedSettings = ({
                         <InputGroupText>milliseconds</InputGroupText>
                       </InputGroupAddon>
                     </InputGroup>
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
 
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="maxTableSyncWorkers"
               render={({ field }) => (
@@ -103,7 +103,7 @@ export const AdvancedSettings = ({
                     </>
                   }
                 >
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <InputGroup>
                       <FormInputGroupInput
                         {...field}
@@ -116,12 +116,12 @@ export const AdvancedSettings = ({
                         <InputGroupText>workers</InputGroupText>
                       </InputGroupAddon>
                     </InputGroup>
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
 
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="maxCopyConnectionsPerTable"
               render={({ field }) => (
@@ -140,7 +140,7 @@ export const AdvancedSettings = ({
                     </>
                   }
                 >
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <InputGroup>
                       <FormInputGroupInput
                         {...field}
@@ -153,48 +153,46 @@ export const AdvancedSettings = ({
                         <InputGroupText>connections</InputGroupText>
                       </InputGroupAddon>
                     </InputGroup>
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
 
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="invalidatedSlotBehavior"
               render={({ field }) => (
                 <FormItemLayout
                   label="Invalidated slot behavior"
                   layout="horizontal"
-                  description="Behavior when the replication slot is invalidated"
+                  description="Behavior of the pipeline's replication slot when invalidated."
                 >
-                  <FormControl_Shadcn_>
-                    <Select_Shadcn_ value={field.value ?? 'error'} onValueChange={field.onChange}>
-                      <SelectTrigger_Shadcn_ className="capitalize">
-                        {field.value ?? 'error'}
-                      </SelectTrigger_Shadcn_>
-                      <SelectContent_Shadcn_>
-                        <SelectItem_Shadcn_ value="error" className="[&>span]:top-2.5">
+                  <FormControl>
+                    <Select value={field.value ?? 'error'} onValueChange={field.onChange}>
+                      <SelectTrigger className="capitalize">{field.value ?? 'error'}</SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="error" className="[&>span]:top-2.5">
                           <p>Error</p>
                           <p className="text-foreground-lighter">
-                            Blocks startup for manual recovery
+                            Blocks startup for manual recovery.
                           </p>
-                        </SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="recreate" className="[&>span]:top-2.5">
+                        </SelectItem>
+                        <SelectItem value="recreate" className="[&>span]:top-2.5">
                           <p>Recreate</p>
                           <p className="text-foreground-lighter">
-                            Rebuilds the slot and restarts replication from scratch
+                            Rebuilds the slot and restarts replication from scratch.
                           </p>
-                        </SelectItem_Shadcn_>
-                      </SelectContent_Shadcn_>
-                    </Select_Shadcn_>
-                  </FormControl_Shadcn_>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
 
             {type === 'BigQuery' && (
               <>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="connectionPoolSize"
                   render={({ field }) => (
@@ -215,7 +213,7 @@ export const AdvancedSettings = ({
                         </>
                       }
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <InputGroup>
                           <FormInputGroupInput
                             {...field}
@@ -228,12 +226,12 @@ export const AdvancedSettings = ({
                             <InputGroupText>connections</InputGroupText>
                           </InputGroupAddon>
                         </InputGroup>
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
 
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="maxStalenessMins"
                   render={({ field }) => (
@@ -258,7 +256,7 @@ export const AdvancedSettings = ({
                         </>
                       }
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <InputGroup>
                           <FormInputGroupInput
                             {...field}
@@ -271,15 +269,15 @@ export const AdvancedSettings = ({
                             <InputGroupText>minutes</InputGroupText>
                           </InputGroupAddon>
                         </InputGroup>
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
               </>
             )}
-          </AccordionContent_Shadcn_>
-        </AccordionItem_Shadcn_>
-      </Accordion_Shadcn_>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </div>
   )
 }

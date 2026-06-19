@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { Button, Form_Shadcn_ } from 'ui'
+import { Button, Form } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
 import { getKeyValueFieldArrayValidationIssues } from 'ui-patterns/form/KeyValueFieldArray/validation'
@@ -44,7 +44,7 @@ export default function KeyValueFieldArrayDemo() {
   }
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form className="w-full max-w-2xl" onSubmit={form.handleSubmit(onSubmit)}>
         <FormItemLayout
           label="HTTP headers"
@@ -64,11 +64,11 @@ export default function KeyValueFieldArrayDemo() {
         </FormItemLayout>
 
         <div className="mt-4">
-          <Button size="tiny" type="primary" htmlType="submit">
+          <Button size="tiny" variant="primary" type="submit">
             Submit
           </Button>
         </div>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

@@ -1,8 +1,8 @@
-import { ident } from '../../../pg-format'
+import { ident, safeSql, type SafeSqlFragment } from '../../../pg-format'
 import pgMetaExtensions from '../../../pg-meta-extensions'
 
-export const getDatabaseExtensionsSQL = () =>
-  `
+export const getDatabaseExtensionsSQL = (): SafeSqlFragment =>
+  safeSql`
 SELECT
   e.name,
   n.nspname AS schema,
@@ -16,7 +16,7 @@ FROM
   LEFT JOIN pg_namespace n ON x.extnamespace = n.oid
   LEFT JOIN pg_available_extension_versions ev
     ON ev.name = e.name AND ev.version = e.default_version;
-`.trim()
+`
 
 export const getEnableDatabaseExtensionSQL = ({
   schema,
@@ -30,12 +30,10 @@ export const getEnableDatabaseExtensionSQL = ({
   version: string
   cascade?: boolean
   createSchema?: boolean
-}) => {
+}): SafeSqlFragment => {
   const { sql } = pgMetaExtensions.create({ schema, name, version, cascade })
   return createSchema
-    ? `
-CREATE SCHEMA IF NOT EXISTS ${ident(schema)};
-${sql}
-`.trim()
-    : sql.trim()
+    ? safeSql`CREATE SCHEMA IF NOT EXISTS ${ident(schema)};
+${sql}`
+    : sql
 }

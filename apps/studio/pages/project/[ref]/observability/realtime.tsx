@@ -1,8 +1,9 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, RefreshCw } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { Button } from 'ui'
 
 import ReportFilterBar from '@/components/interfaces/Reports/ReportFilterBar'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
@@ -16,11 +17,13 @@ import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DateP
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { realtimeReports } from '@/data/reports/v2/realtime.config'
 import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { NextPageWithLayout } from '@/types'
 
 const RealtimeReport: NextPageWithLayout = () => {
@@ -42,6 +45,7 @@ export default RealtimeReport
 
 const RealtimeUsage = () => {
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [showDatePicker, setShowDatePicker] = useState(false)
   const { db, chart, ref } = useParams()
 
   const {
@@ -102,6 +106,13 @@ const RealtimeUsage = () => {
     }
   )
 
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_REFRESH, onRefreshReport, {
+    enabled: !isRefreshing,
+  })
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER, () => {
+    setShowDatePicker((open) => !open)
+  })
+
   const urlStateHasSyncedRef = useRef(false)
   useEffect(() => {
     if (urlStateHasSyncedRef.current) return
@@ -134,18 +145,26 @@ const RealtimeUsage = () => {
         content={
           <div className="flex flex-col gap-3">
             <div className="flex gap-2">
-              <ButtonTooltip
-                type="default"
-                disabled={isRefreshing}
-                icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
-                className="w-7"
-                tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-                onClick={onRefreshReport}
-              />
+              <ShortcutTooltip
+                shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
+                label="Refresh report"
+                side="bottom"
+              >
+                <Button
+                  variant="default"
+                  disabled={isRefreshing}
+                  icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+                  className="w-7"
+                  onClick={onRefreshReport}
+                />
+              </ShortcutTooltip>
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
                 value={datePickerValue}
                 helpers={datePickerHelpers}
+                open={showDatePicker}
+                onOpenChange={setShowDatePicker}
+                shortcutId={SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER}
               />
               <UpgradePrompt
                 show={showUpgradePrompt}

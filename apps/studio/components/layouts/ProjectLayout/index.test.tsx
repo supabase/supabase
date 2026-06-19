@@ -1,4 +1,5 @@
-import { render, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import type { ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -23,6 +24,7 @@ const {
   mockProjectState,
   mockResourceWarningsState,
   mockBannerDismissedState,
+  mockUseLocalStorageQuery,
 } = vi.hoisted(() => ({
   mockAddBanner: vi.fn(),
   mockDismissBanner: vi.fn(),
@@ -33,10 +35,12 @@ const {
       status: 'ACTIVE_HEALTHY',
       postgrestStatus: 'ONLINE',
       infra_compute_size: undefined as string | undefined,
+      integration_source: null as string | null,
     },
   },
   mockResourceWarningsState: { current: undefined as any[] | undefined },
   mockBannerDismissedState: { current: false },
+  mockUseLocalStorageQuery: vi.fn(),
 }))
 
 vi.mock('next/router', () => ({
@@ -52,7 +56,7 @@ vi.mock('next/head', async () => {
         (child) => React.isValidElement(child) && child.type === 'title'
       )
 
-      if (!React.isValidElement(titleElement)) return
+      if (!React.isValidElement<{ children: ReactNode }>(titleElement)) return
 
       const titleText = React.Children.toArray(titleElement.props.children).join('')
       document.title = titleText
@@ -73,6 +77,9 @@ vi.mock('common', () => ({
   LOCAL_STORAGE_KEYS: {
     FREE_MICRO_UPGRADE_BANNER_DISMISSED: (ref: string) =>
       `free-micro-upgrade-banner-dismissed-${ref}`,
+    PROJECT_INTEGRATION_BANNER_DISMISSED: (ref: string, integrationSource: string) =>
+      `project-integration-banner-dismissed-${ref}-${integrationSource}`,
+    UNIFIED_LOGS_BANNER_DISMISSED: 'unified-logs-banner-dismissed',
   },
   isFeatureEnabled: () => false,
 }))
@@ -87,11 +94,14 @@ vi.mock('framer-motion', () => ({
 
 vi.mock('ui', () => ({
   cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
-  CommandInput_Shadcn_: { displayName: 'CommandInput' },
-  Command_Shadcn_: { displayName: 'Command' },
-  CommandGroup_Shadcn_: { displayName: 'CommandGroup' },
-  CommandItem_Shadcn_: { displayName: 'CommandItem' },
-  CommandList_Shadcn_: { displayName: 'CommandList' },
+  Alert: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  AlertDescription: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  AlertTitle: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  CommandInput: { displayName: 'CommandInput' },
+  Command: { displayName: 'Command' },
+  CommandGroup: { displayName: 'CommandGroup' },
+  CommandItem: { displayName: 'CommandItem' },
+  CommandList: { displayName: 'CommandList' },
   LogoLoader: () => <div data-testid="logo-loader" />,
   ResizableHandle: (props: any) => <div {...props} />,
   ResizablePanel: ({ children, ...props }: any) => <div {...props}>{children}</div>,
@@ -117,6 +127,7 @@ vi.mock('../editors/EditorsLayout.hooks', () => ({
 }))
 
 vi.mock('../MainScrollContainerContext', () => ({
+  useMainScrollContainer: () => null,
   useSetMainScrollContainer: () => () => {},
 }))
 
@@ -144,17 +155,26 @@ vi.mock('@/components/interfaces/ProjectAPIDocs/ProjectAPIDocs', () => ({
 vi.mock('@/components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner', () => ({
   ResourceExhaustionWarningBanner: () => null,
 }))
+vi.mock('@/components/ui/ButtonTooltip', () => ({
+  ButtonTooltip: ({ children, ...props }: any) => <button {...props}>{children}</button>,
+}))
+vi.mock('@/components/ui/PartnerIcon', () => ({
+  default: () => <div data-testid="partner-icon" />,
+}))
 
 vi.mock('@/hooks/custom-content/useCustomContent', () => ({
   useCustomContent: () => ({ appTitle: 'Supabase' }),
 }))
 
 vi.mock('@/hooks/misc/useLocalStorage', () => ({
-  useLocalStorageQuery: () => [mockBannerDismissedState.current, vi.fn()],
+  useLocalStorageQuery: (...args: unknown[]) => mockUseLocalStorageQuery(...args),
 }))
 
 vi.mock('@/components/ui/BannerStack/BannerStackProvider', () => ({
-  BANNER_ID: { FREE_MICRO_UPGRADE: 'free-micro-upgrade-banner' },
+  BANNER_ID: {
+    FREE_MICRO_UPGRADE: 'free-micro-upgrade-banner',
+    UNIFIED_LOGS: 'unified-logs-banner',
+  },
   useBannerStack: () => ({
     addBanner: mockAddBanner,
     dismissBanner: mockDismissBanner,
@@ -164,6 +184,20 @@ vi.mock('@/components/ui/BannerStack/BannerStackProvider', () => ({
 
 vi.mock('@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade', () => ({
   BannerFreeMicroUpgrade: () => null,
+}))
+
+vi.mock('@/components/ui/BannerStack/Banners/BannerUnifiedLogs', () => ({
+  BannerUnifiedLogs: () => null,
+}))
+
+vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
+  useUnifiedLogsPreview: () => ({
+    isEnabled: false,
+    isEligible: false,
+    isLoading: false,
+    enable: () => {},
+    disable: () => {},
+  }),
 }))
 
 vi.mock('@/data/usage/resource-warnings-query', () => ({
@@ -216,6 +250,16 @@ describe('ProjectLayout title', () => {
     mockRouter.pathname = '/project/[ref]/observability/query-performance'
     mockRouter.asPath = '/project/default/observability/query-performance'
     document.title = ''
+    mockProjectState.current = {
+      ref: 'default',
+      name: 'Project 1',
+      status: 'ACTIVE_HEALTHY',
+      postgrestStatus: 'ONLINE',
+      infra_compute_size: undefined,
+      integration_source: null,
+    }
+    mockBannerDismissedState.current = false
+    mockUseLocalStorageQuery.mockImplementation(() => [mockBannerDismissedState.current, vi.fn()])
   })
 
   afterEach(() => {
@@ -260,6 +304,35 @@ describe('ProjectLayout title', () => {
       )
     })
   })
+
+  it('renders the Stripe project banner across project surfaces when the selected project is Stripe-connected', () => {
+    mockProjectState.current = {
+      ...mockProjectState.current,
+      integration_source: 'stripe_projects',
+    }
+
+    renderLayout()
+
+    expect(screen.getByText('This project is connected to Stripe')).toBeTruthy()
+    expect(
+      screen.getByText('Changes made here may affect your connected Stripe project.')
+    ).toBeTruthy()
+    expect(screen.getByTestId('partner-icon')).toBeTruthy()
+  })
+
+  it('uses a project-specific dismiss key for the Stripe project banner', () => {
+    mockProjectState.current = {
+      ...mockProjectState.current,
+      integration_source: 'stripe_projects',
+    }
+
+    renderLayout()
+
+    expect(mockUseLocalStorageQuery).toHaveBeenCalledWith(
+      LOCAL_STORAGE_KEYS.PROJECT_INTEGRATION_BANNER_DISMISSED('default', 'stripe_projects'),
+      false
+    )
+  })
 })
 
 describe('FREE_MICRO_UPGRADE banner', () => {
@@ -272,6 +345,7 @@ describe('FREE_MICRO_UPGRADE banner', () => {
       status: 'ACTIVE_HEALTHY',
       postgrestStatus: 'ONLINE',
       infra_compute_size: 'nano',
+      integration_source: null,
     }
     mockResourceWarningsState.current = [
       {
@@ -294,6 +368,7 @@ describe('FREE_MICRO_UPGRADE banner', () => {
       status: 'ACTIVE_HEALTHY',
       postgrestStatus: 'ONLINE',
       infra_compute_size: undefined,
+      integration_source: null,
     }
     mockResourceWarningsState.current = undefined
     mockBannerDismissedState.current = false

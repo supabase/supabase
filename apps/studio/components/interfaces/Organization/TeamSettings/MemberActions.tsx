@@ -128,12 +128,12 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
             const projects = projectScopedRole.projects.map(({ ref }) => ref)
             inviteMember({
               slug,
-              email: member.primary_email,
+              emails: [member.primary_email],
               roleId: projectScopedRole.base_role_id,
               projects,
             })
           } else {
-            inviteMember({ slug, email: member.primary_email, roleId })
+            inviteMember({ slug, emails: [member.primary_email], roleId })
           }
         },
       }
@@ -163,7 +163,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
     <>
       <div className="flex items-center justify-end gap-x-2">
         <ButtonTooltip
-          type="default"
+          variant="default"
           disabled={isPendingInviteAcceptance || !canRemoveMember}
           onClick={() => setShowAccessModal(true)}
           tooltip={{
@@ -183,7 +183,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              type="text"
+              variant="text"
               className="px-1.5"
               disabled={isLoading}
               loading={isLoading}

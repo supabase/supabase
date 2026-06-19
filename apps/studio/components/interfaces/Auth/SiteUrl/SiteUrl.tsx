@@ -4,16 +4,7 @@ import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Button,
-  Card,
-  CardContent,
-  CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
-} from 'ui'
+import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Input } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
@@ -112,11 +103,11 @@ const SiteUrl = () => {
         </PageSectionSummary>
       </PageSectionMeta>
       <PageSectionContent>
-        <Form_Shadcn_ {...siteUrlForm}>
+        <Form {...siteUrlForm}>
           <form onSubmit={siteUrlForm.handleSubmit(onSubmitSiteUrl)}>
             <Card>
               <CardContent>
-                <FormField_Shadcn_
+                <FormField
                   control={siteUrlForm.control}
                   name="SITE_URL"
                   render={({ field }) => (
@@ -125,9 +116,9 @@ const SiteUrl = () => {
                       label="Site URL"
                       description="Configure the default redirect URL used when a redirect URL is not specified or doesn't match one from the allow list. This value is also exposed as a template variable in the email templates section. Wildcards cannot be used here."
                     >
-                      <FormControl_Shadcn_>
-                        <Input_Shadcn_ {...field} disabled={!canUpdateConfig} />
-                      </FormControl_Shadcn_>
+                      <FormControl>
+                        <Input {...field} disabled={!canUpdateConfig} />
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -135,13 +126,13 @@ const SiteUrl = () => {
 
               <CardFooter className="justify-end space-x-2">
                 {isDirty && (
-                  <Button type="default" onClick={() => siteUrlForm.reset()}>
+                  <Button variant="default" onClick={() => siteUrlForm.reset()}>
                     Cancel
                   </Button>
                 )}
                 <Button
-                  type="primary"
-                  htmlType="submit"
+                  variant="primary"
+                  type="submit"
                   disabled={!canUpdateConfig || isUpdatingSiteUrl || !isDirty}
                   loading={isUpdatingSiteUrl}
                 >
@@ -150,7 +141,7 @@ const SiteUrl = () => {
               </CardFooter>
             </Card>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </PageSectionContent>
     </PageSection>
   )

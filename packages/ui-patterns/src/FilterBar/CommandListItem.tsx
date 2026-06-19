@@ -25,15 +25,15 @@ export function CommandListItem({
       role="option"
       onClick={() => onSelect(item)}
       className={cn(
-        'relative flex items-center justify-between gap-2 px-2 py-1.5 text-xs cursor-pointer select-none outline-none text-foreground',
+        'relative flex items-center justify-between gap-2 px-2 py-1.5 text-xs cursor-pointer select-none outline-hidden text-foreground',
         isHighlighted && 'bg-surface-300',
         !isHighlighted && 'hover:bg-surface-200'
       )}
       data-testid={`filter-menu-item-${item.value}`}
     >
-      <span className="flex items-center gap-2">
+      <span className="flex items-center gap-2 min-w-0">
         {includeIcon && item.icon}
-        {getActionItemLabel(item)}
+        <span className="truncate">{getActionItemLabel(item)}</span>
       </span>
       {item.operatorSymbol && <OperatorSymbolBadge symbol={item.operatorSymbol} />}
     </div>

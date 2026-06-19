@@ -42,7 +42,7 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
       <div className="mx-2 flex items-center gap-2">
         {isSnippetOwner && savingState === 'UPDATING_FAILED' && (
           <Button
-            type="text"
+            variant="text"
             size="tiny"
             icon={<RefreshCcw className="text-gray-1100" strokeWidth={2} />}
             onClick={retry}

@@ -3,6 +3,7 @@ import { includes, sortBy } from 'lodash'
 import { Check, ChevronRight, Loader2, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 
+import { pgmqQueueTable } from './Queues.utils'
 import Table from '@/components/to-be-cleaned/Table'
 import { useQueuesMetricsQuery } from '@/data/database-queues/database-queues-metrics-query'
 import { PostgresQueue } from '@/data/database-queues/database-queues-query'
@@ -24,7 +25,7 @@ const QueueRow = ({ queue }: { queue: PostgresQueue }) => {
     connectionString: selectedProject?.connectionString,
     schema: 'pgmq',
   })
-  const queueTable = queueTables?.find((x) => x.name === `q_${queue.queue_name}`)
+  const queueTable = queueTables?.find((x) => x.name === pgmqQueueTable(queue.queue_name))
   const isRlsEnabled = !!queueTable?.rls_enabled
 
   const { data: metrics, isPending: isLoading } = useQueuesMetricsQuery(

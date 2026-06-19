@@ -1,3 +1,4 @@
+import { safeLocalStorage } from 'common'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -48,7 +49,7 @@ const PropertyRow = ({
 
   const service = path?.startsWith('/auth/') ? Service.Auth : undefined
 
-  const handleSearch: LogSearchCallback = async (event: string, { query }: { query?: string }) => {
+  const handleSearch: LogSearchCallback = async (_event: string, { query }: { query?: string }) => {
     setSearch(query || '')
   }
 
@@ -75,7 +76,7 @@ const PropertyRow = ({
   const [isExpanded, setIsExpanded] = useState(() => {
     try {
       // Storing in local storage so users dont have to click expand every time they change selected log
-      return JSON.parse(localStorage.getItem(storageKey) ?? 'false')
+      return JSON.parse(safeLocalStorage.getItem(storageKey) ?? 'false')
     } catch (_) {
       return false
     }
@@ -83,7 +84,7 @@ const PropertyRow = ({
   const [isCopied, setIsCopied] = useState(false)
 
   useEffect(() => {
-    localStorage.setItem(storageKey, JSON.stringify(isExpanded))
+    safeLocalStorage.setItem(storageKey, JSON.stringify(isExpanded))
   }, [isExpanded, storageKey])
 
   const handleCopy = () => {
@@ -115,7 +116,7 @@ const PropertyRow = ({
               <Button
                 className="mt-1 w-full"
                 size="tiny"
-                type="outline"
+                variant="outline"
                 onClick={() => setIsExpanded(!isExpanded)}
               >
                 {isExpanded ? 'Collapse' : 'Expand'}
@@ -134,14 +135,14 @@ const PropertyRow = ({
         <DropdownMenuTrigger className="group w-full" data-testid={dataTestId}>
           <div className="rounded-md w-full overflow-hidden">
             <div
-              className={cn('flex h-[var(--header-height)] w-full', {
+              className={cn('flex h-(--header-height) w-full', {
                 'flex-col gap-1.5 h-auto': isExpanded,
                 'items-center group-hover:bg-surface-300 gap-4': !isExpanded,
               })}
             >
               <h3
                 className={cn('pl-3 text-foreground-lighter text-sm text-left', {
-                  'h-[var(--header-height)] flex items-center': isExpanded,
+                  'h-(--header-height) flex items-center': isExpanded,
                 })}
               >
                 {keyName}

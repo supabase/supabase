@@ -1,5 +1,5 @@
 import { noop } from 'lodash'
-import { Button, Checkbox, cn, Modal } from 'ui'
+import { Button, Checkbox, cn, DialogSection, DialogSectionSeparator } from 'ui'
 
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from '../Storage.constants'
 import { deriveAllowedClientLibraryMethods } from '../Storage.utils'
@@ -52,26 +52,58 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
       </div>
       <div className="md:w-2/3 flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
-          <Checkbox
-            label="SELECT"
-            onChange={() => onToggleOperation('SELECT')}
-            checked={allowedOperations.includes('SELECT')}
-          />
-          <Checkbox
-            label="INSERT"
-            onChange={() => onToggleOperation('INSERT')}
-            checked={allowedOperations.includes('INSERT')}
-          />
-          <Checkbox
-            label="UPDATE"
-            onChange={() => onToggleOperation('UPDATE')}
-            checked={allowedOperations.includes('UPDATE')}
-          />
-          <Checkbox
-            label="DELETE"
-            onChange={() => onToggleOperation('DELETE')}
-            checked={allowedOperations.includes('DELETE')}
-          />
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="checkbox-select"
+              onCheckedChange={() => onToggleOperation('SELECT')}
+              checked={allowedOperations.includes('SELECT')}
+            />
+            <label
+              htmlFor="checkbox-select"
+              className="text-sm text-foreground-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              SELECT
+            </label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="checkbox-insert"
+              onCheckedChange={() => onToggleOperation('INSERT')}
+              checked={allowedOperations.includes('INSERT')}
+            />
+            <label
+              htmlFor="checkbox-insert"
+              className="text-sm text-foreground-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              INSERT
+            </label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="checkbox-update"
+              onCheckedChange={() => onToggleOperation('UPDATE')}
+              checked={allowedOperations.includes('UPDATE')}
+            />
+            <label
+              htmlFor="checkbox-update"
+              className="text-sm text-foreground-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              UPDATE
+            </label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="checkbox-delete"
+              onCheckedChange={() => onToggleOperation('DELETE')}
+              checked={allowedOperations.includes('DELETE')}
+            />
+            <label
+              htmlFor="checkbox-delete"
+              className="text-sm text-foreground-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              DELETE
+            </label>
+          </div>
         </div>
         {hasUpdateOrDelete && (
           <p className="text-sm text-foreground-light mt-3 prose [&>code]:text-xs">
@@ -86,7 +118,7 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
                 className={cn(
                   'text-xs font-mono leading-[1.1] px-2 py-1 rounded-full border font-normal whitespace-nowrap transition-colors duration-200',
                   allowedClientLibraryMethods.includes(method)
-                    ? 'bg-brand bg-opacity-10 text-brand-600 border-brand-500'
+                    ? 'bg-brand/10 text-brand-600 border-brand-500'
                     : 'bg-surface-75 text-foreground-lighter border-muted'
                 )}
               >
@@ -102,10 +134,10 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
 
 const PolicyEditorFooter = ({ onViewTemplates = () => {}, onReviewPolicy = () => {} }) => (
   <div className="flex w-full items-center justify-end gap-x-2 border-t px-6 py-3 border-default">
-    <Button type="default" onClick={onViewTemplates}>
+    <Button variant="default" onClick={onViewTemplates}>
       View templates
     </Button>
-    <Button type="primary" onClick={onReviewPolicy}>
+    <Button variant="primary" onClick={onReviewPolicy}>
       Review
     </Button>
   </div>
@@ -128,31 +160,31 @@ const StoragePoliciesEditor = ({
   return (
     <>
       <div className="space-y-4 py-4">
-        <Modal.Content>
+        <DialogSection>
           <PolicyName
             name={policyFormFields.name}
             limit={50}
             onUpdatePolicyName={onUpdatePolicyName}
           />
-        </Modal.Content>
-        <Modal.Separator />
-        <Modal.Content>
+        </DialogSection>
+        <DialogSectionSeparator />
+        <DialogSection>
           <PolicyAllowedOperations
             allowedOperations={policyFormFields.allowedOperations}
             onToggleOperation={onToggleOperation}
           />
-        </Modal.Content>
-        <Modal.Separator />
-        <Modal.Content>
+        </DialogSection>
+        <DialogSectionSeparator />
+        <DialogSection>
           <PolicyRoles selectedRoles={selectedRoles} onUpdateSelectedRoles={onUpdatePolicyRoles} />
-        </Modal.Content>
-        <Modal.Separator />
-        <Modal.Content>
+        </DialogSection>
+        <DialogSectionSeparator />
+        <DialogSection>
           <PolicyDefinition
             definition={definition}
             onUpdatePolicyDefinition={onUpdatePolicyDefinition}
           />
-        </Modal.Content>
+        </DialogSection>
       </div>
       <PolicyEditorFooter onViewTemplates={onViewTemplates} onReviewPolicy={onReviewPolicy} />
     </>

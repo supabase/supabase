@@ -21,11 +21,11 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
-  Label_Shadcn_ as Label,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+  Label,
   Switch,
   Tooltip,
   TooltipContent,
@@ -40,6 +40,7 @@ import {
   estimateDiskCost,
   estimateRestoreTime,
 } from './BranchManagement.utils'
+import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { BranchingPITRNotice } from '@/components/layouts/AppLayout/EnableBranchingButton/BranchingPITRNotice'
 import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -53,12 +54,12 @@ import { useGitHubConnectionsQuery } from '@/data/integrations/github-connection
 import { projectKeys } from '@/data/projects/keys'
 import { DesiredInstanceSize, instanceSizeSpecs } from '@/data/projects/new-project.constants'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 
 export const CreateBranchModal = () => {
@@ -155,7 +156,7 @@ export const CreateBranchModal = () => {
   const branchComputeSize = estimateComputeSize(projectDiskAttributes.size_gb, computeSize)
   const estimatedDiskCost = estimateDiskCost(branchDiskAttributes)
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const { mutate: checkGithubBranchValidity, isPending: isCheckingGHBranchValidity } =
     useCheckGithubBranchValidity({
@@ -168,16 +169,9 @@ export const CreateBranchModal = () => {
       if (projectRef) {
         await queryClient.invalidateQueries({ queryKey: projectKeys.detail(projectRef) })
       }
-      sendEvent({
-        action: 'branch_create_button_clicked',
-        properties: {
-          branchType: data.persistent ? 'persistent' : 'preview',
-          gitlessBranching: !data.git_branch,
-        },
-        groups: {
-          project: ref ?? 'Unknown',
-          organization: selectedOrg?.slug ?? 'Unknown',
-        },
+      track('branch_create_button_clicked', {
+        branchType: data.persistent ? 'persistent' : 'preview',
+        gitlessBranching: !data.git_branch,
       })
 
       setShowCreateBranchModal(false)
@@ -291,7 +285,7 @@ export const CreateBranchModal = () => {
         </DialogHeader>
         <DialogSectionSeparator />
 
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
             {promptPlanUpgrade && (
               <UpgradeToPro
@@ -309,18 +303,18 @@ export const CreateBranchModal = () => {
               padding="medium"
               className={cn('space-y-4', promptPlanUpgrade && 'opacity-25 pointer-events-none')}
             >
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="branchName"
                 render={({ field }) => (
                   <FormItemLayout label="Preview Branch Name">
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
+                    <FormControl>
+                      <Input
                         {...field}
                         placeholder="e.g. staging, dev-feature-x"
                         autoComplete="off"
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -341,7 +335,7 @@ export const CreateBranchModal = () => {
 
               {isSuccessConnections &&
                 (githubConnection ? (
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="gitBranchName"
                     render={({ field }) => (
@@ -372,8 +366,8 @@ export const CreateBranchModal = () => {
                         description="Automatically deploy changes on every commit"
                       >
                         <div className="relative w-full">
-                          <FormControl_Shadcn_>
-                            <Input_Shadcn_
+                          <FormControl>
+                            <Input
                               {...field}
                               placeholder="e.g. main, feat/some-feature"
                               autoComplete="off"
@@ -382,7 +376,7 @@ export const CreateBranchModal = () => {
                                 setIsGitBranchValid(false)
                               }}
                             />
-                          </FormControl_Shadcn_>
+                          </FormControl>
                           <div className="absolute top-2.5 right-3 flex items-center gap-2">
                             {field.value ? (
                               isCheckingGHBranchValidity ? (
@@ -404,14 +398,14 @@ export const CreateBranchModal = () => {
                         Keep this preview branch in sync with a chosen GitHub branch
                       </p>
                     </div>
-                    <Button type="default" icon={<Github />} onClick={handleGitHubClick}>
+                    <Button variant="default" icon={<Github />} onClick={handleGitHubClick}>
                       Configure
                     </Button>
                   </div>
                 ))}
 
               {allowDataBranching && (
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="withData"
                   render={({ field }) => (
@@ -426,13 +420,13 @@ export const CreateBranchModal = () => {
                       className="[&>div>label]:mb-1"
                       description="Clone production data into this branch"
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Switch
                           disabled={!hasPitrEnabled}
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -605,11 +599,12 @@ export const CreateBranchModal = () => {
               </div>
 
               {!hasPitrEnabled && <BranchingPITRNotice />}
+              <TaxDisclaimer />
             </DialogSection>
 
             <DialogFooter className="justify-end gap-2" padding="medium">
               <Button
-                type="default"
+                variant="default"
                 disabled={isCreatingBranch}
                 onClick={() => setShowCreateBranchModal(false)}
               >
@@ -619,8 +614,8 @@ export const CreateBranchModal = () => {
                 form={formId}
                 disabled={isDisabled}
                 loading={isCreatingBranch}
-                type={promptPlanUpgrade ? 'default' : 'primary'}
-                htmlType="submit"
+                variant={promptPlanUpgrade ? 'default' : 'primary'}
+                type="submit"
                 tooltip={{
                   content: {
                     side: 'bottom',
@@ -632,7 +627,7 @@ export const CreateBranchModal = () => {
               </ButtonTooltip>
             </DialogFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </DialogContent>
     </Dialog>
   )

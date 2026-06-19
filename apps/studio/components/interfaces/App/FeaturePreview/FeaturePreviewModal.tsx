@@ -1,7 +1,9 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { ReactNode } from 'react'
+import { toast } from 'sonner'
 import {
   Badge,
   Button,
@@ -14,6 +16,9 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   ScrollArea,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import {
   Select,
@@ -25,16 +30,17 @@ import {
 import { AdvisorRulesPreview } from './AdvisorRulesPreview'
 import { CLSPreview } from './CLSPreview'
 import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
-import { FloatingMobileToolbarPreview } from './FloatingMobileToolbarPreview'
+import { IntegrationsLayoutPreview } from './IntegrationsLayoutPreview'
 import { JitDbAccessPreview } from './JitDbAccessPreview'
 import { PgDeltaDiffPreview } from './PgDeltaDiffPreview'
 import { PlatformWebhooksPreview } from './PlatformWebhooksPreview'
-import { TableFilterBarPreview } from './TableFilterBarPreview'
+import { RLSTesterPreview } from './RLSTesterPreview'
 import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 import { FeaturePreview, useFeaturePreviews } from './useFeaturePreviews'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [key: string]: ReactNode
@@ -43,13 +49,14 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]: <AdvisorRulesPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]: <CLSPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]: <UnifiedLogsPreview />,
-  [LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR]: <TableFilterBarPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS]: <PlatformWebhooksPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]: <JitDbAccessPreview />,
-  [LOCAL_STORAGE_KEYS.UI_PREVIEW_FLOATING_MOBILE_TOOLBAR]: <FloatingMobileToolbarPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER]: <RLSTesterPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]: <IntegrationsLayoutPreview />,
 }
 
 export const FeaturePreviewModal = () => {
+  const router = useRouter()
   const { ref } = useParams()
   const featurePreviews = useFeaturePreviews()
   const {
@@ -58,9 +65,14 @@ export const FeaturePreviewModal = () => {
     selectFeaturePreview,
     toggleFeaturePreviewModal,
   } = useFeaturePreviewModal()
-  const { data: org } = useSelectedOrganizationQuery()
   const featurePreviewContext = useFeaturePreviewContext()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
+
+  const { dismissBanner } = useBannerStack()
+  const [, setIsDismissedRlsTesterBanner] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.RLS_TESTER_BANNER_DISMISSED(ref ?? ''),
+    false
+  )
 
   const { flags, onUpdateFlag } = featurePreviewContext
   const allFeaturePreviews = (
@@ -72,19 +84,45 @@ export const FeaturePreviewModal = () => {
     allFeaturePreviews[0]
   const isSelectedFeatureEnabled = flags[selectedFeature?.key]
 
+  const selectedFeatureRoute = selectedFeature?.getRoute?.(ref)
+  const hasRoute = selectedFeatureRoute !== undefined && ref !== undefined
+
   const toggleFeature = () => {
     if (!selectedFeature) return
-    onUpdateFlag(selectedFeature.key, !isSelectedFeatureEnabled)
-    sendEvent({
-      action: isSelectedFeatureEnabled ? 'feature_preview_disabled' : 'feature_preview_enabled',
-      properties: { feature: selectedFeature.key },
-      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+
+    const isEnabling = !isSelectedFeatureEnabled
+
+    if (selectedFeature.key === LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER) {
+      dismissBanner('rls-tester-banner')
+      setIsDismissedRlsTesterBanner(true)
+    }
+
+    onUpdateFlag(selectedFeature.key, isEnabling)
+    track(isEnabling ? 'feature_preview_enabled' : 'feature_preview_disabled', {
+      feature: selectedFeature.key,
     })
+
+    if (!isEnabling) {
+      toast(`${selectedFeature.name} disabled`)
+      return
+    }
+
+    toggleFeaturePreviewModal(false)
+    if (hasRoute) {
+      router.push(selectedFeatureRoute)
+      toast.success(`${selectedFeature.name} enabled`, {
+        description: "We've taken you to where you can try it out.",
+      })
+    } else {
+      toast.success(`${selectedFeature.name} enabled`, {
+        description: "It's now active across the dashboard.",
+      })
+    }
   }
 
   return (
     <Dialog open={showFeaturePreviewModal} onOpenChange={toggleFeaturePreviewModal}>
-      <DialogContent size="xlarge" className="flex flex-col !max-w-4xl h-[90dvh] md:h-auto">
+      <DialogContent size="xlarge" className="flex flex-col max-w-4xl! h-[90dvh] md:h-auto">
         <DialogHeader>
           <DialogTitle>Dashboard feature previews</DialogTitle>
           <DialogDescription>Get early access to new features and give feedback</DialogDescription>
@@ -92,7 +130,7 @@ export const FeaturePreviewModal = () => {
 
         <DialogSectionSeparator />
 
-        <DialogSection className="!p-0 flex-1 min-h-0 h-full">
+        <DialogSection className="p-0! flex-1 min-h-0 h-full">
           {allFeaturePreviews.length > 0 ? (
             <div className="max-h-full flex-1 min-h-0 h-full flex flex-col gap-y-1 md:gap-y-4 md:flex-row">
               <div>
@@ -124,7 +162,7 @@ export const FeaturePreviewModal = () => {
                       {selectedFeature.isNew && <Badge variant="success">New</Badge>}
                     </div>
                   </SelectTrigger>
-                  <SelectContent className="!p-0 [&>div]:!w-full [&>div]:!p-0 [&>div]:!flex [&>div]:!flex-col w-full flex">
+                  <SelectContent className="p-0! [&>div]:w-full! [&>div]:p-0! [&>div]:flex! [&>div]:flex-col! w-full flex">
                     {allFeaturePreviews.map((feature) => (
                       <SelectItem
                         key={feature.key}
@@ -142,12 +180,12 @@ export const FeaturePreviewModal = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="h-auto min-h-0 max-h-auto md:max-h-[550px] p-4 pb-0 flex flex-col">
+              <div className="w-full h-auto min-h-0 max-h-auto md:max-h-[550px] p-4 pb-0 flex flex-col">
                 <div className="flex items-center justify-between border-b gap-2 pb-3">
                   <p>{selectedFeature?.name}</p>
                   <div className="flex items-center gap-x-2">
                     {selectedFeature?.discussionsUrl !== undefined && (
-                      <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+                      <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
                         <Link
                           href={selectedFeature.discussionsUrl}
                           target="_blank"
@@ -157,9 +195,24 @@ export const FeaturePreviewModal = () => {
                         </Link>
                       </Button>
                     )}
-                    <Button type="default" onClick={() => toggleFeature()}>
-                      {isSelectedFeatureEnabled ? 'Disable' : 'Enable'} feature
-                    </Button>
+                    {isSelectedFeatureEnabled ? (
+                      <Button variant="default" onClick={() => toggleFeature()}>
+                        Disable feature
+                      </Button>
+                    ) : (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="default" onClick={() => toggleFeature()}>
+                            Enable feature
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" className="max-w-64 text-center">
+                          {hasRoute
+                            ? 'Enables the feature and takes you to where you can try it out'
+                            : 'Enables this preview across the dashboard'}
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
                   </div>
                 </div>
                 <div className="overflow-y-scroll pt-3 pb-4">
@@ -176,7 +229,7 @@ export const FeaturePreviewModal = () => {
                   Have an idea for the dashboard? Let us know via GitHub Discussions!
                 </p>
               </div>
-              <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+              <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
                 <Link
                   href="https://github.com/orgs/supabase/discussions/categories/feature-requests"
                   target="_blank"
@@ -214,7 +267,7 @@ const FeaturePreviewItem = ({
       key={feature.key}
       onClick={() => selectFeaturePreview(feature.key)}
       className={cn(
-        '!w-full flex-1 flex items-center justify-between p-4 border-b cursor-pointer bg transition',
+        'w-full! flex-1 flex items-center justify-between p-4 border-b cursor-pointer bg transition',
         selectedFeature?.key === feature.key ? 'bg-surface-300' : 'bg-surface-100',
         className
       )}

@@ -1,9 +1,7 @@
-import { useParams } from 'common'
 import { Button } from 'ui'
 
 import { useStripeSyncStatus } from './useStripeSyncStatus'
 import AlertError from '@/components/ui/AlertError'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const InstallationError = ({
   error,
@@ -33,7 +31,7 @@ export const InstallationError = ({
         description="There was an error during the uninstallation of the Stripe Sync Engine, please try again. If the problem persists, contact support."
         additionalActions={
           <Button
-            type="default"
+            variant="default"
             onClick={handleUninstall}
             disabled={uninstalling}
             loading={uninstalling}
@@ -61,7 +59,7 @@ export const InstallationError = ({
         }
         additionalActions={
           <Button
-            type="default"
+            variant="default"
             onClick={handleOpenInstallSheet}
             disabled={installing}
             loading={installing}

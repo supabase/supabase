@@ -13,15 +13,15 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -158,7 +158,7 @@ export const NewTokenDialog = ({
                   be very careful when using this API.
                 </p>
                 <div className="mt-4">
-                  <Button asChild type="default" icon={<ExternalLink />}>
+                  <Button asChild variant="default" icon={<ExternalLink />}>
                     <a href="https://api.supabase.com/api/v0" target="_blank" rel="noreferrer">
                       Experimental API documentation
                     </a>
@@ -176,51 +176,51 @@ export const NewTokenDialog = ({
           />
         )}
         <DialogSection className="flex flex-col gap-4">
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form
               id={formId}
               className="flex flex-col gap-4"
               onSubmit={form.handleSubmit(onSubmit)}
             >
-              <FormField_Shadcn_
+              <FormField
                 key="tokenName"
                 name="tokenName"
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout name="tokenName" label="Name">
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
+                    <FormControl>
+                      <Input
                         id="tokenName"
                         {...field}
                         placeholder="Provide a name for your token"
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
-              <FormField_Shadcn_
+              <FormField
                 key="expiresAt"
                 name="expiresAt"
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout name="expiresAt" label="Expires in">
                     <div className="flex gap-2">
-                      <FormControl_Shadcn_ className="flex-grow">
-                        <Select_Shadcn_ value={field.value} onValueChange={handleExpiryChange}>
-                          <SelectTrigger_Shadcn_>
-                            <SelectValue_Shadcn_ placeholder="Expires at" />
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
+                      <FormControl className="grow">
+                        <Select value={field.value} onValueChange={handleExpiryChange}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Expires at" />
+                          </SelectTrigger>
+                          <SelectContent>
                             {Object.values(EXPIRES_AT_OPTIONS).map(
                               (option: { value: string; label: string }) => (
-                                <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                                <SelectItem key={option.value} value={option.value}>
                                   {option.label}
-                                </SelectItem_Shadcn_>
+                                </SelectItem>
                               )
                             )}
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
-                      </FormControl_Shadcn_>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
                       {isCustomExpiry && (
                         <DatePicker
                           selectsRange={false}
@@ -247,11 +247,11 @@ export const NewTokenDialog = ({
                 )}
               />
             </form>
-          </Form_Shadcn_>
+          </Form>
         </DialogSection>
         <DialogFooter>
           <Button
-            type="default"
+            variant="default"
             disabled={isPending}
             onClick={() => {
               form.reset()
@@ -262,7 +262,7 @@ export const NewTokenDialog = ({
           >
             Cancel
           </Button>
-          <Button form={formId} htmlType="submit" loading={isPending}>
+          <Button form={formId} type="submit" loading={isPending}>
             Generate token
           </Button>
         </DialogFooter>

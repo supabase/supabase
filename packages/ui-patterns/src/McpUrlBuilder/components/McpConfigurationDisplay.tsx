@@ -73,7 +73,7 @@ export function McpConfigurationDisplay({
           <div className="text-xs text-foreground-light">
             {selectedClient.deepLinkDescription ?? 'Install in one click:'}
           </div>
-          <Button type="secondary" size="small" asChild>
+          <Button variant="secondary" size="small" asChild>
             <a
               href={mcpButtonData.deepLink}
               target="_blank"
@@ -106,7 +106,10 @@ export function McpConfigurationDisplay({
                 ? 'Or add'
                 : 'Add'}{' '}
             this configuration to{' '}
-            <code className="px-1 py-0.5 bg-surface-200 rounded">{selectedClient.configFile}</code>:
+            <code className="px-1 py-0.5 bg-surface-200 rounded-sm">
+              {selectedClient.configFile}
+            </code>
+            :
           </div>
           <CodeBlock
             value={configValue}

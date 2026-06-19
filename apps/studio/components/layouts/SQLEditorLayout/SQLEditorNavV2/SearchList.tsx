@@ -10,8 +10,8 @@ import { ShareSnippetModal } from './ShareSnippetModal'
 import { formatFolderResponseForTreeView, getLastItemIds } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
 import { UnshareSnippetModal } from './UnshareSnippetModal'
-import DownloadSnippetModal from '@/components/interfaces/SQLEditor/DownloadSnippetModal'
-import RenameQueryModal from '@/components/interfaces/SQLEditor/RenameQueryModal'
+import { DownloadSnippetModal } from '@/components/interfaces/SQLEditor/DownloadSnippetModal'
+import { RenameQueryModal } from '@/components/interfaces/SQLEditor/RenameQueryModal'
 import { useContentCountQuery } from '@/data/content/content-count-query'
 import { useContentInfiniteQuery } from '@/data/content/content-infinite-query'
 import { Snippet, SNIPPET_PAGE_LIMIT } from '@/data/content/sql-folders-query'
@@ -69,7 +69,7 @@ export const SearchList = ({ search }: SearchListProps) => {
 
   return (
     <>
-      <div className="flex flex-col flex-grow">
+      <div className="flex flex-col grow">
         {isLoadingCount ? (
           <div className="px-4 py-1 pb-2.5">
             <Loader2 className="animate-spin" size={14} />
@@ -161,8 +161,8 @@ export const SearchList = ({ search }: SearchListProps) => {
 
       <DownloadSnippetModal
         id={selectedSnippetToDownload?.id ?? ''}
-        visible={selectedSnippetToDownload !== undefined}
-        onCancel={() => setSelectedSnippetToDownload(undefined)}
+        open={selectedSnippetToDownload !== undefined}
+        onOpenChange={() => setSelectedSnippetToDownload(undefined)}
       />
 
       <RenameQueryModal

@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Badge } from 'ui'
 
@@ -10,7 +9,6 @@ import { formatBytes } from '@/lib/helpers'
 import { useAppStateSnapshot } from '@/state/app-state'
 
 export const Bucket = ({ language, apikey, endpoint }: ContentProps) => {
-  const queryClient = useQueryClient()
   const { ref } = useParams()
 
   const snap = useAppStateSnapshot()

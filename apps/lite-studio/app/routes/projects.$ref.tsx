@@ -4,15 +4,15 @@ import {
   Badge,
   Button,
   Card,
-  Checkbox_Shadcn_ as Checkbox,
+  Checkbox,
   Input,
-  Label_Shadcn_ as Label,
+  Label,
   Separator,
+  Switch,
   Tabs_Shadcn_ as Tabs,
   TabsContent_Shadcn_ as TabsContent,
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
-  Toggle,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import {
@@ -75,11 +75,11 @@ export default function ProjectPage() {
             <h3>Quick Actions</h3>
             <Separator />
             <div className="flex flex-wrap gap-3">
-              <Button type="primary">New Table</Button>
-              <Button type="default">SQL Editor</Button>
-              <Button type="default">View Logs</Button>
+              <Button variant="primary">New Table</Button>
+              <Button variant="default">SQL Editor</Button>
+              <Button variant="default">View Logs</Button>
               <Button
-                type="outline"
+                variant="outline"
                 loading={loading}
                 onClick={() => {
                   setLoading(true)
@@ -114,7 +114,7 @@ export default function ProjectPage() {
                     <span className="font-mono text-sm">{table}</span>
                     <Badge variant="default">public</Badge>
                   </div>
-                  <Button type="text" size="tiny">
+                  <Button variant="text" size="tiny">
                     View
                   </Button>
                 </div>
@@ -150,9 +150,13 @@ export default function ProjectPage() {
                 />
               </div>
 
-              <div className="flex items-center gap-3">
-                <Toggle checked={enableRls} onChange={() => setEnableRls(!enableRls)} />
-                <Label>Enable RLS by default on new tables</Label>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="enable-rls"
+                  checked={enableRls}
+                  onCheckedChange={(checked) => setEnableRls(checked)}
+                />
+                <Label htmlFor="enable-rls">Enable RLS by default on new tables</Label>
               </div>
 
               <div className="flex items-center gap-3">
@@ -164,8 +168,8 @@ export default function ProjectPage() {
             </div>
 
             <div className="flex gap-3">
-              <Button type="primary">Save Changes</Button>
-              <Button type="default">Cancel</Button>
+              <Button variant="primary">Save Changes</Button>
+              <Button variant="default">Cancel</Button>
             </div>
           </Card>
         </TabsContent>

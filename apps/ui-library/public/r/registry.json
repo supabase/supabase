@@ -1401,6 +1401,161 @@
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-flow-nextjs",
+      "type": "registry:component",
+      "title": "Realtime Flow",
+      "description": "Real-time flow diagram editor for collaborative applications.",
+      "registryDependencies": [],
+      "dependencies": [
+        "@xyflow/react@latest",
+        "@supabase-labs/y-supabase@latest",
+        "y-protocols@latest",
+        "yjs@latest",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-flow/hooks/use-realtime-flow.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-flow/components/realtime-flow.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.",
+      "envVars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-flow-react",
+      "type": "registry:component",
+      "title": "Realtime Flow",
+      "description": "Real-time flow diagram editor for collaborative applications.",
+      "registryDependencies": [],
+      "dependencies": [
+        "@xyflow/react@latest",
+        "@supabase-labs/y-supabase@latest",
+        "y-protocols@latest",
+        "yjs@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-flow/hooks/use-realtime-flow.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-flow/components/realtime-flow.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/react/lib/supabase/client.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-flow-react-router",
+      "type": "registry:component",
+      "title": "Realtime Flow",
+      "description": "Real-time flow diagram editor for collaborative applications.",
+      "registryDependencies": [],
+      "dependencies": [
+        "@xyflow/react@latest",
+        "@supabase-labs/y-supabase@latest",
+        "y-protocols@latest",
+        "yjs@latest",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-flow/hooks/use-realtime-flow.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-flow/components/realtime-flow.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-flow-tanstack",
+      "type": "registry:component",
+      "title": "Realtime Flow",
+      "description": "Real-time flow diagram editor for collaborative applications.",
+      "registryDependencies": [],
+      "dependencies": [
+        "@xyflow/react@latest",
+        "@supabase-labs/y-supabase@latest",
+        "y-protocols@latest",
+        "yjs@latest",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-flow/hooks/use-realtime-flow.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-flow/components/realtime-flow.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
       "name": "realtime-monaco-nextjs",
       "type": "registry:component",
       "title": "Realtime Monaco",
@@ -2404,6 +2559,95 @@
       ],
       "dependencies": [
         "@supabase/supabase-js@latest"
+      ]
+    },
+    {
+      "name": "realtime-chat-nuxtjs",
+      "type": "registry:block",
+      "title": "Realtime Chat",
+      "description": "Component which provides a realtime chat interface.",
+      "registryDependencies": [
+        "button",
+        "input"
+      ],
+      "files": [
+        {
+          "path": "registry/default/realtime-chat/nuxtjs/app/components/realtime-chat.vue",
+          "type": "registry:component",
+          "target": "app/components/realtime-chat.vue"
+        },
+        {
+          "path": "registry/default/realtime-chat/nuxtjs/app/components/chat-message-item.vue",
+          "type": "registry:component",
+          "target": "app/components/chat-message-item.vue"
+        },
+        {
+          "path": "registry/default/realtime-chat/nuxtjs/app/composables/useChatScroll.ts",
+          "type": "registry:component",
+          "target": "app/composables/useChatScroll.ts"
+        },
+        {
+          "path": "registry/default/realtime-chat/nuxtjs/app/composables/useRealtimeChat.ts",
+          "type": "registry:component",
+          "target": "app/composables/useRealtimeChat.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest",
+        "lucide-vue-next@latest"
+      ]
+    },
+    {
+      "name": "realtime-chat-vue",
+      "type": "registry:block",
+      "title": "Realtime Chat",
+      "description": "Component which provides a realtime chat interface.",
+      "registryDependencies": [
+        "button",
+        "input"
+      ],
+      "files": [
+        {
+          "path": "registry/default/realtime-chat/vue/components/realtime-chat.vue",
+          "type": "registry:component",
+          "target": "components/realtime-chat.vue"
+        },
+        {
+          "path": "registry/default/realtime-chat/vue/components/chat-message-item.vue",
+          "type": "registry:component",
+          "target": "components/chat-message-item.vue"
+        },
+        {
+          "path": "registry/default/realtime-chat/vue/composables/useChatScroll.ts",
+          "type": "registry:component",
+          "target": "composables/useChatScroll.ts"
+        },
+        {
+          "path": "registry/default/realtime-chat/vue/composables/useRealtimeChat.ts",
+          "type": "registry:component",
+          "target": "composables/useRealtimeChat.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest",
+        "lucide-vue-next@latest"
+      ]
+    },
+    {
+      "name": "infinite-query-composable",
+      "type": "registry:component",
+      "title": "Infinite Query for Vue and Supabase",
+      "description": "Vue Composable for infinite lists, fetching data from Supabase.",
+      "files": [
+        {
+          "path": "registry/default/infinite-query/vue/composables/useInfiniteQuery.ts",
+          "type": "registry:component",
+          "target": "composables/useInfiniteQuery.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest",
+        "@supabase/postgrest-js@*"
       ]
     },
     {

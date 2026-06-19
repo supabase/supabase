@@ -1,11 +1,12 @@
+import type { SafeSqlFragment } from '../pg-format'
 import { IQueryFilter, QueryFilter } from './QueryFilter'
 import type { Dictionary, QueryTable } from './types'
 
 export interface IQueryAction {
   count: () => IQueryFilter
   delete: (options?: { returning: boolean }) => IQueryFilter
-  insert: (values: Dictionary<any>[], options?: { returning: boolean }) => IQueryFilter
-  select: (columns?: string) => IQueryFilter
+  insert: (values: Array<Dictionary<any>>, options?: { returning: boolean }) => IQueryFilter
+  select: (columns?: SafeSqlFragment) => IQueryFilter
   update: (value: Dictionary<any>, options?: { returning: boolean }) => IQueryFilter
   truncate: (options?: { returning: boolean }) => IQueryFilter
 }
@@ -17,7 +18,7 @@ export class QueryAction implements IQueryAction {
    * Performs a COUNT on the table.
    */
   count() {
-    return new QueryFilter(this.table, 'count')
+    return new QueryFilter(this.table, { action: 'count' })
   }
 
   /**
@@ -25,8 +26,8 @@ export class QueryAction implements IQueryAction {
    *
    * @param options.returning  If `true`, return the deleted row(s) in the response.
    */
-  delete(options?: { returning: boolean; enumArrayColumns?: string[] }) {
-    return new QueryFilter(this.table, 'delete', undefined, options)
+  delete(options?: { returning: boolean; enumArrayColumns?: Array<string> }) {
+    return new QueryFilter(this.table, { action: 'delete' }, options)
   }
 
   /**
@@ -35,8 +36,11 @@ export class QueryAction implements IQueryAction {
    * @param values             The values to insert.
    * @param options.returning  If `true`, return the inserted row(s) in the response.
    */
-  insert(values: Dictionary<any>[], options?: { returning: boolean; enumArrayColumns?: string[] }) {
-    return new QueryFilter(this.table, 'insert', values, options)
+  insert(
+    values: Array<Dictionary<any>>,
+    options?: { returning: boolean; enumArrayColumns?: Array<string> }
+  ) {
+    return new QueryFilter(this.table, { action: 'insert', actionValue: values }, options)
   }
 
   /**
@@ -44,8 +48,8 @@ export class QueryAction implements IQueryAction {
    *
    * @param columns the query columns, by default set to '*'.
    */
-  select(columns?: string) {
-    return new QueryFilter(this.table, 'select', columns)
+  select(columns?: SafeSqlFragment) {
+    return new QueryFilter(this.table, { action: 'select', actionValue: columns })
   }
 
   /**
@@ -54,14 +58,17 @@ export class QueryAction implements IQueryAction {
    * @param value  The value to update.
    * @param options.returning  If `true`, return the updated row(s) in the response.
    */
-  update(value: Dictionary<any>, options?: { returning: boolean; enumArrayColumns?: string[] }) {
-    return new QueryFilter(this.table, 'update', value, options)
+  update(
+    value: Dictionary<any>,
+    options?: { returning: boolean; enumArrayColumns?: Array<string> }
+  ) {
+    return new QueryFilter(this.table, { action: 'update', actionValue: value }, options)
   }
 
   /**
    * Performs a TRUNCATE on the table
    */
-  truncate(options?: { returning: boolean; enumArrayColumns?: string[] }) {
-    return new QueryFilter(this.table, 'truncate', undefined, options)
+  truncate(options?: { returning: boolean; enumArrayColumns?: Array<string> }) {
+    return new QueryFilter(this.table, { action: 'truncate' }, options)
   }
 }

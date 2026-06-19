@@ -55,7 +55,7 @@ export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowPr
           <p className="text-xs font-mono truncate" title={app.client_id}>
             {app.client_id}
           </p>
-          <CopyButton type="default" iconOnly text={app.client_id ?? ''} className="px-1" />
+          <CopyButton variant="default" iconOnly text={app.client_id ?? ''} className="px-1" />
         </div>
       </TableCell>
       <TableCell>
@@ -68,7 +68,7 @@ export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowPr
       <TableCell className="text-right">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="default" icon={<MoreVertical />} className="px-1" />
+            <Button variant="default" icon={<MoreVertical />} className="px-1" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" side="bottom" className="w-32">
             <Tooltip>
@@ -76,7 +76,7 @@ export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowPr
                 <DropdownMenuItem
                   key="edit"
                   disabled={!canUpdateOAuthApps}
-                  className="space-x-2 !pointer-events-auto"
+                  className="space-x-2 pointer-events-auto!"
                   onClick={() => {
                     if (canUpdateOAuthApps) onSelectEdit()
                   }}
@@ -96,7 +96,7 @@ export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowPr
               <TooltipTrigger asChild>
                 <DropdownMenuItem
                   disabled={!canDeleteOAuthApps}
-                  className="space-x-2 !pointer-events-auto"
+                  className="space-x-2 pointer-events-auto!"
                   key="delete"
                   onClick={() => {
                     if (canDeleteOAuthApps) onSelectDelete()

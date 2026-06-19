@@ -15,7 +15,7 @@ export const NavigationIconButton = forwardRef<
   return (
     <Button
       ref={ref}
-      type="text"
+      variant="text"
       size="tiny"
       {...props}
       className={cn(
@@ -28,7 +28,7 @@ export const NavigationIconButton = forwardRef<
         className={cn(
           'absolute left-10 md:left-7 md:group-data-[state=expanded]:left-10',
           'opacity-100 md:opacity-0 md:group-data-[state=expanded]:opacity-100',
-          'w-[10rem] text-sm flex flex-col items-center',
+          'w-40 text-sm flex flex-col items-center',
           'transition-all'
         )}
       >
