@@ -177,7 +177,6 @@ const CUSTOM_LOGO_URLS = {
 
 export const RequesterLogo = ({ icon, name }: { icon: string | null; name: string }) => {
   const [failedIcon, setFailedIcon] = useState<string | null>(null)
-  const showLetter = !icon || failedIcon === icon
 
   const customLogoUrl = useMemo(() => {
     for (const key of Object.keys(CUSTOM_LOGO_URLS)) {
@@ -190,7 +189,9 @@ export const RequesterLogo = ({ icon, name }: { icon: string | null; name: strin
       }
     }
     return icon || ''
-  }, [icon])
+  }, [icon, name])
+
+  const showLetter = !customLogoUrl || failedIcon === customLogoUrl
 
   return (
     <LogoBox>
