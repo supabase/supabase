@@ -9,7 +9,7 @@ export const Route = createFileRoute('/_auth/sign-up')({
 
 function SignUp() {
   return (
-    <SignInLayout heading="Get started" subheading="Create a new account">
+    <SignInLayout heading="Get started" subheading="Create a new account" inboundFlow="sign-up">
       <SignUpPage dehydratedState={undefined} />
     </SignInLayout>
   )
