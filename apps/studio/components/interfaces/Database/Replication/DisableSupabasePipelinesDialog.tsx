@@ -57,8 +57,8 @@ export const DisableSupabasePipelinesDialog = ({
           <AlertDialogDescription className="space-y-2 text-sm">
             <p>
               This will remove the <code className="text-code-inline">etl</code> schema and all
-              connected resources from your database. Any active pipelines sending changes to
-              external destinations will stop.
+              connected resources from your database. Any active replication pipelines sending
+              changes to external destinations will stop.
             </p>
             <p>Read replicas are not affected.</p>
           </AlertDialogDescription>

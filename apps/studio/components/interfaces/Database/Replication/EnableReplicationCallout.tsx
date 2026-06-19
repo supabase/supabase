@@ -66,8 +66,8 @@ const EnableReplicationModal = () => {
               incorporate customer feedback.
             </p>
             <p className="text-sm leading-normal!">
-              Pricing is not finalized. You can enable Supabase Pipelines now; we'll announce
-              pricing later and notify you before any charges apply.
+              Pricing is not finalized. You can enable Pipelines now; we'll announce pricing later
+              and notify you before any charges apply.
             </p>
           </Admonition>
         </DialogSection>

@@ -13,11 +13,11 @@ toc_depth: 2
 
 Today we're introducing **Supabase Pipelines**: managed change-data-capture pipelines that replicate your Postgres tables to analytical destinations in near real time.
 
-Supabase Pipelines reads changes from your Postgres database and writes them to external destinations. It uses logical replication to capture inserts, updates, deletes, and truncates as they happen. **Setup takes minutes in the Supabase Dashboard.**
+Pipelines reads changes from your Postgres database and writes them to external destinations. It uses logical replication to capture inserts, updates, deletes, and truncates as they happen. **Setup takes minutes in the Supabase Dashboard.**
 
 The first supported destination is Google BigQuery.
 
-Supabase Pipelines is powered by the open-source Supabase ETL engine. You can find the code on GitHub at [github.com/supabase/etl](https://github.com/supabase/etl).
+Pipelines is powered by the open-source Supabase ETL engine. You can find the code on GitHub at [github.com/supabase/etl](https://github.com/supabase/etl).
 
 ## Why separate OLTP and OLAP?
 
@@ -25,11 +25,11 @@ Postgres is excellent for transactional workloads like reading a single user rec
 
 Analytical systems are designed for this. They can aggregate massive datasets **orders of magnitude faster**, compress data more efficiently, and handle complex analytical queries that would choke a transactional database.
 
-**Supabase Pipelines gives you the best of both worlds**: keep your app fast on Postgres while unlocking analytics on purpose-built systems.
+**Pipelines gives you the best of both worlds**: keep your app fast on Postgres while unlocking analytics on purpose-built systems.
 
 ## How it works
 
-Supabase Pipelines captures every change in your Postgres database and delivers it to your analytics destination in near real time.
+Pipelines captures every change in your Postgres database and delivers it to your analytics destination in near real time.
 
 Here's how:
 
@@ -45,9 +45,9 @@ Here's how:
 
 The pipeline starts with an initial copy of your selected tables, then switches to streaming mode. **Your analytics stay fresh with latency measured in milliseconds to seconds.**
 
-## Setting up Supabase Pipelines
+## Setting up Pipelines
 
-You configure Supabase Pipelines entirely through the Supabase Dashboard. **No code required.**
+You configure Pipelines entirely through the Supabase Dashboard. **No code required.**
 
 ### Step 1: Create a publication
 
@@ -63,9 +63,9 @@ create publication analytics_pub
 for tables in schema public;
 ```
 
-### Step 2: Enable Supabase Pipelines
+### Step 2: Enable Pipelines
 
-Navigate to `Database` in your Supabase Dashboard. Select the `Replication` tab, click `Add destination`, choose a Supabase Pipelines destination, and click `Enable Supabase Pipelines`.
+Navigate to `Database` in your Supabase Dashboard. Select the `Replication` tab, click `Add destination`, choose a Pipelines destination, and click `Enable Supabase Pipelines`.
 
 ### Step 3: Configure the destination
 
@@ -77,11 +77,11 @@ The Dashboard shows pipeline status and lag. You can start, stop, restart, or de
 
 ## Available destinations
 
-Our goal with Supabase Pipelines is to let you connect your existing data systems to Supabase. We're actively expanding the list of supported destinations. The first supported destination is Google BigQuery.
+Our goal with Pipelines is to let you connect your existing data systems to Supabase. We're actively expanding the list of supported destinations. The first supported destination is Google BigQuery.
 
 BigQuery is Google's serverless data warehouse, built for large-scale analytics. It handles petabytes of data and integrates well with existing BI tools and data pipelines.
 
-When you replicate to BigQuery, Supabase Pipelines handles the ongoing change delivery so your analytical system stays up to date.
+When you replicate to BigQuery, Pipelines handles the ongoing change delivery so your analytical system stays up to date.
 
 ## Adding and removing tables
 
@@ -103,19 +103,19 @@ After changing your publication, restart the pipeline from the Dashboard actions
 
 **Note:** The pipeline does not remove data from your destination when you remove a table from a publication. This is by design to prevent accidental data loss.
 
-## When to use Supabase Pipelines vs read replicas
+## When to use Pipelines vs read replicas
 
-Read replicas and Supabase Pipelines solve different problems.
+Read replicas and Pipelines solve different problems.
 
 Read replicas help when you need to scale concurrent queries, but they're still Postgres. They don't make analytics faster.
 
-Supabase Pipelines moves your data to systems built for analytics. You get **faster queries on large datasets**, **lower storage costs** through compression, and **complete separation** between your production workload and analytics.
+Pipelines moves your data to systems built for analytics. You get **faster queries on large datasets**, **lower storage costs** through compression, and **complete separation** between your production workload and analytics.
 
-You can use both: read replicas for application read scaling, Supabase Pipelines for analytics.
+You can use both: read replicas for application read scaling, Pipelines for analytics.
 
 ## Things to know
 
-Replication with Supabase Pipelines has a few constraints to be aware of:
+Replication with Pipelines has a few constraints to be aware of:
 
 - Tables must have primary keys (this is a Postgres logical replication requirement)
 - Generated columns are not supported
@@ -128,15 +128,15 @@ We're working on schema change support and additional destinations, and evaluati
 
 ## Pricing
 
-Supabase Pipelines pricing is still being finalized during alpha. You can request access now; we'll announce pricing later and notify you before any charges apply.
+Pipelines pricing is still being finalized during alpha. You can request access now; we'll announce pricing later and notify you before any charges apply.
 
 ## Get started
 
-**Supabase Pipelines is currently in alpha.** Alpha features can be unstable and may introduce breaking changes while we evaluate the product direction, refine the feature set, and incorporate customer feedback. To request access, contact your account manager or fill out the form in the Dashboard.
+**Pipelines is currently in alpha.** Alpha features can be unstable and may introduce breaking changes while we evaluate the product direction, refine the feature set, and incorporate customer feedback. To request access, contact your account manager or fill out the form in the Dashboard.
 
 If you want to dive into the code, **the underlying Supabase ETL engine is open source** and written in Rust. Check out the repository at [github.com/supabase/etl](https://github.com/supabase/etl).
 
-**Note:** Supabase ETL is now Supabase Pipelines. This video was recorded before the rename; Supabase ETL now refers to the underlying engine that powers Supabase Pipelines.
+**Note:** Supabase ETL is now Supabase Pipelines. This video was recorded before the rename; Supabase ETL now refers to the underlying engine that powers Pipelines.
 
 <div className="video-container">
   <iframe

@@ -274,14 +274,14 @@ This is where [Supabase Pipelines](https://supabase.com/blog/introducing-supabas
 
 **How it works:**
 
-1. Supabase Pipelines captures changes from your Postgres tables using change-data-capture (CDC)
+1. Pipelines captures changes from your Postgres tables using change-data-capture (CDC)
 2. Changes stream in near real time to a supported analytical destination
 3. The destination stores the data for large scans and aggregations
 4. You query the data with BI tools or downstream analytics workflows
 
 Analytical systems are optimized for large scans and aggregations. They keep heavy reporting workloads away from your production database and give data teams a better place to run long-running queries.
 
-**When to use Supabase Pipelines instead of Read Replicas:**
+**When to use Pipelines instead of Read Replicas:**
 
 - Your analytical queries scan millions of rows regularly
 - You need to retain historical data for years without bloating your database
@@ -293,7 +293,7 @@ Analytical systems are optimized for large scans and aggregations. They keep hea
 - Your analytics queries are moderately heavy but not massive
 - You want your data team to use the same SQL they already know
 - You need the simplest possible setup with no new tools
-- You also need geo-distribution, which Supabase Pipelines does not provide
+- You also need geo-distribution, which Pipelines does not provide
 
 **A common pattern: use both.** Keep 90 days of data in Postgres for fast operational queries. Stream everything to a supported analytical destination for long-term retention and heavy analytics. Your application queries Postgres. Your data team queries the analytical destination for historical trends. You get speed where you need it and cost efficiency where you need that.
 

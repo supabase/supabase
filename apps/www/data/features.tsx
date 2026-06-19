@@ -655,9 +655,9 @@ Foreign Data Wrappers simplify data integration by bringing external data into y
 6. Production isolation: Complete separation of analytics and production workloads.
 
 ## How it works
-Supabase Pipelines uses Postgres logical replication to capture changes. For BigQuery, a view is created for each table backed by versioned tables.
+Pipelines uses Postgres logical replication to capture changes. For BigQuery, a view is created for each table backed by versioned tables.
 
-## Supabase Pipelines is valuable for:
+## Pipelines is valuable for:
 - Data warehousing and business intelligence
 - Historical analysis and audit trails
 - Large-scale analytics requiring separation from production
@@ -666,7 +666,7 @@ Supabase Pipelines uses Postgres logical replication to capture changes. For Big
 ## Limitations
 Tables require primary keys. DDL support (schema changes) is currently in development.
 
-Supabase Pipelines provides a powerful alternative to Read Replicas for analytics workloads, optimizing performance while reducing costs.`,
+Pipelines provides a powerful alternative to Read Replicas for analytics workloads, optimizing performance while reducing costs.`,
     icon: CloudCog,
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: '',
@@ -2845,7 +2845,7 @@ OrioleDB is a PostgreSQL storage extension built on its pluggable storage framew
 5. Production isolation: Keep analytical workloads away from your primary database.
 
 ## Destinations
-BigQuery creates views backed by versioned tables for efficient querying. Additional managed destinations are being evaluated as Supabase Pipelines develops.
+BigQuery creates views backed by versioned tables for efficient querying. Additional managed destinations are being evaluated as Pipelines develops.
 
 ## Setup
 Create Postgres publication for tables to replicate. Add destination in Replication section of dashboard. Configure destination-specific settings. Monitor pipeline in dashboard.
@@ -2863,7 +2863,7 @@ Tables must have primary keys. Logical replication must be enabled.
 ## Limitations
 No DDL support yet (ALTER TABLE, ADD COLUMN). Destination-specific constraints may apply.
 
-Supabase Pipelines provides the real-time data pipeline required for modern analytics architectures.`,
+Pipelines provides the real-time data pipeline required for modern analytics architectures.`,
     icon: DatabaseZap,
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: '',
