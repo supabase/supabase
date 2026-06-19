@@ -15,4 +15,5 @@ const BIGQUERY_REQUIRED_FIELDS: { path: BigQueryFieldPath; message: string }[] =
 
 export const getBigQueryValidationIssues = (
   data: Pick<DestinationPanelSchemaType, BigQueryFieldPath>
-): BigQueryValidationIssue[] => BIGQUERY_REQUIRED_FIELDS.filter(({ path }) => !data[path]?.length)
+): BigQueryValidationIssue[] =>
+  BIGQUERY_REQUIRED_FIELDS.filter(({ path }) => !data[path]?.trim().length)

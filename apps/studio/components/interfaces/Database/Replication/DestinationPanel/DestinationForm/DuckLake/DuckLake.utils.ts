@@ -52,48 +52,53 @@ type DucklakeValidationData = Pick<
     >
   >
 
+// Required fields per mode. "Use Supabase" only needs project refs + a bucket; the catalog URL and
+// S3 credentials are resolved by the platform API.
+const DUCKLAKE_SUPABASE_REQUIRED_FIELDS: DucklakeValidationIssue[] = [
+  { path: 'ducklakeCatalogProjectRef', message: 'Catalog project is required' },
+  { path: 'ducklakeStorageProjectRef', message: 'Storage project is required' },
+  { path: 'ducklakeStorageBucket', message: 'Bucket is required' },
+]
+
+const DUCKLAKE_CUSTOM_REQUIRED_FIELDS: DucklakeValidationIssue[] = [
+  { path: 'ducklakeCatalogUrl', message: 'Catalog URL is required' },
+  { path: 'ducklakeDataPath', message: 'Data path is required' },
+  { path: 'ducklakeS3AccessKeyId', message: 'S3 Access Key ID is required' },
+  { path: 'ducklakeS3SecretAccessKey', message: 'S3 Secret Access Key is required' },
+  { path: 'ducklakeS3Region', message: 'S3 Region is required' },
+  { path: 'ducklakeS3Endpoint', message: 'S3 Endpoint is required' },
+]
+
+// Catalog metadata schema is optional, but must be a valid Postgres identifier when set.
+const METADATA_SCHEMA_PATTERN = /^[A-Za-z0-9_]+$/
+const METADATA_SCHEMA_ISSUE: DucklakeValidationIssue = {
+  path: 'ducklakeMetadataSchema',
+  message: 'DuckLake metadata schema must contain only letters, numbers, and underscores',
+}
+
+const getMissingRequiredFieldIssues = (
+  data: DucklakeValidationData,
+  requiredFields: DucklakeValidationIssue[]
+) => requiredFields.filter(({ path }) => !data[path]?.trim().length)
+
 export const getDucklakeValidationIssues = (
   data: DucklakeValidationData
 ): DucklakeValidationIssue[] => {
-  // "Use Supabase" mode only needs project refs + a bucket; the catalog URL and S3 credentials
-  // are resolved by the platform API.
   if (data.ducklakeMode === DUCKLAKE_MODE_SUPABASE) {
-    const supabaseIssues: DucklakeValidationIssue[] = []
+    const issues = getMissingRequiredFieldIssues(data, DUCKLAKE_SUPABASE_REQUIRED_FIELDS)
 
-    if (!data.ducklakeCatalogProjectRef?.length) {
-      supabaseIssues.push({
-        path: 'ducklakeCatalogProjectRef',
-        message: 'Catalog project is required',
-      })
+    if (data.ducklakeMetadataSchema && !METADATA_SCHEMA_PATTERN.test(data.ducklakeMetadataSchema)) {
+      issues.push(METADATA_SCHEMA_ISSUE)
     }
 
-    if (!data.ducklakeStorageProjectRef?.length) {
-      supabaseIssues.push({
-        path: 'ducklakeStorageProjectRef',
-        message: 'Storage project is required',
-      })
-    }
-
-    if (!data.ducklakeStorageBucket?.length) {
-      supabaseIssues.push({ path: 'ducklakeStorageBucket', message: 'Bucket is required' })
-    }
-
-    // Catalog metadata schema is optional, but must be a valid Postgres identifier when set.
-    if (data.ducklakeMetadataSchema && !/^[A-Za-z0-9_]+$/.test(data.ducklakeMetadataSchema)) {
-      supabaseIssues.push({
-        path: 'ducklakeMetadataSchema',
-        message: 'DuckLake metadata schema must contain only letters, numbers, and underscores',
-      })
-    }
-
-    return supabaseIssues
+    return issues
   }
 
-  const issues: DucklakeValidationIssue[] = []
+  const issues = getMissingRequiredFieldIssues(data, DUCKLAKE_CUSTOM_REQUIRED_FIELDS)
 
-  if (!data.ducklakeCatalogUrl?.length) {
-    issues.push({ path: 'ducklakeCatalogUrl', message: 'Catalog URL is required' })
-  } else if (
+  // Format checks only apply once a value is present; missing values are already flagged above.
+  if (
+    data.ducklakeCatalogUrl?.trim().length &&
     !data.ducklakeCatalogUrl.startsWith('postgres://') &&
     !data.ducklakeCatalogUrl.startsWith('postgresql://')
   ) {
@@ -103,11 +108,9 @@ export const getDucklakeValidationIssues = (
     })
   }
 
-  if (!data.ducklakeDataPath?.length) {
-    issues.push({ path: 'ducklakeDataPath', message: 'Data path is required' })
-  } else if (
-    !data.ducklakeDataPath.startsWith('s3://') ||
-    data.ducklakeDataPath.includes('file://')
+  if (
+    data.ducklakeDataPath?.trim().length &&
+    (!data.ducklakeDataPath.startsWith('s3://') || data.ducklakeDataPath.includes('file://'))
   ) {
     issues.push({
       path: 'ducklakeDataPath',
@@ -115,26 +118,10 @@ export const getDucklakeValidationIssues = (
     })
   }
 
-  if (!data.ducklakeS3AccessKeyId?.length) {
-    issues.push({ path: 'ducklakeS3AccessKeyId', message: 'S3 Access Key ID is required' })
-  }
-
-  if (!data.ducklakeS3SecretAccessKey?.length) {
-    issues.push({
-      path: 'ducklakeS3SecretAccessKey',
-      message: 'S3 Secret Access Key is required',
-    })
-  }
-
-  if (!data.ducklakeS3Region?.length) {
-    issues.push({ path: 'ducklakeS3Region', message: 'S3 Region is required' })
-  }
-
-  if (!data.ducklakeS3Endpoint?.length) {
-    issues.push({ path: 'ducklakeS3Endpoint', message: 'S3 Endpoint is required' })
-  } else if (
-    data.ducklakeS3Endpoint.startsWith('http://') ||
-    data.ducklakeS3Endpoint.startsWith('https://')
+  if (
+    data.ducklakeS3Endpoint?.trim().length &&
+    (data.ducklakeS3Endpoint.startsWith('http://') ||
+      data.ducklakeS3Endpoint.startsWith('https://'))
   ) {
     issues.push({
       path: 'ducklakeS3Endpoint',
@@ -142,11 +129,8 @@ export const getDucklakeValidationIssues = (
     })
   }
 
-  if (data.ducklakeMetadataSchema && !/^[A-Za-z0-9_]+$/.test(data.ducklakeMetadataSchema)) {
-    issues.push({
-      path: 'ducklakeMetadataSchema',
-      message: 'DuckLake metadata schema must contain only letters, numbers, and underscores',
-    })
+  if (data.ducklakeMetadataSchema && !METADATA_SCHEMA_PATTERN.test(data.ducklakeMetadataSchema)) {
+    issues.push(METADATA_SCHEMA_ISSUE)
   }
 
   return issues

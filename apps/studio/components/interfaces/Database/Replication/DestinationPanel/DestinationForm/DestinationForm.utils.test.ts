@@ -157,6 +157,27 @@ describe('DestinationForm.utils DuckLake', () => {
     ])
   })
 
+  it('treats whitespace-only values as missing', () => {
+    const issues = getDucklakeValidationIssues({
+      ducklakeCatalogUrl: '   ',
+      ducklakeDataPath: '\t',
+      ducklakeS3AccessKeyId: ' ',
+      ducklakeS3SecretAccessKey: '  ',
+      ducklakeS3Region: '\n',
+      ducklakeS3Endpoint: ' ',
+      ducklakeMetadataSchema: '',
+    })
+
+    expect(issues).toEqual([
+      { path: 'ducklakeCatalogUrl', message: 'Catalog URL is required' },
+      { path: 'ducklakeDataPath', message: 'Data path is required' },
+      { path: 'ducklakeS3AccessKeyId', message: 'S3 Access Key ID is required' },
+      { path: 'ducklakeS3SecretAccessKey', message: 'S3 Secret Access Key is required' },
+      { path: 'ducklakeS3Region', message: 'S3 Region is required' },
+      { path: 'ducklakeS3Endpoint', message: 'S3 Endpoint is required' },
+    ])
+  })
+
   it('returns format errors for invalid DuckLake values', () => {
     const issues = getDucklakeValidationIssues({
       ducklakeCatalogUrl: 'mysql://catalog',
@@ -383,6 +404,20 @@ describe('DestinationForm.utils BigQuery', () => {
     ])
   })
 
+  it('treats whitespace-only values as missing', () => {
+    const issues = getBigQueryValidationIssues({
+      projectId: '   ',
+      datasetId: '\t',
+      serviceAccountKey: '\n',
+    })
+
+    expect(issues).toEqual([
+      { path: 'projectId', message: 'Project ID is required' },
+      { path: 'datasetId', message: 'Dataset ID is required' },
+      { path: 'serviceAccountKey', message: 'Service Account Key is required' },
+    ])
+  })
+
   it('returns no issues for a complete configuration', () => {
     const issues = getBigQueryValidationIssues({
       projectId: 'my-project',
@@ -407,9 +442,28 @@ describe('DestinationForm.utils Analytics Bucket', () => {
 
     expect(issues).toEqual([
       { path: 'warehouseName', message: 'Bucket is required' },
-      { path: 'namespace', message: 'Namespace is required' },
       { path: 's3Region', message: 'S3 Region is required' },
       { path: 's3AccessKeyId', message: 'S3 Access Key ID is required' },
+      { path: 'namespace', message: 'Namespace is required' },
+      { path: 's3SecretAccessKey', message: 'S3 Secret Access Key is required' },
+    ])
+  })
+
+  it('treats whitespace-only values as missing', () => {
+    const issues = getAnalyticsBucketValidationIssues({
+      warehouseName: '   ',
+      namespace: '  ',
+      newNamespaceName: '',
+      s3Region: '\t',
+      s3AccessKeyId: ' ',
+      s3SecretAccessKey: '  ',
+    })
+
+    expect(issues).toEqual([
+      { path: 'warehouseName', message: 'Bucket is required' },
+      { path: 's3Region', message: 'S3 Region is required' },
+      { path: 's3AccessKeyId', message: 'S3 Access Key ID is required' },
+      { path: 'namespace', message: 'Namespace is required' },
       { path: 's3SecretAccessKey', message: 'S3 Secret Access Key is required' },
     ])
   })

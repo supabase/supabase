@@ -14,19 +14,22 @@ export type AnalyticsBucketValidationIssue = {
   message: string
 }
 
+// Fields that are always required regardless of the namespace / access key selections.
+const ANALYTICS_BUCKET_REQUIRED_FIELDS: AnalyticsBucketValidationIssue[] = [
+  { path: 'warehouseName', message: 'Bucket is required' },
+  { path: 's3Region', message: 'S3 Region is required' },
+  { path: 's3AccessKeyId', message: 'S3 Access Key ID is required' },
+]
+
 export const getAnalyticsBucketValidationIssues = (
   data: Pick<DestinationPanelSchemaType, AnalyticsBucketFieldPath>
 ): AnalyticsBucketValidationIssue[] => {
-  const issues: AnalyticsBucketValidationIssue[] = []
-
-  if (!data.warehouseName?.length) {
-    issues.push({ path: 'warehouseName', message: 'Bucket is required' })
-  }
+  const issues = ANALYTICS_BUCKET_REQUIRED_FIELDS.filter(({ path }) => !data[path]?.trim().length)
 
   const isCreatingNewNamespace = data.namespace === CREATE_NEW_NAMESPACE
   const hasValidNamespace =
-    (data.namespace?.length && !isCreatingNewNamespace) ||
-    (isCreatingNewNamespace && data.newNamespaceName?.length)
+    (data.namespace?.trim().length && !isCreatingNewNamespace) ||
+    (isCreatingNewNamespace && data.newNamespaceName?.trim().length)
 
   if (!hasValidNamespace) {
     issues.push(
@@ -36,16 +39,8 @@ export const getAnalyticsBucketValidationIssues = (
     )
   }
 
-  if (!data.s3Region?.length) {
-    issues.push({ path: 's3Region', message: 'S3 Region is required' })
-  }
-
-  if (!data.s3AccessKeyId?.length) {
-    issues.push({ path: 's3AccessKeyId', message: 'S3 Access Key ID is required' })
-  }
-
   // Creating a new key generates the secret later, so only require it for existing keys.
-  if (data.s3AccessKeyId !== CREATE_NEW_KEY && !data.s3SecretAccessKey?.length) {
+  if (data.s3AccessKeyId !== CREATE_NEW_KEY && !data.s3SecretAccessKey?.trim().length) {
     issues.push({ path: 's3SecretAccessKey', message: 'S3 Secret Access Key is required' })
   }
 
