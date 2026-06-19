@@ -184,7 +184,7 @@ function getRequesterLogo({
   name: string
   useDarkVariant: boolean
 }) {
-  const searchableText = `${icon ?? ''} ${name}`.toLocaleLowerCase()
+  const searchableText = `${icon ?? ''} ${name}`.toLowerCase()
 
   for (const [match, asset] of Object.entries(CUSTOM_LOGO_KEYS)) {
     if (searchableText.includes(match)) {
