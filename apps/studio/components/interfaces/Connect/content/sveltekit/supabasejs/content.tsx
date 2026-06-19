@@ -64,7 +64,7 @@ export async function load() {
         <SimpleCodeBlock className="html" parentClassName="min-h-72">
           {`
 <script>
-  export let data;
+  let { data } = $props();
 </script>
 
 <ul>
