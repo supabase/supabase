@@ -55,6 +55,7 @@ minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
   - '@supabase-labs/*'
+  - '@stripe/sync-engine'
   # The following are excluded to fix vulnerablities.
 
 onlyBuiltDependencies:
