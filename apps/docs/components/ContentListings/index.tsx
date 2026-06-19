@@ -1,2 +1,1 @@
-export { ContentListings, ContentListingsFooter } from './ContentListings.client'
-export { ContentListingsProvider } from './ContentListingsContext'
+export { ContentListings } from './ContentListings.client'

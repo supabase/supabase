@@ -8,8 +8,6 @@ import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 
-import { parseContentListings, type ContentListings } from './content-listings.schema'
-
 // MUST be process.cwd() here, not import.meta.url, or files that are added
 // with outputFileTracingIncludes (not auto-traced) will not be found at
 // runtime.
@@ -30,7 +28,6 @@ export type GuideFrontmatter = {
   /** @deprecated */
   hide_table_of_contents?: boolean
   tocVideo?: string
-  contentListings?: ContentListings
 }
 
 /**
@@ -66,9 +63,6 @@ export function isValidGuideFrontmatter(obj: object): obj is GuideFrontmatter {
   }
   if ('tocVideo' in obj && typeof obj.tocVideo !== 'string') {
     throw Error(`Invalid guide frontmatter: tocVideo must be a string. Received ${obj.tocVideo}`)
-  }
-  if ('contentListings' in obj && obj.contentListings !== undefined) {
-    parseContentListings(obj.contentListings)
   }
   return true
 }

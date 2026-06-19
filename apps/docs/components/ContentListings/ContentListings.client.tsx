@@ -6,7 +6,6 @@ import {
   getContentListingHeadingTag,
   isExternalContentListingHref,
   normalizeContentListingHref,
-  resolveContentListingGroup,
   type ContentListingGroup,
   type ContentListingItem,
 } from '~/lib/content-listings.schema'
@@ -17,7 +16,6 @@ import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
 
 import { buildDocsContentListingClickedEvent } from './content-listings.telemetry'
-import { useOptionalContentListingsContext } from './ContentListingsContext'
 
 function ContentListingLink({
   item,
@@ -28,7 +26,7 @@ function ContentListingLink({
 }: {
   item: ContentListingItem
   groupLabel: string
-  listingId: string
+  listingId?: string
   children: ReactNode
   className?: string
 }) {
@@ -81,7 +79,7 @@ function ContentListingsListGroup({ group }: { group: ContentListingGroup }) {
       {group.description && <p className="text-foreground-light">{group.description}</p>}
       <ul className="list-disc pl-6 space-y-2">
         {group.items.map((item) => (
-          <li key={`${group.id}-${item.href}`}>
+          <li key={`${group.id ?? group.heading}-${item.href}`}>
             <ContentListingLink item={item} groupLabel={groupLabel} listingId={group.id}>
               <span>
                 <strong>{item.title}</strong>: {item.description}
@@ -104,7 +102,7 @@ function ContentListingsGridGroup({ group }: { group: ContentListingGroup }) {
       {group.description && <p className="text-foreground-light">{group.description}</p>}
       <div className="grid md:grid-cols-12 gap-4">
         {group.items.map((item) => (
-          <div key={`${group.id}-${item.href}`} className={itemClassName}>
+          <div key={`${group.id ?? group.heading}-${item.href}`} className={itemClassName}>
             <ContentListingLink
               item={item}
               groupLabel={groupLabel}
@@ -122,61 +120,18 @@ function ContentListingsGridGroup({ group }: { group: ContentListingGroup }) {
   )
 }
 
-function ContentListingsGroups({
-  groups,
-  className,
-}: {
-  groups: ContentListingGroup[]
-  className?: string
-}) {
-  if (!groups.length) return null
-
-  return (
-    <div className={className}>
-      {groups.map((group) =>
-        group.type === 'grid' ? (
-          <ContentListingsGridGroup key={group.id} group={group} />
-        ) : (
-          <ContentListingsListGroup key={group.id} group={group} />
-        )
-      )}
-    </div>
-  )
-}
-
 /**
- * Renders one contentListings group inline when `listing` is set, or all groups when omitted.
+ * Renders a standardized orientation link section (grid or list layout).
  */
-export function ContentListings({
-  listing,
-  groups: groupsProp,
-}: {
-  listing?: string
-  groups?: ContentListingGroup[]
-}) {
-  const context = useOptionalContentListingsContext()
-  const groups = groupsProp ?? context?.groups ?? []
+export function ContentListings(group: ContentListingGroup) {
+  if (!group.items.length) return null
 
-  if (listing && context) {
-    context.markInlinePlaced(listing)
-  }
+  const content =
+    group.type === 'grid' ? (
+      <ContentListingsGridGroup group={group} />
+    ) : (
+      <ContentListingsListGroup group={group} />
+    )
 
-  const resolvedGroups = resolveContentListingGroup(groups, listing)
-
-  return <ContentListingsGroups groups={resolvedGroups} className="my-10 space-y-10" />
-}
-
-/**
- * Renders contentListings groups that were not placed inline via ContentListings in the article body.
- */
-export function ContentListingsFooter() {
-  const context = useOptionalContentListingsContext()
-  if (!context?.groups.length) return null
-
-  const inlinePlacedIds = context.inlinePlacedIdsRef.current ?? new Set<string>()
-  const footerGroups = context.groups.filter((group) => !inlinePlacedIds.has(group.id))
-
-  if (!footerGroups.length) return null
-
-  return <ContentListingsGroups groups={footerGroups} className="mt-12 space-y-10 border-t pt-10" />
+  return <div className="my-10 space-y-10">{content}</div>
 }

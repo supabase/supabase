@@ -114,23 +114,26 @@ The navigation is defined in [`NavigationMenu.constants.ts`](https://github.com/
 
 Add an entry with the `name`, `url`, and (optional) `icon` for your page.
 
-### Overview pages and `contentListings`
+### Overview pages and content listings
 
-Overview and index pages orient readers across a docs section. Use YAML `contentListings` front matter for **internal** "where to read next" links — not hand-rolled `## Get started` or `## Next steps` sections in the MDX body.
+Overview and index pages orient readers across a docs section. Use reusable **partials** and named **listing components** for curated "where to read next" links — the same patterns as [`providers.mdx`](content/_partials/providers.mdx) and [`MetricsStackCards`](components/MetricsStackCards.tsx).
 
-| Section in the page body                         | Purpose                                                                               |
-| ------------------------------------------------ | ------------------------------------------------------------------------------------- |
-| **Orientation (`contentListings` front matter)** | Curated internal docs links with short descriptions (rendered after the article body) |
-| **Examples**                                     | Demos, sample apps, GitHub repositories                                               |
-| **Resources**                                    | External reference material (source repos, OpenAPI specs, upstream docs)              |
+| Section | Purpose |
+| ------- | ------- |
+| **Get started / Next steps** | Curated internal docs links with short descriptions |
+| **Examples** | Demos, sample apps, GitHub repositories |
+| **Resources** | External reference material (source repos, OpenAPI specs, upstream docs) |
 
-Tutorial and guide pages may still end with `## Next steps` in the body for now; overview pages should use front matter only.
+**Authoring pattern:**
 
-Copy the template from [`content/_partials/content-listings-template.yaml`](content/_partials/content-listings-template.yaml). Each group requires an `id` (first), optional `heading`, optional `heading-level` (`##`, `###`, or `####`, default `##`), optional `description`, optional `type` (`list` or `grid`, default `list`), optional `columns` (`2`, `3`, or `4` for grid groups, default `3`), and `items` with `title`, `href`, and required `description`. Internal `href` values must start with `/guides/`, `/docs/guides/`, or `/dashboard/`.
+1. Add listing data to a co-located `.data.ts` file under [`components/listings/`](components/listings/).
+2. Export a thin wrapper component from [`components/listings/index.tsx`](components/listings/index.tsx) (see existing examples).
+3. Create a partial under [`content/_partials/listings/`](content/_partials/listings/) that renders the component.
+4. Place the partial in the guide body with `<$Partial path="listings/your-listing.mdx" />`.
 
-Place a group in the body with `<ContentListings listing="id" />`. Groups embedded in the body are omitted from the auto footer; groups without a body placement render after the article.
+Use `$Show` to gate partials when a section is conditional (for example, billing-only pricing links).
 
-Run `pnpm lint:content-listings` in `apps/docs` to check overview coverage. Output matches `pnpm lint:mdx` (`path:line:column: [WARN|ERROR] message` plus a summary footer). Lint scope is **derived from navigation**: section root URLs and nav items named `Overview`, `Introduction`, or path-suffixed `Getting started` hubs (see `lib/derive-overview-page-paths.ts`). When adding a new overview page, add a matching nav entry in [`NavigationMenu.constants.ts`](components/Navigation/NavigationMenu/NavigationMenu.constants.ts). Unmigrated pages and hand-rolled orientation headings in the body emit **warnings** during rollout. Flip `OVERVIEW_LINT_LEVEL` and `TROUBLESHOOTING_LINT_LEVEL` in [`scripts/lint-content-listings.ts`](scripts/lint-content-listings.ts) to `'error'` when ready to enforce in CI.
+Markdown export uses the same data modules via handlers in [`internals/markdown-schema/Listings.ts`](internals/markdown-schema/Listings.ts), so web and `.md` alternate output stay in sync.
 
 ## Reference structure
 

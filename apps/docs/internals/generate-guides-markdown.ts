@@ -11,11 +11,10 @@ import { toMarkdown } from 'mdast-util-to-markdown'
 import { gfm } from 'micromark-extension-gfm'
 import { mdxjs } from 'micromark-extension-mdxjs'
 
-import { serializeContentListingsToMarkdown } from '../lib/content-listings.markdown'
-import { parseContentListings } from '../lib/content-listings.schema'
 import { getInternalLinkBaseUrl, prefixInternalLinks } from './internal-links'
 import { Admonition } from './markdown-schema/Admonition'
 import { Link } from './markdown-schema/Link'
+import { ListingsMarkdownHandlers } from './markdown-schema/Listings'
 import { MetricsStackCards } from './markdown-schema/MetricsStackCards'
 import { Panel } from './markdown-schema/Panel'
 import { Price } from './markdown-schema/Price'
@@ -140,6 +139,7 @@ const SCHEMA: ComponentSchema = {
   ...StepHike,
   TabPanel,
   MetricsStackCards,
+  ...ListingsMarkdownHandlers,
 }
 
 async function generateOne(filePath: string, linkBaseUrl: string): Promise<string> {
@@ -161,12 +161,6 @@ async function generateOne(filePath: string, linkBaseUrl: string): Promise<strin
   const header = headerParts.join('\n\n')
 
   let output = header ? `${header}\n\n${body}` : body
-
-  const contentListings = parseContentListings(data.contentListings)
-  if (contentListings) {
-    const contentListingsMarkdown = serializeContentListingsToMarkdown(contentListings, linkBaseUrl)
-    output = `${output}\n\n${contentListingsMarkdown}`
-  }
 
   return output
 }

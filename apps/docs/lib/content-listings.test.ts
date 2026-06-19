@@ -1,5 +1,10 @@
 import { buildDocsContentListingClickedEvent } from '~/components/ContentListings/content-listings.telemetry'
-import { serializeContentListingsToMarkdown } from '~/lib/content-listings.markdown'
+import { storageGetStarted } from '~/components/listings/storage.data'
+import { ListingsMarkdownHandlers } from '~/internals/markdown-schema/Listings'
+import {
+  serializeContentListingGroupToMarkdown,
+  serializeContentListingsToMarkdown,
+} from '~/lib/content-listings.markdown'
 import {
   getContentListingGridItemClassName,
   getContentListingHeadingTag,
@@ -45,6 +50,24 @@ describe('parseContentListings', () => {
     expect(result?.[0].heading).toBeUndefined()
   })
 
+  it('accepts groups without id when heading is set', () => {
+    const result = parseContentListings([
+      {
+        heading: 'Get started',
+        items: [
+          {
+            title: 'Connect',
+            href: '/guides/database/connecting-to-postgres',
+            description: 'Connection strings and pooler modes.',
+          },
+        ],
+      },
+    ])
+
+    expect(result?.[0].id).toBeUndefined()
+    expect(result?.[0].heading).toBe('Get started')
+  })
+
   it('normalizes heading-level from kebab-case YAML', () => {
     const result = parseContentListings([
       {
@@ -81,23 +104,6 @@ describe('parseContentListings', () => {
     ])
 
     expect(result?.[0].items[0].icon).toBe('/docs/img/icons/github-icon')
-  })
-
-  it('requires group id', () => {
-    expect(() =>
-      parseContentListings([
-        {
-          heading: 'Get started',
-          items: [
-            {
-              title: 'Connect',
-              href: '/guides/database/connecting-to-postgres',
-              description: 'Connection strings and pooler modes.',
-            },
-          ],
-        },
-      ])
-    ).toThrow(/Invalid contentListings front matter/)
   })
 
   it('accepts external hrefs', () => {
@@ -198,7 +204,7 @@ describe('parseContentListings', () => {
           items: [{ title: 'Connect', href: '/guides/database/connecting-to-postgres' }],
         },
       ])
-    ).toThrow(/Invalid contentListings front matter/)
+    ).toThrow(/Invalid content listing/)
   })
 })
 
@@ -222,23 +228,21 @@ describe('getContentListingHeadingTag', () => {
   })
 })
 
-describe('serializeContentListingsToMarkdown', () => {
+describe('serializeContentListingGroupToMarkdown', () => {
   it('renders grouped items with absolute URLs and descriptions', () => {
-    const markdown = serializeContentListingsToMarkdown(
-      [
-        {
-          id: 'get-started',
-          heading: 'Get started',
-          description: 'Read these first.',
-          items: [
-            {
-              title: 'Connect to your database',
-              href: '/guides/database/connecting-to-postgres',
-              description: 'Connection strings and pooler modes.',
-            },
-          ],
-        },
-      ],
+    const markdown = serializeContentListingGroupToMarkdown(
+      {
+        id: 'get-started',
+        heading: 'Get started',
+        description: 'Read these first.',
+        items: [
+          {
+            title: 'Connect to your database',
+            href: '/guides/database/connecting-to-postgres',
+            description: 'Connection strings and pooler modes.',
+          },
+        ],
+      },
       'https://supabase.com'
     )
 
@@ -250,19 +254,17 @@ describe('serializeContentListingsToMarkdown', () => {
   })
 
   it('preserves external hrefs in markdown export', () => {
-    const markdown = serializeContentListingsToMarkdown(
-      [
-        {
-          id: 'resources',
-          items: [
-            {
-              title: 'Storage API',
-              href: 'https://github.com/supabase/storage-api',
-              description: 'View the source code.',
-            },
-          ],
-        },
-      ],
+    const markdown = serializeContentListingGroupToMarkdown(
+      {
+        id: 'resources',
+        items: [
+          {
+            title: 'Storage API',
+            href: 'https://github.com/supabase/storage-api',
+            description: 'View the source code.',
+          },
+        ],
+      },
       'https://supabase.com'
     )
 
@@ -272,21 +274,19 @@ describe('serializeContentListingsToMarkdown', () => {
   })
 
   it('respects heading-level in markdown export', () => {
-    const markdown = serializeContentListingsToMarkdown(
-      [
-        {
-          id: 'get-started',
-          heading: 'Get started',
-          headingLevel: '###',
-          items: [
-            {
-              title: 'Connect',
-              href: '/guides/database/connecting-to-postgres',
-              description: 'Connection strings.',
-            },
-          ],
-        },
-      ],
+    const markdown = serializeContentListingGroupToMarkdown(
+      {
+        id: 'get-started',
+        heading: 'Get started',
+        headingLevel: '###',
+        items: [
+          {
+            title: 'Connect',
+            href: '/guides/database/connecting-to-postgres',
+            description: 'Connection strings.',
+          },
+        ],
+      },
       ''
     )
 
@@ -294,10 +294,32 @@ describe('serializeContentListingsToMarkdown', () => {
   })
 
   it('omits heading line when heading is not set', () => {
+    const markdown = serializeContentListingGroupToMarkdown(
+      {
+        id: 'get-started',
+        items: [
+          {
+            title: 'Connect',
+            href: '/guides/database/connecting-to-postgres',
+            description: 'Connection strings.',
+          },
+        ],
+      },
+      ''
+    )
+
+    expect(markdown).not.toMatch(/^#+\s/m)
+    expect(markdown).toContain('**[Connect]')
+  })
+})
+
+describe('serializeContentListingsToMarkdown', () => {
+  it('joins multiple groups with blank lines', () => {
     const markdown = serializeContentListingsToMarkdown(
       [
         {
           id: 'get-started',
+          heading: 'Get started',
           items: [
             {
               title: 'Connect',
@@ -306,12 +328,39 @@ describe('serializeContentListingsToMarkdown', () => {
             },
           ],
         },
+        {
+          id: 'next-steps',
+          heading: 'Next steps',
+          items: [
+            {
+              title: 'Functions',
+              href: '/guides/database/functions',
+              description: 'Database functions.',
+            },
+          ],
+        },
       ],
       ''
     )
 
-    expect(markdown).not.toMatch(/^#+\s/m)
-    expect(markdown).toContain('**[Connect]')
+    expect(markdown).toContain('## Get started')
+    expect(markdown).toContain('## Next steps')
+  })
+})
+
+describe('ListingsMarkdownHandlers', () => {
+  it('exports markdown for named listing components from shared data', () => {
+    const markdown = ListingsMarkdownHandlers.StorageGetStartedListings()
+
+    expect(markdown).toContain('## Get started')
+    expect(markdown).toContain('Files buckets')
+    expect(markdown).toContain('/guides/storage/quickstart')
+  })
+
+  it('matches serializeContentListingGroupToMarkdown for the same data', () => {
+    expect(ListingsMarkdownHandlers.StorageGetStartedListings()).toBe(
+      serializeContentListingGroupToMarkdown(storageGetStarted, '')
+    )
   })
 })
 

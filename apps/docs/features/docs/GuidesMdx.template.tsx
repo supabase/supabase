@@ -1,5 +1,4 @@
 import Breadcrumbs from '~/components/Breadcrumbs'
-import { ContentListingsFooter, ContentListingsProvider } from '~/components/ContentListings'
 import GuidesSidebar from '~/components/GuidesSidebar'
 import { TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
@@ -108,30 +107,10 @@ const GuideTemplate = ({
             )}
             <hr className="not-prose border-t-0 border-b my-8" />
 
-            {meta?.contentListings && meta.contentListings.length > 0 ? (
-              <ContentListingsProvider groups={meta.contentListings}>
-                {content && (
-                  <MDXRemoteBase
-                    source={content}
-                    options={mdxOptions}
-                    customPreprocess={(x) => x}
-                  />
-                )}
-                {children}
-                <ContentListingsFooter />
-              </ContentListingsProvider>
-            ) : (
-              <>
-                {content && (
-                  <MDXRemoteBase
-                    source={content}
-                    options={mdxOptions}
-                    customPreprocess={(x) => x}
-                  />
-                )}
-                {children}
-              </>
+            {content && (
+              <MDXRemoteBase source={content} options={mdxOptions} customPreprocess={(x) => x} />
             )}
+            {children}
 
             <footer className="mt-16 not-prose">
               <a

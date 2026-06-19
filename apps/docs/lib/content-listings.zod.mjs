@@ -14,7 +14,7 @@ export const contentListingGridColumnsSchema = z.union([z.literal(2), z.literal(
 export const contentListingHeadingLevelSchema = z.enum(['##', '###', '####'])
 
 export const contentListingGroupSchema = z.object({
-  id: z.string().min(1),
+  id: z.string().min(1).optional(),
   heading: z.string().min(1).optional(),
   headingLevel: contentListingHeadingLevelSchema.optional(),
   description: z.string().optional(),

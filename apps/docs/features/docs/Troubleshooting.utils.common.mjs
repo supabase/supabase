@@ -22,8 +22,6 @@ import { visit } from 'unist-util-visit'
 import { v4 as uuidv4 } from 'uuid'
 import { z } from 'zod'
 
-import { contentListingsSchema } from '../../lib/content-listings.zod.mjs'
-
 export const TROUBLESHOOTING_DIRECTORY = join(process.cwd(), 'content/troubleshooting')
 
 /**
@@ -100,7 +98,6 @@ export const TroubleshootingSchema = z
     database_id: z.string().default(`pseudo-${uuidv4()}`),
     github_url: z.string().url().optional(),
     date_created: z.date({ coerce: true }).optional(),
-    contentListings: contentListingsSchema.optional(),
   })
   .strict()
 

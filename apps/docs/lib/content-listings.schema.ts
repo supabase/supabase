@@ -55,7 +55,7 @@ export function getContentListingHeadingTag(
 
 /** Label for telemetry and keys — prefers heading, falls back to id. */
 export function getContentListingGroupLabel(group: ContentListingGroup): string {
-  return group.heading ?? group.id
+  return group.heading ?? group.id ?? 'content-listing'
 }
 
 const INTERNAL_HREF_PATTERN = /^\/(docs\/)?(guides|dashboard)\//
@@ -104,7 +104,7 @@ function normalizeContentListingGroupInput(raw: unknown): unknown {
 }
 
 /**
- * Parse and validate contentListings front matter.
+ * Parse and validate a content listing group or array of groups.
  *
  * @throws If the value is present but invalid (schema, href, or columns rules).
  */
@@ -117,7 +117,7 @@ export function parseContentListings(value: unknown): ContentListings | undefine
 
   const parsed = contentListingsSchema.safeParse(normalized)
   if (!parsed.success) {
-    throw new Error(`Invalid contentListings front matter: ${parsed.error.message}`)
+    throw new Error(`Invalid content listing: ${parsed.error.message}`)
   }
 
   for (const group of parsed.data) {
@@ -137,25 +137,4 @@ export function parseContentListings(value: unknown): ContentListings | undefine
   }
 
   return parsed.data
-}
-
-/**
- * Resolves a single listing group by id, or returns all groups when id is omitted.
- *
- * @throws If listing is set but no group matches the id.
- */
-export function resolveContentListingGroup(
-  groups: ContentListings,
-  listing?: string
-): ContentListingGroup[] {
-  if (!listing) {
-    return groups
-  }
-
-  const matched = groups.filter((group) => group.id === listing)
-  if (matched.length === 0) {
-    throw new Error(`No contentListings group found with id "${listing}"`)
-  }
-
-  return matched
 }
