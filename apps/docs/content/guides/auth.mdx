@@ -27,7 +27,7 @@ Auth uses your project's Postgres database under the hood, storing user data and
 
 Auth also enables access control to your database's automatically generated [REST API](/docs/guides/api). When using Supabase SDKs, your data requests are automatically sent with the user's Auth Token. The Auth Token scopes database access on a row-by-row level when used along with [RLS policies](/docs/guides/database/postgres/row-level-security).
 
-<$Partial path="listings/auth-get-started.mdx" />
+<AuthGetStartedListings />
 
 <$Show if="authentication:show_providers">
 <$Partial path="providers.mdx" />
@@ -35,7 +35,7 @@ Auth also enables access control to your database's automatically generated [RES
 
 <$Show if="billing:all">
 
-<$Partial path="listings/auth-pricing.mdx" />
+<AuthPricingListings />
 </$Show>
 
-<$Partial path="listings/auth-next-steps.mdx" />
+<AuthNextStepsListings />

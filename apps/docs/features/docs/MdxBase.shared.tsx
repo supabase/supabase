@@ -8,26 +8,7 @@ import { ComputeDiskLimitsTable } from '~/components/ComputeDiskLimitsTable'
 import { ContentListings } from '~/components/ContentListings'
 import { Extensions } from '~/components/Extensions'
 import Image, { type ImageProps } from '~/components/Image'
-import {
-  AuthGetStartedListings,
-  AuthNextStepsListings,
-  AuthPricingListings,
-  DatabaseGetStartedListings,
-  DatabaseNextStepsListings,
-  FunctionsExamplesAiMediaListings,
-  FunctionsExamplesMessagingListings,
-  FunctionsExamplesOperationsListings,
-  FunctionsExamplesSupabaseListings,
-  FunctionsExamplesWebhooksPaymentsListings,
-  FunctionsGetStartedListings,
-  GettingStartedGetStartedListings,
-  RealtimeExamplesListings,
-  RealtimeGetStartedListings,
-  RealtimeResourcesListings,
-  StorageExamplesListings,
-  StorageGetStartedListings,
-  StorageResourcesListings,
-} from '~/components/listings'
+import { listingMdxComponents } from '~/components/listings'
 import { Mermaid } from '~/components/Mermaid'
 import { MetricsStackCards } from '~/components/MetricsStackCards'
 import { NavData } from '~/components/NavData'
@@ -96,24 +77,7 @@ const components = {
   CodeSampleWrapper,
   ComputeDiskLimitsTable,
   ContentListings,
-  AuthGetStartedListings,
-  AuthNextStepsListings,
-  AuthPricingListings,
-  DatabaseGetStartedListings,
-  DatabaseNextStepsListings,
-  FunctionsExamplesAiMediaListings,
-  FunctionsExamplesMessagingListings,
-  FunctionsExamplesOperationsListings,
-  FunctionsExamplesSupabaseListings,
-  FunctionsExamplesWebhooksPaymentsListings,
-  FunctionsGetStartedListings,
-  GettingStartedGetStartedListings,
-  RealtimeExamplesListings,
-  RealtimeGetStartedListings,
-  RealtimeResourcesListings,
-  StorageExamplesListings,
-  StorageGetStartedListings,
-  StorageResourcesListings,
+  ...listingMdxComponents,
   ErrorCodes,
   Extensions,
   GlassPanel,
