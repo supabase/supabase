@@ -19,13 +19,41 @@ contentListings:
       - title: Row Level Security
         href: /guides/database/postgres/row-level-security
         description: Use RLS policies to authorize data access from the client.
+  - id: pricing
+    heading: Pricing
+    description: Charges apply to Monthly Active Users (MAU), Monthly Active Third-Party Users (Third-Party MAU), and Monthly Active SSO Users (SSO MAU) and Advanced MFA Add-ons. For a detailed breakdown of how these charges are calculated, refer to the following pages.
+    type: list
+    items:
+      - title: Pricing MAU
+        href: /guides/platform/manage-your-usage/monthly-active-users
+        description: How MAU usage is measured and billed.
+      - title: Pricing Third-Party MAU
+        href: /guides/platform/manage-your-usage/monthly-active-users-third-party
+        description: How third-party auth MAU is measured and billed.
+      - title: Pricing SSO MAU
+        href: /guides/platform/manage-your-usage/monthly-active-users-sso
+        description: How SSO MAU usage is measured and billed.
+      - title: Advanced MFA - Phone
+        href: /guides/platform/manage-your-usage/advanced-mfa-phone
+        description: How Advanced MFA Phone add-on usage is measured and billed.
   - id: next-steps
     heading: Next steps
+    description: "Once you've covered the basics, these guides help with other use cases and features:"
     type: grid
+    columns: 3
     items:
-      - title: Social login
-        href: /guides/auth/social-login
-        description: Sign in users with Google, GitHub, Apple, and other OAuth providers.
+      - title: Email (Magic link or OTP)
+        href: /guides/auth/auth-email-passwordless
+        description: Sign up and sign in users with a Magic Link or email OTP instead of a password.
+      - title: Enterprise SSO
+        href: /guides/auth/enterprise-sso
+        description: Add Single Sign-On for enterprise applications with SAML 2.0.
+      - title: User sessions
+        href: /guides/auth/sessions
+        description: Control session lifetime, refresh tokens, and multi-device sign-in behavior.
+      - title: Third-party auth
+        href: /guides/auth/third-party/overview
+        description: Use Clerk, Auth0, Firebase Auth, Cognito, or WorkOS JWTs with Supabase APIs.
       - title: Multi-factor authentication
         href: /guides/auth/auth-mfa
         description: Add a second factor to user sign-in with TOTP or phone.
@@ -60,21 +88,13 @@ Auth also enables access control to your database's automatically generated [RES
 
 <ContentListings listing="get-started" />
 
-<ContentListings listing="next-steps" />
-
 <$Show if="authentication:show_providers">
 <$Partial path="providers.mdx" />
 </$Show>
 
 <$Show if="billing:all">
 
-## Pricing
-
-Charges apply to Monthly Active Users (MAU), Monthly Active Third-Party Users (Third-Party MAU), and Monthly Active SSO Users (SSO MAU) and Advanced MFA Add-ons. For a detailed breakdown of how these charges are calculated, refer to the following pages:
-
-- [Pricing MAU](/docs/guides/platform/manage-your-usage/monthly-active-users)
-- [Pricing Third-Party MAU](/docs/guides/platform/manage-your-usage/monthly-active-users-third-party)
-- [Pricing SSO MAU](/docs/guides/platform/manage-your-usage/monthly-active-users-sso)
-- [Advanced MFA - Phone](/docs/guides/platform/manage-your-usage/advanced-mfa-phone)
-
+<ContentListings listing="pricing" />
 </$Show>
+
+<ContentListings listing="next-steps" />
