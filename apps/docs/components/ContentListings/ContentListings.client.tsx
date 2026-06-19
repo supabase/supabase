@@ -12,7 +12,7 @@ import {
 } from '~/lib/content-listings.schema'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import Link from 'next/link'
-import { useEffect, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
 
@@ -144,6 +144,9 @@ function ContentListingsGroups({
   )
 }
 
+/**
+ * Renders one contentListings group inline when `listing` is set, or all groups when omitted.
+ */
 export function ContentListings({
   listing,
   groups: groupsProp,
@@ -154,22 +157,24 @@ export function ContentListings({
   const context = useOptionalContentListingsContext()
   const groups = groupsProp ?? context?.groups ?? []
 
-  useEffect(() => {
-    if (listing && context) {
-      context.markInlinePlaced(listing)
-    }
-  }, [context, listing])
+  if (listing && context) {
+    context.markInlinePlaced(listing)
+  }
 
   const resolvedGroups = resolveContentListingGroup(groups, listing)
 
   return <ContentListingsGroups groups={resolvedGroups} className="my-10 space-y-10" />
 }
 
+/**
+ * Renders contentListings groups that were not placed inline via ContentListings in the article body.
+ */
 export function ContentListingsFooter() {
   const context = useOptionalContentListingsContext()
   if (!context?.groups.length) return null
 
-  const footerGroups = context.groups.filter((group) => !context.inlinePlacedIds.has(group.id))
+  const inlinePlacedIds = context.inlinePlacedIdsRef.current ?? new Set<string>()
+  const footerGroups = context.groups.filter((group) => !inlinePlacedIds.has(group.id))
 
   if (!footerGroups.length) return null
 

@@ -137,7 +137,19 @@ async function lintOverviewPage(relPath: string): Promise<LintIssue[]> {
     return issues
   }
 
-  const { data } = parseFrontmatter(raw)
+  let data: Record<string, unknown>
+  try {
+    ;({ data } = parseFrontmatter(raw))
+  } catch (error) {
+    issues.push(
+      createIssue(
+        OVERVIEW_LINT_LEVEL,
+        contentPath,
+        error instanceof Error ? error.message : 'Invalid front matter'
+      )
+    )
+    return issues
+  }
 
   try {
     parseContentListings(data.contentListings)
@@ -186,7 +198,20 @@ async function lintContentListingsFrontMatter(
     return { checked: false, issues }
   }
 
-  const { data } = parseFrontmatter(raw, 'toml')
+  let data: Record<string, unknown>
+  try {
+    ;({ data } = parseFrontmatter(raw, 'toml'))
+  } catch (error) {
+    issues.push(
+      createIssue(
+        TROUBLESHOOTING_LINT_LEVEL,
+        contentPath,
+        error instanceof Error ? error.message : 'Invalid front matter'
+      )
+    )
+    return { checked: true, issues }
+  }
+
   if (data.contentListings === undefined) {
     return { checked: false, issues }
   }

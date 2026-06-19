@@ -8,6 +8,8 @@
  * as required.
  */
 
+import { readdir, readFile, stat } from 'node:fs/promises'
+import { join, sep } from 'node:path'
 import matter from 'gray-matter'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm'
@@ -15,12 +17,12 @@ import { mdxFromMarkdown } from 'mdast-util-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { gfm } from 'micromark-extension-gfm'
 import { mdxjs } from 'micromark-extension-mdxjs'
-import { readdir, readFile, stat } from 'node:fs/promises'
-import { join, sep } from 'node:path'
 import { parse } from 'smol-toml'
 import { visit } from 'unist-util-visit'
 import { v4 as uuidv4 } from 'uuid'
 import { z } from 'zod'
+
+import { contentListingsSchema } from '../../lib/content-listings.zod.mjs'
 
 export const TROUBLESHOOTING_DIRECTORY = join(process.cwd(), 'content/troubleshooting')
 
@@ -98,7 +100,7 @@ export const TroubleshootingSchema = z
     database_id: z.string().default(`pseudo-${uuidv4()}`),
     github_url: z.string().url().optional(),
     date_created: z.date({ coerce: true }).optional(),
-    contentListings: z.any().optional(),
+    contentListings: contentListingsSchema.optional(),
   })
   .strict()
 

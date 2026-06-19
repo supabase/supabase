@@ -1,6 +1,9 @@
 import { type ContentListingItem } from '~/lib/content-listings.schema'
 import type { DocsContentListingClickedEvent } from 'common/telemetry-constants'
 
+/**
+ * Builds a PostHog telemetry event for a contentListings link click.
+ */
 export function buildDocsContentListingClickedEvent({
   item,
   groupLabel,

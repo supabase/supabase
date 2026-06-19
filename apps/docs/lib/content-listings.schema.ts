@@ -1,29 +1,22 @@
 import { z } from 'zod'
 
-export const contentListingItemSchema = z.object({
-  title: z.string().min(1),
-  href: z.string().min(1),
-  description: z.string().min(1),
-  icon: z.string().min(1).optional(),
-})
+import {
+  contentListingGridColumnsSchema,
+  contentListingGroupSchema,
+  contentListingGroupTypeSchema,
+  contentListingHeadingLevelSchema,
+  contentListingItemSchema,
+  contentListingsSchema,
+} from './content-listings.zod.mjs'
 
-export const contentListingGroupTypeSchema = z.enum(['list', 'grid'])
-
-export const contentListingGridColumnsSchema = z.union([z.literal(2), z.literal(3), z.literal(4)])
-
-export const contentListingHeadingLevelSchema = z.enum(['##', '###', '####'])
-
-export const contentListingGroupSchema = z.object({
-  id: z.string().min(1),
-  heading: z.string().min(1).optional(),
-  headingLevel: contentListingHeadingLevelSchema.optional(),
-  description: z.string().optional(),
-  type: contentListingGroupTypeSchema.optional(),
-  columns: contentListingGridColumnsSchema.optional(),
-  items: z.array(contentListingItemSchema).min(1),
-})
-
-export const contentListingsSchema = z.array(contentListingGroupSchema).min(1)
+export {
+  contentListingGridColumnsSchema,
+  contentListingGroupSchema,
+  contentListingGroupTypeSchema,
+  contentListingHeadingLevelSchema,
+  contentListingItemSchema,
+  contentListingsSchema,
+}
 
 export type ContentListingItem = z.infer<typeof contentListingItemSchema>
 export type ContentListingGroup = z.infer<typeof contentListingGroupSchema>
@@ -38,6 +31,9 @@ export const CONTENT_LISTING_GRID_ITEM_CLASS: Record<ContentListingGridColumns, 
   4: 'col-span-12 md:col-span-3',
 }
 
+/**
+ * Returns Tailwind column classes for a grid listing group.
+ */
 export function getContentListingGridItemClassName(columns: ContentListingGridColumns = 3): string {
   return CONTENT_LISTING_GRID_ITEM_CLASS[columns]
 }
@@ -48,6 +44,9 @@ const HEADING_LEVEL_TAG: Record<ContentListingHeadingLevel, 'h2' | 'h3' | 'h4'> 
   '####': 'h4',
 }
 
+/**
+ * Maps a contentListings heading level marker to an HTML heading tag.
+ */
 export function getContentListingHeadingTag(
   headingLevel: ContentListingHeadingLevel = '##'
 ): 'h2' | 'h3' | 'h4' {
@@ -61,23 +60,29 @@ export function getContentListingGroupLabel(group: ContentListingGroup): string 
 
 const INTERNAL_HREF_PATTERN = /^\/(docs\/)?(guides|dashboard)\//
 
+/**
+ * Returns true when the href is an absolute http(s) URL.
+ */
 export function isExternalContentListingHref(href: string): boolean {
   return /^https?:\/\//i.test(href)
 }
 
+/**
+ * Returns true when the href is an allowed internal docs path or external URL.
+ */
 export function isValidContentListingHref(href: string): boolean {
   return INTERNAL_HREF_PATTERN.test(href) || isExternalContentListingHref(href)
 }
 
 /**
- * Normalize guide hrefs for Next.js Link (strip /docs prefix when present).
+ * Normalize internal hrefs for Next.js Link (strip /docs prefix when present).
  * External hrefs are returned unchanged.
  */
 export function normalizeContentListingHref(href: string): string {
   if (isExternalContentListingHref(href)) {
     return href
   }
-  if (href.startsWith('/docs/guides/')) {
+  if (href.startsWith('/docs/')) {
     return href.replace(/^\/docs/, '')
   }
   return href
@@ -98,6 +103,11 @@ function normalizeContentListingGroupInput(raw: unknown): unknown {
   return obj
 }
 
+/**
+ * Parse and validate contentListings front matter.
+ *
+ * @throws If the value is present but invalid (schema, href, or columns rules).
+ */
 export function parseContentListings(value: unknown): ContentListings | undefined {
   if (value === undefined || value === null) {
     return undefined
@@ -129,6 +139,11 @@ export function parseContentListings(value: unknown): ContentListings | undefine
   return parsed.data
 }
 
+/**
+ * Resolves a single listing group by id, or returns all groups when id is omitted.
+ *
+ * @throws If listing is set but no group matches the id.
+ */
 export function resolveContentListingGroup(
   groups: ContentListings,
   listing?: string

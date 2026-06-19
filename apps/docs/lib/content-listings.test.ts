@@ -3,6 +3,7 @@ import { serializeContentListingsToMarkdown } from '~/lib/content-listings.markd
 import {
   getContentListingGridItemClassName,
   getContentListingHeadingTag,
+  normalizeContentListingHref,
   parseContentListings,
 } from '~/lib/content-listings.schema'
 import { describe, expect, it } from 'vitest'
@@ -335,6 +336,28 @@ describe('buildDocsContentListingClickedEvent', () => {
         listingId: 'get-started',
       },
     })
+  })
+})
+
+describe('normalizeContentListingHref', () => {
+  it('strips /docs prefix from /docs/guides paths', () => {
+    expect(normalizeContentListingHref('/docs/guides/auth')).toBe('/guides/auth')
+  })
+
+  it('strips /docs prefix from /docs/dashboard paths', () => {
+    expect(normalizeContentListingHref('/docs/dashboard/project/_/sql')).toBe(
+      '/dashboard/project/_/sql'
+    )
+  })
+
+  it('leaves /dashboard paths unchanged', () => {
+    expect(normalizeContentListingHref('/dashboard/project/_/sql')).toBe('/dashboard/project/_/sql')
+  })
+
+  it('leaves external URLs unchanged', () => {
+    expect(normalizeContentListingHref('https://github.com/supabase/supabase')).toBe(
+      'https://github.com/supabase/supabase'
+    )
   })
 })
 
