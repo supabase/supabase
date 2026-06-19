@@ -9,8 +9,10 @@ import { uuidv4 } from '@/lib/helpers'
 // streams rewrite — the pages-router version flushed multipart parts
 // directly via Node's `res.write` + `pipeline(createReadStream, res)`,
 // which the buffering `toWebHandler` shim can't represent. Returns a
-// `Response` whose body is a `ReadableStream`; each file is converted
-// via `Readable.toWeb` and pulled chunk-by-chunk into the same stream.
+// `Response` whose body is a `ReadableStream` built from an async
+// generator (`Readable.from(...).toWeb()`), so file reads honour
+// consumer backpressure and stop on client disconnect rather than
+// buffering every file eagerly.
 //
 // `getFunctionsArtifactStore` already asserts self-hosted mode, so no
 // auth wrapper is needed (matches the pages-router `apiWrapper`'s
@@ -40,58 +42,47 @@ const GET = async ({ params }: { params: { ref?: string; slug?: string } }) => {
 
   const encoder = new TextEncoder()
 
-  const stream = new ReadableStream<Uint8Array>({
-    async start(controller) {
-      try {
-        controller.enqueue(
-          encoder.encode(
-            `--${boundary}\r\n` +
-              `Content-Disposition: form-data; name="metadata"\r\n` +
-              `Content-Type: application/json\r\n` +
-              `\r\n` +
-              JSON.stringify(metadata) +
-              `\r\n`
-          )
-        )
+  // An async generator lets `Readable.from` drive the file reads on demand:
+  // it pauses the generator when the consumer is slow (backpressure) and runs
+  // the generator's cleanup (closing the file handle) if the stream is
+  // destroyed on client disconnect — neither of which an eager
+  // `ReadableStream.start()` loop does.
+  async function* multipartBody() {
+    yield encoder.encode(
+      `--${boundary}\r\n` +
+        `Content-Disposition: form-data; name="metadata"\r\n` +
+        `Content-Type: application/json\r\n` +
+        `\r\n` +
+        JSON.stringify(metadata) +
+        `\r\n`
+    )
 
-        for (const entry of fileEntries) {
-          const safeName = entry.relativePath
-            .replace(/[\r\n]/g, '')
-            .replace(/\\/g, '\\\\')
-            .replace(/"/g, '\\"')
-          const encodedName = encodeURIComponent(entry.relativePath)
-          controller.enqueue(
-            encoder.encode(
-              `--${boundary}\r\n` +
-                `Content-Disposition: form-data; name="file"; filename="${safeName}"; filename*=UTF-8''${encodedName}\r\n` +
-                `Content-Type: text/plain\r\n` +
-                `\r\n`
-            )
-          )
+    for (const entry of fileEntries) {
+      const safeName = entry.relativePath
+        .replace(/[\r\n]/g, '')
+        .replace(/\\/g, '\\\\')
+        .replace(/"/g, '\\"')
+      const encodedName = encodeURIComponent(entry.relativePath)
+      yield encoder.encode(
+        `--${boundary}\r\n` +
+          `Content-Disposition: form-data; name="file"; filename="${safeName}"; filename*=UTF-8''${encodedName}\r\n` +
+          `Content-Type: text/plain\r\n` +
+          `\r\n`
+      )
 
-          const nodeStream = createReadStream(entry.absolutePath)
-          const webStream = Readable.toWeb(nodeStream) as ReadableStream<Uint8Array>
-          const reader = webStream.getReader()
-          try {
-            while (true) {
-              const { done, value } = await reader.read()
-              if (done) break
-              if (value) controller.enqueue(value)
-            }
-          } finally {
-            reader.releaseLock()
-          }
-
-          controller.enqueue(encoder.encode(`\r\n`))
-        }
-
-        controller.enqueue(encoder.encode(`--${boundary}--\r\n`))
-        controller.close()
-      } catch (err) {
-        controller.error(err)
+      for await (const chunk of createReadStream(entry.absolutePath)) {
+        yield chunk as Uint8Array
       }
-    },
-  })
+
+      yield encoder.encode(`\r\n`)
+    }
+
+    yield encoder.encode(`--${boundary}--\r\n`)
+  }
+
+  const stream = Readable.toWeb(
+    Readable.from(multipartBody(), { objectMode: false })
+  ) as ReadableStream<Uint8Array>
 
   return new Response(stream, {
     status: 200,
