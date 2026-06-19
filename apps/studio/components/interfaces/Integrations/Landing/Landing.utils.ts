@@ -154,6 +154,7 @@ export const isOAuthInstalled = ({
 
   if (integration.id === 'doppler') {
     return (
+      isOAuthAppAuthorized(projectData, integration) ||
       isEdgeFunctionSecretPresent(projectData, 'DOPPLER_CONFIG') ||
       isPartnerIntegrationReady(projectData, integration)
     )
