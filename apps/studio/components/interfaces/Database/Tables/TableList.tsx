@@ -11,6 +11,7 @@ import {
   Eye,
   Filter,
   History,
+  Info,
   MoreVertical,
   Plus,
   Search,
@@ -62,6 +63,7 @@ import {
   WarehouseEnablementModal,
   type EnablementVariant,
 } from '../Warehouse/WarehouseEnablementModal'
+import { WarehouseStorageDetailsDialog } from '../Warehouse/WarehouseStorageDetailsDialog'
 import { WarehouseSyncChip } from '../Warehouse/WarehouseSyncChip'
 import { WarehouseTimeTravelFlow } from '../Warehouse/WarehouseTimeTravelFlow'
 import { formatAllEntities } from './Tables.utils'
@@ -134,6 +136,10 @@ export const TableList = ({
     copyName: string
   } | null>(null)
   const [timeTravelSheet, setTimeTravelSheet] = useState<{ tableKey: string } | null>(null)
+  const [detailsTarget, setDetailsTarget] = useState<{
+    tableKey: string
+    postgresSize?: string
+  } | null>(null)
   const warehouseSnap = useSnapshot(warehouseDemoStore)
   const { can: canUpdateTables } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -786,6 +792,15 @@ export const TableList = ({
                                             <DropdownMenuSeparator />
                                             <DropdownMenuItem
                                               className="gap-x-2"
+                                              onClick={() =>
+                                                setDetailsTarget({ tableKey, postgresSize: x.size })
+                                              }
+                                            >
+                                              <Info size={12} />
+                                              Storage details
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                              className="gap-x-2"
                                               onClick={() => setTimeTravelSheet({ tableKey })}
                                             >
                                               <History size={12} />
@@ -831,15 +846,29 @@ export const TableList = ({
                                             </DropdownMenuSub>
                                           )}
                                           {wMode === 'has_warehouse_copy' && (
-                                            <DropdownMenuItem
-                                              className="gap-x-2"
-                                              onClick={() =>
-                                                setDetachConfirm({ tableKey, copyName })
-                                              }
-                                            >
-                                              <Unlink size={12} className="shrink-0" />
-                                              Detach Warehouse copy
-                                            </DropdownMenuItem>
+                                            <>
+                                              <DropdownMenuItem
+                                                className="gap-x-2"
+                                                onClick={() =>
+                                                  setDetailsTarget({
+                                                    tableKey,
+                                                    postgresSize: x.size,
+                                                  })
+                                                }
+                                              >
+                                                <Info size={12} className="shrink-0" />
+                                                Storage details
+                                              </DropdownMenuItem>
+                                              <DropdownMenuItem
+                                                className="gap-x-2"
+                                                onClick={() =>
+                                                  setDetachConfirm({ tableKey, copyName })
+                                                }
+                                              >
+                                                <Unlink size={12} className="shrink-0" />
+                                                Detach Warehouse copy
+                                              </DropdownMenuItem>
+                                            </>
                                           )}
                                         </>
                                       )
@@ -937,6 +966,17 @@ export const TableList = ({
           sheetOpen={true}
           onSheetOpenChange={(open) => {
             if (!open) setTimeTravelSheet(null)
+          }}
+        />
+      )}
+
+      {detailsTarget && (
+        <WarehouseStorageDetailsDialog
+          open={true}
+          tableKey={detailsTarget.tableKey}
+          postgresSize={detailsTarget.postgresSize}
+          onOpenChange={(open) => {
+            if (!open) setDetailsTarget(null)
           }}
         />
       )}

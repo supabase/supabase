@@ -6,6 +6,7 @@ import {
   Edit,
   Globe,
   History,
+  Info,
   Lock,
   MoreVertical,
   Trash,
@@ -43,6 +44,7 @@ import {
   WarehouseEnablementModal,
   type EnablementVariant,
 } from '@/components/interfaces/Database/Warehouse/WarehouseEnablementModal'
+import { WarehouseStorageDetailsDialog } from '@/components/interfaces/Database/Warehouse/WarehouseStorageDetailsDialog'
 import { WarehouseTimeTravelFlow } from '@/components/interfaces/Database/Warehouse/WarehouseTimeTravelFlow'
 import { getEntityLintDetails } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
@@ -205,6 +207,7 @@ export const EntityListItem = ({
   const warehouseMode = warehouseState?.mode ?? 'postgres'
   const warehouseCopyName = warehouseState?.copyName ?? `warehouse.${entity.name}`
   const [warehouseModal, setWarehouseModal] = useState<EnablementVariant | null>(null)
+  const [detailsOpen, setDetailsOpen] = useState(false)
   const [detachConfirm, setDetachConfirm] = useState(false)
   const [detachProgress, setDetachProgress] = useState(false)
   const [snapshotsOpen, setSnapshotsOpen] = useState(false)
@@ -444,6 +447,19 @@ export const EntityListItem = ({
                   </DropdownMenuSub>
 
                   <DropdownMenuSeparator />
+                  {warehouseMode !== 'postgres' && (
+                    <DropdownMenuItem
+                      key="warehouse-details"
+                      className="gap-x-2"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setDetailsOpen(true)
+                      }}
+                    >
+                      <Info size={12} className="shrink-0" />
+                      <span>Storage details</span>
+                    </DropdownMenuItem>
+                  )}
                   {warehouseMode === 'postgres' && (
                     <DropdownMenuSub>
                       <DropdownMenuSubTrigger className="gap-x-2">
@@ -659,6 +675,11 @@ export const EntityListItem = ({
           onSheetOpenChange={setSnapshotsOpen}
         />
       )}
+      <WarehouseStorageDetailsDialog
+        open={detailsOpen}
+        tableKey={warehouseKey}
+        onOpenChange={setDetailsOpen}
+      />
     </EditorTablePageLink>
   )
 }
