@@ -69,14 +69,16 @@ async function buildRequest(
   }
 
   // Next merges route params and URL search params into `req.query`.
-  // Duplicate keys become arrays (URLSearchParams.getAll).
+  // Duplicate keys become arrays (URLSearchParams.getAll). Route params
+  // take precedence over search params of the same name, so they're
+  // applied last.
   const query: Record<string, string | string[]> = {}
-  for (const [k, v] of Object.entries(params)) {
-    if (v !== undefined) query[k] = v
-  }
   for (const key of new Set(url.searchParams.keys())) {
     const values = url.searchParams.getAll(key)
     query[key] = values.length === 1 ? values[0] : values
+  }
+  for (const [k, v] of Object.entries(params)) {
+    if (v !== undefined) query[k] = v
   }
 
   let body: unknown = undefined

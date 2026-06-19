@@ -191,7 +191,9 @@ export function useRouter() {
       // `router.route` specifically; without this it's `undefined` and
       // downstream `.split('/')` calls crash.
       route: pathPattern,
-      query: { ...params, ...search },
+      // Route params take precedence over search params of the same name,
+      // matching Next's pages-router req.query merge order.
+      query: { ...search, ...params },
       // Next's pages-router `asPath` is path + query + hash *without* the
       // origin and *without* the configured `basePath`
       // (https://nextjs.org/docs/pages/api-reference/functions/use-router).
