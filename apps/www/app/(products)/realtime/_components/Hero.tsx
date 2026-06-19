@@ -3,7 +3,7 @@ import { Button } from 'ui'
 
 export function Hero() {
   return (
-    <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6 pt-32 pb-16 md:pt-40 md:pb-32">
+    <div className="mx-auto max-w-(--container-max-w,75rem) px-6 pt-32 pb-16 md:pt-40 md:pb-32">
       <div className="flex flex-col gap-6 lg:gap-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-end">
           <h1 className="text-foreground text-3xl sm:text-5xl sm:leading-none">

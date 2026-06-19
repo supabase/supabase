@@ -39,7 +39,7 @@ export function HighlightsSection() {
   return (
     <div className="py-24 flex flex-col gap-16">
       {/* Header */}
-      <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6 w-full">
+      <div className="mx-auto max-w-(--container-max-w,75rem) px-6 w-full">
         <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
           Enterprise ready
           <br />
@@ -47,7 +47,7 @@ export function HighlightsSection() {
         </h3>
       </div>
 
-      <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6 w-full">
+      <div className="mx-auto max-w-(--container-max-w,75rem) px-6 w-full">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {HIGHLIGHTS.map((highlight) => (
             <div

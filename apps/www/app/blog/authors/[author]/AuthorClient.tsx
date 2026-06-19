@@ -44,7 +44,7 @@ export default function AuthorClient({ author, authorId, blogs, initialView }: A
   return (
     <div>
       {/* Header */}
-      <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6 pt-8 md:pt-12 pb-8">
+      <div className="mx-auto max-w-(--container-max-w,75rem) px-6 pt-8 md:pt-12 pb-8">
         <div className="text-foreground-lighter flex space-x-1 mb-8">
           <h1 className="cursor-pointer">
             <Link href="/blog">Blog</Link>
@@ -90,7 +90,7 @@ export default function AuthorClient({ author, authorId, blogs, initialView }: A
 
       {/* Filters row — divider above the header, search aligned with the view toggle */}
       <div className="sticky top-[65px] z-10 bg-background/80 backdrop-blur-sm border-b border-border">
-        <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6">
+        <div className="mx-auto max-w-(--container-max-w,75rem) px-6">
           <div className="py-3 flex flex-row items-center justify-between gap-2">
             <div className="flex-1 max-w-[280px]">
               <InputGroup className="w-full">
@@ -113,7 +113,7 @@ export default function AuthorClient({ author, authorId, blogs, initialView }: A
       </div>
 
       {/* Posts */}
-      <div className="mx-auto max-w-[var(--container-max-w,75rem)]">
+      <div className="mx-auto max-w-(--container-max-w,75rem)">
         {filteredBlogs.length > 0 ? (
           isList ? (
             <div>

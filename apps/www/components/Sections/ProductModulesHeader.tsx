@@ -34,7 +34,7 @@ interface Types {
 const ProductModulesHeader = (props: Types) => (
   <div
     className={cn(
-      'relative w-full mx-auto max-w-[var(--container-max-w,75rem)] px-6 pt-2 pb-0',
+      'relative w-full mx-auto max-w-(--container-max-w,75rem) px-6 pt-2 pb-0',
       props.className
     )}
   >

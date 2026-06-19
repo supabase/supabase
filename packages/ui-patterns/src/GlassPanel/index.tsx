@@ -1,6 +1,5 @@
 'use client'
 
-import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import * as React from 'react'
 import { cn } from 'ui'
@@ -39,13 +38,15 @@ const IconBackground = ({
 const LogoComponent = ({
   logoImage,
   className,
+  wrapperClassName,
   title,
 }: {
   title: string
   logoImage: string
   className?: string
+  wrapperClassName?: string
 }) => (
-  <div className="relative box-content p-8 pb-0">
+  <div className={cn('relative box-content p-8 pb-0', wrapperClassName)}>
     <div className="relative h-[33px] w-auto max-w-[145px]">
       <Image
         src={logoImage}
@@ -71,10 +72,6 @@ export const GlassPanel = ({
   showIconBg = false,
   className,
 }: Props) => {
-  const { resolvedTheme } = useTheme()
-  const showLogoInverse = logoInverse && resolvedTheme?.includes('dark')
-  const showLogo = !showLogoInverse && logo
-
   return (
     <div
       className={cn(
@@ -92,10 +89,25 @@ export const GlassPanel = ({
         className
       )}
     >
-      {showLogoInverse && (
-        <LogoComponent title={title} logoImage={logoInverse} className="opacity-50" />
+      {logo && !logoInverse && (
+        <LogoComponent title={title} logoImage={logo} className="opacity-75" />
       )}
-      {showLogo && <LogoComponent title={title} logoImage={logo} className="opacity-75" />}
+      {logo && logoInverse && (
+        <LogoComponent
+          title={title}
+          logoImage={logo}
+          className="opacity-75"
+          wrapperClassName="dark:hidden"
+        />
+      )}
+      {logoInverse && (
+        <LogoComponent
+          title={title}
+          logoImage={logoInverse}
+          className="opacity-50"
+          wrapperClassName="hidden dark:block"
+        />
+      )}
 
       {header && (
         <img
@@ -121,12 +133,13 @@ export const GlassPanel = ({
           {icon && typeof icon === 'string' ? (
             <IconBackground showIconBg={showIconBg}>
               <img
-                className="w-5"
+                className="w-5 block dark:hidden"
                 alt={title}
-                src={`${icon}${
-                  hasLightIcon && !resolvedTheme?.includes('dark') ? '-light' : ''
-                }.svg`}
+                src={hasLightIcon ? `${icon}-light.svg` : `${icon}.svg`}
               />
+              {hasLightIcon && (
+                <img className="w-5 hidden dark:block" alt={title} src={`${icon}.svg`} />
+              )}
             </IconBackground>
           ) : (
             icon && <IconBackground showIconBg={showIconBg}>{icon}</IconBackground>

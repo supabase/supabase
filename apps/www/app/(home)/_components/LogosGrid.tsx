@@ -75,14 +75,14 @@ export function LogosGrid() {
 
   return (
     <div>
-      <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6 py-6">
+      <div className="mx-auto max-w-(--container-max-w,75rem) px-6 py-6">
         <p className="text-sm text-foreground-lighter">
           Trusted by fast-growing companies worldwide
         </p>
       </div>
 
       <div className="border-y border-border">
-        <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6 border-x border-border py-10">
+        <div className="mx-auto max-w-(--container-max-w,75rem) px-6 border-x border-border py-10">
           <AnimatePresence mode="popLayout" initial={false}>
             <motion.div
               key={page}

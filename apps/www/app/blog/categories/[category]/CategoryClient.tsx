@@ -33,7 +33,7 @@ export default function CategoryClient({
     <div>
       {/* Filters row — categories navigate; search filters within this category */}
       <div className="sticky top-[65px] z-10 bg-background/80 backdrop-blur-sm border-b border-border">
-        <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6">
+        <div className="mx-auto max-w-(--container-max-w,75rem) px-6">
           <div className="py-3">
             <Suspense fallback={null}>
               <BlogFilters view={view} setView={setView} onSearch={setSearchTerm} />
@@ -43,7 +43,7 @@ export default function CategoryClient({
       </div>
 
       {/* Posts */}
-      <div className="mx-auto max-w-[var(--container-max-w,75rem)]">
+      <div className="mx-auto max-w-(--container-max-w,75rem)">
         {visiblePosts.length ? (
           isList ? (
             <div>

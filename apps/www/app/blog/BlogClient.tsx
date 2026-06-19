@@ -156,7 +156,7 @@ export default function BlogClient({ initialBlogs, totalPosts, initialView }: Bl
 
       {/* Filters row */}
       <div className="sticky top-[65px] z-10 bg-background/80 backdrop-blur-sm border-b border-border">
-        <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6">
+        <div className="mx-auto max-w-(--container-max-w,75rem) px-6">
           <div className="py-3">
             <Suspense fallback={null}>
               <BlogFilters onFilterChange={handleFilterChange} view={view} setView={setView} />
@@ -166,7 +166,7 @@ export default function BlogClient({ initialBlogs, totalPosts, initialView }: Bl
       </div>
 
       {/* Blog posts */}
-      <div className="mx-auto max-w-[var(--container-max-w,75rem)]">
+      <div className="mx-auto max-w-(--container-max-w,75rem)">
         {isFiltering ? (
           isList ? (
             <div>

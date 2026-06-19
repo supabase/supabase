@@ -153,7 +153,7 @@ export function OpenSourceSection() {
           <ContribGraph />
         </div>
 
-        <div className="relative z-10 w-full max-w-[var(--container-max-w,75rem)] mx-auto px-6">
+        <div className="relative z-10 w-full max-w-(--container-max-w,75rem) mx-auto px-6">
           <div className="flex flex-col items-center text-center md:items-start md:text-left justify-between gap-6 py-10 max-w-lg md:max-w-lg mx-auto md:mx-0">
             <div>
               <h2 className="text-4xl text-foreground text-balance">Open source from day one</h2>
