@@ -74,30 +74,11 @@ Key rotation and revocation are one of the most important processes for maintain
 
 ### Lifetime of a signing key
 
-<div className="flex flex-row gap-6 items-center w-full">
-
-<Mermaid
-  chart={`stateDiagram-v2
-    [*] --> standby: A new key is created and advertized
-    standby --> in_use: Once all components have picked up the new key, new JWTs can be issued with it
-    in_use --> previously_used: Rotation, JWT remain accepted
-    previously_used --> revoked: Once all JWTs created with the previous key expire (or sooner)
-    revoked --> [*]: Delete permanently after 7 days
-    previously_used --> standby
-    revoked --> standby`}
-/>
-
-<div>
-
 A newly created key starts off as standby, before being rotated into in use (becoming the current key) while the existing current key becomes previously used.
 
 At any point you can move a key from the previously used or revoked states back to being a standby key, and rotate to it. This gives you the confidence to revert back to an older key if you identify problems with the rotation, such as forgetting to update a component of your application that is relying on a specific key (for example, the legacy JWT secret).
 
 Each action on a key is reversible (except permanent deletion).
-
-</div>
-
-</div>
 
 | Action                                                                           | Accepted JWT signatures                                                | Description                                                                                                                                                                                                                                                                                                                 |
 | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

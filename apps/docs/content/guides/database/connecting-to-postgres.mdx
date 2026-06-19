@@ -315,16 +315,16 @@ Because the dedicated pooler is hosted on the same machine as your database, it 
 
 See the [connection method matrix](#how-to-connect-to-your-postgres-databases) at the top of this page for a quick reference, or follow the decision flow in the diagram below to choose the right option for your environment.
 
-<Mermaid
-  chart={`flowchart TD
-    A[Where are you connecting from?] --> B[Persistent Backend]
-    A --> C[Serverless / Edge]
-    B --> D{IPv6 Supported?<br/>IPv4 Add-on?}
-    B --> E{IPv4 Needed?}
-    C --> H{IPv6 Supported?<br/>IPv4 Add-on?}
-    C --> I{IPv4 Needed?}
-    D --> F[Use Direct Connection]
-    E --> G[Use Supavisor Session Mode]
-    H --> J[Use Dedicated Pooler PgBouncer Pro]
-    I --> K[Use Supavisor Transaction Mode]`}
-/>
+```mermaid
+flowchart TD
+  A[Where are you connecting from?] --> B[Persistent Backend]
+  A --> C[Serverless / Edge]
+  B --> D{IPv6 Supported?<br/>IPv4 Add-on?}
+  B --> E{IPv4 Needed?}
+  C --> H{IPv6 Supported?<br/>IPv4 Add-on?}
+  C --> I{IPv4 Needed?}
+  D --> F[Use Direct Connection]
+  E --> G[Use Supavisor Session Mode]
+  H --> J[Use Dedicated Pooler PgBouncer Pro]
+  I --> K[Use Supavisor Transaction Mode]
+```
