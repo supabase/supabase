@@ -19,6 +19,7 @@ import { Link } from './markdown-schema/Link'
 import { MetricsStackCards } from './markdown-schema/MetricsStackCards'
 import { Panel } from './markdown-schema/Panel'
 import { Price } from './markdown-schema/Price'
+import { RealtimeLimitsEstimator } from './markdown-schema/RealtimeLimitsEstimator'
 import { RegionsList, SmartRegionsList } from './markdown-schema/RegionsList'
 import { SharedData } from './markdown-schema/SharedData'
 import { StepHike } from './markdown-schema/StepHike'
@@ -141,6 +142,7 @@ const SCHEMA: ComponentSchema = {
   Price,
   GlassPanel: Panel,
   IconPanel: Panel,
+  RealtimeLimitsEstimator,
   RegionsList,
   SmartRegionsList,
   ...StepHike,
