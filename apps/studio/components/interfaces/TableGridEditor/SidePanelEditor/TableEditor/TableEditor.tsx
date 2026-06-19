@@ -25,7 +25,6 @@ import {
   validateFields,
 } from './TableEditor.utils'
 import { RLSToggleDialog } from '@/components/interfaces/Database/RLSToggleDialog'
-import { WarehouseEditorPanel } from '@/components/interfaces/Database/Warehouse/WarehouseEditorPanel'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
 import { CONSTRAINT_TYPE, useTableConstraintsQuery } from '@/data/database/constraints-query'
@@ -626,19 +625,6 @@ export const TableEditor = ({
             handler={apiAccessToggleHandler}
           />
         </SidePanel.Content>
-
-        {!isNewRecord && !isDuplicating && (
-          <>
-            <SidePanel.Separator />
-            <SidePanel.Content className="py-6">
-              <WarehouseEditorPanel
-                tableKey={`${table?.schema ?? 'public'}.${table?.name ?? ''}`}
-                tableName={table?.name ?? ''}
-                postgresSize={table?.size}
-              />
-            </SidePanel.Content>
-          </>
-        )}
       </>
     </SidePanel>
   )
