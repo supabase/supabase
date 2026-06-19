@@ -569,7 +569,7 @@ export const ClickHouseFields = ({ form }: { form: UseFormReturn<DestinationPane
                 />
               </FormControl>
               <Button
-                type="default"
+                variant="default"
                 icon={showPassword ? <Eye /> : <EyeOff />}
                 className="w-7 absolute right-6 top-[4px]"
                 onClick={() => setShowPassword(!showPassword)}
