@@ -27,7 +27,12 @@ import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CRONJOB_DEFINITIONS } from '../CronJobs.constants'
-import { buildCronQuery, buildHttpRequestCommand, parseCronJobCommand } from '../CronJobs.utils'
+import {
+  buildCronCreateQuery,
+  buildCronUpdateQuery,
+  buildHttpRequestCommand,
+  parseCronJobCommand,
+} from '../CronJobs.utils'
 import { EdgeFunctionSection } from '../EdgeFunctionSection'
 import { HttpBodyFieldSection } from '../HttpBodyFieldSection'
 import { HTTPHeaderFieldsSection } from '../HttpHeaderFieldsSection'
@@ -55,7 +60,8 @@ import { useTrack } from '@/lib/telemetry/track'
 
 interface CreateCronJobSheetProps {
   open: boolean
-  selectedCronJob?: Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'>
+  selectedCronJob?: Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'> &
+    Partial<Pick<CronJob, 'jobid'>>
   onClose: () => void
 }
 
@@ -93,7 +99,7 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
   const [isLoadingGetCronJob, setIsLoadingGetCronJob] = useState(false)
 
   const jobId = Number(childId)
-  const isEditing = !!selectedCronJob?.jobname
+  const isEditing = selectedCronJob?.jobid !== undefined
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
 
   const { data = [] } = useDatabaseExtensionsQuery({
@@ -164,6 +170,14 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
     if (!project) return console.error('Project is required')
 
     if (!isEditing) {
+      if (!name) {
+        return form.setError(
+          'name',
+          { type: 'manual', message: 'Please provide a name for your cron job' },
+          { shouldFocus: true }
+        )
+      }
+
       try {
         setIsLoadingGetCronJob(true)
         const checkExistingJob = await getDatabaseCronJob({
@@ -191,7 +205,10 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
       }
     }
 
-    const query = buildCronQuery(name, schedule, values.snippet)
+    const query =
+      isEditing && selectedCronJob?.jobid !== undefined
+        ? buildCronUpdateQuery(selectedCronJob.jobid, schedule, values.snippet)
+        : buildCronCreateQuery(name, schedule, values.snippet)
 
     upsertCronJob(
       {
@@ -269,7 +286,9 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
           <div className="flex flex-col h-full" tabIndex={-1}>
             <SheetHeader>
               <SheetTitle>
-                {isEditing ? `Edit ${selectedCronJob.jobname}` : `Create a new cron job`}
+                {isEditing
+                  ? `Edit ${selectedCronJob.jobname || 'cron job'}`
+                  : `Create a new cron job`}
               </SheetTitle>
             </SheetHeader>
 
@@ -371,7 +390,7 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
                               within your cron jobs
                             </span>
                             <ButtonTooltip
-                              type="default"
+                              variant="default"
                               className="w-min"
                               disabled={!canToggleExtensions}
                               onClick={() => setShowEnableExtensionModal(true)}
@@ -418,8 +437,8 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
             <SheetFooter>
               <Button
                 size="tiny"
-                type="default"
-                htmlType="button"
+                variant="default"
+                type="button"
                 onClick={confirmOnClose}
                 disabled={isLoading}
               >
@@ -427,9 +446,9 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
               </Button>
               <Button
                 size="tiny"
-                type="primary"
+                variant="primary"
                 form={FORM_ID}
-                htmlType="submit"
+                type="submit"
                 disabled={isLoading}
                 loading={isLoading}
               >

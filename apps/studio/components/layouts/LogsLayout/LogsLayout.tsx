@@ -25,7 +25,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
 
   if (!logsEnabled) {
     return (
-      <ProjectLayout product="Logs & Analytics" browserTitle={{ section: title }}>
+      <ProjectLayout product="Logs" browserTitle={{ section: title }}>
         <UnknownInterface urlBack={`/project/${ref}`} />
       </ProjectLayout>
     )
@@ -33,14 +33,12 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
 
   if (!canUseLogsExplorer) {
     if (isLoading) {
-      return (
-        <ProjectLayout isLoading product="Logs & Analytics" browserTitle={{ section: title }} />
-      )
+      return <ProjectLayout isLoading product="Logs" browserTitle={{ section: title }} />
     }
 
     if (!isLoading && !canUseLogsExplorer) {
       return (
-        <ProjectLayout product="Logs & Analytics" browserTitle={{ section: title }}>
+        <ProjectLayout product="Logs" browserTitle={{ section: title }}>
           <NoPermission isFullPage resourceText="access your project's logs" />
         </ProjectLayout>
       )
@@ -49,7 +47,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
 
   return (
     <ProjectLayout
-      product="Logs & Analytics"
+      product="Logs"
       browserTitle={{ section: title }}
       productMenu={<LogsSidebarMenuV2 />}
     >

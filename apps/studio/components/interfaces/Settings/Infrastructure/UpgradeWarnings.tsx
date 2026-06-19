@@ -20,7 +20,7 @@ export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: stri
       title="A newer version of Postgres is available"
       description={`You will need to remove all read replicas prior to upgrading your Postgres version to the latest available (${latestPgVersion}).`}
       actions={
-        <Button asChild type="default">
+        <Button asChild variant="default">
           <Link href={`/project/${ref}/database/replication`}>Manage read replicas</Link>
         </Button>
       }
@@ -46,6 +46,10 @@ const getValidationErrorTitle = (error: ProjectUpgradeEligibilityValidationError
       return `${error.schema_name}.${error.obj_name}`
     case 'active_replication_slot':
       return error.slot_name
+    case 'project_hibernating':
+      return 'Project is hibernating'
+    case 'x86_architecture':
+      return 'Project is running on x86 architecture'
   }
 }
 
@@ -67,6 +71,10 @@ const getValidationErrorDescription = (error: ProjectUpgradeEligibilityValidatio
       return `Move the ${error.obj_type} to your own schema`
     case 'active_replication_slot':
       return 'Drop the active replication slot'
+    case 'project_hibernating':
+      return 'The project is currently hibernating and will wake on next supported request'
+    case 'x86_architecture':
+      return 'The project is running on x86 architecture and cannot be upgraded'
   }
 }
 
@@ -116,7 +124,7 @@ const ValidationErrorItem = ({ error }: { error: ProjectUpgradeEligibilityValida
         <p className="text-foreground-lighter text-xs">{description}</p>
       </div>
       {manageLink && (
-        <Button size="tiny" type="default" asChild>
+        <Button size="tiny" variant="default" asChild>
           <Link href={manageLink}>Manage</Link>
         </Button>
       )}
@@ -183,7 +191,7 @@ export const ValidationWarningsAdmonition = ({
       title={getWarningTitle(warning)}
       description={getWarningDescription(warning)}
     >
-      <Button asChild type="default" className="mt-2">
+      <Button asChild variant="default" className="mt-2">
         <Link href={getWarningLink(warning)} target="_blank" rel="noreferrer">
           Read upgrade notes
         </Link>

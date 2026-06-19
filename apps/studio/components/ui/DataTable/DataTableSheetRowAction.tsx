@@ -10,7 +10,7 @@ import {
   Equal,
   Filter,
 } from 'lucide-react'
-import { ComponentPropsWithRef } from 'react'
+import { ComponentPropsWithRef, useEffect, useState } from 'react'
 import {
   cn,
   DropdownMenu,
@@ -21,6 +21,11 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
+import {
+  isLogsFilterColumnValue,
+  type LogsColumnFilterValue,
+} from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
+import CopyButton from '@/components/ui/CopyButton'
 import { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
 import { useCopyToClipboard } from '@/hooks/ui/useCopyToClipboard'
 
@@ -46,7 +51,23 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
   onKeyDown,
   ...props
 }: DataTableSheetRowActionProps<TData, TFields>) {
-  const { copy, isCopied } = useCopyToClipboard()
+  const { copy } = useCopyToClipboard()
+  const [open, setOpen] = useState(false)
+
+  /**
+   * [Joshen] This imo is just a temporary solution and needs to be addressed at the
+   * UI component level RE how we want to handle DropdownContent when scrolling, as its
+   * not specific to unified logs.
+   *
+   * DropdownMenuContent here exceeds the scrolling parent as its portalled. Opting to
+   * close the dropdown menu here when scrolling as a workaround.
+   */
+  useEffect(() => {
+    if (!open) return
+    const onScroll = () => setOpen(false)
+    document.addEventListener('scroll', onScroll, true)
+    return () => document.removeEventListener('scroll', onScroll, true)
+  }, [open])
 
   const field = !!fieldValue ? filterFields.find((f) => f.value === fieldValue) : undefined
   const column =
@@ -61,12 +82,16 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
         return (
           <DropdownMenuItem
             onClick={() => {
-              const filterValue = column?.getFilterValue() as undefined | Array<unknown>
-              const newValue = filterValue?.includes(value)
-                ? filterValue
-                : [...(filterValue || []), value]
-
-              column?.setFilterValue(newValue)
+              // Equality filters use the wrapped { operator, values } shape so the
+              // row action stays compatible with the FilterBar (which writes `=` and `<>`).
+              const current = column?.getFilterValue()
+              const existing: LogsColumnFilterValue = isLogsFilterColumnValue(current)
+                ? current
+                : { operator: '=', values: [] }
+              const next: LogsColumnFilterValue = existing.values.includes(String(value))
+                ? existing
+                : { operator: existing.operator, values: [...existing.values, String(value)] }
+              column?.setFilterValue(next)
             }}
             className="flex items-center gap-2"
           >
@@ -77,7 +102,12 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
       case 'input':
         return (
           <DropdownMenuItem
-            onClick={() => column?.setFilterValue(value)}
+            onClick={() =>
+              column?.setFilterValue({
+                operator: field.value === 'event_message' ? '~~*' : '=',
+                values: [String(value)],
+              } satisfies LogsColumnFilterValue)
+            }
             className="flex items-center gap-2"
           >
             <Filter size={12} />
@@ -152,49 +182,47 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
     }
   }
 
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        className={cn(
-          'rounded-md ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-          'relative',
-          className
-        )}
-        onKeyDown={(e) => {
-          if (e.key === 'ArrowDown') {
-            // REMINDER: default behavior is to open the dropdown menu
-            // But because we use it to navigate between rows, we need to prevent it
-            // and only use "Enter" to select the option
-            e.preventDefault()
-          }
-          onKeyDown?.(e)
-        }}
-        {...props}
-      >
-        {children}
-        {isCopied ? (
-          <div className="absolute inset-0 flex items-center justify-center rounded-md bg-surface-100/80 backdrop-blur-sm animate-in fade-in duration-150">
-            <span className="font-mono text-xs text-foreground-light">Copied</span>
-          </div>
-        ) : null}
-      </DropdownMenuTrigger>
-
-      <DropdownMenuContent align="end" side="bottom" className="w-48 -translate-x-4">
-        {!!field && !!column && (
-          <>
-            {renderOptions()}
-            <DropdownMenuSeparator />
-          </>
-        )}
-
-        <DropdownMenuItem
-          onClick={() => copy(String(value), { timeout: 1000 })}
-          className="flex items-center gap-2"
+  if (!!field && !!column) {
+    return (
+      <DropdownMenu open={open} onOpenChange={setOpen}>
+        <DropdownMenuTrigger
+          asChild
+          className={cn(
+            'rounded-md ring-offset-background',
+            'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+            'relative py-0',
+            className
+          )}
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowDown') {
+              // REMINDER: default behavior is to open the dropdown menu
+              // But because we use it to navigate between rows, we need to prevent it
+              // and only use "Enter" to select the option
+              e.preventDefault()
+            }
+            onKeyDown?.(e)
+          }}
+          {...props}
         >
-          <Copy size={12} />
-          Copy {label}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
+          {children}
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent align="end" side="bottom" className="w-56">
+          {renderOptions()}
+
+          <DropdownMenuSeparator />
+
+          <DropdownMenuItem
+            onClick={() => copy(String(value), { timeout: 1000 })}
+            className="flex items-center gap-2"
+          >
+            <Copy size={12} />
+            Copy {label}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    )
+  }
+
+  return <CopyButton iconOnly variant="text" text={String(value)} className="px-1" />
 }

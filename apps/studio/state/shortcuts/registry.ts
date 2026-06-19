@@ -28,6 +28,13 @@ import {
   OBSERVABILITY_PAGE_SHORTCUT_IDS,
   observabilityPageRegistry,
 } from './registry/observability-page'
+import { ORG_AUDIT_LOGS_SHORTCUT_IDS, orgAuditLogsRegistry } from './registry/org-audit-logs'
+import { ORG_INTEGRATIONS_SHORTCUT_IDS, orgIntegrationsRegistry } from './registry/org-integrations'
+import { ORG_OAUTH_APPS_SHORTCUT_IDS, orgOAuthAppsRegistry } from './registry/org-oauth-apps'
+import { ORG_PRIVATE_APPS_SHORTCUT_IDS, orgPrivateAppsRegistry } from './registry/org-private-apps'
+import { ORG_PROJECTS_SHORTCUT_IDS, orgProjectsRegistry } from './registry/org-projects'
+import { ORG_SETTINGS_NAV_SHORTCUT_IDS, orgSettingsNavRegistry } from './registry/org-settings-nav'
+import { ORG_TEAM_SHORTCUT_IDS, orgTeamRegistry } from './registry/org-team'
 import {
   PLATFORM_WEBHOOKS_SHORTCUT_IDS,
   platformWebhooksRegistry,
@@ -50,6 +57,7 @@ import { STORAGE_BUCKETS_SHORTCUT_IDS, storageBucketsRegistry } from './registry
 import { STORAGE_EXPLORER_SHORTCUT_IDS, storageExplorerRegistry } from './registry/storage-explorer'
 import { STORAGE_NAV_SHORTCUT_IDS, storageNavRegistry } from './registry/storage-nav'
 import { TABLE_EDITOR_SHORTCUT_IDS, tableEditorRegistry } from './registry/table-editor'
+import { UNIFIED_LOGS_SHORTCUT_IDS, unifiedLogsRegistry } from './registry/unified-logs'
 import { ShortcutDefinition } from './types'
 
 /**
@@ -76,7 +84,6 @@ export const SHORTCUT_IDS = {
   OPERATION_QUEUE_SAVE: 'operation-queue.save',
   OPERATION_QUEUE_TOGGLE: 'operation-queue.toggle',
   OPERATION_QUEUE_UNDO: 'operation-queue.undo',
-  UNIFIED_LOGS_RESET_FOCUS: 'unified-logs.reset-focus',
   NAV_HOME: 'nav.home',
   NAV_TABLE_EDITOR: 'nav.table-editor',
   NAV_SQL_EDITOR: 'nav.sql-editor',
@@ -99,8 +106,26 @@ export const SHORTCUT_IDS = {
   SHORTCUTS_OPEN_REFERENCE: 'shortcuts.open-reference',
   CONNECT_OPEN_SHEET: 'connect.open-sheet',
 
+  // Org settings sub-page navigation chords
+  ...ORG_SETTINGS_NAV_SHORTCUT_IDS,
+  // Org OAuth Apps page shortcuts
+  ...ORG_OAUTH_APPS_SHORTCUT_IDS,
+  // Org Team page shortcuts
+  ...ORG_TEAM_SHORTCUT_IDS,
+  // Org Integrations page shortcuts
+  ...ORG_INTEGRATIONS_SHORTCUT_IDS,
+  // Org Projects page shortcuts
+  ...ORG_PROJECTS_SHORTCUT_IDS,
+  // Org Private Apps page shortcuts
+  ...ORG_PRIVATE_APPS_SHORTCUT_IDS,
+  // Org Audit Logs page shortcuts
+  ...ORG_AUDIT_LOGS_SHORTCUT_IDS,
+
   // Table editor shortcuts
   ...TABLE_EDITOR_SHORTCUT_IDS,
+
+  // Unified Logs page shortcuts
+  ...UNIFIED_LOGS_SHORTCUT_IDS,
 
   // SQL editor shortcuts
   ...SQL_EDITOR_SHORTCUT_IDS,
@@ -236,19 +261,19 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
   },
   [SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS]: {
     id: SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS,
-    label: 'Toggle data table filter controls',
+    label: 'Toggle filter sidebar',
     sequence: ['Mod+B'],
     showInSettings: false,
   },
   [SHORTCUT_IDS.DATA_TABLE_RESET_FILTERS]: {
     id: SHORTCUT_IDS.DATA_TABLE_RESET_FILTERS,
-    label: 'Reset data table filters',
+    label: 'Reset filters',
     sequence: ['Mod+Escape'],
     showInSettings: false,
   },
   [SHORTCUT_IDS.DATA_TABLE_RESET_COLUMNS]: {
     id: SHORTCUT_IDS.DATA_TABLE_RESET_COLUMNS,
-    label: 'Reset data table columns',
+    label: 'Reset columns',
     sequence: ['Mod+U'],
     showInSettings: false,
   },
@@ -280,12 +305,6 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
     id: SHORTCUT_IDS.OPERATION_QUEUE_UNDO,
     label: 'Undo latest table edit',
     sequence: ['Mod+Z'],
-    showInSettings: false,
-  },
-  [SHORTCUT_IDS.UNIFIED_LOGS_RESET_FOCUS]: {
-    id: SHORTCUT_IDS.UNIFIED_LOGS_RESET_FOCUS,
-    label: 'Reset focus in logs',
-    sequence: ['Mod+.'],
     showInSettings: false,
   },
   [SHORTCUT_IDS.NAV_HOME]: {
@@ -417,7 +436,7 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
   [SHORTCUT_IDS.NAV_ORG_SETTINGS]: {
     id: SHORTCUT_IDS.NAV_ORG_SETTINGS,
     label: 'Go to Organization Settings',
-    sequence: ['G', 'O'],
+    sequence: ['G', ','],
     showInSettings: false,
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
@@ -440,8 +459,26 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
     options: { ignoreInputs: true },
   },
 
+  // Org settings sub-page navigation chord registration
+  ...orgSettingsNavRegistry,
+  // Org OAuth Apps page shortcut registration
+  ...orgOAuthAppsRegistry,
+  // Org Team page shortcut registration
+  ...orgTeamRegistry,
+  // Org Integrations page shortcut registration
+  ...orgIntegrationsRegistry,
+  // Org Projects page shortcut registration
+  ...orgProjectsRegistry,
+  // Org Private Apps page shortcut registration
+  ...orgPrivateAppsRegistry,
+  // Org Audit Logs page shortcut registration
+  ...orgAuditLogsRegistry,
+
   // Table editor shortcut registration
   ...tableEditorRegistry,
+
+  // Unified Logs page shortcut registration
+  ...unifiedLogsRegistry,
 
   // SQL editor shortcut registration
   ...sqlEditorRegistry,

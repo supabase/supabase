@@ -9,8 +9,6 @@ import {
 } from 'nuqs'
 
 import {
-  ARRAY_DELIMITER,
-  LEVELS,
   RANGE_DELIMITER,
   SLIDER_DELIMITER,
   SORT_DELIMITER,
@@ -18,7 +16,16 @@ import {
 
 export const REGIONS = ['ams', 'fra', 'gru', 'hkg', 'iad', 'syd'] as const
 export const METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] as const
-export const LOG_TYPES = ['postgres', 'postgrest', 'auth', 'storage', 'edge function'] as const
+export const LOG_TYPES = [
+  'postgres',
+  'postgrest',
+  'auth',
+  'storage',
+  'edge function',
+  'realtime',
+  'supavisor',
+  'pgbouncer',
+] as const
 export const DEFAULT_LOG_TYPES = ['postgres', 'postgrest'] as const
 
 const parseAsSort = createParser({
@@ -33,20 +40,18 @@ const parseAsSort = createParser({
 })
 
 export const SEARCH_PARAMS_PARSER = {
-  // CUSTOM FILTERS
-  level: parseAsArrayOf(parseAsStringLiteral(LEVELS), ARRAY_DELIMITER),
-  log_type: parseAsArrayOf(parseAsString, ARRAY_DELIMITER),
+  // Equality filters. Repeatable `?filter=column:opAbbrev:value` (e.g. `level:eq:info`,
+  // `host:neq:foo`). Parsed with the helpers in `UnifiedLogs.filters.ts`.
+  filter: parseAsArrayOf(parseAsString),
+
+  // Range/special filters keep their dedicated keys — their semantics are inherently
+  // multi-value (sliders, time ranges) and don't fit the eq/neq model.
   latency: parseAsArrayOf(parseAsInteger, SLIDER_DELIMITER),
   'timing.dns': parseAsArrayOf(parseAsInteger, SLIDER_DELIMITER),
   'timing.connection': parseAsArrayOf(parseAsInteger, SLIDER_DELIMITER),
   'timing.tls': parseAsArrayOf(parseAsInteger, SLIDER_DELIMITER),
   'timing.ttfb': parseAsArrayOf(parseAsInteger, SLIDER_DELIMITER),
   'timing.transfer': parseAsArrayOf(parseAsInteger, SLIDER_DELIMITER),
-  status: parseAsArrayOf(parseAsString, ARRAY_DELIMITER),
-  regions: parseAsArrayOf(parseAsStringLiteral(REGIONS), ARRAY_DELIMITER),
-  method: parseAsArrayOf(parseAsStringLiteral(METHODS), ARRAY_DELIMITER),
-  host: parseAsString,
-  pathname: parseAsString,
   date: parseAsArrayOf(parseAsTimestamp, RANGE_DELIMITER),
 
   // REQUIRED FOR SORTING & PAGINATION

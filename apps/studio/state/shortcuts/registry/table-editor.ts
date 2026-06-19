@@ -19,6 +19,7 @@ export const TABLE_EDITOR_SHORTCUT_IDS = {
   TABLE_EDITOR_CLEAR_FILTERS: 'table-editor.clear-filters',
   TABLE_EDITOR_CLEAR_SORT: 'table-editor.clear-sort',
   TABLE_EDITOR_REFRESH: 'table-editor.refresh',
+  TABLE_EDITOR_FOCUS_SCHEMA: 'table-editor.focus-schema',
 }
 
 export type TableEditorShortcutId =
@@ -148,6 +149,13 @@ export const tableEditorRegistry: RegistryDefinations<TableEditorShortcutId> = {
     id: TABLE_EDITOR_SHORTCUT_IDS.TABLE_EDITOR_REFRESH,
     label: 'Refresh table',
     sequence: ['Shift+R'],
+    showInSettings: false,
+    options: { ignoreInputs: true },
+  },
+  [TABLE_EDITOR_SHORTCUT_IDS.TABLE_EDITOR_FOCUS_SCHEMA]: {
+    id: TABLE_EDITOR_SHORTCUT_IDS.TABLE_EDITOR_FOCUS_SCHEMA,
+    label: 'Focus schema selector',
+    sequence: ['S', 'S'],
     showInSettings: false,
     options: { ignoreInputs: true },
   },

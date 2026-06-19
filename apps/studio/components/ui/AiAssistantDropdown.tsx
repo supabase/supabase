@@ -54,7 +54,7 @@ export interface AiAssistantDropdownProps {
   onCopyPrompt?: () => void
   telemetrySource?: TelemetrySource
   size?: ComponentProps<typeof Button>['size']
-  type?: ComponentProps<typeof Button>['type']
+  variant?: ComponentProps<typeof Button>['variant']
   disabled?: boolean
   loading?: boolean
   className?: string
@@ -72,7 +72,7 @@ export function AiAssistantDropdown({
   onCopyPrompt,
   telemetrySource,
   size = 'tiny',
-  type = 'default',
+  variant = 'default',
   disabled = false,
   loading = false,
   className,
@@ -128,7 +128,7 @@ export function AiAssistantDropdown({
     <div className={cn('flex items-center', iconOnly ? 'gap-0' : 'gap-0')}>
       {/* Main button */}
       <Button
-        type={type}
+        variant={variant}
         size={size}
         disabled={disabled}
         onClick={handleOpenAssistant}
@@ -142,7 +142,7 @@ export function AiAssistantDropdown({
       <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
           <Button
-            type={type}
+            variant={variant}
             size={size}
             disabled={disabled}
             className={cn('rounded-l-none px-1', iconOnly && 'px-1')}

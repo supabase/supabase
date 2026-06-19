@@ -3,7 +3,7 @@ import { Column } from 'react-data-grid'
 import { cn, IconBroadcast, IconDatabaseChanges, IconPresence } from 'ui'
 
 import type { LogData, PreviewLogData } from './Messages.types'
-import { RowLayout } from './MessagesFormatters'
+import { RowLayout, withBinaryPayloadPlaceholder } from './MessagesFormatters'
 import { isErrorLog } from './MessagesTable'
 
 const ICONS = {
@@ -35,7 +35,7 @@ export const ColumnRenderer: Column<LogData, unknown>[] = [
             {new Date(data.row.timestamp).toISOString()}
           </span>
           <span className={cn('truncate font-mono', isErrorLog(data.row) ? 'text-warning!' : '')}>
-            {JSON.stringify(data.row.metadata)}
+            {JSON.stringify(withBinaryPayloadPlaceholder(data.row.metadata))}
           </span>
         </RowLayout>
       )

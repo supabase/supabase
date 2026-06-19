@@ -39,7 +39,7 @@ import { entityTypeKeys } from '@/data/entity-types/keys'
 import { lintKeys } from '@/data/lint/keys'
 import { prefetchEditorTablePage } from '@/data/prefetchers/project.$ref.editor.$id'
 import { getQueryClient } from '@/data/query-client'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { tableEditorKeys } from '@/data/table-editor/keys'
 import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
 import { tableRowKeys } from '@/data/table-rows/keys'
@@ -781,6 +781,14 @@ export const updateTable = async ({
       schema: table.schema,
       payload,
     })
+    await queryClient.invalidateQueries({
+      queryKey: tableKeys.infiniteListPrefix(projectRef, table.schema),
+    })
+    if (payload.schema && payload.schema !== table.schema) {
+      await queryClient.invalidateQueries({
+        queryKey: tableKeys.infiniteListPrefix(projectRef, payload.schema),
+      })
+    }
   }
 
   if (payload.rls_enabled === true) {
@@ -900,7 +908,9 @@ export const updateTable = async ({
     }),
     queryClient.invalidateQueries({ queryKey: databaseKeys.tableDefinition(projectRef, table.id) }),
     queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(projectRef) }),
-    queryClient.invalidateQueries({ queryKey: tableKeys.list(projectRef, table.schema, true) }),
+    queryClient.invalidateQueries({
+      queryKey: tableKeys.list(projectRef, table.schema, { includeColumns: true }),
+    }),
     queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
   ])
 

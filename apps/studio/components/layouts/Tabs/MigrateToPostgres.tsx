@@ -38,7 +38,7 @@ export const MigrateToPostgres = () => (
           </div>
         </div>
       </div>
-      <Button type="default" className="rounded-full" iconRight={<BookOpen />}>
+      <Button variant="default" className="rounded-full" iconRight={<BookOpen />}>
         Migrate to Postgres
       </Button>
     </div>

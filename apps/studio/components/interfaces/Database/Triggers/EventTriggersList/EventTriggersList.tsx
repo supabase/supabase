@@ -225,13 +225,13 @@ export const EventTriggersList = () => {
               onTrigger={createEventTrigger}
               side="bottom"
             >
-              <Button type="primary" icon={<Plus size={12} />} onClick={createEventTrigger}>
+              <Button variant="primary" icon={<Plus size={12} />} onClick={createEventTrigger}>
                 New trigger
               </Button>
             </Shortcut>
           ) : (
             <ButtonTooltip
-              type="primary"
+              variant="primary"
               icon={<Plus size={12} />}
               disabled
               tooltip={{
@@ -254,7 +254,7 @@ export const EventTriggersList = () => {
           description="Event triggers run on database-level events like DDL commands."
         >
           <ButtonTooltip
-            type="default"
+            variant="default"
             disabled={!canUpdateEventTriggers}
             onClick={createEventTrigger}
             tooltip={{

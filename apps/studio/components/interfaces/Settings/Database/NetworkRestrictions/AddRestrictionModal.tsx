@@ -65,13 +65,18 @@ const AddRestrictionModal = ({
     type === 'IPv4' ? IPV4_MAX_CIDR_BLOCK_SIZE : IPV6_MAX_CIDR_BLOCK_SIZE
   }`
   const formSchema = z.object({
-    cidrBlockSize: z.coerce
-      .number()
-      .min(0, cidrBlockSizeValidationMessage)
-      .max(
-        type === 'IPv4' ? IPV4_MAX_CIDR_BLOCK_SIZE : IPV6_MAX_CIDR_BLOCK_SIZE,
-        cidrBlockSizeValidationMessage
-      ),
+    cidrBlockSize: z
+      .union([
+        z.literal(''),
+        z.coerce
+          .number()
+          .min(0, cidrBlockSizeValidationMessage)
+          .max(
+            type === 'IPv4' ? IPV4_MAX_CIDR_BLOCK_SIZE : IPV6_MAX_CIDR_BLOCK_SIZE,
+            cidrBlockSizeValidationMessage
+          ),
+      ])
+      .refine((value) => value !== '', 'Size is required'),
     ipAddress: z
       .string()
       .min(1, `Please enter a valid IP address`)
@@ -219,7 +224,6 @@ const AddRestrictionModal = ({
                           max={
                             type === 'IPv4' ? IPV4_MAX_CIDR_BLOCK_SIZE : IPV6_MAX_CIDR_BLOCK_SIZE
                           }
-                          onChange={(e) => field.onChange(Number(e.target.value))}
                           placeholder={
                             type === 'IPv4'
                               ? IPV4_MAX_CIDR_BLOCK_SIZE.toString()
@@ -260,10 +264,10 @@ const AddRestrictionModal = ({
             </DialogSection>
           )}
           <DialogFooter>
-            <Button type="default" disabled={isApplying} onClick={() => onClose()}>
+            <Button variant="default" disabled={isApplying} onClick={() => onClose()}>
               Cancel
             </Button>
-            <Button form={formId} htmlType="submit" loading={isApplying} disabled={isApplying}>
+            <Button form={formId} type="submit" loading={isApplying} disabled={isApplying}>
               Save restriction
             </Button>
           </DialogFooter>

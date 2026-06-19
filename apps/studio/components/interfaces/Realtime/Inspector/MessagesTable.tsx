@@ -42,7 +42,7 @@ const NoResultAlert = ({
   )
 
   const broadcastButton = (
-    <Button type="default" onClick={showSendMessage}>
+    <Button variant="default" onClick={showSendMessage}>
       Broadcast a message
     </Button>
   )
@@ -90,7 +90,7 @@ const NoResultAlert = ({
                 </p>
               </div>
               <Link href={`/project/${ref}/realtime/inspector`} target="_blank" rel="noreferrer">
-                <Button type="default" iconRight={<ExternalLink />}>
+                <Button variant="default" iconRight={<ExternalLink />}>
                   Open inspector
                 </Button>
               </Link>
@@ -106,7 +106,7 @@ const NoResultAlert = ({
                 <p className="text-foreground-lighter text-xs">Tables must have realtime enabled</p>
               </div>
               <Link href={`/project/${ref}/database/publications`} target="_blank" rel="noreferrer">
-                <Button type="default" iconRight={<ExternalLink />}>
+                <Button variant="default" iconRight={<ExternalLink />}>
                   Publications settings
                 </Button>
               </Link>
@@ -180,7 +180,7 @@ const MessagesTable = ({
                 </div>
                 <ShortcutTooltip shortcutId={SHORTCUT_IDS.INSPECTOR_BROADCAST} side="bottom">
                   <Button
-                    type="default"
+                    variant="default"
                     onClick={showSendMessage}
                     icon={<Megaphone strokeWidth={1.5} />}
                   >
@@ -191,7 +191,7 @@ const MessagesTable = ({
             )}
 
             <DataGrid
-              className="data-grid--simple-logs h-full border-b-0"
+              className="data-grid--simple-logs h-full border-t-0! border-b-0!"
               rowHeight={40}
               headerRowHeight={0}
               columns={ColumnRenderer}

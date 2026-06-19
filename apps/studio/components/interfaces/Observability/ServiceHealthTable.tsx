@@ -146,7 +146,7 @@ const ServiceCell = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
-                type="text"
+                variant="text"
                 size="tiny"
                 className="relative z-10 px-1 text-foreground-lighter group-hover:text-foreground transition-colors shrink-0"
                 aria-label={`Go to ${service.name} report`}
@@ -169,6 +169,7 @@ const ServiceCell = ({
           <LogsBarChart
             isFullHeight
             hideDateRange
+            hideXAxis
             data={data.eventChartData}
             DateTimeFormat={datetimeFormat}
             onBarClick={onBarClick}
@@ -198,7 +199,9 @@ export const ServiceHealthTable = ({
 
               const isFirst = index === 0
               const isLeftColumn = !isFirst && (index - 1) % 2 === 0
-              const isLastService = index === services.length - 1
+              const restCount = services.length - 1
+              const lastRowCount = restCount % 2 === 0 ? 2 : 1
+              const isInLastRow = !isFirst && index >= services.length - lastRowCount
 
               return (
                 <ServiceCell
@@ -210,7 +213,7 @@ export const ServiceHealthTable = ({
                   className={cn(
                     'border-default border-b',
                     isFirst && 'md:col-span-2',
-                    isLastService && 'md:border-b-0',
+                    isInLastRow && 'md:border-b-0',
                     isLeftColumn && 'md:border-r'
                   )}
                 />

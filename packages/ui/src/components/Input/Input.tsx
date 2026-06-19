@@ -137,12 +137,12 @@ function Input({
           <div className={__styles.actions_container}>
             {error && <InputErrorIcon size={size} />}
             {copy && !(reveal && hidden) ? (
-              <Button size="tiny" type="default" icon={<Copy />} onClick={() => _onCopy(value)}>
+              <Button size="tiny" variant="default" icon={<Copy />} onClick={() => _onCopy(value)}>
                 {copyLabel}
               </Button>
             ) : null}
             {reveal && hidden ? (
-              <Button size="tiny" type="default" onClick={onReveal}>
+              <Button size="tiny" variant="default" onClick={onReveal}>
                 Reveal
               </Button>
             ) : null}
@@ -264,7 +264,12 @@ function TextArea({
             <div className={__styles['textarea_actions_container_items']}>
               {error && <InputErrorIcon size={size} />}
               {copy && (
-                <Button size="tiny" type="default" onClick={() => _onCopy(value)} icon={<Copy />}>
+                <Button
+                  size="tiny"
+                  variant="default"
+                  onClick={() => _onCopy(value)}
+                  icon={<Copy />}
+                >
                   {copyLabel}
                 </Button>
               )}

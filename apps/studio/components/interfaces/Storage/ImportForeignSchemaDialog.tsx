@@ -202,10 +202,10 @@ export const ImportForeignSchemaDialog = ({
               />
             </DialogSection>
             <DialogFooter className="flex items-center space-x-2 justify-end">
-              <Button type="default" htmlType="button" disabled={loading} onClick={onClose}>
+              <Button variant="default" type="button" disabled={loading} onClick={onClose}>
                 Cancel
               </Button>
-              <Button type="primary" htmlType="submit" loading={loading}>
+              <Button variant="primary" type="submit" loading={loading}>
                 Create
               </Button>
             </DialogFooter>

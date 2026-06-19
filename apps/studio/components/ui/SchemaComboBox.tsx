@@ -73,7 +73,7 @@ export const SchemaComboBox = ({
   return (
     <div className={className}>
       {isSchemasLoading && (
-        <Button type="default" className="justify-start" block size={size} loading>
+        <Button variant="default" className="justify-start" block size={size} loading>
           Loading schemas...
         </Button>
       )}
@@ -84,7 +84,7 @@ export const SchemaComboBox = ({
           <AlertDescription className="text-xs mb-2 wrap-break-word">
             Error: {(schemasError as any)?.message}
           </AlertDescription>
-          <Button type="default" size="tiny" onClick={() => refetchSchemas()}>
+          <Button variant="default" size="tiny" onClick={() => refetchSchemas()}>
             Reload schemas
           </Button>
         </Alert>
@@ -96,7 +96,7 @@ export const SchemaComboBox = ({
             <Button
               size={size}
               disabled={disabled}
-              type="default"
+              variant="default"
               className={`w-full [&>span]:w-full`}
               iconRight={
                 <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />

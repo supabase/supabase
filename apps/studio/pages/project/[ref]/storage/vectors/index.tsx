@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 
 import { BucketsUpgradePlan } from '@/components/interfaces/Storage/BucketsUpgradePlan'
 import { VectorsBuckets } from '@/components/interfaces/Storage/VectorBuckets'
@@ -23,10 +23,12 @@ const StorageVectorsPage: NextPageWithLayout = () => {
     project?.region ?? ''
   )
 
-  if (!isAvailableInProjectRegion) {
+  if (IS_PLATFORM && !isAvailableInProjectRegion) {
     return <RegionLimitation />
-  } else if (!isVectorBucketsEnabled) {
+  } else if (IS_PLATFORM && !isVectorBucketsEnabled) {
     return <BucketsUpgradePlan type="vector" />
+  } else if (!isVectorBucketsEnabled) {
+    return null
   } else {
     return <VectorsBuckets />
   }

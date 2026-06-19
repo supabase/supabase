@@ -65,7 +65,7 @@ export const AIOnboarding = ({
                 >
                   <Button
                     size="small"
-                    type="text"
+                    variant="text"
                     className="w-full justify-start border-b hover:border-b-0 hover:rounded-md rounded-none"
                     icon={
                       <FileText strokeWidth={1.5} size={14} className="text-foreground-light" />
@@ -100,7 +100,7 @@ export const AIOnboarding = ({
                           <Button
                             key={`${lint.name}-${index}`}
                             size="small"
-                            type="text"
+                            variant="text"
                             className="w-full justify-start"
                             icon={
                               <BarChart
@@ -131,7 +131,7 @@ export const AIOnboarding = ({
                           <Button
                             key={`${lint.name}-${index}`}
                             size="small"
-                            type="text"
+                            variant="text"
                             className="w-full justify-start"
                             icon={<Shield strokeWidth={1.5} size={14} className="text-warning" />}
                             onClick={() => {
@@ -152,7 +152,7 @@ export const AIOnboarding = ({
                       <Button
                         key={`${item.title}-${index}`}
                         size="small"
-                        type="text"
+                        variant="text"
                         className="w-full justify-start"
                         icon={
                           <FileText strokeWidth={1.5} size={14} className="text-foreground-light" />

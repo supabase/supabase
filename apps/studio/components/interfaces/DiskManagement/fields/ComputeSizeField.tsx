@@ -379,7 +379,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
 
             {!isLoading && !addonsError && hasHiddenOptions && (
               <Button
-                type="default"
+                variant="default"
                 size="tiny"
                 className="mt-4"
                 aria-expanded={showAllSizes}

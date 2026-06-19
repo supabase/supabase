@@ -17,7 +17,7 @@ export const IPV4SuggestionAlert = () => {
           questions.
         </p>
         <p>
-          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+          <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
               target="_blank"
               rel="noreferrer"

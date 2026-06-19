@@ -170,7 +170,7 @@ export const EnumeratedTypes = () => {
             >
               <Button
                 className="ml-auto flex-1"
-                type="primary"
+                variant="primary"
                 onClick={() => setShowCreateTypePanel(true)}
               >
                 Create type
@@ -236,7 +236,11 @@ export const EnumeratedTypes = () => {
                           <div className="flex justify-end items-center space-x-2">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button type="default" className="px-1" icon={<MoreVertical />} />
+                                <Button
+                                  variant="default"
+                                  className="px-1"
+                                  icon={<MoreVertical />}
+                                />
                               </DropdownMenuTrigger>
                               <DropdownMenuContent side="bottom" align="end" className="w-32">
                                 <DropdownMenuItem

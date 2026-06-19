@@ -118,8 +118,11 @@ export const SQLEditor = () => {
   const snapV2 = useSqlEditorV2StateSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
-  const { isHipaaProjectDisallowed } = useOrgAiOptInLevel()
+  const { aiOptInLevel } = useOrgAiOptInLevel()
   const showPrettyExplain = useFlag('ShowPrettyExplain')
+
+  // [Ali] Kill switch to hide the SQL Editor Explain tab and its entry points
+  const disablePrettyExplain = useFlag('DisablePrettyExplainOnSqlEditor')
 
   const {
     sourceSqlDiff,
@@ -223,7 +226,7 @@ export const SQLEditor = () => {
       if (id) {
         snapV2.addResult(id, data.result, vars.autoLimit)
 
-        if (showPrettyExplain && isExplainQuery(data.result)) {
+        if (!disablePrettyExplain && showPrettyExplain && isExplainQuery(data.result)) {
           snapV2.addExplainResult(id, data.result)
           setActiveUtilityTab('explain')
         } else if (activeUtilityTab === 'explain') {
@@ -392,7 +395,9 @@ export const SQLEditor = () => {
       }
 
       if (
-        !isHipaaProjectDisallowed &&
+        // Don't auto-generate a title when the org has disabled AI or is a HIPAA project,
+        // as that would silently forward the query to the AI provider without consent
+        aiOptInLevel !== 'disabled' &&
         snippet?.snippet.name.startsWith(untitledSnippetTitle) &&
         IS_PLATFORM
       ) {
@@ -440,7 +445,7 @@ export const SQLEditor = () => {
       id,
       isExecuting,
       project,
-      isHipaaProjectDisallowed,
+      aiOptInLevel,
       execute,
       getImpersonatedRoleState,
       setAiTitle,
@@ -533,6 +538,7 @@ export const SQLEditor = () => {
   ])
 
   useShortcut(SHORTCUT_IDS.SQL_EDITOR_EXPLAIN, executeExplainQuery, {
+    enabled: !disablePrettyExplain,
     registerInCommandMenu: true,
   })
 
@@ -956,6 +962,7 @@ export const SQLEditor = () => {
                       monacoRef={monacoRef}
                       executeQuery={executeQuery}
                       executeExplainQuery={executeExplainQuery}
+                      showExplainAction={!disablePrettyExplain}
                       prettifyQuery={prettifyQuery}
                       onHasSelection={setHasSelection}
                       onMount={onMount}
@@ -1020,6 +1027,7 @@ export const SQLEditor = () => {
                 prettifyQuery={prettifyQuery}
                 executeQuery={executeQueryFromButton}
                 executeExplainQuery={executeExplainQuery}
+                showExplainTab={!disablePrettyExplain}
                 onDebug={onDebug}
                 buildDebugPrompt={buildDebugPrompt}
                 activeTab={activeUtilityTab}
@@ -1059,7 +1067,7 @@ export const SQLEditor = () => {
                 {results.autoLimit !== undefined && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button type="default" iconRight={<ChevronUp size={14} />}>
+                      <Button variant="default" iconRight={<ChevronUp size={14} />}>
                         Limit results to:{' '}
                         {ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === snapV2.limit)?.label}
                       </Button>

@@ -13,3 +13,9 @@ export const POSTGRES_PASSWORD = process.env.POSTGRES_PASSWORD || 'postgres'
 export const POSTGRES_USER_READ_WRITE = process.env.POSTGRES_USER_READ_WRITE || 'supabase_admin'
 export const POSTGRES_USER_READ_ONLY =
   process.env.POSTGRES_USER_READ_ONLY || 'supabase_read_only_user'
+
+// Fallback used when AUTH_JWT_SECRET is not provided to the Studio container
+// (e.g. local dev without docker-compose). The string is the same default
+// shipped by the supabase/cli — keep them in sync.
+export const DEFAULT_AUTH_JWT_SECRET = 'super-secret-jwt-token-with-at-least-32-characters-long'
+export const AUTH_JWT_SECRET = process.env.AUTH_JWT_SECRET || DEFAULT_AUTH_JWT_SECRET

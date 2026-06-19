@@ -25,13 +25,20 @@ with functions as (
   from
     pg_proc as p
   where
-    p.prokind = 'f'
+    p.prokind in ('f', 'p')
 )
 select
   f.oid as id,
   n.nspname as schema,
   f.proname as name,
   l.lanname as language,
+  case f.prokind
+    when 'f' then 'function'
+    when 'p' then 'procedure'
+    when 'a' then 'aggregate'
+    when 'w' then 'window'
+    else 'unknown'
+  end as type,
   case
     when l.lanname = 'internal' then ''
     else f.prosrc

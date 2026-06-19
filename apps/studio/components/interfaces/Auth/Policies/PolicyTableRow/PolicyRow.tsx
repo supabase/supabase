@@ -70,7 +70,7 @@ export const PolicyRow = ({
       <TableCell className="w-[40%] truncate">
         <div className="flex items-center gap-x-2 min-w-0">
           <Button
-            type="text"
+            variant="text"
             className="text-foreground text-sm p-0 hover:bg-transparent w-full truncate justify-start"
             onClick={() => onSelectEditPolicy(policy)}
           >
@@ -123,7 +123,7 @@ export const PolicyRow = ({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                type="default"
+                variant="default"
                 className="px-1.5"
                 icon={<MoreVertical />}
                 data-testid={`policy-${policy.name}-actions-button`}

@@ -133,7 +133,7 @@ function BlogFilters({ view, setView, onFilterChange, onSearch }: Props) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                type="outline"
+                variant="outline"
                 iconRight={<ChevronDown />}
                 className="w-full min-w-[200px] flex justify-between items-center py-2"
               >
@@ -156,7 +156,7 @@ function BlogFilters({ view, setView, onFilterChange, onSearch }: Props) {
       )}
 
       {/* Desktop: category pills */}
-      <div className="hidden lg:flex flex-wrap items-center flex-grow gap-1">
+      <div className="hidden lg:flex flex-wrap items-center grow gap-1">
         {allCategories.map((category) => {
           const isActive = category === activeCategory
           return (
@@ -188,7 +188,7 @@ function BlogFilters({ view, setView, onFilterChange, onSearch }: Props) {
           <Button
             className="px-2 h-full"
             size="medium"
-            type="default"
+            variant="default"
             onClick={() => setShowSearchInput(true)}
           >
             <Search size="14" />

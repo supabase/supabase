@@ -45,7 +45,7 @@ export const Entities = ({ language }: ContentProps) => {
         <div className="flex items-center gap-x-2 px-4 mt-3">
           <DocsButton href={`${DOCS_URL}/guides/database/api/generating-types`} />
           <Button
-            type="default"
+            variant="default"
             disabled={isGeneratingTypes}
             loading={isGeneratingTypes}
             icon={<Download strokeWidth={1.5} />}
