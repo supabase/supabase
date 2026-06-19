@@ -22,7 +22,7 @@ vi.mock('@/data/query-client', () => ({
   }),
 }))
 
-vi.mock('@/data/sql/execute-sql-query', () => ({
+vi.mock('@/data/sql/execute-sql-mutation', () => ({
   executeSql: (...args: unknown[]) => mockExecuteSql(...args),
 }))
 

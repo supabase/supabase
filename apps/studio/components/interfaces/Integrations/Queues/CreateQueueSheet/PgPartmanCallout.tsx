@@ -19,7 +19,7 @@ export function PgPartmanCallout() {
         description="Unlock partitioned queues for automatic data retention, lower storage costs, and faster performance at scale."
       >
         <Button
-          type="default"
+          variant="default"
           size="tiny"
           className="mt-2"
           onClick={() => setShowEnableModal(true)}

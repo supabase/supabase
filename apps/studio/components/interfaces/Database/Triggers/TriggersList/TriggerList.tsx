@@ -107,7 +107,7 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
         <TableRow key={x.id}>
           <TableCell className="space-x-2">
             <Button
-              type="text"
+              variant="text"
               disabled={isLocked || !canUpdateTriggers}
               onClick={() => editTrigger(x)}
               title={x.name}
@@ -177,7 +177,7 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
                     <DropdownMenuTrigger asChild>
                       <Button
                         aria-label="More options"
-                        type="default"
+                        variant="default"
                         className="px-1"
                         icon={<MoreVertical />}
                       />
@@ -240,7 +240,7 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
                 ) : (
                   <ButtonTooltip
                     disabled
-                    type="default"
+                    variant="default"
                     className="px-1"
                     icon={<MoreVertical />}
                     tooltip={{

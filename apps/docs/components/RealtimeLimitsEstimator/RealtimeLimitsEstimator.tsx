@@ -154,7 +154,7 @@ export default function RealtimeLimitsEstimater({}) {
           <div className="py-1 flex items-center">
             <p className="text-sm">View raw throughput table</p>
             <Button
-              type="text"
+              variant="text"
               icon={
                 <ChevronDown
                   size={18}

@@ -74,7 +74,7 @@ Now import the `HCaptcha` component from the `@hcaptcha/react-hcaptcha` library.
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 ```
 
-Let's create a empty state to store our `captchaToken`
+Create an empty state to store the `captchaToken`
 
 ```jsx
 const [captchaToken, setCaptchaToken] = useState()
@@ -86,7 +86,7 @@ Now lets add the `HCaptcha` component to the JSX section of our code
 <HCaptcha />
 ```
 
-We will pass it the sitekey we copied from the hCaptcha website as a property along with a `onVerify` property which takes a callback function. This callback function will have a token as one of its properties. Let's set the token in the state using `setCaptchaToken`
+Pass it the sitekey we copied from the hCaptcha website as a property along with a `onVerify` property which takes a callback function. This callback function will have a token as one of its properties. Set the token in the state using `setCaptchaToken`
 
 ```jsx
 <HCaptcha
@@ -115,7 +115,7 @@ Create a ref to use on our `HCaptcha` component.
 const captcha = useRef()
 ```
 
-Let's add a ref attribute on the `HCaptcha` component and assign the `captcha` constant to it.
+Add a `ref` attribute on the `HCaptcha` component and assign the `captcha` constant to it.
 
 ```jsx
 <HCaptcha
@@ -153,7 +153,7 @@ Now import the Turnstile component from the @marsidev/react-turnstile library.
 import { Turnstile } from '@marsidev/react-turnstile'
 ```
 
-Let's create an empty state to store our `captchaToken`
+Create an empty state to store the `captchaToken`
 
 ```jsx
 const [captchaToken, setCaptchaToken] = useState()
@@ -165,7 +165,7 @@ Now lets add the Cloudflare Turnstile component to the JSX section of our code:
 <Turnstile />
 ```
 
-We will pass it the sitekey we copied from the Cloudflare website as a property along with a `onSuccess` property which takes a callback function. This callback function will have a token as one of its properties. Let's set the token in the state using `setCaptchaToken`:
+Pass it the sitekey we copied from the Cloudflare website as a property along with a `onSuccess` property which takes a callback function. This callback function will have a token as one of its properties. Set the token in the state using `setCaptchaToken`:
 
 ```jsx
 <Turnstile

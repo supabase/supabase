@@ -152,7 +152,7 @@ export const ConnectionPanel = ({
               title="Transaction pooler is unavailable as pool mode is set to Session"
               description="If you'd like to use transaction mode, update your pool mode to Transaction for the connection pooler in your project's Database Settings."
             >
-              <Button asChild type="default" className="mt-2">
+              <Button asChild variant="default" className="mt-2">
                 <Link
                   href={`/project/${projectRef}/database/settings#connection-pooler`}
                   className="text-xs text-light hover:text-foreground"
@@ -206,7 +206,7 @@ export const ConnectionPanel = ({
                 {links.length > 0 && (
                   <div className="flex items-center gap-x-2 mt-2">
                     {links.map((link) => (
-                      <Button key={link.text} asChild type="default" size="tiny">
+                      <Button key={link.text} asChild variant="default" size="tiny">
                         <Link href={link.url} className="text-xs text-light hover:text-foreground">
                           {link.text}
                         </Link>
@@ -240,7 +240,7 @@ export const ConnectionPanel = ({
                 className="group/collapse w-full justify-start rounded-t-none !last:rounded-b group-data-open:rounded-b-none border-muted"
               >
                 <Button
-                  type="default"
+                  variant="default"
                   size="tiny"
                   className="text-foreground-lighter bg-dash-sidebar!"
                   icon={

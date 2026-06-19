@@ -176,7 +176,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
       <DropdownMenu open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger asChild>
           <Button
-            type="default"
+            variant="default"
             size="tiny"
             className="shrink-0"
             iconRight={
@@ -227,7 +227,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
           <DropdownMenuSeparator />
           <div className="p-1">
             <Button
-              type="default"
+              variant="default"
               size="tiny"
               className="w-full"
               onClick={() => {

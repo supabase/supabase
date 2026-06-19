@@ -249,7 +249,7 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
       <div className="flex items-center justify-between">
         <Label className="text-foreground text-sm">{label}</Label>
         <Button
-          type="default"
+          variant="default"
           size="tiny"
           icon={<Plus size={14} />}
           onClick={() => addKeyValuePair(type)}
@@ -293,7 +293,7 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
             <div className="flex items-center justify-center">
               {(type === 'headers' ? headerFields : queryParamFields).length > 1 && (
                 <Button
-                  type="text"
+                  variant="text"
                   size="tiny"
                   icon={<X strokeWidth={1.5} size={14} />}
                   className="w-6 h-6"
@@ -472,8 +472,8 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
                 />
                 <ShortcutTooltip shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_SUBMIT_TEST} side="top">
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     loading={isPending}
                     disabled={isPending}
                     onClick={() =>

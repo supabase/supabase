@@ -145,12 +145,12 @@ export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) =>
           </Form>
         </DialogSection>
         <DialogFooter>
-          <Button type="default" onClick={onClose} disabled={isPending}>
+          <Button variant="default" onClick={onClose} disabled={isPending}>
             Cancel
           </Button>
           <Button
-            type="primary"
-            htmlType="submit"
+            variant="primary"
+            type="submit"
             form={FORM_ID}
             disabled={isPending}
             loading={isPending}

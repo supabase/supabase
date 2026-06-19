@@ -124,7 +124,7 @@ const BuildingState = () => {
                           If your dashboard hasn't connected within 2 minutes, you can open a
                           support ticket.
                         </p>
-                        <Button asChild type="default">
+                        <Button asChild variant="default">
                           <SupportLink>Contact support team</SupportLink>
                         </Button>
                       </>

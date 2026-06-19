@@ -74,7 +74,7 @@ export const FeatureBanner = ({
       {dismissable && storageKey && (
         <div className={cn('absolute top-3 right-3', dismissClassName)}>
           <Button
-            type="text"
+            variant="text"
             size="tiny"
             icon={<X size={16} strokeWidth={1.5} />}
             onClick={() => setIsDismissed(true)}
