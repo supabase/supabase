@@ -133,7 +133,7 @@ export function WarehouseEnablementModal({
                   <div className="rounded-md border bg-surface-75 px-4 py-3 text-sm">
                     <div className="flex items-center justify-between gap-4">
                       <span className="text-foreground-light">Table</span>
-                      <span className="font-mono text-foreground">{tableKey}</span>
+                      <code className="text-code-inline">{tableKey}</code>
                     </div>
                   </div>
                   <Admonition type="warning" title="Heap storage will be replaced">

@@ -62,8 +62,8 @@ export function WarehouseDetachModal({
         <DialogHeader>
           <DialogTitle>Detach Warehouse copy</DialogTitle>
           <DialogDescription>
-            Removing <span className="font-mono text-foreground">{copyName}</span>. The Postgres
-            source table is not affected.
+            Removing <code className="text-code-inline">{copyName}</code>. The Postgres source table
+            is not affected.
           </DialogDescription>
         </DialogHeader>
         <DialogSection className="flex flex-col items-center gap-3 py-8">
