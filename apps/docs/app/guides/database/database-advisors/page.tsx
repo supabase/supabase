@@ -25,7 +25,7 @@ const meta = {
 }
 
 const generateMetadata = genGuideMeta(() => ({
-  pathname: '/guides/database/database-linter',
+  pathname: '/guides/database/database-advisors',
   meta,
 }))
 

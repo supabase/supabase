@@ -23,6 +23,16 @@ const HIGHLIGHTS = [
     ],
     cta: { label: 'Learn more', href: '/docs/guides/auth/enterprise-sso/auth-sso-saml' },
   },
+  {
+    title: 'Custom OIDC Providers',
+    features: [
+      'OpenID Connect support for any identity provider',
+      'Connect to Auth0, Keycloak, Amazon Cognito, and more',
+      'PKCE security by default',
+      'Configure providers from the Dashboard or API',
+    ],
+    cta: { label: 'Learn more', href: '/features/custom-oidc-providers' },
+  },
 ]
 
 export function HighlightsSection() {
@@ -38,7 +48,7 @@ export function HighlightsSection() {
       </div>
 
       <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {HIGHLIGHTS.map((highlight) => (
             <div
               key={highlight.title}
@@ -57,7 +67,7 @@ export function HighlightsSection() {
                   </ul>
                 </div>
                 <div className="mt-6">
-                  <Button type="default" size="small" asChild>
+                  <Button variant="default" size="small" asChild>
                     <Link href={highlight.cta.href}>{highlight.cta.label}</Link>
                   </Button>
                 </div>

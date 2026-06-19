@@ -136,7 +136,7 @@ const getContent = async ({ slug }: Params) => {
 
   return {
     pathname:
-      `/guides/platform/terraform${slug?.length ? `/${slug.join('/')}` : ''}` satisfies `/${string}`,
+      `/guides/deployment/terraform${slug?.length ? `/${slug.join('/')}` : ''}` satisfies `/${string}`,
     meta,
     content,
     editLink,

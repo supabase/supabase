@@ -24,7 +24,7 @@ function TerminalAnimation() {
 
   useEffect(() => {
     if (!inView) return
-    const timeouts: ReturnType[] = []
+    const timeouts: ReturnType<typeof setTimeout>[] = []
     TERMINAL_LINES.forEach((line, i) => {
       timeouts.push(setTimeout(() => setVisibleCount(i + 1), line.delay * 1000))
     })
@@ -82,7 +82,7 @@ export function CTASection() {
           <Button asChild size="medium">
             <Link href="https://supabase.com/dashboard">Start your project</Link>
           </Button>
-          <Button asChild size="medium" type="default">
+          <Button asChild size="medium" variant="default">
             <Link href="/docs/guides/functions/quickstart">Quickstart guide</Link>
           </Button>
         </div>

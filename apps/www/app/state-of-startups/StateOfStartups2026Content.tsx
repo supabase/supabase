@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { forwardRef, useEffect, useRef, useState, type RefObject } from 'react'
 import { Button, cn } from 'ui'
 
+import { ParticipantsCarousel } from './components/ParticipantsCarousel'
 import { StateOfStartupsAuroraHeader } from './components/StateOfStartupsAuroraHeader'
 import {
   SurveyDataProvider,
@@ -263,6 +264,13 @@ export default function StateOfStartups2026Content({
               title={chapter.title}
               description={chapter.description}
               pullQuote={chapter.pullQuote}
+              pullQuoteCarousel={
+                (
+                  chapter as {
+                    pullQuoteCarousel?: Parameters<typeof SurveyChapter>[0]['pullQuoteCarousel']
+                  }
+                ).pullQuoteCarousel
+              }
             >
               {chapter.sections.map((section, sectionIndex) => (
                 <SurveyChapterSection
@@ -274,6 +282,13 @@ export default function StateOfStartups2026Content({
                   wordCloud={section.wordCloud}
                   summarizedAnswer={section.summarizedAnswer}
                   rankedAnswersPair={section.rankedAnswersPair}
+                  pullQuote={
+                    (
+                      section as {
+                        pullQuote?: Parameters<typeof SurveyChapterSection>[0]['pullQuote']
+                      }
+                    ).pullQuote
+                  }
                   newInYear={(section as { newInYear?: 2025 | 2026 }).newInYear}
                 />
               ))}
@@ -289,37 +304,16 @@ export default function StateOfStartups2026Content({
 
 // Component for the participants list
 const ParticipantsList = () => {
-  const [shuffledParticipants, setShuffledParticipants] = useState(pageData.participantsList)
-
-  useEffect(() => {
-    // Simple shuffle after mount, no animation because it's at the bottom of the page
-    const shuffled = [...pageData.participantsList].sort(() => Math.random() - 0.5)
-    setShuffledParticipants(shuffled)
-  }, [])
-
   return (
-    <section className="flex flex-col items-center gap-12 md:gap-20 px-4 py-20 md:py-28 text-center border-b border-muted">
-      <div className="flex flex-col items-center gap-4 max-w-prose">
+    <section className="flex flex-col items-center gap-12 md:gap-20 py-20 md:py-28 text-center border-b border-muted">
+      <div className="flex flex-col items-center gap-4 max-w-prose px-4">
         <h2 className="text-foreground text-3xl text-balance">Thank you</h2>
         <p className="text-foreground-light text-lg text-balance max-w-prose">
           A special thanks to the following companies for participating in this year's survey.
         </p>
       </div>
 
-      <ul className="flex flex-wrap items-center justify-center gap-5 md:gap-7 max-w-7xl mx-auto px-4">
-        {shuffledParticipants.map((participant, index) => (
-          <li key={participant.company} className="">
-            <Link
-              href={participant.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs md:text-sm font-mono text-center tracking-widest uppercase text-foreground-lighter hover:text-brand-link transition-colors"
-            >
-              {participant.company}
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <ParticipantsCarousel participants={pageData.participantsList} />
     </section>
   )
 }
@@ -358,7 +352,7 @@ const CTABanner = forwardRef<HTMLElement>((props, ref) => {
             Start your project
           </Link>
         </Button>
-        <Button asChild size="medium" type="default">
+        <Button asChild size="medium" variant="default">
           <Link
             href="/contact/sales"
             onClick={() =>

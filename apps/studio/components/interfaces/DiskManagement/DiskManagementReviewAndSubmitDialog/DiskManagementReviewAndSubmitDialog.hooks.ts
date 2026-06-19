@@ -120,7 +120,6 @@ export function useDiskManagementReviewChanges(
 
   // --- Derived predicates ---
 
-  const storageTypeBefore = (form.formState.defaultValues?.storageType ?? '') as DiskType
   const storageTypeAfter = form.getValues('storageType') as DiskType
 
   // Show hero whenever any line-item price actually changes, not just compute
@@ -132,12 +131,14 @@ export function useDiskManagementReviewChanges(
   // Show cooldown warning whenever any disk attribute that enforces the 4-hour lock changes
   const anyDiskAttributeChange = hasIOPSChanges || hasStorageTypeChanges || hasTotalSizeChanges
 
-  // Show throughput row whenever either the before or after storage type is GP3
-  // (covers GP3→IO2 where the throughput charge drops to zero)
+  // Throughput is only a user-configurable, separately-billed attribute for GP3. For IO2 it is
+  // derived from provisioned IOPS (0.256 MiB/s per IOPS) and isn't surfaced as its own value, so
+  // the form clears it to 0 — rendering a misleading "→ 0 MB/s". Only show the row when the
+  // resulting storage type is GP3; any GP3→IO2 throughput price delta still lands in the total.
   const showThroughputRow =
     !isAwsK8sProject &&
     !isAwsNimbus &&
-    (storageTypeBefore === 'gp3' || storageTypeAfter === 'gp3') &&
+    storageTypeAfter === 'gp3' &&
     (hasThroughputChanges || hasStorageTypeChanges)
 
   const hasAnyBreakdownRows =

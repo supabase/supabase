@@ -24,6 +24,7 @@ import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresC
 import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewColumnRenderer'
 import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
 import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
+import MultigresColumnRender from './LogColumnRenderers/MultigresColumnRender'
 import type { LogData, LogQueryError, QueryType } from './Logs.types'
 import {
   formatLogsAsCsv,
@@ -265,6 +266,9 @@ export const LogTable = ({
       case 'pg_cron':
         columns = DatabasePostgresColumnRender
         break
+      case 'multigres':
+        columns = MultigresColumnRender
+        break
       default:
         if (firstRow && isDefaultLogPreviewFormat(firstRow)) {
           columns = DefaultPreviewColumnRenderer
@@ -467,7 +471,7 @@ export const LogTable = ({
     >
       <div className="flex items-center gap-2">
         <DownloadResultsButton
-          type="text"
+          variant="text"
           text={`Results ${data && data.length ? `(${data.length})` : ''}`}
           results={data}
           fileName={`supabase-logs-${ref}.csv`}
@@ -478,7 +482,7 @@ export const LogTable = ({
       {showHistogramToggle && (
         <div className="flex items-center gap-2">
           <Button
-            type="default"
+            variant="default"
             icon={isHistogramShowing ? <Eye /> : <EyeOff />}
             onClick={onHistogramToggle}
           >
@@ -487,10 +491,10 @@ export const LogTable = ({
         </div>
       )}
 
-      <div className="space-x-2">
+      <div className="gap-x-2 flex items-center">
         {IS_PLATFORM && (
           <ButtonTooltip
-            type="default"
+            variant="default"
             onClick={onSave}
             loading={isSaving}
             disabled={!canCreateLogQuery || !hasEditorValue}
@@ -508,7 +512,7 @@ export const LogTable = ({
         )}
         <Button
           title="run-logs-query"
-          type={hasEditorValue ? 'primary' : 'alternative'}
+          variant={hasEditorValue ? 'primary' : 'alternative'}
           disabled={!hasEditorValue}
           onClick={onRun}
           iconRight={<Play size={12} />}
@@ -600,7 +604,7 @@ export const LogTable = ({
             <DataGrid
               role="table"
               style={{ flex: '1 1 0%', minHeight: 0 }}
-              className={cn('border-0', {
+              className={cn('border-t-0! border-b-0!', {
                 'data-grid--simple-logs': queryType,
                 'data-grid--logs-explorer': !queryType,
               })}

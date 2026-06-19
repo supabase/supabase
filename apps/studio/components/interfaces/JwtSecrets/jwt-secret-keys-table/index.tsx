@@ -48,6 +48,7 @@ import { useLegacyJWTSigningKeyCreateMutation } from '@/data/jwt-signing-keys/le
 import { useLegacyJWTSigningKeyQuery } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 type DialogType = 'legacy' | 'create' | 'rotate' | 'key-details' | 'revoke' | 'delete'
 
@@ -195,7 +196,7 @@ export const JWTSecretKeysTable = () => {
                 onClick={() => setShownDialog('rotate')}
                 loading={isUpdatingJWTSigningKey}
                 icon={<RotateCw className="size-4" />}
-                type="primary"
+                variant="primary"
               />
             ) : (
               <ActionPanel
@@ -204,8 +205,9 @@ export const JWTSecretKeysTable = () => {
                 buttonLabel="Create Standby Key"
                 onClick={() => setShownDialog('create')}
                 loading={isPendingMutation}
-                type="primary"
+                variant="primary"
                 icon={<Timer className="size-4" />}
+                shortcutId={SHORTCUT_IDS.JWT_KEYS_CREATE_STANDBY}
               />
             )}
           </>

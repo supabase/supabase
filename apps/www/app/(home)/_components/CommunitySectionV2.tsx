@@ -23,11 +23,14 @@ export function CommunitySectionV2() {
   const [page, setPage] = useState(0)
 
   useEffect(() => {
+    if (topTweets.length === 0) return
     const interval = setInterval(() => {
       setPage((p) => p + 1)
     }, 10000)
     return () => clearInterval(interval)
   }, [])
+
+  if (topTweets.length === 0) return null
 
   const currentTweets = Array.from({ length: TWEETS_PER_PAGE }, (_, i) => {
     const idx = (page * TWEETS_PER_PAGE + i) % topTweets.length
@@ -44,7 +47,7 @@ export function CommunitySectionV2() {
           <p className="text-foreground-lighter text-center text-sm">
             Discover what our community has to say about their Supabase experience.
           </p>
-          <Button asChild type="default" size="small" className="mt-2">
+          <Button asChild variant="default" size="small" className="mt-2">
             <Link href="https://discord.supabase.com/" target="_blank">
               Join us on Discord
             </Link>
@@ -63,10 +66,7 @@ export function CommunitySectionV2() {
           }}
         >
           <AnimatePresence mode="popLayout" initial={false}>
-            <motion.div
-              key={page}
-              className="grid grid-cols-2 md:grid-cols-5 gap-2 -mx-4"
-            >
+            <motion.div key={page} className="grid grid-cols-2 md:grid-cols-5 gap-2 -mx-4">
               {columns.map((col, colIdx) => (
                 <div
                   key={colIdx}

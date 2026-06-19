@@ -30,6 +30,8 @@ import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const logsUpgradeError = 'upgrade to Team or Enterprise Plan to access audit logs.'
 
@@ -123,6 +125,10 @@ export const AuditLogs = () => {
 
   const shouldShowLoadingState =
     (isLoading && fetchStatus !== 'idle') || isLoadingPermissions || isLoadingEntitlements
+
+  useShortcut(SHORTCUT_IDS.ORG_AUDIT_LOGS_REFRESH, () => refetch(), {
+    enabled: !isLoading && !isRefetching && canReadAuditLogs,
+  })
 
   // This feature depends on the subscription tier of the user.
   // The API limits the logs to maximum of 62 days and 5 minutes so when the page is
@@ -230,7 +236,7 @@ export const AuditLogs = () => {
                   )}
                 </div>
                 <Button
-                  type="default"
+                  variant="default"
                   disabled={isLoading || isRefetching}
                   icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
                   onClick={() => refetch()}
@@ -295,7 +301,7 @@ export const AuditLogs = () => {
                           <p>Date</p>
 
                           <ButtonTooltip
-                            type="text"
+                            variant="text"
                             className="px-1"
                             icon={
                               dateSortDesc ? (
@@ -407,7 +413,7 @@ export const AuditLogs = () => {
                               )}
                             </Table.td>
                             <Table.td align="right">
-                              <Button type="default">View details</Button>
+                              <Button variant="default">View details</Button>
                             </Table.td>
                           </Table.tr>
                         )

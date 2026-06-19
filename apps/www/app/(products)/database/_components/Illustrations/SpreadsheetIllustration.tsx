@@ -11,16 +11,96 @@ const columns = [
 ]
 
 const rows = [
-  { id: 1, created_at: '2024-01-15 09:23:41+00', name: 'Alice Johnson', email: 'alice@example.com', role: 'admin', is_active: 'true', avatar_url: 'https://i.pravatar.cc/150?u=alice' },
-  { id: 2, created_at: '2024-01-15 10:45:12+00', name: 'Bob Smith', email: 'bob@example.com', role: 'editor', is_active: 'true', avatar_url: 'https://i.pravatar.cc/150?u=bob' },
-  { id: 3, created_at: '2024-02-03 14:12:08+00', name: 'Carol Williams', email: 'carol@example.com', role: 'viewer', is_active: 'false', avatar_url: 'https://i.pravatar.cc/150?u=carol' },
-  { id: 4, created_at: '2024-02-14 08:33:55+00', name: 'David Brown', email: 'david@example.com', role: 'editor', is_active: 'true', avatar_url: 'NULL' },
-  { id: 5, created_at: '2024-03-01 16:07:29+00', name: 'Eve Martinez', email: 'eve@example.com', role: 'admin', is_active: 'true', avatar_url: 'https://i.pravatar.cc/150?u=eve' },
-  { id: 6, created_at: '2024-03-10 11:52:44+00', name: 'Frank Lee', email: 'frank@example.com', role: 'viewer', is_active: 'true', avatar_url: 'https://i.pravatar.cc/150?u=frank' },
-  { id: 7, created_at: '2024-03-22 07:18:03+00', name: 'Grace Kim', email: 'grace@example.com', role: 'editor', is_active: 'false', avatar_url: 'https://i.pravatar.cc/150?u=grace' },
-  { id: 8, created_at: '2024-04-05 13:41:17+00', name: 'Henry Chen', email: 'henry@example.com', role: 'viewer', is_active: 'true', avatar_url: 'https://i.pravatar.cc/150?u=henry' },
-  { id: 9, created_at: '2024-04-12 09:05:33+00', name: 'Isla Patel', email: 'isla@example.com', role: 'admin', is_active: 'true', avatar_url: 'https://i.pravatar.cc/150?u=isla' },
-  { id: 10, created_at: '2024-04-18 15:22:07+00', name: 'Jack Rivera', email: 'jack@example.com', role: 'editor', is_active: 'false', avatar_url: 'NULL' },
+  {
+    id: 1,
+    created_at: '2024-01-15 09:23:41+00',
+    name: 'Alice Johnson',
+    email: 'alice@example.com',
+    role: 'admin',
+    is_active: 'true',
+    avatar_url: 'https://i.pravatar.cc/150?u=alice',
+  },
+  {
+    id: 2,
+    created_at: '2024-01-15 10:45:12+00',
+    name: 'Bob Smith',
+    email: 'bob@example.com',
+    role: 'editor',
+    is_active: 'true',
+    avatar_url: 'https://i.pravatar.cc/150?u=bob',
+  },
+  {
+    id: 3,
+    created_at: '2024-02-03 14:12:08+00',
+    name: 'Carol Williams',
+    email: 'carol@example.com',
+    role: 'viewer',
+    is_active: 'false',
+    avatar_url: 'https://i.pravatar.cc/150?u=carol',
+  },
+  {
+    id: 4,
+    created_at: '2024-02-14 08:33:55+00',
+    name: 'David Brown',
+    email: 'david@example.com',
+    role: 'editor',
+    is_active: 'true',
+    avatar_url: 'NULL',
+  },
+  {
+    id: 5,
+    created_at: '2024-03-01 16:07:29+00',
+    name: 'Eve Martinez',
+    email: 'eve@example.com',
+    role: 'admin',
+    is_active: 'true',
+    avatar_url: 'https://i.pravatar.cc/150?u=eve',
+  },
+  {
+    id: 6,
+    created_at: '2024-03-10 11:52:44+00',
+    name: 'Frank Lee',
+    email: 'frank@example.com',
+    role: 'viewer',
+    is_active: 'true',
+    avatar_url: 'https://i.pravatar.cc/150?u=frank',
+  },
+  {
+    id: 7,
+    created_at: '2024-03-22 07:18:03+00',
+    name: 'Grace Kim',
+    email: 'grace@example.com',
+    role: 'editor',
+    is_active: 'false',
+    avatar_url: 'https://i.pravatar.cc/150?u=grace',
+  },
+  {
+    id: 8,
+    created_at: '2024-04-05 13:41:17+00',
+    name: 'Henry Chen',
+    email: 'henry@example.com',
+    role: 'viewer',
+    is_active: 'true',
+    avatar_url: 'https://i.pravatar.cc/150?u=henry',
+  },
+  {
+    id: 9,
+    created_at: '2024-04-12 09:05:33+00',
+    name: 'Isla Patel',
+    email: 'isla@example.com',
+    role: 'admin',
+    is_active: 'true',
+    avatar_url: 'https://i.pravatar.cc/150?u=isla',
+  },
+  {
+    id: 10,
+    created_at: '2024-04-18 15:22:07+00',
+    name: 'Jack Rivera',
+    email: 'jack@example.com',
+    role: 'editor',
+    is_active: 'false',
+    avatar_url: 'NULL',
+  },
 ]
 
 const EDITED_ROW = 1
@@ -39,15 +119,9 @@ export function SpreadsheetIllustration() {
               >
                 <div className="flex items-center gap-1.5 overflow-hidden">
                   {col.isPrimaryKey && (
-                    <Key
-                      size={12}
-                      strokeWidth={2}
-                      className="text-brand rotate-45 shrink-0"
-                    />
+                    <Key size={12} strokeWidth={2} className="text-brand rotate-45 shrink-0" />
                   )}
-                  <span className="text-foreground text-xs truncate font-medium">
-                    {col.name}
-                  </span>
+                  <span className="text-foreground text-xs truncate font-medium">{col.name}</span>
                   <span className="text-foreground-light text-xs truncate">{col.format}</span>
                 </div>
               </th>

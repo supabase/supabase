@@ -6,6 +6,7 @@ import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { connectSchema } from './connect.schema'
 import type {
   ConnectionStringPooler,
   ConnectState,
@@ -190,8 +191,15 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
     !ipv4Addon &&
     (state.connectionMethod === 'direct' ||
       (state.connectionMethod === 'transaction' && !state.useSharedPooler))
+  const showSessionPoolerNotice =
+    deploymentMode.isPlatform && state.mode === 'direct' && state.connectionMethod === 'session'
 
   const showSelfHostedMcpNotice = deploymentMode.isSelfHosted && state.mode === 'mcp'
+
+  const customPrompt = useMemo(
+    () => connectSchema.modes.find((m) => m.id === state.mode)?.prompt,
+    [state.mode]
+  )
 
   if (steps.length === 0) return null
 
@@ -200,19 +208,25 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
       <div className="p-8 flex flex-col gap-y-6">
         <h3>Connect your app</h3>
 
-        <CopyPromptAdmonition stepsContainerRef={stepsContainerRef} />
-
         {showIpv4AddonNotice && (
           <Admonition
             type="default"
             title={`${state.connectionMethod === 'direct' ? 'Direct connections use' : 'Transaction pooler uses'} IPv6 by default`}
             description="Enable the dedicated IPv4 address add-on to connect from IPv4-only networks"
             actions={[
-              <Button asChild key="addon" type="default">
+              <Button asChild key="addon" variant="default">
                 <Link href={`/project/${ref}/settings/addons?panel=ipv4`}>Enable IPv4 add-on</Link>
               </Button>,
               <DocsButton key="docs" href={`${DOCS_URL}/guides/platform/ipv4-address`} />,
             ]}
+          />
+        )}
+
+        {showSessionPoolerNotice && (
+          <Admonition
+            type="default"
+            title="Only use Session Pooler on an IPv4 network"
+            description="Session pooler connections are IPv4 proxied for free. Use Direct Connection if connecting via an IPv6 network."
           />
         )}
 
@@ -229,6 +243,8 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
             ]}
           />
         )}
+
+        <CopyPromptAdmonition stepsContainerRef={stepsContainerRef} customPrompt={customPrompt} />
 
         <div className="mt-6" ref={stepsContainerRef}>
           {steps.map((step, index) => (

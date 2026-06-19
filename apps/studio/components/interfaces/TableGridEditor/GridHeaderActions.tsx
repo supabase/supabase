@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { Realtime } from 'icons'
 import { BookOpenText, Lightbulb, Lock, MoreVertical, PlusCircle, Unlock } from 'lucide-react'
 import Link from 'next/link'
@@ -47,10 +46,8 @@ import {
   isView as isTableLikeView,
 } from '@/data/table-editor/table-editor-types'
 import { useTableUpdateMutation } from '@/data/tables/table-update-mutation'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { DOCS_URL } from '@/lib/constants'
@@ -64,12 +61,9 @@ export interface GridHeaderActionsProps {
 }
 export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProps) => {
   const track = useTrack()
-  const { ref } = useParams()
   const appSnap = useAppStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
 
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
   const [realtimeDialogOpen, setRealtimeDialogOpen] = useState(false)
@@ -107,10 +101,14 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const showHeaderActions = snap.selectedRows.size === 0
 
   const projectRef = project?.ref
-  const { data } = useDatabasePoliciesQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const { data } = useDatabasePoliciesQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      schema: table.schema,
+    },
+    { enabled: !!table }
+  )
   const policies = (data ?? []).filter(
     (policy) => policy.schema === table.schema && policy.table === table.name
   )
@@ -156,16 +154,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
     appSnap.setActiveDocsSection(['entities', table.name])
     appSnap.setShowProjectApiDocs(true)
 
-    sendEvent({
-      action: 'api_docs_opened',
-      properties: {
-        source: 'table_editor',
-      },
-      groups: {
-        project: ref ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
-    })
+    track('api_docs_opened', { source: 'table_editor' })
   }
 
   const onToggleRLS = async () => {
@@ -215,7 +204,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                 {policies.length < 1 && !isSchemaLocked ? (
                   <ButtonTooltip
                     asChild
-                    type="default"
+                    variant="default"
                     className="group"
                     icon={<PlusCircle strokeWidth={1.5} className="text-foreground-muted" />}
                     tooltip={{
@@ -233,7 +222,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                 ) : (
                   <Button
                     asChild
-                    type={policies.length < 1 && !isSchemaLocked ? 'warning' : 'default'}
+                    variant={policies.length < 1 && !isSchemaLocked ? 'warning' : 'default'}
                     className="group"
                     icon={
                       isSchemaLocked || policies.length > 0 ? (
@@ -262,7 +251,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
             ) : tableHasLints ? (
               <Popover modal={false} open={showWarning} onOpenChange={setShowWarning}>
                 <PopoverTrigger asChild>
-                  <Button type="danger" icon={<Lock strokeWidth={1.5} />}>
+                  <Button variant="danger" icon={<Lock strokeWidth={1.5} />}>
                     RLS disabled
                   </Button>
                 </PopoverTrigger>
@@ -281,7 +270,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                     </p>
                     {!isSchemaLocked && (
                       <Button
-                        type="default"
+                        variant="default"
                         className="mt-2 w-min"
                         onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
                       >
@@ -310,7 +299,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
           {isForeignTable && table.schema === 'public' && (
             <Popover modal={false} open={showWarning} onOpenChange={setShowWarning}>
               <PopoverTrigger asChild>
-                <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
+                <Button variant="warning" icon={<Unlock strokeWidth={1.5} />}>
                   Unprotected Data API access
                 </Button>
               </PopoverTrigger>
@@ -326,7 +315,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                   </p>
 
                   <div className="mt-2">
-                    <Button type="default" asChild>
+                    <Button variant="default" asChild>
                       <Link
                         target="_blank"
                         href={`${DOCS_URL}/guides/database/extensions/wrappers/overview#security`}
@@ -345,7 +334,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                type="default"
+                variant="default"
                 icon={<MoreVertical />}
                 className="h-7 w-7"
                 aria-label="More actions"

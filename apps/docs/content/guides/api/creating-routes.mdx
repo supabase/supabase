@@ -8,7 +8,7 @@ API routes are automatically created when you create Postgres Tables, Views, or 
 
 ## Create a table
 
-Let's create our first API route by creating a table called `todos` to store tasks.
+Create your first API route by creating a table called `todos` to store tasks.
 This creates a corresponding route `todos` which can accept `GET`, `POST`, `PATCH`, & `DELETE` requests.
 
 <Tabs
@@ -66,16 +66,7 @@ Every Supabase project has a unique API URL. Your API is secured behind an API g
 
 To do this, you need to get the Project URL and key from [the project's **Connect** dialog](/dashboard/project/_?showConnect=true).
 
-<Admonition type="note" title="Changes to API keys">
-
-Supabase is changing the way keys work to improve project security and developer experience. You can [read the full announcement](https://github.com/orgs/supabase/discussions/29260), but in the transition period, you can use both the current `anon` and `service_role` keys and the new publishable key with the form `sb_publishable_xxx` which will replace the older keys.
-
-In most cases, you can get the correct key from [the Project's **Connect** dialog](/dashboard/project/_?showConnect=true), but if you want a specific key, you can find all keys in [the API Keys section of a Project's Settings page](/dashboard/project/_/settings/api-keys/):
-
-- **For legacy keys**, copy the `anon` key for client-side operations and the `service_role` key for server-side operations from the **Legacy API Keys** tab.
-- **For new keys**, open the **API Keys** tab, if you don't have a publishable key already, click **Create new API Keys**, and copy the value from the **Publishable key** section.
-
-</Admonition>
+<$Partial path="api_keys_deprecation.mdx" variables={{ "framework": "{{ .framework }}", "tab": "{{ .tab }}" }} />
 
 [Read the API keys docs](/docs/guides/getting-started/api-keys) for a full explanation of all key types and their uses.
 
@@ -87,7 +78,7 @@ Both of these routes require the key to be passed through an `apikey` header.
 
 You can interact with your API directly via HTTP requests, or you can use the client libraries which we provide.
 
-Let's see how to make a request to the `todos` table which we created in the first step,
+See how to make a request to the `todos` table which we created in the first step,
 using the API URL (`SUPABASE_URL`) and Key (`SUPABASE_PUBLISHABLE_KEY`) we provided:
 
 <Tabs

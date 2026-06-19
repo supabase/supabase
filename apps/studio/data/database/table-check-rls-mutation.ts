@@ -2,7 +2,7 @@ import { getTablesRlsEnabledStatusSQL } from '@supabase/pg-meta'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from '../sql/execute-sql-query'
+import { executeSql } from '../sql/execute-sql-mutation'
 import { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type CheckTableRLSStatusVariables = {

@@ -1,14 +1,14 @@
 import { useState } from 'react'
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react'
+import { Button, Tabs } from 'ui'
 
-import { Tabs, Button, Space } from 'ui'
 import CodeBlock from '../CodeBlock/CodeBlock'
-
 // Import Swiper styles
 import 'swiper/css'
-import { Badge } from 'ui'
+
 import Link from 'next/link'
+import { Badge } from 'ui'
 
 interface Content {
   lang: 'js' | 'py' | 'sql'
@@ -54,7 +54,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
         </p>
       </p>
       <p>
-        <Button type="outline">View documentation</Button>
+        <Button variant="outline">View documentation</Button>
       </p>
     </div>
   )
@@ -122,9 +122,9 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
                   </span>
                 </p>
                 <p className="p mb-6 block">{extension.detail_text}</p>
-                <Space className="justify-between">
+                <div>
                   {extension.url && (
-                    <Button asChild type="default">
+                    <Button asChild variant="default">
                       <Link href={extension.url} as={extension.url} className="ml-px">
                         View documentation
                       </Link>
@@ -137,7 +137,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
                         return <Badge key={badge}>{badge}</Badge>
                       })}
                   </div>
-                </Space>
+                </div>
               </SwiperSlide>
             )
           })}

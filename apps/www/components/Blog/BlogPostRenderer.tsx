@@ -183,7 +183,7 @@ const BlogPostRenderer = async ({
             </div>
 
             {/* Row 2: Hero image — col-start-1 col-span-9 = equal overhang each side of content (col 2–8) */}
-            {!blogMetaData.youtubeHero && blogMetaData.imgThumb && (
+            {!blogMetaData.youtubeHero && blogMetaData.imgThumb && imageUrl && (
               <div className="col-span-12 xl:row-start-2 xl:col-start-1 xl:col-span-9 mb-6">
                 <div className="relative w-full aspect-[1.91/1] overflow-hidden rounded-lg border border-foreground/10">
                   <Image

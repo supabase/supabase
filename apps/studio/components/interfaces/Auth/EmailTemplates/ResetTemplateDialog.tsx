@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import {
   AlertDialog,
+  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -39,23 +40,18 @@ export const ResetTemplateDialog = ({
   const { id } = template
   const templateType = getAuthTemplateType(id)
 
-  const { mutate: resetAuthTemplate, isPending: isResettingTemplate } =
-    useAuthTemplateResetMutation()
+  const { mutate: resetAuthTemplate, isPending: isResetting } = useAuthTemplateResetMutation()
 
-  const resetTemplateToDefault = () => {
-    if (!projectRef) return console.error('Project ref is required')
-    if (!templateType) return console.error('Template type is required')
+  const resetTemplateToDefault = async () => {
+    if (!projectRef) throw new Error('Project ref is required')
+    if (!templateType) throw new Error('Template type is required')
 
     resetAuthTemplate(
-      {
-        projectRef,
-        template: templateType,
-      },
+      { projectRef, template: templateType },
       {
         onSuccess: (config) => {
           toast.success('Email template reset to default')
           onResetSuccess(config)
-          setOpen(false)
         },
       }
     )
@@ -64,7 +60,7 @@ export const ResetTemplateDialog = ({
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <Button type="default" htmlType="button" disabled={!canUpdateConfig || isResettingTemplate}>
+        <Button variant="default" type="button" disabled={!canUpdateConfig}>
           Reset template
         </Button>
       </AlertDialogTrigger>
@@ -78,10 +74,17 @@ export const ResetTemplateDialog = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isResettingTemplate}>Cancel</AlertDialogCancel>
-          <Button type="warning" onClick={resetTemplateToDefault} loading={isResettingTemplate}>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            variant="warning"
+            loading={isResetting}
+            onClick={(e) => {
+              e.preventDefault()
+              resetTemplateToDefault()
+            }}
+          >
             Reset
-          </Button>
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

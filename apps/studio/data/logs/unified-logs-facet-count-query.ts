@@ -4,7 +4,7 @@ import { useFlag } from 'common'
 import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
 import { logsAllEndpointUrl } from './logs-endpoint'
-import { bqIdent, safeSql } from './safe-analytics-sql'
+import { quotedIdent, safeSql } from './safe-analytics-sql'
 import {
   getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
@@ -16,8 +16,7 @@ import {
   getUnifiedLogsCTE,
 } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
-import { ExecuteSqlError } from '@/data/sql/execute-sql-query'
-import { UseCustomQueryOptions } from '@/types'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type UnifiedLogsFacetCountVariables = UnifiedLogsVariables & {
   facet: string
@@ -34,12 +33,14 @@ export async function getUnifiedLogsFacetCount(
   }
 
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
+  const cteName = quotedIdent(facet.replaceAll('.', '_') + '_count')
+
   const sql = useOtel
     ? getFacetCountQuery({ search, facet, facetSearch })
     : safeSql`
 ${getUnifiedLogsCTE()},
-${getFacetCountCTE({ search, facet, facetSearch })}
-SELECT dimension, value, count from ${bqIdent(facet + '_count')};
+${getFacetCountCTE({ search, facet, facetSearch, cteName })}
+SELECT dimension, value, count from ${cteName};
 `
 
   const endpoint = logsAllEndpointUrl(useOtel)
@@ -55,7 +56,7 @@ SELECT dimension, value, count from ${bqIdent(facet + '_count')};
 }
 
 export type UnifiedLogsFacetCountData = Awaited<ReturnType<typeof getUnifiedLogsFacetCount>>
-export type UnifiedLogsFacetCountError = ExecuteSqlError
+export type UnifiedLogsFacetCountError = ResponseError
 
 export const useUnifiedLogsFacetCountQuery = <TData = UnifiedLogsFacetCountData>(
   { projectRef, search, facet, facetSearch }: UnifiedLogsFacetCountVariables,

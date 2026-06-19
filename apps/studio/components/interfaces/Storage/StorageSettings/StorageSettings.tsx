@@ -462,8 +462,8 @@ export const StorageSettings = () => {
                         <CardFooter className="justify-end space-x-2">
                           {form.formState.isDirty && (
                             <Button
-                              type="default"
-                              htmlType="reset"
+                              variant="default"
+                              type="reset"
                               onClick={() => form.reset()}
                               disabled={
                                 !form.formState.isDirty || !canUpdateStorageSettings || isUpdating
@@ -473,8 +473,8 @@ export const StorageSettings = () => {
                             </Button>
                           )}
                           <Button
-                            type={hasLimitedStorageAccess ? 'default' : 'primary'}
-                            htmlType="submit"
+                            variant={hasLimitedStorageAccess ? 'default' : 'primary'}
+                            type="submit"
                             loading={isUpdating}
                             disabled={
                               !canUpdateStorageSettings || isUpdating || !form.formState.isDirty

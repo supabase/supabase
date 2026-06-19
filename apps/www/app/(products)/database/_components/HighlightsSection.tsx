@@ -3,7 +3,15 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Badge, Button } from 'ui'
 
-const HIGHLIGHTS = [
+type Highlight = {
+  title: string
+  badge?: string
+  features: string[]
+  cta: { label: string; href: string }
+  image: { dark: string; light: string }
+}
+
+const HIGHLIGHTS: Highlight[] = [
   {
     title: 'Branching',
     features: [
@@ -69,7 +77,7 @@ export function HighlightsSection() {
                   </ul>
                 </div>
                 <div className="mt-6">
-                  <Button type="default" size="small" asChild>
+                  <Button variant="default" size="small" asChild>
                     <Link href={highlight.cta.href}>{highlight.cta.label}</Link>
                   </Button>
                 </div>

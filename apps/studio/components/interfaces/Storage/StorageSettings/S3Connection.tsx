@@ -220,8 +220,8 @@ export const S3Connection = () => {
                     <CardFooter className="justify-end space-x-2">
                       {form.formState.isDirty && (
                         <Button
-                          type="default"
-                          htmlType="reset"
+                          variant="default"
+                          type="reset"
                           onClick={() => form.reset()}
                           disabled={
                             !form.formState.isDirty || !canUpdateStorageSettings || isUpdating
@@ -231,8 +231,8 @@ export const S3Connection = () => {
                         </Button>
                       )}
                       <Button
-                        type="primary"
-                        htmlType="submit"
+                        variant="primary"
+                        type="submit"
                         loading={isUpdating}
                         disabled={
                           !form.formState.isDirty || !canUpdateStorageSettings || isUpdating
@@ -250,7 +250,7 @@ export const S3Connection = () => {
                       To connect to your S3 bucket, you need to restore your project.
                     </AlertDescription>
                     <div className="mt-3 flex items-center space-x-2">
-                      <Button asChild type="default">
+                      <Button asChild variant="default">
                         <Link href={`/project/${projectRef}`}>Restore project</Link>
                       </Button>
                     </div>
@@ -287,7 +287,7 @@ export const S3Connection = () => {
                   To fetch your S3 access keys, you need to restore your project.
                 </AlertDescription>
                 <AlertDescription>
-                  <Button asChild type="default" className="mt-3">
+                  <Button asChild variant="default" className="mt-3">
                     <Link href={`/project/${projectRef}`}>Restore project</Link>
                   </Button>
                 </AlertDescription>

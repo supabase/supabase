@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { ArrowUp, ChevronDown, FileText } from 'lucide-react'
 import {
   Button,
@@ -11,17 +10,15 @@ import {
 } from 'ui'
 
 import { ShortcutBadge } from '@/components/ui/ShortcutBadge'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export const InsertButton = () => {
-  const { ref: projectRef } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
 
   const snap = useTableEditorTableStateSnapshot()
   const tableEditorSnap = useTableEditorStateSnapshot()
@@ -29,7 +26,6 @@ export const InsertButton = () => {
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'columns'
   )
-  const { mutate: sendEvent } = useSendEventMutation()
 
   const onAddRow =
     snap.editable && (snap.table.columns ?? []).length > 0 ? tableEditorSnap.onAddRow : undefined
@@ -58,7 +54,7 @@ export const InsertButton = () => {
       <DropdownMenuTrigger asChild>
         <Button
           data-testid="table-editor-insert-new-row"
-          type="primary"
+          variant="primary"
           size="tiny"
           icon={<ChevronDown strokeWidth={1.5} />}
         >
@@ -120,14 +116,7 @@ export const InsertButton = () => {
                   className="group gap-x-3"
                   onClick={() => {
                     onImportData()
-                    sendEvent({
-                      action: 'import_data_button_clicked',
-                      properties: { tableType: 'Existing Table' },
-                      groups: {
-                        project: projectRef ?? 'Unknown',
-                        organization: org?.slug ?? 'Unknown',
-                      },
-                    })
+                    track('import_data_button_clicked', { tableType: 'Existing Table' })
                   }}
                 >
                   <div className="relative shrink-0 w-4">

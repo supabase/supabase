@@ -34,7 +34,7 @@ const CollapsibleAlert = React.forwardRef<HTMLDivElement, CollapsibleAlertProps>
           <span className="font-medium">{trigger}</span>
           <CollapsibleTrigger asChild>
             <Button
-              type="outline"
+              variant="outline"
               size="tiny"
               className={cn('px-0! w-[26px]', '[&[data-state=open]_svg]:rotate-180')}
               aria-label="Toggle"

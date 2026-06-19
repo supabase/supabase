@@ -150,7 +150,7 @@ export const Addons = () => {
           Contact support for further assistance.
         </AlertDescription>
         <div className="mt-4">
-          <Button type="default" asChild>
+          <Button variant="default" asChild>
             <SupportLink>Contact support</SupportLink>
           </Button>
         </div>
@@ -164,7 +164,7 @@ export const Addons = () => {
           <p className="text-sm leading-normal mb-2">
             Reach out to us via support if you're interested
           </p>
-          <Button asChild type="default">
+          <Button asChild variant="default">
             <SupportLink
               queryParams={{
                 projectRef,

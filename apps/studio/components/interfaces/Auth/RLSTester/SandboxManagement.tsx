@@ -16,7 +16,7 @@ export const SandboxManagement = () => {
         layout="horizontal"
         className="min-h-min border-none [&>div>div>div>div>p]:!mb-0"
         actions={[
-          <Button key="set-up" type="default" onClick={() => startSandbox()}>
+          <Button key="set-up" variant="default" onClick={() => startSandbox()}>
             Set up sandbox
           </Button>,
         ]}
@@ -58,7 +58,7 @@ export const SandboxManagement = () => {
         description={error ?? 'Please try again'}
         className="min-h-min border-none"
         actions={[
-          <Button key="set-up" type="default" onClick={() => startSandbox()}>
+          <Button key="set-up" variant="default" onClick={() => startSandbox()}>
             Retry set up
           </Button>,
         ]}
@@ -75,7 +75,7 @@ export const SandboxManagement = () => {
       actions={[
         <ButtonTooltip
           key="destroy"
-          type="default"
+          variant="default"
           icon={<LogOut />}
           className="w-7"
           disabled={isSyncing}
@@ -84,7 +84,7 @@ export const SandboxManagement = () => {
         />,
         <ButtonTooltip
           key="refresh"
-          type="default"
+          variant="default"
           icon={<RefreshCw />}
           className="w-7"
           loading={isSyncing}

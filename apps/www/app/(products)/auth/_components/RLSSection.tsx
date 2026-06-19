@@ -9,9 +9,15 @@ const supabaseDark: ThemeRegistration = {
     'editor.foreground': '#ffffff',
   },
   tokenColors: [
-    { scope: ['keyword', 'storage', 'storage.type', 'storage.modifier'], settings: { foreground: '#bda4ff' } },
+    {
+      scope: ['keyword', 'storage', 'storage.type', 'storage.modifier'],
+      settings: { foreground: '#bda4ff' },
+    },
     { scope: ['entity.name.function', 'support.function'], settings: { foreground: '#3ecf8e' } },
-    { scope: ['constant', 'variable.other.constant', 'support.constant'], settings: { foreground: '#3ecf8e' } },
+    {
+      scope: ['constant', 'variable.other.constant', 'support.constant'],
+      settings: { foreground: '#3ecf8e' },
+    },
     { scope: ['string', 'string.quoted'], settings: { foreground: '#ffcda1' } },
     { scope: ['comment', 'punctuation.definition.comment'], settings: { foreground: '#7e7e7e' } },
     { scope: ['punctuation'], settings: { foreground: '#ffffff' } },
@@ -27,9 +33,15 @@ const supabaseLight: ThemeRegistration = {
     'editor.foreground': '#525252',
   },
   tokenColors: [
-    { scope: ['keyword', 'storage', 'storage.type', 'storage.modifier'], settings: { foreground: '#6b35dc' } },
+    {
+      scope: ['keyword', 'storage', 'storage.type', 'storage.modifier'],
+      settings: { foreground: '#6b35dc' },
+    },
     { scope: ['entity.name.function', 'support.function'], settings: { foreground: '#15593b' } },
-    { scope: ['constant', 'variable.other.constant', 'support.constant'], settings: { foreground: '#15593b' } },
+    {
+      scope: ['constant', 'variable.other.constant', 'support.constant'],
+      settings: { foreground: '#15593b' },
+    },
     { scope: ['string', 'string.quoted'], settings: { foreground: '#f1a10d' } },
     { scope: ['comment', 'punctuation.definition.comment'], settings: { foreground: '#7e7e7e' } },
     { scope: ['punctuation'], settings: { foreground: '#a0a0a0' } },

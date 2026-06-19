@@ -19,6 +19,45 @@ interface Props {
   showIconBg?: boolean
 }
 
+const IconBackground = ({
+  children,
+  showIconBg,
+}: {
+  children: React.ReactNode
+  showIconBg?: boolean
+}) => (
+  <div
+    className={cn(
+      'shrink-0',
+      showIconBg ? 'bg-surface-75 border w-8 h-8 flex items-center justify-center rounded-sm' : ''
+    )}
+  >
+    {children}
+  </div>
+)
+
+const LogoComponent = ({
+  logoImage,
+  className,
+  title,
+}: {
+  title: string
+  logoImage: string
+  className?: string
+}) => (
+  <div className="relative box-content p-8 pb-0">
+    <div className="relative h-[33px] w-auto max-w-[145px]">
+      <Image
+        src={logoImage}
+        alt={title}
+        fill
+        sizes="100%"
+        className={cn('object-contain object-left', className)}
+      />
+    </div>
+  </div>
+)
+
 export const GlassPanel = ({
   title,
   icon,
@@ -35,31 +74,6 @@ export const GlassPanel = ({
   const { resolvedTheme } = useTheme()
   const showLogoInverse = logoInverse && resolvedTheme?.includes('dark')
   const showLogo = !showLogoInverse && logo
-
-  const IconBackground: React.FC<React.PropsWithChildren> = (props) => (
-    <div
-      className={cn(
-        'shrink-0',
-        showIconBg ? 'bg-surface-75 border w-8 h-8 flex items-center justify-center rounded-sm' : ''
-      )}
-    >
-      {props.children}
-    </div>
-  )
-
-  const LogoComponent = ({ logoImage, className }: { logoImage: string; className?: string }) => (
-    <div className="relative box-content p-8 pb-0">
-      <div className="relative h-[33px] w-auto max-w-[145px]">
-        <Image
-          src={logoImage}
-          alt={title}
-          fill
-          sizes="100%"
-          className={cn('object-contain object-left', className)}
-        />
-      </div>
-    </div>
-  )
 
   return (
     <div
@@ -78,8 +92,10 @@ export const GlassPanel = ({
         className
       )}
     >
-      {showLogoInverse && <LogoComponent logoImage={logoInverse} className="opacity-50" />}
-      {showLogo && <LogoComponent logoImage={logo} className="opacity-75" />}
+      {showLogoInverse && (
+        <LogoComponent title={title} logoImage={logoInverse} className="opacity-50" />
+      )}
+      {showLogo && <LogoComponent title={title} logoImage={logo} className="opacity-75" />}
 
       {header && (
         <img
@@ -103,7 +119,7 @@ export const GlassPanel = ({
       >
         <div className="flex items-center gap-3">
           {icon && typeof icon === 'string' ? (
-            <IconBackground>
+            <IconBackground showIconBg={showIconBg}>
               <img
                 className="w-5"
                 alt={title}
@@ -113,7 +129,7 @@ export const GlassPanel = ({
               />
             </IconBackground>
           ) : (
-            icon && <IconBackground>{icon}</IconBackground>
+            icon && <IconBackground showIconBg={showIconBg}>{icon}</IconBackground>
           )}
           <p className="text-base text-foreground">{title}</p>
         </div>

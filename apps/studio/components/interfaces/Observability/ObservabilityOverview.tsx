@@ -68,6 +68,14 @@ export const ObservabilityOverview = () => {
   const serviceBase = useMemo(
     () => [
       {
+        key: 'data_api' as const,
+        name: 'API Gateway',
+        reportUrl: undefined,
+        logsUrl: `/project/${projectRef}/logs/edge-logs`,
+        enabled: isDataApiEnabled,
+        hasReport: false,
+      },
+      {
         key: 'db' as const,
         name: 'Database',
         reportUrl: `/project/${projectRef}/observability/database`,
@@ -76,12 +84,12 @@ export const ObservabilityOverview = () => {
         hasReport: true,
       },
       {
-        key: 'data_api' as const,
-        name: 'API Gateway',
-        reportUrl: undefined,
-        logsUrl: `/project/${projectRef}/logs/edge-logs`,
-        enabled: isDataApiEnabled,
-        hasReport: false,
+        key: 'postgrest' as const,
+        name: 'PostgREST',
+        reportUrl: `/project/${projectRef}/observability/postgrest`,
+        logsUrl: `/project/${projectRef}/logs/postgrest-logs`,
+        enabled: true,
+        hasReport: true,
       },
       {
         key: 'auth' as const,
@@ -100,14 +108,6 @@ export const ObservabilityOverview = () => {
         hasReport: true,
       },
       {
-        key: 'realtime' as const,
-        name: 'Realtime',
-        reportUrl: `/project/${projectRef}/observability/realtime`,
-        logsUrl: `/project/${projectRef}/logs/realtime-logs`,
-        enabled: true,
-        hasReport: true,
-      },
-      {
         key: 'storage' as const,
         name: 'Storage',
         reportUrl: `/project/${projectRef}/observability/storage`,
@@ -116,10 +116,10 @@ export const ObservabilityOverview = () => {
         hasReport: true,
       },
       {
-        key: 'postgrest' as const,
-        name: 'PostgREST',
-        reportUrl: `/project/${projectRef}/observability/postgrest`,
-        logsUrl: `/project/${projectRef}/logs/postgrest-logs`,
+        key: 'realtime' as const,
+        name: 'Realtime',
+        reportUrl: `/project/${projectRef}/observability/realtime`,
+        logsUrl: `/project/${projectRef}/logs/realtime-logs`,
         enabled: true,
         hasReport: true,
       },
@@ -168,7 +168,7 @@ export const ObservabilityOverview = () => {
             label="Refresh report"
             side="bottom"
           >
-            <Button type="outline" icon={<RefreshCw size={14} />} onClick={handleRefresh}>
+            <Button variant="outline" icon={<RefreshCw size={14} />} onClick={handleRefresh}>
               Refresh
             </Button>
           </ShortcutTooltip>

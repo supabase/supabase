@@ -49,11 +49,10 @@ import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useEdgeFunctionBodyQuery } from '@/data/edge-functions/edge-function-body-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 dayjs.extend(relativeTime)
@@ -67,9 +66,8 @@ const EdgeFunctionDetailsLayout = ({
   children,
 }: PropsWithChildren<EdgeFunctionDetailsLayoutProps>) => {
   const router = useRouter()
-  const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
   const { functionSlug, ref } = useParams()
-  const { mutate: sendEvent } = useSendEventMutation()
 
   const { isLoading, can: canReadFunctions } = useAsyncCheckPermissions(
     PermissionAction.FUNCTIONS_READ,
@@ -244,13 +242,7 @@ const EdgeFunctionDetailsLayout = ({
     if (!functionSlug) return
     setIsOpen(true)
     if (IS_PLATFORM) {
-      sendEvent({
-        action: 'edge_function_test_side_panel_opened',
-        groups: {
-          project: ref ?? 'Unknown',
-          organization: org?.slug ?? 'Unknown',
-        },
-      })
+      track('edge_function_test_side_panel_opened')
     }
   }
 
@@ -310,7 +302,7 @@ const EdgeFunctionDetailsLayout = ({
                 <div className="flex items-center gap-x-2">
                   <span className="flex items-center gap-2">{functionUrl}</span>
                   <ShortcutTooltip shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_COPY_URL} side="bottom">
-                    <CopyButton iconOnly type="text" text={functionUrl} />
+                    <CopyButton iconOnly variant="text" text={functionUrl} />
                   </ShortcutTooltip>
                 </div>
 
@@ -374,7 +366,7 @@ const EdgeFunctionDetailsLayout = ({
                     open={isDownloadOpen ? false : undefined}
                   >
                     <PopoverTrigger asChild>
-                      <Button type="default" icon={<Download />}>
+                      <Button variant="default" icon={<Download />}>
                         Download
                       </Button>
                     </PopoverTrigger>
@@ -398,7 +390,7 @@ const EdgeFunctionDetailsLayout = ({
                     )}
                     <div className="py-2 px-1">
                       <Button
-                        type="text"
+                        variant="text"
                         className="w-min hover:bg-transparent"
                         icon={<FileArchive />}
                         onClick={downloadFunction}
@@ -413,7 +405,7 @@ const EdgeFunctionDetailsLayout = ({
                     shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_OPEN_TEST}
                     side="bottom"
                   >
-                    <Button type="default" icon={<Send />} onClick={openTestSheet}>
+                    <Button variant="default" icon={<Send />} onClick={openTestSheet}>
                       Test
                     </Button>
                   </ShortcutTooltip>

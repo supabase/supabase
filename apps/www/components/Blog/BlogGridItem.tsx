@@ -30,7 +30,7 @@ const BlogGridItem = ({ post }: Props) => {
 
   return (
     <Link href={post.path} prefetch={false} className="group flex flex-col h-full p-6">
-      <div className="relative w-full aspect-[16/10] overflow-hidden rounded-md border border-foreground/10">
+      <div className="relative w-full aspect-[1.91/1] overflow-hidden rounded-md border border-foreground/10">
         <Image
           fill
           sizes="100%"

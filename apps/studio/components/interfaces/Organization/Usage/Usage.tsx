@@ -167,7 +167,7 @@ export const Usage = () => {
                       return (
                         <Button
                           block
-                          type="default"
+                          variant="default"
                           role="combobox"
                           size="tiny"
                           aria-expanded={open}

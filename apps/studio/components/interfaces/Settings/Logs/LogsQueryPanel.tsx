@@ -38,6 +38,7 @@ import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
 import { LogsWarning, LogTemplate } from './Logs.types'
 import Table from '@/components/to-be-cleaned/Table'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
 import { DOCS_URL } from '@/lib/constants'
 
 export interface LogsQueryPanelProps {
@@ -98,7 +99,13 @@ const LogsQueryPanel = ({
   }, [value.from, value.to, value.text, value.isHelper])
 
   const [open, setOpen] = useState(false)
-  const [selectedSchema, setSelectedSchema] = useState(logConstants.schemas[0])
+
+  const showMultigresLogs = useShowMultigresLogs()
+  const schemas = logConstants.schemas.filter(
+    (schema) => schema.reference !== 'multigres_logs' || showMultigresLogs
+  )
+
+  const [selectedSchema, setSelectedSchema] = useState(schemas[0])
 
   return (
     <div className="flex items-center border-b bg-surface-100 h-(--header-height)">
@@ -107,7 +114,7 @@ const LogsQueryPanel = ({
           <div className="flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button type="default" iconRight={<ChevronDown />}>
+                <Button variant="default" iconRight={<ChevronDown />}>
                   Insert source
                 </Button>
               </DropdownMenuTrigger>
@@ -132,7 +139,7 @@ const LogsQueryPanel = ({
             {logsTemplates && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button type="default" iconRight={<ChevronDown />}>
+                  <Button variant="default" iconRight={<ChevronDown />}>
                     Templates
                   </Button>
                 </DropdownMenuTrigger>
@@ -219,7 +226,7 @@ const LogsQueryPanel = ({
               <div className="flex flex-row justify-between items-center">
                 <h3>Field Reference</h3>
                 <Button
-                  type="text"
+                  variant="text"
                   className="px-1"
                   onClick={() => setShowReference(false)}
                   icon={<X />}
@@ -232,7 +239,7 @@ const LogsQueryPanel = ({
             hideFooter
             triggerElement={
               <Button
-                type="text"
+                variant="text"
                 onClick={() => setShowReference(true)}
                 icon={<BookOpen />}
                 className="px-2"
@@ -269,7 +276,7 @@ const LogsQueryPanel = ({
               <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
                   <Button
-                    type="default"
+                    variant="default"
                     role="combobox"
                     size={'small'}
                     aria-expanded={open}
@@ -285,7 +292,7 @@ const LogsQueryPanel = ({
                     <CommandList>
                       <CommandEmpty>No source found.</CommandEmpty>
                       <CommandGroup>
-                        {logConstants.schemas.map((schema) => (
+                        {schemas.map((schema) => (
                           <CommandItem
                             key={schema.reference}
                             value={schema.reference}

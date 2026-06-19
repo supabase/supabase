@@ -63,7 +63,7 @@ export const DiscordCTACard = ({ organizationSlug }: DiscordCTACardProps) => {
                 <Link href="https://discord.supabase.com" target="_blank" rel="noreferrer">
                   <Button
                     size="tiny"
-                    type="secondary"
+                    variant="secondary"
                     icon={
                       <SVG src={`${router.basePath}/img/discord-icon.svg`} className="h-4 w-4" />
                     }

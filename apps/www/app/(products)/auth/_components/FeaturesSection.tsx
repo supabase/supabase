@@ -30,19 +30,19 @@ const FEATURES = [
   {
     title: 'All the social providers',
     description:
-      'Enable social logins with the click of a button. Google, Facebook, GitHub, Azure, and many more.',
+      'Add social logins with one click. Google, Facebook, GitHub, Azure (Microsoft), GitLab, Twitter, Discord, and many more.',
     visual: ProvidersSkeleton,
   },
   {
     title: 'Fully integrated',
     description:
-      'Built-in Authentication, Authorization, and User Management — no external services needed.',
+      'Auth without any external services. Built-in authentication, authorization, and user management.',
     visual: IntegratedSkeleton,
   },
   {
     title: 'Own your data',
     description:
-      'User data stored in your Supabase database. No third-party privacy concerns. Host in 16+ locations.',
+      'User data stored in your Supabase database. No third-party privacy concerns. Host in 17+ locations.',
     visual: DataOwnershipSkeleton,
   },
 ]

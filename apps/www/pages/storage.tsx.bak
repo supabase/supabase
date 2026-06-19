@@ -238,7 +238,13 @@ function StoragePage() {
                 archives, and more, then serve them fast from a global CDN with fine-grained access
                 controls.
               </p>
-              <Button asChild size="small" type="default" className="mt-4" icon={<ArrowUpRight />}>
+              <Button
+                asChild
+                size="small"
+                variant="default"
+                className="mt-4"
+                icon={<ArrowUpRight />}
+              >
                 <Link href="/docs/guides/storage">Read the docs</Link>
               </Button>
             </div>
@@ -250,10 +256,10 @@ function StoragePage() {
                 is efficient to query, partition, and transform, and optionally expose via Postgres.
               </p>
               <div className="mt-4 flex gap-2">
-                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+                <Button asChild size="small" variant="default" icon={<ArrowUpRight />}>
                   <Link href="/docs/guides/storage/analytics/introduction">Read the docs</Link>
                 </Button>
-                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+                <Button asChild size="small" variant="default" icon={<ArrowUpRight />}>
                   <Link href="/blog/analytics-buckets">Read the blog post</Link>
                 </Button>
               </div>
@@ -267,10 +273,10 @@ function StoragePage() {
                 search, and more.
               </p>
               <div className="mt-4 flex gap-2">
-                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+                <Button asChild size="small" variant="default" icon={<ArrowUpRight />}>
                   <Link href="/docs/guides/storage/vector/introduction">Read the docs</Link>
                 </Button>
-                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+                <Button asChild size="small" variant="default" icon={<ArrowUpRight />}>
                   <Link href="/blog/vector-buckets">Read the blog post</Link>
                 </Button>
               </div>
@@ -298,7 +304,7 @@ function StoragePage() {
                   <Button
                     asChild
                     size="small"
-                    type="default"
+                    variant="default"
                     className="mt-4"
                     icon={<ArrowUpRight />}
                   >
@@ -314,7 +320,7 @@ function StoragePage() {
                   <Button
                     asChild
                     size="small"
-                    type="default"
+                    variant="default"
                     className="mt-4"
                     icon={<ArrowUpRight />}
                   >
@@ -355,7 +361,7 @@ function StoragePage() {
                       <Button
                         asChild
                         size="small"
-                        type="default"
+                        variant="default"
                         className="mt-4"
                         icon={<ArrowUpRight />}
                       >

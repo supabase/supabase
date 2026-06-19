@@ -17,8 +17,7 @@ const ScrollProgress = () => {
       if (!article) return
       const { top, height } = article.getBoundingClientRect()
       const scrollDistance = -top
-      const progress =
-        (scrollDistance / (height - document.documentElement.clientHeight)) * 100
+      const progress = (scrollDistance / (height - document.documentElement.clientHeight)) * 100
       setProgressPercentage(progress)
     }
 

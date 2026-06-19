@@ -3,12 +3,7 @@ import { Globe } from 'lucide-react'
 const highlights = [
   {
     title: 'Fully managed',
-    paragraph: (
-      <>
-        Edge Functions scale automatically,
-        reducing your devops burden
-      </>
-    ),
+    paragraph: <>Edge Functions scale automatically, reducing your devops burden</>,
     icon: (
       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path
@@ -71,7 +66,7 @@ const highlights = [
   },
   {
     title: 'Node.js Support',
-    paragraph: 'Migrate existing workloads with support for 1M+ NPM modules',
+    paragraph: 'Migrate existing workloads with NPM and Node.js support',
     icon: (
       <svg className="w-5 h-5" viewBox="0 0 26 28" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path

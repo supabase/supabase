@@ -46,6 +46,7 @@ export function ExamplesSection() {
                 key={example.title}
                 href={example.repo_url ?? '#'}
                 target="_blank"
+                rel="noopener noreferrer"
                 className="group flex flex-col bg-surface-75 border border-border rounded-lg px-6 py-8 "
               >
                 <div className="flex items-center gap-2 mb-4">
@@ -76,6 +77,7 @@ export function ExamplesSection() {
                 key={example.title}
                 href={example.repo_url ?? '#'}
                 target="_blank"
+                rel="noopener noreferrer"
                 className="group flex flex-col bg-surface-75 border border-border rounded-lg px-6 py-10 "
               >
                 <div className="flex items-center gap-2 mb-4">

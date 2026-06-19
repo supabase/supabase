@@ -3,7 +3,6 @@ import path from 'path'
 
 function slugToTitle(slug) {
   if (!slug) return ''
-  // remove version prefix if available
   const prefixRegex = /^v\d+/
   const title = slug.replace(prefixRegex, '').replace(/-/g, ' ').trimStart()
   return title.charAt(0).toUpperCase() + title.slice(1)
@@ -14,100 +13,83 @@ function isValidSlug(slug) {
   return slugRegex.test(slug)
 }
 
-function extractSectionsFromOpenApi(filePath, outputPath) {
-  fs.readFile(filePath, 'utf8', (err, data) => {
-    if (err) {
-      console.error(`Error reading file ${filePath}:`, err)
-      return
-    }
-
-    try {
-      const openApiJson = JSON.parse(data)
-      const categories: string[] = []
-      const sections: Array<{
-        type: string
-        title: string
-        id?: string
-        slug?: string
-        items: Array<{
-          type: string
-          title: string
-          id: string
-          slug: string
-        }>
-      }> = []
-
-      if (openApiJson.paths) {
-        for (const route in openApiJson.paths) {
-          const methods = openApiJson.paths[route]
-          for (const method in methods) {
-            // We are using `x-internal` to hide endpoints from the docs,
-            // but still have them included in the spec so they generate types and can be used.
-            if (methods[method]['x-internal']) {
-              continue
-            }
-
-            const tag = methods[method].tags?.[0]
-            const operationId = methods[method].operationId
-            // If operationId is not in the form of a slug ignore it.
-            // This is intentional because operationId is not defined under the swagger
-            // spec and is extracted automatically from the function name.
-            if (!tag || !isValidSlug(operationId)) continue
-
-            if (!categories.includes(tag)) {
-              categories.push(tag)
-              sections.push({
-                type: 'category',
-                title: tag,
-                items: [],
-              })
-            }
-
-            const sectionCate = sections.find((i) => i.title === tag)
-            sectionCate?.items.push({
-              id: operationId,
-              title: slugToTitle(operationId),
-              slug: operationId,
-              type: 'operation',
-            })
-          }
-        }
-      }
-
-      // finalize sections
-      sections.sort((a, b) => a.title.localeCompare(b.title))
-      sections.forEach((i) => i.items.sort((a, b) => a.title.localeCompare(b.title)))
-      sections.unshift({
-        title: 'Introduction',
-        id: 'introduction',
-        slug: 'introduction',
-        type: 'markdown',
-        items: [],
-      })
-
-      fs.writeFile(outputPath, JSON.stringify(sections, null, 2), 'utf8', (err) => {
-        if (err) {
-          console.error(`Error writing to file ${outputPath}:`, err)
-          return
-        }
-        console.log(`Sections successfully generated!!!`)
-      })
-    } catch (error) {
-      console.error('Error parsing JSON:', error)
-    }
-  })
+function readJson(filePath: string) {
+  return JSON.parse(fs.readFileSync(filePath, 'utf8'))
 }
 
-// Get file paths from command line arguments
+function extractSectionsFromOpenApi(filePaths: string[], outputPath: string) {
+  try {
+    // Merge paths from all specs, later specs override earlier ones on conflict
+    const mergedPaths = Object.assign({}, ...filePaths.map((p) => readJson(p).paths ?? {}))
+
+    const categories: string[] = []
+    const sections: Array<{
+      type: string
+      title: string
+      id?: string
+      slug?: string
+      items: Array<{
+        type: string
+        title: string
+        id: string
+        slug: string
+      }>
+    }> = []
+
+    for (const route in mergedPaths) {
+      const methods = mergedPaths[route]
+      for (const method in methods) {
+        if (methods[method]['x-internal']) {
+          continue
+        }
+        const tag = methods[method].tags?.[0]
+        const operationId = methods[method].operationId
+        if (!tag || !isValidSlug(operationId)) continue
+        if (!categories.includes(tag)) {
+          categories.push(tag)
+          sections.push({
+            type: 'category',
+            title: tag,
+            items: [],
+          })
+        }
+        const sectionCate = sections.find((i) => i.title === tag)
+        sectionCate?.items.push({
+          id: operationId,
+          title: slugToTitle(operationId),
+          slug: operationId,
+          type: 'operation',
+        })
+      }
+    }
+
+    sections.sort((a, b) => a.title.localeCompare(b.title))
+    sections.forEach((i) => i.items.sort((a, b) => a.title.localeCompare(b.title)))
+    sections.unshift({
+      title: 'Introduction',
+      id: 'introduction',
+      slug: 'introduction',
+      type: 'markdown',
+      items: [],
+    })
+
+    fs.writeFileSync(outputPath, JSON.stringify(sections, null, 2), 'utf8')
+    console.log(`Sections successfully generated!!!`)
+  } catch (error) {
+    console.error('Error:', error)
+  }
+}
+
 const args = process.argv.slice(2)
 if (args.length < 2) {
-  console.error('Please provide the openapi file path and output file path as arguments.')
+  console.error(
+    'Please provide at least one openapi file path and an output file path as arguments.'
+  )
   process.exit(1)
 }
 
-const inputFilePath = path.resolve(args[0])
-const outputFilePath = path.resolve(args[1])
+// Last arg is output, everything before is input files
+const outputFilePath = path.resolve(args[args.length - 1])
+const inputFilePaths = args.slice(0, -1).map((p) => path.resolve(p))
 
-;(async () => {
-  extractSectionsFromOpenApi(inputFilePath, outputFilePath)
-})()
+extractSectionsFromOpenApi(inputFilePaths, outputFilePath)

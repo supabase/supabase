@@ -10,7 +10,8 @@ const FEATURES = [
   },
   {
     title: 'Lightning fast',
-    description: 'Thin API layer built on Postgres permissions, delivered via global CDN.',
+    description:
+      'Thin API server layer built on Postgres permissions with content delivered via global CDN.',
     visual: CDNSkeleton,
   },
   {
