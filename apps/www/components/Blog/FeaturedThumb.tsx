@@ -50,10 +50,10 @@ function renderFeaturedThumb(blog: PostTypes, author: any[]) {
       </Link>
 
       {/* Text */}
-      <div className="flex flex-col lg:col-span-6 px-6 pb-8">
+      <div className="flex flex-col lg:col-span-6 px-6 py-4 xl:justify-center">
         <div>
           <Link href={`${blog.path}`} prefetch={false} className="group">
-            <h2 className="h2 lg:!text-xl xl:!text-2xl !mb-2 group-hover:underline">
+            <h2 className="h2 lg:text-2xl! xl:text-3xl! mb-2! group-hover:underline">
               {blog.title}
             </h2>
           </Link>

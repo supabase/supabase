@@ -80,7 +80,7 @@ const BlogPostRenderer = async ({
   const isLaunchWeek15 = blogMetaData.launchweek?.toString().toLocaleLowerCase() === '15'
 
   const toc = blogMetaData.toc && (
-    <div>
+    <div className="mb-4">
       <p className="text-foreground-lighter text-sm font-normal mb-3">On this page</p>
       <div className="prose-toc">
         {blogMetaData.toc && (
@@ -102,10 +102,10 @@ const BlogPostRenderer = async ({
     <>
       {isDraftMode && <DraftModeBanner />}
       <div className="overflow-x-clip">
-        <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6">
+        <div className="mx-auto max-w-(--container-max-w,75rem) px-6">
           <div className="grid grid-cols-12 xl:gap-x-8 xl:gap-y-0">
             {/* Row 1, Col 1: Back button */}
-            <div className="col-span-12 xl:row-start-1 xl:col-start-1 xl:col-span-1 pt-16 xl:pt-32 flex items-start justify-start">
+            <div className="col-span-12 xl:row-start-1 xl:col-start-1 xl:col-span-1 pt-8 xl:pt-12 flex items-start justify-start">
               <Link
                 href="/blog"
                 className="text-foreground-lighter hover:text-foreground inline-flex cursor-pointer items-center text-sm transition"
@@ -116,7 +116,7 @@ const BlogPostRenderer = async ({
             </div>
 
             {/* Row 1, Col 2: Title + meta */}
-            <div className="col-span-12 xl:row-start-1 xl:col-start-2 xl:col-span-7 pt-4 xl:pt-32 pb-6 space-y-4">
+            <div className="col-span-12 xl:row-start-1 xl:col-start-2 xl:col-span-7 pt-4 xl:pt-12 pb-6 space-y-4">
               <div className="space-y-4">
                 {(blogMetaData.tags as Tag[])?.length > 0 && (
                   <div className="flex flex-wrap gap-2">
@@ -265,7 +265,7 @@ const BlogPostRenderer = async ({
 
             {/* TOC: starts at row 2 alongside image, sticky through article */}
             <div className="hidden xl:block xl:row-start-2 xl:row-span-2 xl:col-start-10 xl:col-span-3 xl:pl-6">
-              <div className="sticky top-24 flex flex-col gap-6 max-h-[calc(100vh-7rem)]">
+              <div className="sticky top-24 flex flex-col gap-6 max-h-[calc(100vh-7rem)] mb-4">
                 <div className="overflow-y-auto min-h-0 flex-1">{toc}</div>
                 <div className="shrink-0">
                   <div className="text-foreground text-sm mb-2">Share this article</div>

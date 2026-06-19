@@ -1,5 +1,6 @@
 'use client'
 
+import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 import FeaturedThumb from 'components/Blog/FeaturedThumb'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
@@ -84,21 +85,19 @@ export default function BlogHero({
       aria-hidden={!expanded}
       className="overflow-hidden"
     >
-      <div className="pt-32 pb-10">
-        <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6">
-          <div className="max-w-4xl">
-            <FeaturedThumb key={featuredPost.slug} {...featuredPost} />
-          </div>
-
-          {secondaryPosts.length > 0 && (
-            <div className="mt-14 max-w-4xl grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {secondaryPosts.map((post) => (
-                <SecondarySpotlight key={post.slug} post={post} />
-              ))}
-            </div>
-          )}
+      <SectionContainerWithCn height="narrow">
+        <div className="">
+          <FeaturedThumb key={featuredPost.slug} {...featuredPost} />
         </div>
-      </div>
+
+        {secondaryPosts.length > 0 && (
+          <div className="mt-14 max-w-4xl grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {secondaryPosts.map((post) => (
+              <SecondarySpotlight key={post.slug} post={post} />
+            ))}
+          </div>
+        )}
+      </SectionContainerWithCn>
     </motion.div>
   )
 }
