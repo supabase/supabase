@@ -191,7 +191,7 @@ export const RequesterLogo = ({ icon, name }: { icon: string | null; name: strin
     return icon || ''
   }, [icon, name])
 
-  const showLetter = !customLogoUrl || failedIcon === customLogoUrl
+  const showLetter = !customLogoUrl || failedIcon === icon
 
   return (
     <LogoBox>
