@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
-import { getMcpClientDefaultIconSrc, getMcpClientIconSrc } from './getMcpIconSrc'
+import { getMcpClientIconSrc } from './getMcpIconSrc'
 
 describe('getMcpClientIconSrc', () => {
   it('returns the default icon when only one asset variant exists', () => {
     const lightSrc = getMcpClientIconSrc({
-      icon: 'cursor',
+      icon: 'claude',
       useDarkVariant: false,
     })
     const darkSrc = getMcpClientIconSrc({
-      icon: 'cursor',
+      icon: 'claude',
       useDarkVariant: true,
     })
 
@@ -19,12 +19,28 @@ describe('getMcpClientIconSrc', () => {
 
   it('returns the dark icon when a distinct dark variant exists', () => {
     const lightSrc = getMcpClientIconSrc({
-      icon: 'openai',
+      icon: 'cursor',
       useDarkVariant: false,
       hasDistinctDarkIcon: true,
     })
     const darkSrc = getMcpClientIconSrc({
-      icon: 'openai',
+      icon: 'cursor',
+      useDarkVariant: true,
+      hasDistinctDarkIcon: true,
+    })
+
+    expect(darkSrc).toBeTruthy()
+    expect(darkSrc).not.toBe(lightSrc)
+  })
+
+  it('returns the dark icon for Perplexity when requested as a distinct variant', () => {
+    const lightSrc = getMcpClientIconSrc({
+      icon: 'perplexity',
+      useDarkVariant: false,
+      hasDistinctDarkIcon: true,
+    })
+    const darkSrc = getMcpClientIconSrc({
+      icon: 'perplexity',
       useDarkVariant: true,
       hasDistinctDarkIcon: true,
     })
@@ -48,19 +64,13 @@ describe('getMcpClientIconSrc', () => {
     expect(src).toBe(lightSrc)
   })
 
-  it('returns the default icon for paired static app-tile surfaces', () => {
-    const defaultSrc = getMcpClientDefaultIconSrc('openai')
+  it('returns an empty string for unknown icons', () => {
     const darkSrc = getMcpClientIconSrc({
-      icon: 'openai',
+      icon: 'unknown-client',
       useDarkVariant: true,
       hasDistinctDarkIcon: true,
     })
 
-    expect(defaultSrc).toBeTruthy()
-    expect(defaultSrc).not.toBe(darkSrc)
-  })
-
-  it('returns an empty string for unknown icons', () => {
-    expect(getMcpClientDefaultIconSrc('unknown-client')).toBe('')
+    expect(darkSrc).toBe('')
   })
 })

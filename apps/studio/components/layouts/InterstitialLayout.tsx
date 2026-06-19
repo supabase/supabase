@@ -152,18 +152,6 @@ export const SupabaseLogo = () => (
   </LogoBox>
 )
 
-/** Static light Supabase app tile for fixed paired-logo authorisation surfaces. */
-export const SupabaseAppTileLogo = () => (
-  <LogoBox className="border-control bg-white">
-    <img
-      alt="Supabase"
-      src={`${BASE_PATH}/img/supabase-logo.svg`}
-      className="size-7"
-      data-testid="supabase-app-tile-logo"
-    />
-  </LogoBox>
-)
-
 export const InterstitialAccountRow = ({
   avatarUrl,
   displayName,

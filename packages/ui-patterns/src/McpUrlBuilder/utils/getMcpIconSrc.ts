@@ -15,7 +15,3 @@ export function getMcpClientIconSrc({
 }): string {
   return getMcpClientIconAssetUrl(icon, useDarkVariant && Boolean(hasDistinctDarkIcon))
 }
-
-export function getMcpClientDefaultIconSrc(icon: string): string {
-  return getMcpClientIconAssetUrl(icon, false)
-}

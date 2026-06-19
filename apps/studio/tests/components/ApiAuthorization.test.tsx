@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import dayjs from 'dayjs'
 import { HttpResponse } from 'msw'
-import { getMcpClientDefaultIconSrc } from 'ui-patterns/McpUrlBuilder'
+import { getMcpClientIconSrc } from 'ui-patterns/McpUrlBuilder'
 import { describe, expect, test, vi } from 'vitest'
 
 import {
@@ -129,10 +129,13 @@ describe('RequesterLogo', () => {
     ['ChatGPT', 'openai'],
     ['OpenAI', 'openai'],
     ['Perplexity', 'perplexity'],
-  ])('resolves %s to a shared static MCP icon asset', (name, iconKey) => {
+  ])('resolves %s to a shared MCP icon asset', (name, iconKey) => {
     customRender(<RequesterLogo icon={null} name={name} />)
 
-    expect(screen.getByAltText(name)).toHaveAttribute('src', getMcpClientDefaultIconSrc(iconKey))
+    expect(screen.getByAltText(name)).toHaveAttribute(
+      'src',
+      getMcpClientIconSrc({ icon: iconKey, useDarkVariant: false })
+    )
   })
 
   test('falls back to the requester initial when the icon fails to load', () => {
@@ -278,7 +281,7 @@ describe('ApiAuthorizationScreen', () => {
           mockBothEndpoints(createMockAuthResponse({ name: 'My OAuth App' }))
           renderScreen()
           await screen.findByText('Authorize API access for My OAuth App')
-          expect(screen.getByTestId('supabase-app-tile-logo')).toBeInTheDocument()
+          expect(screen.getByAltText('Supabase')).toBeInTheDocument()
           expect(screen.getByRole('combobox')).toBeInTheDocument()
           expect(screen.getByRole('button', { name: /Authorize My OAuth App/ })).toBeInTheDocument()
           expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument()

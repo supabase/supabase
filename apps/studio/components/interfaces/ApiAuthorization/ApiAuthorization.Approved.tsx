@@ -6,11 +6,7 @@ import {
   AuthorizeRequesterDetails,
   RequesterLogo,
 } from '@/components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
-import {
-  InterstitialLayout,
-  LogoPair,
-  SupabaseAppTileLogo,
-} from '@/components/layouts/InterstitialLayout'
+import { InterstitialLayout, LogoPair, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
 import type { ApiAuthorizationResponse } from '@/data/api-authorization/api-authorization-query'
 import type { Organization } from '@/types'
 
@@ -30,7 +26,7 @@ export function ApiAuthorizationApprovedScreen({
       logo={
         <LogoPair
           left={<RequesterLogo icon={requester.icon} name={requester.name} />}
-          right={<SupabaseAppTileLogo />}
+          right={<SupabaseLogo />}
         />
       }
       title={requester.name}
