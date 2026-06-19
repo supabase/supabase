@@ -67,7 +67,7 @@ export function BucketTypesSection() {
                   </ul>
                 </div>
                 <div className="mt-6">
-                  <Button type="default" size="small" asChild>
+                  <Button variant="default" size="small" asChild>
                     <Link href={bucket.cta.href}>{bucket.cta.label}</Link>
                   </Button>
                 </div>

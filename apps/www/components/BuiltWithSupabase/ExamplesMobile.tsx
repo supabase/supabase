@@ -3,12 +3,9 @@ import 'swiper/css'
 import content from '~/data/home/content'
 import type { Example } from 'data/Examples'
 import { useRouter } from 'next/compat/router'
-import { useRouter } from 'next/router'
 import React, { FC } from 'react'
-import React, { FC } from 'react'
-import { Swiper, Swiper, SwiperSlide, SwiperSlide } from 'swiper/react'
+import { Swiper, SwiperSlide } from 'swiper/react'
 
-import ExampleCard from '../ExampleCard'
 import ExampleCard from '../ExampleCard'
 
 interface Props {

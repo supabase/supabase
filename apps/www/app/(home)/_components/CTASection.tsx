@@ -173,7 +173,7 @@ export function CTASection() {
               Start your project
             </Link>
           </Button>
-          <Button asChild size="medium" type="default">
+          <Button asChild size="medium" variant="default">
             <Link
               href="/contact/sales"
               onClick={() =>

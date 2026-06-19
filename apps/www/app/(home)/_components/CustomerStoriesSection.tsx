@@ -375,7 +375,7 @@ export function CustomerStoriesSection() {
                 the all-in-one solution for building AI-native platforms and marketplaces.
               </p>
 
-              <Button type="default" size="medium" asChild className="w-fit mt-auto">
+              <Button variant="default" size="medium" asChild className="w-fit mt-auto">
                 <Link href="/partners/integrations">Explore Supabase for Platforms</Link>
               </Button>
             </div>

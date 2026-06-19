@@ -82,7 +82,7 @@ export function CTASection() {
           <Button asChild size="medium">
             <Link href="https://supabase.com/dashboard">Start your project</Link>
           </Button>
-          <Button asChild size="medium" type="default">
+          <Button asChild size="medium" variant="default">
             <Link href="/docs/guides/functions/quickstart">Quickstart guide</Link>
           </Button>
         </div>

@@ -47,7 +47,7 @@ export function CommunitySectionV2() {
           <p className="text-foreground-lighter text-center text-sm">
             Discover what our community has to say about their Supabase experience.
           </p>
-          <Button asChild type="default" size="small" className="mt-2">
+          <Button asChild variant="default" size="small" className="mt-2">
             <Link href="https://discord.supabase.com/" target="_blank">
               Join us on Discord
             </Link>
