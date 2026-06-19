@@ -191,7 +191,7 @@ export const RequesterLogo = ({ icon, name }: { icon: string | null; name: strin
     return icon || ''
   }, [icon, name])
 
-  const showLetter = !customLogoUrl || failedIcon === icon
+  const showLetter = !customLogoUrl || failedIcon === customLogoUrl
 
   return (
     <LogoBox>
@@ -202,7 +202,7 @@ export const RequesterLogo = ({ icon, name }: { icon: string | null; name: strin
           alt={name}
           src={customLogoUrl}
           className="size-full object-cover"
-          onError={() => setFailedIcon(icon)}
+          onError={() => setFailedIcon(customLogoUrl)}
         />
       )}
     </LogoBox>
