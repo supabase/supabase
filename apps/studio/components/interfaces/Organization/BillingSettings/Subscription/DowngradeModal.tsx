@@ -98,7 +98,7 @@ export const DowngradeModal = ({
     <Dialog open={visible} onOpenChange={onClose}>
       <DialogContent size="large">
         <DialogHeader>
-          <DialogTitle>{`Confirm to downgrade to ${selectedPlan?.name} plan`}</DialogTitle>
+          <DialogTitle>Confirm to downgrade to {selectedPlan?.name} plan</DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
         <div className="px-5 py-4 text-foreground-light">
