@@ -48,16 +48,8 @@ export const useConnectedResourceMutations = ({
     }
   }
 
-  /** Deletes a single secret API key by id, used by the dedicated text-confirmation modal. */
-  const deleteApiKey = async (id: string) => {
-    if (!projectRef) throw new Error('Project is required')
-    return deleteAPIKey({ projectRef, id })
-  }
-
   return {
     removeResource,
-    deleteApiKey,
     isRemoving: isRevokingApp || isDeletingApiKey || isDeletingSecret || isUpdatingAuthConfig,
-    isDeletingApiKey,
   }
 }

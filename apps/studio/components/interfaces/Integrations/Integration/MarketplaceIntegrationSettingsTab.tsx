@@ -38,12 +38,11 @@ export const MarketplaceIntegrationSettingsTab = () => {
   const [appToRevoke, setAppToRevoke] = useState<AuthorizedApp | undefined>()
   const [apiKeyToDelete, setApiKeyToDelete] = useState<ApiKeyResource | undefined>()
 
-  const { removeResource, deleteApiKey, isRemoving, isDeletingApiKey } =
-    useConnectedResourceMutations({
-      projectRef: ref,
-      orgSlug: organization?.slug,
-      onSuccess: () => toast.success('Successfully removed the connected resource'),
-    })
+  const { removeResource, isRemoving } = useConnectedResourceMutations({
+    projectRef: ref,
+    orgSlug: organization?.slug,
+    onSuccess: () => toast.success('Successfully removed the connected resource'),
+  })
 
   const integrationName = integration?.name ?? 'this integration'
   const resources =
@@ -122,7 +121,7 @@ export const MarketplaceIntegrationSettingsTab = () => {
   const onConfirmDeleteApiKey = async () => {
     if (!apiKeyToDelete) return
     try {
-      await deleteApiKey(apiKeyToDelete.apiKey.id!)
+      await removeResource(apiKeyToDelete)
       setApiKeyToDelete(undefined)
     } catch {
       // Error toast is handled by the mutation's default onError.
@@ -218,7 +217,7 @@ export const MarketplaceIntegrationSettingsTab = () => {
       <TextConfirmModal
         variant="destructive"
         visible={apiKeyToDelete !== undefined}
-        loading={isDeletingApiKey}
+        loading={isRemoving}
         title={`Delete secret API key: ${apiKeyToDelete?.apiKey.name ?? ''}`}
         confirmString={apiKeyToDelete?.apiKey.name ?? ''}
         confirmLabel="Yes, irreversibly delete this API key"
