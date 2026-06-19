@@ -383,7 +383,16 @@ const SINGLE_LOG_METADATA: Partial<Record<QueryType, (attrs: Record<string, any>
     response: [
       {
         status_code: attrs['response.status_code'] ?? null,
-        headers: [{ x_sb_error_code: attrs['response.headers.sb_error_code'] ?? null }],
+        // OTEL exposes the gateway error code as `sb_error_code`; BigQuery used
+        // `x_sb_error_code`. Coalesce so the panel resolves it either way.
+        headers: [
+          {
+            x_sb_error_code:
+              attrs['response.headers.sb_error_code'] ??
+              attrs['response.headers.x_sb_error_code'] ??
+              null,
+          },
+        ],
       },
     ],
   }),
