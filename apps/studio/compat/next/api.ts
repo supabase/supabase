@@ -161,7 +161,6 @@ async function buildRequest(
 }
 
 function buildResponse() {
-  let statusCode = 200
   const responseHeaders = new Headers()
   const chunks: Uint8Array[] = []
   const encoder = new TextEncoder()
@@ -206,9 +205,10 @@ function buildResponse() {
 
   const res = {} as NextApiResponse & Record<string, unknown>
 
+  // `res.statusCode` is the single source of truth so handlers that write
+  // it directly (a standard Node/Next idiom) are honoured at finalize.
   res.statusCode = 200
   res.status = (code: number) => {
-    statusCode = code
     res.statusCode = code
     return res
   }
@@ -248,7 +248,6 @@ function buildResponse() {
     headersOrMessage?: string | Record<string, number | string | readonly string[]>,
     maybeHeaders?: Record<string, number | string | readonly string[]>
   ) => {
-    statusCode = code
     res.statusCode = code
     const headers =
       typeof headersOrMessage === 'object' && headersOrMessage !== null
@@ -320,7 +319,6 @@ function buildResponse() {
   res.redirect = (...args: unknown[]) => {
     const [status, location] =
       typeof args[0] === 'number' ? [args[0], args[1] as string] : [302, args[0] as string]
-    statusCode = status
     res.statusCode = status
     responseHeaders.set('location', location)
     return res
@@ -351,7 +349,7 @@ function buildResponse() {
       // The handler entered streaming mode (writeHead/flushHeaders) and
       // may still be pushing chunks asynchronously after this return —
       // the stream stays open until res.end() runs.
-      return new Response(stream, { status: statusCode, headers: responseHeaders })
+      return new Response(stream, { status: res.statusCode, headers: responseHeaders })
     }
     const totalLen = chunks.reduce((n, c) => n + c.length, 0)
     const payload = new Uint8Array(totalLen)
@@ -361,7 +359,7 @@ function buildResponse() {
       offset += c.length
     }
     return new Response(payload.length === 0 ? null : payload, {
-      status: statusCode,
+      status: res.statusCode,
       headers: responseHeaders,
     })
   }
