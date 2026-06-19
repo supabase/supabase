@@ -101,7 +101,10 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
           if (isDoubleNegative) {
             values[key] = !(config as any)[key]
           } else {
-            const configValue = (config as any)[key]
+            let configValue = (config as any)[key]
+            if (key === 'SMS_TEMPLATE' && typeof configValue === 'string') {
+              configValue = configValue.replace(/\\n/g, '\n')
+            }
             values[key] = configValue
               ? configValue
               : provider.properties[key].type === 'boolean'
