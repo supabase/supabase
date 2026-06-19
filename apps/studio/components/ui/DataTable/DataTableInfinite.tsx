@@ -52,15 +52,17 @@ export function DataTableInfinite<TData, TValue, TMeta>({
 
   const onScroll = useCallback(
     (e: UIEvent<HTMLElement>) => {
+      // Trigger fetching slightly before reaching the very bottom for a smoother experience
+      const BOTTOM_BUFFER_PX = 300
       const onPageBottom =
         Math.ceil(e.currentTarget.scrollTop + e.currentTarget.clientHeight) >=
-        e.currentTarget.scrollHeight
+        e.currentTarget.scrollHeight - BOTTOM_BUFFER_PX
 
-      if (onPageBottom && !isFetching && totalRows > totalRowsFetched) {
+      if (onPageBottom && !isFetching && hasNextPage) {
         fetchNextPage()
       }
     },
-    [fetchNextPage, isFetching, totalRows, totalRowsFetched]
+    [fetchNextPage, isFetching, hasNextPage]
   )
 
   useShortcut(
