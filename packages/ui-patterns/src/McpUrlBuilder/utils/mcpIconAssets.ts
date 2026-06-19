@@ -15,6 +15,7 @@ import openaiDarkIcon from '../assets/openai-icon-dark.svg'
 import openaiIcon from '../assets/openai-icon.svg'
 import opencodeDarkIcon from '../assets/opencode-icon-dark.svg'
 import opencodeIcon from '../assets/opencode-icon.svg'
+import perplexityIcon from '../assets/perplexity-icon.svg'
 import vscodeIcon from '../assets/vscode-icon.svg'
 import windsurfDarkIcon from '../assets/windsurf-icon-dark.svg'
 import windsurfIcon from '../assets/windsurf-icon.svg'
@@ -37,6 +38,7 @@ const MCP_CLIENT_ICON_ASSETS = {
   kiro: { light: kiroIcon, dark: kiroIcon },
   openai: { light: openaiIcon, dark: openaiDarkIcon },
   opencode: { light: opencodeIcon, dark: opencodeDarkIcon },
+  perplexity: { light: perplexityIcon, dark: perplexityIcon },
   vscode: { light: vscodeIcon, dark: vscodeIcon },
   windsurf: { light: windsurfIcon, dark: windsurfDarkIcon },
 } satisfies Record<string, McpClientIconAsset>

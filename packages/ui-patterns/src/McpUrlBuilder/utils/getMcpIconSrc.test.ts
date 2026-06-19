@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getMcpClientIconSrc } from './getMcpIconSrc'
+import { getMcpClientDefaultIconSrc, getMcpClientIconSrc } from './getMcpIconSrc'
 
 describe('getMcpClientIconSrc', () => {
   it('returns the default icon when only one asset variant exists', () => {
@@ -46,5 +46,21 @@ describe('getMcpClientIconSrc', () => {
     })
 
     expect(src).toBe(lightSrc)
+  })
+
+  it('returns the default icon for paired static app-tile surfaces', () => {
+    const defaultSrc = getMcpClientDefaultIconSrc('openai')
+    const darkSrc = getMcpClientIconSrc({
+      icon: 'openai',
+      useDarkVariant: true,
+      hasDistinctDarkIcon: true,
+    })
+
+    expect(defaultSrc).toBeTruthy()
+    expect(defaultSrc).not.toBe(darkSrc)
+  })
+
+  it('returns an empty string for unknown icons', () => {
+    expect(getMcpClientDefaultIconSrc('unknown-client')).toBe('')
   })
 })
