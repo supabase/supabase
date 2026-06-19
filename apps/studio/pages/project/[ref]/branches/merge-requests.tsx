@@ -300,7 +300,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
   )
 }
 
-const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
+export const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
