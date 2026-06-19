@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
-import { ident, joinSqlFragments, literal, safeSql, type SafeSqlFragment } from './pg-format'
+import { ident, joinSqlFragments, keyword, literal, safeSql, type SafeSqlFragment } from './pg-format'
 import { FUNCTIONS_SQL } from './sql/functions'
 
 export const pgFunctionZod = z.object({
@@ -209,13 +209,13 @@ function _generateCreateFunctionSql(
     CREATE ${replace ? safeSql`OR REPLACE` : safeSql``} FUNCTION ${ident(schema!)}.${ident(name!)}(${
       args?.join(', ') || ''
     })
-    RETURNS ${ident(return_type ?? 'void')}
+    RETURNS ${keyword(return_type ?? 'void')}
     AS ${literal(definition)}
-    LANGUAGE ${ident(language ?? 'sql')}
-    ${ident(behavior ?? 'VOLATILE')}
+    LANGUAGE ${keyword(language ?? 'sql')}
+    ${keyword(behavior ?? 'VOLATILE')}
     CALLED ON NULL INPUT
     ${security_definer ? safeSql`SECURITY DEFINER` : safeSql`SECURITY INVOKER`}
-    ${params}
+    ${params};
   `
 }
 
@@ -276,14 +276,14 @@ export function update(currentFunc: PGFunction, { name, schema, definition }: PG
     name && name !== currentFunc.name
       ? safeSql`ALTER FUNCTION ${ident(currentFunc.schema)}.${ident(
           currentFunc.name
-        )}(${identityArgs}) RENAME TO ${ident(name)}`
+        )}(${identityArgs}) RENAME TO ${ident(name)};`
       : safeSql``
 
   const updateSchemaSql: SafeSqlFragment =
     schema && schema !== currentFunc.schema
       ? safeSql`ALTER FUNCTION ${ident(currentFunc.schema)}.${ident(
           name || currentFunc.name
-        )}(${identityArgs}) SET SCHEMA ${ident(schema)}`
+        )}(${identityArgs}) SET SCHEMA ${ident(schema)};`
       : safeSql``
 
   const sql = safeSql`

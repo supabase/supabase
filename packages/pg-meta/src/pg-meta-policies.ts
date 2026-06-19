@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
-import { ident, literal, safeSql, type SafeSqlFragment } from './pg-format'
+import { ident, joinSqlFragments, literal, safeSql, type SafeSqlFragment } from './pg-format'
 import { POLICIES_SQL } from './sql/policies'
 
 const pgPolicyZod = z.object({
@@ -135,12 +135,13 @@ function update(
   const { name, definition, check, roles } = params
 
   const alter = `ALTER POLICY ${ident(identifier.name)} ON ${ident(identifier.schema)}.${ident(identifier.table)}`
-  const nameSql = name === undefined ? '' : `${alter} RENAME TO ${ident(name)}`
-  const definitionSql = definition === undefined ? '' : `${alter} USING (${definition})`
-  const checkSql = check === undefined ? '' : `${alter} WITH CHECK (${check})`
-  const rolesSql = roles === undefined ? '' : `${alter} TO ${roles.map(ident).join(', ')}`
+  const nameSql = name === undefined ? '' : `${alter} RENAME TO ${ident(name)};`
+  const definitionSql = definition === undefined ? '' : `${alter} USING (${definition});`
+  const checkSql = check === undefined ? '' : `${alter} WITH CHECK (${check});`
+  const rolesSql = roles === undefined ? '' : `${alter} TO ${roles.map(ident).join(', ')};`
 
-  const sql = `${definitionSql} ${checkSql} ${rolesSql} ${nameSql}` as SafeSqlFragment
+  const fragments = [definitionSql, checkSql, rolesSql, nameSql].filter(Boolean) as SafeSqlFragment[]
+  const sql = joinSqlFragments(fragments, ' ') as SafeSqlFragment
 
   return { sql }
 }
