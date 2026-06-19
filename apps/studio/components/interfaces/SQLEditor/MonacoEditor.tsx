@@ -263,7 +263,7 @@ const MonacoEditor = ({
         // than push. The caller navigated to `/sql/new?content=...` (a long,
         // one-shot URL); replacing collapses it out of history so Back returns to
         // the originating page instead of a wasted step that re-seeds the snippet.
-        if (router.query.content) {
+        if (router.query.content !== undefined) {
           router.replace(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
         } else {
           router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
