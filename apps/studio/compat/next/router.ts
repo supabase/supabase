@@ -272,6 +272,32 @@ export function useRouter() {
   }, [router, location.href, location.pathname, matches, params, search])
 }
 
+// Normalise an optional-catch-all route's params across both frameworks.
+//
+// Next's `[[...name]]` surfaces the trailing path as `query.name: string[]`,
+// while TanStack's splat (`$`) surfaces it as `query._splat: string`. The
+// shim can't rename `_splat` to the Next param name on its own — that name
+// only exists in the Next page filename and never reaches the router — so
+// the caller passes it. Returns the trailing path as a string[] plus the
+// remaining query params (with the catch-all keys stripped) for building
+// query strings. Shared by every migrated catch-all page so the logic lives
+// in one place.
+export function parseCatchAllRoute(
+  query: Record<string, string | string[] | undefined>,
+  paramName: string
+): {
+  segments: string[] | undefined
+  queryParams: Record<string, string | string[] | undefined>
+} {
+  const { [paramName]: raw, _splat, ...queryParams } = query
+  const segments = Array.isArray(raw)
+    ? raw
+    : typeof _splat === 'string' && _splat
+      ? _splat.split('/')
+      : undefined
+  return { segments, queryParams }
+}
+
 // Module-scope singleton — Next exposes the same proxy via
 // `import router from 'next/router'`. We have one consumer
 // (Support/DiscordCTACard) that reads `router.basePath` at render time

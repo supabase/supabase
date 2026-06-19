@@ -15,6 +15,7 @@ import {
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
 
+import { parseCatchAllRoute } from '@/compat/next/router'
 import {
   Header,
   LoadingCardView,
@@ -35,16 +36,10 @@ import { withAuth } from '@/hooks/misc/withAuth'
 const GenericProjectPage: NextPage = () => {
   const router = useRouter()
   const { slug } = useParams()
-  // Under TanStack this page is mounted via `routes/project/[_]/$.tsx`,
-  // which surfaces the trailing path as `_splat` (string), not as Next's
-  // `routeSlug` (string[]). Normalise both shapes to an array so
-  // downstream URL building (urlRewriterFactory) keeps working.
-  const { routeSlug: rawRouteSlug, _splat, ...queryParams } = router.query
-  const routeSlug: string[] | undefined = Array.isArray(rawRouteSlug)
-    ? rawRouteSlug
-    : typeof _splat === 'string' && _splat
-      ? _splat.split('/')
-      : undefined
+  // Normalise the catch-all path across Next (`routeSlug: string[]`) and
+  // TanStack (`_splat: string`) so downstream URL building
+  // (urlRewriterFactory) keeps working — see parseCatchAllRoute.
+  const { segments: routeSlug, queryParams } = parseCatchAllRoute(router.query, 'routeSlug')
 
   const { lastVisitedOrganization } = useLastVisitedOrganization()
 
