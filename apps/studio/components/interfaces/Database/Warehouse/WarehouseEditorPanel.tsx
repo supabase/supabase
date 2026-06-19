@@ -18,6 +18,7 @@ import {
 import { WarehouseDetachModal } from './WarehouseDetachModal'
 import { WarehouseEnablementModal, type EnablementVariant } from './WarehouseEnablementModal'
 import { WarehouseSyncChip } from './WarehouseSyncChip'
+import { WarehouseTimeTravelFlow } from './WarehouseTimeTravelFlow'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 
 interface WarehouseEditorPanelProps {
@@ -58,7 +59,7 @@ function StorageCard({ children }: { children: ReactNode }) {
 function StorageMetaRow({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-4 px-4 py-2.5">
-      <span className="text-foreground-light shrink-0">{label}</span>
+      <span className="text-foreground-lighter shrink-0">{label}</span>
       <div className="text-foreground text-right min-w-0">{children}</div>
     </div>
   )
@@ -118,7 +119,7 @@ function CreateWarehouseCopyButton({
         className="rounded-r-none hover:z-10"
         onClick={onAttach}
       >
-        Create Warehouse copy
+        Copy to Warehouse
       </Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -147,6 +148,7 @@ export function WarehouseEditorPanel({
   const [enableModal, setEnableModal] = useState<EnablementVariant | null>(null)
   const [confirmDetach, setConfirmDetach] = useState(false)
   const [detachProgress, setDetachProgress] = useState(false)
+  const [snapshotsOpen, setSnapshotsOpen] = useState(false)
 
   const copyName = state.copyName ?? `warehouse.${tableName}`
   const warehouseSize = formatWarehouseSize(state.warehouseSizeBytes)
@@ -187,17 +189,22 @@ export function WarehouseEditorPanel({
         )}
 
         {state.mode === 'warehouse_backed' && (
-          <StorageCard>
-            <StorageModeRow mode="warehouse_backed" />
-            <StorageMetaRow label="Size">{warehouseSize}</StorageMetaRow>
-            {state.migrationCompletedAt && (
-              <StorageMetaRow label="Moved">
-                <span className="text-foreground-light">
-                  {formatTimestamp(state.migrationCompletedAt)}
-                </span>
-              </StorageMetaRow>
-            )}
-          </StorageCard>
+          <>
+            <StorageCard>
+              <StorageModeRow mode="warehouse_backed" />
+              <StorageMetaRow label="Size">{warehouseSize}</StorageMetaRow>
+              {state.migrationCompletedAt && (
+                <StorageMetaRow label="Moved">
+                  <span className="text-foreground-light">
+                    {formatTimestamp(state.migrationCompletedAt)}
+                  </span>
+                </StorageMetaRow>
+              )}
+            </StorageCard>
+            <Button type="button" variant="default" onClick={() => setSnapshotsOpen(true)}>
+              View snapshots
+            </Button>
+          </>
         )}
       </div>
 
@@ -239,6 +246,15 @@ export function WarehouseEditorPanel({
         copyName={copyName}
         onOpenChange={setDetachProgress}
       />
+
+      {state.mode === 'warehouse_backed' && (
+        <WarehouseTimeTravelFlow
+          tableKey={tableKey}
+          sheetOpen={snapshotsOpen}
+          stacked
+          onSheetOpenChange={setSnapshotsOpen}
+        />
+      )}
     </>
   )
 }

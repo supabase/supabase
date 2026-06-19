@@ -1,6 +1,6 @@
 import { getEnableWebhooksSQL } from '@supabase/pg-meta'
 import type { Tables } from 'common/marketplace.types'
-import { Clock5, Code2, CodeXml, Layers, Timer, Vault, Webhook } from 'lucide-react'
+import { Clock5, Code2, Layers, Timer, Vault, Warehouse, Webhook } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { ComponentType, ReactNode } from 'react'
@@ -420,7 +420,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
     requiredExtensions: [],
     name: 'Warehouse Catalog',
     icon: ({ className, ...props } = {}) => (
-      <CodeXml className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
+      <Warehouse className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
     description: 'Connect analytics tools directly to your Warehouse tables',
     docsUrl: `${DOCS_URL}/guides/warehouse`,

@@ -3,6 +3,12 @@ import { proxy, useSnapshot } from 'valtio'
 export type WarehouseMode = 'postgres' | 'has_warehouse_copy' | 'warehouse_backed'
 export type SyncState = 'syncing' | 'live' | 'error'
 
+export interface WarehouseSnapshot {
+  id: string
+  createdAt: string
+  sizeBytes: number
+}
+
 export interface WarehouseTableState {
   mode: WarehouseMode
   syncState?: SyncState
@@ -11,6 +17,7 @@ export interface WarehouseTableState {
   migrationCompletedAt?: string
   copyName?: string
   warehouseSizeBytes?: number
+  snapshots?: WarehouseSnapshot[]
 }
 
 export const warehouseDemoStore = proxy<{
@@ -24,6 +31,19 @@ export const warehouseDemoStore = proxy<{
 })
 
 const DEMO_WAREHOUSE_SIZE_BYTES = 197_912_092_672 // ~184 GB
+
+const DEMO_SNAPSHOTS: WarehouseSnapshot[] = Array.from({ length: 20 }, (_, index) => {
+  const dayOffset = index
+  const date = new Date()
+  date.setUTCDate(date.getUTCDate() - dayOffset)
+  date.setUTCHours(8, 0, 0, 0)
+
+  return {
+    id: `snap_${String(index + 1).padStart(3, '0')}`,
+    createdAt: date.toISOString(),
+    sizeBytes: 190_000_000_000 - index * 500_000_000,
+  }
+})
 
 function tableNameFromKey(key: string): string {
   return key.split('.').pop() ?? key
@@ -44,6 +64,7 @@ export function setTableMode(key: string, mode: 'has_warehouse_copy' | 'warehous
     }),
     ...(mode === 'warehouse_backed' && {
       migrationCompletedAt: now,
+      snapshots: DEMO_SNAPSHOTS.map((snapshot) => ({ ...snapshot })),
     }),
   }
 }
@@ -69,4 +90,10 @@ export function formatWarehouseSize(bytes: number | undefined): string {
   if (bytes === undefined) return '184 GB'
   const gb = bytes / 1024 ** 3
   return `${Math.round(gb)} GB`
+}
+
+export function getWarehouseSnapshots(tableKey: string): WarehouseSnapshot[] {
+  const state = warehouseDemoStore.tables[tableKey]
+  if (state?.mode !== 'warehouse_backed') return []
+  return state.snapshots ?? DEMO_SNAPSHOTS
 }
