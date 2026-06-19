@@ -49,6 +49,7 @@ function ParityCard() {
             href="https://github.com/supabase/edge-runtime/"
             className="underline hover:text-foreground-light transition-colors"
             target="_blank"
+            rel="noopener noreferrer"
           >
             Edge runtime
           </Link>{' '}
@@ -85,6 +86,7 @@ function CICard() {
             href="https://supabase.com/docs/guides/functions/cicd-workflow"
             className="underline hover:text-foreground-light transition-colors"
             target="_blank"
+            rel="noopener noreferrer"
           >
             Supabase CLI with GitHub actions
           </Link>{' '}
@@ -134,6 +136,7 @@ export function LocalDXSection() {
               href="https://deno.com/"
               className="underline hover:text-foreground-light transition-colors"
               target="_blank"
+              rel="noopener noreferrer"
             >
               Deno
             </Link>
