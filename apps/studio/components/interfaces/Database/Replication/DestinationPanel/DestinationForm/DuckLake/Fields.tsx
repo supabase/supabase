@@ -115,11 +115,7 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
   const { data: sourceProject } = useSelectedProjectQuery()
   const sourceRegion = sourceProject?.region
 
-  const {
-    data: projectsData,
-    isPending: isLoadingProjects,
-    isError: isErrorProjects,
-  } = useOrgProjectsInfiniteQuery(
+  const { data: projectsData } = useOrgProjectsInfiniteQuery(
     { slug: organization?.slug, statuses: [PROJECT_STATUS.ACTIVE_HEALTHY] },
     { enabled: !!organization?.slug }
   )
@@ -143,34 +139,13 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
     return ref === sourceProject?.ref ? sourceProject?.region : undefined
   }
 
-  const projectLabel = (ref?: string) => {
-    if (!ref) return undefined
-    const project = projectsByRef.get(ref)
-    return project ? `${project.name} · ${project.ref}` : ref
-  }
-
-  const {
-    data: bucketsData,
-    isPending: isLoadingBuckets,
-    isError: isErrorBuckets,
-  } = usePaginatedBucketsQuery(
-    { projectRef: ducklakeStorageProjectRef },
-    { enabled: !!ducklakeStorageProjectRef }
-  )
-
-  const buckets = useMemo(
-    () =>
-      (bucketsData?.pages.flat() ?? []).filter(
-        (bucket) => !bucket.type || bucket.type === 'STANDARD'
-      ),
-    [bucketsData]
-  )
-
-  const { mutateAsync: createBucket, isPending: isCreatingBucket } = useBucketCreateMutation()
-
-  const storageProjectName = ducklakeStorageProjectRef
-    ? (projectsByRef.get(ducklakeStorageProjectRef)?.name ?? ducklakeStorageProjectRef)
-    : undefined
+  const { mutate: createBucket, isPending: isCreatingBucket } = useBucketCreateMutation({
+    onSuccess: (_, vars) => {
+      form.setValue('ducklakeStorageBucket', vars.id)
+      setNewBucketName('')
+      setShowNewBucketDialog(false)
+    },
+  })
 
   const handleCreateBucket = async () => {
     const name = newBucketName.trim()
@@ -179,19 +154,12 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
       return toast.error('Bucket name cannot contain "/"')
     }
 
-    try {
-      await createBucket({
-        projectRef: ducklakeStorageProjectRef,
-        id: name,
-        type: 'STANDARD',
-        isPublic: false,
-      })
-      form.setValue('ducklakeStorageBucket', name, { shouldValidate: true, shouldDirty: true })
-      setNewBucketName('')
-      setShowNewBucketDialog(false)
-    } catch {
-      // The mutation surfaces the failure through its onError toast
-    }
+    createBucket({
+      projectRef: ducklakeStorageProjectRef,
+      id: name,
+      type: 'STANDARD',
+      isPublic: false,
+    })
   }
 
   const renderRegionWarning = (ref?: string) => {
@@ -206,126 +174,12 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
     )
   }
 
-  const renderProjectSelect = (
-    value: string | undefined,
-    onChange: (value: string) => void,
-    placeholder: string
-  ) => {
-    if (isLoadingProjects) {
-      return (
-        <Button
-          disabled
-          variant="default"
-          className="w-full justify-between"
-          size="small"
-          iconRight={<Loader2 className="animate-spin" />}
-        >
-          Retrieving projects
-        </Button>
-      )
-    }
-    if (isErrorProjects) {
-      return (
-        <Button
-          disabled
-          variant="default"
-          className="w-full justify-start"
-          size="small"
-          icon={<WarningIcon />}
-        >
-          Failed to retrieve projects
-        </Button>
-      )
-    }
-    return (
-      <Select value={value || ''} onValueChange={onChange}>
-        <SelectTrigger>{projectLabel(value) ?? placeholder}</SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            {projects.length === 0 ? (
-              <SelectItem value="__no_projects__" disabled>
-                No active projects available
-              </SelectItem>
-            ) : (
-              projects.map((project) => (
-                <SelectItem key={project.ref} value={project.ref}>
-                  <div className="flex flex-col">
-                    <span>{project.name}</span>
-                    <span className="text-foreground-lighter">
-                      {project.ref} · {project.region}
-                    </span>
-                  </div>
-                </SelectItem>
-              ))
-            )}
-          </SelectGroup>
-        </SelectContent>
-      </Select>
-    )
-  }
-
-  const renderBucketSelect = (value: string | undefined, onChange: (value: string) => void) => {
-    if (!ducklakeStorageProjectRef) {
-      return (
-        <Button disabled variant="default" className="w-full justify-start" size="small">
-          Select a storage project first
-        </Button>
-      )
-    }
-    if (isLoadingBuckets) {
-      return (
-        <Button
-          disabled
-          variant="default"
-          className="w-full justify-between"
-          size="small"
-          iconRight={<Loader2 className="animate-spin" />}
-        >
-          Retrieving buckets
-        </Button>
-      )
-    }
-    if (isErrorBuckets) {
-      return (
-        <Button
-          disabled
-          variant="default"
-          className="w-full justify-start"
-          size="small"
-          icon={<WarningIcon />}
-        >
-          Failed to retrieve buckets
-        </Button>
-      )
-    }
-    return (
-      <Select value={value || ''} onValueChange={onChange}>
-        <SelectTrigger>{value || 'Select a bucket'}</SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            {buckets.length === 0 ? (
-              <SelectItem value="__no_buckets__" disabled>
-                No buckets available
-              </SelectItem>
-            ) : (
-              buckets.map((bucket) => (
-                <SelectItem key={bucket.id} value={bucket.id}>
-                  {bucket.name}
-                </SelectItem>
-              ))
-            )}
-          </SelectGroup>
-        </SelectContent>
-      </Select>
-    )
-  }
-
   return (
     <div className="flex flex-col gap-y-6">
       <div className="flex flex-col gap-y-1">
         <p className="text-sm font-medium text-foreground">Catalog</p>
         <p className="text-sm text-foreground-light">
-          The selected project's Postgres database is used as the PostgreSQL DuckLake catalog.
+          The selected project's Postgres database is used as the PostgreSQL DuckLake catalog
         </p>
       </div>
 
@@ -341,13 +195,17 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
                 {renderRegionWarning(field.value)}
                 <span>
                   Warehouse connects to this project's Postgres instance to store the DuckLake
-                  catalog.
+                  catalog
                 </span>
               </div>
             }
           >
             <FormControl>
-              {renderProjectSelect(field.value, field.onChange, 'Select a project')}
+              <ProjectSelection
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="Select a project"
+              />
             </FormControl>
           </FormItemLayout>
         )}
@@ -360,7 +218,7 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
           <FormItemLayout
             layout="horizontal"
             label="Pool size"
-            description="Optional number of concurrent DuckDB connections to the catalog"
+            description="Number of concurrent DuckDB connections to the catalog"
           >
             <FormControl>
               <Input
@@ -411,20 +269,20 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
             description={
               <div className="flex flex-col gap-y-2">
                 {renderRegionWarning(field.value)}
-                <span>The project whose object storage holds the DuckLake data files.</span>
+                <span>The project whose object storage holds the DuckLake data files</span>
               </div>
             }
           >
             <FormControl>
-              {renderProjectSelect(
-                field.value,
-                (value) => {
+              <ProjectSelection
+                value={field.value}
+                onChange={(value) => {
                   field.onChange(value)
                   // Buckets are project-scoped, so clear the selection when the project changes
                   form.setValue('ducklakeStorageBucket', '')
-                },
-                'Select a project'
-              )}
+                }}
+                placeholder="Select a project"
+              />
             </FormControl>
           </FormItemLayout>
         )}
@@ -441,7 +299,9 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
           >
             <div className="flex items-center gap-x-2">
               <div className="grow">
-                <FormControl>{renderBucketSelect(field.value, field.onChange)}</FormControl>
+                <FormControl>
+                  <BucketSelection form={form} value={field.value} onChange={field.onChange} />
+                </FormControl>
               </div>
               <Button
                 type="button"
@@ -460,7 +320,7 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
       <Dialog open={showNewBucketDialog} onOpenChange={setShowNewBucketDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create a new bucket</DialogTitle>
+            <DialogTitle>Create a new file bucket</DialogTitle>
           </DialogHeader>
           <DialogSectionSeparator />
           <DialogSection className="flex flex-col gap-y-2">
@@ -473,10 +333,6 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
               placeholder="ducklake-data"
               onChange={(event) => setNewBucketName(event.target.value)}
             />
-            <p className="text-xs text-foreground-lighter">
-              A private Standard bucket will be created in{' '}
-              {storageProjectName ?? 'the selected project'}.
-            </p>
           </DialogSection>
           <DialogFooter>
             <Button
@@ -511,8 +367,7 @@ const DuckLakeCustomFields = ({ form }: { form: UseFormReturn<DestinationPanelSc
       <div className="flex flex-col gap-y-1">
         <p className="text-sm font-medium text-foreground">Catalog</p>
         <p className="text-sm text-foreground-light">
-          Configure the PostgreSQL-backed DuckLake catalog and the S3-compatible storage location
-          for replicated data.
+          Configure the PostgreSQL DuckLake catalog and S3-compatible storage for replicated data
         </p>
       </div>
 
@@ -571,7 +426,7 @@ const DuckLakeCustomFields = ({ form }: { form: UseFormReturn<DestinationPanelSc
             <FormItemLayout
               layout="horizontal"
               label="Pool size"
-              description="Optional number of concurrent DuckDB connections to use"
+              description="Number of concurrent DuckDB connections to use"
             >
               <FormControl>
                 <Input
@@ -789,5 +644,186 @@ export const DuckLakeFields = ({
         <DuckLakeCustomFields form={form} />
       )}
     </div>
+  )
+}
+
+const ProjectSelection = ({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string | undefined
+  onChange: (value: string) => void
+  placeholder: string
+}) => {
+  const { data: organization } = useSelectedOrganizationQuery()
+
+  const {
+    data: projectsData,
+    isPending: isLoadingProjects,
+    isError: isErrorProjects,
+  } = useOrgProjectsInfiniteQuery(
+    { slug: organization?.slug, statuses: [PROJECT_STATUS.ACTIVE_HEALTHY] },
+    { enabled: !!organization?.slug }
+  )
+
+  const projects = useMemo(
+    () =>
+      (projectsData?.pages.flatMap((page) => page.projects) ?? []).filter(
+        (project) => !project.is_branch
+      ),
+    [projectsData]
+  )
+
+  const projectsByRef = useMemo(
+    () => new Map(projects.map((project) => [project.ref, project])),
+    [projects]
+  )
+
+  const projectLabel = (ref?: string) => {
+    if (!ref) return undefined
+    const project = projectsByRef.get(ref)
+    return project ? `${project.name} · ${project.ref}` : ref
+  }
+
+  if (isLoadingProjects) {
+    return (
+      <Button
+        disabled
+        variant="default"
+        className="w-full justify-between"
+        size="small"
+        iconRight={<Loader2 className="animate-spin" />}
+      >
+        Retrieving projects
+      </Button>
+    )
+  }
+  if (isErrorProjects) {
+    return (
+      <Button
+        disabled
+        variant="default"
+        className="w-full justify-start"
+        size="small"
+        icon={<WarningIcon />}
+      >
+        Failed to retrieve projects
+      </Button>
+    )
+  }
+  return (
+    <Select value={value || ''} onValueChange={onChange}>
+      <SelectTrigger>{projectLabel(value) ?? placeholder}</SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          {projects.length === 0 ? (
+            <SelectItem value="__no_projects__" disabled>
+              No active projects available
+            </SelectItem>
+          ) : (
+            projects.map((project) => (
+              <SelectItem key={project.ref} value={project.ref}>
+                <div className="flex flex-col">
+                  <span>{project.name}</span>
+                  <span className="text-foreground-lighter">
+                    {project.ref} · {project.region}
+                  </span>
+                </div>
+              </SelectItem>
+            ))
+          )}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  )
+}
+
+const BucketSelection = ({
+  form,
+  value,
+  onChange,
+}: {
+  form: UseFormReturn<DestinationPanelSchemaType>
+  value: string | undefined
+  onChange: (value: string) => void
+}) => {
+  const { ducklakeStorageProjectRef } = form.watch()
+
+  const {
+    data: bucketsData,
+    isPending: isLoadingBuckets,
+    isError: isErrorBuckets,
+  } = usePaginatedBucketsQuery(
+    { projectRef: ducklakeStorageProjectRef },
+    { enabled: !!ducklakeStorageProjectRef }
+  )
+
+  const buckets = useMemo(
+    () =>
+      (bucketsData?.pages.flat() ?? []).filter(
+        (bucket) => !bucket.type || bucket.type === 'STANDARD'
+      ),
+    [bucketsData]
+  )
+
+  if (!ducklakeStorageProjectRef) {
+    return (
+      <Button disabled variant="default" className="w-full justify-start" size="small">
+        Select a storage project first
+      </Button>
+    )
+  }
+  if (isLoadingBuckets) {
+    return (
+      <Button
+        disabled
+        variant="default"
+        className="w-full justify-between"
+        size="small"
+        iconRight={<Loader2 className="animate-spin" />}
+      >
+        Retrieving buckets
+      </Button>
+    )
+  }
+  if (isErrorBuckets) {
+    return (
+      <Button
+        disabled
+        variant="default"
+        className="w-full justify-start"
+        size="small"
+        icon={<WarningIcon />}
+      >
+        Failed to retrieve buckets
+      </Button>
+    )
+  }
+
+  return (
+    <Select
+      value={value || ''}
+      onValueChange={(e) => {
+        if (e) onChange(e)
+      }}
+    >
+      <SelectTrigger>{value || 'Select a bucket'}</SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          {buckets.length === 0 ? (
+            <SelectItem value="__no_buckets__" disabled>
+              No buckets available
+            </SelectItem>
+          ) : (
+            buckets.map((bucket) => (
+              <SelectItem key={bucket.id} value={bucket.id}>
+                {bucket.name}
+              </SelectItem>
+            ))
+          )}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
   )
 }

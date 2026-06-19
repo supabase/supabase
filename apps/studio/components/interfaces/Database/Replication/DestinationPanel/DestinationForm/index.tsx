@@ -610,7 +610,10 @@ export const DestinationForm = ({
       <NewPublicationPanel
         sourceId={sourceId}
         visible={publicationPanelVisible}
-        onClose={() => setPublicationPanelVisible(false)}
+        onClose={(newPublication?: string) => {
+          if (newPublication) form.setValue('publicationName', newPublication)
+          setPublicationPanelVisible(false)
+        }}
       />
 
       <CreateAnalyticsBucketSheet
