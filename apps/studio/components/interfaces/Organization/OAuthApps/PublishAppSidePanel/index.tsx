@@ -6,6 +6,13 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
   Badge,
   Button,
   cn,
@@ -16,12 +23,11 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
-  Modal,
   SidePanel,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -31,6 +37,7 @@ import { AuthorizeRequesterDetails } from '../AuthorizeRequesterDetails'
 import { OAuthSecrets } from '../OAuthSecrets/OAuthSecrets'
 import { ScopesPanel } from './Scopes'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { Shortcut } from '@/components/ui/Shortcut'
 import {
   OAuthAppCreateResponse,
   useOAuthAppCreateMutation,
@@ -40,6 +47,7 @@ import type { OAuthApp } from '@/data/oauth/oauth-apps-query'
 import { DOCS_URL } from '@/lib/constants'
 import { isValidHttpUrl, uuidv4 } from '@/lib/helpers'
 import { uploadAttachment } from '@/lib/upload'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export interface PublishAppSidePanelProps {
   visible: boolean
@@ -234,7 +242,7 @@ export const PublishAppSidePanel = ({
                           description={selectedApp?.id && `ID: ${selectedApp.id}`}
                         >
                           <FormControl className="col-span-6">
-                            <Input_Shadcn_ {...field} />
+                            <Input {...field} />
                           </FormControl>
                         </FormItemLayout>
                       )}
@@ -245,7 +253,7 @@ export const PublishAppSidePanel = ({
                       render={({ field }) => (
                         <FormItemLayout layout="vertical" label="Website URL">
                           <FormControl className="col-span-6">
-                            <Input_Shadcn_ {...field} placeholder="https://my-website.com" />
+                            <Input {...field} placeholder="https://my-website.com" />
                           </FormControl>
                         </FormItemLayout>
                       )}
@@ -266,7 +274,7 @@ export const PublishAppSidePanel = ({
                         <div className="absolute bottom-1 right-1">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button type="default" className="px-1">
+                              <Button variant="default" className="px-1">
                                 <Edit />
                               </Button>
                             </DropdownMenuTrigger>
@@ -330,7 +338,7 @@ export const PublishAppSidePanel = ({
                     </p>
                   </div>
                   <Button
-                    type="default"
+                    variant="default"
                     onClick={() => appendCallbackUrl({ id: uuidv4(), value: '' })}
                   >
                     Add URL
@@ -356,7 +364,7 @@ export const PublishAppSidePanel = ({
                               {callbackUrlsFields.length > 1 ? (
                                 <InputGroupAddon align="inline-end">
                                   <InputGroupButton
-                                    type="default"
+                                    variant="default"
                                     onClick={() => removeCallbackUrl(index)}
                                   >
                                     Remove
@@ -406,64 +414,63 @@ export const PublishAppSidePanel = ({
             <SidePanel.Content>
               <div className="pt-2 pb-3 flex items-center justify-between">
                 <Button
-                  type="default"
+                  variant="default"
                   onClick={() => setShowPreview(true)}
                   disabled={name.length === 0 || website.length === 0}
                 >
                   Preview consent for users
                 </Button>
                 <div className="flex items-center space-x-2">
-                  <Button type="default" disabled={isSubmitting} onClick={() => onClose()}>
+                  <Button variant="default" disabled={isSubmitting} onClick={() => onClose()}>
                     Cancel
                   </Button>
-                  <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
-                    Confirm
-                  </Button>
+                  <Shortcut
+                    id={SHORTCUT_IDS.ORG_OAUTH_APPS_SUBMIT}
+                    onTrigger={() => form.handleSubmit(onSubmit)()}
+                    options={{ enabled: visible && !isSubmitting }}
+                    side="top"
+                  >
+                    <Button type="submit" loading={isSubmitting} disabled={isSubmitting}>
+                      Confirm
+                    </Button>
+                  </Shortcut>
                 </div>
               </div>
             </SidePanel.Content>
           </div>
 
-          <Modal
-            hideFooter
-            showCloseButton={false}
-            className="max-w-[600px]!"
-            visible={showPreview}
-            onCancel={() => setShowPreview(false)}
-          >
-            <Modal.Content>
-              <div className="flex items-center gap-x-2 justify-between">
-                <p className="truncate">Authorize API access for {name}</p>
-                <Badge variant="success">Preview</Badge>
-              </div>
-            </Modal.Content>
-            <Modal.Separator />
-            <Modal.Content>
-              <AuthorizeRequesterDetails
-                icon={iconUrl || null}
-                name={name}
-                domain={website}
-                scopes={scopes}
-              />
-              <div className="pt-4 space-y-2">
-                <p className="prose text-sm">Select an organization to grant API access to</p>
-                <div className="border border-control text-foreground-light rounded-sm px-4 py-2 text-sm bg-surface-200">
-                  Organizations that you have access to will be listed here
-                </div>
-              </div>
-            </Modal.Content>
-            <Modal.Separator />
-            <Modal.Content>
-              <div className="flex items-center justify-between">
+          <AlertDialog open={showPreview} onOpenChange={(open) => setShowPreview(open)}>
+            <AlertDialogContent size="large">
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  <div className="flex items-center gap-x-2 justify-between">
+                    <p className="truncate">Authorize API access for {name}</p>
+                    <Badge variant="success">Preview</Badge>
+                  </div>
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  <AuthorizeRequesterDetails
+                    icon={iconUrl || null}
+                    name={name}
+                    domain={website}
+                    scopes={scopes}
+                  />
+                  <div className="pt-4 space-y-2">
+                    <p className="prose text-sm">Select an organization to grant API access to</p>
+                    <div className="border border-control text-foreground-light rounded-sm px-4 py-2 text-sm bg-surface-200">
+                      Organizations that you have access to will be listed here
+                    </div>
+                  </div>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="items-baseline sm:justify-between">
                 <p className="prose text-xs">
                   This is what your users will see when authorizing with your app
                 </p>
-                <Button type="default" onClick={() => setShowPreview(false)}>
-                  Close
-                </Button>
-              </div>
-            </Modal.Content>
-          </Modal>
+                <AlertDialogCancel>Close</AlertDialogCancel>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </form>
       </Form>
     </SidePanel>

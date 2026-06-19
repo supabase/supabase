@@ -46,6 +46,7 @@
   --animate-badge-pulse: badge-pulse 3s ease-in-out infinite;
   --animate-chevron-up: chevron-up 2s ease-in-out infinite;
   --animate-sway: sway 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-marketplace-featured-progress: marketplace-featured-progress linear forwards;
 }
 
 @keyframes shimmer {
@@ -105,6 +106,15 @@
   }
   50% {
     transform: rotate(10deg) scale(1.5) translateY(2rem);
+  }
+}
+
+@keyframes marketplace-featured-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
   }
 }
 
@@ -409,4 +419,33 @@ div[data-radix-portal]:not(.portal--toast) {
   50% {
     border-color: transparent;
   }
+}
+
+/* Zoomable image (react-medium-image-zoom) */
+
+[data-rmiz-modal]:focus,
+[data-rmiz-modal-overlay]:focus {
+  outline: none !important;
+}
+
+[data-rmiz-modal-overlay],
+[data-rmiz-modal-img] {
+  transition-timing-function: cubic-bezier(0.24, 0.25, 0.05, 1) !important;
+}
+
+[data-rmiz-modal-overlay='visible'] {
+  @apply bg-background!;
+  opacity: 0.8;
+}
+
+[data-rmiz-modal-img] {
+  image-rendering: high-quality;
+}
+
+.prose.text-sm ol > li::before {
+  top: 0.05rem;
+}
+
+.prose.text-sm ul > li::before {
+  top: 0.65rem;
 }

@@ -1,5 +1,5 @@
 import { noop } from 'lodash'
-import { Button, Checkbox, cn, Modal } from 'ui'
+import { Button, Checkbox, cn, DialogSection, DialogSectionSeparator } from 'ui'
 
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from '../Storage.constants'
 import { deriveAllowedClientLibraryMethods } from '../Storage.utils'
@@ -134,10 +134,10 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
 
 const PolicyEditorFooter = ({ onViewTemplates = () => {}, onReviewPolicy = () => {} }) => (
   <div className="flex w-full items-center justify-end gap-x-2 border-t px-6 py-3 border-default">
-    <Button type="default" onClick={onViewTemplates}>
+    <Button variant="default" onClick={onViewTemplates}>
       View templates
     </Button>
-    <Button type="primary" onClick={onReviewPolicy}>
+    <Button variant="primary" onClick={onReviewPolicy}>
       Review
     </Button>
   </div>
@@ -160,31 +160,31 @@ const StoragePoliciesEditor = ({
   return (
     <>
       <div className="space-y-4 py-4">
-        <Modal.Content>
+        <DialogSection>
           <PolicyName
             name={policyFormFields.name}
             limit={50}
             onUpdatePolicyName={onUpdatePolicyName}
           />
-        </Modal.Content>
-        <Modal.Separator />
-        <Modal.Content>
+        </DialogSection>
+        <DialogSectionSeparator />
+        <DialogSection>
           <PolicyAllowedOperations
             allowedOperations={policyFormFields.allowedOperations}
             onToggleOperation={onToggleOperation}
           />
-        </Modal.Content>
-        <Modal.Separator />
-        <Modal.Content>
+        </DialogSection>
+        <DialogSectionSeparator />
+        <DialogSection>
           <PolicyRoles selectedRoles={selectedRoles} onUpdateSelectedRoles={onUpdatePolicyRoles} />
-        </Modal.Content>
-        <Modal.Separator />
-        <Modal.Content>
+        </DialogSection>
+        <DialogSectionSeparator />
+        <DialogSection>
           <PolicyDefinition
             definition={definition}
             onUpdatePolicyDefinition={onUpdatePolicyDefinition}
           />
-        </Modal.Content>
+        </DialogSection>
       </div>
       <PolicyEditorFooter onViewTemplates={onViewTemplates} onReviewPolicy={onReviewPolicy} />
     </>

@@ -151,7 +151,7 @@ export function TableEditorSection() {
 
           {/* Right: image + footer */}
           <div className="flex flex-col border border-border rounded-md overflow-clip bg-surface-75">
-            <div className="relative aspect-[16/7.5] shrink-0 overflow-hidden flex items-end justify-center relative">
+            <div className="relative aspect-[16/7.5] shrink-0 overflow-hidden rounded-t-md flex items-end justify-center">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={active.label}
@@ -163,12 +163,12 @@ export function TableEditorSection() {
                   <img
                     src={active.image.dark}
                     alt={active.label}
-                    className="absolute inset-0 rounded-lg object-cover pointer-events-none hidden dark:block"
+                    className="absolute inset-0 object-cover pointer-events-none hidden dark:block"
                   />
                   <img
                     src={active.image.light}
                     alt={active.label}
-                    className="absolute inset-0 rounded-lg object-cover pointer-events-none dark:hidden"
+                    className="absolute inset-0 object-cover pointer-events-none dark:hidden"
                   />
                 </motion.div>
               </AnimatePresence>
@@ -184,13 +184,7 @@ export function TableEditorSection() {
                   exit={{ opacity: 0, transition: { duration: 0.05 } }}
                   className="flex flex-col gap-1"
                 >
-                  <h4 className="text-sm font-medium text-foreground flex items-center gap-2">
-                    {(() => {
-                      const Icon = ICONS[active.icon]
-                      return <Icon size={14} strokeWidth={2} />
-                    })()}
-                    {active.label}
-                  </h4>
+                  <h4 className="text-sm font-medium text-foreground">{active.label}</h4>
                   <p className="text-sm text-foreground-lighter">{active.description}</p>
                 </motion.div>
               </AnimatePresence>

@@ -1,6 +1,12 @@
 import { Search } from 'lucide-react'
+import Link from 'next/link'
 import React from 'react'
 import {
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
   Button,
   Card,
   DropdownMenu,
@@ -18,6 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+import { PageBreadcrumbs } from 'ui-patterns/PageBreadcrumbs'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -55,7 +62,21 @@ export default function PageLayoutList() {
 
   return (
     <div className="w-full">
-      <PageHeader size="large">
+      <PageBreadcrumbs>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href="/project/demo/database">Database</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Functions</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </PageBreadcrumbs>
+
+      <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Database Functions</PageHeaderTitle>
@@ -64,7 +85,7 @@ export default function PageLayoutList() {
         </PageHeaderMeta>
       </PageHeader>
 
-      <PageContainer size="large">
+      <PageContainer size="default">
         <PageSection>
           <PageSectionContent>
             <div className="w-full space-y-4">
@@ -81,7 +102,7 @@ export default function PageLayoutList() {
                     </InputGroupAddon>
                   </InputGroup>
                 </div>
-                <Button type="primary">Create a new function</Button>
+                <Button variant="primary">Create a new function</Button>
               </div>
 
               <Card>
@@ -105,7 +126,7 @@ export default function PageLayoutList() {
                         <TableCell>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button type="text" size="small">
+                              <Button variant="text" size="small">
                                 Actions
                               </Button>
                             </DropdownMenuTrigger>

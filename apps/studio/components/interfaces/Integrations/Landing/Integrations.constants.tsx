@@ -1,4 +1,5 @@
 import { getEnableWebhooksSQL } from '@supabase/pg-meta'
+import type { Tables } from 'common/marketplace.types'
 import { Clock5, Code2, Layers, Timer, Vault, Webhook } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
@@ -19,12 +20,15 @@ import { getQueryClient } from '@/data/query-client'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
+export type NavigationContentLayout = 'constrained' | 'full'
+
 export type Navigation = {
   route: string
   label: string
   hasChild?: boolean
   childIcon?: React.ReactNode
   children?: Navigation[]
+  layout?: NavigationContentLayout // applies only to the new marketplace
 }
 
 // [Joshen] Basing this on template.json for now
@@ -46,9 +50,11 @@ type IntegrationStep = {
   description?: string
 }
 
-type InstallUrlType = 'get' | 'post'
+type Listing = Tables<'listings'>
+type InstallUrlType = NonNullable<Listing['installation_url_type']>
+type InstallIdentificationMethod = NonNullable<Listing['installation_identification_method']>
 
-type InstallIdentificationMethod = 'secret_key_prefix'
+export type MarketplaceSource = 'Official' | 'Partner' | 'Community'
 
 /**
  * [Joshen] For marketplace, we probably need to revisit this definition
@@ -59,16 +65,19 @@ export type IntegrationDefinition = {
   name: string
   status?: 'alpha' | 'beta'
   categories?: string[]
+  featured?: boolean
   icon: (props?: { className?: string; style?: Record<string, string | number> }) => ReactNode
   description: string | null
   content?: string | null
-  files?: string[]
+  files?: { src: string; alt: string }[]
   docsUrl: string | null
   siteUrl?: string | null
   author: {
     name: string
     websiteUrl: string
   }
+  /** Provenance of the integration — Official (built by Supabase), Partner (formal third-party listing), Community (open-source, not officially endorsed). */
+  source: MarketplaceSource
   requiredExtensions: Array<string>
   /** Optional component to render if the integration requires extensions that are not available on the current database image */
   missingExtensionsAlert?: ReactNode
@@ -107,7 +116,9 @@ export type IntegrationDefinition = {
   installUrlType?: InstallUrlType
   installIdentificationMethod?: InstallIdentificationMethod
   secretKeyPrefix?: string
+  edgeFunctionSecretName?: string
   listingId?: string
+  oauthAppId?: string
 } & (
   | { type: 'wrapper'; meta: WrapperMeta }
   | { type: 'postgres_extension' | 'custom' | 'oauth' | 'template' }
@@ -122,6 +133,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
   {
     id: 'queues',
     type: 'postgres_extension' as const,
+    source: 'Community' as const,
     requiredExtensions: ['pgmq'],
     missingExtensionsAlert: <UpgradeDatabaseAlert minimumVersion="15.6.1.143" />,
     name: `Queues`,
@@ -150,6 +162,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
       {
         route: 'settings',
         label: 'Settings',
+        layout: 'constrained',
       },
     ],
     navigate: ({ pageId = 'overview', childId }) => {
@@ -183,6 +196,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
   {
     id: 'cron',
     type: 'postgres_extension' as const,
+    source: 'Community' as const,
     requiredExtensions: ['pg_cron'],
     name: `Cron`,
     icon: ({ className, ...props } = {}) => (
@@ -218,8 +232,8 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('@/components/interfaces/Integrations/Integration/IntegrationOverviewTabWrapper').then(
-                (mod) => mod.IntegrationOverviewTabWrapper
+              import('@/components/interfaces/Integrations/CronJobs/OverviewTab').then(
+                (mod) => mod.CronOverviewTab
               ),
             {
               loading: Loading,
@@ -236,6 +250,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
   {
     id: 'vault',
     type: 'postgres_extension' as const,
+    source: 'Official' as const,
     requiredExtensions: ['supabase_vault'],
     missingExtensionsAlert: <UpgradeDatabaseAlert />,
     name: `Vault`,
@@ -261,8 +276,8 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('@/components/interfaces/Integrations/Integration/IntegrationOverviewTabWrapper').then(
-                (mod) => mod.IntegrationOverviewTabWrapper
+              import('@/components/interfaces/Integrations/Vault/OverviewTab').then(
+                (mod) => mod.VaultOverviewTab
               ),
             {
               loading: Loading,
@@ -282,6 +297,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
   {
     id: 'webhooks',
     type: 'postgres_extension' as const,
+    source: 'Official' as const,
     name: `Database Webhooks`,
     icon: ({ className, ...props } = {}) => (
       <Webhook className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
@@ -299,6 +315,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
       {
         route: 'webhooks',
         label: 'Webhooks',
+        layout: 'constrained',
       },
     ],
     navigate: ({ pageId = 'overview' }) => {
@@ -336,6 +353,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
   {
     id: 'data_api',
     type: 'custom' as const,
+    source: 'Official' as const,
     requiredExtensions: [],
     name: `Data API`,
     icon: ({ className, ...props } = {}) => (
@@ -352,6 +370,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
       {
         route: 'settings',
         label: 'Settings',
+        layout: 'constrained',
       },
       {
         route: 'docs',
@@ -397,6 +416,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
   {
     id: 'graphiql',
     type: 'postgres_extension' as const,
+    source: 'Official' as const,
     requiredExtensions: ['pg_graphql'],
     name: `GraphQL`,
     icon: ({ className, ...props } = {}) => (
@@ -426,8 +446,8 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('@/components/interfaces/Integrations/Integration/IntegrationOverviewTabWrapper').then(
-                (mod) => mod.IntegrationOverviewTabWrapper
+              import('@/components/interfaces/Integrations/GraphQL/OverviewTab').then(
+                (mod) => mod.GraphQLOverviewTab
               ),
             {
               loading: Loading,
@@ -453,6 +473,7 @@ const WRAPPER_INTEGRATIONS: Array<IntegrationDefinition> = WRAPPERS.map((w) => {
   return {
     id: w.name,
     type: 'wrapper' as const,
+    source: 'Official' as const,
     name: `${w.label} Wrapper`,
     icon: ({ className, ...props } = {}) => (
       <Image fill src={w.icon} alt={w.name} className={cn('p-2', className)} {...props} />
@@ -460,6 +481,7 @@ const WRAPPER_INTEGRATIONS: Array<IntegrationDefinition> = WRAPPERS.map((w) => {
     requiredExtensions: ['wrappers', 'supabase_vault'],
     description: w.description,
     docsUrl: w.docsUrl,
+    categories: w.categories,
     meta: w,
     author: authorSupabase,
     navigation: [
@@ -504,6 +526,7 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
   {
     id: 'stripe_sync_engine',
     type: 'template' as const,
+    source: 'Partner' as const,
     requiredExtensions: ['pgmq', 'supabase_vault', 'pg_cron', 'pg_net'],
     missingExtensionsAlert: <UpgradeDatabaseAlert minimumVersion="15.6.1.143" />,
     name: `Stripe Sync Engine`,
@@ -532,6 +555,7 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
       {
         route: 'settings',
         label: 'Settings',
+        layout: 'constrained',
       },
     ],
     navigate: ({ pageId = 'overview' }) => {
@@ -618,11 +642,34 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
   },
 ]
 
-export const INTEGRATIONS: Array<IntegrationDefinition> = [
+const INTEGRATIONS_WITH_CATEGORIES = [
   ...WRAPPER_INTEGRATIONS,
-  ...SUPABASE_INTEGRATIONS,
-  ...TEMPLATE_INTEGRATIONS,
+  ...SUPABASE_INTEGRATIONS.map((integration) => {
+    const categoryMap: Record<string, string[]> = {
+      queues: ['devtools'],
+      cron: ['devtools'],
+      vault: ['security'],
+      webhooks: ['api'],
+      data_api: ['api', 'data-platform'],
+      graphiql: ['api', 'devtools'],
+    }
+    return {
+      ...integration,
+      categories: categoryMap[integration.id] || [],
+    }
+  }),
+  ...TEMPLATE_INTEGRATIONS.map((integration) => {
+    const categoryMap: Record<string, string[]> = {
+      stripe_sync_engine: ['billing'],
+    }
+    return {
+      ...integration,
+      categories: categoryMap[integration.id] || [],
+    }
+  }),
 ]
+
+export const INTEGRATIONS: Array<IntegrationDefinition> = INTEGRATIONS_WITH_CATEGORIES
 
 export const Loading = () => (
   <div className="p-10">

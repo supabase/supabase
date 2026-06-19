@@ -2,7 +2,7 @@ import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
-import { Badge, Button, Card, CardHeader, CardTitle, Input_Shadcn_ } from 'ui'
+import { Badge, Button, Card, CardHeader, CardTitle, Input } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ButtonTooltip } from './ButtonTooltip'
@@ -136,7 +136,7 @@ export function OrganizationSelector({
         </span>
       ) : (
         <>
-          <Input_Shadcn_
+          <Input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -158,7 +158,7 @@ export function OrganizationSelector({
                     setSearch('')
                     setShowAll(true)
                   }}
-                  type="default"
+                  variant="default"
                 >
                   Show all organizations
                 </Button>
@@ -172,7 +172,7 @@ export function OrganizationSelector({
           <CardHeader className="border-none">
             <CardTitle>Need a new organization?</CardTitle>
           </CardHeader>
-          <Button size="small" className="" asChild type="default">
+          <Button size="small" className="" asChild variant="default">
             <Link href={`/new?${searchParams.toString()}`}>New Organization</Link>
           </Button>
         </Card>

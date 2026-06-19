@@ -6,6 +6,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "pnpm run content:build && next --port 3000",
+    "prebuild": "pnpm --filter=docs run build:guides-markdown",
     "build": "pnpm run content:build && next build",
     "export": "next export",
     "start": "next start",
@@ -13,7 +14,7 @@
     "clean": "rimraf node_modules",
     "pretypecheck": "next typegen",
     "typecheck": "pnpm run content:build && tsc --noEmit",
-    "content:build": "node scripts/generateStaticContent.mjs && node scripts/generateMdContent.mjs",
+    "content:build": "node scripts/generateStaticContent.mjs && node scripts/generateMdContent.mjs && node scripts/fetchAgentSkills.mjs",
     "test": "vitest --run",
     "test:watch": "vitest watch",
     "postbuild": "node ./internals/generate-sitemap.mjs && ./../../scripts/upload-static-assets.sh"

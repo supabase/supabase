@@ -1,13 +1,13 @@
-import { Box, Cable, Database, Sparkles } from 'lucide-react'
+import { Box, Cable, Database, Server, Sparkles } from 'lucide-react'
 import {
   cn,
   RadioGroupStacked,
   RadioGroupStackedItem,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -27,6 +27,7 @@ const MODE_ICONS: Record<string, React.ReactNode> = {
   direct: <Database size={16} strokeWidth={1.5} />,
   orm: <Cable size={16} strokeWidth={1.5} />,
   mcp: <Sparkles size={16} strokeWidth={1.5} />,
+  server: <Server size={16} strokeWidth={1.5} />,
 }
 
 interface ConnectConfigSectionProps {
@@ -135,24 +136,24 @@ export function ConnectConfigSection({
                 label={field.label}
                 description={field.description}
               >
-                <Select_Shadcn_
+                <Select
                   value={String(value ?? '')}
                   onValueChange={(v) => onFieldChange(field.id, v)}
                 >
-                  <SelectTrigger_Shadcn_
+                  <SelectTrigger
                     size="small"
                     className="[&>span:first-child]:flex [&>span:first-child]:items-center [&>span:first-child]:gap-x-2"
                   >
-                    <SelectValue_Shadcn_ />
-                  </SelectTrigger_Shadcn_>
-                  <SelectContent_Shadcn_>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
                     {options.map((option) => (
-                      <SelectItem_Shadcn_
+                      <SelectItem
                         key={option.value}
                         value={option.value}
                         className="[&>span:last-child]:flex [&>span:last-child]:items-center [&>span:last-child]:gap-x-2"
                       >
-                        {/* 
+                        {/*
                           [Joshen] Omitting MCP icons for now as the images are not optimized (large)
                           and is causing noticeably latency issues on the browser (even with the existing Connect UI)
                          */}
@@ -160,10 +161,10 @@ export function ConnectConfigSection({
                           <ConnectionIcon icon={option.icon} />
                         )}
                         {option.label}
-                      </SelectItem_Shadcn_>
+                      </SelectItem>
                     ))}
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+                  </SelectContent>
+                </Select>
               </FormItemLayout>
             )
 
@@ -244,7 +245,10 @@ interface ModeSelectorProps {
 
 export function ModeSelector({ modes, selected, onChange }: ModeSelectorProps) {
   return (
-    <div className="grid grid-cols-4 rounded-lg border overflow-hidden">
+    <div
+      className="grid rounded-lg border overflow-hidden"
+      style={{ gridTemplateColumns: `repeat(${modes.length}, minmax(0, 1fr))` }}
+    >
       {modes.map((mode) => (
         <button
           key={mode.id}

@@ -10,6 +10,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
+import { ConstrainedIntegrationTabScaffold } from '@/components/interfaces/Integrations/ConstrainedIntegrationTabScaffold'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { FormHeader } from '@/components/ui/Forms/FormHeader'
 import {
@@ -193,7 +194,7 @@ export const QueuesSettings = () => {
 
   return (
     <>
-      <div className="w-full flex flex-col gap-y-4 p-10">
+      <ConstrainedIntegrationTabScaffold className="flex flex-col gap-y-4">
         <FormHeader
           className="mb-0"
           title="Settings"
@@ -281,7 +282,7 @@ export const QueuesSettings = () => {
                           </ul>
 
                           <Button
-                            type="default"
+                            variant="default"
                             className="mt-3"
                             onClick={() => setRlsConfirmModalOpen(true)}
                           >
@@ -332,15 +333,15 @@ export const QueuesSettings = () => {
                 />
                 <div className="flex items-center gap-x-2">
                   <Button
-                    type="default"
+                    variant="default"
                     disabled={Object.keys(formState.dirtyFields).length === 0 || isToggling}
                     onClick={() => form.reset({ enable: false })}
                   >
                     Cancel
                   </Button>
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     disabled={Object.keys(formState.dirtyFields).length === 0}
                     loading={isToggling}
                   >
@@ -351,7 +352,7 @@ export const QueuesSettings = () => {
             </FormPanelContainer>
           </form>
         </Form>
-      </div>
+      </ConstrainedIntegrationTabScaffold>
 
       <ConfirmationModal
         visible={rlsConfirmModalOpen}

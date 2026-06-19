@@ -1,25 +1,23 @@
 'use client'
 
 import { createClient } from '@supabase/supabase-js'
+import { IS_PLATFORM } from '~/lib/constants'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { gotrueClient, useConstant, useIsLoggedIn, type Database } from 'common'
 import { Check, MessageSquareQuote, X } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import {
-  type CSSProperties,
-  type MouseEventHandler,
   forwardRef,
   useReducer,
   useRef,
   useState,
+  type CSSProperties,
+  type MouseEventHandler,
 } from 'react'
-
-import { type Database, useConstant, useIsLoggedIn } from 'common'
 import { Button, cn } from 'ui'
 
-import { IS_PLATFORM } from '~/lib/constants'
-import { useSendFeedbackMutation } from '~/lib/fetch/feedback'
-import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { getLinearTeam, getSanitizedTabParams } from './Feedback.utils'
-import { type FeedbackFields, FeedbackModal } from './FeedbackModal'
+import { getSanitizedTabParams } from './Feedback.utils'
+import { FeedbackModal, type FeedbackFields } from './FeedbackModal'
 
 const FeedbackButton = forwardRef<
   HTMLButtonElement,
@@ -79,7 +77,6 @@ function Feedback({ className }: { className?: string }) {
 
   const pathname = usePathname() ?? ''
   const sendTelemetryEvent = useSendTelemetryEvent()
-  const { mutate: sendFeedbackComment } = useSendFeedbackMutation()
   const supabase = useConstant(() =>
     IS_PLATFORM
       ? createClient<Database>(
@@ -97,14 +94,9 @@ function Feedback({ className }: { className?: string }) {
 
   async function sendFeedbackVote(response: Response) {
     if (!supabase) return
-
-    const { error } = await supabase.from('feedback').insert({
-      vote: response,
-      page: pathname,
-      metadata: {
-        query: getSanitizedTabParams(),
-      },
-    })
+    const { error } = await supabase
+      .from('feedback')
+      .insert({ vote: response, page: pathname, metadata: { query: getSanitizedTabParams() } })
     if (error) console.error(error)
   }
 
@@ -129,15 +121,20 @@ function Feedback({ className }: { className?: string }) {
     }, 100)
   }
 
-  async function handleSubmit({ page, comment, title }: FeedbackFields) {
-    sendFeedbackComment({
-      message: comment,
-      pathname: page,
-      title,
-      // @ts-expect-error -- can't click this button without having a state.response
-      isHelpful: state.response === 'yes',
-      team: getLinearTeam(pathname),
-    })
+  async function handleSubmit({ comment, title }: FeedbackFields) {
+    if (supabase) {
+      const userId = (await gotrueClient.getSession()).data.session?.user?.id ?? null
+      const { error } = await supabase.from('feedback_comments').insert({
+        page: pathname,
+        // @ts-expect-error -- the comment modal only opens after a vote, so state.response is set
+        vote: state.response,
+        title,
+        comment,
+        user_id: userId,
+        metadata: { query: getSanitizedTabParams() },
+      })
+      if (error) console.error(error)
+    }
     setModalOpen(false)
     refocusButton()
   }
@@ -153,7 +150,7 @@ function Feedback({ className }: { className?: string }) {
           className="relative flex gap-2 items-center"
         >
           <Button
-            type="outline"
+            variant="outline"
             rounded
             className={cn(
               'px-1 w-7 h-7',
@@ -172,7 +169,7 @@ function Feedback({ className }: { className?: string }) {
             <span className="sr-only">No</span>
           </Button>
           <Button
-            type="outline"
+            variant="outline"
             rounded
             className={cn(
               'px-1 w-7 h-7',

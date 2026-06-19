@@ -1,10 +1,9 @@
-import 'react-data-grid/lib/styles.css'
 import '@/styles/code.css'
 import '@/styles/editor.css'
 import '@/styles/focus.css'
+import '@/styles/globals.css'
 import '@/styles/graphiql-base.css'
 import '@/styles/grid.css'
-import '@/styles/globals.css'
 import '@/styles/markdown-preview.css'
 import '@/styles/monaco.css'
 import '@/styles/react-data-grid-logs.css'
@@ -12,6 +11,7 @@ import '@/styles/reactflow.css'
 import '@/styles/storage.css'
 import '@/styles/stripe.css'
 import '@/styles/ui.css'
+import 'react-data-grid/lib/styles.css'
 import 'ui-patterns/ShimmeringLoader/index.css'
 
 import { loader } from '@monaco-editor/react'
@@ -36,7 +36,7 @@ import { DevToolbar, DevToolbarProvider, DevToolbarTrigger, type ExtraTab } from
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
-import { ErrorInfo, useCallback, type ComponentProps } from 'react'
+import { ErrorInfo, useCallback, useEffect, useState, type ComponentProps } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { TooltipProvider } from 'ui'
 import { TimestampInfoProvider } from 'ui-patterns'
@@ -47,11 +47,11 @@ import { FeaturePreviewContextProvider } from '@/components/interfaces/App/Featu
 import { FeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProvider'
 import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
-import { UpdateBillingAddressModal } from '@/components/interfaces/App/UpdateBillingAddressModal'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
 import { GlobalShortcuts } from '@/components/ui/GlobalShortcuts/GlobalShortcuts'
+import { getCLIReleaseVersion } from '@/data/misc/cli-release-version-query'
 import { useRootQueryClient } from '@/data/query-client'
 import { inter, sourceCodePro } from '@/fonts'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
@@ -61,6 +61,7 @@ import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/const
 import { TimezoneProvider, useTimezone } from '@/lib/datetime'
 import { ProfileProvider } from '@/lib/profile'
 import { Telemetry } from '@/lib/telemetry'
+import { ToastErrorTracker } from '@/lib/toast-errors'
 import { Toaster } from '@/lib/toaster'
 import { AiAssistantStateContextProvider } from '@/state/ai-assistant-state'
 import type { AppPropsWithLayout } from '@/types'
@@ -90,9 +91,24 @@ const FeatureFlagProviderWithOrgContext = ({
   ...props
 }: ComponentProps<typeof FeatureFlagProvider>) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
+  const cloudProvider = useDefaultProvider()
+
+  const getConfigCatFlags = useCallback(
+    (userEmail?: string) => {
+      const customAttributes: Record<string, string> = {}
+      if (cloudProvider) customAttributes.cloud_provider = cloudProvider
+      if (selectedOrganization?.plan?.id) customAttributes.plan = selectedOrganization.plan.id
+      return getFlags(userEmail, customAttributes)
+    },
+    [cloudProvider, selectedOrganization?.plan?.id]
+  )
 
   return (
-    <FeatureFlagProvider {...props} organizationSlug={selectedOrganization?.slug ?? undefined}>
+    <FeatureFlagProvider
+      {...props}
+      getConfigCatFlags={getConfigCatFlags}
+      organizationSlug={selectedOrganization?.slug ?? undefined}
+    >
       {children}
     </FeatureFlagProvider>
   )
@@ -124,6 +140,7 @@ loader.config({
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const queryClient = useRootQueryClient()
   const { appTitle } = useCustomContent(['app:title'])
+  const [isCLI, setIsCLI] = useState(false)
 
   const getLayout = Component.getLayout ?? ((page) => page)
 
@@ -144,34 +161,32 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
-  const cloudProvider = useDefaultProvider()
+  // [Joshen] Should target hosted staging, local dev, and local CLI only
+  const isNonProdEnv = (IS_PLATFORM && process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod') || isCLI
 
-  const getConfigCatFlags = useCallback(
-    (userEmail?: string) => {
-      const customAttributes = cloudProvider ? { cloud_provider: cloudProvider } : undefined
-      return getFlags(userEmail, customAttributes)
-    },
-    [cloudProvider]
-  )
+  const checkCliEnvironment = async () => {
+    const data = await getCLIReleaseVersion()
+    if (!!data.current) setIsCLI(true)
+  }
+
+  useEffect(() => {
+    if (!IS_PLATFORM) checkCliEnvironment()
+  }, [])
 
   return (
-    <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
         <NuqsAdapter>
           <HydrationBoundary state={pageProps.dehydratedState}>
             <AuthProvider>
-              <FeatureFlagProviderWithOrgContext
-                API_URL={API_URL}
-                enabled={IS_PLATFORM}
-                getConfigCatFlags={getConfigCatFlags}
-              >
+              <FeatureFlagProviderWithOrgContext API_URL={API_URL} enabled={IS_PLATFORM}>
                 <ProfileProvider>
                   <TimezoneProvider>
                     <TimestampInfoTimezoneBridge>
                       <Head>
                         <title>{appTitle ?? 'Supabase'}</title>
                         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-                        <meta property="og:image" content={`${BASE_PATH}/img/supabase-logo.png`} />
+                        <meta property="og:image" content={`${BASE_PATH}/img/supabase-og.png`} />
                         <meta name="googlebot" content="notranslate" />
                         {/* [Alaister]: This has to be an inline style tag here and not a separate component due to next/font */}
                         <style
@@ -188,8 +203,12 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                           />
                         )}
                       </Head>
-                      <MetaFaviconsPagesRouter applicationName="Supabase Studio" includeManifest />
-                      <TooltipProvider delayDuration={0}>
+                      <MetaFaviconsPagesRouter
+                        includeManifest
+                        applicationName="Supabase Studio"
+                        route={isNonProdEnv ? '/favicon/staging' : '/favicon'}
+                      />
+                      <TooltipProvider>
                         <RouteValidationWrapper>
                           <ThemeProvider
                             defaultTheme="system"
@@ -208,7 +227,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                                       <GlobalShortcuts />
                                       <StudioCommandMenu />
                                       <FeaturePreviewModal />
-                                      <UpdateBillingAddressModal />
                                     </FeaturePreviewContextProvider>
                                   </BannerStackProvider>
                                   <Toaster />
@@ -222,6 +240,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         </RouteValidationWrapper>
                       </TooltipProvider>
                       <Telemetry />
+                      <ToastErrorTracker />
                       {!isTestEnv && (
                         <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
                       )}
@@ -232,9 +251,9 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
             </AuthProvider>
           </HydrationBoundary>
         </NuqsAdapter>
-      </QueryClientProvider>
-      <TelemetryTagManager />
-    </ErrorBoundary>
+        <TelemetryTagManager />
+      </ErrorBoundary>
+    </QueryClientProvider>
   )
 }
 

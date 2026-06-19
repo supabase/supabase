@@ -1,12 +1,6 @@
 import Link from 'next/link'
 import { useMemo } from 'react'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Button,
-  CriticalIcon,
-} from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button, CriticalIcon } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import { SectionContent } from '../SectionContent'
@@ -47,14 +41,14 @@ const DatabaseSizeUsage = ({
       <SectionContent section={attribute}>
         <div className="space-y-4">
           {currentBillingCycleSelected && hasProjectsExceedingDatabaseSize && (
-            <Alert_Shadcn_ variant="warning">
+            <Alert variant="warning">
               <CriticalIcon />
-              <AlertTitle_Shadcn_>Projects exceeding quota</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+              <AlertTitle>Projects exceeding quota</AlertTitle>
+              <AlertDescription>
                 You have projects that are exceeding 0.5 GB of database size. Reduce the database
                 size or upgrade to a paid plan.
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
+              </AlertDescription>
+            </Alert>
           )}
 
           <div>
@@ -118,7 +112,7 @@ const DatabaseSizeUsage = ({
                       <span className="text-foreground-light flex items-center gap-2">
                         {project.name}
                       </span>
-                      <Button asChild type="default" size={'tiny'}>
+                      <Button asChild variant="default" size={'tiny'}>
                         <Link
                           href={`/project/${project.ref}/observability/database#database-size-report`}
                         >

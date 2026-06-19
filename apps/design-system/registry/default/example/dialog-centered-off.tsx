@@ -9,15 +9,15 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Input_Shadcn_,
-  Label_Shadcn_,
+  Input,
+  Label,
 } from 'ui'
 
 export default function DialogDemo() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button type="default">Edit profile</Button>
+        <Button variant="default">Edit profile</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]" centered={false}>
         <DialogHeader>
@@ -27,20 +27,20 @@ export default function DialogDemo() {
         <DialogSectionSeparator />
         <DialogSection className="space-y-4">
           <div>
-            <Label_Shadcn_ htmlFor="name" className="text-right">
+            <Label htmlFor="name" className="text-right">
               Name
-            </Label_Shadcn_>
-            <Input_Shadcn_ id="name" defaultValue="Pedro Duarte" className="col-span-3" />
+            </Label>
+            <Input id="name" defaultValue="Pedro Duarte" className="col-span-3" />
           </div>
           <div>
-            <Label_Shadcn_ htmlFor="username" className="text-right">
+            <Label htmlFor="username" className="text-right">
               Username
-            </Label_Shadcn_>
-            <Input_Shadcn_ id="username" defaultValue="@peduarte" className="col-span-3" />
+            </Label>
+            <Input id="username" defaultValue="@peduarte" className="col-span-3" />
           </div>
         </DialogSection>
         <DialogFooter>
-          <Button htmlType="submit">Save changes</Button>
+          <Button type="submit">Save changes</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

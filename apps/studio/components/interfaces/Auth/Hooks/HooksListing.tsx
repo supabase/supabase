@@ -24,7 +24,7 @@ import AlertError from '@/components/ui/AlertError'
 import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthHooksUpdateMutation } from '@/data/auth/auth-hooks-update-mutation'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -143,7 +143,7 @@ export const HooksListing = () => {
             description="Use Postgres functions or HTTP endpoints to customize your authentication flow."
           >
             <AddHookDropdown
-              type="default"
+              variant="default"
               align="center"
               buttonText="Add a new hook"
               open={addHookEmptyOpen}

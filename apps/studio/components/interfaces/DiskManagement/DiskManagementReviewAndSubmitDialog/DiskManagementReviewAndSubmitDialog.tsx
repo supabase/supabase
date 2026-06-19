@@ -2,8 +2,8 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ArrowRight } from 'lucide-react'
 import { UseFormReturn } from 'react-hook-form'
 import {
-  Alert_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertTitle,
   Button,
   ButtonProps,
   Dialog,
@@ -93,8 +93,8 @@ export const DiskManagementReviewAndSubmitDialog = ({
       <DialogTrigger asChild>
         <ButtonTooltip
           size={buttonSize}
-          htmlType="submit"
-          type="primary"
+          type="submit"
+          variant="primary"
           onClick={async (e) => {
             e.preventDefault()
             const isValid = await form.trigger()
@@ -268,14 +268,14 @@ export const DiskManagementReviewAndSubmitDialog = ({
         )}
 
         <DialogFooter className="px-5 py-4">
-          <Button block size="large" type="default" onClick={() => setIsDialogOpen(false)}>
+          <Button block size="large" variant="default" onClick={() => setIsDialogOpen(false)}>
             Cancel
           </Button>
           <Button
             block
-            type="primary"
+            variant="primary"
             size="large"
-            htmlType="submit"
+            type="submit"
             loading={loading}
             onClick={async () => {
               await onSubmit(form.getValues())
@@ -288,10 +288,10 @@ export const DiskManagementReviewAndSubmitDialog = ({
           <>
             <DialogSectionSeparator />
             <DialogSection>
-              <Alert_Shadcn_ variant={message.type === 'error' ? 'destructive' : 'default'}>
+              <Alert variant={message.type === 'error' ? 'destructive' : 'default'}>
                 <WarningIcon />
-                <AlertTitle_Shadcn_>{message.message}</AlertTitle_Shadcn_>
-              </Alert_Shadcn_>
+                <AlertTitle>{message.message}</AlertTitle>
+              </Alert>
             </DialogSection>
           </>
         )}

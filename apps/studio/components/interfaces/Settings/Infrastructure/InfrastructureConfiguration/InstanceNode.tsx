@@ -28,6 +28,7 @@ import {
   NODE_SEP,
   NODE_WIDTH,
   PrimaryNodeData,
+  REGION_NODE_HEIGHT,
   REPLICA_STATUS,
   ReplicaNodeData,
 } from './InstanceConfiguration.constants'
@@ -70,7 +71,7 @@ export const LoadBalancerNode = ({ data }: NodeProps<Node<LoadBalancerData>>) =>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button type="text" icon={<MoreVertical />} className="px-1" />
+              <Button variant="text" icon={<MoreVertical />} className="px-1" />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-40" side="bottom" align="end">
               <DropdownMenuItem asChild className="gap-x-2">
@@ -200,7 +201,7 @@ export const PrimaryNode = ({ data }: NodeProps<Node<PrimaryNodeData>>) => {
                     <>
                       <span className="text-foreground-lighter">·</span>
                       <span className="text-foreground-light">
-                        {connections.current}/{connections.max} conns
+                        {connections.peak}/{connections.max} conns
                       </span>
                     </>
                   )}
@@ -402,7 +403,7 @@ export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="text" icon={<MoreVertical />} className="px-1" />
+            <Button variant="text" icon={<MoreVertical />} className="px-1" />
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-40" side="bottom" align="end">
             <DropdownMenuItem
@@ -435,7 +436,7 @@ export const RegionNode = ({ data }: any) => {
   return (
     <div
       className="relative flex justify-between rounded-sm bg-black/10 border border-default border-white/10 border-2 p-3"
-      style={{ width: regionNodeWidth, height: 162 }}
+      style={{ width: regionNodeWidth, height: REGION_NODE_HEIGHT }}
     >
       <div className="absolute bottom-2 flex items-center justify-between gap-x-2">
         <img

@@ -246,7 +246,7 @@ function randomTimestamp(): string {
   return `2025-${m}-${d} ${h}:${min}:${sec}+00`
 }
 
-function pick<T>(arr: T[]): T {
+function pick<T>(arr: readonly T[]): T {
   return arr[Math.floor(Math.random() * arr.length)]
 }
 

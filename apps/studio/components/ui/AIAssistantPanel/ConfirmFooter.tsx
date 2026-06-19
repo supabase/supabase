@@ -5,6 +5,7 @@ interface ConfirmFooterProps {
   message: string
   cancelLabel?: string
   confirmLabel?: string
+  confirmLabelLoading?: string
   isLoading?: boolean
   onCancel?: () => void | Promise<void>
   onConfirm?: () => void | Promise<void>
@@ -14,6 +15,7 @@ export const ConfirmFooter = ({
   message,
   cancelLabel = 'Cancel',
   confirmLabel = 'Confirm',
+  confirmLabelLoading = 'Working...',
   isLoading = false,
   onCancel,
   onConfirm,
@@ -28,11 +30,11 @@ export const ConfirmFooter = ({
     >
       <div className="flex-1 relative z-10">{message}</div>
       <div className="flex items-center gap-2 relative z-10">
-        <Button size="tiny" type="outline" onClick={onCancel} disabled={isLoading}>
+        <Button size="tiny" variant="outline" onClick={onCancel} disabled={isLoading}>
           {cancelLabel}
         </Button>
-        <Button size="tiny" type="primary" onClick={onConfirm} disabled={isLoading}>
-          {isLoading ? 'Working...' : confirmLabel}
+        <Button size="tiny" variant="primary" onClick={onConfirm} disabled={isLoading}>
+          {isLoading ? confirmLabelLoading : confirmLabel}
         </Button>
       </div>
     </div>

@@ -19,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { REPLICA_STATUS } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
@@ -27,12 +27,12 @@ import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
 import { DisableExternalReplicationDialog } from './DisableExternalReplicationDialog'
-import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { ReadReplicaRow } from './ReadReplicas/ReadReplicaRow'
 import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLDucklakePrivateAlpha,
   useIsETLIcebergPrivateAlpha,
+  useIsETLSnowflakePrivateAlpha,
 } from './useIsETLPrivateAlpha'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -43,6 +43,7 @@ import { replicationKeys } from '@/data/replication/keys'
 import { fetchReplicationPipelineVersion } from '@/data/replication/pipeline-version-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
+import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -55,6 +56,7 @@ export const Destinations = () => {
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
+  const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 
   const newDestinationDefaultType = infrastructureReadReplicas
@@ -65,7 +67,9 @@ export const Destinations = () => {
         ? 'Analytics Bucket'
         : etlEnableDucklake
           ? 'DuckLake'
-          : null
+          : etlEnableSnowflake
+            ? 'Snowflake'
+            : null
 
   const prefetchedRef = useRef(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -81,6 +85,7 @@ export const Destinations = () => {
       'BigQuery',
       'Analytics Bucket',
       'DuckLake',
+      'Snowflake',
     ]).withOptions({
       history: 'push',
       clearOnDefault: true,
@@ -140,7 +145,9 @@ export const Destinations = () => {
     pipelines.length === 0
 
   const isLoading = isDestinationsLoading || isDatabasesLoading
-  const hasErrorsFetchingData = isDestinationsError || isDatabasesError
+
+  const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
+  const hasErrorsFetchingData = (!isLocalETLNotSetUp && isDestinationsError) || isDatabasesError
 
   const openDestinationPanel = () => {
     if (!newDestinationDefaultType) return
@@ -215,7 +222,7 @@ export const Destinations = () => {
               actions={
                 filterString.length > 0 && (
                   <Button
-                    type="text"
+                    variant="text"
                     icon={<X />}
                     className="p-0 h-5 w-5"
                     onClick={() => setFilterString('')}
@@ -233,7 +240,7 @@ export const Destinations = () => {
               side="bottom"
             >
               <Button
-                type="default"
+                variant="default"
                 icon={<Plus />}
                 disabled={!newDestinationDefaultType}
                 onClick={openDestinationPanel}
@@ -245,7 +252,7 @@ export const Destinations = () => {
             {canDisableExternalReplication && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button type="default" icon={<MoreVertical />} className="w-7" />
+                  <Button variant="default" icon={<MoreVertical />} className="w-7" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-52">
                   <DropdownMenuItem onClick={() => setShowDisableExternalReplicationDialog(true)}>
@@ -262,7 +269,14 @@ export const Destinations = () => {
         {hasErrorsFetchingData && (
           <AlertError
             error={destinationsError || databasesError}
-            subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_DESTINATIONS}
+            subject="Failed to retrieve destinations"
+          />
+        )}
+
+        {isLocalETLNotSetUp && (
+          <Admonition
+            type="default"
+            title="ETL API not set up locally — destinations cannot be managed"
           />
         )}
 
@@ -281,7 +295,7 @@ export const Destinations = () => {
                     <TableHead key="status" className="w-[150px]">
                       Status
                     </TableHead>
-                    <TableHead key="lag" className="w-[80px]">
+                    <TableHead key="lag" className="w-[150px]">
                       Lag
                     </TableHead>
                     <TableHead key="publication">Publication</TableHead>
@@ -308,10 +322,10 @@ export const Destinations = () => {
                     filteredReplicas.length === 0 &&
                     (hasReplicas || hasDestinations) && (
                       <TableRow>
-                        <TableCell colSpan={5}>
+                        <TableCell colSpan={6}>
                           <p>No results found</p>
                           <p className="text-foreground-light">
-                            Your search for "{filterString}" did not return any results
+                            Your search for "{filterString}" did not return any results.
                           </p>
                         </TableCell>
                       </TableRow>
@@ -333,7 +347,7 @@ export const Destinations = () => {
               <h4>Replication keeps your data in sync across systems</h4>
               <p className="text-foreground-light text-sm text-balance text-center mt-1">
                 Deploy read replicas for lower latency and better resource management, or capture
-                database changes to external platforms for real-time data pipelines.
+                database changes to external destinations for real-time data pipelines.
               </p>
               <Button
                 icon={<Plus />}

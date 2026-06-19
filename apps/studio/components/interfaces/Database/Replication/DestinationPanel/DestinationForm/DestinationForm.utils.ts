@@ -13,12 +13,14 @@ import {
   DestinationConfig,
   DucklakeDestinationConfig,
   IcebergDestinationConfig,
+  SnowflakeDestinationConfig,
 } from '@/data/replication/create-destination-pipeline-mutation'
+import { type ValidationFailure } from '@/data/replication/validate-destination-mutation'
 import {
   type CreateS3AccessKeyCredentialVariables,
   type S3AccessKeyCreateData,
 } from '@/data/storage/s3-access-key-create-mutation'
-import { ResponseError } from '@/types'
+import { type ResponseError } from '@/types'
 
 const normalizeOptionalString = (value?: string) => {
   const trimmed = value?.trim()
@@ -26,6 +28,10 @@ const normalizeOptionalString = (value?: string) => {
 }
 
 const normalizeRequiredString = (value?: string) => value?.trim() ?? ''
+
+const normalizeOptionalUntrimmedString = (value?: string) => {
+  return value && value.length > 0 ? value : undefined
+}
 
 type DucklakeFieldPath =
   | 'ducklakeCatalogUrl'
@@ -116,6 +122,53 @@ export const getDucklakeValidationIssues = (
   return issues
 }
 
+type SnowflakeFieldPath =
+  | 'snowflakeAccountId'
+  | 'snowflakeUser'
+  | 'snowflakePrivateKey'
+  | 'snowflakeDatabase'
+  | 'snowflakeSchema'
+
+export type SnowflakeValidationIssue = {
+  path: SnowflakeFieldPath
+  message: string
+}
+
+export const getSnowflakeValidationIssues = (
+  data: Pick<
+    DestinationPanelSchemaType,
+    | 'snowflakeAccountId'
+    | 'snowflakeUser'
+    | 'snowflakePrivateKey'
+    | 'snowflakeDatabase'
+    | 'snowflakeSchema'
+  >
+): SnowflakeValidationIssue[] => {
+  const issues: SnowflakeValidationIssue[] = []
+
+  if (!data.snowflakeAccountId?.trim().length) {
+    issues.push({ path: 'snowflakeAccountId', message: 'Account ID is required' })
+  }
+
+  if (!data.snowflakeUser?.trim().length) {
+    issues.push({ path: 'snowflakeUser', message: 'User is required' })
+  }
+
+  if (!data.snowflakePrivateKey?.trim().length) {
+    issues.push({ path: 'snowflakePrivateKey', message: 'Private key is required' })
+  }
+
+  if (!data.snowflakeDatabase?.trim().length) {
+    issues.push({ path: 'snowflakeDatabase', message: 'Database is required' })
+  }
+
+  if (!data.snowflakeSchema?.trim().length) {
+    issues.push({ path: 'snowflakeSchema', message: 'Schema is required' })
+  }
+
+  return issues
+}
+
 // Helper function to build destination config for validation
 export const buildDestinationConfigForValidation = ({
   projectRef,
@@ -176,7 +229,18 @@ export const buildDestinationConfigForValidation = ({
         s3UrlStyle: data.ducklakeS3UrlStyle,
         s3UseSsl: data.ducklakeS3UseSsl,
         metadataSchema: normalizeOptionalString(data.ducklakeMetadataSchema),
-        expireSnapshotsOlderThan: normalizeOptionalString(data.ducklakeExpireSnapshotsOlderThan),
+      },
+    }
+  } else if (selectedType === 'Snowflake') {
+    return {
+      snowflake: {
+        accountId: normalizeRequiredString(data.snowflakeAccountId),
+        user: normalizeRequiredString(data.snowflakeUser),
+        privateKey: data.snowflakePrivateKey ?? '',
+        privateKeyPassphrase: normalizeOptionalUntrimmedString(data.snowflakePrivateKeyPassphrase),
+        database: normalizeRequiredString(data.snowflakeDatabase),
+        schema: normalizeRequiredString(data.snowflakeSchema),
+        role: normalizeOptionalString(data.snowflakeRole),
       },
     }
   } else {
@@ -255,10 +319,39 @@ export const buildDestinationConfig = async ({
       s3UrlStyle: data.ducklakeS3UrlStyle,
       s3UseSsl: data.ducklakeS3UseSsl,
       metadataSchema: normalizeOptionalString(data.ducklakeMetadataSchema),
-      expireSnapshotsOlderThan: normalizeOptionalString(data.ducklakeExpireSnapshotsOlderThan),
     }
     destinationConfig = { ducklake: ducklakeConfig }
+  } else if (selectedType === 'Snowflake') {
+    const snowflakeConfig: SnowflakeDestinationConfig = {
+      accountId: normalizeRequiredString(data.snowflakeAccountId),
+      user: normalizeRequiredString(data.snowflakeUser),
+      privateKey: data.snowflakePrivateKey ?? '',
+      privateKeyPassphrase: normalizeOptionalUntrimmedString(data.snowflakePrivateKeyPassphrase),
+      database: normalizeRequiredString(data.snowflakeDatabase),
+      schema: normalizeRequiredString(data.snowflakeSchema),
+      role: normalizeOptionalString(data.snowflakeRole),
+    }
+    destinationConfig = { snowflake: snowflakeConfig }
   }
 
   return destinationConfig
+}
+
+const getValidationFailureKey = (failure: ValidationFailure) =>
+  JSON.stringify([failure.failure_type, failure.name, failure.reason])
+
+const getSortedValidationFailureKeys = (failures: ValidationFailure[]) =>
+  failures.map(getValidationFailureKey).sort((a, b) => a.localeCompare(b))
+
+export const areValidationFailuresEqual = (
+  previousFailures: ValidationFailure[],
+  nextFailures: ValidationFailure[]
+) => {
+  const previousKeys = getSortedValidationFailureKeys(previousFailures)
+  const nextKeys = getSortedValidationFailureKeys(nextFailures)
+
+  return (
+    previousKeys.length === nextKeys.length &&
+    previousKeys.every((key, index) => key === nextKeys[index])
+  )
 }

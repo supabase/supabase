@@ -26,12 +26,8 @@ export function AuthContent({
       <section className="border-t border-border">
         <HighlightsSection />
       </section>
-      <section className="border-t border-border">
-        {apiSlot}
-      </section>
-      <section className="border-t border-border">
-        {rlsSlot}
-      </section>
+      <section className="border-t border-border">{apiSlot}</section>
+      <section className="border-t border-border">{rlsSlot}</section>
       <section className="border-t border-border">
         <BuiltWithSupabaseSection />
       </section>

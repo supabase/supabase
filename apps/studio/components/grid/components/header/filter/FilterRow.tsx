@@ -1,6 +1,6 @@
 import { ChevronDown, X } from 'lucide-react'
 import { KeyboardEvent, memo } from 'react'
-import { Button, Input_Shadcn_ as Input } from 'ui'
+import { Button, Input } from 'ui'
 
 import { FilterOperatorOptions } from './Filter.constants'
 import { DropdownControl } from '@/components/grid/components/common/DropdownControl'
@@ -39,7 +39,7 @@ const FilterRow = ({ filter, filterIdx, onChange, onDelete, onKeyDown }: FilterR
       >
         <Button
           asChild
-          type="outline"
+          variant="outline"
           icon={
             <div className="text-foreground-lighter">
               <ChevronDown strokeWidth={1.5} />
@@ -62,7 +62,7 @@ const FilterRow = ({ filter, filterIdx, onChange, onDelete, onKeyDown }: FilterR
       >
         <Button
           asChild
-          type="outline"
+          variant="outline"
           icon={
             <div className="text-foreground-lighter">
               <ChevronDown strokeWidth={1.5} />
@@ -86,7 +86,7 @@ const FilterRow = ({ filter, filterIdx, onChange, onDelete, onKeyDown }: FilterR
         onKeyDown={onKeyDown}
       />
       <Button
-        type="text"
+        variant="text"
         className="px-1"
         icon={<X strokeWidth={1.5} />}
         onClick={() => onDelete(filterIdx)}

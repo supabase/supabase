@@ -5,15 +5,13 @@ import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
 import { isArray } from 'lodash'
 import { Check, ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { Button, cn, SidePanel } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import DowngradeModal from './DowngradeModal'
+import { CancellationFlow } from './CancellationFlow'
 import { EnterpriseCard } from './EnterpriseCard'
-import { ExitSurveyModal } from './ExitSurveyModal'
-import MembersExceedLimitModal from './MembersExceedLimitModal'
 import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
 import UpgradeSurveyModal from './UpgradeModal'
 import { STRIPE_PROJECTS_DOCS_URL } from '@/components/interfaces/Billing/Payment/PaymentMethods/StripePaymentConnection'
@@ -21,7 +19,6 @@ import { getPlanChangeType } from '@/components/interfaces/Billing/Subscription/
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
 import { RequestUpgradeToBillingOwners } from '@/components/ui/RequestUpgradeToBillingOwners'
-import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
 import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-utils'
 import { useOrganizationBillingSubscriptionPreview } from '@/data/organizations/organization-billing-subscription-preview'
 import { useOrganizationQuery } from '@/data/organizations/organization-query'
@@ -30,11 +27,11 @@ import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infini
 import { useOrgPlansQuery } from '@/data/subscriptions/org-plans-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import type { OrgPlan } from '@/data/subscriptions/types'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { formatCurrency } from '@/lib/helpers'
+import { useTrack } from '@/lib/telemetry/track'
 import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 import { Organization } from '@/types/base'
 
@@ -68,13 +65,11 @@ export const PlanUpdateSidePanel = () => {
   )
   const isStripeManagedOrganization =
     selectedOrganization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
-  const originalPlanRef = useRef<string>()
+  const originalPlanRef = useRef<string>(undefined)
 
-  const [showExitSurvey, setShowExitSurvey] = useState(false)
   const [showUpgradeSurvey, setShowUpgradeSurvey] = useState(false)
-  const [showDowngradeError, setShowDowngradeError] = useState(false)
   const [selectedTier, setSelectedTier] = useState<'tier_free' | 'tier_pro' | 'tier_team'>()
   const [latestAddress, setLatestAddress] = useState<CustomerAddress>()
   const [latestTaxId, setLatestTaxId] = useState<CustomerTaxId | null>()
@@ -130,10 +125,6 @@ export const PlanUpdateSidePanel = () => {
     { orgSlug: slug },
     { enabled: visible }
   )
-  const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
-    { slug },
-    { enabled: visible }
-  )
 
   const subscriptionPreviewData = useOrganizationBillingSubscriptionPreview({
     tier: selectedTier,
@@ -143,12 +134,12 @@ export const PlanUpdateSidePanel = () => {
   })
 
   const availablePlans: OrgPlan[] = plans?.plans ?? []
-  const hasMembersExceedingFreeTierLimit =
-    (membersExceededLimit || []).length > 0 &&
-    // [Joshen] Note that orgProjects is paginated so there's a chance this may omit certain projects
-    // Although I don't foresee this affecting a majority of users. Ideally perhaps we could return
-    // this data from the organization query
-    orgProjects.filter((it) => it.status !== 'INACTIVE' && it.status !== 'GOING_DOWN').length > 0
+
+  const onPanelOpened = useEffectEvent(
+    (properties: StudioPricingSidePanelOpenedEvent['properties']) => {
+      track('studio_pricing_side_panel_opened', properties)
+    }
+  )
 
   useEffect(() => {
     if (visible) {
@@ -165,11 +156,7 @@ export const PlanUpdateSidePanel = () => {
       if (source) {
         properties.origin = source
       }
-      sendEvent({
-        action: 'studio_pricing_side_panel_opened',
-        properties,
-        groups: { organization: slug ?? 'Unknown' },
-      })
+      onPanelOpened(properties)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible])
@@ -179,15 +166,6 @@ export const PlanUpdateSidePanel = () => {
       originalPlanRef.current = subscription.plan.id
     }
   }, [visible, isSuccessSubscription, subscription?.plan.id])
-
-  const onConfirmDowngrade = () => {
-    setSelectedTier(undefined)
-    if (hasMembersExceedingFreeTierLimit) {
-      setShowDowngradeError(true)
-    } else {
-      setShowExitSurvey(true)
-    }
-  }
 
   const planMeta = selectedTier
     ? availablePlans.find((p) => p.id === selectedTier.split('tier_')[1])
@@ -214,7 +192,7 @@ export const PlanUpdateSidePanel = () => {
         header={
           <div className="flex items-center justify-between w-full">
             <h4>Change subscription plan for {selectedOrganization?.name}</h4>
-            <Button asChild type="default" icon={<ExternalLink />}>
+            <Button asChild variant="default" icon={<ExternalLink />}>
               <a href="https://supabase.com/pricing" target="_blank" rel="noreferrer">
                 Pricing
               </a>
@@ -304,16 +282,17 @@ export const PlanUpdateSidePanel = () => {
                       <p className="text-foreground-light text-sm">{plan.costUnit}</p>
                     </div>
                     {isCurrentPlan ? (
-                      <Button block disabled type="default">
+                      <Button block disabled variant="default">
                         Current plan
                       </Button>
-                    ) : !canUpdateSubscription ? (
+                    ) : !canUpdateSubscription && !isDowngradeOption ? (
                       <RequestUpgradeToBillingOwners block plan={plan.name as 'Pro' | 'Team'} />
                     ) : (
                       <ButtonTooltip
                         block
-                        type={isDowngradeOption ? 'default' : 'primary'}
+                        variant={isDowngradeOption ? 'default' : 'primary'}
                         disabled={
+                          (!canUpdateSubscription && isDowngradeOption) ||
                           subscription?.plan?.id === 'enterprise' ||
                           subscription?.plan?.id === 'platform' ||
                           // Downgrades to free are still allowed through the dashboard given we have much better control about showing customers the impact + any possible issues with downgrading to free
@@ -324,13 +303,9 @@ export const PlanUpdateSidePanel = () => {
                         }
                         onClick={() => {
                           setSelectedTier(plan.id as 'tier_free' | 'tier_pro' | 'tier_team')
-                          sendEvent({
-                            action: 'studio_pricing_plan_cta_clicked',
-                            properties: {
-                              selectedPlan: plan.name,
-                              currentPlan: subscription?.plan?.name,
-                            },
-                            groups: { organization: slug ?? 'Unknown' },
+                          track('studio_pricing_plan_cta_clicked', {
+                            selectedPlan: plan.name,
+                            currentPlan: subscription?.plan?.name,
                           })
                         }}
                         tooltip={{
@@ -338,14 +313,17 @@ export const PlanUpdateSidePanel = () => {
                             side: 'bottom',
                             className: hasOrioleProjects ? 'w-96 text-center' : '',
                             text:
-                              subscription?.plan?.id === 'enterprise' ||
-                              subscription?.plan?.id === 'platform'
-                                ? 'Reach out to us via support to update your plan'
-                                : hasOrioleProjects
-                                  ? 'Your organization has projects that are using the OrioleDB extension which is only available on the Free plan. Remove all OrioleDB projects before changing your plan.'
-                                  : selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE
-                                    ? 'You cannot change the plan for an organization managed by AWS Marketplace'
-                                    : undefined,
+                              !canUpdateSubscription && isDowngradeOption
+                                ? "You need additional permissions to change your organization's plan"
+                                : subscription?.plan?.id === 'enterprise' ||
+                                    subscription?.plan?.id === 'platform'
+                                  ? 'Reach out to us via support to update your plan'
+                                  : hasOrioleProjects
+                                    ? 'Your organization has projects that are using the OrioleDB extension which is only available on the Free plan. Remove all OrioleDB projects before changing your plan.'
+                                    : selectedOrganization?.managed_by ===
+                                        MANAGED_BY.AWS_MARKETPLACE
+                                      ? 'You cannot change the plan for an organization managed by AWS Marketplace'
+                                      : undefined,
                           },
                         }}
                       >
@@ -393,12 +371,10 @@ export const PlanUpdateSidePanel = () => {
         </SidePanel.Content>
       </SidePanel>
 
-      <DowngradeModal
+      <CancellationFlow
         visible={selectedTier === 'tier_free'}
-        subscription={subscription}
-        onClose={() => setSelectedTier(undefined)}
-        onConfirm={onConfirmDowngrade}
-        projects={orgProjects}
+        onCancel={() => setSelectedTier(undefined)}
+        onDowngrade={() => setSelectedTier(undefined)}
       />
 
       <SubscriptionPlanUpdateDialog
@@ -412,20 +388,6 @@ export const PlanUpdateSidePanel = () => {
         onTaxIdChange={handleTaxIdChange}
         useAsDefaultBillingAddress={useAsDefaultBillingAddress}
         onUseAsDefaultBillingAddressChange={handleUseAsDefaultBillingAddressChange}
-      />
-
-      <MembersExceedLimitModal
-        visible={showDowngradeError}
-        onClose={() => setShowDowngradeError(false)}
-      />
-
-      <ExitSurveyModal
-        visible={showExitSurvey}
-        projects={orgProjects}
-        onClose={(success?: boolean) => {
-          setShowExitSurvey(false)
-          if (success) onClose()
-        }}
       />
 
       <UpgradeSurveyModal

@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { AlertCircle } from 'lucide-react'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
+import { Alert, AlertDescription, AlertTitle } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -101,6 +101,18 @@ const PITR = () => {
     )
   }
 
+  if (project?.high_availability) {
+    return (
+      <Admonition
+        type="default"
+        title="Database backups are not available for High Availability projects"
+        description="High Availability projects do not support Point-in-Time Recovery (PITR) backups"
+      >
+        <DocsButton abbrev={false} className="mt-2" href={DOCS_URL} />
+      </Admonition>
+    )
+  }
+
   return (
     <>
       {isLoading && <GenericSkeletonLoader />}
@@ -120,15 +132,15 @@ const PITR = () => {
               }
             />
           ) : !isActiveHealthy ? (
-            <Alert_Shadcn_>
+            <Alert>
               <AlertCircle />
-              <AlertTitle_Shadcn_>
+              <AlertTitle>
                 Point in Time Recovery is not available while project is offline
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+              </AlertTitle>
+              <AlertDescription>
                 Your project needs to be online to restore your database with Point in Time Recovery
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
+              </AlertDescription>
+            </Alert>
           ) : (
             <>
               <PITRNotice />

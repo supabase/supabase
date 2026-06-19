@@ -36,10 +36,8 @@ describe('getHeadersSectionDescription', () => {
 })
 
 describe('getDefaultHeadersByType', () => {
-  it('returns the JSON content type header for webhook destinations', () => {
-    expect(getDefaultHeadersByType('webhook')).toEqual({
-      'Content-Type': 'application/json',
-    })
+  it('does not return a default Content-Type header for webhook destinations', () => {
+    expect(getDefaultHeadersByType('webhook')).toEqual({})
   })
 
   it('returns the protobuf content type header for OTLP destinations', () => {

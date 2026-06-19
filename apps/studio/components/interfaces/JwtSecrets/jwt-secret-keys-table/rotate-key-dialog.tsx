@@ -12,7 +12,7 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Label_Shadcn_,
+  Label,
   Skeleton,
 } from 'ui'
 
@@ -138,7 +138,7 @@ export function RotateKeyDialog({
           <>
             <div className="text-sm">To proceed please confirm:</div>
 
-            <Label_Shadcn_
+            <Label
               htmlFor="understands-standby"
               className="flex items-top gap-4 text-sm leading-none"
             >
@@ -152,7 +152,7 @@ export function RotateKeyDialog({
                 All of my application's components have picked up the standby key.
               </p>
               <ButtonTooltip
-                type="default"
+                variant="default"
                 icon={<Info />}
                 className="px-1.5 py-2 mt-0.5"
                 tooltip={{
@@ -172,9 +172,9 @@ export function RotateKeyDialog({
                   },
                 }}
               />
-            </Label_Shadcn_>
+            </Label>
 
-            <Label_Shadcn_
+            <Label
               htmlFor="understands-previously-used"
               className="flex items-top gap-4 text-sm leading-none"
             >
@@ -188,7 +188,7 @@ export function RotateKeyDialog({
                 To invalidate non-expired JWTs I need to explicitly revoke the currently used key.
               </p>
               <ButtonTooltip
-                type="default"
+                variant="default"
                 icon={<Info />}
                 className="px-1.5 py-2 mt-0.5"
                 tooltip={{
@@ -211,10 +211,10 @@ export function RotateKeyDialog({
                   },
                 }}
               />
-            </Label_Shadcn_>
+            </Label>
 
             {verifyJWTEdgeFunctions.length > 0 && (
-              <Label_Shadcn_ htmlFor="edge-functions-verify-jwt" className="flex gap-4 text-sm">
+              <Label htmlFor="edge-functions-verify-jwt" className="flex gap-4 text-sm">
                 <Checkbox
                   id="edge-functions-verify-jwt"
                   className="mt-0.5"
@@ -242,7 +242,7 @@ export function RotateKeyDialog({
                     )}
                 </p>
                 <ButtonTooltip
-                  type="default"
+                  variant="default"
                   icon={<Info />}
                   className="px-1.5 py-2 mt-0.5"
                   tooltip={{
@@ -268,7 +268,7 @@ export function RotateKeyDialog({
                     },
                   }}
                 />
-              </Label_Shadcn_>
+              </Label>
             )}
           </>
         )}

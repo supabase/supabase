@@ -15,6 +15,7 @@ const RealtimeLogs: FC<Props> = ({ isActive, isInView, className }) => {
 
   const isPlaying = isActive && isInView
   const INTERVAL = 550 // in milliseconds
+  const MAX_LOGS = 120
 
   const logs = [
     createLog(),
@@ -36,7 +37,8 @@ const RealtimeLogs: FC<Props> = ({ isActive, isInView, className }) => {
     t.setSeconds(t.getSeconds() - (offset ?? 0))
 
     const rand = Math.random()
-    const status = rand > 0.92 ? 500 : rand > 0.85 ? 404 : rand > 0.8 ? 301 : rand > 0.75 ? 201 : 200
+    const status =
+      rand > 0.92 ? 500 : rand > 0.85 ? 404 : rand > 0.8 ? 301 : rand > 0.75 ? 201 : 200
 
     return {
       status,
@@ -49,7 +51,7 @@ const RealtimeLogs: FC<Props> = ({ isActive, isInView, className }) => {
   useEffect(() => {
     if (isPlaying) {
       const newLog = createLog()
-      setActiveLogs((prev) => [newLog, ...prev])
+      setActiveLogs((prev) => [newLog, ...prev].slice(0, MAX_LOGS))
     }
   }, [isPlaying])
 
@@ -59,7 +61,7 @@ const RealtimeLogs: FC<Props> = ({ isActive, isInView, className }) => {
       if (skip) return
 
       const newLog = createLog()
-      setActiveLogs((prev) => [newLog, ...prev])
+      setActiveLogs((prev) => [newLog, ...prev].slice(0, MAX_LOGS))
     },
     isPlaying ? INTERVAL : null
   )
@@ -109,9 +111,23 @@ const RealtimeLogs: FC<Props> = ({ isActive, isInView, className }) => {
               <span className="shrink-0">{dayjs(log.timestamp).format('D MMM HH:mm:ss')}</span>
               <span className="shrink-0">
                 <Badge
-                  variant={log.status >= 500 ? 'destructive' : log.status >= 400 ? 'warning' : log.status >= 300 ? 'default' : 'default'}
-                  className={log.status >= 300 && log.status < 400 ? 'bg-blue-200/10 text-blue-900 border-blue-500' : undefined}
-                >{log.status}</Badge>
+                  variant={
+                    log.status >= 500
+                      ? 'destructive'
+                      : log.status >= 400
+                        ? 'warning'
+                        : log.status >= 300
+                          ? 'default'
+                          : 'default'
+                  }
+                  className={
+                    log.status >= 300 && log.status < 400
+                      ? 'bg-blue-200/10 text-blue-900 border-blue-500'
+                      : undefined
+                  }
+                >
+                  {log.status}
+                </Badge>
               </span>
               <span className="w-12 shrink-0">{log.method}</span>
               <span className="truncate">{log.id}</span>

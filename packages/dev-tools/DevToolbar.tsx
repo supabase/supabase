@@ -15,7 +15,7 @@ import {
   Badge,
   Button,
   cn,
-  Input_Shadcn_ as Input,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
@@ -409,7 +409,7 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
-                      type="text"
+                      variant="text"
                       icon={<EyeOff className="w-4 h-4" />}
                       onClick={dismissToolbar}
                       className="text-foreground-light hover:text-foreground p-1"
@@ -421,7 +421,7 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
                   <TooltipTrigger asChild>
                     <SheetClose asChild>
                       <Button
-                        type="text"
+                        variant="text"
                         icon={<X className="w-4 h-4" />}
                         className="text-foreground-light hover:text-foreground p-1"
                       />
@@ -449,7 +449,7 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
                     </InputGroupAddon>
                   </InputGroup>
                   <Button
-                    type="default"
+                    variant="default"
                     onClick={() => setEvents([])}
                     className="text-foreground-lighter hover:text-foreground"
                   >
@@ -510,7 +510,7 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
                   </nav>
                   {totalOverrideCount > 0 && (
                     <div className="mt-auto p-2 border-t">
-                      <Button type="outline" size="tiny" block onClick={clearAllOverrides}>
+                      <Button variant="outline" size="tiny" block onClick={clearAllOverrides}>
                         Reset & Reload
                       </Button>
                     </div>

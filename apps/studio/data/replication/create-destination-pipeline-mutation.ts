@@ -16,6 +16,9 @@ export type DestinationConfig =
   | {
       ducklake: DucklakeDestinationConfig
     }
+  | {
+      snowflake: SnowflakeDestinationConfig
+    }
 
 export type BigQueryDestinationConfig = {
   projectId: string
@@ -46,7 +49,16 @@ export type DucklakeDestinationConfig = {
   s3UrlStyle?: 'path' | 'vhost'
   s3UseSsl?: boolean
   metadataSchema?: string
-  expireSnapshotsOlderThan?: string
+}
+
+export type SnowflakeDestinationConfig = {
+  accountId: string
+  user: string
+  privateKey: string
+  privateKeyPassphrase?: string
+  database: string
+  schema: string
+  role?: string
 }
 
 export type BatchConfig = {
@@ -137,7 +149,6 @@ async function createDestinationPipeline(
       s3UrlStyle,
       s3UseSsl,
       metadataSchema,
-      expireSnapshotsOlderThan,
     } = destinationConfig.ducklake
 
     destination_config = {
@@ -152,11 +163,27 @@ async function createDestinationPipeline(
         s3_url_style: s3UrlStyle,
         s3_use_ssl: s3UseSsl,
         metadata_schema: metadataSchema,
-        expire_snapshots_older_than: expireSnapshotsOlderThan,
+      },
+    } as unknown as components['schemas']['CreateReplicationDestinationPipelineBody']['destination_config']
+  } else if ('snowflake' in destinationConfig) {
+    const { accountId, user, privateKey, privateKeyPassphrase, database, schema, role } =
+      destinationConfig.snowflake
+
+    destination_config = {
+      snowflake: {
+        account_id: accountId,
+        user,
+        private_key: privateKey,
+        private_key_passphrase: privateKeyPassphrase,
+        database,
+        schema,
+        role,
       },
     } as unknown as components['schemas']['CreateReplicationDestinationPipelineBody']['destination_config']
   } else {
-    throw new Error('Invalid destination config: must specify bigQuery, iceberg, or ducklake')
+    throw new Error(
+      'Invalid destination config: must specify bigQuery, iceberg, ducklake, or snowflake'
+    )
   }
 
   const pipeline_config = {

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import {
   Button,
   cn,
-  Input_Shadcn_,
+  Input,
   ResizableHandle,
   ResizablePanel,
   Tabs_Shadcn_,
@@ -59,7 +59,7 @@ export const UserPanel = () => {
       <ResizableHandle withHandle />
       <ResizablePanel defaultSize="35" maxSize="45" minSize="35" className="bg-studio border-t">
         <Button
-          type="text"
+          variant="text"
           className="absolute top-3 right-3 px-1"
           icon={<X />}
           onClick={() => setSelectedId(null)}
@@ -115,7 +115,7 @@ export const UserPanel = () => {
                 className={cn('mt-0 grow min-h-0 overflow-y-auto', PANEL_PADDING)}
               >
                 <div className="flex items-center mb-2">
-                  <Input_Shadcn_
+                  <Input
                     autoFocus
                     type="text"
                     placeholder="Filter..."
@@ -124,7 +124,7 @@ export const UserPanel = () => {
                     className="mr-2"
                   />
                   <Button
-                    type="text"
+                    variant="text"
                     disabled={!searchQuery}
                     onClick={() => setSearchQuery('')}
                     className="text-xs"

@@ -53,12 +53,12 @@ const PromoToast = () => {
       </div>
 
       <div className="relative z-10 flex items-center space-x-2">
-        <Button asChild type="secondary">
+        <Button asChild variant="secondary">
           <Link target="_blank" rel="noreferrer" href={`https://supabase.com${announcement.link}`}>
             Claim your ticket
           </Link>
         </Button>
-        <Button type="default" onClick={handleHide}>
+        <Button variant="default" onClick={handleHide}>
           Dismiss
         </Button>
       </div>

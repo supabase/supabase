@@ -11,15 +11,15 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
-  Input_Shadcn_,
+  Input,
   InputGroup,
   InputGroupAddon,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectSeparator_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
   Sheet,
   SheetContent,
   SheetFooter,
@@ -157,31 +157,31 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                       label="Select a namespace to create your table in"
                     >
                       <FormControl>
-                        <Select_Shadcn_
+                        <Select
                           value={field.value}
                           onValueChange={(value) => {
                             field.onChange(value)
                             form.resetField('newNamespace')
                           }}
                         >
-                          <SelectTrigger_Shadcn_>
-                            <SelectValue_Shadcn_ placeholder="Select a namespace" />
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a namespace" />
+                          </SelectTrigger>
+                          <SelectContent>
                             {namespaces.map((x) => (
-                              <SelectItem_Shadcn_ key={x} value={x}>
+                              <SelectItem key={x} value={x}>
                                 {x}
-                              </SelectItem_Shadcn_>
+                              </SelectItem>
                             ))}
-                            {namespaces.length > 0 && <SelectSeparator_Shadcn_ />}
-                            <SelectItem_Shadcn_ value={NEW_NAMESPACE_MARKER}>
+                            {namespaces.length > 0 && <SelectSeparator />}
+                            <SelectItem value={NEW_NAMESPACE_MARKER}>
                               <div className="flex items-center gap-x-2">
                                 <Plus size={14} />
                                 <p>Create a new namespace</p>
                               </div>
-                            </SelectItem_Shadcn_>
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -193,10 +193,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                     render={({ field }) => (
                       <FormItemLayout name="newNamespace" label="Name of new namespace">
                         <FormControl>
-                          <Input_Shadcn_
-                            {...field}
-                            placeholder="Provide a name for your new namespace"
-                          />
+                          <Input {...field} placeholder="Provide a name for your new namespace" />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -214,10 +211,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                     render={({ field }) => (
                       <FormItemLayout name="name" label="Name of table">
                         <FormControl>
-                          <Input_Shadcn_
-                            {...field}
-                            placeholder="Provide a name for your new table"
-                          />
+                          <Input {...field} placeholder="Provide a name for your new table" />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -227,7 +221,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                     <div className="flex items-center justify-between">
                       <p className="text-sm">Columns</p>
                       <Button
-                        type="default"
+                        variant="default"
                         icon={<Plus />}
                         onClick={() => appendColumn({ name: '', type: 'string' })}
                       >
@@ -258,7 +252,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                                   render={({ field }) => (
                                     <FormItemLayout>
                                       <FormControl>
-                                        <Input_Shadcn_
+                                        <Input
                                           {...field}
                                           placeholder="Provide a column name"
                                           disabled={isCreating}
@@ -273,27 +267,24 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                                   name={`columns.${idx}.type`}
                                   render={({ field }) => (
                                     <FormControl>
-                                      <Select_Shadcn_
-                                        value={field.value}
-                                        onValueChange={field.onChange}
-                                      >
-                                        <SelectTrigger_Shadcn_ className="h-auto">
-                                          <SelectValue_Shadcn_ placeholder="Select a type" />
-                                        </SelectTrigger_Shadcn_>
-                                        <SelectContent_Shadcn_>
+                                      <Select value={field.value} onValueChange={field.onChange}>
+                                        <SelectTrigger className="h-auto">
+                                          <SelectValue placeholder="Select a type" />
+                                        </SelectTrigger>
+                                        <SelectContent>
                                           {COLUMN_TYPES.map((x) => (
-                                            <SelectItem_Shadcn_ key={x} value={x}>
+                                            <SelectItem key={x} value={x}>
                                               {x}
-                                            </SelectItem_Shadcn_>
+                                            </SelectItem>
                                           ))}
-                                        </SelectContent_Shadcn_>
-                                      </Select_Shadcn_>
+                                        </SelectContent>
+                                      </Select>
                                     </FormControl>
                                   )}
                                 />
                                 <div className="flex items-center justify-center">
                                   <Button
-                                    type="text"
+                                    variant="text"
                                     size="tiny"
                                     icon={<X strokeWidth={1.5} size={14} />}
                                     className="w-6 h-6"
@@ -353,7 +344,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
             <SheetFooter>
               <Button
                 disabled={isCreating}
-                type="default"
+                variant="default"
                 onClick={() => {
                   onOpenChange(false)
                   form.reset(defaultValues)
@@ -361,7 +352,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
               >
                 Cancel
               </Button>
-              <Button form={formId} htmlType="submit" loading={isCreating}>
+              <Button form={formId} type="submit" loading={isCreating}>
                 Create table
               </Button>
             </SheetFooter>

@@ -66,7 +66,7 @@ WHERE id IN (
 
 This approach has the benefit of controlling when it runs, locking for a shorter period of time and minimising impact on other transactions.
 
-If you know in advance that such large deletes will have to happen in the business cycle of your database, then you should seriously think about using (table parititioning)[/docs/guides/database/partitions] as a management tool.
+If you know in advance that such large deletes will have to happen in the business cycle of your database, then you should seriously think about using [table partitioning](/docs/guides/database/partitions) as a management tool.
 
 ### Soft deletes
 
@@ -202,4 +202,4 @@ The most efficient way to reclaim disk space, without locks, is to use [pg_repac
 - [Safe Cascading Deletes](/docs/guides/database/postgres/cascade-deletes)
 - [Inspecting your Database](/docs/guides/database/inspect)
 - [Understanding Database and Disk Size](/docs/guides/platform/database-size)
-- [Bloat in Postgres](/docs/blog/postgres-bloat)
+- [Bloat in Postgres](/blog/postgres-bloat)

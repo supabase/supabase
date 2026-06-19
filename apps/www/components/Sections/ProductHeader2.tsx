@@ -69,7 +69,7 @@ const ProductHeader = ({ footerPosition = 'left', ...props }: Props) => (
             <Button
               key={cta.href}
               size="medium"
-              type={cta.type ?? 'default'}
+              variant={cta.type ?? 'default'}
               onClick={cta.onClick}
               asChild
             >

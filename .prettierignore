@@ -4,6 +4,7 @@ node_modules
 pnpm-lock.yaml
 docker*
 apps/**/out
+.context/**
 # prettier-plugin-sql-cst only supports sqlite syntax
 **/supabase/migrations/*.sql
 apps/www/schema.sql
@@ -30,3 +31,5 @@ apps/**/.contentlayer
 packages/ui/src/components/Form/examples/PhoneProvidersSchema.json
 # ignore because of <br/><br/>
 apps/www/_blog/2025-07-14-supabase-ui-platform-kit.mdx
+# vitest file snapshots — JSON.stringify owns the format, not Prettier
+apps/docs/scripts/__snapshots__/

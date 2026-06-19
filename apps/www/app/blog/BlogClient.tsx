@@ -1,54 +1,18 @@
 'use client'
 
-import { isBrowser, LOCAL_STORAGE_KEYS } from 'common'
+import { type BlogView } from 'app/blog/blog-view'
 import BlogFilters from 'components/Blog/BlogFilters'
 import BlogGridItem from 'components/Blog/BlogGridItem'
 import BlogListItem from 'components/Blog/BlogListItem'
-import FeaturedThumb from 'components/Blog/FeaturedThumb'
 import { useInfiniteScrollWithFetch } from 'hooks/useInfiniteScroll'
-import Image from 'next/image'
-import Link from 'next/link'
 import { Suspense, useCallback, useState } from 'react'
 import type PostTypes from 'types/post'
 
-function SecondarySpotlight({ post }: { post: PostTypes }) {
-  const resolveImagePath = (img: string | undefined): string | null => {
-    if (!img) return null
-    return img.startsWith('/') || img.startsWith('http') ? img : `/images/blog/${img}`
-  }
-  const imageUrl =
-    resolveImagePath(post.imgThumb) ||
-    resolveImagePath(post.imgSocial) ||
-    '/images/blog/blog-placeholder.png'
-
-  return (
-    <Link href={post.path} prefetch={false} className="group flex gap-4 items-start">
-      <div className="relative shrink-0 w-36 aspect-video overflow-hidden rounded-md border border-foreground/10">
-        <Image
-          src={imageUrl}
-          fill
-          sizes="112px"
-          quality={80}
-          className="object-cover group-hover:scale-[1.03] transition-transform duration-300"
-          alt={post.title}
-        />
-      </div>
-      <div className="flex flex-col gap-1 min-w-0">
-        <h3 className="text-foreground text-sm leading-snug group-hover:underline line-clamp-3">
-          {post.title}
-        </h3>
-        {post.formattedDate && (
-          <p className="text-foreground-lighter text-xs">{post.formattedDate}</p>
-        )}
-      </div>
-    </Link>
-  )
-}
-
-export type BlogView = 'list' | 'grid'
-
 const POSTS_PER_PAGE = 25
 const SKELETON_COUNT = 6
+// Featured + 2 secondary posts shown by the layout hero on the index. Excluded
+// from the list to avoid duplication — keep in sync with app/blog/layout.tsx.
+const HERO_POST_COUNT = 3
 
 function BlogListItemSkeleton() {
   return (
@@ -91,12 +55,11 @@ function BlogGridItemSkeleton() {
 interface BlogClientProps {
   initialBlogs: any[]
   totalPosts: number
+  initialView: BlogView
 }
 
-export default function BlogClient({ initialBlogs, totalPosts }: BlogClientProps) {
-  const { BLOG_VIEW } = LOCAL_STORAGE_KEYS
-  const localView = isBrowser ? (localStorage?.getItem(BLOG_VIEW) as BlogView) : undefined
-  const [view, setView] = useState<BlogView>(localView ?? 'list')
+export default function BlogClient({ initialBlogs, totalPosts, initialView }: BlogClientProps) {
+  const [view, setView] = useState<BlogView>(initialView)
   const [isFiltering, setIsFiltering] = useState(false)
   const [filterParams, setFilterParams] = useState<{ category?: string; search?: string }>({})
   const [filteredPosts, setFilteredPosts] = useState<any[] | null>(null)
@@ -108,21 +71,13 @@ export default function BlogClient({ initialBlogs, totalPosts }: BlogClientProps
 
   const fetchMorePosts = useCallback(
     async (offset: number, limit: number) => {
-      const isFiltered =
-        (filterParams.category && filterParams.category !== 'all') || Boolean(filterParams.search)
-      // The featured post is rendered above the list (not in `items`), so the
-      // API offset has to skip past it for unfiltered fetches. Filtered
-      // results come from a separate query and don't share that hero slot.
-      const apiOffset = isFiltered ? offset : offset + 1
-
+      // The hero posts stay in the loaded array (just rendered in the layout
+      // hero, sliced off at render), so `offset` already counts them — no skip.
       const params = new URLSearchParams({
-        offset: apiOffset.toString(),
+        offset: offset.toString(),
         limit: limit.toString(),
       })
 
-      if (filterParams.category && filterParams.category !== 'all') {
-        params.set('category', filterParams.category)
-      }
       if (filterParams.search) {
         params.set('q', filterParams.search)
       }
@@ -190,32 +145,14 @@ export default function BlogClient({ initialBlogs, totalPosts }: BlogClientProps
     }
   }, [])
 
-  const featuredPost = initialBlogs[0]
-  const secondaryPosts = initialBlogs.slice(1, 3)
+  // The hero posts (the most recent HERO_POST_COUNT) are rendered by the blog
+  // layout's hero, so drop them from the list to avoid duplication. Filtered
+  // results are a separate query with no hero, so show all.
+  const visibleBlogs = filteredPosts !== null ? blogs : blogs.slice(HERO_POST_COUNT)
 
   return (
     <div>
       <h1 className="sr-only">Supabase blog</h1>
-
-      {/* Featured post section */}
-      {featuredPost && (
-        <div className="pt-32 pb-10">
-          <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6">
-            <div className="max-w-4xl">
-              <FeaturedThumb key={featuredPost.slug} {...featuredPost} />
-            </div>
-
-            {/* Secondary spotlights */}
-            {secondaryPosts.length > 0 && (
-              <div className="mt-14 max-w-4xl grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {secondaryPosts.map((post: PostTypes) => (
-                  <SecondarySpotlight key={post.slug} post={post} />
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* Filters row */}
       <div className="sticky top-[65px] z-10 bg-background/80 backdrop-blur-sm border-b border-border">
@@ -246,16 +183,16 @@ export default function BlogClient({ initialBlogs, totalPosts }: BlogClientProps
               ))}
             </div>
           )
-        ) : blogs?.length ? (
+        ) : visibleBlogs?.length ? (
           isList ? (
             <div>
-              {blogs.map((blog: PostTypes, idx: number) => (
+              {visibleBlogs.map((blog: PostTypes, idx: number) => (
                 <BlogListItem post={blog} key={`list-${idx}-${blog.slug}`} />
               ))}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              {blogs.map((blog: PostTypes, idx: number) => (
+              {visibleBlogs.map((blog: PostTypes, idx: number) => (
                 <BlogGridItem post={blog} key={`grid-${idx}-${blog.slug}`} />
               ))}
             </div>

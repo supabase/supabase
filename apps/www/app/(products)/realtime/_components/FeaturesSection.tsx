@@ -27,6 +27,8 @@ const FEATURES = [
 
 type ChatMsg = { id: number; user: string; text: string }
 
+const MAX_MESSAGES = 20
+
 const initialMessages: ChatMsg[] = [
   { id: 1, user: 'Alice', text: 'Hey, is the deploy ready?' },
   { id: 2, user: 'Bob', text: 'Almost — running final tests now.' },
@@ -66,12 +68,14 @@ function DatabaseChangesSkeleton() {
   useEffect(() => {
     if (!isInView) return
 
+    const innerTimers: ReturnType<typeof setTimeout>[] = []
+
     const timer = setInterval(() => {
       const msg = incomingMessages[nextMsgIdx.current % incomingMessages.length]
       const newMsg = { ...msg, id: Date.now() + nextMsgIdx.current }
       nextMsgIdx.current++
 
-      setMessages((prev) => [...prev, newMsg])
+      setMessages((prev) => [...prev.slice(-(MAX_MESSAGES - 1)), newMsg])
       setTableFlashId(newMsg.id)
 
       requestAnimationFrame(() => {
@@ -81,7 +85,7 @@ function DatabaseChangesSkeleton() {
         })
       })
 
-      setTimeout(() => {
+      const chatTimer = setTimeout(() => {
         setChatFlashId(newMsg.id)
         requestAnimationFrame(() => {
           chatScrollRef.current?.scrollTo({
@@ -89,14 +93,19 @@ function DatabaseChangesSkeleton() {
             behavior: 'smooth',
           })
         })
-        setTimeout(() => {
+        const clearTimer = setTimeout(() => {
           setTableFlashId(null)
           setChatFlashId(null)
         }, 600)
+        innerTimers.push(clearTimer)
       }, 200)
+      innerTimers.push(chatTimer)
     }, 3000)
 
-    return () => clearInterval(timer)
+    return () => {
+      clearInterval(timer)
+      innerTimers.forEach(clearTimeout)
+    }
   }, [isInView])
 
   return (
@@ -161,7 +170,7 @@ function DatabaseChangesSkeleton() {
                 <col style={{ width: 100 }} />
                 <col />
               </colgroup>
-              <tbody className="[&>tr:last-child>td]:border-b-0">
+              <tbody className="[&>tr:last-child>td]:border-b-0 [&>tr:first-child>td]:border-t-0">
                 {messages.map((msg) => (
                   <tr
                     key={msg.id}
@@ -524,13 +533,14 @@ function BroadcastSkeleton() {
         const arrivalOffset = line.delay * 1000 + PULSE_ARRIVAL
         const t = setTimeout(() => {
           setFlashSet((prev) => new Set(prev).add(i))
-          setTimeout(() => {
+          const clearT = setTimeout(() => {
             setFlashSet((prev) => {
               const next = new Set(prev)
               next.delete(i)
               return next
             })
           }, 500)
+          timers.push(clearT)
         }, arrivalOffset)
         timers.push(t)
       })
@@ -549,7 +559,7 @@ function BroadcastSkeleton() {
     <div className="relative h-full w-full">
       {/* Source node — top center */}
       <div className="absolute left-1/2 top-5 z-10 -translate-x-1/2">
-        <div className="flex items-center gap-2 rounded-xl border border-border bg-surface-100 px-3 py-2 shadow-sm">
+        <div className="flex items-center gap-2 rounded-xl border border-border bg-surface-100 px-3 py-2 shadow-xs dark:shadow-sm">
           <svg
             width="14"
             height="14"
@@ -614,7 +624,7 @@ function BroadcastSkeleton() {
           <div
             key={i}
             className={cn(
-              'absolute bottom-6 z-10 flex h-10 w-10 -translate-x-1/2 items-center justify-center rounded-xl border bg-surface-100 shadow-sm transition-all duration-300',
+              'absolute bottom-6 z-10 flex h-10 w-10 -translate-x-1/2 items-center justify-center rounded-xl border bg-surface-100 shadow-xs dark:shadow-sm transition-all duration-300',
               isFlashing ? 'border-brand text-brand' : 'border-border text-foreground-muted'
             )}
             style={{ left: `${xPercent}%` }}

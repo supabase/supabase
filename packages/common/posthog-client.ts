@@ -1,5 +1,7 @@
 import posthog, { PostHogConfig } from 'posthog-js'
 
+import { safeSessionStorage } from './safe-storage'
+
 // Limit the max number of queued events
 // (e.g. if a user navigates around a lot before accepting consent)
 const MAX_PENDING_EVENTS = 20
@@ -170,8 +172,15 @@ class PostHogClient {
     if (!hasConsent) return
 
     if (!this.initialized) {
-      // Queue the identification for when PostHog initializes
-      this.pendingIdentification = { userId, properties }
+      // Queue the identification for when PostHog initializes. Merge properties
+      // across pre-init calls for the same user so callers don't clobber each
+      // other (e.g. useTelemetryIdentify sets gotrue_id, then a separate effect
+      // sets org_count — both should land when the SDK flushes).
+      const pending = this.pendingIdentification
+      this.pendingIdentification =
+        pending && pending.userId === userId
+          ? { userId, properties: { ...pending.properties, ...properties } }
+          : { userId, properties }
       return
     }
 
@@ -250,6 +259,27 @@ class PostHogClient {
     }
 
     return undefined
+  }
+
+  /**
+   * Returns the current value of a person property as stored locally by posthog-js.
+   * Returns undefined if PostHog hasn't initialized or the property hasn't been set.
+   * Use this to gate behavior on whether a property has actually landed in the SDK
+   * (e.g., waiting for an identify to complete before evaluating flag-dependent UI).
+   *
+   * Person properties set via `identify(id, props)` are stored under the
+   * `$stored_person_properties` bucket in persistence — `get_property(key)`
+   * reads top-level super properties, not person properties, so we index in.
+   */
+  getPersonProperty(key: string): unknown {
+    if (!this.initialized) return undefined
+    try {
+      const stored = posthog.get_property('$stored_person_properties')
+      if (!stored || typeof stored !== 'object') return undefined
+      return (stored as Record<string, unknown>)[key]
+    } catch {
+      return undefined
+    }
   }
 
   /**
@@ -345,11 +375,11 @@ class PostHogClient {
     const storageKey = `ph_exposed:${experimentId}`
 
     try {
-      if (sessionStorage.getItem(storageKey) === sessionId) return
+      if (safeSessionStorage.getItem(storageKey) === sessionId) return
 
       const eventName = `${experimentId}_experiment_exposed`
       posthog.capture(eventName, { experiment_id: experimentId, ...properties })
-      sessionStorage.setItem(storageKey, sessionId)
+      safeSessionStorage.setItem(storageKey, sessionId)
     } catch (error) {
       console.error('PostHog experiment exposure capture failed:', error)
     }

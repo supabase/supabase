@@ -132,6 +132,11 @@
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, Menlo, monospace;
+  /* Tailwind v4 inlines .font-sans / .font-mono utilities through these knobs
+   * (see packages/config/css/theme.css). Set them so utility classes pick up
+   * the same fonts as the raw --font-sans / --font-mono vars above. */
+  --font-custom: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-source-code-pro: var(--font-geist-mono), ui-monospace, Menlo, monospace;
   --heading-tracking: -0.02em;
   --body-tracking: -0.01em;
   --heading-leading: 1.1;
@@ -492,7 +497,8 @@ launch week
 */
 
 .launch-week-timeline-border--approaching {
-  border-image: linear-gradient(to bottom, hsl(var(--brand-default)), var(--colors-purple7)) 1 100%;
+  border-image: linear-gradient(to bottom, hsl(var(--brand-default)), var(--color-purple-700)) 1
+    100%;
 }
 
 .video-container {
@@ -793,7 +799,7 @@ launch week
     );
   }
   .gradient-text-100 {
-    background-image: -webkit-linear-gradient(45deg, #fff 0%, var(--colors-green12) 100%);
+    background-image: -webkit-linear-gradient(45deg, #fff 0%, var(--color-green-1200) 100%);
   }
 
   .gradient-text-500 {

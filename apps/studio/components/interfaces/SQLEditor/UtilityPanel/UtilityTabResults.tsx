@@ -136,7 +136,7 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
               {readReplicaError && (
                 <Button
                   className="py-2"
-                  type="default"
+                  variant="default"
                   onClick={() => {
                     state.setSelectedDatabaseId(ref)
                     snapV2.resetResults(id)
@@ -148,7 +148,7 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
               {errorLines.length > 0 && (
                 <Tooltip>
                   <TooltipTrigger>
-                    <CopyButton iconOnly type="default" text={errorLines.join('\n')} />
+                    <CopyButton iconOnly variant="default" text={errorLines.join('\n')} />
                   </TooltipTrigger>
                   <TooltipContent side="bottom" align="center">
                     <span>Copy error</span>

@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PostgresTrigger } from '@supabase/postgres-meta'
+import type { PGTrigger } from '@supabase/pg-meta'
 import { Terminal } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -11,12 +11,12 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Separator,
   Sheet,
   SheetContent,
@@ -39,6 +39,7 @@ import FormBoxEmpty from '@/components/ui/FormBoxEmpty'
 import { useDatabaseTriggerCreateMutation } from '@/data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from '@/data/database-triggers/database-trigger-update-mutation'
 import { useTablesQuery } from '@/data/tables/tables-query'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
@@ -76,7 +77,7 @@ const defaultValues: z.infer<typeof FormSchema> = {
 }
 
 interface TriggerSheetProps {
-  selectedTrigger?: PostgresTrigger
+  selectedTrigger?: PGTrigger
   isDuplicatingTrigger?: boolean
   open: boolean
   onClose: () => void
@@ -89,6 +90,7 @@ export const TriggerSheet = ({
   onClose,
 }: TriggerSheetProps) => {
   const { data: project } = useSelectedProjectQuery()
+  const { selectedSchema } = useQuerySchemaState()
 
   const [showFunctionSelector, setShowFunctionSelector] = useState(false)
 
@@ -118,6 +120,7 @@ export const TriggerSheet = ({
   const { data = [], isSuccess: isSuccessTables } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+    schema: selectedSchema,
   })
   const { data: protectedSchemas, isSuccess: isSuccessProtectedSchemas } = useProtectedSchemas()
   const isSuccess = isSuccessTables && isSuccessProtectedSchemas
@@ -218,7 +221,7 @@ export const TriggerSheet = ({
                     description="Do not use spaces/whitespace."
                   >
                     <FormControl>
-                      <Input_Shadcn_ {...field} placeholder="Name of trigger" />
+                      <Input {...field} placeholder="Name of trigger" />
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -236,22 +239,22 @@ export const TriggerSheet = ({
                       description="Determines if a trigger should or should not fire. Can also be used to disable a trigger, but not delete it."
                     >
                       <FormControl>
-                        <Select_Shadcn_ defaultValue={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger_Shadcn_ className="col-span-8">
+                        <Select defaultValue={field.value} onValueChange={field.onChange}>
+                          <SelectTrigger className="col-span-8">
                             {
                               TRIGGER_ENABLED_MODES.find((option) => option.value === field.value)
                                 ?.label
                             }
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
+                          </SelectTrigger>
+                          <SelectContent>
                             {TRIGGER_ENABLED_MODES.map((option) => (
-                              <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                              <SelectItem key={option.value} value={option.value}>
                                 <p className="text-foreground">{option.label}</p>
                                 <p className="text-foreground-lighter">{option.description}</p>
-                              </SelectItem_Shadcn_>
+                              </SelectItem>
                             ))}
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -271,7 +274,7 @@ export const TriggerSheet = ({
                         description="Trigger will watch for changes on this table"
                       >
                         <FormControl>
-                          <Select_Shadcn_
+                          <Select
                             defaultValue={field.value}
                             onValueChange={(val) => {
                               // mark table ID as dirty to trigger validation
@@ -283,18 +286,18 @@ export const TriggerSheet = ({
                               }
                             }}
                           >
-                            <SelectTrigger_Shadcn_ className="col-span-8">
-                              <SelectValue_Shadcn_ />
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
+                            <SelectTrigger className="col-span-8">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
                               {tables.map((table) => (
-                                <SelectItem_Shadcn_ key={table.id} value={table.id.toString()}>
+                                <SelectItem key={table.id} value={table.id.toString()}>
                                   <span className="text-foreground-light">{table.schema}.</span>
                                   <span className="text-foreground">{table.name}</span>
-                                </SelectItem_Shadcn_>
+                                </SelectItem>
                               ))}
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -354,19 +357,19 @@ export const TriggerSheet = ({
                         description="Determines when your trigger fires"
                       >
                         <FormControl>
-                          <Select_Shadcn_ defaultValue={field.value} onValueChange={field.onChange}>
-                            <SelectTrigger_Shadcn_ className="col-span-8">
+                          <Select defaultValue={field.value} onValueChange={field.onChange}>
+                            <SelectTrigger className="col-span-8">
                               {TRIGGER_TYPES.find((option) => option.value === field.value)?.label}
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
+                            </SelectTrigger>
+                            <SelectContent>
                               {TRIGGER_TYPES.map((option) => (
-                                <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                                <SelectItem key={option.value} value={option.value}>
                                   <p className="text-foreground">{option.label}</p>
                                   <p className="text-foreground-lighter">{option.description}</p>
-                                </SelectItem_Shadcn_>
+                                </SelectItem>
                               ))}
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -383,22 +386,22 @@ export const TriggerSheet = ({
                         description="Identifies whether the trigger fires once for each processed row or once for each statement"
                       >
                         <FormControl>
-                          <Select_Shadcn_ defaultValue={field.value} onValueChange={field.onChange}>
-                            <SelectTrigger_Shadcn_ className="col-span-8">
+                          <Select defaultValue={field.value} onValueChange={field.onChange}>
+                            <SelectTrigger className="col-span-8">
                               {
                                 TRIGGER_ORIENTATIONS.find((option) => option.value === field.value)
                                   ?.label
                               }
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
+                            </SelectTrigger>
+                            <SelectContent>
                               {TRIGGER_ORIENTATIONS.map((option) => (
-                                <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                                <SelectItem key={option.value} value={option.value}>
                                   <p className="text-foreground">{option.label}</p>
                                   <p className="text-foreground-lighter">{option.description}</p>
-                                </SelectItem_Shadcn_>
+                                </SelectItem>
                               ))}
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -450,7 +453,7 @@ export const TriggerSheet = ({
                                   </p>
                                 </div>
                                 <Button
-                                  type="default"
+                                  variant="default"
                                   onClick={() => setShowFunctionSelector(true)}
                                 >
                                   Change function
@@ -469,14 +472,14 @@ export const TriggerSheet = ({
 
           <SheetFooter className="shrink-0">
             <Button
-              type="default"
-              htmlType="reset"
+              variant="default"
+              type="reset"
               disabled={isCreating || isUpdating}
               onClick={confirmOnClose}
             >
               Cancel
             </Button>
-            <Button form={formId} htmlType="submit" loading={isCreating || isUpdating}>
+            <Button form={formId} type="submit" loading={isCreating || isUpdating}>
               {isEditing ? 'Save' : 'Create'} trigger
             </Button>
           </SheetFooter>

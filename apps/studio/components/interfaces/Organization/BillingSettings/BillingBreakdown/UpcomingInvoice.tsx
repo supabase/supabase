@@ -47,6 +47,7 @@ const usageBillingDocsLink: { [K in PricingMetric]?: string } = {
   [PricingMetric.DISK_IOPS_IO2]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-iops`,
   [PricingMetric.DISK_THROUGHPUT_GP3]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-throughput`,
   [PricingMetric.LOG_DRAIN]: `${DOCS_URL}/guides/platform/manage-your-usage/log-drains`,
+  [PricingMetric.ETL_PIPELINE]: `${DOCS_URL}/guides/platform/manage-your-usage/etl`,
 }
 
 export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
@@ -122,7 +123,7 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
           <div>
             <Table className="w-full text-sm">
               <TableBody>
-                {!planFeePaidInAdvance && (
+                {planItem && !planFeePaidInAdvance && (
                   <TableRow>
                     <TableCell className="py-2! px-0">{planItem?.description}</TableCell>
                     <TableCell className="text-right py-2 px-0">
@@ -228,6 +229,13 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                           <span>{item.description ?? 'Unknown'}</span>
                           {(sortedBreakdown.length > 0 || item.usage_metric !== null) && (
                             <InfoTooltip className="max-w-sm">
+                              {item.item_name === 'minimum_amount' && (
+                                <p className="mb-2" translate="no">
+                                  Minimum Fee - If your cost is below the minimum fee, you will be
+                                  charged the difference as a floor fee
+                                </p>
+                              )}
+
                               {item.unit_price_desc && (
                                 <p className="mb-2" translate="no">
                                   Pricing: {item.unit_price_desc}
@@ -270,9 +278,7 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                                     docs
                                   </InlineLink>{' '}
                                   on how billing for {item.description} works and{' '}
-                                  <InlineLink href={`/organization/${slug}/usage`}>
-                                    usage page
-                                  </InlineLink>{' '}
+                                  <InlineLink href={`/org/${slug}/usage`}>usage page</InlineLink>{' '}
                                   for a detailed breakdown.
                                 </p>
                               )}
@@ -448,7 +454,7 @@ function ComputeLineItem({
 
   const discountedComputeCosts = Math.max(
     0,
-    computeItems.reduce((prev, cur) => prev + (cur.amount ?? 0), 0) + (computeCredits?.amount ?? 0)
+    computeItems.reduce((prev, cur) => prev + (cur.amount ?? 0), 0)
   )
 
   if (!computeItems.length) return null

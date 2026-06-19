@@ -1,11 +1,5 @@
-import { Smartphone } from 'lucide-react'
-import {
-  Badge,
-  cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-} from 'ui'
+import { Lock } from 'lucide-react'
+import { Badge, Card, CardContent, CardHeader } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -23,19 +17,6 @@ import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import type { NextPageWithLayout } from '@/types'
-
-const collapsibleClasses = [
-  'bg-surface-100',
-  'hover:bg-surface-200',
-  'data-open:bg-surface-200',
-  'border-default',
-  'hover:border-strong data-open:border-strong',
-  'data-open:pb-px col-span-12 rounded-sm',
-  '-space-y-px overflow-hidden',
-  'border shadow-sm',
-  'transition',
-  'hover:z-50',
-]
 
 const Security: NextPageWithLayout = () => {
   const showSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
@@ -59,28 +40,23 @@ const Security: NextPageWithLayout = () => {
         </PageHeaderMeta>
       </PageHeader>
       <PageContainer size="small">
-        <Collapsible_Shadcn_ className={cn('mt-8', collapsibleClasses)}>
-          <CollapsibleTrigger_Shadcn_ asChild>
-            <button
-              type="button"
-              className="group flex w-full items-center justify-between rounded-sm py-3 px-4 md:px-6 text-foreground"
-            >
-              <div className="flex flex-row gap-4 items-center py-1">
-                <Smartphone strokeWidth={1.5} />
-                <span className="text-sm">Authenticator app</span>
-              </div>
+        <Card className="mt-8">
+          <CardHeader className="py-3 flex flex-row items-center justify-between">
+            <div className="flex flex-row gap-4 items-center py-1 mb-0">
+              <Lock size={18} strokeWidth={1.5} />
+              <span className="text-sm">Multi-factor authentication (MFA)</span>
+            </div>
 
-              {data ? (
-                <Badge variant={data.totp.length === 0 ? 'default' : 'success'}>
-                  {data.totp.length} app{data.totp.length === 1 ? '' : 's'} configured
-                </Badge>
-              ) : null}
-            </button>
-          </CollapsibleTrigger_Shadcn_>
-          <CollapsibleContent_Shadcn_ className="group border-t border-default bg-surface-100 py-6 px-4 md:px-6 text-foreground">
+            {data ? (
+              <Badge variant={data.totp.length === 0 ? 'default' : 'success'}>
+                {data.totp.length} app{data.totp.length === 1 ? '' : 's'} configured
+              </Badge>
+            ) : null}
+          </CardHeader>
+          <CardContent>
             <TOTPFactors />
-          </CollapsibleContent_Shadcn_>
-        </Collapsible_Shadcn_>
+          </CardContent>
+        </Card>
       </PageContainer>
     </>
   )

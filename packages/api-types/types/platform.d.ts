@@ -124,6 +124,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/auth/{ref}/templates/{template}/reset': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Resets Auth template */
+    post: operations['TemplateController_resetTemplate']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/auth/{ref}/users': {
     parameters: {
       query?: never
@@ -452,6 +469,57 @@ export interface paths {
     patch: operations['LinkConversationController_updateConversationCustomFields']
     trace?: never
   }
+  '/platform/feedback/conversations/escalation': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Escalate an AI support conversation in Front */
+    post: operations['ConversationSyncController_escalateConversation']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/feedback/conversations/messages': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Sync AI support chat messages to Front */
+    post: operations['ConversationSyncController_syncConversationMessages']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/feedback/conversations/resolve': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Resolve an AI support conversation in Front */
+    post: operations['ConversationSyncController_resolveConversation']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/feedback/docs': {
     parameters: {
       query?: never
@@ -670,6 +738,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/integrations/partners/{ref}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Lists installed marketplace integrations for the given project. */
+    get: operations['PartnerIntegrationsController_listIntegrations']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/integrations/partners/{ref}/{listing_slug}': {
     parameters: {
       query?: never
@@ -677,7 +762,8 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    get?: never
+    /** Gets the installation status of the given marketplace integration for the given project. */
+    get: operations['PartnerIntegrationsController_getIntegration']
     put?: never
     /** Creates a partner integration and returns the redirect URL */
     post: operations['PartnerIntegrationsController_createIntegration']
@@ -932,6 +1018,60 @@ export interface paths {
     head?: never
     /** Updates organization */
     patch: operations['OrganizationSlugController_updateOrganization']
+    trace?: never
+  }
+  '/platform/organizations/{slug}/analytics/audit-log-drains': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Lists all audit log drains for an organization */
+    get: operations['AuditLogDrainController_listAuditLogDrains']
+    put?: never
+    /** Create an audit log drain */
+    post: operations['AuditLogDrainController_createAuditLogDrain']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/{slug}/analytics/audit-log-drains/{token}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Update an audit log drain */
+    put: operations['AuditLogDrainController_updateAuditLogDrain']
+    post?: never
+    /** Delete an audit log drain */
+    delete: operations['AuditLogDrainController_deleteAuditLogDrain']
+    options?: never
+    head?: never
+    /** Patch an audit log drain */
+    patch: operations['AuditLogDrainController_patchAuditLogDrain']
+    trace?: never
+  }
+  '/platform/organizations/{slug}/analytics/audit-log-drains/{token}/test': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Test an audit log drain connection */
+    post: operations['AuditLogDrainController_testAuditLogDrain']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
     trace?: never
   }
   '/platform/organizations/{slug}/apps': {
@@ -2488,6 +2628,40 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/projects/{ref}/analytics/endpoints/project.metrics.otel': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets a project's metrics from the OTel/ClickHouse backend */
+    get: operations['ProjectMetricsOtelController_getProjectMetricsOtel']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/projects/{ref}/analytics/endpoints/service-health': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets project's service health based on log levels */
+    get: operations['UsageApiController_getProjectServiceHealth']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/projects/{ref}/analytics/endpoints/usage.api-counts': {
     parameters: {
       query?: never
@@ -2557,6 +2731,23 @@ export interface paths {
     head?: never
     /** Patch a log drain */
     patch: operations['LogDrainController_patchLogDrain']
+    trace?: never
+  }
+  '/platform/projects/{ref}/analytics/log-drains/{token}/test': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Test a log drain connection */
+    post: operations['LogDrainController_testLogDrain']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
     trace?: never
   }
   '/platform/projects/{ref}/api-keys/temporary': {
@@ -2854,7 +3045,7 @@ export interface paths {
     /** Creates project's content folder */
     post: operations['ContentFoldersController_createFolder']
     /** Deletes project's content folders */
-    delete: operations['ContentFoldersController_DeleteFolder']
+    delete: operations['ContentFoldersController_deleteFolder']
     options?: never
     head?: never
     patch?: never
@@ -3443,6 +3634,23 @@ export interface paths {
     put?: never
     /** Previews transferring a project to a different organizations, shows eligibility and impact. */
     post: operations['ProjectTransferController_previewTransfer']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/projects/{ref}/wake': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Wakes a specific project that belongs to the authenticated user */
+    post: operations['ProjectWakeController_wakeUpProject']
     delete?: never
     options?: never
     head?: never
@@ -4448,6 +4656,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/support/verify-email': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Verify a support conversation email
+     * @description Called by the Supabase dashboard when a user clicks their email verification link. Validates the token, checks org/project ownership, updates the Front conversation custom fields, and removes unverified tags.
+     */
+    post: operations['VerifyEmailController_verifyEmail']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/telemetry/event': {
     parameters: {
       query?: never
@@ -4810,6 +5038,10 @@ export interface components {
         title: string
       }[]
     }
+    BackendConnectionTest: {
+      'connected?': boolean
+      reason: string
+    }
     BackupsResponse: {
       backups: {
         id: number
@@ -4902,6 +5134,7 @@ export interface components {
           | 'ALREADY_MANAGED_BY_PARTNER'
           | 'ALREADY_MANAGED_BY_PARTNER_AWS'
           | 'OVERDUE_INVOICES'
+          | 'IN_ARREARS_BILLING_MODE'
         )[]
         slug: string
       }[]
@@ -4979,11 +5212,6 @@ export interface components {
             region?: string
           }
         | {
-            password?: string | null
-            url?: string
-            username?: string | null
-          }
-        | {
             headers?: {
               [key: string]: string
             }
@@ -5019,7 +5247,6 @@ export interface components {
         | 'clickhouse'
         | 'webhook'
         | 'datadog'
-        | 'elastic'
         | 'loki'
         | 'sentry'
         | 's3'
@@ -5445,13 +5672,13 @@ export interface components {
       custom_supabase_internal_requests?: {
         ami: {
           /**
-           * @description Exact AWS instance type to provision (e.g. `t3.nano`, `t4g.nano`). When omitted the default for `desired_instance_size` is used. Only for internal use; rejected for user-facing requests in production.
+           * @description Exact AWS instance type to provision (e.g. `t3.nano`, `t4g.nano`). Hard pin — no ODCR fallback. Only for internal use; rejected for user-facing requests in production.
            * @enum {string}
            */
           instance_type?:
             | 't4g.nano'
-            | 't3.nano'
             | 't3a.nano'
+            | 't3.nano'
             | 't4g.micro'
             | 't4g.small'
             | 't4g.medium'
@@ -5471,6 +5698,11 @@ export interface components {
             | 'c8g.48xlarge'
             | 'r8g.48xlarge'
             | 'x8g.48xlarge'
+          /**
+           * @description Preferred architecture for WPP projects. Soft hint — the worker selects the cheapest region-available type for this arch and may cross to the other arch if no ODCR capacity is available. Cannot be set together with instance_type. Only for internal use.
+           * @enum {string}
+           */
+          preferred_arch?: 'x86_64' | 'arm64'
           search_tags?: {
             [key: string]: string
           }
@@ -5614,6 +5846,33 @@ export interface components {
             }
           }
         | {
+            clickhouse: {
+              /**
+               * @description ClickHouse target database
+               * @example analytics
+               */
+              database: string
+              /**
+               * @description Table engine used for replicated tables. Defaults to `replacing_merge_tree` server-side when omitted.
+               * @example replacing_merge_tree
+               * @enum {string}
+               */
+              engine?: 'merge_tree' | 'replacing_merge_tree'
+              /** @description ClickHouse password. Omit for passwordless access. */
+              password?: string
+              /**
+               * @description ClickHouse HTTPS endpoint URL
+               * @example https://clickhouse.example.com:8443
+               */
+              url: string
+              /**
+               * @description ClickHouse user name
+               * @example default
+               */
+              user: string
+            }
+          }
+        | {
             iceberg: {
               supabase: {
                 /**
@@ -5667,11 +5926,6 @@ export interface components {
                */
               data_path: string
               /**
-               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-               * @example 7 days
-               */
-              expire_snapshots_older_than?: string
-              /**
                * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                * @default ducklake
                * @example ducklake
@@ -5714,6 +5968,39 @@ export interface components {
                * @example false
                */
               s3_use_ssl?: boolean
+            }
+          }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id: string
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database: string
+              /** @description Snowflake RSA private key PEM contents */
+              private_key: string
+              /** @description Optional passphrase for encrypted private keys */
+              private_key_passphrase?: string
+              /**
+               * @description Optional Snowflake role
+               * @example ETL_ROLE
+               */
+              role?: string
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema: string
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example ETL_USER
+               */
+              user: string
             }
           }
       /**
@@ -5752,6 +6039,33 @@ export interface components {
             }
           }
         | {
+            clickhouse: {
+              /**
+               * @description ClickHouse target database
+               * @example analytics
+               */
+              database: string
+              /**
+               * @description Table engine used for replicated tables. Defaults to `replacing_merge_tree` server-side when omitted.
+               * @example replacing_merge_tree
+               * @enum {string}
+               */
+              engine?: 'merge_tree' | 'replacing_merge_tree'
+              /** @description ClickHouse password. Omit for passwordless access. */
+              password?: string
+              /**
+               * @description ClickHouse HTTPS endpoint URL
+               * @example https://clickhouse.example.com:8443
+               */
+              url: string
+              /**
+               * @description ClickHouse user name
+               * @example default
+               */
+              user: string
+            }
+          }
+        | {
             iceberg: {
               supabase: {
                 /**
@@ -5805,11 +6119,6 @@ export interface components {
                */
               data_path: string
               /**
-               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-               * @example 7 days
-               */
-              expire_snapshots_older_than?: string
-              /**
                * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                * @default ducklake
                * @example ducklake
@@ -5852,6 +6161,39 @@ export interface components {
                * @example false
                */
               s3_use_ssl?: boolean
+            }
+          }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id: string
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database: string
+              /** @description Snowflake RSA private key PEM contents */
+              private_key: string
+              /** @description Optional passphrase for encrypted private keys */
+              private_key_passphrase?: string
+              /**
+               * @description Optional Snowflake role
+               * @example ETL_ROLE
+               */
+              role?: string
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema: string
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example ETL_USER
+               */
+              user: string
             }
           }
       /**
@@ -6060,6 +6402,8 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
+          /** Format: uri */
+          idjag_issuer_url?: string | null
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -6075,6 +6419,8 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
+          /** Format: uri */
+          idjag_issuer_url?: string | null
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -6090,6 +6436,8 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
+          /** Format: uri */
+          idjag_issuer_url?: string | null
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -6105,6 +6453,8 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
+          /** Format: uri */
+          idjag_issuer_url?: string | null
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -6517,6 +6867,10 @@ export interface components {
       scope?: string
       token_endpoint_auth_method?: string
     }
+    EscalateConversationBody: {
+      chatId: string
+      conversationId: string
+    }
     GetArchiveResponse: {
       archive_empty: boolean
       file_url: string
@@ -6602,6 +6956,7 @@ export interface components {
       expires_at: string
       icon?: string
       name: string
+      redirect_uri: string
       /** @enum {string} */
       registration_type: 'manual' | 'dynamic'
       scopes?: (
@@ -6894,6 +7249,8 @@ export interface components {
       organization_slugs?: string[]
       permissions: string[]
       project_refs?: string[]
+      /** @enum {string} */
+      scope: 'user' | 'organization' | 'project'
       token_alias: string
     }
     GetScopedAccessTokensResponse: {
@@ -6938,6 +7295,8 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
+          /** Format: uri */
+          idjag_issuer_url?: string | null
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -6953,6 +7312,8 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
+          /** Format: uri */
+          idjag_issuer_url?: string | null
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -7000,6 +7361,7 @@ export interface components {
             | 'auth_mfa_phone'
             | 'auth_mfa_web_authn'
             | 'log_drain'
+            | 'etl_pipeline'
           variant: {
             /** @enum {string} */
             identifier:
@@ -7029,6 +7391,7 @@ export interface components {
               | 'auth_mfa_phone_default'
               | 'auth_mfa_web_authn_default'
               | 'log_drain_default'
+              | 'etl_pipeline_default'
             /** @description Any JSON-serializable value */
             meta?: unknown
             name: string
@@ -7313,6 +7676,21 @@ export interface components {
       MAILER_OTP_LENGTH: number
       MAILER_SECURE_EMAIL_CHANGE_ENABLED: boolean
       MAILER_SUBJECTS_CONFIRMATION: string
+      MAILER_SUBJECTS_CUSTOM_CONTENTS: {
+        MAILER_SUBJECTS_CONFIRMATION: boolean
+        MAILER_SUBJECTS_EMAIL_CHANGE: boolean
+        MAILER_SUBJECTS_EMAIL_CHANGED_NOTIFICATION: boolean
+        MAILER_SUBJECTS_IDENTITY_LINKED_NOTIFICATION: boolean
+        MAILER_SUBJECTS_IDENTITY_UNLINKED_NOTIFICATION: boolean
+        MAILER_SUBJECTS_INVITE: boolean
+        MAILER_SUBJECTS_MAGIC_LINK: boolean
+        MAILER_SUBJECTS_MFA_FACTOR_ENROLLED_NOTIFICATION: boolean
+        MAILER_SUBJECTS_MFA_FACTOR_UNENROLLED_NOTIFICATION: boolean
+        MAILER_SUBJECTS_PASSWORD_CHANGED_NOTIFICATION: boolean
+        MAILER_SUBJECTS_PHONE_CHANGED_NOTIFICATION: boolean
+        MAILER_SUBJECTS_REAUTHENTICATION: boolean
+        MAILER_SUBJECTS_RECOVERY: boolean
+      }
       MAILER_SUBJECTS_EMAIL_CHANGE: string
       MAILER_SUBJECTS_EMAIL_CHANGED_NOTIFICATION: string
       MAILER_SUBJECTS_IDENTITY_LINKED_NOTIFICATION: string
@@ -7326,6 +7704,21 @@ export interface components {
       MAILER_SUBJECTS_REAUTHENTICATION: string
       MAILER_SUBJECTS_RECOVERY: string
       MAILER_TEMPLATES_CONFIRMATION_CONTENT: string
+      MAILER_TEMPLATES_CUSTOM_CONTENTS: {
+        MAILER_TEMPLATES_CONFIRMATION_CONTENT: boolean
+        MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT: boolean
+        MAILER_TEMPLATES_EMAIL_CHANGED_NOTIFICATION_CONTENT: boolean
+        MAILER_TEMPLATES_IDENTITY_LINKED_NOTIFICATION_CONTENT: boolean
+        MAILER_TEMPLATES_IDENTITY_UNLINKED_NOTIFICATION_CONTENT: boolean
+        MAILER_TEMPLATES_INVITE_CONTENT: boolean
+        MAILER_TEMPLATES_MAGIC_LINK_CONTENT: boolean
+        MAILER_TEMPLATES_MFA_FACTOR_ENROLLED_NOTIFICATION_CONTENT: boolean
+        MAILER_TEMPLATES_MFA_FACTOR_UNENROLLED_NOTIFICATION_CONTENT: boolean
+        MAILER_TEMPLATES_PASSWORD_CHANGED_NOTIFICATION_CONTENT: boolean
+        MAILER_TEMPLATES_PHONE_CHANGED_NOTIFICATION_CONTENT: boolean
+        MAILER_TEMPLATES_REAUTHENTICATION_CONTENT: boolean
+        MAILER_TEMPLATES_RECOVERY_CONTENT: boolean
+      }
       MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT: string
       MAILER_TEMPLATES_EMAIL_CHANGED_NOTIFICATION_CONTENT: string
       MAILER_TEMPLATES_IDENTITY_LINKED_NOTIFICATION_CONTENT: string
@@ -7498,11 +7891,6 @@ export interface components {
             region?: string
           }
         | {
-            password?: string | null
-            url?: string
-            username?: string | null
-          }
-        | {
             headers?: {
               [key: string]: string
             }
@@ -7545,7 +7933,6 @@ export interface components {
         | 'clickhouse'
         | 'webhook'
         | 'datadog'
-        | 'elastic'
         | 'loki'
         | 'sentry'
         | 's3'
@@ -7600,6 +7987,7 @@ export interface components {
             | 'ipv4'
             | 'pitr.available_variants'
             | 'log_drains'
+            | 'audit_log_drains'
             | 'branching_limit'
             | 'branching_persistent'
             | 'auth.mfa_phone'
@@ -7617,6 +8005,7 @@ export interface components {
             | 'auth.custom_oauth.max_providers'
             | 'backup.retention_days'
             | 'backup.restore_to_new_project'
+            | 'backup.schedule'
             | 'function.max_count'
             | 'function.size_limit_mb'
             | 'realtime.max_concurrent_users'
@@ -8185,6 +8574,7 @@ export interface components {
           | 'PITR_28'
           | 'IPV4'
           | 'LOG_DRAIN'
+          | 'ETL_PIPELINE'
           | 'LOG_INGESTION'
           | 'LOG_QUERYING'
           | 'LOG_STORAGE'
@@ -8249,6 +8639,7 @@ export interface components {
           | 'PITR_28'
           | 'IPV4'
           | 'LOG_DRAIN'
+          | 'ETL_PIPELINE'
           | 'LOG_INGESTION'
           | 'LOG_QUERYING'
           | 'LOG_STORAGE'
@@ -8275,22 +8666,42 @@ export interface components {
       organization_id: number
       overdue_invoice_count: number
     }
+    PartnerIntegrationListResponse: {
+      integrations: {
+        listing_slug: string
+        partner_links?: {
+          dashboard?: string
+          manage?: string
+        }
+        /** @enum {string} */
+        status: 'installing' | 'ready' | 'error'
+        user_alert?: {
+          message: string
+        }
+        version?: string
+      }[]
+    }
     PartnerIntegrationsResponse: {
-      /**
-       * Format: date-time
-       * @description When the integration link expires (1 hour from creation). The user must begin the flow before this time.
-       */
-      expiresAt: string
-      /**
-       * Format: uuid
-       * @description Unique identifier for the integration record
-       */
-      integrationId: string
       /**
        * Format: uri
        * @description URL to redirect the user's browser to
        */
       redirectUrl: string
+    }
+    PartnerIntegrationStatusResponse: {
+      install_state?: {
+        partner_links?: {
+          dashboard?: string
+          manage?: string
+        }
+        /** @enum {string} */
+        status: 'installing' | 'ready' | 'error'
+        user_alert?: {
+          message: string
+        }
+        version?: string
+      }
+      installed: boolean
     }
     PauseStatusResponse: {
       can_restore: boolean
@@ -8849,6 +9260,7 @@ export interface components {
           | 'auth_mfa_phone'
           | 'auth_mfa_web_authn'
           | 'log_drain'
+          | 'etl_pipeline'
         variants: {
           /** @enum {string} */
           identifier:
@@ -8878,6 +9290,7 @@ export interface components {
             | 'auth_mfa_phone_default'
             | 'auth_mfa_web_authn_default'
             | 'log_drain_default'
+            | 'etl_pipeline_default'
           /** @description Any JSON-serializable value */
           meta?: unknown
           name: string
@@ -8900,6 +9313,7 @@ export interface components {
           | 'auth_mfa_phone'
           | 'auth_mfa_web_authn'
           | 'log_drain'
+          | 'etl_pipeline'
         variant: {
           /** @enum {string} */
           identifier:
@@ -8929,6 +9343,7 @@ export interface components {
             | 'auth_mfa_phone_default'
             | 'auth_mfa_web_authn_default'
             | 'log_drain_default'
+            | 'etl_pipeline_default'
           /** @description Any JSON-serializable value */
           meta?: unknown
           name: string
@@ -9003,6 +9418,7 @@ export interface components {
       inserted_at: string
       integration_source: string | null
       is_branch_enabled: boolean
+      is_hibernating?: boolean
       is_physical_backups_enabled: boolean
       lastDatabaseResizeAt?: string
       maxDatabasePreprovisionGb?: number
@@ -9068,6 +9484,18 @@ export interface components {
     ProjectSensitivityResponse: {
       is_sensitive: boolean
     }
+    ProjectServiceHealthResponse: {
+      /** @enum {string} */
+      granularity?: 'day' | 'hour' | 'minute'
+      /** @example 2025-03-01T23:59:59Z */
+      iso_timestamp_end: string
+      /** @example 2025-03-01T00:00:00Z */
+      iso_timestamp_start: string
+      /** @example s:edge_logs */
+      lql?: string
+      /** @example select timestamp, edge_logs from service_health */
+      sql?: string
+    }
     ProjectSettingsResponse: {
       app_config?: {
         db_schema: string
@@ -9094,6 +9522,10 @@ export interface components {
       }[]
       ssl_enforced: boolean
       status: string
+    }
+    ProjectWakeResponse: {
+      connection_string: string | null
+      connection_string_read_only: string | null
     }
     PublicUrlResponse: {
       publicUrl: string
@@ -9247,6 +9679,33 @@ export interface components {
             }
           }
         | {
+            clickhouse: {
+              /**
+               * @description ClickHouse target database
+               * @example analytics
+               */
+              database: string
+              /**
+               * @description Table engine used for replicated tables. Defaults to `replacing_merge_tree` server-side when omitted.
+               * @example replacing_merge_tree
+               * @enum {string}
+               */
+              engine?: 'merge_tree' | 'replacing_merge_tree'
+              /** @description ClickHouse password. Omit for passwordless access. */
+              password?: string
+              /**
+               * @description ClickHouse HTTPS endpoint URL
+               * @example https://clickhouse.example.com:8443
+               */
+              url: string
+              /**
+               * @description ClickHouse user name
+               * @example default
+               */
+              user: string
+            }
+          }
+        | {
             iceberg: {
               supabase: {
                 /**
@@ -9300,11 +9759,6 @@ export interface components {
                */
               data_path: string
               /**
-               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-               * @example 7 days
-               */
-              expire_snapshots_older_than?: string
-              /**
                * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                * @default ducklake
                * @example ducklake
@@ -9347,6 +9801,39 @@ export interface components {
                * @example false
                */
               s3_use_ssl?: boolean
+            }
+          }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id: string
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database: string
+              /** @description Snowflake RSA private key PEM contents */
+              private_key: string
+              /** @description Optional passphrase for encrypted private keys */
+              private_key_passphrase?: string
+              /**
+               * @description Optional Snowflake role
+               * @example ETL_ROLE
+               */
+              role?: string
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema: string
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example ETL_USER
+               */
+              user: string
             }
           }
       /**
@@ -9394,6 +9881,33 @@ export interface components {
                 project_id: string
                 /** @description BigQuery service account key */
                 service_account_key: string
+              }
+            }
+          | {
+              clickhouse: {
+                /**
+                 * @description ClickHouse target database
+                 * @example analytics
+                 */
+                database: string
+                /**
+                 * @description Table engine used for replicated tables. Defaults to `replacing_merge_tree` server-side when omitted.
+                 * @example replacing_merge_tree
+                 * @enum {string}
+                 */
+                engine?: 'merge_tree' | 'replacing_merge_tree'
+                /** @description ClickHouse password. Omit for passwordless access. */
+                password?: string
+                /**
+                 * @description ClickHouse HTTPS endpoint URL
+                 * @example https://clickhouse.example.com:8443
+                 */
+                url: string
+                /**
+                 * @description ClickHouse user name
+                 * @example default
+                 */
+                user: string
               }
             }
           | {
@@ -9450,11 +9964,6 @@ export interface components {
                  */
                 data_path: string
                 /**
-                 * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-                 * @example 7 days
-                 */
-                expire_snapshots_older_than?: string
-                /**
                  * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                  * @default ducklake
                  * @example ducklake
@@ -9499,6 +10008,39 @@ export interface components {
                 s3_use_ssl?: boolean
               }
             }
+          | {
+              snowflake: {
+                /**
+                 * @description Snowflake account identifier
+                 * @example MYORG-MYACCOUNT
+                 */
+                account_id: string
+                /**
+                 * @description Snowflake target database
+                 * @example ANALYTICS
+                 */
+                database: string
+                /** @description Snowflake RSA private key PEM contents */
+                private_key: string
+                /** @description Optional passphrase for encrypted private keys */
+                private_key_passphrase?: string
+                /**
+                 * @description Optional Snowflake role
+                 * @example ETL_ROLE
+                 */
+                role?: string
+                /**
+                 * @description Snowflake target schema
+                 * @example PUBLIC
+                 */
+                schema: string
+                /**
+                 * @description Snowflake user configured for key-pair authentication
+                 * @example ETL_USER
+                 */
+                user: string
+              }
+            }
         /**
          * @description Destination id
          * @example 2001
@@ -9520,6 +10062,11 @@ export interface components {
       /** @description Stats about apply worker lag */
       apply_lag?: {
         /**
+         * @description Whether the slot currently has an active replication connection.
+         * @example true
+         */
+        active: boolean
+        /**
          * @description Bytes between the current WAL location and the confirmed flush LSN.
          * @example 2048
          */
@@ -9530,15 +10077,26 @@ export interface components {
          */
         flush_lag?: number
         /**
+         * @description Milliseconds elapsed since the walsender last received client feedback. This can be present even when write and flush lag are unavailable.
+         * @example 5000
+         */
+        reply_time_lag?: number
+        /**
          * @description Bytes between the current WAL location and the slot restart LSN.
          * @example 1024
          */
         restart_lsn_bytes: number
         /**
-         * @description How many bytes of WAL are still safe to build up before the limit of the slot is reached.
+         * @description How many bytes of WAL are still safe to build up before the limit of the slot is reached. `null` means Postgres reports unlimited slot WAL retention.
          * @example 8192
          */
-        safe_wal_size_bytes: number
+        safe_wal_size_bytes: number | null
+        /**
+         * @description WAL availability status reported by Postgres for the slot.
+         * @example reserved
+         * @enum {string}
+         */
+        wal_status?: 'reserved' | 'extended' | 'unreserved' | 'lost' | 'unknown'
         /**
          * @description Write lag expressed in milliseconds.
          * @example 1500
@@ -9607,6 +10165,11 @@ export interface components {
         /** @description Stats about table sync worker lag */
         table_sync_lag?: {
           /**
+           * @description Whether the slot currently has an active replication connection.
+           * @example true
+           */
+          active: boolean
+          /**
            * @description Bytes between the current WAL location and the confirmed flush LSN.
            * @example 2048
            */
@@ -9617,15 +10180,26 @@ export interface components {
            */
           flush_lag?: number
           /**
+           * @description Milliseconds elapsed since the walsender last received client feedback. This can be present even when write and flush lag are unavailable.
+           * @example 5000
+           */
+          reply_time_lag?: number
+          /**
            * @description Bytes between the current WAL location and the slot restart LSN.
            * @example 1024
            */
           restart_lsn_bytes: number
           /**
-           * @description How many bytes of WAL are still safe to build up before the limit of the slot is reached.
+           * @description How many bytes of WAL are still safe to build up before the limit of the slot is reached. `null` means Postgres reports unlimited slot WAL retention.
            * @example 8192
            */
-          safe_wal_size_bytes: number
+          safe_wal_size_bytes: number | null
+          /**
+           * @description WAL availability status reported by Postgres for the slot.
+           * @example reserved
+           * @enum {string}
+           */
+          wal_status?: 'reserved' | 'extended' | 'unreserved' | 'lost' | 'unknown'
           /**
            * @description Write lag expressed in milliseconds.
            * @example 1500
@@ -9910,6 +10484,12 @@ export interface components {
     ResizeBody: {
       volume_size_gb: number
     }
+    ResolveConversationBody: {
+      /** @enum {string} */
+      aiSupportStatus: 'user_resolved' | 'bot_resolved'
+      chatId: string
+      conversationId: string
+    }
     RestartProjectBody: {
       database_identifier?: string
     }
@@ -10126,10 +10706,12 @@ export interface components {
       siteUrl?: string
       subject?: string
       tags: string[]
+      threadRef?: string
       urlToAirTable?: string
       verified?: boolean
     }
     SendFeedbackResponse: {
+      conversationId?: string
       result: string
     }
     SendUpgradeSurveyBody: {
@@ -10195,8 +10777,7 @@ export interface components {
       name: string
       owner: string
       public: boolean
-      /** @enum {string} */
-      type?: 'STANDARD' | 'ANALYTICS'
+      type?: ('STANDARD' | 'ANALYTICS') | string
       updated_at: string
     }
     StorageConfigResponse: {
@@ -10267,8 +10848,7 @@ export interface components {
         name: string
         owner: string
         public: boolean
-        /** @enum {string} */
-        type?: 'STANDARD' | 'ANALYTICS'
+        type?: ('STANDARD' | 'ANALYTICS') | string
         updated_at: string
       }
       created_at: string | null
@@ -10284,11 +10864,9 @@ export interface components {
     StorageVectorBucketListIndexesResponse: {
       indexes: {
         creationTime?: number
-        /** @enum {string} */
-        dataType: 'float32'
+        dataType: 'float32' | string
         dimension: number
-        /** @enum {string} */
-        distanceMetric: 'cosine' | 'euclidean' | 'dotproduct'
+        distanceMetric: ('cosine' | 'euclidean' | 'dotproduct') | string
         indexName: string
         metadataConfiguration?: {
           nonFilterableMetadataKeys?: string[]
@@ -10322,6 +10900,32 @@ export interface components {
       max_client_conn: number | null
       /** @enum {string} */
       pool_mode: 'transaction' | 'session'
+    }
+    SyncConversationMessagesBody: {
+      affectedServices?: string
+      allowSupportAccess?: boolean
+      browserInformation?: string
+      category?: string
+      chatId: string
+      conversationId?: string
+      /** @default false */
+      isInitial?: boolean
+      library?: string
+      messages: {
+        content: string
+        id: string
+        /** @enum {string} */
+        role: 'user' | 'assistant'
+      }[]
+      organizationSlug?: string
+      projectRef?: string
+      severity?: string
+      subject: string
+    }
+    SyncConversationMessagesResponse: {
+      conversationId?: string
+      /** @enum {string} */
+      result: 'success'
     }
     TaxIdResponse: {
       tax_id: {
@@ -10532,6 +11136,7 @@ export interface components {
           | 'PITR_28'
           | 'IPV4'
           | 'LOG_DRAIN'
+          | 'ETL_PIPELINE'
           | 'LOG_INGESTION'
           | 'LOG_QUERYING'
           | 'LOG_STORAGE'
@@ -10559,6 +11164,7 @@ export interface components {
         | 'auth_mfa_phone'
         | 'auth_mfa_web_authn'
         | 'log_drain'
+        | 'etl_pipeline'
       /** @enum {string} */
       addon_variant:
         | 'ci_micro'
@@ -10587,6 +11193,7 @@ export interface components {
         | 'auth_mfa_phone_default'
         | 'auth_mfa_web_authn_default'
         | 'log_drain_default'
+        | 'etl_pipeline_default'
     }
     UpdateBackendParamsOpenapi: {
       config?:
@@ -10614,11 +11221,6 @@ export interface components {
         | {
             api_key?: string
             region?: string
-          }
-        | {
-            password?: string | null
-            url?: string
-            username?: string | null
           }
         | {
             headers?: {
@@ -10656,7 +11258,6 @@ export interface components {
         | 'clickhouse'
         | 'webhook'
         | 'datadog'
-        | 'elastic'
         | 'loki'
         | 'sentry'
         | 's3'
@@ -10677,6 +11278,13 @@ export interface components {
       project_ref?: string
     }
     UpdateConversationCustomFieldsResponse: {
+      /** @enum {string} */
+      result: 'success'
+    }
+    UpdateConversationLifecycleResponse: {
+      /** @enum {string} */
+      aiSupportStatus: 'bot_active' | 'escalated' | 'user_resolved' | 'bot_resolved'
+      conversationId: string
       /** @enum {string} */
       result: 'success'
     }
@@ -11248,6 +11856,33 @@ export interface components {
             }
           }
         | {
+            clickhouse: {
+              /**
+               * @description ClickHouse target database
+               * @example analytics
+               */
+              database: string
+              /**
+               * @description Table engine used for replicated tables. Defaults to `replacing_merge_tree` server-side when omitted.
+               * @example replacing_merge_tree
+               * @enum {string}
+               */
+              engine?: 'merge_tree' | 'replacing_merge_tree'
+              /** @description ClickHouse password. Omit for passwordless access. */
+              password?: string
+              /**
+               * @description ClickHouse HTTPS endpoint URL
+               * @example https://clickhouse.example.com:8443
+               */
+              url: string
+              /**
+               * @description ClickHouse user name
+               * @example default
+               */
+              user: string
+            }
+          }
+        | {
             iceberg: {
               supabase: {
                 /**
@@ -11301,11 +11936,6 @@ export interface components {
                */
               data_path: string
               /**
-               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-               * @example 7 days
-               */
-              expire_snapshots_older_than?: string
-              /**
                * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                * @default ducklake
                * @example ducklake
@@ -11348,6 +11978,39 @@ export interface components {
                * @example false
                */
               s3_use_ssl?: boolean
+            }
+          }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id: string
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database: string
+              /** @description Snowflake RSA private key PEM contents */
+              private_key: string
+              /** @description Optional passphrase for encrypted private keys */
+              private_key_passphrase?: string
+              /**
+               * @description Optional Snowflake role
+               * @example ETL_ROLE
+               */
+              role?: string
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema: string
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example ETL_USER
+               */
+              user: string
             }
           }
       /**
@@ -11386,6 +12049,33 @@ export interface components {
             }
           }
         | {
+            clickhouse: {
+              /**
+               * @description ClickHouse target database
+               * @example analytics
+               */
+              database: string
+              /**
+               * @description Table engine used for replicated tables. Defaults to `replacing_merge_tree` server-side when omitted.
+               * @example replacing_merge_tree
+               * @enum {string}
+               */
+              engine?: 'merge_tree' | 'replacing_merge_tree'
+              /** @description ClickHouse password. Omit for passwordless access. */
+              password?: string
+              /**
+               * @description ClickHouse HTTPS endpoint URL
+               * @example https://clickhouse.example.com:8443
+               */
+              url: string
+              /**
+               * @description ClickHouse user name
+               * @example default
+               */
+              user: string
+            }
+          }
+        | {
             iceberg: {
               supabase: {
                 /**
@@ -11439,11 +12129,6 @@ export interface components {
                */
               data_path: string
               /**
-               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-               * @example 7 days
-               */
-              expire_snapshots_older_than?: string
-              /**
                * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                * @default ducklake
                * @example ducklake
@@ -11486,6 +12171,39 @@ export interface components {
                * @example false
                */
               s3_use_ssl?: boolean
+            }
+          }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id: string
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database: string
+              /** @description Snowflake RSA private key PEM contents */
+              private_key: string
+              /** @description Optional passphrase for encrypted private keys */
+              private_key_passphrase?: string
+              /**
+               * @description Optional Snowflake role
+               * @example ETL_ROLE
+               */
+              role?: string
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema: string
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example ETL_USER
+               */
+              user: string
             }
           }
       /**
@@ -11599,6 +12317,8 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
+          /** Format: uri */
+          idjag_issuer_url?: string | null
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -11614,6 +12334,8 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
+          /** Format: uri */
+          idjag_issuer_url?: string | null
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -11629,6 +12351,8 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
+          /** Format: uri */
+          idjag_issuer_url?: string | null
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -11644,6 +12368,8 @@ export interface components {
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
+          /** Format: uri */
+          idjag_issuer_url?: string | null
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
           join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
@@ -11935,6 +12661,33 @@ export interface components {
             }
           }
         | {
+            clickhouse: {
+              /**
+               * @description ClickHouse target database
+               * @example analytics
+               */
+              database: string
+              /**
+               * @description Table engine used for replicated tables. Defaults to `replacing_merge_tree` server-side when omitted.
+               * @example replacing_merge_tree
+               * @enum {string}
+               */
+              engine?: 'merge_tree' | 'replacing_merge_tree'
+              /** @description ClickHouse password. Omit for passwordless access. */
+              password?: string
+              /**
+               * @description ClickHouse HTTPS endpoint URL
+               * @example https://clickhouse.example.com:8443
+               */
+              url: string
+              /**
+               * @description ClickHouse user name
+               * @example default
+               */
+              user: string
+            }
+          }
+        | {
             iceberg: {
               supabase: {
                 /**
@@ -11988,11 +12741,6 @@ export interface components {
                */
               data_path: string
               /**
-               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-               * @example 7 days
-               */
-              expire_snapshots_older_than?: string
-              /**
                * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                * @default ducklake
                * @example ducklake
@@ -12037,6 +12785,70 @@ export interface components {
               s3_use_ssl?: boolean
             }
           }
+        | {
+            snowflake: {
+              /**
+               * @description Snowflake account identifier
+               * @example MYORG-MYACCOUNT
+               */
+              account_id: string
+              /**
+               * @description Snowflake target database
+               * @example ANALYTICS
+               */
+              database: string
+              /** @description Snowflake RSA private key PEM contents */
+              private_key: string
+              /** @description Optional passphrase for encrypted private keys */
+              private_key_passphrase?: string
+              /**
+               * @description Optional Snowflake role
+               * @example ETL_ROLE
+               */
+              role?: string
+              /**
+               * @description Snowflake target schema
+               * @example PUBLIC
+               */
+              schema: string
+              /**
+               * @description Snowflake user configured for key-pair authentication
+               * @example ETL_USER
+               */
+              user: string
+            }
+          }
+      /** @description Pipeline configuration */
+      pipeline_config?: {
+        /** @description Batch configuration */
+        batch?: {
+          /**
+           * @description Maximum fill time in milliseconds
+           * @example 200
+           */
+          max_fill_ms?: number
+        }
+        /**
+         * @description Behavior when the replication slot is invalidated
+         * @example error
+         * @enum {string}
+         */
+        invalidated_slot_behavior?: 'error' | 'recreate'
+        /** @description Maximum number of copy connections per table */
+        max_copy_connections_per_table?: number
+        /** @description Maximum number of table sync workers */
+        max_table_sync_workers?: number
+        /**
+         * @description Publication name
+         * @example pub_orders
+         */
+        publication_name: string
+      }
+      /**
+       * @description Source id
+       * @example 1
+       */
+      source_id?: number
     }
     ValidateReplicationPipelineBody: {
       /** @description Pipeline configuration */
@@ -12084,6 +12896,13 @@ export interface components {
     }
     VercelRedirectResponse: {
       url: string
+    }
+    VerifyEmailBody: {
+      token: string
+    }
+    VerifyEmailResponse: {
+      /** @enum {string} */
+      result: 'success'
     }
     WorkflowRunResponse: {
       branch_id: string
@@ -12509,6 +13328,69 @@ export interface operations {
         content?: never
       }
       /** @description Failed to retrieve Auth template */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  TemplateController_resetTemplate: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+        template:
+          | 'confirmation'
+          | 'email-change'
+          | 'invite'
+          | 'magic-link'
+          | 'recovery'
+          | 'reauthentication'
+          | 'password-changed-notification'
+          | 'email-changed-notification'
+          | 'phone-changed-notification'
+          | 'mfa-factor-enrolled-notification'
+          | 'mfa-factor-unenrolled-notification'
+          | 'identity-linked-notification'
+          | 'identity-unlinked-notification'
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GoTrueConfigResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to reset Auth template */
       500: {
         headers: {
           [name: string]: unknown
@@ -13329,6 +14211,13 @@ export interface operations {
         }
         content?: never
       }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Forbidden action */
       403: {
         headers: {
@@ -13474,6 +14363,117 @@ export interface operations {
         }
       }
       /** @description Failed to update conversation custom fields */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ConversationSyncController_escalateConversation: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['EscalateConversationBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['UpdateConversationLifecycleResponse']
+        }
+      }
+      /** @description User is not a participant in the conversation */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update conversation status */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ConversationSyncController_syncConversationMessages: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SyncConversationMessagesBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SyncConversationMessagesResponse']
+        }
+      }
+      /** @description Supplied conversationId does not match the imported messages */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to sync messages */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ConversationSyncController_resolveConversation: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ResolveConversationBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['UpdateConversationLifecycleResponse']
+        }
+      }
+      /** @description User is not a participant in the conversation */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update conversation status */
       500: {
         headers: {
           [name: string]: unknown
@@ -13959,6 +14959,108 @@ export interface operations {
       }
     }
   }
+  PartnerIntegrationsController_listIntegrations: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PartnerIntegrationListResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Project not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  PartnerIntegrationsController_getIntegration: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The slug of the listing in the marketplace database */
+        listing_slug: string
+        /** @description Supabase project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PartnerIntegrationStatusResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Project not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   PartnerIntegrationsController_createIntegration: {
     parameters: {
       query?: never
@@ -14044,6 +15146,13 @@ export interface operations {
         }
         content?: never
       }
+      /** @description This feature requires the Team, or Enterprise organization plan. */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Forbidden action */
       403: {
         headers: {
@@ -14092,6 +15201,13 @@ export interface operations {
       }
       /** @description Unauthorized */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description This feature requires the Team, or Enterprise organization plan. */
+      402: {
         headers: {
           [name: string]: unknown
         }
@@ -14666,6 +15782,331 @@ export interface operations {
         content?: never
       }
       /** @description Failed to update organization */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  AuditLogDrainController_listAuditLogDrains: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['LFBackend'][]
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to fetch audit log drains */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  AuditLogDrainController_createAuditLogDrain: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateBackendParamsOpenapi']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['LFBackend']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description This feature requires the Team, or Enterprise organization plan. */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to create an audit log drain */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  AuditLogDrainController_updateAuditLogDrain: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+        /** @description Audit log drain identifier */
+        token: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateBackendParamsOpenapi']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['LFBackend']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update audit log drain */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  AuditLogDrainController_deleteAuditLogDrain: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+        /** @description Audit log drain identifier */
+        token: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to delete an audit log drain */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  AuditLogDrainController_patchAuditLogDrain: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+        /** @description Audit log drain identifier */
+        token: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateBackendParamsOpenapi']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['LFBackend']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to patch audit log drain */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  AuditLogDrainController_testAuditLogDrain: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+        /** @description Audit log drain identifier */
+        token: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BackendConnectionTest']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to test audit log drain */
       500: {
         headers: {
           [name: string]: unknown
@@ -16410,7 +17851,10 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
       cookie?: never
     }
     requestBody: {
@@ -16513,6 +17957,13 @@ export interface operations {
           'application/json': components['schemas']['OrgDocumentUrlResponse']
         }
       }
+      /** @description Only organizations on Team, Enterprise or Platform Plan can access our ISO 27001 certificate. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Unauthorized */
       401: {
         headers: {
@@ -16556,6 +18007,13 @@ export interface operations {
           'application/json': components['schemas']['OrgDocumentUrlResponse']
         }
       }
+      /** @description Only organizations on Team, Enterprise or Platform Plan can access our SOC2 Type 2 report. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Unauthorized */
       401: {
         headers: {
@@ -16598,6 +18056,13 @@ export interface operations {
         content: {
           'application/json': components['schemas']['OrgDocumentUrlResponse']
         }
+      }
+      /** @description Only organizations on Team, Enterprise or Platform Plan can access our standard security questionnaire. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Unauthorized */
       401: {
@@ -17190,6 +18655,13 @@ export interface operations {
       }
       /** @description Unauthorized */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
         headers: {
           [name: string]: unknown
         }
@@ -18129,6 +19601,13 @@ export interface operations {
       }
       /** @description Unauthorized */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description This feature requires the Team, or Enterprise organization plan. */
+      402: {
         headers: {
           [name: string]: unknown
         }
@@ -19226,6 +20705,7 @@ export interface operations {
           | 'ipv4'
           | 'pitr.available_variants'
           | 'log_drains'
+          | 'audit_log_drains'
           | 'branching_limit'
           | 'branching_persistent'
           | 'auth.mfa_phone'
@@ -19243,6 +20723,7 @@ export interface operations {
           | 'auth.custom_oauth.max_providers'
           | 'backup.retention_days'
           | 'backup.restore_to_new_project'
+          | 'backup.schedule'
           | 'function.max_count'
           | 'function.size_limit_mb'
           | 'realtime.max_concurrent_users'
@@ -20352,6 +21833,114 @@ export interface operations {
       }
     }
   }
+  ProjectMetricsOtelController_getProjectMetricsOtel: {
+    parameters: {
+      query: {
+        interval: '15min' | '1hr' | '3hr' | '1day' | '3day' | '7day'
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AnalyticsResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get project's metrics (otel) */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  UsageApiController_getProjectServiceHealth: {
+    parameters: {
+      query: {
+        granularity?: 'day' | 'hour' | 'minute'
+        iso_timestamp_end: string
+        iso_timestamp_start: string
+        lql?: string
+        sql?: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ProjectServiceHealthResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get project's service health */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   UsageApiController_getApiCounts: {
     parameters: {
       query?: {
@@ -20535,6 +22124,13 @@ export interface operations {
         }
         content?: never
       }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Forbidden action */
       403: {
         headers: {
@@ -20712,6 +22308,58 @@ export interface operations {
         content?: never
       }
       /** @description Failed to patch log drain */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  LogDrainController_testLogDrain: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Log drains identifier */
+        token: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BackendConnectionTest']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to test log drain */
       500: {
         headers: {
           [name: string]: unknown
@@ -21003,6 +22651,7 @@ export interface operations {
           | 'auth_mfa_phone_default'
           | 'auth_mfa_web_authn_default'
           | 'log_drain_default'
+          | 'etl_pipeline_default'
         /** @description Project ref */
         ref: string
       }
@@ -22029,7 +23678,7 @@ export interface operations {
       }
     }
   }
-  ContentFoldersController_DeleteFolder: {
+  ContentFoldersController_deleteFolder: {
     parameters: {
       query: {
         ids: string
@@ -22732,6 +24381,8 @@ export interface operations {
           | 'ram_usage_free'
           | 'ram_usage_cache_and_buffers'
           | 'ram_usage_swap'
+          | 'ram_commit_used'
+          | 'ram_commit_limit'
           | 'swap_usage'
           | 'client_connections_pgbouncer'
           | 'network_receive_bytes'
@@ -22788,6 +24439,8 @@ export interface operations {
           | 'ram_usage_free'
           | 'ram_usage_cache_and_buffers'
           | 'ram_usage_swap'
+          | 'ram_commit_used'
+          | 'ram_commit_limit'
           | 'swap_usage'
           | 'client_connections_pgbouncer'
           | 'network_receive_bytes'
@@ -23335,7 +24988,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description AWS PrivateLink is not available for the current billing plan. */
+      /** @description Invalid request format */
       400: {
         headers: {
           [name: string]: unknown
@@ -23344,6 +24997,13 @@ export interface operations {
       }
       /** @description Unauthorized */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description This feature requires the Team, or Enterprise organization plan. */
+      402: {
         headers: {
           [name: string]: unknown
         }
@@ -23453,6 +25113,13 @@ export interface operations {
       }
       /** @description Unauthorized */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
         headers: {
           [name: string]: unknown
         }
@@ -24153,6 +25820,49 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['PreviewProjectTransferResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ProjectWakeController_wakeUpProject: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ProjectWakeResponse']
         }
       }
       /** @description Unauthorized */
@@ -25520,6 +27230,13 @@ export interface operations {
         }
         content?: never
       }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Forbidden action */
       403: {
         headers: {
@@ -25907,6 +27624,13 @@ export interface operations {
       }
       /** @description Unauthorized */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
         headers: {
           [name: string]: unknown
         }
@@ -27948,6 +29672,30 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+    }
+  }
+  VerifyEmailController_verifyEmail: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['VerifyEmailBody']
+      }
+    }
+    responses: {
+      /** @description Verification successful */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['VerifyEmailResponse']
+        }
       }
     }
   }

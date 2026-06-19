@@ -7,24 +7,24 @@ import {
   Button,
   FormControl,
   FormField,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectSeparator_Shadcn_,
-  SelectTrigger_Shadcn_,
-  TextArea_Shadcn_,
+  Input,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectSeparator,
+  SelectTrigger,
+  TextArea,
   WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useAnalyticsBucketsQuery } from '@/data/storage/analytics-buckets-query'
 import { useIcebergNamespacesQuery } from '@/data/storage/iceberg-namespaces-query'
 import { useStorageCredentialsQuery } from '@/data/storage/s3-access-key-query'
@@ -45,7 +45,7 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               description="The Google Cloud project ID where data will be sent"
             >
               <FormControl>
-                <Input_Shadcn_ {...field} placeholder="my-gcp-project" />
+                <Input {...field} placeholder="my-gcp-project" />
               </FormControl>
             </FormItemLayout>
           )}
@@ -61,7 +61,7 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               description="The BigQuery dataset where replicated tables will be created"
             >
               <FormControl>
-                <Input_Shadcn_ {...field} placeholder="my_dataset" />
+                <Input {...field} placeholder="my_dataset" />
               </FormControl>
             </FormItemLayout>
           )}
@@ -77,7 +77,7 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               description="Service account credentials JSON for authenticating with BigQuery"
             >
               <FormControl>
-                <TextArea_Shadcn_
+                <TextArea
                   {...field}
                   rows={5}
                   maxLength={5000}
@@ -120,7 +120,7 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               description="A PostgreSQL connection string for the DuckLake catalog"
             >
               <FormControl>
-                <Input
+                <PasswordInput
                   value={field.value ?? ''}
                   type={showCatalogUrl ? 'text' : 'password'}
                   placeholder="postgres://user:pass@host:5432/ducklake_catalog"
@@ -128,7 +128,7 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
                   actions={
                     <div className="flex items-center justify-center">
                       <Button
-                        type="default"
+                        variant="default"
                         className="w-7"
                         icon={showCatalogUrl ? <Eye /> : <EyeOff />}
                         onClick={() => setShowCatalogUrl(!showCatalogUrl)}
@@ -151,11 +151,7 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               description="An S3 path where DuckLake data files will be written"
             >
               <FormControl>
-                <Input_Shadcn_
-                  {...field}
-                  placeholder="s3://bucket/path"
-                  value={field.value ?? ''}
-                />
+                <Input {...field} placeholder="s3://bucket/path" value={field.value ?? ''} />
               </FormControl>
             </FormItemLayout>
           )}
@@ -171,7 +167,7 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               description="Optional number of concurrent DuckDB connections to use"
             >
               <FormControl>
-                <Input_Shadcn_
+                <Input
                   type="number"
                   min={1}
                   max={6}
@@ -207,7 +203,7 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               description="Required access key ID for the object storage provider"
             >
               <FormControl>
-                <Input_Shadcn_ {...field} placeholder="my-access-key" value={field.value ?? ''} />
+                <Input {...field} placeholder="my-access-key" value={field.value ?? ''} />
               </FormControl>
             </FormItemLayout>
           )}
@@ -224,7 +220,7 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               className="relative"
             >
               <FormControl>
-                <Input_Shadcn_
+                <Input
                   {...field}
                   type={showSecretAccessKey ? 'text' : 'password'}
                   placeholder="my-secret-key"
@@ -232,7 +228,7 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
                 />
               </FormControl>
               <Button
-                type="default"
+                variant="default"
                 icon={showSecretAccessKey ? <Eye /> : <EyeOff />}
                 className="w-7 absolute right-6 top-[4px]"
                 onClick={() => setShowSecretAccessKey(!showSecretAccessKey)}
@@ -251,7 +247,7 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               description="Required region for the object storage provider"
             >
               <FormControl>
-                <Input_Shadcn_ {...field} placeholder="us-east-1" value={field.value ?? ''} />
+                <Input {...field} placeholder="us-east-1" value={field.value ?? ''} />
               </FormControl>
             </FormItemLayout>
           )}
@@ -267,11 +263,7 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               description="Required endpoint without the protocol scheme, for example `127.0.0.1:5000/s3`"
             >
               <FormControl>
-                <Input_Shadcn_
-                  {...field}
-                  placeholder="127.0.0.1:5000/s3"
-                  value={field.value ?? ''}
-                />
+                <Input {...field} placeholder="127.0.0.1:5000/s3" value={field.value ?? ''} />
               </FormControl>
             </FormItemLayout>
           )}
@@ -287,13 +279,13 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               description="Choose `path` for MinIO/Supabase-style endpoints or `vhost` for AWS-style virtual host addressing"
             >
               <FormControl>
-                <Select_Shadcn_ value={field.value ?? 'path'} onValueChange={field.onChange}>
-                  <SelectTrigger_Shadcn_>{field.value ?? 'path'}</SelectTrigger_Shadcn_>
-                  <SelectContent_Shadcn_>
-                    <SelectItem_Shadcn_ value="path">path</SelectItem_Shadcn_>
-                    <SelectItem_Shadcn_ value="vhost">vhost</SelectItem_Shadcn_>
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+                <Select value={field.value ?? 'path'} onValueChange={field.onChange}>
+                  <SelectTrigger>{field.value ?? 'path'}</SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="path">path</SelectItem>
+                    <SelectItem value="vhost">vhost</SelectItem>
+                  </SelectContent>
+                </Select>
               </FormControl>
             </FormItemLayout>
           )}
@@ -309,18 +301,16 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               description="Whether to use SSL when connecting to the S3-compatible endpoint"
             >
               <FormControl>
-                <Select_Shadcn_
+                <Select
                   value={field.value === false ? 'false' : 'true'}
                   onValueChange={(value) => field.onChange(value === 'true')}
                 >
-                  <SelectTrigger_Shadcn_>
-                    {field.value === false ? 'false' : 'true'}
-                  </SelectTrigger_Shadcn_>
-                  <SelectContent_Shadcn_>
-                    <SelectItem_Shadcn_ value="true">true</SelectItem_Shadcn_>
-                    <SelectItem_Shadcn_ value="false">false</SelectItem_Shadcn_>
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+                  <SelectTrigger>{field.value === false ? 'false' : 'true'}</SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="true">true</SelectItem>
+                    <SelectItem value="false">false</SelectItem>
+                  </SelectContent>
+                </Select>
               </FormControl>
             </FormItemLayout>
           )}
@@ -328,9 +318,9 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
       </div>
 
       <div className="flex flex-col gap-y-1">
-        <p className="text-sm font-medium text-foreground">Maintenance</p>
+        <p className="text-sm font-medium text-foreground">Metadata</p>
         <p className="text-sm text-foreground-light">
-          Optional settings for DuckLake metadata tables and snapshot cleanup.
+          Optional schema setting for DuckLake metadata tables.
         </p>
       </div>
 
@@ -345,7 +335,42 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               description="Schema used for DuckLake metadata tables in PostgreSQL"
             >
               <FormControl>
-                <Input_Shadcn_ {...field} placeholder="ducklake" value={field.value ?? ''} />
+                <Input {...field} placeholder="ducklake" value={field.value ?? ''} />
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+      </div>
+    </div>
+  )
+}
+
+export const SnowflakeFields = ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => {
+  const [showPrivateKeyPassphrase, setShowPrivateKeyPassphrase] = useState(false)
+
+  return (
+    <div className="flex flex-col gap-y-6 p-5">
+      <p className="text-sm font-medium text-foreground">Snowflake settings</p>
+
+      <div className="flex flex-col gap-y-1">
+        <p className="text-sm font-medium text-foreground">Connection</p>
+        <p className="text-sm text-foreground-light">
+          Configure the Snowflake account, user, and target namespace for replicated data.
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-y-4">
+        <FormField
+          control={form.control}
+          name="snowflakeAccountId"
+          render={({ field }) => (
+            <FormItemLayout
+              layout="horizontal"
+              label="Account ID"
+              description="Snowflake account identifier, for example ORGNAME-ACCOUNTNAME"
+            >
+              <FormControl>
+                <Input {...field} placeholder="MYORG-MYACCOUNT" value={field.value ?? ''} />
               </FormControl>
             </FormItemLayout>
           )}
@@ -353,15 +378,126 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
 
         <FormField
           control={form.control}
-          name="ducklakeExpireSnapshotsOlderThan"
+          name="snowflakeUser"
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="Expire snapshots older than"
-              description="Optional snapshot retention interval, for example `7 days`"
+              label="User"
+              description="Snowflake user configured for key-pair authentication"
             >
               <FormControl>
-                <Input_Shadcn_ {...field} placeholder="7 days" value={field.value ?? ''} />
+                <Input {...field} placeholder="ETL_USER" value={field.value ?? ''} />
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="snowflakeDatabase"
+          render={({ field }) => (
+            <FormItemLayout
+              layout="horizontal"
+              label="Database"
+              description="Snowflake database where replicated tables will be created"
+            >
+              <FormControl>
+                <Input {...field} placeholder="ANALYTICS" value={field.value ?? ''} />
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="snowflakeSchema"
+          render={({ field }) => (
+            <FormItemLayout
+              layout="horizontal"
+              label="Schema"
+              description="Snowflake schema where replicated tables will be created"
+            >
+              <FormControl>
+                <Input {...field} placeholder="PUBLIC" value={field.value ?? ''} />
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="snowflakeRole"
+          render={({ field }) => (
+            <FormItemLayout
+              layout="horizontal"
+              label="Role"
+              description="Optional Snowflake role to assume after connecting"
+            >
+              <FormControl>
+                <Input {...field} placeholder="ETL_ROLE" value={field.value ?? ''} />
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+      </div>
+
+      <div className="flex flex-col gap-y-1">
+        <p className="text-sm font-medium text-foreground">Authentication</p>
+        <p className="text-sm text-foreground-light">
+          Use the RSA private key whose public key is registered on the Snowflake user.
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-y-4">
+        <FormField
+          control={form.control}
+          name="snowflakePrivateKey"
+          render={({ field }) => (
+            <FormItemLayout
+              layout="horizontal"
+              label="Private key"
+              description="RSA private key PEM contents in PKCS#8 or PKCS#1 format"
+            >
+              <FormControl>
+                <TextArea
+                  {...field}
+                  rows={8}
+                  maxLength={10000}
+                  placeholder={'-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----'}
+                  value={field.value ?? ''}
+                  className="font-mono text-xs"
+                />
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="snowflakePrivateKeyPassphrase"
+          render={({ field }) => (
+            <FormItemLayout
+              layout="horizontal"
+              label="Private key passphrase"
+              description="Optional passphrase for encrypted private keys"
+            >
+              <FormControl>
+                <PasswordInput
+                  value={field.value ?? ''}
+                  type={showPrivateKeyPassphrase ? 'text' : 'password'}
+                  placeholder="Optional"
+                  onChange={(event) => field.onChange(event.target.value)}
+                  actions={
+                    <div className="flex items-center justify-center">
+                      <Button
+                        variant="default"
+                        className="w-7"
+                        icon={showPrivateKeyPassphrase ? <Eye /> : <EyeOff />}
+                        onClick={() => setShowPrivateKeyPassphrase(!showPrivateKeyPassphrase)}
+                      />
+                    </div>
+                  }
+                />
               </FormControl>
             </FormItemLayout>
           )}
@@ -396,11 +532,11 @@ export const AnalyticsBucketFields = ({
   const { ref: projectRef } = useParams()
 
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeys } = useAPIKeysQuery(
+  const { data: apiKeysData } = useAPIKeys(
     { projectRef, reveal: true },
     { enabled: canReadAPIKeys }
   )
-  const { serviceKey } = getKeys(apiKeys)
+  const { serviceKey } = apiKeysData ?? {}
   const serviceApiKey = serviceKey?.api_key ?? ''
 
   const {
@@ -449,7 +585,7 @@ export const AnalyticsBucketFields = ({
               {isLoadingBuckets ? (
                 <Button
                   disabled
-                  type="default"
+                  variant="default"
                   className="w-full justify-between"
                   size="small"
                   iconRight={<Loader2 className="animate-spin" />}
@@ -459,7 +595,7 @@ export const AnalyticsBucketFields = ({
               ) : isErrorBuckets ? (
                 <Button
                   disabled
-                  type="default"
+                  variant="default"
                   className="w-full justify-start"
                   size="small"
                   icon={<WarningIcon />}
@@ -468,7 +604,7 @@ export const AnalyticsBucketFields = ({
                 </Button>
               ) : (
                 <FormControl>
-                  <Select_Shadcn_
+                  <Select
                     value={field.value}
                     onValueChange={(value) => {
                       if (value === 'new-bucket') {
@@ -481,29 +617,25 @@ export const AnalyticsBucketFields = ({
                       }
                     }}
                   >
-                    <SelectTrigger_Shadcn_>
-                      {field.value || 'Select a bucket'}
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
-                      <SelectGroup_Shadcn_>
+                    <SelectTrigger>{field.value || 'Select a bucket'}</SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
                         {analyticsBuckets.length === 0 ? (
-                          <SelectItem_Shadcn_ value="__no_buckets__" disabled>
+                          <SelectItem value="__no_buckets__" disabled>
                             No buckets available
-                          </SelectItem_Shadcn_>
+                          </SelectItem>
                         ) : (
                           analyticsBuckets.map((bucket) => (
-                            <SelectItem_Shadcn_ key={bucket.name} value={bucket.name}>
+                            <SelectItem key={bucket.name} value={bucket.name}>
                               {bucket.name}
-                            </SelectItem_Shadcn_>
+                            </SelectItem>
                           ))
                         )}
-                        <SelectSeparator_Shadcn_ />
-                        <SelectItem_Shadcn_ value="new-bucket">
-                          Create a new bucket
-                        </SelectItem_Shadcn_>
-                      </SelectGroup_Shadcn_>
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                        <SelectSeparator />
+                        <SelectItem value="new-bucket">Create a new bucket</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </FormControl>
               )}
             </FormItemLayout>
@@ -522,7 +654,7 @@ export const AnalyticsBucketFields = ({
               {isLoadingNamespaces && canSelectNamespace ? (
                 <Button
                   disabled
-                  type="default"
+                  variant="default"
                   className="w-full justify-between"
                   size="small"
                   iconRight={<Loader2 className="animate-spin" />}
@@ -532,7 +664,7 @@ export const AnalyticsBucketFields = ({
               ) : isErrorNamespaces ? (
                 <Button
                   disabled
-                  type="default"
+                  variant="default"
                   className="w-full justify-start"
                   size="small"
                   icon={<WarningIcon />}
@@ -541,7 +673,7 @@ export const AnalyticsBucketFields = ({
                 </Button>
               ) : (
                 <FormControl>
-                  <Select_Shadcn_
+                  <Select
                     value={field.value}
                     onValueChange={(value) => {
                       setIsFormInteracting(true)
@@ -549,33 +681,33 @@ export const AnalyticsBucketFields = ({
                     }}
                     disabled={!canSelectNamespace}
                   >
-                    <SelectTrigger_Shadcn_>
+                    <SelectTrigger>
                       {!canSelectNamespace
                         ? 'Select a warehouse first'
                         : field.value === CREATE_NEW_NAMESPACE
                           ? 'Create a new namespace'
                           : field.value || 'Select a namespace'}
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
-                      <SelectGroup_Shadcn_>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
                         {namespaces.length === 0 ? (
-                          <SelectItem_Shadcn_ value="__no_namespaces__" disabled>
+                          <SelectItem value="__no_namespaces__" disabled>
                             No namespaces available
-                          </SelectItem_Shadcn_>
+                          </SelectItem>
                         ) : (
                           namespaces.map((namespace) => (
-                            <SelectItem_Shadcn_ key={namespace} value={namespace}>
+                            <SelectItem key={namespace} value={namespace}>
                               {namespace}
-                            </SelectItem_Shadcn_>
+                            </SelectItem>
                           ))
                         )}
-                        <SelectSeparator_Shadcn_ />
-                        <SelectItem_Shadcn_ key={CREATE_NEW_NAMESPACE} value={CREATE_NEW_NAMESPACE}>
+                        <SelectSeparator />
+                        <SelectItem key={CREATE_NEW_NAMESPACE} value={CREATE_NEW_NAMESPACE}>
                           Create a new namespace
-                        </SelectItem_Shadcn_>
-                      </SelectGroup_Shadcn_>
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </FormControl>
               )}
             </FormItemLayout>
@@ -593,7 +725,7 @@ export const AnalyticsBucketFields = ({
                 description="A unique name for the new namespace"
               >
                 <FormControl>
-                  <Input_Shadcn_ {...field} placeholder="new_namespace" value={field.value || ''} />
+                  <Input {...field} placeholder="new_namespace" value={field.value || ''} />
                 </FormControl>
               </FormItemLayout>
             )}
@@ -616,7 +748,7 @@ export const AnalyticsBucketFields = ({
                 </>
               }
             >
-              <Input
+              <PasswordInput
                 disabled
                 value={field.value}
                 type={showCatalogToken ? 'text' : 'password'}
@@ -625,7 +757,7 @@ export const AnalyticsBucketFields = ({
                   serviceApiKey ? (
                     <div className="flex items-center justify-center">
                       <Button
-                        type="default"
+                        variant="default"
                         className="w-7"
                         icon={showCatalogToken ? <Eye /> : <EyeOff />}
                         onClick={() => setShowCatalogToken(!showCatalogToken)}
@@ -653,21 +785,26 @@ export const AnalyticsBucketFields = ({
                   </p>
 
                   {isSuccessKeys && keyNoLongerExists && (
-                    <Admonition type="warning" title="Unable to find access key ID in project">
-                      <p className="leading-normal!">
-                        Please select another key or create a new set, as this destination will not
-                        work otherwise. S3 access keys can be managed in your{' '}
-                        <InlineLink href={`/project/${projectRef}/storage/files/settings`}>
-                          storage settings
-                        </InlineLink>
-                      </p>
-                    </Admonition>
+                    <Admonition
+                      type="warning"
+                      title="Unable to find access key ID in project"
+                      description={
+                        <>
+                          Please select another key or create a new set, as this destination will
+                          not work otherwise. S3 access keys can be managed in your{' '}
+                          <InlineLink href={`/project/${projectRef}/storage/files/settings`}>
+                            storage settings
+                          </InlineLink>
+                          .
+                        </>
+                      }
+                    />
                   )}
 
                   {s3AccessKeyId === CREATE_NEW_KEY && (
                     <Admonition
                       type="default"
-                      title="A new set of S3 access keys will be created"
+                      description="A new set of S3 access keys will be created."
                     />
                   )}
                 </div>
@@ -676,7 +813,7 @@ export const AnalyticsBucketFields = ({
               {isLoadingKeys ? (
                 <Button
                   disabled
-                  type="default"
+                  variant="default"
                   className="w-full justify-between"
                   size="small"
                   iconRight={<Loader2 className="animate-spin" />}
@@ -686,7 +823,7 @@ export const AnalyticsBucketFields = ({
               ) : isErrorKeys ? (
                 <Button
                   disabled
-                  type="default"
+                  variant="default"
                   className="w-full justify-start"
                   size="small"
                   icon={<WarningIcon />}
@@ -695,29 +832,29 @@ export const AnalyticsBucketFields = ({
                 </Button>
               ) : (
                 <FormControl>
-                  <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger_Shadcn_>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
                       {field.value === CREATE_NEW_KEY
                         ? 'Create a new key'
                         : (field.value ?? '').length === 0
                           ? 'Select an access key ID'
                           : field.value}
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
-                      <SelectGroup_Shadcn_>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
                         {s3Keys.map((key) => (
-                          <SelectItem_Shadcn_ key={key.id} value={key.access_key}>
+                          <SelectItem key={key.id} value={key.access_key}>
                             {key.access_key}
                             <p className="text-foreground-lighter">{key.description}</p>
-                          </SelectItem_Shadcn_>
+                          </SelectItem>
                         ))}
-                        <SelectSeparator_Shadcn_ />
-                        <SelectItem_Shadcn_ key={CREATE_NEW_KEY} value={CREATE_NEW_KEY}>
+                        <SelectSeparator />
+                        <SelectItem key={CREATE_NEW_KEY} value={CREATE_NEW_KEY}>
                           Create a new key
-                        </SelectItem_Shadcn_>
-                      </SelectGroup_Shadcn_>
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </FormControl>
               )}
             </FormItemLayout>
@@ -733,10 +870,10 @@ export const AnalyticsBucketFields = ({
                 layout="horizontal"
                 label="S3 Secret Access Key"
                 className="relative"
-                description="The secret key corresponding to your selected access key ID"
+                description="The secret key corresponding to your selected access key ID."
               >
                 <FormControl>
-                  <Input_Shadcn_
+                  <Input
                     {...field}
                     type={showSecretAccessKey ? 'text' : 'password'}
                     value={field.value ?? ''}
@@ -744,9 +881,9 @@ export const AnalyticsBucketFields = ({
                   />
                 </FormControl>
                 <Button
-                  type="default"
+                  variant="default"
                   icon={showSecretAccessKey ? <Eye /> : <EyeOff />}
-                  className="w-7 absolute right-6 top-[4px]"
+                  className="w-7 absolute right-1 top-[4px]"
                   onClick={() => setShowSecretAccessKey(!showSecretAccessKey)}
                 />
               </FormItemLayout>

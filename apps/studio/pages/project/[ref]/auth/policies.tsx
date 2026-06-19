@@ -1,5 +1,5 @@
 import { ident, safeSql } from '@supabase/pg-meta'
-import type { PostgresTable } from '@supabase/postgres-meta'
+import type { PGTable } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { Search, X } from 'lucide-react'
@@ -34,6 +34,7 @@ import { RLSTesterSheet } from '@/components/interfaces/Auth/RLSTester/RLSTester
 import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { getExposedSchemas } from '@/components/layouts/ProjectNeedsSecuring/ProjectNeedsSecuring.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { AutoEnableRLSNotice } from '@/components/ui/AutoEnableRLSNotice'
 import { BannerRlsTester } from '@/components/ui/BannerStack/Banners/BannerRlsTester'
@@ -66,11 +67,7 @@ import type { NextPageWithLayout } from '@/types'
  *
  * @returns list of table
  */
-const getTableFilterState = (
-  tables: PostgresTable[],
-  policies: Array<Policy>,
-  searchString?: string
-) => {
+const getTableFilterState = (tables: PGTable[], policies: Array<Policy>, searchString?: string) => {
   const sortedTables = tables.slice().sort((a, b) => a.name.localeCompare(b.name))
   const visibleTableIds = new Set<number>()
 
@@ -118,7 +115,10 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data: postgrestConfig } = useProjectPostgrestConfigQuery({ projectRef: project?.ref })
+  const { data: dbSchema } = useProjectPostgrestConfigQuery(
+    { projectRef: project?.ref },
+    { select: ({ db_schema }) => db_schema }
+  )
 
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
   const rlsTesterEnabled = useIsRLSTesterEnabled()
@@ -171,6 +171,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+    schema,
   })
   const selectedPolicyToEdit = policies.find((policy) => policy.id.toString() === selectedIdToEdit)
 
@@ -190,13 +191,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
     () => getTableFilterState(tables ?? [], policies ?? [], searchString),
     [tables, policies, searchString]
   )
-  const exposedSchemas = useMemo(() => {
-    if (!postgrestConfig?.db_schema) return []
-    return postgrestConfig.db_schema
-      .split(',')
-      .map((schema) => schema.trim())
-      .filter((schema) => schema.length > 0)
-  }, [postgrestConfig?.db_schema])
+  const exposedSchemas = getExposedSchemas(dbSchema)
 
   const { can: canReadPolicies, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_READ,
@@ -347,7 +342,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
                   searchString ? (
                     <Button
                       size="tiny"
-                      type="text"
+                      variant="text"
                       className="p-0 h-5 w-5"
                       icon={<X />}
                       onClick={() => setSearchString('')}

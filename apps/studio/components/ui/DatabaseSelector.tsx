@@ -9,13 +9,13 @@ import {
   Button,
   ButtonProps,
   cn,
-  Command_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
   Tooltip,
   TooltipContent,
@@ -73,7 +73,7 @@ export const DatabaseSelector = ({
 
   const selectedAdditionalOption = additionalOptions.find((x) => x.id === selectedDatabaseId)
 
-  const newReplicaURL = `/project/${projectRef}/database/replication?type=Read+Replica`
+  const newReplicaURL = `/project/${projectRef}/database/replication?destinationType=Read+Replica`
 
   useEffect(() => {
     if (_selectedDatabaseId && !isForm) state.setSelectedDatabaseId(_selectedDatabaseId)
@@ -81,8 +81,8 @@ export const DatabaseSelector = ({
   }, [_selectedDatabaseId])
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
+      <PopoverTrigger asChild>
         <div className={cn('flex cursor-pointer', className)}>
           {!isForm && (
             <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
@@ -90,7 +90,7 @@ export const DatabaseSelector = ({
             </span>
           )}
           <Button
-            type="default"
+            variant="default"
             icon={isLoading && <Loader2 className="animate-spin" />}
             iconRight={<ChevronDown strokeWidth={1.5} size={12} />}
             {...buttonProps}
@@ -121,14 +121,14 @@ export const DatabaseSelector = ({
             )}
           </Button>
         </div>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align={align}>
-        <Command_Shadcn_>
-          <CommandList_Shadcn_>
+      </PopoverTrigger>
+      <PopoverContent className="p-0 w-64" side="bottom" align={align}>
+        <Command>
+          <CommandList>
             {additionalOptions.length > 0 && (
-              <CommandGroup_Shadcn_ className="border-b">
+              <CommandGroup className="border-b">
                 {additionalOptions.map((option) => (
-                  <CommandItem_Shadcn_
+                  <CommandItem
                     key={option.id}
                     value={option.id}
                     className="cursor-pointer w-full"
@@ -147,11 +147,11 @@ export const DatabaseSelector = ({
                       <p>{option.name}</p>
                       {option.id === selectedDatabaseId && <Check size={14} />}
                     </div>
-                  </CommandItem_Shadcn_>
+                  </CommandItem>
                 ))}
-              </CommandGroup_Shadcn_>
+              </CommandGroup>
             )}
-            <CommandGroup_Shadcn_>
+            <CommandGroup>
               <ScrollArea className={(databases || []).length > 7 ? 'h-[210px]' : ''}>
                 {sortedDatabases?.map((database) => {
                   const region = formatDatabaseRegion(database.region)
@@ -185,7 +185,7 @@ export const DatabaseSelector = ({
                   }
 
                   return (
-                    <CommandItem_Shadcn_
+                    <CommandItem
                       key={database.identifier}
                       value={database.identifier}
                       className="cursor-pointer w-full"
@@ -208,14 +208,15 @@ export const DatabaseSelector = ({
                         </p>
                         {database.identifier === selectedDatabaseId && <Check size={16} />}
                       </div>
-                    </CommandItem_Shadcn_>
+                    </CommandItem>
                   )
                 })}
               </ScrollArea>
-            </CommandGroup_Shadcn_>
+            </CommandGroup>
+
             {IS_PLATFORM && infrastructureReadReplicas && (
-              <CommandGroup_Shadcn_ className="border-t">
-                <CommandItem_Shadcn_
+              <CommandGroup className="border-t">
+                <CommandItem
                   className="cursor-pointer w-full"
                   onSelect={() => {
                     setOpen(false)
@@ -235,12 +236,12 @@ export const DatabaseSelector = ({
                     <Plus size={14} strokeWidth={1.5} />
                     <p>Create a new read replica</p>
                   </Link>
-                </CommandItem_Shadcn_>
-              </CommandGroup_Shadcn_>
+                </CommandItem>
+              </CommandGroup>
             )}
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }

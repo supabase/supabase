@@ -259,7 +259,7 @@ const AttributeUsage = ({
                       </div>
                     </div>
 
-                    <Button type="primary" asChild>
+                    <Button variant="primary" asChild>
                       <Link href={upgradeUrl}>Upgrade plan</Link>
                     </Button>
                   </div>

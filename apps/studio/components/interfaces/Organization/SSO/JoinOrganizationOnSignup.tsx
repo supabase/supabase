@@ -2,12 +2,12 @@ import { useForm } from 'react-hook-form'
 import {
   FormControl,
   FormField,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -30,7 +30,7 @@ export const JoinOrganizationOnSignup = ({
           <FormItemLayout
             layout="flex-row-reverse"
             label="Automatically add users to organization on sign up"
-            description="If disabled, users will need to be invited to the organization after signing up"
+            description="If disabled, users will need to be invited to the organization after signing up."
           >
             <FormControl className="flex items-center gap-2">
               <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -50,19 +50,19 @@ export const JoinOrganizationOnSignup = ({
               className="justify-between"
             >
               <FormControl>
-                <Select_Shadcn_ value={field.value} onValueChange={(val) => field.onChange(val)}>
-                  <SelectTrigger_Shadcn_ className="w-52">
-                    <SelectValue_Shadcn_ placeholder="Select a role" />
-                  </SelectTrigger_Shadcn_>
-                  <SelectContent_Shadcn_>
-                    <SelectGroup_Shadcn_>
-                      <SelectItem_Shadcn_ value="Owner">Owner</SelectItem_Shadcn_>
-                      <SelectItem_Shadcn_ value="Administrator">Administrator</SelectItem_Shadcn_>
-                      <SelectItem_Shadcn_ value="Developer">Developer</SelectItem_Shadcn_>
-                      <SelectItem_Shadcn_ value="Read-only">Read-only</SelectItem_Shadcn_>
-                    </SelectGroup_Shadcn_>
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+                <Select value={field.value} onValueChange={(val) => field.onChange(val)}>
+                  <SelectTrigger className="w-52">
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="Owner">Owner</SelectItem>
+                      <SelectItem value="Administrator">Administrator</SelectItem>
+                      <SelectItem value="Developer">Developer</SelectItem>
+                      <SelectItem value="Read-only">Read-only</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </FormControl>
             </FormItemLayout>
           )}

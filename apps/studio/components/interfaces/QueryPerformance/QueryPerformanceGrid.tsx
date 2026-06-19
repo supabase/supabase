@@ -130,7 +130,7 @@ export const QueryPerformanceGrid = ({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    type="text"
+                    variant="text"
                     size="tiny"
                     className="p-1 h-5 w-5 shrink-0"
                     icon={<ChevronDown size={14} className="text-foreground-muted" />}
@@ -187,11 +187,11 @@ export const QueryPerformanceGrid = ({
               </div>
               <CodeBlock
                 language="pgsql"
-                className="bg-transparent! p-0! m-0! border-none! whitespace-nowrap! [&>code]:whitespace-nowrap! [&>code]:wrap-break-word overflow-visible! truncate! w-full! pr-20! pointer-events-none"
-                wrapperClassName="max-w-full! flex-1"
+                className="bg-transparent! p-0! m-0! border-none! truncate! whitespace-nowrap! w-full! pr-20! pointer-events-none"
+                wrapperClassName="flex-1 min-w-0 max-w-full overflow-hidden!"
                 hideLineNumbers
                 hideCopy
-                value={value.replace(/\s+/g, ' ').trim() as string}
+                value={typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() : ''}
                 wrapLines={false}
               />
               {onCurrentSelectQuery && (
@@ -199,7 +199,7 @@ export const QueryPerformanceGrid = ({
                   tooltip={{ content: { text: 'Query details' } }}
                   icon={<ArrowRight size={14} />}
                   size="tiny"
-                  type="default"
+                  variant="default"
                   onClick={(e) => {
                     e.stopPropagation()
                     setSelectedRow(props.rowIdx)
@@ -488,7 +488,7 @@ export const QueryPerformanceGrid = ({
           >
             {onRetry && (
               <div className="mt-4">
-                <Button type="default" onClick={onRetry}>
+                <Button variant="default" onClick={onRetry}>
                   Try again
                 </Button>
               </div>
@@ -509,7 +509,7 @@ export const QueryPerformanceGrid = ({
         <DataGrid
           ref={gridRef}
           style={{ height: '100%' }}
-          className={cn('flex-1 grow h-full')}
+          className={cn('flex-1 grow h-full border-t-0! border-b-0!')}
           rowHeight={44}
           headerRowHeight={36}
           columns={columns}

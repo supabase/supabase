@@ -17,6 +17,7 @@ import {
 
 import type { EventTrigger } from './EventTriggerList.utils'
 import { SUPABASE_ROLES } from '@/components/interfaces/Database/Roles/Roles.constants'
+import { getDatabaseFunctionsHref } from '@/components/interfaces/Database/Triggers/TriggersList/TriggerList.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface EventTriggerListProps {
@@ -105,7 +106,7 @@ export const EventTriggerList = ({
             <TableCell className="space-x-2">
               {canEditTrigger ? (
                 <Button
-                  type="text"
+                  variant="text"
                   onClick={() => onEditTrigger(trigger)}
                   title={trigger.name}
                   className="text-link-table-cell text-left text-sm disabled:opacity-90 disabled:no-underline min-w-0 p-0 hover:bg-transparent font-medium max-w-48 title"
@@ -126,7 +127,11 @@ export const EventTriggerList = ({
             <TableCell className="space-x-2">
               {trigger.function_name ? (
                 <Link
-                  href={`/project/${projectRef}/database/functions?search=${trigger.function_name}&schema=${trigger.function_schema}`}
+                  href={getDatabaseFunctionsHref(
+                    projectRef,
+                    trigger.function_schema,
+                    trigger.function_name
+                  )}
                   className="text-link-table-cell block max-w-40 text-foreground-light"
                 >
                   {trigger.function_name}
@@ -163,7 +168,7 @@ export const EventTriggerList = ({
                   <DropdownMenuTrigger asChild>
                     <Button
                       aria-label="More options"
-                      type="default"
+                      variant="default"
                       className="px-1"
                       icon={<MoreVertical />}
                     />
@@ -200,7 +205,7 @@ export const EventTriggerList = ({
               ) : (
                 <ButtonTooltip
                   disabled
-                  type="default"
+                  variant="default"
                   className="px-1"
                   icon={<MoreVertical />}
                   tooltip={{

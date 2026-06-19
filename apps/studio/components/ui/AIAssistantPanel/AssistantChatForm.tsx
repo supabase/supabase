@@ -12,7 +12,7 @@ import type { AssistantModelId } from '@/lib/ai/model.utils'
 
 export interface FormProps {
   /* The ref for the textarea, optional. Exposed for the CommandsPopover to attach events. */
-  textAreaRef?: React.RefObject<HTMLTextAreaElement>
+  textAreaRef?: React.RefObject<HTMLTextAreaElement | null>
   /* The loading state of the form */
   loading: boolean
   /* The disabled state of the form */
@@ -79,7 +79,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
 
     const handleSubmit = (event?: FormEvent<HTMLFormElement>) => {
       if (event) event.preventDefault()
-      if (!value || (loading && !isEditing)) return
+      if (disabled || !value || (loading && !isEditing)) return
 
       let finalMessage = value
       if (includeSnippetsInMessage && sqlSnippets && sqlSnippets.length > 0) {
@@ -99,7 +99,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
       }
     }
 
-    const canSubmit = !loading && !!value
+    const canSubmit = !disabled && !loading && !!value
 
     return (
       <div className="w-full">
@@ -141,7 +141,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
               {loading ? (
                 onStop ? (
                   <ButtonTooltip
-                    type="outline"
+                    variant="outline"
                     aria-label="Stop response"
                     icon={<Square fill="currentColor" className="scale-75" />}
                     onClick={onStop}
@@ -153,7 +153,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
                 )
               ) : (
                 <ButtonTooltip
-                  htmlType="submit"
+                  type="submit"
                   aria-label="Send message"
                   icon={<ArrowUp />}
                   disabled={!canSubmit}

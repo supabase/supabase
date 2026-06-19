@@ -1,6 +1,6 @@
 import { ident, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { useEffect, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
@@ -9,7 +9,7 @@ import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { databasePoliciesKeys } from '@/data/database-policies/keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { storageKeys } from '@/data/storage/keys'
 import { usePublicBucketsWithSelectPoliciesQuery } from '@/data/storage/public-buckets-with-select-policies-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -19,7 +19,7 @@ const DISMISS_DURATION_MS = 14 * 24 * 60 * 60 * 1000 // 14 days
 
 function isDismissed(projectRef: string, bucketId: string): boolean {
   try {
-    const raw = localStorage.getItem(
+    const raw = safeLocalStorage.getItem(
       LOCAL_STORAGE_KEYS.STORAGE_PUBLIC_BUCKET_SELECT_POLICY_WARNING_DISMISSED(projectRef, bucketId)
     )
     if (!raw) return false
@@ -31,7 +31,7 @@ function isDismissed(projectRef: string, bucketId: string): boolean {
 }
 
 function persistDismiss(projectRef: string, bucketId: string): void {
-  localStorage.setItem(
+  safeLocalStorage.setItem(
     LOCAL_STORAGE_KEYS.STORAGE_PUBLIC_BUCKET_SELECT_POLICY_WARNING_DISMISSED(projectRef, bucketId),
     JSON.stringify({ dismissedAt: new Date().toISOString() })
   )
@@ -174,10 +174,10 @@ function PublicBucketWarningView(props: PublicBucketWarningViewProps): ReactNode
         }
         actions={
           <div className="flex gap-2">
-            <Button type="default" size="tiny" onClick={onDismiss}>
+            <Button variant="default" size="tiny" onClick={onDismiss}>
               Dismiss
             </Button>
-            <Button type="warning" size="tiny" onClick={onShowModal}>
+            <Button variant="warning" size="tiny" onClick={onShowModal}>
               Remove policy
             </Button>
           </div>
@@ -198,8 +198,11 @@ function PublicBucketWarningView(props: PublicBucketWarningViewProps): ReactNode
       >
         <div className="flex flex-col gap-3">
           <p className="text-sm text-foreground-light">
-            This will drop {hasMultiplePolicies ? 'one' : 'the'} <code>SELECT</code> policy that
-            makes the bucket&apos;s contents listable. Object URLs will continue to work.
+            This will drop {hasMultiplePolicies ? 'one' : 'the'}{' '}
+            <code className="text-code-inline">SELECT</code>
+            {
+              ' policy that makes the bucket’s contents listable. Object URLs will continue to work.'
+            }
             {hasMultiplePolicies
               ? ` ${policyCount - 1} matching ${
                   policyCount - 1 === 1 ? 'policy' : 'policies'

@@ -1,4 +1,4 @@
-import { Button, Input_Shadcn_ as Input, Textarea } from 'ui'
+import { Button, Input, Textarea } from 'ui'
 import {
   Field,
   FieldContent,
@@ -43,8 +43,8 @@ export default function FieldResponsive() {
             </Field>
             <FieldSeparator />
             <Field orientation="responsive">
-              <Button htmlType="submit">Submit</Button>
-              <Button htmlType="button" type="default">
+              <Button type="submit">Submit</Button>
+              <Button type="button" variant="default">
                 Cancel
               </Button>
             </Field>

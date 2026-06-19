@@ -3,14 +3,9 @@ import { Globe } from 'lucide-react'
 const highlights = [
   {
     title: 'Fully managed',
-    paragraph: 'Edge Functions scale automatically, reducing your devops burden',
+    paragraph: <>Edge Functions scale automatically, reducing your devops burden</>,
     icon: (
-      <svg
-        className="w-5 h-5"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
+      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path
           fillRule="evenodd"
           clipRule="evenodd"
@@ -41,12 +36,7 @@ const highlights = [
     title: 'Secure and Scalable',
     paragraph: 'Simply write your code in TypeScript and deploy',
     icon: (
-      <svg
-        className="w-5 h-5"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
+      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path
           fillRule="evenodd"
           clipRule="evenodd"
@@ -76,14 +66,9 @@ const highlights = [
   },
   {
     title: 'Node.js Support',
-    paragraph: 'Migrate existing workloads with support for 1M+ NPM modules',
+    paragraph: 'Migrate existing workloads with NPM and Node.js support',
     icon: (
-      <svg
-        className="w-5 h-5"
-        viewBox="0 0 26 28"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
+      <svg className="w-5 h-5" viewBox="0 0 26 28" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path
           d="M11.9233 0.444469C12.6102 0.0512999 13.5049 0.049524 14.1912 0.444469C17.6439 2.39542 21.0976 4.3433 24.5497 6.29543C25.199 6.66117 25.6333 7.38378 25.6267 8.13193V19.8696C25.6315 20.6487 25.1543 21.3886 24.4693 21.746C21.028 23.6862 17.5884 25.6288 14.1477 27.569C13.4466 27.9698 12.5339 27.939 11.8547 27.5052C10.823 26.9072 9.78955 26.312 8.75774 25.7145C8.5469 25.5888 8.30922 25.4888 8.16034 25.2844C8.29195 25.107 8.52726 25.0849 8.71847 25.0074C9.14913 24.8705 9.54467 24.6507 9.9403 24.4373C10.0403 24.3689 10.1625 24.3951 10.2584 24.4564C11.1406 24.9622 12.0151 25.4828 12.9003 25.9838C13.0891 26.0928 13.2803 25.9481 13.4417 25.8581C16.8187 23.9495 20.1999 22.048 23.5763 20.1388C23.7014 20.0786 23.7706 19.9458 23.7604 19.8088C23.7628 15.9368 23.761 12.0641 23.7616 8.19212C23.7759 8.03662 23.6859 7.89366 23.5453 7.83003C20.1159 5.89871 16.6883 3.96444 13.2595 2.03263C13.2001 1.99179 13.1297 1.96988 13.0576 1.96977C12.9855 1.96967 12.9151 1.99138 12.8556 2.03204C9.42677 3.96444 5.99974 5.90049 2.57093 7.8317C2.43083 7.89544 2.3368 8.03603 2.35348 8.19212C2.35407 12.0641 2.35348 15.9368 2.35348 19.8094C2.34753 19.8763 2.36222 19.9433 2.39556 20.0016C2.4289 20.0599 2.47929 20.1065 2.53995 20.1353C3.45494 20.6541 4.37112 21.1694 5.2867 21.6864C5.80251 21.9641 6.43582 22.129 7.00412 21.9163C7.50562 21.7365 7.85715 21.2247 7.84758 20.6922C7.85232 16.8428 7.84521 12.9928 7.85113 9.14401C7.8386 8.97313 8.0007 8.83194 8.16685 8.84802C8.60649 8.84506 9.04672 8.8421 9.48636 8.84921C9.66987 8.84506 9.79616 9.02907 9.77347 9.20123C9.77169 13.075 9.7782 16.9489 9.77051 20.8227C9.77169 21.8551 9.34754 22.9784 8.39259 23.4836C7.21614 24.093 5.76206 23.9638 4.59982 23.3794C3.59366 22.8772 2.63348 22.2845 1.64518 21.7465C0.958393 21.391 0.483532 20.6482 0.488366 19.8697V8.13193C0.481164 7.36829 0.932741 6.63256 1.60226 6.27215C5.04301 4.33038 8.48316 2.38713 11.9233 0.444469Z"
           fill="currentColor"
@@ -100,22 +85,22 @@ const highlights = [
 export function Highlights() {
   return (
     <div className="border-t border-border">
-    <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6">
-      <div className="-translate-y-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {highlights.map((highlight) => (
-            <div
-              key={highlight.title}
-              className="bg-surface-75 border border-border rounded-lg p-6 flex flex-col gap-3"
-            >
-              <div className="text-foreground-lighter">{highlight.icon}</div>
-              <h3 className="text-foreground text-base font-medium">{highlight.title}</h3>
-              <p className="text-foreground-lighter text-sm">{highlight.paragraph}</p>
-            </div>
-          ))}
+      <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6">
+        <div className="-translate-y-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {highlights.map((highlight) => (
+              <div
+                key={highlight.title}
+                className="bg-surface-75 border border-border rounded-lg p-6 flex flex-col gap-3"
+              >
+                <div className="text-foreground-lighter">{highlight.icon}</div>
+                <h3 className="text-foreground text-base font-medium">{highlight.title}</h3>
+                <p className="text-foreground-lighter text-sm">{highlight.paragraph}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
     </div>
   )
 }

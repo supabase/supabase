@@ -27,7 +27,7 @@ const JWTKeysLegacyPage: NextPageWithLayout = () => {
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
   const jwtSecretUpdateError = data?.jwtSecretUpdateError
 
-  const previousJwtSecretUpdateStatus = useRef<JwtSecretUpdateStatus>()
+  const previousJwtSecretUpdateStatus = useRef<JwtSecretUpdateStatus>(undefined)
   const { Failed, Updated, Updating } = JwtSecretUpdateStatus
   const jwtSecretUpdateErrorMessage =
     JWT_SECRET_UPDATE_ERROR_MESSAGES[jwtSecretUpdateError as JwtSecretUpdateError]

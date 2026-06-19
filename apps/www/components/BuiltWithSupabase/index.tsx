@@ -16,12 +16,12 @@ const BuiltWithSupabase = () => {
             Kickstart your next project with templates built by us and our community.
           </p>
           <div className="flex justify-center gap-2 py-4">
-            <Button asChild type="default" size="small" className="h-full">
+            <Button asChild variant="default" size="small" className="h-full">
               <Link href="/docs/guides/examples">View all examples</Link>
             </Button>
             <Button
               asChild
-              type="default"
+              variant="default"
               icon={<IconGitHubSolid size="tiny" className="w-full! h-full!" />}
               size="small"
             >

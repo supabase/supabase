@@ -14,9 +14,9 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
 } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
@@ -140,7 +140,7 @@ export const CreateNewProjectDialog = ({
                 render={({ field }) => (
                   <FormItemLayout label="New Project Name">
                     <FormControl>
-                      <Input_Shadcn_ placeholder="Enter a name" type="text" {...field} />
+                      <Input placeholder="Enter a name" type="text" {...field} />
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -161,7 +161,7 @@ export const CreateNewProjectDialog = ({
                     }
                   >
                     <FormControl>
-                      <Input
+                      <PasswordInput
                         id="db-password"
                         type="password"
                         placeholder="Type in a strong password"
@@ -184,10 +184,10 @@ export const CreateNewProjectDialog = ({
             </DialogSection>
             <AdditionalMonthlySpend additionalMonthlySpend={additionalMonthlySpend} />
             <DialogFooter>
-              <Button htmlType="reset" type="outline" onClick={() => onOpenChange(false)}>
+              <Button type="reset" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button htmlType="submit" loading={cloneMutationLoading}>
+              <Button type="submit" loading={cloneMutationLoading}>
                 Restore to new project
               </Button>
             </DialogFooter>

@@ -16,9 +16,7 @@ export function RealtimeContent({ apiSlot }: { apiSlot: React.ReactNode }) {
       <section className="border-t border-border">
         <QuoteSection />
       </section>
-      <section className="border-t border-border">
-        {apiSlot}
-      </section>
+      <section className="border-t border-border">{apiSlot}</section>
       <section className="border-t border-border">
         <BuiltWithSupabaseSection />
       </section>

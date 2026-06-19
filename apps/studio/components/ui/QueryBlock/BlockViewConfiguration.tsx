@@ -1,15 +1,15 @@
 import { BarChart2, Settings2, Table } from 'lucide-react'
 import {
   Checkbox,
-  Label_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
+  Label,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
   ToggleGroup,
   ToggleGroupItem,
 } from 'ui'
@@ -37,17 +37,17 @@ export const BlockViewConfiguration = ({
   updateChartConfig,
 }: BlockViewConfigurationProps) => {
   return (
-    <Popover_Shadcn_ modal={false}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover modal={false}>
+      <PopoverTrigger asChild>
         <ButtonTooltip
           id="help-popover-button"
-          type="text"
+          variant="text"
           className="px-1"
           icon={<Settings2 size={14} strokeWidth={1.5} />}
           tooltip={{ content: { side: 'bottom', text: 'View data' } }}
         />
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ side="bottom" align="center" className="w-[240px] p-3">
+      </PopoverTrigger>
+      <PopoverContent side="bottom" align="center" className="w-[240px] p-3">
         <form className="grid gap-2">
           <ToggleGroup
             type="single"
@@ -69,46 +69,46 @@ export const BlockViewConfiguration = ({
 
           {isChart && chartConfig && (
             <>
-              <Select_Shadcn_
+              <Select
                 disabled={lockColumns}
                 value={chartConfig?.xKey}
                 onValueChange={(value) => updateChartConfig({ ...chartConfig, xKey: value })}
               >
-                <SelectTrigger_Shadcn_ className="text-left">
+                <SelectTrigger className="text-left">
                   X Axis {chartConfig?.xKey && `- ${chartConfig.xKey}`}
-                </SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_>
-                  <SelectGroup_Shadcn_>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
                     {columns.map((key) => (
-                      <SelectItem_Shadcn_ value={key} key={key}>
+                      <SelectItem value={key} key={key}>
                         {key}
-                      </SelectItem_Shadcn_>
+                      </SelectItem>
                     ))}
-                  </SelectGroup_Shadcn_>
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
 
-              <Select_Shadcn_
+              <Select
                 disabled={lockColumns}
                 value={chartConfig?.yKey}
                 onValueChange={(value) => updateChartConfig({ ...chartConfig, yKey: value })}
               >
-                <SelectTrigger_Shadcn_ className="text-left">
+                <SelectTrigger className="text-left">
                   Y Axis {chartConfig?.yKey && `- ${chartConfig.yKey}`}
-                </SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_>
-                  <SelectGroup_Shadcn_>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
                     {columns.map((key) => (
-                      <SelectItem_Shadcn_ value={key} key={key}>
+                      <SelectItem value={key} key={key}>
                         {key}
-                      </SelectItem_Shadcn_>
+                      </SelectItem>
                     ))}
-                  </SelectGroup_Shadcn_>
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
 
               <div className="*:flex *:gap-2 *:items-center grid gap-2 *:text-foreground-light *:p-1.5 *:pl-0">
-                <Label_Shadcn_ htmlFor="cumulative">
+                <Label htmlFor="cumulative">
                   <Checkbox
                     id="cumulative"
                     checked={chartConfig?.cumulative}
@@ -120,8 +120,8 @@ export const BlockViewConfiguration = ({
                     }
                   />
                   Cumulative
-                </Label_Shadcn_>
-                <Label_Shadcn_ htmlFor="logScale">
+                </Label>
+                <Label htmlFor="logScale">
                   <Checkbox
                     id="logScale"
                     checked={chartConfig?.logScale}
@@ -133,12 +133,12 @@ export const BlockViewConfiguration = ({
                     }
                   />
                   Log scale
-                </Label_Shadcn_>
+                </Label>
               </div>
             </>
           )}
         </form>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

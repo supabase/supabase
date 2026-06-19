@@ -30,9 +30,7 @@ export function DatabaseContent({ apiSlot }: { apiSlot: React.ReactNode }) {
       <section className="border-t border-border">
         <SqlEditorSection />
       </section>
-      <section className="border-t border-border">
-        {apiSlot}
-      </section>
+      <section className="border-t border-border">{apiSlot}</section>
       <section className="border-t border-border">
         <BuiltWithSupabaseSection />
       </section>

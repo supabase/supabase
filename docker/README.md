@@ -44,6 +44,7 @@ This Docker Compose configuration includes the following services:
 - **[CHANGELOG.md](./CHANGELOG.md)** - Track recent updates and changes to services
 - **[versions.md](./versions.md)** - Complete history of Docker image versions for rollback reference
 - **[Ask DeepWiki / Supabase](https://deepwiki.com/supabase/supabase/3-self-hosted-deployment)** - DeepWiki-generated description of self-hosted configuration
+- **[CONFIG.md](./CONFIG.md)** - Configuration reference for all environment variables
 
 ## Updates
 
@@ -81,14 +82,13 @@ Share your self-hosting experience:
 ⚠️ **The default configuration is not secure for production use.**
 
 Before deploying to production, you must:
-- Update all default passwords and secrets in the `.env` file
-- Generate new JWT secrets
+- [Update](https://supabase.com/docs/guides/self-hosting/docker#configuring-and-securing-supabase) all default passwords and secrets in the `.env` file
 - Review and update CORS settings
 - Consider setting up a secure proxy in front of self-hosted Supabase
 - Review and adjust network security configuration (ACLs, etc.)
 - Set up proper backup procedures
 
-See the [security section](https://supabase.com/docs/guides/self-hosting/docker#configuring-and-securing-supabase) in the documentation.
+See the [main installation guide](https://supabase.com/docs/guides/self-hosting/docker) and the how-tos in the documentation.
 
 ## License
 

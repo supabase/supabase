@@ -5,7 +5,7 @@ import {
   JwtSecretUpdateProgress,
   JwtSecretUpdateStatus,
 } from '@supabase/shared-types/out/events'
-import { useFlag, useParams } from 'common'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
 import {
   AlertCircle,
   ChevronDown,
@@ -26,9 +26,17 @@ import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -41,7 +49,6 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Modal,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -112,7 +119,7 @@ export const JWTSettings = () => {
     'custom_config_gotrue'
   )
 
-  const { data } = useJwtSecretUpdatingStatusQuery({ projectRef })
+  const { data } = useJwtSecretUpdatingStatusQuery({ projectRef }, { enabled: IS_PLATFORM })
   const { data: config, isError } = useProjectPostgrestConfigQuery({ projectRef })
   const { mutateAsync: updateJwt, isPending: isSubmittingJwtSecretUpdateRequest } =
     useJwtSecretUpdateMutation()
@@ -120,14 +127,17 @@ export const JWTSettings = () => {
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: legacyKey, isPending } = useLegacyJWTSigningKeyQuery(
     { projectRef },
-    { enabled: canReadAPIKeys, retry: false }
+    { enabled: IS_PLATFORM && canReadAPIKeys, retry: false }
   )
   const { data: legacyAPIKeysStatus } = useLegacyAPIKeysStatusQuery(
     { projectRef },
-    { enabled: canReadAPIKeys }
+    { enabled: IS_PLATFORM && canReadAPIKeys }
   )
 
-  const { data: authConfig, isPending: isLoadingAuthConfig } = useAuthConfigQuery({ projectRef })
+  const { data: authConfig, isPending: isLoadingAuthConfig } = useAuthConfigQuery(
+    { projectRef },
+    { enabled: IS_PLATFORM }
+  )
   const { mutate: updateAuthConfig, isPending: isUpdatingAuthConfig } =
     useAuthConfigUpdateMutation()
 
@@ -199,6 +209,26 @@ export const JWTSettings = () => {
       toast.error(`Failed to update JWT secret: ${error.message}`)
     }
   }
+
+  if (!IS_PLATFORM) {
+    return (
+      <Panel>
+        <Panel.Content className="border-t border-panel-border-interior-light in-data-[theme*=dark]:border-panel-border-interior-dark">
+          <Form {...form}>
+            <FormItemLayout
+              layout="flex-row-reverse"
+              id="JWT_SECRET"
+              label="JWT secret"
+              description="Used to verify legacy user session JWTs issued by Supabase Auth."
+            >
+              <Input id="JWT_SECRET" copy reveal readOnly value={config?.jwt_secret || ''} />
+            </FormItemLayout>
+          </Form>
+        </Panel.Content>
+      </Panel>
+    )
+  }
+
   return (
     <>
       <Panel
@@ -259,7 +289,7 @@ export const JWTSettings = () => {
                         </p>
                       )}
 
-                      <Button asChild type="default" icon={<ExternalLink />} className="mt-2">
+                      <Button asChild variant="default" icon={<ExternalLink />} className="mt-2">
                         <Link href={`/project/${projectRef}/settings/api-keys`}>
                           Go to API keys
                         </Link>
@@ -372,16 +402,16 @@ export const JWTSettings = () => {
                 </Admonition>
               )}
 
-              <Collapsible_Shadcn_ className="bg border rounded-md mt-4">
-                <CollapsibleTrigger_Shadcn_ className="p-4 w-full flex items-center justify-between [&[data-state=open]>svg]:-rotate-180!">
+              <Collapsible className="bg border rounded-md mt-4">
+                <CollapsibleTrigger className="p-4 w-full flex items-center justify-between [&[data-state=open]>svg]:-rotate-180!">
                   <p className="text-sm">
                     {disableLegacyJwtSecretRotation
                       ? 'How to migrate to the new API keys?'
                       : 'How to change your JWT secret?'}
                   </p>
                   <ChevronDown size={14} className="transition-transform duration-200" />
-                </CollapsibleTrigger_Shadcn_>
-                <CollapsibleContent_Shadcn_ className="border-t p-4">
+                </CollapsibleTrigger>
+                <CollapsibleContent className="border-t p-4">
                   <p className="text-sm text-foreground-light text-balance mb-2">
                     {disableLegacyJwtSecretRotation
                       ? 'Migrate to the new publishable and secret API keys to enable rotation with zero downtime and without signing users out. The change is reversible until you revoke the legacy secret.'
@@ -472,7 +502,7 @@ export const JWTSettings = () => {
 
                   <div className="flex flex-row gap-x-2 mt-4">
                     {disableLegacyJwtSecretRotation ? (
-                      <Button type="default" icon={<ExternalLink className="size-4" />} asChild>
+                      <Button variant="default" icon={<ExternalLink className="size-4" />} asChild>
                         <Link
                           href="https://supabase.com/docs/guides/auth/signing-keys#getting-started"
                           target="_blank"
@@ -486,7 +516,7 @@ export const JWTSettings = () => {
                         <DropdownMenuTrigger asChild>
                           <ButtonTooltip
                             disabled={!canGenerateNewJWTSecret}
-                            type="default"
+                            variant="default"
                             iconRight={<ChevronDown size={14} />}
                             loading={isUpdatingJwtSecret}
                             tooltip={{
@@ -521,8 +551,8 @@ export const JWTSettings = () => {
                       </DropdownMenu>
                     )}
                   </div>
-                </CollapsibleContent_Shadcn_>
-              </Collapsible_Shadcn_>
+                </CollapsibleContent>
+              </Collapsible>
             </>
           )}
         </Panel.Content>
@@ -621,75 +651,77 @@ export const JWTSettings = () => {
         </ul>
       </TextConfirmModal>
 
-      <Modal
-        header="Pick a new JWT secret"
-        visible={isCreatingKey && !disableLegacyJwtSecretRotation}
-        size="medium"
-        variant="danger"
-        onCancel={() => {
+      <Dialog
+        open={isCreatingKey && !disableLegacyJwtSecretRotation}
+        onOpenChange={() => {
           setIsCreatingKey(false)
           setCustomToken('')
           customJwtSecretForm.reset({ customToken: '' })
         }}
-        loading={isSubmittingJwtSecretUpdateRequest}
-        customFooter={
-          <div className="space-x-2">
+      >
+        <DialogContent size="medium">
+          <DialogHeader>
+            <DialogTitle>Pick a new JWT secret</DialogTitle>
+            <DialogDescription>
+              Pick a new custom JWT secret. Make sure it is a strong combination of characters that
+              cannot be guessed easily.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogSectionSeparator />
+          <DialogSection>
+            <Form {...customJwtSecretForm}>
+              <form
+                id={customJwtSecretFormId}
+                onSubmit={customJwtSecretForm.handleSubmit((values) => {
+                  setIsGeneratingKey(true)
+                  setIsCreatingKey(false)
+                  setCustomToken(values.customToken)
+                })}
+                className="flex flex-col space-y-2"
+                noValidate
+              >
+                <FormField
+                  control={customJwtSecretForm.control}
+                  name="customToken"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="vertical"
+                      label="Custom JWT secret"
+                      description="Minimally 32 characters long, '@' and '$' are not allowed."
+                    >
+                      <FormControl>
+                        <Input copy reveal icon={<Key />} className="w-full text-left" {...field} />
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
+              </form>
+            </Form>
+          </DialogSection>
+          <DialogFooter>
             <Button
-              type="default"
+              variant="default"
               onClick={() => {
                 setIsCreatingKey(false)
                 setCustomToken('')
                 customJwtSecretForm.reset({ customToken: '' })
               }}
+              disabled={isSubmittingJwtSecretUpdateRequest}
             >
               Cancel
             </Button>
             <Button
-              type="primary"
-              htmlType="submit"
+              variant="primary"
+              type="submit"
               form={customJwtSecretFormId}
               loading={isSubmittingJwtSecretUpdateRequest}
+              disabled={isSubmittingJwtSecretUpdateRequest}
             >
               Proceed to final confirmation
             </Button>
-          </div>
-        }
-      >
-        <Modal.Content>
-          <Form {...customJwtSecretForm}>
-            <form
-              id={customJwtSecretFormId}
-              onSubmit={customJwtSecretForm.handleSubmit((values) => {
-                setIsGeneratingKey(true)
-                setIsCreatingKey(false)
-                setCustomToken(values.customToken)
-              })}
-              className="flex flex-col space-y-2"
-              noValidate
-            >
-              <p className="text-sm text-foreground-light">
-                Pick a new custom JWT secret. Make sure it is a strong combination of characters
-                that cannot be guessed easily.
-              </p>
-              <FormField
-                control={customJwtSecretForm.control}
-                name="customToken"
-                render={({ field }) => (
-                  <FormItemLayout
-                    layout="vertical"
-                    label="Custom JWT secret"
-                    description="Minimally 32 characters long, '@' and '$' are not allowed."
-                  >
-                    <FormControl>
-                      <Input copy reveal icon={<Key />} className="w-full text-left" {...field} />
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
-            </form>
-          </Form>
-        </Modal.Content>
-      </Modal>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

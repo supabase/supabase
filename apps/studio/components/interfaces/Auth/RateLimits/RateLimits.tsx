@@ -70,7 +70,9 @@ export const RateLimits = () => {
     },
   })
 
-  const canUpdateEmailLimit = authConfig?.EXTERNAL_EMAIL_ENABLED && isSmtpEnabled(authConfig)
+  const canUpdateEmailLimit =
+    authConfig?.EXTERNAL_EMAIL_ENABLED &&
+    (isSmtpEnabled(authConfig) || authConfig?.HOOK_SEND_EMAIL_ENABLED)
   const canUpdateSMSRateLimit = authConfig?.EXTERNAL_PHONE_ENABLED
   const canUpdateAnonymousUsersRateLimit = authConfig?.EXTERNAL_ANONYMOUS_USERS_ENABLED
   const canUpdateWeb3RateLimit = authConfig?.EXTERNAL_WEB3_SOLANA_ENABLED
@@ -261,7 +263,7 @@ export const RateLimits = () => {
                                     Enable email-based logins to update this rate limit
                                   </p>
                                   <div className="mt-3">
-                                    <Button asChild type="default" size="tiny">
+                                    <Button asChild variant="default" size="tiny">
                                       <Link href={`/project/${projectRef}/auth/providers`}>
                                         View auth providers
                                       </Link>
@@ -271,17 +273,23 @@ export const RateLimits = () => {
                               ) : (
                                 <>
                                   <p className="font-medium">
-                                    Custom SMTP provider is required to update this configuration
+                                    Custom SMTP or Send Email hook is required to update this
+                                    configuration
                                   </p>
                                   <p className="mt-1">
-                                    The built-in email service has a fixed rate limit. You will need
-                                    to set up your own custom SMTP provider to update your email
-                                    rate limit
+                                    The built-in email service has a fixed rate limit. Set up a
+                                    custom SMTP provider or enable the Send Email hook to update
+                                    your email rate limit
                                   </p>
-                                  <div className="mt-3">
-                                    <Button asChild type="default" size="tiny">
+                                  <div className="mt-3 flex gap-2">
+                                    <Button asChild variant="default" size="tiny">
                                       <Link href={`/project/${projectRef}/auth/smtp`}>
                                         View SMTP settings
+                                      </Link>
+                                    </Button>
+                                    <Button asChild variant="default" size="tiny">
+                                      <Link href={`/project/${projectRef}/auth/hooks`}>
+                                        View hooks
                                       </Link>
                                     </Button>
                                   </div>
@@ -330,7 +338,7 @@ export const RateLimits = () => {
                                 Enable phone-based logins to update this rate limit
                               </p>
                               <div className="mt-3">
-                                <Button asChild type="default" size="tiny">
+                                <Button asChild variant="default" size="tiny">
                                   <Link href={`/project/${projectRef}/auth/providers`}>
                                     View auth providers
                                   </Link>
@@ -400,7 +408,7 @@ export const RateLimits = () => {
                       <FormItemLayout
                         layout="flex-row-reverse"
                         label="Rate limit for token verifications"
-                        description="Number of OTP/Magic link verifications that can be made in a 5 minute interval per IP address"
+                        description="Number of OTP and magic link verifications that can be made in a 5 minute interval per IP address"
                       >
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -473,7 +481,7 @@ export const RateLimits = () => {
                                 control this rate limit.
                               </p>
                               <div className="mt-3">
-                                <Button asChild type="default" size="tiny">
+                                <Button asChild variant="default" size="tiny">
                                   <Link href={`/project/${projectRef}/auth/providers`}>
                                     View auth settings
                                   </Link>
@@ -568,7 +576,7 @@ export const RateLimits = () => {
                                 control this rate limit.
                               </p>
                               <div className="mt-3">
-                                <Button asChild type="default" size="tiny">
+                                <Button asChild variant="default" size="tiny">
                                   <Link href={`/project/${projectRef}/auth/providers`}>
                                     View Auth provider settings
                                   </Link>
@@ -584,13 +592,13 @@ export const RateLimits = () => {
 
                 <CardFooter className="justify-end space-x-2">
                   {rateLimitForm.formState.isDirty && (
-                    <Button type="default" onClick={() => rateLimitForm.reset()}>
+                    <Button variant="default" onClick={() => rateLimitForm.reset()}>
                       Cancel
                     </Button>
                   )}
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     disabled={
                       !canUpdateConfig || isUpdatingConfig || !rateLimitForm.formState.isDirty
                     }
@@ -649,13 +657,13 @@ export const RateLimits = () => {
                 </CardContent>
                 <CardFooter className="justify-end space-x-2">
                   {ipForwardingForm.formState.isDirty && (
-                    <Button type="default" onClick={() => ipForwardingForm.reset()}>
+                    <Button variant="default" onClick={() => ipForwardingForm.reset()}>
                       Cancel
                     </Button>
                   )}
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     disabled={
                       !canUpdateConfig || isUpdatingConfig || !ipForwardingForm.formState.isDirty
                     }

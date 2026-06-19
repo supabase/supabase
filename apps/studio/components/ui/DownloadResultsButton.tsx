@@ -25,11 +25,12 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface DownloadResultsButtonProps {
   iconOnly?: boolean
-  type?: 'text' | 'default'
+  variant?: 'text' | 'default'
   text?: string
   align?: 'start' | 'center' | 'end'
   results: any[]
   fileName: string
+  enableCopyShortcuts?: boolean
   onDownloadAsCSV?: () => void
   onCopyAsMarkdown?: () => void
   onCopyAsJSON?: () => void
@@ -38,11 +39,12 @@ interface DownloadResultsButtonProps {
 
 export const DownloadResultsButton = ({
   iconOnly = false,
-  type = 'default',
+  variant = 'default',
   text = 'Export',
   align = 'start',
   results,
   fileName,
+  enableCopyShortcuts = true,
   onDownloadAsCSV,
   onCopyAsMarkdown,
   onCopyAsJSON,
@@ -103,15 +105,18 @@ export const DownloadResultsButton = ({
   }
 
   useShortcut(SHORTCUT_IDS.RESULTS_COPY_MARKDOWN, copyAsMarkdown, {
-    enabled: !isEmpty,
+    enabled: !isEmpty && enableCopyShortcuts,
+    conflictBehavior: 'allow',
     registerInCommandMenu: true,
   })
   useShortcut(SHORTCUT_IDS.RESULTS_COPY_JSON, copyAsJSON, {
-    enabled: !isEmpty,
+    enabled: !isEmpty && enableCopyShortcuts,
+    conflictBehavior: 'allow',
     registerInCommandMenu: true,
   })
   useShortcut(SHORTCUT_IDS.RESULTS_COPY_CSV, copyAsCSV, {
-    enabled: !isEmpty,
+    enabled: !isEmpty && enableCopyShortcuts,
+    conflictBehavior: 'allow',
     registerInCommandMenu: true,
   })
   useShortcut(SHORTCUT_IDS.RESULTS_DOWNLOAD_CSV, downloadAsCSV, {
@@ -123,7 +128,7 @@ export const DownloadResultsButton = ({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          type={type}
+          variant={variant}
           icon={iconOnly ? <Download /> : undefined}
           iconRight={iconOnly ? undefined : <ChevronDown />}
           disabled={results.length === 0}
