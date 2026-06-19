@@ -4,17 +4,7 @@ import { flexRender } from '@tanstack/react-table'
 import { LoaderCircle } from 'lucide-react'
 import { useQueryState } from 'nuqs'
 import { Fragment, UIEvent, useCallback, useRef } from 'react'
-import {
-  Button,
-  cn,
-  Table,
-  TableBody,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from 'ui'
+import { Button, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
 
 import { AlertError } from '../AlertError'
@@ -90,7 +80,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
         ref={tableRef}
         containerProps={{
           onScroll,
-          className: 'h-full w-full overflow-auto caption-bottom text-sm',
+          className: 'h-full w-full overflow-auto caption-bottom text-sm @container',
         }}
         className={cn(
           !isLoading && rows.length === 0 && 'h-full',
@@ -217,50 +207,49 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                 'hover:bg-transparent data-[state=selected]:bg-transparent'
               )}
             >
-              <TableCell
-                colSpan={columns.length}
-                className={cn(TableCellClassName, 'text-center py-2!')}
-              >
-                {hasNextPage || isFetching ? (
-                  <div className="flex flex-col items-center gap-2">
-                    <Button
-                      disabled={isFetching}
-                      onClick={() => fetchNextPage()}
-                      size="small"
-                      variant="default"
-                      icon={
-                        isFetching ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : null
-                      }
-                    >
-                      Load more
-                    </Button>
-                    <p className="text-xs text-foreground-lighter">
-                      Showing{' '}
-                      <span className="font-mono font-medium">
-                        {formatCompactNumber(totalRowsFetched)}
-                      </span>{' '}
-                      of{' '}
-                      <span className="font-mono font-medium">
-                        {formatCompactNumber(totalRows)}
-                      </span>{' '}
-                      rows
-                    </p>
-                  </div>
-                ) : (
-                  rows.length > 0 && (
-                    <p className="text-xs text-foreground-lighter">
-                      No more data to load (
-                      <span className="font-mono font-medium">
-                        {formatCompactNumber(filterRows)}
-                      </span>{' '}
-                      of{' '}
-                      <span className="font-mono font-medium">
-                        {formatCompactNumber(totalRows)}
-                      </span>{' '}
-                      rows)
-                    </p>
-                  )
-                )}
+              <TableCell colSpan={columns.length} className="text-xs p-0! overflow-visible">
+                <div className="sticky left-0 w-[100cqw] flex flex-col items-center gap-2 py-2 text-center">
+                  {hasNextPage || isFetching ? (
+                    <>
+                      <Button
+                        disabled={isFetching}
+                        onClick={() => fetchNextPage()}
+                        size="tiny"
+                        variant="default"
+                        icon={
+                          isFetching ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : null
+                        }
+                      >
+                        Load more
+                      </Button>
+                      <p className="text-xs text-foreground-lighter">
+                        Showing{' '}
+                        <span className="font-mono font-medium">
+                          {formatCompactNumber(totalRowsFetched)}
+                        </span>{' '}
+                        of{' '}
+                        <span className="font-mono font-medium">
+                          {formatCompactNumber(totalRows)}
+                        </span>{' '}
+                        rows
+                      </p>
+                    </>
+                  ) : (
+                    rows.length > 0 && (
+                      <p className="text-xs text-foreground-lighter">
+                        No more data to load (
+                        <span className="font-mono font-medium">
+                          {formatCompactNumber(filterRows)}
+                        </span>{' '}
+                        of{' '}
+                        <span className="font-mono font-medium">
+                          {formatCompactNumber(totalRows)}
+                        </span>{' '}
+                        rows)
+                      </p>
+                    )
+                  )}
+                </div>
               </TableCell>
             </TableRow>
           )}
