@@ -32,7 +32,7 @@ export function buildWarehouseCatalogEnv(creds = WAREHOUSE_CATALOG_CREDENTIALS):
 export function getWarehouseCatalogEngineContent(
   engine: WarehouseCatalogEngine,
   creds = WAREHOUSE_CATALOG_CREDENTIALS
-): { headerLabel: string; language: 'sql' | 'ini' | 'python'; value: string } {
+): { headerLabel: string; language: 'sql' | 'toml' | 'python'; value: string } {
   const { catalogUri, accessToken, warehouseId } = creds
 
   switch (engine) {
@@ -60,7 +60,7 @@ SELECT * FROM wh.events LIMIT 10;`,
     case 'spark':
       return {
         headerLabel: 'spark-defaults.conf',
-        language: 'ini',
+        language: 'toml',
         value: `spark.sql.catalog.warehouse=org.apache.iceberg.spark.SparkCatalog
 spark.sql.catalog.warehouse.catalog-impl=org.apache.iceberg.rest.RESTCatalog
 spark.sql.catalog.warehouse.uri=${catalogUri}
@@ -70,7 +70,7 @@ spark.sql.catalog.warehouse.warehouse=${warehouseId}`,
     case 'trino':
       return {
         headerLabel: 'warehouse.properties',
-        language: 'ini',
+        language: 'toml',
         value: `connector.name=iceberg
 iceberg.catalog.type=rest
 iceberg.rest-catalog.uri=${catalogUri}
@@ -99,7 +99,7 @@ print(table.scan().to_pandas().head())`,
     default:
       return {
         headerLabel: 'catalog.env',
-        language: 'ini',
+        language: 'toml',
         value: buildWarehouseCatalogEnv(creds),
       }
   }

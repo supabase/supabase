@@ -1,5 +1,4 @@
-import { Loader2 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -13,9 +12,9 @@ import {
   DialogSectionSeparator,
   DialogTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
 
 import { setTableMode } from './warehouseDemoStore'
+import { WarehouseProgressSteps } from './WarehouseProgressSteps'
 
 export type EnablementVariant = 'move' | 'attach'
 
@@ -27,15 +26,16 @@ interface WarehouseEnablementModalProps {
   onOpenChange: (open: boolean) => void
 }
 
-const MOVE_PROGRESS = ['Preparing', 'Copying', 'Cutover', 'Complete']
-const ATTACH_PROGRESS = ['Creating copy', 'Initial sync', 'Live']
+const MOVE_PROGRESS = ['Preparing', 'Copying data', 'Switching over']
+const ATTACH_PROGRESS = ['Creating copy', 'Running initial sync']
 
-const MOVE_LIMITATIONS = [
-  'Triggers may not work',
-  'Foreign keys are not supported',
-  'Traditional indexes are not available',
-  'Row locks may not work as expected',
-]
+// What a warehouse-backed table gives up vs. the Postgres heap. Parallel phrasing
+// keeps the list scannable.
+const MOVE_TRADE_OFFS = ['Triggers and row locks', 'Foreign key enforcement', 'Traditional indexes']
+
+const STEP_INTERVAL_MS = 1300
+// Beat after the last step checks off, so the completed state is visible.
+const COMPLETION_HOLD_MS = 650
 
 export function WarehouseEnablementModal({
   open,
@@ -47,11 +47,9 @@ export function WarehouseEnablementModal({
   const [isRunning, setIsRunning] = useState(false)
   const [progressIndex, setProgressIndex] = useState(0)
   const [acknowledged, setAcknowledged] = useState(false)
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const isMove = variant === 'move'
-  const progressLabels = isMove ? MOVE_PROGRESS : ATTACH_PROGRESS
-  const intervalMs = isMove ? 1500 : 1200
+  const steps = isMove ? MOVE_PROGRESS : ATTACH_PROGRESS
   const warehouseCopyName = `warehouse.${tableName}`
 
   useEffect(() => {
@@ -65,29 +63,22 @@ export function WarehouseEnablementModal({
   useEffect(() => {
     if (!isRunning) return
 
-    intervalRef.current = setInterval(() => {
-      setProgressIndex((prev) => {
-        const next = prev + 1
-        if (next >= progressLabels.length) {
-          clearInterval(intervalRef.current!)
-          setTableMode(tableKey, isMove ? 'warehouse_backed' : 'has_warehouse_copy')
-          toast.success(isMove ? 'Table moved to Warehouse' : 'Warehouse copy is live')
-          onOpenChange(false)
-          return prev
-        }
-        return next
-      })
-    }, intervalMs)
-
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
+    // All steps checked off — hold briefly so the user sees the completed
+    // checklist, then commit and close together. Committing is deferred into the
+    // timeout (rather than fired now) so the store mutation doesn't re-render the
+    // parent mid-hold and re-enter this effect.
+    if (progressIndex >= steps.length) {
+      const timeout = setTimeout(() => {
+        setTableMode(tableKey, isMove ? 'warehouse_backed' : 'has_warehouse_copy')
+        toast.success(isMove ? 'Table moved to Warehouse' : 'Warehouse copy is live')
+        onOpenChange(false)
+      }, COMPLETION_HOLD_MS)
+      return () => clearTimeout(timeout)
     }
-  }, [isRunning, tableKey, isMove, progressLabels.length, intervalMs, onOpenChange])
 
-  function handleConfirm() {
-    setProgressIndex(0)
-    setIsRunning(true)
-  }
+    const timeout = setTimeout(() => setProgressIndex((index) => index + 1), STEP_INTERVAL_MS)
+    return () => clearTimeout(timeout)
+  }, [isRunning, progressIndex, steps.length, tableKey, isMove, onOpenChange])
 
   return (
     <Dialog
@@ -101,58 +92,61 @@ export function WarehouseEnablementModal({
           <DialogTitle>{isMove ? 'Move to Warehouse' : 'Create Warehouse copy'}</DialogTitle>
           <DialogDescription>
             {isMove
-              ? 'Move analytical storage off the Postgres heap. Best for append-only tables like events and logs.'
-              : 'Keep Postgres as the source of truth with a synced Warehouse copy for analytics.'}
+              ? 'Relocate this table’s storage to Warehouse. Best for large, append-only tables like events or logs.'
+              : 'Keep Postgres as the source of truth and sync a Warehouse copy for analytics.'}
           </DialogDescription>
         </DialogHeader>
 
         {isRunning ? (
-          <DialogSection className="flex flex-col items-center gap-3 py-8">
-            <Loader2 size={28} strokeWidth={1.5} className="animate-spin text-foreground-light" />
-            <p className="text-sm text-foreground">{progressLabels[progressIndex]}</p>
+          <DialogSection className="py-5">
+            <WarehouseProgressSteps steps={steps} activeIndex={progressIndex} />
           </DialogSection>
         ) : (
           <>
             <DialogSectionSeparator />
-            <DialogSection className="flex flex-col gap-4">
-              {!isMove && (
-                <div className="rounded-md border bg-surface-75 divide-y text-sm">
-                  <div className="flex items-center justify-between gap-4 px-4 py-2.5">
-                    <span className="text-foreground-light">Table</span>
-                    <code className="text-code-inline">{tableKey}</code>
-                  </div>
-                  <div className="flex items-center justify-between gap-4 px-4 py-2.5">
-                    <span className="text-foreground-light">Warehouse copy</span>
+            <DialogSection className="flex flex-col gap-5">
+              <div className="rounded-md border bg-surface-75 text-sm">
+                <div className="flex items-center justify-between gap-4 px-4 py-2.5">
+                  <span className="text-foreground-lighter">Table</span>
+                  <code className="text-code-inline">{tableKey}</code>
+                </div>
+                {!isMove && (
+                  <div className="flex items-center justify-between gap-4 border-t px-4 py-2.5">
+                    <span className="text-foreground-lighter">Warehouse copy</span>
                     <code className="text-code-inline">{warehouseCopyName}</code>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
 
               {isMove && (
                 <>
-                  <div className="rounded-md border bg-surface-75 px-4 py-3 text-sm">
-                    <div className="flex items-center justify-between gap-4">
-                      <span className="text-foreground-light">Table</span>
-                      <code className="text-code-inline">{tableKey}</code>
-                    </div>
-                  </div>
-                  <Admonition type="warning" title="Heap storage will be replaced">
-                    <ul className="list-disc space-y-1 pl-4 text-sm leading-normal!">
-                      {MOVE_LIMITATIONS.map((item) => (
-                        <li key={item}>{item}</li>
+                  <div className="flex flex-col gap-2">
+                    <p className="text-sm text-foreground">
+                      Once moved, this table no longer supports:
+                    </p>
+                    <ul className="flex flex-col gap-1.5">
+                      {MOVE_TRADE_OFFS.map((item) => (
+                        <li
+                          key={item}
+                          className="flex items-center gap-2 text-sm text-foreground-light"
+                        >
+                          <span className="size-1 shrink-0 rounded-full bg-foreground-muted" />
+                          {item}
+                        </li>
                       ))}
                     </ul>
-                  </Admonition>
-                  <label className="flex cursor-pointer items-start gap-3">
+                  </div>
+
+                  <label className="flex cursor-pointer items-start gap-3 rounded-md border border-warning-400 bg-warning-200 px-4 py-3">
                     <Checkbox
                       id="warehouse-move-ack"
                       checked={acknowledged}
-                      onCheckedChange={(v) => setAcknowledged(Boolean(v))}
+                      onCheckedChange={(val) => setAcknowledged(Boolean(val))}
                       className="mt-0.5"
                     />
-                    <span className="text-sm text-foreground-light">
-                      I understand this table will use Warehouse storage instead of the Postgres
-                      heap.
+                    <span className="text-sm text-foreground">
+                      <span className="font-medium">This can’t be undone.</span> The Postgres copy
+                      is dropped once the move completes.
                     </span>
                   </label>
                 </>
@@ -162,8 +156,15 @@ export function WarehouseEnablementModal({
               <Button variant="default" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button variant="primary" onClick={handleConfirm} disabled={isMove && !acknowledged}>
-                {isMove ? 'Move to Warehouse' : 'Copy to Warehouse'}
+              <Button
+                variant="primary"
+                onClick={() => {
+                  setProgressIndex(0)
+                  setIsRunning(true)
+                }}
+                disabled={isMove && !acknowledged}
+              >
+                {isMove ? 'Move to Warehouse' : 'Create copy'}
               </Button>
             </DialogFooter>
           </>

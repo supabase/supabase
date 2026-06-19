@@ -12,8 +12,10 @@ import {
   Filter,
   History,
   MoreVertical,
+  Plus,
   Search,
   Trash,
+  Unlink,
   X,
 } from 'lucide-react'
 import Link from 'next/link'
@@ -796,49 +798,49 @@ export const TableList = ({
                                       return (
                                         <>
                                           <DropdownMenuSeparator />
-                                          <DropdownMenuSub>
-                                            <DropdownMenuSubTrigger className="gap-x-2">
-                                              <Box size={12} className="shrink-0" />
-                                              Storage
-                                            </DropdownMenuSubTrigger>
-                                            <DropdownMenuSubContent>
-                                              {wMode === 'postgres' && (
-                                                <>
-                                                  <DropdownMenuItem
-                                                    onClick={() =>
-                                                      setWarehouseModal({
-                                                        variant: 'attach',
-                                                        tableKey,
-                                                        tableName: x.name,
-                                                      })
-                                                    }
-                                                  >
-                                                    Copy to Warehouse
-                                                  </DropdownMenuItem>
-                                                  <DropdownMenuItem
-                                                    onClick={() =>
-                                                      setWarehouseModal({
-                                                        variant: 'move',
-                                                        tableKey,
-                                                        tableName: x.name,
-                                                      })
-                                                    }
-                                                  >
-                                                    Move to Warehouse
-                                                  </DropdownMenuItem>
-                                                </>
-                                              )}
-                                              {wMode === 'has_warehouse_copy' && (
+                                          {wMode === 'postgres' && (
+                                            <DropdownMenuSub>
+                                              <DropdownMenuSubTrigger className="gap-x-2">
+                                                <Box size={12} className="shrink-0" />
+                                                Storage
+                                              </DropdownMenuSubTrigger>
+                                              <DropdownMenuSubContent>
                                                 <DropdownMenuItem
                                                   onClick={() =>
-                                                    setDetachConfirm({ tableKey, copyName })
+                                                    setWarehouseModal({
+                                                      variant: 'attach',
+                                                      tableKey,
+                                                      tableName: x.name,
+                                                    })
                                                   }
                                                 >
-                                                  Detach copy
+                                                  Copy to Warehouse
                                                 </DropdownMenuItem>
-                                              )}
-                                            </DropdownMenuSubContent>
-                                          </DropdownMenuSub>
+                                                <DropdownMenuItem
+                                                  onClick={() =>
+                                                    setWarehouseModal({
+                                                      variant: 'move',
+                                                      tableKey,
+                                                      tableName: x.name,
+                                                    })
+                                                  }
+                                                >
+                                                  Move to Warehouse
+                                                </DropdownMenuItem>
+                                              </DropdownMenuSubContent>
+                                            </DropdownMenuSub>
+                                          )}
+                                          {wMode === 'has_warehouse_copy' && (
+                                            <DropdownMenuItem
+                                              className="gap-x-2"
+                                              onClick={() =>
+                                                setDetachConfirm({ tableKey, copyName })
+                                              }
+                                            >
+                                              <Unlink size={12} className="shrink-0" />
+                                              Detach Warehouse copy
+                                            </DropdownMenuItem>
+                                          )}
                                         </>
                                       )
                                     })()}
@@ -909,11 +911,12 @@ export const TableList = ({
         title="Detach Warehouse copy"
         description={
           <>
-            Drops the Warehouse copy of <strong>{detachConfirm?.copyName}</strong>. The source table
-            is unaffected and your data remains in Postgres.
+            Detaching deletes the Warehouse copy{' '}
+            <code className="text-code-inline break-keep">{detachConfirm?.copyName}</code>. Your
+            source table and its data in Postgres are unaffected.
           </>
         }
-        confirmLabel="Detach copy"
+        confirmLabel="Detach"
         cancelLabel="Cancel"
       />
 

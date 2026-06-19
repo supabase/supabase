@@ -23,11 +23,9 @@ export interface WarehouseTableState {
 export const warehouseDemoStore = proxy<{
   tables: Record<string, WarehouseTableState>
   catalogEnabled: boolean
-  dataApiEnabled: boolean
 }>({
   tables: {},
   catalogEnabled: false,
-  dataApiEnabled: false,
 })
 
 const DEMO_WAREHOUSE_SIZE_BYTES = 197_912_092_672 // ~184 GB
@@ -75,10 +73,6 @@ export function clearTableMode(key: string): void {
 
 export function setCatalogEnabled(enabled: boolean): void {
   warehouseDemoStore.catalogEnabled = enabled
-}
-
-export function setDataApiEnabled(enabled: boolean): void {
-  warehouseDemoStore.dataApiEnabled = enabled
 }
 
 export function useWarehouseTableState(tableKey: string): WarehouseTableState {

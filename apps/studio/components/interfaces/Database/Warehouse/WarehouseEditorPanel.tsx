@@ -7,6 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
+import { TimestampInfo } from 'ui-patterns'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import {
@@ -46,10 +47,6 @@ const WAREHOUSE_MODE_TOOLTIPS: Partial<Record<WarehouseMode, ReactNode>> = {
       exists.
     </>
   ),
-}
-
-function formatTimestamp(iso: string): string {
-  return new Date(iso).toLocaleString()
 }
 
 function StorageCard({ children }: { children: ReactNode }) {
@@ -92,7 +89,11 @@ function StorageSyncRows({ state }: { state: WarehouseTableState }) {
       )}
       {state.lastSyncedAt !== undefined && (
         <StorageMetaRow label="Last synced">
-          <span className="text-foreground-light">{formatTimestamp(state.lastSyncedAt)}</span>
+          <TimestampInfo
+            className="text-sm text-foreground-light"
+            utcTimestamp={state.lastSyncedAt}
+            displayAs="local"
+          />
         </StorageMetaRow>
       )}
       {state.lagSeconds !== undefined && (
@@ -195,9 +196,11 @@ export function WarehouseEditorPanel({
               <StorageMetaRow label="Size">{warehouseSize}</StorageMetaRow>
               {state.migrationCompletedAt && (
                 <StorageMetaRow label="Moved">
-                  <span className="text-foreground-light">
-                    {formatTimestamp(state.migrationCompletedAt)}
-                  </span>
+                  <TimestampInfo
+                    className="text-sm text-foreground-light"
+                    utcTimestamp={state.migrationCompletedAt}
+                    displayAs="local"
+                  />
                 </StorageMetaRow>
               )}
             </StorageCard>
@@ -231,9 +234,9 @@ export function WarehouseEditorPanel({
         title="Detach Warehouse copy"
         description={
           <>
-            This will drop the Warehouse copy of{' '}
-            <code className="text-code-inline break-keep">{copyName}</code>. The source table will
-            be unaffected and your data will remain in Postgres.
+            Detaching deletes the Warehouse copy{' '}
+            <code className="text-code-inline break-keep">{copyName}</code>. Your source table and
+            its data in Postgres are unaffected.
           </>
         }
         confirmLabel="Detach"
@@ -251,7 +254,6 @@ export function WarehouseEditorPanel({
         <WarehouseTimeTravelFlow
           tableKey={tableKey}
           sheetOpen={snapshotsOpen}
-          stacked
           onSheetOpenChange={setSnapshotsOpen}
         />
       )}

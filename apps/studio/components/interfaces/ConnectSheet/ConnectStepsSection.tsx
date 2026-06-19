@@ -5,7 +5,6 @@ import { useMemo, useRef } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { useSnapshot } from 'valtio'
 
 import { connectSchema } from './connect.schema'
 import type {
@@ -20,7 +19,6 @@ import { ConnectSheetStep } from './ConnectSheetStep'
 import { CopyPromptAdmonition } from './CopyPromptAdmonition'
 import { buildConnectionStringPooler, getConnectionStrings } from './DatabaseSettings.utils'
 import { getAddons } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
-import { warehouseDemoStore } from '@/components/interfaces/Database/Warehouse/warehouseDemoStore'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
@@ -28,6 +26,7 @@ import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-config
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
+import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
 import { DOCS_URL } from '@/lib/constants'
 import { pluckObjectFields } from '@/lib/helpers'
 
@@ -198,8 +197,8 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
 
   const showSelfHostedMcpNotice = deploymentMode.isSelfHosted && state.mode === 'mcp'
 
-  const { dataApiEnabled } = useSnapshot(warehouseDemoStore)
-  const showDataApiDisabledNotice = state.mode === 'framework' && !dataApiEnabled
+  const { isEnabled: isDataApiEnabled } = useIsDataApiEnabled({ projectRef: ref })
+  const showDataApiDisabledNotice = state.mode === 'framework' && !isDataApiEnabled
 
   const customPrompt = useMemo(
     () => connectSchema.modes.find((m) => m.id === state.mode)?.prompt,

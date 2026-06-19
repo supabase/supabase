@@ -1,5 +1,4 @@
-import { Loader2 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Dialog,
@@ -11,9 +10,11 @@ import {
 } from 'ui'
 
 import { clearTableMode } from './warehouseDemoStore'
+import { WarehouseProgressSteps } from './WarehouseProgressSteps'
 
-const DETACH_PROGRESS = ['Disconnecting sync', 'Dropping copy', 'Complete']
+const DETACH_PROGRESS = ['Stopping sync', 'Deleting copy']
 const STEP_INTERVAL_MS = 1200
+const COMPLETION_HOLD_MS = 650
 
 interface WarehouseDetachModalProps {
   open: boolean
@@ -29,7 +30,6 @@ export function WarehouseDetachModal({
   onOpenChange,
 }: WarehouseDetachModalProps) {
   const [progressIndex, setProgressIndex] = useState(0)
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
     if (!open) {
@@ -37,38 +37,31 @@ export function WarehouseDetachModal({
       return
     }
 
-    intervalRef.current = setInterval(() => {
-      setProgressIndex((prev) => {
-        const next = prev + 1
-        if (next >= DETACH_PROGRESS.length) {
-          clearInterval(intervalRef.current!)
-          clearTableMode(tableKey)
-          toast.success('Warehouse copy detached')
-          onOpenChange(false)
-          return prev
-        }
-        return next
-      })
-    }, STEP_INTERVAL_MS)
-
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
+    if (progressIndex >= DETACH_PROGRESS.length) {
+      const timeout = setTimeout(() => {
+        clearTableMode(tableKey)
+        toast.success('Warehouse copy detached')
+        onOpenChange(false)
+      }, COMPLETION_HOLD_MS)
+      return () => clearTimeout(timeout)
     }
-  }, [open, tableKey, onOpenChange])
+
+    const timeout = setTimeout(() => setProgressIndex((index) => index + 1), STEP_INTERVAL_MS)
+    return () => clearTimeout(timeout)
+  }, [open, progressIndex, tableKey, onOpenChange])
 
   return (
     <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent>
+      <DialogContent hideClose>
         <DialogHeader>
-          <DialogTitle>Detach Warehouse copy</DialogTitle>
+          <DialogTitle>Detaching Warehouse copy</DialogTitle>
           <DialogDescription>
-            Removing <code className="text-code-inline">{copyName}</code>. The Postgres source table
-            is not affected.
+            Deleting the Warehouse copy <code className="text-code-inline">{copyName}</code>. Your
+            data in Postgres is unaffected.
           </DialogDescription>
         </DialogHeader>
-        <DialogSection className="flex flex-col items-center gap-3 py-8">
-          <Loader2 size={28} strokeWidth={1.5} className="animate-spin text-foreground-light" />
-          <p className="text-sm text-foreground">{DETACH_PROGRESS[progressIndex]}</p>
+        <DialogSection className="py-5">
+          <WarehouseProgressSteps steps={DETACH_PROGRESS} activeIndex={progressIndex} />
         </DialogSection>
       </DialogContent>
     </Dialog>
