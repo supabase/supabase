@@ -1,4 +1,4 @@
-import { ArrowRight, ChevronDown } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import {
   Button,
@@ -7,6 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import {
   formatWarehouseSize,
@@ -25,25 +26,25 @@ interface WarehouseEditorPanelProps {
   postgresSize?: string
 }
 
-interface StorageModeConfig {
-  title: string
-  description: string
+const MODE_LABELS: Record<WarehouseMode, string> = {
+  postgres: 'Postgres',
+  has_warehouse_copy: 'Postgres + Warehouse',
+  warehouse_backed: 'Warehouse',
 }
 
-const STORAGE_MODE_CONFIG: Record<WarehouseMode, StorageModeConfig> = {
-  postgres: {
-    title: 'Postgres',
-    description: 'Reads and writes on Postgres.',
-  },
-  has_warehouse_copy: {
-    title: 'Postgres + Warehouse',
-    description:
-      'Writes on Postgres. Analytical queries on Warehouse. Copy stays in sync with Postgres.',
-  },
-  warehouse_backed: {
-    title: 'Warehouse',
-    description: 'Reads and writes on Warehouse.',
-  },
+const WAREHOUSE_MODE_TOOLTIPS: Partial<Record<WarehouseMode, ReactNode>> = {
+  has_warehouse_copy: (
+    <>
+      Keeps this table in the Postgres heap and maintains a synced columnar copy in Warehouse.
+      Changes in Postgres propagate to the copy; sync is one-way, not bidirectional.
+    </>
+  ),
+  warehouse_backed: (
+    <>
+      This table&apos;s storage was moved to Warehouse. The Postgres heap for this table no longer
+      exists.
+    </>
+  ),
 }
 
 function formatTimestamp(iso: string): string {
@@ -63,86 +64,52 @@ function StorageMetaRow({ label, children }: { label: string; children: ReactNod
   )
 }
 
-function StorageModeHeader({
-  title,
-  description,
-  trailing,
-}: {
-  title: string
-  description: string
-  trailing?: ReactNode
-}) {
+function StorageModeRow({ mode }: { mode: WarehouseMode }) {
+  const tooltip = WAREHOUSE_MODE_TOOLTIPS[mode]
+
   return (
-    <div className="flex items-start justify-between gap-3 px-4 py-3">
-      <div className="min-w-0 space-y-1">
-        <p className="text-foreground">{title}</p>
-        <p className="text-xs leading-relaxed text-foreground-light">{description}</p>
+    <StorageMetaRow label="Mode">
+      <div className="flex items-center justify-end gap-1.5">
+        <span>{MODE_LABELS[mode]}</span>
+        {tooltip && (
+          <InfoTooltip side="top" className="max-w-80">
+            {tooltip}
+          </InfoTooltip>
+        )}
       </div>
-      {trailing}
-    </div>
+    </StorageMetaRow>
   )
 }
 
-function StorageCopyFlow({
-  sourceName,
-  sourceSize,
-  copyName,
-  copySize,
-}: {
-  sourceName: string
-  sourceSize?: string
-  copyName: string
-  copySize: string
-}) {
+function StorageSyncRows({ state }: { state: WarehouseTableState }) {
   return (
-    <div className="px-4 py-3">
-      <div className="flex items-start gap-3">
-        <div className="min-w-0 flex-1">
-          <p className="mb-1 text-xs text-foreground-light">Postgres</p>
-          <code className="text-code-inline break-all">{sourceName}</code>
-          <p className="mt-1 text-foreground-light">{sourceSize ?? '—'}</p>
-        </div>
-        <ArrowRight
-          className="mt-5 size-4 shrink-0 text-foreground-light"
-          strokeWidth={1.5}
-          aria-hidden="true"
-        />
-        <div className="min-w-0 flex-1 text-right">
-          <p className="mb-1 text-xs text-foreground-light">Warehouse copy</p>
-          <code className="text-code-inline break-all">{copyName}</code>
-          <p className="mt-1 text-foreground-light">{copySize}</p>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function StorageSyncMeta({ state }: { state: WarehouseTableState }) {
-  const hasSyncMeta =
-    state.syncState !== undefined ||
-    state.lastSyncedAt !== undefined ||
-    state.lagSeconds !== undefined
-
-  if (!hasSyncMeta) return null
-
-  return (
-    <div className="flex flex-wrap items-center justify-end gap-x-2 gap-y-1 px-4 py-2.5 text-xs text-foreground-light">
-      {state.syncState && <WarehouseSyncChip syncState={state.syncState} />}
-      {state.syncState && (state.lastSyncedAt !== undefined || state.lagSeconds !== undefined) && (
-        <span aria-hidden="true">·</span>
+    <>
+      {state.syncState && (
+        <StorageMetaRow label="Status">
+          <WarehouseSyncChip syncState={state.syncState} />
+        </StorageMetaRow>
       )}
       {state.lastSyncedAt !== undefined && (
-        <span>Last synced {formatTimestamp(state.lastSyncedAt)}</span>
+        <StorageMetaRow label="Last synced">
+          <span className="text-foreground-light">{formatTimestamp(state.lastSyncedAt)}</span>
+        </StorageMetaRow>
       )}
-      {state.lastSyncedAt !== undefined && state.lagSeconds !== undefined && (
-        <span aria-hidden="true">·</span>
+      {state.lagSeconds !== undefined && (
+        <StorageMetaRow label="Lag">
+          <span className="text-foreground-light">{state.lagSeconds}s</span>
+        </StorageMetaRow>
       )}
-      {state.lagSeconds !== undefined && <span>Lag {state.lagSeconds}s</span>}
-    </div>
+    </>
   )
 }
 
-function CreateWarehouseCopyButton({ onAttach, onMove }: { onAttach: () => void; onMove: () => void }) {
+function CreateWarehouseCopyButton({
+  onAttach,
+  onMove,
+}: {
+  onAttach: () => void
+  onMove: () => void
+}) {
   return (
     <div className="flex">
       <Button
@@ -183,7 +150,6 @@ export function WarehouseEditorPanel({
 
   const copyName = state.copyName ?? `warehouse.${tableName}`
   const warehouseSize = formatWarehouseSize(state.warehouseSizeBytes)
-  const modeConfig = STORAGE_MODE_CONFIG[state.mode]
 
   return (
     <>
@@ -193,10 +159,7 @@ export function WarehouseEditorPanel({
         {state.mode === 'postgres' && (
           <>
             <StorageCard>
-              <StorageModeHeader
-                title={modeConfig.title}
-                description={modeConfig.description}
-              />
+              <StorageModeRow mode="postgres" />
               <StorageMetaRow label="Size">{postgresSize ?? '—'}</StorageMetaRow>
             </StorageCard>
             <CreateWarehouseCopyButton
@@ -209,17 +172,13 @@ export function WarehouseEditorPanel({
         {state.mode === 'has_warehouse_copy' && (
           <>
             <StorageCard>
-              <StorageModeHeader
-                title={modeConfig.title}
-                description={modeConfig.description}
-              />
-              <StorageCopyFlow
-                sourceName={tableKey}
-                sourceSize={postgresSize}
-                copyName={copyName}
-                copySize={warehouseSize}
-              />
-              <StorageSyncMeta state={state} />
+              <StorageModeRow mode="has_warehouse_copy" />
+              <StorageMetaRow label="Copy name">
+                <code className="text-code-inline break-all">{copyName}</code>
+              </StorageMetaRow>
+              <StorageMetaRow label="Postgres size">{postgresSize ?? '—'}</StorageMetaRow>
+              <StorageMetaRow label="Copy size">{warehouseSize}</StorageMetaRow>
+              <StorageSyncRows state={state} />
             </StorageCard>
             <Button type="button" variant="danger" onClick={() => setConfirmDetach(true)}>
               Detach Warehouse copy
@@ -229,7 +188,7 @@ export function WarehouseEditorPanel({
 
         {state.mode === 'warehouse_backed' && (
           <StorageCard>
-            <StorageModeHeader title={modeConfig.title} description={modeConfig.description} />
+            <StorageModeRow mode="warehouse_backed" />
             <StorageMetaRow label="Size">{warehouseSize}</StorageMetaRow>
             {state.migrationCompletedAt && (
               <StorageMetaRow label="Moved">
