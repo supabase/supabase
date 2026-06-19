@@ -264,7 +264,14 @@ export default defineConfig(({ command, mode }) => {
   // for other frameworks. Mirror that behaviour by re-exposing the unprefixed
   // system vars under their `NEXT_PUBLIC_VERCEL_*` names so call sites that
   // predate the TanStack migration keep working.
-  const vercelPublicVars = ['VERCEL_ENV', 'VERCEL_BRANCH_URL'] as const
+  const vercelPublicVars = [
+    'VERCEL_ENV',
+    'VERCEL_BRANCH_URL',
+    // Skew protection: the client pins its session to this deployment (see
+    // router.tsx). Both are build-time system env vars on Vercel.
+    'VERCEL_DEPLOYMENT_ID',
+    'VERCEL_SKEW_PROTECTION_ENABLED',
+  ] as const
   for (const key of vercelPublicVars) {
     const value = env[key]
     if (value !== undefined) {
