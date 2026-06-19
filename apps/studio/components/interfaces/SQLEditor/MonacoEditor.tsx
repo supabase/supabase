@@ -259,7 +259,15 @@ const MonacoEditor = ({
           project_id: project?.id,
         })
         snapV2.addSnippet({ projectRef: ref, snippet })
-        router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
+        // When the editor was seeded from a `content` deep-link, replace rather
+        // than push. The caller navigated to `/sql/new?content=...` (a long,
+        // one-shot URL); replacing collapses it out of history so Back returns to
+        // the originating page instead of a wasted step that re-seeds the snippet.
+        if (router.query.content) {
+          router.replace(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
+        } else {
+          router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
+        }
       }
       setValue(value)
     }
