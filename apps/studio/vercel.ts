@@ -113,7 +113,12 @@ function buildTanstackConfig(): VercelConfig {
     // runtime import resolves.
     functions: {
       'api/server.js': {
-        includeFiles: 'dist/server/**',
+        // Ship the SSR output, plus libpg-query's wasm. libpg-query is
+        // externalized for SSR and loads its `.wasm` relative to its own
+        // dir (`__dirname`) at import time; Vercel's function bundler
+        // doesn't trace that node_modules asset, so co-ship it explicitly
+        // or the server crashes at boot with ENOENT on libpg-query.wasm.
+        includeFiles: '{dist/server/**,node_modules/libpg-query/wasm/libpg-query.wasm}',
       },
     },
   }
