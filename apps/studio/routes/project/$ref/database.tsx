@@ -16,10 +16,15 @@ function DatabaseShell() {
   // setRef → setState every render and trips React's max-update-depth.
   const title = useMatches({
     select: (matches) => {
-      const leaf = matches[matches.length - 1]?.staticData as
-        | { databaseLayoutTitle?: string }
-        | undefined
-      return leaf?.databaseLayoutTitle ?? ''
+      // Walk up from the leaf to the nearest match that declares a title.
+      // Section layouts like `database/triggers.tsx` set `databaseLayoutTitle`
+      // while their leaf children (`triggers/data`, `triggers/event`, the
+      // index) don't, so a leaf-only read would drop the title to ''.
+      for (let i = matches.length - 1; i >= 0; i--) {
+        const data = matches[i]?.staticData as { databaseLayoutTitle?: string } | undefined
+        if (typeof data?.databaseLayoutTitle === 'string') return data.databaseLayoutTitle
+      }
+      return ''
     },
   })
 
