@@ -118,7 +118,15 @@ function buildTanstackConfig(): VercelConfig {
         // dir (`__dirname`) at import time; Vercel's function bundler
         // doesn't trace that node_modules asset, so co-ship it explicitly
         // or the server crashes at boot with ENOENT on libpg-query.wasm.
-        includeFiles: '{dist/server/**,node_modules/libpg-query/wasm/libpg-query.wasm}',
+        //
+        // Target the real pnpm store path (repo-root `.pnpm`, two levels up
+        // from this Root Directory) rather than `node_modules/libpg-query`,
+        // which is a pnpm symlink — Vercel rejects packaging files reached
+        // through symlinked dirs ("invalid deployment package"). The real
+        // path also matches where Node resolves __dirname at runtime
+        // (/var/task/node_modules/.pnpm/libpg-query@.../wasm/...).
+        includeFiles:
+          '{dist/server/**,../../node_modules/.pnpm/libpg-query@*/node_modules/libpg-query/wasm/libpg-query.wasm}',
       },
     },
   }
