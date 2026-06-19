@@ -14,7 +14,7 @@ Supabase Pipelines is currently in alpha. Alpha features can be unstable and may
 
 ## What destinations are supported?
 
-Supabase Pipelines currently supports **BigQuery** as the managed destination. See the [BigQuery destination guide](/docs/guides/database/replication/bigquery) for configuration details.
+Pipelines currently supports **BigQuery** as the managed destination. See the [BigQuery destination guide](/docs/guides/database/replication/bigquery) for configuration details.
 
 We are working on new destinations. Supported destinations can be Supabase-managed or third-party systems as support expands. Availability may continue to vary based on the planned roll-out strategy.
 
@@ -22,7 +22,7 @@ We are working on new destinations. Supported destinations can be Supabase-manag
 
 ## Which plans support Supabase Pipelines?
 
-Supabase Pipelines is available on the Pro, Team, and Enterprise plans.
+Pipelines is available on the Pro, Team, and Enterprise plans.
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
@@ -30,13 +30,13 @@ Supabase Pipelines is available on the Pro, Team, and Enterprise plans.
 
 We are currently working on a new Supabase Warehouse product designed to address the limitations of the previous Analytics Buckets. Our goal is to build a solution we can confidently stand behind, rather than continuing to support an approach that does not meet the quality and flexibility we want for our users.
 
-As a result, replication into Analytics Buckets via Supabase Pipelines is no longer supported. Right now, **BigQuery** is the only supported managed destination, and we are actively working on expanding capabilities.
+As a result, replication into Analytics Buckets via Pipelines is no longer supported. Right now, **BigQuery** is the only supported managed destination, and we are actively working on expanding capabilities.
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ## What does Supabase Pipelines install in the database?
 
-When you enable Supabase Pipelines, Supabase installs database objects that help track replication state and support schema changes:
+When you enable Pipelines, Supabase installs database objects that help track replication state and support schema changes:
 
 - An event trigger that runs on every `ALTER TABLE` statement. Supabase uses this to support schema change handling.
 - A set of tables in the `etl` schema. These tables track replication state for your pipelines.
@@ -55,17 +55,17 @@ Supported schema changes:
 - Dropping a `NOT NULL` constraint
 - Setting or dropping supported column default metadata
 
-Supabase Pipelines does not currently support changing column data types, adding `NOT NULL` with `SET NOT NULL`, or filling existing destination rows for `ADD COLUMN ... DEFAULT`. Supported defaults are applied as destination metadata for future rows where BigQuery can represent them. See [BigQuery schema change support](/docs/guides/database/replication/bigquery#schema-change-support) for details.
+Pipelines does not currently support changing column data types, adding `NOT NULL` with `SET NOT NULL`, or filling existing destination rows for `ADD COLUMN ... DEFAULT`. Supported defaults are applied as destination metadata for future rows where BigQuery can represent them. See [BigQuery schema change support](/docs/guides/database/replication/bigquery#schema-change-support) for details.
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ## What happens when you disable Supabase Pipelines?
 
-Disabling Supabase Pipelines removes the database objects that were installed in your source database, including the replication state tables in the `etl` schema and the DDL event trigger.
+Disabling Pipelines removes the database objects that were installed in your source database, including the replication state tables in the `etl` schema and the DDL event trigger.
 
-To remove Supabase Pipelines from a project, delete all replication pipelines first. After all pipelines are deleted, the disable action becomes available. For the Dashboard steps, see [Disabling Supabase Pipelines](/docs/guides/database/replication/supabase-pipelines#disabling-supabase-pipelines).
+To remove Pipelines from a project, delete all replication pipelines first. After all pipelines are deleted, the disable action becomes available. For the Dashboard steps, see [Disabling Supabase Pipelines](/docs/guides/database/replication/supabase-pipelines#disabling-supabase-pipelines).
 
-Disabling Supabase Pipelines stops Supabase from managing replication for the project. It does not delete tables or data that were already written to your destination.
+Disabling Pipelines stops Supabase from managing replication for the project. It does not delete tables or data that were already written to your destination.
 
 ## Why is a table not being replicated?
 
@@ -81,7 +81,7 @@ Custom data types replicate as strings. Check that your destination can interpre
 
 ## Why are partitioned tables replicated as separate tables?
 
-Postgres controls this with the publication's `publish_via_partition_root` setting. If the setting is `false`, or if you created the publication manually with SQL and did not set it, Postgres publishes changes from the leaf partitions. Supabase Pipelines then creates destination tables for those leaf partitions. If `publish_via_partition_root = true`, Postgres publishes changes as the partition root, so the partition hierarchy is treated as the published partition root.
+Postgres controls this with the publication's `publish_via_partition_root` setting. If the setting is `false`, or if you created the publication manually with SQL and did not set it, Postgres publishes changes from the leaf partitions. Pipelines then creates destination tables for those leaf partitions. If `publish_via_partition_root = true`, Postgres publishes changes as the partition root, so the partition hierarchy is treated as the published partition root.
 
 Publications created from the Dashboard replication flow use `publish_via_partition_root = true`.
 
@@ -152,7 +152,7 @@ See [Handling errors](/docs/guides/database/replication/supabase-pipelines-monit
 
 ## Why was the pipeline stopped?
 
-Supabase may automatically stop a pipeline if it encounters too many errors in a short period of time. This protects your source database, your destination, and the Supabase Pipelines system from a pipeline repeatedly retrying a failing operation.
+Supabase may automatically stop a pipeline if it encounters too many errors in a short period of time. This protects your source database, your destination, and the Pipelines system from a pipeline repeatedly retrying a failing operation.
 
 Automatic stopping is a safety mechanism. It prevents repeated pipeline errors from consuming resources or causing wider instability while preserving the pipeline's replication position so you can investigate the underlying issue.
 
@@ -205,13 +205,13 @@ Stopping replication causes changes to queue up in the WAL.
 
 ## What happens if a project becomes inactive?
 
-If your project becomes inactive, Supabase Pipelines stops any running pipelines and does not automatically resume them after the project is restarted.
+If your project becomes inactive, Pipelines stops any running pipelines and does not automatically resume them after the project is restarted.
 
 After restarting the project, restart each replication pipeline manually from the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard.
 
 ## What happens after a downgrade to the free plan?
 
-When a project is downgraded to the Free Plan, all replication pipelines created with Supabase Pipelines for that project are deleted.
+When a project is downgraded to the Free Plan, all replication pipelines created with Pipelines for that project are deleted.
 
 ## What happens if a table is deleted at the destination?
 

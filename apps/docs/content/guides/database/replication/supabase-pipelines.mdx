@@ -12,11 +12,11 @@ Supabase Pipelines is currently in alpha. Alpha features can be unstable and may
 
 </Admonition>
 
-Supabase Pipelines is a managed CDC feature for creating replication pipelines from Supabase Postgres to destination systems. It uses **Postgres logical replication** with the open-source [Supabase ETL engine](https://github.com/supabase/etl). You choose a destination in the Dashboard, and Supabase runs the pipeline that streams database changes to that destination.
+Pipelines is a managed CDC feature for creating replication pipelines from Supabase Postgres to destination systems. It uses **Postgres logical replication** with the open-source [Supabase ETL engine](https://github.com/supabase/etl). You choose a destination in the Dashboard, and Supabase runs the pipeline that streams database changes to that destination.
 
 ## Setup overview
 
-Supabase Pipelines requires two main components: a **Postgres publication** (defines what to replicate) and a **destination** (where data is sent). Supabase runs the managed pipeline that reads from the publication and writes to the destination. Follow these steps to set up your replication pipeline.
+Pipelines requires two main components: a **Postgres publication** (defines what to replicate) and a **destination** (where data is sent). Supabase runs the managed pipeline that reads from the publication and writes to the destination. Follow these steps to set up your replication pipeline.
 
 <Admonition type="tip">
 
@@ -90,7 +90,7 @@ for table orders where (created_at > '2024-01-01');
 
 ##### Partitioned tables
 
-Supabase Pipelines follows Postgres publication semantics for partitioned tables. The `publish_via_partition_root` publication setting controls whether changes from partitions are emitted as the partition root or as the leaf partitions.
+Pipelines follows Postgres publication semantics for partitioned tables. The `publish_via_partition_root` publication setting controls whether changes from partitions are emitted as the partition root or as the leaf partitions.
 
 | Publication setting                        | What gets replicated                                                                                       | Destination shape                                                       |
 | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
@@ -118,7 +118,7 @@ Use `publish_via_partition_root = true` when you want analytics queries to read 
 
 Publications created from the Dashboard replication flow use `publish_via_partition_root = true`. If you create or alter a publication manually with SQL, set this option explicitly so the destination shape matches what you expect.
 
-On Postgres 15 and newer, row filters on partition publications apply during both the initial copy and streaming phases. Supabase Pipelines uses the row filter attached to the effective publication table entry: the published partition root when `publish_via_partition_root = true`, and the published leaf relation when `publish_via_partition_root = false`.
+On Postgres 15 and newer, row filters on partition publications apply during both the initial copy and streaming phases. Pipelines uses the row filter attached to the effective publication table entry: the published partition root when `publish_via_partition_root = true`, and the published leaf relation when `publish_via_partition_root = false`.
 
 <Admonition type="note">
 
@@ -137,11 +137,11 @@ After creating a publication via SQL, you can view it in the Dashboard:
 
 ### Step 2: Enable Supabase Pipelines
 
-Before creating a managed replication pipeline, enable Supabase Pipelines for your project:
+Before creating a managed replication pipeline, enable Pipelines for your project:
 
 1. Navigate to the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard
 2. Click **Add destination** to show the replication side panel
-3. Select a Supabase Pipelines destination, such as **BigQuery**
+3. Select a Pipelines destination, such as **BigQuery**
 4. Click **Enable Supabase Pipelines**
 
 <Image
@@ -153,7 +153,7 @@ Before creating a managed replication pipeline, enable Supabase Pipelines for yo
 
 ### Step 3: Configure a destination
 
-Once Supabase Pipelines is enabled and you have a Postgres publication, configure a destination. The destination is where your replicated data will be stored, while the pipeline is the active Postgres replication process that continuously streams changes from your database to that destination.
+Once Pipelines is enabled and you have a Postgres publication, configure a destination. The destination is where your replicated data will be stored, while the pipeline is the active Postgres replication process that continuously streams changes from your database to that destination.
 
 #### Choose and configure your destination
 
@@ -225,7 +225,7 @@ Available actions:
 
 ### Disabling Supabase Pipelines
 
-To turn off Supabase Pipelines for a project, delete all replication pipelines first. After all pipelines are removed, open the three-dot actions menu on the Replication page and click **Disable Supabase Pipelines**.
+To turn off Pipelines for a project, delete all replication pipelines first. After all pipelines are removed, open the three-dot actions menu on the Replication page and click **Disable Supabase Pipelines**.
 
 <Image
   alt="Disable Supabase Pipelines from the Replication page actions menu"
@@ -292,7 +292,7 @@ Once configured, a replication pipeline:
 2. **Streams** the changes through the managed pipeline
 3. **Loads** the data to your destination
 
-Supabase Pipelines automatically optimizes how changes are delivered to the destination. It currently performs data extraction and loading only, without transformation - your data is replicated as-is to the destination.
+Pipelines automatically optimizes how changes are delivered to the destination. It currently performs data extraction and loading only, without transformation - your data is replicated as-is to the destination.
 
 ### Troubleshooting
 
@@ -307,7 +307,7 @@ For more troubleshooting help, see the [Supabase Pipelines FAQ](/docs/guides/dat
 
 ### Limitations
 
-Supabase Pipelines has the following limitations:
+Pipelines has the following limitations:
 
 - **Primary keys required**: Tables must have primary keys (Postgres logical replication requirement)
 - **Custom data types**: Custom values replicate as strings. Check that your destination can interpret those string values correctly.

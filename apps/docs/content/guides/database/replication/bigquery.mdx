@@ -90,7 +90,7 @@ Once configured, replication to BigQuery:
 
 ## Source table requirements
 
-BigQuery replication requires each source table to have a primary key, and the publication must include the primary-key columns. Supabase Pipelines declares those columns as the BigQuery destination primary key so BigQuery change data capture (CDC) can apply `UPSERT` and `DELETE` rows.
+BigQuery replication requires each source table to have a primary key, and the publication must include the primary-key columns. Pipelines declares those columns as the BigQuery destination primary key so BigQuery change data capture (CDC) can apply `UPSERT` and `DELETE` rows.
 
 BigQuery primary keys are `NOT ENFORCED`, and BigQuery change data capture (CDC) supports composite primary keys with up to 16 columns. Your source primary key must stay unique and non-null because BigQuery uses it to match CDC rows.
 
@@ -145,7 +145,7 @@ This structure handles table truncations while maintaining query compatibility.
 
 ## Schema change support
 
-Schema change support for BigQuery is currently in beta. Supabase Pipelines supports a limited set of schema changes for BigQuery while the feature is developed further.
+Schema change support for BigQuery is currently in beta. Pipelines supports a limited set of schema changes for BigQuery while the feature is developed further.
 
 Supported schema changes:
 
@@ -162,7 +162,7 @@ Unsupported or limited schema changes:
 - Filling existing rows for `ADD COLUMN ... DEFAULT`
 - Unsupported default expressions
 
-BigQuery requires added columns to be nullable. When a replicated `ADD COLUMN` includes a default, Supabase Pipelines can apply supported default metadata for future rows, but BigQuery does not backfill existing rows through that DDL. Existing destination rows remain `NULL` unless you run a separate backfill.
+BigQuery requires added columns to be nullable. When a replicated `ADD COLUMN` includes a default, Pipelines can apply supported default metadata for future rows, but BigQuery does not backfill existing rows through that DDL. Existing destination rows remain `NULL` unless you run a separate backfill.
 
 Supported defaults are best-effort translations to BigQuery SQL. Unsupported defaults are skipped with a warning instead of failing replication.
 
