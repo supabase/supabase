@@ -36,22 +36,30 @@ const URL_SLUG_TO_LISTING: Record<string, string> = Object.fromEntries(
   Object.entries(SUPABASE_LISTING_OVERRIDES).map(([listingSlug, { slug }]) => [slug, listingSlug])
 )
 
-const MARKETPLACE_SLUGS = [
-  'aikido',
-  'aikido-security',
-  'bigquery-wrapper',
-  'doppler',
-  'firebase-wrapper',
-  'grafana',
-  'resend',
-  'stripe-wrapper',
-]
+// Only FDW wrappers need the dashboard marketplace treatment (install button + dashboard URL).
+const MARKETPLACE_SLUGS = ['bigquery-wrapper', 'firebase-wrapper', 'stripe-wrapper']
 
 /** Returns true if a listing is in the Supabase Marketplace. */
 export function isMarketplaceListing(listing: Listing): boolean {
   if (MARKETPLACE_SLUGS.includes(listing.slug)) return true
   return false
 }
+
+// Partners whose catalog pages are not yet ready to launch.
+// Excluded from listing, detail, slug generation, and search.
+const PRE_LAUNCH_CATALOG_BLOCKLIST = new Set(['grafana'])
+
+// Listings that must show as "Integration", never "Dashboard Integration",
+// regardless of what published_in_marketplace_at is set to in the DB.
+const PLAIN_INTEGRATION_SLUGS = new Set([
+  'aikido',
+  'aikido-security',
+  'doppler',
+  'stripe-sync-engine',
+])
+
+// Listings that must show as "Guide", regardless of marketplace_url or DB flags.
+const GUIDE_SLUGS = new Set(['resend'])
 
 /** Returns true if a listing is a Foreign Data Wrapper (FDW). */
 function isFdwListing(listing: Listing): boolean {
@@ -148,9 +156,15 @@ async function getPartnersFromMarketplace(): Promise<Partner[]> {
     byPartnerSlug.set(slug, arr)
   }
 
-  // Exclude 'supabase' and any partner whose URL slug is covered by an override.
+  // Exclude 'supabase', overridden slugs, and pre-launch partners.
   const regularPartners = partnersData
-    .filter((p) => p.slug && p.slug !== SUPABASE_PARTNER_SLUG && !OVERRIDE_URL_SLUGS.has(p.slug))
+    .filter(
+      (p) =>
+        p.slug &&
+        p.slug !== SUPABASE_PARTNER_SLUG &&
+        !OVERRIDE_URL_SLUGS.has(p.slug) &&
+        !PRE_LAUNCH_CATALOG_BLOCKLIST.has(p.slug)
+    )
     .flatMap((p) => {
       const slug = p.slug
       if (!slug) return []
@@ -193,8 +207,10 @@ async function getPartnersFromMarketplace(): Promise<Partner[]> {
  */
 function getLabelForListing(listing: Listing): string {
   if (isFdwListing(listing)) return 'Foreign Data Wrapper'
-  if (!!listing.published_in_marketplace_at) return 'Dashboard Integration'
-  if (listing.marketplace_url) return 'Integration'
+  if (GUIDE_SLUGS.has(listing.slug)) return 'Guide'
+  if (!!listing.published_in_marketplace_at && !PLAIN_INTEGRATION_SLUGS.has(listing.slug))
+    return 'Dashboard Integration'
+  if (listing.marketplace_url || PLAIN_INTEGRATION_SLUGS.has(listing.slug)) return 'Integration'
   return 'Guide'
 }
 
@@ -204,6 +220,8 @@ function getLabelForListing(listing: Listing): string {
 async function getPartnerFromMarketplace(slug: string): Promise<Partner | null> {
   // 'supabase' never appears directly as a catalog partner
   if (slug === SUPABASE_PARTNER_SLUG) return null
+  // Partners blocked from the catalog until they're ready to launch
+  if (PRE_LAUNCH_CATALOG_BLOCKLIST.has(slug)) return null
 
   // Supabase-owned listings remapped to independent partners.
   // Accept both the clean URL slug ('bigquery') and the listing DB slug ('bigquery-wrapper').
@@ -307,10 +325,12 @@ async function getPartnerSlugsFromMarketplace(): Promise<string[]> {
       .in('slug', Object.keys(SUPABASE_LISTING_OVERRIDES)),
   ])
 
-  // Exclude any partner whose URL slug is covered by an override.
+  // Exclude any partner whose URL slug is covered by an override or is pre-launch.
   const partnerSlugs =
     partnerRows?.flatMap((row) =>
-      row.slug && !OVERRIDE_URL_SLUGS.has(row.slug) ? [row.slug] : []
+      row.slug && !OVERRIDE_URL_SLUGS.has(row.slug) && !PRE_LAUNCH_CATALOG_BLOCKLIST.has(row.slug)
+        ? [row.slug]
+        : []
     ) ?? []
   // Map each listing DB slug to its clean URL slug (e.g. 'bigquery-wrapper' → 'bigquery').
   const overriddenSlugs =
@@ -354,7 +374,7 @@ async function searchPartnersFromMarketplace(search: string): Promise<Partner[] 
     }
 
     const slug = listing.partner_slug
-    if (!slug || slug === SUPABASE_PARTNER_SLUG) continue
+    if (!slug || slug === SUPABASE_PARTNER_SLUG || PRE_LAUNCH_CATALOG_BLOCKLIST.has(slug)) continue
 
     const arr = byPartnerSlug.get(slug) ?? []
     arr.push(listing)
