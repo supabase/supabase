@@ -289,7 +289,7 @@ export const JWTSettings = () => {
                         </p>
                       )}
 
-                      <Button asChild type="default" icon={<ExternalLink />} className="mt-2">
+                      <Button asChild variant="default" icon={<ExternalLink />} className="mt-2">
                         <Link href={`/project/${projectRef}/settings/api-keys`}>
                           Go to API keys
                         </Link>
@@ -502,7 +502,7 @@ export const JWTSettings = () => {
 
                   <div className="flex flex-row gap-x-2 mt-4">
                     {disableLegacyJwtSecretRotation ? (
-                      <Button type="default" icon={<ExternalLink className="size-4" />} asChild>
+                      <Button variant="default" icon={<ExternalLink className="size-4" />} asChild>
                         <Link
                           href="https://supabase.com/docs/guides/auth/signing-keys#getting-started"
                           target="_blank"
@@ -516,7 +516,7 @@ export const JWTSettings = () => {
                         <DropdownMenuTrigger asChild>
                           <ButtonTooltip
                             disabled={!canGenerateNewJWTSecret}
-                            type="default"
+                            variant="default"
                             iconRight={<ChevronDown size={14} />}
                             loading={isUpdatingJwtSecret}
                             tooltip={{
@@ -700,7 +700,7 @@ export const JWTSettings = () => {
           </DialogSection>
           <DialogFooter>
             <Button
-              type="default"
+              variant="default"
               onClick={() => {
                 setIsCreatingKey(false)
                 setCustomToken('')
@@ -711,8 +711,8 @@ export const JWTSettings = () => {
               Cancel
             </Button>
             <Button
-              type="primary"
-              htmlType="submit"
+              variant="primary"
+              type="submit"
               form={customJwtSecretFormId}
               loading={isSubmittingJwtSecretUpdateRequest}
               disabled={isSubmittingJwtSecretUpdateRequest}

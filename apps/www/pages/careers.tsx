@@ -131,7 +131,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
           <p className="text-sm md:text-base text-foreground-lighter max-w-sm sm:max-w-md md:max-w-lg mx-auto">
             Explore remote opportunities and join our team to help us achieve it.
           </p>
-          <Button asChild type="primary" className="mt-4">
+          <Button asChild variant="primary" className="mt-4">
             <Link href="#positions">Open positions</Link>
           </Button>
         </header>
@@ -443,7 +443,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                   Join our talent community to stay updated on future opportunities.
                 </p>
               </div>
-              <Button asChild type="primary">
+              <Button asChild variant="primary">
                 <Link
                   href="https://jobs.ashbyhq.com/supabase/form/talent-community-form"
                   target="_blank"
@@ -486,7 +486,7 @@ const JobItem = ({ job }: { job: JobItemProps }) => {
           </Badge>
           <span className="hidden md:block">{job.employment}</span>
         </div>
-        <div className={cn(buttonVariants({ type: 'default', size: 'tiny' }), 'rounded-full')}>
+        <div className={cn(buttonVariants({ variant: 'default', size: 'tiny' }), 'rounded-full')}>
           {isPlaceholderJob ? 'Submit resume' : 'Apply for position'}
         </div>
       </div>

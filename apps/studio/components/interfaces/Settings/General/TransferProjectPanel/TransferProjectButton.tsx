@@ -98,7 +98,7 @@ export const TransferProjectButton = () => {
     <Dialog onOpenChange={(open) => setIsOpen(open)} open={isOpen}>
       <DialogTrigger asChild>
         <ButtonTooltip
-          type="default"
+          variant="default"
           disabled={!canTransferProject || disableProjectTransfer}
           tooltip={{
             content: {
@@ -283,7 +283,7 @@ export const TransferProjectButton = () => {
           </Loading>
         )}
         <DialogFooter>
-          <Button type="default" onClick={() => setIsOpen(false)}>
+          <Button variant="default" onClick={() => setIsOpen(false)}>
             Cancel
           </Button>
           <Button

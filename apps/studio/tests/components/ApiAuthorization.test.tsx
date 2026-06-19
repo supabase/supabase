@@ -122,10 +122,12 @@ function renderScreen(props: Partial<ApiAuthorizationScreenProps> = {}) {
 
 describe('ApiAuthorizationScreen', () => {
   describe('when auth_id is missing', () => {
-    test('renders invalid screen when auth_id is undefined', () => {
+    test('renders invalid interstitial when auth_id is undefined', () => {
       renderScreen({ auth_id: undefined })
-      expect(screen.getByText('Missing parameters')).toBeInTheDocument()
+      expect(screen.getByText('Missing authorization link')).toBeInTheDocument()
       expect(screen.getByText(/auth_id/)).toBeInTheDocument()
+      expect(screen.getByAltText('Supabase')).toBeInTheDocument()
+      expect(screen.getByRole('link', { name: 'Back to dashboard' })).toHaveAttribute('href', '/')
     })
   })
 
@@ -148,6 +150,20 @@ describe('ApiAuthorizationScreen', () => {
         method: 'get',
         path: '/platform/oauth/authorizations/:id',
         response: () => HttpResponse.json<APIErrorBody>({ message: 'Not found' }, { status: 404 }),
+      })
+      renderScreen()
+      await screen.findByText('Unable to load authorization')
+    })
+
+    test('renders error screen when authorization query returns no requester', async () => {
+      mockOrgsEndpoint()
+      addAPIMock({
+        method: 'get',
+        path: '/platform/oauth/authorizations/:id',
+        response: () =>
+          HttpResponse.json<GetOAuthAuthorizationResponse>(
+            null as unknown as GetOAuthAuthorizationResponse
+          ),
       })
       renderScreen()
       await screen.findByText('Unable to load authorization')

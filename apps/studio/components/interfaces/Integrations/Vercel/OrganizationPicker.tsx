@@ -62,7 +62,7 @@ const OrganizationPicker = ({
         <PopoverTrigger asChild>
           <Button
             ref={ref}
-            type="default"
+            variant="default"
             size="medium"
             block
             className="justify-start"

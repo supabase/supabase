@@ -25,7 +25,7 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface DownloadResultsButtonProps {
   iconOnly?: boolean
-  type?: 'text' | 'default'
+  variant?: 'text' | 'default'
   text?: string
   align?: 'start' | 'center' | 'end'
   results: any[]
@@ -39,7 +39,7 @@ interface DownloadResultsButtonProps {
 
 export const DownloadResultsButton = ({
   iconOnly = false,
-  type = 'default',
+  variant = 'default',
   text = 'Export',
   align = 'start',
   results,
@@ -128,7 +128,7 @@ export const DownloadResultsButton = ({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          type={type}
+          variant={variant}
           icon={iconOnly ? <Download /> : undefined}
           iconRight={iconOnly ? undefined : <ChevronDown />}
           disabled={results.length === 0}

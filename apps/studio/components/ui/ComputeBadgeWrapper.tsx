@@ -188,8 +188,8 @@ export const ComputeBadgeWrapper = ({
               <div>
                 <Button
                   asChild
-                  type="default"
-                  htmlType="button"
+                  variant="default"
+                  type="button"
                   role="button"
                   onClick={() => {
                     track('compute_badge_upgrade_clicked', {

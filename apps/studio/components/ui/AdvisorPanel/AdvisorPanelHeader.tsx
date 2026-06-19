@@ -34,7 +34,7 @@ export const AdvisorPanelHeader = ({ selectedItem, onBack, onClose }: AdvisorPan
   return (
     <div className="border-b px-4 py-3 flex items-center gap-3">
       <ButtonTooltip
-        type="text"
+        variant="text"
         className="w-7 h-7 p-0 flex justify-center items-center"
         icon={<ChevronLeft size={16} strokeWidth={1.5} aria-hidden={true} />}
         onClick={onBack}
@@ -58,7 +58,7 @@ export const AdvisorPanelHeader = ({ selectedItem, onBack, onClose }: AdvisorPan
         )}
       </div>
       <ButtonTooltip
-        type="text"
+        variant="text"
         className="w-7 h-7 p-0"
         icon={<X strokeWidth={1.5} />}
         onClick={onClose}

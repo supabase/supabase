@@ -85,7 +85,7 @@ export const RowSelectionHeader = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <ButtonTooltip
-                    type="default"
+                    variant="default"
                     size="tiny"
                     icon={<Copy size={12} />}
                     className="w-7"
@@ -120,7 +120,7 @@ export const RowSelectionHeader = () => {
               />
 
               <ButtonTooltip
-                type="text"
+                variant="text"
                 icon={<X />}
                 className="px-1"
                 onClick={() => table.resetRowSelection()}

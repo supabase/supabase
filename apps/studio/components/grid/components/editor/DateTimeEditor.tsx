@@ -141,13 +141,17 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
           <div className="flex">
             {isNullable ? (
               <>
-                <Button type="default" className="rounded-r-none" onClick={() => saveChanges(null)}>
+                <Button
+                  variant="default"
+                  className="rounded-r-none"
+                  onClick={() => saveChanges(null)}
+                >
                   Set NULL
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
-                      type="default"
+                      variant="default"
                       icon={<ChevronDown />}
                       className="px-1 rounded-l-none border-l-0"
                     />
@@ -158,7 +162,7 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
                 </DropdownMenu>
               </>
             ) : (
-              <Button type="default" onClick={setToNow}>
+              <Button variant="default" onClick={setToNow}>
                 Set to NOW
               </Button>
             )}
