@@ -47,6 +47,7 @@ interface ImageProps extends Omit<ComponentPropsWithoutRef<'img'>, 'src' | 'alt'
 
 function applyBasePath(src: string): string {
   if (!BASE_PATH) return src
+  // Schemes (http:, https:, data:, blob:) and protocol-relative URLs.
   if (/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(src) || src.startsWith('//')) return src
   if (src === BASE_PATH || src.startsWith(`${BASE_PATH}/`)) return src
   if (src.startsWith('/')) return `${BASE_PATH}${src}`
@@ -95,18 +96,36 @@ const Image = forwardRef(function Image(
 ) {
   const innerRef = useRef<HTMLImageElement | null>(null)
 
-  const handleLoad = (e: SyntheticEvent<HTMLImageElement>) => {
-    onLoad?.(e)
-    if (onLoadingComplete && e.currentTarget) {
-      onLoadingComplete(e.currentTarget)
-    }
+  // Keep the latest callback in a ref so firing doesn't depend on the
+  // caller memoizing onLoadingComplete.
+  const onLoadingCompleteRef = useRef(onLoadingComplete)
+  useEffect(() => {
+    onLoadingCompleteRef.current = onLoadingComplete
+  })
+
+  const resolvedSrc = resolveSrc(src, width, quality, loader)
+
+  // Fire onLoadingComplete at most once per resolved src, matching Next's
+  // once-per-load contract.
+  const firedForSrc = useRef<string | null>(null)
+  const fireLoadingComplete = (img: HTMLImageElement) => {
+    if (firedForSrc.current === resolvedSrc) return
+    firedForSrc.current = resolvedSrc
+    onLoadingCompleteRef.current?.(img)
   }
 
+  const handleLoad = (e: SyntheticEvent<HTMLImageElement>) => {
+    onLoad?.(e)
+    if (e.currentTarget) fireLoadingComplete(e.currentTarget)
+  }
+
+  // Catch the cached-image case where the load event fired before our
+  // handler attached. Keyed on src so it re-arms when the image changes.
   useEffect(() => {
     const img = innerRef.current
-    if (!onLoadingComplete || !img) return
-    if (img.complete && img.naturalWidth > 0) onLoadingComplete(img)
-  }, [onLoadingComplete])
+    if (img?.complete && img.naturalWidth > 0) fireLoadingComplete(img)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolvedSrc])
 
   const layoutStyle: CSSProperties | undefined =
     layout === 'fill'
@@ -128,7 +147,7 @@ const Image = forwardRef(function Image(
         if (typeof forwardedRef === 'function') forwardedRef(node)
         else if (forwardedRef) forwardedRef.current = node
       }}
-      src={resolveSrc(src, width, quality, loader)}
+      src={resolvedSrc}
       width={layout === 'fill' ? undefined : width}
       height={layout === 'fill' ? undefined : height}
       sizes={sizes}

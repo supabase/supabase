@@ -99,25 +99,36 @@ const Image = forwardRef(function Image(
 ) {
   const innerRef = useRef<HTMLImageElement | null>(null)
 
-  // Mirror Next's onLoadingComplete by firing once when the image has
-  // finished decoding. Next deduplicates against re-fires; we approximate
-  // by firing on the load event (the practical observable difference is
-  // negligible for our bundle).
-  const handleLoad = (e: SyntheticEvent<HTMLImageElement>) => {
-    onLoad?.(e)
-    if (onLoadingComplete && e.currentTarget) {
-      onLoadingComplete(e.currentTarget)
-    }
+  // Keep the latest callback in a ref so firing doesn't depend on the
+  // caller memoizing onLoadingComplete.
+  const onLoadingCompleteRef = useRef(onLoadingComplete)
+  useEffect(() => {
+    onLoadingCompleteRef.current = onLoadingComplete
+  })
+
+  const resolvedSrc = resolveSrc(src, width, quality, loader)
+
+  // Mirror Next's onLoadingComplete, firing at most once per resolved src.
+  const firedForSrc = useRef<string | null>(null)
+  const fireLoadingComplete = (img: HTMLImageElement) => {
+    if (firedForSrc.current === resolvedSrc) return
+    firedForSrc.current = resolvedSrc
+    onLoadingCompleteRef.current?.(img)
   }
 
-  // If onLoadingComplete is provided and the image is already cached
-  // (loaded synchronously before our handler attaches), fire it on
-  // mount so the contract holds.
+  const handleLoad = (e: SyntheticEvent<HTMLImageElement>) => {
+    onLoad?.(e)
+    if (e.currentTarget) fireLoadingComplete(e.currentTarget)
+  }
+
+  // If the image is already cached (loaded synchronously before our
+  // handler attaches), fire on mount so the contract holds. Keyed on src
+  // so it re-arms when the image changes.
   useEffect(() => {
     const img = innerRef.current
-    if (!onLoadingComplete || !img) return
-    if (img.complete && img.naturalWidth > 0) onLoadingComplete(img)
-  }, [onLoadingComplete])
+    if (img?.complete && img.naturalWidth > 0) fireLoadingComplete(img)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolvedSrc])
 
   const finalStyle: CSSProperties | undefined = fill
     ? { position: 'absolute', inset: 0, width: '100%', height: '100%', ...style }
@@ -131,7 +142,7 @@ const Image = forwardRef(function Image(
         if (typeof forwardedRef === 'function') forwardedRef(node)
         else if (forwardedRef) forwardedRef.current = node
       }}
-      src={resolveSrc(src, width, quality, loader)}
+      src={resolvedSrc}
       width={fill ? undefined : width}
       height={fill ? undefined : height}
       sizes={sizes}
