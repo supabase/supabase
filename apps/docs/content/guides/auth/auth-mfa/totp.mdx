@@ -12,15 +12,24 @@ The use of a QR code was [initially introduced by Google Authenticator](https://
 
 Below is a flow chart illustrating how the Enrollment, Challenge, and Verify APIs work in the context of MFA (TOTP).
 
-<Image
-  alt="Diagram showing the flow of Multi-Factor authentication"
-  src={{
-    light: '/docs/img/guides/auth-mfa/auth-mfa-flow.svg',
-    dark: '/docs/img/guides/auth-mfa/auth-mfa-flow.svg',
-  }}
-  containerClassName="max-w-[700px]"
-  width={111}
-  height={150}
+<Mermaid
+  chart={`flowchart TD
+    InitS((Setup flow)) --> SAAL1[/Session is AAL1/]
+    SAAL1 --> Enroll[Enroll API]
+    Enroll --> ShowQR[Show QR code]
+    ShowQR --> Scan([User: Scan QR code in authenticator])
+    Scan --> Enter([User: Enter code])
+    Enter --> Verify[Challenge + Verify API]
+    Verify --> Check{{Is code correct?}}
+    Check -->|Yes| AAL2[/Upgrade to AAL2/]
+    AAL2 --> Done((Done))
+    Check -->|No| Enter
+    InitA((Login flow)) --> SignIn([User: Sign-in])
+    SignIn --> AAL1[/Upgrade to AAL1/]
+    AAL1 --> ListFactors[List Factors API]
+    ListFactors -->|1 or more factors| OpenAuth([User: Open authenticator])
+    OpenAuth --> Enter
+    ListFactors -->|0 factors| Setup[[Setup flow]]`}
 />
 
 [TOTP MFA API](/docs/reference/javascript/auth-mfa-api) is free to use and is enabled on all Supabase projects by default.
