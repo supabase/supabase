@@ -7,18 +7,10 @@ import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DestinationConfig =
-  | {
-      bigQuery: BigQueryDestinationConfig
-    }
-  | {
-      iceberg: IcebergDestinationConfig
-    }
-  | {
-      ducklake: DucklakeDestinationConfig
-    }
-  | {
-      snowflake: SnowflakeDestinationConfig
-    }
+  | { bigQuery: BigQueryDestinationConfig }
+  | { iceberg: IcebergDestinationConfig }
+  | { ducklake: DucklakeDestinationConfig }
+  | { snowflake: SnowflakeDestinationConfig }
 
 export type BigQueryDestinationConfig = {
   projectId: string
@@ -68,7 +60,7 @@ export type DucklakeDestinationConfig =
   | DucklakeManualDestinationConfig
   | DucklakeSupabaseDestinationConfig
 
-export function isDucklakeSupabaseConfig(
+function isDucklakeSupabaseConfig(
   config: DucklakeDestinationConfig
 ): config is DucklakeSupabaseDestinationConfig {
   return 'catalogProjectRef' in config

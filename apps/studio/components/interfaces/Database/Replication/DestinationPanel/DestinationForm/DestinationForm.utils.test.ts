@@ -1,11 +1,14 @@
 import { describe, expect, it, vi } from 'vitest'
 
+import { getAnalyticsBucketValidationIssues } from './AnalyticsBucket/AnalyticsBucket.utils'
+import { getBigQueryValidationIssues } from './BigQuery/BigQuery.utils'
+import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
 import {
   buildDestinationConfig,
   buildDestinationConfigForValidation,
-  getDucklakeValidationIssues,
-  getSnowflakeValidationIssues,
 } from './DestinationForm.utils'
+import { getDucklakeValidationIssues } from './DuckLake/DuckLake.utils'
+import { getSnowflakeValidationIssues } from './Snowflake/Snowflake.utils'
 
 const baseDucklakeFormData = {
   name: 'DuckLake Destination',
@@ -362,5 +365,91 @@ describe('DestinationForm.utils Snowflake', () => {
       { path: 'snowflakeDatabase', message: 'Database is required' },
       { path: 'snowflakeSchema', message: 'Schema is required' },
     ])
+  })
+})
+
+describe('DestinationForm.utils BigQuery', () => {
+  it('returns required-field errors for missing BigQuery settings', () => {
+    const issues = getBigQueryValidationIssues({
+      projectId: '',
+      datasetId: '',
+      serviceAccountKey: '',
+    })
+
+    expect(issues).toEqual([
+      { path: 'projectId', message: 'Project ID is required' },
+      { path: 'datasetId', message: 'Dataset ID is required' },
+      { path: 'serviceAccountKey', message: 'Service Account Key is required' },
+    ])
+  })
+
+  it('returns no issues for a complete configuration', () => {
+    const issues = getBigQueryValidationIssues({
+      projectId: 'my-project',
+      datasetId: 'my_dataset',
+      serviceAccountKey: '{ "type": "service_account" }',
+    })
+
+    expect(issues).toEqual([])
+  })
+})
+
+describe('DestinationForm.utils Analytics Bucket', () => {
+  it('returns required-field errors for an empty configuration', () => {
+    const issues = getAnalyticsBucketValidationIssues({
+      warehouseName: '',
+      namespace: '',
+      newNamespaceName: '',
+      s3Region: '',
+      s3AccessKeyId: '',
+      s3SecretAccessKey: '',
+    })
+
+    expect(issues).toEqual([
+      { path: 'warehouseName', message: 'Bucket is required' },
+      { path: 'namespace', message: 'Namespace is required' },
+      { path: 's3Region', message: 'S3 Region is required' },
+      { path: 's3AccessKeyId', message: 'S3 Access Key ID is required' },
+      { path: 's3SecretAccessKey', message: 'S3 Secret Access Key is required' },
+    ])
+  })
+
+  it('requires a name when creating a new namespace', () => {
+    const issues = getAnalyticsBucketValidationIssues({
+      warehouseName: 'bucket',
+      namespace: CREATE_NEW_NAMESPACE,
+      newNamespaceName: '',
+      s3Region: 'us-east-1',
+      s3AccessKeyId: 'key',
+      s3SecretAccessKey: 'secret',
+    })
+
+    expect(issues).toEqual([{ path: 'newNamespaceName', message: 'Namespace name is required' }])
+  })
+
+  it('skips the S3 secret when creating a new access key', () => {
+    const issues = getAnalyticsBucketValidationIssues({
+      warehouseName: 'bucket',
+      namespace: 'analytics',
+      newNamespaceName: '',
+      s3Region: 'us-east-1',
+      s3AccessKeyId: CREATE_NEW_KEY,
+      s3SecretAccessKey: '',
+    })
+
+    expect(issues).toEqual([])
+  })
+
+  it('returns no issues for a complete configuration', () => {
+    const issues = getAnalyticsBucketValidationIssues({
+      warehouseName: 'bucket',
+      namespace: CREATE_NEW_NAMESPACE,
+      newNamespaceName: 'new_namespace',
+      s3Region: 'us-east-1',
+      s3AccessKeyId: 'key',
+      s3SecretAccessKey: 'secret',
+    })
+
+    expect(issues).toEqual([])
   })
 })
