@@ -7,6 +7,7 @@ import {
 } from '@/components/interfaces/Storage/Storage.constants'
 import type { StorageItem } from '@/components/interfaces/Storage/Storage.types'
 import {
+  calculateTotalRemainingTime,
   getPathAlongFoldersToIndex,
   getPathAlongOpenedFolders,
   sanitizeNameForDuplicateInColumn,
@@ -274,5 +275,33 @@ describe('sanitizeNameForDuplicateInColumn', () => {
         ' (1).myfile'
       )
     })
+  })
+})
+
+describe('calculateTotalRemainingTime', () => {
+  const progress = (remainingBytes: number, remainingTime: number) => ({
+    percentage: 0,
+    elapsed: 0,
+    uploadSpeed: 0,
+    remainingBytes,
+    remainingTime,
+  })
+
+  it('returns 0 when there are no remaining bytes', () => {
+    expect(calculateTotalRemainingTime([])).toBe(0)
+    expect(calculateTotalRemainingTime([progress(0, 30)])).toBe(0)
+  })
+
+  it('weights each remaining time by its share of the total remaining bytes', () => {
+    // equal bytes, 10s and 20s left -> 0.5 * 10 + 0.5 * 20 = 15
+    expect(calculateTotalRemainingTime([progress(100, 10), progress(100, 20)])).toBeCloseTo(15)
+  })
+
+  it('does not depend on the order of the uploads', () => {
+    // bytes 100 / 300 -> weights 0.25 / 0.75 -> 0.25 * 10 + 0.75 * 20 = 17.5
+    const forward = calculateTotalRemainingTime([progress(100, 10), progress(300, 20)])
+    const reversed = calculateTotalRemainingTime([progress(300, 20), progress(100, 10)])
+    expect(forward).toBeCloseTo(reversed)
+    expect(forward).toBeCloseTo(17.5)
   })
 })
