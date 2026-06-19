@@ -32,9 +32,9 @@ export const MarketplaceIntegrationSettingsTab = () => {
 
   const { data: projectData, isLoading, isError, error } = useProjectOAuthIntegrationData(ref)
 
-  // The generic confirmation modal targets a single resource or all of them ('all'). The OAuth app
-  // and API keys are removed through their own dedicated modals, tracked separately.
-  const [confirmTarget, setConfirmTarget] = useState<ConnectedResource | 'all' | undefined>()
+  // The generic confirmation modal targets a single resource. The OAuth app and API keys are
+  // removed through their own dedicated modals, tracked separately.
+  const [confirmTarget, setConfirmTarget] = useState<ConnectedResource | undefined>()
   const [appToRevoke, setAppToRevoke] = useState<AuthorizedApp | undefined>()
   const [apiKeyToDelete, setApiKeyToDelete] = useState<ApiKeyResource | undefined>()
 
@@ -107,11 +107,7 @@ export const MarketplaceIntegrationSettingsTab = () => {
   const onConfirmRemove = async () => {
     if (!confirmTarget) return
     try {
-      if (confirmTarget === 'all') {
-        for (const resource of resources) await removeResource(resource)
-      } else {
-        await removeResource(confirmTarget)
-      }
+      await removeResource(confirmTarget)
       setConfirmTarget(undefined)
     } catch (err) {
       toast.error(`Failed to remove: ${err instanceof Error ? err.message : 'Unknown error'}`)
@@ -128,9 +124,7 @@ export const MarketplaceIntegrationSettingsTab = () => {
     }
   }
 
-  const isUninstallingAll = confirmTarget === 'all'
-  const confirmResourceTitle =
-    confirmTarget && confirmTarget !== 'all' ? confirmTarget.title.toLowerCase() : 'resource'
+  const confirmResourceTitle = confirmTarget ? confirmTarget.title.toLowerCase() : 'resource'
 
   return (
     <>
@@ -184,27 +178,15 @@ export const MarketplaceIntegrationSettingsTab = () => {
         variant="destructive"
         visible={confirmTarget !== undefined}
         loading={isRemoving}
-        title={
-          isUninstallingAll ? `Uninstall ${integrationName}?` : `Remove ${confirmResourceTitle}?`
-        }
-        confirmLabel={isUninstallingAll ? 'Uninstall' : 'Remove'}
-        confirmLabelLoading={isUninstallingAll ? 'Uninstalling' : 'Removing'}
+        title={`Remove ${confirmResourceTitle}?`}
+        confirmLabel="Remove"
+        confirmLabelLoading="Removing"
         onCancel={() => setConfirmTarget(undefined)}
         onConfirm={onConfirmRemove}
       >
         <p className="text-sm text-foreground-light">
-          {isUninstallingAll ? (
-            <>
-              This removes all {resources.length} connected resource
-              {resources.length === 1 ? '' : 's'} and revokes {integrationName}&apos;s access to
-              your project. This action cannot be undone.
-            </>
-          ) : (
-            <>
-              This removes the resource immediately and may stop {integrationName} from working
-              correctly. This action cannot be undone.
-            </>
-          )}
+          This removes the resource immediately and may stop {integrationName} from working
+          correctly. This action cannot be undone.
         </p>
       </ConfirmationModal>
 
