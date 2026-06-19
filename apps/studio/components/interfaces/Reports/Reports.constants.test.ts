@@ -128,6 +128,11 @@ describe('generateOtelWhereSafe', () => {
     expect(sqlText(generateOtelWhereSafe([]))).toBe('')
   })
 
+  it('returns an empty fragment for the non-prepend form with no filters', () => {
+    // otelWhere relies on this so an empty filter set never emits a dangling `AND`.
+    expect(sqlText(generateOtelWhereSafe([], false))).toBe('')
+  })
+
   it('maps `matches` to ClickHouse match() over the log_attributes lookup', () => {
     const filters: ReportFilterItem[] = [
       { key: 'request.path', value: '/auth', compare: 'matches' },

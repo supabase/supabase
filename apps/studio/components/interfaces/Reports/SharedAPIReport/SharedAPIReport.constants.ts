@@ -38,17 +38,26 @@ function otelWhere(
   const base = extra
     ? safeSql`where source = ${analyticsLiteral(otelSourceName(src))} and ${extra}`
     : safeSql`where source = ${analyticsLiteral(otelSourceName(src))}`
+  // The user-filter fragment must extend the existing WHERE (never start a new one),
+  // so it is always generated with prepend=false. Only append it when non-empty to
+  // avoid trailing whitespace in the emitted SQL.
+  if (filters.length === 0) return base
   return safeSql`${base} ${generateOtelWhereSafe(filters, false)}`
 }
 
-// Route grouping columns, shared by the top-routes style queries.
+// Route grouping columns, shared by the top-routes style queries. status_code is
+// cast to an int so the result column matches the BigQuery schema's numeric type
+// (the renderers read it as a number); an absent attribute becomes 0, as in BQ.
+const OTEL_STATUS_CODE: SafeLogSqlFragment = safeSql`toInt32OrZero(log_attributes['response.status_code'])`
 const OTEL_ROUTE_SELECT: SafeLogSqlFragment = safeSql`
   log_attributes['request.path'] as path,
   log_attributes['request.method'] as method,
   log_attributes['request.search'] as search,
-  log_attributes['response.status_code'] as status_code`
-const OTEL_ROUTE_GROUP_BY: SafeLogSqlFragment = safeSql`log_attributes['request.path'], log_attributes['request.method'], log_attributes['request.search'], log_attributes['response.status_code']`
-const OTEL_STATUS_IS_ERROR: SafeLogSqlFragment = safeSql`toInt64OrZero(log_attributes['response.status_code']) >= 400`
+  ${OTEL_STATUS_CODE} as status_code`
+const OTEL_ROUTE_GROUP_BY: SafeLogSqlFragment = safeSql`log_attributes['request.path'], log_attributes['request.method'], log_attributes['request.search'], ${OTEL_STATUS_CODE}`
+const OTEL_STATUS_IS_ERROR: SafeLogSqlFragment = safeSql`${OTEL_STATUS_CODE} >= 400`
+// response.origin_time is stored in milliseconds (verified against the staging OTEL
+// endpoint: values are in the single/double-digit ms range), matching BigQuery.
 const OTEL_ORIGIN_TIME: SafeLogSqlFragment = safeSql`toFloat64OrZero(log_attributes['response.origin_time'])`
 
 export const SHARED_API_REPORT_SQL = {
@@ -434,9 +443,12 @@ export const useSharedAPIReport = ({
 
   const isLoadingData = Object.values(isLoading).some(Boolean)
 
+  // `sql` is surfaced for the "Open in Logs Explorer" link, which runs against the
+  // BigQuery logs endpoint. Keep it on the BigQuery builder even when the charts
+  // fetch via OTEL, so the link stays runnable in the explorer.
   const SQLMap = keys.reduce(
     (acc, key) => {
-      acc[key] = buildSql(SHARED_API_REPORT_SQL[key])(allFilters, filterByMapSource[filterBy])
+      acc[key] = SHARED_API_REPORT_SQL[key].safeSql(allFilters, filterByMapSource[filterBy])
       return acc
     },
     {} as Record<SharedAPIReportKey, SafeLogSqlFragment>

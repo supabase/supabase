@@ -164,12 +164,10 @@ export function generateOtelWhereSafe(
         ? [splitKey[splitKey.length - 2], splitKey[splitKey.length - 1]].join('.')
         : filter.key
 
-      let col: SafeLogSqlFragment
-      try {
-        col = safeLogSql`log_attributes[${analyticsLiteral(normalizedKey)}]`
-      } catch {
-        return null
-      }
+      // Unlike the BigQuery generator (which validates an identifier via quotedIdent
+      // and can reject it), analyticsLiteral escapes the key into a quoted string
+      // subscript, so there is no key to reject here.
+      const col = safeLogSql`log_attributes[${analyticsLiteral(normalizedKey)}]`
 
       const valueIsNumber = !isNaN(Number(filter.value))
       const stringLit = analyticsLiteral(String(filter.value).toLowerCase())
