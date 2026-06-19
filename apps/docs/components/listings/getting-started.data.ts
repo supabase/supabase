@@ -2,7 +2,6 @@ import type { ContentListingGroup } from '~/lib/content-listings.schema'
 
 export const gettingStartedGetStarted: ContentListingGroup = {
   id: 'get-started',
-  heading: 'Get started',
   type: 'grid',
   items: [
     {

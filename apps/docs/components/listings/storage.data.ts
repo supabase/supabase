@@ -16,7 +16,7 @@ export const storageGetStarted: ContentListingGroup = {
       title: 'Analytics buckets',
       href: '/guides/storage/analytics/introduction',
       description:
-        'Store data in Apache Iceberg tables for data lakes, logs, and ETL. Query from Postgres via foreign tables with partitioning.',
+        'Store data in Apache Iceberg tables for data lakes, logs, and Supabase Pipelines. Query from Postgres via foreign tables with partitioning.',
     },
     {
       title: 'Vector buckets',
