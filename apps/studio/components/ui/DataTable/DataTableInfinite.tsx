@@ -255,7 +255,6 @@ export function DataTableInfinite<TData, TValue, TMeta>({
           )}
         </TableBody>
       </Table>
-      <div>asdasdasd</div>
     </>
   )
 }
