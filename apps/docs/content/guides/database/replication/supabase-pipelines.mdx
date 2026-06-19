@@ -289,7 +289,7 @@ Schema change support depends on the destination. BigQuery is currently the only
 Once configured, a replication pipeline:
 
 1. **Captures** changes from your Postgres database using Postgres publications and logical replication
-2. **Streams** the changes through Supabase Pipelines
+2. **Streams** the changes through the managed pipeline
 3. **Loads** the data to your destination
 
 Supabase Pipelines automatically optimizes how changes are delivered to the destination. It currently performs data extraction and loading only, without transformation - your data is replicated as-is to the destination.
