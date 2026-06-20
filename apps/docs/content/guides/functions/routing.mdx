@@ -195,7 +195,8 @@ async function createTask(req: Request): Promise<Response> {
 async function updateTask(id: string, req: Request): Promise<Response> {
   const index = tasks.findIndex((t) => t.id === id)
   if (index !== -1) {
-    tasks[index] = { ...tasks[index] }
+    const updates = await req.json()
+    tasks[index] = { ...tasks[index], ...updates }
     return Response.json({ task: tasks[index] })
   } else {
     return Response.json({ error: 'Task not found' }, { status: 404 })
