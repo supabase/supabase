@@ -1,6 +1,6 @@
-import type { Claims } from '@supabase/supabase-js'
+import type { User } from '@supabase/supabase-js'
 import { reactive } from 'vue'
 
-export const store = reactive<{ user: Claims | null }>({
+export const store = reactive<{ user: User | null }>({
   user: null,
 })
