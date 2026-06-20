@@ -25,6 +25,7 @@
 .monaco-diff-editor {
   --vscode-editor-background: hsl(var(--background-dash-sidebar)) !important;
   --vscode-editorGutter-background: hsl(var(--background-dash-sidebar)) !important;
+  outline: none !important;
 }
 
 .gutter {
