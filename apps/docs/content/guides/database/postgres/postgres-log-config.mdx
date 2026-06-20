@@ -156,7 +156,7 @@ Postgres logs have severity levels.
 | **fatal**             | An error that causes a database connection to abruptly terminate.                          | `FATAL: terminating connection due to administrator command`                                                           |
 | **panic**             | A critical, system-wide failure that forces the database to shut down and crash-recover.   | `PANIC: could not locate a valid checkpoint record at 0/61013608`                                                      |
 
-By changing the `log_min_messages`, you can force postgres to disregard logs that have weaker severtity levels rather than recording them.
+By changing the `log_min_messages` setting, you can force Postgres to disregard logs with lower severity levels rather than record them.
 
 Setting the log level to a higher rank includes all logs below. So, if you were to set the value to `info`, it would also log activity for `notice`, `warning`, ...
 
@@ -184,7 +184,7 @@ Logs information about clients connecting/disconnecting from the database. Some 
 
 <Admonition type="caution">
 
-Can produce high levels of log activty, especially for servers with frequent connects/disconnects.
+Can produce high levels of log activity, especially for servers with frequent connects/disconnects.
 
 </Admonition>
 
@@ -205,7 +205,7 @@ connection authenticated: identity="pgbouncer" method=scram-sha-256
 
 <Admonition type="tip">
 
-The logged IP address is the client directly communicating with Postgres. If you connect through Supavisor, the dedicated pooler, or the Data API, those service IPs will appear instead of the original client.
+The logged IP address is from the device directly communicating with Postgres. If you connect through Supavisor, the dedicated pooler, or the Data API, those service IPs will appear instead of the original client.
 
 </Admonition>
 
@@ -231,7 +231,7 @@ postgres-config update --config log_connections=true \
 
 <Admonition type="caution">
 
-Can produce high levels of log activty, especially for servers with frequent connects/disconnects.
+Can produce high levels of log activity, especially for servers with frequent connects/disconnects.
 
 </Admonition>
 
@@ -470,7 +470,7 @@ postgres-config update --config log_startup_progress_interval=1s \
 
 ### `log_recovery_conflict_waits`
 
-If a read-replca is acting on data that is being modified/discarded by the primary, then it may wait to determine if the data should be readable or not. The setting `log_recovery_conflict_waits` determines if the replica should report what it is waiting on after a second.
+If a read-replica is acting on data that is being modified/discarded by the primary, then it may wait to determine if the data should be readable or not. The setting `log_recovery_conflict_waits` determines if the replica should report what it is waiting on after a second.
 
 **Useful for:**
 
@@ -513,7 +513,7 @@ To avoid excessive logging and performance penalties, it is not advised to confi
 
 </Admonition>
 
-[auto_explain](https://www.postgresql.org/docs/current/auto-explain.html) is a Postgres Module that is preinstalled on all Supabase projects. It logs the statements and [explain plans](postgresql.org/docs/current/sql-explain.html) of queries that took more than setting's limit.
+[auto_explain](https://www.postgresql.org/docs/current/auto-explain.html) is a Postgres module that is installed on all Supabase projects. It logs the statements and [explain plans](postgresql.org/docs/current/sql-explain.html) of queries that took more than setting's limit.
 
 **Useful for:**
 
