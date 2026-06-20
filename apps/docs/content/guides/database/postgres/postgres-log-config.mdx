@@ -23,7 +23,7 @@ The table outlines **configurable** log settings. For more information about eac
 | [`log_disconnections`](#logdisconnections)                     | Network Monitoring    | `API` + `CLI`         |  `false`  |
 | [`log_lock_waits`](#loglockwaits)                              | Background Activity   | `API` + `CLI` + `SQL` |  `true`   |
 | [`log_checkpoints`](#logcheckpoints)                           | Background Activity   | `API` + `CLI`         |  `true`   |
-| [`log_autovacuum_min_duration`](#logautovacuumminduration)     | Background Activity   | `API`                 | `60000ms` |
+| [`log_autovacuum_min_duration`](#logautovacuumminduration)     | Background Activity   | `API` + `CLI`         | `60000ms` |
 | [`log_temp_files`](#logtempfiles)                              | Background Activity   | `API` + `CLI` + `SQL` |   `-1`    |
 | [`log_startup_progress_interval`](#logstartupprogressinterval) | Background Activity   | `API` + `CLI`         | `10000ms` |
 | [`log_recovery_conflict_waits`](#logrecoveryconflictwaits)     | Background Activity   | `API` + `CLI`         |  `false`  |
@@ -241,7 +241,7 @@ Logs when a database connection gracefully closes.
 
 - Monitoring how long connections persist
 
-**Example logs:**
+**Example log:**
 
 ```sh
 disconnection: session time: 0:00:01.492 user=postgres database=postgres host=127.0.0.1
@@ -249,7 +249,7 @@ disconnection: session time: 0:00:01.492 user=postgres database=postgres host=12
 
 <Admonition type="tip">
 
-The logged IP address is the client directly communicating with Postgres. If you connect through Supavisor, the dedicated pooler, or the Data API, those service IPs will appear instead of the original client.
+The logged IP address is from the client directly communicating with Postgres. If you connect through Supavisor, the dedicated pooler, or the Data API, those service IPs will appear instead of the original client.
 
 </Admonition>
 
@@ -407,7 +407,7 @@ Some queries require sorting, hashing, or other memory-intensive operations. Whe
 - Determining when the memory constraint settings should be adjusted
 - Identifying disk strain caused by temp files
 
-**Example logs:**
+**Example log:**
 
 ```sh
 # records the creation of a temp file that is 8.33MB in size
@@ -444,7 +444,7 @@ For large servers, recovery after a crash may take an extended period. To provid
 
 - Determining if a server is responsive during startup/recovery
 
-**Example logs:**
+**Example los:**
 
 ```sh
 syncing data directory (pre-fsync), elapsed time: 0.00 s, current path: ./base/4/13456
@@ -452,7 +452,7 @@ syncing data directory (pre-fsync), elapsed time: 0.00 s, current path: ./base/4
 
 **Configuring:**
 
-```sh name='Management API'
+```sh name=API
 curl https://api.supabase.com/v1/projects/PROJECT_REF/config/database/postgres \
   --request PUT \
   --header 'Content-Type: application/json' \
@@ -625,9 +625,7 @@ statement: select * from testing WHERE id = 5 limit 100;
 
 **Configuring:**
 
-SQL:
-
-```sql
+```sql name=SQL
 alter role "postgres" set "log_statement" to 'none';
 ```
 
