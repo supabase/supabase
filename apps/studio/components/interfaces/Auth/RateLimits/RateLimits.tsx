@@ -35,6 +35,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { isSmtpEnabled } from '../SmtpForm/SmtpForm.utils'
+import { AUTH_RATE_LIMIT_FIELD_COPY } from './RateLimits.constants'
 import AlertError from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import NoPermission from '@/components/ui/NoPermission'
@@ -502,8 +503,8 @@ export const RateLimits = () => {
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
-                        label="Rate limit for sign-ups and sign-ins"
-                        description="Number of sign-up and sign-in requests that can be made in a 5 minute interval per IP address (excludes anonymous users)"
+                        label={AUTH_RATE_LIMIT_FIELD_COPY.RATE_LIMIT_OTP.label}
+                        description={AUTH_RATE_LIMIT_FIELD_COPY.RATE_LIMIT_OTP.description}
                       >
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -516,7 +517,9 @@ export const RateLimits = () => {
                                   disabled={!canUpdateConfig}
                                 />
                                 <InputGroupAddon align="inline-end">
-                                  <InputGroupText>requests/5 min</InputGroupText>
+                                  <InputGroupText>
+                                    {AUTH_RATE_LIMIT_FIELD_COPY.RATE_LIMIT_OTP.unit}
+                                  </InputGroupText>
                                 </InputGroupAddon>
                               </InputGroup>
                             </FormControl>
@@ -533,11 +536,12 @@ export const RateLimits = () => {
                             </TooltipContent>
                           )}
                         </Tooltip>
-                        {rateLimitForm.watch('RATE_LIMIT_OTP') > 0 && (
-                          <p className="text-foreground-lighter text-sm mt-2">
-                            {rateLimitForm.watch('RATE_LIMIT_OTP') * 12} requests per hour
-                          </p>
-                        )}
+                        {AUTH_RATE_LIMIT_FIELD_COPY.RATE_LIMIT_OTP.showHourlyEstimate &&
+                          rateLimitForm.watch('RATE_LIMIT_OTP') > 0 && (
+                            <p className="text-foreground-lighter text-sm mt-2">
+                              {rateLimitForm.watch('RATE_LIMIT_OTP') * 12} requests per hour
+                            </p>
+                          )}
                       </FormItemLayout>
                     )}
                   />
