@@ -1,6 +1,7 @@
 import { Hotkey } from '@tanstack/react-hotkeys'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { AlignLeft, Check, Heart, Keyboard, MoreVertical } from 'lucide-react'
+import { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -11,11 +12,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   KeyboardShortcut,
+  ToggleGroup,
+  ToggleGroupItem,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
 
+import {
+  clampSqlEditorFontSize,
+  SQL_EDITOR_FONT_SIZE_DEFAULT,
+  SQL_EDITOR_FONT_SIZE_MAX,
+  SQL_EDITOR_FONT_SIZE_MIN,
+  SQL_EDITOR_FONT_SIZE_STEP,
+} from '../SQLEditor.constants'
 import { SqlRunButton } from './RunButton'
 import SavingIndicator from './SavingIndicator'
 import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
@@ -55,6 +65,34 @@ export const UtilityActions = ({
     LOCAL_STORAGE_KEYS.SQL_EDITOR_LAST_SELECTED_DB(ref as string),
     ''
   )
+
+  const [sqlEditorFontSizeStored, setSqlEditorFontSize] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_FONT_SIZE,
+    SQL_EDITOR_FONT_SIZE_DEFAULT
+  )
+
+  const sqlEditorFontSize = useMemo(
+    () =>
+      clampSqlEditorFontSize(
+        typeof sqlEditorFontSizeStored === 'number' && Number.isFinite(sqlEditorFontSizeStored)
+          ? sqlEditorFontSizeStored
+          : SQL_EDITOR_FONT_SIZE_DEFAULT
+      ),
+    [sqlEditorFontSizeStored]
+  )
+
+  const bumpSqlEditorFontSize = useCallback(
+    (direction: -1 | 1) => {
+      setSqlEditorFontSize((prev) => {
+        const base =
+          typeof prev === 'number' && Number.isFinite(prev) ? prev : SQL_EDITOR_FONT_SIZE_DEFAULT
+        return clampSqlEditorFontSize(base + direction * SQL_EDITOR_FONT_SIZE_STEP)
+      })
+    },
+    [setSqlEditorFontSize]
+  )
+
+  const [fontToggleValue, setFontToggleValue] = useState<string>()
 
   const snippet = snapV2.snippets[id]
   const isFavorite = snippet !== undefined ? snippet.snippet.favorite : false
@@ -128,6 +166,19 @@ export const UtilityActions = ({
             </span>
             {formatKeys && <KeyboardShortcut keys={formatKeys} />}
           </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            disabled={sqlEditorFontSize >= SQL_EDITOR_FONT_SIZE_MAX}
+            onClick={() => bumpSqlEditorFontSize(1)}
+          >
+            Increase font size (A+)
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            disabled={sqlEditorFontSize <= SQL_EDITOR_FONT_SIZE_MIN}
+            onClick={() => bumpSqlEditorFontSize(-1)}
+          >
+            Decreased font size (A−)
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -191,6 +242,37 @@ export const UtilityActions = ({
             </div>
           </TooltipContent>
         </Tooltip>
+
+        <ToggleGroup
+          type="single"
+          size="sm"
+          value={fontToggleValue}
+          onValueChange={(val) => {
+            if (val === 'dec') bumpSqlEditorFontSize(-1)
+            else if (val === 'inc') bumpSqlEditorFontSize(1)
+            setFontToggleValue(undefined)
+          }}
+          className="gap-0 rounded-md border border-strong p-0"
+        >
+          <ToggleGroupItem
+            value="dec"
+            size="sm"
+            disabled={sqlEditorFontSize <= SQL_EDITOR_FONT_SIZE_MIN}
+            className="h-[26px] min-w-[2rem] rounded-none rounded-l-md border-0 px-2 text-xs font-medium data-[state=on]:bg-transparent"
+            aria-label="Decrease SQL editor font size"
+          >
+            A−
+          </ToggleGroupItem>
+          <ToggleGroupItem
+            value="inc"
+            size="sm"
+            disabled={sqlEditorFontSize >= SQL_EDITOR_FONT_SIZE_MAX}
+            className="h-[26px] min-w-[2rem] rounded-none rounded-r-md border-0 border-l border-strong px-2 text-xs font-medium data-[state=on]:bg-transparent"
+            aria-label="Increase SQL editor font size"
+          >
+            A+
+          </ToggleGroupItem>
+        </ToggleGroup>
       </div>
 
       <div className="flex items-center justify-between gap-x-2">

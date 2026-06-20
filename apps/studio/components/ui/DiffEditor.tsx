@@ -1,5 +1,6 @@
 import { DiffEditor as BaseDiffEditor } from '@monaco-editor/react'
 import type { editor as monacoEditor } from 'monaco-editor'
+import { useEffect, useRef } from 'react'
 
 interface DiffViewerProps {
   /** Original/left hand side content (optional) */
@@ -35,19 +36,35 @@ export const DiffEditor = ({
   height = '100%',
   options,
   onMount,
-}: DiffViewerProps) => (
-  <BaseDiffEditor
-    // [Joshen] These ones are meant to solve a UI issue that seems to only be happening locally
-    // Happens when you use the inline assistant in the SQL Editor and accept the suggestion
-    // Error: TextModel got disposed before DiffEditorWidget model got reset
-    keepCurrentOriginalModel
-    keepCurrentModifiedModel
-    theme="supabase"
-    language={language}
-    height={height}
-    original={original}
-    modified={modified}
-    options={{ ...DEFAULT_OPTIONS, ...options }}
-    onMount={onMount}
-  />
-)
+}: DiffViewerProps) => {
+  const mergedOptions = { ...DEFAULT_OPTIONS, ...options }
+  const fontSize = mergedOptions.fontSize ?? DEFAULT_OPTIONS.fontSize
+  const diffEditorRef = useRef<monacoEditor.IStandaloneDiffEditor | null>(null)
+
+  useEffect(() => {
+    const editor = diffEditorRef.current
+    if (!editor) return
+    editor.getOriginalEditor().updateOptions({ fontSize })
+    editor.getModifiedEditor().updateOptions({ fontSize })
+  }, [fontSize])
+
+  return (
+    <BaseDiffEditor
+      // [Joshen] These ones are meant to solve a UI issue that seems to only be happening locally
+      // Happens when you use the inline assistant in the SQL Editor and accept the suggestion
+      // Error: TextModel got disposed before DiffEditorWidget model got reset
+      keepCurrentOriginalModel
+      keepCurrentModifiedModel
+      theme="supabase"
+      language={language}
+      height={height}
+      original={original}
+      modified={modified}
+      options={mergedOptions}
+      onMount={(editor) => {
+        diffEditorRef.current = editor
+        onMount?.(editor)
+      }}
+    />
+  )
+}

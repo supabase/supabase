@@ -26,6 +26,16 @@ export const sqlAiDisclaimerComment = `
 // Should only be used for comparisons. If you need a new title, use generateSnippetTitle()
 export const untitledSnippetTitle = 'Untitled query'
 
+export const SQL_EDITOR_FONT_SIZE_DEFAULT = 13
+export const SQL_EDITOR_FONT_SIZE_MIN = 11
+export const SQL_EDITOR_FONT_SIZE_MAX = 21
+export const SQL_EDITOR_FONT_SIZE_STEP = 3
+
+export function clampSqlEditorFontSize(size: number): number {
+  if (!Number.isFinite(size)) return SQL_EDITOR_FONT_SIZE_DEFAULT
+  return Math.min(SQL_EDITOR_FONT_SIZE_MAX, Math.max(SQL_EDITOR_FONT_SIZE_MIN, Math.round(size)))
+}
+
 /**
  * Generates a snippet title. If the platform is self-hosted, it will return a random number to avoid conflicts.
  */
