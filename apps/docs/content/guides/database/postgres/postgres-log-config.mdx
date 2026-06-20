@@ -704,7 +704,7 @@ Postgres stores subfields in the `metadata.parsed` section. The below sections l
 | :---------------------- | :---------------------------------------------------------------------------- | :------------------------------ |
 | `parsed.query`          | The SQL query executed                                                        | `select * from some_table;`     |
 | `parsed.command_tag`    | Tag identifying the type of command                                           | `select`, `insert`, `update`... |
-| `parsed.internal_query` | An internal query used to facilitate a primary query (often used by Realtime) | `select to_jsonb()`             |
+| `parsed.internal_query` | An internal query used to help a primary query (often used by Realtime) | `select to_jsonb()`             |
 
 #### Suggested use cases
 
