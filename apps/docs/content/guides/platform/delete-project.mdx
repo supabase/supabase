@@ -89,22 +89,10 @@ To pause a project, navigate to [**Settings** > **General** > **Project availabi
 
 To safeguard against accidental deletion, consider the following:
 
-### 1. Export critical data
+### 1. Backup your database
+If you are on the Pro, Team or Enterprise Plan, you can get daily backups from [your Supabase dashboard](https://supabase.com/dashboard/project/_/database/backups/scheduled)
 
-- **Database backups**: Use `pg_dump` to export your Postgres database:
-
-```bash
-pg_dump -U postgres -d db -s -f schema.sql
-```
-
-Or with a connection string:
-
-```bash
-pg_dump postgres://user:password@db.<project_id>.supabase.co:5432/postgres > backup.sql
-```
-
-- **Selective exports**: Export specific tables or schemas needed for your records
-- **External storage**: Save backups to S3, Google Cloud Storage, or your local machine
+You can also backup your database by following the [backup and restore guide](/docs/guides/platform/migrating-within-supabase/backup-restore) provided.
 
 ### 2. Download storage objects
 
