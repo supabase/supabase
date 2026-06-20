@@ -5,7 +5,8 @@ description: 'How to handle WebSocket connections in Edge Functions'
 subtitle: 'Handle WebSocket connections in Edge Functions.'
 ---
 
-Edge Functions supports hosting WebSocket servers that can facilitate bi-directional communications with browser clients.
+Edge Functions supports hosting WebSocket servers that can facilitate bi-directional
+communications with browser clients.
 
 This allows you to:
 
@@ -13,7 +14,8 @@ This allows you to:
 - Create WebSocket relay servers for external APIs
 - Establish both incoming and outgoing WebSocket connections
 
-For a production-ready reconnect pattern with session persistence and replay, see [Resumable WebSockets with Edge Functions](/docs/guides/functions/examples/resumable-websockets).
+For a production-ready reconnect pattern with session persistence and replay, see
+[Resumable WebSockets with Edge Functions](/docs/guides/functions/examples/resumable-websockets).
 
 ---
 
@@ -36,7 +38,10 @@ export default {
     const upgrade = req.headers.get('upgrade') || ''
 
     if (upgrade.toLowerCase() != 'websocket') {
-      return Response.json({ error: "request isn't trying to upgrade to WebSocket." }, { status: 400 })
+      return Response.json(
+        { error: "request isn't trying to upgrade to WebSocket." },
+        { status: 400 }
+      )
     }
 
     const { socket, response } = Deno.upgradeWebSocket(req)
@@ -105,7 +110,9 @@ server.listen(8080)
 
 You can also establish an outbound WebSocket connection to another server from an Edge Function.
 
-Combining it with incoming WebSocket servers, it's possible to use Edge Functions as a WebSocket proxy, for example as a [relay server](https://github.com/supabase-community/openai-realtime-console?tab=readme-ov-file#using-supabase-edge-functions-as-a-relay-server) for the [OpenAI Realtime API](https://platform.openai.com/docs/guides/realtime/overview).
+Combining it with incoming WebSocket servers, it's possible to use Edge Functions as a
+WebSocket proxy, for example as a [relay server](https://github.com/supabase-community/openai-realtime-console?tab=readme-ov-file#using-supabase-edge-functions-as-a-relay-server)
+for the [OpenAI Realtime API](https://platform.openai.com/docs/guides/realtime/overview).
 
 <$CodeSample
 external={true}
@@ -121,11 +128,17 @@ lines={[[1, 3], [5, -1]]}
 
 ## Authentication
 
-WebSocket browser clients don't have the option to send custom headers. Because of this, Edge Functions won't be able to perform the usual authorization header check to verify the JWT.
+WebSocket browser clients don't have the option to send custom headers. Because of this,
+Edge Functions won't be able to perform the usual authorization header check to verify
+the JWT.
 
-You can skip the default authorization header checks by explicitly providing `--no-verify-jwt` when serving and deploying functions.
+You can skip the default authorization header checks by explicitly providing
+`--no-verify-jwt` when serving and deploying functions.
 
-To authenticate the user making WebSocket requests, you can pass the JWT in URL query params or via a custom protocol. The [`withSupabase`](/docs/guides/functions/auth) wrapper validates credentials on request headers, so it can't authenticate WebSocket clients. Verify the JWT yourself, as shown below.
+To authenticate the user making WebSocket requests, you can pass the JWT in URL query
+params or via a custom protocol. The [`withSupabase`](/docs/guides/functions/auth)
+wrapper validates credentials on request headers, so it can't authenticate WebSocket
+clients. Verify the JWT yourself, as shown below.
 
 <Tabs
   scrollable
@@ -150,7 +163,10 @@ export default {
   fetch: async (req) => {
     const upgrade = req.headers.get('upgrade') || ''
     if (upgrade.toLowerCase() != 'websocket') {
-      return Response.json({ error: "request isn't trying to upgrade to WebSocket." }, { status: 400 })
+      return Response.json(
+        { error: "request isn't trying to upgrade to WebSocket." },
+        { status: 400 }
+      )
     }
 
     // Please be aware query params may be logged in some logging systems.
@@ -207,7 +223,10 @@ export default {
   fetch: async (req) => {
     const upgrade = req.headers.get('upgrade') || ''
     if (upgrade.toLowerCase() != 'websocket') {
-      return Response.json({ error: "request isn't trying to upgrade to WebSocket." }, { status: 400 })
+      return Response.json(
+        { error: "request isn't trying to upgrade to WebSocket." },
+        { status: 400 }
+      )
     }
 
     // Sec-WebScoket-Protocol may return multiple protocol values `jwt-TOKEN, value1, value 2`
@@ -254,17 +273,24 @@ export default {
 
 <Admonition type="caution">
 
-The maximum duration is capped based on the wall-clock, CPU, and memory limits. The Function will shutdown when it reaches one of these [limits](/docs/guides/functions/limits).
+The maximum duration is capped based on the wall-clock, CPU, and memory limits. The
+Function will shutdown when it reaches one of these
+[limits](/docs/guides/functions/limits).
 
 </Admonition>
 
-When using WebSockets, keep in mind that the HTTP request is considered complete after `Deno.upgradeWebSocket(req)` returns the response. To prevent early worker retirement while the socket is still open, keep an unresolved `EdgeRuntime.waitUntil()` promise that resolves in `socket.onclose`.
+When using WebSockets, keep in mind that the HTTP request is considered complete after
+`Deno.upgradeWebSocket(req)` returns the response. To prevent early worker retirement
+while the socket is still open, keep an unresolved `EdgeRuntime.waitUntil()` promise
+that resolves in `socket.onclose`.
 
 ---
 
 ## Testing WebSockets locally
 
-When testing Edge Functions locally with Supabase CLI, the instances are terminated automatically after a request is completed. This will prevent keeping WebSocket connections open.
+When testing Edge Functions locally with Supabase CLI, the instances are terminated
+automatically after a request is completed. This will prevent keeping WebSocket
+connections open.
 
 To prevent that, you can update the `supabase/config.toml` with the following settings:
 
@@ -275,6 +301,7 @@ policy = "per_worker"
 
 <Admonition type="caution">
 
-When running with `per_worker` policy, Function won't auto-reload on edits. You will need to manually restart it by running `supabase functions serve`.
+When running with `per_worker` policy, Function won't auto-reload on edits. You will
+need to manually restart it by running `supabase functions serve`.
 
 </Admonition>
