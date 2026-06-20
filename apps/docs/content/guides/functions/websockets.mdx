@@ -36,7 +36,7 @@ export default {
     const upgrade = req.headers.get('upgrade') || ''
 
     if (upgrade.toLowerCase() != 'websocket') {
-      return new Response("request isn't trying to upgrade to WebSocket.", { status: 400 })
+      return Response.json({ error: "request isn't trying to upgrade to WebSocket." }, { status: 400 })
     }
 
     const { socket, response } = Deno.upgradeWebSocket(req)
@@ -61,7 +61,7 @@ export default {
 
 ```ts
 import { createServer } from 'node:http'
-import { WebSocketServer } from 'npm:ws'
+import { WebSocketServer } from 'npm:ws@^8'
 
 const server = createServer()
 // Since we manually created the HTTP server,
@@ -137,7 +137,7 @@ To authenticate the user making WebSocket requests, you can pass the JWT in URL 
 <TabPanel id="query" label="Using query params">
 
 ```ts
-import { createClient } from 'npm:@supabase/supabase-js@2'
+import { createClient } from 'npm:@supabase/supabase-js@^2'
 
 const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
 const supabase = createClient(
@@ -150,7 +150,7 @@ export default {
   fetch: async (req) => {
     const upgrade = req.headers.get('upgrade') || ''
     if (upgrade.toLowerCase() != 'websocket') {
-      return new Response("request isn't trying to upgrade to WebSocket.", { status: 400 })
+      return Response.json({ error: "request isn't trying to upgrade to WebSocket." }, { status: 400 })
     }
 
     // Please be aware query params may be logged in some logging systems.
@@ -159,19 +159,19 @@ export default {
 
     if (!jwt) {
       console.error('Auth token not provided')
-      return new Response('Auth token not provided', { status: 403 })
+      return Response.json({ error: 'Auth token not provided' }, { status: 403 })
     }
 
     const { error, data } = await supabase.auth.getUser(jwt)
 
     if (error) {
       console.error(error)
-      return new Response('Invalid token provided', { status: 403 })
+      return Response.json({ error: 'Invalid token provided' }, { status: 403 })
     }
 
     if (!data.user) {
       console.error('user is not authenticated')
-      return new Response('User is not authenticated', { status: 403 })
+      return Response.json({ error: 'User is not authenticated' }, { status: 403 })
     }
 
     const { socket, response } = Deno.upgradeWebSocket(req)
@@ -194,7 +194,7 @@ export default {
 <TabPanel id="protocol" label="Using custom protocol">
 
 ```ts
-import { createClient } from 'npm:@supabase/supabase-js@2'
+import { createClient } from 'npm:@supabase/supabase-js@^2'
 
 const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
 const supabase = createClient(
@@ -207,7 +207,7 @@ export default {
   fetch: async (req) => {
     const upgrade = req.headers.get('upgrade') || ''
     if (upgrade.toLowerCase() != 'websocket') {
-      return new Response("request isn't trying to upgrade to WebSocket.", { status: 400 })
+      return Response.json({ error: "request isn't trying to upgrade to WebSocket." }, { status: 400 })
     }
 
     // Sec-WebScoket-Protocol may return multiple protocol values `jwt-TOKEN, value1, value 2`
@@ -219,18 +219,18 @@ export default {
 
     if (!jwt) {
       console.error('Auth token not provided')
-      return new Response('Auth token not provided', { status: 403 })
+      return Response.json({ error: 'Auth token not provided' }, { status: 403 })
     }
 
     const { error, data } = await supabase.auth.getUser(jwt)
     if (error) {
       console.error(error)
-      return new Response('Invalid token provided', { status: 403 })
+      return Response.json({ error: 'Invalid token provided' }, { status: 403 })
     }
 
     if (!data.user) {
       console.error('user is not authenticated')
-      return new Response('User is not authenticated', { status: 403 })
+      return Response.json({ error: 'User is not authenticated' }, { status: 403 })
     }
 
     const { socket, response } = Deno.upgradeWebSocket(req)
