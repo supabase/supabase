@@ -13,6 +13,14 @@ export function buildEdgeFunctionTestHeaders({
   testAuthorization,
   customHeaders,
 }: BuildEdgeFunctionTestHeadersArgs) {
+  const normalizedCustomHeaders = Object.entries(customHeaders).reduce(
+    (headers, [key, value]) => {
+      headers[key.toLowerCase() === 'x-test-authorization' ? 'x-test-authorization' : key] = value
+      return headers
+    },
+    {} as Record<string, string>
+  )
+
   const generatedHeaders: Record<string, string> = {
     'Content-Type': 'application/json',
   }
@@ -21,7 +29,7 @@ export function buildEdgeFunctionTestHeaders({
     generatedHeaders.apikey = publishableKey.api_key
   }
 
-  const hasCustomAuthorization = Object.keys(customHeaders).some(
+  const hasCustomAuthorization = Object.keys(normalizedCustomHeaders).some(
     (key) => key.toLowerCase() === 'authorization' || key.toLowerCase() === 'x-test-authorization'
   )
 
@@ -35,6 +43,6 @@ export function buildEdgeFunctionTestHeaders({
 
   return {
     ...generatedHeaders,
-    ...customHeaders,
+    ...normalizedCustomHeaders,
   }
 }

@@ -90,6 +90,23 @@ describe('EdgeFunctionTesterSheet.utils: buildEdgeFunctionTestHeaders', () => {
     expect(headers['x-test-authorization']).toBeUndefined()
   })
 
+  it('normalizes manually entered x-test-authorization casing before sending to the API route', () => {
+    const headers = buildEdgeFunctionTestHeaders({
+      publishableKey,
+      serviceKey,
+      testAuthorization: 'Bearer impersonated-role-token',
+      customHeaders: {
+        'X-Test-Authorization': 'Bearer manual-token',
+      },
+    })
+
+    expect(headers).toMatchObject({
+      apikey: 'sb_publishable_project_key',
+      'x-test-authorization': 'Bearer manual-token',
+    })
+    expect(headers['X-Test-Authorization']).toBeUndefined()
+  })
+
   it('keeps the legacy service role fallback when a publishable key is unavailable', () => {
     const headers = buildEdgeFunctionTestHeaders({
       publishableKey: undefined,
