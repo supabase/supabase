@@ -162,6 +162,8 @@ Listing components and markdown export handlers are registered automatically fro
 
 Markdown export uses the same data modules via handlers in [`internals/markdown-schema/Listings.ts`](internals/markdown-schema/Listings.ts), so web and `.md` alternate output stay in sync.
 
+For batch audits and follow-on conversions, use the `audit-content-listings` agent skill (`.cursor/skills/audit-content-listings/SKILL.md`) and keep [`conversion-manifest.yaml`](components/listings/conversion-manifest.yaml) up to date.
+
 ## Reference structure
 
 Reference docs are produced from the reference specs and library source code. A common spec file contains shared function and endpoint definitions, and library-specific spec files contain further details.
