@@ -142,6 +142,18 @@ Listing components and markdown export handlers are registered automatically fro
 
 **Editing existing links:** change the relevant `.data.ts` file only.
 
+**Using an AI assistant:** copy this prompt when adding a new listing block:
+
+```text
+Add a content listing block for [TOPIC] / [SECTION] (for example, Storage / Examples).
+Follow CONTRIBUTING § Overview pages and content listings in apps/docs.
+- Add data to apps/docs/components/listings/[topic].data.ts
+- Register in apps/docs/components/listings/listings-markdown-registry.ts
+- Place inline in the guide MDX unless the block is reused (then use a partial)
+- Copy structure from storageGetStarted / StorageGetStartedListings
+- Run pnpm test content-listings from apps/docs
+```
+
 **VS Code / Cursor snippets:** type these prefixes in the docs workspace (see [`.vscode/content-listing.code-snippets`](../../.vscode/content-listing.code-snippets)):
 
 | Prefix | Inserts |
@@ -150,19 +162,15 @@ Listing components and markdown export handlers are registered automatically fro
 | `cl-registry` | Registry entry and import |
 | `cl-inline` | Inline component in guide MDX |
 
-**Using an AI assistant:** copy this prompt when adding a new listing block:
+**Batch audit skill (follow-on conversions):** for auditing and converting remaining overview pages, use the `audit-content-listings` agent skill ([`.claude/skills/audit-content-listings/SKILL.md`](../../.claude/skills/audit-content-listings/SKILL.md)) and keep [`conversion-manifest.yaml`](components/listings/conversion-manifest.yaml) up to date.
 
-> Add a content listing block for [TOPIC] / [SECTION] (for example, Storage / Examples).
-> Follow CONTRIBUTING § Overview pages and content listings in apps/docs.
-> - Add data to apps/docs/components/listings/[topic].data.ts
-> - Register in apps/docs/components/listings/listings-markdown-registry.ts
-> - Place inline in the guide MDX unless the block is reused (then use a partial)
-> - Copy structure from storageGetStarted / StorageGetStartedListings
-> - Run `pnpm test content-listings` from apps/docs
+Validate manifest drift from repo root:
+
+```bash
+node .claude/skills/audit-content-listings/scripts/validate-conversion-manifest.mjs
+```
 
 Markdown export uses the same data modules via handlers in [`internals/markdown-schema/Listings.ts`](internals/markdown-schema/Listings.ts), so web and `.md` alternate output stay in sync.
-
-For batch audits and follow-on conversions, use the `audit-content-listings` agent skill (`.cursor/skills/audit-content-listings/SKILL.md`) and keep [`conversion-manifest.yaml`](components/listings/conversion-manifest.yaml) up to date.
 
 ## Reference structure
 

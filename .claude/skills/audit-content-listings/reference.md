@@ -162,12 +162,13 @@ Cards use JSX titles with `<Badge variant="success">Official</Badge>`. Content l
 
 From CONTRIBUTING — use when adding one block:
 
-> Add a content listing block for [TOPIC] / [SECTION].
-> Follow CONTRIBUTING § Overview pages and content listings in apps/docs.
->
-> - Add data to apps/docs/components/listings/[topic].data.ts
-> - Register in listings-markdown-registry.ts
-> - Place inline in guide MDX
-> - Copy structure from storageGetStarted / StorageGetStartedListings
-> - Run `pnpm vitest content-listings --run` from apps/docs
-> - Update conversion-manifest.yaml
+```text
+Add a content listing block for [TOPIC] / [SECTION] (for example, Storage / Examples).
+Follow CONTRIBUTING § Overview pages and content listings in apps/docs.
+- Add data to apps/docs/components/listings/[topic].data.ts
+- Register in apps/docs/components/listings/listings-markdown-registry.ts
+- Place inline in the guide MDX unless the block is reused (then use a partial)
+- Copy structure from storageGetStarted / StorageGetStartedListings
+- Run pnpm test content-listings from apps/docs
+- Update conversion-manifest.yaml
+```

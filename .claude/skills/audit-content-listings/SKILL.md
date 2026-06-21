@@ -95,7 +95,7 @@ Required for any file matching the last command (currently `getting-started.mdx`
 Validate manifest drift:
 
 ```bash
-node .cursor/skills/audit-content-listings/scripts/validate-conversion-manifest.mjs
+node .claude/skills/audit-content-listings/scripts/validate-conversion-manifest.mjs
 ```
 
 ## Phase 2 — Convert (per section)
@@ -123,7 +123,7 @@ Naming conventions and edge cases: [reference.md](reference.md).
 | Schema + hrefs  | `cd apps/docs && pnpm vitest content-listings --run`                                  |
 | Markdown export | `cd apps/docs && pnpm build:guides-markdown` — spot-check `.md` output                |
 | MDX lint        | `pnpm lint:mdx` on changed paths                                                      |
-| Manifest        | `node .cursor/skills/audit-content-listings/scripts/validate-conversion-manifest.mjs` |
+| Manifest        | `node .claude/skills/audit-content-listings/scripts/validate-conversion-manifest.mjs` |
 | Visual          | Before/after screenshots under `.github/pr-screenshots/`                              |
 
 **Manifest reconciliation:**

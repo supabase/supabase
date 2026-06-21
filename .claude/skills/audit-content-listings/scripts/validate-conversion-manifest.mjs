@@ -2,7 +2,7 @@
 /**
  * Validates conversion-manifest.yaml against listings registry and MDX usage.
  * Run from repo root:
- *   node .cursor/skills/audit-content-listings/scripts/validate-conversion-manifest.mjs
+ *   node .claude/skills/audit-content-listings/scripts/validate-conversion-manifest.mjs
  */
 
 import fs from 'node:fs'

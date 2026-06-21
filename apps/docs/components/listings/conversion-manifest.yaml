@@ -1,6 +1,6 @@
 # Content listings conversion progress.
 # Update on each audit/conversion batch. Validate with:
-#   node .cursor/skills/audit-content-listings/scripts/validate-conversion-manifest.mjs
+#   node .claude/skills/audit-content-listings/scripts/validate-conversion-manifest.mjs
 
 version: 1
 last_audit: 2026-06-21
