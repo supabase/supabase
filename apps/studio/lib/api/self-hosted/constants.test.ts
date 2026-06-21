@@ -103,6 +103,21 @@ describe('api/self-hosted/constants', () => {
     })
   })
 
+  describe('DEFAULT_EXPOSED_SCHEMAS', () => {
+    it('should use PGRST_DB_SCHEMAS when set', async () => {
+      vi.stubEnv('PGRST_DB_SCHEMAS', 'public,storage,custom')
+      const { DEFAULT_EXPOSED_SCHEMAS } = await import('./constants')
+      expect(DEFAULT_EXPOSED_SCHEMAS).toBe('public,storage,custom')
+    })
+
+    it('should default to public, storage, and graphql_public', async () => {
+      vi.unstubAllEnvs()
+      vi.resetModules()
+      const { DEFAULT_EXPOSED_SCHEMAS } = await import('./constants')
+      expect(DEFAULT_EXPOSED_SCHEMAS).toBe('public,storage,graphql_public')
+    })
+  })
+
   describe('AUTH_JWT_SECRET', () => {
     it('should use AUTH_JWT_SECRET when set', async () => {
       vi.stubEnv('AUTH_JWT_SECRET', 'custom-jwt-secret-32-chars-long-xyz')
