@@ -4,8 +4,9 @@
 #   Dev mode:           docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up -d
 #   Reset everything:   sh reset.sh
 #
-# TODO:
-#   - Podman does not support nested variable interpolation (${A:-${B}})
+# Notes:
+#   - Nested variable interpolation (${A:-${B}}) requires podman-compose >= 1.6.0.
+#     Earlier versions (still shipped by some distros) do not support it.
 #
 
 name: supabase
