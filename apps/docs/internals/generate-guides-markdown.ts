@@ -16,6 +16,7 @@ import { ComputeDiskLimitsTable } from './markdown-schema/ComputeDiskLimitsTable
 import { addBaseUrlPrefix } from './internal-links'
 import { Link } from './markdown-schema/Link'
 import { MetricsStackCards } from './markdown-schema/MetricsStackCards'
+import { NavData } from './markdown-schema/NavData'
 import { Panel } from './markdown-schema/Panel'
 import { Price } from './markdown-schema/Price'
 import { RealtimeLimitsEstimator } from './markdown-schema/RealtimeLimitsEstimator'
@@ -147,6 +148,7 @@ const SCHEMA: ComponentSchema = {
   ...StepHike,
   TabPanel,
   MetricsStackCards,
+  NavData,
   SharedData,
 }
 
