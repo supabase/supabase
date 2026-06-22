@@ -22,8 +22,8 @@ const DEFAULT_ACTIONS = {
 }
 
 interface CodeEditorProps {
-  id: string
-  language: 'pgsql' | 'json' | 'html' | 'typescript' | undefined
+  id?: string
+  language: 'pgsql' | 'json' | 'html' | 'typescript' | 'plaintext' | undefined
   autofocus?: boolean
   defaultValue?: string
   isReadOnly?: boolean
@@ -125,29 +125,6 @@ export const CodeEditor = ({
     hasValue.current = editor.createContextKey('hasValue', false)
     hasValue.current.set(value !== undefined && value.trim().length > 0)
     setShowPlaceholder(showPlaceholderDefault)
-
-    // Blur the editor on Escape so users can hop out to the rest of the UI.
-    // The precondition defers to Monaco's own Escape consumers (suggest widget,
-    // find widget, parameter hints, snippet/rename mode, inline suggestions) and
-    // to selection/multi-cursor cancellation, so inline features keep working.
-    editor.addCommand(
-      monaco.KeyCode.Escape,
-      () => {
-        ;(document.activeElement as HTMLElement | null)?.blur()
-      },
-      [
-        'editorTextFocus',
-        '!editorHasSelection',
-        '!editorHasMultipleSelections',
-        '!suggestWidgetVisible',
-        '!findWidgetVisible',
-        '!parameterHintsVisible',
-        '!renameInputVisible',
-        '!inSnippetMode',
-        '!accessibilityHelpWidgetVisible',
-        '!inlineSuggestionVisible',
-      ].join(' && ')
-    )
 
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK, () => {
       if (commandMenuHotkeyEnabledRef.current) {
