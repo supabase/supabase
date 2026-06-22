@@ -1,4 +1,10 @@
-import { FeatureFlagContext, IS_PLATFORM, useFlag } from 'common'
+import {
+  FeatureFlagContext,
+  FeatureFlagContextType,
+  IS_PLATFORM,
+  useFeatureFlags,
+  useFlag,
+} from 'common'
 import { fullImageUrl } from 'common/marketplace-client'
 import { Boxes } from 'lucide-react'
 import dynamic from 'next/dynamic'
@@ -38,16 +44,15 @@ function isForeignDataWrapper(integration: MarketplaceIntegration) {
   return integration.categories.some((c) => c?.slug === 'foreign-data-wrapper')
 }
 
-function parsePreviewListingsFlag(flagVal: string | false): (slug: string) => boolean {
-  if (flagVal === false) {
-    return (_slug) => false
-  }
-  const slugs = flagVal.split(',').map((s) => s.trim())
-  if (slugs.includes('*')) {
-    return (_slug) => true
-  } else {
-    return (slug) => slugs.includes(slug)
-  }
+/**
+ * We use per-listing feature flags with a templated naming convention in order to independently
+ * enable previews for users where the global `previewMarketplaceListingsEnabled` flag is not set.
+ * This will let us make previews available to partner users and beta testers and then independently
+ * roll each one out to a wider audience.
+ */
+const isPreviewEnabled = (featureFlags: FeatureFlagContextType, listingSlug: string) => {
+  const flagName = `${listingSlug}DashboardIntegrationEnabled`
+  return (featureFlags.configcat[flagName] ?? false) as boolean
 }
 
 /**
@@ -72,20 +77,20 @@ export const useAvailableIntegrations = () => {
     !IS_PLATFORM || (hasLoaded && (!isMarketplaceEnabled || (!!marketplaceData && !error)))
   const isError = IS_PLATFORM && isMarketplaceEnabled && !!error
 
-  const previewListingsEnabled = useFlag<string>('previewMarketplaceListings')
-  const isPreviewEnabled = useMemo(
-    () => parsePreviewListingsFlag(previewListingsEnabled),
-    [previewListingsEnabled]
-  )
+  // This flag can globally enable preview listings for all partners for a given user (i.e. for Supabase users)
+  const previewAllListingsEnabled = useFlag<boolean>('previewMarketplaceListingsEnabled')
+
+  const featureFlags = useFeatureFlags()
 
   const enabledMarketplaceListings = useMemo(
     () =>
       (marketplaceData ?? []).filter(
         (integration) =>
           integration.review_status === 'approved' ||
-          (integration.review_status === 'preview' && isPreviewEnabled(integration.slug))
+          (integration.review_status === 'preview' &&
+            (previewAllListingsEnabled || isPreviewEnabled(featureFlags, integration.slug)))
       ),
-    [marketplaceData, isPreviewEnabled]
+    [marketplaceData, previewAllListingsEnabled, featureFlags]
   )
 
   // [Joshen] Format marketplace integrations into existing ones for now
