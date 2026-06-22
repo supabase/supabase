@@ -11,6 +11,7 @@ import { toMarkdown } from 'mdast-util-to-markdown'
 import { gfm } from 'micromark-extension-gfm'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import { Admonition } from './markdown-schema/Admonition'
+import { AuthProviders } from './markdown-schema/AuthProviders'
 import { ComputeDiskLimitsTable } from './markdown-schema/ComputeDiskLimitsTable'
 import { addBaseUrlPrefix } from './internal-links'
 import { Link } from './markdown-schema/Link'
@@ -132,6 +133,7 @@ function applySchema(parent: Parent, schema: ComponentSchema): void {
  */
 const SCHEMA: ComponentSchema = {
   Admonition,
+  AuthProviders,
   ComputeDiskLimitsTable,
   Link,
   Price,
