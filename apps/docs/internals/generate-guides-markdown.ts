@@ -10,14 +10,17 @@ import type { MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { gfm } from 'micromark-extension-gfm'
 import { mdxjs } from 'micromark-extension-mdxjs'
-
-import { getInternalLinkBaseUrl, prefixInternalLinks } from './internal-links'
 import { Admonition } from './markdown-schema/Admonition'
+import { AuthProviders } from './markdown-schema/AuthProviders'
 import { ComputeDiskLimitsTable } from './markdown-schema/ComputeDiskLimitsTable'
+import { addBaseUrlPrefix } from './internal-links'
 import { Link } from './markdown-schema/Link'
 import { MetricsStackCards } from './markdown-schema/MetricsStackCards'
+import { NavData } from './markdown-schema/NavData'
 import { Panel } from './markdown-schema/Panel'
 import { Price } from './markdown-schema/Price'
+import { RealtimeLimitsEstimator } from './markdown-schema/RealtimeLimitsEstimator'
+import { RegionsList, SmartRegionsList } from './markdown-schema/RegionsList'
 import { SharedData } from './markdown-schema/SharedData'
 import { StepHike } from './markdown-schema/StepHike'
 import { TabPanel } from './markdown-schema/TabPanel'
@@ -133,25 +136,31 @@ function applySchema(parent: Parent, schema: ComponentSchema): void {
  */
 const SCHEMA: ComponentSchema = {
   Admonition,
+  AuthProviders,
   ComputeDiskLimitsTable,
   Link,
   Price,
   GlassPanel: Panel,
   IconPanel: Panel,
+  RealtimeLimitsEstimator,
+  RegionsList,
+  SmartRegionsList,
   ...StepHike,
   TabPanel,
   MetricsStackCards,
+  NavData,
   SharedData,
 }
 
-async function generateOne(filePath: string, linkBaseUrl: string): Promise<string> {
+async function generateOne(filePath: string): Promise<string> {
   const raw = await fs.readFile(filePath, 'utf8')
   const { content, data } = matter(raw)
 
   const tree = parseMdx(content)
   await inlinePartials(tree)
+  addBaseUrlPrefix(tree)
   applySchema(tree, SCHEMA)
-  const body = prefixInternalLinks(serializeMdx(tree), linkBaseUrl)
+  const body = serializeMdx(tree)
 
   const headerParts: string[] = []
   if (data.title) headerParts.push(`# ${data.title}`)
@@ -167,7 +176,6 @@ async function generateOne(filePath: string, linkBaseUrl: string): Promise<strin
 
 async function generate() {
   const files = await globby(['content/guides/**/!(_)*.mdx'])
-  const linkBaseUrl = getInternalLinkBaseUrl()
   let warnings = 0
 
   await Promise.all(
@@ -181,7 +189,7 @@ async function generate() {
 
       let output: string
       try {
-        output = await generateOne(filePath, linkBaseUrl)
+        output = await generateOne(filePath)
       } catch (err) {
         warnings++
         console.warn(
