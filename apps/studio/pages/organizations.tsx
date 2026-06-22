@@ -27,8 +27,8 @@ const OrganizationsPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { appTitle } = useCustomContent(['app:title'])
   const [search, setSearch] = useState('')
-  const { error: orgNotFoundError, org: orgSlug } = useParams()
-  const orgNotFound = orgNotFoundError === 'org_not_found'
+  const { orgNotFound: orgNotFoundSlug } = useParams()
+  const orgNotFound = orgNotFoundSlug !== undefined
   const pageTitle = buildStudioPageTitle({
     section: 'Organizations',
     brand: appTitle || 'Supabase',
@@ -72,9 +72,9 @@ const OrganizationsPage: NextPageWithLayout = () => {
               title="Organization not found"
               description={
                 <>
-                  The organization <code className="text-code-inline">{orgSlug}</code> does not
-                  exist or you do not have permission to access to it. Contact the the owner if you
-                  believe this is a mistake.
+                  The organization <code className="text-code-inline">{orgNotFoundSlug}</code> does
+                  not exist or you do not have permission to access to it. Contact the the owner if
+                  you believe this is a mistake.
                 </>
               }
             />

@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 import { toast } from 'sonner'
 
+import { buildOrgNotFoundRedirectUrl } from './RouteValidationWrapper.utils'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
@@ -68,7 +69,7 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
 
       if (!isValidOrg) {
         toast.error('You do not have access to this organization')
-        router.push(`${DEFAULT_HOME}?error=org_not_found&org=${slug}`)
+        router.push(buildOrgNotFoundRedirectUrl(DEFAULT_HOME, slug))
         return
       }
     }
