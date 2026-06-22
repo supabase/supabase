@@ -160,6 +160,10 @@ const getWarningTitle = (warning: ProjectUpgradeEligibilityWarning): string => {
   switch (warning.type) {
     case 'pg_graphql_introspection_change':
       return 'GraphQL introspection will be disabled by default after upgrade'
+    case 'ltree_reindex_required':
+      return 'ltree indexes must be reindexed after this upgrade'
+    case 'operator_estimator_gate':
+      return 'Custom operators may need attention after this upgrade'
   }
 }
 
@@ -167,6 +171,10 @@ const getWarningDescription = (warning: ProjectUpgradeEligibilityWarning): strin
   switch (warning.type) {
     case 'pg_graphql_introspection_change':
       return 'After upgrading, queries to `__schema` and `__type` will return an error unless introspection is explicitly re-enabled on the schema. Regular data queries are not affected.'
+    case 'ltree_reindex_required':
+      return 'After upgrading, ltree indexes on this database can return incomplete results until they are rebuilt. Run `REINDEX INDEX CONCURRENTLY` on the affected indexes — this runs online with no downtime.'
+    case 'operator_estimator_gate':
+      return 'After upgrading, recreating an operator that references a non-built-in selectivity estimator (for example during a restore or branch) requires superuser and may fail. Most projects are not affected.'
   }
 }
 
@@ -174,6 +182,10 @@ const getWarningLink = (warning: ProjectUpgradeEligibilityWarning): string => {
   switch (warning.type) {
     case 'pg_graphql_introspection_change':
       return `${DOCS_URL}/guides/platform/upgrading#upgrading-to-pg_graphql-160`
+    case 'ltree_reindex_required':
+      return `${DOCS_URL}/guides/platform/upgrading#ltree-indexes-require-reindexing-after-upgrade`
+    case 'operator_estimator_gate':
+      return `${DOCS_URL}/guides/platform/upgrading#custom-operator-selectivity-estimators`
   }
 }
 
