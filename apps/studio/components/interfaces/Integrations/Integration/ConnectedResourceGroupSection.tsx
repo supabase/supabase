@@ -45,7 +45,7 @@ export const ResourceGroupSection = ({
       {group.missing ? (
         group.manageAction && (
           <div className="max-w-2xl">
-            <Button asChild type="default" icon={<Settings />}>
+            <Button asChild variant="default" icon={<Settings />}>
               <a href={group.manageAction.href}>{group.manageAction.label}</a>
             </Button>
           </div>
@@ -68,12 +68,12 @@ export const ResourceGroupSection = ({
               </div>
               <div className="flex shrink-0 items-center gap-x-2">
                 {group.manageAction && (
-                  <Button asChild type="default" icon={<Settings />}>
+                  <Button asChild variant="default" icon={<Settings />}>
                     <a href={group.manageAction.href}>{group.manageAction.label}</a>
                   </Button>
                 )}
                 <Button
-                  type="default"
+                  variant="default"
                   icon={<Trash2 className="text-foreground-light" />}
                   onClick={() => onRemove(item.resource)}
                 >
