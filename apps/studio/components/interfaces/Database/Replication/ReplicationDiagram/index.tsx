@@ -12,6 +12,7 @@ import { timeout } from '@/lib/helpers'
 import '@xyflow/react/dist/style.css'
 
 import { SmoothstepEdge } from './Edges'
+import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 
 export const ReplicationDiagram = () => {
   return (
@@ -42,10 +43,17 @@ const ReplicationDiagramContent = () => {
     [databases, projectRef]
   )
 
-  const { data, isSuccess: isSuccessDestinations } = useReplicationDestinationsQuery({
+  const {
+    data,
+    error: destinationsError,
+    isSuccess: isSuccessDestinations,
+    isError: isErrorDestinations,
+  } = useReplicationDestinationsQuery({
     projectRef,
   })
   const destinations = useMemo(() => data?.destinations ?? [], [data])
+  const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
+  const skipRenderingDestinations = isErrorDestinations && isLocalETLNotSetUp
 
   const nodes = useMemo(() => {
     return [
@@ -103,10 +111,14 @@ const ReplicationDiagramContent = () => {
   }
 
   useEffect(() => {
-    if (nodes.length > 0 && isSuccessDestinations && isSuccessReplicas) {
+    if (
+      nodes.length > 0 &&
+      (isSuccessDestinations || skipRenderingDestinations) &&
+      isSuccessReplicas
+    ) {
       setReactFlow()
     }
-  }, [nodes, isSuccessDestinations, isSuccessReplicas])
+  }, [nodes, isSuccessDestinations, skipRenderingDestinations, isSuccessReplicas])
 
   return (
     <div className="nowheel relative min-h-[350px]">

@@ -1,5 +1,5 @@
+import { parseSchemaComment } from '@stripe/sync-engine/supabase'
 import { useMemo } from 'react'
-import { parseSchemaComment } from 'stripe-experiment-sync/supabase'
 
 import { type WrapperMeta } from '../Wrappers/Wrappers.types'
 import { wrapperMetaComparator } from '../Wrappers/Wrappers.utils'
