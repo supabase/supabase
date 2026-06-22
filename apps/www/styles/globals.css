@@ -12,6 +12,14 @@
 @source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
 @source './../../../packages/marketing/src/**/*.{tsx,ts,js}';
 
+@theme inline {
+  --font-sans:
+    var(--font-inter), Inter, Helvetica Neue, Helvetica, ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-manrope), Manrope, sans-serif;
+  --font-mono:
+    var(--font-geist-mono), 'Geist Mono', 'Source Code Pro', ui-monospace, Menlo, monospace;
+}
+
 @theme {
   --color-purple-sos-100: hsl(293 80% 97%);
   --color-purple-sos-200: hsl(293 85% 91%);
@@ -111,6 +119,21 @@
   ::file-selector-button {
     border-color: hsl(var(--border-default, currentColor));
   }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .h1,
+  .h2,
+  .h3,
+  .h4,
+  .h5,
+  .h6 {
+    font-family: var(--font-manrope, Manrope, sans-serif);
+  }
 }
 
 @layer utilities {
@@ -126,26 +149,6 @@
   .disable-blur {
     image-rendering: -webkit-optimize-contrast;
   }
-}
-
-@font-face {
-  font-family: 'custom-font';
-  src:
-    url(../../../packages/common/assets/fonts/CustomFont-Book.woff2) format('woff2'),
-    url(../../../packages/common/assets/fonts/CustomFont-Book.woff) format('woff');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'custom-font';
-  src:
-    url(../../../packages/common/assets/fonts/CustomFont-Medium.woff2) format('woff2'),
-    url(../../../packages/common/assets/fonts/CustomFont-Medium.woff) format('woff');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
 }
 
 html {
