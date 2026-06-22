@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ResourceGroupSection } from './ConnectedResourceGroupSection'
 import { type ApiKeyResource, type ResourceGroup } from './MarketplaceIntegrationSettingsTab.types'
@@ -120,8 +119,8 @@ export const MarketplaceIntegrationSettingsTab = () => {
     try {
       await removeResource(apiKeyToDelete)
       setApiKeyToDelete(undefined)
-    } catch {
-      // Error toast is handled by the mutation's default onError.
+    } catch (err) {
+      toast.error(`Failed to delete API key: ${err instanceof Error ? err.message : 'Unknown error'}`)
     }
   }
 
