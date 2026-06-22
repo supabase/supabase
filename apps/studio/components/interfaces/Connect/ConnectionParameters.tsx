@@ -1,13 +1,12 @@
 import { Check, ChevronRight, Copy } from 'lucide-react'
 import { useState } from 'react'
-
-import { copyToClipboard } from 'lib/helpers'
 import {
   Button,
   cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+  copyToClipboard,
   Separator,
 } from 'ui'
 
@@ -25,15 +24,15 @@ export const ConnectionParameters = ({ parameters }: ConnectionParametersProps) 
   const [copiedMap, setCopiedMap] = useState<Record<string, boolean>>({})
 
   return (
-    <Collapsible_Shadcn_ open={isOpen} onOpenChange={setIsOpen} className="group -space-y-px">
-      <CollapsibleTrigger_Shadcn_
+    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="group -space-y-px">
+      <CollapsibleTrigger
         asChild
-        className="w-full justify-start rounded-t-none !last:rounded-b group-data-[state=open]:rounded-b-none border-light px-3"
+        className="w-full justify-start rounded-t-none !last:rounded-b group-data-open:rounded-b-none px-3"
       >
         <Button
-          type="default"
+          variant="default"
           size="tiny"
-          className="text-foreground-lighter !bg-dash-sidebar"
+          className="text-foreground-lighter bg-dash-sidebar!"
           icon={
             <ChevronRight
               className={cn(
@@ -45,8 +44,8 @@ export const ConnectionParameters = ({ parameters }: ConnectionParametersProps) 
         >
           View parameters
         </Button>
-      </CollapsibleTrigger_Shadcn_>
-      <CollapsibleContent_Shadcn_ className="bg-dash-sidebar rounded-b border font-mono text-sm">
+      </CollapsibleTrigger>
+      <CollapsibleContent className="bg-dash-sidebar rounded-b border font-mono text-sm">
         <div className="px-4 py-2">
           {parameters.map((param) => (
             <div key={param.key} className="py-0.5 group/param">
@@ -65,7 +64,7 @@ export const ConnectionParameters = ({ parameters }: ConnectionParametersProps) 
                   className={cn(
                     'text-foreground-lighter',
                     'ml-2 opacity-0 group-hover/param:opacity-100',
-                    'hover:text-foreground rounded-sm p-1',
+                    'hover:text-foreground rounded-xs p-1',
                     copiedMap[param.key] && 'opacity-100',
                     'transition-all'
                   )}
@@ -84,7 +83,7 @@ export const ConnectionParameters = ({ parameters }: ConnectionParametersProps) 
         <div className="text-foreground-muted text-xs px-4 py-1 font-sans">
           For security reasons, your database password is never shown.
         </div>
-      </CollapsibleContent_Shadcn_>
-    </Collapsible_Shadcn_>
+      </CollapsibleContent>
+    </Collapsible>
   )
 }

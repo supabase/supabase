@@ -1,27 +1,32 @@
+import { IS_PLATFORM, useParams } from 'common'
+import { AlertTriangleIcon } from 'lucide-react'
 import { NextPage } from 'next'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from 'ui'
+import { ShimmeringLoader } from 'ui-patterns'
 
-import { ProjectList } from 'components/interfaces/Home/ProjectList'
-import { withAuth } from 'hooks/misc/withAuth'
-import { BASE_PATH } from 'lib/constants'
-
-const Header = () => {
-  return (
-    <div className="border-default border-b p-3">
-      <div className="flex items-center space-x-2">
-        <Link href="/projects">
-          <img
-            src={`${BASE_PATH}/img/supabase-logo.svg`}
-            alt="Supabase"
-            className="border-default rounded border p-1 hover:border-white"
-            style={{ height: 24 }}
-          />
-        </Link>
-      </div>
-    </div>
-  )
-}
+import {
+  Header,
+  LoadingCardView,
+  NoOrganizationsState,
+} from '@/components/interfaces/Home/ProjectList/EmptyStates'
+import { ProjectList } from '@/components/interfaces/Home/ProjectList/ProjectList'
+import { HomePageActions } from '@/components/interfaces/HomePageActions'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
+import { withAuth } from '@/hooks/misc/withAuth'
 
 // [Joshen] I'd say we don't do route validation here, this page will act more
 // like a proxy to the project specific pages, and we let those pages handle
@@ -29,7 +34,24 @@ const Header = () => {
 
 const GenericProjectPage: NextPage = () => {
   const router = useRouter()
+  const { slug } = useParams()
   const { routeSlug, ...queryParams } = router.query
+
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
+
+  const {
+    data: organizations = [],
+    isSuccess: isSuccessOrganizations,
+    isPending: isLoadingOrganizations,
+    isError: isErrorOrganizations,
+  } = useOrganizationsQuery({
+    enabled: IS_PLATFORM,
+  })
+
+  const [selectedSlug, setSlug] = useState<string>(
+    slug || lastVisitedOrganization || organizations[0]?.slug
+  )
+  const selectedOrganization = organizations.find((x) => x.slug === selectedSlug)
 
   const query = Object.keys(queryParams).length
     ? `?${new URLSearchParams(queryParams as Record<string, string>)}`
@@ -48,19 +70,65 @@ const GenericProjectPage: NextPage = () => {
     }
   }
 
+  useEffect(() => {
+    if (!!lastVisitedOrganization) {
+      setSlug(lastVisitedOrganization)
+    } else if (isSuccessOrganizations) {
+      setSlug(organizations[0]?.slug)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastVisitedOrganization, isSuccessOrganizations])
+
   return (
-    <>
+    <div className="h-screen flex flex-col">
       <Header />
-      <div className="flex flex-col mx-auto w-full max-w-5xl">
-        <h1 className="mt-8 text-2xl">Select a project to continue</h1>
-        <div
-          className="flex-grow py-6 space-y-8 overflow-y-auto"
-          style={{ maxHeight: 'calc(100vh - 49px - 64px)' }}
-        >
-          <ProjectList rewriteHref={urlRewriterFactory(routeSlug)} search="" />
-        </div>
-      </div>
-    </>
+      <PageLayout className="grow min-h-0" title="Select a project to continue">
+        <ScaffoldContainer className="grow flex flex-col gap-y-4">
+          <ScaffoldSection isFullWidth className="py-0">
+            <div className="flex items-center gap-x-2">
+              {isLoadingOrganizations ? (
+                <ShimmeringLoader className="w-60 py-0 h-[26px]" />
+              ) : (
+                <Select value={selectedSlug} onValueChange={setSlug}>
+                  <SelectTrigger size="tiny" className="w-60 truncate">
+                    <div className="flex items-center gap-x-2">
+                      <p className="text-xs text-foreground-light">Organization:</p>
+                      <SelectValue placeholder="Select an organization" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent className="col-span-8">
+                    {organizations.map((org) => (
+                      <SelectItem key={org.slug} value={org.slug} className="text-xs">
+                        {org.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+              <HomePageActions hideNewProject />
+            </div>
+          </ScaffoldSection>
+          <ScaffoldSection isFullWidth className="py-0">
+            {isLoadingOrganizations ? (
+              <LoadingCardView />
+            ) : isErrorOrganizations ? (
+              <Alert variant="warning">
+                <AlertTriangleIcon />
+                <AlertTitle>Failed to load your Supabase organizations</AlertTitle>
+                <AlertDescription>Try refreshing the page</AlertDescription>
+              </Alert>
+            ) : organizations.length === 0 ? (
+              <NoOrganizationsState />
+            ) : !!selectedOrganization ? (
+              <ProjectList
+                organization={selectedOrganization}
+                rewriteHref={urlRewriterFactory(routeSlug)}
+              />
+            ) : null}
+          </ScaffoldSection>
+        </ScaffoldContainer>
+      </PageLayout>
+    </div>
   )
 }
 

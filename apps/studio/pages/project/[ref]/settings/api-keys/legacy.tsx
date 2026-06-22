@@ -1,0 +1,27 @@
+import { IS_PLATFORM } from 'common'
+
+import ApiKeysLayout from '@/components/layouts/APIKeys/APIKeysLayout'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
+import { DisplayApiSettings } from '@/components/ui/ProjectSettings/DisplayApiSettings'
+import { ToggleLegacyApiKeysPanel } from '@/components/ui/ProjectSettings/ToggleLegacyApiKeys'
+import type { NextPageWithLayout } from '@/types'
+
+const ApiKeysLegacyPage: NextPageWithLayout = () => {
+  return (
+    <>
+      <DisplayApiSettings showTitle={false} showNotice={false} />
+      {IS_PLATFORM && <ToggleLegacyApiKeysPanel />}
+    </>
+  )
+}
+
+ApiKeysLegacyPage.getLayout = (page) => (
+  <DefaultLayout>
+    <SettingsLayout title="API Keys (Legacy)">
+      <ApiKeysLayout>{page}</ApiKeysLayout>
+    </SettingsLayout>
+  </DefaultLayout>
+)
+
+export default ApiKeysLegacyPage

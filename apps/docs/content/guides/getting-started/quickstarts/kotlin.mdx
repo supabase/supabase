@@ -79,7 +79,8 @@ hideToc: true
       Replace the `supabaseUrl` and `supabaseKey` with your own:
 
       <ProjectConfigVariables variable="url" />
-      <ProjectConfigVariables variable="anonKey" />
+      <ProjectConfigVariables variable="publishable" />
+
 
     </StepHikeCompact.Details>
 
@@ -90,12 +91,14 @@ hideToc: true
 
       val supabase = createSupabaseClient(
           supabaseUrl = "https://xyzcompany.supabase.co",
-          supabaseKey = "your_public_anon_key"
+          supabaseKey = "your_publishable_key"
         ) {
           install(Postgrest)
       }
       ...
       ```
+
+      <$Partial path="api_settings_steps.mdx" variables={{ "framework": "androidkotlin", "tab": "mobiles" }} />
 
     </StepHikeCompact.Code>
 

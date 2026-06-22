@@ -12,6 +12,10 @@
     "answer": "Our Pro Plan is charged up front, and billed on a monthly basis. Additional usage costs are also billed at the end of the month."
   },
   {
+    "question": "Does Supabase charge sales tax, VAT or GST?",
+    "answer": "Supabase applies sales tax, VAT, GST, and other indirect taxes where required by law, based on your billing address. For more details, see our [Billing FAQ](/docs/guides/platform/billing-faq#taxes)."
+  },
+  {
     "question": "Are you going to change your pricing in the future?",
     "answer": "Our pricing is in Beta. You can read more about our decisions in our [pricing blog post](/blog/2021/03/29/pricing). Pricing may change in the future, however as a team of developers we are committed to pricing being as developer friendly as possible."
   },

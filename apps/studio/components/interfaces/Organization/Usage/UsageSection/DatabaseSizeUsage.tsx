@@ -1,29 +1,19 @@
-import AlertError from 'components/ui/AlertError'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import type { OrgSubscription } from 'data/subscriptions/types'
-import SectionContent from '../SectionContent'
-import { CategoryAttribute } from '../Usage.constants'
-import { useOrgProjectsQuery } from 'data/projects/org-projects'
-import { PROJECT_STATUS } from 'lib/constants'
-import {
-  Button,
-  Alert_Shadcn_,
-  CriticalIcon,
-  AlertTitle_Shadcn_,
-  AlertDescription_Shadcn_,
-} from 'ui'
-import MotionNumber from '@number-flow/react'
 import Link from 'next/link'
 import { useMemo } from 'react'
+import { Alert, AlertDescription, AlertTitle, Button, CriticalIcon } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { OrgUsageResponse } from 'data/usage/org-usage-query'
-import { PricingMetric } from 'data/analytics/org-daily-stats-query'
-import Panel from 'components/ui/Panel'
-import { formatBytes } from 'lib/helpers'
+
+import { SectionContent } from '../SectionContent'
+import { CategoryAttribute } from '../Usage.constants'
+import Panel from '@/components/ui/Panel'
+import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
+import type { OrgSubscription } from '@/data/subscriptions/types'
+import { OrgUsageResponse } from '@/data/usage/org-usage-query'
+import { formatBytes } from '@/lib/helpers'
 
 export interface DatabaseSizeUsageProps {
   slug: string
-  projectRef?: string
+  projectRef?: string | null
   attribute: CategoryAttribute
   subscription?: OrgSubscription
   usage?: OrgUsageResponse
@@ -51,14 +41,14 @@ const DatabaseSizeUsage = ({
       <SectionContent section={attribute}>
         <div className="space-y-4">
           {currentBillingCycleSelected && hasProjectsExceedingDatabaseSize && (
-            <Alert_Shadcn_ variant="warning">
+            <Alert variant="warning">
               <CriticalIcon />
-              <AlertTitle_Shadcn_>Projects exceeding quota</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+              <AlertTitle>Projects exceeding quota</AlertTitle>
+              <AlertDescription>
                 You have projects that are exceeding 0.5 GB of database size. Reduce the database
                 size or upgrade to a paid plan.
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
+              </AlertDescription>
+            </Alert>
           )}
 
           <div>
@@ -68,22 +58,28 @@ const DatabaseSizeUsage = ({
               </div>
             </div>
 
-            <div className="flex items-center justify-between border-b py-1">
-              <p className="text-xs text-foreground-light">
-                Included in {subscription?.plan?.name} Plan
-              </p>
-              <p className="text-xs">0.5 GB per project</p>
-            </div>
+            {subscription?.plan.id !== 'platform' && (
+              <>
+                <div className="flex items-center justify-between border-b py-1">
+                  <p className="text-xs text-foreground-light">
+                    Included in {subscription?.plan?.name} Plan
+                  </p>
+                  <p className="text-xs">0.5 GB per project</p>
+                </div>
 
-            <div className="flex items-center justify-between">
-              <p className="text-xs text-foreground-light">Max database size</p>
-              <p className="text-xs">
-                {databaseSizeUsage?.usage ? formatBytes(databaseSizeUsage?.usage_original) : '-'}
-              </p>
-            </div>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-foreground-light">Max database size</p>
+                  <p className="text-xs">
+                    {databaseSizeUsage?.usage
+                      ? formatBytes(databaseSizeUsage?.usage_original)
+                      : '-'}
+                  </p>
+                </div>
+              </>
+            )}
           </div>
 
-          {currentBillingCycleSelected ? (
+          {currentBillingCycleSelected && subscription?.plan.id !== 'platform' ? (
             <div className="space-y-4">
               <div className="space-y-1">
                 <p className="text-sm">Current database size per project</p>
@@ -116,9 +112,9 @@ const DatabaseSizeUsage = ({
                       <span className="text-foreground-light flex items-center gap-2">
                         {project.name}
                       </span>
-                      <Button asChild type="default" size={'tiny'}>
+                      <Button asChild variant="default" size={'tiny'}>
                         <Link
-                          href={`/project/${project.ref}/reports/database#database-size-report`}
+                          href={`/project/${project.ref}/observability/database#database-size-report`}
                         >
                           Manage Database Size
                         </Link>
@@ -127,7 +123,7 @@ const DatabaseSizeUsage = ({
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center h-6 gap-3">
                         <span className="text-foreground-light text-sm font-mono flex items-center gap-2">
-                          <span className="text-foreground font-semibold font-mono -mt-[2px]">
+                          <span className="text-foreground font-semibold font-mono mt-[-2px]">
                             {formatBytes(project.usage)}
                           </span>{' '}
                           Database Size

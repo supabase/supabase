@@ -1,20 +1,11 @@
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { RefreshCw, StopCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import AlertError from 'components/ui/AlertError'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useQueryAbortMutation } from 'data/sql/abort-query-mutation'
-import { useOngoingQueriesQuery } from 'data/sql/ongoing-queries-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useUrlState } from 'hooks/ui/useUrlState'
-import { IS_PLATFORM } from 'lib/constants'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { ResponseError } from 'types'
 import {
   Button,
-  CodeBlock,
+  cn,
   Sheet,
   SheetContent,
   SheetDescription,
@@ -24,16 +15,25 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useAppStateSnapshot } from 'state/app-state'
-import { useParams } from 'common'
+
+import AlertError from '@/components/ui/AlertError'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { useQueryAbortMutation } from '@/data/sql/abort-query-mutation'
+import { useOngoingQueriesQuery } from '@/data/sql/ongoing-queries-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useUrlState } from '@/hooks/ui/useUrlState'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useAppStateSnapshot } from '@/state/app-state'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import type { ResponseError } from '@/types'
 
 export const OngoingQueriesPanel = () => {
   const [_, setParams] = useUrlState({ replace: true })
   const { viewOngoingQueries } = useParams()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const state = useDatabaseSelectorStateSnapshot()
   const appState = useAppStateSnapshot()
   const [selectedId, setSelectedId] = useState<number>()
@@ -45,7 +45,7 @@ export const OngoingQueriesPanel = () => {
     data,
     error,
     isError,
-    isLoading: isLoadingOngoingQueries,
+    isPending: isLoadingOngoingQueries,
     isFetching: isFetchingOngoingQueries,
     refetch,
   } = useOngoingQueriesQuery(
@@ -67,7 +67,7 @@ export const OngoingQueriesPanel = () => {
     }
   }, [viewOngoingQueries])
 
-  const { mutate: abortQuery, isLoading } = useQueryAbortMutation({
+  const { mutate: abortQuery, isPending } = useQueryAbortMutation({
     onSuccess: () => {
       toast.success(`Successfully aborted query (ID: ${selectedId})`)
       setSelectedId(undefined)
@@ -88,7 +88,7 @@ export const OngoingQueriesPanel = () => {
               Running queries on{' '}
               {database?.identifier === project?.ref ? 'primary database' : 'read replica'}
               <Button
-                type="default"
+                variant="default"
                 className="px-1.5"
                 loading={isLoadingOngoingQueries || isFetchingOngoingQueries}
                 icon={<RefreshCw />}
@@ -122,7 +122,7 @@ export const OngoingQueriesPanel = () => {
                       : 'database'}
                 </span>
                 <Button
-                  type="default"
+                  variant="default"
                   loading={isLoadingOngoingQueries || isFetchingOngoingQueries}
                   icon={<RefreshCw />}
                   onClick={() => refetch()}
@@ -140,7 +140,7 @@ export const OngoingQueriesPanel = () => {
                     language="sql"
                     className={cn(
                       'max-w-none max-h-52 w-full',
-                      '!bg-transparent !py-3 !px-3.5 prose dark:prose-dark',
+                      'bg-transparent! py-3! px-3.5! prose dark:prose-dark',
                       '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
                     )}
                   />
@@ -156,7 +156,7 @@ export const OngoingQueriesPanel = () => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
-                      type="warning"
+                      variant="warning"
                       className="px-1.5"
                       icon={<StopCircle />}
                       onClick={() => setSelectedId(query.pid)}
@@ -171,7 +171,7 @@ export const OngoingQueriesPanel = () => {
       </Sheet>
 
       <ConfirmationModal
-        loading={isLoading}
+        loading={isPending}
         variant="warning"
         title={`Confirm to abort this query? (ID: ${selectedId})`}
         visible={selectedId !== undefined}

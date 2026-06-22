@@ -4,7 +4,7 @@ import { cn } from 'ui'
 type TableProps = TableHTMLAttributes<HTMLTableElement>
 
 const Table = ({ children, ...props }: TableProps) => {
-  const containerRef = useRef(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const [showShadow, setShowShadow] = useState(true)
 
   const handleScroll = () => {
@@ -18,15 +18,18 @@ const Table = ({ children, ...props }: TableProps) => {
   }
 
   useEffect(() => {
-    containerRef?.current?.addEventListener('scroll', handleScroll)
-    return () => containerRef?.current?.removeEventListener('scroll', handleScroll)
+    const container = containerRef.current
+    if (container) {
+      container.addEventListener('scroll', handleScroll)
+      return () => container.removeEventListener('scroll', handleScroll)
+    }
   }, [])
 
   return (
     <div className="relative">
       <span
         className={cn(
-          'block md:hidden absolute inset-0 left-auto w-5 bg-gradient-to-r from-transparent to-background transition-opacity opacity-100',
+          'block md:hidden absolute inset-0 left-auto w-5 bg-linear-to-r from-transparent to-background transition-opacity opacity-100',
           !showShadow && 'opacity-0 duration-300'
         )}
       />

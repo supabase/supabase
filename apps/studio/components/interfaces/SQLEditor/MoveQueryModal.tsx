@@ -1,29 +1,19 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { IS_PLATFORM, useParams } from 'common'
 import { Check, Code, Plus } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { useParams } from 'common'
-import { getContentById } from 'data/content/content-id-query'
-import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
-import { useSQLSnippetFolderCreateMutation } from 'data/content/sql-folder-create-mutation'
-import { Snippet } from 'data/content/sql-folders-query'
-import {
-  SnippetWithContent,
-  useSnippetFolders,
-  useSqlEditorV2StateSnapshot,
-} from 'state/sql-editor-v2'
 import {
   Button,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
-  Command_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -32,19 +22,31 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
-  Form_Shadcn_,
-  Input_Shadcn_,
-  Label_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Input,
+  Label,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
+import * as z from 'zod'
+
+import { getContentById } from '@/data/content/content-id-query'
+import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
+import { useSQLSnippetFolderCreateMutation } from '@/data/content/sql-folder-create-mutation'
+import { Snippet } from '@/data/content/sql-folders-query'
+import {
+  SnippetWithContent,
+  useSnippetFolders,
+  useSqlEditorV2StateSnapshot,
+} from '@/state/sql-editor-v2'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 interface MoveQueryModalProps {
   visible: boolean
@@ -63,13 +65,19 @@ interface MoveQueryModalProps {
 export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryModalProps) => {
   const { ref } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const tabsSnap = useTabsStateSnapshot()
+  const router = useRouter()
 
   const [open, setOpen] = useState(false)
   const [selectedId, setSelectedId] = useState<string>()
 
-  const { mutateAsync: createFolder, isLoading: isCreatingFolder } =
-    useSQLSnippetFolderCreateMutation()
-  const { mutateAsync: moveSnippetAsync, isLoading: isMovingSnippet } = useContentUpsertMutation({
+  const { mutateAsync: createFolder, isPending: isCreatingFolder } =
+    useSQLSnippetFolderCreateMutation({
+      onError: (error) => {
+        toast.error(`Failed to create new folder: ${error.message}`)
+      },
+    })
+  const { mutateAsync: moveSnippetAsync, isPending: isMovingSnippet } = useContentUpsertMutation({
     onError: (error) => {
       toast.error(`Failed to move query: ${error.message}`)
     },
@@ -132,7 +140,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
           let snippetContent = (snippet as SnippetWithContent)?.content
           if (snippetContent === undefined) {
             const { content } = await getContentById({ projectRef: ref, id: snippet.id })
-            if ('sql' in content) {
+            if ('unchecked_sql' in content) {
               snippetContent = content
             }
           }
@@ -140,7 +148,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
           if (snippetContent === undefined) {
             return toast.error('Failed to save snippet: Unable to retrieve snippet contents')
           } else {
-            await moveSnippetAsync({
+            const movedSnippet = await moveSnippetAsync({
               projectRef: ref,
               payload: {
                 id: snippet.id,
@@ -154,6 +162,28 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                 content: snippetContent as any,
               },
             })
+            if (IS_PLATFORM) {
+              snapV2.updateSnippet({
+                id: snippet.id,
+                snippet: { ...snippet, folder_id: selectedId === 'root' ? null : folderId },
+                skipSave: true,
+              })
+            } else if (movedSnippet) {
+              // On selfhosted, we need to update the state with the moved snippet because the snippet depends on the
+              // folder_id the moved snippet has a different id than the original snippet.
+
+              // remove the old snippet from the state without saving to API
+              snapV2.removeSnippet(snippet.id, true)
+
+              snapV2.addSnippet({ projectRef: ref, snippet: movedSnippet })
+
+              // remove the tab for the old snippet if the snippet was open. Moving can also happen when the tab is not open.
+              const tabId = createTabId('sql', { id: snippet.id })
+              if (tabsSnap.hasTab(tabId)) {
+                tabsSnap.removeTab(tabId)
+                await router.push(`/project/${ref}/sql/${movedSnippet.id}`)
+              }
+            }
           }
         })
       )
@@ -161,16 +191,11 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
       toast.success(
         `Successfully moved ${snippets.length === 1 ? `"${snippets[0].name}"` : `${snippets.length} snippets`} to ${selectedId === 'root' ? 'the root of the editor' : selectedFolder}`
       )
-      snippets.forEach((snippet) => {
-        snapV2.updateSnippet({
-          id: snippet.id,
-          snippet: { ...snippet, folder_id: selectedId === 'root' ? null : folderId },
-          skipSave: true,
-        })
-      })
+
       onClose()
     } catch (error: any) {
-      toast.error(`Failed to create new folder: ${error.message}`)
+      // error will be handled by the mutation's onError callback
+      console.error('Error moving snippets:', error)
     }
   }
 
@@ -188,7 +213,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
   return (
     <Dialog open={visible} onOpenChange={() => onClose()}>
       <DialogContent>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id="move-snippet" onSubmit={form.handleSubmit(onConfirmMove)}>
             <DialogHeader>
               <DialogTitle>
@@ -204,13 +229,13 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
 
             <DialogSection className="py-5 flex flex-col gap-y-4">
               <div className="flex flex-col gap-y-2">
-                <Label_Shadcn_ className="text-foreground-light">Select a folder</Label_Shadcn_>
-                <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-                  <PopoverTrigger_Shadcn_ asChild>
+                <Label className="text-foreground-light">Select a folder</Label>
+                <Popover open={open} onOpenChange={setOpen} modal={false}>
+                  <PopoverTrigger asChild>
                     <Button
                       block
                       size="small"
-                      type="default"
+                      variant="default"
                       className="pr-2 justify-between"
                       iconRight={
                         <Code
@@ -225,20 +250,15 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                         {isCurrentFolder && ` (Current)`}
                       </div>
                     </Button>
-                  </PopoverTrigger_Shadcn_>
-                  <PopoverContent_Shadcn_
-                    className="p-0"
-                    side="bottom"
-                    align="start"
-                    sameWidthAsTrigger
-                  >
-                    <Command_Shadcn_>
-                      <CommandInput_Shadcn_ placeholder="Find folder..." />
-                      <CommandList_Shadcn_>
-                        <CommandEmpty_Shadcn_>No folders found</CommandEmpty_Shadcn_>
-                        <CommandGroup_Shadcn_>
+                  </PopoverTrigger>
+                  <PopoverContent className="p-0" side="bottom" align="start" sameWidthAsTrigger>
+                    <Command>
+                      <CommandInput placeholder="Find folder..." />
+                      <CommandList>
+                        <CommandEmpty>No folders found</CommandEmpty>
+                        <CommandGroup>
                           <ScrollArea className={(folders || []).length > 6 ? 'h-[210px]' : ''}>
-                            <CommandItem_Shadcn_
+                            <CommandItem
                               key="root"
                               value="root"
                               className="cursor-pointer w-full justify-between"
@@ -258,9 +278,9 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                                   ` (Current)`}
                               </span>
                               {selectedId === 'root' && <Check size={14} />}
-                            </CommandItem_Shadcn_>
+                            </CommandItem>
                             {folders?.map((folder) => (
-                              <CommandItem_Shadcn_
+                              <CommandItem
                                 key={folder.id}
                                 value={folder.name}
                                 className="cursor-pointer w-full justify-between"
@@ -280,15 +300,15 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                                     ` (Current)`}
                                 </span>
                                 {folder.id === selectedId && <Check size={14} />}
-                              </CommandItem_Shadcn_>
+                              </CommandItem>
                             ))}
                           </ScrollArea>
-                        </CommandGroup_Shadcn_>
-                        <CommandSeparator_Shadcn_ />
-                        <CommandGroup_Shadcn_>
-                          <CommandItem_Shadcn_
+                        </CommandGroup>
+                        <CommandSeparator />
+                        <CommandGroup>
+                          <CommandItem
                             className="cursor-pointer w-full justify-start gap-x-2"
-                            onSelect={(e) => {
+                            onSelect={(_e) => {
                               setOpen(false)
                               setSelectedId('new-folder')
                             }}
@@ -299,32 +319,32 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                           >
                             <Plus size={14} strokeWidth={1.5} />
                             <p>New folder</p>
-                          </CommandItem_Shadcn_>
-                        </CommandGroup_Shadcn_>
-                      </CommandList_Shadcn_>
-                    </Command_Shadcn_>
-                  </PopoverContent_Shadcn_>
-                </Popover_Shadcn_>
+                          </CommandItem>
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
 
               {selectedId === 'new-folder' && (
                 <div className="flex flex-col gap-y-2">
-                  <FormField_Shadcn_
+                  <FormField
                     name="name"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItem_Shadcn_ className="flex flex-col gap-y-2">
-                        <FormLabel_Shadcn_>Provide a name for your new folder</FormLabel_Shadcn_>
-                        <FormControl_Shadcn_>
-                          <Input_Shadcn_
+                      <FormItem className="flex flex-col gap-y-2">
+                        <FormLabel>Provide a name for your new folder</FormLabel>
+                        <FormControl>
+                          <Input
                             autoFocus
                             {...field}
                             autoComplete="off"
                             disabled={isMovingSnippet || isCreatingFolder}
                           />
-                        </FormControl_Shadcn_>
-                        <FormMessage_Shadcn_ />
-                      </FormItem_Shadcn_>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
                   />
                 </div>
@@ -333,15 +353,15 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
 
             <DialogFooter>
               <Button
-                type="default"
+                variant="default"
                 disabled={isMovingSnippet || isCreatingFolder}
                 onClick={() => onClose()}
               >
                 Cancel
               </Button>
               <Button
-                type="primary"
-                htmlType="submit"
+                variant="primary"
+                type="submit"
                 disabled={isMovingToSameFolder}
                 loading={isMovingSnippet || isCreatingFolder}
               >
@@ -349,7 +369,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
               </Button>
             </DialogFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </DialogContent>
     </Dialog>
   )

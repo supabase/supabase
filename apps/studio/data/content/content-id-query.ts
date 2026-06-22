@@ -1,10 +1,11 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-
+import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+
 import type { Content } from './content-query'
+import { remapSqlContentField } from './content-remap'
 import { contentKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type GetUserContentByIdResponse = Omit<
   components['schemas']['GetUserContentByIdResponse'],
@@ -26,8 +27,7 @@ export async function getContentById(
   })
 
   if (error) throw handleError(error)
-  // override content type
-  return data as unknown as GetUserContentByIdResponse
+  return remapSqlContentField(data as unknown as GetUserContentByIdResponse)
 }
 
 export type ContentIdData = Awaited<ReturnType<typeof getContentById>>
@@ -35,13 +35,11 @@ export type ContentIdError = ResponseError
 
 export const useContentIdQuery = <TData = ContentIdData>(
   { projectRef, id }: { projectRef?: string; id?: string },
-  { enabled = true, ...options }: UseQueryOptions<ContentIdData, ContentIdError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<ContentIdData, ContentIdError, TData> = {}
 ) =>
-  useQuery<ContentIdData, ContentIdError, TData>(
-    contentKeys.resource(projectRef, id),
-    ({ signal }) => getContentById({ projectRef, id }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ContentIdData, ContentIdError, TData>({
+    queryKey: contentKeys.resource(projectRef, id),
+    queryFn: ({ signal }) => getContentById({ projectRef, id }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined',
+    ...options,
+  })

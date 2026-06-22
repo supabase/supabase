@@ -1,5 +1,4 @@
 import { Admonition } from 'ui-patterns/admonition'
-import { CostWarning } from './AuthSmsProviderConfig.Warnings'
 
 ## Prerequisites
 
@@ -11,13 +10,11 @@ You'll need:
 
 SMS Authentication can be done with either Twilio Verify or Twilio Programmable Messaging. [Twilio Verify](https://www.twilio.com/en-us/trusted-activation/verify) is a specialized OTP solution and is recommended for most developers that need over-the-phone authentication. Alternatively you can use [Twilio Programmable Messaging](https://www.twilio.com/docs/messaging) which offers generic SMS sending support.
 
-<CostWarning />
-
 ## Twilio Verify
 
 To set up Twilio Verify, you will need to:
 
-1. Create a new [verification service](https://support.twilio.com/hc/en-us/articles/360033309133-Getting-Started-with-Twilio-Verify-V2) in the Twilio dashboard.
+1. Create a new [verification service](https://help.twilio.com/articles/360033309133-Getting-Started-with-Twilio-Verify-V2) in the Twilio dashboard.
 2. [Switch Phone Provider to Twilio Verify](https://supabase.com/dashboard/project/_/auth/providers)
 3. Configure the Twilio Verify Service ID field using the Verification Service ID obtained in 1.
 

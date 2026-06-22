@@ -1,25 +1,51 @@
-import { PropsWithChildren } from 'react'
-
-import { CH } from '@code-hike/mdx/components'
-import { ArrowUpRight, Triangle } from 'lucide-react'
 import {
-  Badge,
-  cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  Heading,
-  Image,
-} from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
-import { type ImageProps } from 'ui/src/components/Image/Image'
+  Annotation,
+  annotations,
+  Code,
+  CodeSlot,
+  InlineCode,
+  Preview,
+  PreviewSlot,
+  Scrollycoding,
+  Section,
+  SectionCode,
+  SectionLink,
+  Slideshow,
+  Spotlight,
+} from '@code-hike/mdx/components'
 import Avatar from '~/components/Avatar'
+import BlogCollapsible from '~/components/Blog/BlogCollapsible'
+import DeveloperGrowthChart from '~/components/Charts/DeveloperGrowthChart'
 import Chart from '~/components/Charts/PGCharts'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
+import { NamedCodeBlock } from '~/components/CodeTabs'
 import ImageFadeStack from '~/components/ImageFadeStack'
 import ImageGrid from '~/components/ImageGrid'
 import InlineCodeTag from '~/components/InlineCode'
 import Quote from '~/components/Quote'
+import Tabs, { TabPanel } from '~/components/Tabs/Tabs'
+import { ArrowUpRight } from 'lucide-react'
+import type { PropsWithChildren } from 'react'
+import { Badge, cn, Heading } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { Image, type ImageProps } from 'ui-patterns/Image'
+import { Mermaid } from 'ui-patterns/Mermaid'
+
+const CH = {
+  Annotation,
+  Code,
+  CodeSlot,
+  InlineCode,
+  Preview,
+  PreviewSlot,
+  Scrollycoding,
+  Section,
+  SectionCode,
+  SectionLink,
+  Slideshow,
+  Spotlight,
+  annotations,
+}
 
 // import all components used in blog articles here
 // to do: move this into a helper/utils, it is used elsewhere
@@ -37,39 +63,12 @@ const LinkComponent = (props: PropsWithChildren<HTMLAnchorElement>) => (
   </a>
 )
 
-const BlogCollapsible = ({
-  title,
-  containerClassName,
-  ...props
-}: {
-  title: string
-  containerClassName?: string
-}) => {
-  return (
-    <Collapsible_Shadcn_ className={containerClassName}>
-      <CollapsibleTrigger_Shadcn_
-        className="
-        data-[state=open]:text
-        hover:text-foreground-light
-        flex items-center gap-3
-        [&>svg]:fill-current
-        [&>svg]:rotate-90
-        [&>svg]:transition-transform
-        [&>svg]:data-[state='open']:rotate-180
-        [&>svg]:data-[state='open']:text
-        "
-      >
-        <Triangle size={10} />
-        <span>{title}</span>
-      </CollapsibleTrigger_Shadcn_>
-      <CollapsibleContent_Shadcn_ {...props} />
-    </Collapsible_Shadcn_>
-  )
-}
-
 export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
   const components = {
     CodeBlock,
+    Tabs,
+    TabPanel,
+    NamedCodeBlock,
     CH,
     h1: (props: any) => <Heading {...props} tag="h1" />,
     h2: (props: any) => <Heading {...props} tag="h2" />,
@@ -83,9 +82,15 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
     PGChart: (props: any) => {
       return <Chart {...props} />
     },
+    DeveloperGrowthChart,
     pre: (props: any) => {
       if (props.className !== ignoreClass) {
-        return <CodeBlock {...props.children.props} />
+        const childProps = props.children?.props
+        // Detect mermaid code blocks and render with Mermaid component
+        if (childProps?.className === 'language-mermaid') {
+          return <Mermaid chart={childProps.children} />
+        }
+        return <CodeBlock {...childProps} />
       } else {
         return <code {...props} />
       }
@@ -107,6 +112,7 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
           />
         )
       }
+      // biome-ignore lint/a11y/useAltText: provided in props
       return <img {...props} />
     },
     Img: ({ zoomable = true, className, ...props }: ImageProps & { wide?: boolean }) => (
@@ -125,6 +131,7 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
       <p className={cn('-mt-6 text-foreground-lighter text-lg', props.className)} {...props} />
     ),
     Admonition,
+    Mermaid,
   }
 
   return components as any

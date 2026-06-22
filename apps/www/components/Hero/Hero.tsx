@@ -1,15 +1,13 @@
-import Link from 'next/link'
-
-import { Button } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import AnnouncementBadge from '../Announcement/Badge'
+import Link from 'next/link'
+import { Button } from 'ui'
 
 const Hero = () => {
   const sendTelemetryEvent = useSendTelemetryEvent()
 
   return (
-    <div className="relative -mt-[65px]">
+    <div className="relative mt-[-65px]">
       <SectionContainer className="pt-8 pb-10 md:pt-16 overflow-hidden">
         <div className="relative">
           <div className="mx-auto">
@@ -21,7 +19,7 @@ const Hero = () => {
                     <span className="text-brand block md:ml-0">Scale to millions</span>
                   </h1>
                   <p className="pt-2 text-foreground my-3 text-sm sm:mt-5 lg:mb-0 sm:text-base lg:text-lg">
-                    Supabase is an open source Firebase alternative.{' '}
+                    Supabase is the Postgres development platform.{' '}
                     <br className="hidden md:block" />
                     Start your project with a Postgres database, Authentication, instant APIs, Edge
                     Functions, Realtime subscriptions, Storage, and Vector embeddings.
@@ -42,7 +40,7 @@ const Hero = () => {
                       Start your project
                     </Link>
                   </Button>
-                  <Button asChild size="medium" type="default">
+                  <Button asChild size="medium" variant="default">
                     <Link
                       href="/contact/sales"
                       as="/contact/sales"

@@ -1,157 +1,191 @@
-import { Search } from 'lucide-react'
+import { useParams } from 'common'
+import { Loader2 } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useState } from 'react'
+import { MouseEvent, useEffect, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
+import { LoadingLine } from 'ui'
 
-import { CreateCronJobSheet } from 'components/interfaces/Integrations/CronJobs/CreateCronJobSheet'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { CronJob, useCronJobsQuery } from 'data/database-cron-jobs/database-cron-jobs-query'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { Button, Input, Sheet, SheetContent } from 'ui'
-import { CronJobCard } from './CronJobCard'
+import { formatCronJobColumns } from './CronJobs.utils'
+import { CronJobRunDetailsOverflowNotice } from './CronJobsTab.CleanupNotice'
+import { CronJobsTabDataGrid } from './CronJobsTab.DataGrid'
+import { CronJobsTabHeader } from './CronJobsTab.Header'
+import { useCronJobsData } from './CronJobsTab.useCronJobsData'
 import { DeleteCronJob } from './DeleteCronJob'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { CreateCronJobSheet } from '@/components/interfaces/Integrations/CronJobs/CreateCronJobSheet/CreateCronJobSheet'
+import { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
+import { useInfiniteScroll } from '@/hooks/misc/useInfiniteScroll'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { cleanPointerEventsNoneOnBody } from '@/lib/helpers'
+import { createNavigationHandler } from '@/lib/navigation'
+import { useTrack } from '@/lib/telemetry/track'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
-const EMPTY_CRON_JOB = {
-  jobname: '',
-  schedule: '',
-  active: true,
-  command: '',
-}
+const EMPTY_CRON_JOB = { jobname: '', schedule: '', active: true, command: '' }
 
 export const CronjobsTab = () => {
-  const { project } = useProjectContext()
-  const org = useSelectedOrganization()
+  const router = useRouter()
+  const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+  const track = useTrack()
 
   const [searchQuery, setSearchQuery] = useQueryState('search', parseAsString.withDefault(''))
+
+  const [search, setSearch] = useState(searchQuery)
+
+  const handleSearchSubmit = () => {
+    const trimmed = search.trim()
+    setSearchQuery(trimmed.length > 0 ? trimmed : null)
+  }
+  const handleClearSearch = () => {
+    setSearch('')
+    setSearchQuery(null)
+  }
+
+  const { grid, count } = useCronJobsData({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    searchQuery,
+  })
+
   const [createCronJobSheetShown, setCreateCronJobSheetShown] = useQueryState(
-    'dialog-shown',
+    'new',
     parseAsBoolean.withDefault(false).withOptions({ clearOnDefault: true })
   )
 
-  // used for confirmation prompt in the Create Cron Job Sheet
-  const [isClosingCreateCronJobSheet, setIsClosingCreateCronJobSheet] = useState(false)
-  const [cronJobForEditing, setCronJobForEditing] = useState<
-    Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'> | undefined
-  >()
-  const [cronJobForDeletion, setCronJobForDeletion] = useState<CronJob | undefined>()
+  const [cronJobIdForEditing, setCronJobForEditing] = useQueryState('edit', parseAsString)
+  const cronJobForEditing = grid.rows.find((j) => j.jobid.toString() === cronJobIdForEditing)
 
-  const { data: cronJobs, isLoading } = useCronJobsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
+  const [, setCronJobForDeletion] = useQueryState('delete', parseAsString)
+
+  const columns = useMemo(
+    () =>
+      formatCronJobColumns({
+        onSelectEdit: (job: CronJob) => {
+          track('cron_job_update_clicked')
+          setCronJobForEditing(job.jobid.toString())
+        },
+        onSelectDelete: (job: CronJob) => {
+          track('cron_job_delete_clicked')
+          setCronJobForDeletion(job.jobid.toString())
+        },
+      }),
+    [track, setCronJobForEditing, setCronJobForDeletion]
+  )
+
+  const handleScroll = useInfiniteScroll({
+    isLoading: grid.isLoading,
+    isFetchingNextPage: grid.isFetchingNextPage,
+    hasNextPage: grid.hasNextPage,
+    fetchNextPage: grid.fetchNextPage,
   })
-
-  const { data: extensions } = useDatabaseExtensionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-
-  const { mutate: sendEvent } = useSendEventMutation()
-
-  // check pg_cron version to see if it supports seconds
-  const pgCronExtension = (extensions ?? []).find((ext) => ext.name === 'pg_cron')
-  const installedVersion = pgCronExtension?.installed_version
-  const supportsSeconds = installedVersion ? parseFloat(installedVersion) >= 1.5 : false
-
-  if (isLoading)
-    return (
-      <div className="p-10">
-        <GenericSkeletonLoader />
-      </div>
-    )
-
-  const filteredCronJobs =
-    searchQuery.length > 0
-      ? (cronJobs ?? []).filter((cj) => cj?.jobname?.includes(searchQuery || ''))
-      : cronJobs ?? []
 
   const onOpenCreateJobSheet = () => {
-    sendEvent({
-      action: 'cron_job_create_clicked',
-      groups: { project: project?.ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-    })
+    track('cron_job_create_clicked')
     setCreateCronJobSheetShown(true)
   }
 
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search cron jobs' }
+  )
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, handleClearSearch)
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, onOpenCreateJobSheet, { label: 'Create cron job' })
+
+  // Row click handler
+  const handleRowClick = (row: CronJob, event: MouseEvent<HTMLDivElement>) => {
+    const { jobid, jobname } = row
+    const url = `/project/${ref}/integrations/cron/jobs/${jobid}?child-label=${encodeURIComponent(
+      jobname || `Job #${jobid}`
+    )}`
+
+    track('cron_job_history_clicked')
+
+    createNavigationHandler(url, router)(event)
+  }
+
+  const onClose = () => {
+    setCronJobForEditing(null)
+    setCreateCronJobSheetShown(false)
+    cleanPointerEventsNoneOnBody(500)
+  }
+
+  useEffect(() => {
+    if (grid.isSuccess && !!cronJobIdForEditing && !cronJobForEditing) {
+      toast('Cron job not found')
+      setCronJobForEditing(null)
+    }
+  }, [cronJobForEditing, cronJobIdForEditing, grid.isSuccess, setCronJobForEditing])
+
   return (
     <>
-      <div className="w-full space-y-4 p-4 md:p-10">
-        {(cronJobs ?? []).length == 0 ? (
-          <div className="border rounded border-default px-20 py-16 flex flex-col items-center justify-center space-y-4 border-dashed">
-            <p className="text-sm text-foreground">No cron jobs created yet</p>
-            <Button onClick={onOpenCreateJobSheet}>Create job</Button>
-          </div>
-        ) : (
-          <div className="w-full space-y-4">
-            <div className="flex items-center justify-between flex-wrap">
-              <Input
-                placeholder="Search for a job"
-                size="small"
-                icon={<Search size={14} />}
-                value={searchQuery || ''}
-                className="w-64"
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-
-              <Button onClick={onOpenCreateJobSheet}>Create job</Button>
-            </div>
-            {filteredCronJobs.length === 0 ? (
-              <div
-                className={
-                  'border rounded border-default px-20 py-16 flex flex-col items-center justify-center space-y-4 border-dashed'
-                }
-              >
-                <p className="text-sm text-foreground">No results found</p>
-                <p className="text-sm text-foreground-light">
-                  Your search for "{searchQuery}" did not return any results
-                </p>
-              </div>
-            ) : isLoading ? (
-              <div className="p-10">
-                <GenericSkeletonLoader />
-              </div>
-            ) : (
-              filteredCronJobs.map((job) => (
-                <CronJobCard
-                  key={job.jobid}
-                  job={job}
-                  onEditCronJob={(job) => {
-                    setCronJobForEditing(job)
-                    setCreateCronJobSheetShown(true)
-                  }}
-                  onDeleteCronJob={(job) => setCronJobForDeletion(job)}
-                />
-              ))
-            )}
-          </div>
-        )}
+      <div className="h-full w-full space-y-4">
+        <div className="h-full w-full flex flex-col relative">
+          <CronJobsTabHeader
+            search={search}
+            isRefreshing={grid.isRefetching && !grid.isFetchingNextPage}
+            searchInputRef={searchInputRef}
+            onSearchChange={setSearch}
+            onSearchSubmit={handleSearchSubmit}
+            onClearSearch={handleClearSearch}
+            onRefresh={grid.refetch}
+            onCreateJob={onOpenCreateJobSheet}
+          />
+          <LoadingLine loading={grid.isLoading || grid.isRefetching || grid.isFetchingNextPage} />
+          {grid.isMinimal && (
+            <CronJobRunDetailsOverflowNotice
+              queryCost={grid.queryCost}
+              refetchJobs={grid.refetch}
+            />
+          )}
+          <CronJobsTabDataGrid
+            columns={columns}
+            rows={grid.rows}
+            isLoading={grid.isLoading}
+            error={grid.error}
+            searchQuery={searchQuery}
+            onScroll={handleScroll}
+            onRowClick={handleRowClick}
+          />
+          <CronJobsFooter count={count} />
+        </div>
       </div>
 
-      <DeleteCronJob
-        visible={!!cronJobForDeletion}
-        onClose={() => setCronJobForDeletion(undefined)}
-        cronJob={cronJobForDeletion!}
-      />
+      <DeleteCronJob />
 
-      <Sheet
-        open={!!createCronJobSheetShown}
-        onOpenChange={() => setIsClosingCreateCronJobSheet(true)}
-      >
-        <SheetContent size="default" tabIndex={undefined}>
-          <CreateCronJobSheet
-            selectedCronJob={cronJobForEditing ?? EMPTY_CRON_JOB}
-            supportsSeconds={supportsSeconds}
-            onClose={() => {
-              setIsClosingCreateCronJobSheet(false)
-              setCronJobForEditing(undefined)
-              setCreateCronJobSheetShown(false)
-            }}
-            isClosing={isClosingCreateCronJobSheet}
-            setIsClosing={setIsClosingCreateCronJobSheet}
-          />
-        </SheetContent>
-      </Sheet>
+      <CreateCronJobSheet
+        open={!!createCronJobSheetShown || !!cronJobForEditing}
+        selectedCronJob={cronJobForEditing ?? EMPTY_CRON_JOB}
+        onClose={onClose}
+      />
     </>
   )
 }
+
+// Footer component for displaying job count
+interface CronJobsFooterProps {
+  count: {
+    value: number | undefined
+    isEstimate: boolean
+    isLoading: boolean
+  }
+}
+
+const CronJobsFooter = ({ count }: CronJobsFooterProps) => (
+  <div className="flex justify-between min-h-9 h-9 overflow-hidden items-center px-6 w-full border-t text-xs text-foreground-light">
+    {count.isLoading ? (
+      <span className="flex items-center gap-2">
+        <Loader2 size={14} className="animate-spin" /> Loading...
+      </span>
+    ) : (
+      `Total: ${count.value ?? 0} jobs${count.isEstimate ? ' (estimate)' : ''}`
+    )}
+  </div>
+)

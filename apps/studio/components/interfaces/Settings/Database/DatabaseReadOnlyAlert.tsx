@@ -2,19 +2,21 @@ import { useParams } from 'common'
 import { AlertTriangle, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import { Alert, AlertDescription, AlertTitle, Button } from 'ui'
 
-import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import ConfirmDisableReadOnlyModeModal from './DatabaseSettings/ConfirmDisableReadOnlyModal'
+import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from '@/lib/constants'
 
 export const DatabaseReadOnlyAlert = () => {
   const { ref: projectRef } = useParams()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
-  const { data: resourceWarnings } = useResourceWarningsQuery()
-
+  const { data: resourceWarnings } = useResourceWarningsQuery({ ref: projectRef })
+  // [Joshen Cleanup] JFYI this can be cleaned up once BE changes are live which will only return the warnings based on the provided ref
+  // No longer need to filter by ref on the client side
   const isReadOnlyMode =
     (resourceWarnings ?? [])?.find((warning) => warning.project === projectRef)
       ?.is_readonly_mode_enabled ?? false
@@ -22,12 +24,12 @@ export const DatabaseReadOnlyAlert = () => {
   return (
     <>
       {isReadOnlyMode && (
-        <Alert_Shadcn_ variant="destructive">
+        <Alert variant="destructive">
           <AlertTriangle />
-          <AlertTitle_Shadcn_>
+          <AlertTitle>
             Project is in read-only mode and database is no longer accepting write requests
-          </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
+          </AlertTitle>
+          <AlertDescription>
             You have reached 95% of your project's disk space, and read-only mode has been enabled
             to preserve your database's stability and prevent your project from exceeding its
             current billing plan. To resolve this, you may:
@@ -55,14 +57,14 @@ export const DatabaseReadOnlyAlert = () => {
                 </li>
               ) : null}
             </ul>
-          </AlertDescription_Shadcn_>
+          </AlertDescription>
           <div className="mt-4 flex items-center space-x-2">
-            <Button type="default" onClick={() => setShowConfirmationModal(true)}>
+            <Button variant="default" onClick={() => setShowConfirmationModal(true)}>
               Disable read-only mode
             </Button>
-            <Button asChild type="default" icon={<ExternalLink />}>
+            <Button asChild variant="default" icon={<ExternalLink />}>
               <a
-                href="https://supabase.com/docs/guides/platform/database-size#disabling-read-only-mode"
+                href={`${DOCS_URL}/guides/platform/database-size#disabling-read-only-mode`}
                 target="_blank"
                 rel="noreferrer"
               >
@@ -70,7 +72,7 @@ export const DatabaseReadOnlyAlert = () => {
               </a>
             </Button>
           </div>
-        </Alert_Shadcn_>
+        </Alert>
       )}
       <ConfirmDisableReadOnlyModeModal
         visible={showConfirmationModal}

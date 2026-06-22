@@ -4,6 +4,28 @@ export * from './infrastructure'
 
 export const IS_PLATFORM = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
 
+/**
+ * Server-side flag for Supabase CLI (local development) runs. Detected via
+ * CURRENT_CLI_VERSION, which the CLI sets when launching Studio. The browser
+ * cannot read this directly — use the /platform/deployment-mode endpoint.
+ */
+export const IS_CLI = !IS_PLATFORM && !!process.env.CURRENT_CLI_VERSION
+
+/**
+ * Indicates that the app is running in a test environment (E2E tests).
+ * Set via NEXT_PUBLIC_NODE_ENV=test in the generateLocalEnv.js script.
+ */
+export const IS_TEST_ENV = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
+
+/**
+ * True when running against the staging or local environments. Used to gate
+ * staff-only debugging affordances (e.g. the unified logs OTEL toggle) that
+ * should never be visible to customers on production.
+ */
+export const IS_STAGING_OR_LOCAL =
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging' ||
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
+
 export const API_URL = (() => {
   if (process.env.NODE_ENV === 'test') return 'http://localhost:3000/api'
   //  If running in platform, use API_URL from the env var
@@ -37,12 +59,24 @@ export const GOTRUE_ERRORS = {
 export const STRIPE_PUBLIC_KEY =
   process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || 'pk_test_XVwg5IZH3I9Gti98hZw6KRzd00v5858heG'
 
+export const POSTHOG_URL =
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging' ||
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
+    ? 'https://ph.supabase.green'
+    : 'https://ph.supabase.com'
+
 export const USAGE_APPROACHING_THRESHOLD = 0.75
+
+export const DOCS_URL = process.env.NEXT_PUBLIC_DOCS_URL || 'https://supabase.com/docs'
 
 export const OPT_IN_TAGS = {
   AI_SQL: 'AI_SQL_GENERATOR_OPT_IN',
+  AI_DATA: 'AI_DATA_GENERATOR_OPT_IN',
+  AI_LOG: 'AI_LOG_GENERATOR_OPT_IN',
 }
 
 export const GB = 1024 * 1024 * 1024
 export const MB = 1024 * 1024
 export const KB = 1024
+
+export const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i

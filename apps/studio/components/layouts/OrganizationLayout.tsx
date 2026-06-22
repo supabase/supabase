@@ -1,162 +1,181 @@
-import { ExternalLink } from 'lucide-react'
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { ExternalLink, XIcon } from 'lucide-react'
+import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { type PropsWithChildren } from 'react'
+import type { PropsWithChildren } from 'react'
+import { Alert, AlertDescription, AlertTitle, Button, cn } from 'ui'
 
-import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import PartnerIcon from 'components/ui/PartnerIcon'
-import { PARTNER_TO_NAME } from 'components/ui/PartnerManagedResource'
-import { useVercelRedirectQuery } from 'data/integrations/vercel-redirect-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { withAuth } from 'hooks/misc/withAuth'
-import { IS_PLATFORM } from 'lib/constants'
-import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
-import { SidebarSection } from './AccountLayout/AccountLayout.types'
-import WithSidebar from './AccountLayout/WithSidebar'
-import LayoutHeader from './ProjectLayout/LayoutHeader/LayoutHeader'
+import { useRegisterOrgMenu } from './OrganizationLayout/useRegisterOrgMenu'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import PartnerIcon from '@/components/ui/PartnerIcon'
+import { useAwsRedirectQuery } from '@/data/integrations/aws-redirect-query'
+import { useVercelRedirectQuery } from '@/data/integrations/vercel-redirect-query'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { withAuth } from '@/hooks/misc/withAuth'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
+import { buildStudioPageTitle } from '@/lib/page-title'
 
-const OrganizationLayoutContent = ({ children }: PropsWithChildren<{}>) => {
-  const selectedOrganization = useSelectedOrganization()
-  const { data, isSuccess } = useVercelRedirectQuery({
-    installationId: selectedOrganization?.partner_id,
+interface OrganizationLayoutProps {
+  title: string
+}
+
+// [Joshen] Just for page title generation for org settings pages
+const settingsPages = ['general', 'security', 'sso', 'apps', 'audit', 'documents']
+
+type MarketplaceBannerRedirectSource = 'vercel' | 'aws'
+
+type MarketplaceBannerConfig = {
+  title: string
+  description: string
+  redirectSource?: MarketplaceBannerRedirectSource
+}
+
+const MARKETPLACE_BANNER_CONFIG: Record<
+  | typeof MANAGED_BY.VERCEL_MARKETPLACE
+  | typeof MANAGED_BY.AWS_MARKETPLACE
+  | typeof MANAGED_BY.STRIPE_PROJECTS,
+  MarketplaceBannerConfig
+> = {
+  [MANAGED_BY.VERCEL_MARKETPLACE]: {
+    title: 'This organization is managed via Vercel Marketplace',
+    description: 'Billing and some organization access settings are managed in Vercel.',
+    redirectSource: 'vercel',
+  },
+  [MANAGED_BY.AWS_MARKETPLACE]: {
+    title: 'This organization is billed via AWS Marketplace',
+    description: 'Changes to billing and payment details must be made in AWS.',
+    redirectSource: 'aws',
+  },
+  [MANAGED_BY.STRIPE_PROJECTS]: {
+    title: 'This organization is connected to Stripe',
+    description: 'Changes here will be reflected in your connected Stripe account.',
+  },
+}
+
+const DEFAULT_ORGANIZATION_MARKETPLACE_BANNER_DISMISS_KEY =
+  LOCAL_STORAGE_KEYS.ORGANIZATION_MARKETPLACE_BANNER_DISMISSED('unknown', MANAGED_BY.SUPABASE)
+
+function getMarketplaceBannerDismissKey({
+  organizationSlug,
+  managedBy,
+}: {
+  organizationSlug?: string
+  managedBy?: string
+}) {
+  if (!organizationSlug || !managedBy) return DEFAULT_ORGANIZATION_MARKETPLACE_BANNER_DISMISS_KEY
+
+  return LOCAL_STORAGE_KEYS.ORGANIZATION_MARKETPLACE_BANNER_DISMISSED(organizationSlug, managedBy)
+}
+
+function getMarketplaceBannerConfig(managedBy?: string): MarketplaceBannerConfig | undefined {
+  switch (managedBy) {
+    case MANAGED_BY.VERCEL_MARKETPLACE:
+      return MARKETPLACE_BANNER_CONFIG[MANAGED_BY.VERCEL_MARKETPLACE]
+    case MANAGED_BY.AWS_MARKETPLACE:
+      return MARKETPLACE_BANNER_CONFIG[MANAGED_BY.AWS_MARKETPLACE]
+    case MANAGED_BY.STRIPE_PROJECTS:
+      return MARKETPLACE_BANNER_CONFIG[MANAGED_BY.STRIPE_PROJECTS]
+    default:
+      return undefined
+  }
+}
+
+const OrganizationLayoutContent = ({
+  children,
+  title,
+}: PropsWithChildren<OrganizationLayoutProps>) => {
+  const router = useRouter()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { appTitle } = useCustomContent(['app:title'])
+  const [isBannerDismissed, setIsBannerDismissed] = useLocalStorageQuery<boolean>(
+    getMarketplaceBannerDismissKey({
+      organizationSlug: selectedOrganization?.slug,
+      managedBy: selectedOrganization?.managed_by,
+    }),
+    false
+  )
+
+  // Keep title intent close to each page (getLayout) to avoid route-to-title drift in this layout.
+  const isSettingsSurface = settingsPages.some((x) => router.pathname.endsWith(x))
+  const pageTitle = buildStudioPageTitle({
+    section: title,
+    surface: isSettingsSurface ? 'Organization Settings' : undefined,
+    org: selectedOrganization?.name,
+    brand: appTitle || 'Supabase',
   })
+
+  const vercelQuery = useVercelRedirectQuery(
+    { installationId: selectedOrganization?.partner_id },
+    { enabled: selectedOrganization?.managed_by === MANAGED_BY.VERCEL_MARKETPLACE }
+  )
+
+  const awsQuery = useAwsRedirectQuery(
+    { organizationSlug: selectedOrganization?.slug },
+    { enabled: selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE }
+  )
+
+  const bannerConfig = getMarketplaceBannerConfig(selectedOrganization?.managed_by)
+
+  const selectedRedirectQuery = (() => {
+    if (!bannerConfig?.redirectSource) return undefined
+
+    switch (bannerConfig.redirectSource) {
+      case 'aws':
+        return awsQuery
+      case 'vercel':
+        return vercelQuery
+      default:
+        return undefined
+    }
+  })()
+
   return (
-    <div className={cn('w-full flex flex-col overflow-hidden')}>
-      {selectedOrganization && selectedOrganization?.managed_by !== 'supabase' && (
-        <Alert_Shadcn_
+    <div className={cn('h-full w-full flex flex-col overflow-hidden')}>
+      {pageTitle && (
+        <Head>
+          <title>{pageTitle}</title>
+          <meta name="description" content="Supabase Studio" />
+        </Head>
+      )}
+      {selectedOrganization && bannerConfig && !isBannerDismissed && (
+        <Alert
           variant="default"
           className="flex items-center gap-4 border-t-0 border-x-0 rounded-none"
         >
           <PartnerIcon organization={selectedOrganization} showTooltip={false} size="medium" />
-          <AlertTitle_Shadcn_ className="flex-1">
-            This organization is managed by {PARTNER_TO_NAME[selectedOrganization.managed_by]}.
-          </AlertTitle_Shadcn_>
-          <Button asChild type="default" iconRight={<ExternalLink />} disabled={!isSuccess}>
-            <a href={data?.url} target="_blank" rel="noopener noreferrer">
-              Manage
-            </a>
-          </Button>
-        </Alert_Shadcn_>
+          <div className="flex-1">
+            <AlertTitle>{bannerConfig.title}</AlertTitle>
+            <AlertDescription>{bannerConfig.description}</AlertDescription>
+          </div>
+          <div className="flex items-center gap-2">
+            {selectedRedirectQuery?.data?.url && (
+              <Button asChild variant="default" iconRight={<ExternalLink />}>
+                <a href={selectedRedirectQuery.data.url} target="_blank" rel="noopener noreferrer">
+                  Manage
+                </a>
+              </Button>
+            )}
+            <ButtonTooltip
+              variant="text"
+              icon={<XIcon size={14} />}
+              className="h-7 w-7 p-0"
+              onClick={() => setIsBannerDismissed(true)}
+              aria-label="Dismiss banner"
+              tooltip={{ content: { text: 'Dismiss' } }}
+            />
+          </div>
+        </Alert>
       )}
-      <main className="h-full w-full overflow-y-auto">{children}</main>
+      <main className="h-full w-full overflow-y-auto flex flex-col">{children}</main>
     </div>
   )
 }
 
-const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
-  const router = useRouter()
-  const newLayoutPreview = useIsNewLayoutEnabled()
-
-  const selectedOrganization = useSelectedOrganization()
-  const { data: organizations } = useOrganizationsQuery()
-
-  const organizationsLinks = (organizations ?? [])
-    .map((organization) => ({
-      isActive:
-        router.pathname.startsWith('/org/') && selectedOrganization?.slug === organization.slug,
-      label: organization.name,
-      href: `/org/${organization.slug}/general`,
-      key: organization.slug,
-      icon: <PartnerIcon organization={organization} />,
-    }))
-    .sort((a, b) => a.label.localeCompare(b.label))
-
-  const sectionsWithHeaders: SidebarSection[] = [
-    {
-      heading: 'Projects',
-      key: 'projects',
-      links: [
-        {
-          isActive: router.pathname === '/projects',
-          label: 'All projects',
-          href: '/projects',
-          key: 'all-projects-item',
-        },
-      ],
-    },
-    ...(IS_PLATFORM && organizationsLinks?.length > 0
-      ? [
-          {
-            heading: 'Organizations',
-            key: 'organizations',
-            links: organizationsLinks,
-          },
-        ]
-      : []),
-    ...(IS_PLATFORM
-      ? [
-          {
-            heading: 'Account',
-            key: 'account',
-            links: [
-              {
-                isActive: router.pathname === `/account/me`,
-                label: 'Preferences',
-                href: `/account/me`,
-                key: `/account/me`,
-              },
-              {
-                isActive: router.pathname === `/account/tokens`,
-                label: 'Access Tokens',
-                href: `/account/tokens`,
-                key: `/account/tokens`,
-              },
-
-              {
-                isActive: router.pathname === `/account/security`,
-                label: 'Security',
-                href: `/account/security`,
-                key: `/account/security`,
-              },
-              {
-                isActive: router.pathname === `/account/audit`,
-                label: 'Audit Logs',
-                href: `/account/audit`,
-                key: `/account/audit`,
-              },
-            ],
-          },
-        ]
-      : []),
-    {
-      heading: 'Documentation',
-      key: 'documentation',
-      links: [
-        {
-          key: 'ext-guides',
-          label: 'Guides',
-          href: 'https://supabase.com/docs',
-          isExternal: true,
-        },
-        {
-          key: 'ext-guides',
-          label: 'API Reference',
-          href: 'https://supabase.com/docs/guides/api',
-          isExternal: true,
-        },
-      ],
-    },
-  ]
-
-  if (newLayoutPreview) {
-    return (
-      <>
-        {!newLayoutPreview && <LayoutHeader />}
-        <OrganizationLayoutContent>{children}</OrganizationLayoutContent>
-      </>
-    )
-  }
-
-  return (
-    <WithSidebar
-      title={selectedOrganization?.name ?? 'Supabase'}
-      breadcrumbs={[{ key: `org-settings`, label: 'Settings' }]}
-      sections={sectionsWithHeaders}
-    >
-      {!newLayoutPreview && <LayoutHeader />}
-      <OrganizationLayoutContent>{children}</OrganizationLayoutContent>
-    </WithSidebar>
-  )
+const OrganizationLayout = ({ children, title }: PropsWithChildren<OrganizationLayoutProps>) => {
+  useRegisterOrgMenu()
+  return <OrganizationLayoutContent title={title}>{children}</OrganizationLayoutContent>
 }
 
 export default withAuth(OrganizationLayout)

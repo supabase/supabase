@@ -2,8 +2,8 @@
 title: Getting started with Laravel and Postgres
 description: 'Learn how to create a new Laravel PHP app and connect it to a Supabase PostgreSQL database.'
 author: thor_schaeff
-image: getting-started/laravel/laravel.jpg
-thumb: getting-started/laravel/laravel.jpg
+imgSocial: getting-started/laravel/laravel.jpg
+imgThumb: getting-started/laravel/laravel.jpg
 categories:
   - engineering
 tags:
@@ -20,7 +20,7 @@ Postgres is an ideal choice for your Laravel PHP applications as Laravel ships w
 
 In this post we'll start from scratch, creating a new Laravel application, setting up the Laravel Breeze starter kit for user authentication, and connecting it to our Supabase Postgres database.
 
-<Admonition type="note" label="Need help migrating?">
+<Admonition type="note" title="Need help migrating?">
 
 Supabase is one of the best [free alternatives to Heroku Postgres](/alternatives/supabase-vs-heroku-postgres). See [this guide](/docs/guides/resources/migrating-to-supabase/heroku) to learn how to migrate from Heroku to Supabase.
 
@@ -67,7 +67,7 @@ Go to [database.new](https://database.new) and create a new Supabase project. Sa
 
 When your project is up and running, navigate to the [project connect page](/dashboard/project/_?showConnect=true) to find the URI connection string.
 
-Laravel ships with a Postgres adapter out of the box, you can simply configure it via the environment variables. You can find the database URL in your [Supabase Dashboard](/dashboard/project/_/settings/database).
+Laravel ships with a Postgres adapter out of the box, you can simply configure it via the environment variables. You can find the database URL in your [Supabase Dashboard](/dashboard/project/_/database/settings).
 
 ```bash .env
 DB_CONNECTION=pgsql

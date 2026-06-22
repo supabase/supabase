@@ -1,35 +1,31 @@
-import { Check, Edit, MessageSquare, Plus, Trash, X } from 'lucide-react'
+import { Check, ChevronDown, Edit, Plus, Trash, X } from 'lucide-react'
 import { useState } from 'react'
-
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
-  Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
-import { ButtonTooltip } from '../ButtonTooltip'
+
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 
 interface AIAssistantChatSelectorProps {
-  className?: string
   disabled?: boolean
 }
 
-export const AIAssistantChatSelector = ({
-  className,
-  disabled = false,
-}: AIAssistantChatSelectorProps) => {
+export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSelectorProps) => {
   const snap = useAiAssistantStateSnapshot()
+  const currentChat = snap.activeChat?.name
 
   const [chatSelectorOpen, setChatSelectorOpen] = useState(false)
   const [editingChatId, setEditingChatId] = useState<string | null>(null)
@@ -89,26 +85,27 @@ export const AIAssistantChatSelector = ({
   }
 
   return (
-    <Popover_Shadcn_ open={chatSelectorOpen} onOpenChange={setChatSelectorOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
-        <ButtonTooltip
-          type="default"
+    <Popover open={chatSelectorOpen} onOpenChange={setChatSelectorOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="text"
           size="tiny"
-          icon={<MessageSquare size={14} />}
-          className={cn('h-7 w-7', className)}
-          tooltip={{ content: { side: 'bottom', text: 'View chats' } }}
-        />
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="w-[250px] p-0" align="end">
-        <Command_Shadcn_>
-          <CommandInput_Shadcn_ placeholder="Search chats..." />
-          <CommandList_Shadcn_>
-            <CommandEmpty_Shadcn_>No chats found.</CommandEmpty_Shadcn_>
-            <CommandGroup_Shadcn_>
+          iconRight={<ChevronDown size={14} />}
+          className="max-w-64 truncate"
+        >
+          {currentChat}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[250px] p-0" align="start">
+        <Command>
+          <CommandInput className="text-xs" placeholder="Search chats..." />
+          <CommandList>
+            <CommandEmpty>No chats found.</CommandEmpty>
+            <CommandGroup>
               <ScrollArea className={chats.length > 4 ? 'h-40' : ''}>
                 {/* @ts-ignore */}
                 {chats.map(([id, chat]) => (
-                  <CommandItem_Shadcn_
+                  <CommandItem
                     key={id}
                     value={id}
                     onSelect={() => handleSelectChat(id)}
@@ -119,7 +116,7 @@ export const AIAssistantChatSelector = ({
                     <div className="flex items-center w-full flex-1 min-w-0">
                       {editingChatId === id ? (
                         <div className="flex items-center gap-2 w-full">
-                          <Input_Shadcn_
+                          <Input
                             value={editingChatName}
                             onChange={(e) => setEditingChatName(e.target.value)}
                             autoFocus
@@ -141,14 +138,14 @@ export const AIAssistantChatSelector = ({
                           />
                           <div className="flex items-center gap-0">
                             <Button
-                              type="text"
+                              variant="text"
                               size="tiny"
                               icon={<Check size={14} />}
                               onClick={(e) => handleSaveEditChat(e)}
                               className="h-7 w-7"
                             />
                             <Button
-                              type="text"
+                              variant="text"
                               size="tiny"
                               icon={<X size={14} />}
                               onClick={(e) => handleCancelEditChat(e)}
@@ -160,20 +157,18 @@ export const AIAssistantChatSelector = ({
                         <>
                           <Check
                             className={cn(
-                              'mr-2 h-4 w-4 flex-shrink-0',
+                              'mr-2 h-4 w-4 shrink-0',
                               snap.activeChatId === id ? 'opacity-100' : 'opacity-0'
                             )}
                           />
-                          <span className="truncate flex-1 min-w-0 overflow-hidden">
-                            {chat.name}
-                          </span>
+                          <span className="truncate flex-1 w-0">{chat.name}</span>
                         </>
                       )}
                     </div>
                     {editingChatId !== id && (
                       <div className="flex items-center gap-x-0 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button
-                          type="text"
+                          variant="text"
                           size="tiny"
                           icon={<Edit size={14} />}
                           onClick={(e) => handleStartEditChat(id, chat.name, e)}
@@ -181,7 +176,7 @@ export const AIAssistantChatSelector = ({
                         />
                         {chats.length > 1 && (
                           <Button
-                            type="text"
+                            variant="text"
                             size="tiny"
                             icon={<Trash size={14} />}
                             onClick={(e) => handleDeleteChat(id, e)}
@@ -190,13 +185,13 @@ export const AIAssistantChatSelector = ({
                         )}
                       </div>
                     )}
-                  </CommandItem_Shadcn_>
+                  </CommandItem>
                 ))}
               </ScrollArea>
-            </CommandGroup_Shadcn_>
-            <CommandSeparator_Shadcn_ />
-            <CommandGroup_Shadcn_>
-              <CommandItem_Shadcn_
+            </CommandGroup>
+            <CommandSeparator />
+            <CommandGroup>
+              <CommandItem
                 className="cursor-pointer w-full gap-x-2"
                 onSelect={() => {
                   snap.newChat()
@@ -209,12 +204,12 @@ export const AIAssistantChatSelector = ({
                 disabled={disabled}
               >
                 <Plus size={14} strokeWidth={1.5} />
-                <span>New chat</span>
-              </CommandItem_Shadcn_>
-            </CommandGroup_Shadcn_>
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+                <span>Start a new chat</span>
+              </CommandItem>
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }

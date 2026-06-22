@@ -1,42 +1,46 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop } from 'lodash'
-import { Lock, Unlock } from 'lucide-react'
-
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { AiIconAnimation, Badge } from 'ui'
+import { noop } from 'lodash'
+import { Lock, Table } from 'lucide-react'
+import { AiIconAnimation, Badge, CardTitle } from 'ui'
+
+import type { PolicyTable } from './PolicyTableRow.types'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { EditorTablePageLink } from '@/data/prefetchers/project.$ref.editor.$id'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface PolicyTableRowHeaderProps {
-  table: {
-    id: number
-    schema: string
-    name: string
-    rls_enabled: boolean
-  }
+  table: PolicyTable
   isLocked: boolean
-  onSelectToggleRLS: (table: {
-    id: number
-    schema: string
-    name: string
-    rls_enabled: boolean
-  }) => void
-  onSelectCreatePolicy: () => void
+  hasApiAccess: boolean
+  isLoadingApiAccess: boolean
+  onSelectToggleRLS: (table: PolicyTable) => void
+  onSelectCreatePolicy: (table: PolicyTable) => void
 }
 
-const PolicyTableRowHeader = ({
+export const PolicyTableRowHeader = ({
   table,
   isLocked,
+  hasApiAccess,
+  isLoadingApiAccess,
   onSelectToggleRLS = noop,
   onSelectCreatePolicy,
 }: PolicyTableRowHeaderProps) => {
   const { ref } = useParams()
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
-  const canCreatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
-  const canToggleRLS = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const { can: canCreatePolicies } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'policies'
+  )
+  const { can: canToggleRLS } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'tables'
+  )
 
   const isRealtimeSchema = table.schema === 'realtime'
   const isRealtimeMessagesTable = isRealtimeSchema && table.name === 'messages'
@@ -44,41 +48,42 @@ const PolicyTableRowHeader = ({
 
   return (
     <div id={table.id.toString()} className="flex w-full items-center justify-between">
-      <div className="flex gap-x-4 text-left">
+      <div className="flex gap-x-4 text-left flex-wrap">
         <EditorTablePageLink
           projectRef={ref}
           id={String(table.id)}
-          className="flex items-center gap-x-2"
+          className="flex items-center gap-3 flex-wrap"
         >
-          {table.rls_enabled ? (
-            <div className="flex items-center gap-x-1 text-xs">
-              <Lock size={14} strokeWidth={2} className="text-brand" />
-            </div>
-          ) : (
-            <div className="flex items-center gap-x-1 text-xs">
-              <Unlock size={14} strokeWidth={2} className="text-warning-600" />
-            </div>
-          )}
-          <h4 className="m-0">{table.name}</h4>
-        </EditorTablePageLink>
-        <div className="flex items-center gap-x-2">
-          {isTableLocked && (
-            <Badge>
-              <span className="flex gap-2 items-center text-xs uppercase text-foreground-lighter">
-                <Lock size={12} /> Locked
-              </span>
+          <Table strokeWidth={1.5} size={16} className="text-foreground-muted" />
+          <CardTitle className="m-0 normal-case">{table.name}</CardTitle>
+          {!table.rls_enabled && (
+            <Badge variant="warning" className="shrink-0">
+              RLS Disabled
             </Badge>
           )}
-        </div>
+          {!isLoadingApiAccess && !hasApiAccess && (
+            <Badge variant="default" className="shrink-0">
+              API Disabled
+            </Badge>
+          )}
+        </EditorTablePageLink>
+        {isTableLocked && (
+          <Badge>
+            <span className="flex gap-2 items-center text-xs uppercase text-foreground-lighter">
+              <Lock size={12} /> Locked
+            </span>
+          </Badge>
+        )}
       </div>
       {!isTableLocked && (
         <div className="flex-1">
           <div className="flex flex-row justify-end gap-x-2">
             {!isRealtimeMessagesTable && (
               <ButtonTooltip
-                type="default"
+                variant="default"
                 disabled={!canToggleRLS}
                 onClick={() => onSelectToggleRLS(table)}
+                data-testid={`${table.name}-toggle-rls`}
                 tooltip={{
                   content: {
                     side: 'bottom',
@@ -92,9 +97,10 @@ const PolicyTableRowHeader = ({
               </ButtonTooltip>
             )}
             <ButtonTooltip
-              type="default"
+              variant="default"
               disabled={!canToggleRLS || !canCreatePolicies}
-              onClick={() => onSelectCreatePolicy()}
+              onClick={() => onSelectCreatePolicy(table)}
+              data-testid={`${table.name}-create-policy`}
               tooltip={{
                 content: {
                   side: 'bottom',
@@ -110,12 +116,12 @@ const PolicyTableRowHeader = ({
             </ButtonTooltip>
 
             <ButtonTooltip
-              type="default"
+              variant="default"
               className="px-1"
               onClick={() => {
+                openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                 aiSnap.newChat({
                   name: 'Create new policy',
-                  open: true,
                   initialInput: `Create and name a new policy for the ${table.schema} schema on the ${table.name} table that ...`,
                 })
               }}
@@ -128,6 +134,11 @@ const PolicyTableRowHeader = ({
                       : 'Create with Supabase Assistant',
                 },
               }}
+              aria-label={
+                !canToggleRLS || !canCreatePolicies
+                  ? 'You need additional permissions to create RLS policies'
+                  : 'Create with Supabase Assistant'
+              }
             >
               <AiIconAnimation size={16} />
             </ButtonTooltip>
@@ -137,5 +148,3 @@ const PolicyTableRowHeader = ({
     </div>
   )
 }
-
-export default PolicyTableRowHeader

@@ -1,0 +1,343 @@
+/*
+ * Defines every Tailwind v4 --color-* design token. Tailwind generates
+ * bg-{name} / text-{name} / border-{name} / ring-{name} / border-{r,l,t,b}-{name}
+ * utilities for each entry. Semantic tokens wrap their HSL triplet in hsl();
+ * Radix/scale/brand tokens self-reference the matching var declared in
+ * colors.css, which holds the per-theme literal values.
+ */
+
+@theme inline {
+  --color-foreground: hsl(var(--foreground-default));
+  --color-foreground-light: hsl(var(--foreground-light));
+  --color-foreground-lighter: hsl(var(--foreground-lighter));
+  --color-foreground-muted: hsl(var(--foreground-muted));
+  --color-foreground-contrast: hsl(var(--foreground-contrast));
+  --color-background-200: hsl(var(--background-200));
+  --color-background: hsl(var(--background-default));
+  --color-background-alternative-200: hsl(var(--background-alternative-200));
+  --color-background-alternative: hsl(var(--background-alternative-default));
+  --color-background-selection: hsl(var(--background-selection));
+  --color-background-control: hsl(var(--background-control));
+  --color-background-surface-75: hsl(var(--background-surface-75));
+  --color-background-surface-100: hsl(var(--background-surface-100));
+  --color-background-surface-200: hsl(var(--background-surface-200));
+  --color-background-surface-300: hsl(var(--background-surface-300));
+  --color-background-surface-400: hsl(var(--background-surface-400));
+  --color-background-overlay: hsl(var(--background-overlay-default));
+  --color-background-overlay-hover: hsl(var(--background-overlay-hover));
+  --color-background-muted: hsl(var(--background-muted));
+  --color-background-button: hsl(var(--background-button-default));
+  --color-background-dialog: hsl(var(--background-dialog-default));
+  --color-background-dash-sidebar: hsl(var(--background-dash-sidebar));
+  --color-background-dash-canvas: hsl(var(--background-dash-canvas));
+  --color-destructive-200: hsl(var(--destructive-200));
+  --color-destructive-300: hsl(var(--destructive-300));
+  --color-destructive-400: hsl(var(--destructive-400));
+  --color-destructive-500: hsl(var(--destructive-500));
+  --color-destructive-600: hsl(var(--destructive-600));
+  --color-destructive: hsl(var(--destructive-default));
+  --color-warning-200: hsl(var(--warning-200));
+  --color-warning-300: hsl(var(--warning-300));
+  --color-warning-400: hsl(var(--warning-400));
+  --color-warning-500: hsl(var(--warning-500));
+  --color-warning-600: hsl(var(--warning-600));
+  --color-warning: hsl(var(--warning-default));
+  --color-brand-200: hsl(var(--brand-200));
+  --color-brand-300: hsl(var(--brand-300));
+  --color-brand-400: hsl(var(--brand-400));
+  --color-brand-500: hsl(var(--brand-500));
+  --color-brand-600: hsl(var(--brand-600));
+  --color-brand: hsl(var(--brand-default));
+  --color-brand-link: hsl(var(--brand-link));
+  --color-_secondary-200: hsl(var(--secondary-200));
+  --color-_secondary-400: hsl(var(--secondary-400));
+  --color-_secondary: hsl(var(--secondary-default));
+  --color-code_block-1: hsl(var(--code-block-1));
+  --color-code_block-2: hsl(var(--code-block-2));
+  --color-code_block-3: hsl(var(--code-block-3));
+  --color-code_block-4: hsl(var(--code-block-4));
+  --color-code_block-5: hsl(var(--code-block-5));
+  --color-amber-100: var(--color-amber-100);
+  --color-amber-200: var(--color-amber-200);
+  --color-amber-300: var(--color-amber-300);
+  --color-amber-400: var(--color-amber-400);
+  --color-amber-500: var(--color-amber-500);
+  --color-amber-600: var(--color-amber-600);
+  --color-amber-700: var(--color-amber-700);
+  --color-amber-800: var(--color-amber-800);
+  --color-amber-900: var(--color-amber-900);
+  --color-amber-1000: var(--color-amber-1000);
+  --color-amber-1100: var(--color-amber-1100);
+  --color-amber-1200: var(--color-amber-1200);
+  --color-blue-100: var(--color-blue-100);
+  --color-blue-200: var(--color-blue-200);
+  --color-blue-300: var(--color-blue-300);
+  --color-blue-400: var(--color-blue-400);
+  --color-blue-500: var(--color-blue-500);
+  --color-blue-600: var(--color-blue-600);
+  --color-blue-700: var(--color-blue-700);
+  --color-blue-800: var(--color-blue-800);
+  --color-blue-900: var(--color-blue-900);
+  --color-blue-1000: var(--color-blue-1000);
+  --color-blue-1100: var(--color-blue-1100);
+  --color-blue-1200: var(--color-blue-1200);
+  --color-crimson-100: var(--color-crimson-100);
+  --color-crimson-200: var(--color-crimson-200);
+  --color-crimson-300: var(--color-crimson-300);
+  --color-crimson-400: var(--color-crimson-400);
+  --color-crimson-500: var(--color-crimson-500);
+  --color-crimson-600: var(--color-crimson-600);
+  --color-crimson-700: var(--color-crimson-700);
+  --color-crimson-800: var(--color-crimson-800);
+  --color-crimson-900: var(--color-crimson-900);
+  --color-crimson-1000: var(--color-crimson-1000);
+  --color-crimson-1100: var(--color-crimson-1100);
+  --color-crimson-1200: var(--color-crimson-1200);
+  --color-gold-100: var(--color-gold-100);
+  --color-gold-200: var(--color-gold-200);
+  --color-gold-300: var(--color-gold-300);
+  --color-gold-400: var(--color-gold-400);
+  --color-gold-500: var(--color-gold-500);
+  --color-gold-600: var(--color-gold-600);
+  --color-gold-700: var(--color-gold-700);
+  --color-gold-800: var(--color-gold-800);
+  --color-gold-900: var(--color-gold-900);
+  --color-gold-1000: var(--color-gold-1000);
+  --color-gold-1100: var(--color-gold-1100);
+  --color-gold-1200: var(--color-gold-1200);
+  --color-gray-100: var(--color-gray-100);
+  --color-gray-200: var(--color-gray-200);
+  --color-gray-300: var(--color-gray-300);
+  --color-gray-400: var(--color-gray-400);
+  --color-gray-500: var(--color-gray-500);
+  --color-gray-600: var(--color-gray-600);
+  --color-gray-700: var(--color-gray-700);
+  --color-gray-800: var(--color-gray-800);
+  --color-gray-900: var(--color-gray-900);
+  --color-gray-1000: var(--color-gray-1000);
+  --color-gray-1100: var(--color-gray-1100);
+  --color-gray-1200: var(--color-gray-1200);
+  --color-green-100: var(--color-green-100);
+  --color-green-200: var(--color-green-200);
+  --color-green-300: var(--color-green-300);
+  --color-green-400: var(--color-green-400);
+  --color-green-500: var(--color-green-500);
+  --color-green-600: var(--color-green-600);
+  --color-green-700: var(--color-green-700);
+  --color-green-800: var(--color-green-800);
+  --color-green-900: var(--color-green-900);
+  --color-green-1000: var(--color-green-1000);
+  --color-green-1100: var(--color-green-1100);
+  --color-green-1200: var(--color-green-1200);
+  --color-indigo-100: var(--color-indigo-100);
+  --color-indigo-200: var(--color-indigo-200);
+  --color-indigo-300: var(--color-indigo-300);
+  --color-indigo-400: var(--color-indigo-400);
+  --color-indigo-500: var(--color-indigo-500);
+  --color-indigo-600: var(--color-indigo-600);
+  --color-indigo-700: var(--color-indigo-700);
+  --color-indigo-800: var(--color-indigo-800);
+  --color-indigo-900: var(--color-indigo-900);
+  --color-indigo-1000: var(--color-indigo-1000);
+  --color-indigo-1100: var(--color-indigo-1100);
+  --color-indigo-1200: var(--color-indigo-1200);
+  --color-orange-100: var(--color-orange-100);
+  --color-orange-200: var(--color-orange-200);
+  --color-orange-300: var(--color-orange-300);
+  --color-orange-400: var(--color-orange-400);
+  --color-orange-500: var(--color-orange-500);
+  --color-orange-600: var(--color-orange-600);
+  --color-orange-700: var(--color-orange-700);
+  --color-orange-800: var(--color-orange-800);
+  --color-orange-900: var(--color-orange-900);
+  --color-orange-1000: var(--color-orange-1000);
+  --color-orange-1100: var(--color-orange-1100);
+  --color-orange-1200: var(--color-orange-1200);
+  --color-pink-100: var(--color-pink-100);
+  --color-pink-200: var(--color-pink-200);
+  --color-pink-300: var(--color-pink-300);
+  --color-pink-400: var(--color-pink-400);
+  --color-pink-500: var(--color-pink-500);
+  --color-pink-600: var(--color-pink-600);
+  --color-pink-700: var(--color-pink-700);
+  --color-pink-800: var(--color-pink-800);
+  --color-pink-900: var(--color-pink-900);
+  --color-pink-1000: var(--color-pink-1000);
+  --color-pink-1100: var(--color-pink-1100);
+  --color-pink-1200: var(--color-pink-1200);
+  --color-purple-100: var(--color-purple-100);
+  --color-purple-200: var(--color-purple-200);
+  --color-purple-300: var(--color-purple-300);
+  --color-purple-400: var(--color-purple-400);
+  --color-purple-500: var(--color-purple-500);
+  --color-purple-600: var(--color-purple-600);
+  --color-purple-700: var(--color-purple-700);
+  --color-purple-800: var(--color-purple-800);
+  --color-purple-900: var(--color-purple-900);
+  --color-purple-1000: var(--color-purple-1000);
+  --color-purple-1100: var(--color-purple-1100);
+  --color-purple-1200: var(--color-purple-1200);
+  --color-red-100: var(--color-red-100);
+  --color-red-200: var(--color-red-200);
+  --color-red-300: var(--color-red-300);
+  --color-red-400: var(--color-red-400);
+  --color-red-500: var(--color-red-500);
+  --color-red-600: var(--color-red-600);
+  --color-red-700: var(--color-red-700);
+  --color-red-800: var(--color-red-800);
+  --color-red-900: var(--color-red-900);
+  --color-red-1000: var(--color-red-1000);
+  --color-red-1100: var(--color-red-1100);
+  --color-red-1200: var(--color-red-1200);
+  --color-slate-100: var(--color-slate-100);
+  --color-slate-200: var(--color-slate-200);
+  --color-slate-300: var(--color-slate-300);
+  --color-slate-400: var(--color-slate-400);
+  --color-slate-500: var(--color-slate-500);
+  --color-slate-600: var(--color-slate-600);
+  --color-slate-700: var(--color-slate-700);
+  --color-slate-800: var(--color-slate-800);
+  --color-slate-900: var(--color-slate-900);
+  --color-slate-1000: var(--color-slate-1000);
+  --color-slate-1100: var(--color-slate-1100);
+  --color-slate-1200: var(--color-slate-1200);
+  --color-tomato-100: var(--color-tomato-100);
+  --color-tomato-200: var(--color-tomato-200);
+  --color-tomato-300: var(--color-tomato-300);
+  --color-tomato-400: var(--color-tomato-400);
+  --color-tomato-500: var(--color-tomato-500);
+  --color-tomato-600: var(--color-tomato-600);
+  --color-tomato-700: var(--color-tomato-700);
+  --color-tomato-800: var(--color-tomato-800);
+  --color-tomato-900: var(--color-tomato-900);
+  --color-tomato-1000: var(--color-tomato-1000);
+  --color-tomato-1100: var(--color-tomato-1100);
+  --color-tomato-1200: var(--color-tomato-1200);
+  --color-violet-100: var(--color-violet-100);
+  --color-violet-200: var(--color-violet-200);
+  --color-violet-300: var(--color-violet-300);
+  --color-violet-400: var(--color-violet-400);
+  --color-violet-500: var(--color-violet-500);
+  --color-violet-600: var(--color-violet-600);
+  --color-violet-700: var(--color-violet-700);
+  --color-violet-800: var(--color-violet-800);
+  --color-violet-900: var(--color-violet-900);
+  --color-violet-1000: var(--color-violet-1000);
+  --color-violet-1100: var(--color-violet-1100);
+  --color-violet-1200: var(--color-violet-1200);
+  --color-yellow-100: var(--color-yellow-100);
+  --color-yellow-200: var(--color-yellow-200);
+  --color-yellow-300: var(--color-yellow-300);
+  --color-yellow-400: var(--color-yellow-400);
+  --color-yellow-500: var(--color-yellow-500);
+  --color-yellow-600: var(--color-yellow-600);
+  --color-yellow-700: var(--color-yellow-700);
+  --color-yellow-800: var(--color-yellow-800);
+  --color-yellow-900: var(--color-yellow-900);
+  --color-yellow-1000: var(--color-yellow-1000);
+  --color-yellow-1100: var(--color-yellow-1100);
+  --color-yellow-1200: var(--color-yellow-1200);
+  --color-scale-100: var(--color-scale-100);
+  --color-scale-200: var(--color-scale-200);
+  --color-scale-300: var(--color-scale-300);
+  --color-scale-400: var(--color-scale-400);
+  --color-scale-500: var(--color-scale-500);
+  --color-scale-600: var(--color-scale-600);
+  --color-scale-700: var(--color-scale-700);
+  --color-scale-800: var(--color-scale-800);
+  --color-scale-900: var(--color-scale-900);
+  --color-scale-1000: var(--color-scale-1000);
+  --color-scale-1100: var(--color-scale-1100);
+  --color-scale-1200: var(--color-scale-1200);
+  --color-brand-100: var(--color-brand-100);
+  --color-brand-700: var(--color-brand-700);
+  --color-brand-800: var(--color-brand-800);
+  --color-brand-900: var(--color-brand-900);
+  --color-brand-1000: var(--color-brand-1000);
+  --color-brand-1100: var(--color-brand-1100);
+  --color-brand-1200: var(--color-brand-1200);
+  --color-sidebar: hsl(var(--sidebar-background));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
+  --color-hi-contrast: hsl(var(--foreground-default));
+  --color-lo-contrast: hsl(var(--background-alternative-default));
+
+  /*
+   * This will generate colors only for bg utilities.
+   */
+  --background-color-200: hsl(var(--background-200));
+  --background-color-default: hsl(var(--background-default));
+  --background-color-muted: hsl(var(--background-muted));
+  --background-color-alternative-200: hsl(var(--background-alternative-200));
+  --background-color-alternative: hsl(var(--background-alternative-default));
+  --background-color-selection: hsl(var(--background-selection));
+  --background-color-control: hsl(var(--background-control));
+  --background-color-surface-75: hsl(var(--background-surface-75));
+  --background-color-surface-100: hsl(var(--background-surface-100));
+  --background-color-surface-200: hsl(var(--background-surface-200));
+  --background-color-surface-300: hsl(var(--background-surface-300));
+  --background-color-surface-400: hsl(var(--background-surface-400));
+  --background-color-overlay: hsl(var(--background-overlay-default));
+  --background-color-overlay-hover: hsl(var(--background-overlay-hover));
+  --background-color-button: hsl(var(--background-button-default));
+  --background-color-dialog: hsl(var(--background-dialog-default));
+  --background-color-dash-sidebar: hsl(var(--background-dash-sidebar));
+  --background-color-dash-canvas: hsl(var(--background-dash-canvas));
+  --background-color-studio: hsl(var(--background-200));
+
+  /*
+   * This will generate colors for all utilities, they'll have border in the name i.e. bg-border-overlay, text-border-muted
+   * This usage should be discouraged and deprecated.
+   */
+  --color-border: hsl(var(--border-default));
+  --color-border-overlay: hsl(var(--border-overlay));
+  --color-border-muted: hsl(var(--border-muted));
+  --color-border-control: hsl(var(--border-control));
+  --color-border-strong: hsl(var(--border-strong));
+  --color-border-stronger: hsl(var(--border-stronger));
+  /*
+   * This will generate colors only for border utilities
+   * i.e. bg-muted and they'll only have border-color: var(--border-muted) rule
+   */
+  --border-color-default: hsl(var(--border-default));
+  --border-color-overlay: hsl(var(--border-overlay));
+  --border-color-muted: hsl(var(--border-muted));
+  --border-color-control: hsl(var(--border-control));
+  --border-color-strong: hsl(var(--border-strong));
+  --border-color-stronger: hsl(var(--border-stronger));
+  --border-color-secondary: hsl(var(--border-secondary));
+  --border-color-alternative: hsl(var(--border-alternative));
+  --border-color-button: hsl(var(--border-button-default));
+  --border-color-button-hover: hsl(var(--border-button-hover));
+
+  /* This will generate colors only for text utilities */
+  --text-color-default: hsl(var(--foreground-default));
+  --text-color-light: hsl(var(--foreground-light));
+  --text-color-lighter: hsl(var(--foreground-lighter));
+  --text-color-muted: hsl(var(--foreground-muted));
+  --text-color-contrast: hsl(var(--foreground-contrast));
+
+  /* misc theme tokens — typography, breakpoints, sizing, transform-origin */
+  --font-sans: var(
+    --font-custom,
+    Circular,
+    custom-font,
+    Helvetica Neue,
+    Helvetica,
+    Arial,
+    sans-serif
+  );
+  --font-mono: var(--font-source-code-pro, Source Code Pro, Office Code Pro, Menlo, monospace);
+  --breakpoint-xs: 480px;
+  --width-listbox: 320px;
+  --radius-panel: 6px;
+  --spacing-content: 21px;
+  --spacing-card: var(--card-padding-x);
+  --transform-origin-dropdown: var(--radix-dropdown-menu-content-transform-origin);
+  --transform-origin-popover: var(--radix-popover-menu-content-transform-origin);
+}

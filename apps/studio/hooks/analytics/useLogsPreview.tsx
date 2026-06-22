@@ -1,12 +1,15 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { useMemo, useState, useCallback } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
+import { useFillTimeseriesSorted } from './useFillTimeseriesSorted'
+import { useLogsUrlState } from './useLogsUrlState'
+import useTimeseriesUnixToIso from './useTimeseriesUnixToIso'
 import {
+  getDefaultHelper,
   LogsTableName,
   PREVIEWER_DATEPICKER_HELPERS,
-  getDefaultHelper,
-} from 'components/interfaces/Settings/Logs/Logs.constants'
+} from '@/components/interfaces/Settings/Logs/Logs.constants'
 import type {
   Count,
   EventChart,
@@ -15,16 +18,13 @@ import type {
   LogData,
   Logs,
   LogsEndpointParams,
-} from 'components/interfaces/Settings/Logs/Logs.types'
+} from '@/components/interfaces/Settings/Logs/Logs.types'
 import {
   genChartQuery,
   genCountQuery,
   genDefaultQuery,
-} from 'components/interfaces/Settings/Logs/Logs.utils'
-import { get } from 'data/fetchers'
-import { useLogsUrlState } from './useLogsUrlState'
-import { useFillTimeseriesSorted } from './useFillTimeseriesSorted'
-import useTimeseriesUnixToIso from './useTimeseriesUnixToIso'
+} from '@/components/interfaces/Settings/Logs/Logs.utils'
+import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
 
 interface LogsPreviewHook {
   logData: LogData[]
@@ -80,17 +80,24 @@ function useLogsPreview({
     [JSON.stringify(urlFilters), JSON.stringify(filterOverride), search]
   )
 
-  const params: LogsEndpointParams = useMemo(() => {
-    const currentSql = genDefaultQuery(table, mergedFilters, limit)
-    return {
-      project: projectRef,
+  const defaultSql = useMemo(
+    () => genDefaultQuery(table, mergedFilters, limit),
+    [table, mergedFilters, limit]
+  )
+
+  const params: LogsEndpointParams = useMemo(
+    () => ({
       iso_timestamp_start: timestampStart,
       iso_timestamp_end: timestampEnd,
-      sql: currentSql,
-    }
-  }, [projectRef, timestampStart, timestampEnd, table, mergedFilters, limit])
+      sql: defaultSql,
+    }),
+    [timestampStart, timestampEnd, defaultSql]
+  )
 
-  const queryKey = useMemo(() => ['projects', projectRef, 'logs', params], [projectRef, params])
+  const queryKey = useMemo(
+    () => ['projects', projectRef, 'logs', params, defaultSql],
+    [projectRef, params, defaultSql]
+  )
 
   const {
     data,
@@ -101,38 +108,32 @@ function useLogsPreview({
     fetchNextPage,
     isFetchingNextPage,
     refetch,
-  } = useInfiniteQuery(
+  } = useInfiniteQuery({
     queryKey,
-    async ({ signal, pageParam }) => {
-      const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-        params: {
-          path: { ref: projectRef },
-          query: {
-            ...params,
-            iso_timestamp_end: pageParam || params.iso_timestamp_end,
-          },
-        },
+    queryFn: async ({ signal, pageParam }) => {
+      const data = await executeAnalyticsSql({
+        projectRef,
+        endpoint: '/platform/projects/{ref}/analytics/endpoints/logs.all',
+        sql: defaultSql,
+        iso_timestamp_start: params.iso_timestamp_start ?? '',
+        iso_timestamp_end: (pageParam || params.iso_timestamp_end) ?? '',
+        method: 'get',
         signal,
       })
-      if (error) {
-        throw error
-      }
-
       return data as unknown as Logs
     },
-    {
-      refetchOnWindowFocus: false,
-      getNextPageParam(lastPage) {
-        if ((lastPage.result?.length ?? 0) === 0) {
-          return undefined
-        }
-        const len = lastPage.result.length
-        const { timestamp: tsLimit }: LogData = lastPage.result[len - 1]
-        const isoTsLimit = dayjs.utc(Number(tsLimit / 1000)).toISOString()
-        return isoTsLimit
-      },
-    }
-  )
+    refetchOnWindowFocus: false,
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam(lastPage) {
+      if ((lastPage.result?.length ?? 0) === 0) {
+        return undefined
+      }
+      const len = lastPage.result.length
+      const { timestamp: tsLimit }: LogData = lastPage.result[len - 1]
+      const isoTsLimit = dayjs.utc(Number(tsLimit / 1000)).toISOString()
+      return isoTsLimit
+    },
+  })
 
   const { logData, error, oldestTimestamp } = useMemo(() => {
     let logData: LogData[] = []
@@ -170,33 +171,24 @@ function useLogsPreview({
     [projectRef, countQuerySql, latestRefresh, timestampEnd, table, mergedFilters]
   )
 
-  const { data: countData } = useQuery(
-    countQueryKey,
-    async ({ signal }) => {
-      const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-        params: {
-          path: { ref: projectRef },
-          query: {
-            project: projectRef,
-            sql: countQuerySql,
-            iso_timestamp_start: latestRefresh,
-            iso_timestamp_end: timestampEnd,
-          },
-        },
+  const { data: countData } = useQuery({
+    queryKey: countQueryKey,
+    queryFn: async ({ signal }) => {
+      const data = await executeAnalyticsSql({
+        projectRef,
+        endpoint: '/platform/projects/{ref}/analytics/endpoints/logs.all',
+        sql: countQuerySql,
+        iso_timestamp_start: latestRefresh,
+        iso_timestamp_end: timestampEnd ?? '',
+        method: 'get',
         signal,
       })
-      if (error) {
-        throw error
-      }
-
       return data as unknown as Count
     },
-    {
-      refetchOnWindowFocus: false,
-      refetchInterval: 60000,
-      enabled: !error && data && data?.pages?.length > 0 ? true : false,
-    }
-  )
+    refetchOnWindowFocus: false,
+    refetchInterval: 60000,
+    enabled: !error && data && data?.pages?.length > 0 ? true : false,
+  })
 
   const newCount = countData?.result?.[0]?.count ?? 0
 
@@ -219,29 +211,22 @@ function useLogsPreview({
     [projectRef, chartQuery, timestampStart, timestampEnd]
   )
 
-  const { data: eventChartResponse, refetch: refreshEventChart } = useQuery(
-    chartQueryKey,
-    async ({ signal }) => {
-      const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-        params: {
-          path: { ref: projectRef },
-          query: {
-            iso_timestamp_start: timestampStart,
-            iso_timestamp_end: timestampEnd,
-            project: projectRef,
-            sql: chartQuery,
-          },
-        },
+  const { data: eventChartResponse, refetch: refreshEventChart } = useQuery({
+    queryKey: chartQueryKey,
+    queryFn: async ({ signal }) => {
+      const data = await executeAnalyticsSql({
+        projectRef,
+        endpoint: '/platform/projects/{ref}/analytics/endpoints/logs.all',
+        sql: chartQuery,
+        iso_timestamp_start: timestampStart,
+        iso_timestamp_end: timestampEnd ?? '',
+        method: 'get',
         signal,
       })
-      if (error) {
-        throw error
-      }
-
       return data as unknown as EventChart
     },
-    { refetchOnWindowFocus: false }
-  )
+    refetchOnWindowFocus: false,
+  })
 
   const refresh = useCallback(async () => {
     setLatestRefresh(new Date().toISOString())
@@ -254,14 +239,14 @@ function useLogsPreview({
     'timestamp'
   )
 
-  const { data: eventChartData, error: eventChartError } = useFillTimeseriesSorted(
-    normalizedEventChartData,
-    'timestamp',
-    'count',
-    0,
-    timestampStart,
-    timestampEnd || new Date().toISOString()
-  )
+  const { data: eventChartData, error: eventChartError } = useFillTimeseriesSorted({
+    data: normalizedEventChartData,
+    timestampKey: 'timestamp',
+    valueKey: 'count',
+    defaultValue: 0,
+    startDate: timestampStart,
+    endDate: timestampEnd ?? new Date().toISOString(),
+  })
 
   return {
     newCount,

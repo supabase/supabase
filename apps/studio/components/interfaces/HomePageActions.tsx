@@ -1,152 +1,166 @@
-import { Filter, Search } from 'lucide-react'
+import { keepPreviousData } from '@tanstack/react-query'
+import { useDebounce } from '@uidotdev/usehooks'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { Grid, List, Loader2, Plus, Search, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { parseAsArrayOf, parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
+import { useEffect, useRef } from 'react'
+import { Button, ToggleGroup, ToggleGroupItem } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
-import { IS_PLATFORM, useParams } from 'common'
-import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { PROJECT_STATUS } from 'lib/constants'
-import { EMPTY_ARR } from 'lib/void'
+import { FilterPopover } from '../ui/FilterPopover'
+import { SortDropdown } from '../ui/SortDropdown'
 import {
-  Button,
-  Checkbox_Shadcn_,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  Input,
-  Label_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-} from 'ui'
+  PROJECT_LIST_SORT_VALUES,
+  type ProjectListSort,
+} from '@/components/interfaces/Home/ProjectList/ProjectListSort.utils'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { PROJECT_STATUS } from '@/lib/constants'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface HomePageActionsProps {
-  organizations?: { name: string; slug: string }[]
-  search: string
-  filterStatus: string[]
-  setSearch: (value: string) => void
-  setFilterStatus: (value: string[]) => void
+  slug?: string
+  hideNewProject?: boolean
 }
 
-const HomePageActions = ({
-  organizations = EMPTY_ARR,
-  search,
-  filterStatus,
-  setSearch,
-  setFilterStatus,
-}: HomePageActionsProps) => {
-  const newLayoutPreview = useIsNewLayoutEnabled()
-
+export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePageActionsProps) => {
+  const { slug: urlSlug } = useParams()
   const router = useRouter()
-  const { slug } = useParams()
-
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
-  const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
-  const { isSuccess: orgsLoaded } = useOrganizationsQuery()
+
+  const slug = _slug ?? urlSlug
+  const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
+  const debouncedSearch = useDebounce(search, 500)
+  const [filterStatus, setFilterStatus] = useQueryState(
+    'status',
+    parseAsArrayOf(parseAsString, ',').withDefault([])
+  )
+  const [sort, setSort] = useQueryState(
+    'sort',
+    parseAsStringLiteral(PROJECT_LIST_SORT_VALUES).withDefault('name_asc')
+  )
+  const [viewMode, setViewMode] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.PROJECTS_VIEW, 'grid')
+
+  const [filterStatusStorage, setFilterStatusStorage, { isSuccess: isSuccessFilterStatusStorage }] =
+    useLocalStorageQuery<string[]>(LOCAL_STORAGE_KEYS.PROJECTS_FILTER, [])
+
+  const [sortStorage, setSortStorage, { isSuccess: isSuccessSortStorage }] =
+    useLocalStorageQuery<ProjectListSort>(LOCAL_STORAGE_KEYS.PROJECTS_SORT, 'name_asc')
+
+  const { isFetching: isFetchingProjects } = useOrgProjectsInfiniteQuery(
+    {
+      slug,
+      sort,
+      search: search.length === 0 ? search : debouncedSearch,
+      statuses: filterStatus,
+    },
+    { placeholderData: keepPreviousData }
+  )
+
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useShortcut(SHORTCUT_IDS.ORG_PROJECTS_SEARCH, () => {
+    searchInputRef.current?.focus()
+  })
+
+  useEffect(() => {
+    if (isSuccessFilterStatusStorage && !!slug) setFilterStatus(filterStatusStorage)
+  }, [filterStatusStorage, isSuccessFilterStatusStorage, setFilterStatus, slug])
+
+  useEffect(() => {
+    if (isSuccessSortStorage && slug) setSort(sortStorage)
+  }, [sortStorage, isSuccessSortStorage, setSort, slug])
 
   return (
-    <div className="flex flex-col gap-2 md:gap-3 md:flex-row">
-      {newLayoutPreview ? (
-        projectCreationEnabled ? (
-          <Link href={`/new/${slug}`}>
-            <Button type="primary">New project</Button>
-          </Link>
-        ) : null
-      ) : (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button type="primary">
-              <span>New project</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="start">
-            <>
-              <DropdownMenuLabel>Choose organization</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {organizations
-                .sort((a, b) => a.name.localeCompare(b.name))
-                .map((x) => (
-                  <DropdownMenuItem key={x.slug} onClick={() => router.push(`/new/${x.slug}`)}>
-                    {x.name}
-                  </DropdownMenuItem>
-                ))}
-            </>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
-
-      {IS_PLATFORM && organizationCreationEnabled && orgsLoaded && !newLayoutPreview && (
-        <Button type="default" asChild>
-          <Link href="/new" className="flex items-center gap-2">
-            New organization
-          </Link>
-        </Button>
-      )}
-
-      <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center justify-between gap-2 w-full">
+      <div className="flex flex-col gap-2 min-w-0 flex-1 basis-full md:basis-auto sm:flex-row sm:flex-wrap sm:items-center">
         <Input
-          size="tiny"
+          ref={searchInputRef}
           placeholder="Search for a project"
-          icon={<Search size={16} />}
-          className="w-full flex-1 md:w-64 [&>div>div>div>input]:!pl-7 [&>div>div>div>div]:!pl-2"
+          icon={<Search />}
+          size="tiny"
+          className="w-full sm:w-32 md:w-64"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
+          onKeyDown={onSearchInputEscape(search, (v) => setSearch(v))}
+          actions={[
+            search && (
+              <Button
+                key="clear"
+                size="tiny"
+                variant="text"
+                icon={<X />}
+                onClick={() => setSearch('')}
+                className="p-0 h-5 w-5"
+              />
+            ),
+          ]}
         />
 
-        <Popover_Shadcn_>
-          <PopoverTrigger_Shadcn_ asChild>
-            <Button
-              type={filterStatus.length !== 2 ? 'secondary' : 'dashed'}
-              className="h-[26px] w-[26px]"
-              icon={<Filter />}
-            />
-          </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
-            <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
-              <p className="text-xs">Filter projects by status</p>
-              <div className="flex flex-col">
-                {[
-                  { key: PROJECT_STATUS.ACTIVE_HEALTHY, label: 'Active' },
-                  { key: PROJECT_STATUS.INACTIVE, label: 'Paused' },
-                ].map(({ key, label }) => (
-                  <div key={key} className="group flex items-center justify-between py-0.5">
-                    <div className="flex items-center gap-x-2">
-                      <Checkbox_Shadcn_
-                        id={key}
-                        name={key}
-                        checked={filterStatus.includes(key)}
-                        onCheckedChange={() => {
-                          if (filterStatus.includes(key)) {
-                            setFilterStatus(filterStatus.filter((y) => y !== key))
-                          } else {
-                            setFilterStatus(filterStatus.concat([key]))
-                          }
-                        }}
-                      />
-                      <Label_Shadcn_ htmlFor={key} className="capitalize text-xs">
-                        {label}
-                      </Label_Shadcn_>
-                    </div>
-                    <Button
-                      size="tiny"
-                      type="default"
-                      onClick={() => setFilterStatus([key])}
-                      className="transition opacity-0 group-hover:opacity-100 h-auto px-1 py-0.5"
-                    >
-                      Select only
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </PopoverContent_Shadcn_>
-        </Popover_Shadcn_>
+        <div className="flex items-center gap-2">
+          <FilterPopover
+            name="Status"
+            title="Filter projects by status"
+            options={[
+              { key: PROJECT_STATUS.ACTIVE_HEALTHY, label: 'Active' },
+              { key: PROJECT_STATUS.INACTIVE, label: 'Paused' },
+            ]}
+            activeOptions={filterStatus}
+            valueKey="key"
+            labelKey="label"
+            onSaveFilters={(options) => setFilterStatusStorage(options)}
+          />
+
+          <SortDropdown
+            options={[
+              { label: 'name', value: 'name' },
+              { label: 'creation date', value: 'created' },
+            ]}
+            value={sort}
+            setValue={(val) => setSortStorage(val as ProjectListSort)}
+          />
+
+          {isFetchingProjects && <Loader2 className="animate-spin" size={14} />}
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 shrink-0">
+        {viewMode && setViewMode && (
+          <ToggleGroup
+            type="single"
+            size="sm"
+            value={viewMode}
+            onValueChange={(value) => value && setViewMode(value as 'grid' | 'table')}
+          >
+            <ToggleGroupItem value="grid" size="sm" className="h-[26px] w-[26px] p-0">
+              <Grid size={14} strokeWidth={1.5} />
+            </ToggleGroupItem>
+            <ToggleGroupItem value="table" size="sm" className="h-[26px] w-[26px] p-0">
+              <List size={14} strokeWidth={1.5} />
+            </ToggleGroupItem>
+          </ToggleGroup>
+        )}
+
+        {projectCreationEnabled && !hideNewProject && (
+          <Shortcut
+            id={SHORTCUT_IDS.ORG_PROJECTS_NEW}
+            onTrigger={() => {
+              if (slug) router.push(`/new/${slug}`)
+            }}
+            side="bottom"
+          >
+            <Button asChild icon={<Plus />} variant="primary" size="tiny">
+              <Link href={`/new/${slug}`}>New project</Link>
+            </Button>
+          </Shortcut>
+        )}
       </div>
     </div>
   )
 }
-export default HomePageActions

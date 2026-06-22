@@ -3,15 +3,19 @@ import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-
-import { useSignOut } from 'lib/auth'
 import { Button } from 'ui'
+
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
+import { useSignOut } from '@/lib/auth'
 
 const Error500: NextPage = () => {
   const router = useRouter()
+  const signOut = useSignOut()
   const { resolvedTheme } = useTheme()
 
-  const signOut = useSignOut()
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
+
   const onClickLogout = async () => {
     await signOut()
     await router.push('/sign-in')
@@ -22,7 +26,7 @@ const Error500: NextPage = () => {
     <div className="relative mx-auto flex flex-1 w-full flex-col items-center justify-center space-y-6">
       <div className="absolute top-0 mx-auto w-full max-w-7xl px-8 pt-6 sm:px-6 lg:px-8">
         <nav className="relative flex items-center justify-between sm:h-10">
-          <div className="flex flex-shrink-0 flex-grow items-center lg:flex-grow-0">
+          <div className="flex shrink-0 grow items-center lg:grow-0">
             <div className="flex w-full items-center justify-between md:w-auto">
               <Link href="/projects">
                 <Image
@@ -48,15 +52,21 @@ const Error500: NextPage = () => {
         </p>
       </div>
       <div className="flex items-center space-x-4">
-        {router.pathname !== '/projects' ? (
+        {router.pathname !== '/organizations' ? (
           <Button asChild>
-            <Link href="/projects">Head back</Link>
+            <Link
+              href={
+                !!lastVisitedOrganization ? `/org/${lastVisitedOrganization}` : '/organizations'
+              }
+            >
+              Head back
+            </Link>
           </Button>
         ) : (
           <Button onClick={onClickLogout}>Head back</Button>
         )}
-        <Button type="secondary" asChild>
-          <Link href="/support/new">Submit a support request</Link>
+        <Button variant="secondary" asChild>
+          <SupportLink>Submit a support request</SupportLink>
         </Button>
       </div>
     </div>

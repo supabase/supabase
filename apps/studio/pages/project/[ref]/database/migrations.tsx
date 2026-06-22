@@ -1,41 +1,46 @@
-import { ExternalLink } from 'lucide-react'
-
-import Migrations from 'components/interfaces/Database/Migrations/Migrations'
-import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import { PageContainer } from 'ui-patterns/PageContainer'
 import {
-  ScaffoldContainer,
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import type { NextPageWithLayout } from 'types'
-import { Button } from 'ui'
-import { DocsButton } from 'components/ui/DocsButton'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+
+import Migrations from '@/components/interfaces/Database/Migrations/Migrations'
+import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { DOCS_URL } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
 
 const MigrationsPage: NextPageWithLayout = () => {
   return (
-    <ScaffoldContainer>
-      <ScaffoldSection>
-        <ScaffoldSectionContent>
-          <FormHeader
-            className="!mb-0"
-            title="Database Migrations"
-            description="History of migrations that have been run on your database"
-          />
-        </ScaffoldSectionContent>
-        <ScaffoldSectionDetail className="flex items-center md:justify-end gap-x-2">
-          <DocsButton
-            className="no-underline"
-            href="https://supabase.com/docs/guides/deployment/database-migrations"
-          />
-        </ScaffoldSectionDetail>
-        <div className="col-span-12 mt-3">
-          <Migrations />
-        </div>
-      </ScaffoldSection>
-    </ScaffoldContainer>
+    <>
+      <PageHeader size="large">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Database Migrations</PageHeaderTitle>
+            <PageHeaderDescription>Track changes to your database over time</PageHeaderDescription>
+          </PageHeaderSummary>
+          <PageHeaderAside>
+            <DocsButton
+              className="no-underline"
+              href={`${DOCS_URL}/guides/deployment/database-migrations`}
+            />
+          </PageHeaderAside>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="large">
+        <PageSection>
+          <PageSectionContent>
+            <Migrations />
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+    </>
   )
 }
 

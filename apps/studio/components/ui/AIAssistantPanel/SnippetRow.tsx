@@ -1,0 +1,73 @@
+import { X } from 'lucide-react'
+import React from 'react'
+import { Button, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
+
+import { type SqlSnippet } from './AIAssistant.types'
+
+export const getSnippetLabel = (snippet: SqlSnippet, index: number): string => {
+  if (typeof snippet === 'string') {
+    return `Snippet ${index + 1}`
+  }
+  return snippet.label
+}
+
+export const getSnippetContent = (snippet: SqlSnippet): string => {
+  if (typeof snippet === 'string') {
+    return snippet
+  }
+  return snippet.content
+}
+
+interface SnippetRowProps {
+  snippets: SqlSnippet[]
+  onRemoveSnippet?: (index: number) => void
+  className?: string
+}
+
+export const SnippetRow: React.FC<SnippetRowProps> = ({
+  snippets,
+  onRemoveSnippet,
+  className = '',
+}) => {
+  if (!snippets || snippets.length === 0) return null
+
+  return (
+    <div className={`w-full overflow-x-auto flex ${className}`}>
+      {snippets.map((snippet, idx) => (
+        <HoverCard key={idx}>
+          <HoverCardTrigger asChild>
+            <div
+              tabIndex={0}
+              className="border bg inline-flex gap-1 items-center shrink-0 py-1 pl-2 rounded-full pr-1 text-xs cursor-pointer"
+            >
+              {getSnippetLabel(snippet, idx)}
+              {onRemoveSnippet && (
+                <Button
+                  size="tiny"
+                  variant="text"
+                  className="h-4! w-4! rounded-full p-0"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onRemoveSnippet(idx)
+                  }}
+                  aria-label={`Remove snippet ${idx + 1}`}
+                  icon={<X strokeWidth={1.5} className="h-3! w-3!" />}
+                />
+              )}
+            </div>
+          </HoverCardTrigger>
+          <HoverCardContent className="w-96 max-h-64 overflow-auto p-0">
+            <CodeBlock
+              hideLineNumbers
+              className="text-xs font-mono whitespace-pre-wrap wrap-break-word p-2 border-0"
+              language="sql"
+            >
+              {getSnippetContent(snippet)}
+            </CodeBlock>
+          </HoverCardContent>
+        </HoverCard>
+      ))}
+    </div>
+  )
+}

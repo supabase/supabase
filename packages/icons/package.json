@@ -4,10 +4,10 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "build:icons": "build-icons --templateSrc=./scripts/exportTemplate.mjs --renderUniqueKey --iconFileExtension=.ts --exportFileName=index.ts",
-    "clean": "rimraf node_modules"
+    "clean": "rimraf node_modules .turbo"
   },
   "dependencies": {
-    "typescript": "~5.5.0",
+    "typescript": "catalog:",
     "@supabase/build-icons": "workspace:*"
   },
   "devDependencies": {

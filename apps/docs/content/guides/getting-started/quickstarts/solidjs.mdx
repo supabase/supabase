@@ -56,7 +56,8 @@ hideToc: true
     Create a `.env.local` file and populate with your Supabase connection variables:
 
     <ProjectConfigVariables variable="url" />
-    <ProjectConfigVariables variable="anonKey" />
+    <ProjectConfigVariables variable="publishable" />
+
 
     </StepHikeCompact.Details>
 
@@ -66,10 +67,12 @@ hideToc: true
 
         ```text name=.env.local
         VITE_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
-        VITE_SUPABASE_ANON_KEY=<SUBSTITUTE_SUPABASE_ANON_KEY>
+        VITE_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
         ```
 
       </$CodeTabs>
+
+      <$Partial path="api_settings_steps.mdx" variables={{ "framework": "solidjs", "tab": "frameworks" }} />
 
     </StepHikeCompact.Code>
 
@@ -87,27 +90,27 @@ hideToc: true
 
 
       ```jsx name=src/App.jsx
-        import { createClient } from "@supabase/supabase-js";
-        import { createResource, For } from "solid-js";
+      import { createClient } from "@supabase/supabase-js";
+      import { createResource, For } from "solid-js";
 
-        const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>');
+      const supabase = createClient('https://<project>.supabase.co', '<sb_publishable_key>');
 
-        async function getInstruments() {
-          const { data } = await supabase.from("instruments").select();
-          return data;
-        }
+      async function getInstruments() {
+        const { data } = await supabase.from("instruments").select();
+        return data;
+      }
 
-        function App() {
-          const [instruments] = createResource(getInstruments);
+      function App() {
+        const [instruments] = createResource(getInstruments);
 
-          return (
-            <ul>
-              <For each={instruments()}>{(instrument) => <li>{instrument.name}</li>}</For>
-            </ul>
-          );
-        }
+        return (
+          <ul>
+            <For each={instruments()}>{(instrument) => <li>{instrument.name}</li>}</For>
+          </ul>
+        );
+      }
 
-        export default App;
+      export default App;
       ```
 
     </StepHikeCompact.Code>

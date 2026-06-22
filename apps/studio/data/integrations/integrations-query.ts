@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { integrationKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export async function getIntegrations(signal?: AbortSignal) {
   const { data, error } = await get('/platform/integrations', {
@@ -20,13 +20,11 @@ export type IntegrationsError = ResponseError
 export const useIntegrationsQuery = <TData = IntegrationsData>({
   enabled = true,
   ...options
-}: UseQueryOptions<IntegrationsData, IntegrationsError, TData> = {}) =>
-  useQuery<IntegrationsData, IntegrationsError, TData>(
-    integrationKeys.integrationsList(),
-    ({ signal }) => getIntegrations(signal),
-    {
-      enabled: enabled,
-      staleTime: 30 * 60 * 1000, // 30 minutes
-      ...options,
-    }
-  )
+}: UseCustomQueryOptions<IntegrationsData, IntegrationsError, TData> = {}) =>
+  useQuery<IntegrationsData, IntegrationsError, TData>({
+    queryKey: integrationKeys.integrationsList(),
+    queryFn: ({ signal }) => getIntegrations(signal),
+    enabled: enabled,
+    staleTime: 30 * 60 * 1000,
+    ...options,
+  })

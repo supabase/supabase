@@ -10,7 +10,7 @@ sidebar_label: 'Uploads'
 
 The standard file upload method is ideal for small files that are not larger than 6MB.
 
-It uses the traditional `multipart/form-data` format and is simple to implement using the supabase-js SDK. Here's an example of how to upload a file using the standard upload method:
+You implement file uploads with the supabase-js SDK using the traditional `multipart/form-data` format. Here's an example of how to upload a file using the standard upload method:
 
 <Admonition type="note">
 
@@ -48,6 +48,7 @@ async function uploadFile(file) {
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -58,6 +59,8 @@ Future<void> uploadFile(File file) async {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -70,6 +73,8 @@ try await supabase.storage.from("bucket_name").upload(path: "file_path", file: f
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -80,10 +85,23 @@ supabase.storage.from("bucket_name").upload("file_path", file)
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
 response = supabase.storage.from_('bucket_name').upload('file_path', file)
+```
+
+</TabPanel>
+</$Show>
+<TabPanel id="curl" label="cURL">
+
+```bash
+curl -X POST "https://{your_project_ref}.supabase.co/storage/v1/object/{bucket_name}/{file_path}" \
+  -H "apikey: {your_anon_key}" \
+  -H "Authorization: Bearer {your_jwt_token}" \
+  --data-binary "@/local/path/to/your/file.ext"
 ```
 
 </TabPanel>
@@ -105,6 +123,7 @@ If you want to overwrite a file on a specific path you can set the `upsert` opti
 
 ```javascript
 import { createClient } from '@supabase/supabase-js'
+
 const file = new Blob()
 
 // ---cut---
@@ -117,6 +136,7 @@ await supabase.storage.from('bucket_name').upload('file_path', file, {
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -128,6 +148,8 @@ await supabase.storage.from('bucket_name').upload(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -147,6 +169,8 @@ try await supabase.storage.from("bucket_name")
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -156,12 +180,26 @@ supabase.storage.from("bucket_name").upload("file_path", bytes) {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
 response = supabase.storage.from_('bucket_name').upload('file_path', file, {
   'upsert': 'true',
 })
+```
+
+</TabPanel>
+</$Show>
+<TabPanel id="curl" label="cURL">
+
+```bash
+curl -X POST "https://{your_project_ref}.supabase.co/storage/v1/object/{bucket_name}/{file_path}" \
+  -H "apikey: {your_anon_key}" \
+  -H "Authorization: Bearer {your_jwt_token}" \
+  -H "x-upsert: true" \
+  --data-binary "@/local/path/to/your/file.ext"
 ```
 
 </TabPanel>
@@ -185,6 +223,7 @@ By default, Storage will assume the content type of an asset from the file exten
 
 ```javascript
 import { createClient } from '@supabase/supabase-js'
+
 const file = new Blob()
 
 // ---cut---
@@ -197,6 +236,7 @@ await supabase.storage.from('bucket_name').upload('file_path', file, {
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -208,6 +248,8 @@ await supabase.storage.from('bucket_name').upload(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -227,6 +269,8 @@ try await supabase.storage.from("bucket_name")
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -236,12 +280,26 @@ supabase.storage.from("bucket_name").upload("file_path", bytes) {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
 response = supabase.storage.from_('bucket_name').upload('file_path', file, {
   'content-type': 'image/jpeg',
 })
+```
+
+</TabPanel>
+</$Show>
+<TabPanel id="curl" label="cURL">
+
+```bash
+curl -X POST "https://{your_project_ref}.supabase.co/storage/v1/object/{bucket_name}/{file_path}" \
+  -H "apikey: {your_anon_key}" \
+  -H "Authorization: Bearer {your_jwt_token}" \
+  -H "Content-Type: {Content-Type}" \
+  --data-binary "@/local/path/to/your/file.ext"
 ```
 
 </TabPanel>

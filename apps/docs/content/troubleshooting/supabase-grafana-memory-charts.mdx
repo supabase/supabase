@@ -7,7 +7,7 @@ date_created = "2024-06-05"
 database_id = "179d70f3-1e26-4346-9ee8-d340fad382a3"
 ---
 
-> [Supabase Grafana Installation Guide](/docs/guides/platform/metrics#deploying-supabase-grafana)
+> [Supabase Grafana Installation Guide](/docs/guides/telemetry/metrics/grafana-self-hosted)
 
 Here are examples of unhealthy memory usage:
 ![image](https://github.com/supabase/supabase/assets/91111415/baebfc74-642d-4988-992c-bb0f473a05ad)
@@ -47,7 +47,7 @@ Optimizing:
 2. [Increasing the compute size](/docs/guides/platform/compute-add-ons)
 3. [Distribute load by using read-replicas](/dashboard/project/_/settings/infrastructure)
 4. [Partitions](/docs/guides/database/partitions): Generally should be used on _very_ large tables to minimize data pulled from disk into memory
-5. [Remove bloat](/docs/guides/database/bloat): Bloat can fragment data across pages, causing redundant data to be pulled from disk.
+5. [Remove bloat](/docs/reference/cli/supabase-inspect-db): Bloat can fragment data across pages, causing redundant data to be pulled from disk.
 6. Table refactoring: Split tables to isolate columns that are less frequently accessed, so they are not redundantly pulled into memory while accessing hotter data
 
 ### Other useful Supabase Grafana guides:

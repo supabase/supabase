@@ -1,28 +1,32 @@
 import { useBreakpoint } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
-import { startCase } from 'lodash'
+import { startCase } from 'lib/helpers'
+import { ChevronDown, X as CloseIcon, Search } from 'lucide-react'
+import { useRouter } from 'next/compat/router'
+import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { useKey } from 'react-use'
-import type PostTypes from '~/types/post'
-
+import type PostTypes from 'types/post'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Input,
-  cn,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
 } from 'ui'
-import { ChevronDown, Search, X as CloseIcon } from 'lucide-react'
 
 interface Props {
   allEvents: PostTypes[]
   events?: PostTypes[]
   setEvents: (posts: any) => void
   categories: { [key: string]: number }
+  onDemandEvents?: PostTypes[]
 }
 
 /**
@@ -30,7 +34,7 @@ interface Props {
  * search via category and reset q param if present
  */
 
-function EventFilters({ allEvents, setEvents, categories }: Props) {
+function EventFilters({ allEvents, setEvents, categories, onDemandEvents }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [category, setCategory] = useState<string>('all')
   const [searchTerm, setSearchTerm] = useState<string>('')
@@ -61,9 +65,9 @@ function EventFilters({ allEvents, setEvents, categories }: Props) {
   }, [q])
 
   const handleReplaceRouter = () => {
-    if (!searchTerm && category !== 'all') {
+    if (!searchTerm && category !== 'all' && router) {
       router.query.category = category
-      router.replace(router, undefined, { shallow: true, scroll: false })
+      router?.replace(router, undefined, { shallow: true, scroll: false })
     }
   }
 
@@ -87,19 +91,20 @@ function EventFilters({ allEvents, setEvents, categories }: Props) {
   }, [isMobile])
 
   useEffect(() => {
-    if (router.isReady && q) {
+    if (router?.isReady && q) {
       setSearchTerm(q)
     }
-    if (router.isReady && activeCategory && activeCategory !== 'all') {
+    if (router?.isReady && activeCategory && activeCategory !== 'all') {
       setCategory(activeCategory)
     }
-  }, [activeCategory, router.isReady, q])
+  }, [activeCategory, router?.isReady, q])
 
   const handleSearchByText = (text: string) => {
     setSearchTerm(text)
-    searchParams?.has('q') && router.replace('/events', undefined, { shallow: true, scroll: false })
-    router.replace(`/events?q=${text}`, undefined, { shallow: true, scroll: false })
-    if (text.length < 1) router.replace('/events', undefined, { shallow: true, scroll: false })
+    searchParams?.has('q') &&
+      router?.replace('/events', undefined, { shallow: true, scroll: false })
+    router?.replace(`/events?q=${text}`, undefined, { shallow: true, scroll: false })
+    if (text.length < 1) router?.replace('/events', undefined, { shallow: true, scroll: false })
 
     const matches = allEvents.filter((event: any) => {
       const found =
@@ -117,8 +122,8 @@ function EventFilters({ allEvents, setEvents, categories }: Props) {
     searchTerm && setSearchTerm('')
     setCategory(category)
     category === 'all'
-      ? router.replace('/events', undefined, { shallow: true, scroll: false })
-      : router.replace(`/events?category=${category}`, undefined, {
+      ? router?.replace('/events', undefined, { shallow: true, scroll: false })
+      : router?.replace(`/events?category=${category}`, undefined, {
           shallow: true,
           scroll: false,
         })
@@ -144,7 +149,7 @@ function EventFilters({ allEvents, setEvents, categories }: Props) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  type="outline"
+                  variant="outline"
                   size="medium"
                   iconRight={<ChevronDown />}
                   className="w-full min-w-[200px] flex [&_span]:flex [&_span]:items-center [&_span]:gap-2 justify-between items-center py-2"
@@ -184,11 +189,11 @@ function EventFilters({ allEvents, setEvents, categories }: Props) {
             </DropdownMenu>
           </motion.div>
         )}
-        <div className="hidden lg:flex flex-wrap items-center flex-grow gap-2">
+        <div className="hidden lg:flex flex-wrap items-center grow gap-2">
           {Object.entries(categories).map(([category, count]) => (
             <Button
               key={category}
-              type={
+              variant={
                 category === 'all' && !searchTerm && !activeCategory
                   ? 'default'
                   : category === activeCategory
@@ -207,6 +212,22 @@ function EventFilters({ allEvents, setEvents, categories }: Props) {
               {category === 'all' ? 'All' : startCase(category.replaceAll('-', ' '))}{' '}
             </Button>
           ))}
+          {!!onDemandEvents?.length && (
+            <Button
+              key="on-demand"
+              variant="outline"
+              size={is2XL ? 'tiny' : 'small'}
+              className="rounded-full"
+              iconRight={
+                <span className="text-foreground-lighter text-xs flex items-center h-[16px] self-center">
+                  {onDemandEvents.length}
+                </span>
+              }
+              asChild
+            >
+              <Link href="#on-demand">On Demand</Link>
+            </Button>
+          )}
         </div>
       </AnimatePresence>
       {!showSearchInput && (
@@ -219,7 +240,7 @@ function EventFilters({ allEvents, setEvents, categories }: Props) {
           <Button
             className="px-2 w-9 h-9"
             size="large"
-            type="default"
+            variant="default"
             onClick={() => setShowSearchInput(true)}
           >
             <Search size="14" />
@@ -233,32 +254,31 @@ function EventFilters({ allEvents, setEvents, categories }: Props) {
           exit={{ opacity: 0, transition: { duration: 0.05 } }}
           className="w-full h-[38px] flex justify-end gap-2 items-stretch lg:max-w-[240px] xl:max-w-[280px]"
         >
-          <Input
-            inputRef={inputRef}
-            icon={<Search size="14" />}
-            size="small"
-            layout="vertical"
-            autoComplete="off"
-            type="search"
-            placeholder="Search event"
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className="w-full"
-            actions={
-              isMobile && (
-                <Button
-                  type="link"
+          <InputGroup className="w-full">
+            <InputGroupInput
+              size="small"
+              autoComplete="off"
+              type="search"
+              placeholder="Search event"
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+            <InputGroupAddon>
+              <Search />
+            </InputGroupAddon>
+            {isMobile && (
+              <InputGroupAddon align="inline-end">
+                <InputGroupButton
                   onClick={() => {
-                    setSearchTerm('')
+                    handleSearchByText('')
                     setShowSearchInput(false)
                   }}
-                  className="text-foreground-light hover:text-foreground bg-control/100 hover:bg-selection"
                 >
                   <CloseIcon size="14" />
-                </Button>
-              )
-            }
-          />
+                </InputGroupButton>
+              </InputGroupAddon>
+            )}
+          </InputGroup>
         </motion.div>
       )}
     </div>

@@ -1,12 +1,12 @@
-import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
+import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
 
+import type { ContentFileProps } from '@/components/interfaces/Connect/Connect.types'
 import {
-  ConnectTabs,
-  ConnectTabTriggers,
-  ConnectTabTrigger,
   ConnectTabContent,
-} from 'components/interfaces/Connect/ConnectTabs'
-import { SimpleCodeBlock } from 'ui'
+  ConnectTabs,
+  ConnectTabTrigger,
+  ConnectTabTriggers,
+} from '@/components/interfaces/Connect/ConnectTabs'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
@@ -21,7 +21,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
 REACT_APP_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
-REACT_APP_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
+REACT_APP_SUPABASE_KEY=${projectKeys.publishableKey ?? '<prefer publishable key instead of anon key for mobile or desktop apps>'}
         `}
         </SimpleCodeBlock>
       </ConnectTabContent>
@@ -32,7 +32,7 @@ REACT_APP_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL
-const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY
+const supabaseKey = process.env.REACT_APP_SUPABASE_KEY
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 `}

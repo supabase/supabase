@@ -1,0 +1,219 @@
+// End of third-party imports
+import { SupportCategories } from '@supabase/shared-types/out/constants'
+import type { UseFormReturn } from 'react-hook-form'
+import {
+  cn,
+  FormControl,
+  FormField,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
+import {
+  CATEGORY_OPTIONS,
+  SEVERITY_OPTIONS,
+  type ExtendedSupportCategories,
+} from './Support.constants'
+import type { SupportFormValues } from './SupportForm.schema'
+import { NO_PROJECT_MARKER } from './SupportForm.utils'
+import { InlineLink } from '@/components/ui/InlineLink'
+
+interface CategoryAndSeverityInfoProps {
+  form: UseFormReturn<SupportFormValues>
+  category: ExtendedSupportCategories
+  severity?: string
+  projectRef: string
+  showSeverity?: boolean
+  showIssueSuggestion?: boolean
+}
+
+export function CategoryAndSeverityInfo({
+  form,
+  category,
+  severity,
+  projectRef,
+  showSeverity = true,
+  showIssueSuggestion = true,
+}: CategoryAndSeverityInfoProps) {
+  return (
+    <div
+      className={cn(
+        'grid sm:grid-rows-1 gap-4 grid-cols-1 grid-rows-2',
+        showSeverity ? 'sm:grid-cols-2' : 'sm:grid-cols-1'
+      )}
+    >
+      <CategorySelector form={form} />
+      {showSeverity && <SeveritySelector form={form} />}
+      {showIssueSuggestion && <IssueSuggestion category={category} projectRef={projectRef} />}
+      {(severity === 'Urgent' || severity === 'High') && (
+        <Admonition
+          type="default"
+          className="sm:col-span-2"
+          title="We do our best to respond to everyone as quickly as possible"
+          description="Prioritization will be based on production status. We ask that you reserve High and Urgent severity for production-impacting issues only."
+        />
+      )}
+    </div>
+  )
+}
+
+interface CategorySelectorProps {
+  form: UseFormReturn<SupportFormValues>
+}
+
+function CategorySelector({ form }: CategorySelectorProps) {
+  return (
+    <FormField
+      name="category"
+      control={form.control}
+      render={({ field }) => {
+        const { ref: _ref, ...fieldWithoutRef } = field
+        // Radix Select fires `onValueChange('')` when its controlled value
+        // transitions from `undefined` to a defined value whose matching
+        // SelectItem isn't mounted yet (the dropdown is closed, so
+        // SelectContent and the items it portals haven't registered). On
+        // React 19's stricter scheduling this races our `setValue` from
+        // useSupportForm and clobbers the prefilled category. No
+        // SelectItem can have value="" (Radix throws), so `v === ''` is
+        // always the spurious bubble — drop it. See
+        // radix-ui/primitives#3381.
+        const onValueChange = (v: string) => {
+          if (v === '' && field.value) return
+          field.onChange(v)
+        }
+        return (
+          <FormItemLayout hideMessage layout="vertical" label="What issue are you having?">
+            <FormControl>
+              <Select {...fieldWithoutRef} defaultValue={field.value} onValueChange={onValueChange}>
+                <SelectTrigger aria-label="Select an issue" className="w-full">
+                  <SelectValue placeholder="Select an issue">
+                    {field.value
+                      ? CATEGORY_OPTIONS.find((o) => o.value === field.value)?.label
+                      : null}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {CATEGORY_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                        <span className="block text-xs text-foreground-lighter">
+                          {option.description}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </FormControl>
+          </FormItemLayout>
+        )
+      }}
+    />
+  )
+}
+
+interface SeveritySelectorProps {
+  form: UseFormReturn<SupportFormValues>
+}
+
+function SeveritySelector({ form }: SeveritySelectorProps) {
+  return (
+    <FormField
+      name="severity"
+      control={form.control}
+      render={({ field }) => {
+        const { ref, ...fieldWithoutRef } = field
+        return (
+          <FormItemLayout hideMessage layout="vertical" label="Severity">
+            <FormControl>
+              <Select
+                {...fieldWithoutRef}
+                defaultValue={field.value}
+                onValueChange={field.onChange}
+              >
+                <SelectTrigger aria-label="Select a severity" className="w-full">
+                  <SelectValue placeholder="Select a severity">{field.value}</SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {SEVERITY_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                        <span className="block text-xs text-foreground-lighter">
+                          {option.description}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </FormControl>
+          </FormItemLayout>
+        )
+      }}
+    />
+  )
+}
+
+const IssueSuggestion = ({ category, projectRef }: { category: string; projectRef?: string }) => {
+  const baseUrl = `/project/${projectRef === NO_PROJECT_MARKER ? '_' : projectRef}`
+
+  const className = 'col-span-2 mb-0'
+
+  if (category === SupportCategories.PROBLEM) {
+    return (
+      <Admonition
+        type="default"
+        className={className}
+        title="Have you checked your project's logs?"
+      >
+        Logs can help you identify errors that you might be running into when using your project's
+        API or client libraries. View logs for each product{' '}
+        <InlineLink href={`${baseUrl}/logs/edge-logs`}>here</InlineLink>.
+      </Admonition>
+    )
+  }
+
+  if (category === SupportCategories.DATABASE_UNRESPONSIVE) {
+    return (
+      <Admonition
+        type="default"
+        className={className}
+        title="Have you checked your project's infrastructure activity?"
+      >
+        High memory or low disk IO bandwidth may be slowing down your database. Verify by checking
+        the infrastructure activity of your project{' '}
+        <InlineLink href={`${baseUrl}/settings/infrastructure#infrastructure-activity`}>
+          here
+        </InlineLink>
+        .
+      </Admonition>
+    )
+  }
+
+  if (category === SupportCategories.PERFORMANCE_ISSUES) {
+    return (
+      <Admonition
+        type="default"
+        className={className}
+        title="Have you checked the Query Performance Advisor?"
+      >
+        Identify slow running queries and get actionable insights on how to optimize them with the
+        Query Performance Advisor{' '}
+        <InlineLink href={`${baseUrl}/settings/infrastructure#infrastructure-activity`}>
+          here
+        </InlineLink>
+        .
+      </Admonition>
+    )
+  }
+
+  return null
+}

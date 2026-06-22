@@ -125,6 +125,7 @@ const remarkPyMdownTabs = function () {
  * Splices the discovered siblings out of the original parent and returns them.
  */
 function extractLinkedSiblings(parent: Root, node: Node, index: number, indentAmount = 4) {
+  if (!node.position) return []
   const { column } = node.position.start
 
   let nextSibling: Content

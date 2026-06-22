@@ -1,18 +1,9 @@
 import { useEscapeKeydown } from '@radix-ui/react-use-escape-keydown'
+import { useParams } from 'common'
+import dayjs from 'dayjs'
 import { isNil, noop } from 'lodash'
 import { Archive, Clock12, Trash2, X } from 'lucide-react'
 import { useState } from 'react'
-
-import { useParams } from 'common'
-import { MonacoEditor } from 'components/grid/components/common/MonacoEditor'
-import { RowAction, RowData } from 'components/interfaces/Auth/Users/UserOverview'
-import { useDatabaseQueueMessageArchiveMutation } from 'data/database-queues/database-queue-messages-archive-mutation'
-import { useDatabaseQueueMessageDeleteMutation } from 'data/database-queues/database-queue-messages-delete-mutation'
-import { PostgresQueueMessage } from 'data/database-queues/database-queue-messages-infinite-query'
-import { useDatabaseQueueMessageReadMutation } from 'data/database-queues/database-queue-messages-read-mutation'
-import dayjs from 'dayjs'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { prettifyJSON } from 'lib/helpers'
 import {
   Button,
   ResizablePanel,
@@ -22,6 +13,15 @@ import {
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
 } from 'ui'
+
+import { MonacoEditor } from '@/components/grid/components/common/MonacoEditor'
+import { RowAction, RowData } from '@/components/interfaces/Auth/Users/UserOverview'
+import { useDatabaseQueueMessageArchiveMutation } from '@/data/database-queues/database-queue-messages-archive-mutation'
+import { useDatabaseQueueMessageDeleteMutation } from '@/data/database-queues/database-queue-messages-delete-mutation'
+import { PostgresQueueMessage } from '@/data/database-queues/database-queue-messages-infinite-query'
+import { useDatabaseQueueMessageReadMutation } from '@/data/database-queues/database-queue-messages-read-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { prettifyJSON } from '@/lib/helpers'
 
 export const DATE_FORMAT = 'DD MMM, YYYY HH:mm'
 
@@ -48,25 +48,25 @@ export const MessageDetailsPanel = ({
   setSelectedMessage,
 }: MessageDetailsPanelProps) => {
   const { id: _id, childId: queueName } = useParams()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   useEscapeKeydown(() => setSelectedMessage(null))
 
   const {
     mutate: archiveMessage,
-    isLoading: isLoadingArchive,
+    isPending: isLoadingArchive,
     isSuccess: isSuccessArchive,
   } = useDatabaseQueueMessageArchiveMutation()
 
   const {
     mutate: readMessage,
-    isLoading: isLoadingRead,
+    isPending: isLoadingRead,
     isSuccess: isSuccessRead,
   } = useDatabaseQueueMessageReadMutation()
 
   const {
     mutate: deleteMessage,
-    isLoading: isLoadingDelete,
+    isPending: isLoadingDelete,
     isSuccess: isSuccessDelete,
   } = useDatabaseQueueMessageDeleteMutation()
 
@@ -77,15 +77,19 @@ export const MessageDetailsPanel = ({
 
   return (
     <ResizablePanel
-      defaultSize={30}
-      maxSize={45}
-      minSize={30}
+      defaultSize="30"
+      maxSize="45"
+      minSize="30"
       collapsible
-      onCollapse={() => setSelectedMessage(null)}
+      onResize={(panelSize) => {
+        if (panelSize.asPercentage === 0) {
+          setSelectedMessage(null)
+        }
+      }}
       className="bg-studio border-t pointer-events-auto"
     >
       <Button
-        type="text"
+        variant="text"
         className="absolute top-3 right-3 px-1"
         icon={<X />}
         onClick={() => setSelectedMessage(null)}
@@ -101,7 +105,7 @@ export const MessageDetailsPanel = ({
         <TabsList_Shadcn_ className="px-5 flex gap-x-4 min-h-[46px]">
           <TabsTrigger_Shadcn_
             value="details"
-            className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent !shadow-none"
+            className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent shadow-none!"
           >
             Overview
           </TabsTrigger_Shadcn_>
@@ -146,7 +150,7 @@ export const MessageDetailsPanel = ({
                       readMessage({
                         projectRef: project!.ref,
                         connectionString: project?.connectionString,
-                        queryName: queueName!,
+                        queueName: queueName!,
                         messageId: selectedMessage.msg_id,
                         duration: 60,
                       })
@@ -168,12 +172,12 @@ export const MessageDetailsPanel = ({
                     icon: <Archive />,
                     text: 'Archive',
                     isLoading: isLoadingArchive,
-                    type: 'warning',
+                    variant: 'warning',
                     onClick: () => {
                       archiveMessage({
                         projectRef: project!.ref,
                         connectionString: project?.connectionString,
-                        queryName: queueName!,
+                        queueName: queueName!,
                         messageId: selectedMessage.msg_id,
                       })
                     },
@@ -193,7 +197,7 @@ export const MessageDetailsPanel = ({
                   button={{
                     icon: <Trash2 />,
                     text: 'Delete',
-                    type: 'danger',
+                    variant: 'danger',
                     isLoading: isLoadingDelete,
                     onClick: () => {
                       deleteMessage({

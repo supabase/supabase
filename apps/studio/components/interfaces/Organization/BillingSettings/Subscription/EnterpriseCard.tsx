@@ -1,25 +1,22 @@
 import { Check } from 'lucide-react'
-
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { PricingInformation } from 'shared-data'
-import { pickFeatures } from 'shared-data/plans'
 import { Button, cn } from 'ui'
+
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 
 export interface EnterpriseCardProps {
   plan: PricingInformation
   isCurrentPlan: boolean
-  billingPartner: 'fly' | 'aws' | 'vercel_marketplace' | undefined
 }
 
-export const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: EnterpriseCardProps) => {
-  const selectedOrganization = useSelectedOrganization()
-  const orgSlug = selectedOrganization?.slug
+export const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => {
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
-  const features = pickFeatures(plan, billingPartner)
+  const features = plan.features
   const currentPlan = selectedOrganization?.plan.name
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   return (
     <div
@@ -33,11 +30,11 @@ export const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: Enterpri
         <div className="flex items-center space-x-2">
           <p className={cn('text-brand text-sm uppercase')}>{plan.name}</p>
           {isCurrentPlan ? (
-            <div className="text-xs bg-surface-300 text-foreground-light rounded px-2 py-0.5">
+            <div className="text-xs bg-surface-300 text-foreground-light rounded-sm px-2 py-0.5">
               Current plan
             </div>
           ) : plan.nameBadge ? (
-            <div className="text-xs bg-surface-200 text-brand rounded px-2 py-0.5">
+            <div className="text-xs bg-surface-200 text-brand rounded-sm px-2 py-0.5">
               {plan.nameBadge}
             </div>
           ) : null}
@@ -48,13 +45,12 @@ export const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: Enterpri
         <Button
           block
           asChild
-          type="default"
+          variant="default"
           size="tiny"
           onClick={() =>
-            sendEvent({
-              action: 'studio_pricing_plan_cta_clicked',
-              properties: { selectedPlan: 'Enterprise', currentPlan },
-              groups: { organization: orgSlug ?? 'Unknown' },
+            track('studio_pricing_plan_cta_clicked', {
+              selectedPlan: 'Enterprise',
+              currentPlan,
             })
           }
         >
@@ -85,13 +81,12 @@ export const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: Enterpri
         <Button
           block
           asChild
-          type="default"
+          variant="default"
           size="tiny"
           onClick={() =>
-            sendEvent({
-              action: 'studio_pricing_plan_cta_clicked',
-              properties: { selectedPlan: 'Enterprise', currentPlan },
-              groups: { organization: orgSlug ?? 'Unknown' },
+            track('studio_pricing_plan_cta_clicked', {
+              selectedPlan: 'Enterprise',
+              currentPlan,
             })
           }
         >

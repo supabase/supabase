@@ -29,13 +29,16 @@ create table document_sections (
   id bigint primary key generated always as identity,
   document_id bigint not null references documents (id),
   content text not null,
-  embedding vector (384)
+  embedding extensions.vector (384)
 );
 ```
 
-Notice how we record the `owner_id` on each document. Let's create an RLS policy that restricts access to `document_sections` based on whether or not they own the linked document:
+Notice the record of `owner_id` on each document. Create an RLS policy that restricts access to `document_sections` based on whether or not they own the linked document:
 
 ```sql
+-- Grant the privileges the roles need
+GRANT SELECT ON public.document_sections TO authenticated;
+
 -- enable row level security
 alter table document_sections enable row level security;
 
@@ -82,7 +85,7 @@ Every app has its own unique requirements and may differ from the above example.
 
 ### Documents owned by multiple people
 
-Instead of a one-to-many relationship between `users` and `documents`, you may require a many-to-many relationship so that multiple people can access the same document. Let's reimplement this using a join table:
+Instead of a one-to-many relationship between `users` and `documents`, you may require a many-to-many relationship so that multiple people can access the same document. Reimplement this using a join table:
 
 ```sql
 create table document_owners (
@@ -109,21 +112,21 @@ Instead of directly querying the `documents` table, we query the join table.
 
 ### User and document data live outside of Supabase
 
-You may have an existing system that stores users, documents, and their permissions in a separate database. Let's explore the scenario where this data exists in another Postgres database. We'll use a foreign data wrapper (FDW) to connect to the external DB from within your Supabase DB:
+You may have an existing system that stores users, documents, and their permissions in a separate database. Consider the scenario where this data exists in another Postgres database. We'll use a foreign data wrapper (FDW) to connect to the external DB from within your Supabase DB:
 
 <Admonition type="caution">
 
-RLS is latency-sensitive, so extra caution should be taken before implementing this method. Use the [query plan analyzer](https://supabase.com/docs/guides/platform/performance#optimizing-poor-performing-queries) to measure execution times for your queries to ensure they are within expected ranges. For enterprise applications, contact enterprise@supabase.io.
+RLS is latency-sensitive, so extra caution should be taken before implementing this method. Use the [query plan analyzer](/docs/guides/platform/performance#optimizing-poor-performing-queries) to measure execution times for your queries to ensure they are within expected ranges. For enterprise applications, contact enterprise@supabase.io.
 
 </Admonition>
 
 <Admonition type="tip">
 
-For data sources other than Postgres, see [Foreign Data Wrappers](/docs/guides/database/extensions/wrappers/overview) for a list of external sources supported today. If your data lives in a source not provided in the list, contact [support](https://supabase.com/dashboard/support/new) and we'll be happy to discuss your use case.
+For data sources other than Postgres, see [Foreign Data Wrappers](/docs/guides/database/extensions/wrappers/overview) for a list of external sources supported today. If your data lives in a source not provided in the list, contact [support](/dashboard/support/new) and we'll be happy to discuss your use case.
 
 </Admonition>
 
-Let's assume your external DB contains a `users` and `documents` table like this:
+Assume your external DB contains a `users` and `documents` table like this:
 
 ```sql
 create table public.users (
@@ -140,7 +143,7 @@ create table public.documents (
 );
 ```
 
-In your Supabase DB, let's create foreign tables that link to the above tables:
+In your Supabase DB, create foreign tables that link to the above tables:
 
 ```sql
 create schema external;
@@ -176,7 +179,7 @@ create table document_sections (
   id bigint primary key generated always as identity,
   document_id bigint not null,
   content text not null,
-  embedding vector (384)
+  embedding extensions.vector (384)
 );
 ```
 
@@ -189,7 +192,7 @@ Since we're managing users and authentication outside of Supabase, we have two o
 
 #### Direct Postgres connection
 
-You can directly connect to your Supabase Postgres DB using the [connection info](/dashboard/project/_/settings/database) on your project's database settings page. To use RLS with this method, we use a custom session variable that contains the current user's ID:
+You can directly connect to your Supabase Postgres DB using the [connection info](/dashboard/project/_/?showConnect=true) on a project page. To use RLS with this method, we use a custom session variable that contains the current user's ID:
 
 ```sql
 -- enable row level security
@@ -228,7 +231,7 @@ order by document_sections.embedding <#> embedding;
 
 {/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 
-You might be tempted to discard RLS completely and simply filter by user within the `where` clause. Though this will work, we recommend RLS as a general best practice since RLS is always applied even as new queries and application logic is introduced in the future.
+You might be tempted to discard RLS completely and filter by user within the `where` clause. Though this will work, we recommend RLS as a general best practice since RLS is always applied even as new queries and application logic is introduced in the future.
 
 </Admonition>
 
@@ -271,4 +274,4 @@ order by document_sections.embedding <#> embedding;
 
 There are endless approaches to this problem based on the complexities of each system. Luckily Postgres comes with all the primitives needed to provide access control in the way that works best for your project.
 
-If the examples above didn't fit your use case or you need to adjust them slightly to better fit your existing system, feel free to reach out to [support](https://supabase.com/dashboard/support/new) and we'll be happy to assist you.
+If the examples above didn't fit your use case or you need to adjust them slightly to better fit your existing system, feel free to reach out to [support](/dashboard/support/new) and we'll be happy to assist you.

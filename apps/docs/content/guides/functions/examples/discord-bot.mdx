@@ -43,12 +43,13 @@ This will register a Slash Command named `hello` that accepts a parameter named 
 
 ```ts index.ts
 // Sift is a small routing library that abstracts away details like starting a
-// listener on a port, and provides a simple function (serve) that has an API
+// listener on a port, and provides a function (serve) that has an API
 // to invoke a function for a specific path.
-import { json, serve, validateRequest } from 'https://deno.land/x/sift@0.6.0/mod.ts'
+
 // TweetNaCl is a cryptography library that we use to verify requests
 // from Discord.
 import nacl from 'https://cdn.skypack.dev/tweetnacl@v1.0.3?dts'
+import { json, serve, validateRequest } from 'https://deno.land/x/sift@0.6.0/mod.ts'
 
 enum DiscordCommandType {
   Ping = 1,
@@ -152,7 +153,7 @@ Navigate to your Function details in the Supabase Dashboard to get your Endpoint
 1. Go back to your application (Greeter) page on Discord Developer Portal
 2. Fill **INTERACTIONS ENDPOINT URL** field with the URL and click on **Save Changes**.
 
-The application is now ready. Let's proceed to the next section to install it.
+The application is now ready. Proceed to the next section to install it.
 
 ## Install the slash command on your Discord server
 

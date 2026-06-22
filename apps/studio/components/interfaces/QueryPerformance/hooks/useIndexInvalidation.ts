@@ -4,30 +4,31 @@ import { parseAsString, useQueryStates } from 'nuqs'
 import { useCallback } from 'react'
 
 import {
-  QueryPerformanceSort,
-  useQueryPerformanceQuery,
-} from 'components/interfaces/Reports/Reports.queries'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { databaseIndexesKeys } from 'data/database-indexes/keys'
-import { databaseKeys } from 'data/database/keys'
-import {
   QUERY_PERFORMANCE_PRESET_MAP,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from '../QueryPerformance.constants'
-import { useIsIndexAdvisorAvailable } from './useIsIndexAdvisorAvailable'
+import { type QueryPerformanceSort } from '../QueryPerformance.types'
+import { useQueryPerformanceQuery } from '../useQueryPerformanceQuery'
+import { useIndexAdvisorStatus } from './useIsIndexAdvisorStatus'
+import { useTableIndexAdvisor } from '@/components/grid/context/TableIndexAdvisorContext'
+import { databaseIndexesKeys } from '@/data/database-indexes/keys'
+import { databaseKeys } from '@/data/database/keys'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export function useIndexInvalidation() {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { project } = useProjectContext()
-  const isAdvisorAvailable = useIsIndexAdvisorAvailable()
+  const { data: project } = useSelectedProjectQuery()
+  const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
   const [{ preset: urlPreset, search: searchQuery, order, sort }] = useQueryStates({
     sort: parseAsString,
     search: parseAsString.withDefault(''),
     order: parseAsString,
-    preset: parseAsString.withDefault(QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING),
+    preset: parseAsString.withDefault('unified'),
   })
+
+  const { invalidate: invalidateTableIndexAdvisor } = useTableIndexAdvisor()
 
   const preset = QUERY_PERFORMANCE_PRESET_MAP[urlPreset as QUERY_PERFORMANCE_REPORT_TYPES]
   const orderBy = !!sort ? ({ column: sort, order } as QueryPerformanceSort) : undefined
@@ -38,12 +39,16 @@ export function useIndexInvalidation() {
     orderBy,
     preset,
     roles: typeof roles === 'string' ? [roles] : roles,
-    runIndexAdvisor: isAdvisorAvailable,
+    runIndexAdvisor: isIndexAdvisorEnabled,
   })
 
   return useCallback(() => {
     queryPerformanceQuery.runQuery()
-    queryClient.invalidateQueries(databaseKeys.indexAdvisorFromQuery(project?.ref, ''))
-    queryClient.invalidateQueries(databaseIndexesKeys.list(project?.ref))
-  }, [queryPerformanceQuery, queryClient, project?.ref])
+    queryClient.invalidateQueries({
+      queryKey: databaseKeys.indexAdvisorFromQuery(project?.ref, ''),
+    })
+    queryClient.invalidateQueries({ queryKey: databaseIndexesKeys.list(project?.ref) })
+
+    invalidateTableIndexAdvisor()
+  }, [queryPerformanceQuery, queryClient, project?.ref, invalidateTableIndexAdvisor])
 }

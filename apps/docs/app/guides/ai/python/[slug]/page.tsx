@@ -1,14 +1,14 @@
-import type { SerializeOptions } from 'next-mdx-remote/dist/types'
 import { notFound } from 'next/navigation'
 import { relative } from 'path'
 import rehypeSlug from 'rehype-slug'
 
-import { genGuideMeta, removeRedundantH1 } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
-import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
+import { genGuideMeta, removeRedundantH1 } from '~/features/docs/GuidesMdx.utils'
+import { getGitHubFileContents } from '~/lib/octokit'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
+import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 
 export const dynamicParams = false
 
@@ -83,12 +83,9 @@ const getContent = async ({ slug }: Params) => {
 
   const editLink = newEditLink(`${org}/${repo}/blob/${branch}/${docsDir}/${remoteFile}`)
 
-  const response = await fetchRevalidatePerDay(
-    `https://raw.githubusercontent.com/${org}/${repo}/${branch}/${docsDir}/${remoteFile}`
+  const content = removeRedundantH1(
+    await getGitHubFileContents({ org, repo, path: `${docsDir}/${remoteFile}`, branch })
   )
-
-  let content = await response.text()
-  content = removeRedundantH1(content)
 
   return {
     pathname: `/guides/ai/python/${slug}` satisfies `/${string}`,
@@ -135,4 +132,4 @@ const generateStaticParams = () => pageMap.map(({ slug }) => ({ slug }))
 const generateMetadata = genGuideMeta(getContent)
 
 export default PythonClientDocs
-export { generateStaticParams, generateMetadata }
+export { generateMetadata, generateStaticParams }

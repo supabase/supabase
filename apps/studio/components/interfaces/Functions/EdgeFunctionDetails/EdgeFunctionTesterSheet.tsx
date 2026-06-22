@@ -1,38 +1,25 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { Loader2, Plus, Send, X } from 'lucide-react'
 import { useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
-import * as z from 'zod'
-
-import { useParams } from 'common'
-import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
-import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { constructHeaders } from 'data/fetchers'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-import { prettifyJSON } from 'lib/helpers'
-import { getRoleImpersonationJWT } from 'lib/role-impersonation'
-import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import {
   Badge,
   Button,
-  CodeBlock,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_ as Input,
-  Label_Shadcn_ as Label,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+  Label,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-  Select_Shadcn_ as Select,
-  SelectContent_Shadcn_ as SelectContent,
-  SelectItem_Shadcn_ as SelectItem,
-  SelectTrigger_Shadcn_ as SelectTrigger,
-  SelectValue_Shadcn_ as SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Sheet,
   SheetContent,
   SheetFooter,
@@ -42,11 +29,32 @@ import {
   TabsContent_Shadcn_ as TabsContent,
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
-  TextArea_Shadcn_ as Textarea,
+  Textarea,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
 import { HTTP_METHODS } from './EdgeFunctionDetails.constants'
 import { ErrorWithStatus, ResponseData } from './EdgeFunctionDetails.types'
+import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { useSessionAccessTokenQuery } from '@/data/auth/session-access-token-query'
+import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useEdgeFunctionTestMutation } from '@/data/edge-functions/edge-function-test-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { IS_PLATFORM } from '@/lib/constants'
+import { prettifyJSON } from '@/lib/helpers'
+import { getRoleImpersonationJWT } from '@/lib/role-impersonation'
+import { useTrack } from '@/lib/telemetry/track'
+import {
+  RoleImpersonationStateContextProvider,
+  useGetImpersonatedRoleState,
+} from '@/state/role-impersonation-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface EdgeFunctionTesterSheetProps {
   visible: boolean
@@ -75,19 +83,46 @@ const FormSchema = z.object({
 
 type FormValues = z.infer<typeof FormSchema>
 
-export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTesterSheetProps) => {
+export const EdgeFunctionTesterSheet = (props: EdgeFunctionTesterSheetProps) => {
+  const { ref: projectRef } = useParams()
+
+  // [Alaister]: We're using a fresh context here as edge functions don't allow impersonating users.
+  return (
+    <RoleImpersonationStateContextProvider key={`role-impersonation-state-${projectRef}`}>
+      <EdgeFunctionTesterSheetContent {...props} />
+    </RoleImpersonationStateContextProvider>
+  )
+}
+
+const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTesterSheetProps) => {
   const { ref: projectRef, functionSlug } = useParams()
-  const { mutate: sendEvent } = useSendEventMutation()
-  const org = useSelectedOrganization()
+  const getImpersonatedRoleState = useGetImpersonatedRoleState()
+
   const [response, setResponse] = useState<ResponseData | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
 
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { data: apiKeysData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
+  const { serviceKey } = apiKeysData ?? {}
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: accessToken } = useSessionAccessTokenQuery({ enabled: IS_PLATFORM })
-  const getImpersonatedRoleState = useGetImpersonatedRoleState()
-  const { serviceKey } = getAPIKeys(settings)
+
+  const track = useTrack()
+  const { mutate: testEdgeFunction, isPending } = useEdgeFunctionTestMutation({
+    onSuccess: (res) => setResponse(res),
+    onError: (err) => {
+      setError(err instanceof Error ? err.message : 'An unknown error occurred')
+      if (err instanceof Error) {
+        const errorWithStatus = err as ErrorWithStatus
+        setResponse({
+          status: errorWithStatus.cause?.status || 500,
+          headers: {},
+          body: '',
+        })
+      }
+    },
+  })
 
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint ?? ''
@@ -138,99 +173,75 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
     }
   }
 
+  useShortcut(
+    SHORTCUT_IDS.FUNCTION_DETAIL_SUBMIT_TEST,
+    () => {
+      form.handleSubmit(onSubmit)()
+    },
+    { enabled: visible && !isPending }
+  )
+
   const onSubmit = async (values: FormValues) => {
+    setError(null)
+    setResponse(null)
+
+    // Validate that the body is valid JSON
     try {
-      setIsLoading(true)
-      setError(null)
-      setResponse(null)
-
-      // Validate that the body is valid JSON
-      try {
-        JSON.parse(values.body)
-      } catch (e) {
-        form.setError('body', { message: 'Must be a valid JSON string' })
-        return
-      }
-
-      let testAuthorization: string | undefined
-      const role = getImpersonatedRoleState().role
-
-      if (
-        projectRef !== undefined &&
-        config?.jwt_secret !== undefined &&
-        role !== undefined &&
-        role.type === 'postgrest'
-      ) {
-        try {
-          const token = await getRoleImpersonationJWT(projectRef, config.jwt_secret, role)
-          testAuthorization = 'Bearer ' + token
-        } catch (err: any) {
-          console.error('Failed to generate JWT:', {
-            error: err.message,
-            roleDetails: role,
-          })
-        }
-      }
-
-      // Construct custom headers
-      const customHeaders: Record<string, string> = {}
-      headerFields.forEach(({ key, value }) => {
-        if (key && value) {
-          customHeaders[key] = value
-        }
-      })
-
-      // Construct query parameters
-      const queryString = queryParamFields
-        .filter(({ key, value }) => key && value)
-        .map(({ key, value }) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-        .join('&')
-
-      const finalUrl = queryString ? `${url}?${queryString}` : url
-
-      const defaultHeaders = await constructHeaders()
-      const res = await fetch(`${BASE_PATH}/api/edge-functions/test`, {
-        method: 'POST',
-        headers: {
-          ...defaultHeaders,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          url: finalUrl,
-          method: values.method,
-          body: values.body,
-          headers: {
-            ...(accessToken && {
-              Authorization: `Bearer ${accessToken}`,
-            }),
-            'x-test-authorization': testAuthorization ?? `Bearer ${serviceKey?.api_key}`,
-            'Content-Type': 'application/json',
-            ...customHeaders,
-          },
-        }),
-      })
-
-      const data = await res.json()
-      if (!res.ok) {
-        throw new Error(data.error?.message || 'Failed to test edge function', {
-          cause: { status: data.status },
-        })
-      }
-
-      setResponse(data)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred')
-      if (err instanceof Error) {
-        const errorWithStatus = err as ErrorWithStatus
-        setResponse({
-          status: errorWithStatus.cause?.status || 500,
-          headers: {},
-          body: '',
-        })
-      }
-    } finally {
-      setIsLoading(false)
+      JSON.parse(JSON.stringify(values.body))
+    } catch (e) {
+      form.setError('body', { message: 'Must be a valid JSON string' })
+      return
     }
+
+    let testAuthorization: string | undefined
+    const role = getImpersonatedRoleState().role
+
+    if (
+      projectRef !== undefined &&
+      config?.jwt_secret !== undefined &&
+      role !== undefined &&
+      role.type === 'postgrest'
+    ) {
+      try {
+        const token = await getRoleImpersonationJWT(projectRef, config.jwt_secret, role)
+        testAuthorization = 'Bearer ' + token
+      } catch (err: any) {
+        console.error('Failed to generate JWT:', {
+          error: err.message,
+          roleDetails: role,
+        })
+      }
+    }
+
+    // Construct custom headers
+    const customHeaders: Record<string, string> = {}
+    values.headers.forEach(({ key, value }) => {
+      if (key && value) {
+        customHeaders[key] = value
+      }
+    })
+
+    // Construct query parameters
+    const queryString = values.queryParams
+      .filter(({ key, value }) => key && value)
+      .map(({ key, value }) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+      .join('&')
+
+    const finalUrl = queryString ? `${url}?${queryString}` : url
+
+    testEdgeFunction({
+      url: finalUrl,
+      method: values.method,
+      body: values.body,
+      headers: {
+        ...(accessToken && {
+          Authorization: `Bearer ${accessToken}`,
+        }),
+        'x-test-authorization': testAuthorization ?? `Bearer ${serviceKey?.api_key}`,
+        'Content-Type': 'application/json',
+        ...customHeaders,
+      },
+    })
   }
 
   const renderKeyValuePairs = (type: 'headers' | 'queryParams', label: string) => (
@@ -238,7 +249,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
       <div className="flex items-center justify-between">
         <Label className="text-foreground text-sm">{label}</Label>
         <Button
-          type="default"
+          variant="default"
           size="tiny"
           icon={<Plus size={14} />}
           onClick={() => addKeyValuePair(type)}
@@ -248,41 +259,41 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
       </div>
       <div className="border rounded-md bg-surface-200">
         {(type === 'headers' ? headerFields : queryParamFields).map((field, index) => (
-          <div key={field.id} className="grid grid-cols-[1fr,1fr,32px] border-b last:border-b-0">
-            <FormField_Shadcn_
+          <div key={field.id} className="grid grid-cols-[1fr_1fr_32px] border-b last:border-b-0">
+            <FormField
               control={form.control}
               name={`${type}.${index}.key`}
               render={({ field }) => (
-                <FormControl_Shadcn_>
+                <FormControl>
                   <Input
                     {...field}
                     size="tiny"
                     placeholder="Enter key..."
-                    disabled={isLoading}
-                    className="h-auto py-2 font-mono rounded-none shadow-none bg-transparent border-l-0 border-r-1 border-t-0 border-b-0 border-border"
+                    disabled={isPending}
+                    className="h-auto py-2 font-mono rounded-none shadow-none bg-transparent border-l-0 border-r border-t-0 border-b-0 border-border"
                   />
-                </FormControl_Shadcn_>
+                </FormControl>
               )}
             />
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name={`${type}.${index}.value`}
               render={({ field }) => (
-                <FormControl_Shadcn_>
+                <FormControl>
                   <Input
                     {...field}
                     size="tiny"
                     placeholder="Enter value..."
-                    disabled={isLoading}
+                    disabled={isPending}
                     className="h-auto py-2 font-mono rounded-none shadow-none bg-transparent border-none"
                   />
-                </FormControl_Shadcn_>
+                </FormControl>
               )}
             />
             <div className="flex items-center justify-center">
               {(type === 'headers' ? headerFields : queryParamFields).length > 1 && (
                 <Button
-                  type="text"
+                  variant="text"
                   size="tiny"
                   icon={<X strokeWidth={1.5} size={14} />}
                   className="w-6 h-6"
@@ -298,29 +309,51 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
 
   return (
     <Sheet open={visible} onOpenChange={onClose}>
-      <SheetContent size="default" className="flex flex-col gap-0 p-0">
+      <SheetContent
+        size="default"
+        hasOverlay={false}
+        className="flex flex-col gap-0 p-0"
+        onPointerDownOutside={(e) => {
+          // react-resizable-panels v4 registers document-level capture-phase pointer
+          // handlers that can interfere with Radix Dialog's outside-interaction detection.
+          // Prevent the sheet from closing when interacting with the resize handle.
+          const target = (e as CustomEvent<{ originalEvent: PointerEvent }>).detail?.originalEvent
+            ?.target as HTMLElement | null
+          if (target?.closest?.('[data-separator]')) {
+            e.preventDefault()
+          }
+        }}
+        onFocusOutside={(e) => {
+          // The v4 Separator explicitly calls .focus() on itself during pointerdown,
+          // which can trigger Radix Dialog's focus-outside detection.
+          const target = e.target as HTMLElement | null
+          if (target?.closest?.('[data-separator]')) {
+            e.preventDefault()
+          }
+        }}
+      >
         <SheetHeader>
           <SheetTitle>Test {functionSlug}</SheetTitle>
         </SheetHeader>
 
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex-1 overflow-y-auto flex flex-col"
           >
-            <ResizablePanelGroup direction="vertical">
+            <ResizablePanelGroup orientation="vertical">
               <ResizablePanel>
                 <div className="flex flex-col gap-y-4 p-5 h-full overflow-y-auto">
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="method"
                     render={({ field }) => (
                       <FormItemLayout layout="vertical" label="HTTP Method">
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Select
                             value={field.value}
                             onValueChange={field.onChange}
-                            disabled={isLoading}
+                            disabled={isPending}
                           >
                             <SelectTrigger className="w-full">
                               <SelectValue placeholder="Select method" />
@@ -333,25 +366,25 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                               ))}
                             </SelectContent>
                           </Select>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
                   {method !== 'GET' && (
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="body"
                       render={({ field }) => (
                         <FormItemLayout layout="vertical" label="Request Body">
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <Textarea
                               {...field}
                               placeholder="Request body (JSON)"
                               rows={3}
-                              disabled={isLoading}
+                              disabled={isPending}
                               className="font-mono text-xs"
                             />
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
@@ -362,7 +395,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                 </div>
               </ResizablePanel>
               <ResizableHandle withHandle />
-              <ResizablePanel defaultSize={41} minSize={41} maxSize={83}>
+              <ResizablePanel defaultSize="41" minSize="41" maxSize="83">
                 <div className="h-full bg-surface-100 border-t flex-1 flex flex-col overflow-hidden">
                   {response ? (
                     <div className="h-full bg-surface-100 flex flex-col overflow-hidden">
@@ -401,7 +434,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                             <CodeBlock
                               language="json"
                               hideLineNumbers
-                              className="rounded-md !border-none !px-4 !py-3 h-full"
+                              className="rounded-md border-none! px-4! py-3! h-full"
                               value={prettifyJSON(response.body)}
                             />
                           </TabsContent>
@@ -409,14 +442,14 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                             <CodeBlock
                               language="json"
                               hideLineNumbers
-                              className="rounded-md !border-none !px-4 !py-3 h-full"
+                              className="rounded-md border-none! px-4! py-3! h-full"
                               value={prettifyJSON(JSON.stringify(response.headers, null, 2))}
                             />
                           </TabsContent>
                         </Tabs>
                       )}
                     </div>
-                  ) : isLoading ? (
+                  ) : isPending ? (
                     <div className="h-full flex flex-col items-center justify-center gap-2">
                       <Loader2 size={24} className="text-foreground-muted animate-spin" />
                       <p className="text-sm text-foreground-light">Sending request...</p>
@@ -433,31 +466,27 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
 
             <SheetFooter className="px-5 py-3 border-t">
               <div className="flex items-center gap-2">
-                <RoleImpersonationPopover portal={false} />
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={isLoading}
-                  disabled={isLoading}
-                  onClick={() =>
-                    sendEvent({
-                      action: 'edge_function_test_send_button_clicked',
-                      properties: {
-                        httpMethod: method,
-                      },
-                      groups: {
-                        project: projectRef ?? 'Unknown',
-                        organization: org?.slug ?? 'Unknown',
-                      },
-                    })
-                  }
-                >
-                  Send Request
-                </Button>
+                <RoleImpersonationPopover
+                  disallowAuthenticatedOption
+                  header="Run edge function as a role"
+                />
+                <ShortcutTooltip shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_SUBMIT_TEST} side="top">
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    loading={isPending}
+                    disabled={isPending}
+                    onClick={() =>
+                      track('edge_function_test_send_button_clicked', { httpMethod: method })
+                    }
+                  >
+                    Send Request
+                  </Button>
+                </ShortcutTooltip>
               </div>
             </SheetFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </SheetContent>
     </Sheet>
   )

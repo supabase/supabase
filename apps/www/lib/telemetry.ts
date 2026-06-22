@@ -1,16 +1,22 @@
+'use client'
+
 import { sendTelemetryEvent } from 'common'
-import { TelemetryEvent } from 'common/telemetry-constants'
+import type { TelemetryEvent } from 'common/telemetry-constants'
 import { API_URL } from 'lib/constants'
-import { useRouter } from 'next/router'
+import { usePathname } from 'next/navigation'
 import { useCallback } from 'react'
 
 export function useSendTelemetryEvent() {
-  const router = useRouter()
+  const pathname = usePathname()
 
   return useCallback(
     (event: TelemetryEvent) => {
-      return sendTelemetryEvent(API_URL, event, router.pathname)
+      const url = new URL(API_URL ?? 'http://localhost:3000')
+      url.pathname = pathname ?? ''
+      url.search = window.location.search
+
+      return sendTelemetryEvent(API_URL, event, url.toString())
     },
-    [router.pathname]
+    [pathname]
   )
 }

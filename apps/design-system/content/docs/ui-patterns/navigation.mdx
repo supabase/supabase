@@ -1,0 +1,35 @@
+---
+title: Navigation
+description: Navigation patterns help users understand where they are and where they can go next.
+---
+
+Supabase has a necessarily complex navigation system to handle multiple products and levels of hierarchy. This page introduces those general patterns, best practices, and the components involved.
+
+## Components
+
+### NavMenu
+
+A horizontal list of related views within a consistent PageLayout context, allowing for clearer page-level organisation. Activating a NavMenu item should trigger a URL change.
+
+[NavMenu component guidelines](../components/nav-menu)
+
+## Page titles
+
+Browser page titles should follow a consistent most-specific-first structure so tabs and browser history are easier to scan:
+
+`Entity | Section | Surface | Project | Org | Supabase`
+
+Examples:
+
+- `users | Table Editor | My Project | My Org | Supabase`
+- `Backups | Database | My Project | My Org | Supabase`
+
+Implementation notes (Studio):
+
+- Use the shared title formatter in `apps/studio/lib/page-title.ts`
+- Prefer `ProjectLayout` for project-scoped pages
+- Prefer a layout's explicit `title` prop when a wrapper layout exposes one
+- Use `browserTitle.section` when rendering `ProjectLayout` directly
+- Use `browserTitle.entity` for the most specific resource (table/function/query) when available
+- Use `product` as the single source of truth for the project-level surface segment
+- Avoid assembling `document.title` ad hoc in individual pages/layouts

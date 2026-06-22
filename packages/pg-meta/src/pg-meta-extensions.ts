@@ -1,6 +1,7 @@
-import { literal } from './pg-format'
-import { EXTENSIONS_SQL } from './sql/extensions'
 import { z } from 'zod'
+
+import { ident, literal, safeSql, type SafeSqlFragment } from './pg-format'
+import { EXTENSIONS_SQL } from './sql/extensions'
 
 const pgExtensionZod = z.object({
   name: z.string(),
@@ -22,15 +23,15 @@ function list({
   limit?: number
   offset?: number
 } = {}): {
-  sql: string
+  sql: SafeSqlFragment
   zod: typeof pgExtensionArrayZod
 } {
   let sql = EXTENSIONS_SQL
   if (limit) {
-    sql = `${sql} LIMIT ${limit}`
+    sql = safeSql`${sql} LIMIT ${literal(limit)}`
   }
   if (offset) {
-    sql = `${sql} OFFSET ${offset}`
+    sql = safeSql`${sql} OFFSET ${literal(offset)}`
   }
   return {
     sql,
@@ -39,10 +40,10 @@ function list({
 }
 
 function retrieve({ name }: { name: string }): {
-  sql: string
+  sql: SafeSqlFragment
   zod: typeof pgExtensionOptionalZod
 } {
-  const sql = `${EXTENSIONS_SQL} WHERE name = ${literal(name)};`
+  const sql = safeSql`${EXTENSIONS_SQL} WHERE name = ${literal(name)};`
   return {
     sql,
     zod: pgExtensionOptionalZod,
@@ -57,29 +58,13 @@ type ExtensionCreateParams = {
 }
 
 function create({ name, schema, version, cascade = false }: ExtensionCreateParams): {
-  sql: string
+  sql: SafeSqlFragment
 } {
-  const sql = `
-do $$
-begin
-  -- Check if extension exists
-  if exists (
-    select 1 from pg_extension where extname = ${literal(name)}
-  ) then
-    raise exception 'Extension % already exists', ${literal(name)};
-  end if;
-
-  execute(format('CREATE EXTENSION %I
-    %s
-    %s
-    %s',
-    ${literal(name)},
-    ${schema ? `'SCHEMA ' || quote_ident(${literal(schema)})` : `''`},
-    ${version ? `'VERSION ' || quote_ident(${literal(version)})` : `''`},
-    ${cascade ? `'CASCADE'` : `''`}
-));
-end
-$$;`
+  const sql = safeSql`
+CREATE EXTENSION ${ident(name)}
+  ${schema === undefined ? safeSql`` : safeSql`SCHEMA ${ident(schema)}`}
+  ${version === undefined ? safeSql`` : safeSql`VERSION ${literal(version)}`}
+  ${cascade ? safeSql`CASCADE` : safeSql``};`
   return { sql }
 }
 
@@ -92,37 +77,19 @@ type ExtensionUpdateParams = {
 function update(
   name: string,
   { update = false, version, schema }: ExtensionUpdateParams
-): { sql: string } {
-  const sql = `
-do $$
-declare
-  ext record;
-begin
-  -- Check if extension exists
-  select * into ext from pg_extension where extname = ${literal(name)};
-  if ext is null then
-    raise exception 'Extension % does not exist', ${literal(name)};
-  end if;
-
-  ${
-    update
-      ? `execute(format('ALTER EXTENSION %I UPDATE %s',
-    ${literal(name)},
-    ${version ? `'TO ' || quote_ident(${literal(version)})` : `''`}
-  ));`
-      : ''
+): { sql: SafeSqlFragment } {
+  let updateSql = safeSql``
+  if (update) {
+    updateSql = safeSql`ALTER EXTENSION ${ident(name)} UPDATE ${
+      version === undefined ? safeSql`` : safeSql`TO ${literal(version)}`
+    };`
   }
+  const schemaSql =
+    schema === undefined
+      ? safeSql``
+      : safeSql`ALTER EXTENSION ${ident(name)} SET SCHEMA ${ident(schema)};`
 
-  ${
-    schema
-      ? `execute(format('ALTER EXTENSION %I SET SCHEMA %I',
-    ${literal(name)},
-    ${literal(schema)}
-  ));`
-      : ''
-  }
-end
-$$;`
+  const sql = safeSql`BEGIN; ${updateSql} ${schemaSql} COMMIT;`
   return { sql }
 }
 
@@ -130,18 +97,13 @@ type ExtensionRemoveParams = {
   cascade?: boolean
 }
 
-function remove(name: string, { cascade = false }: ExtensionRemoveParams = {}): { sql: string } {
-  const sql = `
-do $$
-declare
-  ext record;
-begin
-    execute(format('DROP EXTENSION %I %s',
-      ${literal(name)},
-      ${cascade ? `'CASCADE'` : `'RESTRICT'`}
-    ));
-end
-$$;`
+function remove(
+  name: string,
+  { cascade = false }: ExtensionRemoveParams = {}
+): {
+  sql: SafeSqlFragment
+} {
+  const sql = safeSql`DROP EXTENSION ${ident(name)} ${cascade ? safeSql`CASCADE` : safeSql`RESTRICT`};`
   return { sql }
 }
 

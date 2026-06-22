@@ -1,6 +1,7 @@
-import { expect, test, beforeAll, afterAll } from 'vitest'
+import { afterAll, beforeAll, expect, test } from 'vitest'
+
 import pgMeta from '../src/index'
-import { createTestDatabase, cleanupRoot } from './db/utils'
+import { cleanupRoot, createTestDatabase } from './db/utils'
 
 beforeAll(async () => {
   // Any global setup if needed
@@ -57,106 +58,109 @@ withTestDatabase('list tables', async ({ executeQuery }) => {
       size: expect.any(String),
     },
     `
-      {
-        "bytes": Any<Number>,
-        "columns": [
-          {
-            "check": null,
-            "comment": null,
-            "data_type": "bigint",
-            "default_value": null,
-            "enums": [],
-            "format": "int8",
-            "identity_generation": "BY DEFAULT",
-            "is_generated": false,
-            "is_identity": true,
-            "is_nullable": false,
-            "is_unique": false,
-            "is_updatable": true,
-            "name": "id",
-            "ordinal_position": 1,
-            "schema": "public",
-            "table": "users",
-          },
-          {
-            "check": null,
-            "comment": null,
-            "data_type": "text",
-            "default_value": null,
-            "enums": [],
-            "format": "text",
-            "identity_generation": null,
-            "is_generated": false,
-            "is_identity": false,
-            "is_nullable": true,
-            "is_unique": false,
-            "is_updatable": true,
-            "name": "name",
-            "ordinal_position": 2,
-            "schema": "public",
-            "table": "users",
-          },
-          {
-            "check": null,
-            "comment": null,
-            "data_type": "USER-DEFINED",
-            "default_value": "'ACTIVE'::user_status",
-            "enums": [
-              "ACTIVE",
-              "INACTIVE",
-            ],
-            "format": "user_status",
-            "identity_generation": null,
-            "is_generated": false,
-            "is_identity": false,
-            "is_nullable": true,
-            "is_unique": false,
-            "is_updatable": true,
-            "name": "status",
-            "ordinal_position": 3,
-            "schema": "public",
-            "table": "users",
-          },
-        ],
-        "comment": null,
-        "dead_rows_estimate": Any<Number>,
-        "id": Any<Number>,
-        "live_rows_estimate": Any<Number>,
-        "name": "users",
-        "primary_keys": [
-          {
-            "name": "id",
-            "schema": "public",
-            "table_name": "users",
-          },
-        ],
-        "relationships": [
-          {
-            "constraint_name": "todos_user-id_fkey",
-            "source_column_name": "user-id",
-            "source_schema": "public",
-            "source_table_name": "todos",
-            "target_column_name": "id",
-            "target_table_name": "users",
-            "target_table_schema": "public",
-          },
-          {
-            "constraint_name": "user_details_user_id_fkey",
-            "source_column_name": "user_id",
-            "source_schema": "public",
-            "source_table_name": "user_details",
-            "target_column_name": "id",
-            "target_table_name": "users",
-            "target_table_schema": "public",
-          },
-        ],
-        "replica_identity": "DEFAULT",
-        "rls_enabled": false,
-        "rls_forced": false,
-        "schema": "public",
-        "size": Any<String>,
-      }
-    `
+    {
+      "bytes": Any<Number>,
+      "columns": [
+        {
+          "check": null,
+          "comment": null,
+          "data_type": "bigint",
+          "default_value": null,
+          "enums": [],
+          "format": "int8",
+          "format_schema": "pg_catalog",
+          "identity_generation": "BY DEFAULT",
+          "is_generated": false,
+          "is_identity": true,
+          "is_nullable": false,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "id",
+          "ordinal_position": 1,
+          "schema": "public",
+          "table": "users",
+        },
+        {
+          "check": null,
+          "comment": null,
+          "data_type": "text",
+          "default_value": null,
+          "enums": [],
+          "format": "text",
+          "format_schema": "pg_catalog",
+          "identity_generation": null,
+          "is_generated": false,
+          "is_identity": false,
+          "is_nullable": true,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "name",
+          "ordinal_position": 2,
+          "schema": "public",
+          "table": "users",
+        },
+        {
+          "check": null,
+          "comment": null,
+          "data_type": "USER-DEFINED",
+          "default_value": "'ACTIVE'::user_status",
+          "enums": [
+            "ACTIVE",
+            "INACTIVE",
+          ],
+          "format": "user_status",
+          "format_schema": "public",
+          "identity_generation": null,
+          "is_generated": false,
+          "is_identity": false,
+          "is_nullable": true,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "status",
+          "ordinal_position": 3,
+          "schema": "public",
+          "table": "users",
+        },
+      ],
+      "comment": null,
+      "dead_rows_estimate": Any<Number>,
+      "id": Any<Number>,
+      "live_rows_estimate": Any<Number>,
+      "name": "users",
+      "primary_keys": [
+        {
+          "name": "id",
+          "schema": "public",
+          "table_name": "users",
+        },
+      ],
+      "relationships": [
+        {
+          "constraint_name": "todos_user-id_fkey",
+          "source_column_name": "user-id",
+          "source_schema": "public",
+          "source_table_name": "todos",
+          "target_column_name": "id",
+          "target_table_name": "users",
+          "target_table_schema": "public",
+        },
+        {
+          "constraint_name": "user_details_user_id_fkey",
+          "source_column_name": "user_id",
+          "source_schema": "public",
+          "source_table_name": "user_details",
+          "target_column_name": "id",
+          "target_table_name": "users",
+          "target_table_schema": "public",
+        },
+      ],
+      "replica_identity": "DEFAULT",
+      "rls_enabled": false,
+      "rls_forced": false,
+      "schema": "public",
+      "size": Any<String>,
+    }
+  `
   )
 })
 
@@ -311,16 +315,13 @@ withTestDatabase('create, retrieve, update, and delete table', async ({ executeQ
   )
 
   // Update table
-  const { sql: updateSql } = await pgMeta.tables.update(
-    { id: retrieveRes!.id },
-    {
-      name: 'test a',
-      rls_enabled: true,
-      rls_forced: true,
-      replica_identity: 'NOTHING',
-      comment: 'foo',
-    }
-  )
+  const { sql: updateSql } = await pgMeta.tables.update(retrieveRes!, {
+    name: 'test a',
+    rls_enabled: true,
+    rls_forced: true,
+    replica_identity: 'NOTHING',
+    comment: 'foo',
+  })
   await executeQuery(updateSql)
 
   // Retrieve the updated table
@@ -359,15 +360,11 @@ withTestDatabase('create, retrieve, update, and delete table', async ({ executeQ
   )
 
   // Remove table
-  const { sql: removeSql } = await pgMeta.tables.remove({
-    id: updateRes!.id,
-  })
+  const { sql: removeSql } = await pgMeta.tables.remove(updateRes!)
   await executeQuery(removeSql)
 
   // Verify table is deleted
-  const { sql: verifyDeleteSql } = await pgMeta.tables.retrieve({
-    id: updateRes!.id,
-  })
+  const { sql: verifyDeleteSql } = await pgMeta.tables.retrieve(updateRes!)
   const verifyDeleteRes = await executeQuery(verifyDeleteSql)
   expect(verifyDeleteRes).toHaveLength(0)
 })
@@ -385,7 +382,7 @@ withTestDatabase('update with name unchanged', async ({ executeQuery }) => {
   const table = retrieveZod.parse((await executeQuery(retrieveSql))[0])
 
   // Update table with same name
-  const { sql: updateSql } = await pgMeta.tables.update({ id: table!.id }, { name: 't' })
+  const { sql: updateSql } = await pgMeta.tables.update(table!, { name: 't' })
   await executeQuery(updateSql)
 
   // Verify update
@@ -486,10 +483,9 @@ withTestDatabase('primary keys', async ({ executeQuery }) => {
   const table = retrieveZod.parse((await executeQuery(retrieveSql))[0])
 
   // Update table with primary keys
-  const { sql: updateSql } = await pgMeta.tables.update(
-    { id: table!.id },
-    { primary_keys: [{ name: 'c' }, { name: 'cc' }] }
-  )
+  const { sql: updateSql } = await pgMeta.tables.update(table!, {
+    primary_keys: [{ name: 'c' }, { name: 'cc' }],
+  })
   await executeQuery(updateSql)
 
   // Verify update
@@ -508,71 +504,73 @@ withTestDatabase('primary keys', async ({ executeQuery }) => {
       size: expect.any(String),
     },
     `
-      {
-        "bytes": Any<Number>,
-        "columns": [
-          {
-            "check": null,
-            "comment": null,
-            "data_type": "bigint",
-            "default_value": null,
-            "enums": [],
-            "format": "int8",
-            "identity_generation": null,
-            "is_generated": false,
-            "is_identity": false,
-            "is_nullable": false,
-            "is_unique": false,
-            "is_updatable": true,
-            "name": "c",
-            "ordinal_position": 1,
-            "schema": "public",
-            "table": "t",
-          },
-          {
-            "check": null,
-            "comment": null,
-            "data_type": "text",
-            "default_value": null,
-            "enums": [],
-            "format": "text",
-            "identity_generation": null,
-            "is_generated": false,
-            "is_identity": false,
-            "is_nullable": false,
-            "is_unique": false,
-            "is_updatable": true,
-            "name": "cc",
-            "ordinal_position": 2,
-            "schema": "public",
-            "table": "t",
-          },
-        ],
-        "comment": null,
-        "dead_rows_estimate": Any<Number>,
-        "id": Any<Number>,
-        "live_rows_estimate": Any<Number>,
-        "name": "t",
-        "primary_keys": [
-          {
-            "name": "c",
-            "schema": "public",
-            "table_name": "t",
-          },
-          {
-            "name": "cc",
-            "schema": "public",
-            "table_name": "t",
-          },
-        ],
-        "relationships": [],
-        "replica_identity": "DEFAULT",
-        "rls_enabled": false,
-        "rls_forced": false,
-        "schema": "public",
-        "size": Any<String>,
-      }
-      `
+    {
+      "bytes": Any<Number>,
+      "columns": [
+        {
+          "check": null,
+          "comment": null,
+          "data_type": "bigint",
+          "default_value": null,
+          "enums": [],
+          "format": "int8",
+          "format_schema": "pg_catalog",
+          "identity_generation": null,
+          "is_generated": false,
+          "is_identity": false,
+          "is_nullable": false,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "c",
+          "ordinal_position": 1,
+          "schema": "public",
+          "table": "t",
+        },
+        {
+          "check": null,
+          "comment": null,
+          "data_type": "text",
+          "default_value": null,
+          "enums": [],
+          "format": "text",
+          "format_schema": "pg_catalog",
+          "identity_generation": null,
+          "is_generated": false,
+          "is_identity": false,
+          "is_nullable": false,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "cc",
+          "ordinal_position": 2,
+          "schema": "public",
+          "table": "t",
+        },
+      ],
+      "comment": null,
+      "dead_rows_estimate": Any<Number>,
+      "id": Any<Number>,
+      "live_rows_estimate": Any<Number>,
+      "name": "t",
+      "primary_keys": [
+        {
+          "name": "c",
+          "schema": "public",
+          "table_name": "t",
+        },
+        {
+          "name": "cc",
+          "schema": "public",
+          "table_name": "t",
+        },
+      ],
+      "relationships": [],
+      "replica_identity": "DEFAULT",
+      "rls_enabled": false,
+      "rls_forced": false,
+      "schema": "public",
+      "size": Any<String>,
+    }
+  `
   )
 })
 
@@ -600,6 +598,7 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "text",
+          "format_schema": "pg_catalog",
           "id": "16510.2",
           "identity_generation": null,
           "is_generated": false,
@@ -620,6 +619,7 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "int4",
+          "format_schema": "pg_catalog",
           "id": "16510.3",
           "identity_generation": null,
           "is_generated": false,
@@ -640,6 +640,7 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "jsonb",
+          "format_schema": "pg_catalog",
           "id": "16510.4",
           "identity_generation": null,
           "is_generated": false,
@@ -660,6 +661,7 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "timestamp",
+          "format_schema": "pg_catalog",
           "id": "16510.5",
           "identity_generation": null,
           "is_generated": false,
@@ -680,6 +682,7 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
           "default_value": "nextval('memes_id_seq'::regclass)",
           "enums": [],
           "format": "int4",
+          "format_schema": "pg_catalog",
           "id": "16510.1",
           "identity_generation": null,
           "is_generated": false,
@@ -704,6 +707,7 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
             "retired",
           ],
           "format": "meme_status",
+          "format_schema": "public",
           "id": "16510.6",
           "identity_generation": null,
           "is_generated": false,
@@ -766,166 +770,172 @@ withTestDatabase('retrieve table by name and schema', async ({ executeQuery }) =
       size: expect.any(String),
     },
     `
-      {
-        "bytes": Any<Number>,
-        "columns": [
-          {
-            "check": null,
-            "comment": null,
-            "data_type": "text",
-            "default_value": null,
-            "enums": [],
-            "format": "text",
-            "id": "16510.2",
-            "identity_generation": null,
-            "is_generated": false,
-            "is_identity": false,
-            "is_nullable": false,
-            "is_unique": false,
-            "is_updatable": true,
-            "name": "name",
-            "ordinal_position": 2,
-            "schema": "public",
-            "table": "memes",
-            "table_id": 16510,
-          },
-          {
-            "check": null,
-            "comment": null,
-            "data_type": "integer",
-            "default_value": null,
-            "enums": [],
-            "format": "int4",
-            "id": "16510.3",
-            "identity_generation": null,
-            "is_generated": false,
-            "is_identity": false,
-            "is_nullable": true,
-            "is_unique": false,
-            "is_updatable": true,
-            "name": "category",
-            "ordinal_position": 3,
-            "schema": "public",
-            "table": "memes",
-            "table_id": 16510,
-          },
-          {
-            "check": null,
-            "comment": null,
-            "data_type": "jsonb",
-            "default_value": null,
-            "enums": [],
-            "format": "jsonb",
-            "id": "16510.4",
-            "identity_generation": null,
-            "is_generated": false,
-            "is_identity": false,
-            "is_nullable": true,
-            "is_unique": false,
-            "is_updatable": true,
-            "name": "metadata",
-            "ordinal_position": 4,
-            "schema": "public",
-            "table": "memes",
-            "table_id": 16510,
-          },
-          {
-            "check": null,
-            "comment": null,
-            "data_type": "timestamp without time zone",
-            "default_value": null,
-            "enums": [],
-            "format": "timestamp",
-            "id": "16510.5",
-            "identity_generation": null,
-            "is_generated": false,
-            "is_identity": false,
-            "is_nullable": false,
-            "is_unique": false,
-            "is_updatable": true,
-            "name": "created_at",
-            "ordinal_position": 5,
-            "schema": "public",
-            "table": "memes",
-            "table_id": 16510,
-          },
-          {
-            "check": null,
-            "comment": null,
-            "data_type": "integer",
-            "default_value": "nextval('memes_id_seq'::regclass)",
-            "enums": [],
-            "format": "int4",
-            "id": "16510.1",
-            "identity_generation": null,
-            "is_generated": false,
-            "is_identity": false,
-            "is_nullable": false,
-            "is_unique": false,
-            "is_updatable": true,
-            "name": "id",
-            "ordinal_position": 1,
-            "schema": "public",
-            "table": "memes",
-            "table_id": 16510,
-          },
-          {
-            "check": null,
-            "comment": null,
-            "data_type": "USER-DEFINED",
-            "default_value": "'old'::meme_status",
-            "enums": [
-              "new",
-              "old",
-              "retired",
-            ],
-            "format": "meme_status",
-            "id": "16510.6",
-            "identity_generation": null,
-            "is_generated": false,
-            "is_identity": false,
-            "is_nullable": true,
-            "is_unique": false,
-            "is_updatable": true,
-            "name": "status",
-            "ordinal_position": 6,
-            "schema": "public",
-            "table": "memes",
-            "table_id": 16510,
-          },
-        ],
-        "comment": null,
-        "dead_rows_estimate": Any<Number>,
-        "id": Any<Number>,
-        "live_rows_estimate": Any<Number>,
-        "name": "memes",
-        "primary_keys": [
-          {
-            "name": "id",
-            "schema": "public",
-            "table_id": 16510,
-            "table_name": "memes",
-          },
-        ],
-        "relationships": [
-          {
-            "constraint_name": "memes_category_fkey",
-            "id": 16519,
-            "source_column_name": "category",
-            "source_schema": "public",
-            "source_table_name": "memes",
-            "target_column_name": "id",
-            "target_table_name": "category",
-            "target_table_schema": "public",
-          },
-        ],
-        "replica_identity": "DEFAULT",
-        "rls_enabled": false,
-        "rls_forced": false,
-        "schema": "public",
-        "size": Any<String>,
-      }
-    `
+    {
+      "bytes": Any<Number>,
+      "columns": [
+        {
+          "check": null,
+          "comment": null,
+          "data_type": "text",
+          "default_value": null,
+          "enums": [],
+          "format": "text",
+          "format_schema": "pg_catalog",
+          "id": "16510.2",
+          "identity_generation": null,
+          "is_generated": false,
+          "is_identity": false,
+          "is_nullable": false,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "name",
+          "ordinal_position": 2,
+          "schema": "public",
+          "table": "memes",
+          "table_id": 16510,
+        },
+        {
+          "check": null,
+          "comment": null,
+          "data_type": "integer",
+          "default_value": null,
+          "enums": [],
+          "format": "int4",
+          "format_schema": "pg_catalog",
+          "id": "16510.3",
+          "identity_generation": null,
+          "is_generated": false,
+          "is_identity": false,
+          "is_nullable": true,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "category",
+          "ordinal_position": 3,
+          "schema": "public",
+          "table": "memes",
+          "table_id": 16510,
+        },
+        {
+          "check": null,
+          "comment": null,
+          "data_type": "jsonb",
+          "default_value": null,
+          "enums": [],
+          "format": "jsonb",
+          "format_schema": "pg_catalog",
+          "id": "16510.4",
+          "identity_generation": null,
+          "is_generated": false,
+          "is_identity": false,
+          "is_nullable": true,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "metadata",
+          "ordinal_position": 4,
+          "schema": "public",
+          "table": "memes",
+          "table_id": 16510,
+        },
+        {
+          "check": null,
+          "comment": null,
+          "data_type": "timestamp without time zone",
+          "default_value": null,
+          "enums": [],
+          "format": "timestamp",
+          "format_schema": "pg_catalog",
+          "id": "16510.5",
+          "identity_generation": null,
+          "is_generated": false,
+          "is_identity": false,
+          "is_nullable": false,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "created_at",
+          "ordinal_position": 5,
+          "schema": "public",
+          "table": "memes",
+          "table_id": 16510,
+        },
+        {
+          "check": null,
+          "comment": null,
+          "data_type": "integer",
+          "default_value": "nextval('memes_id_seq'::regclass)",
+          "enums": [],
+          "format": "int4",
+          "format_schema": "pg_catalog",
+          "id": "16510.1",
+          "identity_generation": null,
+          "is_generated": false,
+          "is_identity": false,
+          "is_nullable": false,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "id",
+          "ordinal_position": 1,
+          "schema": "public",
+          "table": "memes",
+          "table_id": 16510,
+        },
+        {
+          "check": null,
+          "comment": null,
+          "data_type": "USER-DEFINED",
+          "default_value": "'old'::meme_status",
+          "enums": [
+            "new",
+            "old",
+            "retired",
+          ],
+          "format": "meme_status",
+          "format_schema": "public",
+          "id": "16510.6",
+          "identity_generation": null,
+          "is_generated": false,
+          "is_identity": false,
+          "is_nullable": true,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "status",
+          "ordinal_position": 6,
+          "schema": "public",
+          "table": "memes",
+          "table_id": 16510,
+        },
+      ],
+      "comment": null,
+      "dead_rows_estimate": Any<Number>,
+      "id": Any<Number>,
+      "live_rows_estimate": Any<Number>,
+      "name": "memes",
+      "primary_keys": [
+        {
+          "name": "id",
+          "schema": "public",
+          "table_id": 16510,
+          "table_name": "memes",
+        },
+      ],
+      "relationships": [
+        {
+          "constraint_name": "memes_category_fkey",
+          "id": 16519,
+          "source_column_name": "category",
+          "source_schema": "public",
+          "source_table_name": "memes",
+          "target_column_name": "id",
+          "target_table_name": "category",
+          "target_table_schema": "public",
+        },
+      ],
+      "replica_identity": "DEFAULT",
+      "rls_enabled": false,
+      "rls_forced": false,
+      "schema": "public",
+      "size": Any<String>,
+    }
+  `
   )
 })
 
@@ -948,10 +958,10 @@ withTestDatabase('remove table by id', async ({ executeQuery }) => {
   // Get the table's id
   const { sql: listSql, zod: listZod } = await pgMeta.tables.list()
   const tables = listZod.parse(await executeQuery(listSql))
-  const tableId = tables.find((t) => t.name === 'test_remove_table')!.id
+  const tableId = tables.find((t) => t.name === 'test_remove_table')!
 
   // Remove the table
-  const { sql } = await pgMeta.tables.remove({ id: tableId })
+  const { sql } = await pgMeta.tables.remove(tableId)
   await executeQuery(sql)
 
   // Verify the table is gone
@@ -989,22 +999,15 @@ withTestDatabase('remove throws error for non-existent table', async ({ executeQ
 
   // With schema and name
   await expect(executeQuery(sql)).rejects.toThrow(
-    `Failed to execute query: Cannot find table with: name = 'non_existent_table' and schema = 'public'`
+    `Failed to execute query: table "non_existent_table" does not exist`
   )
-  await expect(
-    executeQuery(
-      pgMeta.tables.remove({
-        id: 999999,
-      }).sql
-    )
-  ).rejects.toThrow(`Failed to execute query: Cannot find table with: id = 999999`)
 })
 
 withTestDatabase('remove throws error with missing identifiers', async ({}) => {
   await expect(async () => {
     //@ts-expect-error use with missing params
     await pgMeta.tables.remove({ name: 'some_table' })
-  }).rejects.toThrow('Must provide either id or name and schema')
+  }).rejects.toThrow('SQL identifier cannot be null or undefined')
 })
 
 withTestDatabase('update table - rename', async ({ executeQuery }) => {
@@ -1014,7 +1017,7 @@ withTestDatabase('update table - rename', async ({ executeQuery }) => {
 
   // Update table name
   const { sql: updateSql } = await pgMeta.tables.update(
-    { name: 'test_rename', schema: 'public' },
+    { id: 0, name: 'test_rename', schema: 'public' },
     { name: 'test_renamed' }
   )
   await executeQuery(updateSql)
@@ -1036,7 +1039,7 @@ withTestDatabase('update table - change schema', async ({ executeQuery }) => {
 
   // Move table to new schema
   const { sql: updateSql } = await pgMeta.tables.update(
-    { name: 'test_schema_move', schema: 'public' },
+    { id: 0, name: 'test_schema_move', schema: 'public' },
     { schema: 'test_schema' }
   )
   await executeQuery(updateSql)
@@ -1057,7 +1060,7 @@ withTestDatabase('update table - row level security', async ({ executeQuery }) =
 
   // Enable RLS
   const { sql: updateSql } = await pgMeta.tables.update(
-    { name: 'test_rls', schema: 'public' },
+    { id: 0, name: 'test_rls', schema: 'public' },
     { rls_enabled: true, rls_forced: true }
   )
   await executeQuery(updateSql)
@@ -1079,7 +1082,7 @@ withTestDatabase('update table - replica identity', async ({ executeQuery }) => 
 
   // Change replica identity
   const { sql: updateSql } = await pgMeta.tables.update(
-    { name: 'test_replica', schema: 'public' },
+    { id: 0, name: 'test_replica', schema: 'public' },
     { replica_identity: 'NOTHING' }
   )
   await executeQuery(updateSql)
@@ -1093,6 +1096,12 @@ withTestDatabase('update table - replica identity', async ({ executeQuery }) => 
   expect(res!.replica_identity).toBe('NOTHING')
 })
 
+withTestDatabase('update table - replica identity INDEX requires index name', async () => {
+  expect(() =>
+    pgMeta.tables.update({ id: 1, name: 'test', schema: 'public' }, { replica_identity: 'INDEX' })
+  ).toThrow('replica_identity_index is required')
+})
+
 withTestDatabase('update table - primary keys', async ({ executeQuery }) => {
   // Create test table with a column
   const { sql: createSql } = await pgMeta.tables.create({ name: 'test_pk' })
@@ -1101,7 +1110,7 @@ withTestDatabase('update table - primary keys', async ({ executeQuery }) => {
 
   // Add primary key
   const { sql: updateSql } = await pgMeta.tables.update(
-    { name: 'test_pk', schema: 'public' },
+    { id: 0, name: 'test_pk', schema: 'public' },
     { primary_keys: [{ name: 'id' }] }
   )
   await executeQuery(updateSql)
@@ -1122,11 +1131,14 @@ withTestDatabase('update table - remove primary keys', async ({ executeQuery }) 
   await executeQuery(createSql)
   await executeQuery('ALTER TABLE test_pk_remove ADD COLUMN id INT PRIMARY KEY')
 
+  const { sql: tableSql, zod: tableZod } = await pgMeta.tables.retrieve({
+    name: 'test_pk_remove',
+    schema: 'public',
+  })
+  const table = tableZod.parse((await executeQuery(tableSql))[0])
+
   // Remove primary key
-  const { sql: updateSql } = await pgMeta.tables.update(
-    { name: 'test_pk_remove', schema: 'public' },
-    { primary_keys: [] }
-  )
+  const { sql: updateSql } = await pgMeta.tables.update(table!, { primary_keys: [] })
   await executeQuery(updateSql)
 
   // Verify update
@@ -1145,7 +1157,7 @@ withTestDatabase('update table - comment', async ({ executeQuery }) => {
 
   // Add comment
   const { sql: updateSql } = await pgMeta.tables.update(
-    { name: 'test_comment', schema: 'public' },
+    { id: 0, name: 'test_comment', schema: 'public' },
     { comment: 'Test comment' }
   )
   await executeQuery(updateSql)
@@ -1167,7 +1179,7 @@ withTestDatabase('update table - multiple changes', async ({ executeQuery }) => 
 
   // Make multiple changes
   const { sql: updateSql } = await pgMeta.tables.update(
-    { name: 'test_multiple', schema: 'public' },
+    { id: 0, name: 'test_multiple', schema: 'public' },
     {
       name: 'test_multiple_updated',
       comment: 'Updated table',
@@ -1206,10 +1218,7 @@ withTestDatabase('update table - by id', async ({ executeQuery }) => {
   const table = zod.parse((await executeQuery(retrieveSql))[0])
 
   // Update by id
-  const { sql: updateSql } = await pgMeta.tables.update(
-    { id: table!.id },
-    { name: 'test_by_id_updated' }
-  )
+  const { sql: updateSql } = await pgMeta.tables.update(table!, { name: 'test_by_id_updated' })
   await executeQuery(updateSql)
 
   // Verify update
@@ -1223,7 +1232,7 @@ withTestDatabase('update table - by id', async ({ executeQuery }) => {
 
 withTestDatabase('update table - error on non-existent table', async ({ executeQuery }) => {
   const { sql: updateSql } = await pgMeta.tables.update(
-    { name: 'non_existent', schema: 'public' },
+    { id: 0, name: 'non_existent', schema: 'public' },
     { name: 'new_name' }
   )
 
@@ -1238,7 +1247,7 @@ withTestDatabase('update table - rename with schema change', async ({ executeQue
 
   // Update both name and schema
   const { sql: updateSql } = await pgMeta.tables.update(
-    { name: 'test_rename_schema', schema: 'public' },
+    { id: 0, name: 'test_rename_schema', schema: 'public' },
     {
       name: 'test_renamed_schema',
       schema: 'test_schema',
@@ -1442,7 +1451,6 @@ for (const testCase of tableCreationTests) {
       await testCase.beforeTest(executeQuery)
     }
 
-    //@ts-expect-error
     const { sql } = pgMeta.tables.create(testCase.input)
     await executeQuery(sql)
 

@@ -1,15 +1,23 @@
-import { authKeys } from 'data/auth/keys'
-import { databaseExtensionsKeys } from 'data/database-extensions/keys'
-import { databaseIndexesKeys } from 'data/database-indexes/keys'
-import { databasePoliciesKeys } from 'data/database-policies/keys'
-import { databaseTriggerKeys } from 'data/database-triggers/keys'
-import { databaseKeys } from 'data/database/keys'
-import { enumeratedTypesKeys } from 'data/enumerated-types/keys'
-import { tableKeys } from 'data/tables/keys'
+import { isToolUIPart, type UIMessage } from 'ai'
+import { toast } from 'sonner'
+
 import { SAFE_FUNCTIONS } from './AiAssistant.constants'
+import { authKeys } from '@/data/auth/keys'
+import { databaseExtensionsKeys } from '@/data/database-extensions/keys'
+import { databaseIndexesKeys } from '@/data/database-indexes/keys'
+import { databasePoliciesKeys } from '@/data/database-policies/keys'
+import { databaseTriggerKeys } from '@/data/database-triggers/keys'
+import { databaseKeys } from '@/data/database/keys'
+import { enumeratedTypesKeys } from '@/data/enumerated-types/keys'
+import { handleError } from '@/data/fetchers'
+import { tableKeys } from '@/data/tables/keys'
+import { tryParseJson } from '@/lib/helpers'
+import { ResponseError } from '@/types'
+
+export type MutationCategory = 'functions' | 'rls-policies'
 
 // [Joshen] This is just very basic identification, but possible can extend perhaps
-export const identifyQueryType = (query: string) => {
+export const identifyQueryType = (query: string): MutationCategory | undefined => {
   const formattedQuery = query.toLowerCase().replaceAll('\n', ' ')
   if (
     formattedQuery.includes('create function') ||
@@ -19,6 +27,7 @@ export const identifyQueryType = (query: string) => {
   } else if (formattedQuery.includes('create policy') || formattedQuery.includes('alter policy')) {
     return 'rls-policies'
   }
+  return undefined
 }
 
 // Check for function calls that aren't in the safe list
@@ -67,8 +76,38 @@ export const isReadOnlySelect = (query: string): boolean => {
   return true
 }
 
+export const hasPendingToolApproval = (messages: Pick<UIMessage, 'role' | 'parts'>[]) => {
+  return messages.some((message) => {
+    if (message.role !== 'assistant') return false
+
+    return message.parts?.some((part) => isToolUIPart(part) && part.state === 'approval-requested')
+  })
+}
+
+export const resolvePendingToolApprovalsAsDenied = (messages: UIMessage[]): UIMessage[] => {
+  return messages.map((message) => {
+    if (message.role !== 'assistant') return message
+
+    const parts = message.parts?.map((part) => {
+      if (!isToolUIPart(part) || part.state !== 'approval-requested') return part
+
+      return {
+        ...part,
+        state: 'output-denied',
+        approval: {
+          id: part.approval.id,
+          approved: false,
+          reason: 'Skipped because the user sent a follow-up message.',
+        },
+      } as UIMessage['parts'][number]
+    })
+
+    return { ...message, parts } as UIMessage
+  })
+}
+
 const getContextKey = (pathname: string) => {
-  const [_, __, ___, ...rest] = pathname.split('/')
+  const [, , , ...rest] = pathname.split('/')
   const key = rest.join('/')
   return key
 }
@@ -90,7 +129,10 @@ export const getContextualInvalidationKeys = ({
         'auth/users': [authKeys.usersInfinite(ref)],
         'auth/policies': [databasePoliciesKeys.list(ref)],
         'database/functions': [databaseKeys.databaseFunctions(ref)],
-        'database/tables': [tableKeys.list(ref, schema, true), tableKeys.list(ref, schema, false)],
+        'database/tables': [
+          tableKeys.list(ref, schema, { includeColumns: true }),
+          tableKeys.list(ref, schema, { includeColumns: false }),
+        ],
         'database/triggers': [databaseTriggerKeys.list(ref)],
         'database/types': [enumeratedTypesKeys.list(ref)],
         'database/extensions': [databaseExtensionsKeys.list(ref)],
@@ -98,4 +140,22 @@ export const getContextualInvalidationKeys = ({
       } as const
     )[key] ?? []
   )
+}
+
+export const onErrorChat = (error: Error) => {
+  const parsedError = error ? tryParseJson(error.message) : undefined
+
+  try {
+    handleError(parsedError?.error || parsedError || error)
+  } catch (e: any) {
+    if (e instanceof ResponseError) {
+      toast.error(e.message)
+    } else if (e instanceof Error) {
+      toast.error(e.message)
+    } else if (typeof e === 'string') {
+      toast.error(e)
+    } else {
+      toast.error('An unknown error occurred')
+    }
+  }
 }

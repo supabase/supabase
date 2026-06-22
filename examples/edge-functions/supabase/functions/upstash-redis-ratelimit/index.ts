@@ -1,17 +1,18 @@
 import { Redis } from 'https://deno.land/x/upstash_redis@v1.19.3/mod.ts'
 import { Ratelimit } from 'https://cdn.skypack.dev/@upstash/ratelimit@0.4.4'
-import { createClient } from 'jsr:@supabase/supabase-js@2'
+import { createClient } from 'npm:supabase-js@2'
 
 console.log(`Function "upstash-redis-counter" up and running!`)
 
 Deno.serve(async (req) => {
   try {
+    const SUPABASE_PUBLISHABLE_KEYS = JSON.parse(Deno.env.get('SUPABASE_PUBLISHABLE_KEYS')!)
     // Create a Supabase client with the Auth context of the logged in user.
     const supabaseClient = createClient(
       // Supabase API URL - env var exported by default.
       Deno.env.get('SUPABASE_URL') ?? '',
-      // Supabase API ANON KEY - env var exported by default.
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      // Supabase publishable key - env var exported by default.
+      SUPABASE_PUBLISHABLE_KEYS['default'] ?? '',
       // Create client with Auth context of the user that called the function.
       // This way your row-level-security (RLS) policies are applied.
       {

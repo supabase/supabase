@@ -1,9 +1,11 @@
 'use client'
 
-import { RegistryNode } from '@/lib/process-registry'
-import { File, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, File } from 'lucide-react'
 import { useState } from 'react'
-import { CodeBlock, TreeView, TreeViewItem, flattenTree } from 'ui'
+import { cn, flattenTree, TreeView, TreeViewItem } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
+
+import { RegistryNode } from '@/lib/process-registry'
 
 interface BlockItemCodeProps {
   files: RegistryNode[]
@@ -74,10 +76,13 @@ export function BlockItemCode({ files }: BlockItemCodeProps) {
   return (
     <div className="flex mt-4 border rounded-lg overflow-hidden h-[652px] not-prose">
       {/* File browser sidebar */}
-      <div className="relative border-r h-full">
-        <div
-          className={`${sidebarVisible ? 'w-64' : 'w-6'} grow-0 shrink-0 flex-0 py-2 bg-muted/30 overflow-y-auto transition-all duration-200 h-full`}
-        >
+      <div
+        className={cn(
+          'relative border-r bg-muted/30 transition-[width] duration-300 ease-in-out',
+          sidebarVisible ? 'w-64' : 'w-6'
+        )}
+      >
+        <div className="py-2 h-full overflow-y-auto">
           {sidebarVisible && (
             <TreeView
               data={flattenedData}
@@ -126,7 +131,7 @@ export function BlockItemCode({ files }: BlockItemCodeProps) {
       {selectedFile?.content ? (
         <CodeBlock
           wrapperClassName="w-full"
-          className="h-full max-w-none !w-full flex-1 font-mono text-xs rounded-none border-none"
+          className="h-full max-w-none w-full! flex-1 font-mono text-xs rounded-none border-none"
           language="ts"
         >
           {selectedFile?.content}

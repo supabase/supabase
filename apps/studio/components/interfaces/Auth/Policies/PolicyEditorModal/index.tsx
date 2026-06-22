@@ -1,13 +1,15 @@
+import { acceptUntrustedSql, PGPolicy } from '@supabase/pg-meta'
 import { isEmpty, noop } from 'lodash'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from 'ui'
 
-import { useAppStateSnapshot } from 'state/app-state'
-import { Modal } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { POLICY_MODAL_VIEWS } from '../Policies.constants'
 import {
+  DraftPostgresPolicyCreatePayload,
+  DraftPostgresPolicyUpdatePayload,
   PolicyFormField,
+  PolicyForReview,
   PostgresPolicyCreatePayload,
   PostgresPolicyUpdatePayload,
 } from '../Policies.types'
@@ -16,19 +18,41 @@ import {
   createPayloadForUpdatePolicy,
   createSQLPolicy,
 } from '../Policies.utils'
-import PolicyEditor from '../PolicyEditor'
-import PolicyReview from '../PolicyReview'
+import { PolicyEditor } from '../PolicyEditor'
+import { PolicyReview } from '../PolicyReview'
 import PolicySelection from '../PolicySelection'
 import PolicyTemplates from '../PolicyTemplates'
 import { PolicyTemplate } from '../PolicyTemplates/PolicyTemplates.constants'
 import { getGeneralPolicyTemplates } from './PolicyEditorModal.constants'
 import PolicyEditorModalTitle from './PolicyEditorModalTitle'
+import { useFeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import useLatest from '@/hooks/misc/useLatest'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+
+// Call only from a user-gesture handler (the Save click). Promotes the draft payload's
+// `definition`/`check` from `DisplayableSqlFragment` to executable `SafeSqlFragment`.
+const acceptCreatePayload = (
+  draft: DraftPostgresPolicyCreatePayload
+): PostgresPolicyCreatePayload => ({
+  ...draft,
+  definition: draft.definition === undefined ? undefined : acceptUntrustedSql(draft.definition),
+  check: draft.check === undefined ? undefined : acceptUntrustedSql(draft.check),
+})
+
+const acceptUpdatePayload = (
+  draft: DraftPostgresPolicyUpdatePayload
+): PostgresPolicyUpdatePayload => ({
+  ...draft,
+  definition: draft.definition === undefined ? undefined : acceptUntrustedSql(draft.definition),
+  check: draft.check === undefined ? undefined : acceptUntrustedSql(draft.check),
+})
 
 interface PolicyEditorModalProps {
-  visible: boolean
-  schema: string
-  table: string
-  selectedPolicyToEdit: any
+  visible?: boolean
+  schema?: string
+  table?: string
+  selectedPolicyToEdit?: PGPolicy
   showAssistantPreview?: boolean
   onSelectCancel: () => void
   onCreatePolicy: (payload: PostgresPolicyCreatePayload) => Promise<boolean>
@@ -36,18 +60,18 @@ interface PolicyEditorModalProps {
   onSaveSuccess: () => void
 }
 
-const PolicyEditorModal = ({
+export const PolicyEditorModal = ({
   visible = false,
   schema = '',
   table = '',
-  selectedPolicyToEdit = {},
+  selectedPolicyToEdit,
   showAssistantPreview = false,
   onSelectCancel = noop,
   onCreatePolicy,
   onUpdatePolicy,
   onSaveSuccess = noop,
 }: PolicyEditorModalProps) => {
-  const snap = useAppStateSnapshot()
+  const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
 
   const newPolicyTemplate: PolicyFormField = {
     schema,
@@ -69,24 +93,19 @@ const PolicyEditorModal = ({
   const [policyFormFields, setPolicyFormFields] = useState<PolicyFormField>(
     initializedPolicyFormFields
   )
-  const [policyStatementForReview, setPolicyStatementForReview] = useState<any>('')
+  const [policyStatementForReview, setPolicyStatementForReview] = useState<PolicyForReview>()
   const [isDirty, setIsDirty] = useState(false)
-  const [isClosingPolicyEditorModal, setIsClosingPolicyEditorModal] = useState(false)
-  useEffect(() => {
-    if (visible) {
-      if (isNewPolicy) {
-        onViewIntro()
-      } else {
-        onViewEditor()
-      }
-      setPolicyFormFields(initializedPolicyFormFields)
-    }
-  }, [visible])
 
-  /* Methods that are for the UI */
+  const { confirmOnClose, modalProps } = useConfirmOnClose({
+    checkIsDirty: () => isDirty,
+    onClose: () => {
+      onSelectCancel()
+      setIsDirty(false)
+    },
+  })
 
-  const onViewIntro = () => setView(POLICY_MODAL_VIEWS.SELECTION)
-  const onViewEditor = () => setView(POLICY_MODAL_VIEWS.EDITOR)
+  const onViewIntro = useCallback(() => setView(POLICY_MODAL_VIEWS.SELECTION), [])
+  const onViewEditor = useCallback(() => setView(POLICY_MODAL_VIEWS.EDITOR), [])
   const onViewTemplates = () => {
     setPreviousView(view)
     setView(POLICY_MODAL_VIEWS.TEMPLATES)
@@ -94,8 +113,30 @@ const PolicyEditorModal = ({
   const onReviewPolicy = () => setView(POLICY_MODAL_VIEWS.REVIEW)
   const onSelectBackFromTemplates = () => setView(previousView)
 
+  const isNewPolicyRef = useLatest(isNewPolicy)
+  const initializedPolicyFormFieldsRef = useLatest(initializedPolicyFormFields)
+  useEffect(() => {
+    if (visible) {
+      if (isNewPolicyRef.current) {
+        onViewIntro()
+      } else {
+        onViewEditor()
+      }
+      setPolicyFormFields(initializedPolicyFormFieldsRef.current)
+    }
+  }, [
+    onViewIntro,
+    onViewEditor,
+    isNewPolicyRef,
+    initializedPolicyFormFieldsRef,
+    // end of stable references
+    visible,
+  ])
+
+  /* Methods that are for the UI */
+
   const onToggleFeaturePreviewModal = () => {
-    snap.setShowFeaturePreviewModal(!snap.showFeaturePreviewModal)
+    toggleFeaturePreviewModal(true)
     onSelectCancel()
   }
 
@@ -142,10 +183,11 @@ const PolicyEditorModal = ({
     onReviewPolicy()
   }
 
+  // The Save click is the explicit user gesture that promotes editor SQL to executable.
   const onReviewSave = () => {
     const payload = isNewPolicy
-      ? createPayloadForCreatePolicy(policyFormFields)
-      : createPayloadForUpdatePolicy(policyFormFields, selectedPolicyToEdit)
+      ? acceptCreatePayload(createPayloadForCreatePolicy(policyFormFields))
+      : acceptUpdatePayload(createPayloadForUpdatePolicy(policyFormFields, selectedPolicyToEdit))
     onSavePolicy(payload)
     setIsDirty(false)
   }
@@ -158,79 +200,57 @@ const PolicyEditorModal = ({
     hasError ? onViewEditor() : onSaveSuccess()
   }
 
-  const isClosingPolicyEditor = () => {
-    isDirty ? setIsClosingPolicyEditorModal(true) : onSelectCancel()
-  }
-
   return (
-    <Modal
-      hideFooter
-      size={view === POLICY_MODAL_VIEWS.SELECTION ? 'medium' : 'xxlarge'}
-      visible={visible}
-      contentStyle={{ padding: 0 }}
-      header={[
-        <PolicyEditorModalTitle
-          key="0"
-          view={view}
-          isNewPolicy={isNewPolicy}
-          schema={schema}
-          table={table}
-          showAssistantPreview={showAssistantPreview}
-          onSelectBackFromTemplates={onSelectBackFromTemplates}
-          onToggleFeaturePreviewModal={onToggleFeaturePreviewModal}
-        />,
-      ]}
-      onCancel={isClosingPolicyEditor}
-    >
-      <div>
-        <ConfirmationModal
-          visible={isClosingPolicyEditorModal}
-          title="Discard changes"
-          confirmLabel="Discard"
-          onCancel={() => setIsClosingPolicyEditorModal(false)}
-          onConfirm={() => {
-            onSelectCancel()
-            setIsClosingPolicyEditorModal(false)
-            setIsDirty(false)
-          }}
-        >
-          <p className="text-sm text-foreground-light">
-            There are unsaved changes. Are you sure you want to close the editor? Your changes will
-            be lost.
-          </p>
-        </ConfirmationModal>
-        {view === POLICY_MODAL_VIEWS.SELECTION ? (
-          <PolicySelection
-            description="Write rules with PostgreSQL's policies to fit your unique business needs."
-            onViewTemplates={onViewTemplates}
-            onViewEditor={onViewEditor}
-            showAssistantPreview={showAssistantPreview}
-            onToggleFeaturePreviewModal={onToggleFeaturePreviewModal}
-          />
-        ) : view === POLICY_MODAL_VIEWS.EDITOR ? (
-          <PolicyEditor
-            isNewPolicy={isNewPolicy}
-            policyFormFields={policyFormFields}
-            onUpdatePolicyFormFields={onUpdatePolicyFormFields}
-            onViewTemplates={onViewTemplates}
-            onReviewPolicy={validatePolicyFormFields}
-          />
-        ) : view === POLICY_MODAL_VIEWS.TEMPLATES ? (
-          <PolicyTemplates
-            templates={getGeneralPolicyTemplates(schema, table).filter((policy) => !policy.preview)}
-            templatesNote="* References a specific column in the table"
-            onUseTemplate={onUseTemplate}
-          />
-        ) : view === POLICY_MODAL_VIEWS.REVIEW ? (
-          <PolicyReview
-            policy={policyStatementForReview}
-            onSelectBack={onViewEditor}
-            onSelectSave={onReviewSave}
-          />
-        ) : null}
-      </div>
-    </Modal>
+    <Dialog open={visible} onOpenChange={(open) => !open && confirmOnClose()}>
+      <DialogContent size={view === POLICY_MODAL_VIEWS.SELECTION ? 'medium' : 'xxlarge'}>
+        <DialogHeader className="border-b">
+          <DialogTitle>
+            <PolicyEditorModalTitle
+              view={view}
+              isNewPolicy={isNewPolicy}
+              schema={schema}
+              table={table}
+              showAssistantPreview={showAssistantPreview}
+              onSelectBackFromTemplates={onSelectBackFromTemplates}
+              onToggleFeaturePreviewModal={onToggleFeaturePreviewModal}
+            />
+          </DialogTitle>
+        </DialogHeader>
+        <div>
+          <DiscardChangesConfirmationDialog {...modalProps} />
+          {view === POLICY_MODAL_VIEWS.SELECTION ? (
+            <PolicySelection
+              description="Write rules with PostgreSQL's policies to fit your unique business needs."
+              onViewTemplates={onViewTemplates}
+              onViewEditor={onViewEditor}
+              showAssistantPreview={showAssistantPreview}
+              onToggleFeaturePreviewModal={onToggleFeaturePreviewModal}
+            />
+          ) : view === POLICY_MODAL_VIEWS.EDITOR ? (
+            <PolicyEditor
+              isNewPolicy={isNewPolicy}
+              policyFormFields={policyFormFields}
+              onUpdatePolicyFormFields={onUpdatePolicyFormFields}
+              onViewTemplates={onViewTemplates}
+              onReviewPolicy={validatePolicyFormFields}
+            />
+          ) : view === POLICY_MODAL_VIEWS.TEMPLATES ? (
+            <PolicyTemplates
+              templates={getGeneralPolicyTemplates(schema, table).filter(
+                (policy) => !policy.preview
+              )}
+              templatesNote="* References a specific column in the table"
+              onUseTemplate={onUseTemplate}
+            />
+          ) : view === POLICY_MODAL_VIEWS.REVIEW && !!policyStatementForReview ? (
+            <PolicyReview
+              policy={policyStatementForReview}
+              onSelectBack={onViewEditor}
+              onSelectSave={onReviewSave}
+            />
+          ) : null}
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }
-
-export default PolicyEditorModal

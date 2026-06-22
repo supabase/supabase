@@ -1,3 +1,5 @@
+import { redirect, useFetcher, type ActionFunctionArgs } from 'react-router'
+
 import { createClient } from '@/registry/default/clients/react-router/lib/supabase/server'
 import { Button } from '@/registry/default/components/ui/button'
 import {
@@ -7,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/registry/default/components/ui/card'
-import { type ActionFunctionArgs, redirect, useFetcher } from 'react-router'
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase } = createClient(request)
@@ -51,7 +52,7 @@ export default function Login() {
                 <div className="flex flex-col gap-6">
                   {error && <p className="text-sm text-destructive-500">{error}</p>}
                   <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? 'Logging in...' : 'Continue with Github'}
+                    {loading ? 'Logging in...' : 'Continue with GitHub'}
                   </Button>
                 </div>
               </fetcher.Form>

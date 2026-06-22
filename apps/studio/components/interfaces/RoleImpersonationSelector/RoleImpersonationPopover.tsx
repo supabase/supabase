@@ -1,37 +1,39 @@
-import { useState } from 'react'
-import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
-
-import type { User } from 'data/auth/users-infinite-query'
+import { RoleImpersonationSelector } from '.'
 import { ChevronDown, User as IconUser } from 'lucide-react'
-import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
+import { useState } from 'react'
+import { Button, cn, Popover, PopoverContent, PopoverTrigger } from 'ui'
+
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
-import RoleImpersonationSelector from './RoleImpersonationSelector'
+import type { User } from '@/data/auth/users-infinite-query'
+import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 export interface RoleImpersonationPopoverProps {
-  portal?: boolean
+  header?: string
   serviceRoleLabel?: string
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
   align?: 'center' | 'start' | 'end'
+  disallowAuthenticatedOption?: boolean
 }
 
-const RoleImpersonationPopover = ({
-  portal = true,
+export const RoleImpersonationPopover = ({
+  header,
   serviceRoleLabel,
   variant = 'regular',
   align = 'end',
+  disallowAuthenticatedOption = false,
 }: RoleImpersonationPopoverProps) => {
   const state = useRoleImpersonationStateSnapshot()
 
   const [isOpen, setIsOpen] = useState(false)
 
-  const currentRole = state.role?.role ?? serviceRoleLabel ?? 'service role'
+  const currentRole = state.role?.role ?? serviceRoleLabel ?? 'postgres'
 
   return (
-    <Popover_Shadcn_ open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
         <Button
           size="tiny"
-          type="default"
+          variant="default"
           className={cn(
             'h-[26px] pr-3 gap-0',
             variant === 'connected-on-right' && 'rounded-r-none border-r-0',
@@ -57,20 +59,17 @@ const RoleImpersonationPopover = ({
             <ChevronDown className="text-muted" strokeWidth={1} size={12} />
           </div>
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
-        portal={portal}
-        className="p-0 w-full overflow-hidden"
-        side="bottom"
-        align={align}
-      >
-        <RoleImpersonationSelector serviceRoleLabel={serviceRoleLabel} />
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverTrigger>
+      <PopoverContent className="p-0 overflow-hidden w-min" side="bottom" align={align}>
+        <RoleImpersonationSelector
+          header={header}
+          serviceRoleLabel={serviceRoleLabel}
+          disallowAuthenticatedOption={disallowAuthenticatedOption}
+        />
+      </PopoverContent>
+    </Popover>
   )
 }
-
-export default RoleImpersonationPopover
 
 const UserRoleButtonSection = ({ user }: { user: User }) => {
   const avatarUrl = getAvatarUrl(user)

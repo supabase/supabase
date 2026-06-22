@@ -1,9 +1,9 @@
-import { type PropsWithChildren } from 'react'
+import { Fragment, type PropsWithChildren } from 'react'
 import { bundledLanguages, createHighlighter, type BundledLanguage, type ThemedToken } from 'shiki'
 import { createTwoslasher, type ExtraFiles, type NodeHover } from 'twoslash'
 import { cn } from 'ui'
 
-import { AnnotatedSpan, CodeCopyButton } from './CodeBlock.client'
+import { AnnotatedSpan, CodeBlockControls } from './CodeBlock.client'
 import { getFontStyle } from './CodeBlock.utils'
 import theme from './supabase-2.json' with { type: 'json' }
 import denoTypes from './types/lib.deno.d.ts.include'
@@ -34,10 +34,10 @@ export async function CodeBlock({
   skipTypeGeneration?: boolean
 }>) {
   let code = (contents || extractCode(children)).trim()
-  const lang = tryToBundledLanguage(langSetting) || extractLang(children)
+  const lang = tryToBundledLanguage(langSetting || '') || extractLang(children)
 
   let twoslashed = null as null | Map<number, Map<number, Array<NodeHover>>>
-  if (!skipTypeGeneration && TWOSLASHABLE_LANGS.includes(lang)) {
+  if (!skipTypeGeneration && lang && TWOSLASHABLE_LANGS.includes(lang)) {
     try {
       const { code: editedCode, nodes } = twoslasher(code)
       const hoverNodes: Array<NodeHover> = nodes.filter((node) => node.type === 'hover')
@@ -53,7 +53,7 @@ export async function CodeBlock({
   }
 
   const { tokens } = highlighter.codeToTokens(code, {
-    lang,
+    lang: lang || undefined,
     theme: 'Supabase Theme',
   })
 
@@ -64,7 +64,7 @@ export async function CodeBlock({
         'group',
         'relative',
         'not-prose',
-        'w-full overflow-hidden',
+        'w-full overflow-x-auto',
         'border border-default rounded-lg',
         'bg-200',
         'text-sm',
@@ -72,27 +72,42 @@ export async function CodeBlock({
       )}
     >
       <pre>
-        <code className={lineNumbers ? 'flex' : ''}>
-          {lineNumbers && (
-            <div className="flex-shrink-0 select-none text-right text-muted bg-control py-6 px-2">
-              {tokens.map((_, idx) => (
-                <div key={idx} className="w-full">
-                  {idx + 1}
-                </div>
+        <code className={lineNumbers ? 'grid grid-cols-[auto_1fr]' : ''}>
+          {lineNumbers ? (
+            <>
+              {tokens.map((line, idx) => (
+                <Fragment key={idx}>
+                  <div
+                    className={cn(
+                      'select-none text-right text-muted bg-control px-2 min-h-5 leading-5',
+                      idx === 0 && 'pt-6',
+                      idx === tokens.length - 1 && 'pb-6'
+                    )}
+                  >
+                    {idx + 1}
+                  </div>
+                  <div
+                    className={cn(
+                      'code-content min-h-5 leading-5 pl-6 pr-6',
+                      idx === 0 && 'pt-6',
+                      idx === tokens.length - 1 && 'pb-6'
+                    )}
+                  >
+                    <CodeLine tokens={line} twoslash={twoslashed?.get(idx)} />
+                  </div>
+                </Fragment>
+              ))}
+            </>
+          ) : (
+            <div className="code-content p-6">
+              {tokens.map((line, idx) => (
+                <CodeLine key={idx} tokens={line} twoslash={twoslashed?.get(idx)} />
               ))}
             </div>
           )}
-          <div className={cn('p-6 overflow-x-auto', lineNumbers ? 'flex-grow' : '')}>
-            {tokens.map((line, idx) => (
-              <CodeLine key={idx} tokens={line} twoslash={twoslashed?.get(idx)} />
-            ))}
-          </div>
         </code>
       </pre>
-      <CodeCopyButton
-        content={code.trim()}
-        className="hidden group-hover:block absolute top-2 right-2"
-      />
+      <CodeBlockControls content={code.trim()} />
     </div>
   )
 }
@@ -112,7 +127,7 @@ function CodeLine({
   })
 
   return (
-    <span className="block h-5">
+    <span className="block min-h-5 leading-5">
       {tokens.map((token) =>
         twoslash?.has(token.offset) ? (
           <AnnotatedSpan
@@ -121,7 +136,10 @@ function CodeLine({
             annotations={twoslash.get(token.offset)!}
           />
         ) : (
-          <span key={token.offset} style={{ color: token.color, ...getFontStyle(token.fontStyle) }}>
+          <span
+            key={token.offset}
+            style={{ color: token.color, ...getFontStyle(token.fontStyle || 0) }}
+          >
             {token.content}
           </span>
         )

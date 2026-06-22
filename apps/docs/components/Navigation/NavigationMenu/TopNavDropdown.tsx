@@ -1,10 +1,13 @@
 'use client'
 
-import React, { Fragment } from 'react'
-import Link from 'next/link'
-import { useTheme } from 'next-themes'
+import { isFeatureEnabled } from 'common'
 import { Menu } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import Link from 'next/link'
+import React, { Fragment } from 'react'
 import {
+  buttonVariants,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -15,23 +18,28 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   Theme,
-  buttonVariants,
-  cn,
   themes,
 } from 'ui'
+
 import MenuIconPicker from './MenuIconPicker'
 
 const menu = [
   [
-    {
-      label: 'Supabase.com',
-      icon: 'home',
-      href: 'https://supabase.com',
-      otherProps: {
-        target: '_blank',
-        rel: 'noreferrer noopener',
-      },
-    },
+    isFeatureEnabled('docs:navigation_dropdown_links_home')
+      ? {
+          label: 'Supabase.com',
+          icon: 'home',
+          href: 'https://supabase.com',
+          otherProps: {
+            target: '_blank',
+            rel: 'noreferrer noopener',
+          },
+        }
+      : {
+          label: 'Dashboard',
+          icon: 'home',
+          href: '../dashboard',
+        },
     {
       label: 'GitHub',
       icon: 'github',
@@ -62,8 +70,8 @@ const TopNavDropdown = () => {
         <button
           title="Menu dropdown button"
           className={cn(
-            buttonVariants({ type: 'default' }),
-            'text-foreground-light border-default w-[30px] min-w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30 hover:border-strong data-[state=open]:border-stronger hover:!bg-overlay-hover/50 bg-transparent'
+            buttonVariants({ variant: 'default' }),
+            'text-foreground-light border-default w-[30px] min-w-[30px] h-[30px] data-open:bg-overlay-hover/30 hover:border-strong data-open:border-stronger hover:bg-overlay-hover/50! bg-transparent'
           )}
         >
           <Menu size={18} strokeWidth={1} />

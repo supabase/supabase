@@ -1,19 +1,22 @@
+import { useParams } from 'common'
 import { useEffect } from 'react'
 
-import { useParams } from 'common'
-import { BillingSettings } from 'components/interfaces/Organization'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import OrganizationSettingsLayout from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'
+import { BillingSettings } from '@/components/interfaces/Organization/BillingSettings/BillingSettings'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import OrganizationLayout from '@/components/layouts/OrganizationLayout'
+import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import {
   ORG_SETTINGS_PANEL_KEYS,
   useOrgSettingsPageStateSnapshot,
-} from 'state/organization-settings'
-import type { NextPageWithLayout } from 'types'
+} from '@/state/organization-settings'
+import type { NextPageWithLayout } from '@/types'
 
 const OrgBillingSettings: NextPageWithLayout = () => {
-  const { panel } = useParams()
+  const { panel, slug } = useParams()
   const snap = useOrgSettingsPageStateSnapshot()
+
+  const showBilling = useIsFeatureEnabled('billing:all')
 
   useEffect(() => {
     const allowedValues = ['subscriptionPlan', 'costControl']
@@ -24,14 +27,16 @@ const OrgBillingSettings: NextPageWithLayout = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [panel])
 
+  if (!showBilling) {
+    return <UnknownInterface urlBack={`/org/${slug}`} />
+  }
+
   return <BillingSettings />
 }
 
 OrgBillingSettings.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout>
-      <OrganizationSettingsLayout>{page}</OrganizationSettingsLayout>
-    </OrganizationLayout>
+    <OrganizationLayout title="Billing">{page}</OrganizationLayout>
   </DefaultLayout>
 )
 export default OrgBillingSettings

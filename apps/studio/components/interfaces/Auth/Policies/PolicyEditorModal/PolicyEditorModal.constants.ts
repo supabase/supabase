@@ -1,4 +1,7 @@
+import { safeSql } from '@supabase/pg-meta/src/pg-format'
+
 import { PolicyTemplate } from '../PolicyTemplates/PolicyTemplates.constants'
+
 /**
  * ----------------------------------------------------------------
  * PostgreSQL policy templates for the auth policies page
@@ -26,8 +29,8 @@ create policy "Enable read access for all users"
 on "${schema}"."${table}"
 for select using (true);`.trim(),
     name: 'Enable read access for all users',
-    definition: 'true',
-    check: '',
+    definition: safeSql`true`,
+    check: safeSql``,
     command: 'SELECT',
     roles: [],
   },
@@ -42,33 +45,13 @@ on "${schema}"."${table}"
 for insert to authenticated
 with check (true);`.trim(),
     name: 'Enable insert for authenticated users only',
-    definition: '',
-    check: 'true',
+    definition: safeSql``,
+    check: safeSql`true`,
     command: 'INSERT',
     roles: ['authenticated'],
   },
   {
     id: 'policy-3',
-    preview: false,
-    templateName: 'Enable update access for users based on their email *',
-    description:
-      'This policy assumes that your table has a column "email", and allows users to update rows which the "email" column matches their email.',
-    statement: `
-create policy "Enable update for users based on email"
-on "${schema}"."${table}"
-for update using (
-  (select auth.jwt()) ->> 'email' = email
-) with check (
-  (select auth.jwt()) ->> 'email' = email
-);`.trim(),
-    name: 'Enable update for users based on email',
-    definition: `(select auth.jwt()) ->> 'email' = email`,
-    check: `(select auth.jwt()) ->> 'email' = email`,
-    command: 'UPDATE',
-    roles: [],
-  },
-  {
-    id: 'policy-4',
     preview: false,
     templateName: 'Enable delete access for users based on their user ID *',
     description:
@@ -80,13 +63,13 @@ for delete using (
   (select auth.uid()) = user_id
 );`.trim(),
     name: 'Enable delete for users based on user_id',
-    definition: '(select auth.uid()) = user_id',
-    check: '',
+    definition: safeSql`(select auth.uid()) = user_id`,
+    check: safeSql``,
     command: 'DELETE',
     roles: [],
   },
   {
-    id: 'policy-5',
+    id: 'policy-4',
     preview: false,
     templateName: 'Enable insert access for users based on their user ID *',
     description:
@@ -98,13 +81,13 @@ for insert with check (
   (select auth.uid()) = user_id
 );`.trim(),
     name: 'Enable insert for users based on user_id',
-    definition: '',
-    check: '(select auth.uid()) = user_id',
+    definition: safeSql``,
+    check: safeSql`(select auth.uid()) = user_id`,
     command: 'INSERT',
     roles: [],
   },
   {
-    id: 'policy-6',
+    id: 'policy-5',
     preview: true,
     name: 'Policy with table joins',
     templateName: 'Policy with table joins',
@@ -120,13 +103,13 @@ on teams for update using (
   )
 );
 `.trim(),
-    definition: `(select auth.uid()) in (select user_id from members where team_id = id)`,
-    check: '',
+    definition: safeSql`(select auth.uid()) in (select user_id from members where team_id = id)`,
+    check: safeSql``,
     command: 'UPDATE',
     roles: [],
   },
   {
-    id: 'policy-7',
+    id: 'policy-6',
     preview: true,
     templateName: 'Policy with security definer functions',
     description: `
@@ -146,13 +129,13 @@ for all using (
 );
 `.trim(),
     name: 'Policy with security definer functions',
-    definition: 'team_id in (select get_teams_for_user(auth.uid()))',
-    check: '',
+    definition: safeSql`team_id in (select get_teams_for_user(auth.uid()))`,
+    check: safeSql``,
     command: 'ALL',
     roles: [],
   },
   {
-    id: 'policy-8',
+    id: 'policy-7',
     preview: true,
     name: 'Policy to implement Time To Live (TTL)',
     templateName: 'Policy to implement Time To Live (TTL)',
@@ -167,13 +150,13 @@ for select using (
   created_at > (current_timestamp - interval '1 day')
 );
 `.trim(),
-    definition: `created_at > (current_timestamp - interval '1 day')`,
-    check: '',
+    definition: safeSql`created_at > (current_timestamp - interval '1 day')`,
+    check: safeSql``,
     command: 'SELECT',
     roles: [],
   },
   {
-    id: 'policy-9',
+    id: 'policy-8',
     preview: false,
     templateName: 'Allow users to only view their own data',
     description: 'Restrict users to reading only their own data.',
@@ -186,8 +169,8 @@ using (
   (select auth.uid()) = user_id
 );`.trim(),
     name: 'Enable users to view their own data only',
-    definition: '(select auth.uid()) = user_id',
-    check: '',
+    definition: safeSql`(select auth.uid()) = user_id`,
+    check: safeSql``,
     command: 'SELECT',
     roles: ['authenticated'],
   },
@@ -206,8 +189,8 @@ on realtime.messages for select
 to authenticated
 using ( realtime.messages.extension = 'broadcast' );`.trim(),
       name: 'Allow listening for broadcasts for authenticated users only',
-      definition: "realtime.messages.extension = 'broadcast'",
-      check: '',
+      definition: safeSql`realtime.messages.extension = 'broadcast'`,
+      check: safeSql``,
       command: 'SELECT',
       roles: ['authenticated'],
     },
@@ -222,8 +205,8 @@ ON realtime.messages for insert
 TO authenticated
 with check ( realtime.messages.extension = 'broadcast' );`.trim(),
       name: 'Allow pushing broadcasts for authenticated users only',
-      definition: "realtime.messages.extension = 'broadcast'",
-      check: "realtime.messages.extension = 'broadcast'",
+      definition: safeSql`realtime.messages.extension = 'broadcast'`,
+      check: safeSql`realtime.messages.extension = 'broadcast'`,
       command: 'INSERT',
       roles: ['authenticated'],
     },
@@ -237,8 +220,8 @@ create policy "Allow listening for broadcasts from a specific channel"
 on realtime.messages for select
 using ( realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name' );`.trim(),
       name: 'Allow listening for broadcasts from a specific channel',
-      definition: `realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name'`,
-      check: '',
+      definition: safeSql`realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name'`,
+      check: safeSql``,
       command: 'SELECT',
       roles: [],
     },
@@ -252,8 +235,8 @@ create policy "Allow pushing broadcasts to specific channel"
 ON realtime.messages for insert
 with check ( realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name' );`.trim(),
       name: 'Allow pushing broadcasts to specific channel',
-      definition: `realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name'`,
-      check: `realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name'`,
+      definition: safeSql`realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name'`,
+      check: safeSql`realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name'`,
       command: 'INSERT',
       roles: [],
     },
@@ -269,8 +252,8 @@ on realtime.messages for select
 to authenticated
 using ( realtime.messages.extension = 'presence' );`.trim(),
       name: 'Allow listening for presences on all channels for authenticated users only',
-      definition: "realtime.messages.extension = 'presence'",
-      check: '',
+      definition: safeSql`realtime.messages.extension = 'presence'`,
+      check: safeSql``,
       command: 'SELECT',
       roles: ['authenticated'],
     },
@@ -287,8 +270,8 @@ TO authenticated
 with check ( realtime.messages.extension = 'presence' );
   ;`.trim(),
       name: 'Allow broadcasting presences on all channels for authenticated users only',
-      definition: "realtime.messages.extension = 'presence'",
-      check: "realtime.messages.extension = 'presence'",
+      definition: safeSql`realtime.messages.extension = 'presence'`,
+      check: safeSql`realtime.messages.extension = 'presence'`,
       command: 'INSERT',
       roles: ['authenticated'],
     },
@@ -302,8 +285,8 @@ create policy "Allow listening for presences from a specific channel"
 on realtime.messages for select
 using ( realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name' );`.trim(),
       name: 'Allow listening for presences from a specific channel',
-      definition: `realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name'`,
-      check: '',
+      definition: safeSql`realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name'`,
+      check: safeSql``,
       command: 'SELECT',
       roles: [],
     },
@@ -318,8 +301,8 @@ ON realtime.messages for insert
 with check ( realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name' );
   ;`.trim(),
       name: 'Publish presence to a specific channel',
-      definition: `realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name'`,
-      check: `realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name'`,
+      definition: safeSql`realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name'`,
+      check: safeSql`realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name'`,
       command: 'INSERT',
       roles: [],
     },
@@ -337,8 +320,8 @@ export const getQueuePolicyTemplates = (): PolicyTemplate[] => {
       name: 'Allow anon and authenticated to access messages from queue',
       description:
         'Base policy to ensure that anon and authenticated can only access appropriate rows. USING and CHECK statements will need to be adjusted accordingly',
-      definition: 'true',
-      check: 'true',
+      definition: safeSql`true`,
+      check: safeSql`true`,
       command: 'ALL',
       roles: ['anon', 'authenticated'],
     },

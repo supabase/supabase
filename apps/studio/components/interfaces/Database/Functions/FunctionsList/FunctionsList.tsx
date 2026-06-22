@@ -1,207 +1,467 @@
-import type { PostgresFunction } from '@supabase/postgres-meta'
+import { safeSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop, partition } from 'lodash'
-import { Search } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { Database, Plus, Search } from 'lucide-react'
+import { parseAsBoolean, parseAsJson, parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
+import {
+  AiIconAnimation,
+  Button,
+  Card,
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
+import { EmptyStatePresentational } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import Table from 'components/to-be-cleaned/Table'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import SchemaSelector from 'components/ui/SchemaSelector'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { AiIconAnimation, Input } from 'ui'
-import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
-import FunctionList from './FunctionList'
+import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
+import { FunctionList } from './FunctionList'
+import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { CreateFunction } from '@/components/interfaces/Database/Functions/CreateFunction'
+import {
+  ReportsSelectFilter,
+  selectFilterSchema,
+} from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import SchemaSelector from '@/components/ui/SchemaSelector'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
+import { useDatabaseFunctionDeleteMutation } from '@/data/database-functions/database-functions-delete-mutation'
+import type { SavedDatabaseFunction } from '@/data/database-functions/database-functions-query'
+import { useDatabaseFunctionsQuery } from '@/data/database-functions/database-functions-query'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
-interface FunctionsListProps {
-  createFunction: () => void
-  editFunction: (fn: PostgresFunction) => void
-  deleteFunction: (fn: PostgresFunction) => void
-}
+const createFunctionSnippet = safeSql`create function function_name()
+returns void
+language plpgsql
+as $$
+begin
+  -- Write your function logic here
+end;
+$$;`
 
-const FunctionsList = ({
-  createFunction = noop,
-  editFunction = noop,
-  deleteFunction = noop,
-}: FunctionsListProps) => {
-  const router = useRouter()
-  const { search } = useParams()
-  const { project } = useProjectContext()
+export const FunctionsList = () => {
+  const { data: project } = useSelectedProjectQuery()
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+  const isInlineEditorEnabled = useIsInlineEditorEnabled()
+  const {
+    setValue: setEditorPanelValue,
+    setTemplates: setEditorPanelTemplates,
+    setInitialPrompt: setEditorPanelInitialPrompt,
+  } = useEditorPanelStateSnapshot()
 
-  const filterString = search ?? ''
-
-  const setFilterString = (str: string) => {
-    const url = new URL(document.URL)
-    if (str === '') {
-      url.searchParams.delete('search')
+  const createFunction = () => {
+    setSelectedFunctionIdToDuplicate(null)
+    if (isInlineEditorEnabled) {
+      setEditorPanelInitialPrompt('Create a new database function that...')
+      setEditorPanelValue(createFunctionSnippet)
+      setEditorPanelTemplates([])
+      openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
     } else {
-      url.searchParams.set('search', str)
+      setShowCreateFunctionForm(true)
     }
-    router.push(url)
   }
 
-  const canCreateFunctions = useCheckPermissions(
+  const duplicateFunction = (fn: SavedDatabaseFunction) => {
+    if (isInlineEditorEnabled) {
+      const dupFn = {
+        ...fn,
+        name: `${fn.name}_duplicate`,
+      }
+      setEditorPanelInitialPrompt('Create new database function that...')
+      setEditorPanelValue(dupFn.complete_statement)
+      setEditorPanelTemplates([])
+      openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+    } else {
+      setSelectedFunctionIdToDuplicate(fn.id.toString())
+    }
+  }
+
+  const editFunction = (fn: SavedDatabaseFunction) => {
+    setSelectedFunctionIdToDuplicate(null)
+    if (isInlineEditorEnabled) {
+      setEditorPanelValue(fn.complete_statement)
+      setEditorPanelTemplates([])
+      openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+    } else {
+      setSelectedFunctionToEdit(fn.id.toString())
+    }
+  }
+
+  const [filterString, setFilterString] = useQueryState(
+    'search',
+    parseAsString.withDefault('').withOptions({ clearOnDefault: true })
+  )
+
+  // Filters
+  const [returnTypeFilter, setReturnTypeFilter] = useQueryState(
+    'return_type',
+    parseAsJson(selectFilterSchema.parse)
+  )
+  const [securityFilter, setSecurityFilter] = useQueryState(
+    'security',
+    parseAsJson(selectFilterSchema.parse)
+  )
+
+  const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  const { can: canCreateFunctions } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'functions'
   )
 
-  const { data: schemas } = useSchemasQuery({
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search functions' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
+    setFilterString('')
+    setReturnTypeFilter(null)
+    setSecurityFilter(null)
+  })
+
+  // [Joshen] This is to preload the data for the Schema Selector
+  useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const [protectedSchemas] = partition(schemas ?? [], (schema) =>
-    PROTECTED_SCHEMAS.includes(schema?.name ?? '')
-  )
-  const foundSchema = schemas?.find((schema) => schema.name === selectedSchema)
-  const isLocked = protectedSchemas.some((s) => s.id === foundSchema?.id)
 
   const {
-    data: functions,
+    data: functions = [],
     error,
-    isLoading,
+    isPending: isLoading,
     isError,
+    isSuccess,
   } = useDatabaseFunctionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+    schema: selectedSchema,
   })
+
+  // Get unique return types from functions in the selected schema
+  const schemaFunctions = functions.filter((fn) => fn.schema === selectedSchema)
+  const uniqueReturnTypes = Array.from(new Set(schemaFunctions.map((fn) => fn.return_type)))
+    .filter(Boolean)
+    .sort()
+
+  // Get security options based on what exists in the selected schema
+  const hasDefiner = schemaFunctions.some((fn) => fn.security_definer)
+  const hasInvoker = schemaFunctions.some((fn) => !fn.security_definer)
+  const securityOptions = [
+    ...(hasDefiner ? [{ label: 'Definer', value: 'definer' }] : []),
+    ...(hasInvoker ? [{ label: 'Invoker', value: 'invoker' }] : []),
+  ]
+
+  const [showCreateFunctionForm, setShowCreateFunctionForm] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+
+  const [functionIdToEdit, setSelectedFunctionToEdit] = useQueryState('edit', parseAsString)
+  const functionToEdit = functions.find((fn) => fn.id.toString() === functionIdToEdit)
+
+  const [functionIdToDuplicate, setSelectedFunctionIdToDuplicate] = useQueryState(
+    'duplicate',
+    parseAsString
+  )
+  const functionToDuplicate = functions.find((fn) => fn.id.toString() === functionIdToDuplicate)
+
+  const [functionIdToDelete, setSelectedFunctionToDelete] = useQueryState('delete', parseAsString)
+  const functionToDelete = functions.find((fn) => fn.id.toString() === functionIdToDelete)
+
+  const {
+    mutate: deleteDatabaseFunction,
+    isPending: isDeletingFunction,
+    isSuccess: isSuccessDelete,
+  } = useDatabaseFunctionDeleteMutation({
+    onSuccess: (_, variables) => {
+      toast.success(`Successfully removed function ${variables.func.name}`)
+      setSelectedFunctionToDelete(null)
+    },
+  })
+
+  const onDeleteFunction = () => {
+    if (!project) return console.error('Project is required')
+    if (!functionToDelete) return console.error('Function is required')
+
+    deleteDatabaseFunction({
+      func: functionToDelete,
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+    })
+  }
+
+  useEffect(() => {
+    if (isSuccess && !!functionIdToEdit && !functionToEdit) {
+      toast('Function not found')
+      setSelectedFunctionToEdit(null)
+    }
+  }, [functionIdToEdit, functionToEdit, isSuccess, setSelectedFunctionToEdit])
+
+  useEffect(() => {
+    if (isSuccess && !!functionIdToDuplicate && !functionToDuplicate) {
+      toast('Function not found')
+      setSelectedFunctionIdToDuplicate(null)
+    }
+  }, [functionIdToDuplicate, functionToDuplicate, isSuccess, setSelectedFunctionIdToDuplicate])
+
+  useEffect(() => {
+    if (isSuccess && !!functionIdToDelete && !functionToDelete && !isSuccessDelete) {
+      toast('Function not found')
+      setSelectedFunctionToDelete(null)
+    }
+  }, [
+    functionIdToDelete,
+    functionToDelete,
+    isSuccess,
+    isSuccessDelete,
+    setSelectedFunctionToDelete,
+  ])
 
   if (isLoading) return <GenericSkeletonLoader />
   if (isError) return <AlertError error={error} subject="Failed to retrieve database functions" />
 
   return (
     <>
-      {(functions ?? []).length == 0 ? (
-        <div className="flex h-full w-full items-center justify-center">
-          <ProductEmptyState
-            title="Functions"
-            ctaButtonLabel="Create a new function"
-            onClickCta={() => createFunction()}
-            disabled={!canCreateFunctions}
-            disabledMessage="You need additional permissions to create functions"
-          >
-            <p className="text-sm text-foreground-light">
-              PostgreSQL functions, also known as stored procedures, is a set of SQL and procedural
-              commands such as declarations, assignments, loops, flow-of-control, etc.
-            </p>
-            <p className="text-sm text-foreground-light">
-              It's stored on the database server and can be invoked using the SQL interface.
-            </p>
-          </ProductEmptyState>
-        </div>
-      ) : (
-        <div className="w-full space-y-4">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
-            <div className="flex flex-col lg:flex-row lg:items-center gap-2">
+      <div className="w-full space-y-4">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-2">
+            <Shortcut
+              id={SHORTCUT_IDS.LIST_PAGE_FOCUS_SCHEMA}
+              onTrigger={() => setSchemaSelectorOpen(true)}
+              side="bottom"
+              tooltipOpen={schemaSelectorOpen ? false : undefined}
+            >
               <SchemaSelector
                 className="w-full lg:w-[180px]"
                 size="tiny"
                 showError={false}
                 selectedSchemaName={selectedSchema}
                 onSelectSchema={(schema) => {
-                  const url = new URL(document.URL)
-                  url.searchParams.delete('search')
-                  router.push(url)
+                  setFilterString('')
                   setSelectedSchema(schema)
                 }}
+                open={schemaSelectorOpen}
+                onOpenChange={setSchemaSelectorOpen}
               />
-              <Input
-                placeholder="Search for a function"
-                size="tiny"
-                icon={<Search size={14} />}
-                value={filterString}
-                className="w-full lg:w-52"
-                onChange={(e) => setFilterString(e.target.value)}
-              />
-            </div>
-
-            <div className="flex items-center gap-x-2">
-              {!isLocked && (
-                <>
-                  <ButtonTooltip
-                    disabled={!canCreateFunctions}
-                    onClick={() => createFunction()}
-                    className="flex-grow"
-                    tooltip={{
-                      content: {
-                        side: 'bottom',
-                        text: !canCreateFunctions
-                          ? 'You need additional permissions to create functions'
-                          : undefined,
-                      },
-                    }}
-                  >
-                    Create a new function
-                  </ButtonTooltip>
-                  <ButtonTooltip
-                    type="default"
-                    disabled={!canCreateFunctions}
-                    className="px-1 pointer-events-auto"
-                    icon={<AiIconAnimation size={16} />}
-                    onClick={() =>
-                      aiSnap.newChat({
-                        name: 'Create new function',
-                        open: true,
-                        initialInput: `Create a new function for the schema ${selectedSchema} that does ...`,
-                      })
-                    }
-                    tooltip={{
-                      content: {
-                        side: 'bottom',
-                        text: !canCreateFunctions
-                          ? 'You need additional permissions to create functions'
-                          : 'Create with Supabase Assistant',
-                      },
-                    }}
-                  />
-                </>
-              )}
-            </div>
+            </Shortcut>
+            <Input
+              ref={searchInputRef}
+              placeholder="Search for a function"
+              size="tiny"
+              icon={<Search />}
+              value={filterString}
+              className="w-full lg:w-52"
+              onChange={(e) => setFilterString(e.target.value)}
+              onKeyDown={onSearchInputEscape(filterString, setFilterString)}
+            />
+            <ReportsSelectFilter
+              label="Return Type"
+              options={uniqueReturnTypes.map((type) => ({
+                label: type,
+                value: type,
+              }))}
+              value={returnTypeFilter ?? []}
+              onChange={setReturnTypeFilter}
+              showSearch
+            />
+            <ReportsSelectFilter
+              label="Security"
+              options={securityOptions}
+              value={securityFilter ?? []}
+              onChange={setSecurityFilter}
+            />
           </div>
 
-          {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="functions" />}
-
-          <Table
-            className="table-fixed overflow-x-auto"
-            head={
+          <div className="flex items-center gap-x-2">
+            {!isSchemaLocked && (
               <>
-                <Table.th key="name">Name</Table.th>
-                <Table.th key="arguments" className="table-cell">
-                  Arguments
-                </Table.th>
-                <Table.th key="return_type" className="table-cell">
-                  Return type
-                </Table.th>
-                <Table.th key="security" className="table-cell w-[100px]">
-                  Security
-                </Table.th>
-                <Table.th key="buttons" className="w-1/6"></Table.th>
+                <CreateFunctionButton createFunction={createFunction} />
+                <ButtonTooltip
+                  variant="default"
+                  disabled={!canCreateFunctions}
+                  className="px-1 pointer-events-auto"
+                  icon={<AiIconAnimation size={16} />}
+                  onClick={() => {
+                    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+                    aiSnap.newChat({
+                      name: 'Create new function',
+                      initialInput: `Create a new function for the schema ${selectedSchema} that does ...`,
+                    })
+                  }}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: !canCreateFunctions
+                        ? 'You need additional permissions to create functions'
+                        : 'Create with Supabase Assistant',
+                    },
+                  }}
+                />
               </>
-            }
-            body={
-              <FunctionList
-                schema={selectedSchema}
-                filterString={filterString}
-                isLocked={isLocked}
-                editFunction={editFunction}
-                deleteFunction={deleteFunction}
-              />
-            }
-          />
+            )}
+          </div>
         </div>
-      )}
+
+        {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="functions" />}
+
+        {functions.length === 0 ? (
+          <>
+            <EmptyStatePresentational
+              icon={Database}
+              title="Add your first function"
+              description="PostgreSQL functions are a set of SQL and procedural commands such as declarations, assignments, loops, or flow-of-control."
+            >
+              <CreateFunctionButton hideIcon variant="default" createFunction={createFunction} />
+            </EmptyStatePresentational>
+          </>
+        ) : (
+          <Card>
+            <Table className="table-fixed overflow-x-auto">
+              <TableHeader>
+                <TableRow>
+                  <TableHead key="name">Name</TableHead>
+                  <TableHead key="type">Type</TableHead>
+                  <TableHead key="arguments" className="table-cell">
+                    Arguments
+                  </TableHead>
+                  <TableHead key="return_type" className="table-cell">
+                    Return type
+                  </TableHead>
+                  <TableHead key="security" className="table-cell w-[100px]">
+                    Security
+                  </TableHead>
+                  <TableHead key="buttons" className="w-1/6"></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <FunctionList
+                  filterString={filterString}
+                  isLocked={isSchemaLocked}
+                  returnTypeFilter={returnTypeFilter ?? []}
+                  securityFilter={securityFilter ?? []}
+                  duplicateFunction={duplicateFunction}
+                  editFunction={editFunction}
+                  deleteFunction={(fn) => setSelectedFunctionToDelete(fn.id.toString())}
+                />
+              </TableBody>
+            </Table>
+          </Card>
+        )}
+      </div>
+
+      <CreateFunction
+        func={functionToEdit || functionToDuplicate}
+        visible={showCreateFunctionForm || !!functionToEdit || !!functionToDuplicate}
+        onClose={() => {
+          setShowCreateFunctionForm(false)
+          setSelectedFunctionToEdit(null)
+          setSelectedFunctionIdToDuplicate(null)
+        }}
+        isDuplicating={!!functionToDuplicate}
+      />
+
+      <TextConfirmModal
+        variant="destructive"
+        visible={!!functionToDelete}
+        onCancel={() => setSelectedFunctionToDelete(null)}
+        onConfirm={onDeleteFunction}
+        title="Delete this function"
+        loading={isDeletingFunction}
+        confirmLabel={`Delete function ${functionToDelete?.name}`}
+        confirmPlaceholder="Type in name of function"
+        confirmString={functionToDelete?.name ?? 'Unknown'}
+        text={
+          <>
+            <span>This will delete the function</span>{' '}
+            <span className="text-bold text-foreground">{functionToDelete?.name}</span>{' '}
+            <span>from the schema</span>{' '}
+            <span className="text-bold text-foreground">{functionToDelete?.schema}</span>
+          </>
+        }
+        alert={{ title: 'You cannot recover this function once deleted.' }}
+      />
     </>
   )
 }
 
-export default FunctionsList
+const CreateFunctionButton = ({
+  variant = 'primary',
+  hideIcon = false,
+  createFunction,
+}: {
+  variant?: 'default' | 'primary'
+  hideIcon?: boolean
+  createFunction: () => void
+}) => {
+  const { selectedSchema } = useQuerySchemaState()
+  const { can: canCreateFunctions } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'functions'
+  )
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
+  const canAddFunctions = canCreateFunctions && !isSchemaLocked
+
+  if (canAddFunctions) {
+    return (
+      <Shortcut
+        id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+        label="Create new function"
+        onTrigger={() => createFunction()}
+        side="bottom"
+      >
+        <Button
+          variant={variant}
+          className="grow"
+          onClick={() => createFunction()}
+          icon={hideIcon ? null : <Plus />}
+        >
+          New function
+        </Button>
+      </Shortcut>
+    )
+  } else {
+    return (
+      <ButtonTooltip
+        disabled
+        variant={variant}
+        className="grow"
+        icon={hideIcon ? null : <Plus />}
+        tooltip={{
+          content: {
+            side: 'bottom',
+            text: 'You need additional permissions to create functions',
+          },
+        }}
+      >
+        New function
+      </ButtonTooltip>
+    )
+  }
+}

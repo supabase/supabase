@@ -1,12 +1,12 @@
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { ChevronUp } from 'lucide-react'
 import { cn } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export interface RoleRowSkeletonProps {
   index?: number
 }
 
-const RoleRowSkeleton = ({ index }: RoleRowSkeletonProps) => {
+export const RoleRowSkeleton = ({ index }: RoleRowSkeletonProps) => {
   return (
     <div
       className={cn([
@@ -16,12 +16,12 @@ const RoleRowSkeleton = ({ index }: RoleRowSkeletonProps) => {
         'data-open:border-strong',
         'data-open:pb-px col-span-12 mx-auto',
         '-space-y-px overflow-hidden',
-        'border border-t-0 first:border-t first:!mt-0 shadow transition',
+        'border border-t-0 first:border-t first:mt-0! shadow-sm transition',
         'first:rounded-tl first:rounded-tr',
         'last:rounded-bl last:rounded-br',
       ])}
     >
-      <div className="flex w-full items-center justify-between rounded py-3 px-6 text-foreground">
+      <div className="flex w-full items-center justify-between rounded-sm py-3 px-6 text-foreground">
         <div className="flex items-start space-x-3">
           <ChevronUp
             id="collapsible-trigger"
@@ -40,5 +40,3 @@ const RoleRowSkeleton = ({ index }: RoleRowSkeletonProps) => {
     </div>
   )
 }
-
-export default RoleRowSkeleton

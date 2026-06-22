@@ -19,7 +19,7 @@ Realtime Messages are billed using Package pricing, with each package representi
 
 ### Example
 
-For simplicity, let's assume a package size of 1,000,000 and a charge of <Price price="2.50" /> per package without quota.
+For simplicity, assume a package size of 1,000,000 and a charge of <Price price="2.50" /> per package without quota.
 
 | Messages  | Packages Billed | Costs                  |
 | --------- | --------------- | ---------------------- |
@@ -45,11 +45,11 @@ The organization's Realtime messages are within the quota, so no charges apply.
 | Line Item           | Units                | Costs                    |
 | ------------------- | -------------------- | ------------------------ |
 | Pro Plan            | 1                    | <Price price="25" />     |
-| Compute Hours Micro | 744 hours            | <Price price="10" />     |
+| Compute Hours Small | 730 hours            | <Price price="15" />     |
 | Realtime Messages   | 1.8 million messages | <Price price="0" />      |
-| **Subtotal**        |                      | **<Price price="35" />** |
+| **Subtotal**        |                      | **<Price price="40" />** |
 | Compute Credits     |                      | -<Price price="10" />    |
-| **Total**           |                      | **<Price price="25" />** |
+| **Total**           |                      | **<Price price="30" />** |
 
 ### Exceeding quota
 
@@ -58,15 +58,15 @@ The organization's Realtime messages exceed the quota by 3.5 million, incurring 
 | Line Item           | Units                | Costs                    |
 | ------------------- | -------------------- | ------------------------ |
 | Pro Plan            | 1                    | <Price price="25" />     |
-| Compute Hours Micro | 744 hours            | <Price price="10" />     |
+| Compute Hours Small | 730 hours            | <Price price="15" />     |
 | Realtime Messages   | 8.5 million messages | <Price price="10" />     |
-| **Subtotal**        |                      | **<Price price="45" />** |
+| **Subtotal**        |                      | **<Price price="50" />** |
 | Compute Credits     |                      | -<Price price="10" />    |
-| **Total**           |                      | **<Price price="35" />** |
+| **Total**           |                      | **<Price price="40" />** |
 
 ## View usage
 
-You can view Realtime Messages usage on the [organization's usage page](https://supabase.com/dashboard/org/_/usage). The page shows the usage of all projects by default. To view the usage for a specific project, select it from the dropdown. You can also select a different time period.
+You can view Realtime Messages usage on the [organization's usage page](/dashboard/org/_/usage). The page shows the usage of all projects by default. To view the usage for a specific project, select it from the dropdown. You can also select a different time period.
 
 <Image
   alt="Usage page navigation bar"
@@ -74,7 +74,9 @@ You can view Realtime Messages usage on the [organization's usage page](https://
     light: '/docs/img/guides/platform/usage-navbar--light.png',
     dark: '/docs/img/guides/platform/usage-navbar--dark.png',
   }}
-  zoomable
+
+width={1546}
+height={208}
 />
 
 In the Realtime Messages section, you can see the usage for the selected time period.
@@ -85,5 +87,11 @@ In the Realtime Messages section, you can see the usage for the selected time pe
     light: '/docs/img/guides/platform/usage-realtime-messages--light.png',
     dark: '/docs/img/guides/platform/usage-realtime-messages--dark.png',
   }}
-  zoomable
+
+width={2036}
+height={760}
 />
+
+## Exceeding Quotas
+
+<$Partial path="billing/exceeding_usage_quotas.mdx" />

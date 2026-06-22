@@ -240,7 +240,7 @@ export default (isMobile?: boolean) => ({
               href="https://supabase.com/docs/guides/functions/cicd-workflow"
               className="underline hover:text-foreground-light transition-colors"
             >
-              Supabase CLI with Github actions
+              Supabase CLI with GitHub actions
             </Link>{' '}
             to preview and deploy your functions along with the rest of your application
           </>

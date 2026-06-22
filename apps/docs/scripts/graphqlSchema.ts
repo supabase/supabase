@@ -1,7 +1,10 @@
 import { printSchema } from 'graphql'
 import fs from 'node:fs'
 import path from 'node:path'
-import { rootGraphQLSchema } from '../resources/rootSchema'
+import { fileURLToPath } from 'node:url'
+import { rootGraphQLSchema } from '../resources/rootSchema.js'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 async function generateGraphQLSchema() {
   try {
@@ -22,6 +25,6 @@ async function generateGraphQLSchema() {
   }
 }
 
-if (require.main === module) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   generateGraphQLSchema()
 }

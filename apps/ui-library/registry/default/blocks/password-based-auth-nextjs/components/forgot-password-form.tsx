@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+
 import { cn } from '@/lib/utils'
 import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'
 import { Button } from '@/registry/default/components/ui/button'
@@ -13,7 +15,6 @@ import {
 import { Input } from '@/registry/default/components/ui/input'
 import { Label } from '@/registry/default/components/ui/label'
 import { Link } from '@/registry/default/components/ui/link'
-import { useState } from 'react'
 
 export function ForgotPasswordForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const [email, setEmail] = useState('')

@@ -1,0 +1,222 @@
+import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import { CreditCardIcon, ExternalLink, Plus } from 'lucide-react'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import ChangePaymentMethodModal from './ChangePaymentMethodModal'
+import CreditCard from './CreditCard'
+import DeletePaymentMethodModal from './DeletePaymentMethodModal'
+import AddNewPaymentMethodModal from '@/components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import {
+  ScaffoldSection,
+  ScaffoldSectionContent,
+  ScaffoldSectionDetail,
+} from '@/components/layouts/Scaffold'
+import AlertError from '@/components/ui/AlertError'
+import { FormPanel } from '@/components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent } from '@/components/ui/Forms/FormSection'
+import NoPermission from '@/components/ui/NoPermission'
+import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
+import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-utils'
+import { useOrganizationPaymentMethodsQuery } from '@/data/organizations/organization-payment-methods-query'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
+import { getURL } from '@/lib/helpers'
+
+const PaymentMethods = () => {
+  const { slug } = useParams()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const [selectedMethodForUse, setSelectedMethodForUse] = useState<any>()
+  const [selectedMethodToDelete, setSelectedMethodToDelete] = useState<any>()
+  const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState(false)
+
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
+  const {
+    data: paymentMethods,
+    error,
+    isPending: isLoading,
+    isError,
+    isSuccess,
+  } = useOrganizationPaymentMethodsQuery({ slug })
+
+  const { can: canReadPaymentMethods, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.payment_methods'
+  )
+  const { can: canUpdatePaymentMethods } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.payment_methods'
+  )
+  const isPartnerBilledOrganization = isPartnerBillingOrganization(
+    selectedOrganization?.billing_partner
+  )
+  const isStripeManagedOrganization =
+    selectedOrganization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
+  return (
+    <>
+      <ScaffoldSection>
+        <ScaffoldSectionDetail>
+          <div className="sticky space-y-2 top-12">
+            <p className="text-foreground text-base m-0">Payment Methods</p>
+            <p className="text-sm text-foreground-light mb-2 pr-4 m-0">
+              {isStripeManagedOrganization
+                ? 'Billing for this organisation is handled through Stripe Projects.'
+                : 'Payments for your subscription are made using the default card.'}
+            </p>
+          </div>
+        </ScaffoldSectionDetail>
+        <ScaffoldSectionContent>
+          {selectedOrganization && isPartnerBilledOrganization ? (
+            <PartnerManagedResource
+              managedBy={selectedOrganization?.managed_by}
+              resource="Payment Methods"
+              cta={{
+                installationId: selectedOrganization?.partner_id,
+              }}
+            />
+          ) : isPermissionsLoaded && !canReadPaymentMethods ? (
+            <NoPermission resourceText="view this organization's payment methods" />
+          ) : (
+            <>
+              {isLoading && (
+                <div className="space-y-2">
+                  <ShimmeringLoader />
+                  <ShimmeringLoader className="w-3/4" />
+                  <ShimmeringLoader className="w-1/2" />
+                </div>
+              )}
+
+              {isError && (
+                <AlertError subject="Failed to retrieve payment methods" error={error as any} />
+              )}
+
+              {isSuccess && (
+                <>
+                  {subscription?.payment_method_type === 'invoice' && (
+                    <Admonition
+                      type="note"
+                      layout="horizontal"
+                      title="Payment is currently by invoice"
+                      description={
+                        isStripeManagedOrganization
+                          ? 'You get a monthly invoice and payment link via email. Manage payment methods through Stripe Projects.'
+                          : 'You get a monthly invoice and payment link via email. To change your payment method, please contact us via our support form.'
+                      }
+                      actions={
+                        isStripeManagedOrganization ? (
+                          <Button
+                            asChild
+                            key="stripe-projects-billing-docs"
+                            variant="default"
+                            iconRight={<ExternalLink size={14} />}
+                          >
+                            <a
+                              href="https://docs.stripe.com/projects#manage-billing"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              View Stripe Projects docs
+                            </a>
+                          </Button>
+                        ) : (
+                          <Button asChild key="payment-method-support" variant="default">
+                            <SupportLink
+                              queryParams={{
+                                category: SupportCategories.BILLING,
+                                subject: 'Request to change payment method',
+                              }}
+                            >
+                              Contact support
+                            </SupportLink>
+                          </Button>
+                        )
+                      }
+                    />
+                  )}
+                  <FormPanel
+                    footer={
+                      !isStripeManagedOrganization ? (
+                        <div className="flex items-center justify-between py-4 px-8">
+                          {!canUpdatePaymentMethods ? (
+                            <p className="text-sm text-foreground-light">
+                              You need additional permissions to manage payment methods
+                            </p>
+                          ) : (
+                            <div />
+                          )}
+                          <Button
+                            variant="default"
+                            icon={<Plus />}
+                            disabled={!canUpdatePaymentMethods}
+                            onClick={() => setShowAddPaymentMethodModal(true)}
+                          >
+                            Add new card
+                          </Button>
+                        </div>
+                      ) : undefined
+                    }
+                  >
+                    <FormSection>
+                      <FormSectionContent fullWidth loading={false}>
+                        {(paymentMethods?.data?.length ?? 0) === 0 ? (
+                          <div className="flex items-center gap-2 opacity-50">
+                            <CreditCardIcon size={16} strokeWidth={1.5} />
+                            <p className="text-sm">No payment methods</p>
+                          </div>
+                        ) : (
+                          <div className="space-y-3">
+                            {paymentMethods?.data?.map((paymentMethod) => (
+                              <CreditCard
+                                key={paymentMethod.id}
+                                paymentMethod={paymentMethod}
+                                canUpdatePaymentMethods={canUpdatePaymentMethods}
+                                paymentMethodType={subscription?.payment_method_type}
+                                setSelectedMethodForUse={setSelectedMethodForUse}
+                                setSelectedMethodToDelete={setSelectedMethodToDelete}
+                                paymentMethodCount={paymentMethods?.data.length ?? 0}
+                                subscriptionPlan={subscription?.plan.id}
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </FormSectionContent>
+                    </FormSection>
+                  </FormPanel>
+                </>
+              )}
+            </>
+          )}
+        </ScaffoldSectionContent>
+      </ScaffoldSection>
+
+      <AddNewPaymentMethodModal
+        visible={showAddPaymentMethodModal}
+        returnUrl={`${getURL()}/org/${slug}/billing`}
+        onCancel={() => setShowAddPaymentMethodModal(false)}
+        onConfirm={() => {
+          setShowAddPaymentMethodModal(false)
+          toast.success('Successfully added new payment method')
+        }}
+      />
+
+      <ChangePaymentMethodModal
+        selectedPaymentMethod={selectedMethodForUse}
+        onClose={() => setSelectedMethodForUse(undefined)}
+      />
+
+      <DeletePaymentMethodModal
+        selectedPaymentMethod={selectedMethodToDelete}
+        onClose={() => setSelectedMethodToDelete(undefined)}
+      />
+    </>
+  )
+}
+
+export default PaymentMethods

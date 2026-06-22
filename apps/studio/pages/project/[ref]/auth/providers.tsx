@@ -1,26 +1,25 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useFlag } from 'common'
+import { PageContainer } from 'ui-patterns/PageContainer'
 
-import { AuthProvidersForm, BasicAuthSettingsForm } from 'components/interfaces/Auth'
-import { AuthProvidersLayout } from 'components/layouts/AuthLayout/AuthProvidersLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
-import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import type { NextPageWithLayout } from 'types'
+import { AuthProvidersForm } from '@/components/interfaces/Auth/AuthProvidersForm'
+import { BasicAuthSettingsForm } from '@/components/interfaces/Auth/BasicAuthSettingsForm'
+import { CustomAuthProviders } from '@/components/interfaces/Auth/CustomAuthProviders'
+import { AuthProvidersLayout } from '@/components/layouts/AuthLayout/AuthProvidersLayout'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import type { NextPageWithLayout } from '@/types'
 
 const ProvidersPage: NextPageWithLayout = () => {
-  const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
-  const isPermissionsLoaded = usePermissionsLoaded()
-
-  if (isPermissionsLoaded && !canReadAuthSettings) {
-    return <NoPermission isFullPage resourceText="access your project's auth provider settings" />
-  }
+  const showProviders = useIsFeatureEnabled('authentication:show_providers')
+  const showCustomProviders = useIsFeatureEnabled('authentication:show_custom_providers')
+  const isOauthProvidersEnabled = useFlag('CustomOauthProviders')
 
   return (
-    <ScaffoldContainer>
+    <PageContainer size="default">
       <BasicAuthSettingsForm />
-      <AuthProvidersForm />
-    </ScaffoldContainer>
+      {showProviders && <AuthProvidersForm />}
+      {showCustomProviders && isOauthProvidersEnabled && <CustomAuthProviders />}
+    </PageContainer>
   )
 }
 

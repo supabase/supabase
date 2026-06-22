@@ -55,10 +55,11 @@ hideToc: true
 
     <StepHikeCompact.Details title="Initialize the Supabase client">
 
-      Open `lib/main.dart` and edit the main function to initialize Supabase using your project URL and public API (anon) key:
+      Open `lib/main.dart` and edit the main function to initialize Supabase using your project URL and publishable key:
 
       <ProjectConfigVariables variable="url" />
-      <ProjectConfigVariables variable="anonKey" />
+      <ProjectConfigVariables variable="publishable" />
+
 
     </StepHikeCompact.Details>
 
@@ -72,11 +73,13 @@ hideToc: true
 
         await Supabase.initialize(
           url: 'YOUR_SUPABASE_URL',
-          anonKey: 'YOUR_SUPABASE_ANON_KEY',
+          publishableKey: 'YOUR_SUPABASE_PUBLISHABLE_KEY',
         );
         runApp(MyApp());
       }
       ```
+
+      <$Partial path="api_settings_steps.mdx" variables={{ "framework": "flutter", "tab": "mobiles" }} />
 
     </StepHikeCompact.Code>
 

@@ -29,30 +29,30 @@ The organization's Storage size usage is within the quota, so no charges for Sto
 | Line Item           | Units     | Costs                    |
 | ------------------- | --------- | ------------------------ |
 | Pro Plan            | 1         | <Price price="25" />     |
-| Compute Hours Micro | 744 hours | <Price price="10" />     |
+| Compute Hours Small | 730 hours | <Price price="15" />     |
 | Storage Size        | 85 GB     | <Price price="0" />      |
-| **Subtotal**        |           | **<Price price="35" />** |
+| **Subtotal**        |           | **<Price price="40" />** |
 | Compute Credits     |           | -<Price price="10" />    |
-| **Total**           |           | **<Price price="25" />** |
+| **Total**           |           | **<Price price="30" />** |
 
 ### Exceeding quota
 
-The organization's Storage size usage exceeds the quota by 257 GB, incurring charges for this additional usage.
+The organization's Storage size usage exceeds the quota by 188 GB, incurring charges for this additional usage.
 
-| Line Item           | Units     | Costs                      |
-| ------------------- | --------- | -------------------------- |
-| Pro Plan            | 1         | <Price price="25" />       |
-| Compute Hours Micro | 744 hours | <Price price="10" />       |
-| Storage Size        | 357 GB    | <Price price="5.4" />      |
-| **Subtotal**        |           | **<Price price="40.4" />** |
-| Compute Credits     |           | -<Price price="10" />      |
-| **Total**           |           | **<Price price="30.4" />** |
+| Line Item           | Units     | Costs                    |
+| ------------------- | --------- | ------------------------ |
+| Pro Plan            | 1         | <Price price="25" />     |
+| Compute Hours Small | 730 hours | <Price price="15" />     |
+| Storage Size        | 288 GB    | <Price price="4" />      |
+| **Subtotal**        |           | **<Price price="44" />** |
+| Compute Credits     |           | -<Price price="10" />    |
+| **Total**           |           | **<Price price="34" />** |
 
 ## View usage
 
 ### Usage page
 
-You can view Storage size usage on the [organization's usage page](https://supabase.com/dashboard/org/_/usage). The page shows the usage of all projects by default. To view the usage for a specific project, select it from the dropdown. You can also select a different time period.
+You can view Storage size usage on the [organization's usage page](/dashboard/org/_/usage). The page shows the usage of all projects by default. To view the usage for a specific project, select it from the dropdown. You can also select a different time period.
 
 <Image
   alt="Usage page navigation bar"
@@ -60,7 +60,9 @@ You can view Storage size usage on the [organization's usage page](https://supab
     light: '/docs/img/guides/platform/usage-navbar--light.png',
     dark: '/docs/img/guides/platform/usage-navbar--dark.png',
   }}
-  zoomable
+
+width={1546}
+height={208}
 />
 
 In the Storage size section, you can see how much storage your projects have used during the selected time period.
@@ -71,7 +73,9 @@ In the Storage size section, you can see how much storage your projects have use
     light: '/docs/img/guides/platform/usage-storage-size--light.png',
     dark: '/docs/img/guides/platform/usage-storage-size--dark.png',
   }}
-  zoomable
+
+width={2028}
+height={882}
 />
 
 ### SQL Editor
@@ -119,3 +123,7 @@ order by
 
 - [Limit the upload size](/docs/guides/storage/production/scaling#limit-the-upload-size) for your buckets
 - [Delete assets](/docs/guides/storage/management/delete-objects) that are no longer in use
+
+## Exceeding Quotas
+
+<$Partial path="billing/exceeding_usage_quotas.mdx" />

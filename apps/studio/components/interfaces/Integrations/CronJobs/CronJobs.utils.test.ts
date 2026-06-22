@@ -1,5 +1,28 @@
 import { describe, expect, it } from 'vitest'
-import { cronPattern, parseCronJobCommand, secondsPattern } from './CronJobs.utils'
+
+import { cronPattern, secondsPattern } from './CronJobs.constants'
+import {
+  buildCronCreateQuery,
+  buildCronUpdateQuery,
+  formatCronJobColumns,
+  parseCronJobCommand,
+} from './CronJobs.utils'
+
+describe('buildCronQuery', () => {
+  it('uses cron.schedule to create a job by name', () => {
+    expect(buildCronCreateQuery('my-job', '*/5 * * * *', 'select 1')).toBe(
+      "select cron.schedule('my-job', '*/5 * * * *', 'select 1');"
+    )
+  })
+})
+
+describe('buildCronUpdateQuery', () => {
+  it('uses cron.alter_job to update a job by id', () => {
+    expect(buildCronUpdateQuery(42, '*/10 * * * *', 'select 2')).toBe(
+      "select cron.alter_job(job_id := 42, schedule := '*/10 * * * *', command := 'select 2');"
+    )
+  })
+})
 
 describe('parseCronJobCommand', () => {
   it('should return a default object when the command is null', () => {
@@ -30,22 +53,79 @@ describe('parseCronJobCommand', () => {
     })
   })
 
-  it('should return a sql function command when the command is SELECT public.test_fn(1, 2)', () => {
-    const command = 'SELECT public.test_fn(1, 2)'
+  it('should return a sql function command when the command is SELECT auth.jwt () and ends with ;', () => {
+    const command = 'SELECT auth.jwt ();'
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       type: 'sql_function',
-      schema: 'public',
-      functionName: 'test_fn',
+      schema: 'auth',
+      functionName: 'jwt',
+      snippet: command,
+    })
+  })
+
+  it('should return a sql function command when the function name contains an underscore', () => {
+    const command = 'SELECT random_schema.function_1()'
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      type: 'sql_function',
+      schema: 'random_schema',
+      functionName: 'function_1',
+      snippet: command,
+    })
+  })
+
+  it('should return a sql function command for lowercase select', () => {
+    const command = 'select lowercase.issue ()'
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      type: 'sql_function',
+      schema: 'lowercase',
+      functionName: 'issue',
+      snippet: command,
+    })
+  })
+
+  it('should return a sql snippet command when the command is SELECT public.test_fn(1, 2)', () => {
+    const command = 'SELECT public.test_fn(1, 2)'
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      type: 'sql_snippet',
+      snippet: command,
+    })
+  })
+
+  it('should return a sql snippet command when the command is using a SQL function from the search path', () => {
+    const command = 'SELECT test_cron_function()'
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      type: 'sql_snippet',
+      snippet: command,
+    })
+  })
+
+  it('should return a sql snippet command when the command is SELECT .()', () => {
+    const command = 'SELECT .()'
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      type: 'sql_snippet',
+      snippet: command,
+    })
+  })
+
+  it('should return a sql snippet command when the command is SELECT schema.()', () => {
+    const command = 'SELECT schema.()'
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      type: 'sql_snippet',
       snippet: command,
     })
   })
 
   it('should return a edge function config when the command posts to its own supabase.co project', () => {
-    const command = `select net.http_post( url:='https://random_project_ref.supabase.co/functions/v1/_', headers:=jsonb_build_object(), body:='', timeout_milliseconds:=5000 );`
+    const command = `select net.http_post( url:='https://random_project_ref.supabase.co/functions/v1/_', headers:=jsonb_build_object('Authorization', 'Bearer something'), body:='', timeout_milliseconds:=5000 );`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       edgeFunctionName: 'https://random_project_ref.supabase.co/functions/v1/_',
       method: 'POST',
-      httpHeaders: [],
+      httpHeaders: [
+        {
+          name: 'Authorization',
+          value: 'Bearer something',
+        },
+      ],
       httpBody: '',
       timeoutMs: 5000,
       type: 'edge_function',
@@ -53,7 +133,43 @@ describe('parseCronJobCommand', () => {
     })
   })
 
-  it('should return a HTTP request config when the command posts to another supabase.co project', () => {
+  it('should return a edge function config when the body is missing', () => {
+    const command = `select net.http_post( url:='https://random_project_ref.supabase.co/functions/v1/_', headers:=jsonb_build_object('Authorization', 'Bearer something'), timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      edgeFunctionName: 'https://random_project_ref.supabase.co/functions/v1/_',
+      method: 'POST',
+      httpHeaders: [
+        {
+          name: 'Authorization',
+          value: 'Bearer something',
+        },
+      ],
+      httpBody: '',
+      timeoutMs: 5000,
+      type: 'edge_function',
+      snippet: command,
+    })
+  })
+
+  it("should return an HTTP request config when there's a query parameter or hash in the URL (also handles edge function)", () => {
+    const command = `select net.http_post( url:='https://random_project_ref.supabase.co/functions/v1/_?first=1#second=2', headers:=jsonb_build_object('Authorization', 'Bearer something'), timeout_milliseconds:=5000 )`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://random_project_ref.supabase.co/functions/v1/_?first=1#second=2',
+      method: 'POST',
+      httpHeaders: [
+        {
+          name: 'Authorization',
+          value: 'Bearer something',
+        },
+      ],
+      httpBody: '',
+      timeoutMs: 5000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should return an HTTP request config when the command posts to another supabase.co project', () => {
     const command = `select net.http_post( url:='https://another_project_ref.supabase.co/functions/v1/_', headers:=jsonb_build_object(), body:='', timeout_milliseconds:=5000 );`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       endpoint: 'https://another_project_ref.supabase.co/functions/v1/_',
@@ -66,7 +182,7 @@ describe('parseCronJobCommand', () => {
     })
   })
 
-  it('should return a HTTP request config with POST method, empty headers and a body as string', () => {
+  it('should return an HTTP request config with POST method, empty headers and a body as string', () => {
     const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object(), body:='hello', timeout_milliseconds:=5000 );`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       endpoint: 'https://example.com/api/endpoint',
@@ -79,14 +195,14 @@ describe('parseCronJobCommand', () => {
     })
   })
 
-  it('should return a HTTP request config with POST method, some headers and empty body', () => {
-    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('fst', '1', 'snd', '2'), body:='', timeout_milliseconds:=1000 );`
+  it('should return an HTTP request config with POST method, some headers and empty body', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('fst', '1', 'snd', 'O''Reilly'), body:='', timeout_milliseconds:=1000 );`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       endpoint: 'https://example.com/api/endpoint',
       method: 'POST',
       httpHeaders: [
         { name: 'fst', value: '1' },
-        { name: 'snd', value: '2' },
+        { name: 'snd', value: "O'Reilly" },
       ],
       httpBody: '',
       timeoutMs: 1000,
@@ -95,7 +211,117 @@ describe('parseCronJobCommand', () => {
     })
   })
 
-  it('should return a HTTP request config with GET method and empty body', () => {
+  it('should keep a jsonb_build_object header value that contains a comma intact', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('Accept', 'application/json, text/plain'), timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [{ name: 'Accept', value: 'application/json, text/plain' }],
+      httpBody: '',
+      timeoutMs: 5000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should not shift later jsonb_build_object headers when an earlier value contains a comma', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('Accept', 'application/json, text/plain', 'Authorization', 'Bearer abc'), timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [
+        { name: 'Accept', value: 'application/json, text/plain' },
+        { name: 'Authorization', value: 'Bearer abc' },
+      ],
+      httpBody: '',
+      timeoutMs: 5000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should keep a jsonb_build_object header value that contains parentheses intact', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('User-Agent', 'Mozilla/5.0 (compatible)'), timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [{ name: 'User-Agent', value: 'Mozilla/5.0 (compatible)' }],
+      httpBody: '',
+      timeoutMs: 5000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should keep an escaped quote inside a comma-containing jsonb_build_object value', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('X-Company', 'O''Reilly, Inc'), timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [{ name: 'X-Company', value: "O'Reilly, Inc" }],
+      httpBody: '',
+      timeoutMs: 5000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should unescape backslashes in an E-prefixed jsonb_build_object header value', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('X-Custom', E'value\\\\here'), timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [{ name: 'X-Custom', value: 'value\\here' }],
+      httpBody: '',
+      timeoutMs: 5000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should keep later jsonb_build_object headers when an earlier value contains parentheses', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('User-Agent', 'Mozilla/5.0 (compatible)', 'Accept', 'application/json'), timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [
+        { name: 'User-Agent', value: 'Mozilla/5.0 (compatible)' },
+        { name: 'Accept', value: 'application/json' },
+      ],
+      httpBody: '',
+      timeoutMs: 5000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should parse jsonb_build_object headers when there is whitespace before the opening parenthesis', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object ('Accept', 'application/json'), timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [{ name: 'Accept', value: 'application/json' }],
+      httpBody: '',
+      timeoutMs: 5000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should not let a comma inside a jsonb_build_object value swallow the following body argument', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('Accept', 'application/json, text/plain'), body:='{"key": "value"}', timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [{ name: 'Accept', value: 'application/json, text/plain' }],
+      httpBody: '{"key": "value"}',
+      timeoutMs: 5000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should return an HTTP request config with GET method and empty body', () => {
     const command = `select net.http_get( url:='https://example.com/api/endpoint', headers:=jsonb_build_object(), timeout_milliseconds:=5000 );`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       endpoint: 'https://example.com/api/endpoint',
@@ -108,7 +334,7 @@ describe('parseCronJobCommand', () => {
     })
   })
 
-  it('should return a HTTP request config with POST method and a body as JSON object', () => {
+  it('should return an HTTP request config with POST method and a body as JSON object', () => {
     const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object(), body:='{"key": "value"}', timeout_milliseconds:=5000 );`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       endpoint: 'https://example.com/api/endpoint',
@@ -121,7 +347,7 @@ describe('parseCronJobCommand', () => {
     })
   })
 
-  it('should return a HTTP request config with POST method, plain JSON headers and plain JSON body', () => {
+  it('should return an HTTP request config with POST method, plain JSON headers and plain JSON body', () => {
     const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:='{"fst": "1", "snd": "2"}',body:='{"key": "value"}',timeout_milliseconds:=5000);`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       endpoint: 'https://example.com/api/endpoint',
@@ -137,18 +363,52 @@ describe('parseCronJobCommand', () => {
     })
   })
 
-  it('should return a HTTP request config with POST method, plain JSON headers and plain JSON body with ::jsonb typecasting', () => {
-    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:='{"fst": "1", "snd": "2"}'::jsonb,body:='{"key": "value"}'::jsonb,timeout_milliseconds:=5000);`
+  it('should return an HTTP request config with POST method, plain JSON headers and plain JSON body with escaped SQL strings and ::jsonb typecasting', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:='{"X-Name":"O''Reilly"}'::jsonb,body:='{"message":"hello  there","name":"O''Reilly"}'::jsonb,timeout_milliseconds:=5000);`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [{ name: 'X-Name', value: "O'Reilly" }],
+      httpBody: `{"message":"hello  there","name":"O'Reilly"}`,
+      timeoutMs: 5000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should return an HTTP request config with POST method, escape-string headers and body with backslashes', () => {
+    const command = String.raw`select net.http_post( url:='https://example.com/api/endpoint', headers:=E'{"Content-Type":"application/json","X-Regex":"^\\\\d+$"}'::jsonb,body:=E'{"path":"C:\\\\tmp","regex":"^\\\\d+$"}',timeout_milliseconds:=1000);`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       endpoint: 'https://example.com/api/endpoint',
       method: 'POST',
       httpHeaders: [
-        { name: 'fst', value: '1' },
-        { name: 'snd', value: '2' },
+        { name: 'Content-Type', value: 'application/json' },
+        { name: 'X-Regex', value: String.raw`^\d+$` },
       ],
-      httpBody: '{"key": "value"}',
+      httpBody: String.raw`{"path":"C:\\tmp","regex":"^\\d+$"}`,
+      timeoutMs: 1000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should parse a POST body without swallowing later quoted arguments', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', body:='{"payload":"ok"}'::jsonb, headers:='{"Authorization":"Bearer demo"}'::jsonb, timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [{ name: 'Authorization', value: 'Bearer demo' }],
+      httpBody: '{"payload":"ok"}',
       timeoutMs: 5000,
       type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should return SQL snippet type if the command is an HTTP request that cannot be parsed properly due to positional notation', () => {
+    const command = `SELECT net.http_post( 'https://webhook.site/dacc2028-a588-462c-9597-c8968e61d0fa', '{"message":"Hello from Supabase"}'::jsonb, '{}'::jsonb, '{"Content-Type":"application/json"}'::jsonb );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      type: 'sql_snippet',
       snippet: command,
     })
   })
@@ -178,12 +438,47 @@ describe('parseCronJobCommand', () => {
     { description: 'every weekend at 10 AM', command: '0 10 * * 0,6' },
     { description: 'every quarter hour', command: '*/15 * * * *' },
     { description: 'twice daily at 8 AM and 8 PM', command: '0 8,20 * * *' },
+    { description: 'last day of every month at midnight (pg_cron $ syntax)', command: '0 0 $ * *' },
+    { description: 'last day of every month at noon (pg_cron $ syntax)', command: '0 12 $ * *' },
   ]
+
+  const cronPatternRejectTests = [
+    { description: '$ in minute field', command: '$ * * * *' },
+    { description: '$ in hour field', command: '* $ * * *' },
+    { description: '$ in month field', command: '* * * $ *' },
+    { description: '$ in day-of-week field', command: '* * * * $' },
+  ]
+
+  cronPatternRejectTests.forEach(({ description, command }) => {
+    it(`should not match the regex for a cronPattern with "${description}"`, () => {
+      expect(command).not.toMatch(cronPattern)
+    })
+  })
 
   // Replace the single cronPattern test with forEach
   cronPatternTests.forEach(({ description, command }) => {
     it(`should match the regex for a cronPattern with "${description}"`, () => {
       expect(command).toMatch(cronPattern)
     })
+  })
+})
+
+describe('formatCronJobColumns', () => {
+  it('enables resizing for informational columns and keeps utility columns fixed', () => {
+    const columns = formatCronJobColumns({
+      onSelectEdit: () => undefined,
+      onSelectDelete: () => undefined,
+    })
+
+    const columnsByKey = Object.fromEntries(columns.map((column) => [String(column.key), column]))
+
+    expect(columnsByKey.jobname.resizable).toBe(true)
+    expect(columnsByKey.jobname.minWidth).toBeGreaterThan(0)
+    expect(columnsByKey.schedule.resizable).toBe(true)
+    expect(columnsByKey.latest_run.resizable).toBe(true)
+    expect(columnsByKey.next_run.resizable).toBe(true)
+    expect(columnsByKey.command.resizable).toBe(true)
+    expect(columnsByKey.active.resizable).toBe(false)
+    expect(columnsByKey.actions.resizable).toBe(false)
   })
 })

@@ -1,14 +1,12 @@
-import React from 'react'
-import Link from 'next/link'
-import { useParams } from 'common'
 import { BookOpen } from 'lucide-react'
-import { Alert_Shadcn_, AlertTitle_Shadcn_, AlertDescription_Shadcn_, cn, Button } from 'ui'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH } from 'lib/constants'
+import Link from 'next/link'
+import { Alert, AlertDescription, AlertTitle, Button, cn } from 'ui'
+
+import { BASE_PATH, DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 const GrafanaPromoBanner = () => (
-  <Alert_Shadcn_ className="relative overflow-hidden">
+  <Alert className="relative overflow-hidden">
     <div className="absolute inset-0 z-0">
       <img
         src={`${BASE_PATH}/img/reports/bg-grafana-dark.svg`}
@@ -20,7 +18,7 @@ const GrafanaPromoBanner = () => (
         alt="Supabase Grafana"
         className="w-full h-full object-cover object-right dark:hidden"
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-background-alternative to-transparent" />
+      <div className="absolute inset-0 bg-linear-to-r from-background-alternative to-transparent" />
     </div>
     <svg
       width="78"
@@ -37,50 +35,38 @@ const GrafanaPromoBanner = () => (
     </svg>
 
     <div className="flex flex-col md:flex-row gap-2 mt-1">
-      <AlertTitle_Shadcn_ className="flex-grow">Advanced observability</AlertTitle_Shadcn_>
+      <AlertTitle className="grow">Advanced observability</AlertTitle>
       <GrafanaBannerActions className="hidden xl:flex" />
     </div>
-    <AlertDescription_Shadcn_ className="relative flex flex-col xl:flex-row gap-2 md:max-w-lg">
-      <p className="flex-grow">
+    <AlertDescription className="relative flex flex-col xl:flex-row gap-2 md:max-w-lg">
+      <p className="grow">
         Set up the Supabase Grafana Dashboard to visualize over 200 database performance and health
         metrics on your Supabase project.
       </p>
       <GrafanaBannerActions className="xl:hidden" />
-    </AlertDescription_Shadcn_>
-  </Alert_Shadcn_>
+    </AlertDescription>
+  </Alert>
 )
 
 const GrafanaBannerActions = ({ className }: { className?: string }) => {
-  const { ref } = useParams()
-  const org = useSelectedOrganization()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   return (
     <div className={cn('flex gap-2', className)}>
-      <Button type="outline" className="bg-alternative" size="tiny" icon={<BookOpen />} asChild>
+      <Button variant="outline" className="bg-alternative" size="tiny" icon={<BookOpen />} asChild>
         <Link
-          href="https://supabase.com/docs/guides/telemetry/metrics"
+          href={`${DOCS_URL}/guides/telemetry/metrics`}
           target="_blank"
-          onClick={() =>
-            sendEvent({
-              action: 'reports_database_grafana_banner_clicked',
-              groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-            })
-          }
+          onClick={() => track('reports_database_grafana_banner_clicked')}
         >
           Docs
         </Link>
       </Button>
-      <Button type="default" size="tiny" asChild>
+      <Button variant="default" size="tiny" asChild>
         <Link
           href="https://github.com/supabase/supabase-grafana"
           target="_blank"
-          onClick={() =>
-            sendEvent({
-              action: 'reports_database_grafana_banner_clicked',
-              groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-            })
-          }
+          onClick={() => track('reports_database_grafana_banner_clicked')}
         >
           Configure Grafana
         </Link>

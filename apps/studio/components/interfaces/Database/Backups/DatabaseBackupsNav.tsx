@@ -1,15 +1,16 @@
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Link from 'next/link'
-import React from 'react'
-
 import { Badge, NavMenu, NavMenuItem } from 'ui'
+
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 type Props = {
   active: 'pitr' | 'scheduled' | 'rtnp'
 }
 
 function DatabaseBackupsNav({ active }: Props) {
-  const { ref, cloud_provider } = useProjectContext()?.project || {}
+  const { ref, cloud_provider } = useSelectedProjectQuery()?.data || {}
+  const { databaseRestoreToNewProject } = useIsFeatureEnabled(['database:restore_to_new_project'])
 
   const navMenuItems = [
     {
@@ -25,14 +26,11 @@ function DatabaseBackupsNav({ active }: Props) {
       href: `/project/${ref}/database/backups/pitr`,
     },
     {
-      enabled: cloud_provider !== 'FLY',
+      enabled: databaseRestoreToNewProject && cloud_provider !== 'FLY',
       id: 'rtnp',
       label: (
-        <div className="flex items-center gap-1">
-          Restore to new project{' '}
-          <Badge size="small" className="!text-[10px] px-1.5 py-0">
-            New
-          </Badge>
+        <div className="flex items-center gap-2">
+          Restore to new project <Badge variant="warning">Beta</Badge>
         </div>
       ),
       href: `/project/${ref}/database/backups/restore-to-new-project`,

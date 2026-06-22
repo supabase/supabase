@@ -1,14 +1,9 @@
+import { useParams } from 'common'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
+import { Alert, AlertDescription, AlertTitle, Button, WarningIcon } from 'ui'
 
-import { useParams } from 'common'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Button,
-  WarningIcon,
-} from 'ui'
+import { DOCS_URL } from '@/lib/constants'
 
 export const AuthAlert = ({
   title,
@@ -23,39 +18,39 @@ export const AuthAlert = ({
     // TODO (KM): Remove after 10th October 2024 when we disable the provider
     case 'Slack (Deprecated)':
       return (
-        <Alert_Shadcn_ variant="warning">
+        <Alert variant="warning">
           <WarningIcon />
-          <AlertTitle_Shadcn_>Slack (Deprecated) Provider</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
+          <AlertTitle>Slack (Deprecated) Provider</AlertTitle>
+          <AlertDescription>
             Recently, Slack has updated their OAuth API. Please use the new Slack (OIDC) provider
             below. Developers using this provider should move over to the new provider. Please refer
             to our{' '}
             <a
-              href="https://supabase.com/docs/guides/auth/social-login/auth-slack"
+              href={`${DOCS_URL}/guides/auth/social-login/auth-slack`}
               className="underline"
               target="_blank"
             >
               documentation
             </a>{' '}
             for more details.
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+          </AlertDescription>
+        </Alert>
       )
     case 'Phone':
       return (
         isHookSendSMSEnabled && (
-          <Alert_Shadcn_>
+          <Alert>
             <WarningIcon />
-            <AlertTitle_Shadcn_>
+            <AlertTitle>
               SMS provider settings are disabled while the SMS hook is enabled.
-            </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_ className="flex flex-col gap-y-3">
+            </AlertTitle>
+            <AlertDescription className="flex flex-col gap-y-3">
               <p>The SMS hook will be used in place of the SMS provider configured</p>
-              <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
+              <Button asChild variant="default" className="w-min" icon={<ExternalLink />}>
                 <Link href={`/project/${ref}/auth/hooks`}>View auth hooks</Link>
               </Button>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+            </AlertDescription>
+          </Alert>
         )
       )
     default:

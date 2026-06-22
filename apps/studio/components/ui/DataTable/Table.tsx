@@ -1,0 +1,108 @@
+import { ComponentPropsWithRef, forwardRef } from 'react'
+import { cn } from 'ui'
+import {
+  Table as ShadcnTable,
+  TableBody as ShadcnTableBody,
+  TableCaption as ShadcnTableCaption,
+  TableCell as ShadcnTableCell,
+  TableFooter as ShadcnTableFooter,
+  TableHead as ShadcnTableHead,
+  TableHeader as ShadcnTableHeader,
+  TableRow as ShadcnTableRow,
+} from 'ui/src/components/shadcn/ui/table'
+
+// Only create a custom component for Table with the added props
+export const Table = forwardRef<HTMLTableElement, ComponentPropsWithRef<typeof ShadcnTable>>(
+  ({ className, onScroll, ...props }, ref) => (
+    <ShadcnTable
+      ref={ref}
+      {...props}
+      className={cn(className)}
+      containerProps={{
+        onScroll,
+        className: 'h-full w-full overflow-auto caption-bottom text-sm [&>table]:table-fixed',
+      }}
+    />
+  )
+)
+Table.displayName = 'Table'
+
+export const TableHeader = forwardRef<
+  HTMLTableSectionElement,
+  ComponentPropsWithRef<typeof ShadcnTableHeader>
+>(({ className, ...props }, ref) => (
+  <ShadcnTableHeader ref={ref} className={cn('sticky top-0 z-1', className)} {...props} />
+))
+TableHeader.displayName = 'TableHeader'
+
+export const TableBody = forwardRef<
+  HTMLTableSectionElement,
+  ComponentPropsWithRef<typeof ShadcnTableBody>
+>(({ className, ...props }, ref) => (
+  <ShadcnTableBody
+    ref={ref}
+    {...props}
+    className={cn(
+      'transition-colors outline-none focus-visible:outline-1 focus-visible:-outline-offset-1 focus-visible:outline-primary',
+      className
+    )}
+  />
+))
+TableBody.displayName = 'TableBody'
+
+export const TableFooter = forwardRef<
+  HTMLTableSectionElement,
+  ComponentPropsWithRef<typeof ShadcnTableFooter>
+>(({ className, ...props }, ref) => (
+  <ShadcnTableFooter ref={ref} className={cn('text-primary-foreground', className)} {...props} />
+))
+TableFooter.displayName = 'TableFooter'
+
+export const TableRow = forwardRef<
+  HTMLTableRowElement,
+  ComponentPropsWithRef<typeof ShadcnTableRow>
+>(({ className, ...props }, ref) => (
+  <ShadcnTableRow
+    ref={ref}
+    className={cn('bg-background hover:bg-surface-100 border-b-0', className)}
+    {...props}
+  />
+))
+TableRow.displayName = 'TableRow'
+
+export const TableHead = forwardRef<
+  HTMLTableCellElement,
+  ComponentPropsWithRef<typeof ShadcnTableHead>
+>(({ className, ...props }, ref) => (
+  <ShadcnTableHead
+    ref={ref}
+    className={cn(
+      'text-xs! font-normal! text-foreground-lighter font-mono',
+      'relative select-none truncate [&>.cursor-col-resize]:last:opacity-0',
+      'text-muted-foreground h-9 px-2 text-left align-middle [&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-[2px]',
+      className
+    )}
+    {...props}
+  />
+))
+TableHead.displayName = 'TableHead'
+
+export const TableCell = forwardRef<
+  HTMLTableCellElement,
+  ComponentPropsWithRef<typeof ShadcnTableCell>
+>(({ className, ...props }, ref) => (
+  <ShadcnTableCell
+    ref={ref}
+    className={cn('text-xs py-1! p-2 *:[[role=checkbox]]:translate-y-[2px] truncate', className)}
+    {...props}
+  />
+))
+TableCell.displayName = 'TableCell'
+
+export const TableCaption = forwardRef<
+  HTMLTableCaptionElement,
+  ComponentPropsWithRef<typeof ShadcnTableCaption>
+>(({ className, ...props }, ref) => (
+  <ShadcnTableCaption ref={ref} className={cn('text-sm', className)} {...props} />
+))
+TableCaption.displayName = 'TableCaption'

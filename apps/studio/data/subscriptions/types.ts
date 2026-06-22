@@ -1,4 +1,4 @@
-import type { components } from 'data/api'
+import type { components } from '@/data/api'
 
 export type SubscriptionTier =
   | 'tier_free'
@@ -6,6 +6,7 @@ export type SubscriptionTier =
   | 'tier_payg'
   | 'tier_team'
   | 'tier_enterprise'
+  | 'tier_platform'
 
 export type AddonVariantId = components['schemas']['UpdateAddonBody']['addon_variant']
 
@@ -13,7 +14,7 @@ export type OrgSubscription = components['schemas']['GetSubscriptionResponse']
 
 export type ProjectAddon = components['schemas']['GetSubscriptionResponse']['project_addons'][0]
 
-export type PlanId = components['schemas']['BillingPlanId']
+export type PlanId = components['schemas']['PlansResponse']['plans'][number]['id']
 
 export type OrgPlan = components['schemas']['PlansResponse']['plans'][0]
 

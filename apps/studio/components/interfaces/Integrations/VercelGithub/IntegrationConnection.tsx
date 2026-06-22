@@ -3,15 +3,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { forwardRef, useCallback, useState } from 'react'
 import { toast } from 'sonner'
-
-import {
-  IntegrationConnection,
-  IntegrationConnectionProps,
-} from 'components/interfaces/Integrations/VercelGithub/IntegrationPanels'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
-import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { useProjectsQuery } from 'data/projects/projects-query'
 import {
   Button,
   DropdownMenu,
@@ -21,21 +12,29 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+
+import {
+  IntegrationConnection,
+  IntegrationConnectionProps,
+} from '@/components/interfaces/Integrations/VercelGithub/IntegrationPanels'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useIntegrationsVercelConnectionSyncEnvsMutation } from '@/data/integrations/integrations-vercel-connection-sync-envs-mutation'
+import type { IntegrationProjectConnection } from '@/data/integrations/integrations.types'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
   disabled?: boolean
   onDeleteConnection: (connection: IntegrationProjectConnection) => void | Promise<void>
 }
 
-const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectionItemProps>(
-  ({ disabled, onDeleteConnection, ...props }, ref) => {
+export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectionItemProps>(
+  ({ disabled, onDeleteConnection, ...props }, _ref) => {
     const router = useRouter()
-    const org = useSelectedOrganization()
+    const { data: org } = useSelectedOrganizationQuery()
 
     const { type, connection } = props
-    const { data: projects } = useProjectsQuery()
-    const project = projects?.find((project) => project.ref === connection.supabase_project_ref)
+    const { data: project } = useProjectDetailQuery({ ref: connection.supabase_project_ref })
     const isBranchingEnabled = project?.is_branch_enabled === true
 
     const [isOpen, setIsOpen] = useState(false)
@@ -58,7 +57,7 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
       setIsOpen(false)
     }, [])
 
-    const { mutate: syncEnvs, isLoading: isSyncEnvLoading } =
+    const { mutate: syncEnvs, isPending: isSyncEnvLoading } =
       useIntegrationsVercelConnectionSyncEnvsMutation({
         onSuccess: () => {
           toast.success('Successfully synced environment variables')
@@ -81,7 +80,7 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
               <ButtonTooltip
                 disabled
                 iconRight={<ChevronDown size={14} />}
-                type="default"
+                variant="default"
                 tooltip={{
                   content: {
                     side: 'bottom',
@@ -98,7 +97,7 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
                 modal={false}
               >
                 <DropdownMenuTrigger asChild>
-                  <Button iconRight={<ChevronDown size={14} />} type="default">
+                  <Button iconRight={<ChevronDown size={14} />} variant="default">
                     <span>Manage</span>
                   </Button>
                 </DropdownMenuTrigger>
@@ -154,18 +153,11 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
           onCancel={onCancel}
           onConfirm={onConfirm}
           loading={isDeleting}
-          alert={
-            type === 'GitHub' && isBranchingEnabled
-              ? {
-                  title: 'Branching will be disabled for this project',
-                  description: ` Deleting this GitHub connection will remove all preview branches on this project,
-                and also disable branching for ${project.name}`,
-                }
-              : undefined
-          }
         >
           <p className="text-sm text-foreground-light">
-            This action cannot be undone. Are you sure you want to delete this {type} connection?
+            {type === 'Vercel'
+              ? 'Deleting this Vercel connection will stop syncing environment variables to your Vercel project. Existing environment variables will remain unchanged.'
+              : 'Deleting this GitHub connection will stop automatic creation and merging of preview branches. Existing preview branches will remain unchanged.'}
           </p>
         </ConfirmationModal>
       </>
@@ -174,5 +166,3 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
 )
 
 IntegrationConnectionItem.displayName = 'IntegrationConnectionItem'
-
-export { IntegrationConnectionItem }

@@ -1,20 +1,25 @@
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { AnimatePresence, motion } from 'framer-motion'
-import { MessageSquare, X } from 'lucide-react'
+import { MessageSquare } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
-import { Button } from 'ui'
+import { AiIconAnimation, Button } from 'ui'
+
+import { NO_ORG_MARKER, NO_PROJECT_MARKER } from './SupportForm.utils'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface AIAssistantOptionProps {
-  projectRef: string
-  organizationSlug: string
+  projectRef?: string | null
+  organizationSlug?: string | null
+  onClick?: () => void
 }
 
-export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantOptionProps) => {
+export const AIAssistantOption = ({
+  projectRef,
+  organizationSlug,
+  onClick,
+}: AIAssistantOptionProps) => {
+  const track = useTrack()
   const [isVisible, setIsVisible] = useState(false)
-  const { data: projects } = useProjectsQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 800)
@@ -22,63 +27,60 @@ export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantO
   }, [])
 
   const onAiAssistantClicked = useCallback(() => {
-    sendEvent({
-      action: 'ai_assistant_in_support_form_clicked',
-      groups: {
-        project: projectRef === 'no-project' ? undefined : projectRef,
-        organization: organizationSlug,
-      },
+    track('ai_assistant_in_support_form_clicked', undefined, {
+      project: projectRef === null || projectRef === NO_PROJECT_MARKER ? undefined : projectRef,
+      organization:
+        organizationSlug === null || organizationSlug === NO_ORG_MARKER
+          ? undefined
+          : organizationSlug,
     })
-  }, [projectRef, organizationSlug, sendEvent])
 
-  if (!organizationSlug || organizationSlug === 'no-org') {
-    return null
-  }
+    onClick?.()
+  }, [onClick, projectRef, organizationSlug, track])
 
-  const getProjectRef = () => {
-    if (projectRef !== 'no-project') {
-      return projectRef
-    }
-    // If no specific project selected, use first project from the org
-    const orgProjects = projects?.filter((p) => p.organization_slug === organizationSlug)
-    return orgProjects?.[0]?.ref || '_'
-  }
+  // If no specific project selected, use the wildcard route
+  const aiLink = `/project/${projectRef !== NO_PROJECT_MARKER ? projectRef : '_'}?sidebar=ai-assistant&slug=${organizationSlug}`
 
-  const aiLink = `/project/${getProjectRef()}?aiAssistantPanelOpen=true`
+  if (!organizationSlug || organizationSlug === NO_ORG_MARKER) return null
 
   return (
-    <AnimatePresence initial={false}>
+    <AnimatePresence>
       {isVisible && (
-        <motion.div
+        <motion.aside
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: 'auto', opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
-          className="w-full overflow-hidden border rounded-md relative"
+          className="w-full overflow-hidden border rounded-md relative bg-200"
         >
-          <div className="flex flex-col xl:flex-row py-8 px-10">
-            <Button
-              type="text"
-              size="tiny"
-              className="absolute top-3 right-3 hover:bg-background-surface-300 z-[2] px-1"
-              icon={<X size={14} strokeWidth={2} />}
-              onClick={() => setIsVisible(false)}
-            />
-            <div className="flex flex-col gap-3 z-[2] flex-shrink-0">
+          <div className="flex items-center p-6">
+            <div className="flex flex-col gap-3 z-2 shrink-0 w-full">
               <div>
-                <p className="text-sm text-foreground">Try the AI Assistant</p>
+                <h5 className="text-sm font-medium text-foreground">Try Supabase Assistant</h5>
                 <p className="text-sm text-foreground-lighter">
-                  Ask the AI assistant to help you with your support issue
+                  Ask our AI assistant to help you with your support issue.
                 </p>
               </div>
               <div>
-                <Link href={aiLink} onClick={onAiAssistantClicked}>
-                  <Button size="tiny" type="default">
-                    Ask AI assistant
+                {onClick ? (
+                  <Button
+                    size="tiny"
+                    variant="default"
+                    icon={<AiIconAnimation size={14} />}
+                    onClick={onAiAssistantClicked}
+                  >
+                    Ask the Assistant
                   </Button>
-                </Link>
+                ) : (
+                  <Link href={aiLink} onClick={onAiAssistantClicked}>
+                    <Button size="tiny" variant="default" icon={<AiIconAnimation size={14} />}>
+                      Ask the Assistant
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
-            <div className="absolute z-[1] scale-75 -right-24 top-0">
+            {/* Decorative background */}
+            <div className="absolute z-1 scale-75 -right-40 md:-right-24 -top-6 md:top-0">
               <div className="relative grow flex flex-col gap-3 w-[400px]">
                 <div className="flex items-start gap-3 pl-12">
                   <div className="w-8 h-8 rounded-full bg-background-surface-300 flex items-center justify-center">
@@ -99,10 +101,10 @@ export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantO
                   </div>
                 </div>
               </div>
-              <div className="absolute -inset-2 bg-gradient-to-l from-transparent via-background-200 via-[95%] to-background-200 to-[100%] z-[1]" />
+              <div className="absolute -inset-2 bg-linear-to-l from-transparent via-background-200 via-90% to-background-200 to-100% z-1" />
             </div>
           </div>
-        </motion.div>
+        </motion.aside>
       )}
     </AnimatePresence>
   )

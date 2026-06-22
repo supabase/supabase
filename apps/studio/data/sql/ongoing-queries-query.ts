@@ -1,19 +1,14 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { getOngoingQueriesSql } from '@supabase/pg-meta'
+import { useQuery } from '@tanstack/react-query'
+
 import { sqlKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type OngoingQuery = {
   pid: number
   query: string
   query_start: string
-}
-
-export const getOngoingQueriesSql = () => {
-  const sql = /* SQL */ `
-select pid, query, query_start from pg_stat_activity where state = 'active' and datname = 'postgres';
-`.trim()
-
-  return sql
 }
 
 export type OngoingQueriesVariables = {
@@ -25,7 +20,7 @@ export async function getOngoingQueries(
   { projectRef, connectionString }: OngoingQueriesVariables,
   signal?: AbortSignal
 ) {
-  const sql = getOngoingQueriesSql().trim()
+  const sql = getOngoingQueriesSql()
 
   const { result } = await executeSql(
     { projectRef, connectionString, sql, queryKey: ['ongoing-queries'] },
@@ -36,20 +31,18 @@ export async function getOngoingQueries(
 }
 
 export type OngoingQueriesData = Awaited<ReturnType<typeof getOngoingQueries>>
-export type OngoingQueriesError = ExecuteSqlError
+export type OngoingQueriesError = ResponseError
 
 export const useOngoingQueriesQuery = <TData = OngoingQueriesData>(
   { projectRef, connectionString }: OngoingQueriesVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<OngoingQueriesData, OngoingQueriesError, TData> = {}
+  }: UseCustomQueryOptions<OngoingQueriesData, OngoingQueriesError, TData> = {}
 ) =>
-  useQuery<OngoingQueriesData, OngoingQueriesError, TData>(
-    sqlKeys.ongoingQueries(projectRef),
-    ({ signal }) => getOngoingQueries({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<OngoingQueriesData, OngoingQueriesError, TData>({
+    queryKey: sqlKeys.ongoingQueries(projectRef),
+    queryFn: ({ signal }) => getOngoingQueries({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

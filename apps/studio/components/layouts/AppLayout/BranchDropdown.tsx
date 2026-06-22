@@ -1,213 +1,113 @@
-import { AlertCircle, Check, ChevronsUpDown, ListTree, MessageCircle, Shield } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
-
 import { useParams } from 'common'
-import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { Branch, useBranchesQuery } from 'data/branches/branches-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import {
-  Badge,
-  Button,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
-  Command_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  ScrollArea,
-  cn,
-} from 'ui'
-import { sanitizeRoute } from './ProjectDropdown'
+import { useState } from 'react'
+import { ShimmeringLoader } from 'ui-patterns'
 
-const BranchLink = ({
-  branch,
-  isSelected,
-  setOpen,
-}: {
-  branch: Branch
-  isSelected: boolean
-  setOpen: (value: boolean) => void
-}) => {
-  const router = useRouter()
-  const sanitizedRoute = sanitizeRoute(router.route, router.query)
-  const href =
-    sanitizedRoute?.replace('[ref]', branch.project_ref) ?? `/project/${branch.project_ref}`
+import { AppLayoutDropdownError, AppLayoutDropdownWithPopover } from './AppLayoutDropdown'
+import { BranchBadge } from './BranchBadge'
+import { BranchDropdownCommandContent } from './BranchDropdownCommandContent'
+import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
+import { useBranchesQuery } from '@/data/branches/branches-query'
+import type { Branch } from '@/data/branches/branches-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
+import { useAppStateSnapshot } from '@/state/app-state'
 
-  return (
-    <Link passHref href={href}>
-      <CommandItem_Shadcn_
-        value={branch.name.replaceAll('"', '')}
-        className="cursor-pointer w-full flex items-center justify-between"
-        onSelect={() => {
-          setOpen(false)
-          router.push(href)
-        }}
-        onClick={() => {
-          setOpen(false)
-        }}
-      >
-        <p className="truncate w-60 flex items-center gap-1" title={branch.name}>
-          {branch.is_default && <Shield size={14} className="text-amber-900" />}
-          {branch.name}
-        </p>
-        {isSelected && <Check size={14} strokeWidth={1.5} />}
-      </CommandItem_Shadcn_>
-    </Link>
-  )
+interface BranchDropdownProps {
+  embedded?: boolean
+  className?: string
+  onClose?: () => void
 }
 
-const BranchDropdown = () => {
-  const newLayoutPreview = useIsNewLayoutEnabled()
-
-  const router = useRouter()
+export const BranchDropdown = ({
+  embedded = false,
+  className,
+  onClose,
+}: BranchDropdownProps = {}) => {
   const { ref } = useParams()
-  const projectDetails = useSelectedProject()
-
-  const isBranch = projectDetails?.parent_project_ref !== undefined
-  const projectRef =
-    projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
-  const { data: branches, isLoading, isError, isSuccess } = useBranchesQuery({ projectRef })
+  const snap = useAppStateSnapshot()
+  const { data: projectDetails } = useSelectedProjectQuery()
 
   const [open, setOpen] = useState(false)
+  const close = useEmbeddedCloseHandler(embedded, onClose, setOpen)
+  const track = useTrack()
+
+  const handleOpenChange = (next: boolean) => {
+    if (next) track('header_branch_dropdown_opened')
+    setOpen(next)
+  }
+
+  const projectRef = projectDetails?.parent_project_ref || ref
+
+  const {
+    data: branches,
+    isPending: isLoading,
+    isError,
+    isSuccess,
+  } = useBranchesQuery({ projectRef }, { enabled: Boolean(projectDetails) })
+
+  const isBranchingEnabled = projectDetails?.is_branch_enabled === true
   const selectedBranch = branches?.find((branch) => branch.project_ref === ref)
+
+  const defaultMainBranch = {
+    id: 'main',
+    name: 'main',
+    project_ref: projectRef ?? ref ?? '',
+    is_default: true,
+  } as unknown as Branch
 
   const mainBranch = branches?.find((branch) => branch.is_default)
   const restOfBranches = branches
     ?.filter((branch) => !branch.is_default)
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    ?.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
-  const sortedBranches = mainBranch
-    ? [mainBranch].concat(restOfBranches ?? [])
-    : restOfBranches ?? []
+  const sortedBranches =
+    branches && branches.length > 0
+      ? mainBranch
+        ? [mainBranch].concat(restOfBranches ?? [])
+        : (restOfBranches ?? [])
+      : [defaultMainBranch]
+  const branchList = isBranchingEnabled ? (sortedBranches ?? []) : [defaultMainBranch]
 
-  const BRANCHING_GITHUB_DISCUSSION_LINK = 'https://github.com/orgs/supabase/discussions/18937'
+  const commandContent = (
+    <BranchDropdownCommandContent
+      embedded={embedded}
+      className={className}
+      branchList={branchList}
+      selectedBranch={selectedBranch}
+      branchesCount={branches?.length ?? 0}
+      isBranchingEnabled={isBranchingEnabled}
+      projectRef={ref}
+      onClose={close}
+      onCreateBranch={() => snap.setShowCreateBranchModal(true)}
+    />
+  )
+
+  if (isLoading) return <ShimmeringLoader className="p-2 md:w-[90px]" />
+
+  if (isError) return <AppLayoutDropdownError message="Failed to load branches" />
+
+  if (!isSuccess) return null
+
+  if (embedded) return commandContent
 
   return (
-    <>
-      {isLoading && <ShimmeringLoader className="w-[90px]" />}
-
-      {isError && (
-        <div className="flex items-center space-x-2 text-amber-900">
-          <AlertCircle size={16} strokeWidth={2} />
-          <p className="text-sm">Failed to load branches</p>
-        </div>
-      )}
-
-      {isSuccess && branches.length > 0 && (
+    <AppLayoutDropdownWithPopover
+      linkHref={`/project/${ref}`}
+      linkContent={
         <>
-          {newLayoutPreview && (
-            <Link
-              href={`/project/${ref}`}
-              className="flex items-center gap-2 flex-shrink-0 text-sm"
-            >
-              <span className="text-foreground max-w-32 lg:max-w-none truncate">
-                {selectedBranch?.name}
-              </span>
-              {selectedBranch?.is_default ? (
-                <Badge variant="warning">Production</Badge>
-              ) : (
-                <Badge variant="brand">Preview Branch</Badge>
-              )}
-            </Link>
-          )}
-          <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-            <PopoverTrigger_Shadcn_ asChild>
-              {newLayoutPreview ? (
-                <Button
-                  type="text"
-                  className={cn('px-0.25 [&_svg]:w-5 [&_svg]:h-5 ml-1')}
-                  iconRight={<ChevronsUpDown strokeWidth={1.5} />}
-                />
-              ) : (
-                <Button type="text" className="pr-2" iconRight={<ChevronsUpDown />}>
-                  <div className="flex items-center space-x-2">
-                    <p className={'text-xs'}>{selectedBranch?.name}</p>
-                    {selectedBranch?.is_default ? (
-                      <Badge variant="warning">Production</Badge>
-                    ) : (
-                      <Badge variant="brand">Preview Branch</Badge>
-                    )}
-                  </div>
-                </Button>
-              )}
-            </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
-              <Command_Shadcn_>
-                <CommandInput_Shadcn_ placeholder="Find branch..." />
-                <CommandList_Shadcn_>
-                  <CommandEmpty_Shadcn_>No branches found</CommandEmpty_Shadcn_>
-                  <CommandGroup_Shadcn_>
-                    <ScrollArea className="max-h-[210px] overflow-y-auto">
-                      {sortedBranches?.map((branch) => (
-                        <BranchLink
-                          key={branch.id}
-                          branch={branch}
-                          isSelected={branch.id === selectedBranch?.id}
-                          setOpen={setOpen}
-                        />
-                      ))}
-                    </ScrollArea>
-                  </CommandGroup_Shadcn_>
-                  <CommandSeparator_Shadcn_ />
-                  <CommandGroup_Shadcn_>
-                    <CommandItem_Shadcn_
-                      className="cursor-pointer w-full"
-                      onSelect={(e) => {
-                        setOpen(false)
-                        router.push(`/project/${ref}/branches`)
-                      }}
-                      onClick={() => setOpen(false)}
-                    >
-                      <Link
-                        href={`/project/${ref}/branches`}
-                        className="w-full flex items-center gap-2"
-                      >
-                        <ListTree size={14} strokeWidth={1.5} />
-                        <p>Manage branches</p>
-                      </Link>
-                    </CommandItem_Shadcn_>
-                  </CommandGroup_Shadcn_>
-                  <CommandSeparator_Shadcn_ />
-                  <CommandGroup_Shadcn_>
-                    <CommandItem_Shadcn_
-                      className="cursor-pointer w-full"
-                      onSelect={() => {
-                        setOpen(false)
-                        window?.open(BRANCHING_GITHUB_DISCUSSION_LINK, '_blank')?.focus()
-                      }}
-                      onClick={() => setOpen(false)}
-                    >
-                      <Link
-                        href={BRANCHING_GITHUB_DISCUSSION_LINK}
-                        target="_blank"
-                        onClick={() => {
-                          setOpen(false)
-                        }}
-                        className="w-full flex gap-2"
-                      >
-                        <MessageCircle size={14} strokeWidth={1} className="text-muted mt-0.5" />
-                        <div>
-                          <p>Branching feedback</p>
-                          <p className="text-lighter">Join Github Discussion</p>
-                        </div>
-                      </Link>
-                    </CommandItem_Shadcn_>
-                  </CommandGroup_Shadcn_>
-                </CommandList_Shadcn_>
-              </Command_Shadcn_>
-            </PopoverContent_Shadcn_>
-          </Popover_Shadcn_>
+          <span
+            title={isBranchingEnabled ? selectedBranch?.name : 'main'}
+            className="text-sm text-foreground max-w-32 lg:max-w-64 truncate"
+          >
+            {isBranchingEnabled ? selectedBranch?.name : 'main'}
+          </span>
+          <BranchBadge branch={selectedBranch} isBranchingEnabled={isBranchingEnabled} />
         </>
-      )}
-    </>
+      }
+      linkClassName="flex items-center gap-2 shrink-0"
+      commandContent={commandContent}
+      open={open}
+      onOpenChange={handleOpenChange}
+    />
   )
 }
-
-export default BranchDropdown

@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
 import { docsKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type ProjectJsonSchemaVariables = {
   projectRef?: string
@@ -93,13 +93,11 @@ export const useProjectJsonSchemaQuery = <TData = ProjectJsonSchemaData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectJsonSchemaData, ProjectJsonSchemaError, TData> = {}
+  }: UseCustomQueryOptions<ProjectJsonSchemaData, ProjectJsonSchemaError, TData> = {}
 ) =>
-  useQuery<ProjectJsonSchemaData, ProjectJsonSchemaError, TData>(
-    docsKeys.jsonSchema(projectRef),
-    ({ signal }) => getProjectJsonSchema({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ProjectJsonSchemaData, ProjectJsonSchemaError, TData>({
+    queryKey: docsKeys.jsonSchema(projectRef),
+    queryFn: ({ signal }) => getProjectJsonSchema({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

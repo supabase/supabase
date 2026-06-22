@@ -1,22 +1,19 @@
-import { ArrowLeft } from 'lucide-react'
 import Head from 'next/head'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect } from 'react'
+import type { PropsWithChildren } from 'react'
+import { useEffect, useLayoutEffect, useMemo } from 'react'
+import { cn } from 'ui'
 
-import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { withAuth } from 'hooks/misc/withAuth'
-import { IS_PLATFORM } from 'lib/constants'
-import { LOCAL_STORAGE_KEYS } from 'common'
-import { useAppStateSnapshot } from 'state/app-state'
-import { cn, NavMenu, NavMenuItem } from 'ui'
-import {
-  MAX_WIDTH_CLASSES,
-  PADDING_CLASSES,
-  ScaffoldContainerLegacy,
-  ScaffoldTitle,
-} from '../Scaffold'
+import { useMobileSheet } from '../Navigation/NavigationBar/MobileSheetContext'
+import { AccountMenuContent } from './AccountMenuContent'
+import { WithSidebar } from './WithSidebar'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
+import { withAuth } from '@/hooks/misc/withAuth'
+import { IS_PLATFORM } from '@/lib/constants'
+import { buildStudioPageTitle } from '@/lib/page-title'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 export interface AccountLayoutProps {
   title: string
@@ -25,78 +22,118 @@ export interface AccountLayoutProps {
 const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps>) => {
   const router = useRouter()
   const appSnap = useAppStateSnapshot()
-  const newLayoutPreview = useIsNewLayoutEnabled()
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
+  const { setContent: setMobileSheetContent, registerOpenMenu } = useMobileSheet()
+  const currentPath = router.pathname
 
-  const [lastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
+  const showSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
+
+  const { appTitle } = useCustomContent(['app:title'])
+  const brandTitle = appTitle || 'Supabase'
+  const surfaceLabel = IS_PLATFORM ? 'Account' : 'Preferences'
 
   const backToDashboardURL =
     appSnap.lastRouteBeforeVisitingAccountPage.length > 0
       ? appSnap.lastRouteBeforeVisitingAccountPage
-      : !!lastVisitedOrganization
+      : IS_PLATFORM && !!lastVisitedOrganization
         ? `/org/${lastVisitedOrganization}`
-        : '/organizations'
+        : IS_PLATFORM
+          ? '/organizations'
+          : '/project/default'
 
-  const accountLinks = [
-    {
-      label: 'Account Settings',
-      href: `/account/me`,
-      keys: [`/account/me`, `/account/tokens`, `/account/security`],
-    },
-    {
-      label: 'Audit Logs',
-      href: `/account/audit`,
-      key: `/account/audit`,
-    },
-  ]
+  const pageTitle = buildStudioPageTitle({
+    section: title,
+    surface: surfaceLabel,
+    brand: brandTitle,
+  })
 
-  const currentPath = router.pathname
+  const sections = useMemo(
+    () =>
+      !IS_PLATFORM
+        ? [
+            {
+              key: 'preferences',
+              links: [
+                {
+                  key: 'preferences',
+                  label: 'Preferences',
+                  href: '/account/me',
+                  isActive: currentPath === '/account/me',
+                },
+              ],
+            },
+          ]
+        : [
+            {
+              key: 'account-settings',
+              heading: 'Account Settings',
+              links: [
+                {
+                  key: 'preferences',
+                  label: 'Preferences',
+                  href: '/account/me',
+                  isActive: currentPath === '/account/me',
+                },
+                {
+                  key: 'access-tokens',
+                  label: 'Access Tokens',
+                  href: '/account/tokens',
+                  isActive:
+                    currentPath === '/account/tokens' || currentPath === '/account/tokens/scoped',
+                },
+                ...(showSecuritySettings
+                  ? [
+                      {
+                        key: 'security',
+                        label: 'Security',
+                        href: '/account/security',
+                        isActive: currentPath === '/account/security',
+                      },
+                    ]
+                  : []),
+              ],
+            },
+            {
+              key: 'logs',
+              heading: 'Logs',
+              links: [
+                {
+                  key: 'audit-logs',
+                  label: 'Audit Logs',
+                  href: '/account/audit',
+                  isActive: currentPath === '/account/audit',
+                },
+              ],
+            },
+          ],
+    [currentPath, showSecuritySettings]
+  )
+
+  useLayoutEffect(() => {
+    const unregister = registerOpenMenu(() => {
+      setMobileSheetContent(
+        <AccountMenuContent sections={sections} onCloseSheet={() => setMobileSheetContent(null)} />
+      )
+    })
+    return unregister
+  }, [registerOpenMenu, setMobileSheetContent, sections])
 
   useEffect(() => {
-    if (!IS_PLATFORM) {
+    if (!IS_PLATFORM && currentPath !== '/account/me') {
       router.push('/project/default')
     }
-  }, [router])
+  }, [currentPath, router])
 
   return (
     <>
       <Head>
-        <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
+        <title>{pageTitle}</title>
         <meta name="description" content="Supabase Studio" />
       </Head>
-      <div className={cn(newLayoutPreview ? 'flex flex-col h-screen w-screen' : '')}>
-        {newLayoutPreview && (
-          <>
-            <ScaffoldContainerLegacy>
-              <Link
-                href={backToDashboardURL}
-                className="flex text-xs flex-row gap-2 items-center text-foreground-lighter focus-visible:text-foreground hover:text-foreground"
-              >
-                <ArrowLeft strokeWidth={1.5} size={14} />
-                Back to dashboard
-              </Link>
-              <ScaffoldTitle>Account settings</ScaffoldTitle>
-            </ScaffoldContainerLegacy>
-            <div className="border-b">
-              <NavMenu
-                className={cn(PADDING_CLASSES, MAX_WIDTH_CLASSES, 'border-none')}
-                aria-label="Organization menu navigation"
-              >
-                {accountLinks.map((item, i) => (
-                  <NavMenuItem
-                    key={`${item.key}-${i}`}
-                    active={(item.key === currentPath || item.keys?.includes(currentPath)) ?? false}
-                  >
-                    <Link href={item.href}>{item.label}</Link>
-                  </NavMenuItem>
-                ))}
-              </NavMenu>
-            </div>
-          </>
-        )}
-        {children}
+      <div className={cn('flex flex-col w-screen h-[calc(100vh-48px)]')}>
+        <WithSidebar backToDashboardURL={backToDashboardURL} sections={sections}>
+          {children}
+        </WithSidebar>
       </div>
     </>
   )

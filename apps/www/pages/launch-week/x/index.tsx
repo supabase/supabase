@@ -91,7 +91,7 @@ export default function LaunchWeekIndex({ meetups }: Props) {
         openGraph={{
           title: TITLE,
           description: DESCRIPTION,
-          url: LW_URL,
+          url: `${LW_URL}/x`,
           images: [
             {
               url: OG_IMAGE,
@@ -117,7 +117,7 @@ export default function LaunchWeekIndex({ meetups }: Props) {
           <LWXHeader />
           <MainStage />
           <BuildStage />
-          <SectionContainer id="meetups" className="-scroll-mt-[66px]">
+          <SectionContainer id="meetups" className="scroll-mt-[-66px]">
             <LWXMeetups meetups={meetups} />
           </SectionContainer>
           <SectionContainer className="lg:pb-40">

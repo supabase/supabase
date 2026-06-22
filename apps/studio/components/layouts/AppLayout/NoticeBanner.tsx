@@ -1,58 +1,87 @@
-import { ExternalLink } from 'lucide-react'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
+import { TimestampInfo } from 'ui-patterns'
 
-import { useAppBannerContext } from 'components/interfaces/App/AppBannerWrapperContext'
-import { useProfile } from 'lib/profile'
-import { Button } from 'ui'
+import { HeaderBanner } from '@/components/interfaces/Organization/HeaderBanner'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
-// This file, like AppBannerWrapperContext.tsx, is meant to be dynamic - update this as and when we need to use the NoticeBanner
+// Update this whenever the banner content below changes so old client bundles
+// stop displaying outdated notices after the relevant date passes.
+const BANNER_EXPIRES_AT = new Date('2026-06-09T15:00:00Z')
 
-// [Alaister] As of 11th February 2025, this notice is around Fly's Postgres offering
-// https://github.com/orgs/supabase/discussions/33413
-// Timelines TLDR:
-// - Before April 11 2025: Users will still be able to access your existing Fly Postgres projects.
-// - On April 11 2025: Your Fly Postgres projects are removed from our platform
-// We can disable this banner after 14th March 2025 as the Fly Postgres offering is no longer available
+const SUPAVISOR_UPDATE_REGIONS = {
+  'eu-central-1': {
+    start: Date.UTC(2026, 4, 26, 13, 0, 0),
+    end: Date.UTC(2026, 4, 26, 15, 0, 0),
+    url: 'https://status.supabase.com/incidents/jy1tm4wfs68t',
+  },
+  'eu-west-2': {
+    start: Date.UTC(2026, 5, 9, 13, 0, 0),
+    end: Date.UTC(2026, 5, 9, 15, 0, 0),
+    url: 'https://status.supabase.com/incidents/3t293hpd545z',
+  },
+  'us-west-1': {
+    start: Date.UTC(2026, 5, 2, 16, 0, 0),
+    end: Date.UTC(2026, 5, 2, 18, 0, 0),
+    url: 'https://status.supabase.com/incidents/8f72bnv3xs8r',
+  },
+  'us-east-1': {
+    start: Date.UTC(2026, 5, 3, 13, 0, 0),
+    end: Date.UTC(2026, 5, 3, 15, 0, 0),
+    url: 'https://status.supabase.com/incidents/y8rp6dwjyplw',
+  },
+}
 
+/**
+ * Used to display urgent notices that apply for all users, such as maintenance windows.
+ */
 export const NoticeBanner = () => {
   const router = useRouter()
-  const { isLoading: isLoadingProfile, profile } = useProfile()
+  const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
 
-  const appBannerContext = useAppBannerContext()
-  const { flyPostgresBannerAcknowledged, onUpdateAcknowledged } = appBannerContext
+  const [bannerAcknowledged, setBannerAcknowledged, { isSuccess }] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SUPAVISOR_MAINTENANCE(ref ?? ''),
+    false
+  )
 
-  const isFlyUser = Boolean(profile?.primary_email?.endsWith('customer.fly.io'))
-  const acknowledged = flyPostgresBannerAcknowledged
+  const region = project?.region ?? ''
+  const maintenanceWindow =
+    SUPAVISOR_UPDATE_REGIONS[region as keyof typeof SUPAVISOR_UPDATE_REGIONS]
 
-  if (isLoadingProfile || !isFlyUser || router.pathname.includes('sign-in') || acknowledged) {
+  if (
+    Date.now() >= BANNER_EXPIRES_AT.getTime() ||
+    router.pathname.includes('sign-in') ||
+    !isSuccess ||
+    !project ||
+    !maintenanceWindow ||
+    bannerAcknowledged
+  ) {
     return null
   }
 
   return (
-    <div className="flex items-center justify-center gap-x-4 bg py-0.5 border transition text-foreground border-default">
-      <p className="text-sm">
-        Supabase is deprecating Fly's Postgres offering managed by Supabase on April 11, 2025
-      </p>
-      <div className="flex items-center gap-x-1">
-        <Button asChild type="link" iconRight={<ExternalLink size={14} />}>
-          <a
-            target="_blank"
-            rel="noreferrer"
-            href="https://github.com/orgs/supabase/discussions/33413"
-          >
-            Learn more
-          </a>
-        </Button>
-        <Button
-          type="text"
-          className="opacity-75"
-          onClick={() => {
-            onUpdateAcknowledged('fly-postgres')
-          }}
-        >
-          Dismiss
-        </Button>
-      </div>
-    </div>
+    <HeaderBanner
+      variant="note"
+      title="Upcoming maintenance"
+      description={
+        <>
+          Shared pooler maintenance in{' '}
+          <a target="_blank" rel="noopener referrer" href={maintenanceWindow.url}>
+            {project.region}
+          </a>{' '}
+          on{' '}
+          <TimestampInfo
+            className="text-sm"
+            utcTimestamp={maintenanceWindow.start}
+            label={dayjs(maintenanceWindow.start).format('DD MMM, HH:mm')}
+          />
+          .
+        </>
+      }
+      onDismiss={() => setBannerAcknowledged(true)}
+    />
   )
 }

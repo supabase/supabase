@@ -1,21 +1,21 @@
 import { useParams } from 'common'
+import { AlertTriangle, Info } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button } from 'ui'
 
-import OrganizationPicker from 'components/interfaces/Integrations/Vercel/OrganizationPicker'
-import { Markdown } from 'components/interfaces/Markdown'
-import { getHasInstalledObject } from 'components/layouts/IntegrationsLayout/Integrations.utils'
-import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
-import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
-import { useIntegrationsQuery } from 'data/integrations/integrations-query'
-import { useVercelIntegrationCreateMutation } from 'data/integrations/vercel-integration-create-mutation'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
-import type { NextPageWithLayout, Organization } from 'types'
-import { AlertTriangle, Info } from 'lucide-react'
+import OrganizationPicker from '@/components/interfaces/Integrations/Vercel/OrganizationPicker'
+import { Markdown } from '@/components/interfaces/Markdown'
+import { getHasInstalledObject } from '@/components/layouts/IntegrationsLayout/Integrations.utils'
+import VercelIntegrationWindowLayout from '@/components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
+import { ScaffoldColumn, ScaffoldContainer } from '@/components/layouts/Scaffold'
+import { useIntegrationsQuery } from '@/data/integrations/integrations-query'
+import { useVercelIntegrationCreateMutation } from '@/data/integrations/vercel-integration-create-mutation'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useIntegrationInstallationSnapshot } from '@/state/integration-installation'
+import type { NextPageWithLayout, Organization } from '@/types'
 
 /**
  * Variations of the Vercel integration flow.
@@ -29,7 +29,7 @@ export type VercelIntegrationFlow = 'deploy-button' | 'marketing'
 
 const VercelIntegration: NextPageWithLayout = () => {
   const router = useRouter()
-  const { code, configurationId, teamId, source, externalId } = useParams()
+  const { code, configurationId, teamId, source } = useParams()
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
 
   const snapshot = useIntegrationInstallationSnapshot()
@@ -43,7 +43,7 @@ const VercelIntegration: NextPageWithLayout = () => {
 
   const {
     data: organizationsData,
-    isLoading: isLoadingOrganizationsQuery,
+    isPending: isLoadingOrganizationsQuery,
     isSuccess: isOrganizationsDataSuccess,
   } = useOrganizationsQuery()
 
@@ -111,7 +111,7 @@ const VercelIntegration: NextPageWithLayout = () => {
     }
   }
 
-  const { mutate, isLoading: isLoadingVercelIntegrationCreateMutation } =
+  const { mutate, isPending: isLoadingVercelIntegrationCreateMutation } =
     useVercelIntegrationCreateMutation({
       onMutate() {
         snapshot.setLoading(true)
@@ -189,7 +189,7 @@ const VercelIntegration: NextPageWithLayout = () => {
     <>
       <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
         <ScaffoldColumn className="mx-auto w-full max-w-md">
-          <h1 className="text-xl text-foreground">Choose organization</h1>
+          <h2>Choose organization</h2>
           <>
             <Markdown content={`Choose the Supabase organization you wish to install in`} />
             <OrganizationPicker
@@ -203,29 +203,27 @@ const VercelIntegration: NextPageWithLayout = () => {
               configurationId={configurationId}
             />
             {alreadyInstalled && (
-              <Alert_Shadcn_ variant="warning">
+              <Alert variant="warning">
                 <AlertTriangle className="h-4 w-4" strokeWidth={2} />
-                <AlertTitle_Shadcn_>Vercel Integration is already installed.</AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
+                <AlertTitle>Vercel Integration is already installed.</AlertTitle>
+                <AlertDescription>
                   You will need to choose another organization to install the integration.
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                </AlertDescription>
+              </Alert>
             )}
             {noOrganizations && (
-              <Alert_Shadcn_ variant="warning">
+              <Alert variant="warning">
                 <AlertTriangle className="h-4 w-4" strokeWidth={2} />
-                <AlertTitle_Shadcn_>
-                  No Supabase Organizations to install Integration.
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_ className="prose">
+                <AlertTitle>No Supabase Organizations to install Integration.</AlertTitle>
+                <AlertDescription className="prose">
                   You will need to create a Supabase Organization before you can install the Vercel
                   Integration. You can create a new organization{' '}
                   <Link href="https://supabase.com/dashboard/new" target="_blank">
                     here
                   </Link>
                   .
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                </AlertDescription>
+              </Alert>
             )}
             <div className="flex flex-row w-full justify-end">
               <Button
@@ -242,13 +240,13 @@ const VercelIntegration: NextPageWithLayout = () => {
         </ScaffoldColumn>
       </ScaffoldContainer>
       <ScaffoldContainer className="flex flex-col gap-6 py-3">
-        <Alert_Shadcn_ variant="default">
+        <Alert variant="default">
           <Info className="h-4 w-4" strokeWidth={2} />
-          <AlertTitle_Shadcn_>You can uninstall this Integration at any time.</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
+          <AlertTitle>You can uninstall this Integration at any time.</AlertTitle>
+          <AlertDescription>
             Remove this integration at any time from Vercel or the Supabase dashboard.
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+          </AlertDescription>
+        </Alert>
       </ScaffoldContainer>
     </>
   )

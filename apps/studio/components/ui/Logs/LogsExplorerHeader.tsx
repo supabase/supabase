@@ -1,13 +1,30 @@
-import { BookOpen, Check, Clipboard, ExternalLink, List, X } from 'lucide-react'
+import { BookOpen, Check, ChevronsUpDown, Copy, ExternalLink, List, X } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-
-import { LOGS_EXPLORER_DOCS_URL } from 'components/interfaces/Settings/Logs/Logs.constants'
-import Table from 'components/to-be-cleaned/Table'
-import { copyToClipboard } from 'lib/helpers'
 import { logConstants } from 'shared-data'
-import { Button, SidePanel, Tabs, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Button,
+  cn,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  copyToClipboard,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  SidePanel,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
+
 import { DocsButton } from '../DocsButton'
+import { LOGS_EXPLORER_DOCS_URL } from '@/components/interfaces/Settings/Logs/Logs.constants'
+import Table from '@/components/to-be-cleaned/Table'
+import { DOCS_URL } from '@/lib/constants'
 
 export interface LogsExplorerHeaderProps {
   subtitle?: string
@@ -15,20 +32,18 @@ export interface LogsExplorerHeaderProps {
 
 const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
   const [showReference, setShowReference] = useState(false)
+  const [open, setOpen] = useState(false)
+  const [selectedSchema, setSelectedSchema] = useState(logConstants.schemas[0])
 
   return (
     <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 transition-all pb-6 justify-between">
       <div className="flex flex-col md:flex-row md:items-center gap-3">
         <div className="flex flex-row items-center gap-3">
-          <div
-            className="flex h-6 w-6 items-center justify-center rounded border
-              border-brand-600 bg-brand-300 text-brand
-            "
-          >
+          <div className="flex h-6 w-6 items-center justify-center rounded-sm border border-brand-600 bg-brand-300 text-brand">
             <List size={14} strokeWidth={3} />
           </div>
 
-          <h1 className="text-2xl text-foreground">Logs Explorer</h1>
+          <h1>Logs Explorer</h1>
         </div>
         {subtitle && <span className="text-2xl text-foreground-light">{subtitle}</span>}
       </div>
@@ -41,7 +56,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
             <div className="flex flex-row justify-between items-center">
               <h3>Field Reference</h3>
               <Button
-                type="text"
+                variant="text"
                 className="px-1"
                 onClick={() => setShowReference(false)}
                 icon={<X size={18} strokeWidth={1.5} />}
@@ -54,11 +69,11 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
           hideFooter
           triggerElement={
             <Button
-              type="default"
+              variant="default"
               onClick={() => setShowReference(true)}
               icon={<BookOpen strokeWidth={1.5} />}
             >
-              Field Reference
+              <span>Field Reference</span>
             </Button>
           }
         >
@@ -69,7 +84,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
                 respective source. Do note that to access nested keys, you would need to perform the
                 necessary{' '}
                 <Link
-                  href="https://supabase.com/docs/guides/platform/logs#unnesting-arrays"
+                  href={`${DOCS_URL}/guides/platform/logs#unnesting-arrays`}
                   target="_blank"
                   rel="noreferrer"
                   className="text-brand"
@@ -77,7 +92,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
                   unnesting joins
                   <ExternalLink
                     size={14}
-                    className="ml-1 inline -translate-y-[2px]"
+                    className="ml-1 inline translate-y-[-2px]"
                     strokeWidth={1.5}
                   />
                 </Link>
@@ -85,38 +100,63 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
             </div>
           </SidePanel.Content>
           <SidePanel.Separator />
-          <Tabs
-            scrollable
-            size="small"
-            type="underlined"
-            defaultActiveId="edge_logs"
-            listClassNames="px-2"
-          >
-            {logConstants.schemas.map((schema) => (
-              <Tabs.Panel
-                key={schema.reference}
-                id={schema.reference}
-                label={schema.name}
-                className="px-4 pb-4"
-              >
-                <Table
-                  head={[
-                    <Table.th className="text-xs !p-2" key="path">
-                      Path
-                    </Table.th>,
-                    <Table.th key="type" className="text-xs !p-2">
-                      Type
-                    </Table.th>,
-                  ]}
-                  body={schema.fields
-                    .sort((a: any, b: any) => a.path - b.path)
-                    .map((field) => (
-                      <Field key={field.path} field={field} />
-                    ))}
-                />
-              </Tabs.Panel>
-            ))}
-          </Tabs>
+          <div className="px-4 pb-4 flex flex-col gap-4">
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="default"
+                  role="combobox"
+                  size={'small'}
+                  aria-expanded={open}
+                  className="w-full justify-between"
+                  iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+                >
+                  {selectedSchema?.name ?? 'Select source...'}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="p-0" sameWidthAsTrigger>
+                <Command>
+                  <CommandInput placeholder="Search source..." />
+                  <CommandList>
+                    <CommandEmpty>No source found.</CommandEmpty>
+                    <CommandGroup>
+                      {logConstants.schemas.map((schema) => (
+                        <CommandItem
+                          key={schema.reference}
+                          value={schema.reference}
+                          onSelect={() => {
+                            setSelectedSchema(schema)
+                            setOpen(false)
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              'mr-2 h-4 w-4',
+                              selectedSchema === schema ? 'opacity-100' : 'opacity-0'
+                            )}
+                          />
+                          {schema.name}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+            <Table
+              head={[
+                <Table.th className="text-xs p-2!" key="path">
+                  Path
+                </Table.th>,
+                <Table.th key="type" className="text-xs p-2!">
+                  Type
+                </Table.th>,
+              ]}
+              body={selectedSchema.fields.map((field) => (
+                <Field key={field.path} field={field} />
+              ))}
+            />
+          </div>
         </SidePanel>
       </div>
     </div>
@@ -138,7 +178,7 @@ const Field = ({
   return (
     <Table.tr>
       <Table.td
-        className="font-mono text-xs !p-2 cursor-pointer hover:text-foreground transition flex items-center space-x-2"
+        className="font-mono text-xs p-2! cursor-pointer hover:text-foreground transition flex items-center space-x-2"
         onClick={() =>
           copyToClipboard(field.path, () => {
             setIsCopied(true)
@@ -159,7 +199,7 @@ const Field = ({
         ) : (
           <Tooltip>
             <TooltipTrigger>
-              <Clipboard size={14} strokeWidth={1.5} />
+              <Copy size={14} />
             </TooltipTrigger>
             <TooltipContent side="bottom" className="font-sans">
               Copy value
@@ -167,7 +207,7 @@ const Field = ({
           </Tooltip>
         )}
       </Table.td>
-      <Table.td className="font-mono text-xs !p-2">{field.type}</Table.td>
+      <Table.td className="font-mono text-xs p-2!">{field.type}</Table.td>
     </Table.tr>
   )
 }

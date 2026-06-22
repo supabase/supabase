@@ -1,36 +1,10 @@
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { useIsSQLEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
-import { MoveQueryModal } from 'components/interfaces/SQLEditor/MoveQueryModal'
-import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
-import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
-import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import { EmptyPrivateQueriesPanel } from 'components/layouts/SQLEditorLayout/PrivateSqlSnippetEmpty'
-import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorMenuListSkeleton'
-import { sqlEditorTabsCleanup } from 'components/layouts/Tabs/Tabs.utils'
-import { useContentCountQuery } from 'data/content/content-count-query'
-import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
-import { getContentById } from 'data/content/content-id-query'
-import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
-import { useSQLSnippetFoldersDeleteMutation } from 'data/content/sql-folders-delete-mutation'
-import { Snippet, SnippetFolder, useSQLSnippetFoldersQuery } from 'data/content/sql-folders-query'
-import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
-import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useProfile } from 'lib/profile'
-import uuidv4 from 'lib/uuid'
-import { Eye, EyeOffIcon, Heart, Unlock } from 'lucide-react'
+import { keepPreviousData } from '@tanstack/react-query'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { Heart } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import {
-  SnippetWithContent,
-  useSnippetFolders,
-  useSqlEditorV2StateSnapshot,
-} from 'state/sql-editor-v2'
-import { createTabId, getTabsStore, makeTabPermanent, removeTabs, useTabsStore } from 'state/tabs'
-import { SqlSnippets } from 'types'
-import { Separator, TreeView } from 'ui'
+import { TreeView } from 'ui'
 import {
   InnerSideBarEmptyPanel,
   InnerSideMenuCollapsible,
@@ -39,28 +13,46 @@ import {
   InnerSideMenuSeparator,
 } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import SQLEditorLoadingSnippets from './SQLEditorLoadingSnippets'
+
+import { DeleteSnippetsModal } from './DeleteSnippetsModal'
+import { ReferenceSnippetsSection } from './ReferenceSnippetsSection'
+import { ShareSnippetModal } from './ShareSnippetModal'
+import { SQLEditorLoadingSnippets } from './SQLEditorLoadingSnippets'
+import { DEFAULT_SECTION_STATE, type SectionState } from './SQLEditorNav.constants'
 import { formatFolderResponseForTreeView, getLastItemIds, ROOT_NODE } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
+import { UnshareSnippetModal } from './UnshareSnippetModal'
+import { DownloadSnippetModal } from '@/components/interfaces/SQLEditor/DownloadSnippetModal'
+import { MoveQueryModal } from '@/components/interfaces/SQLEditor/MoveQueryModal'
+import { RenameQueryModal } from '@/components/interfaces/SQLEditor/RenameQueryModal'
+import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
+import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
+import { EmptyPrivateQueriesPanel } from '@/components/layouts/SQLEditorLayout/PrivateSqlSnippetEmpty'
+import { EditorMenuListSkeleton } from '@/components/layouts/TableEditorLayout/EditorMenuListSkeleton'
+import { useSqlEditorTabsCleanup } from '@/components/layouts/Tabs/Tabs.utils'
+import { useContentCountQuery } from '@/data/content/content-count-query'
+import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
+import { useSQLSnippetFoldersDeleteMutation } from '@/data/content/sql-folders-delete-mutation'
+import { Snippet, SnippetFolder, useSQLSnippetFoldersQuery } from '@/data/content/sql-folders-query'
+import { useSqlSnippetsQuery, type SqlSnippet } from '@/data/content/sql-snippets-query'
+import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProfile } from '@/lib/profile'
+import { useSnippetFolders, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 interface SQLEditorNavProps {
   sort?: 'inserted_at' | 'name'
 }
-
-type SectionState = { shared: boolean; favorite: boolean; private: boolean }
-const DEFAULT_SECTION_STATE: SectionState = { shared: false, favorite: false, private: true }
 
 export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   const router = useRouter()
   const { ref: projectRef, id } = useParams()
 
   const { profile } = useProfile()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
+  const tabs = useTabsStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
-
-  const tabStore = getTabsStore(projectRef)
-  const tabs = useTabsStore(projectRef)
-  const isSQLEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
   const [sectionVisibility, setSectionVisibility] = useLocalStorage<SectionState>(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_SECTION_STATE(projectRef ?? ''),
@@ -93,12 +85,13 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     data: privateSnippetsPages,
     isSuccess,
     isLoading,
-    isPreviousData,
+    isPlaceholderData,
     isFetching,
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-  } = useSQLSnippetFoldersQuery({ projectRef, sort }, { keepPreviousData: true })
+    error: snippetsFoldersError,
+  } = useSQLSnippetFoldersQuery({ projectRef, sort }, { placeholderData: keepPreviousData })
 
   const [subResults, setSubResults] = useState<{
     [id: string]: { snippets?: Snippet[]; isLoading: boolean }
@@ -130,7 +123,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
       },
       {
         snippets: rootSnippets,
-        isLoading: isLoading || (isPreviousData && isFetching),
+        isLoading: isLoading || (isPlaceholderData && isFetching),
         snippetIds: new Set<string>(rootSnippets.map((snippet) => snippet.id)),
       }
     )
@@ -141,7 +134,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     }
 
     return snippetInfo
-  }, [privateSnippetsPages?.pages, subResults, isLoading, isPreviousData, isFetching, snippet])
+  }, [privateSnippetsPages?.pages, subResults, isLoading, isPlaceholderData, isFetching, snippet])
 
   const privateSnippets = useMemo(
     () =>
@@ -153,12 +146,21 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
         }) ?? [],
     [filteredSnippets.snippets, sort]
   )
-  const folders = useSnippetFolders(projectRef as string)
+  const folders = useSnippetFolders(projectRef!)
 
-  const { data: snippetCountData } = useContentCountQuery({
+  const { data: snippetCountData, error: snippetCountError } = useContentCountQuery({
     projectRef,
     type: 'sql',
   })
+
+  useEffect(() => {
+    if (snippetCountError || snippetsFoldersError) {
+      toast.error(
+        snippetCountError?.message || snippetsFoldersError?.message || 'Failed to load snippets'
+      )
+    }
+  }, [snippetCountError, snippetsFoldersError])
+
   const numPrivateSnippets = snippetCountData?.private ?? 0
 
   const privateSnippetsTreeState = useMemo(
@@ -167,6 +169,11 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
         ? [ROOT_NODE]
         : formatFolderResponseForTreeView({ folders, contents: privateSnippets }),
     [folders, privateSnippets]
+  )
+
+  const privateSnippetsTreeNodeIds = useMemo(
+    () => new Set(privateSnippetsTreeState.map((node) => node.id.toString())),
+    [privateSnippetsTreeState]
   )
 
   const privateSnippetsLastItemIds = useMemo(
@@ -179,7 +186,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   // =================
   const {
     data: favoriteSqlSnippetsData,
-    isLoading: isLoadingFavoriteSqlSnippets,
+    isPending: isLoadingFavoriteSqlSnippets,
     hasNextPage: hasMoreFavoriteSqlSnippets,
     fetchNextPage: fetchNextFavoriteSqlSnippets,
     isFetchingNextPage: isFetchingMoreFavoriteSqlSnippets,
@@ -190,14 +197,14 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
       favorite: true,
       sort,
     },
-    { enabled: showFavoriteSnippets, keepPreviousData: true }
+    { enabled: showFavoriteSnippets, placeholderData: keepPreviousData }
   )
 
   const favoriteSnippets = useMemo(() => {
     let snippets = favoriteSqlSnippetsData?.pages.flatMap((page) => page.contents ?? []) ?? []
 
     if (snippet && snippet.favorite && !snippets.find((x) => x.id === snippet.id)) {
-      snippets.push(snippet as any)
+      snippets.push(snippet as SqlSnippet)
     }
 
     return (
@@ -216,7 +223,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     () =>
       favoriteSnippets.length === 0
         ? [ROOT_NODE]
-        : formatFolderResponseForTreeView({ contents: favoriteSnippets }),
+        : formatFolderResponseForTreeView({ contents: favoriteSnippets, folders: [] }),
     [favoriteSnippets]
   )
 
@@ -241,14 +248,14 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
       visibility: 'project',
       sort,
     },
-    { enabled: showSharedSnippets, keepPreviousData: true }
+    { enabled: showSharedSnippets, placeholderData: keepPreviousData }
   )
 
   const sharedSnippets = useMemo(() => {
     let snippets = sharedSqlSnippetsData?.pages.flatMap((page) => page.contents ?? []) ?? []
 
     if (snippet && snippet.visibility === 'project' && !snippets.find((x) => x.id === snippet.id)) {
-      snippets.push(snippet as any)
+      snippets.push(snippet as SqlSnippet)
     }
 
     return (
@@ -265,7 +272,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     () =>
       sharedSnippets.length === 0
         ? [ROOT_NODE]
-        : formatFolderResponseForTreeView({ contents: sharedSnippets }),
+        : formatFolderResponseForTreeView({ contents: sharedSnippets, folders: [] }),
     [sharedSnippets]
   )
 
@@ -274,29 +281,24 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     [projectSnippetsTreeState]
   )
 
-  const allSnippetsInView = [
-    ...(privateSnippetsPages?.pages.flatMap((x) => x.contents) ?? []),
-    ...(sharedSqlSnippetsData?.pages.flatMap((x) => x.contents) ?? []),
-  ]
+  const allSnippetsInView = useMemo(
+    () => [
+      ...(privateSnippetsPages?.pages.flatMap((x) => x.contents) ?? []),
+      ...(sharedSqlSnippetsData?.pages.flatMap((x) => x.contents) ?? []),
+    ],
+    [privateSnippetsPages, sharedSqlSnippetsData]
+  )
 
   // ==========================
   // Snippet mutations from  RQ
   // ==========================
 
-  const { mutate: upsertContent, isLoading: isUpserting } = useContentUpsertMutation({
-    onError: (error) => {
-      toast.error(`Failed to update query: ${error.message}`)
-    },
-  })
-
-  const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
+  const { mutate: deleteContent } = useContentDeleteMutation({
     onSuccess: (data) => {
-      if (isSQLEditorTabsEnabled) {
-        // Update Tabs state - currently unknown how to differentiate between sql and non-sql content
-        // so we're just deleting all tabs for with matching IDs
-        const tabIds = data.map((id) => createTabId('sql', { id }))
-        removeTabs(projectRef, tabIds)
-      }
+      // Update Tabs state - currently unknown how to differentiate between sql and non-sql content
+      // so we're just deleting all tabs for with matching IDs
+      const tabIds = data.map((id) => createTabId('sql', { id }))
+      tabs.removeTabs(tabIds)
     },
     onError: (error, data) => {
       if (error.message.includes('Contents not found')) {
@@ -307,7 +309,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     },
   })
 
-  const { mutate: deleteFolder, isLoading: isDeletingFolder } = useSQLSnippetFoldersDeleteMutation({
+  const { mutate: deleteFolder, isPending: isDeletingFolder } = useSQLSnippetFoldersDeleteMutation({
     onSuccess: (_, vars) => {
       toast.success('Successfully deleted folder')
       const { ids } = vars
@@ -334,101 +336,6 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     }
 
     if (ids.length > 0) ids.forEach((id) => snapV2.removeSnippet(id))
-  }
-
-  const onConfirmDelete = () => {
-    if (!projectRef) return console.error('Project ref is required')
-    deleteContent(
-      { projectRef, ids: selectedSnippets.map((x) => x.id) },
-      {
-        onSuccess: (data) => {
-          toast.success(
-            `Successfully deleted ${selectedSnippets.length.toLocaleString()} quer${selectedSnippets.length > 1 ? 'ies' : 'y'}`
-          )
-          postDeleteCleanup(data)
-        },
-      }
-    )
-  }
-
-  const onUpdateVisibility = async (action: 'share' | 'unshare') => {
-    const snippet = action === 'share' ? selectedSnippetToShare : selectedSnippetToUnshare
-    if (!projectRef) return console.error('Project ref is required')
-    if (!snippet) return console.error('Snippet ID is required')
-
-    const storeSnippet = snapV2.snippets[snippet.id]
-    let snippetContent = storeSnippet?.snippet?.content
-
-    if (snippetContent === undefined) {
-      const { content } = await getContentById({ projectRef, id: snippet.id })
-      snippetContent = content as unknown as SqlSnippets.Content
-    }
-
-    // [Joshen] Just as a final check - to ensure that the content is minimally there (empty string is fine)
-    if (snippetContent === undefined) {
-      return toast.error('Unable to update snippet visibility: Content is missing')
-    }
-
-    const visibility = action === 'share' ? 'project' : 'user'
-
-    upsertContent(
-      {
-        projectRef,
-        payload: {
-          ...snippet,
-          visibility,
-          folder_id: null,
-          content: snippetContent,
-        },
-      },
-      {
-        onSuccess: () => {
-          setSelectedSnippetToShare(undefined)
-          setSelectedSnippetToUnshare(undefined)
-          setSectionVisibility({ ...sectionVisibility, shared: true })
-          snapV2.updateSnippet({
-            id: snippet.id,
-            snippet: { visibility, folder_id: null },
-            skipSave: true,
-          })
-          toast.success(
-            action === 'share'
-              ? 'Snippet is now shared to the project'
-              : 'Snippet is now unshared from the project'
-          )
-        },
-      }
-    )
-  }
-
-  const onSelectDuplicate = async (snippet: SnippetWithContent) => {
-    if (!profile) return console.error('Profile is required')
-    if (!project) return console.error('Project is required')
-    if (!projectRef) return console.error('Project ref is required')
-    if (!id) return console.error('Snippet ID is required')
-
-    let sql: string = ''
-    if (snippet.content && snippet.content.sql) {
-      sql = snippet.content.sql
-    } else {
-      // Fetch the content first
-      const { content } = await getContentById({ projectRef, id: snippet.id })
-      if ('sql' in content) {
-        sql = content.sql
-      }
-    }
-
-    const snippetCopy = createSqlSnippetSkeletonV2({
-      id: uuidv4(),
-      name: `${snippet.name} (Duplicate)`,
-      sql,
-      owner_id: profile?.id,
-      project_id: project?.id,
-    })
-
-    snapV2.addSnippet({ projectRef, snippet: snippetCopy })
-    snapV2.addNeedsSaving(snippetCopy.id!)
-    router.push(`/project/${projectRef}/sql/${snippetCopy.id}`)
   }
 
   const onConfirmDeleteFolder = async () => {
@@ -495,7 +402,11 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
       } else if (snippet.visibility === 'user') {
         setSectionVisibility({ ...sectionVisibility, private: true })
       }
-      if (snippet.folder_id && !expandedFolderIds.includes(snippet.folder_id)) {
+      if (
+        snippet.folder_id &&
+        !expandedFolderIds.includes(snippet.folder_id) &&
+        privateSnippetsTreeNodeIds.has(snippet.folder_id)
+      ) {
         setExpandedFolderIds([...expandedFolderIds, snippet.folder_id])
       }
     }
@@ -507,12 +418,12 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   }, [id])
 
   useEffect(() => {
-    if (projectRef && privateSnippetsPages) {
+    if (projectRef && privateSnippetsPages?.pages) {
       privateSnippetsPages.pages.forEach((page) => {
         page.contents?.forEach((snippet: Snippet) => {
           snapV2.addSnippet({ projectRef, snippet })
         })
-        page.folders?.forEach((folder: SnippetFolder) => snapV2.addFolder({ projectRef, folder }))
+        page.folders?.forEach((folder) => snapV2.addFolder({ projectRef, folder }))
       })
     }
   }, [projectRef, privateSnippetsPages?.pages])
@@ -537,177 +448,178 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     })
   }, [projectRef, sharedSqlSnippetsData?.pages])
 
+  const sqlEditorTabsCleanup = useSqlEditorTabsCleanup()
   useEffect(() => {
-    if (projectRef && isSuccess && isSQLEditorTabsEnabled) {
-      sqlEditorTabsCleanup({ ref: projectRef, snippets: allSnippetsInView as any })
+    if (isSuccess) {
+      sqlEditorTabsCleanup({ snippets: allSnippetsInView as any })
     }
-  }, [isSuccess, isSharedSqlSnippetsSuccess, allSnippetsInView, isSQLEditorTabsEnabled])
+  }, [allSnippetsInView, isSuccess, sqlEditorTabsCleanup])
 
   return (
     <>
-      <InnerSideMenuCollapsible
-        className="px-0"
-        open={showSharedSnippets}
-        onOpenChange={(value) => {
-          setSectionVisibility({ ...(sectionVisibility ?? DEFAULT_SECTION_STATE), shared: value })
-        }}
-      >
-        <InnerSideMenuCollapsibleTrigger
-          title={`Shared ${numProjectSnippets > 0 ? ` (${numProjectSnippets})` : ''}`}
-        />
-        <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
-          {isLoadingSharedSqlSnippets ? (
-            <SQLEditorLoadingSnippets />
-          ) : sharedSnippets.length === 0 ? (
-            <InnerSideBarEmptyPanel
-              className="mx-2"
-              title="No shared queries"
-              description="Share queries with your team by right-clicking on the query."
-            />
-          ) : (
-            <TreeView
-              data={projectSnippetsTreeState}
-              aria-label="project-level-snippets"
-              nodeRenderer={({ element, ...props }) => {
-                const isOpened =
-                  isSQLEditorTabsEnabled &&
-                  Object.values(tabs.tabsMap).some(
-                    (tab) => tab.metadata?.sqlId === element.metadata?.id
-                  )
-                const tabId = createTabId('sql', {
-                  id: element?.metadata?.id as unknown as Snippet['id'],
-                })
-                const isPreview = isSQLEditorTabsEnabled && tabStore.previewTabId === tabId
-                const isActive = !isPreview && element.metadata?.id === id
-                const isSelected = selectedSnippets.some((x) => x.id === element.metadata?.id)
-
-                return (
-                  <SQLEditorTreeViewItem
-                    {...props}
-                    isOpened={isOpened && !isPreview}
-                    isSelected={isActive || isSelected}
-                    isPreview={isPreview}
-                    onDoubleClick={(e) => {
-                      e.preventDefault()
-                      makeTabPermanent(projectRef, tabId)
-                    }}
-                    element={element}
-                    onSelectDelete={() => {
-                      setShowDeleteModal(true)
-                      setSelectedSnippets([element.metadata as unknown as Snippet])
-                    }}
-                    onSelectRename={() => {
-                      setShowRenameModal(true)
-                      setSelectedSnippetToRename(element.metadata as Snippet)
-                    }}
-                    onSelectDownload={() => {
-                      setSelectedSnippetToDownload(element.metadata as Snippet)
-                    }}
-                    onSelectDuplicate={() => {
-                      onSelectDuplicate(element.metadata as Snippet)
-                    }}
-                    onSelectUnshare={() => {
-                      setSelectedSnippetToUnshare(element.metadata as Snippet)
-                    }}
-                    isLastItem={projectSnippetsLastItemIds.has(element.id as string)}
-                    hasNextPage={hasMoreSharedSqlSnippets}
-                    fetchNextPage={fetchNextSharedSqlSnippets}
-                    isFetchingNextPage={isFetchingMoreSharedSqlSnippets}
-                  />
-                )
-              }}
-            />
-          )}
-        </InnerSideMenuCollapsibleContent>
-      </InnerSideMenuCollapsible>
-
       <InnerSideMenuSeparator />
-
-      <InnerSideMenuCollapsible
-        className="px-0"
-        open={showFavoriteSnippets}
-        onOpenChange={(value) => {
-          setSectionVisibility({ ...(sectionVisibility ?? DEFAULT_SECTION_STATE), favorite: value })
-        }}
-      >
-        <InnerSideMenuCollapsibleTrigger
-          title={`Favorites ${numFavoriteSnippets > 0 ? ` (${numFavoriteSnippets})` : ''}`}
-        />
-        <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
-          {isLoadingFavoriteSqlSnippets ? (
-            <SQLEditorLoadingSnippets />
-          ) : favoriteSnippets.length === 0 ? (
-            <InnerSideBarEmptyPanel
-              title="No favorite queries"
-              className="mx-2 px-3"
-              description={
-                <>
-                  Save a query to favorites for easy accessibility by clicking the{' '}
-                  <Heart size={12} className="inline-block relative align-center -top-[1px]" />{' '}
-                  icon.
-                </>
-              }
+      {IS_PLATFORM && (
+        <>
+          <InnerSideMenuCollapsible
+            className="px-0"
+            open={showSharedSnippets}
+            onOpenChange={(value) => {
+              setSectionVisibility({
+                ...(sectionVisibility ?? DEFAULT_SECTION_STATE),
+                shared: value,
+              })
+            }}
+          >
+            <InnerSideMenuCollapsibleTrigger
+              title={`Shared ${numProjectSnippets > 0 ? ` (${numProjectSnippets})` : ''}`}
             />
-          ) : (
-            <TreeView
-              data={favoritesTreeState}
-              aria-label="favorite-snippets"
-              nodeRenderer={({ element, ...props }) => {
-                const isOpened =
-                  isSQLEditorTabsEnabled &&
-                  Object.values(tabs.tabsMap).some(
-                    (tab) => tab.metadata?.sqlId === element.metadata?.id
-                  )
-                const tabId = createTabId('sql', {
-                  id: element?.metadata?.id as unknown as Snippet['id'],
-                })
-                const isPreview = isSQLEditorTabsEnabled && tabStore.previewTabId === tabId
-                const isActive = !isPreview && element.metadata?.id === id
-                const isSelected = selectedSnippets.some((x) => x.id === element.metadata?.id)
+            <InnerSideMenuCollapsibleContent className="group-data-open:pt-2">
+              {isLoadingSharedSqlSnippets ? (
+                <SQLEditorLoadingSnippets />
+              ) : sharedSnippets.length === 0 ? (
+                <InnerSideBarEmptyPanel
+                  className="mx-2"
+                  title="No shared queries"
+                  description="Share queries with your team by right-clicking on the query."
+                />
+              ) : (
+                <TreeView
+                  data={projectSnippetsTreeState}
+                  aria-label="project-level-snippets"
+                  nodeRenderer={({ element, ...props }) => {
+                    const isOpened = Object.values(tabs.tabsMap).some(
+                      (tab) => tab.metadata?.sqlId === element.metadata?.id
+                    )
+                    const tabId = createTabId('sql', {
+                      id: element?.metadata?.id as unknown as Snippet['id'],
+                    })
+                    const isPreview = tabs.previewTabId === tabId
+                    const isActive = !isPreview && element.metadata?.id === id
+                    const isSelected = selectedSnippets.some((x) => x.id === element.metadata?.id)
 
-                return (
-                  <SQLEditorTreeViewItem
-                    {...props}
-                    isSelected={isActive || isSelected}
-                    isOpened={isOpened && !isPreview}
-                    isPreview={isPreview}
-                    onDoubleClick={(e) => {
-                      e.preventDefault()
-                      makeTabPermanent(projectRef, tabId)
-                    }}
-                    element={element}
-                    onSelectDelete={() => {
-                      setShowDeleteModal(true)
-                      setSelectedSnippets([element.metadata as unknown as Snippet])
-                    }}
-                    onSelectRename={() => {
-                      setShowRenameModal(true)
-                      setSelectedSnippetToRename(element.metadata as Snippet)
-                    }}
-                    onSelectDownload={() => {
-                      setSelectedSnippetToDownload(element.metadata as Snippet)
-                    }}
-                    onSelectDuplicate={() => {
-                      onSelectDuplicate(element.metadata as Snippet)
-                    }}
-                    onSelectShare={() => setSelectedSnippetToShare(element.metadata as Snippet)}
-                    onSelectUnshare={() => {
-                      setSelectedSnippetToUnshare(element.metadata as Snippet)
-                    }}
-                    isLastItem={favoriteSnippetsLastItemIds.has(element.id as string)}
-                    hasNextPage={hasMoreFavoriteSqlSnippets}
-                    fetchNextPage={fetchNextFavoriteSqlSnippets}
-                    isFetchingNextPage={isFetchingMoreFavoriteSqlSnippets}
-                  />
-                )
-              }}
+                    return (
+                      <SQLEditorTreeViewItem
+                        {...props}
+                        isOpened={isOpened && !isPreview}
+                        isSelected={isActive || isSelected}
+                        isPreview={isPreview}
+                        onDoubleClick={(e) => {
+                          e.preventDefault()
+                          tabs.makeTabPermanent(tabId)
+                        }}
+                        element={element}
+                        onSelectDelete={() => {
+                          setShowDeleteModal(true)
+                          setSelectedSnippets([element.metadata as unknown as Snippet])
+                        }}
+                        onSelectRename={() => {
+                          setShowRenameModal(true)
+                          setSelectedSnippetToRename(element.metadata as Snippet)
+                        }}
+                        onSelectDownload={() => {
+                          setSelectedSnippetToDownload(element.metadata as Snippet)
+                        }}
+                        onSelectUnshare={() => {
+                          setSelectedSnippetToUnshare(element.metadata as Snippet)
+                        }}
+                        isLastItem={projectSnippetsLastItemIds.has(element.id as string)}
+                        hasNextPage={hasMoreSharedSqlSnippets}
+                        fetchNextPage={fetchNextSharedSqlSnippets}
+                        isFetchingNextPage={isFetchingMoreSharedSqlSnippets}
+                      />
+                    )
+                  }}
+                />
+              )}
+            </InnerSideMenuCollapsibleContent>
+          </InnerSideMenuCollapsible>
+
+          <InnerSideMenuSeparator />
+
+          <InnerSideMenuCollapsible
+            className="px-0"
+            open={showFavoriteSnippets}
+            onOpenChange={(value) => {
+              setSectionVisibility({
+                ...(sectionVisibility ?? DEFAULT_SECTION_STATE),
+                favorite: value,
+              })
+            }}
+          >
+            <InnerSideMenuCollapsibleTrigger
+              title={`Favorites ${numFavoriteSnippets > 0 ? ` (${numFavoriteSnippets})` : ''}`}
             />
-          )}
-        </InnerSideMenuCollapsibleContent>
-      </InnerSideMenuCollapsible>
+            <InnerSideMenuCollapsibleContent className="group-data-open:pt-2">
+              {isLoadingFavoriteSqlSnippets ? (
+                <SQLEditorLoadingSnippets />
+              ) : favoriteSnippets.length === 0 ? (
+                <InnerSideBarEmptyPanel
+                  title="No favorite queries"
+                  className="mx-2 px-3"
+                  description={
+                    <>
+                      Save a query to favorites for easy accessibility by clicking the{' '}
+                      <Heart size={12} className="inline-block relative align-center -top-px" />{' '}
+                      icon.
+                    </>
+                  }
+                />
+              ) : (
+                <TreeView
+                  data={favoritesTreeState}
+                  aria-label="favorite-snippets"
+                  nodeRenderer={({ element, ...props }) => {
+                    const isOpened = Object.values(tabs.tabsMap).some(
+                      (tab) => tab.metadata?.sqlId === element.metadata?.id
+                    )
+                    const tabId = createTabId('sql', {
+                      id: element?.metadata?.id as unknown as Snippet['id'],
+                    })
+                    const isPreview = tabs.previewTabId === tabId
+                    const isActive = !isPreview && element.metadata?.id === id
+                    const isSelected = selectedSnippets.some((x) => x.id === element.metadata?.id)
 
-      <InnerSideMenuSeparator />
+                    return (
+                      <SQLEditorTreeViewItem
+                        {...props}
+                        isSelected={isActive || isSelected}
+                        isOpened={isOpened && !isPreview}
+                        isPreview={isPreview}
+                        onDoubleClick={(e) => {
+                          e.preventDefault()
+                          tabs.makeTabPermanent(tabId)
+                        }}
+                        element={element}
+                        onSelectDelete={() => {
+                          setShowDeleteModal(true)
+                          setSelectedSnippets([element.metadata as unknown as Snippet])
+                        }}
+                        onSelectRename={() => {
+                          setShowRenameModal(true)
+                          setSelectedSnippetToRename(element.metadata as Snippet)
+                        }}
+                        onSelectDownload={() => {
+                          setSelectedSnippetToDownload(element.metadata as Snippet)
+                        }}
+                        onSelectShare={() => setSelectedSnippetToShare(element.metadata as Snippet)}
+                        onSelectUnshare={() => {
+                          setSelectedSnippetToUnshare(element.metadata as Snippet)
+                        }}
+                        isLastItem={favoriteSnippetsLastItemIds.has(element.id as string)}
+                        hasNextPage={hasMoreFavoriteSqlSnippets}
+                        fetchNextPage={fetchNextFavoriteSqlSnippets}
+                        isFetchingNextPage={isFetchingMoreFavoriteSqlSnippets}
+                      />
+                    )
+                  }}
+                />
+              )}
+            </InnerSideMenuCollapsibleContent>
+          </InnerSideMenuCollapsible>
 
+          <InnerSideMenuSeparator />
+        </>
+      )}
       <InnerSideMenuCollapsible
         open={showPrivateSnippets}
         onOpenChange={(value) => {
@@ -719,7 +631,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
           title={`PRIVATE
             ${numPrivateSnippets > 0 ? ` (${numPrivateSnippets})` : ''}`}
         />
-        <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
+        <InnerSideMenuCollapsibleContent className="group-data-open:pt-2">
           {isLoading ? (
             <EditorMenuListSkeleton />
           ) : folders.length === 0 && privateSnippets.length === 0 ? (
@@ -743,15 +655,13 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
               }}
               expandedIds={expandedFolderIds}
               nodeRenderer={({ element, ...props }) => {
-                const isOpened =
-                  isSQLEditorTabsEnabled &&
-                  Object.values(tabs.tabsMap).some(
-                    (tab) => tab.metadata?.sqlId === element.metadata?.id
-                  )
+                const isOpened = Object.values(tabs.tabsMap).some(
+                  (tab) => tab.metadata?.sqlId === element.metadata?.id
+                )
                 const tabId = createTabId('sql', {
                   id: element?.metadata?.id as unknown as Snippet['id'],
                 })
-                const isPreview = isSQLEditorTabsEnabled && tabStore.previewTabId === tabId
+                const isPreview = tabs.previewTabId === tabId
                 const isActive = !isPreview && element.metadata?.id === id
                 const isSelected = selectedSnippets.some((x) => x.id === element.metadata?.id)
 
@@ -769,8 +679,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                     onSelectCreate={() => {
                       if (profile && project) {
                         const snippet = createSqlSnippetSkeletonV2({
-                          id: uuidv4(),
-                          name: untitledSnippetTitle,
+                          name: generateSnippetTitle(),
                           owner_id: profile?.id,
                           project_id: project?.id,
                           folder_id: element.id as string,
@@ -807,7 +716,6 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                     onSelectDownload={() =>
                       setSelectedSnippetToDownload(element.metadata as Snippet)
                     }
-                    onSelectDuplicate={() => onSelectDuplicate(element.metadata as Snippet)}
                     onSelectShare={() => setSelectedSnippetToShare(element.metadata as Snippet)}
                     onEditSave={(name: string) => {
                       // [Joshen] Inline editing only for folders for now
@@ -829,7 +737,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                     }}
                     onDoubleClick={(e) => {
                       e.preventDefault()
-                      makeTabPermanent(projectRef, tabId)
+                      tabs.makeTabPermanent(tabId)
                     }}
                   />
                 )
@@ -839,7 +747,11 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
         </InnerSideMenuCollapsibleContent>
       </InnerSideMenuCollapsible>
 
-      <Separator />
+      <InnerSideMenuSeparator />
+
+      <ReferenceSnippetsSection />
+
+      <InnerSideMenuSeparator />
 
       <RenameQueryModal
         snippet={selectedSnippetToRename}
@@ -859,87 +771,30 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
 
       <DownloadSnippetModal
         id={selectedSnippetToDownload?.id ?? ''}
-        visible={selectedSnippetToDownload !== undefined}
-        onCancel={() => setSelectedSnippetToDownload(undefined)}
+        open={selectedSnippetToDownload !== undefined}
+        onOpenChange={() => setSelectedSnippetToDownload(undefined)}
       />
 
-      <ConfirmationModal
-        size="medium"
-        loading={isUpserting}
-        title={`Confirm to share query: ${selectedSnippetToShare?.name}`}
-        confirmLabel="Share query"
-        confirmLabelLoading="Sharing query"
-        visible={selectedSnippetToShare !== undefined}
-        onCancel={() => setSelectedSnippetToShare(undefined)}
-        onConfirm={() => onUpdateVisibility('share')}
-        alert={{
-          title: 'This SQL query will become public to all team members',
-          description: 'Anyone with access to the project can view it',
-        }}
-      >
-        <ul className="text-sm text-foreground-light space-y-5">
-          <li className="flex gap-3 items-center">
-            <Eye size={16} />
-            <span>Project members will have read-only access to this query.</span>
-          </li>
-          <li className="flex gap-3 items-center">
-            <Unlock size={16} />
-            <span>Anyone will be able to duplicate it to their personal snippets.</span>
-          </li>
-        </ul>
-      </ConfirmationModal>
+      <ShareSnippetModal
+        snippet={selectedSnippetToShare}
+        onClose={() => setSelectedSnippetToShare(undefined)}
+        onSuccess={() => setSectionVisibility({ ...sectionVisibility, shared: true })}
+      />
 
-      <ConfirmationModal
-        size="medium"
-        title={`Confirm to unshare query: ${selectedSnippetToUnshare?.name}`}
-        confirmLabel="Unshare query"
-        confirmLabelLoading="Unsharing query"
-        visible={selectedSnippetToUnshare !== undefined}
-        onCancel={() => setSelectedSnippetToUnshare(undefined)}
-        onConfirm={() => onUpdateVisibility('unshare')}
-        alert={{
-          title: 'This SQL query will no longer be public to all team members',
-          description: 'Only you will have access to this query',
-        }}
-      >
-        <ul className="text-sm text-foreground-light space-y-5">
-          <li className="flex gap-3">
-            <EyeOffIcon />
-            <span>Project members will no longer be able to view this query.</span>
-          </li>
-        </ul>
-      </ConfirmationModal>
+      <UnshareSnippetModal
+        snippet={selectedSnippetToUnshare}
+        onClose={() => setSelectedSnippetToUnshare(undefined)}
+        onSuccess={() => setSectionVisibility({ ...sectionVisibility, private: true })}
+      />
 
-      <ConfirmationModal
-        size="small"
-        title={`Confirm to delete ${selectedSnippets.length === 1 ? 'query' : `${selectedSnippets.length.toLocaleString()} quer${selectedSnippets.length > 1 ? 'ies' : 'y'}`}`}
-        confirmLabel={`Delete ${selectedSnippets.length.toLocaleString()} quer${selectedSnippets.length > 1 ? 'ies' : 'y'}`}
-        confirmLabelLoading="Deleting query"
-        loading={isDeleting}
+      <DeleteSnippetsModal
         visible={showDeleteModal}
-        variant="destructive"
-        onCancel={() => {
+        snippets={selectedSnippets}
+        onClose={() => {
           setShowDeleteModal(false)
           setSelectedSnippets([])
         }}
-        onConfirm={onConfirmDelete}
-        alert={
-          (selectedSnippets[0]?.visibility as unknown as string) === 'project'
-            ? {
-                title: 'This SQL snippet will be lost forever',
-                description:
-                  'Deleting this query will remove it for all members of the project team.',
-              }
-            : undefined
-        }
-      >
-        <p className="text-sm">
-          This action cannot be undone.{' '}
-          {selectedSnippets.length === 1
-            ? `Are you sure you want to delete '${selectedSnippets[0]?.name}'?`
-            : `Are you sure you want to delete the selected ${selectedSnippets.length} quer${selectedSnippets.length > 1 ? 'ies' : 'y'}?`}
-        </p>
-      </ConfirmationModal>
+      />
 
       <ConfirmationModal
         size="small"

@@ -1,97 +1,117 @@
 import { useMonaco } from '@monaco-editor/react'
 import { useLocalStorage } from '@uidotdev/usehooks'
-import dayjs from 'dayjs'
-import { editor } from 'monaco-editor'
-import { useRouter } from 'next/router'
-import { useEffect, useRef, useState } from 'react'
-import { toast } from 'sonner'
-
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
+import dayjs from 'dayjs'
+import type { editor } from 'monaco-editor'
+import { useRouter } from 'next/router'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 
 import {
+  EXPLORER_DATEPICKER_HELPERS,
+  getDefaultHelper,
   LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
-  LOGS_TABLES,
   TEMPLATES,
-} from 'components/interfaces/Settings/Logs/Logs.constants'
+} from '@/components/interfaces/Settings/Logs/Logs.constants'
+import { DatePickerValue } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
+import { LogData, LogsWarning, LogTemplate } from '@/components/interfaces/Settings/Logs/Logs.types'
+import { UpdateSavedQueryModal } from '@/components/interfaces/Settings/Logs/Logs.UpdateSavedQueryModal'
 import {
-  DatePickerToFrom,
-  LogTemplate,
-  LogsWarning,
-} from 'components/interfaces/Settings/Logs/Logs.types'
-import {
-  maybeShowUpgradePrompt,
+  maybeShowUpgradePromptIfNotEntitled,
   useEditorHints,
-} from 'components/interfaces/Settings/Logs/Logs.utils'
-import LogsQueryPanel, { SourceType } from 'components/interfaces/Settings/Logs/LogsQueryPanel'
-import LogTable from 'components/interfaces/Settings/Logs/LogTable'
-import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import { createWarehouseQueryTemplates } from 'components/interfaces/Settings/Logs/Warehouse.utils'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
-import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import LoadingOpacity from 'components/ui/LoadingOpacity'
-import ShimmerLine from 'components/ui/ShimmerLine'
-import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
-import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
-import { useContentQuery } from 'data/content/content-query'
+} from '@/components/interfaces/Settings/Logs/Logs.utils'
+import {
+  buildLogQueryParams,
+  resolveLogDateRange,
+} from '@/components/interfaces/Settings/Logs/logsDateRange'
+import LogsQueryPanel from '@/components/interfaces/Settings/Logs/LogsQueryPanel'
+import { LogTable } from '@/components/interfaces/Settings/Logs/LogTable'
+import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import LogsLayout from '@/components/layouts/LogsLayout/LogsLayout'
+import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import LoadingOpacity from '@/components/ui/LoadingOpacity'
+import ShimmerLine from '@/components/ui/ShimmerLine'
+import { useContentQuery } from '@/data/content/content-query'
 import {
   UpsertContentPayload,
   useContentUpsertMutation,
-} from 'data/content/content-upsert-mutation'
-import useLogsQuery from 'hooks/analytics/useLogsQuery'
-import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
-import { uuidv4 } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import type { LogSqlSnippets, NextPageWithLayout } from 'types'
-import {
-  Button,
-  Form,
-  Input,
-  Modal,
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from 'ui'
+} from '@/data/content/content-upsert-mutation'
+import useLogsQuery from '@/hooks/analytics/useLogsQuery'
+import { useLogsUrlState } from '@/hooks/analytics/useLogsUrlState'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useUpgradePrompt } from '@/hooks/misc/useUpgradePrompt'
+import { uuidv4 } from '@/lib/helpers'
+import { useProfile } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
+import type { LogSqlSnippets, NextPageWithLayout } from '@/types'
 
-const PLACEHOLDER_WAREHOUSE_QUERY =
-  '-- Fetch the last 10 logs in the last 7 days \nselect id, timestamp, event_message from `COLLECTION_NAME` \nwhere timestamp > timestamp_sub(current_timestamp(), interval 7 day) \norder by timestamp desc limit 10'
 const LOCAL_PLACEHOLDER_QUERY =
   'select\n  timestamp, event_message, metadata\n  from edge_logs limit 5'
 
 const PLATFORM_PLACEHOLDER_QUERY =
   'select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nlimit 5'
 
-const PLACEHOLDER_QUERY = IS_PLATFORM ? PLATFORM_PLACEHOLDER_QUERY : LOCAL_PLACEHOLDER_QUERY
-
 export const LogsExplorerPage: NextPageWithLayout = () => {
   useEditorHints()
   const monaco = useMonaco()
   const router = useRouter()
   const { profile } = useProfile()
-  const { ref, q, queryId, source: routerSource } = useParams()
+  const { ref, q, queryId } = useParams()
+  const track = useTrack()
   const projectRef = ref as string
-  const organization = useSelectedOrganization()
+  const { logsShowMetadataIpTemplate } = useIsFeatureEnabled(['logs:show_metadata_ip_template'])
 
-  const editorRef = useRef<editor.IStandaloneCodeEditor>()
+  const allTemplates = useMemo(() => {
+    if (logsShowMetadataIpTemplate) return TEMPLATES
+    else return TEMPLATES.filter((x) => x.label !== 'Metadata IP')
+  }, [logsShowMetadataIpTemplate])
+
+  const editorRef = useRef<editor.IStandaloneCodeEditor>(null)
   const [editorId] = useState<string>(uuidv4())
-  const { timestampStart, timestampEnd, setTimeRange } = useLogsUrlState()
+  const { search, setSearch, timestampStart, timestampEnd, setTimeRange } = useLogsUrlState()
+  const defaultHelper = useMemo(() => getDefaultHelper(EXPLORER_DATEPICKER_HELPERS), [])
+  const initialDatePickerValue = useMemo<DatePickerValue>(() => {
+    if (timestampStart && timestampEnd) {
+      return { from: timestampStart, to: timestampEnd, isHelper: false }
+    }
+    if (timestampStart) {
+      return { from: timestampStart, to: timestampEnd || '', isHelper: false }
+    }
+    return {
+      from: defaultHelper.calcFrom(),
+      to: defaultHelper.calcTo(),
+      isHelper: true,
+      text: defaultHelper.text,
+    }
+  }, [timestampStart, timestampEnd, defaultHelper])
+  const [datePickerValue, setDatePickerValue] = useState<DatePickerValue>(initialDatePickerValue)
+
+  const { logsDefaultQuery } = useCustomContent(['logs:default_query'])
+  const PLACEHOLDER_QUERY = IS_PLATFORM
+    ? (logsDefaultQuery ?? PLATFORM_PLACEHOLDER_QUERY)
+    : LOCAL_PLACEHOLDER_QUERY
 
   const [editorValue, setEditorValue] = useState<string>(PLACEHOLDER_QUERY)
-  const [warehouseEditorId, setWarehouseEditorId] = useState<string>(uuidv4())
-  const [warehouseEditorValue, setWarehouseEditorValue] = useState<string>(
-    PLACEHOLDER_WAREHOUSE_QUERY
-  )
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
   const [warnings, setWarnings] = useState<LogsWarning[]>([])
-  const [sourceType, setSourceType] = useState<SourceType>((routerSource as SourceType) || 'logs')
-  const [selectedLog, setSelectedLog] = useState<any>(null)
+  const [selectedLog, setSelectedLog] = useState<LogData | null>(null)
 
   const [recentLogs, setRecentLogs] = useLocalStorage<LogSqlSnippets.Content[]>(
     `project-content-${projectRef}-recent-log-sql`,
     []
   )
+
+  const [useOtelEndpoint, setUseOtelEndpoint] = useLocalStorage<boolean>(
+    `logs-explorer-use-otel-endpoint-${projectRef}`,
+    false
+  )
+
+  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
+  const entitledToAuditLogDays = getEntitlementNumericValue()
 
   const { data: content } = useContentQuery({
     projectRef: ref,
@@ -99,39 +119,36 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   })
   const query = content?.content.find((x) => x.id === queryId)
 
+  const resolvedRange = useMemo(() => {
+    if (datePickerValue.isHelper) {
+      return resolveLogDateRange(datePickerValue)
+    }
+    if (timestampStart && timestampEnd) {
+      return { from: timestampStart, to: timestampEnd }
+    }
+    return resolveLogDateRange(datePickerValue)
+  }, [timestampStart, timestampEnd, datePickerValue])
+
   const {
     params,
     logData,
     error,
     isLoading: logsLoading,
-    changeQuery,
-    runQuery,
+    setParams,
   } = useLogsQuery(
     projectRef,
     {
-      iso_timestamp_start: timestampStart,
-      iso_timestamp_end: timestampEnd,
+      iso_timestamp_start: resolvedRange.from,
+      iso_timestamp_end: resolvedRange.to,
     },
-    sourceType === 'logs'
+    true,
+    { useOtel: useOtelEndpoint }
   )
 
-  const {
-    refetch: runWarehouseQuery,
-    data: warehouseResults,
-    isFetching: warehouseFetching,
-    error: warehouseError,
-  } = useWarehouseQueryQuery(
-    { ref: projectRef, sql: warehouseEditorValue },
-    {
-      enabled: false,
-    }
-  )
-  const results = sourceType === 'warehouse' ? warehouseResults?.result : logData
-  const isLoading = logsLoading || warehouseFetching
+  const results = logData
+  const isLoading = logsLoading
 
-  const { data: warehouseCollections } = useWarehouseCollectionsQuery({ projectRef })
-
-  const { mutate: upsertContent, isLoading: isUpsertingContent } = useContentUpsertMutation({
+  const { mutateAsync: upsertContent, isPending: isUpsertingContent } = useContentUpsertMutation({
     onError: (e) => {
       const error = e as { message: string }
       console.error(error)
@@ -155,7 +172,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const addRecentLogSqlSnippet = (snippet: Partial<LogSqlSnippets.Content>) => {
     const defaults: LogSqlSnippets.Content = {
       schema_version: '1',
-      favorite: false,
       sql: '',
       content_id: '',
     }
@@ -184,84 +200,60 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     addRecentLogSqlSnippet({ sql: template.searchString })
   }
 
-  const handleRun = (value?: string | React.MouseEvent<HTMLButtonElement>) => {
-    const query = typeof value === 'string' ? value || editorValue : editorValue
+  const handleRun = (value?: string | React.MouseEvent) => {
+    track('log_explorer_query_run_button_clicked', { is_saved_query: !!queryId })
 
-    if (sourceType === 'warehouse') {
-      const whQuery = warehouseEditorValue
+    // Read the latest value straight from the editor instance rather than from
+    // `editorValue` state, which can lag behind the most recent keystroke. This
+    // keeps the Run button consistent with the Cmd+Enter keybinding.
+    const liveValue = editorRef.current?.getValue()
+    const query = typeof value === 'string' ? value || editorValue : (liveValue ?? editorValue)
+    const resolvedParams = buildLogQueryParams(datePickerValue, query)
 
-      if (!warehouseCollections?.length) {
-        toast.error('You do not have any collections yet.')
-        return
-      }
-
-      // Check that a collection name is included in the query
-      const collectionNames = warehouseCollections?.map((collection) => collection.name)
-      const collectionExists = collectionNames?.find((collectionName) =>
-        whQuery.includes(collectionName)
-      )
-
-      if (!collectionExists) {
-        toast.error('Please specify a collection name in the query')
-        return
-      }
-
-      // Check that the user is not trying to query logs tables and warehouse collections at the same time
-      const logsSources = Object.values(LOGS_TABLES)
-      const logsSourceExists = logsSources.find((source) => whQuery.includes(source))
-
-      if (logsSourceExists) {
-        return toast.error('Cannot query logs tables from current query.')
-      }
-
-      runWarehouseQuery()
-      return router.push({
-        pathname: router.pathname,
-        query: { ...router.query, q: query },
-      })
+    setSelectedLog(null)
+    setParams((prev) => ({
+      ...prev,
+      sql: resolvedParams.sql,
+      iso_timestamp_start: resolvedParams.from,
+      iso_timestamp_end: resolvedParams.to,
+    }))
+    if (!datePickerValue.isHelper) {
+      setTimeRange(resolvedParams.from, resolvedParams.to)
+    } else {
+      setTimeRange('', '')
     }
-
-    changeQuery(query)
-    runQuery()
-    router.push({
-      pathname: router.pathname,
-      query: { ...router.query, q: query },
-    })
+    setSearch(query)
     addRecentLogSqlSnippet({ sql: query })
   }
 
   const handleInsertSource = (source: string) => {
-    if (sourceType === 'warehouse') {
-      //TODO: Only one collection can be queried at a time, we need to replace the current collection from the query for the new one
-      return setWarehouseEditorId(uuidv4())
-    } else {
-      if (editorRef.current && monaco) {
-        const editorModel = editorRef.current?.getModel()
-        const currentValue = editorRef.current.getValue()
-        const index = currentValue.indexOf('from')
+    if (editorRef.current && monaco) {
+      const editorModel = editorRef.current?.getModel()
+      const currentValue = editorRef.current.getValue()
+      const index = currentValue.indexOf('from')
 
-        const updatedValue =
-          index < 0
-            ? `${currentValue}${source}`
-            : `${currentValue.substring(0, index + 4)} ${source} ${currentValue.substring(index + 5)}`
+      const updatedValue =
+        index < 0
+          ? `${currentValue}${source}`
+          : `${currentValue.substring(0, index + 4)} ${source} ${currentValue.substring(index + 5)}`
 
-        editorRef.current.pushUndoStop()
-        editorRef.current.executeEdits(`insert-identifier`, [
-          {
-            text: updatedValue,
-            range: editorModel?.getFullModelRange() ?? new monaco.Range(1, 1, 1, 1),
-          },
-        ])
-        editorRef.current.pushUndoStop()
-        editorRef.current.focus()
-      }
+      editorRef.current.pushUndoStop()
+      editorRef.current.executeEdits(`insert-identifier`, [
+        {
+          text: updatedValue,
+          range: editorModel?.getFullModelRange() ?? new monaco.Range(1, 1, 1, 1),
+        },
+      ])
+      editorRef.current.pushUndoStop()
+      editorRef.current.focus()
     }
   }
 
-  const handleCreateQuery = async (values: any, { setSubmitting }: any) => {
+  type SaveQueryFormValues = { name: string; description?: string }
+
+  const handleCreateQuery = async (values: SaveQueryFormValues) => {
     if (!projectRef) return console.error('Project ref is required')
     if (!profile) return console.error('Profile is required')
-    setSubmitting(true)
 
     const id = uuidv4()
     const payload: UpsertContentPayload = {
@@ -278,7 +270,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       owner_id: profile.id,
       visibility: 'user' as const,
     }
-    upsertContent(
+    await upsertContent(
       { projectRef, payload },
       {
         onSuccess: () => router.push(`/project/${projectRef}/logs/explorer?queryId=${id}`),
@@ -286,12 +278,12 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     )
   }
 
-  function handleOnSave() {
+  async function handleOnSave() {
     if (!projectRef) return console.error('Project ref is required')
 
     // if we have a queryId, we are editing a saved query
     if (queryId && query) {
-      upsertContent({
+      await upsertContent({
         projectRef: projectRef!,
         payload: {
           ...query,
@@ -305,27 +297,49 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     setSaveModalOpen(!saveModalOpen)
   }
 
-  const handleDateChange = ({ to, from }: DatePickerToFrom) => {
-    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, organization?.plan?.id)
+  const handleDateChange = (value: DatePickerValue) => {
+    setDatePickerValue(value)
+    const resolvedRange = resolveLogDateRange(value)
+    const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+      resolvedRange.from,
+      entitledToAuditLogDays
+    )
 
     if (shouldShowUpgradePrompt) {
-      setShowUpgradePrompt(!showUpgradePrompt)
-    } else {
-      setTimeRange(from || '', to || '')
+      setShowUpgradePrompt(true)
+      return
     }
+
+    if (value.isHelper) {
+      setTimeRange('', '')
+    } else {
+      setTimeRange(resolvedRange.from || '', resolvedRange.to || '')
+    }
+    setSelectedLog(null)
+    setParams((prev) => ({
+      ...prev,
+      iso_timestamp_start: resolvedRange.from,
+      iso_timestamp_end: resolvedRange.to,
+    }))
   }
 
   useEffect(() => {
-    if (warehouseError) toast.error(warehouseError.message)
-  }, [warehouseError])
+    if (search) {
+      setEditorValue(search)
+    } else if (q) {
+      setEditorValue(q)
+      setSearch(q)
+    }
+  }, [q, search, setSearch])
 
   useEffect(() => {
-    // on mount, set initial values
-    if (q) {
-      setEditorValue(q)
-      setWarehouseEditorValue(q)
+    // prevents overwriting when the user selects a helper.
+    // without this, if the user selects "last 3 days" it would overwrite it with "last hour"
+    // its the simplest solution I could come up with - jordi
+    if (!initialDatePickerValue.isHelper) {
+      setDatePickerValue(initialDatePickerValue)
     }
-  }, [q])
+  }, [initialDatePickerValue])
 
   useEffect(() => {
     let newWarnings = []
@@ -338,7 +352,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         text: 'Querying large date ranges can be slow. Consider selecting a smaller date range.',
       })
     }
-    if (editorValue && !editorValue.includes('limit')) {
+    if (editorValue && !editorValue.toLowerCase().includes('limit')) {
       newWarnings.push({ text: 'When querying large date ranges, include a LIMIT clause.' })
     }
     setWarnings(newWarnings)
@@ -347,67 +361,48 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   // Show the prompt on page load based on query params
   useEffect(() => {
     if (timestampStart) {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(timestampStart, organization?.plan?.id)
+      const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+        timestampStart,
+        entitledToAuditLogDays
+      )
       if (shouldShowUpgradePrompt) {
-        setShowUpgradePrompt(!showUpgradePrompt)
+        setShowUpgradePrompt(true)
       }
     }
-  }, [timestampStart, organization])
+  }, [timestampStart, entitledToAuditLogDays, setShowUpgradePrompt])
 
   return (
     <div className="w-full h-full mx-auto">
       <ResizablePanelGroup
         className="w-full h-full max-h-screen"
-        direction="vertical"
+        orientation="vertical"
         autoSaveId={LOCAL_STORAGE_KEYS.LOG_EXPLORER_SPLIT_SIZE}
       >
-        <ResizablePanel collapsible minSize={5}>
+        <ResizablePanel collapsible minSize="5">
           <LogsQueryPanel
-            defaultFrom={timestampStart || ''}
-            defaultTo={timestampEnd || ''}
+            value={datePickerValue}
             onDateChange={handleDateChange}
             onSelectSource={handleInsertSource}
-            templates={TEMPLATES.filter((template) => template.mode === 'custom')}
-            warehouseCollections={warehouseCollections || []}
+            templates={allTemplates.filter((template) => template.mode === 'custom')}
             onSelectTemplate={onSelectTemplate}
-            warehouseTemplates={createWarehouseQueryTemplates(warehouseCollections || [])}
-            onSelectWarehouseTemplate={(template) => {
-              setWarehouseEditorValue(template.query)
-              setWarehouseEditorId(uuidv4())
-            }}
             warnings={warnings}
-            dataSource={sourceType}
-            onDataSourceChange={(srcType) => {
-              setSourceType(srcType)
-              router.push({
-                pathname: router.pathname,
-                query: { ...router.query, source: srcType },
-              })
-            }}
+            useOtel={useOtelEndpoint}
+            onUseOtelChange={setUseOtelEndpoint}
           />
-
           <ShimmerLine active={isLoading} />
-          {sourceType === 'warehouse' ? (
-            <CodeEditor
-              id={warehouseEditorId}
-              language="pgsql" // its bq sql but monaco doesn't have a language for it
-              defaultValue={warehouseEditorValue}
-              onInputChange={(v) => setWarehouseEditorValue(v || '')}
-              actions={{ runQuery: { enabled: true, callback: handleRun } }}
-            />
-          ) : (
-            <CodeEditor
-              id={editorId}
-              editorRef={editorRef}
-              language="pgsql"
-              defaultValue={editorValue}
-              onInputChange={(v) => setEditorValue(v || '')}
-              actions={{ runQuery: { enabled: true, callback: handleRun } }}
-            />
-          )}
+          <CodeEditor
+            // Ensure we reset the editor to the query content whenever the selected query changes
+            key={queryId}
+            id={editorId}
+            editorRef={editorRef}
+            language="pgsql"
+            defaultValue={editorValue}
+            onInputChange={(v) => setEditorValue(v || '')}
+            actions={{ runQuery: { enabled: true, callback: handleRun } }}
+          />
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel collapsible minSize={5} className="overflow-auto">
+        <ResizablePanel collapsible minSize="5" className="overflow-auto">
           <LoadingOpacity active={isLoading}>
             <LogTable
               isSaving={isUpsertingContent}
@@ -419,7 +414,8 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               error={error}
               projectRef={projectRef}
               onSelectedLogChange={setSelectedLog}
-              selectedLog={selectedLog}
+              selectedLog={selectedLog || undefined}
+              sqlQuery={editorValue}
             />
 
             <div className="flex flex-row justify-end mt-2">
@@ -429,59 +425,22 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         </ResizablePanel>
       </ResizablePanelGroup>
 
-      <Modal
-        size="medium"
-        onCancel={() => setSaveModalOpen(!saveModalOpen)}
+      <UpdateSavedQueryModal
         header="Save log query"
         visible={saveModalOpen}
-        hideFooter
-      >
-        <Form
-          initialValues={{
-            name: '',
-            desdcription: '',
-          }}
-          onSubmit={handleCreateQuery}
-        >
-          {() => (
-            <>
-              <Modal.Content className="space-y-6">
-                <Input layout="horizontal" label="Name" id="name" />
-                <div className="text-area-text-sm">
-                  <Input.TextArea
-                    layout="horizontal"
-                    labelOptional="Optional"
-                    label="Description"
-                    id="description"
-                    rows={2}
-                  />
-                </div>
-              </Modal.Content>
-              <Modal.Separator />
-              <Modal.Content className="flex items-center justify-end gap-2">
-                <Button size="tiny" type="default" onClick={() => setSaveModalOpen(!saveModalOpen)}>
-                  Cancel
-                </Button>
-                <Button
-                  size="tiny"
-                  loading={isUpsertingContent}
-                  disabled={isUpsertingContent}
-                  htmlType="submit"
-                >
-                  Save
-                </Button>
-              </Modal.Content>
-            </>
-          )}
-        </Form>
-      </Modal>
+        initialValues={{ name: '', description: '' }}
+        onCancel={() => {
+          setSaveModalOpen(false)
+        }}
+        onSubmit={handleCreateQuery}
+      />
     </div>
   )
 }
 
 LogsExplorerPage.getLayout = (page) => (
   <DefaultLayout>
-    <LogsLayout>{page}</LogsLayout>
+    <LogsLayout title="Explorer">{page}</LogsLayout>
   </DefaultLayout>
 )
 

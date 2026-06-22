@@ -1,27 +1,14 @@
 'use client'
 
-import type {
-  Branch,
-  Org,
-  Project,
-  Variable,
-} from '~/components/ProjectConfigVariables/ProjectConfigVariables.utils'
-import type { ProjectApiData } from '~/lib/fetch/projectApi'
-
-import { Copy, Check } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect, useMemo } from 'react'
-import CopyToClipboard from 'react-copy-to-clipboard'
-import { withErrorBoundary } from 'react-error-boundary'
-import { proxy, useSnapshot } from 'valtio'
-
-import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useIsUserLoading } from 'common'
-import { Button_Shadcn_ as Button, Input_Shadcn_ as Input, cn } from 'ui'
-
 import {
   ComboBox,
   ComboBoxOption,
 } from '~/components/ProjectConfigVariables/ProjectConfigVariables.ComboBox'
+import type {
+  Branch,
+  Org,
+  Variable,
+} from '~/components/ProjectConfigVariables/ProjectConfigVariables.utils'
 import {
   fromBranchValue,
   fromOrgProjectValue,
@@ -31,13 +18,26 @@ import {
   toOrgProjectValue,
 } from '~/components/ProjectConfigVariables/ProjectConfigVariables.utils'
 import { useCopy } from '~/hooks/useCopy'
+import { useDebounce } from '~/hooks/useDebounce'
 import { useBranchesQuery } from '~/lib/fetch/branches'
 import { useOrganizationsQuery } from '~/lib/fetch/organizations'
-import { type SupavisorConfigData, useSupavisorConfigQuery } from '~/lib/fetch/pooler'
-import { useProjectApiQuery } from '~/lib/fetch/projectApi'
-import { isProjectPaused, type ProjectsData, useProjectsQuery } from '~/lib/fetch/projects'
+import { useSupavisorConfigQuery, type SupavisorConfigData } from '~/lib/fetch/pooler'
+import { useProjectKeysQuery, useProjectSettingsQuery } from '~/lib/fetch/projectApi'
+import {
+  isProjectPaused,
+  ProjectInfoInfinite,
+  useProjectsInfiniteQuery,
+} from '~/lib/fetch/projects-infinite'
 import { retrieve, storeOrRemoveNull } from '~/lib/storage'
 import { useOnLogout } from '~/lib/userAuth'
+import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useIsUserLoading } from 'common'
+import { Check, Copy } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useMemo, useState } from 'react'
+import CopyToClipboard from 'react-copy-to-clipboard'
+import { withErrorBoundary } from 'react-error-boundary'
+import { Button_Shadcn_ as Button, cn, Input } from 'ui'
+import { proxy, useSnapshot } from 'valtio'
 
 type ProjectOrgDataState =
   | 'userLoading'
@@ -67,8 +67,8 @@ type VariableDataState =
 
 const projectsStore = proxy({
   selectedOrg: null as Org | null,
-  selectedProject: null as Project | null,
-  setSelectedOrgProject: (org: Org | null, project: Project | null) => {
+  selectedProject: null as ProjectInfoInfinite | null,
+  setSelectedOrgProject: (org: Org | null, project: ProjectInfoInfinite | null) => {
     projectsStore.selectedOrg = org
     storeOrRemoveNull('local', LOCAL_STORAGE_KEYS.SAVED_ORG, org?.id.toString())
 
@@ -90,6 +90,9 @@ function OrgProjectSelector() {
   const isUserLoading = useIsUserLoading()
   const isLoggedIn = useIsLoggedIn()
 
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search, 500)
+
   const { selectedOrg, selectedProject, setSelectedOrgProject } = useSnapshot(projectsStore)
 
   const {
@@ -97,11 +100,21 @@ function OrgProjectSelector() {
     isPending: organizationsIsPending,
     isError: organizationsIsError,
   } = useOrganizationsQuery({ enabled: isLoggedIn })
+
   const {
-    data: projects,
+    data: projectsData,
     isPending: projectsIsPending,
     isError: projectsIsError,
-  } = useProjectsQuery({ enabled: isLoggedIn })
+    isFetching,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useProjectsInfiniteQuery(
+    { search: search.length === 0 ? search : debouncedSearch },
+    { enabled: isLoggedIn }
+  )
+  const projects =
+    useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
 
   const anyIsPending = organizationsIsPending || projectsIsPending
   const anyIsError = organizationsIsError || projectsIsError
@@ -122,14 +135,20 @@ function OrgProjectSelector() {
     () =>
       stateSummary !== 'loggedIn.dataSuccess.hasData'
         ? []
-        : projects.map((project) => {
-            const organization = organizations.find((org) => org.id === project.organization_id)
-            return {
-              id: project.ref,
-              value: toOrgProjectValue(organization, project),
-              displayName: toDisplayNameOrgProject(organization, project),
-            }
-          }),
+        : (projects!
+            .map((project) => {
+              const organization = organizations!.find((org) => org.id === project.organization_id)!
+              const paused = isProjectPaused(project)
+              return {
+                id: project.ref,
+                value: toOrgProjectValue(organization, project),
+                displayName: paused
+                  ? `${toDisplayNameOrgProject(organization, project)} (paused)`
+                  : toDisplayNameOrgProject(organization, project),
+                disabled: paused,
+              }
+            })
+            .filter(Boolean) as ComboBoxOption[]),
     [organizations, projects, stateSummary]
   )
 
@@ -138,19 +157,23 @@ function OrgProjectSelector() {
       const storedMaybeOrgId = retrieve('local', LOCAL_STORAGE_KEYS.SAVED_ORG)
       const storedMaybeProjectRef = retrieve('local', LOCAL_STORAGE_KEYS.SAVED_PROJECT)
 
-      let storedOrg: Org
-      let storedProject: Project
+      let storedOrg: Org | undefined
+      let storedProject: ProjectInfoInfinite | undefined
       if (storedMaybeOrgId && storedMaybeProjectRef) {
-        storedOrg = organizations.find((org) => org.id === Number(storedMaybeOrgId))
-        storedProject = projects.find((project) => project.ref === storedMaybeProjectRef)
+        storedOrg = organizations!.find((org) => org.id === Number(storedMaybeOrgId))
+        storedProject = projects!.find((project) => project.ref === storedMaybeProjectRef)
       }
 
       if (storedOrg && storedProject && storedProject.organization_id === storedOrg.id) {
         setSelectedOrgProject(storedOrg, storedProject)
       } else {
-        const firstProject = projects[0]
-        const matchingOrg = organizations.find((org) => org.id === firstProject.organization_id)
-        if (matchingOrg) setSelectedOrgProject(matchingOrg, firstProject)
+        const firstActiveProject = projects!.find((project) => !isProjectPaused(project))
+        if (firstActiveProject) {
+          const matchingOrg = organizations!.find(
+            (org) => org.id === firstActiveProject.organization_id
+          )
+          if (matchingOrg) setSelectedOrgProject(matchingOrg, firstActiveProject)
+        }
       }
     }
   }, [organizations, projects, selectedOrg, selectedProject, setSelectedOrgProject, stateSummary])
@@ -165,6 +188,11 @@ function OrgProjectSelector() {
         stateSummary === 'loggedIn.dataSuccess.hasNoData'
       }
       options={formattedData}
+      selectedDisplayName={
+        selectedOrg && selectedProject
+          ? toDisplayNameOrgProject(selectedOrg, selectedProject)
+          : undefined
+      }
       selectedOption={
         selectedOrg && selectedProject ? toOrgProjectValue(selectedOrg, selectedProject) : undefined
       }
@@ -172,13 +200,20 @@ function OrgProjectSelector() {
         const [orgId, projectRef] = fromOrgProjectValue(optionValue)
         if (!orgId || !projectRef) return
 
-        const org = organizations.find((org) => org.id === orgId)
-        const project = projects.find((project) => project.ref === projectRef)
+        const org = organizations?.find((org) => org.id === orgId)
+        const project = projects?.find((project) => project.ref === projectRef)
 
         if (org && project && project.organization_id === org.id) {
           setSelectedOrgProject(org, project)
         }
       }}
+      search={search}
+      isFetching={isFetching}
+      isFetchingNextPage={isFetchingNextPage}
+      hasNextPage={hasNextPage}
+      fetchNextPage={fetchNextPage}
+      setSearch={setSearch}
+      useCommandSearch={false}
     />
   )
 }
@@ -188,6 +223,7 @@ function BranchSelector() {
   const isLoggedIn = useIsLoggedIn()
 
   const { selectedProject, selectedBranch, setSelectedBranch } = useSnapshot(projectsStore)
+  const [branchSearch, setBranchSearch] = useState('')
 
   const projectPaused = isProjectPaused(selectedProject)
   const hasBranches = selectedProject?.is_branch_enabled ?? false
@@ -214,7 +250,7 @@ function BranchSelector() {
   const formattedData: ComboBoxOption[] =
     stateSummary !== 'loggedIn.branches.dataSuccess.hasData'
       ? []
-      : data.map((branch) => ({
+      : data!.map((branch) => ({
           id: branch.id,
           displayName: branch.name,
           value: toBranchValue(branch),
@@ -224,18 +260,18 @@ function BranchSelector() {
     if (stateSummary === 'loggedIn.branches.dataSuccess.hasData' && !selectedBranch) {
       const storedMaybeBranchId = retrieve('local', LOCAL_STORAGE_KEYS.SAVED_BRANCH)
 
-      let storedBranch: Branch
+      let storedBranch: Branch | undefined
       if (storedMaybeBranchId) {
-        storedBranch = data.find((branch) => branch.id === storedMaybeBranchId)
+        storedBranch = data!.find((branch) => branch.id === storedMaybeBranchId)
       }
 
       if (storedBranch) {
         setSelectedBranch(storedBranch)
       } else {
-        const productionBranch = data.find(
+        const productionBranch = data!.find(
           (branch) => branch.project_ref === branch.parent_project_ref
         )
-        setSelectedBranch(productionBranch ?? data[0])
+        setSelectedBranch(productionBranch ?? data![0])
       }
     }
   }, [data, selectedBranch, setSelectedBranch, stateSummary])
@@ -251,11 +287,14 @@ function BranchSelector() {
         stateSummary === 'loggedIn.branches.dataSuccess.noData'
       }
       options={formattedData}
+      selectedDisplayName={selectedBranch?.name}
       selectedOption={selectedBranch ? toBranchValue(selectedBranch) : undefined}
+      search={branchSearch}
+      setSearch={setBranchSearch}
       onSelectOption={(option) => {
         const [branchId] = fromBranchValue(option)
         if (branchId) {
-          const branch = data.find((branch) => branch.id === branchId)
+          const branch = data?.find((branch) => branch.id === branchId)
           if (branch) setSelectedBranch(branch)
         }
       }}
@@ -272,14 +311,25 @@ function VariableView({ variable, className }: { variable: Variable; className?:
   const hasBranches = selectedProject?.is_branch_enabled ?? false
   const ref = hasBranches ? selectedBranch?.project_ref : selectedProject?.ref
 
-  const needsApiQuery = variable === 'anonKey' || variable === 'url'
+  const needsApiQuery = variable === 'publishable' || variable === 'anon' || variable === 'url'
   const needsSupavisorQuery = variable === 'sessionPooler'
 
   const {
-    data: apiData,
-    isPending: isApiPending,
-    isError: isApiError,
-  } = useProjectApiQuery(
+    data: apiSettingsData,
+    isPending: isApiSettingsPending,
+    isError: isApiSettingsError,
+  } = useProjectSettingsQuery(
+    {
+      projectRef: ref,
+    },
+    { enabled: isLoggedIn && !!ref && !projectPaused && needsApiQuery }
+  )
+
+  const {
+    data: apiKeysData,
+    isPending: isApiKeysPending,
+    isError: isApiKeysError,
+  } = useProjectKeysQuery(
     {
       projectRef: ref,
     },
@@ -297,15 +347,6 @@ function VariableView({ variable, className }: { variable: Variable; className?:
     { enabled: isLoggedIn && !!ref && !projectPaused && needsSupavisorQuery }
   )
 
-  function isInvalidApiData(apiData: ProjectApiData) {
-    switch (variable) {
-      case 'url':
-        return !apiData.app_config?.endpoint
-      case 'anonKey':
-        return !apiData.service_api_keys?.some((key) => key.tags === 'anon')
-    }
-  }
-
   function isInvalidSupavisorData(supavisorData: SupavisorConfigData) {
     return supavisorData.length === 0
   }
@@ -318,27 +359,32 @@ function VariableView({ variable, className }: { variable: Variable; className?:
         ? 'loggedIn.noSelectedProject'
         : projectPaused
           ? 'loggedIn.selectedProject.projectPaused'
-          : (needsApiQuery ? isApiPending : isSupavisorPending)
+          : (needsApiQuery ? isApiSettingsPending || isApiKeysPending : isSupavisorPending)
             ? 'loggedIn.selectedProject.dataPending'
             : (
                   needsApiQuery
-                    ? isApiError || isInvalidApiData(apiData)
-                    : isSupavisorError || isInvalidSupavisorData(supavisorConfig)
+                    ? isApiSettingsError || isApiKeysError
+                    : isSupavisorError || isInvalidSupavisorData(supavisorConfig!)
                 )
               ? 'loggedIn.selectedProject.dataError'
               : 'loggedIn.selectedProject.dataSuccess'
 
-  let variableValue: string = null
+  let variableValue: string = ''
+
   if (stateSummary === 'loggedIn.selectedProject.dataSuccess') {
     switch (variable) {
       case 'url':
-        variableValue = `https://${apiData.app_config!.endpoint}`
+        variableValue = `https://${apiSettingsData?.app_config?.endpoint}`
         break
-      case 'anonKey':
-        variableValue = apiData.service_api_keys!.find((key) => key.tags === 'anon')!.api_key
+      case 'anon':
+        variableValue =
+          apiKeysData?.find((key) => key.type === 'legacy' && key.id === 'anon')?.api_key || ''
+        break
+      case 'publishable':
+        variableValue = apiKeysData?.find((key) => key.type === 'publishable')?.api_key || ''
         break
       case 'sessionPooler':
-        variableValue = supavisorConfig[0].connection_string
+        variableValue = supavisorConfig?.[0]?.connection_string || ''
     }
   }
 

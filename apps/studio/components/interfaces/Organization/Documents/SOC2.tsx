@@ -1,30 +1,35 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Download } from 'lucide-react'
-import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { Button } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import NoPermission from 'components/ui/NoPermission'
-import { getDocument } from 'data/documents/document-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Button } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+} from '@/components/layouts/Scaffold'
+import NoPermission from '@/components/ui/NoPermission'
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
+import { getDocument } from '@/data/documents/document-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 
-const SOC2 = () => {
-  const organization = useSelectedOrganization()
+export const SOC2 = () => {
+  const { data: organization } = useSelectedOrganizationQuery()
   const slug = organization?.slug
-  const canReadSubscriptions = useCheckPermissions(
+
+  const track = useTrack()
+  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
   )
-
-  const currentPlan = organization?.plan
+  const { hasAccess: hasAccessToSoc2Report, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('security.soc2_report')
 
   const [isOpen, setIsOpen] = useState(false)
 
@@ -33,35 +38,55 @@ const SOC2 = () => {
       const soc2Link = await getDocument({ orgSlug, docType: 'soc2-type-2-report' })
       if (soc2Link?.fileUrl) window.open(soc2Link.fileUrl, '_blank')
       setIsOpen(false)
-    } catch (error: any) {
-      toast.error(`Failed to download SOC2 report: ${error.message}`)
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error occurred'
+      toast.error(`Failed to download SOC2 report: ${message}`)
     }
   }
 
+  const handleDownloadClick = () => {
+    if (!slug) return
+
+    track('document_view_button_clicked', { documentName: 'SOC2' })
+    setIsOpen(true)
+  }
+
   return (
-    <ScaffoldSection>
-      <ScaffoldSectionDetail className="sticky space-y-6 top-12">
-        <p className="text-base m-0">SOC2 Type 2</p>
-        <div className="space-y-2 text-sm text-foreground-light m-0">
+    <ScaffoldSection className="py-12">
+      <ScaffoldSectionDetail>
+        <h4 className="mb-5">SOC2 Type 2</h4>
+        <div className="space-y-2 text-sm text-foreground-light [&_p]:m-0">
           <p>
             Organizations on Team Plan or above have access to our most recent SOC2 Type 2 report.
           </p>
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
-        {!canReadSubscriptions ? (
+        {isLoadingPermissions || isLoadingEntitlement ? (
+          <div className="@lg:flex items-center justify-center h-full">
+            <ShimmeringLoader className="w-24" />
+          </div>
+        ) : !canReadSubscriptions ? (
           <NoPermission resourceText="access our SOC2 Type 2 report" />
+        ) : !hasAccessToSoc2Report ? (
+          <div className="@lg:flex items-center justify-center h-full">
+            <UpgradePlanButton
+              variant="default"
+              plan="Team"
+              source="org-documents-soc2"
+              featureProposition="download the SOC2 Type 2report"
+            />
+          </div>
         ) : (
-          <div className="flex items-center justify-center h-full">
-            {currentPlan?.id === 'free' || currentPlan?.id === 'pro' ? (
-              <Link href={`/org/${slug}/billing?panel=subscriptionPlan&source=soc2`}>
-                <Button type="default">Upgrade to Team</Button>
-              </Link>
-            ) : (
-              <Button type="default" icon={<Download />} onClick={() => setIsOpen(true)}>
-                Download SOC2 Type 2 Report
-              </Button>
-            )}
+          <div className="@lg:flex items-center justify-center h-full">
+            <Button
+              variant="default"
+              icon={<Download />}
+              onClick={handleDownloadClick}
+              disabled={!slug}
+            >
+              Download SOC2 Type 2 Report
+            </Button>
           </div>
         )}
         <ConfirmationModal
@@ -111,5 +136,3 @@ const SOC2 = () => {
     </ScaffoldSection>
   )
 }
-
-export default SOC2

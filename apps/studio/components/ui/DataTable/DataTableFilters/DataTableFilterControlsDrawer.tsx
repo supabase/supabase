@@ -1,0 +1,78 @@
+import { FilterIcon } from 'lucide-react'
+import { VisuallyHidden } from 'radix-ui'
+import { useRef } from 'react'
+import {
+  Button,
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
+
+import { useMediaQuery } from '../hooks/useMediaQuery'
+import { Kbd } from '../primitives/Kbd'
+import { DataTableFilterControls } from './DataTableFilterControls'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
+
+export function DataTableFilterControlsDrawer() {
+  const triggerButtonRef = useRef<HTMLButtonElement>(null)
+  const isMobile = useMediaQuery('(max-width: 640px)')
+
+  useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS, () => {
+    triggerButtonRef.current?.click()
+  })
+
+  return (
+    <Drawer>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DrawerTrigger asChild>
+            <Button
+              size="tiny"
+              variant="text"
+              icon={<FilterIcon />}
+              className="w-[26px]"
+              ref={isMobile ? triggerButtonRef : null}
+              aria-label="Open filters"
+            />
+          </DrawerTrigger>
+        </TooltipTrigger>
+        <TooltipContent side="right">
+          <p>
+            Toggle controls with{' '}
+            <Kbd className="ml-1 text-muted-foreground group-hover:text-accent-foreground">
+              <span className="mr-1">⌘</span>
+              <span>B</span>
+            </Kbd>
+          </p>
+        </TooltipContent>
+      </Tooltip>
+      <DrawerContent className="max-h-[calc(100dvh-4rem)]">
+        <VisuallyHidden.VisuallyHidden>
+          <DrawerHeader>
+            <DrawerTitle>Filters</DrawerTitle>
+            <DrawerDescription>Adjust your table filters</DrawerDescription>
+          </DrawerHeader>
+        </VisuallyHidden.VisuallyHidden>
+        <div className="px-4 flex-1 overflow-y-auto">
+          <DataTableFilterControls />
+        </div>
+        <DrawerFooter>
+          <DrawerClose asChild>
+            <Button variant="outline" className="w-full">
+              Close
+            </Button>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
+  )
+}

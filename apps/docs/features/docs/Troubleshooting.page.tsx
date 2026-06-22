@@ -1,11 +1,11 @@
+import { Github } from 'lucide-react'
+import Link from 'next/link'
 import { cn } from 'ui'
-
 import Breadcrumbs from '~/components/Breadcrumbs'
 import { Feedback } from '~/components/Feedback'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 import { MDXRemoteBase } from './MdxBase'
 import { getTroubleshootingUpdatedDates, type ITroubleshootingEntry } from './Troubleshooting.utils'
-import Link from 'next/link'
 import { formatError, serializeTroubleshootingSearchParams } from './Troubleshooting.utils.shared'
 
 export default async function TroubleshootingPage({ entry }: { entry: ITroubleshootingEntry }) {
@@ -16,7 +16,7 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
   return (
     <SidebarSkeleton
       hideSideNav
-      className="@container/troubleshooting-entry-layout w-full max-w-screen-lg mx-auto lg:py-8 lg:px-5"
+      className="@container/troubleshooting-entry-layout w-full max-w-(--breakpoint-lg) mx-auto lg:py-8 lg:px-5"
     >
       <div className="px-5 py-8 lg:px-0 lg:py-0">
         <Breadcrumbs minLength={1} forceDisplayOnMobile />
@@ -28,7 +28,7 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
             </p>
           )}
           <hr className="my-7" aria-hidden />
-          <div className="grid gap-10 @3xl/troubleshooting-entry-layout:grid-cols-[1fr,250px]">
+          <div className="grid gap-10 @3xl/troubleshooting-entry-layout:grid-cols-[1fr_250px]">
             <div className="min-w-0">
               <MDXRemoteBase source={entry.content} />
             </div>
@@ -58,7 +58,7 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
                   <hr className="my-6" aria-hidden />
                 </>
               )}
-              {entry.data.errors?.length > 0 && (
+              {entry.data.errors?.length && entry.data.errors.length > 0 && (
                 <>
                   <h3 className="text-sm text-foreground-lighter mb-3">Related error codes</h3>
                   <div className="flex flex-wrap gap-0.5">
@@ -76,9 +76,9 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
                   <hr className="my-6" aria-hidden />
                 </>
               )}
-              {entry.data.keywords?.length > 0 && (
+              {entry.data.keywords?.length && entry.data.keywords.length > 0 && (
                 <>
-                  <h3 className="text-sm text-foreground-lighter mb-3">Tags</h3>
+                  <h3 className="text-sm text-foreground-lighter mb-3">Keywords</h3>
                   <div className="flex flex-wrap gap-0.5">
                     {entry.data.keywords.map((keyword) => (
                       <Link
@@ -95,6 +95,19 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
                 </>
               )}
               <Feedback className="px-0 mb-6 lg:mb-8" />
+              {entry.data.github_url && (
+                <>
+                  <hr className="my-6" aria-hidden />
+                  <Link
+                    target="_blank"
+                    href={entry.data.github_url}
+                    className="flex items-center gap-2 text-sm text-foreground-lighter"
+                  >
+                    <Github size={14} />
+                    View discussion on GitHub
+                  </Link>
+                </>
+              )}
             </aside>
           </div>
         </article>

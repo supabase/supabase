@@ -3,12 +3,13 @@ import { includes, sortBy } from 'lodash'
 import { Check, ChevronRight, Loader2, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Table from 'components/to-be-cleaned/Table'
-import { useQueuesMetricsQuery } from 'data/database-queues/database-queues-metrics-query'
-import { PostgresQueue } from 'data/database-queues/database-queues-query'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { DATETIME_FORMAT } from 'lib/constants'
+import { pgmqQueueTable } from './Queues.utils'
+import Table from '@/components/to-be-cleaned/Table'
+import { useQueuesMetricsQuery } from '@/data/database-queues/database-queues-metrics-query'
+import { PostgresQueue } from '@/data/database-queues/database-queues-query'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DATETIME_FORMAT } from '@/lib/constants'
 
 interface QueuesRowsProps {
   queues: PostgresQueue[]
@@ -17,17 +18,17 @@ interface QueuesRowsProps {
 
 const QueueRow = ({ queue }: { queue: PostgresQueue }) => {
   const router = useRouter()
-  const { project: selectedProject } = useProjectContext()
+  const { data: selectedProject } = useSelectedProjectQuery()
 
   const { data: queueTables } = useTablesQuery({
     projectRef: selectedProject?.ref,
     connectionString: selectedProject?.connectionString,
     schema: 'pgmq',
   })
-  const queueTable = queueTables?.find((x) => x.name === `q_${queue.queue_name}`)
+  const queueTable = queueTables?.find((x) => x.name === pgmqQueueTable(queue.queue_name))
   const isRlsEnabled = !!queueTable?.rls_enabled
 
-  const { data: metrics, isLoading } = useQueuesMetricsQuery(
+  const { data: metrics, isPending: isLoading } = useQueuesMetricsQuery(
     {
       queueName: queue.queue_name,
       projectRef: selectedProject?.ref,

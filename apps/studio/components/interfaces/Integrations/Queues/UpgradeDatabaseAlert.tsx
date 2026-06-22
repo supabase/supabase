@@ -1,20 +1,19 @@
 import Link from 'next/link'
-
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface UpgradeDatabaseAlertProps {
   minimumVersion?: string
 }
 
 export const UpgradeDatabaseAlert = ({ minimumVersion = '15.6' }: UpgradeDatabaseAlertProps) => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   return (
     <Admonition
-      type="warning"
-      className="mt-4"
+      type="default"
       title="Database upgrade needed"
       childProps={{ description: { className: 'flex flex-col gap-y-2' } }}
     >

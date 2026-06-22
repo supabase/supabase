@@ -25,11 +25,9 @@ This will create user tables and profile tables for user management.
 
 ### 3. Get the URL and Key
 
-Go to the Project Settings (the cog icon), open the API tab, and find your API URL and `anon` key, you'll need these in the next step.
+Go to the Project Settings (the cog icon), open the API tab, and find your API URL and `publishable` key, you'll need these in the next step.
 
-The `anon` key is your client-side API key. It allows "anonymous access" to your database, until the user has logged in. Once they have logged in, the keys will switch to the user's own login token.
-
-![Supabase Anon Key](supabase_anon_key.jpg?raw=true 'Supabase Anon Key')
+The `publishable` key is your client-side API key. It allows "anonymous access" to your database, until the user has logged in. Once they have logged in, the keys will switch to the user's own login token.
 
 ### 4. Pull this example git repository
 
@@ -42,7 +40,7 @@ Create a .env.local file and add following environment variables.
 ```
 NEXT_PUBLIC_SUPABASE_URL=<<insert-your-db-url-here>>
 
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<<insert-your-anon-key-here>>
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<<insert-your-publishable-key-here>>
 ```
 
 ### 5. Now run the development server!

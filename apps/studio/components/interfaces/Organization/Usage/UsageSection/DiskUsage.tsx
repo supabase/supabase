@@ -1,28 +1,23 @@
-import AlertError from 'components/ui/AlertError'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import type { OrgSubscription } from 'data/subscriptions/types'
-import SectionContent from '../SectionContent'
-import { CategoryAttribute } from '../Usage.constants'
-import { useOrgProjectsQuery } from 'data/projects/org-projects'
-import { PROJECT_STATUS } from 'lib/constants'
-import {
-  Button,
-  Alert_Shadcn_,
-  CriticalIcon,
-  AlertTitle_Shadcn_,
-  AlertDescription_Shadcn_,
-} from 'ui'
 import MotionNumber from '@number-flow/react'
 import Link from 'next/link'
 import { useMemo } from 'react'
+import { Alert, AlertDescription, AlertTitle, Button, CriticalIcon } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { OrgUsageResponse } from 'data/usage/org-usage-query'
-import { PricingMetric } from 'data/analytics/org-daily-stats-query'
-import Panel from 'components/ui/Panel'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { SectionContent } from '../SectionContent'
+import { CategoryAttribute } from '../Usage.constants'
+import AlertError from '@/components/ui/AlertError'
+import Panel from '@/components/ui/Panel'
+import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import type { OrgSubscription } from '@/data/subscriptions/types'
+import { OrgUsageResponse } from '@/data/usage/org-usage-query'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 export interface DiskUsageProps {
   slug: string
-  projectRef?: string
+  projectRef?: string | null
   attribute: CategoryAttribute
   subscription?: OrgSubscription
   usage?: OrgUsageResponse
@@ -30,7 +25,7 @@ export interface DiskUsageProps {
   currentBillingCycleSelected: boolean
 }
 
-const DiskUsage = ({
+export const DiskUsage = ({
   slug,
   projectRef,
   attribute,
@@ -39,23 +34,17 @@ const DiskUsage = ({
   currentBillingCycleSelected,
 }: DiskUsageProps) => {
   const {
-    data: diskUsage,
+    data,
     isError,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
     error,
-  } = useOrgProjectsQuery(
-    {
-      orgSlug: slug,
-    },
-    {
-      enabled: currentBillingCycleSelected,
-    }
-  )
+  } = useOrgProjectsInfiniteQuery({ slug }, { enabled: currentBillingCycleSelected })
+  const projects = useMemo(() => data?.pages.flatMap((page) => page.projects) || [], [data?.pages])
 
   const relevantProjects = useMemo(() => {
-    return diskUsage
-      ? diskUsage.projects
+    return isSuccess
+      ? projects
           .filter((project) => {
             // We do want to show branches that are exceeding the 8 GB limit, as people could have persistent or very long-living branches
             const isBranchExceedingFreeQuota =
@@ -71,7 +60,8 @@ const DiskUsage = ({
           })
           .filter((it) => it.ref === projectRef || !projectRef)
       : []
-  }, [diskUsage, projectRef])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccess, projects, projectRef])
 
   const hasProjectsExceedingDiskSize = useMemo(() => {
     return relevantProjects.some((it) =>
@@ -104,15 +94,15 @@ const DiskUsage = ({
             {currentBillingCycleSelected &&
               subscription?.usage_billing_enabled === false &&
               hasProjectsExceedingDiskSize && (
-                <Alert_Shadcn_ variant="warning">
+                <Alert variant="warning">
                   <CriticalIcon />
-                  <AlertTitle_Shadcn_>Projects exceeding quota</AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
+                  <AlertTitle>Projects exceeding quota</AlertTitle>
+                  <AlertDescription>
                     You have projects that are exceeding 8 GB of provisioned disk size, but do not
                     allow any overages with the Spend Cap on. Reduce the disk size or disable the
                     spend cap.
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
+                  </AlertDescription>
+                </Alert>
               )}
 
             <div>
@@ -184,7 +174,7 @@ const DiskUsage = ({
                         <span className="text-foreground-light flex items-center gap-2">
                           {project.name}
                         </span>
-                        <Button asChild type="default" size={'tiny'}>
+                        <Button asChild variant="default" size={'tiny'}>
                           <Link href={`/project/${project.ref}/settings/compute-and-disk`}>
                             Manage Disk
                           </Link>
@@ -193,7 +183,7 @@ const DiskUsage = ({
                       <div className="flex flex-col gap-2">
                         <div className="flex items-center h-6 gap-3">
                           <span className="text-foreground-light text-sm font-mono flex items-center gap-2">
-                            <span className="text-foreground font-semibold -mt-[2px]">
+                            <span className="text-foreground font-semibold mt-[-2px]">
                               <MotionNumber
                                 value={totalDiskUsage}
                                 style={{ lineHeight: 0.8 }}
@@ -241,5 +231,3 @@ const DiskUsage = ({
     </div>
   )
 }
-
-export default DiskUsage

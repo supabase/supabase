@@ -1,10 +1,10 @@
-import { Doc } from '@/.contentlayer/generated'
-import Link from 'next/link'
-import { forwardRef } from 'react'
-
 import { ExternalLink } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
+import { forwardRef } from 'react'
 import { Button, cn } from 'ui'
+
+import { Doc } from '@/.contentlayer/generated'
 
 const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> & { doc: Doc }>(
   ({ doc, children, ...props }, ref) => {
@@ -111,7 +111,7 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
               <div className="flex items-center gap-2 justify-end">
                 {doc.links?.doc && (
                   <Button
-                    type="outline"
+                    variant="outline"
                     className="rounded-full"
                     icon={<ExternalLink className="text-foreground-muted" strokeWidth={1} />}
                   >
@@ -128,17 +128,11 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
                 )}
                 {doc.links?.api && (
                   <Button
-                    type="outline"
+                    variant="outline"
                     className="rounded-full"
                     icon={<ExternalLink className="text-foreground-muted" strokeWidth={1} />}
                   >
-                    <Link
-                      href={doc.links.api}
-                      target="_blank"
-                      rel="noreferrer"
-
-                      // className={cn(badgeVariants({ variant: 'default' }), 'gap-1')}
-                    >
+                    <Link href={doc.links.api} target="_blank" rel="noreferrer">
                       API Reference
                     </Link>
                   </Button>
@@ -211,34 +205,22 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
                 <div className="flex items-center gap-2 justify-end">
                   {doc.links?.doc && (
                     <Button
-                      type="outline"
+                      variant="outline"
                       className="rounded-full"
                       icon={<ExternalLink className="text-foreground-muted" strokeWidth={1} />}
                     >
-                      <Link
-                        href={doc.links.doc}
-                        target="_blank"
-                        rel="noreferrer"
-
-                        // className={cn(buttonVariants({ variant: 'default' }), 'gap-1')}
-                      >
+                      <Link href={doc.links.doc} target="_blank" rel="noreferrer">
                         Docs
                       </Link>
                     </Button>
                   )}
                   {doc.links?.api && (
                     <Button
-                      type="outline"
+                      variant="outline"
                       className="rounded-full"
                       icon={<ExternalLink className="text-foreground-muted" strokeWidth={1} />}
                     >
-                      <Link
-                        href={doc.links.api}
-                        target="_blank"
-                        rel="noreferrer"
-
-                        // className={cn(badgeVariants({ variant: 'default' }), 'gap-1')}
-                      >
+                      <Link href={doc.links.api} target="_blank" rel="noreferrer">
                         API Reference
                       </Link>
                     </Button>

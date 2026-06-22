@@ -1,22 +1,23 @@
+import dayjs from 'dayjs'
+import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useState } from 'react'
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { PropsWithChildren, useMemo, useState } from 'react'
+import { Button, Tooltip, TooltipContent, TooltipTrigger, WarningIcon } from 'ui'
 
-import AreaChart from 'components/ui/Charts/AreaChart'
-import BarChart from 'components/ui/Charts/BarChart'
-import { AnalyticsInterval } from 'data/analytics/constants'
+import type { ChartData } from './Charts.types'
+import AreaChart from '@/components/ui/Charts/AreaChart'
+import BarChart from '@/components/ui/Charts/BarChart'
+import { AnalyticsInterval } from '@/data/analytics/constants'
+import { mapMultiResponseToAnalyticsData } from '@/data/analytics/infra-monitoring-queries'
 import {
   InfraMonitoringAttribute,
-  useInfraMonitoringQuery,
-} from 'data/analytics/infra-monitoring-query'
+  useInfraMonitoringAttributesQuery,
+} from '@/data/analytics/infra-monitoring-query'
 import {
   ProjectDailyStatsAttribute,
   useProjectDailyStatsQuery,
-} from 'data/analytics/project-daily-stats-query'
-import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { WarningIcon } from 'ui'
-import type { ChartData } from './Charts.types'
+} from '@/data/analytics/project-daily-stats-query'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 interface ChartHandlerProps {
   id?: string
@@ -33,6 +34,7 @@ interface ChartHandlerProps {
   isLoading?: boolean
   format?: string
   highlightedValue?: string | number
+  syncId?: string
 }
 
 /**
@@ -59,6 +61,8 @@ const ChartHandler = ({
   isLoading,
   format,
   highlightedValue,
+  syncId,
+  ...otherProps
 }: PropsWithChildren<ChartHandlerProps>) => {
   const router = useRouter()
   const { ref } = router.query
@@ -68,23 +72,21 @@ const ChartHandler = ({
 
   const databaseIdentifier = state.selectedDatabaseId
 
-  const { data: dailyStatsData, isLoading: isFetchingDailyStats } = useProjectDailyStatsQuery(
+  const { data: dailyStatsData, isPending: isFetchingDailyStats } = useProjectDailyStatsQuery(
     {
       projectRef: ref as string,
       attribute: attribute as ProjectDailyStatsAttribute,
-      startDate,
-      endDate,
-      interval: interval as AnalyticsInterval,
-      databaseIdentifier,
+      startDate: dayjs(startDate).format('YYYY-MM-DD'),
+      endDate: dayjs(endDate).format('YYYY-MM-DD'),
     },
     { enabled: provider === 'daily-stats' && data === undefined }
   )
 
-  const { data: infraMonitoringData, isLoading: isFetchingInfraMonitoring } =
-    useInfraMonitoringQuery(
+  const { data: infraMonitoringData, isPending: isFetchingInfraMonitoring } =
+    useInfraMonitoringAttributesQuery(
       {
         projectRef: ref as string,
-        attribute: attribute as InfraMonitoringAttribute,
+        attributes: [attribute as InfraMonitoringAttribute],
         startDate,
         endDate,
         interval: interval as AnalyticsInterval,
@@ -93,10 +95,18 @@ const ChartHandler = ({
       { enabled: provider === 'infra-monitoring' && data === undefined }
     )
 
+  const transformedInfraData = useMemo(() => {
+    if (!infraMonitoringData) return undefined
+    const mapped = mapMultiResponseToAnalyticsData(infraMonitoringData, [
+      attribute as InfraMonitoringAttribute,
+    ])
+    return mapped[attribute]
+  }, [infraMonitoringData, attribute])
+
   const chartData =
     data ||
     (provider === 'infra-monitoring'
-      ? infraMonitoringData
+      ? transformedInfraData
       : provider === 'daily-stats'
         ? dailyStatsData
         : undefined)
@@ -139,7 +149,7 @@ const ChartHandler = ({
 
   if (chartData === undefined) {
     return (
-      <div className="flex h-52 w-full flex-col items-center justify-center gap-y-2">
+      <div className="flex h-64 w-full flex-col items-center justify-center gap-y-2 border border-dashed rounded-md">
         <WarningIcon />
         <p className="text-xs text-foreground-lighter">Unable to load data for {label}</p>
       </div>
@@ -153,7 +163,7 @@ const ChartHandler = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
-                type="default"
+                variant="default"
                 className="px-1.5"
                 icon={chartStyle === 'bar' ? <Activity /> : <BarChartIcon />}
                 onClick={() => setChartStyle(chartStyle === 'bar' ? 'line' : 'bar')}
@@ -168,7 +178,6 @@ const ChartHandler = ({
       </div>
       {chartStyle === 'bar' ? (
         <BarChart
-          YAxisProps={{ width: 1 }}
           data={(chartData?.data ?? []) as any}
           format={format || chartData?.format}
           xAxisKey={'period_start'}
@@ -176,6 +185,8 @@ const ChartHandler = ({
           highlightedValue={_highlightedValue}
           title={label}
           customDateFormat={customDateFormat}
+          syncId={syncId}
+          {...otherProps}
         />
       ) : (
         <AreaChart
@@ -186,6 +197,8 @@ const ChartHandler = ({
           highlightedValue={_highlightedValue}
           title={label}
           customDateFormat={customDateFormat}
+          syncId={syncId}
+          {...otherProps}
         />
       )}
     </div>

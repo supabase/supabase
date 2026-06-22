@@ -10,7 +10,7 @@ interface Props {
   submitText?: string
 }
 
-const FormActions = ({
+export const FormActions = ({
   form,
   hasChanges = undefined,
   handleReset,
@@ -31,13 +31,13 @@ const FormActions = ({
     >
       {helper && <span className="text-sm text-foreground-lighter">{helper}</span>}
       <div className="flex items-center gap-2">
-        <Button disabled={isDisabled} type="default" htmlType="reset" onClick={() => handleReset()}>
+        <Button disabled={isDisabled} variant="default" type="reset" onClick={() => handleReset()}>
           Cancel
         </Button>
         <Button
           form={form}
-          type="primary"
-          htmlType="submit"
+          variant="primary"
+          type="submit"
           disabled={isDisabled}
           loading={isSubmitting}
         >
@@ -47,5 +47,3 @@ const FormActions = ({
     </div>
   )
 }
-
-export { FormActions }

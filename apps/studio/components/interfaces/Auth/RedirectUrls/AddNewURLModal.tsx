@@ -1,26 +1,29 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Plus, Trash } from 'lucide-react'
-import { useEffect } from 'react'
-import { useFieldArray, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import * as z from 'zod'
-
+import { Label } from '@ui/components/shadcn/ui/label'
 import { useParams } from 'common'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
   cn,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
   DialogSectionSeparator,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Modal,
+  DialogTitle,
+  Form,
   ScrollArea,
 } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { Label } from '@ui/components/shadcn/ui/label'
+import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
+import * as z from 'zod'
+
 import { urlRegex } from '../Auth.constants'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 
 const MAX_URLS_LENGTH = 2 * 1024
 
@@ -30,9 +33,12 @@ interface AddNewURLModalProps {
   onClose: () => void
 }
 
+const normaliseUrl = (value: string) => value.replace(/,\s*$/, '')
+
 export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalProps) => {
   const { ref } = useParams()
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
+  const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()
+  const redirectUrlRegex = urlRegex()
 
   const FormSchema = z.object({
     urls: z
@@ -40,8 +46,11 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
         value: z
           .string()
           .min(1, 'Please provide a value')
-          .regex(urlRegex(), 'Please provide a valid URL')
-          .refine((value) => !allowList.includes(value), {
+          .refine(
+            (value) => redirectUrlRegex.test(normaliseUrl(value)),
+            'Please provide a valid URL'
+          )
+          .refine((value) => !allowList.includes(normaliseUrl(value)), {
             message: 'URL already exists in the allow list',
           }),
       })
@@ -54,15 +63,13 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
     resolver: zodResolver(FormSchema),
     defaultValues: initialValues,
   })
-
-  const { fields, append, remove } = useFieldArray({
-    name: 'urls',
-    control: form.control,
-  })
+  const urls = form.watch('urls')
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
-    const dedupedData = [...new Set(data.urls.map((url) => url.value))]
-    const payload = allowList.concat(dedupedData.map((url) => url.replace(/,\s*$/, ''))).toString()
+    const dedupedUrls = [...new Set(data.urls.map((url) => normaliseUrl(url.value)))]
+    const payloadUrls = allowList.concat(dedupedUrls)
+    const addedCount = dedupedUrls.length
+    const payload = payloadUrls.toString()
 
     if (payload.length > MAX_URLS_LENGTH) {
       return toast.error('Too many redirect URLs, please remove some or try to use wildcards')
@@ -74,7 +81,7 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
             toast.error(`Failed to add URL(s): ${error?.message}`)
           },
           onSuccess: () => {
-            toast.success(`Successfully added ${fields.length} URL${fields.length > 1 ? 's' : ''}`)
+            toast.success(`Successfully added ${addedCount} URL${addedCount > 1 ? 's' : ''}`)
             form.reset(initialValues)
             onClose()
           },
@@ -88,75 +95,59 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
   }, [visible])
 
   return (
-    <Modal
-      hideFooter
-      size="medium"
-      className="!max-w-[440px]"
-      visible={visible}
-      onCancel={() => {
+    <Dialog
+      open={visible}
+      onOpenChange={() => {
         form.reset(initialValues)
         onClose()
       }}
-      header="Add new redirect URLs"
-      description="This will add a URL to a list of allowed URLs that can interact with your Authentication services for this project."
     >
-      <Form_Shadcn_ {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <Modal.Content className="flex flex-col gap-y-2 px-0">
-            <Label className="px-5">URL</Label>
-            <ScrollArea className={cn(fields.length > 4 ? 'h-[220px]' : '')}>
-              <div className="px-5 py-1 flex flex-col gap-y-2">
-                {fields.map((field, index) => (
-                  <FormField_Shadcn_
-                    control={form.control}
-                    key={field.id}
-                    name={`urls.${index}.value`}
-                    render={({ field: inputField }) => (
-                      <FormItemLayout className="[&>div>div]:mt-0">
-                        <FormControl_Shadcn_>
-                          <div className="flex items-center gap-x-2 [&>div]:w-full">
-                            <Input placeholder="https://mydomain.com" {...inputField} />
-                            <Button
-                              type="default"
-                              size="small"
-                              icon={<Trash />}
-                              className="px-2"
-                              disabled={fields.length === 1}
-                              onClick={() => remove(index)}
-                            />
-                          </div>
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
-                    )}
-                  />
-                ))}
-              </div>
-            </ScrollArea>
-            <div className="px-5">
+      <DialogContent size="medium" className="max-w-[440px]!">
+        <DialogHeader>
+          <DialogTitle>Add new redirect URLs</DialogTitle>
+          <DialogDescription>
+            This will add a URL to a list of allowed URLs that can interact with your Authentication
+            services for this project.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <DialogSection className="flex flex-col gap-y-2 px-0">
+              <Label className="px-5">URL</Label>
+              <ScrollArea className={cn(urls.length > 4 ? 'h-[220px]' : '')}>
+                <div className="px-5 py-1">
+                  <FormItemLayout className="[&>div>div]:mt-0">
+                    <SingleValueFieldArray
+                      control={form.control}
+                      name="urls"
+                      valueFieldName="value"
+                      createEmptyRow={() => ({ value: '' })}
+                      placeholder="https://mydomain.com"
+                      addLabel="Add URL"
+                      removeLabel="Remove URL"
+                      minimumRows={1}
+                      rowsClassName="space-y-2"
+                      addButtonClassName="w-min"
+                    />
+                  </FormItemLayout>
+                </div>
+              </ScrollArea>
+            </DialogSection>
+            <DialogFooter>
               <Button
-                type="default"
-                className="w-min"
-                icon={<Plus strokeWidth={1.5} />}
-                onClick={() => append({ value: '' })}
+                block
+                type="submit"
+                size="small"
+                disabled={isUpdatingConfig}
+                loading={isUpdatingConfig}
               >
-                Add URL
+                Save URLs
               </Button>
-            </div>
-          </Modal.Content>
-          <DialogSectionSeparator />
-          <Modal.Content>
-            <Button
-              block
-              htmlType="submit"
-              size="small"
-              disabled={isUpdatingConfig}
-              loading={isUpdatingConfig}
-            >
-              Save URLs
-            </Button>
-          </Modal.Content>
-        </form>
-      </Form_Shadcn_>
-    </Modal>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   )
 }

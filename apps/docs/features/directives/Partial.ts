@@ -7,6 +7,10 @@
  * Simple string replacement is supported. The replacement strings are
  * specified using the `variables` field.
  *
+ * Variable substitution is optional. Any variable referenced in the partial
+ * content but not provided is rendered as an empty string, and any variable
+ * provided but not referenced in the content is ignored.
+ *
  * ## Examples
  *
  * ### Simple partial
@@ -33,14 +37,14 @@
  * ```
  */
 
-import { type Root } from 'mdast'
-import type { MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { PARTIALS_DIRECTORY } from '~/lib/docs'
+import { type Root } from 'mdast'
+import type { MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
 import { type Parent } from 'unist'
 import { visitParents } from 'unist-util-visit-parents'
 
-import { PARTIALS_DIRECTORY } from '~/lib/docs'
 import { fromDocsMarkdown, getAttributeValue, getAttributeValueExpression } from './utils.server'
 
 export function partialsRemark() {
@@ -65,6 +69,7 @@ function toFilePath(node: MdxJsxFlowElement) {
   if (typeof path !== 'string' || !isMdFile(path)) {
     throw new Error('Invalid $Partial path: path must end with .mdx or .md')
   }
+
   const filePath = join(PARTIALS_DIRECTORY, path)
   if (!filePath.startsWith(PARTIALS_DIRECTORY)) {
     throw new Error(`Invalid $Partial path: Path must be inside ${PARTIALS_DIRECTORY}`)
@@ -72,14 +77,20 @@ function toFilePath(node: MdxJsxFlowElement) {
   return filePath
 }
 
+/**
+ * Substitutes provided variables into the partial content. Variable
+ * substitution is optional: any variable referenced in the content but not
+ * provided is replaced with an empty string, and any variable provided but not
+ * referenced is ignored. The leading `\` escape (`\{{ .var }}`) opts a
+ * placeholder out of substitution.
+ */
 function substituteVars(content: string, vars: Record<string, string> | undefined) {
-  if (vars === undefined) {
-    return content
-  }
-
-  for (const [key, value] of Object.entries(vars)) {
+  for (const [key, value] of Object.entries(vars ?? {})) {
     content = content.replace(new RegExp(`(?<!\\\\)\\{\\{\\s*\\.${key}\\s*\\}\\}`, 'g'), value)
   }
+
+  // Clear any remaining (unprovided) placeholders.
+  content = content.replace(/(?<!\\)\{\{\s*\.[\w-]+\s*\}\}/g, '')
   return content
 }
 
@@ -135,7 +146,7 @@ function rewriteNodes(
   contentMap: Map<MdxJsxFlowElement, [Parent, string, undefined | Record<string, string>]>
 ) {
   for (const [node, [parent, rawContent, vars]] of contentMap) {
-    let content = substituteVars(rawContent.trim(), vars)
+    const content = substituteVars(rawContent.trim(), vars)
     const replacementContent = fromDocsMarkdown(content)
     parent.children.splice(parent.children.indexOf(node), 1, replacementContent)
   }

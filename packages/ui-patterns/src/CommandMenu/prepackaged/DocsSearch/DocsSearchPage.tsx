@@ -1,0 +1,371 @@
+'use client'
+
+import {
+  DocsSearchResultType as PageType,
+  useDocsSearch,
+  type DocsSearchResult as Page,
+  type DocsSearchResultSection as PageSection,
+} from 'common'
+import { Book, ChevronRight, Github, Hash, Loader2, MessageSquare, Search } from 'lucide-react'
+import { useCallback, useEffect, useRef } from 'react'
+import { Button, cn, CommandGroup, CommandItem, CommandList } from 'ui'
+import { StatusIcon } from 'ui/src/components/StatusIcon'
+
+import {
+  Breadcrumb,
+  CommandHeader,
+  CommandMenuInput,
+  CommandWrapper,
+  escapeAttributeSelector,
+  generateCommandClassNames,
+  TextHighlighter,
+  useCommandMenuTelemetryContext,
+  useCrossCompatRouter,
+  useQuery,
+  useSetCommandMenuOpen,
+  useSetQuery,
+} from '../..'
+import { BASE_PATH } from '../shared/constants'
+
+const questions = [
+  'How do I get started with Supabase?',
+  'How do I run Supabase locally?',
+  'How do I connect to my database?',
+  'How do I run migrations? ',
+  'How do I listen to changes in a table?',
+  'How do I set up authentication?',
+]
+
+const ChevronArrow = () => (
+  <ChevronRight
+    strokeWidth={1.5}
+    className={cn(
+      '-left-4',
+      'opacity-0',
+      'text-foreground-muted',
+      'group-aria-selected:scale-[101%] group-aria-selected:opacity-100 group-aria-selected:left-0',
+      'transition'
+    )}
+  />
+)
+
+const IconContainer = (
+  props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>
+) => (
+  <div
+    className={cn(
+      'w-6 h-6',
+      'bg-surface-100 border rounded-sm',
+      'flex items-center justify-center',
+      'text-foreground-muted',
+      'group-aria-selected:bg-surface-200 group-aria-selected:text-foreground-lighter group-aria-selected:[&_svg]:scale-[103%]',
+      'transition'
+    )}
+    {...props}
+  />
+)
+
+const DocsSearchPage = () => {
+  const {
+    searchState: state,
+    handleDocsSearch: handleSearch,
+    handleDocsSearchDebounced: debouncedSearch,
+    resetSearch,
+  } = useDocsSearch()
+  const setIsOpen = useSetCommandMenuOpen()
+  const setQuery = useSetQuery()
+  const query = useQuery()
+
+  const telemetryContext = useCommandMenuTelemetryContext()
+
+  const initialLoad = useRef(true)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const router = useCrossCompatRouter()
+
+  const trackResultClicked = useCallback(
+    function trackResultClicked(name: string, path: string) {
+      telemetryContext?.onTelemetry?.({
+        action: 'command_menu_command_clicked',
+        properties: {
+          command_name: name,
+          command_type: 'route',
+          search_query: query || undefined,
+          result_path: path,
+          app: telemetryContext.app,
+        },
+        groups: {},
+      })
+    },
+    [query]
+  )
+
+  async function openLink(pageType: PageType, link: string) {
+    // A simple way to achieve opening links in new tab but room for improvement including support for middle clicks
+    let openInNewTab =
+      (window.event as KeyboardEvent)?.metaKey || (window.event as KeyboardEvent)?.ctrlKey
+    let finalLink: string = link
+    switch (pageType) {
+      case PageType.Markdown:
+      case PageType.Reference:
+      case PageType.Troubleshooting:
+        if (BASE_PATH === '/docs') {
+          if (openInNewTab) {
+            finalLink = `/docs${link}`
+          }
+        } else if (!BASE_PATH) {
+          finalLink = `/docs${link}`
+        } else {
+          finalLink = `https://supabase.com/docs${link}`
+          openInNewTab = true
+        }
+        break
+      case PageType.Integration:
+        if (BASE_PATH) {
+          openInNewTab = true
+          finalLink = `https://supabase.com${link}`
+        }
+        break
+      case PageType.GithubDiscussion:
+        openInNewTab = true
+        break
+      default:
+        throw new Error(`Unknown page type '${pageType}'`)
+    }
+    if (openInNewTab) {
+      window.open(finalLink, '_blank', 'noreferrer,noopener')
+    } else {
+      router.push(finalLink)
+      setIsOpen(false)
+    }
+  }
+
+  const hasResults =
+    state.status === 'fullResults' ||
+    state.status === 'partialResults' ||
+    (state.status === 'loading' && state.staleResults.length > 0)
+
+  function handleResetPrompt() {
+    setQuery('')
+    resetSearch()
+  }
+
+  useEffect(() => {
+    if (initialLoad.current) {
+      // On first navigation into 'docs search' page, search immediately
+      if (query) {
+        handleSearch(query)
+      }
+      initialLoad.current = false
+    } else if (query) {
+      // Else if user is typing, debounce search
+      debouncedSearch(query)
+    } else {
+      // If user clears search, reset results
+      resetSearch()
+    }
+  }, [query, handleSearch, debouncedSearch])
+
+  // Immediately run search if user presses enter
+  // and abort any debounced searches that are waiting
+  useEffect(() => {
+    const handleEnter = (event: KeyboardEvent) => {
+      if (
+        event.key === 'Enter' &&
+        document.activeElement === inputRef.current &&
+        query &&
+        // If there are results, cmdk menu will trigger navigation to the highlighted
+        // result on Enter, even though the active element is the input
+        !hasResults
+      ) {
+        event.preventDefault()
+        debouncedSearch.cancel()
+        handleSearch(query)
+      }
+    }
+
+    inputRef.current?.addEventListener('keydown', handleEnter)
+    return () => inputRef.current?.removeEventListener('keydown', handleEnter)
+  }, [query, hasResults])
+
+  return (
+    <CommandWrapper>
+      <CommandHeader>
+        <Breadcrumb />
+        <CommandMenuInput placeholder="Search..." ref={inputRef} />
+      </CommandHeader>
+      <CommandList className="max-h-[initial]">
+        {hasResults &&
+          ('results' in state ? state.results : state.staleResults).map((page, i) => {
+            return (
+              <CommandGroup
+                heading=""
+                key={`${page.path}-group`}
+                value={`${escapeAttributeSelector(page.title)}-group-index-${i}`}
+                forceMount={true}
+                className="overflow-hidden py-3 px-2 text-border-strong **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:pb-1.5 **:[[cmdk-group-heading]]:text-sm **:[[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted"
+              >
+                <CommandItem
+                  key={`${page.path}-item`}
+                  value={`${escapeAttributeSelector(page.title)}-item-index-${i}`}
+                  onSelect={() => {
+                    trackResultClicked(page.title, page.path)
+                    openLink(page.type, page.path)
+                  }}
+                  forceMount={true}
+                  className={cn(generateCommandClassNames(true), 'border border-overlay/90')}
+                >
+                  <div className="grow flex gap-3 items-center">
+                    <IconContainer>{getPageIcon(page)}</IconContainer>
+                    <div className="flex flex-col gap-0">
+                      <TextHighlighter>{page.title}</TextHighlighter>
+                      {(page.description || page.subtitle) && (
+                        <div className="text-xs text-foreground-muted">
+                          {page.description || page.subtitle}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <ChevronArrow />
+                </CommandItem>
+                {page.sections.length > 0 && (
+                  <div className="border-l border-muted ml-3 pt-3">
+                    {page.sections.map((section, i) => (
+                      <CommandItem
+                        className={cn(
+                          generateCommandClassNames(true),
+                          'border border-overlay/90',
+                          'ml-3 mb-3'
+                        )}
+                        onSelect={() => {
+                          trackResultClicked(
+                            section.heading ?? page.title,
+                            formatSectionUrl(page, section)
+                          )
+                          openLink(page.type, formatSectionUrl(page, section))
+                        }}
+                        key={`${page.path}__${section.heading}-item`}
+                        value={`${escapeAttributeSelector(page.title)}__${escapeAttributeSelector(section.heading)}-item-index-${i}`}
+                        forceMount={true}
+                      >
+                        <div className="grow flex gap-3 items-center">
+                          <IconContainer>{getPageSectionIcon(page)}</IconContainer>
+                          <div className="flex flex-col gap-0">
+                            <cite>
+                              <TextHighlighter className="not-italic text-[10px] rounded-full px-2 py-1 bg-surface-300 text-foreground-muted">
+                                {page.title}
+                              </TextHighlighter>
+                            </cite>
+                            {section.heading && (
+                              <TextHighlighter>{section.heading}</TextHighlighter>
+                            )}
+                          </div>
+                        </div>
+                        <ChevronArrow />
+                      </CommandItem>
+                    ))}
+                  </div>
+                )}
+              </CommandGroup>
+            )
+          })}
+        {state.status === 'initial' && (
+          <CommandGroup className="overflow-hidden py-3 px-2 text-border-strong **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:pb-1.5 **:[[cmdk-group-heading]]:text-sm **:[[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted">
+            {questions.map((question) => {
+              const key = question.replace(/\s+/g, '_')
+              return (
+                <CommandItem
+                  className={generateCommandClassNames(false)}
+                  disabled={hasResults}
+                  onSelect={() => {
+                    if (!query) {
+                      handleSearch(question)
+                      setQuery(question)
+                    }
+                  }}
+                  key={key}
+                >
+                  <Search />
+                  {question}
+                </CommandItem>
+              )
+            })}
+          </CommandGroup>
+        )}
+        {state.status === 'loading' && state.staleResults.length === 0 && (
+          <div className="flex items-center gap-3 my-4 justify-center">
+            <Loader2 className="animate animate-spin text-foreground-muted" size={14} />
+            <p className="text-sm text-foreground-muted text-center">Searching for results</p>
+          </div>
+        )}
+        {state.status === 'noResults' && (
+          <div className="p-6 flex flex-col items-center gap-6 mt-4 text-foreground-light">
+            <StatusIcon variant="default" />
+            <p className="text-sm text-foreground-light text-center">No results found.</p>
+            <Button size="tiny" variant="default" onClick={handleResetPrompt}>
+              Try again?
+            </Button>
+          </div>
+        )}
+        {state.status === 'error' && (
+          <div className="p-6 flex flex-col items-center gap-6 mt-4">
+            <StatusIcon variant="warning" />
+            <p className="text-lg text-foreground-light">
+              Sorry, looks like we&apos;re having some issues with search!
+            </p>
+            <p className="text-sm text-foreground-lighter">Please try again in a bit.</p>
+            <Button size="tiny" variant="default" onClick={handleResetPrompt}>
+              Try again?
+            </Button>
+          </div>
+        )}
+      </CommandList>
+    </CommandWrapper>
+  )
+}
+
+export function formatSectionUrl(page: Page, section: PageSection) {
+  switch (page.type) {
+    case PageType.Markdown:
+    case PageType.GithubDiscussion:
+      return `${page.path}#${section.slug ?? ''}`
+    case PageType.Reference:
+      return `${page.path}/${section.slug ?? ''}`
+    case PageType.Troubleshooting:
+    // [Charis] Markdown headings on integrations pages don't have slugs yet
+    case PageType.Integration:
+      return page.path
+    default:
+      throw new Error(`Unknown page type '${page.type}'`)
+  }
+}
+
+export function getPageIcon(page: Page) {
+  switch (page.type) {
+    case PageType.Markdown:
+    case PageType.Reference:
+    case PageType.Integration:
+    case PageType.Troubleshooting:
+      return <Book strokeWidth={1.5} className="mr-0! w-4! h-4!" />
+    case PageType.GithubDiscussion:
+      return <Github strokeWidth={1.5} className="mr-0! w-4! h-4!" />
+    default:
+      throw new Error(`Unknown page type '${page.type}'`)
+  }
+}
+
+export function getPageSectionIcon(page: Page) {
+  switch (page.type) {
+    case PageType.Markdown:
+    case PageType.Reference:
+    case PageType.Integration:
+    case PageType.Troubleshooting:
+      return <Hash strokeWidth={1.5} className="mr-0! w-4! h-4!" />
+    case PageType.GithubDiscussion:
+      return <MessageSquare strokeWidth={1.5} className="mr-0! w-4! h-4!" />
+    default:
+      throw new Error(`Unknown page type '${page.type}'`)
+  }
+}
+
+export { DocsSearchPage }

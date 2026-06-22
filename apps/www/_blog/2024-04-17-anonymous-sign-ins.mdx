@@ -2,8 +2,8 @@
 title: 'Supabase Auth now supports Anonymous Sign-ins'
 description: 'Sign in as an anonymous user to authenticate with Supabase'
 author: kangmingtay
-image: ga-week/anonymous-sign-ins/og.png
-thumb: ga-week/anonymous-sign-ins/thumb.png
+imgSocial: ga-week/anonymous-sign-ins/og.png
+imgThumb: ga-week/anonymous-sign-ins/thumb.png
 categories:
   - product
 tags:
@@ -30,7 +30,7 @@ Anonymous sign-ins can be used to create **temporary users** who haven’t signe
 
 ## Enabling Anonymous sign-ins
 
-You can [enable anonymous sign-ins](/dashboard/project/_/settings/auth) for your project today from the dashboard:
+You can [enable anonymous sign-ins](/dashboard/project/_/auth/providers) for your project today from the dashboard:
 
 <Img
   alt="Allow anonymous sign ins"
@@ -157,7 +157,7 @@ const { data, error } = await supabase
 
 ### Link an OAuth identity
 
-To link an OAuth identity to an anonymous user, you need to [enable manual linking](/dashboard/project/_/settings/auth) for your project. Learn about how [identity linking](/docs/guides/auth/auth-identity-linking) works with Supabase Auth.
+To link an OAuth identity to an anonymous user, you need to [enable manual linking](/dashboard/project/_/auth/providers) for your project. Learn about how [identity linking](/docs/guides/auth/auth-identity-linking) works with Supabase Auth.
 
 <Img
   alt="Allow anonymous sign ins"

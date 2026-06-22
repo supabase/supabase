@@ -1,4 +1,6 @@
-import { SimpleCodeBlock } from 'ui'
+import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
+
+import { useTrack } from '@/lib/telemetry/track'
 
 interface CodeSnippetProps {
   selectedLang: 'bash' | 'js'
@@ -10,13 +12,24 @@ interface CodeSnippetProps {
 }
 
 const CodeSnippet = ({ selectedLang, snippet }: CodeSnippetProps) => {
+  const track = useTrack()
+
+  const handleCopy = () => {
+    track('api_docs_code_copy_button_clicked', {
+      title: snippet.title,
+      selectedLanguage: selectedLang,
+    })
+  }
+
   if (!snippet[selectedLang]) return null
   return (
-    <div className="codeblock-container">
-      <h4>{snippet.title}</h4>
-      <SimpleCodeBlock className={snippet[selectedLang]?.language}>
-        {snippet[selectedLang]?.code}
-      </SimpleCodeBlock>
+    <div>
+      <h4 className="heading-default mb-2">{snippet.title}</h4>
+      <div className="[&_.codeBlock]:p-0 [&_.token-line]:text-sm">
+        <SimpleCodeBlock className={snippet[selectedLang]?.language} onCopy={handleCopy}>
+          {snippet[selectedLang]?.code}
+        </SimpleCodeBlock>
+      </div>
     </div>
   )
 }

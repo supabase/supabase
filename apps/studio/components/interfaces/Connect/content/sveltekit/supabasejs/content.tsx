@@ -1,12 +1,12 @@
-import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
+import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
 
+import type { ContentFileProps } from '@/components/interfaces/Connect/Connect.types'
 import {
-  ConnectTabs,
-  ConnectTabTriggers,
-  ConnectTabTrigger,
   ConnectTabContent,
-} from 'components/interfaces/Connect/ConnectTabs'
-import { SimpleCodeBlock } from 'ui'
+  ConnectTabs,
+  ConnectTabTrigger,
+  ConnectTabTriggers,
+} from '@/components/interfaces/Connect/ConnectTabs'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
@@ -20,10 +20,14 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
 
       <ConnectTabContent value=".env.local">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
-          {`
-PUBLIC_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
-PUBLIC_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
-        `}
+          {[
+            '',
+            `PUBLIC_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}`,
+            projectKeys?.publishableKey
+              ? `PUBLIC_SUPABASE_PUBLISHABLE_KEY=${projectKeys.publishableKey}`
+              : `PUBLIC_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}`,
+            '',
+          ].join('\n')}
         </SimpleCodeBlock>
       </ConnectTabContent>
 
@@ -31,10 +35,10 @@ PUBLIC_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
         <SimpleCodeBlock className="js" parentClassName="min-h-72">
           {`
 import { createClient } from "@supabase/supabase-js";
-import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from "$env/static/public"
+import { PUBLIC_SUPABASE_URL, ${projectKeys.publishableKey ? 'PUBLIC_SUPABASE_PUBLISHABLE_KEY' : 'PUBLIC_SUPABASE_ANON_KEY'} } from "$env/static/public"
 
 const supabaseUrl = PUBLIC_SUPABASE_URL;
-const supabaseKey = PUBLIC_SUPABASE_ANON_KEY;
+const supabaseKey = ${projectKeys.publishableKey ? 'PUBLIC_SUPABASE_PUBLISHABLE_KEY' : 'PUBLIC_SUPABASE_ANON_KEY'};
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
         `}

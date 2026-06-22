@@ -1,9 +1,10 @@
 import { components } from 'api-types'
-import { handleError, post } from 'data/fetchers'
-import { IS_PLATFORM } from './constants'
-import { LOCAL_STORAGE_KEYS, hasConsented } from 'common'
+import { hasConsented } from 'common'
 
-type TrackFeatureFlagVariables = components['schemas']['TelemetryFeatureFlagBodyDto']
+import { IS_PLATFORM } from './constants'
+import { handleError, post } from '@/data/fetchers'
+
+type TrackFeatureFlagVariables = components['schemas']['TelemetryFeatureFlagBody']
 
 export async function trackFeatureFlag(body: TrackFeatureFlagVariables) {
   const consent = hasConsented()

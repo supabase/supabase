@@ -1,18 +1,18 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { Check, Key, Trash } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import CopyButton from 'components/ui/CopyButton'
-import { useClientSecretDeleteMutation } from 'data/oauth-secrets/client-secret-delete-mutation'
-import { Secret, useClientSecretsQuery } from 'data/oauth-secrets/client-secrets-query'
-import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import CopyButton from '@/components/ui/CopyButton'
+import { useClientSecretDeleteMutation } from '@/data/oauth-secrets/client-secret-delete-mutation'
+import { Secret, useClientSecretsQuery } from '@/data/oauth-secrets/client-secrets-query'
+import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 export interface SecretRowProps {
   secret: Secret
@@ -22,7 +22,7 @@ export interface SecretRowProps {
 export const SecretRow = ({ secret, appId }: SecretRowProps) => {
   const { slug } = useParams()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const canManageSecrets = useCheckPermissions(PermissionAction.UPDATE, 'oauth_apps')
+  const { can: canManageSecrets } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'oauth_apps')
 
   const { data } = useClientSecretsQuery({ slug, appId })
   const secrets = data?.client_secrets ?? []
@@ -32,7 +32,7 @@ export const SecretRow = ({ secret, appId }: SecretRowProps) => {
   const generatedBy = members.find((x) => x.gotrue_id === secret.created_by)
   const generatedByName = generatedBy?.username ?? generatedBy?.primary_email ?? secret.created_by
 
-  const { mutate: deleteSecret, isLoading: isDeleting } = useClientSecretDeleteMutation({
+  const { mutate: deleteSecret, isPending: isDeleting } = useClientSecretDeleteMutation({
     onSuccess: () => {
       // Show success toast and close modal after successful deletion
       toast.success('Successfully deleted client secret')
@@ -66,7 +66,7 @@ export const SecretRow = ({ secret, appId }: SecretRowProps) => {
                   {isNew ? secret.client_secret : `${secret.client_secret_alias}${'*'.repeat(36)}`}
                 </p>
                 {isNew && secret.client_secret && (
-                  <CopyButton text={secret.client_secret} type="default" iconOnly />
+                  <CopyButton text={secret.client_secret} variant="default" iconOnly />
                 )}
               </div>
             </div>
@@ -74,12 +74,20 @@ export const SecretRow = ({ secret, appId }: SecretRowProps) => {
               <p className="text-sm text-foreground-lighter">
                 Added {isNew ? 'now' : dayjs(secret.created_at).fromNow()} by {generatedByName}
               </p>
+              {secret.last_used_at && (
+                <p className="text-sm text-foreground-lighter">
+                  Last used {dayjs(secret.last_used_at).fromNow()}
+                </p>
+              )}
+              {!secret.last_used_at && !isNew && (
+                <p className="text-sm text-foreground-lighter">Never used</p>
+              )}
             </div>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <ButtonTooltip
-            type="default"
+            variant="default"
             className="w-7"
             icon={<Trash />}
             disabled={!appId || !canManageSecrets || isLast}

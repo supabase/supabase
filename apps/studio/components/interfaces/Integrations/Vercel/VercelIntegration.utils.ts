@@ -1,6 +1,7 @@
 export function isVercelUrl(url: string): boolean {
   try {
-    return new URL(url).hostname === 'vercel.com'
+    const u = new URL(url)
+    return u.protocol === 'https:' && u.hostname === 'vercel.com'
   } catch {
     // If the URL is invalid, return false
     return false

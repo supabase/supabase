@@ -5,7 +5,13 @@ title: 'Manage IPv4 usage'
 
 ## What you are charged for
 
-You can assign a dedicated [IPv4 address](/docs/guides/platform/ipv4-address) to a database by enabling the [IPv4 add-on](https://supabase.com/dashboard/project/_/settings/addons?panel=ipv4). You are charged for all IPv4 addresses configured across your databases.
+You can assign a dedicated [IPv4 address](/docs/guides/platform/ipv4-address) to a database by enabling the [IPv4 add-on](/dashboard/project/_/settings/addons?panel=ipv4). You are charged for all IPv4 addresses configured across your databases.
+
+<Admonition type="note">
+
+IPv4 Hours are **not** covered by the [Spend Cap](/docs/guides/platform/cost-control#spend-cap).
+
+</Admonition>
 
 <Admonition type="note">
 
@@ -45,11 +51,11 @@ The project has the IPv4 add-on enabled throughout the entire billing cycle.
 | Line Item                     | Hours | Costs                    |
 | ----------------------------- | ----- | ------------------------ |
 | Pro Plan                      | -     | <Price price="25" />     |
-| Compute Hours Micro Project 1 | 744   | <Price price="10" />     |
-| IPv4 Hours                    | 744   | <Price price="4" />      |
-| **Subtotal**                  |       | **<Price price="39" />** |
+| Compute Hours Small Project 1 | 730   | <Price price="15" />     |
+| IPv4 Hours                    | 730   | <Price price="4" />      |
+| **Subtotal**                  |       | **<Price price="44" />** |
 | Compute Credits               |       | -<Price price="10" />    |
-| **Total**                     |       | **<Price price="29" />** |
+| **Total**                     |       | **<Price price="34" />** |
 
 ### Multiple projects
 
@@ -59,18 +65,18 @@ All projects have the IPv4 add-on enabled throughout the entire billing cycle.
 | ----------------------------- | ----- | ------------------------ |
 | Pro Plan                      | -     | <Price price="25" />     |
 |                               |       |                          |
-| Compute Hours Micro Project 1 | 744   | <Price price="10" />     |
-| IPv4 Hours Project 1          | 744   | <Price price="4" />      |
+| Compute Hours Small Project 1 | 730   | <Price price="15" />     |
+| IPv4 Hours Project 1          | 730   | <Price price="4" />      |
 |                               |       |                          |
-| Compute Hours Micro Project 2 | 744   | <Price price="10" />     |
-| IPv4 Hours Project 2          | 744   | <Price price="4" />      |
+| Compute Hours Small Project 2 | 730   | <Price price="15" />     |
+| IPv4 Hours Project 2          | 730   | <Price price="4" />      |
 |                               |       |                          |
-| Compute Hours Micro Project 3 | 744   | <Price price="10" />     |
-| IPv4 Hours Project 3          | 744   | <Price price="4" />      |
+| Compute Hours Small Project 3 | 730   | <Price price="15" />     |
+| IPv4 Hours Project 3          | 730   | <Price price="4" />      |
 |                               |       |                          |
-| **Subtotal**                  |       | **<Price price="67" />** |
+| **Subtotal**                  |       | **<Price price="82" />** |
 | Compute Credits               |       | -<Price price="10" />    |
-| **Total**                     |       | **<Price price="57" />** |
+| **Total**                     |       | **<Price price="72" />** |
 
 ### One project with Read Replicas
 
@@ -80,18 +86,34 @@ The project has two Read Replicas and the IPv4 add-on enabled throughout the ent
 | ----------------------------- | ----- | ------------------------ |
 | Pro Plan                      | -     | <Price price="25" />     |
 |                               |       |                          |
-| Compute Hours Small Project 1 | 744   | <Price price="15" />     |
-| IPv4 Hours Project 1          | 744   | <Price price="4" />      |
+| Compute Hours Small Project 1 | 730   | <Price price="15" />     |
+| IPv4 Hours Project 1          | 730   | <Price price="4" />      |
 |                               |       |                          |
-| Compute Hours Small Replica 1 | 744   | <Price price="15" />     |
-| IPv4 Hours Replica 1          | 744   | <Price price="4" />      |
+| Compute Hours Small Replica 1 | 730   | <Price price="15" />     |
+| IPv4 Hours Replica 1          | 730   | <Price price="4" />      |
 |                               |       |                          |
-| Compute Hours Small Replica 2 | 744   | <Price price="15" />     |
-| IPv4 Hours Replica 2          | 744   | <Price price="4" />      |
+| Compute Hours Small Replica 2 | 730   | <Price price="15" />     |
+| IPv4 Hours Replica 2          | 730   | <Price price="4" />      |
 |                               |       |                          |
 | **Subtotal**                  |       | **<Price price="82" />** |
 | Compute Credits               |       | -<Price price="10" />    |
 | **Total**                     |       | **<Price price="72" />** |
+
+### Add-on disabled after a day
+
+Project add-ons are billed in arrears based on how many hours you used them.
+If you remove the IPv4 add-on, you are no longer billed from the time of removal onward.
+
+| Line Item                     | Hours | Costs                       |
+| ----------------------------- | ----- | --------------------------- |
+| Pro Plan                      | -     | <Price price="25" />        |
+|                               |       |                             |
+| Compute Hours Small Project 1 | 730   | <Price price="15" />        |
+| IPv4 Hours Project 1          | 24    | <Price price="0.13" />      |
+|                               |       |                             |
+| **Subtotal**                  |       | **<Price price="40.13" />** |
+| Compute Credits               |       | -<Price price="10" />       |
+| **Total**                     |       | **<Price price="30.13" />** |
 
 ## Optimize usage
 

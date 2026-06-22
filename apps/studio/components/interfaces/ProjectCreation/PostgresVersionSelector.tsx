@@ -1,34 +1,32 @@
 import { useEffect } from 'react'
 import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
-
-import { components } from 'api-types'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useProjectCreationPostgresVersionsQuery } from 'data/config/project-creation-postgres-versions-query'
-import { useProjectUnpausePostgresVersionsQuery } from 'data/config/project-unpause-postgres-versions-query'
 import type { CloudProvider } from 'shared-data'
 import {
   Badge,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-  Select_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-type ReleaseChannel = components['schemas']['ReleaseChannel']
-type PostgresEngine = components['schemas']['PostgresEngine']
+import { smartRegionToExactRegion } from './ProjectCreation.utils'
+import { useProjectCreationPostgresVersionsQuery } from '@/data/config/project-creation-postgres-versions-query'
+import { useProjectUnpausePostgresVersionsQuery } from '@/data/config/project-unpause-postgres-versions-query'
+import { PostgresEngine, ReleaseChannel } from '@/data/projects/new-project.constants'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface PostgresVersionDetails {
-  postgresEngine: PostgresEngine | undefined
-  releaseChannel: ReleaseChannel | undefined
+  postgresEngine?: Exclude<PostgresEngine, '13' | '14'>
+  releaseChannel?: ReleaseChannel
 }
 
 interface PostgresVersionSelectorProps {
   cloudProvider: CloudProvider
   dbRegion: string
-  organizationSlug: string | undefined
+  organizationSlug?: string
   field: ControllerRenderProps<any, 'postgresVersionSelection'>
   form: UseFormReturn<any>
   type?: 'create' | 'unpause'
@@ -63,24 +61,26 @@ export const PostgresVersionSelector = ({
   form,
   type = 'create',
   layout = 'horizontal',
-  label = 'Postgres Version',
+  label = 'Postgres version',
 }: PostgresVersionSelectorProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
+
+  const dbRegionExact = smartRegionToExactRegion(dbRegion)
 
   const {
     data: createVersions,
-    isLoading: isLoadingProjectCreateVersions,
+    isPending: isLoadingProjectCreateVersions,
     isSuccess,
   } = useProjectCreationPostgresVersionsQuery(
     {
       cloudProvider,
-      dbRegion,
+      dbRegion: dbRegionExact,
       organizationSlug,
     },
     { enabled: type === 'create' }
   )
 
-  const { data: unpauseVersions, isLoading: isLoadingProjectUnpauseVersions } =
+  const { data: unpauseVersions, isPending: isLoadingProjectUnpauseVersions } =
     useProjectUnpausePostgresVersionsQuery(
       { projectRef: project?.ref },
       { enabled: type === 'unpause' }
@@ -88,9 +88,9 @@ export const PostgresVersionSelector = ({
 
   const versions =
     type === 'create'
-      ? createVersions?.available_versions ?? []
-      : unpauseVersions?.available_versions ?? []
-  const availableVersions = versions.sort((a, b) => a.version.localeCompare(b.version))
+      ? (createVersions?.available_versions ?? [])
+      : (unpauseVersions?.available_versions ?? [])
+  const availableVersions = versions.sort((a, b) => a.version.localeCompare(b.version)).reverse()
   const { postgresVersionSelection } = form.watch()
 
   useEffect(() => {
@@ -103,7 +103,7 @@ export const PostgresVersionSelector = ({
 
   return (
     <FormItemLayout label={label} layout={layout}>
-      <Select_Shadcn_
+      <Select
         value={postgresVersionSelection}
         onValueChange={field.onChange}
         disabled={
@@ -112,42 +112,38 @@ export const PostgresVersionSelector = ({
           (type === 'unpause' && isLoadingProjectUnpauseVersions)
         }
       >
-        <SelectTrigger_Shadcn_ className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start">
-          <SelectValue_Shadcn_ placeholder="Select a Postgres version for your project" />
-        </SelectTrigger_Shadcn_>
-        <SelectContent_Shadcn_>
-          <SelectGroup_Shadcn_>
+        <SelectTrigger className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start">
+          <SelectValue placeholder="Select a Postgres version for your project" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
             {availableVersions.map((value) => {
               const postgresVersion = value.version
                 .split('supabase-postgres-')[1]
                 .replace('-orioledb', '')
               return (
-                <SelectItem_Shadcn_
+                <SelectItem
                   key={formatValue(value)}
                   value={formatValue(value)}
                   className="w-full [&>:nth-child(2)]:w-full"
                 >
                   <div className="flex flex-row items-center justify-between w-full">
                     <span className="text-foreground">{postgresVersion}</span>
-                    <div>
+                    <div className="flex flex-row gap-x-2">
                       {value.release_channel !== 'ga' && (
-                        <Badge variant="warning" className="mr-1 capitalize">
-                          {value.release_channel}
-                        </Badge>
+                        <Badge variant="warning">{value.release_channel}</Badge>
                       )}
                       {value.postgres_engine.includes('oriole') && (
-                        <Badge variant="default" className="mr-1">
-                          OrioleDB
-                        </Badge>
+                        <Badge variant="default">OrioleDB</Badge>
                       )}
                     </div>
                   </div>
-                </SelectItem_Shadcn_>
+                </SelectItem>
               )
             })}
-          </SelectGroup_Shadcn_>
-        </SelectContent_Shadcn_>
-      </Select_Shadcn_>
+          </SelectGroup>
+        </SelectContent>
+      </Select>
     </FormItemLayout>
   )
 }

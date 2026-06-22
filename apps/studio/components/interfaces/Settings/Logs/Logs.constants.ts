@@ -1,9 +1,11 @@
+import { IS_PLATFORM } from 'common'
 import dayjs from 'dayjs'
 
 import type { DatetimeHelper, FilterTableSet, LogTemplate } from './Logs.types'
+import { analyticsLiteral, safeSql, type SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
+import { DOCS_URL } from '@/lib/constants'
 
-export const LOGS_EXPLORER_DOCS_URL =
-  'https://supabase.com/docs/guides/platform/logs#querying-with-the-logs-explorer'
+export const LOGS_EXPLORER_DOCS_URL = `${DOCS_URL}/guides/platform/logs#querying-with-the-logs-explorer`
 
 export const LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD = 2 // IN DAYS
 
@@ -53,7 +55,7 @@ where h.x_real_ip is not null
     for: ['api'],
   },
   {
-    label: 'Requests by Country',
+    label: 'Requests by Geography',
     description: 'List all ISO 3166-1 alpha-2 country codes that used the Supabase API',
     mode: 'custom',
     searchString: `select
@@ -203,6 +205,18 @@ limit 100
     for: ['database'],
   },
   {
+    label: 'Auth Audit Logs',
+    description: 'Audit logs for auth events',
+    mode: 'custom',
+    searchString: `select
+  cast(timestamp as datetime) as timestamp,
+  event_message, metadata 
+from auth_audit_logs 
+limit 10
+`,
+    for: ['database'],
+  },
+  {
     label: 'Storage Object Requests',
     description: 'Number of requests done on Storage Objects',
     mode: 'custom',
@@ -229,21 +243,22 @@ limit 100
     description: 'Check the number of requests done on Storage Affecting Egress',
     mode: 'custom',
     searchString: `select
-    r.method as http_verb,
-    r.path as filepath,
-    count(*) as num_requests,
-  from edge_logs
-    cross join unnest(metadata) as m
-    cross join unnest(m.request) AS r
-    cross join unnest(r.headers) AS h
-  where
-    (path like '%storage/v1/object/%' or path like '%storage/v1/render/%')
-    and r.method = 'GET'
-  group by
-    r.path, r.method
-  order by
-    num_requests desc
-  limit 100
+  request.method as http_verb,
+  request.path as filepath,
+  (responseHeaders.cf_cache_status = 'HIT') as cached,
+  count(*) as num_requests
+from
+  edge_logs
+  cross join unnest(metadata) as metadata
+  cross join unnest(metadata.request) as request
+  cross join unnest(metadata.response) as response
+  cross join unnest(response.headers) as responseHeaders
+where
+  (path like '%storage/v1/object/%' or path like '%storage/v1/render/%')
+  and request.method = 'GET'
+group by 1, 2, 3
+order by num_requests desc
+limit 100;
 `,
     for: ['api'],
   },
@@ -265,73 +280,87 @@ where starts_with(r.path, '/storage/v1/object')
   and h.cf_cache_status in ('MISS', 'NONE/UNKNOWN', 'EXPIRED', 'BYPASS', 'DYNAMIC')
 group by path, search
 order by count desc
-limit 100
+limit 100;
 `,
     for: ['api'],
   },
 ]
 
-const _SQL_FILTER_COMMON = {
-  search_query: (value: string) => `regexp_contains(event_message, '${value}')`,
+type SqlFilterFn = (value: any) => SafeLogSqlFragment
+type SqlFilterEntry = SafeLogSqlFragment | SqlFilterFn
+
+const _SQL_FILTER_COMMON: Record<string, SqlFilterEntry> = {
+  search_query: (value: string) =>
+    safeSql`regexp_contains(event_message, ${analyticsLiteral(value)})`,
 }
 
-export const SQL_FILTER_TEMPLATES: any = {
+// Auth logs always emit `level: info` even for failed requests, so HTTP status
+// is the reliable severity signal. Shared by the severity filter, the chart,
+// and the table badge so all three agree: 5xx (or level error/fatal) = error,
+// 4xx (or level warning) = warning, everything else = info. IFNULL keeps each
+// condition strictly boolean (never NULL) so the info condition can safely
+// negate the other two when a row has no status or no level.
+export const AUTH_LOG_ERROR_CONDITION: SafeLogSqlFragment = safeSql`IFNULL(metadata.level, '') IN ('error', 'fatal') OR IFNULL(SAFE_CAST(metadata.status AS INT64), 0) >= 500`
+export const AUTH_LOG_WARNING_CONDITION: SafeLogSqlFragment = safeSql`IFNULL(metadata.level, '') = 'warning' OR IFNULL(SAFE_CAST(metadata.status AS INT64), 0) BETWEEN 400 AND 499`
+export const AUTH_LOG_INFO_CONDITION: SafeLogSqlFragment = safeSql`NOT (${AUTH_LOG_ERROR_CONDITION}) AND NOT (${AUTH_LOG_WARNING_CONDITION})`
+
+export const SQL_FILTER_TEMPLATES: Record<string, Record<string, SqlFilterEntry>> = {
   postgres_logs: {
     ..._SQL_FILTER_COMMON,
-    database: (value: string) => `identifier = '${value}'`,
-    'severity.error': `parsed.error_severity in ('ERROR', 'FATAL', 'PANIC')`,
-    'severity.noError': `parsed.error_severity not in ('ERROR', 'FATAL', 'PANIC')`,
-    'severity.log': `parsed.error_severity = 'LOG'`,
+    database: (value: string) => safeSql`identifier = ${analyticsLiteral(value)}`,
+    'severity.error': safeSql`parsed.error_severity in ('ERROR', 'FATAL', 'PANIC')`,
+    'severity.noError': safeSql`parsed.error_severity not in ('ERROR', 'FATAL', 'PANIC')`,
+    'severity.log': safeSql`parsed.error_severity = 'LOG'`,
   },
   edge_logs: {
     ..._SQL_FILTER_COMMON,
-    database: (value: string) => `identifier = '${value}'`,
-    'status_code.error': `response.status_code between 500 and 599`,
-    'status_code.success': `response.status_code between 200 and 299`,
-    'status_code.warning': `response.status_code between 400 and 499`,
+    database: (value: string) => safeSql`identifier = ${analyticsLiteral(value)}`,
+    'status_code.error': safeSql`response.status_code between 500 and 599`,
+    'status_code.success': safeSql`response.status_code between 200 and 299`,
+    'status_code.warning': safeSql`response.status_code between 400 and 499`,
 
-    'product.database': `request.path like '/rest/%' or request.path like '/graphql/%'`,
-    'product.storage': `request.path like '/storage/%'`,
-    'product.auth': `request.path like '/auth/%'`,
-    'product.realtime': `request.path like '/realtime/%'`,
+    'product.database': safeSql`request.path like '/rest/%' or request.path like '/graphql/%'`,
+    'product.storage': safeSql`request.path like '/storage/%'`,
+    'product.auth': safeSql`request.path like '/auth/%'`,
+    'product.realtime': safeSql`request.path like '/realtime/%'`,
 
-    'method.get': `request.method = 'GET'`,
-    'method.post': `request.method = 'POST'`,
-    'method.put': `request.method = 'PUT'`,
-    'method.patch': `request.method = 'PATCH'`,
-    'method.delete': `request.method = 'DELETE'`,
-    'method.options': `request.method = 'OPTIONS'`,
+    'method.get': safeSql`request.method = 'GET'`,
+    'method.post': safeSql`request.method = 'POST'`,
+    'method.put': safeSql`request.method = 'PUT'`,
+    'method.patch': safeSql`request.method = 'PATCH'`,
+    'method.delete': safeSql`request.method = 'DELETE'`,
+    'method.options': safeSql`request.method = 'OPTIONS'`,
   },
   function_edge_logs: {
     ..._SQL_FILTER_COMMON,
-    'status_code.error': `response.status_code between 500 and 599`,
-    'status_code.success': `response.status_code between 200 and 299`,
-    'status_code.warning': `response.status_code between 400 and 499`,
+    'status_code.error': safeSql`response.status_code between 500 and 599`,
+    'status_code.success': safeSql`response.status_code between 200 and 299`,
+    'status_code.warning': safeSql`response.status_code between 400 and 499`,
   },
   function_logs: {
     ..._SQL_FILTER_COMMON,
-    'severity.error': `metadata.level = 'error'`,
-    'severity.notError': `metadata.level != 'error'`,
-    'severity.log': `metadata.level = 'log'`,
-    'severity.info': `metadata.level = 'info'`,
-    'severity.debug': `metadata.level = 'debug'`,
-    'severity.warn': `metadata.level = 'warn'`,
+    'severity.error': safeSql`metadata.level = 'error'`,
+    'severity.notError': safeSql`metadata.level != 'error'`,
+    'severity.log': safeSql`metadata.level = 'log'`,
+    'severity.info': safeSql`metadata.level = 'info'`,
+    'severity.debug': safeSql`metadata.level = 'debug'`,
+    'severity.warn': safeSql`metadata.level = 'warn'`,
   },
   auth_logs: {
     ..._SQL_FILTER_COMMON,
-    'severity.error': `metadata.level = 'error' or metadata.level = 'fatal'`,
-    'severity.warning': `metadata.level = 'warning'`,
-    'severity.info': `metadata.level = 'info'`,
-    'status_code.server_error': `cast(metadata.status as int64) between 500 and 599`,
-    'status_code.client_error': `cast(metadata.status as int64) between 400 and 499`,
-    'status_code.redirection': `cast(metadata.status as int64) between 300 and 399`,
-    'status_code.success': `cast(metadata.status as int64) between 200 and 299`,
-    'endpoints.admin': `REGEXP_CONTAINS(metadata.path, "/admin")`,
-    'endpoints.signup': `REGEXP_CONTAINS(metadata.path, "/signup|/invite|/verify")`,
-    'endpoints.authentication': `REGEXP_CONTAINS(metadata.path, "/token|/authorize|/callback|/otp|/magiclink")`,
-    'endpoints.recover': `REGEXP_CONTAINS(metadata.path, "/recover")`,
-    'endpoints.user': `REGEXP_CONTAINS(metadata.path, "/user")`,
-    'endpoints.logout': `REGEXP_CONTAINS(metadata.path, "/logout")`,
+    'severity.error': AUTH_LOG_ERROR_CONDITION,
+    'severity.warning': AUTH_LOG_WARNING_CONDITION,
+    'severity.info': AUTH_LOG_INFO_CONDITION,
+    'status_code.server_error': safeSql`cast(metadata.status as int64) between 500 and 599`,
+    'status_code.client_error': safeSql`cast(metadata.status as int64) between 400 and 499`,
+    'status_code.redirection': safeSql`cast(metadata.status as int64) between 300 and 399`,
+    'status_code.success': safeSql`cast(metadata.status as int64) between 200 and 299`,
+    'endpoints.admin': safeSql`REGEXP_CONTAINS(metadata.path, "/admin")`,
+    'endpoints.signup': safeSql`REGEXP_CONTAINS(metadata.path, "/signup|/invite|/verify")`,
+    'endpoints.authentication': safeSql`REGEXP_CONTAINS(metadata.path, "/token|/authorize|/callback|/otp|/magiclink")`,
+    'endpoints.recover': safeSql`REGEXP_CONTAINS(metadata.path, "/recover")`,
+    'endpoints.user': safeSql`REGEXP_CONTAINS(metadata.path, "/user")`,
+    'endpoints.logout': safeSql`REGEXP_CONTAINS(metadata.path, "/logout")`,
   },
   realtime_logs: {
     ..._SQL_FILTER_COMMON,
@@ -341,20 +370,24 @@ export const SQL_FILTER_TEMPLATES: any = {
   },
   postgrest_logs: {
     ..._SQL_FILTER_COMMON,
-    database: (value: string) => `identifier = '${value}'`,
+    database: (value: string) => safeSql`identifier = ${analyticsLiteral(value)}`,
   },
   pgbouncer_logs: {
     ..._SQL_FILTER_COMMON,
   },
   supavisor_logs: {
     ..._SQL_FILTER_COMMON,
-    database: (value: string) => `m.project like '${value}%'`,
+    database: (value: string) => safeSql`m.project like ${analyticsLiteral(value + '%')}`,
   },
   pg_upgrade_logs: {
     ..._SQL_FILTER_COMMON,
   },
   pg_cron_logs: {
     ..._SQL_FILTER_COMMON,
+  },
+  etl_replication_logs: {
+    ..._SQL_FILTER_COMMON,
+    pipeline_id: (value: string | number) => safeSql`pipeline_id = ${analyticsLiteral(value)}`,
   },
 }
 
@@ -364,14 +397,16 @@ export enum LogsTableName {
   FUNCTIONS = 'function_logs',
   FN_EDGE = 'function_edge_logs',
   AUTH = 'auth_logs',
+  AUTH_AUDIT = 'auth_audit_logs',
   REALTIME = 'realtime_logs',
   STORAGE = 'storage_logs',
   POSTGREST = 'postgrest_logs',
   SUPAVISOR = 'supavisor_logs',
   PGBOUNCER = 'pgbouncer_logs',
-  WAREHOUSE = 'warehouse_logs',
   PG_UPGRADE = 'pg_upgrade_logs',
   PG_CRON = 'pg_cron_logs',
+  ETL = 'etl_replication_logs',
+  MULTIGRES = 'multigres_logs',
 }
 
 export const LOGS_TABLES = {
@@ -384,10 +419,11 @@ export const LOGS_TABLES = {
   storage: LogsTableName.STORAGE,
   postgrest: LogsTableName.POSTGREST,
   supavisor: LogsTableName.SUPAVISOR,
-  warehouse: LogsTableName.WAREHOUSE,
   pg_upgrade: LogsTableName.PG_UPGRADE,
   pg_cron: LogsTableName.POSTGRES,
   pgbouncer: LogsTableName.PGBOUNCER,
+  etl: LogsTableName.ETL,
+  multigres: LogsTableName.MULTIGRES,
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {
@@ -395,15 +431,17 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.POSTGRES]: 'Database logs obtained directly from Postgres',
   [LogsTableName.FUNCTIONS]: 'Function logs generated from runtime execution',
   [LogsTableName.FN_EDGE]: 'Function call logs, containing the request and response',
-  [LogsTableName.AUTH]: 'Authentication logs from GoTrue',
+  [LogsTableName.AUTH]: 'Errors, warnings, and performance details from the auth service',
+  [LogsTableName.AUTH_AUDIT]: 'Audit records of user signups, logins, and account changes',
   [LogsTableName.REALTIME]: 'Realtime server for Postgres logical replication broadcasting',
   [LogsTableName.STORAGE]: 'Object storage logs',
   [LogsTableName.POSTGREST]: 'RESTful API web server logs',
   [LogsTableName.SUPAVISOR]: 'Shared connection pooler logs for PostgreSQL',
   [LogsTableName.PGBOUNCER]: 'Dedicated connection pooler for PostgreSQL',
-  [LogsTableName.WAREHOUSE]: 'Logs obtained from a data warehouse collection',
   [LogsTableName.PG_UPGRADE]: 'Logs generated by the Postgres version upgrade process',
   [LogsTableName.PG_CRON]: 'Postgres logs from pg_cron cron jobs',
+  [LogsTableName.ETL]: 'Logs from the replication process',
+  [LogsTableName.MULTIGRES]: 'Logs from the Multigres high availability service',
 }
 
 export const FILTER_OPTIONS: FilterTableSet = {
@@ -519,29 +557,33 @@ export const FILTER_OPTIONS: FilterTableSet = {
     },
   },
   // function_edge_logs
-  function_edge_logs: {
-    status_code: {
-      label: 'Status',
-      key: 'status_code',
-      options: [
-        {
-          key: 'error',
-          label: 'Error',
-          description: '500 error codes',
+  ...(IS_PLATFORM
+    ? {
+        function_edge_logs: {
+          status_code: {
+            label: 'Status',
+            key: 'status_code',
+            options: [
+              {
+                key: 'error',
+                label: 'Error',
+                description: '500 error codes',
+              },
+              {
+                key: 'success',
+                label: 'Success',
+                description: '200 codes',
+              },
+              {
+                key: 'warning',
+                label: 'Warning',
+                description: '400 codes',
+              },
+            ],
+          },
         },
-        {
-          key: 'success',
-          label: 'Success',
-          description: '200 codes',
-        },
-        {
-          key: 'warning',
-          label: 'Warning',
-          description: '400 codes',
-        },
-      ],
-    },
-  },
+      }
+    : {}),
   // function_logs
   function_logs: {
     severity: {
@@ -753,6 +795,7 @@ export const TIER_QUERY_LIMITS: {
   PAYG: { text: '7 days', value: 7, unit: 'day', promptUpgrade: true },
   TEAM: { text: '28 days', value: 28, unit: 'day', promptUpgrade: true },
   ENTERPRISE: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
+  PLATFORM: { text: '1 day', value: 1, unit: 'day', promptUpgrade: false },
 }
 
 export const LOG_ROUTES_WITH_REPLICA_SUPPORT = [

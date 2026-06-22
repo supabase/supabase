@@ -1,16 +1,29 @@
-import { openDB, DBSchema, IDBPDatabase } from 'idb'
-import type { Message as MessageType } from 'ai/react'
-import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
-import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
+import { Chat, type UIMessage as MessageType } from '@ai-sdk/react'
+import { DefaultChatTransport, lastAssistantMessageIsCompleteWithApprovalResponses } from 'ai'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
+import { DBSchema, IDBPDatabase, openDB } from 'idb'
 import { debounce } from 'lodash'
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
+
+import { constructHeaders } from '@/data/fetchers'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { prepareMessagesForAPI } from '@/lib/ai/message-utils'
+import { isKnownAssistantModelId } from '@/lib/ai/model.utils'
+import type { AssistantModelId } from '@/lib/ai/model.utils'
+import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 
 type SuggestionsType = {
   title: string
-  prompts?: string[]
+  prompts?: { label: string; description: string }[]
 }
 
-type AssistantMessageType = MessageType & { results?: { [id: string]: any[] } }
+export type AssistantMessageType = MessageType
+
+export type SqlSnippet = string | { label: string; content: string }
+
+export type AssistantModel = AssistantModelId
 
 type ChatSession = {
   id: string
@@ -20,32 +33,40 @@ type ChatSession = {
   updatedAt: Date
 }
 
+export type AiAssistantContext = {
+  projectRef?: string
+  orgSlug?: string
+  connectionString?: string
+}
+
 type AiAssistantData = {
-  open: boolean
   initialInput: string
-  sqlSnippets?: string[]
+  sqlSnippets?: SqlSnippet[]
   suggestions?: SuggestionsType
   tables: { schema: string; name: string }[]
   chats: Record<string, ChatSession>
   activeChatId?: string
+  model?: AssistantModel
+  context: AiAssistantContext
 }
 
 // Data structure stored in IndexedDB
 type StoredAiAssistantState = {
   projectRef: string
-  open: boolean
   activeChatId?: string
   chats: Record<string, ChatSession>
+  model?: AssistantModel
 }
 
 const INITIAL_AI_ASSISTANT: AiAssistantData = {
-  open: false,
   initialInput: '',
   sqlSnippets: undefined,
   suggestions: undefined,
   tables: [],
   chats: {},
   activeChatId: undefined,
+  model: undefined,
+  context: {},
 }
 
 const DB_NAME = 'ai-assistant-db'
@@ -90,16 +111,42 @@ async function saveAiState(state: StoredAiAssistantState): Promise<void> {
   }
 }
 
+async function clearStorage(): Promise<void> {
+  try {
+    const db = await openAiDb()
+    await db.clear(STORE_NAME)
+  } catch (error) {
+    console.error('Failed to clear AI state from IndexedDB:', error)
+  }
+}
+
+// Helper function to sanitize objects to ensure they're cloneable
+// Issue due to addToolResult
+function sanitizeForCloning(obj: any): any {
+  if (obj === null || obj === undefined) return obj
+  if (typeof obj !== 'object') return obj
+  return JSON.parse(JSON.stringify(obj))
+}
+
 // Helper function to load state from IndexedDB
 async function loadFromIndexedDB(projectRef: string): Promise<StoredAiAssistantState | null> {
   try {
     const persistedState = await getAiState(projectRef)
     if (persistedState) {
-      // Revive dates
+      // Revive dates and sanitize message data
       Object.values(persistedState.chats).forEach((chat: ChatSession) => {
         if (chat && typeof chat === 'object') {
           chat.createdAt = new Date(chat.createdAt)
           chat.updatedAt = new Date(chat.updatedAt)
+
+          // Sanitize message parts to remove proxy objects
+          if (chat.messages) {
+            chat.messages.forEach((message: any) => {
+              if (message.parts) {
+                message.parts = message.parts.map((part: any) => sanitizeForCloning(part))
+              }
+            })
+          }
         }
       })
       return persistedState
@@ -114,7 +161,7 @@ async function loadFromIndexedDB(projectRef: string): Promise<StoredAiAssistantS
 async function tryMigrateFromLocalStorage(
   projectRef: string
 ): Promise<StoredAiAssistantState | null> {
-  const stored = localStorage.getItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
+  const stored = safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
   if (!stored) {
     return null
   }
@@ -131,25 +178,25 @@ async function tryMigrateFromLocalStorage(
     if (parsedFromLocalStorage && typeof parsedFromLocalStorage.chats === 'object') {
       migratedState = {
         projectRef: projectRef,
-        open: parsedFromLocalStorage.open ?? false,
         activeChatId: parsedFromLocalStorage.activeChatId,
         chats: parsedFromLocalStorage.chats,
+        model: parsedFromLocalStorage.model ?? INITIAL_AI_ASSISTANT.model,
       }
     } else {
       console.warn('Data in localStorage is not in the expected format, ignoring.')
       // Clean up invalid data
-      localStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
+      safeLocalStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
     }
   } catch (error) {
     console.error('Failed to parse state from localStorage:', error)
     // Clear potentially corrupted data
-    localStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
+    safeLocalStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
   }
 
   if (migratedState) {
     try {
       await saveAiState(migratedState)
-      localStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
+      safeLocalStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
       return migratedState
     } catch (saveError) {
       console.error('Failed to save migrated state to IndexedDB:', saveError)
@@ -162,15 +209,6 @@ async function tryMigrateFromLocalStorage(
 
 // Helper function to ensure an active chat exists or initialize a new one
 function ensureActiveChatOrInitialize(state: AiAssistantState) {
-  // Check URL param again to override loaded 'open' state if present
-  if (typeof window !== 'undefined') {
-    const urlParams = new URLSearchParams(window.location.search)
-    const aiAssistantPanelOpenParam = urlParams.get('aiAssistantPanelOpen')
-    if (aiAssistantPanelOpenParam !== null) {
-      state.open = aiAssistantPanelOpenParam === 'true'
-    }
-  }
-
   // Ensure an active chat exists after loading/migration
   if (!state.activeChatId || !state.chats[state.activeChatId]) {
     const chatIds = Object.keys(state.chats)
@@ -187,37 +225,107 @@ function ensureActiveChatOrInitialize(state: AiAssistantState) {
   }
 }
 
+function createChatInstance(
+  state: AiAssistantState,
+  options: { id: string; initialMessages: MessageType[] }
+) {
+  return new Chat<MessageType>({
+    id: options.id,
+    messages: options.initialMessages.map((message) => sanitizeForCloning(message)),
+    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses,
+    transport: new DefaultChatTransport({
+      api: `${BASE_PATH}/api/ai/sql/generate-v4`,
+      fetch: async (url, init) => {
+        const response = await globalThis.fetch(url as RequestInfo, init)
+        const spanId = response.headers.get('x-braintrust-span-id')
+        if (spanId) {
+          state.pendingSpanIds[options.id] = spanId
+        }
+        return response
+      },
+      async prepareSendMessagesRequest({ messages, ...opts }) {
+        const cleanedMessages = prepareMessagesForAPI(messages)
+        const headerData = await constructHeaders()
+        const authorizationHeader = headerData.get('Authorization')
+
+        // Get the chat specific to this request to ensure we have the correct name
+        const chat = state.chats[options.id]
+
+        return {
+          ...opts,
+          body: {
+            messages: cleanedMessages,
+            projectRef: state.context.projectRef,
+            connectionString: state.context.connectionString,
+            chatId: options.id,
+            chatName: chat?.name,
+            orgSlug: state.context.orgSlug,
+            context: state.context,
+            model: state.model,
+            ...opts.body,
+          },
+          ...(IS_PLATFORM ? { headers: { Authorization: authorizationHeader ?? '' } } : {}),
+        }
+      },
+    }),
+    async onToolCall({ toolCall }) {
+      if (toolCall.dynamic) {
+        return
+      }
+
+      if (toolCall.toolName === 'rename_chat') {
+        const { newName } = toolCall.input as { newName: string }
+
+        if (options.id && newName?.trim()) {
+          state.renameChat(options.id, newName.trim())
+        }
+      }
+    },
+    onFinish(_result) {
+      // Sync messages back to state
+      const chatInstance = state.chatInstances[options.id]
+      if (chatInstance) {
+        const messages = chatInstance.messages
+        const chat = state.chats[options.id]
+        if (chat) {
+          chat.messages = messages
+          chat.updatedAt = new Date()
+        }
+
+        // Associate pending span ID with the last assistant message
+        const pendingSpanId = state.pendingSpanIds[options.id]
+        if (pendingSpanId) {
+          const lastAssistantMsg = [...messages].reverse().find((m) => m.role === 'assistant')
+          if (lastAssistantMsg) {
+            state.messageSpanIds[lastAssistantMsg.id] = pendingSpanId
+          }
+          delete state.pendingSpanIds[options.id]
+        }
+      }
+    },
+  })
+}
+
 export const createAiAssistantState = (): AiAssistantState => {
   // Initialize with defaults, loading happens asynchronously in the provider
   const initialState = { ...INITIAL_AI_ASSISTANT }
 
-  // Check URL params for initial 'open' state, overriding any loaded state later if present
-  if (typeof window !== 'undefined') {
-    const urlParams = new URLSearchParams(window.location.search)
-    const aiAssistantPanelOpenParam = urlParams.get('aiAssistantPanelOpen')
-    if (aiAssistantPanelOpenParam !== null) {
-      initialState.open = aiAssistantPanelOpenParam === 'true'
-    }
-  }
-
   const state: AiAssistantState = proxy({
     ...initialState, // Spread initial values directly
+    chatInstances: {},
+    pendingSpanIds: {},
+    messageSpanIds: {},
+
+    setContext: (context: Partial<AiAssistantContext>) => {
+      state.context = { ...state.context, ...context }
+    },
 
     resetAiAssistantPanel: () => {
       Object.assign(state, INITIAL_AI_ASSISTANT)
     },
 
-    // Panel visibility
-    openAssistant: () => {
-      state.open = true
-    },
-
-    closeAssistant: () => {
-      state.open = false
-    },
-
-    toggleAssistant: () => {
-      state.open = !state.open
+    setModel: (model: AssistantModel) => {
+      state.model = model
     },
 
     // Chat management
@@ -226,14 +334,14 @@ export const createAiAssistantState = (): AiAssistantState => {
     },
 
     newChat: (
-      options?: { name?: string } & Partial<
-        Pick<AiAssistantData, 'open' | 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
+      options?: { name?: string; initialMessage?: string } & Partial<
+        Pick<AiAssistantData, 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
       >
     ) => {
-      const chatId = crypto.randomUUID()
+      const chatId = uuidv4()
       const newChat: ChatSession = {
         id: chatId,
-        name: options?.name ?? 'Untitled',
+        name: options?.name ?? 'New chat',
         messages: [],
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -245,8 +353,19 @@ export const createAiAssistantState = (): AiAssistantState => {
       }
       state.activeChatId = chatId
 
+      // Create new chat instance
+      const chatInstance = createChatInstance(state, { id: chatId, initialMessages: [] })
+
+      state.chatInstances[chatId] = ref(chatInstance)
+
+      // If initialMessage is provided, append it to the chat instance
+      if (options?.initialMessage) {
+        chatInstance.sendMessage({
+          text: options.initialMessage,
+        })
+      }
+
       // Update non-chat related state based on options, falling back to current state, then initial
-      state.open = options?.open ?? state.open
       state.initialInput = options?.initialInput ?? INITIAL_AI_ASSISTANT.initialInput
       state.sqlSnippets = options?.sqlSnippets ?? INITIAL_AI_ASSISTANT.sqlSnippets
       state.suggestions = options?.suggestions ?? INITIAL_AI_ASSISTANT.suggestions
@@ -258,6 +377,14 @@ export const createAiAssistantState = (): AiAssistantState => {
     selectChat: (id: string) => {
       if (id !== state.activeChatId) {
         state.activeChatId = id
+        const chat = state.chats[id]
+        if (chat) {
+          if (!state.chatInstances[id]) {
+            state.chatInstances[id] = ref(
+              createChatInstance(state, { id, initialMessages: chat.messages })
+            )
+          }
+        }
       }
     },
 
@@ -268,6 +395,15 @@ export const createAiAssistantState = (): AiAssistantState => {
       if (id === state.activeChatId) {
         const remainingChatIds = Object.keys(remainingChats)
         state.activeChatId = remainingChatIds.length > 0 ? remainingChatIds[0] : undefined
+
+        if (state.activeChatId) {
+          const chat = state.chats[state.activeChatId]
+          if (!state.chatInstances[state.activeChatId]) {
+            state.chatInstances[state.activeChatId] = ref(
+              createChatInstance(state, { id: state.activeChatId, initialMessages: chat.messages })
+            )
+          }
+        }
       }
     },
 
@@ -284,24 +420,42 @@ export const createAiAssistantState = (): AiAssistantState => {
       if (chat) {
         chat.messages = []
         chat.updatedAt = new Date()
+        state.suggestions = undefined
         state.sqlSnippets = []
         state.initialInput = ''
       }
+    },
+
+    deleteMessagesAfter: (id: string, { includeSelf = true } = {}) => {
+      const chat = state.activeChat
+      if (!chat) return
+
+      const messageIndex = chat.messages.findIndex((msg) => msg.id === id)
+      if (messageIndex === -1) return
+
+      // Delete all messages from the target message (optionally including) to the end
+      const startIndex = includeSelf ? messageIndex : messageIndex + 1
+      chat.messages.splice(startIndex)
+      chat.updatedAt = new Date()
     },
 
     saveMessage: (message: MessageType | MessageType[]) => {
       const chat = state.activeChat
       if (!chat) return
 
-      const existingMessages = chat.messages
-      const messagesToAdd = Array.isArray(message)
-        ? message.filter(
-            (msg) =>
-              !existingMessages.some((existing: AssistantMessageType) => existing.id === msg.id)
-          )
-        : !existingMessages.some((existing: AssistantMessageType) => existing.id === message.id)
-          ? [message]
-          : []
+      const incomingMessages = Array.isArray(message) ? message : [message]
+
+      const messagesToAdd: AssistantMessageType[] = []
+
+      incomingMessages.forEach((msg) => {
+        const index = chat.messages.findIndex((existing) => existing.id === msg.id)
+
+        if (index !== -1) {
+          state.updateMessage(msg)
+        } else {
+          messagesToAdd.push(msg)
+        }
+      })
 
       if (messagesToAdd.length > 0) {
         chat.messages.push(...messagesToAdd)
@@ -309,30 +463,18 @@ export const createAiAssistantState = (): AiAssistantState => {
       }
     },
 
-    updateMessage: ({
-      id,
-      resultId,
-      results,
-    }: {
-      id: string
-      resultId?: string
-      results: any[]
-    }) => {
+    updateMessage: (updatedMessage: MessageType) => {
       const chat = state.activeChat
-      if (!chat || !resultId) return
+      if (!chat) return
 
-      const messageIndex = chat.messages.findIndex((msg) => msg.id === id)
-
+      const messageIndex = chat.messages.findIndex((msg) => msg.id === updatedMessage.id)
       if (messageIndex !== -1) {
-        const msg = chat.messages[messageIndex]
-        if (!msg.results) {
-          msg.results = {}
-        }
-        msg.results[resultId] = results
+        chat.messages[messageIndex] = updatedMessage
+        chat.updatedAt = new Date()
       }
     },
 
-    setSqlSnippets: (snippets: string[]) => {
+    setSqlSnippets: (snippets: SqlSnippet[]) => {
       state.sqlSnippets = snippets
     },
 
@@ -341,35 +483,21 @@ export const createAiAssistantState = (): AiAssistantState => {
       state.suggestions = undefined
     },
 
-    getCachedSQLResults: ({ messageId, snippetId }: { messageId: string; snippetId?: string }) => {
-      const chat = state.activeChat
-      if (!chat || !snippetId) return
-
-      const message = chat.messages.find((msg) => msg.id === messageId)
-      const results = (message?.results ?? {})[snippetId]
-      return results
-    },
-
     // --- New function to load persisted state ---
     loadPersistedState: (persistedState: StoredAiAssistantState) => {
-      state.open = persistedState.open
       state.chats = persistedState.chats
       state.activeChatId = persistedState.activeChatId
-
-      // Check URL param again to override loaded 'open' state if present
-      if (typeof window !== 'undefined') {
-        const urlParams = new URLSearchParams(window.location.search)
-        const aiAssistantPanelOpenParam = urlParams.get('aiAssistantPanelOpen')
-        if (aiAssistantPanelOpenParam !== null) {
-          state.open = aiAssistantPanelOpenParam === 'true'
-        }
-      }
+      const storedModel = persistedState.model
+      state.model =
+        storedModel && isKnownAssistantModelId(storedModel)
+          ? storedModel
+          : INITIAL_AI_ASSISTANT.model
 
       // Ensure an active chat exists after loading
       if (!state.activeChat) {
         const chatIds = Object.keys(state.chats)
         if (chatIds.length > 0) {
-          // Maybe select the most recently updated? For now, first.
+          // Select the most recently updated chat
           state.activeChatId = chatIds.sort(
             (a, b) =>
               (state.chats[b].updatedAt?.getTime() || 0) -
@@ -380,6 +508,24 @@ export const createAiAssistantState = (): AiAssistantState => {
           state.newChat()
         }
       }
+
+      // Initialize chat instance for the active chat
+      if (
+        state.activeChatId &&
+        state.chats[state.activeChatId] &&
+        !state.chatInstances[state.activeChatId]
+      ) {
+        state.chatInstances[state.activeChatId] = ref(
+          createChatInstance(state, {
+            id: state.activeChatId,
+            initialMessages: state.chats[state.activeChatId].messages,
+          })
+        )
+      }
+    },
+
+    clearStorage: async () => {
+      await clearStorage()
     },
   })
 
@@ -388,35 +534,34 @@ export const createAiAssistantState = (): AiAssistantState => {
 
 export type AiAssistantState = AiAssistantData & {
   resetAiAssistantPanel: () => void
-  openAssistant: () => void
-  closeAssistant: () => void
-  toggleAssistant: () => void
   activeChat: ChatSession | undefined
+  chatInstances: Record<string, Chat<MessageType>>
+  pendingSpanIds: Record<string, string>
+  messageSpanIds: Record<string, string>
+  setContext: (context: Partial<AiAssistantContext>) => void
+  setModel: (model: AssistantModel) => void
   newChat: (
-    options?: { name?: string } & Partial<
-      Pick<AiAssistantData, 'open' | 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
+    options?: { name?: string; initialMessage?: string } & Partial<
+      Pick<AiAssistantData, 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
     >
   ) => string
   selectChat: (id: string) => void
   deleteChat: (id: string) => void
   renameChat: (id: string, name: string) => void
   clearMessages: () => void
+  deleteMessagesAfter: (id: string, options?: { includeSelf?: boolean }) => void
   saveMessage: (message: MessageType | MessageType[]) => void
-  updateMessage: (args: { id: string; resultId?: string; results: any[] }) => void
-  setSqlSnippets: (snippets: string[]) => void
+  updateMessage: (message: MessageType) => void
+  setSqlSnippets: (snippets: SqlSnippet[]) => void
   clearSqlSnippets: () => void
-  getCachedSQLResults: (args: { messageId: string; snippetId?: string }) => any[] | undefined
   loadPersistedState: (persistedState: StoredAiAssistantState) => void
+  clearStorage: () => Promise<void>
 }
 
 export const AiAssistantStateContext = createContext<AiAssistantState>(createAiAssistantState())
 
-export const AiAssistantStateContextProvider = ({
-  projectRef,
-  children,
-}: PropsWithChildren<{
-  projectRef: string | undefined
-}>) => {
+export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren) => {
+  const { data: project } = useSelectedProjectQuery()
   // Initialize state. createAiAssistantState now just sets defaults.
   const [state] = useState(() => createAiAssistantState())
 
@@ -425,8 +570,8 @@ export const AiAssistantStateContextProvider = ({
     let isMounted = true
 
     async function loadAndInitializeState() {
-      if (!projectRef || typeof window === 'undefined') {
-        if (projectRef === undefined) {
+      if (!project?.ref || typeof window === 'undefined') {
+        if (project?.ref === undefined) {
           state.resetAiAssistantPanel()
         }
         return // Don't load if no projectRef or not in browser
@@ -435,11 +580,11 @@ export const AiAssistantStateContextProvider = ({
       let loadedState: StoredAiAssistantState | null = null
 
       // 1. Try loading from IndexedDB
-      loadedState = await loadFromIndexedDB(projectRef)
+      loadedState = await loadFromIndexedDB(project?.ref)
 
       // 2. If not in IndexedDB, try migrating from localStorage
       if (!loadedState) {
-        loadedState = await tryMigrateFromLocalStorage(projectRef)
+        loadedState = await tryMigrateFromLocalStorage(project?.ref)
       }
 
       if (!isMounted) return // Component unmounted during async operations
@@ -458,11 +603,11 @@ export const AiAssistantStateContextProvider = ({
     return () => {
       isMounted = false
     }
-  }, [projectRef, state])
+  }, [project?.ref, state])
 
   // Effect to save state to IndexedDB on changes
   useEffect(() => {
-    if (typeof window !== 'undefined' && projectRef) {
+    if (typeof window !== 'undefined' && project?.ref) {
       // Create a debounced version of saveAiState
       const debouncedSaveAiState = debounce(saveAiState, 500)
 
@@ -470,9 +615,9 @@ export const AiAssistantStateContextProvider = ({
         const snap = snapshot(state)
         // Prepare state for IndexedDB
         const stateToSave: StoredAiAssistantState = {
-          projectRef: projectRef,
-          open: snap.open,
+          projectRef: project?.ref,
           activeChatId: snap.activeChatId,
+          model: snap.model,
           chats: snap.chats
             ? Object.entries(snap.chats).reduce((acc, [chatId, chat]) => {
                 // Limit messages before saving
@@ -495,7 +640,7 @@ export const AiAssistantStateContextProvider = ({
       }
     }
     return undefined
-  }, [state, projectRef])
+  }, [state, project?.ref])
 
   return (
     <AiAssistantStateContext.Provider value={state}>{children}</AiAssistantStateContext.Provider>
@@ -505,4 +650,9 @@ export const AiAssistantStateContextProvider = ({
 export const useAiAssistantStateSnapshot = (options?: Parameters<typeof useSnapshot>[1]) => {
   const state = useContext(AiAssistantStateContext)
   return useSnapshot(state, options)
+}
+
+export const useAiAssistantState = () => {
+  const state = useContext(AiAssistantStateContext)
+  return state
 }

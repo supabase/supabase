@@ -1,24 +1,30 @@
-import matter from 'gray-matter'
-import { type SerializeOptions } from 'next-mdx-remote/dist/types'
 import { readFile } from 'node:fs/promises'
 import { join, relative } from 'node:path'
-import rehypeSlug from 'rehype-slug'
-import emoji from 'remark-emoji'
-import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import {
   genGuideMeta,
   genGuidesStaticParams,
   removeRedundantH1,
 } from '~/features/docs/GuidesMdx.utils'
-import { REVALIDATION_TAGS } from '~/features/helpers.fetch'
+import { newEditLink } from '~/features/helpers.edit-link'
+import { Guide, GuideArticle, GuideFooter, GuideHeader, GuideMdxContent } from '~/features/ui/guide'
+// End of third-party imports
+
+import { IS_DEV } from '~/lib/constants'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter } from '~/lib/docs'
-import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
+import { linkTransform, type UrlTransformFunction } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
-import { octokit } from '~/lib/octokit'
-
-export const dynamicParams = false
+import { getGitHubFileContents, octokit } from '~/lib/octokit'
+import type { SerializeOptions } from '~/types/next-mdx-remote-serialize'
+import { isFeatureEnabled } from 'common'
+import matter from 'gray-matter'
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+import rehypeSlug from 'rehype-slug'
+import emoji from 'remark-emoji'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
@@ -26,48 +32,36 @@ const repo = 'wrappers'
 const docsDir = 'docs/catalog'
 const externalSite = 'https://supabase.github.io/wrappers'
 
-type TagQueryResponse = {
+type DocsTagsQueryResponse = {
   repository: {
     refs: {
-      nodes:
-        | {
-            name: string
-          }[]
-        | null
-      pageInfo: {
-        hasNextPage: boolean
-        endCursor: string | null
-      }
+      nodes: { name: string }[] | null
+      pageInfo: { hasNextPage: boolean; endCursor: string | null }
     }
   }
 }
 
-const tagQuery = `
-    query TagQuery($owner: String!, $name: String!, $after: String) {
-      repository(owner: $owner, name: $name) {
-        refs(
-          refPrefix: "refs/tags/",
-          orderBy: {
-            field: TAG_COMMIT_DATE,
-            direction: DESC
-          },
-          first: 5,
-          after: $after
-        ) {
-          nodes {
-            name
-          }
-          pageInfo {
-            hasNextPage
-            endCursor
-          }
-        }
+const docsTagsQuery = `
+  query DocsTagsQuery($owner: String!, $name: String!, $after: String) {
+    repository(owner: $owner, name: $name) {
+      refs(
+        refPrefix: "refs/tags/",
+        orderBy: { field: TAG_COMMIT_DATE, direction: DESC },
+        first: 5,
+        after: $after
+      ) {
+        nodes { name }
+        pageInfo { hasNextPage endCursor }
       }
     }
-  `
+  }
+`
 
-async function getLatestRelease(after: string | null = null) {
+async function getLatestDocsTag(after: string | null = null): Promise<string | null> {
   try {
+    /**
+     * We use GraphQL as it's the only way to use `orderBy` on Github API.
+     */
     const {
       repository: {
         refs: {
@@ -75,22 +69,18 @@ async function getLatestRelease(after: string | null = null) {
           pageInfo: { hasNextPage, endCursor },
         },
       },
-    } = await octokit().graphql<TagQueryResponse>(tagQuery, {
+    } = await octokit().graphql<DocsTagsQueryResponse>(docsTagsQuery, {
       owner: org,
       name: repo,
       after,
-      request: {
-        fetch: (url: RequestInfo | URL, options?: RequestInit) =>
-          fetch(url, { ...options, next: { tags: [REVALIDATION_TAGS.WRAPPERS] } }),
-      },
     })
 
     return (
-      nodes?.find((node) => node?.name?.match(/^docs_v\d+\.\d+\.\d+/))?.name ??
-      (hasNextPage && endCursor ? await getLatestRelease(endCursor) : null)
+      nodes?.find(({ name }) => /^docs_v\d+\.\d+\.\d+/.test(name))?.name ??
+      (hasNextPage && endCursor ? await getLatestDocsTag(endCursor) : null)
     )
   } catch (error) {
-    console.error(`Error fetching release tags for wrappers federated pages: ${error}`)
+    console.error(`Error fetching docs tags for wrappers federated pages: ${error}`)
     return null
   }
 }
@@ -101,6 +91,7 @@ const pageMap = [
     slug: 'airtable',
     meta: {
       title: 'Airtable',
+      dashboardIntegrationPath: 'airtable_wrapper',
     },
     remoteFile: 'airtable.md',
   },
@@ -108,6 +99,7 @@ const pageMap = [
     slug: 'auth0',
     meta: {
       title: 'Auth0',
+      dashboardIntegrationPath: 'auth0_wrapper',
     },
     remoteFile: 'auth0.md',
   },
@@ -115,13 +107,31 @@ const pageMap = [
     slug: 'bigquery',
     meta: {
       title: 'BigQuery',
+      dashboardIntegrationPath: 'bigquery_wrapper',
     },
     remoteFile: 'bigquery.md',
+  },
+  {
+    slug: 'cal',
+    meta: {
+      title: 'Cal.com',
+      dashboardIntegrationPath: 'cal_wrapper',
+    },
+    remoteFile: 'cal.md',
+  },
+  {
+    slug: 'calendly',
+    meta: {
+      title: 'Calendly',
+      dashboardIntegrationPath: 'calendly_wrapper',
+    },
+    remoteFile: 'calendly.md',
   },
   {
     slug: 'clerk',
     meta: {
       title: 'Clerk',
+      dashboardIntegrationPath: 'clerk_wrapper',
     },
     remoteFile: 'clerk.md',
   },
@@ -129,27 +139,87 @@ const pageMap = [
     slug: 'clickhouse',
     meta: {
       title: 'ClickHouse',
+      dashboardIntegrationPath: 'clickhouse_wrapper',
     },
     remoteFile: 'clickhouse.md',
+  },
+  {
+    slug: 'cloudflare-d1',
+    meta: {
+      title: 'Cloudflare D1',
+      dashboardIntegrationPath: 'cfd1_wrapper',
+    },
+    remoteFile: 'cfd1.md',
   },
   {
     slug: 'cognito',
     meta: {
       title: 'AWS Cognito',
+      dashboardIntegrationPath: 'cognito_wrapper',
     },
     remoteFile: 'cognito.md',
+  },
+  {
+    slug: 'duckdb',
+    meta: {
+      title: 'DuckDB',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'duckdb.md',
+  },
+  {
+    slug: 'dynamodb',
+    meta: {
+      title: 'AWS DynamoDB',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'dynamodb.md',
   },
   {
     slug: 'firebase',
     meta: {
       title: 'Firebase',
+      dashboardIntegrationPath: 'firebase_wrapper',
     },
     remoteFile: 'firebase.md',
+  },
+  {
+    slug: 'gravatar',
+    meta: {
+      title: 'Gravatar',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'gravatar.md',
+  },
+  {
+    slug: 'hubspot',
+    meta: {
+      title: 'HubSpot',
+      dashboardIntegrationPath: 'hubspot_wrapper',
+    },
+    remoteFile: 'hubspot.md',
+  },
+  {
+    slug: 'iceberg',
+    meta: {
+      title: 'Iceberg',
+      dashboardIntegrationPath: 'iceberg_wrapper',
+    },
+    remoteFile: 'iceberg.md',
+  },
+  {
+    slug: 'infura',
+    meta: {
+      title: 'Infura',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'infura.md',
   },
   {
     slug: 'logflare',
     meta: {
       title: 'Logflare',
+      dashboardIntegrationPath: 'logflare_wrapper',
     },
     remoteFile: 'logflare.md',
   },
@@ -157,20 +227,47 @@ const pageMap = [
     slug: 'mssql',
     meta: {
       title: 'MSSQL',
+      dashboardIntegrationPath: 'mssql_wrapper',
     },
     remoteFile: 'mssql.md',
+  },
+  {
+    slug: 'mysql',
+    meta: {
+      title: 'MySQL',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'mysql.md',
   },
   {
     slug: 'notion',
     meta: {
       title: 'Notion',
+      dashboardIntegrationPath: 'notion_wrapper',
     },
     remoteFile: 'notion.md',
+  },
+  {
+    slug: 'openapi',
+    meta: {
+      title: 'OpenAPI',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'openapi.md',
+  },
+  {
+    slug: 'orb',
+    meta: {
+      title: 'Orb',
+      dashboardIntegrationPath: 'orb_wrapper',
+    },
+    remoteFile: 'orb.md',
   },
   {
     slug: 'paddle',
     meta: {
       title: 'Paddle',
+      dashboardIntegrationPath: 'paddle_wrapper',
     },
     remoteFile: 'paddle.md',
   },
@@ -178,6 +275,7 @@ const pageMap = [
     slug: 'redis',
     meta: {
       title: 'Redis',
+      dashboardIntegrationPath: 'redis_wrapper',
     },
     remoteFile: 'redis.md',
   },
@@ -185,13 +283,39 @@ const pageMap = [
     slug: 's3',
     meta: {
       title: 'AWS S3',
+      dashboardIntegrationPath: 's3_wrapper',
     },
     remoteFile: 's3.md',
+  },
+  {
+    slug: 's3_vectors',
+    meta: {
+      title: 'AWS S3 Vectors',
+      dashboardIntegrationPath: 's3_vectors_wrapper',
+    },
+    remoteFile: 's3vectors.md',
+  },
+  {
+    slug: 'shopify',
+    meta: {
+      title: 'Shopify',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'shopify.md',
+  },
+  {
+    slug: 'slack',
+    meta: {
+      title: 'Slack',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'slack.md',
   },
   {
     slug: 'snowflake',
     meta: {
       title: 'Snowflake',
+      dashboardIntegrationPath: 'snowflake_wrapper',
     },
     remoteFile: 'snowflake.md',
   },
@@ -199,6 +323,7 @@ const pageMap = [
     slug: 'stripe',
     meta: {
       title: 'Stripe',
+      dashboardIntegrationPath: 'stripe_wrapper',
     },
     remoteFile: 'stripe.md',
   },
@@ -209,8 +334,25 @@ interface Params {
 }
 
 const WrappersDocs = async (props: { params: Promise<Params> }) => {
+  if (!isFeatureEnabled('docs:fdw')) {
+    notFound()
+  }
+
   const params = await props.params
-  const { isExternal, meta, ...data } = await getContent(params)
+  const { isExternal, meta, assetsBaseUrl, ...data } = await getContent(params)
+
+  // Create a combined URL transformer that handles both regular URLs and asset URLs
+  const combinedUrlTransformer: UrlTransformFunction = (url, node) => {
+    // First try assets URL transformation (starts with ../assets/)
+    const transformedUrl = assetUrlTransform(url, assetsBaseUrl)
+
+    // If URL wasn't changed proceed with regular URL transformation
+    if (transformedUrl === url) {
+      return urlTransform(url, node)
+    }
+
+    return transformedUrl
+  }
 
   const options = isExternal
     ? ({
@@ -221,12 +363,36 @@ const WrappersDocs = async (props: { params: Promise<Params> }) => {
             remarkPyMdownTabs,
             [removeTitle, meta.title],
           ],
-          rehypePlugins: [[linkTransform, urlTransform], rehypeSlug],
+          rehypePlugins: [[linkTransform, combinedUrlTransformer], rehypeSlug],
         },
       } as SerializeOptions)
     : undefined
 
-  return <GuideTemplate meta={meta} mdxOptions={options} {...data} />
+  const dashboardIntegrationURL = getDashboardIntegrationURL(meta.dashboardIntegrationPath)
+
+  return (
+    <Guide meta={meta}>
+      <GuideArticle>
+        <GuideHeader />
+
+        {dashboardIntegrationURL && (
+          <Admonition type="tip" className="mb-4">
+            <p>You can enable the {meta.title} wrapper right from the Supabase dashboard.</p>
+
+            <Button asChild>
+              <Link href={dashboardIntegrationURL} className="no-underline">
+                Open wrapper in dashboard
+              </Link>
+            </Button>
+          </Admonition>
+        )}
+
+        <GuideMdxContent content={data.content} mdxOptions={options} />
+
+        <GuideFooter editLink={data.editLink} />
+      </GuideArticle>
+    </Guide>
+  )
 }
 
 /**
@@ -241,6 +407,7 @@ const getContent = async (params: Params) => {
   let meta: any
   let content: string
   let editLink: string
+  let assetsBaseUrl: string = ''
 
   if (!federatedPage) {
     isExternal = false
@@ -263,19 +430,22 @@ const getContent = async (params: Params) => {
     let remoteFile: string
     ;({ remoteFile, meta } = federatedPage)
 
-    const tag = await getLatestRelease()
+    const tag = await getLatestDocsTag()
+
     if (!tag) {
-      throw new Error('No latest release found for federated wrappers pages')
+      throw new Error('No latest docs tag found for federated wrappers pages')
     }
 
-    const repoPath = `${org}/${repo}/${tag}/${docsDir}/${remoteFile}`
     editLink = `${org}/${repo}/blob/${tag}/${docsDir}/${remoteFile}`
 
-    const response = await fetch(`https://raw.githubusercontent.com/${repoPath}`, {
-      cache: 'force-cache',
-      next: { tags: [REVALIDATION_TAGS.WRAPPERS] },
+    let rawContent = await getGitHubFileContents({
+      org,
+      repo,
+      path: `${docsDir}/${remoteFile}`,
+      branch: tag,
     })
-    const rawContent = await response.text()
+
+    assetsBaseUrl = `https://raw.githubusercontent.com/${org}/${repo}/${tag}/docs/assets/`
 
     const { content: contentWithoutFrontmatter } = matter(rawContent)
     content = removeRedundantH1(contentWithoutFrontmatter)
@@ -288,7 +458,24 @@ const getContent = async (params: Params) => {
     editLink: newEditLink(editLink),
     meta,
     content,
+    assetsBaseUrl,
   }
+}
+
+const getDashboardIntegrationURL = (wrapperPath?: string) => {
+  return wrapperPath
+    ? `https://supabase.com/dashboard/project/_/integrations/${wrapperPath}/overview`
+    : null
+}
+
+const assetUrlTransform = (url: string, baseUrl: string): string => {
+  const assetPattern = /(\.\.\/)+assets\//
+
+  if (assetPattern.test(url)) {
+    return url.replace(assetPattern, baseUrl)
+  }
+
+  return url
 }
 
 const urlTransform: UrlTransformFunction = (url) => {
@@ -324,6 +511,10 @@ const urlTransform: UrlTransformFunction = (url) => {
 }
 
 const generateStaticParams = async () => {
+  if (IS_DEV) {
+    return []
+  }
+
   const mdxPaths = await genGuidesStaticParams('database/extensions/wrappers')()
   const federatedPaths = pageMap.map(({ slug }) => ({
     slug: [slug],

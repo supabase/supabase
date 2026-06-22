@@ -13,7 +13,7 @@ In the browser, `signInWithOAuth` automatically redirects to the OAuth provider'
 
 ```js
 import { createClient, type Provider } from '@supabase/supabase-js';
-const supabase = createClient('url', 'anonKey')
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 const provider = 'provider' as Provider
 
 // ---cut---
@@ -33,7 +33,7 @@ In the server, you need to handle the redirect to the OAuth provider's authentic
 
 ```js
 import { createClient, type Provider } from '@supabase/supabase-js'
-const supabase = createClient('url', 'anonKey')
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 const provider = 'provider' as Provider
 const redirect = (url: string) => {}
 
@@ -69,6 +69,7 @@ Create a new file at `app/auth/callback/route.ts` and populate with the followin
 
 ```ts name=app/auth/callback/route.ts
 import { NextResponse } from 'next/server'
+
 // The client you created from the Server-Side Auth instructions
 import { createClient } from '@/utils/supabase/server'
 
@@ -76,7 +77,11 @@ export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   // if "next" is in param, use it as the redirect URL
-  const next = searchParams.get('next') ?? '/'
+  let next = searchParams.get('next') ?? '/'
+  if (!next.startsWith('/')) {
+    // if "next" is not a relative URL, use the default
+    next = '/'
+  }
 
   if (code) {
     const supabase = await createClient()
@@ -119,12 +124,12 @@ export const GET = async (event) => {
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      throw redirect(303, `/${next.slice(1)}`);
+      redirect(303, `/${next.slice(1)}`);
     }
   }
 
   // return the user to an error page with instructions
-  throw redirect(303, '/auth/auth-code-error');
+  redirect(303, '/auth/auth-code-error');
 };
 ```
 
@@ -146,13 +151,13 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
   if (code) {
     const supabase = createServerClient(
       import.meta.env.PUBLIC_SUPABASE_URL,
-      import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
+      import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY,
       {
         cookies: {
           getAll() {
             return parseCookieHeader(Astro.request.headers.get('Cookie') ?? '')
           },
-          setAll(cookiesToSet) {
+          setAll(cookiesToSet, _headers) {
             cookiesToSet.forEach(({ name, value, options }) =>
               Astro.cookies.set(name, value, options)
             )
@@ -187,31 +192,36 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
   const next = requestUrl.searchParams.get('next') || '/'
-  const headers = new Headers()
+  const responseHeaders = new Headers()
 
   if (code) {
-    const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
-      cookies: {
-        getAll() {
-          return parseCookieHeader(request.headers.get('Cookie') ?? '')
+    const supabase = createServerClient(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_PUBLISHABLE_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return parseCookieHeader(request.headers.get('Cookie') ?? '')
+          },
+          setAll(cookiesToSet, cacheHeaders) {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              responseHeaders.append('Set-Cookie', serializeCookieHeader(name, value, options))
+            )
+            Object.entries(cacheHeaders).forEach(([key, value]) => responseHeaders.set(key, value))
+          },
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
-          )
-        },
-      },
-    })
+      }
+    )
 
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error) {
-      return redirect(next, { headers })
+      return redirect(next, { headers: responseHeaders })
     }
   }
 
   // return the user to an error page with instructions
-  return redirect('/auth/auth-code-error', { headers })
+  return redirect('/auth/auth-code-error', { headers: responseHeaders })
 }
 ```
 
@@ -229,14 +239,17 @@ app.get("/auth/callback", async function (req, res) {
   if (code) {
     const supabase = createServerClient(
       process.env.SUPABASE_URL,
-      process.env.SUPABASE_ANON_KEY, {
+      process.env.SUPABASE_PUBLISHABLE_KEY, {
     cookies: {
       getAll() {
-        return parseCookieHeader(context.req.headers.cookie ?? '')
+        return parseCookieHeader(req.headers.cookie ?? '')
       },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet, headers) {
         cookiesToSet.forEach(({ name, value, options }) =>
-          context.res.appendHeader('Set-Cookie', serializeCookieHeader(name, value, options))
+          res.appendHeader('Set-Cookie', serializeCookieHeader(name, value, options))
+        )
+        Object.entries(headers).forEach(([key, value]) =>
+          res.setHeader(key, value)
         )
       },
     },

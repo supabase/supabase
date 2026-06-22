@@ -1,46 +1,44 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect } from 'react'
+import { useParams } from 'common'
+import { PropsWithChildren } from 'react'
 
-import NoPermission from 'components/ui/NoPermission'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { withAuth } from 'hooks/misc/withAuth'
-import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import { ProjectLayout } from '../ProjectLayout'
 import { LogsSidebarMenuV2 } from './LogsSidebarMenuV2'
-import { LOCAL_STORAGE_KEYS } from 'common'
+import NoPermission from '@/components/ui/NoPermission'
+import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { withAuth } from '@/hooks/misc/withAuth'
 
 interface LogsLayoutProps {
-  title?: string
+  title: string
 }
 
 const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => {
-  const { isLoading, can: canUseLogsExplorer } = useAsyncCheckProjectPermissions(
+  const { ref } = useParams()
+  const logsEnabled = useIsFeatureEnabled('logs:all')
+
+  const { isLoading, can: canUseLogsExplorer } = useAsyncCheckPermissions(
     PermissionAction.ANALYTICS_READ,
     'logflare'
   )
 
-  const router = useRouter()
-  const [_, setLastLogsPage] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_LOGS_PAGE,
-    router.pathname.split('/logs/')[1]
-  )
-
-  useEffect(() => {
-    if (router.pathname.includes('/logs/')) {
-      const path = router.pathname.split('/logs/')[1]
-      setLastLogsPage(path)
-    }
-  }, [router, setLastLogsPage])
+  if (!logsEnabled) {
+    return (
+      <ProjectLayout product="Logs" browserTitle={{ section: title }}>
+        <UnknownInterface urlBack={`/project/${ref}`} />
+      </ProjectLayout>
+    )
+  }
 
   if (!canUseLogsExplorer) {
     if (isLoading) {
-      return <ProjectLayout isLoading></ProjectLayout>
+      return <ProjectLayout isLoading product="Logs" browserTitle={{ section: title }} />
     }
 
     if (!isLoading && !canUseLogsExplorer) {
       return (
-        <ProjectLayout>
+        <ProjectLayout product="Logs" browserTitle={{ section: title }}>
           <NoPermission isFullPage resourceText="access your project's logs" />
         </ProjectLayout>
       )
@@ -48,7 +46,11 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
   }
 
   return (
-    <ProjectLayout title={title} product="Logs & Analytics" productMenu={<LogsSidebarMenuV2 />}>
+    <ProjectLayout
+      product="Logs"
+      browserTitle={{ section: title }}
+      productMenu={<LogsSidebarMenuV2 />}
+    >
       {children}
     </ProjectLayout>
   )

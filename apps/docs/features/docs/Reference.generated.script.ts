@@ -1,12 +1,8 @@
-import { isPlainObject, keyBy } from 'lodash'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import slugify from 'slugify'
-import { parse } from 'yaml'
-
 import { clientSdkIds, REFERENCES } from '~/content/navigation.references'
-import { parseTypeSpec } from '~/features/docs/Reference.typeSpec'
+import { SUPPORTS_NEW_REFERENCE_PROCESS } from '~/features/docs/Reference.constants'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { deepFilterRec } from '~/features/helpers.fn'
 import type { Json } from '~/features/helpers.types'
@@ -21,7 +17,12 @@ import selfHostingRealtimeCommonSections from '~/spec/common-self-hosting-realti
 import selfHostingStorageCommonSections from '~/spec/common-self-hosting-storage-sections.json' with { type: 'json' }
 import storageSpec from '~/spec/storage_v0_openapi.json' with { type: 'json' }
 import analyticsSpec from '~/spec/transforms/analytics_v0_openapi_deparsed.json' with { type: 'json' }
-import openApiSpec from '~/spec/transforms/api_v1_openapi_deparsed.json' with { type: 'json' }
+import apiV1Spec from '~/spec/transforms/api_v1_openapi_deparsed.json' with { type: 'json' }
+import apiV2Spec from '~/spec/transforms/api_v2_openapi_deparsed.json' with { type: 'json' }
+import { isPlainObject, keyBy } from 'lodash-es'
+import slugify from 'slugify'
+import { parse } from 'yaml'
+
 import { IApiEndPoint } from './Reference.api.utils'
 
 const DOCS_DIRECTORY = join(dirname(fileURLToPath(import.meta.url)), '../..')
@@ -78,12 +79,12 @@ function mapEndpointsById(
   const endpoints = spec.paths
   const endpointsById = new Map<string, IApiEndPoint>()
 
-  Object.entries(endpoints).forEach(([path, methods]) => {
-    Object.entries(methods).forEach(([method, details]) => {
+  Object.entries(endpoints as Record<string, any>).forEach(([path, methods]) => {
+    Object.entries(methods as Record<string, any>).forEach(([method, details]) => {
       endpointsById.set(getId(details), {
         id: getId(details),
         path,
-        method,
+        method: method as 'get' | 'post' | 'put' | 'delete' | 'patch',
         ...details,
       })
     })
@@ -92,13 +93,16 @@ function mapEndpointsById(
   return endpointsById
 }
 
-function genClientSdkSectionTree(fns: Array<{ id: unknown }>, excludeName: string) {
+function genClientSdkSectionTree(
+  fns: Array<{ id: unknown }>,
+  excludeName: string
+): AbbrevApiReferenceSection[] {
   const validSections = deepFilterRec(
-    commonClientLibSections as Array<AbbrevApiReferenceSection>,
+    commonClientLibSections as AbbrevApiReferenceSection[],
     'items',
     (section) =>
       section.type === 'markdown' || section.type === 'category'
-        ? !('excludes' in section && section.excludes.includes(excludeName))
+        ? !('excludes' in section && section.excludes?.includes(excludeName))
         : section.type === 'function'
           ? fns.some(({ id }) => section.id === id)
           : true
@@ -106,11 +110,11 @@ function genClientSdkSectionTree(fns: Array<{ id: unknown }>, excludeName: strin
   return validSections
 }
 
-async function genCliSectionTree() {
+async function genCliSectionTree(): Promise<AbbrevApiReferenceSection[]> {
   const cliSpec = await getSpec('cli_v1_commands', { ext: 'yaml' })
 
   const validSections = deepFilterRec(
-    cliCommonSections as Array<AbbrevApiReferenceSection>,
+    cliCommonSections as AbbrevApiReferenceSection[],
     'items',
     (section) =>
       section.type === 'cli-command' ? cliSpec.commands.some(({ id }) => id === section.id) : true
@@ -118,9 +122,9 @@ async function genCliSectionTree() {
   return validSections
 }
 
-function genApiSectionTree(endpointsById: Map<string, IApiEndPoint>) {
+function genApiSectionTree(endpointsById: Map<string, IApiEndPoint>): AbbrevApiReferenceSection[] {
   const validSections = deepFilterRec(
-    apiCommonSections as Array<AbbrevApiReferenceSection>,
+    apiCommonSections as AbbrevApiReferenceSection[],
     'items',
     (section) => (section.type === 'operation' ? endpointsById.has(section.id) : true)
   )
@@ -131,7 +135,7 @@ function genSelfHostedSectionTree(
   spec: Array<AbbrevApiReferenceSection>,
   endpointsById: Map<string, IApiEndPoint>
 ) {
-  const validSections = deepFilterRec(spec, 'items', (section) =>
+  const validSections = deepFilterRec(spec as any, 'items', (section: any) =>
     section.type === 'self-hosted-operation' ? endpointsById.has(section.id) : true
   )
   return validSections
@@ -143,28 +147,13 @@ export function flattenCommonClientLibSections(tree: Array<AbbrevApiReferenceSec
       const prunedElem = { ...elem }
       delete prunedElem.items
       acc.push(prunedElem)
-      acc.push(...flattenCommonClientLibSections(elem.items))
+      acc.push(...flattenCommonClientLibSections(elem.items || []))
     } else {
       acc.push(elem)
     }
 
     return acc
   }, [] as Array<AbbrevApiReferenceSection>)
-}
-
-async function writeTypes() {
-  const types = await parseTypeSpec()
-
-  await writeFile(
-    join(GENERATED_DIRECTORY, 'typeSpec.json'),
-    JSON.stringify(types, (key, value) => {
-      if (key === 'methods') {
-        return Object.fromEntries(value.entries())
-      } else {
-        return value
-      }
-    })
-  )
 }
 
 async function writeSdkReferenceSections() {
@@ -177,6 +166,10 @@ async function writeSdkReferenceSections() {
           version,
         }))
       })
+      // Libs that opted into the new pipeline emit their own outputs via
+      // `scripts/build-reference-content.ts`. Skip them here so the legacy
+      // script doesn't need a YAML spec file for them at all.
+      .filter(({ sdkId, version }) => !SUPPORTS_NEW_REFERENCE_PROCESS.has(`${sdkId}-${version}`))
       .flatMap(async ({ sdkId, version }) => {
         const spec = await getSpec(REFERENCES[sdkId].meta[version].specFile)
 
@@ -247,7 +240,25 @@ async function writeCliReferenceSections() {
 }
 
 async function writeApiReferenceSections() {
-  const endpointsById = mapEndpointsById(openApiSpec)
+  const mergedSpec = {
+    ...apiV1Spec,
+    paths: {
+      ...apiV1Spec.paths,
+      ...apiV2Spec.paths,
+    },
+    components: {
+      ...apiV1Spec.components,
+      schemas: {
+        ...apiV1Spec.components?.schemas,
+        ...apiV2Spec.components?.schemas,
+      },
+      securitySchemes: {
+        ...apiV1Spec.components?.securitySchemes,
+        ...apiV2Spec.components?.securitySchemes,
+      },
+    },
+  }
+  const endpointsById = mapEndpointsById(mergedSpec)
   const pendingEndpointsByIdWrite = writeFile(
     join(GENERATED_DIRECTORY, 'api.latest.endpointsById.json'),
     JSON.stringify(Array.from(endpointsById.entries()))
@@ -289,7 +300,7 @@ async function writeSelfHostingReferenceSections() {
     selfHostingSpecs.flatMap((service) => {
       let tasks: Promise<any>[] = []
 
-      let endpointsById: Map<string, IApiEndPoint>
+      let endpointsById: Map<string, IApiEndPoint> = new Map()
       if (service.spec) {
         endpointsById = mapEndpointsById(service.spec, (details) =>
           slugify(details.summary || `dummy-id-${String(id++)}`, {
@@ -313,7 +324,9 @@ async function writeSelfHostingReferenceSections() {
         )
       )
 
-      const flattenedSelfHostedSections = flattenCommonClientLibSections(selfHostedSectionTree)
+      const flattenedSelfHostedSections = flattenCommonClientLibSections(
+        selfHostedSectionTree as AbbrevApiReferenceSection[]
+      )
       tasks.push(
         writeFile(
           join(GENERATED_DIRECTORY, `${service.id}.latest.flat.json`),
@@ -342,7 +355,6 @@ async function run() {
     await mkdir(GENERATED_DIRECTORY, { recursive: true })
 
     await Promise.all([
-      writeTypes(),
       writeSdkReferenceSections(),
       writeCliReferenceSections(),
       writeApiReferenceSections(),

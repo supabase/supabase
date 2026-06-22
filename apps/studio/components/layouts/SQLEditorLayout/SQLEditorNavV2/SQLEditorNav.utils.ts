@@ -1,4 +1,4 @@
-import { SnippetFolderResponse } from 'data/content/sql-folders-query'
+import { SnippetFolderResponse } from '@/data/content/sql-folders-query'
 
 export interface TreeViewItemProps {
   id: string | number

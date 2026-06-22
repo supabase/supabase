@@ -32,6 +32,10 @@ Send database changes to any external service using Webhooks. [Docs](/docs/guide
 
 Encrypt sensitive data and store secrets using our Postgres extension, Supabase Vault. [Docs](/docs/guides/database/vault).
 
+### Replication
+
+Automatically replicate your database to destination systems like data warehouses and analytics platforms with external replication (ETL), powered by Supabase ETL. Read [the documentation](/docs/guides/database/replication/external-replication-setup) for more details.
+
 ## Platform
 
 ### Database backups
@@ -64,7 +68,7 @@ Deploy read-only databases across multiple regions, for lower latency and better
 
 ### Log drains
 
-Export Supabase logs at to 3rd party providers and external tooling. [Docs](/docs/guides/platform/log-drains).
+Export Supabase logs to 3rd party providers and external tooling. [Docs](/docs/guides/platform/log-drains).
 
 ## Studio
 
@@ -124,7 +128,7 @@ Helpers for implementing user authentication in popular server-side languages an
 
 ### File storage
 
-Supabase Storage makes it simple to store and serve files. [Docs](/docs/guides/storage).
+Supabase Storage helps you store and serve files. [Docs](/docs/guides/storage).
 
 ### Content Delivery Network
 
@@ -158,7 +162,7 @@ Execute an Edge Function in a region close to your database. [Docs](/docs/guides
 
 ### NPM compatibility
 
-Edge functions natively support NPM modules and Node built-in APIs. [Link](https://supabase.com/blog/edge-functions-node-npm).
+Edge functions natively support NPM modules and Node built-in APIs. [Link](/blog/edge-functions-node-npm).
 
 ## Project management
 
@@ -185,7 +189,7 @@ Features are initially launched as a private alpha to gather feedback from the c
 
 ### Public alpha
 
-The alpha stage indicates that the API might change in the future, not that the service isn’t stable. Even though the [uptime Service Level Agreement](https://supabase.com/sla) does not cover products in Alpha, we do our best to have the service as stable as possible.
+The alpha stage indicates that the API might change in the future, not that the service isn’t stable. Even though the [uptime Service Level Agreement](/sla) does not cover products in Alpha, we do our best to have the service as stable as possible.
 
 ### Beta
 
@@ -193,7 +197,7 @@ Features in Beta are tested by an external penetration tester for security issue
 
 ### Generally available
 
-In addition to the Beta requirements, features in GA are covered by the [uptime SLA](https://supabase.com/sla).
+In addition to the Beta requirements, features in GA are covered by the [uptime SLA](/sla).
 
 | Product        | Feature                    | Stage           | Available on self-hosted                    |
 | -------------- | -------------------------- | --------------- | ------------------------------------------- |
@@ -203,31 +207,36 @@ In addition to the Beta requirements, features in GA are covered by the [uptime 
 | Database       | Auto-generated GraphQL API | `GA`            | ✅                                          |
 | Database       | Webhooks                   | `beta`          | ✅                                          |
 | Database       | Vault                      | `public alpha`  | ✅                                          |
+| Database       | Replication                | `private alpha` | N/A                                         |
 | Platform       |                            | `GA`            | ✅                                          |
 | Platform       | Point-in-Time Recovery     | `GA`            | 🚧 [wal-g](https://github.com/wal-g/wal-g)  |
 | Platform       | Custom Domains             | `GA`            | N/A                                         |
-| Platform       | Network Restrictions       | `beta`          | N/A                                         |
+| Platform       | Network Restrictions       | `GA`            | N/A                                         |
 | Platform       | SSL enforcement            | `GA`            | N/A                                         |
-| Platform       | Branching                  | `public alpha`  | N/A                                         |
+| Platform       | Branching                  | `beta`          | N/A                                         |
 | Platform       | Terraform Provider         | `public alpha`  | N/A                                         |
-| Platform       | Read Replicas              | `private alpha` | N/A                                         |
+| Platform       | Read Replicas              | `GA`            | N/A                                         |
 | Platform       | Log Drains                 | `public alpha`  | ✅                                          |
+| Platform       | MCP                        | `public alpha`  | ✅                                          |
+| Platform       | PrivateLink                | `beta`          | N/A                                         |
 | Studio         |                            | `GA`            | ✅                                          |
 | Studio         | SSO                        | `GA`            | ✅                                          |
+| Studio         | Column Privileges          | `public alpha`  | ✅                                          |
 | Realtime       | Postgres Changes           | `GA`            | ✅                                          |
 | Realtime       | Broadcast                  | `GA`            | ✅                                          |
 | Realtime       | Presence                   | `GA`            | ✅                                          |
 | Realtime       | Broadcast Authorization    | `public beta`   | ✅                                          |
 | Realtime       | Presence Authorization     | `public beta`   | ✅                                          |
+| Realtime       | Broadcast from Database    | `public beta`   | ✅                                          |
 | Storage        |                            | `GA`            | ✅                                          |
 | Storage        | CDN                        | `GA`            | 🚧 [Cloudflare](https://www.cloudflare.com) |
 | Storage        | Smart CDN                  | `GA`            | 🚧 [Cloudflare](https://www.cloudflare.com) |
 | Storage        | Image Transformations      | `GA`            | ✅                                          |
 | Storage        | Resumable Uploads          | `GA`            | ✅                                          |
-| Storage        | S3 compatibility           | `public alpha`  | ✅                                          |
-| Edge Functions |                            | `beta`          | ✅                                          |
-| Edge Functions | Regional Invocations       | `beta`          | ✅                                          |
-| Edge Functions | NPM compatibility          | `beta`          | ✅                                          |
+| Storage        | S3 compatibility           | `GA`            | ✅                                          |
+| Edge Functions |                            | `GA`            | ✅                                          |
+| Edge Functions | Regional Invocations       | `GA`            | ✅                                          |
+| Edge Functions | NPM compatibility          | `GA`            | ✅                                          |
 | Auth           |                            | `GA`            | ✅                                          |
 | Auth           | Email login                | `GA`            | ✅                                          |
 | Auth           | Social login               | `GA`            | ✅                                          |
@@ -237,11 +246,14 @@ In addition to the Beta requirements, features in GA are covered by the [uptime 
 | Auth           | Authorization via RLS      | `GA`            | ✅                                          |
 | Auth           | CAPTCHA protection         | `GA`            | ✅                                          |
 | Auth           | Server-side Auth           | `beta`          | ✅                                          |
+| Auth           | Third-Party Auth           | `GA`            | ✅                                          |
+| Auth           | Hooks                      | `beta`          | ✅                                          |
 | CLI            |                            | `GA`            | ✅ Works with self-hosted                   |
 | Management API |                            | `GA`            | N/A                                         |
 | Client Library | JavaScript                 | `GA`            | N/A                                         |
-| Client Library | Flutter                    | `beta`          | N/A                                         |
-| Client Library | Swift                      | `beta`          | N/A                                         |
+| Client Library | Flutter                    | `GA`            | N/A                                         |
+| Client Library | Swift                      | `GA`            | N/A                                         |
+| Client Library | Python                     | `beta`          | N/A                                         |
 
 - ✅ = Fully Available
 - 🚧 = Available, but requires external tools or configuration
