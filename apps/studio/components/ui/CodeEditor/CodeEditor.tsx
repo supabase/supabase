@@ -9,7 +9,6 @@ import { alignEditor } from './CodeEditor.utils'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatSql } from '@/lib/formatSql'
-import { timeout } from '@/lib/helpers'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 
@@ -157,10 +156,13 @@ export const CodeEditor = ({
         contextMenuGroupId: 'operation',
         contextMenuOrder: 0,
         run: () => {
-          const selectedValue = (editorRef?.current as any)
-            .getModel()
-            .getValueInRange((editorRef?.current as any)?.getSelection())
-          runQueryCallbackRef.current(selectedValue || (editorRef?.current as any)?.getValue())
+          const selection = editorRef?.current?.getSelection()
+          if (!selection) return
+
+          const selectedValue = editorRef?.current?.getModel()?.getValueInRange(selection)
+          const editorValue = editorRef?.current?.getValue()
+
+          runQueryCallbackRef.current(selectedValue || editorValue)
         },
       })
     }
@@ -175,12 +177,13 @@ export const CodeEditor = ({
     // position / focus before CodeEditor's own (timeout-deferred) autofocus.
     onMountProps?.(editor, monaco)
 
-    await timeout(500)
-
-    if (autofocus) {
-      if (editor.getValue().length === 1) editor.setPosition({ lineNumber: 1, column: 2 })
-      editor.focus()
-    }
+    // auto focus on mount
+    setTimeout(() => {
+      if (autofocus) {
+        if (editor.getValue().length === 1) editor.setPosition({ lineNumber: 1, column: 2 })
+        editor.focus()
+      }
+    }, 0)
   }
 
   const onChangeContent: OnChange = (value) => {
