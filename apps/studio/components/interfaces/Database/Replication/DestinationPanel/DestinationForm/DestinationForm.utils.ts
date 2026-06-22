@@ -3,6 +3,7 @@ import { snakeCase } from 'lodash'
 import z from 'zod'
 
 import { DestinationType } from '../DestinationPanel.types'
+import { type ClickHouseApiConfig } from './ClickHouse/ClickHouse.utils'
 import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
 import {
   DestinationPanelFormSchema,
@@ -13,7 +14,6 @@ import {
   DUCKLAKE_MODE_SUPABASE,
   type DucklakeMode,
 } from './DuckLake/DuckLake.constants'
-import { type ClickHouseApiConfig } from './ClickHouse/ClickHouse.utils'
 import { type DucklakeApiConfig } from './DuckLake/DuckLake.utils'
 import { type SnowflakeApiConfig } from './Snowflake/Snowflake.utils'
 import {

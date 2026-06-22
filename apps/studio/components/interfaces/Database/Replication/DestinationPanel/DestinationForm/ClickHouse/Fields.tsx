@@ -117,7 +117,10 @@ export const ClickHouseFields = ({ form }: { form: UseFormReturn<DestinationPane
               description="Server defaults to replacing_merge_tree when unset"
             >
               <FormControl>
-                <Select value={field.value ?? 'replacing_merge_tree'} onValueChange={field.onChange}>
+                <Select
+                  value={field.value ?? 'replacing_merge_tree'}
+                  onValueChange={field.onChange}
+                >
                   <SelectTrigger>{field.value ?? 'replacing_merge_tree'}</SelectTrigger>
                   <SelectContent>
                     <SelectItem value="replacing_merge_tree">replacing_merge_tree</SelectItem>
