@@ -16,8 +16,11 @@ import { ComputeDiskLimitsTable } from './markdown-schema/ComputeDiskLimitsTable
 import { addBaseUrlPrefix } from './internal-links'
 import { Link } from './markdown-schema/Link'
 import { MetricsStackCards } from './markdown-schema/MetricsStackCards'
+import { NavData } from './markdown-schema/NavData'
 import { Panel } from './markdown-schema/Panel'
 import { Price } from './markdown-schema/Price'
+import { RealtimeLimitsEstimator } from './markdown-schema/RealtimeLimitsEstimator'
+import { RegionsList, SmartRegionsList } from './markdown-schema/RegionsList'
 import { SharedData } from './markdown-schema/SharedData'
 import { StepHike } from './markdown-schema/StepHike'
 import { TabPanel } from './markdown-schema/TabPanel'
@@ -139,9 +142,13 @@ const SCHEMA: ComponentSchema = {
   Price,
   GlassPanel: Panel,
   IconPanel: Panel,
+  RealtimeLimitsEstimator,
+  RegionsList,
+  SmartRegionsList,
   ...StepHike,
   TabPanel,
   MetricsStackCards,
+  NavData,
   SharedData,
 }
 
