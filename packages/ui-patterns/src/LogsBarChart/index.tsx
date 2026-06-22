@@ -3,7 +3,7 @@
 import dayjs from 'dayjs'
 import { ReactNode, useState } from 'react'
 import { Bar, Cell, BarChart as RechartBarChart, XAxis, YAxis } from 'recharts'
-import type { CategoricalChartState } from 'recharts/types/chart/types'
+import type { MouseHandlerDataParam } from 'recharts'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
 
 const CHART_COLORS = {
@@ -39,7 +39,7 @@ export const LogsBarChart = ({
 }: {
   data: LogsBarChartDatum[]
   error?: unknown | null
-  onBarClick?: (datum: LogsBarChartDatum, tooltipData?: CategoricalChartState) => void
+  onBarClick?: (datum: LogsBarChartDatum, tooltipData?: MouseHandlerDataParam) => void
   EmptyState?: ReactNode
   ErrorState?: ReactNode
   DateTimeFormat?: string
@@ -91,8 +91,9 @@ export const LogsBarChart = ({
           }}
           onMouseLeave={() => setFocusDataIndex(null)}
           onClick={(tooltipData) => {
-            const datum = tooltipData?.activePayload?.[0]?.payload
-            if (onBarClick) onBarClick(datum, tooltipData)
+            const index = tooltipData?.activeTooltipIndex
+            const datum = index != null ? data[Number(index)] : undefined
+            if (onBarClick && datum) onBarClick(datum, tooltipData)
           }}
         >
           <YAxis
@@ -133,7 +134,7 @@ export const LogsBarChart = ({
                   payload={filteredPayload}
                   label={props.label}
                   className="text-foreground-light -mt-5 transition-none!"
-                  labelFormatter={(v: string) => dayjs(v).format(DateTimeFormat)}
+                  labelFormatter={(v) => dayjs(v as string).format(DateTimeFormat)}
                 />
               )
             }}

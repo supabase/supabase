@@ -188,7 +188,7 @@ const StackedBarChart: React.FC<Props> = ({
                 const index = percentagesStackedData.findIndex(
                   (pStack) => pStack === props.payload!
                 )
-                const val = stackedData[index][name]
+                const val = stackedData[index][name as string]
                 const percentage = precisionFormatter(Number(value) * 100, 1) + '%'
                 return `${percentage} (${val}${suffix})`
               }
