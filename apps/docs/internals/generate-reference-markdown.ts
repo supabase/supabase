@@ -2,8 +2,12 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import matter from 'gray-matter'
 import yaml from 'js-yaml'
+import { fromMarkdown } from 'mdast-util-from-markdown'
+import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm'
+import { toMarkdown } from 'mdast-util-to-markdown'
+import { gfm } from 'micromark-extension-gfm'
 
-import { getInternalLinkBaseUrl, prefixInternalLinks } from './internal-links'
+import { addBaseUrlPrefix } from './internal-links'
 
 const GENERATED = path.join(process.cwd(), 'features/docs/generated')
 const OUT_DIR = path.join(process.cwd(), 'public/markdown/reference')
@@ -388,7 +392,6 @@ async function generate() {
   const sharedTypeSpec = await readJson<TypeSpec>(
     path.join(process.cwd(), 'content/reference/javascript/v2/typeSpec.json')
   )
-  const linkBaseUrl = getInternalLinkBaseUrl()
 
   await Promise.all(
     REFERENCES.map(async (ref) => {
@@ -407,7 +410,17 @@ async function generate() {
           output = await renderCli(ref)
           break
       }
-      await fs.writeFile(path.join(OUT_DIR, ref.outFile), prefixInternalLinks(output, linkBaseUrl))
+      const tree = fromMarkdown(output, {
+        extensions: [gfm()],
+        mdastExtensions: [gfmFromMarkdown()],
+      })
+      addBaseUrlPrefix(tree)
+      const prefixed = toMarkdown(tree, {
+        extensions: [gfmToMarkdown()],
+        bullet: '-',
+        listItemIndent: 'one',
+      })
+      await fs.writeFile(path.join(OUT_DIR, ref.outFile), prefixed)
     })
   )
 
