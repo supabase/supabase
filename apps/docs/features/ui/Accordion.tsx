@@ -72,8 +72,7 @@ export function AccordionItem({ children, className, header, id, disabled }: Ite
         setOpen(!open)
       }}
     >
-      <AccordionTrigger className={cn('text-sm', 'hover:bg-200'
-        )}>{header}</AccordionTrigger>
+      <AccordionTrigger className={cn('text-sm', 'hover:bg-200')}>{header}</AccordionTrigger>
       <AccordionContent>{children}</AccordionContent>
     </BaseAccordionItem>
   )
