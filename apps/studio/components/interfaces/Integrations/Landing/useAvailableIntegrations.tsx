@@ -45,28 +45,17 @@ function isForeignDataWrapper(integration: MarketplaceIntegration) {
 }
 
 /**
- * We use per-listing feature flags with a templated naming convention in order to independently
- * enable previews for users where the global `previewMarketplaceListingsEnabled` flag is not set.
- * This will let us make previews available to partner users and beta testers and then independently
- * roll each one out to a wider audience.
+ * Use per-listing feature flags with a templated naming convention in order to independently
+ * enable/disable previews for users where the global `previewMarketplaceListingsEnabled` flag is not set.
  */
 const isPreviewEnabled = (featureFlags: FeatureFlagContextType, listingSlug: string) => {
   const flagName = `${listingSlug}DashboardIntegrationEnabled`
   return (featureFlags.configcat[flagName] ?? false) as boolean
 }
 
-/**
- * [Joshen] Returns a combination of
- * - Marketplace integrations retrieved remotely (Only if feature flag enabled)
- * - Existing integrations that are defined within studio
- */
-export const useAvailableIntegrations = () => {
+const useMarketplaceListings = () => {
   const { hasLoaded } = useContext(FeatureFlagContext)
   const isMarketplaceEnabled = useIsMarketplaceEnabled()
-  const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
-
-  const { data: cliData } = useCLIReleaseVersionQuery()
-  const isCLI = !!cliData?.current
 
   const { data: marketplaceData, error } = useMarketplaceIntegrationsQuery({
     enabled: isMarketplaceEnabled,
@@ -82,7 +71,7 @@ export const useAvailableIntegrations = () => {
 
   const featureFlags = useFeatureFlags()
 
-  const enabledMarketplaceListings = useMemo(
+  const enabledListings = useMemo(
     () =>
       (marketplaceData ?? []).filter(
         (integration) =>
@@ -93,13 +82,35 @@ export const useAvailableIntegrations = () => {
     [marketplaceData, previewAllListingsEnabled, featureFlags]
   )
 
+  return { isPending, isSuccess, isError, data: enabledListings, error }
+}
+
+/**
+ * [Joshen] Returns a combination of
+ * - Marketplace integrations retrieved remotely (Only if feature flag enabled)
+ * - Existing integrations that are defined within studio
+ */
+export const useAvailableIntegrations = () => {
+  const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
+
+  const { data: cliData } = useCLIReleaseVersionQuery()
+  const isCLI = !!cliData?.current
+
+  const {
+    isPending,
+    isSuccess,
+    isError,
+    data: marketplaceListings,
+    error,
+  } = useMarketplaceListings()
+
   // [Joshen] Format marketplace integrations into existing ones for now
   // Likely that we might need to change, but can look into separately
   // Wrappers from marketplace are excluded here — they are merged into the
   // hardcoded studio wrappers below as content overrides.
   const marketplaceIntegrations: IntegrationDefinition[] = useMemo(
     () =>
-      enabledMarketplaceListings
+      marketplaceListings
         .filter((integration) => !isForeignDataWrapper(integration))
         .map((integration) => {
           const {
@@ -175,19 +186,19 @@ export const useAvailableIntegrations = () => {
             },
           }
         }),
-    [enabledMarketplaceListings]
+    [marketplaceListings]
   )
 
   // Marketplace wrapper listings keyed by their studio-equivalent id
   // (marketplace uses dash-separated slugs, studio uses underscore-separated ids).
   const marketplaceWrappers = useMemo(() => {
     const map: Record<string, MarketplaceIntegration> = {}
-    enabledMarketplaceListings.forEach((integration) => {
+    marketplaceListings.forEach((integration) => {
       if (!isForeignDataWrapper(integration)) return
       map[integration.slug.replaceAll('-', '_')] = integration
     })
     return map
-  }, [enabledMarketplaceListings])
+  }, [marketplaceListings])
 
   // [Joshen] Existing integrations that are defined within studio
   // Available integrations are all integrations that can be installed. If an integration can't be installed (needed
