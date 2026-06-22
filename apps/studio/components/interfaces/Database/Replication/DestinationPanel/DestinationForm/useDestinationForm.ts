@@ -243,16 +243,16 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
             PipelineStatusRequestStatus.RestartRequested,
             snapshot
           )
+          await restartPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
           toast.success('Settings applied. Restarting the pipeline...')
-          restartPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
         } else {
           setRequestStatus(
             existingDestination.pipelineId,
             PipelineStatusRequestStatus.StartRequested,
             snapshot
           )
+          await startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
           toast.success('Settings applied. Starting the pipeline...')
-          startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
         }
         onClose()
       } else {
@@ -268,8 +268,8 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
         )
         // Set request status only right before starting, then fire and close
         setRequestStatus(pipelineId, PipelineStatusRequestStatus.StartRequested, undefined)
+        await startPipeline({ projectRef, pipelineId })
         toast.success('Destination created. Starting the pipeline...')
-        startPipeline({ projectRef, pipelineId })
         onClose()
       }
     } catch (error) {
