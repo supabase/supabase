@@ -73,12 +73,6 @@ function getMultiSelect(page: any, name: string): string[] {
   return prop.multi_select.map((s: any) => s.name)
 }
 
-function getSelect(page: any, name: string): string {
-  const prop = page.properties[name]
-  if (!prop || prop.type !== 'select') return ''
-  return prop.select?.name ?? ''
-}
-
 function getFormulaString(page: any, name: string): string {
   const prop = page.properties[name]
   if (!prop || prop.type !== 'formula' || prop.formula?.type !== 'string') return ''
@@ -122,10 +116,6 @@ export const getNotionEvents = async (): Promise<SupabaseEvent[]> => {
         const rawMeetingLink = getUrl(page, 'Book Meeting Link')
         const meetingLink = isSafeHttpUrl(rawMeetingLink) ? rawMeetingLink : ''
         const location = getRichText(page, 'Location')
-        const notionType = getSelect(page, 'Type')
-        // "Conference" events are third-party — we attend but don't host, so no
-        // "Hosted by" line. "Supabase event" → host = Supabase.
-        const isConferenceType = notionType.toLowerCase() === 'conference'
         const categories = ['conference']
         const speakingAnswers = getMultiSelect(page, 'Are you speaking at this event?')
         const isSpeaking = speakingAnswers.includes('Yes')
@@ -145,7 +135,9 @@ export const getNotionEvents = async (): Promise<SupabaseEvent[]> => {
           categories,
           timezone: '',
           location,
-          hosts: isConferenceType ? [] : [SUPABASE_HOST],
+          // Notion events are third-party — Supabase attends but does not host,
+          // so no "Hosted by" line. Only Luma events are Supabase-hosted.
+          hosts: [],
           source: 'notion',
           disable_page_build: true,
           isSpeaking,

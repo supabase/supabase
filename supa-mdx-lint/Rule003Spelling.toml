@@ -328,6 +328,7 @@ allow_list = [
     "PagerDuty",
     "PGAudit",
     "PGroonga",
+    "pg_basebackup",
     "PgBouncer",
     "pgjwt",
     "PHI",

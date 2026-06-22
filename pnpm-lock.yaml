@@ -937,6 +937,9 @@ importers:
       '@stripe/stripe-js':
         specifier: 9.1.0
         version: 9.1.0
+      '@stripe/sync-engine':
+        specifier: 1.0.32
+        version: 1.0.32(@types/node@22.13.14)(supports-color@8.1.1)
       '@supabase/auth-js':
         specifier: 'catalog:'
         version: 2.108.2
@@ -1030,6 +1033,9 @@ importers:
       framer-motion:
         specifier: ^11.18.2
         version: 11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      fuse.js:
+        specifier: ^7.4.0
+        version: 7.4.0
       generate-password-browser:
         specifier: ^1.1.0
         version: 1.1.0
@@ -1165,9 +1171,6 @@ importers:
       streamdown:
         specifier: ^1.3.0
         version: 1.3.0(@types/react@19.2.14)(react@19.2.6)(supports-color@8.1.1)
-      stripe-experiment-sync:
-        specifier: 1.0.31
-        version: 1.0.31(@types/node@22.13.14)(supports-color@8.1.1)
       swiper:
         specifier: ^12.1.2
         version: 12.1.2
@@ -7730,6 +7733,10 @@ packages:
     resolution: {integrity: sha512-v51LoEfZNiNS/5DcarWPCYgn24w4dqwwALR4GTbMW/N0DDzzj4DgYNoixX6PYvpt6uIJMucGUabn/BHhylggIQ==}
     engines: {node: '>=12.16'}
 
+  '@stripe/sync-engine@1.0.32':
+    resolution: {integrity: sha512-c1Ht5A7Jl0UWDwDr9tzIcpusr3B02l868UT3qgSuFuwVoTyvnX+G8h4n6rJ9hTKD07ktKA2MLL8KnXt1S1wUzA==}
+    hasBin: true
+
   '@supabase-labs/y-supabase@0.1.0':
     resolution: {integrity: sha512-1ItaKbcImgy7ueYfJcyVYihqCKi9RAee9MKBV8wcCqSMNsrWvw4ibhW8ai91kWsewsiWzIDXVPONgcUcxagk9g==}
 
@@ -10656,10 +10663,6 @@ packages:
 
   dotenv@16.5.0:
     resolution: {integrity: sha512-m/C+AwOAr9/W1UOIZUo232ejMNnJAJtYQjUbHoNTBNTJSvqzzDh7vnrei3o3r3m9blf6ZoDkvcw0VmozNRFJxg==}
-    engines: {node: '>=12'}
-
-  dotenv@17.2.3:
-    resolution: {integrity: sha512-JVUnt+DUIzu87TABbhPmNfVdBDt18BLOWjMUFJMSi/Qqg7NTYtabbvSNJGOJ7afbRuv9D/lngizHtP7QyLQ+9w==}
     engines: {node: '>=12'}
 
   dotenv@17.4.2:
@@ -16371,10 +16374,6 @@ packages:
   strip-literal@3.1.0:
     resolution: {integrity: sha512-8r3mkIM/2+PpjHoOtiAW8Rg3jJLHaV7xPwG+YRGrv6FP0wwk/toTpATxWYOW0BKdWwl82VT2tFYi5DlROa0Mxg==}
 
-  stripe-experiment-sync@1.0.31:
-    resolution: {integrity: sha512-v37KFbFB4kpnJYkPxBXvxxsw/i+6GiF+U/5cH3TgZ8GdnHHt8WlykZQOdzhZlJlqZSeLfRC4ditD5CIQK76Qeg==}
-    hasBin: true
-
   stripe@17.7.0:
     resolution: {integrity: sha512-aT2BU9KkizY9SATf14WhhYVv2uOapBWX0OFWF4xvcj1mPaNotlSc2CsxpS4DS46ZueSppmCF5BX1sNYBtwBvfw==}
     engines: {node: '>=12.*'}
@@ -17844,9 +17843,6 @@ packages:
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
-  zod@4.3.6:
-    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
-
   zod@4.4.3:
     resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
 
@@ -19138,7 +19134,7 @@ snapshots:
   '@dotenvx/dotenvx@1.51.0':
     dependencies:
       commander: 11.1.0
-      dotenv: 17.2.3
+      dotenv: 17.4.2
       eciesjs: 0.4.15
       execa: 5.1.1
       fdir: 6.5.0(picomatch@4.0.4)
@@ -23990,6 +23986,28 @@ snapshots:
 
   '@stripe/stripe-js@9.1.0': {}
 
+  '@stripe/sync-engine@1.0.32(@types/node@22.13.14)(supports-color@8.1.1)':
+    dependencies:
+      '@ngrok/ngrok': 1.6.0
+      chalk: 5.4.1
+      commander: 12.1.0
+      dotenv: 16.5.0
+      express: 4.22.1(supports-color@8.1.1)
+      inquirer: 12.11.1(@types/node@22.13.14)
+      papaparse: 5.4.1
+      pg: 8.16.3
+      stripe: 17.7.0
+      supabase-management-js: 2.0.2
+      ws: 8.21.0
+      yesql: 7.0.0
+    transitivePeerDependencies:
+      - '@types/node'
+      - bufferutil
+      - debug
+      - pg-native
+      - supports-color
+      - utf-8-validate
+
   '@supabase-labs/y-supabase@0.1.0':
     dependencies:
       '@supabase/supabase-js': 2.108.2
@@ -27291,8 +27309,6 @@ snapshots:
   dotenv@16.4.7: {}
 
   dotenv@16.5.0: {}
-
-  dotenv@17.2.3: {}
 
   dotenv@17.4.2: {}
 
@@ -34601,28 +34617,6 @@ snapshots:
     dependencies:
       js-tokens: 9.0.1
 
-  stripe-experiment-sync@1.0.31(@types/node@22.13.14)(supports-color@8.1.1):
-    dependencies:
-      '@ngrok/ngrok': 1.6.0
-      chalk: 5.4.1
-      commander: 12.1.0
-      dotenv: 16.5.0
-      express: 4.22.1(supports-color@8.1.1)
-      inquirer: 12.11.1(@types/node@22.13.14)
-      papaparse: 5.4.1
-      pg: 8.16.3
-      stripe: 17.7.0
-      supabase-management-js: 2.0.2
-      ws: 8.21.0
-      yesql: 7.0.0
-    transitivePeerDependencies:
-      - '@types/node'
-      - bufferutil
-      - debug
-      - pg-native
-      - supports-color
-      - utf-8-validate
-
   stripe@17.7.0:
     dependencies:
       '@types/node': 22.13.14
@@ -34676,7 +34670,7 @@ snapshots:
   supabase-management-js@2.0.2:
     dependencies:
       axios: 1.16.0
-      zod: 4.3.6
+      zod: 4.4.3
     transitivePeerDependencies:
       - debug
 
@@ -36169,8 +36163,6 @@ snapshots:
       zod: 3.25.76
 
   zod@3.25.76: {}
-
-  zod@4.3.6: {}
 
   zod@4.4.3: {}
 

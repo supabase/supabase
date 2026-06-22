@@ -1897,7 +1897,7 @@ export interface HomeProjectUsageServiceClickedEvent {
     /**
      * The service that was clicked
      */
-    service_type: 'db' | 'functions' | 'auth' | 'storage' | 'realtime'
+    service_type: 'db' | 'functions' | 'auth' | 'storage' | 'realtime' | 'data_api'
     /**
      * Total requests for this service
      */
@@ -1923,7 +1923,7 @@ export interface HomeProjectUsageChartClickedEvent {
     /**
      * The service type for this chart
      */
-    service_type: 'db' | 'functions' | 'auth' | 'storage' | 'realtime'
+    service_type: 'db' | 'functions' | 'auth' | 'storage' | 'realtime' | 'data_api'
     /**
      * Timestamp of the bar clicked
      */
@@ -1997,7 +1997,7 @@ export interface HomeConnectActionClickedEvent {
     /**
      * The connect action/tile that was clicked
      */
-    mode: 'framework' | 'direct' | 'orm' | 'mcp' | 'api_keys'
+    mode: 'framework' | 'direct' | 'orm' | 'mcp' | 'server' | 'api_keys'
   }
   groups: TelemetryGroups
 }
