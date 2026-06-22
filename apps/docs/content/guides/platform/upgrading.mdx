@@ -192,11 +192,29 @@ Existing projects on pg_graphql 1.5.x are not impacted unless they choose to upg
 
 ### Ltree indexes require reindexing after upgrade
 
+_Applies when upgrading to Postgres 15.18 or 17.10._
+
 After upgrading, indexes on `ltree` columns that were built under the previous version can return incomplete results — for example, label searches silently miss rows that are present — until the index is rebuilt. This affects databases using a multibyte encoding (such as UTF-8) or a non-`libc` collation provider (ICU or builtin).
 
 This is silent: no error is raised. Affected queries return fewer rows than expected until the indexes are reindexed.
 
-To find affected indexes, run the following in the SQL editor:
+You are affected only if you have indexes on `ltree` columns **and** your database uses a multibyte encoding or a non-`libc` collation provider.
+
+First, check whether your database needs reindexing:
+
+```sql
+select
+  pg_encoding_to_char(encoding) as encoding,
+  pg_encoding_max_length(encoding) as max_bytes_per_char, -- 1 = single-byte, >1 = multibyte
+  datlocprovider as collation_provider, -- 'c' libc, 'i' icu, 'b' builtin
+  (pg_encoding_max_length(encoding) > 1 or datlocprovider != 'c') as reindex_required
+from pg_database
+where datname = current_database();
+```
+
+If `reindex_required` is `false` (single-byte encoding such as LATIN1 with `libc` collation), no action is needed.
+
+If `reindex_required` is `true`, find the affected indexes:
 
 ```sql
 select schemaname, tablename, indexname
@@ -220,6 +238,8 @@ REINDEX INDEX CONCURRENTLY <index_name>;
 ```
 
 ### Custom operator selectivity estimators
+
+_Applies when upgrading to Postgres 15.18 or 17.10._
 
 Attaching a non-built-in (extension- or user-provided) selectivity estimator function to an operator now requires superuser. Existing operators continue to work — the check only fires when an operator is (re)created, most commonly during `pg_dump` / `pg_restore`, a logical restore, or a branch.
 
