@@ -4,18 +4,32 @@ title: 'Postgres connection logging'
 description: 'Enable or disable Postgres connection logging for audit and compliance.'
 ---
 
-Postgres can log connection lifecycle events (for example, `connection received`, `connection authenticated`, and `connection authorized`) to your project's [Postgres logs](/docs/guides/telemetry/logs#postgres). These events help with security monitoring and compliance audits.
+For security monitoring and compliance audits, Postgres can log connection lifecycle events to your project's [Postgres logs](/docs/guides/telemetry/logs#postgres), including events such as `connection received`, `connection authenticated`, and `connection authorized`.
 
 ## Default behavior
 
-Supabase sets `log_connections` to **off** by default for new projects. This matches common managed Postgres defaults and reduces log volume from high-frequency connection events.
+By default, Supabase sets `log_connections` to off for new projects and you must enable it first. This behavior matches common managed Postgres defaults and reduces log volume from high-frequency connection events.
 
 Existing projects may retain different settings depending on plan and compliance configuration:
 
-- **Team, Enterprise, and HIPAA organizations** — connection logging is typically enabled to support audit requirements.
+- **Team, Enterprise, and HIPAA organizations** — Connection logging is typically enabled to support audit requirements.
 - **HIPAA projects** — Supabase enables connection logging when a project is marked as high compliance. The [Security Advisor](/dashboard/project/_/advisors/security) warns if connection logging is later disabled.
 
-If you need connection audit evidence for SOC 2 or other compliance programs, enable connection logging explicitly.
+## Compliance considerations
+
+
+<Admonition type="note">
+
+If you need connection audit evidence for SOC 2 or other compliance programs, you must enable it explicitly.
+
+</Admonition>
+
+Connection logging supports audit and monitoring controls required by some compliance programs:
+
+- **HIPAA** — High-compliance projects should keep connection logging enabled. See the [shared responsibility model for healthcare data](/docs/guides/deployment/shared-responsibility-model#managing-healthcare-data) and [HIPAA compliance guide](/docs/guides/security/hipaa-compliance).
+- **SOC 2** — Users who need connection audit evidence should enable logging and retain logs according to their own policies. See the [SOC 2 compliance guide](/docs/guides/security/soc-2-compliance).
+
+Disabling connection logging does not affect other Supabase logging (for example, [Platform Audit Logs](/docs/guides/security/platform-audit-logs), [Auth Audit Logs](/docs/guides/auth/audit-logs), or [pgAudit](/docs/guides/telemetry/logs#configuring-pgauditlog)).
 
 ## Manage connection logging via the dashboard
 
@@ -59,17 +73,8 @@ curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/config/database/p
   }'
 ```
 
-You can verify the setting in the SQL Editor:
+To verify the setting, use the SQL Editor:
 
 ```sql
 show log_connections;
 ```
-
-## Compliance considerations
-
-Connection logging supports audit and monitoring controls required by some compliance programs:
-
-- **HIPAA** — high-compliance projects should keep connection logging enabled. See the [shared responsibility model for healthcare data](/docs/guides/deployment/shared-responsibility-model#managing-healthcare-data) and [HIPAA compliance guide](/docs/guides/security/hipaa-compliance).
-- **SOC 2** — customers who need connection audit evidence should enable logging and retain logs according to their own policies. See the [SOC 2 compliance guide](/docs/guides/security/soc-2-compliance).
-
-Disabling connection logging does not affect other Supabase logging (for example, [Platform Audit Logs](/docs/guides/security/platform-audit-logs), [Auth Audit Logs](/docs/guides/auth/audit-logs), or [pgAudit](/docs/guides/telemetry/logs#configuring-pgauditlog)).
