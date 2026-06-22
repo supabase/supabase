@@ -1,22 +1,24 @@
 import Editor, { EditorProps, Monaco, OnChange, OnMount, useMonaco } from '@monaco-editor/react'
 import { merge, noop } from 'lodash'
 import type { editor } from 'monaco-editor'
-import { MutableRefObject, useEffect, useRef, useState } from 'react'
+import { RefObject, useEffect, useRef, useState } from 'react'
 import { cn, LogoLoader } from 'ui'
+import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 import { alignEditor } from './CodeEditor.utils'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatSql } from '@/lib/formatSql'
 import { timeout } from '@/lib/helpers'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 
 type CodeEditorActions = { enabled: boolean; callback: (value: any) => void }
+
 const DEFAULT_ACTIONS = {
   runQuery: { enabled: false, callback: noop },
-  explainCode: { enabled: false, callback: noop },
   formatDocument: { enabled: true, callback: noop },
   placeholderFill: { enabled: true },
-  closeAssistant: { enabled: false, callback: noop },
 }
 
 interface CodeEditorProps {
@@ -36,11 +38,15 @@ interface CodeEditorProps {
     runQuery: CodeEditorActions
     formatDocument: CodeEditorActions
     placeholderFill: Omit<CodeEditorActions, 'callback'>
-    explainCode: CodeEditorActions
-    closeAssistant: CodeEditorActions
   }>
-  editorRef?: MutableRefObject<editor.IStandaloneCodeEditor | null>
+  editorRef?: RefObject<editor.IStandaloneCodeEditor | null>
+  monacoRef?: RefObject<Monaco | null>
   onInputChange?: (value?: string) => void
+  /**
+   * Fired after CodeEditor's own mount setup runs, so wrappers can register
+   * additional actions/keybindings on the shared editor instance.
+   */
+  onMount?: OnMount
 }
 
 export const CodeEditor = ({
@@ -55,19 +61,32 @@ export const CodeEditor = ({
   options,
   value,
   placeholder,
-  actions = DEFAULT_ACTIONS,
+  actions,
   editorRef: editorRefProps,
+  monacoRef: monacoRefProps,
   onInputChange = noop,
+  onMount: onMountProps,
 }: CodeEditorProps) => {
   const monaco = useMonaco()
   const { data: project } = useSelectedProjectQuery()
 
+  // Monaco claims Cmd+K as a chord prefix, which swallows the global command menu
+  // shortcut while the editor is focused. CodeEditor intercepts it for every editor
+  // (see handleMount) so it behaves the same inside and outside the editor.
+  const isCommandMenuHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.COMMAND_MENU_OPEN)
+  const setCommandMenuOpen = useSetCommandMenuOpen()
+  const commandMenuHotkeyEnabledRef = useRef(isCommandMenuHotkeyEnabled)
+  commandMenuHotkeyEnabledRef.current = isCommandMenuHotkeyEnabled
+  const setCommandMenuOpenRef = useRef(setCommandMenuOpen)
+  setCommandMenuOpenRef.current = setCommandMenuOpen
+
   const hasValue = useRef<editor.IContextKey<boolean>>(null)
   const ref = useRef<editor.IStandaloneCodeEditor>(null)
   const editorRef = editorRefProps || ref
-  const monacoRef = useRef<Monaco>(null)
+  const internalMonacoRef = useRef<Monaco | null>(null)
+  const monacoRef = monacoRefProps || internalMonacoRef
 
-  const { runQuery, placeholderFill, formatDocument, explainCode, closeAssistant } = {
+  const { runQuery, placeholderFill, formatDocument } = {
     ...DEFAULT_ACTIONS,
     ...actions,
   }
@@ -98,7 +117,7 @@ export const CodeEditor = ({
     options
   )
 
-  const onMount: OnMount = async (editor, monaco) => {
+  const handleMount: OnMount = async (editor, monaco) => {
     editorRef.current = editor
     monacoRef.current = monaco
     alignEditor(editor)
@@ -106,6 +125,35 @@ export const CodeEditor = ({
     hasValue.current = editor.createContextKey('hasValue', false)
     hasValue.current.set(value !== undefined && value.trim().length > 0)
     setShowPlaceholder(showPlaceholderDefault)
+
+    // Blur the editor on Escape so users can hop out to the rest of the UI.
+    // The precondition defers to Monaco's own Escape consumers (suggest widget,
+    // find widget, parameter hints, snippet/rename mode, inline suggestions) and
+    // to selection/multi-cursor cancellation, so inline features keep working.
+    editor.addCommand(
+      monaco.KeyCode.Escape,
+      () => {
+        ;(document.activeElement as HTMLElement | null)?.blur()
+      },
+      [
+        'editorTextFocus',
+        '!editorHasSelection',
+        '!editorHasMultipleSelections',
+        '!suggestWidgetVisible',
+        '!findWidgetVisible',
+        '!parameterHintsVisible',
+        '!renameInputVisible',
+        '!inSnippetMode',
+        '!accessibilityHelpWidgetVisible',
+        '!inlineSuggestionVisible',
+      ].join(' && ')
+    )
+
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK, () => {
+      if (commandMenuHotkeyEnabledRef.current) {
+        setCommandMenuOpenRef.current(true)
+      }
+    })
 
     if (placeholderFill.enabled) {
       editor.addCommand(
@@ -140,38 +188,22 @@ export const CodeEditor = ({
       })
     }
 
-    if (explainCode.enabled) {
-      editor.addAction({
-        id: 'explain-code',
-        label: 'Explain Code',
-        contextMenuGroupId: 'operation',
-        contextMenuOrder: 1,
-        run: () => {
-          const selectedValue = (editorRef?.current as any)
-            .getModel()
-            .getValueInRange((editorRef?.current as any)?.getSelection())
-          explainCode.callback(selectedValue)
-        },
-      })
-    }
-
-    if (closeAssistant.enabled) {
-      editor.addAction({
-        id: 'close-assistant',
-        label: 'Close Assistant',
-        keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyI],
-        run: () => closeAssistant.callback(),
-      })
-    }
-
     const model = editor.getModel()
     if (model) {
       const position = model.getPositionAt((value ?? '').length)
       editor.setPosition(position)
     }
 
+    // Run last so wrappers can register actions and have the final say on cursor
+    // position / focus before CodeEditor's own (timeout-deferred) autofocus.
+    onMountProps?.(editor, monaco)
+
     await timeout(500)
-    if (autofocus) editor?.focus()
+
+    if (autofocus) {
+      if (editor.getValue().length === 1) editor.setPosition({ lineNumber: 1, column: 2 })
+      editor.focus()
+    }
   }
 
   const onChangeContent: OnChange = (value) => {
@@ -244,7 +276,7 @@ export const CodeEditor = ({
         defaultValue={defaultValue ?? undefined}
         loading={loading || <LogoLoader />}
         options={optionsMerged}
-        onMount={onMount}
+        onMount={handleMount}
         onChange={onChangeContent}
       />
       {placeholder !== undefined && (
@@ -261,5 +293,3 @@ export const CodeEditor = ({
     </>
   )
 }
-
-export default CodeEditor
