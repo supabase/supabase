@@ -161,7 +161,7 @@ To update Postgres configurations, use the [`postgres config`](/docs/reference/c
 ```bash
 supabase --experimental \
 postgres-config update --config shared_buffers=250MB \
---project-ref <project-ref> 
+--project-ref <project-ref>
 ```
 
 By default, the CLI will merge any provided config overrides with any existing ones. The `--replace-existing-overrides` flag can be used to instead force all existing overrides to be replaced with the ones being provided:
@@ -170,7 +170,7 @@ By default, the CLI will merge any provided config overrides with any existing o
 supabase --experimental \
 postgres-config update --config max_parallel_workers=3 \
 --replace-existing-overrides \
---project-ref <project-ref> 
+--project-ref <project-ref>
 ```
 
 To delete specific configuration overrides, use the `postgres-config delete` command:
