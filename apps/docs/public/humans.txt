@@ -111,6 +111,7 @@ Greg Marzouka
 Greg P
 Greg Richardson
 Gregor Vand
+Guillaume Faas
 Guilherme Souza
 Hanefi Önaldı
 Hannah Bowers
@@ -198,6 +199,7 @@ Mert Yerekapan
 Michal Kleczek
 Michelle Jubrey
 Miranda Limonczenko
+Mo Khan
 Monica Khoury
 Mrinal Paliwal
 Mykhailo Mischa Lieibenson
@@ -241,6 +243,7 @@ Ryan Goulet
 Ryan Senior
 Ruan Maia
 Saba Pochkhua
+Sagar Shedge
 Sam Meech-Ward
 Sam Rome
 Sam Rose
@@ -268,6 +271,7 @@ Taha Le Bras
 Tanun Chalermsinsuwan
 Taryn King
 Terry Sutton
+Terry Wilcox
 Thomas E
 Tim Frietas
 Tim Palmer

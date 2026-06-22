@@ -99,7 +99,7 @@ export const StorageReport: NextPageWithLayout = () => {
                 side="bottom"
               >
                 <Button
-                  type="default"
+                  variant="default"
                   disabled={report.isLoading}
                   icon={<RefreshCw className={report.isLoading ? 'animate-spin' : ''} />}
                   className="w-7"

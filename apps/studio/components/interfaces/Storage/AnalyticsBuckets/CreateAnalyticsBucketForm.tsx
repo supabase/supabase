@@ -257,12 +257,12 @@ export const CreateAnalyticsBucketForm = ({
       </Section>
 
       <Footer>
-        <Button type="default" disabled={isCreating} onClick={() => onOpenChange(false)}>
+        <Button variant="default" disabled={isCreating} onClick={() => onOpenChange(false)}>
           Cancel
         </Button>
         <Button
           form={formId}
-          htmlType="submit"
+          type="submit"
           loading={isCreating}
           disabled={wrappersExtensionNeedsUpgrading || isCreating}
         >

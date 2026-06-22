@@ -73,7 +73,7 @@ export const ReviewRow = ({ branch }: ReviewRowProps) => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              type="text"
+              variant="text"
               icon={<MoreVertical />}
               className="px-1"
               onClick={(e) => e.stopPropagation()}

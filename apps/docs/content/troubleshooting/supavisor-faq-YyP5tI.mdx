@@ -66,7 +66,7 @@ postgresql://postgres.ajrbwkcuthywfddihrmflo:[YOUR-PASSWORD]@aws-0-us-east-1.poo
 
 ### Supavisor: Transaction mode vs. Session mode?
 
-When a client forms a direct connection with Postgres, it usually will make a few queries, but may not utilize the connection the entire time. In transaction mode, a client is allowed to make a single query before being sent back to the figurative "waiting room". This prevents greedy or sedentary clients from hoarding connections. In most cases, this increases query throughput and is optimal.
+When a client forms a direct connection with Postgres, it usually makes a few queries but may not use the connection the entire time. In transaction mode, a client is allowed to make a single query before being sent back to the figurative "waiting room". This prevents greedy or sedentary clients from hoarding connections. In most cases, this increases query throughput and is optimal.
 
 In session mode, once the pooler assigns a direct connection, it stays with that client until voluntarily surrendered.
 
@@ -119,7 +119,7 @@ When a distinct combination connects to your database, a new direct connection p
 
 ### **Does Supavisor immediately establish the max pool size?**
 
-No, it doesn't. Let's break it down:
+No, it doesn't. See why:
 
 - In transaction mode, the pooler will only add connections if there are not enough connections to service all pending queries simultaneously. If 10 clients connect, but a single direct connection can comfortably accommodate them all, the pooler will not create more.
 - If necessary, it can create as many connections to prevent queries from pending up to the limit specified by the "Pool Size".

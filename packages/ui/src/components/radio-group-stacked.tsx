@@ -47,6 +47,8 @@ const RadioGroupStackedItem = React.forwardRef<
         'disabled:opacity-50 disabled:cursor-not-allowed',
         // Enabled/hover states
         'enabled:cursor-pointer enabled:hover:bg-surface-300 enabled:hover:border-foreground-muted',
+        // Focus state
+        'focus:ring-background-control focus:border-control focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-background-control focus-visible:ring-offset-2 focus-visible:ring-offset-foreground-muted',
         // Z-index for interactions
         'hover:z-1 focus-visible:z-1 data-[state=checked]:z-1',
         // Checked state
@@ -68,7 +70,7 @@ const RadioGroupStackedItem = React.forwardRef<
               // States
               'group-data-[state=checked]:border-foreground-muted',
               'group-focus:border-foreground-muted group-focus:outline-hidden',
-              'group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2',
+              'group-focus-visible:ring-2 group-focus-visible:ring-background-control group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-foreground-muted',
               'group-hover:border-foreground-muted'
             )}
           >

@@ -271,13 +271,13 @@ export const ColumnType = ({
                     specific use case.
                   </p>
                   <div className="flex items-center space-x-2 mt-3">
-                    <Button asChild type="default" icon={<ExternalLink />}>
+                    <Button asChild variant="default" icon={<ExternalLink />}>
                       <Link href={recommendation.reference} target="_blank" rel="noreferrer">
                         Read more
                       </Link>
                     </Button>
                     <Button
-                      type="primary"
+                      variant="primary"
                       onClick={() => field.onChange(recommendation.alternative)}
                     >
                       Use {recommendation.alternative}

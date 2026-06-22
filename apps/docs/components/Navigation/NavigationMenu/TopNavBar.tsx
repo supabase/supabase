@@ -57,7 +57,7 @@ const TopNavBar: FC = () => {
               <button
                 title="Menu dropdown button"
                 className={cn(
-                  buttonVariants({ type: 'default' }),
+                  buttonVariants({ variant: 'default' }),
                   'flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-open:bg-overlay-hover/30'
                 )}
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -99,7 +99,7 @@ const HeaderLogo = memo(() => {
     <Link
       href="/"
       className={cn(
-        buttonVariants({ type: 'default' }),
+        buttonVariants({ variant: 'default' }),
         'flex shrink-0 items-center w-fit bg-transparent! border-none! shadow-none!'
       )}
     >

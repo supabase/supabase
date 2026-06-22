@@ -80,7 +80,7 @@ const BucketPage: NextPageWithLayout = () => {
             <PageBreadcrumbsActions>
               <Button
                 asChild
-                type="outline"
+                variant="outline"
                 size="tiny"
                 icon={<Shield size={14} />}
                 iconRight={
@@ -99,7 +99,7 @@ const BucketPage: NextPageWithLayout = () => {
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button type="outline" size="tiny" iconRight={<ChevronDown size={14} />}>
+                  <Button variant="outline" size="tiny" iconRight={<ChevronDown size={14} />}>
                     Edit bucket
                   </Button>
                 </DropdownMenuTrigger>

@@ -10,6 +10,7 @@ import {
   SelectLabel,
   SelectTrigger,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { useDestinationInformation } from '../useDestinationInformation'
 import {
@@ -135,14 +136,23 @@ export const DestinationTypeSelection = () => {
     .find((option) => option.value === destinationType)
 
   return (
-    <div className="flex flex-col gap-y-2 p-5">
-      <div className="flex flex-col gap-y-1">
-        <p className="text-sm font-medium text-foreground">Type</p>
-        <p className="text-sm text-foreground-light">
-          The destination type cannot be changed after creation.
-        </p>
-      </div>
-
+    <FormItemLayout
+      isReactForm={false}
+      layout="horizontal"
+      className="p-5 [&>div]:gap-y-1 [&>div>span]:text-foreground-lighter"
+      label="Type"
+      labelOptional="Destination type cannot be changed after creation"
+      description={
+        selectedOption?.isAlpha && (
+          <span className="block text-sm text-foreground-light mb-1">
+            This destination type is in alpha and may change while we iterate.{' '}
+            <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
+              Leave feedback
+            </InlineLink>
+          </span>
+        )
+      }
+    >
       <Select
         disabled={editMode}
         value={destinationType ?? undefined}
@@ -161,7 +171,7 @@ export const DestinationTypeSelection = () => {
             <span className="text-foreground-lighter">Select a destination type</span>
           )}
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent align="end">
           {visibleGroups.map((group) => (
             <SelectGroup key={group.label}>
               <SelectLabel>{group.label}</SelectLabel>
@@ -183,15 +193,6 @@ export const DestinationTypeSelection = () => {
           ))}
         </SelectContent>
       </Select>
-
-      {selectedOption?.isAlpha && (
-        <p className="text-sm text-foreground-light">
-          This destination type is in alpha and may change while we iterate.{' '}
-          <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
-            Leave feedback
-          </InlineLink>
-        </p>
-      )}
-    </div>
+    </FormItemLayout>
   )
 }

@@ -19,8 +19,7 @@ export const TOTPFactors = () => {
     <>
       <section className="space-y-3">
         <p className="text-sm text-foreground-light">
-          Generate one-time passwords via authenticator apps like 1Password, Authy, etc. as a second
-          factor to verify your identity during sign-in.
+          Use an authenticator app (like 1Password or Authy) to verify your identity at sign-in.
         </p>
         <div>
           {isLoading && <GenericSkeletonLoader />}
@@ -54,7 +53,7 @@ export const TOTPFactors = () => {
                         </p>
                         <Button
                           size="tiny"
-                          type="default"
+                          variant="default"
                           onClick={() => setFactorToBeDeleted(factor.id)}
                         >
                           Remove

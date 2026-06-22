@@ -275,13 +275,20 @@ export const UnifiedLogs = () => {
 
       // For hardcoded enum fields, keep the predefined options (facets only used for counts)
       if (field.value === 'log_type' || field.value === 'method' || field.value === 'level') {
-        return field
+        const fieldWithCounts = {
+          ...field,
+          options: field.options.map((x) => {
+            return { ...x, count: facetsField.rows.find((y) => y.value === x.value)?.total ?? 0 }
+          }),
+        }
+        return fieldWithCounts
       }
 
       // For dynamic fields, use faceted options
-      const options: Option[] = facetsField.rows.map(({ value }) => ({
+      const options: Option[] = facetsField.rows.map(({ value, total }) => ({
         label: `${value}`,
         value,
+        count: total,
       }))
 
       return { ...field, options }
@@ -382,7 +389,7 @@ export const UnifiedLogs = () => {
                 <ShortcutTooltip shortcutId={SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS} side="bottom">
                   <Button
                     size="tiny"
-                    type="text"
+                    variant="text"
                     icon={isFilterBarOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
                     onClick={() => setIsFilterBarOpen((prev) => !prev)}
                     className="hidden w-[26px] sm:flex"

@@ -118,7 +118,7 @@ export function prefetchProjectDetail(client: QueryClient, { ref }: ProjectDetai
   return client.fetchQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: projectKeys.detail(ref),
-    queryFn: ({ signal }) => getProjectDetail({ ref }, signal, undefined, client),
+    queryFn: ({ client, signal }) => getProjectDetail({ ref }, signal, undefined, client),
   })
 }
 

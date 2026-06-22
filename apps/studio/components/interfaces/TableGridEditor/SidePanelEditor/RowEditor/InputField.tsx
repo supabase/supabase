@@ -154,7 +154,7 @@ export const InputField = ({
             {isEditable && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <InputGroupButton type="default" icon={<Edit />} className="px-1.5" />
+                  <InputGroupButton variant="default" icon={<Edit />} className="px-1.5" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-28">
                   {field.isNullable && (
@@ -216,7 +216,7 @@ export const InputField = ({
               <DropdownMenuTrigger asChild>
                 <InputGroupButton
                   data-testid={`${field.name}-field-actions`}
-                  type="default"
+                  variant="default"
                   icon={<Edit />}
                   className="ml-auto px-1.5"
                 />
@@ -276,8 +276,8 @@ export const InputField = ({
           />
           <InputGroupAddon align="inline-end">
             <InputGroupButton
-              type="default"
-              htmlType="button"
+              variant="default"
+              type="button"
               onClick={() => onEditJson({ column: field.name, value: field.value })}
               icon={isEditable ? <Edit /> : <Eye />}
             >
@@ -406,8 +406,8 @@ export const InputField = ({
         <InputGroupAddon align="inline-end">
           {isTruncated ? (
             <InputGroupButton
-              type="default"
-              htmlType="button"
+              variant="default"
+              type="button"
               onClick={() => onEditJson({ column: field.name, value: field.value })}
               icon={isEditable ? <Edit /> : <Eye />}
             >

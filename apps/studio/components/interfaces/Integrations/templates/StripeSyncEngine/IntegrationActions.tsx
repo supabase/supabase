@@ -39,7 +39,7 @@ export const IntegrationInstalledActions = ({
       <div className={cn('flex gap-x-2 justify-end', className)}>
         {upgradeAvailable && !uninstallError && !uninstalling && (
           <ButtonTooltip
-            type="primary"
+            variant="primary"
             onClick={() => setShouldShowInstallSheet(true)}
             disabled={disabled}
             loading={installing}
@@ -55,7 +55,7 @@ export const IntegrationInstalledActions = ({
           </ButtonTooltip>
         )}
         <ButtonTooltip
-          type="default"
+          variant="default"
           onClick={() => setShowUninstallModal(true)}
           disabled={disabled}
           loading={uninstalling}
@@ -105,7 +105,7 @@ export const IntegrationNotInstalledActions = ({
     <div className={cn('flex gap-x-2 justify-end', className)}>
       {!hideInstallCTA && (
         <ButtonTooltip
-          type="primary"
+          variant="primary"
           onClick={() => setShouldShowInstallSheet(true)}
           disabled={!canInstall || !canManageSecrets}
           loading={installing}
@@ -123,7 +123,7 @@ export const IntegrationNotInstalledActions = ({
         </ButtonTooltip>
       )}
       {installError && (
-        <Button type="default" loading={isUninstallRequested} onClick={handleUninstall}>
+        <Button variant="default" loading={isUninstallRequested} onClick={handleUninstall}>
           Uninstall
         </Button>
       )}

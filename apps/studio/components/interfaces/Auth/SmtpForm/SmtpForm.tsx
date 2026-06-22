@@ -519,7 +519,7 @@ export const SmtpForm = () => {
                 <div className="flex items-center gap-x-2">
                   {isDirty && (
                     <Button
-                      type="default"
+                      variant="default"
                       onClick={() => {
                         form.reset()
                         setEnableSmtp(isSmtpEnabled(authConfig))
@@ -529,8 +529,8 @@ export const SmtpForm = () => {
                     </Button>
                   )}
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     loading={isUpdatingConfig}
                     disabled={!canUpdateConfig || !isDirty}
                   >

@@ -201,7 +201,7 @@ export const TableEditorMenu = () => {
                 disabled={!canCreateTables}
                 size="tiny"
                 icon={<Plus size={14} strokeWidth={1.5} className="text-foreground-muted" />}
-                type="default"
+                variant="default"
                 className="justify-start"
                 onClick={() => snap.onAddTable()}
                 tooltip={{
@@ -253,7 +253,7 @@ export const TableEditorMenu = () => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
-                      type={visibleTypes.length !== 5 ? 'default' : 'dashed'}
+                      variant={visibleTypes.length !== 5 ? 'default' : 'dashed'}
                       className="h-[32px] md:h-[28px] px-1.5"
                       icon={<Filter />}
                       aria-label="Filter"
@@ -287,7 +287,7 @@ export const TableEditorMenu = () => {
                         </div>
                         <Button
                           size="tiny"
-                          type="default"
+                          variant="default"
                           onClick={() => setVisibleTypes([value])}
                           className="transition opacity-0 group-hover:opacity-100 h-auto px-1 py-0.5"
                         >

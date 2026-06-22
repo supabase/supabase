@@ -165,9 +165,9 @@ export const KeyValueFieldArray = <
             />
 
             <Button
-              type="default"
+              variant="default"
               size="tiny"
-              htmlType="button"
+              type="button"
               icon={<Trash size={12} />}
               aria-label={removeLabel}
               disabled={disabled}
@@ -180,9 +180,9 @@ export const KeyValueFieldArray = <
 
       <div className="flex items-center">
         <Button
-          type="default"
+          variant="default"
           size="tiny"
-          htmlType="button"
+          type="button"
           icon={<Plus />}
           disabled={disabled}
           onClick={() => append(createEmptyRow())}
@@ -195,9 +195,9 @@ export const KeyValueFieldArray = <
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                type="default"
+                variant="default"
                 size="tiny"
-                htmlType="button"
+                type="button"
                 icon={<ChevronDown size={14} />}
                 aria-label={addActionsLabel}
                 disabled={disabled}
