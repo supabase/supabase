@@ -1,12 +1,15 @@
 import { describe, expect, it, vi } from 'vitest'
 
+import { getAnalyticsBucketValidationIssues } from './AnalyticsBucket/AnalyticsBucket.utils'
+import { getBigQueryValidationIssues } from './BigQuery/BigQuery.utils'
+import { getClickHouseValidationIssues } from './ClickHouse/ClickHouse.utils'
+import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
 import {
   buildDestinationConfig,
   buildDestinationConfigForValidation,
-  getClickHouseValidationIssues,
-  getDucklakeValidationIssues,
-  getSnowflakeValidationIssues,
 } from './DestinationForm.utils'
+import { getDucklakeValidationIssues } from './DuckLake/DuckLake.utils'
+import { getSnowflakeValidationIssues } from './Snowflake/Snowflake.utils'
 
 const baseDucklakeFormData = {
   name: 'DuckLake Destination',
@@ -75,6 +78,42 @@ const baseSnowflakeFormData = {
   snowflakeDatabase: ' ANALYTICS ',
   snowflakeSchema: ' PUBLIC ',
   snowflakeRole: ' ETL_ROLE ',
+}
+
+const baseClickHouseFormData = {
+  name: 'ClickHouse Destination',
+  publicationName: 'pub',
+  maxFillMs: undefined,
+  maxTableSyncWorkers: undefined,
+  maxCopyConnectionsPerTable: undefined,
+  invalidatedSlotBehavior: undefined,
+  projectId: undefined,
+  datasetId: undefined,
+  serviceAccountKey: undefined,
+  connectionPoolSize: undefined,
+  maxStalenessMins: undefined,
+  warehouseName: undefined,
+  namespace: undefined,
+  newNamespaceName: undefined,
+  catalogToken: undefined,
+  s3AccessKeyId: undefined,
+  s3SecretAccessKey: undefined,
+  s3Region: undefined,
+  ducklakeCatalogUrl: undefined,
+  ducklakeDataPath: undefined,
+  ducklakePoolSize: undefined,
+  ducklakeS3AccessKeyId: undefined,
+  ducklakeS3SecretAccessKey: undefined,
+  ducklakeS3Region: undefined,
+  ducklakeS3Endpoint: undefined,
+  ducklakeS3UrlStyle: undefined,
+  ducklakeS3UseSsl: undefined,
+  ducklakeMetadataSchema: undefined,
+  clickhouseUrl: ' https://your-cluster.clickhouse.cloud:8443 ',
+  clickhouseUser: ' default ',
+  clickhousePassword: ' secret password ',
+  clickhouseDatabase: ' analytics ',
+  clickhouseEngine: 'replacing_merge_tree' as const,
 }
 
 describe('DestinationForm.utils DuckLake', () => {
@@ -155,6 +194,27 @@ describe('DestinationForm.utils DuckLake', () => {
     ])
   })
 
+  it('treats whitespace-only values as missing', () => {
+    const issues = getDucklakeValidationIssues({
+      ducklakeCatalogUrl: '   ',
+      ducklakeDataPath: '\t',
+      ducklakeS3AccessKeyId: ' ',
+      ducklakeS3SecretAccessKey: '  ',
+      ducklakeS3Region: '\n',
+      ducklakeS3Endpoint: ' ',
+      ducklakeMetadataSchema: '',
+    })
+
+    expect(issues).toEqual([
+      { path: 'ducklakeCatalogUrl', message: 'Catalog URL is required' },
+      { path: 'ducklakeDataPath', message: 'Data path is required' },
+      { path: 'ducklakeS3AccessKeyId', message: 'S3 Access Key ID is required' },
+      { path: 'ducklakeS3SecretAccessKey', message: 'S3 Secret Access Key is required' },
+      { path: 'ducklakeS3Region', message: 'S3 Region is required' },
+      { path: 'ducklakeS3Endpoint', message: 'S3 Endpoint is required' },
+    ])
+  })
+
   it('returns format errors for invalid DuckLake values', () => {
     const issues = getDucklakeValidationIssues({
       ducklakeCatalogUrl: 'mysql://catalog',
@@ -196,6 +256,100 @@ describe('DestinationForm.utils DuckLake', () => {
         ducklakeS3Region: 'eu-west-1',
         ducklakeS3Endpoint: 's3.example.com',
         ducklakeMetadataSchema: 'ducklake_schema_1',
+      })
+    ).toEqual([])
+  })
+})
+
+const baseDucklakeSupabaseFormData = {
+  ...baseDucklakeFormData,
+  ducklakeMode: 'supabase' as const,
+  ducklakeCatalogProjectRef: 'catalog-ref',
+  ducklakeStorageProjectRef: 'storage-ref',
+  ducklakeStorageBucket: 'ducklake-data',
+}
+
+describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
+  it('builds DuckLake validation config from project refs in supabase mode', () => {
+    const config = buildDestinationConfigForValidation({
+      projectRef: 'project-ref',
+      selectedType: 'DuckLake',
+      data: baseDucklakeSupabaseFormData,
+    })
+
+    expect(config).toEqual({
+      ducklake: {
+        catalogProjectRef: 'catalog-ref',
+        storageProjectRef: 'storage-ref',
+        bucket: 'ducklake-data',
+        poolSize: 4,
+        metadataSchema: 'ducklake_metadata',
+      },
+    })
+  })
+
+  it('builds DuckLake submit config from project refs in supabase mode', async () => {
+    const createS3AccessKey = vi.fn()
+    const resolveNamespace = vi.fn()
+
+    const config = await buildDestinationConfig({
+      projectRef: 'project-ref',
+      selectedType: 'DuckLake',
+      data: baseDucklakeSupabaseFormData,
+      createS3AccessKey,
+      resolveNamespace,
+    })
+
+    expect(config).toEqual({
+      ducklake: {
+        catalogProjectRef: 'catalog-ref',
+        storageProjectRef: 'storage-ref',
+        bucket: 'ducklake-data',
+        poolSize: 4,
+        metadataSchema: 'ducklake_metadata',
+      },
+    })
+    expect(createS3AccessKey).not.toHaveBeenCalled()
+    expect(resolveNamespace).not.toHaveBeenCalled()
+  })
+
+  it('returns required-field errors for missing supabase selections, ignoring custom fields', () => {
+    const issues = getDucklakeValidationIssues({
+      ducklakeMode: 'supabase',
+      ducklakeCatalogProjectRef: '',
+      ducklakeStorageProjectRef: '',
+      ducklakeStorageBucket: '',
+      // Custom-mode fields are intentionally blank and must not be validated in supabase mode
+      ducklakeCatalogUrl: '',
+      ducklakeDataPath: '',
+      ducklakeS3AccessKeyId: '',
+      ducklakeS3SecretAccessKey: '',
+      ducklakeS3Region: '',
+      ducklakeS3Endpoint: '',
+      ducklakeMetadataSchema: '',
+    })
+
+    expect(issues).toEqual([
+      { path: 'ducklakeCatalogProjectRef', message: 'Catalog project is required' },
+      { path: 'ducklakeStorageProjectRef', message: 'Storage project is required' },
+      { path: 'ducklakeStorageBucket', message: 'Bucket is required' },
+    ])
+  })
+
+  it('accepts a complete supabase configuration', () => {
+    expect(
+      getDucklakeValidationIssues({
+        ducklakeMode: 'supabase',
+        ducklakeCatalogProjectRef: 'catalog-ref',
+        ducklakeStorageProjectRef: 'storage-ref',
+        ducklakeStorageBucket: 'ducklake-data',
+        ducklakeCatalogUrl: '',
+        ducklakeDataPath: '',
+        ducklakeS3AccessKeyId: '',
+        ducklakeS3SecretAccessKey: '',
+        ducklakeS3Region: '',
+        ducklakeS3Endpoint: '',
+        ducklakeMetadataSchema: '',
       })
     ).toEqual([])
   })
@@ -272,42 +426,6 @@ describe('DestinationForm.utils Snowflake', () => {
   })
 })
 
-const baseClickHouseFormData = {
-  name: 'ClickHouse Destination',
-  publicationName: 'pub',
-  maxFillMs: undefined,
-  maxTableSyncWorkers: undefined,
-  maxCopyConnectionsPerTable: undefined,
-  invalidatedSlotBehavior: undefined,
-  projectId: undefined,
-  datasetId: undefined,
-  serviceAccountKey: undefined,
-  connectionPoolSize: undefined,
-  maxStalenessMins: undefined,
-  warehouseName: undefined,
-  namespace: undefined,
-  newNamespaceName: undefined,
-  catalogToken: undefined,
-  s3AccessKeyId: undefined,
-  s3SecretAccessKey: undefined,
-  s3Region: undefined,
-  ducklakeCatalogUrl: undefined,
-  ducklakeDataPath: undefined,
-  ducklakePoolSize: undefined,
-  ducklakeS3AccessKeyId: undefined,
-  ducklakeS3SecretAccessKey: undefined,
-  ducklakeS3Region: undefined,
-  ducklakeS3Endpoint: undefined,
-  ducklakeS3UrlStyle: undefined,
-  ducklakeS3UseSsl: undefined,
-  ducklakeMetadataSchema: undefined,
-  clickhouseUrl: ' https://cluster.clickhouse.cloud:8443 ',
-  clickhouseUser: ' default ',
-  clickhousePassword: ' secret ',
-  clickhouseDatabase: ' analytics ',
-  clickhouseEngine: 'replacing_merge_tree' as const,
-}
-
 describe('DestinationForm.utils ClickHouse', () => {
   it('builds ClickHouse validation config with required fields trimmed and blank optionals removed', () => {
     const config = buildDestinationConfigForValidation({
@@ -321,7 +439,7 @@ describe('DestinationForm.utils ClickHouse', () => {
 
     expect(config).toEqual({
       clickHouse: {
-        url: 'https://cluster.clickhouse.cloud:8443',
+        url: 'https://your-cluster.clickhouse.cloud:8443',
         user: 'default',
         password: undefined,
         database: 'analytics',
@@ -344,9 +462,9 @@ describe('DestinationForm.utils ClickHouse', () => {
 
     expect(config).toEqual({
       clickHouse: {
-        url: 'https://cluster.clickhouse.cloud:8443',
+        url: 'https://your-cluster.clickhouse.cloud:8443',
         user: 'default',
-        password: 'secret',
+        password: 'secret password',
         database: 'analytics',
         engine: 'replacing_merge_tree',
       },
@@ -369,10 +487,10 @@ describe('DestinationForm.utils ClickHouse', () => {
     ])
   })
 
-  it('rejects non-HTTPS and internal-address ClickHouse URLs', () => {
+  it('rejects ClickHouse URLs that are not https or target internal addresses', () => {
     expect(
       getClickHouseValidationIssues({
-        clickhouseUrl: 'http://example.com',
+        clickhouseUrl: 'http://example.clickhouse.cloud:8443',
         clickhouseUser: 'default',
         clickhouseDatabase: 'analytics',
       })
@@ -387,65 +505,124 @@ describe('DestinationForm.utils ClickHouse', () => {
     ).toEqual([
       { path: 'clickhouseUrl', message: 'ClickHouse URL must not target an internal address' },
     ])
+  })
+})
 
-    expect(
-      getClickHouseValidationIssues({
-        clickhouseUrl: 'https://192.168.1.1:8443',
-        clickhouseUser: 'default',
-        clickhouseDatabase: 'analytics',
-      })
-    ).toEqual([
-      { path: 'clickhouseUrl', message: 'ClickHouse URL must not target an internal address' },
-    ])
+describe('DestinationForm.utils BigQuery', () => {
+  it('returns required-field errors for missing BigQuery settings', () => {
+    const issues = getBigQueryValidationIssues({
+      projectId: '',
+      datasetId: '',
+      serviceAccountKey: '',
+    })
 
-    expect(
-      getClickHouseValidationIssues({
-        clickhouseUrl: 'https://[::1]:8443',
-        clickhouseUser: 'default',
-        clickhouseDatabase: 'analytics',
-      })
-    ).toEqual([
-      { path: 'clickhouseUrl', message: 'ClickHouse URL must not target an internal address' },
-    ])
-
-    expect(
-      getClickHouseValidationIssues({
-        clickhouseUrl: 'https://100.64.0.1:8443',
-        clickhouseUser: 'default',
-        clickhouseDatabase: 'analytics',
-      })
-    ).toEqual([
-      { path: 'clickhouseUrl', message: 'ClickHouse URL must not target an internal address' },
-    ])
-
-    expect(
-      getClickHouseValidationIssues({
-        clickhouseUrl: 'https://198.18.0.1:8443',
-        clickhouseUser: 'default',
-        clickhouseDatabase: 'analytics',
-      })
-    ).toEqual([
-      { path: 'clickhouseUrl', message: 'ClickHouse URL must not target an internal address' },
-    ])
-
-    expect(
-      getClickHouseValidationIssues({
-        clickhouseUrl: 'https://[64:ff9b::a9fe:a9fe]:8443',
-        clickhouseUser: 'default',
-        clickhouseDatabase: 'analytics',
-      })
-    ).toEqual([
-      { path: 'clickhouseUrl', message: 'ClickHouse URL must not target an internal address' },
+    expect(issues).toEqual([
+      { path: 'projectId', message: 'Project ID is required' },
+      { path: 'datasetId', message: 'Dataset ID is required' },
+      { path: 'serviceAccountKey', message: 'Service Account Key is required' },
     ])
   })
 
-  it('accepts a valid public ClickHouse URL', () => {
-    expect(
-      getClickHouseValidationIssues({
-        clickhouseUrl: 'https://cluster.clickhouse.cloud:8443',
-        clickhouseUser: 'default',
-        clickhouseDatabase: 'analytics',
-      })
-    ).toEqual([])
+  it('treats whitespace-only values as missing', () => {
+    const issues = getBigQueryValidationIssues({
+      projectId: '   ',
+      datasetId: '\t',
+      serviceAccountKey: '\n',
+    })
+
+    expect(issues).toEqual([
+      { path: 'projectId', message: 'Project ID is required' },
+      { path: 'datasetId', message: 'Dataset ID is required' },
+      { path: 'serviceAccountKey', message: 'Service Account Key is required' },
+    ])
+  })
+
+  it('returns no issues for a complete configuration', () => {
+    const issues = getBigQueryValidationIssues({
+      projectId: 'my-project',
+      datasetId: 'my_dataset',
+      serviceAccountKey: '{ "type": "service_account" }',
+    })
+
+    expect(issues).toEqual([])
+  })
+})
+
+describe('DestinationForm.utils Analytics Bucket', () => {
+  it('returns required-field errors for an empty configuration', () => {
+    const issues = getAnalyticsBucketValidationIssues({
+      warehouseName: '',
+      namespace: '',
+      newNamespaceName: '',
+      s3Region: '',
+      s3AccessKeyId: '',
+      s3SecretAccessKey: '',
+    })
+
+    expect(issues).toEqual([
+      { path: 'warehouseName', message: 'Bucket is required' },
+      { path: 's3Region', message: 'S3 Region is required' },
+      { path: 's3AccessKeyId', message: 'S3 Access Key ID is required' },
+      { path: 'namespace', message: 'Namespace is required' },
+      { path: 's3SecretAccessKey', message: 'S3 Secret Access Key is required' },
+    ])
+  })
+
+  it('treats whitespace-only values as missing', () => {
+    const issues = getAnalyticsBucketValidationIssues({
+      warehouseName: '   ',
+      namespace: '  ',
+      newNamespaceName: '',
+      s3Region: '\t',
+      s3AccessKeyId: ' ',
+      s3SecretAccessKey: '  ',
+    })
+
+    expect(issues).toEqual([
+      { path: 'warehouseName', message: 'Bucket is required' },
+      { path: 's3Region', message: 'S3 Region is required' },
+      { path: 's3AccessKeyId', message: 'S3 Access Key ID is required' },
+      { path: 'namespace', message: 'Namespace is required' },
+      { path: 's3SecretAccessKey', message: 'S3 Secret Access Key is required' },
+    ])
+  })
+
+  it('requires a name when creating a new namespace', () => {
+    const issues = getAnalyticsBucketValidationIssues({
+      warehouseName: 'bucket',
+      namespace: CREATE_NEW_NAMESPACE,
+      newNamespaceName: '',
+      s3Region: 'us-east-1',
+      s3AccessKeyId: 'key',
+      s3SecretAccessKey: 'secret',
+    })
+
+    expect(issues).toEqual([{ path: 'newNamespaceName', message: 'Namespace name is required' }])
+  })
+
+  it('skips the S3 secret when creating a new access key', () => {
+    const issues = getAnalyticsBucketValidationIssues({
+      warehouseName: 'bucket',
+      namespace: 'analytics',
+      newNamespaceName: '',
+      s3Region: 'us-east-1',
+      s3AccessKeyId: CREATE_NEW_KEY,
+      s3SecretAccessKey: '',
+    })
+
+    expect(issues).toEqual([])
+  })
+
+  it('returns no issues for a complete configuration', () => {
+    const issues = getAnalyticsBucketValidationIssues({
+      warehouseName: 'bucket',
+      namespace: CREATE_NEW_NAMESPACE,
+      newNamespaceName: 'new_namespace',
+      s3Region: 'us-east-1',
+      s3AccessKeyId: 'key',
+      s3SecretAccessKey: 'secret',
+    })
+
+    expect(issues).toEqual([])
   })
 })

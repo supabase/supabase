@@ -18,27 +18,28 @@ import {
 } from '../../useIsETLPrivateAlpha'
 import { DestinationType } from '../DestinationPanel.types'
 import { AdvancedSettings } from './AdvancedSettings'
+import { getAnalyticsBucketValidationIssues } from './AnalyticsBucket/AnalyticsBucket.utils'
+import { AnalyticsBucketFields } from './AnalyticsBucket/Fields'
+import { getBigQueryValidationIssues } from './BigQuery/BigQuery.utils'
+import { BigQueryFields } from './BigQuery/Fields'
+import { getClickHouseValidationIssues } from './ClickHouse/ClickHouse.utils'
+import { ClickHouseFields } from './ClickHouse/Fields'
 import { CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
 import { DestinationPanelFormSchema as FormSchema } from './DestinationForm.schema'
 import {
   areValidationFailuresEqual,
   buildDestinationConfig,
   buildDestinationConfigForValidation,
-  getClickHouseValidationIssues,
-  getDucklakeValidationIssues,
-  getSnowflakeValidationIssues,
+  generateDefaultValues,
 } from './DestinationForm.utils'
 import { DestinationNameInput } from './DestinationNameInput'
-import {
-  AnalyticsBucketFields,
-  BigQueryFields,
-  ClickHouseFields,
-  DuckLakeFields,
-  SnowflakeFields,
-} from './DestinationPanelFields'
+import { getDucklakeValidationIssues } from './DuckLake/DuckLake.utils'
+import { DuckLakeFields } from './DuckLake/Fields'
 import { NewPublicationPanel } from './NewPublicationPanel'
 import { NoDestinationsAvailable } from './NoDestinationsAvailable'
 import { PublicationSelection } from './PublicationSelection'
+import { SnowflakeFields } from './Snowflake/Fields'
+import { getSnowflakeValidationIssues } from './Snowflake/Snowflake.utils'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
 import { ValidationWarningsDialog } from './ValidationWarningsDialog'
 import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
@@ -82,37 +83,6 @@ interface DestinationFormProps {
     statusName?: string
   }
   onClose: () => void
-}
-
-type DucklakeApiConfig = {
-  catalog_url: string
-  data_path: string
-  pool_size?: number
-  s3_access_key_id?: string
-  s3_secret_access_key?: string
-  s3_region?: string
-  s3_endpoint?: string
-  s3_url_style?: 'path' | 'vhost'
-  s3_use_ssl?: boolean
-  metadata_schema?: string
-}
-
-type SnowflakeApiConfig = {
-  account_id: string
-  user: string
-  private_key: string
-  private_key_passphrase?: string
-  database: string
-  schema: string
-  role?: string
-}
-
-type ClickHouseApiConfig = {
-  url: string
-  user: string
-  password?: string
-  database: string
-  engine?: 'merge_tree' | 'replacing_merge_tree'
 }
 
 export const DestinationForm = ({
@@ -162,10 +132,10 @@ export const DestinationForm = ({
     return destinations
   }, [
     etlEnableBigQuery,
-    etlEnableClickHouse,
     etlEnableDucklake,
     etlEnableIceberg,
     etlEnableSnowflake,
+    etlEnableClickHouse,
   ])
   const hasNoAvailableDestinations = availableDestinations.length === 0
 
@@ -227,89 +197,18 @@ export const DestinationForm = ({
 
   const isValidating = isValidatingDestination || isValidatingPipeline
 
-  const defaultValues = useMemo(() => {
-    const config = destinationData?.config
-    const isBigQueryConfig = config && 'big_query' in config
-    const isIcebergConfig = config && 'iceberg' in config
-    const ducklakeConfigValue =
-      config && 'ducklake' in (config as Record<string, unknown>)
-        ? (config as Record<string, unknown>).ducklake
-        : undefined
-    const ducklakeConfig =
-      ducklakeConfigValue && typeof ducklakeConfigValue === 'object'
-        ? (ducklakeConfigValue as DucklakeApiConfig)
-        : undefined
-    const snowflakeConfigValue =
-      config && 'snowflake' in (config as Record<string, unknown>)
-        ? (config as Record<string, unknown>).snowflake
-        : undefined
-    const snowflakeConfig =
-      snowflakeConfigValue && typeof snowflakeConfigValue === 'object'
-        ? (snowflakeConfigValue as SnowflakeApiConfig)
-        : undefined
-    const clickhouseConfigValue =
-      config && 'clickhouse' in (config as Record<string, unknown>)
-        ? (config as Record<string, unknown>).clickhouse
-        : undefined
-    const clickhouseConfig =
-      clickhouseConfigValue && typeof clickhouseConfigValue === 'object'
-        ? (clickhouseConfigValue as ClickHouseApiConfig)
-        : undefined
-
-    return {
-      // Common fields
-      name: destinationData?.name ?? '',
-      publicationName: pipelineData?.config.publication_name ?? '',
-      maxFillMs: pipelineData?.config?.batch?.max_fill_ms ?? undefined,
-      maxTableSyncWorkers: pipelineData?.config?.max_table_sync_workers ?? undefined,
-      maxCopyConnectionsPerTable: pipelineData?.config?.max_copy_connections_per_table ?? undefined,
-      invalidatedSlotBehavior:
-        (pipelineData?.config as { invalidated_slot_behavior?: 'error' | 'recreate' } | undefined)
-          ?.invalidated_slot_behavior ?? undefined,
-      // BigQuery fields
-      projectId: isBigQueryConfig ? config.big_query.project_id : '',
-      datasetId: isBigQueryConfig ? config.big_query.dataset_id : '',
-      serviceAccountKey: isBigQueryConfig ? config.big_query.service_account_key : '',
-      connectionPoolSize:
-        (config as { big_query?: { connection_pool_size?: number } } | undefined)?.big_query
-          ?.connection_pool_size ?? undefined,
-      maxStalenessMins: isBigQueryConfig ? config.big_query.max_staleness_mins : undefined, // Default: null
-      // Analytics Bucket fields
-      warehouseName: isIcebergConfig ? config.iceberg.supabase.warehouse_name : '',
-      namespace: isIcebergConfig ? config.iceberg.supabase.namespace : '',
-      newNamespaceName: '',
-      catalogToken: isIcebergConfig ? config.iceberg.supabase.catalog_token : catalogToken,
-      s3AccessKeyId: isIcebergConfig ? config.iceberg.supabase.s3_access_key_id : '',
-      s3SecretAccessKey: isIcebergConfig ? config.iceberg.supabase.s3_secret_access_key : '',
-      s3Region:
-        projectSettings?.region ?? (isIcebergConfig ? config.iceberg.supabase.s3_region : ''),
-      // DuckLake fields
-      ducklakeCatalogUrl: ducklakeConfig?.catalog_url ?? '',
-      ducklakeDataPath: ducklakeConfig?.data_path ?? '',
-      ducklakePoolSize: ducklakeConfig?.pool_size,
-      ducklakeS3AccessKeyId: ducklakeConfig?.s3_access_key_id ?? '',
-      ducklakeS3SecretAccessKey: ducklakeConfig?.s3_secret_access_key ?? '',
-      ducklakeS3Region: ducklakeConfig?.s3_region ?? '',
-      ducklakeS3Endpoint: ducklakeConfig?.s3_endpoint ?? '',
-      ducklakeS3UrlStyle: ducklakeConfig?.s3_url_style ?? 'path',
-      ducklakeS3UseSsl: ducklakeConfig?.s3_use_ssl ?? true,
-      ducklakeMetadataSchema: ducklakeConfig?.metadata_schema ?? 'ducklake',
-      // Snowflake fields
-      snowflakeAccountId: snowflakeConfig?.account_id ?? '',
-      snowflakeUser: snowflakeConfig?.user ?? '',
-      snowflakePrivateKey: snowflakeConfig?.private_key ?? '',
-      snowflakePrivateKeyPassphrase: snowflakeConfig?.private_key_passphrase ?? '',
-      snowflakeDatabase: snowflakeConfig?.database ?? '',
-      snowflakeSchema: snowflakeConfig?.schema ?? '',
-      snowflakeRole: snowflakeConfig?.role ?? '',
-      // ClickHouse fields
-      clickhouseUrl: clickhouseConfig?.url ?? '',
-      clickhouseUser: clickhouseConfig?.user ?? '',
-      clickhousePassword: clickhouseConfig?.password ?? '',
-      clickhouseDatabase: clickhouseConfig?.database ?? '',
-      clickhouseEngine: clickhouseConfig?.engine ?? 'replacing_merge_tree',
-    }
-  }, [destinationData, pipelineData, catalogToken, projectSettings])
+  const defaultValues = useMemo(
+    () =>
+      generateDefaultValues({
+        destinationData,
+        pipelineData,
+        catalogToken,
+        region: projectSettings?.region,
+        projectRef,
+        editMode,
+      }),
+    [destinationData, pipelineData, catalogToken, projectSettings, projectRef, editMode]
+  )
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onChange',
@@ -325,34 +224,13 @@ export const DestinationForm = ({
         }
 
         if (selectedType === 'BigQuery') {
-          if (!data.projectId?.length) addRequiredFieldError('projectId', 'Project ID is required')
-          if (!data.datasetId?.length) addRequiredFieldError('datasetId', 'Dataset ID is required')
-          if (!data.serviceAccountKey?.length)
-            addRequiredFieldError('serviceAccountKey', 'Service Account Key is required')
+          getBigQueryValidationIssues(data).forEach(({ path, message }) => {
+            addRequiredFieldError(path, message)
+          })
         } else if (selectedType === 'Analytics Bucket') {
-          if (!data.warehouseName?.length)
-            addRequiredFieldError('warehouseName', 'Bucket is required')
-
-          const hasValidNamespace =
-            (data.namespace?.length && data.namespace !== 'create-new-namespace') ||
-            (data.namespace === 'create-new-namespace' && data.newNamespaceName?.length)
-
-          if (!hasValidNamespace) {
-            const isCreatingNew = data.namespace === 'create-new-namespace'
-            addRequiredFieldError(
-              isCreatingNew ? 'newNamespaceName' : 'namespace',
-              isCreatingNew ? 'Namespace name is required' : 'Namespace is required'
-            )
-          }
-
-          if (!data.s3Region?.length) addRequiredFieldError('s3Region', 'S3 Region is required')
-
-          if (!data.s3AccessKeyId?.length)
-            addRequiredFieldError('s3AccessKeyId', 'S3 Access Key ID is required')
-
-          if (data.s3AccessKeyId !== 'create-new' && !data.s3SecretAccessKey?.length) {
-            addRequiredFieldError('s3SecretAccessKey', 'S3 Secret Access Key is required')
-          }
+          getAnalyticsBucketValidationIssues(data).forEach(({ path, message }) => {
+            addRequiredFieldError(path, message)
+          })
         } else if (selectedType === 'DuckLake') {
           getDucklakeValidationIssues(data).forEach(({ path, message }) => {
             addRequiredFieldError(path, message)
@@ -687,7 +565,7 @@ export const DestinationForm = ({
                   onSelectNewBucket={() => setNewBucketSheetVisible(true)}
                 />
               ) : selectedType === 'DuckLake' && etlEnableDucklake ? (
-                <DuckLakeFields form={form} />
+                <DuckLakeFields form={form} editMode={editMode} />
               ) : selectedType === 'Snowflake' && etlEnableSnowflake ? (
                 <SnowflakeFields form={form} />
               ) : selectedType === 'ClickHouse' && etlEnableClickHouse ? (
@@ -749,7 +627,10 @@ export const DestinationForm = ({
       <NewPublicationPanel
         sourceId={sourceId}
         visible={publicationPanelVisible}
-        onClose={() => setPublicationPanelVisible(false)}
+        onClose={(newPublication?: string) => {
+          if (newPublication) form.setValue('publicationName', newPublication)
+          setPublicationPanelVisible(false)
+        }}
       />
 
       <CreateAnalyticsBucketSheet
