@@ -42,8 +42,15 @@ For each audit log, you can see additional details by clicking on the log entry:
 
 Each Supabase user account also has access to [Account Audit logs](/dashboard/account/audit) which displays these logs for only the associated user account.
 
+## Audit Log Drains
+
+Audit Log Drains let you stream platform audit log events to an external destination in real time. This is useful for centralizing security monitoring in a SIEM or custom log aggregation pipeline.
+
+Audit Log Drains can be configured under your [organization's audit log drains](/dashboard/org/_/audit-log-drains). 
+
+For setup instructions and supported destinations, see the [Log Drains guide](/docs/guides/telemetry/log-drains).
+
 ## Limitations
 
 - There is currently no way to export the logs via dashboard
-- There is currently no way to set up a log drain of platform audit logs
 - Retention periods depend on your plan
