@@ -9,26 +9,16 @@ Realtime is a globally distributed Elixir cluster. Clients can connect to any no
 
 Realtime is written in [Elixir](https://elixir-lang.org/), which compiles to [Erlang](https://www.erlang.org/), and uses many tools the [Phoenix Framework](https://www.phoenixframework.org/) provides out of the box.
 
-{/* Double headed arrows have some issues, this fixes that, but the rendering isn't great */}
+<Image
+  alt="Architecture"
+  src={{
+    light: '/docs/img/guides/platform/realtime/architecture--light.png',
+    dark: '/docs/img/guides/platform/realtime/architecture--dark.png',
+  }}
 
-```mermaid
-flowchart LR
-  UserB[User in Region B] --> RBNode["Realtime Node"]
-  UserA[User in Region A] --> RANode["Realtime Node"]
-  subgraph GC[Realtime Global Cluster]
-    subgraph RB[Region B]
-      RBNode[Region B]
-    end
-    subgraph RA["Region A"]
-      RANode["Realtime Node"]
-      TDB[(Tenant Database)]
-    end
-  end
-  RBNode --> RANode
-  RANode --> RBNode
-  RANode --> TDB
-  TDB --> RANode
-```
+width={1990}
+height={2226}
+/>
 
 ## Elixir & Phoenix
 
