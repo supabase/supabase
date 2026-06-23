@@ -136,12 +136,18 @@ export const SQLEditorMenu = () => {
           </InnerSideBarFilters>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                data-testid="sql-editor-new-query-button"
-                variant="default"
-                icon={<Plus className="text-foreground" />}
-                className="w-[26px]"
-              />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    data-testid="sql-editor-new-query-button"
+                    variant="default"
+                    icon={<Plus className="text-foreground" />}
+                    className="w-[26px]"
+                    aria-label="Create a new query"
+                  />
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Create a new query</TooltipContent>
+              </Tooltip>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" side="bottom" className="w-48">
               <DropdownMenuItem className="gap-x-2" onClick={() => handleNewQuery()}>
