@@ -17,7 +17,6 @@ import {
 export const REGIONS = ['ams', 'fra', 'gru', 'hkg', 'iad', 'syd'] as const
 export const METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] as const
 export const LOG_TYPES_LABELS = {
-  edge: 'API Gateway',
   postgres: 'Postgres',
   postgrest: 'PostgREST',
   auth: 'Auth',
@@ -30,7 +29,7 @@ export const LOG_TYPES_LABELS = {
 
 type LogType = keyof typeof LOG_TYPES_LABELS
 export const LOG_TYPES = Object.keys(LOG_TYPES_LABELS) as [LogType, ...LogType[]]
-export const DEFAULT_LOG_TYPES = ['postgres', 'edge'] as const
+export const DEFAULT_LOG_TYPES = ['postgres', 'postgrest'] as const
 
 const parseAsSort = createParser({
   parse(queryValue: string) {
