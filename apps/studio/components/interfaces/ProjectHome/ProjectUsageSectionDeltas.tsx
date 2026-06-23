@@ -11,7 +11,6 @@ import {
   getBucketLogRange,
   isServiceDisabled,
   type ChartIntervalKey,
-  type LogsBarChartDatum,
 } from './ProjectUsage.metrics'
 import { ApiGatewayProductChart } from '@/components/interfaces/Observability/ApiGatewayProductChart'
 import {
@@ -41,6 +40,10 @@ type ServiceEntry = {
   route: string
   enabled: boolean
 }
+
+// Both the per-level and by-product charts only expose `timestamp` to the click
+// handler, so the shared contract is just that field.
+type ChartClickDatum = { timestamp: string }
 
 export const ProjectUsageSectionDeltas = () => {
   const router = useRouter()
@@ -113,11 +116,6 @@ export const ProjectUsageSectionDeltas = () => {
     [projectRef, authEnabled, storageEnabled, dataApiEnabled]
   )
 
-  const services = useMemo(
-    () => buildSortedServiceCards(serviceBase, serviceData),
-    [serviceBase, serviceData]
-  )
-
   // The API Gateway routes to every product, so its by-product breakdown is the
   // headline: "Total Requests" and "Success Rate" equal the API Gateway chart total.
   const apiGatewayProductData = useMemo(
@@ -128,8 +126,28 @@ export const ProjectUsageSectionDeltas = () => {
   const totalRequests = apiGateway.total
   const successRate = apiGateway.successRate
 
+  // The API Gateway card displays the by-product aggregate, so feed that total into
+  // card building too. This keeps its grid ordering and header in sync with the chart.
+  const serviceCardStats = useMemo(
+    () => ({
+      ...serviceData,
+      data_api: {
+        ...serviceData.data_api,
+        total: apiGateway.total,
+        warningCount: apiGateway.warningCount,
+        errorCount: apiGateway.errorCount,
+      },
+    }),
+    [serviceData, apiGateway]
+  )
+
+  const services = useMemo(
+    () => buildSortedServiceCards(serviceBase, serviceCardStats),
+    [serviceBase, serviceCardStats]
+  )
+
   const handleBarClick =
-    (logRoute: string, serviceKey: HomeServiceKey) => (datum: LogsBarChartDatum) => {
+    (logRoute: string, serviceKey: HomeServiceKey) => (datum: ChartClickDatum) => {
       if (!datum?.timestamp) return
 
       // Logs explorer reads the range from `its`/`ite` (iso_timestamp_start/end
@@ -174,13 +192,10 @@ export const ProjectUsageSectionDeltas = () => {
       </div>
       <Row maxColumns={4} minWidth={280}>
         {services.map((s) => {
-          // The API Gateway card shows the by-product breakdown, so its header
-          // counts come from the aggregate to match the chart it renders.
+          // The API Gateway card renders the by-product breakdown chart; its header
+          // counts already carry the aggregate via serviceCardStats above.
           const isApiGateway = s.key === 'data_api'
-          const total = isApiGateway ? apiGateway.total : s.total
-          const warn = isApiGateway ? apiGateway.warningCount : s.warn
-          const err = isApiGateway ? apiGateway.errorCount : s.err
-          const disabled = isServiceDisabled(total, isLoading)
+          const disabled = isServiceDisabled(s.total, isLoading)
           return (
             <Card
               key={s.key}
@@ -207,7 +222,7 @@ export const ProjectUsageSectionDeltas = () => {
                         s.title
                       )}
                     </CardTitle>
-                    <span className="text-foreground text-xl">{total.toLocaleString()}</span>
+                    <span className="text-foreground text-xl">{s.total.toLocaleString()}</span>
                   </div>
                 </div>
                 <div className="flex items-end gap-4 text-foreground-light">
@@ -216,14 +231,14 @@ export const ProjectUsageSectionDeltas = () => {
                       <div className="w-1.5 h-1.5 bg-warning rounded-full" />
                       <span className="heading-meta">Warnings</span>
                     </div>
-                    <span className="text-foreground text-base">{warn.toLocaleString()}</span>
+                    <span className="text-foreground text-base">{s.warn.toLocaleString()}</span>
                   </div>
                   <div className="flex flex-col items-end">
                     <div className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 bg-destructive rounded-full" />
                       <span className="heading-meta">Errors</span>
                     </div>
-                    <span className="text-foreground text-base">{err.toLocaleString()}</span>
+                    <span className="text-foreground text-base">{s.err.toLocaleString()}</span>
                   </div>
                 </div>
               </CardHeader>
@@ -233,13 +248,7 @@ export const ProjectUsageSectionDeltas = () => {
                     <ApiGatewayProductChart
                       data={apiGatewayProductData}
                       DateTimeFormat={datetimeFormat}
-                      // The handler only reads `timestamp`, shared by both datum shapes
-                      onBarClick={
-                        disabled
-                          ? undefined
-                          : (datum) =>
-                              handleBarClick(s.route, s.key)(datum as unknown as LogsBarChartDatum)
-                      }
+                      onBarClick={disabled ? undefined : handleBarClick(s.route, s.key)}
                       EmptyState={
                         isLoading ? (
                           <></>
