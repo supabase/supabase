@@ -220,7 +220,7 @@ Overview and index pages use listing components for curated link sections, such 
 ```text
 Add a content listing block for [TOPIC] / [SECTION] (for example, Storage / Examples).
 Follow CONTRIBUTING § Content listings in apps/docs.
-Copy structure from storageGetStarted / StorageGetStartedListings. Run pnpm test content-listings from apps/docs.
+Copy structure from storageGetStarted / StorageGetStartedListings. Run pnpm test:local lib/content-listings.test.ts from apps/docs.
 ```
 
 **Manually add content listings:**
@@ -228,7 +228,7 @@ Copy structure from storageGetStarted / StorageGetStartedListings. Run pnpm test
 1. Add or update a `ContentListingGroup` export in [`components/listings/[topic].data.ts`](components/listings/).
 2. Register the export in [`listings-markdown-registry.ts`](components/listings/listings-markdown-registry.ts). Use PascalCase with a `Listings` suffix, for example `StorageGetStartedListings`.
 3. Place the component inline into guide MDX, for example `<StorageGetStartedListings />`. Use a partial only when the block is reused or gated with `$Show` at the partial level.
-4. Run `pnpm test content-listings` from `apps/docs`.
+4. Run `pnpm test:local lib/content-listings.test.ts` from `apps/docs`.
 
 Code snippets for manually adding content listings are available in [`.vscode/content-listing.code-snippets`](../../.vscode/content-listing.code-snippets): `cl-data` (data export), `cl-registry` (registry entry), `cl-inline` (MDX component).
 
