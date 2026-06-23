@@ -74,6 +74,11 @@ ALTER ROLE supabase_storage_admin WITH LOGIN PASSWORD 'postgres';
 ALTER ROLE supabase_functions_admin WITH LOGIN PASSWORD 'postgres';
 ALTER ROLE supabase_read_only_user WITH LOGIN PASSWORD 'postgres';
 
+-- Pin each admin role's search_path to its own schema (some services issue
+-- unqualified queries against their schema and rely on this being set).
+ALTER ROLE supabase_auth_admin SET search_path TO auth, public, extensions;
+ALTER ROLE supabase_storage_admin SET search_path TO storage, public, extensions;
+
 GRANT anon, authenticated, service_role TO authenticator;
 GRANT anon, authenticated, service_role TO postgres;
 -- Admin roles switch into the request role (SET ROLE) per request, so they need
