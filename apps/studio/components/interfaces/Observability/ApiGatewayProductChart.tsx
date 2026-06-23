@@ -3,6 +3,7 @@
 import dayjs from 'dayjs'
 import { ReactNode, useState } from 'react'
 import { Bar, Cell, BarChart as RechartBarChart, XAxis, YAxis } from 'recharts'
+import type { CategoricalChartState } from 'recharts/types/chart/types'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
 
 import {
@@ -21,10 +22,8 @@ const PRODUCT_CONFIG: Record<ApiGatewayProductKey, { label: string; color: strin
   realtime: { label: 'Realtime', color: 'hsl(var(--chart-blue))' },
 }
 
-const chartConfig: ChartConfig = API_GATEWAY_PRODUCT_KEYS.reduce((config, key) => {
-  config[key] = { label: PRODUCT_CONFIG[key].label, color: PRODUCT_CONFIG[key].color }
-  return config
-}, {} as ChartConfig)
+// PRODUCT_CONFIG already has the { label, color } shape ChartContainer expects
+const chartConfig: ChartConfig = PRODUCT_CONFIG
 
 export const ApiGatewayProductChart = ({
   data,
@@ -56,9 +55,9 @@ export const ApiGatewayProductChart = ({
       <ChartContainer className="h-full" config={chartConfig}>
         <RechartBarChart
           data={data}
-          onMouseMove={(e: any) => {
+          onMouseMove={(e: CategoricalChartState) => {
             if (e.activeTooltipIndex !== focusDataIndex) {
-              setFocusDataIndex(e.activeTooltipIndex)
+              setFocusDataIndex(e.activeTooltipIndex ?? null)
             }
           }}
           onMouseLeave={() => setFocusDataIndex(null)}

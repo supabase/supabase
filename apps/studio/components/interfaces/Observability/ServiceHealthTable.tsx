@@ -41,10 +41,14 @@ type ServiceData = {
   isLoading: boolean
 }
 
+// Both the per-level and the by-product charts only expose `timestamp` to the
+// click handler, so the shared contract is just that field.
+type ServiceChartClickDatum = { timestamp: string }
+
 export type ServiceHealthTableProps = {
   services: ServiceConfig[]
   serviceData: Record<string, ServiceData>
-  onBarClick: (logsUrl: string) => (datum: LogsBarChartDatum) => void
+  onBarClick: (logsUrl: string) => (datum: ServiceChartClickDatum) => void
   datetimeFormat: string
 }
 
@@ -90,7 +94,7 @@ const getSubtitle = (data: ServiceData) => {
 type ServiceCellProps = {
   service: ServiceConfig
   data: ServiceData
-  onBarClick: (datum: LogsBarChartDatum) => void
+  onBarClick: (datum: ServiceChartClickDatum) => void
   datetimeFormat: string
   className?: string
   // When provided, the cell renders the API Gateway traffic stacked by product
@@ -191,8 +195,7 @@ const ServiceCell = ({
             hideXAxis
             data={productChartData}
             DateTimeFormat={datetimeFormat}
-            // The bar-click handler only reads `timestamp`, shared by both datum shapes
-            onBarClick={(datum) => onBarClick(datum as unknown as LogsBarChartDatum)}
+            onBarClick={onBarClick}
             EmptyState={<ChartEmptyState className="h-full" description="No traffic" />}
           />
         ) : (

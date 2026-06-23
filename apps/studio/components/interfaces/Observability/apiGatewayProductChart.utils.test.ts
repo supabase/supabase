@@ -54,17 +54,32 @@ describe('buildApiGatewayProductData', () => {
     expect(result[1].storage).toBe(0)
   })
 
-  it('only includes the requested product keys', () => {
-    const result = buildApiGatewayProductData(
-      {
-        db: { eventChartData: [datum('2024-01-01T00:00:00Z', 10, 0, 0)] },
-        auth: { eventChartData: [datum('2024-01-01T00:00:00Z', 5, 0, 0)] },
-      },
-      ['db']
-    )
+  it('stacks every product in a shared bucket so the height equals the request total', () => {
+    const ts = '2024-01-01T00:00:00Z'
+    const result = buildApiGatewayProductData({
+      db: { eventChartData: [datum(ts, 10, 0, 0)] },
+      postgrest: { eventChartData: [datum(ts, 5, 1, 0)] },
+      auth: { eventChartData: [datum(ts, 4, 0, 0)] },
+      functions: { eventChartData: [datum(ts, 3, 0, 1)] },
+      storage: { eventChartData: [datum(ts, 2, 0, 0)] },
+      realtime: { eventChartData: [datum(ts, 1, 0, 0)] },
+    })
 
-    expect(result[0]).toEqual({ timestamp: '2024-01-01T00:00:00Z', db: 10 })
-    expect(result[0]).not.toHaveProperty('auth')
+    expect(result).toHaveLength(1)
+    const bucket = result[0]
+    const stackedHeight =
+      bucket.db + bucket.postgrest + bucket.auth + bucket.functions + bucket.storage + bucket.realtime
+    // 10 + 6 + 4 + 4 + 2 + 1
+    expect(stackedHeight).toBe(27)
+  })
+
+  it('ignores services that are not API Gateway products', () => {
+    const result = buildApiGatewayProductData({
+      data_api: { eventChartData: [datum('2024-01-01T00:00:00Z', 999, 0, 0)] },
+    })
+
+    // data_api is the gateway entry point, not a product, so it contributes no buckets
+    expect(result).toEqual([])
   })
 })
 
@@ -94,14 +109,11 @@ describe('calculateApiGatewayAggregate', () => {
     expect(result.successRate).toBe(80)
   })
 
-  it('respects a custom product key list', () => {
-    const result = calculateApiGatewayAggregate(
-      {
-        db: { total: 80, errorCount: 4, warningCount: 0 },
-        auth: { total: 20, errorCount: 0, warningCount: 16 },
-      },
-      ['db']
-    )
+  it('ignores services that are not API Gateway products', () => {
+    const result = calculateApiGatewayAggregate({
+      db: { total: 80, errorCount: 4, warningCount: 0 },
+      data_api: { total: 1000, errorCount: 50, warningCount: 50 },
+    })
 
     expect(result.total).toBe(80)
     expect(result.errorCount).toBe(4)

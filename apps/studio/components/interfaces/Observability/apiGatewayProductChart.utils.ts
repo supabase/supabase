@@ -27,24 +27,29 @@ type ServiceTotals = { total: number; errorCount: number; warningCount: number }
 const bucketTotal = (datum: LogsBarChartDatum): number =>
   datum.ok_count + datum.warning_count + datum.error_count
 
+/** A fresh bucket with every product zeroed, so each datum always has the full product shape */
+const emptyDatum = (timestamp: string): ApiGatewayProductDatum => ({
+  timestamp,
+  db: 0,
+  postgrest: 0,
+  auth: 0,
+  functions: 0,
+  storage: 0,
+  realtime: 0,
+})
+
 /**
  * Merges every product's per-level timeseries into one stacked-by-product series.
  * Each bar segment is a product's total event count for that timestamp bucket, so
  * the stacked bar height equals the aggregate request count for the API Gateway.
+ * Services not in API_GATEWAY_PRODUCT_KEYS (e.g. data_api itself) are ignored.
  */
 export const buildApiGatewayProductData = (
-  serviceData: Partial<Record<ServiceKey, ServiceChartData>>,
-  productKeys: readonly ApiGatewayProductKey[] = API_GATEWAY_PRODUCT_KEYS
+  serviceData: Partial<Record<ServiceKey, ServiceChartData>>
 ): ApiGatewayProductDatum[] => {
   const bucketsByTimestamp = new Map<string, ApiGatewayProductDatum>()
 
-  const emptyDatum = (timestamp: string): ApiGatewayProductDatum => {
-    const datum = { timestamp } as ApiGatewayProductDatum
-    for (const key of productKeys) datum[key] = 0
-    return datum
-  }
-
-  for (const productKey of productKeys) {
+  for (const productKey of API_GATEWAY_PRODUCT_KEYS) {
     const rows = serviceData[productKey]?.eventChartData ?? []
     for (const row of rows) {
       const existing = bucketsByTimestamp.get(row.timestamp) ?? emptyDatum(row.timestamp)
@@ -63,8 +68,7 @@ export const buildApiGatewayProductData = (
  * row header numbers match the stacked-by-product chart exactly.
  */
 export const calculateApiGatewayAggregate = (
-  serviceData: Partial<Record<ServiceKey, ServiceTotals>>,
-  productKeys: readonly ApiGatewayProductKey[] = API_GATEWAY_PRODUCT_KEYS
+  serviceData: Partial<Record<ServiceKey, ServiceTotals>>
 ): {
   total: number
   errorCount: number
@@ -76,7 +80,7 @@ export const calculateApiGatewayAggregate = (
   let errorCount = 0
   let warningCount = 0
 
-  for (const productKey of productKeys) {
+  for (const productKey of API_GATEWAY_PRODUCT_KEYS) {
     const service = serviceData[productKey]
     if (!service) continue
     total += service.total
