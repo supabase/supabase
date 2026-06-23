@@ -126,6 +126,9 @@ if [ "$(run_sql -A -t -c "SELECT EXISTS (SELECT 1 FROM pg_available_extensions W
     echo "Seeding Vault secret on Postgres 15..."
     run_sql <<EOSQL
 CREATE EXTENSION IF NOT EXISTS supabase_vault;
+-- Pre-clean so a re-run after a mid-run failure (where the trailing cleanup
+-- never executed) does not abort on the unique (name) index.
+DELETE FROM vault.secrets WHERE name = '${VAULT_SECRET_NAME}';
 SELECT vault.create_secret('${VAULT_SECRET_VALUE}', '${VAULT_SECRET_NAME}', 'pg17 upgrade test');
 EOSQL
     pre_secret=$(run_sql -A -t -c "SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = '${VAULT_SECRET_NAME}';" | tr -d '\n')
