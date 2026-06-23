@@ -2,11 +2,11 @@ import dayjs from 'dayjs'
 import { ArrowLeft } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import ReactMarkdown from 'react-markdown'
 import type { PostReturnType, ProcessedBlogData, StaticAuthor, Tag } from 'types/post'
 import { Badge } from 'ui'
 
 import { CTASection } from '../CTASection'
+import { BlogTableOfContents } from '@/components/Blog/BlogTableOfContents'
 import DraftModeBanner from '@/components/Blog/DraftModeBanner'
 import ShareArticleActions from '@/components/Blog/ShareArticleActions'
 import BlogLinks from '@/components/LaunchWeek/7/BlogLinks'
@@ -79,20 +79,14 @@ const BlogPostRenderer = async ({
   const isLaunchWeek14 = blogMetaData.launchweek?.toString().toLocaleLowerCase() === '14'
   const isLaunchWeek15 = blogMetaData.launchweek?.toString().toLocaleLowerCase() === '15'
 
-  const toc = blogMetaData.toc && (
-    <div className="mb-4">
-      <p className="text-foreground-lighter text-sm font-normal mb-3">On this page</p>
-      <div className="prose-toc">
-        {blogMetaData.toc && (
-          <ReactMarkdown>
-            {typeof blogMetaData.toc === 'string'
-              ? (blogMetaData.toc as string)
-              : (blogMetaData.toc as { content: string }).content}
-          </ReactMarkdown>
-        )}
-      </div>
-    </div>
-  )
+  type TocJsonItem = { content: string; slug: string; lvl: number }
+
+  const rawToc = blogMetaData.toc as unknown as { json?: TocJsonItem[] } | string | undefined
+  const tocItems =
+    rawToc && typeof rawToc !== 'string' && Array.isArray(rawToc.json)
+      ? rawToc.json.map((h) => ({ title: h.content, url: `#${h.slug}`, depth: h.lvl }))
+      : []
+  const toc = tocItems.length > 0 ? <BlogTableOfContents items={tocItems} /> : null
 
   const imageUrl = getBlogThumbnailImage(blogMetaData, {
     fallbackToPlaceholder: false,

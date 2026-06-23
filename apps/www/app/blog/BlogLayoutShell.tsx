@@ -20,8 +20,12 @@ export default function BlogLayoutShell({
 
   return (
     <>
-      <BlogHero featuredPost={featuredPost} secondaryPosts={secondaryPosts} />
-      <main className="relative min-h-screen">{children}</main>
+      <Nav hideNavbar={false} />
+      <div className="relative w-full [--container-max-w:75rem]">
+        <BlogHero featuredPost={featuredPost} secondaryPosts={secondaryPosts} />
+        <main className="relative min-h-screen">{children}</main>
+      </div>
+      <Footer />
     </>
   )
 }
