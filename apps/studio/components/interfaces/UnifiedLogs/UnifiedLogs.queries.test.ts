@@ -17,20 +17,19 @@ const withFilters = (...entries: string[]) => ({ ...baseSearch, filter: entries 
 
 describe('UnifiedLogs.queries (OTEL flat)', () => {
   describe('getUnifiedLogsQuery', () => {
-    it('defaults to postgres + postgrest log types when none specified', () => {
+    it('defaults to postgres + edge log types when none specified', () => {
       const sql = getUnifiedLogsQuery(baseSearch)
-      expect(sql).toContain(`source = 'postgres_logs'`)
-      // postgrest = edge_logs filtered by /rest/ path
-      expect(sql).toContain(
-        `source = 'edge_logs' AND log_attributes['request.path'] LIKE '%/rest/%'`
-      )
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(`source = 'postgres_logs'`)
+      expect(where).toContain(`source = 'edge_logs'`)
+      // postgrest is no longer a default type
+      expect(where).not.toContain(`source = 'postgrest_logs'`)
     })
 
-    it('routes the `edge` log type to edge_logs without /rest/ or /storage/ paths', () => {
+    it('routes the `edge` log type to all edge_logs', () => {
       const sql = getUnifiedLogsQuery(withFilters('log_type:eq:edge'))
-      expect(sql).toContain(`NOT LIKE '%/rest/%'`)
-      expect(sql).toContain(`NOT LIKE '%/storage/%'`)
       const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(`source = 'edge_logs'`)
       expect(where).not.toContain(`source = 'postgres_logs'`)
     })
 
