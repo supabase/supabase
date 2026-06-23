@@ -42,10 +42,6 @@ vi.mock('@/components/ui/PartnerIcon', () => ({
     ),
 }))
 
-vi.mock('@/data/prefetchers/project.$ref', () => ({
-  ProjectIndexPageLink: () => null,
-}))
-
 vi.mock('@/hooks/custom-content/useCustomContent', () => ({
   useCustomContent: () => ({ infraAwsNimbusLabel: 'AWS Nimbus' }),
 }))

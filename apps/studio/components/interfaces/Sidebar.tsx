@@ -36,7 +36,6 @@ import {
   generateSettingsRoutes,
   generateToolRoutes,
 } from '@/components/layouts/Navigation/NavigationBar/NavigationBar.utils'
-import { ProjectIndexPageLink } from '@/data/prefetchers/project.$ref'
 import { useHideSidebar } from '@/hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLints } from '@/hooks/misc/useLints'
@@ -288,7 +287,6 @@ const ProjectLinks = () => {
             label: 'Project Overview',
             icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: `/project/${ref}`,
-            linkElement: <ProjectIndexPageLink projectRef={ref} />,
             shortcutId: SHORTCUT_IDS.NAV_HOME,
           }}
         />

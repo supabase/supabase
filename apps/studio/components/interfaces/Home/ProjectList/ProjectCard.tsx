@@ -18,7 +18,6 @@ import { ComputeBadgeWrapper } from '@/components/ui/ComputeBadgeWrapper'
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import type { IntegrationProjectConnection } from '@/data/integrations/integrations.types'
 import { getManagedByFromOrganizationPartner } from '@/data/organizations/managed-by-utils'
-import { ProjectIndexPageLink } from '@/data/prefetchers/project.$ref'
 import { getComputeSize, OrgProject } from '@/data/projects/org-projects-infinite-query'
 import type { ResourceWarning } from '@/data/usage/resource-warnings-query'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
@@ -155,7 +154,6 @@ export const ProjectCard = ({
           footer={
             <ProjectCardStatus projectStatus={projectStatus} resourceWarnings={resourceWarnings} />
           }
-          containerElement={<ProjectIndexPageLink projectRef={projectRef} />}
         />
       </li>
     </>
