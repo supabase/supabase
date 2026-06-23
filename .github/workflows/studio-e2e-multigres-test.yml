@@ -1,0 +1,167 @@
+name: Selfhosted Studio E2E Tests (Multigres)
+
+# Runs the Studio E2E suite against the Supabase self-hosted stack backed by an
+# external Multigres database, using the harness in e2e/studio/multigres/.
+# The test step is non-gating: it posts a Playwright report on the PR rather than
+# blocking it.
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'e2e/studio/multigres/**'
+      - '.github/workflows/studio-e2e-multigres-test.yml'
+
+# Cancel old builds on new commit for same workflow + branch/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: 'E2E tests (Multigres)'
+    timeout-minutes: 60
+    runs-on: blacksmith-8vcpu-ubuntu-2404
+    strategy:
+      fail-fast: false
+      matrix:
+        shardIndex: [1, 2]
+        shardTotal: [2]
+    outputs:
+      tests_ran: ${{ steps.detect.outputs.ran }}
+
+    permissions:
+      contents: read
+      id-token: write
+
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      # Point the e2e suite at the Multigres-backed stack (.env.local is
+      # gitignored, so we set these explicitly). Keys are the self-hosted demo
+      # keys from docker/.env.example, matching e2e/studio/multigres/multigres.env.
+      STUDIO_URL: http://localhost:8082
+      API_URL: http://localhost:8000
+      IS_PLATFORM: 'false'
+      ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE
+      SERVICE_ROLE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJzZXJ2aWNlX3JvbGUiLAogICAgImlzcyI6ICJzdXBhYmFzZS1kZW1vIiwKICAgICJpYXQiOiAxNjQxNzY5MjAwLAogICAgImV4cCI6IDE3OTk1MzU2MDAKfQ.DaYlNEoUrrEn2Ig7tqibS-PHK5vgusbcbo7X36XVt4Q
+
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          persist-credentials: false
+
+      - name: Mark tests as run
+        id: detect
+        run: echo "ran=true" >> "$GITHUB_OUTPUT"
+
+      - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Use Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright Browsers
+        run: pnpm -C e2e/studio exec playwright install chromium --with-deps --only-shell
+
+      - name: Start Multigres
+        run: |
+          git clone --depth 1 https://github.com/multigres/multigres.git /tmp/multigres
+          cd /tmp/multigres
+          echo "Multigres ref: $(git rev-parse --short HEAD)"
+          docker compose up --build -d
+          echo "Waiting for Multigres to become healthy..."
+          for i in $(seq 1 60); do
+            status=$(docker inspect -f '{{.State.Health.Status}}' multigres-multigres-1 2>/dev/null || echo "missing")
+            echo "  attempt $i: $status"
+            [ "$status" = "healthy" ] && break
+            [ "$status" = "unhealthy" ] && { docker logs multigres-multigres-1 | tail -50; exit 1; }
+            sleep 5
+          done
+          [ "$(docker inspect -f '{{.State.Health.Status}}' multigres-multigres-1)" = "healthy" ]
+
+      - name: Start Supabase self-hosted stack against Multigres
+        run: pnpm e2e:multigres
+
+      - name: Wait for stack readiness
+        run: |
+          echo "Waiting for Studio (:8082) and kong (:8000)..."
+          for i in $(seq 1 40); do
+            studio=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8082/project/default || echo 000)
+            api=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8000/ || echo 000)
+            echo "  attempt $i: studio=$studio api=$api"
+            [ "$studio" = "200" ] && break
+            sleep 3
+          done
+          cd e2e/studio/multigres && ./setup.sh status
+
+      - name: 🚀 Run Playwright tests against Multigres-backed studio (non-gating)
+        id: playwright
+        continue-on-error: true
+        run: pnpm e2e --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+
+      - name: Stack diagnostics on test failure
+        if: steps.playwright.outcome != 'success'
+        run: |
+          cd e2e/studio/multigres && ./setup.sh status || true
+          for svc in supabase-auth supabase-rest supabase-storage realtime-dev.supabase-realtime supabase-meta; do
+            echo "===== logs: $svc ====="; docker logs "$svc" 2>&1 | tail -40 || true
+          done
+
+      - name: Upload blob report to GitHub Actions Artifacts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: blob-report-${{ matrix.shardIndex }}
+          path: e2e/studio/blob-report
+          retention-days: 7
+
+  merge-reports:
+    name: 'E2E reports (Multigres)'
+    # Always merge, even if some shards reported failures (expected on Multigres).
+    if: ${{ !cancelled() && needs.test.outputs.tests_ran == 'true' }}
+    needs: [test]
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          persist-credentials: false
+      - name: Use Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Download blob reports from GitHub Actions Artifacts
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v 5.0.0
+        with:
+          path: e2e/studio/blob-report
+          pattern: blob-report-*
+          merge-multiple: true
+
+      - name: Merge Playwright reports
+        run: npx playwright merge-reports --config=e2e/studio/playwright.merge.config.ts -- e2e/studio/blob-report
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: playwright-artifacts
+          path: |
+            e2e/studio/playwright-report/
+            e2e/studio/test-results/
+          retention-days: 7
+
+      - name: Comment Playwright test results on PR
+        if: always() && github.event_name == 'pull_request' && !github.event.pull_request.head.repo.fork
+        uses: daun/playwright-report-comment@be9e270edd5ad86038604d3caa84a819a6ff6fed # v3.10.0
+        with:
+          report-file: e2e/studio/test-results/test-results.json
+          comment-title: '🎭 Playwright Test Results (Multigres)'
