@@ -65,10 +65,6 @@ function getContext(): RouterContext {
 }
 
 export function getRouter() {
-  // TEMP skew-test marker (REVERT before merge): a string the minifier keeps,
-  // so this build's chunk hashes differ from the previous deploy's — lets us
-  // test skew routing across a real deploy boundary.
-  console.info('[skew-test] build B')
   pinDeploymentForSession()
   registerChunkErrorBackstop()
 
