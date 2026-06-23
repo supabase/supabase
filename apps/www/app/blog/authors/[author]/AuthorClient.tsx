@@ -3,13 +3,15 @@
 import { type BlogView } from 'app/blog/blog-view'
 import BlogGridItem from 'components/Blog/BlogGridItem'
 import BlogListItem from 'components/Blog/BlogListItem'
-import BlogViewToggle from 'components/Blog/BlogViewToggle'
 import { Search } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { Suspense, useMemo, useState } from 'react'
 import type PostTypes from 'types/post'
 import { InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
+
+import BlogFilters from '../../../../components/Blog/BlogFilters'
+import SectionContainer from '../../../../components/Layouts/SectionContainer'
 
 interface Author {
   author_id: string
@@ -90,26 +92,15 @@ export default function AuthorClient({ author, authorId, blogs, initialView }: A
 
       {/* Filters row — divider above the header, search aligned with the view toggle */}
       <div className="sticky top-[65px] z-10 bg-background/80 backdrop-blur-sm border-b border-border">
-        <div className="mx-auto max-w-(--container-max-w,75rem) px-6">
-          <div className="py-3 flex flex-row items-center justify-between gap-2">
-            <div className="flex-1 max-w-[280px]">
-              <InputGroup className="w-full">
-                <InputGroupInput
-                  size="small"
-                  autoComplete="off"
-                  type="search"
-                  placeholder="Search posts"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <InputGroupAddon>
-                  <Search />
-                </InputGroupAddon>
-              </InputGroup>
-            </div>
-            <BlogViewToggle view={view} setView={setView} />
-          </div>
-        </div>
+        <SectionContainer className="py-3!">
+          <Suspense fallback={null}>
+            <BlogFilters
+              view={view}
+              setView={setView}
+              onFilterChange={(_, search) => setSearchTerm(search ?? '')}
+            />
+          </Suspense>
+        </SectionContainer>
       </div>
 
       {/* Posts */}

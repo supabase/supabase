@@ -35,12 +35,14 @@ export default function CategoryClient({
     <div>
       {/* Filters row — categories navigate; search filters within this category */}
       <div className="sticky top-[65px] z-10 bg-background/80 backdrop-blur-sm border-b border-border">
-        <SectionContainer className="py-0!">
-          <div className="py-3">
-            <Suspense fallback={null}>
-              <BlogFilters view={view} setView={setView} onSearch={setSearchTerm} />
-            </Suspense>
-          </div>
+        <SectionContainer className="py-3!">
+          <Suspense fallback={null}>
+            <BlogFilters
+              view={view}
+              setView={setView}
+              onFilterChange={(_, search) => setSearchTerm(search ?? '')}
+            />
+          </Suspense>
         </SectionContainer>
       </div>
 
