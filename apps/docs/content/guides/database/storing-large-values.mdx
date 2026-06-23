@@ -24,7 +24,7 @@ A column's storage strategy controls this:
 
 <Admonition type="note">
 
-LLM payloads are usually high-entropy and unique, so Postgres's default compression recovers little. The value still gets TOASTed — it just doesn't shrink much. That's why _how much_ you store matters more than compression settings.
+LLM payloads are usually high-entropy and unique, so Postgres's default compression recovers little. The value still gets TOASTed — it doesn't shrink much. That's why _how much_ you store matters more than compression settings.
 
 </Admonition>
 
@@ -33,7 +33,7 @@ LLM payloads are usually high-entropy and unique, so Postgres's default compress
 - A table is far larger than its row count suggests, and `pg_total_relation_size` is dominated by TOAST.
 - Disk usage doesn't drop after deleting many rows. This is expected Postgres behavior — see [Reclaiming space](#reclaiming-space) below for why, and how to recover it.
 
-## Decide: keep in Postgres, or offload to Storage
+## Keep in Postgres or offload to Storage
 
 Use this as a decision framework, not a rule:
 
