@@ -365,7 +365,7 @@ const ExtensionNotInstalled = ({
             <Link
               href={
                 databaseNeedsUpgrading
-                  ? `/project/${projectRef}/settings/infrastructure`
+                  ? `/project/${projectRef}/database/settings#service-versions`
                   : `/project/${projectRef}/database/extensions?filter=wrappers`
               }
             >
@@ -414,7 +414,7 @@ const ExtensionNeedsUpgrade = ({
             <Link
               href={
                 databaseNeedsUpgrading
-                  ? `/project/${projectRef}/settings/infrastructure`
+                  ? `/project/${projectRef}/database/settings#service-versions`
                   : `/project/${projectRef}/database/extensions?filter=wrappers`
               }
             >

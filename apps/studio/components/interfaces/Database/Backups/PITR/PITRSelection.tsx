@@ -95,15 +95,13 @@ export const PITRSelection = () => {
                 Unable to restore from PITR as project has read replicas enabled
               </AlertTitle>
               <AlertDescription>
-                You will need to remove all read replicas first from your project's infrastructure
+                You will need to remove all read replicas first from your project's replication
                 settings prior to starting a PITR restore.
               </AlertDescription>
               <div className="flex items-center gap-x-2 mt-2">
                 {/* [Joshen] Ideally we have some links to a docs to explain why so */}
                 <Button variant="default">
-                  <Link href={`/project/${ref}/settings/infrastructure`}>
-                    Infrastructure settings
-                  </Link>
+                  <Link href={`/project/${ref}/database/replication`}>Replication settings</Link>
                 </Button>
               </div>
             </Alert>

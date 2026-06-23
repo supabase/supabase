@@ -14,6 +14,7 @@ import { useBackupsQuery } from '@/data/database/backups-query'
 import { DatabaseMigration, useMigrationsQuery } from '@/data/database/migrations-query'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
 import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
+import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
@@ -22,6 +23,7 @@ import { EMPTY_ARR } from '@/lib/void'
 export const ActivityStats = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const { isHighAvailability } = useHighAvailability()
   const { data: organization } = useSelectedOrganizationQuery()
   const { data: resourceWarnings } = useResourceWarningsQuery({ slug: organization?.slug })
   const projectResourceWarnings = resourceWarnings?.find((warning) => warning.project === ref)
@@ -109,7 +111,7 @@ export const ActivityStats = () => {
               ) : (
                 <p className="text-foreground-lighter">Unknown</p>
               )}
-              {project?.high_availability && <HighAvailabilityBadge />}
+              {isHighAvailability && <HighAvailabilityBadge />}
             </div>
           }
         />

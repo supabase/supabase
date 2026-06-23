@@ -124,7 +124,7 @@ const AddNewWrapperCTA = () => {
           <Link
             href={
               databaseNeedsUpgrading
-                ? `/project/${project?.ref}/settings/infrastructure`
+                ? `/project/${project?.ref}/database/settings#service-versions`
                 : `/project/${project?.ref}/database/extensions?filter=wrappers`
             }
           >

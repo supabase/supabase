@@ -78,6 +78,7 @@
     "ai": "^6.0.174",
     "ai-commands": "workspace:*",
     "awesome-debounce-promise": "^2.1.0",
+    "cobe": "^2.0.1",
     "common": "workspace:*",
     "common-tags": "^1.8.2",
     "config": "workspace:*",

@@ -1,38 +1,52 @@
-import { InfrastructureActivity } from '@/components/interfaces/Settings/Infrastructure/InfrastructureActivity'
-import { InfrastructureInfo } from '@/components/interfaces/Settings/Infrastructure/InfrastructureInfo'
-import { DefaultLayout } from '@/components/layouts/DefaultLayout'
-import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
+import { useEffect, useState } from 'react'
 import {
-  ScaffoldContainer,
-  ScaffoldDescription,
-  ScaffoldDivider,
-  ScaffoldHeader,
-  ScaffoldTitle,
-} from '@/components/layouts/Scaffold'
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+
+import { DiskManagementForm } from '@/components/interfaces/DiskManagement/DiskManagementForm'
+import { ProjectInfrastructureDiagram } from '@/components/interfaces/Settings/Infrastructure/ProjectInfrastructureDiagram'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from '@/types'
 
-const ProjectInfrastructure: NextPageWithLayout = () => {
+const InfrastructureSettings: NextPageWithLayout = () => {
+  const { data: project } = useSelectedProjectQuery()
+  const [isHighAvailability, setIsHighAvailability] = useState(false)
+
+  useEffect(() => {
+    setIsHighAvailability(project?.high_availability ?? false)
+  }, [project?.high_availability])
+
   return (
     <>
-      <ScaffoldContainer>
-        <ScaffoldHeader>
-          <ScaffoldTitle>Infrastructure</ScaffoldTitle>
-          <ScaffoldDescription>
-            General information regarding your server instance
-          </ScaffoldDescription>
-        </ScaffoldHeader>
-      </ScaffoldContainer>
-      <InfrastructureInfo />
-      <ScaffoldDivider />
-      <InfrastructureActivity />
+      <PageHeader size="default" className="pb-12">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Infrastructure</PageHeaderTitle>
+            <PageHeaderDescription>
+              View and configure compute, disk, and infrastructure for your project.
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+      <ProjectInfrastructureDiagram bottomOverlap isHighAvailability={isHighAvailability} />
+      <DiskManagementForm
+        chartsClassName="-mt-16 relative z-10"
+        isHighAvailability={isHighAvailability}
+        onHighAvailabilityChange={setIsHighAvailability}
+      />
     </>
   )
 }
 
-ProjectInfrastructure.getLayout = (page) => (
+InfrastructureSettings.getLayout = (page) => (
   <DefaultLayout>
     <SettingsLayout title="Infrastructure">{page}</SettingsLayout>
   </DefaultLayout>
 )
-
-export default ProjectInfrastructure
+export default InfrastructureSettings

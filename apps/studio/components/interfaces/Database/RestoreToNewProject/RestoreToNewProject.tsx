@@ -158,7 +158,7 @@ export const RestoreToNewProject = () => {
         <Markdown
           className="max-w-full"
           content={`Restore to new project is only available for Postgres 15 and above.  
-            Go to [infrastructure settings](/project/${project?.ref}/settings/infrastructure)
+            Go to [database settings](/project/${project?.ref}/database/settings#service-versions)
             to upgrade your database version.
           `}
         />

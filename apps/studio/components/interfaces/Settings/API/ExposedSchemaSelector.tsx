@@ -17,6 +17,10 @@ import {
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { useSchemasQuery } from '@/data/database/schemas-query'
+import {
+  filterSchemasForHighAvailability,
+  useHighAvailability,
+} from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
 import { pluralize } from '@/lib/helpers'
@@ -43,6 +47,7 @@ export const ExposedSchemaSelector = ({
   const [open, setOpen] = useState(false)
 
   const { data: project } = useSelectedProjectQuery()
+  const { isHighAvailability } = useHighAvailability()
 
   const {
     data: allSchemas,
@@ -56,10 +61,11 @@ export const ExposedSchemaSelector = ({
 
   const schemas = useMemo(
     () =>
-      (allSchemas ?? [])
-        .filter((s) => !internalSchemasCannotExpose.has(s.name))
-        .sort((a, b) => a.name.localeCompare(b.name)),
-    [allSchemas]
+      filterSchemasForHighAvailability(
+        (allSchemas ?? []).filter((s) => !internalSchemasCannotExpose.has(s.name)),
+        isHighAvailability
+      ).sort((a, b) => a.name.localeCompare(b.name)),
+    [allSchemas, isHighAvailability]
   )
 
   const missingExposedSchema = useMemo(

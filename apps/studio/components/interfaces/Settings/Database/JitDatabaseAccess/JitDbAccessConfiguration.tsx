@@ -375,7 +375,9 @@ export const JitDbAccessConfiguration = () => {
               actions={
                 unavailableReason === 'postgres_upgrade_required' && ref ? (
                   <Button variant="default" asChild>
-                    <Link href={`/project/${ref}/settings/infrastructure`}>Upgrade Postgres</Link>
+                    <Link href={`/project/${ref}/database/settings#service-versions`}>
+                      Upgrade Postgres
+                    </Link>
                   </Button>
                 ) : (
                   <Button variant="default" asChild>

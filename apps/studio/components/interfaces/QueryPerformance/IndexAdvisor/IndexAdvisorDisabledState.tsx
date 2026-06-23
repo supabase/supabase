@@ -77,7 +77,9 @@ export const IndexAdvisorDisabledState = () => {
         <div className="flex items-center gap-x-2">
           {indexAdvisor === undefined ? (
             <Button asChild variant="default">
-              <Link href={`/project/${ref}/settings/infrastructure`}>Upgrade Postgres version</Link>
+              <Link href={`/project/${ref}/database/settings#service-versions`}>
+                Upgrade Postgres version
+              </Link>
             </Button>
           ) : (
             <Button

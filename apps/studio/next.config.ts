@@ -215,6 +215,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/project/:ref/settings/compute-and-disk',
+        destination: '/project/:ref/settings/infrastructure',
+        permanent: true,
+      },
+      {
         source: '/project/:ref/auth/settings',
         destination: '/project/:ref/auth/users',
         permanent: true,
@@ -252,7 +257,7 @@ const nextConfig = {
             value: 'computeInstance',
           },
         ],
-        destination: '/project/:ref/settings/compute-and-disk',
+        destination: '/project/:ref/settings/infrastructure',
         permanent: true,
       },
       {

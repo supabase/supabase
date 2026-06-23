@@ -22,6 +22,10 @@ import {
 
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import {
+  filterSchemasForHighAvailability,
+  useHighAvailability,
+} from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 type SchemaSelectorProps = Omit<ComponentPropsWithoutRef<'div'>, 'onSelect'> & {
@@ -74,6 +78,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
     )
 
     const { data: project } = useSelectedProjectQuery()
+    const { isHighAvailability } = useHighAvailability()
     const {
       data,
       isPending: isSchemasLoading,
@@ -86,9 +91,10 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
       connectionString: project?.connectionString,
     })
 
-    const schemas = (data || [])
-      .filter((schema) => !excludedSchemas.includes(schema.name))
-      .sort((a, b) => a.name.localeCompare(b.name))
+    const schemas = filterSchemasForHighAvailability(
+      (data || []).filter((schema) => !excludedSchemas.includes(schema.name)),
+      isHighAvailability
+    ).sort((a, b) => a.name.localeCompare(b.name))
 
     return (
       <div ref={ref} className={className} {...rest}>

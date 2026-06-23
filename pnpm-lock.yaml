@@ -997,6 +997,9 @@ importers:
       awesome-debounce-promise:
         specifier: ^2.1.0
         version: 2.1.0
+      cobe:
+        specifier: ^2.0.1
+        version: 2.0.1
       common:
         specifier: workspace:*
         version: link:../../packages/common
@@ -9826,6 +9829,9 @@ packages:
 
   cobe@0.6.5:
     resolution: {integrity: sha512-MA8bu81EFY6JjQpj+FovEuhyJ25khx2Q7Lh+ot/UkCJe5yKyDgzdc6u2lGZIOmsZTXK6Itg1i4lQZIJZbPWnAg==}
+
+  cobe@2.0.1:
+    resolution: {integrity: sha512-aaa6vcIlaC8C1SF50LDH0Anybo/EAXnrxqe+bwvr4+YUtZydqjeBjTTD7ziCCkbRrRGSns3I3F6cZsf3W+L+ag==}
 
   code-block-writer@13.0.1:
     resolution: {integrity: sha512-c5or4P6erEA69TxaxTNcHUNcIn+oyxSRTOWV+pSYF+z4epXqNvwvJ70XPGjPNgue83oAFAPBRQYwpAJ/Hpe/Sg==}
@@ -26440,6 +26446,8 @@ snapshots:
   cobe@0.6.5:
     dependencies:
       phenomenon: 1.6.0
+
+  cobe@2.0.1: {}
 
   code-block-writer@13.0.1: {}
 

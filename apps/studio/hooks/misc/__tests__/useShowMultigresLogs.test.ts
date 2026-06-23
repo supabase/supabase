@@ -4,26 +4,26 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useShowMultigresLogs } from '../useShowMultigresLogs'
 
 const mockUseFlag = vi.fn()
-const mockUseIsHighAvailability = vi.fn()
+const mockUseHighAvailability = vi.fn()
 
 vi.mock('common', async (importOriginal) => ({
   ...(await importOriginal<typeof import('common')>()),
   useFlag: (name: string) => mockUseFlag(name),
 }))
 
-vi.mock('../useSelectedProject', () => ({
-  useIsHighAvailability: () => mockUseIsHighAvailability(),
+vi.mock('../useHighAvailability', () => ({
+  useHighAvailability: () => mockUseHighAvailability(),
 }))
 
 describe('useShowMultigresLogs', () => {
   beforeEach(() => {
     mockUseFlag.mockReset()
-    mockUseIsHighAvailability.mockReset()
+    mockUseHighAvailability.mockReset()
   })
 
   it('returns true only when the multigresLogs flag and high availability are both enabled', () => {
     mockUseFlag.mockReturnValue(true)
-    mockUseIsHighAvailability.mockReturnValue(true)
+    mockUseHighAvailability.mockReturnValue({ isHighAvailability: true })
 
     const { result } = renderHook(() => useShowMultigresLogs())
 
@@ -33,7 +33,7 @@ describe('useShowMultigresLogs', () => {
 
   it('returns false when the flag is off, even on a high availability project', () => {
     mockUseFlag.mockReturnValue(false)
-    mockUseIsHighAvailability.mockReturnValue(true)
+    mockUseHighAvailability.mockReturnValue({ isHighAvailability: true })
 
     const { result } = renderHook(() => useShowMultigresLogs())
 
@@ -42,7 +42,7 @@ describe('useShowMultigresLogs', () => {
 
   it('returns false when the project is not high availability, even with the flag on', () => {
     mockUseFlag.mockReturnValue(true)
-    mockUseIsHighAvailability.mockReturnValue(false)
+    mockUseHighAvailability.mockReturnValue({ isHighAvailability: false })
 
     const { result } = renderHook(() => useShowMultigresLogs())
 
@@ -51,7 +51,7 @@ describe('useShowMultigresLogs', () => {
 
   it('returns false when both the flag and high availability are off', () => {
     mockUseFlag.mockReturnValue(false)
-    mockUseIsHighAvailability.mockReturnValue(false)
+    mockUseHighAvailability.mockReturnValue({ isHighAvailability: false })
 
     const { result } = renderHook(() => useShowMultigresLogs())
 

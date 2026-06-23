@@ -30,10 +30,17 @@ import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 
 interface ReadReplicaRow {
   replica: Database
+  displayName?: string
+  readOnly?: boolean
   onUpdateReplica: () => void
 }
 
-export const ReadReplicaRow = ({ replica, onUpdateReplica }: ReadReplicaRow) => {
+export const ReadReplicaRow = ({
+  replica,
+  displayName,
+  readOnly = false,
+  onUpdateReplica,
+}: ReadReplicaRow) => {
   const { ref } = useParams()
   const { identifier, region, status } = replica
   const formattedId = formatDatabaseID(identifier ?? '')
@@ -48,7 +55,7 @@ export const ReadReplicaRow = ({ replica, onUpdateReplica }: ReadReplicaRow) => 
       projectRef: ref,
       connectionString: replica.connectionString,
     },
-    { enabled: status === REPLICA_STATUS.ACTIVE_HEALTHY }
+    { enabled: !readOnly && status === REPLICA_STATUS.ACTIVE_HEALTHY }
   )
 
   const [showConfirmRestart, setShowConfirmRestart] = useState(false)
@@ -68,7 +75,7 @@ export const ReadReplicaRow = ({ replica, onUpdateReplica }: ReadReplicaRow) => 
 
         <TableCell>
           <div>
-            <p>Read Replica (ID: {formattedId})</p>
+            <p>{displayName ?? `Read Replica (ID: ${formattedId})`}</p>
             <Tooltip>
               <TooltipTrigger asChild>
                 <p className="text-foreground-lighter w-fit">{regionMeta?.displayName}</p>
@@ -96,7 +103,7 @@ export const ReadReplicaRow = ({ replica, onUpdateReplica }: ReadReplicaRow) => 
         </TableCell>
 
         <TableCell>
-          {isErrorLag || status !== REPLICA_STATUS.ACTIVE_HEALTHY ? (
+          {readOnly || isErrorLag || status !== REPLICA_STATUS.ACTIVE_HEALTHY ? (
             <Minus size={18} className="text-foreground-lighter" />
           ) : isLoadingLag ? (
             <ShimmeringLoader />
@@ -115,51 +122,57 @@ export const ReadReplicaRow = ({ replica, onUpdateReplica }: ReadReplicaRow) => 
               asChild
               variant="default"
               className="relative"
-              disabled={status === 'GOING_DOWN'}
+              disabled={readOnly || status === 'GOING_DOWN'}
             >
               <Link href={`/project/${ref}/database/replication/replica/${replica.identifier}`}>
                 View replication
               </Link>
             </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="default" icon={<MoreVertical />} className="w-7" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52">
-                <DropdownMenuItem
-                  className="gap-x-2"
-                  disabled={status !== 'ACTIVE_HEALTHY'}
-                  onClick={() => setShowConfirmRestart(true)}
-                >
-                  <RotateCcw size={14} />
-                  <span>Restart replica</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="gap-x-2"
-                  disabled={status === 'GOING_DOWN'}
-                  onClick={() => setShowConfirmDrop(true)}
-                >
-                  <Trash size={14} />
-                  <span>Drop replica</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {!readOnly && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="default" icon={<MoreVertical />} className="w-7" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-52">
+                  <DropdownMenuItem
+                    className="gap-x-2"
+                    disabled={status !== 'ACTIVE_HEALTHY'}
+                    onClick={() => setShowConfirmRestart(true)}
+                  >
+                    <RotateCcw size={14} />
+                    <span>Restart replica</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="gap-x-2"
+                    disabled={status === 'GOING_DOWN'}
+                    onClick={() => setShowConfirmDrop(true)}
+                  >
+                    <Trash size={14} />
+                    <span>Drop replica</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </TableCell>
       </TableRow>
 
-      <DropReplicaConfirmationModal
-        selectedReplica={showConfirmDrop ? replica : undefined}
-        onSuccess={() => onUpdateReplica()}
-        onCancel={() => setShowConfirmDrop(false)}
-      />
+      {!readOnly && (
+        <>
+          <DropReplicaConfirmationModal
+            selectedReplica={showConfirmDrop ? replica : undefined}
+            onSuccess={() => onUpdateReplica()}
+            onCancel={() => setShowConfirmDrop(false)}
+          />
 
-      <RestartReplicaConfirmationModal
-        selectedReplica={showConfirmRestart ? replica : undefined}
-        onSuccess={() => onUpdateReplica()}
-        onCancel={() => setShowConfirmRestart(false)}
-      />
+          <RestartReplicaConfirmationModal
+            selectedReplica={showConfirmRestart ? replica : undefined}
+            onSuccess={() => onUpdateReplica()}
+            onCancel={() => setShowConfirmRestart(false)}
+          />
+        </>
+      )}
     </>
   )
 }

@@ -177,7 +177,7 @@ export const DatabaseSelector = ({
                         <TooltipContent side="right" className="w-80">
                           <Markdown
                             className="text-xs text-foreground"
-                            content={`Replica unable to accept requests as its ${status}. [View infrastructure settings](/project/${projectRef}/settings/infrastructure) for more information.`}
+                            content={`Replica unable to accept requests as its ${status}. [View compute and disk settings](/project/${projectRef}/settings/infrastructure) for more information.`}
                           />
                         </TooltipContent>
                       </Tooltip>

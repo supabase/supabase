@@ -1,10 +1,9 @@
-import { ReactFlowProvider } from '@xyflow/react'
 import Link from 'next/link'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { InstanceConfiguration } from '../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
 import { ActivityStats } from '@/components/interfaces/ProjectHome/ActivityStats'
 import { ProjectConnectionPopover } from '@/components/interfaces/ProjectHome/ProjectConnectionPopover'
+import { ProjectInfrastructureDiagram } from '@/components/interfaces/Settings/Infrastructure/ProjectInfrastructureDiagram'
 import { ProjectPausedState } from '@/components/layouts/ProjectLayout/PausedState/ProjectPausedState'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { ProjectUpgradeFailedBanner } from '@/components/ui/ProjectUpgradeFailedBanner'
@@ -88,12 +87,10 @@ export const TopSection = () => {
           <div>
             <div
               className={cn(
-                'w-full h-[400px] md:h-[500px] border border-muted rounded-md overflow-hidden flex flex-col relative'
+                'w-full h-[360px] md:h-[400px] border border-muted rounded-md overflow-hidden flex flex-col relative'
               )}
             >
-              <ReactFlowProvider>
-                <InstanceConfiguration diagramOnly />
-              </ReactFlowProvider>
+              <ProjectInfrastructureDiagram embedded />
             </div>
           </div>
         )}

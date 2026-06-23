@@ -11,7 +11,6 @@ import { RegistryDefinations } from '../types'
 export const PROJECT_SETTINGS_NAV_SHORTCUT_IDS = {
   NAV_PROJECT_SETTINGS_GENERAL: 'nav.project-settings-general',
   NAV_PROJECT_SETTINGS_COMPUTE_AND_DISK: 'nav.project-settings-compute-and-disk',
-  NAV_PROJECT_SETTINGS_INFRASTRUCTURE: 'nav.project-settings-infrastructure',
   NAV_PROJECT_SETTINGS_INTEGRATIONS: 'nav.project-settings-integrations',
   NAV_PROJECT_SETTINGS_WEBHOOKS: 'nav.project-settings-webhooks',
   NAV_PROJECT_SETTINGS_API_KEYS: 'nav.project-settings-api-keys',
@@ -34,15 +33,8 @@ export const projectSettingsNavRegistry: RegistryDefinations<ProjectSettingsNavS
   },
   [PROJECT_SETTINGS_NAV_SHORTCUT_IDS.NAV_PROJECT_SETTINGS_COMPUTE_AND_DISK]: {
     id: PROJECT_SETTINGS_NAV_SHORTCUT_IDS.NAV_PROJECT_SETTINGS_COMPUTE_AND_DISK,
-    label: 'Go to Compute and Disk',
-    sequence: ['S', 'C'],
-    showInSettings: false,
-    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_PROJECT_SETTINGS,
-  },
-  [PROJECT_SETTINGS_NAV_SHORTCUT_IDS.NAV_PROJECT_SETTINGS_INFRASTRUCTURE]: {
-    id: PROJECT_SETTINGS_NAV_SHORTCUT_IDS.NAV_PROJECT_SETTINGS_INFRASTRUCTURE,
     label: 'Go to Infrastructure',
-    sequence: ['S', 'I'],
+    sequence: ['S', 'C'],
     showInSettings: false,
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_PROJECT_SETTINGS,
   },

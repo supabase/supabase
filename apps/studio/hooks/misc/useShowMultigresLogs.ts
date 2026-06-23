@@ -1,6 +1,6 @@
 import { useFlag } from 'common'
 
-import { useIsHighAvailability } from './useSelectedProject'
+import { useHighAvailability } from './useHighAvailability'
 
 /**
  * Whether to surface the Multigres logs collection (sidebar, page, and Field
@@ -18,7 +18,7 @@ import { useIsHighAvailability } from './useSelectedProject'
  */
 export const useShowMultigresLogs = () => {
   const multigresLogsEnabled = useFlag('multigresLogs')
-  const isHighAvailability = useIsHighAvailability()
+  const { isHighAvailability } = useHighAvailability()
 
   return multigresLogsEnabled && isHighAvailability
 }

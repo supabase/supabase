@@ -226,7 +226,7 @@ export const CreateAnalyticsBucketForm = ({
                 <p className="prose max-w-full text-sm leading-normal!">
                   Update the <code className="text-code-inline">wrappers</code> extension by
                   upgrading your project from your{' '}
-                  <InlineLink href={`/project/${ref}/settings/infrastructure`}>
+                  <InlineLink href={`/project/${ref}/database/settings#service-versions`}>
                     project settings
                   </InlineLink>{' '}
                   before creating an Analytics bucket.{' '}

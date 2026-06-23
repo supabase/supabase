@@ -16,13 +16,13 @@ export const BranchingPostgresVersionNotice = () => {
         Your project needs to be on Postgres 15 to enable branching
       </AlertTitle>
       <AlertDescription>
-        Head over to your project's infrastructure settings to upgrade to the latest version of
-        Postgres before enabling branching.
+        Head over to your project's database settings to upgrade to the latest version of Postgres
+        before enabling branching.
       </AlertDescription>
       <AlertDescription>
         <Button size="tiny" variant="default" className="mt-4">
           <Link
-            href={`/project/${ref}/settings/infrastructure`}
+            href={`/project/${ref}/database/settings#service-versions`}
             onClick={() => snap.setShowCreateBranchModal(false)}
           >
             Head to project settings

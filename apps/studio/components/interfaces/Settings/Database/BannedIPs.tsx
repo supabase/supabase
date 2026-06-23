@@ -17,16 +17,22 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { HighAvailabilityDisabledSectionNotice } from '@/components/ui/HighAvailability/HighAvailabilityDisabledSectionNotice'
 import { useBannedIPsDeleteMutation } from '@/data/banned-ips/banned-ips-delete-mutations'
 import { useBannedIPsQuery } from '@/data/banned-ips/banned-ips-query'
 import { useUserIPAddressQuery } from '@/data/misc/user-ip-address-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import {
+  getHighAvailabilityDisabledTooltip,
+  useHighAvailability,
+} from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
 export const BannedIPs = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const { isHighAvailability } = useHighAvailability()
 
   const [selectedIPToUnban, setSelectedIPToUnban] = useState<string | null>(null) // Track the selected IP for unban
 
@@ -51,6 +57,11 @@ export const BannedIPs = () => {
       project_id: project?.id,
     },
   })
+
+  const isSectionDisabled = isHighAvailability || !canUnbanNetworks
+  const sectionDisabledReason = isHighAvailability
+    ? getHighAvailabilityDisabledTooltip('Network bans')
+    : 'You need additional permissions to unban networks'
 
   const { mutate: unbanIPs, isPending: isUnbanning } = useBannedIPsDeleteMutation({
     onSuccess: () => {
@@ -90,49 +101,53 @@ export const BannedIPs = () => {
           <DocsButton href={`${DOCS_URL}/reference/cli/supabase-network-bans`} />
         </PageSectionMeta>
         <PageSectionContent>
-          {ipListLoading ? (
-            <Card>
-              <CardContent className="space-y-4">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full" />
-              </CardContent>
-            </Card>
-          ) : ipListError ? (
-            <AlertError error={ipListError} subject="Failed to retrieve banned IP addresses" />
-          ) : ipList.banned_ipv4_addresses.length > 0 ? (
-            <Card>
-              {ipList.banned_ipv4_addresses.map((ip) => (
-                <CardContent key={ip} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-5">
-                    <Globe size={16} className="text-foreground-lighter" />
-                    <p className="text-sm font-mono">{ip}</p>
-                    {ip === userIPAddress && <Badge>Your IP address</Badge>}
-                  </div>
-                  <ButtonTooltip
-                    variant="default"
-                    disabled={!canUnbanNetworks}
-                    onClick={() => openConfirmationModal(ip)}
-                    tooltip={{
-                      content: {
-                        side: 'bottom',
-                        text: !canUnbanNetworks
-                          ? 'You need additional permissions to unban networks'
-                          : undefined,
-                      },
-                    }}
-                  >
-                    Unban IP
-                  </ButtonTooltip>
-                </CardContent>
-              ))}
-            </Card>
-          ) : (
-            <Card>
-              <CardContent className="text-foreground text-sm">
-                There are no banned IP addresses for your project
-              </CardContent>
-            </Card>
+          {isHighAvailability && (
+            <div className="mb-4">
+              <HighAvailabilityDisabledSectionNotice feature="Network bans" />
+            </div>
           )}
+          {!isHighAvailability &&
+            (ipListLoading ? (
+              <Card>
+                <CardContent className="space-y-4">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                </CardContent>
+              </Card>
+            ) : ipListError ? (
+              <AlertError error={ipListError} subject="Failed to retrieve banned IP addresses" />
+            ) : ipList.banned_ipv4_addresses.length > 0 ? (
+              <Card>
+                {ipList.banned_ipv4_addresses.map((ip) => (
+                  <CardContent key={ip} className="flex items-center justify-between">
+                    <div className="flex items-center space-x-5">
+                      <Globe size={16} className="text-foreground-lighter" />
+                      <p className="text-sm font-mono">{ip}</p>
+                      {ip === userIPAddress && <Badge>Your IP address</Badge>}
+                    </div>
+                    <ButtonTooltip
+                      variant="default"
+                      disabled={isSectionDisabled}
+                      onClick={() => openConfirmationModal(ip)}
+                      tooltip={{
+                        content: {
+                          side: 'bottom',
+                          text: isSectionDisabled ? sectionDisabledReason : undefined,
+                        },
+                      }}
+                    >
+                      Unban IP
+                    </ButtonTooltip>
+                  </CardContent>
+                ))}
+              </Card>
+            ) : (
+              <Card>
+                <CardContent className="text-foreground text-sm">
+                  There are no banned IP addresses for your project
+                </CardContent>
+              </Card>
+            ))}
         </PageSectionContent>
       </PageSection>
 

@@ -522,9 +522,9 @@ export const CreateBranchModal = () => {
                                     <InlineLink
                                       onClick={() => setShowCreateBranchModal(false)}
                                       className="pointer-events-auto"
-                                      href={`/project/${ref}/settings/compute-and-disk`}
+                                      href={`/project/${ref}/settings/infrastructure`}
                                     >
-                                      Compute and Disk
+                                      Infrastructure
                                     </InlineLink>
                                   </p>
                                 </TooltipContent>

@@ -22,6 +22,7 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
+import { getHighAvailabilityFailoverReplicas } from '../../Settings/Infrastructure/Infrastructure.mock'
 import { REPLICA_STATUS } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
@@ -35,6 +36,7 @@ import {
   useIsETLSnowflakePrivateAlpha,
 } from './useIsETLPrivateAlpha'
 import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
@@ -43,15 +45,24 @@ import { replicationKeys } from '@/data/replication/keys'
 import { fetchReplicationPipelineVersion } from '@/data/replication/pipeline-version-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
+import { HIGH_AVAILABILITY_REPLICATION_DISABLED_MESSAGES } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
-export const Destinations = () => {
+interface DestinationsProps {
+  readOnly?: boolean
+}
+
+export const Destinations = ({ readOnly = false }: DestinationsProps) => {
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
-
+  const { data: project } = useSelectedProjectQuery()
+  const addDestinationDisabledTooltip = readOnly
+    ? HIGH_AVAILABILITY_REPLICATION_DISABLED_MESSAGES.addDestinationTooltip
+    : undefined
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
@@ -73,7 +84,9 @@ export const Destinations = () => {
   const prefetchedRef = useRef(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const [filterString, setFilterString] = useState<string>('')
-  const [statusRefetchInterval, setStatusRefetchInterval] = useState<number | false>(5000)
+  const [statusRefetchInterval, setStatusRefetchInterval] = useState<number | false>(
+    readOnly ? false : 5000
+  )
   const [showDisableExternalReplicationDialog, setShowDisableExternalReplicationDialog] =
     useState(false)
 
@@ -91,24 +104,55 @@ export const Destinations = () => {
     })
   )
 
+  const failoverReplicas = useMemo(
+    () => (readOnly ? getHighAvailabilityFailoverReplicas(project?.region) : []),
+    [readOnly, project?.region]
+  )
+  const failoverReplicaDisplayNames = useMemo(
+    () =>
+      Object.fromEntries(
+        failoverReplicas.map(({ replica, displayName }) => [replica.identifier, displayName])
+      ),
+    [failoverReplicas]
+  )
+
   const {
     data: databases = [],
     error: databasesError,
-    isPending: isDatabasesLoading,
+    isLoading: isDatabasesLoading,
     isError: isDatabasesError,
     isSuccess: isDatabasesSuccess,
-  } = useReadReplicasQuery({ projectRef }, { refetchInterval: statusRefetchInterval })
-  const readReplicas = databases.filter((x) => x.identifier !== projectRef)
-  const hasReplicas = isDatabasesSuccess && readReplicas.length > 0
+  } = useReadReplicasQuery(
+    { projectRef },
+    {
+      enabled: !readOnly && !!projectRef,
+      refetchInterval: readOnly ? false : statusRefetchInterval,
+    }
+  )
+  const readReplicas = useMemo(() => {
+    if (readOnly) return failoverReplicas.map(({ replica }) => replica)
+    return databases.filter((database) => database.identifier !== projectRef)
+  }, [databases, failoverReplicas, projectRef, readOnly])
+  const replicaStatusSignature = useMemo(
+    () => readReplicas.map((replica) => `${replica.identifier}:${replica.status}`).join('|'),
+    [readReplicas]
+  )
+  const hasReplicas = readOnly
+    ? failoverReplicas.length > 0
+    : isDatabasesSuccess && readReplicas.length > 0
   const filteredReplicas =
     filterString.length === 0
       ? readReplicas
-      : readReplicas.filter((replica) => replica.identifier.includes(filterString.toLowerCase()))
+      : readReplicas.filter((replica) => {
+          const displayName = failoverReplicaDisplayNames[replica.identifier]
+          const searchTarget = (displayName ?? replica.identifier).toLowerCase()
+          return searchTarget.includes(filterString.toLowerCase())
+        })
 
   const {
     data: destinationsData,
     error: destinationsError,
-    isPending: isDestinationsLoading,
+    isLoading: isDestinationsLoading,
     isError: isDestinationsError,
     isSuccess: isDestinationsSuccess,
   } = useReplicationDestinationsQuery({
@@ -123,14 +167,16 @@ export const Destinations = () => {
           destination.name.toLowerCase().includes(filterString.toLowerCase())
         )
 
-  const { data: pipelinesData, isSuccess: isPipelinesSuccess } = useReplicationPipelinesQuery({
-    projectRef,
-  })
+  const { data: pipelinesData, isSuccess: isPipelinesSuccess } = useReplicationPipelinesQuery(
+    { projectRef },
+    { enabled: !readOnly }
+  )
   const pipelines = pipelinesData?.pipelines ?? []
 
-  const { data: sourcesData, isSuccess: isSourcesSuccess } = useReplicationSourcesQuery({
-    projectRef,
-  })
+  const { data: sourcesData, isSuccess: isSourcesSuccess } = useReplicationSourcesQuery(
+    { projectRef },
+    { enabled: !readOnly }
+  )
   const externalReplicationSource = useMemo(
     () => sourcesData?.sources.find((source) => source.name === projectRef),
     [projectRef, sourcesData?.sources]
@@ -143,13 +189,22 @@ export const Destinations = () => {
     destinations.length === 0 &&
     pipelines.length === 0
 
-  const isLoading = isDestinationsLoading || isDatabasesLoading
-  const hasErrorsFetchingData = isDestinationsError || isDatabasesError
+  const isLoading =
+    readOnly && failoverReplicas.length > 0
+      ? false
+      : readOnly
+        ? isDestinationsLoading
+        : isDestinationsLoading || isDatabasesLoading
+  const hasErrorsFetchingData = readOnly
+    ? isDestinationsError
+    : isDestinationsError || isDatabasesError
 
   const openDestinationPanel = () => {
-    if (!newDestinationDefaultType) return
+    if (readOnly || !newDestinationDefaultType) return
     setDestinationType(newDestinationDefaultType)
   }
+
+  const canAddDestination = !readOnly && !!newDestinationDefaultType
 
   useShortcut(
     SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
@@ -184,24 +239,20 @@ export const Destinations = () => {
   }, [projectRef, pipelinesData?.pipelines, isPipelinesSuccess, queryClient])
 
   useEffect(() => {
-    if (!isDatabasesSuccess) return
+    if (readOnly || !isDatabasesSuccess) return
 
-    const pollReplicas = async () => {
-      const fixedStatuses = [
-        REPLICA_STATUS.ACTIVE_HEALTHY,
-        REPLICA_STATUS.ACTIVE_UNHEALTHY,
-        REPLICA_STATUS.INIT_READ_REPLICA_FAILED,
-      ]
+    const fixedStatuses = [
+      REPLICA_STATUS.ACTIVE_HEALTHY,
+      REPLICA_STATUS.ACTIVE_UNHEALTHY,
+      REPLICA_STATUS.INIT_READ_REPLICA_FAILED,
+    ]
 
-      const replicasInTransition = readReplicas.filter((db) => !fixedStatuses.includes(db.status))
-      const hasTransientStatus = replicasInTransition.length > 0
+    const replicasInTransition = readReplicas.filter((db) => !fixedStatuses.includes(db.status))
+    const hasTransientStatus = replicasInTransition.length > 0
 
-      // If all replicas are active healthy, stop fetching statuses
-      if (!hasTransientStatus) setStatusRefetchInterval(false)
-    }
-
-    pollReplicas()
-  }, [isDatabasesSuccess, readReplicas])
+    // If all replicas are active healthy, stop fetching statuses
+    if (!hasTransientStatus) setStatusRefetchInterval(false)
+  }, [isDatabasesSuccess, readOnly, replicaStatusSignature, readReplicas])
 
   return (
     <>
@@ -233,20 +284,27 @@ export const Destinations = () => {
               id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
               label="Add destination"
               onTrigger={openDestinationPanel}
-              options={{ enabled: !!newDestinationDefaultType }}
+              options={{ enabled: canAddDestination }}
               side="bottom"
+              tooltipOpen={readOnly ? false : undefined}
             >
-              <Button
+              <ButtonTooltip
                 variant="default"
                 icon={<Plus />}
-                disabled={!newDestinationDefaultType}
+                disabled={!canAddDestination}
                 onClick={openDestinationPanel}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: addDestinationDisabledTooltip,
+                  },
+                }}
               >
                 Add destination
-              </Button>
+              </ButtonTooltip>
             </Shortcut>
             <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
-            {canDisableExternalReplication && (
+            {canDisableExternalReplication && !readOnly && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="default" icon={<MoreVertical />} className="w-7" />
@@ -298,6 +356,8 @@ export const Destinations = () => {
                       <ReadReplicaRow
                         key={replica.identifier}
                         replica={replica}
+                        displayName={failoverReplicaDisplayNames[replica.identifier]}
+                        readOnly={readOnly}
                         onUpdateReplica={() => setStatusRefetchInterval(5000)}
                       />
                     )
@@ -339,20 +399,28 @@ export const Destinations = () => {
                 Deploy read replicas for lower latency and better resource management, or capture
                 database changes to external destinations for real-time data pipelines.
               </p>
-              <Button
+              <ButtonTooltip
                 icon={<Plus />}
-                disabled={!newDestinationDefaultType}
+                disabled={!canAddDestination}
                 onClick={openDestinationPanel}
                 className="mt-4"
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: addDestinationDisabledTooltip,
+                  },
+                }}
               >
                 Add destination
-              </Button>
+              </ButtonTooltip>
             </div>
           )
         )}
       </div>
 
-      <DestinationPanel onSuccessCreateReadReplica={() => setStatusRefetchInterval(5000)} />
+      {!readOnly && (
+        <DestinationPanel onSuccessCreateReadReplica={() => setStatusRefetchInterval(5000)} />
+      )}
 
       <DisableExternalReplicationDialog
         open={showDisableExternalReplicationDialog}

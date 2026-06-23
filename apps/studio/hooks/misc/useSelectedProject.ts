@@ -1,5 +1,6 @@
 import { useParams } from 'common'
 
+import { MOCK_HIGH_AVAILABILITY } from './useHighAvailability.constants'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { PROJECT_STATUS, PROVIDERS } from '@/lib/constants'
 
@@ -14,6 +15,9 @@ export function useSelectedProjectQuery({ enabled = true } = {}) {
         return {
           ...data,
           parentRef: data.parent_project_ref ?? data.ref,
+          ...(MOCK_HIGH_AVAILABILITY !== undefined && {
+            high_availability: MOCK_HIGH_AVAILABILITY,
+          }),
         }
       },
     }
@@ -53,6 +57,8 @@ export const useIsOrioleDbInAws = () => {
     project?.dbVersion?.endsWith('orioledb') && project?.cloud_provider === PROVIDERS.AWS.id
   return isOrioleDbInAws
 }
+
+export { useHighAvailability } from './useHighAvailability'
 
 export const useIsHighAvailability = () => {
   const { data: project } = useSelectedProjectQuery()

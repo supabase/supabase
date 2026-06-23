@@ -30,11 +30,11 @@ export function DiskManagementPanelForm() {
           type="default"
           layout="responsive"
           title="Disk Management has moved"
-          description="Disk configuration is now managed alongside Project Compute on the new Compute and Disk page."
+          description="Disk configuration is now managed alongside project compute on the Infrastructure page."
           actions={
             <Button variant="default" asChild>
-              <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
-                Go to Compute and Disk
+              <Link href={`/project/${projectRef}/settings/infrastructure`}>
+                Go to Infrastructure
               </Link>
             </Button>
           }
