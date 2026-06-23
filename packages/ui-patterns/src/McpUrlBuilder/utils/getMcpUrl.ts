@@ -63,6 +63,8 @@ function getMcpUrlBase({ isPlatform, apiUrl }: { isPlatform: boolean; apiUrl?: s
     return process.env.NEXT_PUBLIC_MCP_URL ?? DEFAULT_MCP_URL_PLATFORM
   }
 
-  // Self-hosted uses API URL with fallback
-  return apiUrl ? `${apiUrl}/mcp` : DEFAULT_MCP_URL_NON_PLATFORM
+  // Self-hosted uses API URL, then environment variable, with fallback
+  return apiUrl
+    ? `${apiUrl}/mcp`
+    : (process.env.NEXT_PUBLIC_MCP_URL_NON_PLATFORM ?? DEFAULT_MCP_URL_NON_PLATFORM)
 }
