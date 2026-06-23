@@ -356,7 +356,7 @@ export const EntityListItem = ({
                     }}
                   >
                     <Edit size={12} className="shrink-0" />
-                    <span>Edit table</span>
+                    <span>Edit definitions</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     key="duplicate-table"

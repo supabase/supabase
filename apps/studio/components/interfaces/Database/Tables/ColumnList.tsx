@@ -162,6 +162,7 @@ export const ColumnList = ({
         {!isSchemaLocked && isTableEntity && (
           <ButtonTooltip
             icon={<Plus />}
+            variant="default"
             disabled={!canUpdateColumns}
             onClick={() => onAddColumn()}
             tooltip={{

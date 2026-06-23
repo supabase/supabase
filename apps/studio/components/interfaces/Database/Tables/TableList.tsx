@@ -4,6 +4,7 @@ import { useParams } from 'common'
 import { noop } from 'lodash'
 import {
   Check,
+  ChevronRight,
   Columns2,
   Copy,
   Edit,
@@ -50,7 +51,7 @@ import { useSnapshot } from 'valtio'
 
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import {
-  formatWarehouseSize,
+  getWarehouseStorageSummaryLabel,
   warehouseDemoStore,
   type WarehouseMode,
 } from '../Warehouse/warehouseDemoStore'
@@ -560,7 +561,7 @@ export const TableList = ({
                       return (
                         <TableRow
                           key={x.id}
-                          className="group cursor-pointer hover:bg-surface-100 inset-focus"
+                          className="group relative cursor-pointer inset-focus"
                           onClick={handleRowNavigation}
                           onAuxClick={handleRowNavigation}
                           onKeyDown={handleRowNavigation}
@@ -625,7 +626,11 @@ export const TableList = ({
                                   mode: 'postgres',
                                 }
                                 const mode = wState.mode as WarehouseMode
-                                const warehouseSize = formatWarehouseSize(wState.warehouseSizeBytes)
+                                const storageSummary = getWarehouseStorageSummaryLabel(
+                                  wState,
+                                  x.size
+                                )
+                                const storageUrl = `${tableDetailUrl}/settings`
                                 const showSyncChip =
                                   wState.syncState === 'syncing' || wState.syncState === 'error'
 
@@ -637,14 +642,12 @@ export const TableList = ({
 
                                 return (
                                   <Link
-                                    href={tableDetailUrl}
+                                    href={storageUrl}
                                     onClick={(event: MouseEvent) => event.stopPropagation()}
                                     className="inline-flex max-w-full items-center gap-2 rounded-sm hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter"
                                   >
                                     <span className="text-sm text-foreground-light">
-                                      {mode === 'warehouse_backed'
-                                        ? `${warehouseSize} · Moved`
-                                        : `${x.size ?? '—'} · Copy · ${warehouseSize}`}
+                                      {storageSummary}
                                     </span>
                                     {showSyncChip && (
                                       <WarehouseSyncChip syncState={wState.syncState!} />
@@ -673,8 +676,9 @@ export const TableList = ({
                           </TableCell>
                           <TableCell>
                             <div
-                              className="flex justify-end gap-2"
+                              className="flex items-center justify-end gap-3"
                               onClick={(event) => event.stopPropagation()}
+                              onKeyDown={(event) => event.stopPropagation()}
                             >
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
@@ -730,7 +734,7 @@ export const TableList = ({
                                         }}
                                       >
                                         <Edit size={12} />
-                                        <p>Edit table</p>
+                                        <p>Edit definitions</p>
                                       </DropdownMenuItemTooltip>
                                       <DropdownMenuItemTooltip
                                         key="duplicate-table"
@@ -773,6 +777,11 @@ export const TableList = ({
                                   )}
                                 </DropdownMenuContent>
                               </DropdownMenu>
+                              <ChevronRight
+                                aria-hidden
+                                size={14}
+                                className="text-foreground-muted/60"
+                              />
                             </div>
                           </TableCell>
                         </TableRow>

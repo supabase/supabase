@@ -1,18 +1,15 @@
 import { useParams } from 'common'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { ColumnList } from '@/components/interfaces/Database/Tables/ColumnList'
-import { TableDetailColumnsTab } from '@/components/interfaces/Database/Tables/TableDetailColumnsTab'
+import { TableDetailSettingsTab } from '@/components/interfaces/Database/Tables/TableDetailSettingsTab'
 import { TableDetailLayout } from '@/components/layouts/DatabaseLayout/TableDetailLayout'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import type { NextPageWithLayout } from '@/types'
 
-const TableDetailColumnsPage: NextPageWithLayout = () => {
-  const snap = useTableEditorStateSnapshot()
+const TableDetailSettingsPage: NextPageWithLayout = () => {
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
   const { data: project } = useSelectedProjectQuery()
@@ -26,33 +23,17 @@ const TableDetailColumnsPage: NextPageWithLayout = () => {
     return <ShimmeringLoader />
   }
 
-  if (selectedTable === undefined) {
+  if (selectedTable === undefined || !isTableLike(selectedTable)) {
     return null
   }
 
-  if (isTableLike(selectedTable)) {
-    return (
-      <TableDetailColumnsTab
-        onAddColumn={snap.onAddColumn}
-        onEditColumn={snap.onEditColumn}
-        onDeleteColumn={snap.onDeleteColumn}
-      />
-    )
-  }
-
-  return (
-    <ColumnList
-      onAddColumn={snap.onAddColumn}
-      onEditColumn={snap.onEditColumn}
-      onDeleteColumn={snap.onDeleteColumn}
-    />
-  )
+  return <TableDetailSettingsTab table={selectedTable} />
 }
 
-TableDetailColumnsPage.getLayout = (page) => (
+TableDetailSettingsPage.getLayout = (page) => (
   <DefaultLayout>
-    <TableDetailLayout section="columns">{page}</TableDetailLayout>
+    <TableDetailLayout section="settings">{page}</TableDetailLayout>
   </DefaultLayout>
 )
 
-export default TableDetailColumnsPage
+export default TableDetailSettingsPage

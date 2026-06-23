@@ -95,17 +95,8 @@ export function WarehouseTableStoragePanel({
           {mode === 'has_warehouse_copy' && (
             <>
               {state.syncState && (
-                <MetaRow label="Status">
+                <MetaRow label="Sync status">
                   <WarehouseSyncChip syncState={state.syncState} />
-                </MetaRow>
-              )}
-              {state.lastSyncedAt !== undefined && (
-                <MetaRow label="Last synced">
-                  <TimestampInfo
-                    className="text-sm text-foreground-light"
-                    utcTimestamp={state.lastSyncedAt}
-                    displayAs="local"
-                  />
                 </MetaRow>
               )}
               {state.lagSeconds !== undefined && (
@@ -165,15 +156,39 @@ export function WarehouseTableStoragePanel({
         )}
 
         {mode === 'has_warehouse_copy' && (
-          <Button type="button" variant="default" onClick={() => setDetachConfirm(true)}>
-            Detach Warehouse copy
-          </Button>
+          <div className="flex">
+            <Button
+              type="button"
+              variant="default"
+              className="rounded-r-none"
+              onClick={() => setEnablementModal('move')}
+            >
+              Move fully to Warehouse
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  variant="default"
+                  icon={<ChevronDown />}
+                  className="rounded-l-none border-l-0 px-2"
+                  aria-label="More storage actions"
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setDetachConfirm(true)}>
+                  Detach Warehouse copy
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         )}
 
         {mode === 'warehouse_backed' && (
           <Button
             type="button"
             variant="default"
+            className="w-fit"
             icon={<History />}
             onClick={() => setTimeTravelOpen(true)}
           >

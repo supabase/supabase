@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
-import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { TableDetailLayout } from '@/components/layouts/DatabaseLayout/TableDetailLayout'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import type { NextPageWithLayout } from '@/types'
 
@@ -12,7 +12,7 @@ const TableStorageRedirect: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (ref && id) {
-      router.replace(`/project/${ref}/database/tables/${id}`)
+      router.replace(`/project/${ref}/database/tables/${id}/settings`)
     }
   }, [ref, id, router])
 
@@ -21,7 +21,7 @@ const TableStorageRedirect: NextPageWithLayout = () => {
 
 TableStorageRedirect.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Tables">{page}</DatabaseLayout>
+    <TableDetailLayout section="settings">{page}</TableDetailLayout>
   </DefaultLayout>
 )
 

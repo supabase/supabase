@@ -278,6 +278,7 @@ type ApiAccessToggleComponentProps = {
   tableName?: string
   isNewRecord: boolean
   handler: TableApiAccessHandlerWithHistoryReturn
+  hideHeading?: boolean
 }
 
 export const ApiAccessToggle = ({
@@ -286,6 +287,7 @@ export const ApiAccessToggle = ({
   tableName,
   isNewRecord,
   handler,
+  hideHeading = false,
 }: ApiAccessToggleComponentProps): ReactNode => {
   const track = useTrack()
   const isPending = handler.isPending
@@ -320,7 +322,7 @@ export const ApiAccessToggle = ({
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <h5>Data API access</h5>
+            {!hideHeading && <h5>Data API access</h5>}
             <p className="text-sm text-foreground-lighter">
               Allow this table to be queried via Supabase client libraries or the API directly
             </p>

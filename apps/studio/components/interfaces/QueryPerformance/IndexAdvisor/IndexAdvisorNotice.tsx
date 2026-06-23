@@ -19,7 +19,7 @@ export const IndexAdvisorNotice = () => {
   if (!isIndexAdvisorAvailable || isIndexAdvisorEnabled || isDismissed) return null
 
   return (
-    <div className="px-6">
+    <div>
       <Admonition showIcon={false} type="tip" className="relative overflow-hidden mb-4">
         <div className="absolute -inset-16 z-0 opacity-50">
           <img

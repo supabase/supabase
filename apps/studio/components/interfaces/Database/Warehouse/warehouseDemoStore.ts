@@ -86,6 +86,20 @@ export function formatWarehouseSize(bytes: number | undefined): string {
   return `${Math.round(gb)} GB`
 }
 
+export function getWarehouseStorageSummaryLabel(
+  state: Pick<WarehouseTableState, 'mode' | 'warehouseSizeBytes'> | undefined,
+  postgresSize?: string
+): string | null {
+  const mode = state?.mode ?? 'postgres'
+  const warehouseSize = formatWarehouseSize(state?.warehouseSizeBytes)
+
+  if (mode === 'postgres') return null
+  if (mode === 'has_warehouse_copy') {
+    return postgresSize ? `${postgresSize} · Copy · ${warehouseSize}` : `Copy · ${warehouseSize}`
+  }
+  return `${warehouseSize} · Moved`
+}
+
 export function getWarehouseSnapshots(tableKey: string): WarehouseSnapshot[] {
   const state = warehouseDemoStore.tables[tableKey]
   if (state?.mode !== 'warehouse_backed') return []
