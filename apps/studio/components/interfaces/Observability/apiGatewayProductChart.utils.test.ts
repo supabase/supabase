@@ -118,3 +118,45 @@ describe('calculateApiGatewayAggregate', () => {
     expect(result.errorCount).toBe(4)
   })
 })
+
+describe('chart and header agreement', () => {
+  // The API Gateway header request count must equal the total stacked bar height.
+  // This locks that invariant for shared input where each product's `total` is the
+  // sum of its event buckets, matching how the live hook derives both values.
+  it('aggregate total equals the summed bucket heights of the product chart', () => {
+    const serviceData = {
+      db: {
+        eventChartData: [
+          datum('2024-01-01T00:00:00Z', 10, 1, 1),
+          datum('2024-01-01T01:00:00Z', 5, 0, 0),
+        ],
+        total: 17,
+        errorCount: 1,
+        warningCount: 1,
+      },
+      storage: {
+        eventChartData: [datum('2024-01-01T00:00:00Z', 4, 0, 2)],
+        total: 6,
+        errorCount: 2,
+        warningCount: 0,
+      },
+      realtime: {
+        eventChartData: [datum('2024-01-01T01:00:00Z', 3, 0, 0)],
+        total: 3,
+        errorCount: 0,
+        warningCount: 0,
+      },
+    }
+
+    const chartData = buildApiGatewayProductData(serviceData)
+    const aggregate = calculateApiGatewayAggregate(serviceData)
+
+    const stackedHeight = chartData.reduce(
+      (sum, bucket) => sum + bucket.db + bucket.storage + bucket.realtime,
+      0
+    )
+
+    expect(stackedHeight).toBe(aggregate.total)
+    expect(aggregate.total).toBe(26)
+  })
+})
