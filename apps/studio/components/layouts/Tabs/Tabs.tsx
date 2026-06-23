@@ -187,10 +187,12 @@ export const EditorTabs = () => {
                 'flex items-center gap-2 px-3 text-xs',
                 'bg-dash-sidebar/50 dark:bg-surface-100/50',
                 'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
-                'relative group h-full border-t-2 border-b-0!',
+                'relative group h-full',
+                'border-b border-default data-[state=active]:border-b-background-dash-sidebar dark:data-[state=active]:border-b-background-surface-100',
                 'hover:bg-surface-300 dark:hover:bg-surface-100'
               )}
             >
+              <div className="absolute top-0 left-0 right-0 w-full h-0.5 bg-foreground opacity-0 group-data-[state=active]:opacity-100" />
               <Plus size={16} strokeWidth={1.5} className={'text-foreground-lighter'} />
               <div className="flex items-center gap-0">
                 <span>New</span>
@@ -201,7 +203,7 @@ export const EditorTabs = () => {
                   e.preventDefault()
                   e.stopPropagation()
                 }}
-                className="ml-1 opacity-0 group-hover:opacity-100 hover:bg-200 rounded-xs cursor-pointer"
+                className="ml-1 opacity-0 group-hover:opacity-100 hover:bg-200 rounded-xs cursor-pointer p-0.5"
                 onMouseDown={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
@@ -220,23 +222,26 @@ export const EditorTabs = () => {
 
           <AnimatePresence initial={false}>
             {!hasNewTab && (
-              <motion.button
-                className="flex items-center justify-center w-10 min-h-(--header-height) hover:bg-surface-100 shrink-0 border-b"
-                onClick={() =>
-                  router.push(
-                    `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new?skip=true`
-                  )
-                }
-                initial={{ opacity: 0, scale: 0.8, x: -10 }}
-                animate={{ opacity: 1, scale: 1, x: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Plus
-                  size={16}
-                  strokeWidth={1.5}
-                  className="text-foreground-lighter hover:text-foreground-light"
-                />
-              </motion.button>
+              <div className="relative flex h-full shrink-0">
+                <motion.button
+                  className="flex h-full w-10 items-center justify-center border-b border-b-transparent hover:bg-surface-100"
+                  onClick={() =>
+                    router.push(
+                      `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new?skip=true`
+                    )
+                  }
+                  initial={{ opacity: 0, scale: 0.8, x: -10 }}
+                  animate={{ opacity: 1, scale: 1, x: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Plus
+                    size={16}
+                    strokeWidth={1.5}
+                    className="text-foreground-lighter hover:text-foreground-light"
+                  />
+                </motion.button>
+                <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-px bg-border" />
+              </div>
             )}
           </AnimatePresence>
           <div className="grow h-full border-b pr-6" />

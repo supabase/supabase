@@ -904,7 +904,7 @@ export const SQLEditor = () => {
           <ResizablePanel defaultSize="50" maxSize="70">
             <div className="grow overflow-y-auto border-b h-full">
               {isLoading ? (
-                <div className="flex h-full w-full items-center justify-center">
+                <div className="flex h-full w-full items-center justify-center bg-surface-100">
                   <Loader2 className="animate-spin text-brand" />
                 </div>
               ) : (
