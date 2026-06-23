@@ -1,4 +1,3 @@
-import { buildDocsContentListingClickedEvent } from '~/components/ContentListings/content-listings.telemetry'
 import { storageGetStarted } from '~/components/listings/storage.data'
 import { ListingsMarkdownHandlers } from '~/internals/markdown-schema/Listings'
 import {
@@ -364,30 +363,6 @@ describe('ListingsMarkdownHandlers', () => {
   })
 })
 
-describe('buildDocsContentListingClickedEvent', () => {
-  it('builds a docs_content_listing_clicked telemetry payload', () => {
-    expect(
-      buildDocsContentListingClickedEvent({
-        item: {
-          title: 'Auth',
-          href: '/guides/auth',
-          description: 'Supabase Auth overview.',
-        },
-        groupLabel: 'Get started',
-        listingId: 'get-started',
-      })
-    ).toEqual({
-      action: 'docs_content_listing_clicked',
-      properties: {
-        targetPath: '/guides/auth',
-        linkTitle: 'Auth',
-        groupTitle: 'Get started',
-        listingId: 'get-started',
-      },
-    })
-  })
-})
-
 describe('normalizeContentListingHref', () => {
   it('strips /docs prefix from /docs/guides paths', () => {
     expect(normalizeContentListingHref('/docs/guides/auth')).toBe('/guides/auth')
@@ -412,13 +387,13 @@ describe('normalizeContentListingHref', () => {
 
 describe('TelemetryEvent union', () => {
   it('includes docs_content_listing_clicked', () => {
-    const event = buildDocsContentListingClickedEvent({
-      item: {
-        title: 'Storage',
-        href: '/guides/storage',
-        description: 'Supabase Storage overview.',
+    const event = {
+      action: 'docs_content_listing_clicked' as const,
+      properties: {
+        targetPath: '/guides/storage',
+        linkTitle: 'Storage',
       },
-    })
+    }
 
     const _typeCheck: import('common/telemetry-constants').TelemetryEvent = event
     expect(_typeCheck.action).toBe('docs_content_listing_clicked')

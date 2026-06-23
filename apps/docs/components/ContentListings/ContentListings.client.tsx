@@ -15,8 +15,6 @@ import { type ReactNode } from 'react'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
 
-import { buildDocsContentListingClickedEvent } from './content-listings.telemetry'
-
 function ContentListingLink({
   item,
   groupLabel,
@@ -34,7 +32,15 @@ function ContentListingLink({
   const href = normalizeContentListingHref(item.href)
 
   const onClick = () => {
-    sendTelemetryEvent(buildDocsContentListingClickedEvent({ item, groupLabel, listingId }))
+    sendTelemetryEvent({
+      action: 'docs_content_listing_clicked',
+      properties: {
+        targetPath: item.href,
+        linkTitle: item.title,
+        ...(groupLabel ? { groupTitle: groupLabel } : {}),
+        ...(listingId ? { listingId } : {}),
+      },
+    })
   }
 
   if (isExternalContentListingHref(href)) {

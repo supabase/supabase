@@ -839,7 +839,7 @@ export interface AskAiClickedEvent {
 }
 
 /**
- * User clicked a curated orientation link from contentListings front matter or MDX component.
+ * User clicked a curated orientation link from a content listings MDX component.
  *
  * @group Events
  * @source docs
