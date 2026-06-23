@@ -1,4 +1,4 @@
-import { Pool } from 'https://deno.land/x/postgres@v0.17.0/mod.ts'
+import { Pool } from 'jsr:@db/postgres@^0'
 
 // Create a database pool with one connection.
 const pool = new Pool(
@@ -24,16 +24,16 @@ export default {
         const result = await connection.queryObject`SELECT * FROM animals`
         const animals = result.rows // [{ id: 1, name: "Lion" }, ...]
 
-        // Encode the result as pretty printed JSON
-        const body = JSON.stringify(
-          animals,
-          (_key, value) => (typeof value === 'bigint' ? value.toString() : value),
-          2
+        const data = animals.map((animal) =>
+          Object.fromEntries(
+            Object.entries(animal).map(([key, value]) => [
+              key,
+              typeof value === 'bigint' ? value.toString() : value,
+            ])
+          )
         )
 
-        // Return the response with the correct content type header
-        return new Response(body, {
-          status: 200,
+        return Response.json(data, {
           headers: {
             'Content-Type': 'application/json; charset=utf-8',
           },
@@ -44,7 +44,7 @@ export default {
       }
     } catch (err) {
       console.error(err)
-      return new Response(String(err?.message ?? err), { status: 500 })
+      return Response.json({ error: String(err?.message ?? err) }, { status: 500 })
     }
   },
 }

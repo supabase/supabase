@@ -107,13 +107,13 @@ Since Supabase Edge Function uses the [Deno runtime](https://deno.land/), you do
 In your newly created `scribe-bot/index.ts` file, add the following code:
 
 ```ts supabase/functions/scribe-bot/index.ts
-import { Bot, webhookCallback } from 'https://deno.land/x/grammy@v1.34.0/mod.ts'
+import { Bot, webhookCallback } from 'npm:grammy@^1'
 
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 
 import { withSupabase } from 'npm:@supabase/server@^1'
-import type { SupabaseClient } from 'npm:@supabase/supabase-js@2'
-import { ElevenLabsClient } from 'npm:elevenlabs@1.50.5'
+import type { SupabaseClient } from 'npm:@supabase/supabase-js@^2'
+import { ElevenLabsClient } from 'npm:elevenlabs@^1'
 
 console.log(`Function "elevenlabs-scribe-bot" up and running!`)
 
@@ -235,7 +235,7 @@ export default {
     try {
       const url = new URL(req.url)
       if (url.searchParams.get('secret') !== Deno.env.get('FUNCTION_SECRET')) {
-        return new Response('not allowed', { status: 405 })
+        return Response.json({ error: 'not allowed' }, { status: 405 })
       }
 
       supabaseAdmin = ctx.supabaseAdmin
