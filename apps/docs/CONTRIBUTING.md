@@ -114,64 +114,6 @@ The navigation is defined in [`NavigationMenu.constants.ts`](https://github.com/
 
 Add an entry with the `name`, `url`, and (optional) `icon` for your page.
 
-### Overview pages and content listings
-
-Overview and index pages orient readers across a docs section. Use named **listing components** for curated "what do I read next?" links (the same patterns as [`MetricsStackCards`](components/MetricsStackCards.tsx) and [`providers.mdx`](content/_partials/providers.mdx)).
-
-| Section | Purpose |
-| ------- | ------- |
-| **Get started / Next steps** | Curated internal docs links with short descriptions |
-| **Examples** | Demos, sample apps, GitHub repositories |
-| **Resources** | External reference material (source repos, OpenAPI specs, upstream docs) |
-
-**Adding or editing a listing block:**
-
-1. Add or update listing data in a co-located `.data.ts` file under [`components/listings/`](components/listings/) (see [`storage.data.ts`](components/listings/storage.data.ts) for a canonical example).
-2. Register the data export in [`listings-markdown-registry.ts`](components/listings/listings-markdown-registry.ts). The component name must be PascalCase and end with `Listings` (for example, `StorageGetStartedListings`).
-3. Place the component **inline in the guide MDX** (default):
-
-   ```mdx
-   <StorageGetStartedListings />
-   ```
-
-   Use a partial only when the same block is reused across pages or you need to gate it with `$Show` at the partial level.
-
-4. Run `pnpm test content-listings` from `apps/docs`.
-
-Listing components and markdown export handlers are registered automatically from the registry — you do not need to edit [`index.tsx`](components/listings/index.tsx) or [`MdxBase.shared.tsx`](features/docs/MdxBase.shared.tsx) when adding a new block.
-
-**Editing existing links:** change the relevant `.data.ts` file only.
-
-**Using an AI assistant:** copy this prompt when adding a new listing block:
-
-```text
-Add a content listing block for [TOPIC] / [SECTION] (for example, Storage / Examples).
-Follow CONTRIBUTING § Overview pages and content listings in apps/docs.
-- Add data to apps/docs/components/listings/[topic].data.ts
-- Register in apps/docs/components/listings/listings-markdown-registry.ts
-- Place inline in the guide MDX unless the block is reused (then use a partial)
-- Copy structure from storageGetStarted / StorageGetStartedListings
-- Run pnpm test content-listings from apps/docs
-```
-
-**VS Code / Cursor snippets:** type these prefixes in the docs workspace (see [`.vscode/content-listing.code-snippets`](../../.vscode/content-listing.code-snippets)):
-
-| Prefix | Inserts |
-| ------ | ------- |
-| `cl-data` | `ContentListingGroup` export skeleton |
-| `cl-registry` | Registry entry and import |
-| `cl-inline` | Inline component in guide MDX |
-
-**Batch audit skill (follow-on conversions):** for auditing and converting remaining overview pages, install the `audit-content-listings` skill from [`docs-agent-skills`](https://github.com/supabase/docs-agent-skills/tree/main/audit-content-listings) and keep [`conversion-manifest.json`](https://github.com/supabase/docs-agent-skills/blob/main/audit-content-listings/conversion-manifest.json) up to date there.
-
-Validate manifest drift from repo root:
-
-```bash
-node ~/GitHub/supabase/docs-agent-skills/audit-content-listings/scripts/validate-conversion-manifest.mjs
-```
-
-Markdown export uses the same data modules via handlers in [`internals/markdown-schema/Listings.ts`](internals/markdown-schema/Listings.ts), so web and `.md` alternate output stay in sync.
-
 ## Reference structure
 
 Reference docs are produced from the reference specs and library source code. A common spec file contains shared function and endpoint definitions, and library-specific spec files contain further details.
@@ -268,6 +210,28 @@ Optionally highlight lines by using `mark=${lineNumber}`.
 
 ```
 ````
+
+### Content listings
+
+Overview and index pages use listing components for curated link sections, such as "Get started", "Next steps", "Examples", or "Resources". Refer to [`storage.data.ts`](components/listings/storage.data.ts) and [`storage.mdx`](content/guides/storage.mdx) for a full example.
+
+**Prompt to add content listings:**
+
+```text
+Add a content listing block for [TOPIC] / [SECTION] (for example, Storage / Examples).
+Follow CONTRIBUTING § Content listings in apps/docs.
+Copy structure from storageGetStarted / StorageGetStartedListings. Run pnpm test content-listings from apps/docs.
+```
+
+**Manually add content listings:**
+
+1. Add or update a `ContentListingGroup` export in [`components/listings/[topic].data.ts`](components/listings/).
+2. Register the export in [`listings-markdown-registry.ts`](components/listings/listings-markdown-registry.ts). Use PascalCase with a `Listings` suffix, for example `StorageGetStartedListings`.
+3. Place the component inline into guide MDX, for example `<StorageGetStartedListings />`. Use a partial only when the block is reused or gated with `$Show` at the partial level.
+4. Run `pnpm test content-listings` from `apps/docs`.
+
+Code snippets for manually adding content listings are available in [`.vscode/content-listing.code-snippets`](../../.vscode/content-listing.code-snippets): `cl-data` (data export), `cl-registry` (registry entry), `cl-inline` (MDX component).
+
 
 ### Footnotes
 
