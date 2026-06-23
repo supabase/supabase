@@ -16,36 +16,20 @@
 //   - Forward everything else to the TanStack Start handler exported
 //     from `dist/server/server.js`.
 import { createReadStream } from 'node:fs'
-import { readFile, stat } from 'node:fs/promises'
+import { stat } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import path from 'node:path'
 import { Readable } from 'node:stream'
 import { fileURLToPath } from 'node:url'
 
+import { readEnvFiles } from './lib/env.js'
+
 const studioRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const clientDir = path.join(studioRoot, 'dist/client')
 const mode = process.env.MODE || 'production'
 
-const dotenvLine = /^\s*(?:export\s+)?([\w.-]+)\s*=\s*(.*?)\s*$/
 const envFiles = ['.env', '.env.local', `.env.${mode}`, `.env.${mode}.local`]
-const parsed = {}
-for (const file of envFiles) {
-  let content
-  try {
-    content = await readFile(path.join(studioRoot, file), 'utf8')
-  } catch {
-    continue
-  }
-  for (const raw of content.split('\n')) {
-    const m = dotenvLine.exec(raw)
-    if (!m) continue
-    let v = m[2]
-    if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
-      v = v.slice(1, -1)
-    }
-    parsed[m[1]] = v
-  }
-}
+const parsed = readEnvFiles(studioRoot, envFiles)
 // Don't clobber values the shell already provides — match `vite preview`.
 for (const [k, v] of Object.entries(parsed)) {
   if (process.env[k] !== undefined) continue
