@@ -8,7 +8,6 @@ const ScrollProgress = () => {
   const pathname = usePathname()
 
   const isBlogPost = pathname?.includes('/blog/')
-  if (!isBlogPost) return null
 
   const handleScroll = () => {
     if (typeof document === 'undefined') return null
@@ -22,11 +21,14 @@ const ScrollProgress = () => {
   }
 
   useEffect(() => {
+    if (!isBlogPost) return
     window.addEventListener('scroll', handleScroll)
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [])
+  }, [isBlogPost])
+
+  if (!isBlogPost) return null
 
   let isActive = progressPercentage <= 100
 

@@ -1,6 +1,5 @@
 'use client'
 
-import type { BlogView } from 'app/blog/BlogClient'
 import { LOCAL_STORAGE_KEYS, useBreakpoint } from 'common'
 import { startCase } from 'lib/helpers'
 import { AlignJustify, ChevronDown, X as CloseIcon, Grid, Search } from 'lucide-react'
@@ -18,6 +17,8 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from 'ui'
+
+import type { BlogView } from '@/app/blog/blog-view'
 
 interface Props {
   onFilterChange: (category?: string, search?: string) => void
