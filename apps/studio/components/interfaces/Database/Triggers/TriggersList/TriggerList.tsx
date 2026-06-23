@@ -14,6 +14,9 @@ import {
   DropdownMenuTrigger,
   TableCell,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
 import {
@@ -175,12 +178,17 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
                 {canUpdateTriggers ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button
-                        aria-label="More options"
-                        variant="default"
-                        className="px-1"
-                        icon={<MoreVertical />}
-                      />
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            aria-label="More options"
+                            variant="default"
+                            className="px-1"
+                            icon={<MoreVertical />}
+                          />
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">More options</TooltipContent>
+                      </Tooltip>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent side="bottom" align="end" className="w-52">
                       <DropdownMenuItem
