@@ -47,7 +47,7 @@ export const FrameworkSelector = ({
         <PopoverTrigger asChild>
           <Button
             size={size}
-            type="default"
+            variant="default"
             className={cn('gap-0 justify-between', className?.includes('w-full') && 'w-full')}
             iconRight={<ChevronDown strokeWidth={1.5} />}
           >

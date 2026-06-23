@@ -33,7 +33,7 @@ create table document_sections (
 );
 ```
 
-Notice how we record the `owner_id` on each document. Let's create an RLS policy that restricts access to `document_sections` based on whether or not they own the linked document:
+Notice the record of `owner_id` on each document. Create an RLS policy that restricts access to `document_sections` based on whether or not they own the linked document:
 
 ```sql
 -- Grant the privileges the roles need
@@ -85,7 +85,7 @@ Every app has its own unique requirements and may differ from the above example.
 
 ### Documents owned by multiple people
 
-Instead of a one-to-many relationship between `users` and `documents`, you may require a many-to-many relationship so that multiple people can access the same document. Let's reimplement this using a join table:
+Instead of a one-to-many relationship between `users` and `documents`, you may require a many-to-many relationship so that multiple people can access the same document. Reimplement this using a join table:
 
 ```sql
 create table document_owners (
@@ -112,7 +112,7 @@ Instead of directly querying the `documents` table, we query the join table.
 
 ### User and document data live outside of Supabase
 
-You may have an existing system that stores users, documents, and their permissions in a separate database. Let's explore the scenario where this data exists in another Postgres database. We'll use a foreign data wrapper (FDW) to connect to the external DB from within your Supabase DB:
+You may have an existing system that stores users, documents, and their permissions in a separate database. Consider the scenario where this data exists in another Postgres database. We'll use a foreign data wrapper (FDW) to connect to the external DB from within your Supabase DB:
 
 <Admonition type="caution">
 
@@ -126,7 +126,7 @@ For data sources other than Postgres, see [Foreign Data Wrappers](/docs/guides/d
 
 </Admonition>
 
-Let's assume your external DB contains a `users` and `documents` table like this:
+Assume your external DB contains a `users` and `documents` table like this:
 
 ```sql
 create table public.users (
@@ -143,7 +143,7 @@ create table public.documents (
 );
 ```
 
-In your Supabase DB, let's create foreign tables that link to the above tables:
+In your Supabase DB, create foreign tables that link to the above tables:
 
 ```sql
 create schema external;
@@ -231,7 +231,7 @@ order by document_sections.embedding <#> embedding;
 
 {/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 
-You might be tempted to discard RLS completely and simply filter by user within the `where` clause. Though this will work, we recommend RLS as a general best practice since RLS is always applied even as new queries and application logic is introduced in the future.
+You might be tempted to discard RLS completely and filter by user within the `where` clause. Though this will work, we recommend RLS as a general best practice since RLS is always applied even as new queries and application logic is introduced in the future.
 
 </Admonition>
 

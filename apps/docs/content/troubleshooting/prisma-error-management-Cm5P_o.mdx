@@ -27,7 +27,7 @@ message = "Drift detected: Your database schema is not in sync with your migrati
 
 > This guide has been deprecated. Use the troubleshooting guide in the [Supabase docs](/docs/guides/database/prisma/prisma-troubleshooting).
 
-# Addressing specific errors:
+## Addressing specific errors
 
 Prisma, unlike other libraries, uses [query parameters for configurations](https://www.prisma.io/docs/orm/overview/databases/postgresql#arguments).
 
@@ -37,7 +37,7 @@ Some can be used to address specific errors and can be appended to end of your c
 .../postgres?KEY1=VALUE&KEY2=VALUE&KEY3=VALUE
 ```
 
-## `Can't reach database server at`:
+### Can't reach database server
 
 Increase `connect_timeout` to 30s and check to make sure you are using a valid connection string.
 
@@ -45,7 +45,7 @@ Increase `connect_timeout` to 30s and check to make sure you are using a valid c
 .../postgres?connect_timeout=30
 ```
 
-## `Timed out fetching a new connection from the connection pool`:
+### Timed out fetching a new connection from the connection pool
 
 Increase `pool_timeout` to 30s .
 
@@ -53,7 +53,7 @@ Increase `pool_timeout` to 30s .
 .../postgres?pool_timeout=30
 ```
 
-## `... prepared statement "" already exists`
+### Prepared statement already exists
 
 Add pgbouncer=true to the connection string.
 
@@ -61,23 +61,23 @@ Add pgbouncer=true to the connection string.
 .../postgres?pgbouncer=true
 ```
 
-## `Max client connections reached`
+### Max client connections reached
 
 Check out this [guide](https://github.com/orgs/supabase/discussions/22305) for managing this error
 
-## `Server has closed the connection`
+### Server has closed the connection
 
 According to this [GitHub Issue for Prisma](https://github.com/prisma/prisma/discussions/7389), it may be related to large return values for queries. Try to limit the total amount of rows returned for particularly large requests.
 
-## `Drift detected: Your database schema is not in sync with your migration history`
+### Drift detected: Your database schema is not in sync with your migration history
 
 Prisma will try to act as the source of truth for your database structures. If you `CREATE`, `DROP`, or `ALTER` database objects outside of a Prisma Migration, it is likely to detect drift and may offer to correct the situation by purging your schemas. To circumvent this issue, try [baselining your migrations](https://www.prisma.io/docs/orm/prisma-migrate/workflows/baselining).
 
 Some users have discussed how they managed this problem in a [GitHub Discussion.](https://github.com/prisma/prisma/issues/19100#top)
 
-# Management suggestions
+## Management suggestions
 
-## Make a custom role for Prisma to increase observability
+### Make a custom role for Prisma to increase observability
 
 **Imagine your database as a house, and users as the people with keys.**
 
@@ -85,7 +85,7 @@ Some users have discussed how they managed this problem in a [GitHub Discussion.
 - it's usually safer to give Prisma its own key! This way, it can only access the rooms (tables) it needs.
 - Plus, with separate keys, it's easier to see what Prisma is doing in your house with monitoring tools, such as [PGAudit](/docs/guides/database/extensions/pgaudit?queryGroups=database-method&database-method=sql) and [pg_stat_activity](/docs/guides/platform/performance).
 
-### Creating the Prisma user:
+#### Creating the Prisma user
 
 ```sql
 create user "prisma" with password 'secret_password' bypassrls createdb;
@@ -93,7 +93,7 @@ create user "prisma" with password 'secret_password' bypassrls createdb;
 
 > Prisma requires the [`createdb` modifier](/blog/postgres-roles-and-privileges#role-attributes) to create shadow databases. It uses them to help manage migrations.
 
-### Give Postgres ownership of the new user:
+#### Give Postgres ownership of the new user
 
 This allows you to view Prisma migration changes in the [Dashboard](/dashboard/project/_/editor)
 
@@ -101,9 +101,9 @@ This allows you to view Prisma migration changes in the [Dashboard](/dashboard/p
 grant "prisma" to "postgres";
 ```
 
-### Keep it safe!
+#### Keep it safe!
 
-Use a strong password for Prisma. Bitwarden provides a free and simple [password generator](https://bitwarden.com/password-generator/) that can make one for you.
+Use a strong password for Prisma. Bitwarden provides a free [password generator](https://bitwarden.com/password-generator/) that can make one for you.
 
 If you need to change it later, you can use the below SQL:
 
@@ -111,7 +111,7 @@ If you need to change it later, you can use the below SQL:
 alter user "prisma" with password 'new_password';
 ```
 
-### Grant Prisma access
+#### Grant Prisma access
 
 The below example gives Prisma full authority over all database objects in the public schema:
 
@@ -129,7 +129,7 @@ The below example gives Prisma full authority over all database objects in the p
 
 > For more guidance on specifying access, check out this [article](/blog/postgres-roles-and-privileges#creating-objects-and-assigning-privileges) on privileges
 
-## Optimize Prisma queries:
+### Optimize Prisma queries
 
 In the [Query Performance Advisor](/dashboard/project/_/database/query-performance), you can view long-running or frequently accessed queries by role:
 
@@ -141,7 +141,7 @@ In the [Query Performance Advisor](/dashboard/project/_/database/query-performan
 
 Selecting a query can reveal suggestions to improve its performance
 
-## Configuring connections
+### Configuring connections
 
 Useful Links:
 
@@ -150,7 +150,7 @@ Useful Links:
 
 Supabase provides 3 database connection strings that can be used simultaneously if necessary. You can find them on the dashboard by clicking [Connect](/dashboard/project/_?showConnect=true).
 
-### Direct connection:
+#### Direct connection
 
 Best used with stationary servers, such as VMs and long-standing containers, but it only works in IPv6 environments unless the [IPv4 Add-On](/dashboard/project/_/settings/addons) is enabled. If you are unsure if your network is IPv6 compatible, [check here](https://github.com/orgs/supabase/discussions/27034).
 
@@ -160,7 +160,7 @@ Best used with stationary servers, such as VMs and long-standing containers, but
 postgresql://postgres:[PASSWORD]@db.[PROJECT REF].supabase.co:5432/postgres
 ```
 
-### Supavisor in session mode (port 5432):
+#### Supavisor in session mode (port 5432)
 
 ```md
 # Example Connection
@@ -172,7 +172,7 @@ An alternative to direct connections when working in IPv4-only environments.
 
 > Session mode is a good option for migrations
 
-### Supavisor in transaction mode (port 6543):
+#### Supavisor in transaction mode (port 6543)
 
 ```md
 # Example Connection

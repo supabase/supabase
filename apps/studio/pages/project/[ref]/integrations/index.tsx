@@ -54,7 +54,7 @@ function getIntegrationImage(integration: IntegrationDefinition) {
 
   if (integration.files?.length) {
     const heroImage = integration?.files?.[0]
-    return heroImage
+    return heroImage?.src ?? undefined
   }
 }
 

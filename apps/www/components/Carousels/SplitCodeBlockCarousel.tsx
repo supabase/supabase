@@ -54,7 +54,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
         </p>
       </p>
       <p>
-        <Button type="outline">View documentation</Button>
+        <Button variant="outline">View documentation</Button>
       </p>
     </div>
   )
@@ -124,7 +124,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
                 <p className="p mb-6 block">{extension.detail_text}</p>
                 <div>
                   {extension.url && (
-                    <Button asChild type="default">
+                    <Button asChild variant="default">
                       <Link href={extension.url} as={extension.url} className="ml-px">
                         View documentation
                       </Link>

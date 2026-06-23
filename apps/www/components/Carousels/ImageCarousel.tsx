@@ -62,7 +62,7 @@ function ImageCarousel(props: ImageCarouselProps) {
         </p>
       </p>
       <p>
-        <Button type="outline" size="small" icon={<CornerRightUp />}>
+        <Button variant="outline" size="small" icon={<CornerRightUp />}>
           View documentation
         </Button>
       </p>

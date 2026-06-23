@@ -92,7 +92,7 @@ const OrganizationsPage: NextPageWithLayout = () => {
               />
 
               {organizationCreationEnabled && (
-                <Button asChild icon={<Plus />} type="primary" className="w-min">
+                <Button asChild icon={<Plus />} variant="primary" className="w-min">
                   <Link href={`/new`}>New organization</Link>
                 </Button>
               )}

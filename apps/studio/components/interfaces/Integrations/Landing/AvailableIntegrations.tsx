@@ -66,7 +66,7 @@ export const AvailableIntegrations = () => {
               className={cn(
                 buttonVariants({
                   size: 'tiny',
-                  type: selectedCategory === category.key ? 'default' : 'outline',
+                  variant: selectedCategory === category.key ? 'default' : 'outline',
                 }),
                 selectedCategory === category.key ? 'text-foreground' : 'text-foreground-lighter',
                 'rounded-full! px-3'

@@ -1,12 +1,15 @@
 import { describe, expect, test } from 'vitest'
 
-import type { LogData } from './Logs.types'
+import { LogsTableName } from './Logs.constants'
+import type { Filters, LogData } from './Logs.types'
 import {
   buildLogsPrompt,
   extractEdgeFunctionName,
   formatLogsAsCsv,
   formatLogsAsJson,
   formatLogsAsMarkdown,
+  genDefaultQuery,
+  getAuthLogSeverity,
   parseMultigresEventMessage,
 } from './Logs.utils'
 
@@ -217,6 +220,79 @@ describe('Logs.utils', () => {
       expect(parseMultigresEventMessage(undefined)).toBeNull()
       expect(parseMultigresEventMessage(null)).toBeNull()
       expect(parseMultigresEventMessage(42)).toBeNull()
+    })
+  })
+
+  describe('getAuthLogSeverity', () => {
+    test('reports server errors (5xx) as error', () => {
+      expect(getAuthLogSeverity('info', 500)).toBe('error')
+      expect(getAuthLogSeverity('info', 503)).toBe('error')
+    })
+
+    test('reports client errors (4xx) as warning', () => {
+      expect(getAuthLogSeverity('info', 400)).toBe('warning')
+      expect(getAuthLogSeverity('info', 401)).toBe('warning')
+      expect(getAuthLogSeverity('info', 429)).toBe('warning')
+      expect(getAuthLogSeverity('info', 499)).toBe('warning')
+    })
+
+    test('handles status passed as a string', () => {
+      expect(getAuthLogSeverity('info', '500')).toBe('error')
+      expect(getAuthLogSeverity('info', '404')).toBe('warning')
+      expect(getAuthLogSeverity('info', '200')).toBe('info')
+    })
+
+    test('preserves the original level for non-error statuses', () => {
+      expect(getAuthLogSeverity('info', 200)).toBe('info')
+      expect(getAuthLogSeverity('info', 302)).toBe('info')
+      expect(getAuthLogSeverity('info', 399)).toBe('info')
+    })
+
+    test('falls back to the level when status is missing or invalid', () => {
+      expect(getAuthLogSeverity('info')).toBe('info')
+      expect(getAuthLogSeverity('warning', null)).toBe('warning')
+      expect(getAuthLogSeverity('info', 'not-a-number')).toBe('info')
+    })
+
+    test('keeps explicit error levels even with a non-error status', () => {
+      expect(getAuthLogSeverity('error')).toBe('error')
+      expect(getAuthLogSeverity('fatal')).toBe('fatal')
+      expect(getAuthLogSeverity('error', 200)).toBe('error')
+      expect(getAuthLogSeverity('fatal', 404)).toBe('fatal')
+    })
+
+    test('returns an empty string when level is missing', () => {
+      expect(getAuthLogSeverity()).toBe('')
+      expect(getAuthLogSeverity(null, 200)).toBe('')
+    })
+
+    test('ignores non-string levels and non-numeric statuses', () => {
+      expect(getAuthLogSeverity({}, {})).toBe('')
+      expect(getAuthLogSeverity(42, 500)).toBe('error')
+      expect(getAuthLogSeverity('info', {})).toBe('info')
+      expect(getAuthLogSeverity('info', [500])).toBe('info')
+    })
+  })
+
+  describe('auth_logs severity filter query', () => {
+    const queryFor = (severity: Filters['severity']) =>
+      genDefaultQuery(LogsTableName.AUTH, { severity } as Filters, 100)
+
+    test('error severity filter matches 5xx status as well as the log level', () => {
+      const sql = queryFor({ error: true })
+      expect(sql).toContain("IFNULL(metadata.level, '') IN ('error', 'fatal')")
+      expect(sql).toContain('IFNULL(SAFE_CAST(metadata.status AS INT64), 0) >= 500')
+    })
+
+    test('warning severity filter matches 4xx status as well as the log level', () => {
+      const sql = queryFor({ warning: true })
+      expect(sql).toContain("IFNULL(metadata.level, '') = 'warning'")
+      expect(sql).toContain('IFNULL(SAFE_CAST(metadata.status AS INT64), 0) BETWEEN 400 AND 499')
+    })
+
+    test('info severity filter excludes error and warning rows', () => {
+      const sql = queryFor({ info: true })
+      expect(sql).toContain('NOT (')
     })
   })
 })

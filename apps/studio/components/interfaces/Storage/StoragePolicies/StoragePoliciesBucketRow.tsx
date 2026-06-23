@@ -67,7 +67,7 @@ export const StoragePoliciesBucketRow = forwardRef<HTMLDivElement, StoragePolici
               )}
             </div>
           </div>
-          <Button type="outline" onClick={() => onSelectPolicyAdd(bucket?.name, table)}>
+          <Button variant="outline" onClick={() => onSelectPolicyAdd(bucket?.name, table)}>
             New policy
           </Button>
         </CardHeader>

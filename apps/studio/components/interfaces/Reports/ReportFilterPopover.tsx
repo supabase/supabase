@@ -197,7 +197,7 @@ const ReportFilterRow = ({
         <DropdownControl align="start" options={propertyOptions} onSelect={handlePropertyChange}>
           <Button
             asChild
-            type="outline"
+            variant="outline"
             icon={
               <div className="text-foreground-lighter">
                 <ChevronDown strokeWidth={1.5} />
@@ -212,7 +212,7 @@ const ReportFilterRow = ({
         <DropdownControl align="start" options={operatorOptions} onSelect={handleOperatorChange}>
           <Button
             asChild
-            type="outline"
+            variant="outline"
             icon={
               <div className="text-foreground-lighter">
                 <ChevronDown strokeWidth={1.5} />
@@ -248,7 +248,7 @@ const ReportFilterRow = ({
           />
         )}
         <Button
-          type="text"
+          variant="text"
           size="tiny"
           className="px-1"
           icon={<X strokeWidth={1.5} />}
@@ -334,7 +334,7 @@ export const ReportFilterPopover = ({
     <Popover open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger asChild>
         <Button
-          type={filters.length > 0 ? 'link' : 'text'}
+          variant={filters.length > 0 ? 'link' : 'text'}
           icon={<FilterIcon />}
           disabled={disabled}
         >
@@ -367,16 +367,16 @@ export const ReportFilterPopover = ({
           <PopoverSeparator />
           <div className="px-3 flex flex-row justify-between">
             <div className="flex gap-2">
-              <Button icon={<Plus />} type="text" onClick={onAddFilter}>
+              <Button icon={<Plus />} variant="text" onClick={onAddFilter}>
                 Add filter
               </Button>
               {filters.length > 0 && (
-                <Button type="text" onClick={onResetFilters}>
+                <Button variant="text" onClick={onResetFilters}>
                   Clear all
                 </Button>
               )}
             </div>
-            <Button disabled={!hasChanges} type="default" onClick={onApplyFilters}>
+            <Button disabled={!hasChanges} variant="default" onClick={onApplyFilters}>
               Apply filters
             </Button>
           </div>

@@ -11,10 +11,8 @@ import { cn } from '../../lib/utils/cn'
 export type ButtonVariantProps = VariantProps<typeof buttonVariants>
 const buttonVariants = cva(
   `relative
-  flex items-center justify-center
+  inline-flex items-center justify-center
   cursor-pointer
-  inline-flex
-  items-center
   space-x-2
   text-center
   font-regular
@@ -24,13 +22,14 @@ const buttonVariants = cva(
   outline-hidden
   transition-all
   outline-0
+  focus-visible:outline-solid
   focus-visible:outline-4
   focus-visible:outline-offset-1
   border
   `,
   {
     variants: {
-      type: {
+      variant: {
         primary: `
           bg-brand-400 dark:bg-brand-500
           hover:bg-brand/80 dark:hover:bg-brand/50
@@ -45,9 +44,9 @@ const buttonVariants = cva(
           text-foreground
           bg-alternative dark:bg-muted  hover:bg-selection
           border-strong hover:border-stronger
-          focus-visible:outline-brand-600
+          focus-visible:outline-border-strong
           data-[state=open]:bg-selection
-          data-[state=open]:outline-brand-600
+          data-[state=open]:outline-border-strong
           data-[state=open]:border-button-hover
           `,
         secondary: `
@@ -166,7 +165,7 @@ const IconContainerVariants = cva('inline-flex items-center justify-center shrin
       xxlarge: '[&_svg]:h-[30px] [&_svg]:w-[30px]',
       xxxlarge: '[&_svg]:h-[42px] [&_svg]:w-[42px]',
     },
-    type: {
+    variant: {
       primary: 'text-brand-600',
       default: 'text-foreground-lighter',
       secondary: 'text-border-muted',
@@ -184,7 +183,7 @@ const IconContainerVariants = cva('inline-flex items-center justify-center shrin
 export type LoadingVariantProps = VariantProps<typeof loadingVariants>
 const loadingVariants = cva('', {
   variants: {
-    type: {
+    variant: {
       primary: 'text-brand-600',
       default: 'text-foreground-lighter',
       secondary: 'text-border-muted',
@@ -207,13 +206,12 @@ export interface ButtonProps
   // omit `type` as we use it to change type of button
   // replaced with `htmlType`
   extends
-    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type'>,
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
     // omit 'disabled' as it is included in HTMLButtonElement
     Omit<ButtonVariantProps, 'disabled'>,
-    Omit<LoadingVariantProps, 'type'> {
+    LoadingVariantProps {
   asChild?: boolean
-  type?: ButtonVariantProps['type']
-  htmlType?: React.ButtonHTMLAttributes<HTMLButtonElement>['type']
+  variant?: ButtonVariantProps['variant']
   icon?: React.ReactNode
   iconLeft?: React.ReactNode
   iconRight?: React.ReactNode
@@ -225,14 +223,14 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     {
       asChild = false,
       size = 'tiny',
-      type = 'primary',
+      variant = 'primary',
       children,
       loading,
       block,
       icon,
       iconRight,
       iconLeft,
-      htmlType = 'button',
+      type = 'button',
       rounded,
       ...props
     },
@@ -256,11 +254,11 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <Comp
         ref={ref}
         data-size={size}
-        type={htmlType}
+        type={type}
         {...props}
         disabled={disabled}
         tabIndex={computedTabIndex}
-        className={cn(buttonVariants({ type, size, disabled, block, rounded }), className)}
+        className={cn(buttonVariants({ variant, size, disabled, block, rounded }), className)}
         onClick={(e) => {
           // [Joshen] Prevents redirecting if Button is used with a link-based child element
           if (disabled) return e.preventDefault()
@@ -274,17 +272,17 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
               undefined,
               showIcon &&
                 (loading ? (
-                  <div className={cn(IconContainerVariants({ size, type }))}>
-                    <Loader2 className={cn(loadingVariants({ loading, type }))} />
+                  <div className={cn(IconContainerVariants({ size, variant }))}>
+                    <Loader2 className={cn(loadingVariants({ loading, variant }))} />
                   </div>
                 ) : _iconLeft ? (
-                  <div className={cn(IconContainerVariants({ size, type }))}>{_iconLeft}</div>
+                  <div className={cn(IconContainerVariants({ size, variant }))}>{_iconLeft}</div>
                 ) : null),
               children.props.children && (
                 <span className={'truncate'}>{children.props.children}</span>
               ),
               iconRight && !loading && (
-                <div className={cn(IconContainerVariants({ size, type }))}>{iconRight}</div>
+                <div className={cn(IconContainerVariants({ size, variant }))}>{iconRight}</div>
               )
             )
           ) : null
@@ -292,15 +290,15 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           <>
             {showIcon &&
               (loading ? (
-                <div className={cn(IconContainerVariants({ size, type }))}>
-                  <Loader2 className={cn(loadingVariants({ loading, type }))} />
+                <div className={cn(IconContainerVariants({ size, variant }))}>
+                  <Loader2 className={cn(loadingVariants({ loading, variant }))} />
                 </div>
               ) : _iconLeft ? (
-                <div className={cn(IconContainerVariants({ size, type }))}>{_iconLeft}</div>
+                <div className={cn(IconContainerVariants({ size, variant }))}>{_iconLeft}</div>
               ) : null)}{' '}
             {children && <span className={'truncate'}>{children}</span>}{' '}
             {iconRight && !loading && (
-              <div className={cn(IconContainerVariants({ size, type }))}>{iconRight}</div>
+              <div className={cn(IconContainerVariants({ size, variant }))}>{iconRight}</div>
             )}
           </>
         )}

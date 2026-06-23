@@ -10,10 +10,8 @@ import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { Button, cn, SidePanel } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { DowngradeModal } from './DowngradeModal'
+import { CancellationFlow } from './CancellationFlow'
 import { EnterpriseCard } from './EnterpriseCard'
-import { ExitSurveyModal } from './ExitSurveyModal'
-import MembersExceedLimitModal from './MembersExceedLimitModal'
 import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
 import UpgradeSurveyModal from './UpgradeModal'
 import { STRIPE_PROJECTS_DOCS_URL } from '@/components/interfaces/Billing/Payment/PaymentMethods/StripePaymentConnection'
@@ -21,7 +19,6 @@ import { getPlanChangeType } from '@/components/interfaces/Billing/Subscription/
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
 import { RequestUpgradeToBillingOwners } from '@/components/ui/RequestUpgradeToBillingOwners'
-import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
 import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-utils'
 import { useOrganizationBillingSubscriptionPreview } from '@/data/organizations/organization-billing-subscription-preview'
 import { useOrganizationQuery } from '@/data/organizations/organization-query'
@@ -72,9 +69,7 @@ export const PlanUpdateSidePanel = () => {
 
   const originalPlanRef = useRef<string>(undefined)
 
-  const [showExitSurvey, setShowExitSurvey] = useState(false)
   const [showUpgradeSurvey, setShowUpgradeSurvey] = useState(false)
-  const [showDowngradeError, setShowDowngradeError] = useState(false)
   const [selectedTier, setSelectedTier] = useState<'tier_free' | 'tier_pro' | 'tier_team'>()
   const [latestAddress, setLatestAddress] = useState<CustomerAddress>()
   const [latestTaxId, setLatestTaxId] = useState<CustomerTaxId | null>()
@@ -130,10 +125,6 @@ export const PlanUpdateSidePanel = () => {
     { orgSlug: slug },
     { enabled: visible }
   )
-  const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
-    { slug },
-    { enabled: visible }
-  )
 
   const subscriptionPreviewData = useOrganizationBillingSubscriptionPreview({
     tier: selectedTier,
@@ -143,12 +134,6 @@ export const PlanUpdateSidePanel = () => {
   })
 
   const availablePlans: OrgPlan[] = plans?.plans ?? []
-  const hasMembersExceedingFreeTierLimit =
-    (membersExceededLimit || []).length > 0 &&
-    // [Joshen] Note that orgProjects is paginated so there's a chance this may omit certain projects
-    // Although I don't foresee this affecting a majority of users. Ideally perhaps we could return
-    // this data from the organization query
-    orgProjects.filter((it) => it.status !== 'INACTIVE' && it.status !== 'GOING_DOWN').length > 0
 
   const onPanelOpened = useEffectEvent(
     (properties: StudioPricingSidePanelOpenedEvent['properties']) => {
@@ -182,15 +167,6 @@ export const PlanUpdateSidePanel = () => {
     }
   }, [visible, isSuccessSubscription, subscription?.plan.id])
 
-  const onConfirmDowngrade = () => {
-    setSelectedTier(undefined)
-    if (hasMembersExceedingFreeTierLimit) {
-      setShowDowngradeError(true)
-    } else {
-      setShowExitSurvey(true)
-    }
-  }
-
   const planMeta = selectedTier
     ? availablePlans.find((p) => p.id === selectedTier.split('tier_')[1])
     : null
@@ -216,7 +192,7 @@ export const PlanUpdateSidePanel = () => {
         header={
           <div className="flex items-center justify-between w-full">
             <h4>Change subscription plan for {selectedOrganization?.name}</h4>
-            <Button asChild type="default" icon={<ExternalLink />}>
+            <Button asChild variant="default" icon={<ExternalLink />}>
               <a href="https://supabase.com/pricing" target="_blank" rel="noreferrer">
                 Pricing
               </a>
@@ -306,7 +282,7 @@ export const PlanUpdateSidePanel = () => {
                       <p className="text-foreground-light text-sm">{plan.costUnit}</p>
                     </div>
                     {isCurrentPlan ? (
-                      <Button block disabled type="default">
+                      <Button block disabled variant="default">
                         Current plan
                       </Button>
                     ) : !canUpdateSubscription && !isDowngradeOption ? (
@@ -314,7 +290,7 @@ export const PlanUpdateSidePanel = () => {
                     ) : (
                       <ButtonTooltip
                         block
-                        type={isDowngradeOption ? 'default' : 'primary'}
+                        variant={isDowngradeOption ? 'default' : 'primary'}
                         disabled={
                           (!canUpdateSubscription && isDowngradeOption) ||
                           subscription?.plan?.id === 'enterprise' ||
@@ -395,12 +371,10 @@ export const PlanUpdateSidePanel = () => {
         </SidePanel.Content>
       </SidePanel>
 
-      <DowngradeModal
+      <CancellationFlow
         visible={selectedTier === 'tier_free'}
-        subscription={subscription}
-        onClose={() => setSelectedTier(undefined)}
-        onConfirm={onConfirmDowngrade}
-        projects={orgProjects}
+        onCancel={() => setSelectedTier(undefined)}
+        onDowngrade={() => setSelectedTier(undefined)}
       />
 
       <SubscriptionPlanUpdateDialog
@@ -414,20 +388,6 @@ export const PlanUpdateSidePanel = () => {
         onTaxIdChange={handleTaxIdChange}
         useAsDefaultBillingAddress={useAsDefaultBillingAddress}
         onUseAsDefaultBillingAddressChange={handleUseAsDefaultBillingAddressChange}
-      />
-
-      <MembersExceedLimitModal
-        visible={showDowngradeError}
-        onClose={() => setShowDowngradeError(false)}
-      />
-
-      <ExitSurveyModal
-        visible={showExitSurvey}
-        projects={orgProjects}
-        onClose={(success?: boolean) => {
-          setShowExitSurvey(false)
-          if (success) onClose()
-        }}
       />
 
       <UpgradeSurveyModal

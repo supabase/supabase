@@ -43,7 +43,7 @@ export const TableReplicationRow = ({
 
           <ButtonTooltip
             asChild
-            type="text"
+            variant="text"
             className="px-1.5"
             icon={<ExternalLink />}
             tooltip={{
@@ -96,7 +96,7 @@ export const TableReplicationRow = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
-                type="default"
+                variant="default"
                 className="w-7"
                 icon={<RotateCcw />}
                 disabled={showDisabledState || isRestarting || isAnyRestartInProgress}

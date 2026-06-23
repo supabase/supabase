@@ -38,7 +38,7 @@ const PLUGIN_CLIENTS: PluginClient[] = [
     key: 'gemini-cli',
     label: 'Gemini CLI',
     icon: 'gemini-cli',
-    repoUrl: 'https://github.com/supabase-community/gemini-extension',
+    repoUrl: 'https://github.com/supabase-community/supabase-plugin',
     docsUrl: 'https://geminicli.com/docs/extensions/',
   },
   {
@@ -151,7 +151,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
           your terminal.
         </p>
         <CodeBlock
-          value="gemini extensions install https://github.com/supabase-community/gemini-extension"
+          value="gemini extensions install https://github.com/supabase-community/supabase-plugin"
           language="bash"
           focusable={false}
           className="block"
@@ -159,7 +159,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
         <p className="text-xs text-foreground-lighter">
           You can also find the extension in the{' '}
           <a
-            href="https://geminicli.com/extensions/?name=supabase-communitygemini-extension"
+            href="https://geminicli.com/extensions/?name=supabase-communitysupabase-plugin"
             target="_blank"
             rel="noopener noreferrer"
             className="text-brand-link hover:underline"

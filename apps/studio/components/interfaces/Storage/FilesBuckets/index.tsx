@@ -144,7 +144,7 @@ export const FilesBuckets = () => {
                         </ShortcutTooltip>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button type="default" icon={<ArrowDownNarrowWide />}>
+                            <Button variant="default" icon={<ArrowDownNarrowWide />}>
                               Sorted by {sortBucket === 'alphabetical' ? 'name' : 'created at'}
                             </Button>
                           </DropdownMenuTrigger>
@@ -167,7 +167,7 @@ export const FilesBuckets = () => {
                           side="bottom"
                         >
                           <Button
-                            type="default"
+                            variant="default"
                             icon={<RefreshCw />}
                             loading={isFetchingBuckets}
                             onClick={handleRefresh}
