@@ -124,6 +124,13 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).not.toContain("event_message NOT LIKE 'connection received%'")
     })
 
+    it("always excludes Realtime's 'Billing metrics:' log lines", () => {
+      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:realtime'))
+      expect(sql).toContain(
+        "(source != 'realtime_logs' OR NOT startsWith(event_message, 'Billing metrics:'))"
+      )
+    })
+
     it('does not emit subqueries or CTEs (rejected by the OTEL endpoint)', () => {
       const sql = getUnifiedLogsQuery(baseSearch)
       expect(sql).not.toMatch(/WITH\s+\w+\s+AS\s*\(/i)
@@ -169,6 +176,17 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       const logTypeWhere = whereOfBranchContaining(sql, `'log_type'`)
       expect(logTypeWhere).not.toContain(`NOT LIKE '%/rest/%'`)
     })
+
+    it("excludes Realtime's 'Billing metrics:' log lines from every count scan", () => {
+      const sql = getLogsCountQuery(baseSearch)
+      const scans = sql.split(/\bUNION ALL\b/)
+      expect(scans.length).toBeGreaterThan(1)
+      for (const scan of scans) {
+        expect(scan).toContain(
+          "(source != 'realtime_logs' OR NOT startsWith(event_message, 'Billing metrics:'))"
+        )
+      }
+    })
   })
 
   describe('getLogsChartQuery', () => {
@@ -197,6 +215,13 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       const sql = getLogsChartQuery(baseSearch)
       expect(sql).toContain(
         `if(source = 'auth_logs', log_attributes['status'], log_attributes['response.status_code'])`
+      )
+    })
+
+    it("excludes Realtime's 'Billing metrics:' log lines from the chart", () => {
+      const sql = getLogsChartQuery(withFilters('log_type:eq:realtime'))
+      expect(sql).toContain(
+        "(source != 'realtime_logs' OR NOT startsWith(event_message, 'Billing metrics:'))"
       )
     })
   })

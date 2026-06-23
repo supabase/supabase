@@ -264,6 +264,15 @@ const rowProjection = (): SafeLogSqlFragment => safeSql`
     null AS logs
 `
 
+/**
+ * Excludes Realtime's periodic `Billing metrics:` log lines, which are internal
+ * bookkeeping noise rather than user-facing events. Always applied (no toggle)
+ * and shared by every query via `buildBaseWhere`, so the row, chart and sidebar
+ * facet counts all agree. The `source != 'realtime_logs'` guard makes it a
+ * no-op for every other log type.
+ */
+const REALTIME_BILLING_METRICS_FILTER: SafeLogSqlFragment = safeSql`(source != 'realtime_logs' OR NOT startsWith(event_message, 'Billing metrics:'))`
+
 const buildBaseWhere = (
   search: QuerySearchParamsType,
   excludeField?: string
@@ -292,6 +301,8 @@ const buildBaseWhere = (
     }
   }
 
+  parts.push(REALTIME_BILLING_METRICS_FILTER)
+
   return parts
 }
 
@@ -309,6 +320,7 @@ const connectionLogsFilter = (search: QuerySearchParamsType): SafeLogSqlFragment
     event_message NOT LIKE 'connection authorized%'
   ))`
 }
+
 
 /**
  * Unified logs row query — flat SELECT, no subquery wrapper.
