@@ -13,11 +13,12 @@
  * and carries the legacy function shape (description, notes, params, examples)
  * on a non-TypeDoc `content` field. `build-reference-content.ts` spreads that
  * straight onto the functions.json entry, so the renderer shows params,
- * examples, and notes exactly as the legacy YAML did — no typeSpec round-trip.
+ * examples, and notes exactly as the legacy YAML did, with no typeSpec
+ * round-trip.
  *
  * Overview/header entries (e.g. "Using filters", "Auth MFA") and the top-level
  * markdown sections (introduction, installing, upgrade-guide, initializing) are
- * NOT emitted here — they live as hand-authored partials under
+ * not emitted here. They live as hand-authored partials under
  * `spec/reference/dart/v2/partials/`, matching how the JavaScript lib is set up.
  *
  * The dump is gitignored (like every other reference dump); only `config.json`
@@ -36,7 +37,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const DOCS_DIR = join(__dirname, '..')
 const YAML_PATH = join(DOCS_DIR, 'spec/supabase_dart_v2.yml')
 const SECTIONS_PATH = join(DOCS_DIR, 'spec/common-client-libs-sections.json')
-const OUT_PATH = join(DOCS_DIR, 'spec/reference/dart/v2/supabase_flutter.json')
+const VERSION_DIR = join(DOCS_DIR, 'spec/reference/dart/v2')
+const CONFIG_PATH = join(VERSION_DIR, 'config.json')
+const OUT_PATH = join(VERSION_DIR, 'supabase_flutter.json')
 
 const LIB_ID = 'reference_dart_v2'
 
@@ -134,14 +137,43 @@ function textTag(tag: string, text: string) {
   return { tag, content: [{ kind: 'text', text }] }
 }
 
+type NavigationPrefixes = Record<string, string | false>
+
+/**
+ * Recomputes the slug `build-reference-content.ts` will assign to a method, so
+ * collisions are caught here (and reported by id) rather than silently dropped
+ * by the build's first-wins dedup. Mirrors that script's `functionPrefix` /
+ * slug logic, keyed on the nearest container (subcategory, else category).
+ */
+function functionSlug(
+  name: string,
+  category: string,
+  subcategory: string | null,
+  navigationPrefixes: NavigationPrefixes
+): string {
+  const key = subcategory ?? category
+  const override = navigationPrefixes[key]
+  const prefix = override === false ? null : typeof override === 'string' ? override : slugify(key)
+  const nameLower = name.toLowerCase()
+  return prefix === null ? nameLower : `${prefix}-${nameLower}`
+}
+
+function slugify(value: string): string {
+  return value.toLowerCase().trim().replace(/\s+/g, '-')
+}
+
 export async function generateDartReferenceDump(): Promise<{ methodCount: number }> {
   const doc = parse(await readFile(YAML_PATH, 'utf-8')) as { functions: DartFunction[] }
   const sections = JSON.parse(await readFile(SECTIONS_PATH, 'utf-8')) as SectionNode[]
+  const config = JSON.parse(await readFile(CONFIG_PATH, 'utf-8')) as {
+    navigationPrefixes?: NavigationPrefixes
+  }
+  const navigationPrefixes = config.navigationPrefixes ?? {}
   const sectionMap = buildSectionMap(sections)
 
   let nextId = 1
   const children: unknown[] = []
-  const seenNames = new Set<string>()
+  const slugOwners = new Map<string, string>()
   const skipped: string[] = []
 
   for (const fn of doc.functions) {
@@ -157,12 +189,13 @@ export async function generateDartReferenceDump(): Promise<{ methodCount: number
     if (!/^[A-Za-z][A-Za-z0-9]*$/.test(name)) {
       throw new Error(`Dart converter: id "${fn.id}" yielded an invalid method name "${name}"`)
     }
-    if (seenNames.has(`${section.category}|${section.subcategory}|${name}`)) {
-      throw new Error(
-        `Dart converter: duplicate method "${name}" in ${section.category}/${section.subcategory}`
-      )
+
+    const slug = functionSlug(name, section.category, section.subcategory, navigationPrefixes)
+    const owner = slugOwners.get(slug)
+    if (owner) {
+      throw new Error(`Dart converter: ids "${owner}" and "${fn.id}" both map to slug "${slug}"`)
     }
-    seenNames.add(`${section.category}|${section.subcategory}|${name}`)
+    slugOwners.set(slug, fn.id)
 
     const blockTags = [textTag('@category', section.category)]
     if (section.subcategory) blockTags.push(textTag('@subcategory', section.subcategory))
@@ -196,14 +229,16 @@ export async function generateDartReferenceDump(): Promise<{ methodCount: number
   await mkdir(dirname(OUT_PATH), { recursive: true })
   await writeFile(OUT_PATH, JSON.stringify(dump, null, 2))
 
+  if (skipped.length) {
+    throw new Error(
+      `Dart converter: ${skipped.length} ids have no section mapping (add them to ` +
+        `common-client-libs-sections.json or SECTION_OVERRIDE): ${skipped.join(', ')}`
+    )
+  }
+
   console.log(
     `[dart/v2] wrote ${children.length} method declarations to ${OUT_PATH.replace(DOCS_DIR + '/', '')}`
   )
-  if (skipped.length) {
-    console.warn(
-      `[dart/v2] skipped ${skipped.length} ids with no section mapping: ${skipped.join(', ')}`
-    )
-  }
 
   return { methodCount: children.length }
 }

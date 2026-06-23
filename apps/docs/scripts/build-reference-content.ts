@@ -529,9 +529,8 @@ function buildBySlug(
     items.push(entry)
     // functions.json `id` must match the bySlug entry's `id` (not the slug) —
     // the renderer in Reference.sections.tsx does `fns.find(f => f.id === section.id)`.
-    // `fn.content` (when present) carries the legacy function shape (description,
-    // notes, params, examples) for non-TypeDoc sources; spread it so the renderer
-    // reads those fields directly instead of via typeSpec.
+    // `fn.content`, when present, carries the legacy function shape for non-TypeDoc
+    // sources; spread it so the renderer reads those fields without a typeSpec.
     functionsList.push({ id: entry.id, $ref: fn.$ref, ...(fn.content ?? {}) })
   }
 

@@ -41,7 +41,7 @@ export const REFERENCES = {
       v2: {
         // Dart v2 is driven by the new reference pipeline
         // (`scripts/build-reference-content.ts` + `spec/reference/dart/v2/`).
-        // It intentionally has no `specFile` — the legacy YAML loader skips it.
+        // It intentionally has no `specFile`, so the legacy YAML loader skips it.
         libId: 'reference_dart_v2',
       },
       v1: {

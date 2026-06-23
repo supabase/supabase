@@ -147,8 +147,8 @@ Each Dart method becomes a `variant: 'declaration'` node tagged with
 carries the legacy function shape (description, notes, params, examples) on a
 non-TypeDoc `content` field. `build-reference-content.ts` spreads that `content`
 straight onto the functions.json entry, so the renderer shows params, examples,
-and notes exactly as the YAML did — no typeSpec round-trip. The `content` field
-is absent for real TypeDoc dumps, so JavaScript output is unchanged.
+and notes exactly as the YAML did, with no typeSpec round-trip. The `content`
+field is absent for real TypeDoc dumps, so JavaScript output is unchanged.
 
 The generated dump (`spec/reference/dart/v2/supabase_flutter.json`) is gitignored
 like every other dump; `pnpm codegen:references:new` regenerates it from the
@@ -411,8 +411,16 @@ The same set drives every runtime read that depends on the new layout:
   directly. Other libs still go through `ClientLibReferenceLoader` against
   their YAML. To migrate another lib, swap the same way once it's in
   `SUPPORTS_NEW_REFERENCE_PROCESS`.
+- The public/LLMs markdown generator
+  [`internals/generate-reference-markdown.ts`](../../internals/generate-reference-markdown.ts)
+  keys each lib on its own `kind` (`sdk-legacy` reads
+  `features/docs/generated/<sdk>.<version>.*.json`; `sdk-new` reads
+  `content/reference/<sdk>/<version>/*.json`). This switch is independent of
+  `SUPPORTS_NEW_REFERENCE_PROCESS`, so a migrated lib must also be flipped to
+  `sdk-new` here, otherwise it reads legacy files the generator above no longer
+  produces and the build fails.
 
-No other call sites in the render path need to change.
+No other call sites need to change.
 
 > ⚠️ Don't move the constant. `Reference.utils.ts` transitively pulls in
 > `next/navigation`, which crashes `tsx --conditions=react-server` (used by

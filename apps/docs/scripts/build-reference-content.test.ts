@@ -36,7 +36,7 @@ function serialize(content: {
  * self-referencing builder types) into `[Object]` placeholders — which would
  * make param renames, signature changes, and JSDoc edits invisible.
  */
-describe('build-reference-content — javascript/v2', () => {
+describe('build-reference-content: javascript/v2', () => {
   it('matches snapshot', async () => {
     const content = await collectReferenceContent('javascript', 'v2')
     await expect(serialize(content)).toMatchFileSnapshot(
@@ -49,9 +49,9 @@ describe('build-reference-content — javascript/v2', () => {
  * Dart/v2 has no upstream TypeDoc dump; its source is regenerated from the
  * committed `spec/supabase_dart_v2.yml` by `generate-dart-reference.ts`. We run
  * that converter first so the snapshot covers the full conversion + build path
- * (YAML → dump → content) and surfaces any drift in either step.
+ * (YAML to dump to content) and surfaces any drift in either step.
  */
-describe('build-reference-content — dart/v2', () => {
+describe('build-reference-content: dart/v2', () => {
   beforeAll(async () => {
     await generateDartReferenceDump()
   })
