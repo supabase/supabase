@@ -34,9 +34,13 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(where).not.toContain(`source = 'postgres_logs'`)
     })
 
-    it('routes the `storage` log type to the storage_logs source', () => {
+    it('routes the `storage` log type to storage_logs or edge_logs /storage/', () => {
       const sql = getUnifiedLogsQuery(withFilters('log_type:eq:storage'))
-      expect(sql).toContain(`source = 'storage_logs'`)
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(`source = 'storage_logs'`)
+      expect(where).toContain(
+        `source = 'edge_logs' AND log_attributes['request.path'] LIKE '%/storage/%'`
+      )
     })
 
     it('escapes single quotes in filter values to prevent SQL injection', () => {
