@@ -9,18 +9,18 @@ Applications that store large values in a single column — LLM prompts and resp
 
 ## How Postgres stores large values (TOAST)
 
-When a row is wider than ~2 kB, Postgres automatically moves large column values out of the main table into a companion **TOAST** table, compressing them first. This is transparent — your queries don't change — but it means a table's size is often dominated by its hidden TOAST relation, not by the columns you see.
+When a row is wider than ~2 KB, Postgres automatically moves large column values out of the main table into a companion **TOAST** table, compressing them first. This is transparent — your queries don't change — but it means a table's size is often dominated by its hidden TOAST relation, not by the columns you see.
 
-Each large value is compressed, then split into ~2 kB chunks stored as rows in the TOAST table. See the Postgres docs on [TOAST](https://www.postgresql.org/docs/current/storage-toast.html) for details.
+Each large value is compressed, then split into ~2 KB chunks stored as rows in the TOAST table. See the Postgres docs on [TOAST](https://www.postgresql.org/docs/current/storage-toast.html) for details.
 
 A column's storage strategy controls this:
 
-| Strategy | Compression | Out-of-line (TOAST) | Notes |
-| --- | --- | --- | --- |
-| `EXTENDED` | Yes | Yes | Default for `text`, `jsonb`, `bytea` |
-| `EXTERNAL` | No | Yes | Faster substring reads, larger storage |
-| `MAIN` | Yes | Last resort | Keeps data in-line when it fits |
-| `PLAIN` | No | No | Only for non-TOASTable types |
+| Strategy   | Compression | Out-of-line (TOAST) | Notes                                           |
+| ---------- | ----------- | ------------------- | ----------------------------------------------- |
+| `EXTENDED` | Yes         | Yes                 | Default for `text`, `jsonb`, `bytea`            |
+| `EXTERNAL` | No          | Yes                 | Faster partial reads, larger storage            |
+| `MAIN`     | Yes         | Last resort         | Keeps data in-line when it fits                 |
+| `PLAIN`    | No          | No                  | Only for types that can't be stored out-of-line |
 
 <Admonition type="note">
 
@@ -37,14 +37,14 @@ LLM payloads are usually high-entropy and unique, so Postgres's default compress
 
 Use this as a decision framework, not a rule:
 
-| Keep in Postgres when… | Offload to Storage when… |
-| --- | --- |
-| You query _into_ the value (filter/index on its contents) | You only ever read the whole value back by key |
-| Values are modest (low KB) and bounded | Values are large (100s of KB–MB) or unbounded |
-| You need transactional consistency with the row | The payload is an artifact (a generated file, a raw response log) |
-| Row count is moderate | The table grows without limit (e.g. one row per request) |
+| Keep in Postgres when…                                    | Offload to Storage when…                                          |
+| --------------------------------------------------------- | ----------------------------------------------------------------- |
+| You query _into_ the value (filter/index on its contents) | You only ever read the whole value back by key                    |
+| Values are modest (low KB) and bounded                    | Values are large (100s of KB–MB) or unbounded                     |
+| You need transactional consistency with the row           | The payload is an artifact (a generated file, a raw response log) |
+| Row count is moderate                                     | The table grows without limit (e.g. one row per request)          |
 
-For AI apps, a common split: keep small, queryable fields (status, token counts, a short summary, embeddings) in Postgres; offload the raw prompt/response/log to [Storage](/docs/guides/storage) and keep a path pointer.
+For AI apps, a common split: keep small, frequently queried fields (status, token counts, a short summary, embeddings) in Postgres; offload the raw prompt/response/log to [Storage](/docs/guides/storage) and keep a path pointer.
 
 ## Keeping large values in Postgres
 
@@ -70,12 +70,12 @@ If the data belongs in Postgres, model it to limit bloat:
   );
   ```
 
-- **Set a retention policy.** If old rows aren't needed, delete them on a schedule with [pg_cron](/docs/guides/database/extensions/pg_cron). (Deleting alone won't shrink the file — see the troubleshooting guide for reclaiming.)
+- **Set a retention policy.** If old rows aren't needed, delete them on a schedule with [pg_cron](/docs/guides/database/extensions/pg_cron). (Deleting alone won't shrink the file — see [Reclaiming space](#reclaiming-space).)
 - **Consider `lz4` column compression.** Supabase's Postgres supports `lz4` (faster, often better ratio than the default `pglz`); set it per column with `ALTER TABLE … ALTER COLUMN … SET COMPRESSION lz4` (see [`default_toast_compression`](https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-DEFAULT-TOAST-COMPRESSION)). It applies only to values written after the change, and helps structured/repetitive JSON more than unique text.
 
 ## Offloading large values to Storage
 
-Store the artifact in a bucket and keep a pointer plus queryable metadata in Postgres:
+Store the artifact in a bucket and keep a pointer plus the metadata you query on in Postgres:
 
 ```sql
 create table generations (
@@ -95,7 +95,7 @@ await supabase.storage.from('generations').upload(path, JSON.stringify(payload))
 await supabase.from('generations').update({ response_path: path }).eq('id', id)
 ```
 
-This keeps the table small and queryable while the heavy bytes live in object storage.
+This keeps the table small and fast to query while the heavy bytes live in object storage.
 
 ## Measuring bloat
 
