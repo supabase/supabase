@@ -11,6 +11,8 @@ import { useMemo, useState } from 'react'
 import type PostTypes from 'types/post'
 import { Button, cn, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
 
+import SectionContainer from '@/components/Layouts/SectionContainer'
+
 export type BlogView = 'list' | 'grid'
 
 interface Author {
@@ -54,7 +56,7 @@ export default function AuthorClient({ author, authorId, blogs }: AuthorClientPr
 
   return (
     <DefaultLayout>
-      <div className="container mx-auto px-4 py-4 md:py-8 xl:py-10 sm:px-16 xl:px-20">
+      <SectionContainer className="py-8! xl:py-10!">
         <div className="text-foreground-lighter flex space-x-1 mb-8">
           <h1 className="cursor-pointer">
             <Link href="/blog">Blog</Link>
@@ -64,7 +66,7 @@ export default function AuthorClient({ author, authorId, blogs }: AuthorClientPr
         </div>
 
         {author && (
-          <div className="flex items-center gap-6 pb-8">
+          <div className="flex items-center gap-6">
             {author.author_image_url && (
               <Image
                 src={author.author_image_url}
@@ -96,10 +98,10 @@ export default function AuthorClient({ author, authorId, blogs }: AuthorClientPr
             </div>
           </div>
         )}
-      </div>
+      </SectionContainer>
 
       <div className="border-default border-t">
-        <div className="container mx-auto px-4 py-4 md:py-8 xl:py-10 sm:px-16 xl:px-20">
+        <SectionContainer className="py-8! xl:py-10!">
           <div className="flex flex-row items-center justify-between gap-2 mb-6">
             <div className="flex-1 max-w-[280px]">
               <InputGroup className="w-full">
@@ -162,7 +164,7 @@ export default function AuthorClient({ author, authorId, blogs }: AuthorClientPr
                 : 'No posts found by this author.'}
             </p>
           )}
-        </div>
+        </SectionContainer>
       </div>
     </DefaultLayout>
   )
