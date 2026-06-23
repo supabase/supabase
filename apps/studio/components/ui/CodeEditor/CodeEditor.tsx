@@ -7,6 +7,7 @@ import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 import { alignEditor } from './CodeEditor.utils'
 import { Markdown } from '@/components/interfaces/Markdown'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatSql } from '@/lib/formatSql'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -69,16 +70,6 @@ export const CodeEditor = ({
   const monaco = useMonaco()
   const { data: project } = useSelectedProjectQuery()
 
-  // Monaco claims Cmd+K as a chord prefix, which swallows the global command menu
-  // shortcut while the editor is focused. CodeEditor intercepts it for every editor
-  // (see handleMount) so it behaves the same inside and outside the editor.
-  const isCommandMenuHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.COMMAND_MENU_OPEN)
-  const setCommandMenuOpen = useSetCommandMenuOpen()
-  const commandMenuHotkeyEnabledRef = useRef(isCommandMenuHotkeyEnabled)
-  commandMenuHotkeyEnabledRef.current = isCommandMenuHotkeyEnabled
-  const setCommandMenuOpenRef = useRef(setCommandMenuOpen)
-  setCommandMenuOpenRef.current = setCommandMenuOpen
-
   const hasValue = useRef<editor.IContextKey<boolean>>(null)
   const ref = useRef<editor.IStandaloneCodeEditor>(null)
   const editorRef = editorRefProps || ref
@@ -90,10 +81,14 @@ export const CodeEditor = ({
     ...actions,
   }
 
-  const runQueryCallbackRef = useRef(runQuery.callback)
-  useEffect(() => {
-    runQueryCallbackRef.current = runQuery.callback
-  }, [runQuery.callback])
+  // Monaco claims Cmd+K as a chord prefix, which swallows the global command menu
+  // shortcut while the editor is focused. CodeEditor intercepts it for every editor
+  // (see handleMount) so it behaves the same inside and outside the editor.
+  const commandMenuHotkeyEnabledRef = useLatest(
+    useIsShortcutEnabled(SHORTCUT_IDS.COMMAND_MENU_OPEN)
+  )
+  const setCommandMenuOpenRef = useLatest(useSetCommandMenuOpen())
+  const runQueryCallbackRef = useLatest(runQuery.callback)
 
   const showPlaceholderDefault = placeholder !== undefined && (value ?? '').trim().length === 0
   const [showPlaceholder, setShowPlaceholder] = useState(showPlaceholderDefault)
