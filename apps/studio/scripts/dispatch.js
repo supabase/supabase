@@ -1,20 +1,24 @@
 #!/usr/bin/env node
 // Dispatch a top-level npm script (dev/build/start) to either the next- or
-// tanstack-flavoured variant based on STUDIO_FRAMEWORK. Read .env.local
-// manually for STUDIO_FRAMEWORK only (we don't want to leak the whole file
-// into the child's process.env — scripts/serve.js / vite handle .env file
-// loading themselves and would otherwise refuse to override the
-// dispatcher-set values, including NEXT_PUBLIC_IS_PLATFORM which the e2e
-// `.env.test` needs to flip to `false`).
+// tanstack-flavoured variant based on STUDIO_FRAMEWORK. We parse the env files
+// (via the shared scripts/lib/env.js parser) and pull out only
+// STUDIO_FRAMEWORK — we deliberately don't load the whole file into the
+// child's process.env, because scripts/serve.js / vite do their own .env
+// loading and would otherwise refuse to override the dispatcher-set values,
+// including NEXT_PUBLIC_IS_PLATFORM which the e2e `.env.test` needs to flip to
+// `false`.
 //
 // Usage: node scripts/dispatch.js <target>
 //   target ∈ { dev, build, start }
 //
 // Resolves to `pnpm run <target>:<framework>` where framework is `tanstack`
-// when STUDIO_FRAMEWORK=tanstack (set in shell env or .env.local),
-// otherwise `next`.
+// when STUDIO_FRAMEWORK=tanstack (set in the shell env, `.env`, or
+// `.env.local`), otherwise `next`.
 import { spawn } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+import { readEnvFiles } from './lib/env.js'
 
 const target = process.argv[2]
 if (!target) {
@@ -22,26 +26,13 @@ if (!target) {
   process.exit(2)
 }
 
-function readEnvLocalKey(key) {
-  try {
-    const content = readFileSync('.env.local', 'utf8')
-    const line = /^\s*(?:export\s+)?([\w.-]+)\s*=\s*(.*?)\s*$/
-    for (const raw of content.split('\n')) {
-      const m = line.exec(raw)
-      if (!m || m[1] !== key) continue
-      let v = m[2]
-      if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
-        v = v.slice(1, -1)
-      }
-      return v
-    }
-  } catch {
-    // .env.local doesn't exist — fine, fall through.
-  }
-  return undefined
-}
+const studioRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
-const studioFramework = process.env.STUDIO_FRAMEWORK ?? readEnvLocalKey('STUDIO_FRAMEWORK')
+// Shell env wins, then `.env.local`, then `.env` — the same precedence
+// scripts/serve.js and vite use, so STUDIO_FRAMEWORK set in either file is
+// picked up (not just `.env.local`).
+const fileEnv = readEnvFiles(studioRoot, ['.env', '.env.local'])
+const studioFramework = process.env.STUDIO_FRAMEWORK ?? fileEnv.STUDIO_FRAMEWORK
 const framework = studioFramework === 'tanstack' ? 'tanstack' : 'next'
 const script = `${target}:${framework}`
 
