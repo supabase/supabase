@@ -16,16 +16,22 @@ import {
 
 export const REGIONS = ['ams', 'fra', 'gru', 'hkg', 'iad', 'syd'] as const
 export const METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] as const
-export const LOG_TYPES = [
-  'postgres',
-  'postgrest',
-  'auth',
-  'storage',
-  'edge function',
-  'realtime',
-  'supavisor',
-  'pgbouncer',
-] as const
+export const LOG_TYPES_LABELS = {
+  edge: 'API Gateway',
+  postgres: 'Postgres',
+  postgrest: 'PostgREST',
+  auth: 'Auth',
+  storage: 'Storage',
+  'edge function': 'Edge Function',
+  realtime: 'Realtime',
+  supavisor: 'Supavisor',
+  pgbouncer: 'PgBouncer',
+}
+
+export const LOG_TYPES = Object.keys(LOG_TYPES_LABELS) as [
+  keyof typeof LOG_TYPES_LABELS,
+  ...(keyof typeof LOG_TYPES_LABELS)[],
+]
 export const DEFAULT_LOG_TYPES = ['postgres', 'postgrest'] as const
 
 const parseAsSort = createParser({
