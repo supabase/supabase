@@ -464,7 +464,7 @@ export const LogTable = ({
   const logsExplorerTableHeader = (
     <div
       className={cn(
-        'flex w-full items-center justify-between border-t bg-surface-100 px-5 py-2',
+        'flex w-full items-center justify-between bg-surface-100 px-5 py-2',
         className,
         { hidden: !showHeader }
       )}
