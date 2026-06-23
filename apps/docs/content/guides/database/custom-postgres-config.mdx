@@ -149,6 +149,10 @@ Use the examples below with `supabase --experimental --project-ref <project-ref>
 | [wal_sender_timeout](https://www.postgresql.org/docs/current/runtime-config-replication.html#GUC-WAL-SENDER-TIMEOUT)                                                                                                           | CLI only  | No      | `--config wal_sender_timeout=60s`             |
 | [work_mem](https://www.postgresql.org/docs/current/runtime-config-resource.html#GUC-WORK-MEM)                                                                                                                                  | CLI + SQL | No      | `--config work_mem=64MB`                      |
 
+#### Management API only parameters
+
+Some Postgres settings are configurable through the [Management API](/docs/reference/api/v1-update-postgres-config) but not the CLI. These include logging settings such as `log_connections`. See [Postgres connection logging](/docs/guides/platform/postgres-connection-logging) for details.
+
 #### Managing Postgres configuration with the CLI
 
 To start:
@@ -160,25 +164,25 @@ To update Postgres configurations, use the [`postgres config`](/docs/reference/c
 
 ```bash
 supabase --experimental \
---project-ref <project-ref> \
-postgres-config update --config shared_buffers=250MB
+postgres-config update --config shared_buffers=250MB \
+--project-ref <project-ref>
 ```
 
 By default, the CLI will merge any provided config overrides with any existing ones. The `--replace-existing-overrides` flag can be used to instead force all existing overrides to be replaced with the ones being provided:
 
 ```bash
 supabase --experimental \
---project-ref <project-ref> \
 postgres-config update --config max_parallel_workers=3 \
---replace-existing-overrides
+--replace-existing-overrides \
+--project-ref <project-ref>
 ```
 
 To delete specific configuration overrides, use the `postgres-config delete` command:
 
 ```bash
 supabase --experimental \
---project-ref <project-ref> \
-postgres-config delete --config shared_buffers,work_mem
+postgres-config delete --config shared_buffers,work_mem \
+--project-ref <project-ref>
 ```
 
 By default, CLI v2 (≥ 2.0.0) checks the parameter’s context and requests the correct action (reload or restart):
