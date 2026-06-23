@@ -85,12 +85,13 @@ export function LogosGrid() {
       <div className="border-y border-border">
         <SectionContainer className="border-x border-border py-10!">
           <AnimatePresence mode="popLayout" initial={false}>
-            <motion.div
+            <motion.ul
               key={page}
-              className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-y-10 gap-x-6"
+              aria-label="Trusted by fast-growing companies worldwide"
+              className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-y-10 gap-x-6 list-none"
             >
               {currentLogos.map(({ name, Logo }, i) => (
-                <motion.div
+                <motion.li
                   key={name}
                   initial={{ opacity: 0, scale: 0.95, filter: 'blur(2px)' }}
                   animate={{ opacity: 0.7, scale: 1, filter: 'blur(0px)' }}
@@ -102,10 +103,14 @@ export function LogosGrid() {
                   }}
                   className="flex items-center justify-center h-10 text-foreground-lighter"
                 >
-                  <Logo className="h-8 lg:h-12 w-auto" />
-                </motion.div>
+                  <Logo
+                    role="img"
+                    aria-label={name.charAt(0).toUpperCase() + name.slice(1)}
+                    className="h-8 lg:h-12 w-auto"
+                  />
+                </motion.li>
               ))}
-            </motion.div>
+            </motion.ul>
           </AnimatePresence>
         </SectionContainer>
       </div>

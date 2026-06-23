@@ -49,10 +49,17 @@ export function FrameworksSectionClient({ frameworks }: { frameworks: Framework[
           {/* Right: icon tabs + code */}
           <div className="border border-border flex flex-col rounded-md overflow-clip">
             {/* 6-col icon row */}
-            <div className="grid grid-cols-6 border-b border-border">
+            <div
+              role="tablist"
+              aria-label="Framework"
+              className="grid grid-cols-6 border-b border-border"
+            >
               {frameworks.map((framework, index) => (
                 <button
                   key={framework.name}
+                  role="tab"
+                  aria-selected={index === activeIdx}
+                  aria-label={framework.name}
                   onClick={() => handleTabChange(index)}
                   className={cn(
                     'flex items-center justify-center py-4 border-r border-border last:border-r-0 transition-colors',
@@ -62,6 +69,7 @@ export function FrameworksSectionClient({ frameworks }: { frameworks: Framework[
                   )}
                 >
                   <svg
+                    aria-hidden="true"
                     width={28}
                     height={28}
                     fillRule="evenodd"
@@ -77,7 +85,11 @@ export function FrameworksSectionClient({ frameworks }: { frameworks: Framework[
             </div>
 
             {/* Code area */}
-            <div className="relative h-[440px] overflow-auto">
+            <div
+              role="tabpanel"
+              aria-label={`${active.name} code example`}
+              className="relative h-[440px] overflow-auto"
+            >
               <AnimatePresence mode="wait">
                 <motion.div
                   key={active.name}

@@ -83,7 +83,7 @@ const supabaseLight: ThemeRegistration = {
       ],
       settings: { foreground: '#15593b' },
     },
-    { scope: ['string', 'string.quoted'], settings: { foreground: '#f1a10d' } },
+    { scope: ['string', 'string.quoted'], settings: { foreground: '#b45309' } },
     { scope: ['comment', 'punctuation.definition.comment'], settings: { foreground: '#7e7e7e' } },
     { scope: ['variable.parameter'], settings: { foreground: '#525252' } },
     { scope: ['punctuation'], settings: { foreground: '#a0a0a0' } },

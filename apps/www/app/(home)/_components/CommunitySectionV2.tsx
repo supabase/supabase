@@ -54,7 +54,9 @@ export function CommunitySectionV2() {
           </Button>
         </div>
 
+        {/* Decorative social proof — hidden from a11y tree, links not keyboard-reachable to prevent focus trap */}
         <div
+          aria-hidden="true"
           className="relative overflow-hidden h-[620px]"
           style={{
             maskImage:
@@ -85,7 +87,12 @@ export function CommunitySectionV2() {
                         ease: [0.25, 0.46, 0.45, 0.94],
                       }}
                     >
-                      <Link href={tweet.url} target="_blank" className="block group/tweet-card">
+                      <Link
+                        href={tweet.url}
+                        target="_blank"
+                        tabIndex={-1}
+                        className="block group/tweet-card"
+                      >
                         <TweetCard
                           handle={`@${tweet.handle}`}
                           quote={tweet.text}

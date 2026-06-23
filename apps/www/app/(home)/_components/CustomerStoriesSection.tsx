@@ -184,6 +184,8 @@ export function CustomerStoriesSection() {
                 key={story.slug}
                 role="button"
                 tabIndex={0}
+                aria-expanded={isActive}
+                aria-label={story.name}
                 onClick={() => setActiveIdx(index)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
@@ -265,6 +267,8 @@ export function CustomerStoriesSection() {
                 key={story.slug}
                 role="button"
                 tabIndex={0}
+                aria-expanded={isActive}
+                aria-label={story.name}
                 onClick={() => setActiveIdx(index)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
@@ -300,6 +304,8 @@ export function CustomerStoriesSection() {
                     ease: [0.165, 0.84, 0.44, 1],
                     delay: isActive ? 0.2 : 0,
                   }}
+                  aria-hidden={!isActive}
+                  {...(!isActive ? { inert: '' } : {})}
                 >
                   {/* Top: company name + tagline */}
                   <motion.div layout className="flex flex-col gap-1">
@@ -385,12 +391,14 @@ export function CustomerStoriesSection() {
                 <Link
                   key={story.slug}
                   href={`/customers/${story.slug}`}
+                  aria-label={`Read the ${story.name} customer story`}
                   className="group relative overflow-hidden rounded-lg w-full aspect-[4/3] border border-white/10 flex flex-col justify-end p-5"
                 >
-                  {/* Photo background */}
+                  {/* Photo background — decorative */}
                   <img
                     src={story.photo}
-                    alt={story.name}
+                    alt=""
+                    aria-hidden="true"
                     className="absolute inset-0 w-full h-full object-cover select-none scale-[1.015]"
                   />
                   {/* Dark gradient overlay — heavier at bottom */}
@@ -399,9 +407,11 @@ export function CustomerStoriesSection() {
 
                   {/* Logo + description at bottom */}
                   <div className="relative z-10 flex flex-col gap-2">
+                    {/* Logo is decorative — the link itself is already labelled */}
                     <img
                       src={story.logo}
-                      alt={story.name}
+                      alt=""
+                      aria-hidden="true"
                       className="h-6 w-auto object-contain object-left brightness-0 invert select-none"
                     />
                     <p className="text-white/75 text-sm leading-relaxed text-pretty">
