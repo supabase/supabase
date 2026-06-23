@@ -1,9 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
 import { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
-import { Button, cn } from 'ui'
+import { cn } from 'ui'
 import {
   PageSection,
   PageSectionContent,
@@ -217,22 +216,15 @@ export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean })
                   </EmptyIntegrationConnection>
                 </div>
               ) : (
-                <div>
-                  <Button
-                    icon={<ExternalLink />}
-                    asChild={!isBranch}
-                    variant="default"
-                    disabled={isBranch}
-                  >
-                    {isBranch ? (
-                      <p>Install Vercel Integration</p>
-                    ) : (
-                      <Link href={integrationUrl} target="_blank" rel="noreferrer">
-                        Install Vercel Integration
-                      </Link>
-                    )}
-                  </Button>
-                </div>
+                <EmptyIntegrationConnection
+                  showNode={false}
+                  disabled={isBranch}
+                  href={integrationUrl}
+                  icon={<ExternalLink />}
+                  disabledTooltip="Install Vercel Integration on your project's main branch"
+                >
+                  Install Vercel Integration
+                </EmptyIntegrationConnection>
               )}
             </div>
             {vercelProjectCount > 0 && vercelIntegration !== undefined && (

@@ -6,6 +6,7 @@ import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { connectSchema } from './connect.schema'
 import type {
   ConnectionStringPooler,
   ConnectState,
@@ -225,6 +226,11 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
 
   const showSelfHostedMcpNotice = deploymentMode.isSelfHosted && state.mode === 'mcp'
 
+  const customPrompt = useMemo(
+    () => connectSchema.modes.find((m) => m.id === state.mode)?.prompt,
+    [state.mode]
+  )
+
   if (steps.length === 0) return null
 
   return (
@@ -268,7 +274,7 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
           />
         )}
 
-        <CopyPromptAdmonition stepsContainerRef={stepsContainerRef} />
+        <CopyPromptAdmonition stepsContainerRef={stepsContainerRef} customPrompt={customPrompt} />
 
         <div className="mt-6" ref={stepsContainerRef}>
           {steps.map((step, index) => (

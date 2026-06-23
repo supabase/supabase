@@ -1,4 +1,4 @@
-import { Box, Cable, Database, Sparkles } from 'lucide-react'
+import { Box, Cable, Database, Server, Sparkles } from 'lucide-react'
 import {
   cn,
   RadioGroupStacked,
@@ -27,6 +27,7 @@ const MODE_ICONS: Record<string, React.ReactNode> = {
   direct: <Database size={16} strokeWidth={1.5} />,
   orm: <Cable size={16} strokeWidth={1.5} />,
   mcp: <Sparkles size={16} strokeWidth={1.5} />,
+  server: <Server size={16} strokeWidth={1.5} />,
 }
 
 interface ConnectConfigSectionProps {
@@ -244,7 +245,10 @@ interface ModeSelectorProps {
 
 export function ModeSelector({ modes, selected, onChange }: ModeSelectorProps) {
   return (
-    <div className="grid grid-cols-4 rounded-lg border overflow-hidden">
+    <div
+      className="grid rounded-lg border overflow-hidden"
+      style={{ gridTemplateColumns: `repeat(${modes.length}, minmax(0, 1fr))` }}
+    >
       {modes.map((mode) => (
         <button
           key={mode.id}
