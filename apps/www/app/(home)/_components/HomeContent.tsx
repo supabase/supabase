@@ -22,7 +22,7 @@ export function HomeContent({ frameworksSlot }: { frameworksSlot: React.ReactNod
   const content = getContent()
 
   return (
-    <div className="[&_.container]:max-w-(--container-max-w,75rem)! [&_.container]:px-6!">
+    <div className="[&_.container]:max-w-7xl! [&_.container]:px-6!">
       <section>
         <Hero />
       </section>

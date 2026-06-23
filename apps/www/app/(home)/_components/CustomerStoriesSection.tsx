@@ -156,7 +156,7 @@ export function CustomerStoriesSection() {
     <div className="py-24 flex flex-col gap-16">
       {/* Header row */}
       <div className="">
-        <div className="mx-auto max-w-(--container-max-w,75rem) px-6">
+        <div className="section-container">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
               How industry leaders <br />{' '}
@@ -173,7 +173,7 @@ export function CustomerStoriesSection() {
       </div>
 
       {/* Cards row */}
-      <div className="px-6 mx-auto max-w-(--container-max-w,75rem) w-full">
+      <div className="section-container w-full">
         {/* Mobile: stacked cards */}
         <div className="flex flex-col gap-2 md:hidden">
           {customerStories.map((story, index) => {
@@ -362,7 +362,7 @@ export function CustomerStoriesSection() {
 
       {/* AI Builder stories */}
       <div className="mt-10">
-        <div className="mx-auto max-w-(--container-max-w,75rem) px-6">
+        <div className="section-container">
           <div className="grid grid-cols-1 items-end lg:grid-cols-[420px_1fr] gap-8">
             <div className="flex flex-col md:min-h-[320px] gap-4 justify-between">
               <h3 className="text-xl md:text-3xl text-foreground-lighter">

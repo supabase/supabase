@@ -10,7 +10,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
   return (
     <>
       <Nav hideNavbar={false} />
-      <div className="relative w-full [--container-max-w:75rem]">
+      <div className="relative w-full">
         <main className="relative min-h-screen">{children}</main>
       </div>
       <Footer />

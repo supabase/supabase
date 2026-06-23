@@ -152,7 +152,7 @@ export function OpenSourceSection() {
         <ContribGraph />
       </div>
 
-      <div className="relative z-10 w-full max-w-(--container-max-w,75rem) mx-auto px-6 py-24">
+      <div className="section-container relative z-10 w-full py-24">
         <div className="flex flex-col mx-auto md:mx-0 items-center md:items-start gap-6 w-full max-w-lg">
           <div className="flex flex-col items-center text-center md:items-start md:text-left gap-6 w-full">
             <div>

@@ -59,7 +59,7 @@ export function DashboardFeaturesSection({
     <div className="border-b border-border">
       <div
         ref={sectionRef}
-        className="relative mx-auto max-w-(--container-max-w,75rem) px-6 pt-10 pb-4 overflow-hidden"
+        className="mx-auto section-container relative pt-10 pb-4 overflow-hidden"
       >
         <div className="pt-12 flex flex-col gap-8">
           <h3 className="text-2xl md:text-4xl text-foreground-lighter">{title}</h3>
@@ -107,7 +107,7 @@ export function DashboardFeaturesSection({
 
       {/* Customer story banner */}
       <div className="border-t border-border">
-        <div className="mx-auto max-w-(--container-max-w,75rem) py-4">
+        <div className="section-container py-4">
           <AnimatePresence mode="wait">
             <motion.div
               key={story.slug}
