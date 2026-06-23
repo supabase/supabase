@@ -34,11 +34,11 @@ supabase functions new send-email
 Paste the following code into the `index.ts` file:
 
 ```tsx supabase/functions/send-email/index.ts
-import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
-import { renderAsync } from 'npm:@react-email/components@0.0.22'
+import { Webhook } from 'npm:standardwebhooks@^1'
+import { renderAsync } from 'npm:@react-email/components@^1'
 import { withSupabase } from 'npm:@supabase/server@^1'
-import React from 'npm:react@18.3.1'
-import { Resend } from 'npm:resend@4.0.0'
+import React from 'npm:react@^19'
+import { Resend } from 'npm:resend@^6'
 
 import { MagicLinkEmail } from './_templates/magic-link.tsx'
 
@@ -48,7 +48,7 @@ const hookSecret = (Deno.env.get('SEND_EMAIL_HOOK_SECRET') as string).replace('v
 export default {
   fetch: withSupabase({ auth: 'none' }, async (req) => {
     if (req.method !== 'POST') {
-      return new Response('not allowed', { status: 400 })
+      return Response.json({ error: 'not allowed' }, { status: 400 })
     }
 
     const payload = await req.text()
@@ -124,8 +124,8 @@ import {
   Link,
   Preview,
   Text,
-} from 'npm:@react-email/components@0.0.22'
-import * as React from 'npm:react@18.3.1'
+} from 'npm:@react-email/components@^1'
+import * as React from 'npm:react@^19'
 
 interface MagicLinkEmailProps {
   supabase_url: string

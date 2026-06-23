@@ -93,8 +93,8 @@ export const CreateBranchModal = () => {
       .string()
       .min(1, 'Branch name cannot be empty')
       .refine(
-        (val) => /^[a-zA-Z0-9\-_]+$/.test(val),
-        'Branch name can only contain alphanumeric characters, hyphens, and underscores.'
+        (val) => /^[a-zA-Z0-9\-_/]+$/.test(val),
+        'Only letters, numbers, hyphens, underscores, and forward slashes are allowed.'
       )
       .refine(
         (val) => (branches ?? []).every((branch) => branch.name !== val),
@@ -105,7 +105,7 @@ export const CreateBranchModal = () => {
   })
 
   const form = useForm<z.infer<typeof FormSchema>>({
-    mode: 'onSubmit',
+    mode: 'onChange',
     reValidateMode: 'onBlur',
     resolver: zodResolver(FormSchema),
     defaultValues: { branchName: '', gitBranchName: '', withData: false },
@@ -307,7 +307,7 @@ export const CreateBranchModal = () => {
                 control={form.control}
                 name="branchName"
                 render={({ field }) => (
-                  <FormItemLayout label="Preview Branch Name">
+                  <FormItemLayout label="Preview branch name">
                     <FormControl>
                       <Input
                         {...field}

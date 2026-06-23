@@ -139,9 +139,13 @@ function toRelativeSameOrigin(url: string): string {
 }
 
 // Next's pages-router passes a TransitionOptions bag as the 3rd arg to
-// push/replace. We accept the shape but ignore the fields TanStack has
-// no direct equivalent for (shallow, locale, scroll, unstable_skipClientCache).
-// `replace` is the only one we honour.
+// push/replace. We accept the shape but ignore every field — TanStack has
+// no direct equivalent for any of them (shallow, locale, scroll,
+// unstable_skipClientCache). Notably `shallow` is a no-op here, NOT a
+// push-vs-replace signal: callers pass `push(url, as, { shallow: true })`
+// expecting a normal history push (e.g. useUrlState, MonacoEditor). Whether
+// a navigation replaces is decided solely by which method is called
+// (push vs replace) via the internal `_replace` flag below.
 type TransitionOptions = {
   shallow?: boolean
   locale?: string | false
@@ -174,11 +178,13 @@ export function useRouter() {
     const navigate = async (
       url: string | UrlObject,
       _as?: string | UrlObject,
-      options?: TransitionOptions
+      // `_replace` is an internal flag set by the `replace()` method below.
+      // It's intentionally not part of Next's public TransitionOptions.
+      options?: TransitionOptions & { _replace?: boolean }
     ): Promise<boolean> => {
       const to = toRelativeSameOrigin(resolveUrl(url))
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await router.navigate({ to: to as any, replace: !!options?.shallow ? false : undefined })
+      await router.navigate({ to: to as any, replace: options?._replace })
       return true
     }
 
@@ -237,7 +243,7 @@ export function useRouter() {
       push: (url: string | UrlObject, as?: string | UrlObject, options?: TransitionOptions) =>
         navigate(url, as, options),
       replace: (url: string | UrlObject, as?: string | UrlObject, options?: TransitionOptions) =>
-        navigate(url, as, { ...options, shallow: true }),
+        navigate(url, as, { ...options, _replace: true }),
       reload: () => {
         if (typeof window !== 'undefined') window.location.reload()
       },

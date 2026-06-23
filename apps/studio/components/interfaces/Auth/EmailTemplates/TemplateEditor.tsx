@@ -366,9 +366,15 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                       <p className="text-sm text-foreground-lighter">
                         Data placeholders that can be inserted into the subject or body.{' '}
                         <InlineLink
+                          href={`${DOCS_URL}/guides/auth/auth-email-templates#terminology`}
+                        >
+                          Terminology
+                        </InlineLink>
+                        {' · '}
+                        <InlineLink
                           href={`${DOCS_URL}/guides/local-development/customizing-email-templates#template-variables`}
                         >
-                          Learn more
+                          Local development
                         </InlineLink>
                       </p>
                     </div>

@@ -1,5 +1,5 @@
+import { SchemaInstallationStatus } from '@stripe/sync-engine/supabase'
 import { AlertCircle, Check, RefreshCwIcon } from 'lucide-react'
-import { SchemaInstallationStatus } from 'stripe-experiment-sync/supabase'
 
 import {
   hasInstallError,
