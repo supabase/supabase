@@ -1,5 +1,4 @@
 import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
-import { computeSuccessAndNonSuccessRates } from '../ProjectHome/ProjectUsage.metrics'
 import type { ServiceKey } from './ObservabilityOverview.utils'
 
 /**
@@ -64,8 +63,10 @@ export const buildApiGatewayProductData = (
 }
 
 /**
- * Aggregates request count and success rate across all API Gateway products so the
- * row header numbers match the stacked-by-product chart exactly.
+ * Aggregates request count and health across all API Gateway products so the row
+ * header matches the stacked-by-product chart. Each product's `total` is the sum of
+ * its infos + warnings + errors, the same value the chart stacks, so the header
+ * request count always equals the chart's total bar height.
  */
 export const calculateApiGatewayAggregate = (
   serviceData: Partial<Record<ServiceKey, ServiceTotals>>
@@ -73,7 +74,6 @@ export const calculateApiGatewayAggregate = (
   total: number
   errorCount: number
   warningCount: number
-  successRate: number
   errorRate: number
 } => {
   let total = 0
@@ -88,8 +88,7 @@ export const calculateApiGatewayAggregate = (
     warningCount += service.warningCount
   }
 
-  const { successRate } = computeSuccessAndNonSuccessRates(total, warningCount, errorCount)
   const errorRate = total > 0 ? (errorCount / total) * 100 : 0
 
-  return { total, errorCount, warningCount, successRate, errorRate }
+  return { total, errorCount, warningCount, errorRate }
 }

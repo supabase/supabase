@@ -89,12 +89,11 @@ describe('calculateApiGatewayAggregate', () => {
       total: 0,
       errorCount: 0,
       warningCount: 0,
-      successRate: 0,
       errorRate: 0,
     })
   })
 
-  it('sums totals across products and derives success and error rates', () => {
+  it('sums totals across products and derives the error rate', () => {
     const result = calculateApiGatewayAggregate({
       db: { total: 80, errorCount: 4, warningCount: 0 },
       auth: { total: 20, errorCount: 0, warningCount: 16 },
@@ -105,8 +104,6 @@ describe('calculateApiGatewayAggregate', () => {
     expect(result.warningCount).toBe(16)
     // 4 errors / 100 total
     expect(result.errorRate).toBe(4)
-    // 100 - ((16 warnings + 4 errors) / 100) * 100
-    expect(result.successRate).toBe(80)
   })
 
   it('ignores services that are not API Gateway products', () => {
