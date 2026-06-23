@@ -145,7 +145,7 @@ export const DestinationTypeSelection = () => {
       labelOptional="Destination type cannot be changed after creation"
       description={
         selectedOption?.isAlpha && (
-          <span className="text-sm text-foreground-light mb-1">
+          <span className="block text-sm text-foreground-light mb-1">
             This destination type is in alpha and may be unstable or introduce breaking changes
             while we iterate based on customer feedback.{' '}
             <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
