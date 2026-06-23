@@ -358,7 +358,7 @@ Since Llamafile provides an OpenAI API compatible server, you can either use it 
 
       ```ts
       import { withSupabase } from 'npm:@supabase/server@^1'
-      import OpenAI from 'https://deno.land/x/openai@v4.53.2/mod.ts'
+      import OpenAI from 'jsr:@openai/openai@^6'
 
       export default {
         fetch: withSupabase({ auth: 'publishable' }, async (req, ctx) => {

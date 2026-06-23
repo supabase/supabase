@@ -303,11 +303,24 @@ th code {
 }
 
 /*
- * Prevents very long code lines (checksums, URLs, etc., from breaking table
- * widths
+ * First column (e.g. variable names): wrap at word boundaries, not mid-token.
  */
-.prose :where(td) code {
+.prose :where(td:first-child) code {
+  @apply break-words whitespace-normal;
+}
+
+/*
+ * Other columns: prevents very long code lines (checksums, URLs, etc.) from
+ * breaking table widths.
+ */
+.prose :where(td:not(:first-child)) code {
   @apply break-all;
+}
+
+.prose table td:first-child,
+.prose table th:first-child {
+  min-width: 12rem;
+  width: 30%;
 }
 
 /* Zoomable image */
