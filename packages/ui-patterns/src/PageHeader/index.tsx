@@ -2,8 +2,7 @@
 
 import { cva, type VariantProps } from 'class-variance-authority'
 import React, { createContext, useContext } from 'react'
-import { cn } from 'ui'
-import { Breadcrumb } from 'ui/src/components/shadcn/ui/breadcrumb'
+import { Breadcrumb, cn } from 'ui'
 
 import { PageContainer } from '../PageContainer'
 

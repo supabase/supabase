@@ -13,6 +13,7 @@ function SignIn() {
       heading="Welcome back"
       subheading="Sign in to your account"
       logoLinkToMarketingSite={true}
+      inboundFlow="sign-in"
     >
       <SignInPage dehydratedState={undefined} />
     </SignInLayout>

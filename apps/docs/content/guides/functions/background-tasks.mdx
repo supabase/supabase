@@ -27,7 +27,7 @@ EdgeRuntime.waitUntil(asyncLongRunningTask())
 
 export default {
   fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
-    return new Response(...)
+    return Response.json({ ok: true })
   }),
 }
 ```
@@ -42,7 +42,7 @@ export default {
     // Won't block the request, runs in background.
     EdgeRuntime.waitUntil(asyncLongRunningTask())
 
-    return new Response(...)
+    return Response.json({ ok: true })
   }),
 }
 ```
@@ -62,7 +62,7 @@ addEventListener('beforeunload', (ev) => {
 
 export default {
   fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
-    return new Response(...)
+    return Response.json({ ok: true })
   }),
 }
 ```

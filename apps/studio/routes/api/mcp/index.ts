@@ -87,10 +87,17 @@ const POST = async ({ request }: { request: Request }) => {
         headers: { 'Content-Type': 'application/json' },
       })
     }
-    return new Response(JSON.stringify({ error: 'Unable to process MCP request', cause: err }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    })
+    // `err` here is a non-Error throw, so stringify a safe representation
+    // rather than embedding the raw value — a circular/non-serializable
+    // object would make JSON.stringify throw inside the catch and turn this
+    // into an unhandled 500.
+    return new Response(
+      JSON.stringify({ error: 'Unable to process MCP request', cause: String(err) }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
   }
 }
 
