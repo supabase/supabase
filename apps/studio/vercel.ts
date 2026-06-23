@@ -32,16 +32,27 @@ const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 //
 // Rewrite ordering: API + server-function passthrough first so extensioned
 // API paths (/api/foo.json) don't get caught by the asset rule. Asset rule
-// next — it's an identity rewrite that also guards missing files from
-// falling through to the shell (a missing .js should 404, not serve HTML).
-// Shell rule last, catching everything else.
+// next — strips the basePath prefix so `/dashboard/assets/x.js` maps onto the
+// `dist/client/assets/x.js` filesystem layout (a no-op identity when
+// prefix=''). Shell rule LAST, and it deliberately matches only extensionless
+// paths via a negative lookahead.
+//
+// Why the lookahead matters: a request WITH a file extension that doesn't
+// resolve to a real file — e.g. a hashed chunk from an older deployment after
+// a redeploy — must fall through to a 404, NOT the HTML shell. A catch-all
+// `(.*)` shell swallows those misses and returns `text/html`, so the browser
+// gets HTML for a `.js` request and throws "Failed to load module script …
+// MIME type text/html" (and, because /assets/* is cached immutable, that HTML
+// poisons the edge cache under the asset URL). A clean 404 instead lets skew
+// protection's `__vdpl` routing serve the chunk from the deployment that still
+// has it, or the client's `vite:preloadError` backstop recover.
 function routesFor(prefix: string) {
   return {
     rewrites: [
       routes.rewrite(`${prefix}/api/(.*)`, '/api/server'),
       routes.rewrite(`${prefix}/_serverFn/(.*)`, '/api/server'),
       routes.rewrite(`${prefix}/(.*\\.\\w+)`, '/$1'),
-      routes.rewrite(`${prefix}/(.*)`, '/_shell'),
+      routes.rewrite(`${prefix}/((?!.*\\.\\w+$).*)`, '/_shell'),
     ],
     headers: [
       // Dynamic function responses must not be cached by any shared cache —
