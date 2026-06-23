@@ -32,16 +32,19 @@ export function parseEnv(content) {
 
 // Read a cascade of env files from `dir`, with later files overriding earlier
 // ones — matching the precedence vite/Next use
-// (`.env` < `.env.local` < `.env.<mode>` < `.env.<mode>.local`). Missing files
-// are skipped. Returns the merged key/value object; never mutates process.env.
+// (`.env` < `.env.local` < `.env.<mode>` < `.env.<mode>.local`). A missing file
+// is skipped, but any other read error (permissions, IO) is surfaced rather
+// than silently dropping that file's values. Returns the merged key/value
+// object; never mutates process.env.
 export function readEnvFiles(dir, files) {
   const parsed = {}
   for (const file of files) {
     let content
     try {
       content = readFileSync(path.join(dir, file), 'utf8')
-    } catch {
-      continue
+    } catch (err) {
+      if (err && typeof err === 'object' && err.code === 'ENOENT') continue
+      throw err
     }
     Object.assign(parsed, parseEnv(content))
   }
