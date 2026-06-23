@@ -149,7 +149,17 @@ function toWebRequest(req) {
 
 async function pipeWebResponse(response, res) {
   res.statusCode = response.status
-  for (const [k, v] of response.headers) res.setHeader(k, v)
+  // The Headers iterator collapses duplicate keys, and for `set-cookie` it joins
+  // every cookie into one comma-separated value — which corrupts auth/session
+  // cookies. Pull the cookies out separately via getSetCookie() and set them as
+  // an array so each one becomes its own header.
+  const setCookies =
+    typeof response.headers.getSetCookie === 'function' ? response.headers.getSetCookie() : []
+  for (const [k, v] of response.headers) {
+    if (k.toLowerCase() === 'set-cookie') continue
+    res.setHeader(k, v)
+  }
+  if (setCookies.length > 0) res.setHeader('set-cookie', setCookies)
   if (!response.body) {
     res.end()
     return

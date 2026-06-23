@@ -1,9 +1,7 @@
-import { createClient } from '@supabase/supabase-js'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from '@/lib/api/apiWrapper'
-
-const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_KEY!)
+import { selfHostedSupabaseAdmin as supabase } from '@/lib/api/self-hosted-admin'
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
