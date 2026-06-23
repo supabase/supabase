@@ -12,8 +12,8 @@ import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { useIsJitDbAccessEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DiskManagementPanelForm } from '@/components/interfaces/DiskManagement/DiskManagementPanelForm'
 import { BannedIPs } from '@/components/interfaces/Settings/Database/BannedIPs'
+import { ConnectionLogging } from '@/components/interfaces/Settings/Database/ConnectionLogging'
 import { ConnectionPooling } from '@/components/interfaces/Settings/Database/ConnectionPooling/ConnectionPooling'
-import { DatabaseLogs } from '@/components/interfaces/Settings/Database/DatabaseLogs'
 import { DatabaseReadOnlyAlert } from '@/components/interfaces/Settings/Database/DatabaseReadOnlyAlert'
 import { ResetDbPassword } from '@/components/interfaces/Settings/Database/DatabaseSettings/ResetDbPassword'
 import { DiskSizeConfiguration } from '@/components/interfaces/Settings/Database/DiskSizeConfiguration'
@@ -64,7 +64,7 @@ const DatabaseSettings: NextPageWithLayout = () => {
               <DiskSizeConfiguration />
             )}
             {databaseNetworkRestrictions && <NetworkRestrictions />}
-            {databaseLogsConfigurationEnabled && <DatabaseLogs />}
+            {databaseLogsConfigurationEnabled && <ConnectionLogging />}
             <BannedIPs />
           </PageContainer>
           <PoolingModesModal />
