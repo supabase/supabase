@@ -76,6 +76,10 @@ ALTER ROLE supabase_read_only_user WITH LOGIN PASSWORD 'postgres';
 
 GRANT anon, authenticated, service_role TO authenticator;
 GRANT anon, authenticated, service_role TO postgres;
+-- Admin roles switch into the request role (SET ROLE) per request, so they need
+-- membership in those roles.
+GRANT anon, authenticated, service_role TO supabase_storage_admin;
+GRANT anon, authenticated, service_role TO supabase_auth_admin;
 GRANT supabase_functions_admin, supabase_realtime_admin TO postgres;
 GRANT supabase_auth_admin, supabase_storage_admin TO postgres;
 
