@@ -57,7 +57,7 @@ const HTTP_STATUS_EXPR: SafeLogSqlFragment = safeSql`if(source = 'auth_logs', lo
 const LOG_TYPE_CONDITION: Record<string, SafeLogSqlFragment> = {
   edge: safeSql`source = 'edge_logs' AND ${ATTR.path} NOT LIKE '%/rest/%' AND ${ATTR.path} NOT LIKE '%/storage/%'`,
   postgrest: safeSql`source = 'edge_logs' AND ${ATTR.path} LIKE '%/rest/%'`,
-  storage: safeSql`source = 'edge_logs' AND ${ATTR.path} LIKE '%/storage/%'`,
+  storage: safeSql`source = 'storage_logs'`,
   postgres: safeSql`source = 'postgres_logs'`,
   'edge function': safeSql`source = 'function_edge_logs'`,
   auth: safeSql`source = 'auth_logs'`,
@@ -67,9 +67,10 @@ const LOG_TYPE_CONDITION: Record<string, SafeLogSqlFragment> = {
 }
 
 // Derived `log_type` column for SELECT / GROUP BY / countIf use.
+// WHEN source = 'edge_logs' AND ${ATTR.path} LIKE '%/storage/%' THEN 'storage'
 const LOG_TYPE_EXPR: SafeLogSqlFragment = safeSql`CASE
       WHEN source = 'edge_logs' AND ${ATTR.path} LIKE '%/rest/%' THEN 'postgrest'
-      WHEN source = 'edge_logs' AND ${ATTR.path} LIKE '%/storage/%' THEN 'storage'
+      WHEN source = 'storage_logs' THEN 'storage'
       WHEN source = 'edge_logs' THEN 'edge'
       WHEN source = 'postgres_logs' THEN 'postgres'
       WHEN source = 'function_edge_logs' THEN 'edge function'
@@ -292,14 +293,17 @@ const buildBaseWhere = (
     }
   }
 
+  const connFilter = connectionLogsFilter(search)
+  if (connFilter) parts.push(connFilter)
+
   return parts
 }
 
 /**
  * Returns a WHERE condition that excludes Postgres connection lifecycle messages.
- * Applied only to the row query and chart query so sidebar facets remain unaffected
- * (the OTEL endpoint's UNION ALL count query fails silently when this condition is
- * included there, returning empty facet data).
+ * Shared by every query via `buildBaseWhere`, so the row list, chart and sidebar
+ * facet counts all hide connection logs together (otherwise the badges over-count
+ * by the connection rows the list hides).
  */
 const connectionLogsFilter = (search: QuerySearchParamsType): SafeLogSqlFragment | null => {
   if (!search.hide_connection_logs) return null
@@ -315,8 +319,6 @@ const connectionLogsFilter = (search: QuerySearchParamsType): SafeLogSqlFragment
  */
 export const getUnifiedLogsQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
   const conditions = buildBaseWhere(search)
-  const connFilter = connectionLogsFilter(search)
-  if (connFilter) conditions.push(connFilter)
   return safeSql`
 SELECT ${rowProjection()}
 FROM logs
@@ -442,8 +444,6 @@ export const getLogsChartQuery = (search: QuerySearchParamsType): SafeLogSqlFrag
   const truncationLevel = calculateChartBucketing(search)
   const truncFn = truncationFunction(truncationLevel)
   const conditions = buildBaseWhere(search)
-  const connFilter = connectionLogsFilter(search)
-  if (connFilter) conditions.push(connFilter)
 
   return safeSql`
 SELECT
