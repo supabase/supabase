@@ -321,7 +321,6 @@ const connectionLogsFilter = (search: QuerySearchParamsType): SafeLogSqlFragment
   ))`
 }
 
-
 /**
  * Unified logs row query — flat SELECT, no subquery wrapper.
  */
