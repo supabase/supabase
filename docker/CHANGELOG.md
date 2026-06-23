@@ -12,11 +12,15 @@ See per-service updates below for details. Only the most important changes relev
 
 ## Unreleased
 
-⚠️ **Upcoming changes:** Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions/categories/changelog?discussions_q=is%3Aopen+category%3AChangelog+label%3Aself-hosted) for updates.
+⚠️ **Upcoming changes:**
+- ⚠️ **Breaking change** (week of July 6, 2026): Access to the OpenAPI spec at `/rest/v1/` via the anon (publishable) key will be removed. Requests using the service role or new secret keys are unaffected, and data access via `/rest/v1/your_table` or any client library continues to work as it does today. See discussion [#42949](https://github.com/orgs/supabase/discussions/42949).
+- ⚠️ **Breaking change** (week of July 6, 2026): `API_EXTERNAL_URL` will be updated to include the `/auth/v1` path prefix (e.g. `http://localhost:8000/auth/v1`), aligning self-hosted with the platform and CLI. This makes custom OAuth providers work out of the box and moves SAML SSO endpoints to `/auth/v1/sso/saml/*`. See discussion [#47093](https://github.com/orgs/supabase/discussions/47093).
+
+Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions/categories/changelog?discussions_q=is%3Aopen+category%3AChangelog+label%3Aself-hosted) for updates.
 
 ---
 
-## [2026-06-17]
+## [0.6.0](https://github.com/supabase/supabase/releases/tag/self-hosted/v0.6.0) - 2026-06-17
 
 ⚠️ **Note:** This update contains **breaking changes**. Make sure to read the **important** details below:
 - **Postgres 17 is now the default**. Do not start Postgres 17 on an existing Postgres 15 data directory. See the [Upgrade to Postgres 17](https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17) guide. Check the **Configuration** and **Postgres** sections for additional information
@@ -59,7 +63,7 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
-## [2026-06-03]
+## [0.5.0](https://github.com/supabase/supabase/releases/tag/self-hosted/v0.5.0) - 2026-06-03
 
 ⚠️ **Note:** This update includes **important changes**. Please check the details below.
 
@@ -118,7 +122,7 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
-## [2026-04-27]
+## 2026-04-27
 
 ### Configuration
 - ⚠️ Added `docker-compose.envoy.yml` and `volumes/api/envoy`. See also the API gateway updates below - PR [#43838](https://github.com/supabase/supabase/pull/43838)
@@ -142,7 +146,7 @@ See per-service updates below for details. Only the most important changes relev
 - ⚠️ Added 4 new lints to the Security Advisor. Read more about lint rules 0026 - 0029 in the [Performance and Security Advisors](https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0026_pg_graphql_anon_table_exposed) section of the Supabase documentation - PR [#45253](https://github.com/supabase/supabase/pull/45253), PR [#45260](https://github.com/supabase/supabase/pull/45260)
 ---
 
-## [2026-04-08]
+## 2026-04-08
 
 ### Documentation
 - Added new how-to guides for configuring [custom email templates](https://supabase.com/docs/guides/self-hosting/custom-email-templates), setting up [SAML SSO](https://supabase.com/docs/guides/self-hosting/self-hosted-saml-sso), and [using Postgres 17](https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17) - PR [#42832](https://github.com/supabase/supabase/pull/42832), PR [#43386](https://github.com/supabase/supabase/pull/43386), PR [#44147](https://github.com/supabase/supabase/pull/44147)
@@ -178,7 +182,7 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
-## [2026-03-16]
+## 2026-03-16
 
 ⚠️ **Note:** This update includes **important changes**. Please check the details below. The following configuration files have been added/updated: `utils/add-new-auth-keys.sh`, `utils/rotate-new-api-keys.sh`, `docker-compose.yml`, `.env.example`, `docker-compose.s3.yml`, `docker-compose.rustfs.yml`, `volumes/api/kong.yml`, `volumes/api/kong-entrypoint.sh`, `docker-compose.caddy.yml`, `docker-compose.nginx.yml`, `volumes/functions/main/index.ts`, and `volumes/proxy`.
 
@@ -224,7 +228,7 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
-## [2026-02-18]
+## 2026-02-18
 
 ### Storage
 - Changed MinIO image to use Chainguard [minio](https://images.chainguard.dev/directory/image/minio/overview) and [minio-client](https://images.chainguard.dev/directory/image/minio-client/overview) (requires `docker-compose.s3.yml` update) - PR [#42942](https://github.com/supabase/supabase/pull/42942)
@@ -237,7 +241,7 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
-## [2026-02-16]
+## 2026-02-16
 
 ⚠️ **Note:** This update includes several breaking changes, including a security fix for Analytics. Please check the details below. The following configuration files have been updated: `docker-compose.yml`, `.env.example`, `docker-compose.s3.yml`, `volumes/api/kong.yml`, and `volumes/logs/vector.yml`.
 
@@ -279,7 +283,7 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
-## [2026-02-05]
+## 2026-02-05
 
 ### Storage
 - Updated to `v1.37.1` - [Release](https://github.com/supabase/storage/releases/tag/v1.37.1)
@@ -287,7 +291,7 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
-## [2026-01-27]
+## 2026-01-27
 
 ### Studio
 - Updated to `2026.01.27-sha-6aa59ff`
@@ -328,7 +332,7 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
-## [2025-12-18]
+## 2025-12-18
 
 ### Documentation
 - Updated self-hosting installation and configuration guide - PR [#40901](https://github.com/supabase/supabase/pull/40901), PR [#41438](https://github.com/supabase/supabase/pull/41438)
@@ -358,7 +362,7 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
-## [2025-12-10]
+## 2025-12-10
 
 ### Studio
 - Updated to `2025.12.09-sha-434634f`
@@ -386,7 +390,7 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
-## [2025-12-08]
+## 2025-12-08
 
 ### Realtime
 - No image update
@@ -395,7 +399,7 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
-## [2025-11-26]
+## 2025-11-26
 
 ### Studio
 - Updated to `2025.11.26-sha-8f096b5`
@@ -412,7 +416,7 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
-## [2025-11-25]
+## 2025-11-25
 
 ### Studio
 - Updated to `2025.11.24-sha-d990ae8` - [Dashboard updates](https://github.com/orgs/supabase/discussions/40734)
@@ -441,7 +445,7 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
-## [2025-11-17]
+## 2025-11-17
 
 ### Storage
 - No image update
@@ -449,7 +453,7 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
-## [2025-11-12]
+## 2025-11-12
 
 ### Studio
 - Updated to `2025.11.10-sha-5291fe3` - [Dashboard updates](https://github.com/orgs/supabase/discussions/40083)
@@ -473,7 +477,7 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
-## [2025-11-05]
+## 2025-11-05
 
 ### Studio
 - No image update
@@ -485,7 +489,7 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
-## [2025-10-28]
+## 2025-10-28
 
 ### Studio
 - Updated to `2025.10.27-sha-85b84e0` - [Dashboard updates](https://github.com/orgs/supabase/discussions/40083)
@@ -505,7 +509,7 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
-## [2025-10-27]
+## 2025-10-27
 
 ### Studio
 - No image update
@@ -514,7 +518,7 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
-## [2025-10-21]
+## 2025-10-21
 
 ### Studio
 - Updated to `2025.10.20-sha-5005fc6` - [Dashboard updates](https://github.com/orgs/supabase/discussions/39709)
@@ -537,14 +541,14 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
-## [2025-10-13]
+## 2025-10-13
 
 ### Analytics (Logflare)
 - Updated to `1.22.6` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.22.6)
 
 ---
 
-## [2025-10-08]
+## 2025-10-08
 
 ### Studio
 - Updated to `2025.10.01-sha-8460121` - [Dashboard updates](https://github.com/orgs/supabase/discussions/39709)

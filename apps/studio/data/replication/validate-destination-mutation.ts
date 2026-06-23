@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import type { components } from 'api-types'
 
-import { DestinationConfig } from './create-destination-pipeline-mutation'
+import { buildDucklakeApiConfig, DestinationConfig } from './create-destination-pipeline-mutation'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -75,33 +75,9 @@ async function validateDestination(
       },
     }
   } else if ('ducklake' in destinationConfig) {
-    const {
-      catalogUrl,
-      dataPath,
-      poolSize,
-      s3AccessKeyId,
-      s3SecretAccessKey,
-      s3Region,
-      s3Endpoint,
-      s3UrlStyle,
-      s3UseSsl,
-      metadataSchema,
-    } = destinationConfig.ducklake
-
-    config = {
-      ducklake: {
-        catalog_url: catalogUrl,
-        data_path: dataPath,
-        pool_size: poolSize,
-        s3_access_key_id: s3AccessKeyId,
-        s3_secret_access_key: s3SecretAccessKey,
-        s3_region: s3Region,
-        s3_endpoint: s3Endpoint,
-        s3_url_style: s3UrlStyle,
-        s3_use_ssl: s3UseSsl,
-        metadata_schema: metadataSchema,
-      },
-    } as unknown as components['schemas']['ValidateReplicationDestinationBody']['config']
+    config = buildDucklakeApiConfig(
+      destinationConfig.ducklake
+    ) as components['schemas']['ValidateReplicationDestinationBody']['config']
   } else if ('snowflake' in destinationConfig) {
     const { accountId, user, privateKey, privateKeyPassphrase, database, schema, role } =
       destinationConfig.snowflake
