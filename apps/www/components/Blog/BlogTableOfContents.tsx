@@ -1,10 +1,44 @@
 'use client'
 
-import { AnchorProvider, Toc, TOCItems, TOCScrollArea } from 'ui-patterns'
+import { useEffect, useState, type ReactNode } from 'react'
+import { AnchorProvider, Toc, TOCItems, TocPrimitive, TOCScrollArea } from 'ui-patterns'
 import type { TOCItemType } from 'ui-patterns/Toc/types'
 
 interface Props {
   items: TOCItemType[]
+}
+
+function SuppressUntilFirstAnchor({
+  items,
+  children,
+}: {
+  items: TOCItemType[]
+  children: ReactNode
+}) {
+  const [enabled, setEnabled] = useState(false)
+  const anchors = TocPrimitive.useActiveAnchors()
+
+  useEffect(() => {
+    const firstId = items[0]?.url.split('#')[1]
+    if (!firstId) return
+
+    const el = document.getElementById(firstId)
+    if (!el) return
+
+    // Activate when the first heading is within the bottom half of the viewport,
+    // anticipating navigation jumps that land the heading near the top
+    const check = () => setEnabled(el.getBoundingClientRect().top <= window.innerHeight * 0.5)
+
+    check()
+    window.addEventListener('scroll', check, { passive: true })
+    return () => window.removeEventListener('scroll', check)
+  }, [items])
+
+  return (
+    <TocPrimitive.ActiveAnchorContext.Provider value={enabled ? anchors : []}>
+      {children}
+    </TocPrimitive.ActiveAnchorContext.Provider>
+  )
 }
 
 export function BlogTableOfContents({ items }: Props) {
@@ -12,14 +46,18 @@ export function BlogTableOfContents({ items }: Props) {
 
   return (
     <AnchorProvider toc={items} single>
-      <Toc>
-        <p className="text-foreground-lighter text-sm font-normal">On this page</p>
-        <TOCScrollArea>
-          <div className="-ml-[calc(0.75rem+5px)]">
-            <TOCItems items={items} />
-          </div>
-        </TOCScrollArea>
-      </Toc>
+      <SuppressUntilFirstAnchor items={items}>
+        <p className="text-foreground-light font-mono uppercase tracking-wide text-xs mb-4">
+          On this page
+        </p>
+        <Toc className="border-l">
+          <TOCScrollArea className="ml-[-2px]">
+            <div className="-ml-3">
+              <TOCItems items={items} />
+            </div>
+          </TOCScrollArea>
+        </Toc>
+      </SuppressUntilFirstAnchor>
     </AnchorProvider>
   )
 }
