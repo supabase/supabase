@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 import { devtools, proxyMap } from 'valtio/utils'
 
+import { buildUpsertPayload, isLoadedSnippet, validateMoveToFolder } from './sql-editor-rules'
 import type { SnippetWithContent, StateSnippet, StateSnippetFolder } from './types'
 import type { QueryPlanRow } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
 import { DiffType } from '@/components/interfaces/SQLEditor/SQLEditor.types'
@@ -241,11 +242,12 @@ export const sqlEditorState = proxy({
     let storeFolder = sqlEditorState.folders[id]
     const isNewFolder = id === 'new-folder'
     const hasChanges = storeFolder.folder.name !== name
+    const folderNameTaken = sqlEditorState.allFolderNames.includes(name)
 
-    if (isNewFolder && sqlEditorState.allFolderNames.includes(name)) {
+    if (isNewFolder && folderNameTaken) {
       sqlEditorState.removeFolder(id)
       return toast.error('Unable to create new folder: This folder name already exists')
-    } else if (hasChanges && sqlEditorState.allFolderNames.includes(name)) {
+    } else if (hasChanges && folderNameTaken) {
       storeFolder.status = 'idle'
       return toast.error('Unable to update folder: This folder name already exists')
     }
@@ -462,38 +464,16 @@ if (typeof window !== 'undefined') {
       const folder = state.folders[id]
 
       if (snippet) {
-        const {
-          name,
-          description,
-          visibility,
-          project_id,
-          owner_id,
-          folder_id,
-          content,
-          favorite,
-        } = snippet.snippet
+        const { visibility, folder_id } = snippet.snippet
+        const result = validateMoveToFolder({ visibility, folderId: folder_id })
 
-        if (visibility === 'project' && !!folder_id) {
-          toast.error('Shared snippet cannot be within a folder')
-        } else {
+        if (!result.ok) {
+          toast.error(result.error)
+        } else if (isLoadedSnippet(snippet.snippet)) {
           debouncedUpdateSnippet(
             id,
             snippet.projectRef,
-            {
-              id,
-              type: 'sql',
-              name: name ?? 'Untitled',
-              description: description ?? '',
-              visibility: visibility ?? 'user',
-              project_id: project_id ?? 0,
-              owner_id: owner_id,
-              folder_id: folder_id ?? undefined,
-              favorite: favorite ?? false,
-              content: {
-                ...content!,
-                content_id: id,
-              },
-            },
+            buildUpsertPayload(snippet.snippet, id),
             shouldInvalidate
           )
           sqlEditorState.needsSaving.delete(id)
