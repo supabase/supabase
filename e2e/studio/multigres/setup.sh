@@ -74,12 +74,16 @@ ALTER ROLE supabase_storage_admin WITH LOGIN PASSWORD 'postgres';
 ALTER ROLE supabase_functions_admin WITH LOGIN PASSWORD 'postgres';
 ALTER ROLE supabase_read_only_user WITH LOGIN PASSWORD 'postgres';
 
--- Pin each admin role's search_path to its own schema (some services issue
--- unqualified queries against their schema and rely on this being set).
+-- search_path per role, matching the bundled database image. Services issue
+-- unqualified queries and rely on these being set (e.g. the role each service
+-- connects as needs its own schema + extensions on the path).
 ALTER ROLE supabase_auth_admin SET search_path TO auth, public, extensions;
 ALTER ROLE supabase_storage_admin SET search_path TO storage, public, extensions;
+ALTER ROLE supabase_admin SET search_path TO "$user", public, auth, extensions;
+ALTER ROLE postgres SET search_path TO "$user", public, extensions;
 
 GRANT anon, authenticated, service_role TO authenticator;
+GRANT supabase_admin TO authenticator;
 GRANT anon, authenticated, service_role TO postgres;
 -- Admin roles switch into the request role (SET ROLE) per request, so they need
 -- membership in those roles.
