@@ -162,12 +162,12 @@ Follow CONTRIBUTING § Overview pages and content listings in apps/docs.
 | `cl-registry` | Registry entry and import |
 | `cl-inline` | Inline component in guide MDX |
 
-**Batch audit skill (follow-on conversions):** for auditing and converting remaining overview pages, use the `audit-content-listings` agent skill ([`.claude/skills/audit-content-listings/SKILL.md`](../../.claude/skills/audit-content-listings/SKILL.md)) and keep [`conversion-manifest.yaml`](components/listings/conversion-manifest.yaml) up to date.
+**Batch audit skill (follow-on conversions):** for auditing and converting remaining overview pages, install the `audit-content-listings` skill from [`docs-agent-skills`](https://github.com/supabase/docs-agent-skills/tree/main/audit-content-listings) and keep [`conversion-manifest.json`](https://github.com/supabase/docs-agent-skills/blob/main/audit-content-listings/conversion-manifest.json) up to date there.
 
 Validate manifest drift from repo root:
 
 ```bash
-node .claude/skills/audit-content-listings/scripts/validate-conversion-manifest.mjs
+node ~/GitHub/supabase/docs-agent-skills/audit-content-listings/scripts/validate-conversion-manifest.mjs
 ```
 
 Markdown export uses the same data modules via handlers in [`internals/markdown-schema/Listings.ts`](internals/markdown-schema/Listings.ts), so web and `.md` alternate output stay in sync.
