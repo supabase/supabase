@@ -1,6 +1,6 @@
 'use client'
 
-import { AnimatePresence, motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Button, cn } from 'ui'
@@ -305,7 +305,7 @@ export function CustomerStoriesSection() {
                     delay: isActive ? 0.2 : 0,
                   }}
                   aria-hidden={!isActive}
-                  {...(!isActive ? { inert: '' } : {})}
+                  {...(!isActive ? { inert: true } : {})}
                 >
                   {/* Top: company name + tagline */}
                   <motion.div layout className="flex flex-col gap-1">
