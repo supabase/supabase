@@ -8,7 +8,7 @@ cli = [ "supabase-start" ]
 ---
 
 When running Supabase locally with the CLI, the Kong API gateway can stop
-responding under heavy load. This typically shows up when many parallel
+responding under heavy load. This typically happens when many parallel
 requests are made (for example, bulk operations against the Storage API):
 Kong starts terminating socket connections and logs errors about not having
 enough available workers.
