@@ -67,10 +67,58 @@ function serializeQuery(query: UrlObject['query']): string {
   return s ? `?${s}` : ''
 }
 
+// Next's pages-router fills dynamic segments in a UrlObject's `pathname` from
+// `query`, then drops the consumed keys from the query string — e.g.
+// `push({ pathname: '/project/[ref]/editor/[id]', query: { ref, id, foo } })`
+// resolves to `/project/<ref>/editor/<id>?foo=...`. `router.pathname` here is
+// the bracketed route *pattern* (see toNextPathPattern) and callers like
+// useUrlState push it back verbatim, so without this a sort/filter update on a
+// dynamic route would navigate TanStack to a LITERAL `/project/[ref]/...`,
+// which matches no project (ref === '[ref]') and bounces to a "project not
+// found" redirect. Mirrors Next's behaviour so those pushes stay on-page.
+function interpolatePathname(
+  pathname: string,
+  query: Record<string, QueryValue>
+): { pathname: string; query: Record<string, QueryValue> } {
+  if (!pathname.includes('[')) return { pathname, query }
+  const consumed = new Set<string>()
+  const encodeValue = (v: QueryValue) =>
+    v == null
+      ? ''
+      : Array.isArray(v)
+        ? v.map((item) => encodeURIComponent(String(item))).join('/')
+        : encodeURIComponent(String(v))
+  const interpolated = pathname
+    // optional + required catch-all: `[[...name]]` / `[...name]`
+    .replace(/\[\[?\.\.\.([^\]]+)\]?\]/g, (_match, name: string) => {
+      consumed.add(name)
+      return encodeValue(query[name])
+    })
+    // single dynamic segment: `[name]`
+    .replace(/\[([^\]]+)\]/g, (_match, name: string) => {
+      consumed.add(name)
+      return encodeValue(query[name])
+    })
+  if (consumed.size === 0) return { pathname: interpolated, query }
+  const rest: Record<string, QueryValue> = {}
+  for (const [key, value] of Object.entries(query)) {
+    if (!consumed.has(key)) rest[key] = value
+  }
+  return { pathname: interpolated, query: rest }
+}
+
 function resolveUrl(url: string | UrlObject): string {
   if (typeof url === 'string') return url
-  const pathname = url.pathname ?? ''
-  const search = url.search ?? serializeQuery(url.query)
+  let pathname = url.pathname ?? ''
+  let query = url.query
+  // Interpolate named params into the path when query is a record — a raw query
+  // string can't fill `[param]` placeholders, so leave it untouched.
+  if (query && typeof query === 'object') {
+    const interpolated = interpolatePathname(pathname, query)
+    pathname = interpolated.pathname
+    query = interpolated.query
+  }
+  const search = url.search ?? serializeQuery(query)
   const hash = url.hash ? (url.hash.startsWith('#') ? url.hash : `#${url.hash}`) : ''
   return `${pathname}${search}${hash}`
 }
