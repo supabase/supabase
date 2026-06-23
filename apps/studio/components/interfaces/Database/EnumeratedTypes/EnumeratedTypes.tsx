@@ -15,6 +15,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -236,11 +239,17 @@ export const EnumeratedTypes = () => {
                           <div className="flex justify-end items-center space-x-2">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button
-                                  variant="default"
-                                  className="px-1"
-                                  icon={<MoreVertical />}
-                                />
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="default"
+                                      className="px-1"
+                                      icon={<MoreVertical />}
+                                      aria-label="More options"
+                                    />
+                                  </TooltipTrigger>
+                                  <TooltipContent side="bottom">More options</TooltipContent>
+                                </Tooltip>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent side="bottom" align="end" className="w-32">
                                 <DropdownMenuItem
