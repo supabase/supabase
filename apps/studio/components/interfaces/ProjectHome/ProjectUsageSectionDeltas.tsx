@@ -8,12 +8,16 @@ import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
 import {
   buildSortedServiceCards,
-  computeSuccessAndNonSuccessRates,
   getBucketLogRange,
   isServiceDisabled,
   type ChartIntervalKey,
   type LogsBarChartDatum,
 } from './ProjectUsage.metrics'
+import { ApiGatewayProductChart } from '@/components/interfaces/Observability/ApiGatewayProductChart'
+import {
+  buildApiGatewayProductData,
+  calculateApiGatewayAggregate,
+} from '@/components/interfaces/Observability/apiGatewayProductChart.utils'
 import { useServiceHealthMetrics } from '@/components/interfaces/Observability/useServiceHealthMetrics'
 import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
 import { ChartIntervalDropdown } from '@/components/ui/Logs/ChartIntervalDropdown'
@@ -114,15 +118,15 @@ export const ProjectUsageSectionDeltas = () => {
     [serviceBase, serviceData]
   )
 
-  const totalRequests = services.reduce((sum, s) => sum + s.total, 0)
-  const totalErrors = services.reduce((sum, s) => sum + s.err, 0)
-  const totalWarnings = services.reduce((sum, s) => sum + s.warn, 0)
-
-  const { successRate } = computeSuccessAndNonSuccessRates(
-    totalRequests,
-    totalWarnings,
-    totalErrors
+  // The API Gateway routes to every product, so its by-product breakdown is the
+  // headline: "Total Requests" and "Success Rate" equal the API Gateway chart total.
+  const apiGatewayProductData = useMemo(
+    () => buildApiGatewayProductData(serviceData),
+    [serviceData]
   )
+  const apiGateway = useMemo(() => calculateApiGatewayAggregate(serviceData), [serviceData])
+  const totalRequests = apiGateway.total
+  const successRate = apiGateway.successRate
 
   const handleBarClick =
     (logRoute: string, serviceKey: HomeServiceKey) => (datum: LogsBarChartDatum) => {
@@ -170,7 +174,13 @@ export const ProjectUsageSectionDeltas = () => {
       </div>
       <Row maxColumns={4} minWidth={280}>
         {services.map((s) => {
-          const disabled = isServiceDisabled(s.total, isLoading)
+          // The API Gateway card shows the by-product breakdown, so its header
+          // counts come from the aggregate to match the chart it renders.
+          const isApiGateway = s.key === 'data_api'
+          const total = isApiGateway ? apiGateway.total : s.total
+          const warn = isApiGateway ? apiGateway.warningCount : s.warn
+          const err = isApiGateway ? apiGateway.errorCount : s.err
+          const disabled = isServiceDisabled(total, isLoading)
           return (
             <Card
               key={s.key}
@@ -197,7 +207,7 @@ export const ProjectUsageSectionDeltas = () => {
                         s.title
                       )}
                     </CardTitle>
-                    <span className="text-foreground text-xl">{s.total.toLocaleString()}</span>
+                    <span className="text-foreground text-xl">{total.toLocaleString()}</span>
                   </div>
                 </div>
                 <div className="flex items-end gap-4 text-foreground-light">
@@ -206,42 +216,67 @@ export const ProjectUsageSectionDeltas = () => {
                       <div className="w-1.5 h-1.5 bg-warning rounded-full" />
                       <span className="heading-meta">Warnings</span>
                     </div>
-                    <span className="text-foreground text-base">{s.warn.toLocaleString()}</span>
+                    <span className="text-foreground text-base">{warn.toLocaleString()}</span>
                   </div>
                   <div className="flex flex-col items-end">
                     <div className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 bg-destructive rounded-full" />
                       <span className="heading-meta">Errors</span>
                     </div>
-                    <span className="text-foreground text-base">{s.err.toLocaleString()}</span>
+                    <span className="text-foreground text-base">{err.toLocaleString()}</span>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="p-card flex-1 h-full overflow-hidden">
                 <Loading isFullHeight active={isLoading}>
-                  <LogsBarChart
-                    isFullHeight
-                    data={s.data}
-                    DateTimeFormat={datetimeFormat}
-                    onBarClick={disabled ? undefined : handleBarClick(s.route, s.key)}
-                    hideZeroValues={true}
-                    chartConfig={{
-                      error_count: { label: 'Errors' },
-                      warning_count: { label: 'Warnings' },
-                      ok_count: { label: 'Infos' },
-                    }}
-                    EmptyState={
-                      isLoading ? (
-                        <></>
-                      ) : (
-                        <NoDataPlaceholder
-                          size="small"
-                          message="No data for selected period"
-                          isFullHeight
-                        />
-                      )
-                    }
-                  />
+                  {isApiGateway ? (
+                    <ApiGatewayProductChart
+                      data={apiGatewayProductData}
+                      DateTimeFormat={datetimeFormat}
+                      // The handler only reads `timestamp`, shared by both datum shapes
+                      onBarClick={
+                        disabled
+                          ? undefined
+                          : (datum) =>
+                              handleBarClick(s.route, s.key)(datum as unknown as LogsBarChartDatum)
+                      }
+                      EmptyState={
+                        isLoading ? (
+                          <></>
+                        ) : (
+                          <NoDataPlaceholder
+                            size="small"
+                            message="No data for selected period"
+                            isFullHeight
+                          />
+                        )
+                      }
+                    />
+                  ) : (
+                    <LogsBarChart
+                      isFullHeight
+                      data={s.data}
+                      DateTimeFormat={datetimeFormat}
+                      onBarClick={disabled ? undefined : handleBarClick(s.route, s.key)}
+                      hideZeroValues={true}
+                      chartConfig={{
+                        error_count: { label: 'Errors' },
+                        warning_count: { label: 'Warnings' },
+                        ok_count: { label: 'Infos' },
+                      }}
+                      EmptyState={
+                        isLoading ? (
+                          <></>
+                        ) : (
+                          <NoDataPlaceholder
+                            size="small"
+                            message="No data for selected period"
+                            isFullHeight
+                          />
+                        )
+                      }
+                    />
+                  )}
                 </Loading>
               </CardContent>
             </Card>
