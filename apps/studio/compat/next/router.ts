@@ -107,7 +107,8 @@ function interpolatePathname(
   return { pathname: interpolated, query: rest }
 }
 
-function resolveUrl(url: string | UrlObject): string {
+// Exported for unit tests (see router.test.ts) — not part of the Next surface.
+export function resolveUrl(url: string | UrlObject): string {
   if (typeof url === 'string') return url
   let pathname = url.pathname ?? ''
   let query = url.query
