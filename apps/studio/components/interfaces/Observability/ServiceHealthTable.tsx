@@ -1,9 +1,11 @@
 import { ChevronRight, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
+import { useMemo } from 'react'
 import {
   Button,
   Card,
   CardContent,
+  type ChartConfig,
   cn,
   Skeleton,
   Tooltip,
@@ -14,6 +16,12 @@ import { ChartEmptyState, ChartLoadingState } from 'ui-patterns/Chart'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
 import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
+import { ApiGatewayProductChart } from './ApiGatewayProductChart'
+import {
+  buildApiGatewayProductData,
+  calculateApiGatewayAggregate,
+  type ApiGatewayProductDatum,
+} from './apiGatewayProductChart.utils'
 import { getHealthStatus, type ServiceKey } from './ObservabilityOverview.utils'
 
 type ServiceConfig = {
@@ -47,6 +55,14 @@ const colorClassMap: Record<string, string> = {
   brand: 'bg-brand',
 }
 
+// Tooltip labels for the per-level service charts. "Infos" keeps the level
+// wording consistent with "Errors" and "Warnings" across the page.
+const LEVEL_CHART_CONFIG: ChartConfig = {
+  error_count: { label: 'Errors' },
+  warning_count: { label: 'Warnings' },
+  ok_count: { label: 'Infos' },
+}
+
 const SERVICE_DESCRIPTIONS: Record<ServiceKey, string> = {
   db: 'PostgreSQL database health and performance',
   auth: 'Authentication and user management',
@@ -77,6 +93,9 @@ type ServiceCellProps = {
   onBarClick: (datum: LogsBarChartDatum) => void
   datetimeFormat: string
   className?: string
+  // When provided, the cell renders the API Gateway traffic stacked by product
+  // instead of the default per-level chart.
+  productChartData?: ApiGatewayProductDatum[]
 }
 
 const ServiceCell = ({
@@ -85,6 +104,7 @@ const ServiceCell = ({
   onBarClick,
   datetimeFormat,
   className,
+  productChartData,
 }: ServiceCellProps) => {
   const reportUrl = service.reportUrl || service.logsUrl
   const { color } = getHealthStatus(data.errorRate, data.total)
@@ -165,12 +185,23 @@ const ServiceCell = ({
       <div className="relative z-10 h-16">
         {data.isLoading ? (
           <ChartLoadingState className="h-full" />
+        ) : productChartData ? (
+          <ApiGatewayProductChart
+            hideDateRange
+            hideXAxis
+            data={productChartData}
+            DateTimeFormat={datetimeFormat}
+            // The bar-click handler only reads `timestamp`, shared by both datum shapes
+            onBarClick={(datum) => onBarClick(datum as unknown as LogsBarChartDatum)}
+            EmptyState={<ChartEmptyState className="h-full" description="No traffic" />}
+          />
         ) : (
           <LogsBarChart
             isFullHeight
             hideDateRange
             hideXAxis
             data={data.eventChartData}
+            chartConfig={LEVEL_CHART_CONFIG}
             DateTimeFormat={datetimeFormat}
             onBarClick={onBarClick}
             EmptyState={<ChartEmptyState className="h-full" description="No traffic" />}
@@ -187,6 +218,17 @@ export const ServiceHealthTable = ({
   onBarClick,
   datetimeFormat,
 }: ServiceHealthTableProps) => {
+  // The API Gateway row shows traffic grouped by product, with its request count
+  // and health derived from the same products so the header matches the chart.
+  const apiGatewayProductData = useMemo(
+    () => buildApiGatewayProductData(serviceData),
+    [serviceData]
+  )
+  const apiGatewayAggregate = useMemo(
+    () => calculateApiGatewayAggregate(serviceData),
+    [serviceData]
+  )
+
   return (
     <div>
       <h2 className="heading-section mb-4">Service Health</h2>
@@ -203,11 +245,23 @@ export const ServiceHealthTable = ({
               const lastRowCount = restCount % 2 === 0 ? 2 : 1
               const isInLastRow = !isFirst && index >= services.length - lastRowCount
 
+              const isApiGateway = service.key === 'data_api'
+              const cellData: ServiceData = isApiGateway
+                ? {
+                    ...data,
+                    total: apiGatewayAggregate.total,
+                    errorRate: apiGatewayAggregate.errorRate,
+                    errorCount: apiGatewayAggregate.errorCount,
+                    warningCount: apiGatewayAggregate.warningCount,
+                  }
+                : data
+
               return (
                 <ServiceCell
                   key={service.key}
                   service={service}
-                  data={data}
+                  data={cellData}
+                  productChartData={isApiGateway ? apiGatewayProductData : undefined}
                   onBarClick={onBarClick(service.logsUrl)}
                   datetimeFormat={datetimeFormat}
                   className={cn(
