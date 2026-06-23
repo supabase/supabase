@@ -1,6 +1,26 @@
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 
 import { collectReferenceContent } from './build-reference-content'
+import { generateDartReferenceDump } from './generate-dart-reference'
+
+function serialize(content: {
+  bySlug: unknown
+  flat: unknown
+  sections: unknown
+  functionsList: unknown
+  typeSpec: unknown
+}): string {
+  const seen = new WeakSet<object>()
+  const breakCycles = (_key: string, value: unknown) => {
+    if (value && typeof value === 'object') {
+      if (seen.has(value as object)) return '[Circular]'
+      seen.add(value as object)
+    }
+    return value
+  }
+  const { bySlug, flat, sections, functionsList, typeSpec } = content
+  return JSON.stringify({ bySlug, flat, sections, functionsList, typeSpec }, breakCycles, 2)
+}
 
 /**
  * Regression guard for the new reference-content pipeline. Snapshots the five
@@ -18,19 +38,28 @@ import { collectReferenceContent } from './build-reference-content'
  */
 describe('build-reference-content — javascript/v2', () => {
   it('matches snapshot', async () => {
-    const { bySlug, flat, sections, functionsList, typeSpec } = await collectReferenceContent(
-      'javascript',
-      'v2'
+    const content = await collectReferenceContent('javascript', 'v2')
+    await expect(serialize(content)).toMatchFileSnapshot(
+      './__snapshots__/build-reference-content.v2.json'
     )
-    const seen = new WeakSet<object>()
-    const breakCycles = (_key: string, value: unknown) => {
-      if (value && typeof value === 'object') {
-        if (seen.has(value as object)) return '[Circular]'
-        seen.add(value as object)
-      }
-      return value
-    }
-    const json = JSON.stringify({ bySlug, flat, sections, functionsList, typeSpec }, breakCycles, 2)
-    await expect(json).toMatchFileSnapshot('./__snapshots__/build-reference-content.v2.json')
+  })
+})
+
+/**
+ * Dart/v2 has no upstream TypeDoc dump; its source is regenerated from the
+ * committed `spec/supabase_dart_v2.yml` by `generate-dart-reference.ts`. We run
+ * that converter first so the snapshot covers the full conversion + build path
+ * (YAML → dump → content) and surfaces any drift in either step.
+ */
+describe('build-reference-content — dart/v2', () => {
+  beforeAll(async () => {
+    await generateDartReferenceDump()
+  })
+
+  it('matches snapshot', async () => {
+    const content = await collectReferenceContent('dart', 'v2')
+    await expect(serialize(content)).toMatchFileSnapshot(
+      './__snapshots__/build-reference-content.dart.v2.json'
+    )
   })
 })

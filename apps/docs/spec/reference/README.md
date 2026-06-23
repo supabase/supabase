@@ -135,6 +135,28 @@ Key tags the walker reads:
 Anything without `@category` is collected into `typeSpec.json` (for cross-reference
 by `$ref`) but does **not** appear in the navigation/section list.
 
+### Non-TypeDoc sources (Dart/Flutter)
+
+Not every SDK ships TypeDoc. Dart is adapted "as a pre-step": the committed
+legacy spec [`spec/supabase_dart_v2.yml`](../supabase_dart_v2.yml) plus the
+shared section tree (`spec/common-client-libs-sections.json`) are converted into
+a TypeDoc-shaped dump by
+[`scripts/generate-dart-reference.ts`](../../scripts/generate-dart-reference.ts).
+Each Dart method becomes a `variant: 'declaration'` node tagged with
+`@category` / `@subcategory` (so it groups like any TypeDoc declaration) and
+carries the legacy function shape (description, notes, params, examples) on a
+non-TypeDoc `content` field. `build-reference-content.ts` spreads that `content`
+straight onto the functions.json entry, so the renderer shows params, examples,
+and notes exactly as the YAML did — no typeSpec round-trip. The `content` field
+is absent for real TypeDoc dumps, so JavaScript output is unchanged.
+
+The generated dump (`spec/reference/dart/v2/supabase_flutter.json`) is gitignored
+like every other dump; `pnpm codegen:references:new` regenerates it from the
+committed YAML before the content build (and a `make generate.dart.v2` target
+mirrors that for manual runs). Overview/header blocks (e.g. "Using filters",
+"Auth MFA") and the top-level markdown sections live as hand-authored partials
+under `spec/reference/dart/v2/partials/`, exactly like the JavaScript lib.
+
 `$ref` values are constructed as `<package>.<module…>.<class…>.<member>`,
 following TypeDoc's module (kind 2), namespace (kind 4), class (kind 128) and
 interface (kind 256) nesting. The `index` module segment is stripped via
@@ -361,10 +383,7 @@ to the constant in
 [`features/docs/Reference.constants.ts`](../../features/docs/Reference.constants.ts):
 
 ```ts
-export const SUPPORTS_NEW_REFERENCE_PROCESS = new Set([
-  'javascript-v2',
-  // 'dart-v2',         ← uncomment when ready
-])
+export const SUPPORTS_NEW_REFERENCE_PROCESS = new Set(['javascript-v2', 'dart-v2'])
 ```
 
 The same set drives every runtime read that depends on the new layout:
