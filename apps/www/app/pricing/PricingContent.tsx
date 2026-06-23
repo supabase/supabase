@@ -58,7 +58,7 @@ export default function PricingContent() {
 
       <div
         id="addon-compute"
-        className="section-container relative pt-16 md:pt-24 lg:pt-32 lg:pb-16"
+        className="container relative mx-auto px-4 lg:px-12 pt-16 md:pt-24 lg:pt-32 lg:pb-16"
       >
         <div className="text-center mb-8 lg:mb-16">
           <h2 className="text-foreground text-3xl" id="how-compute-pricing-works">
@@ -81,11 +81,14 @@ export default function PricingContent() {
         <PricingComputeSection />
       </div>
 
-      <div id="disk" className="section-container relative pt-16 md:pt-24 lg:pt-32 lg:pb-16">
+      <div
+        id="disk"
+        className="container relative mx-auto px-4 lg:px-12 pt-16 md:pt-24 lg:pt-32 lg:pb-16"
+      >
         <PricingDiskSection />
       </div>
 
-      <div id="addons" className="sm:py-18 section-container relative py-16 md:py-24">
+      <div id="addons" className="sm:py-18 container relative mx-auto px-4 py-16 md:py-24 lg:px-12">
         <PricingAddons />
       </div>
 
