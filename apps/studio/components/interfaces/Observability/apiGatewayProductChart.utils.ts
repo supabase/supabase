@@ -1,3 +1,4 @@
+import { computeSuccessAndNonSuccessRates } from '../ProjectHome/ProjectUsage.metrics'
 import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
 import type { ServiceKey } from './ObservabilityOverview.utils'
 
@@ -75,6 +76,7 @@ export const calculateApiGatewayAggregate = (
   errorCount: number
   warningCount: number
   errorRate: number
+  successRate: number
 } => {
   let total = 0
   let errorCount = 0
@@ -89,6 +91,7 @@ export const calculateApiGatewayAggregate = (
   }
 
   const errorRate = total > 0 ? (errorCount / total) * 100 : 0
+  const { successRate } = computeSuccessAndNonSuccessRates(total, warningCount, errorCount)
 
-  return { total, errorCount, warningCount, errorRate }
+  return { total, errorCount, warningCount, errorRate, successRate }
 }

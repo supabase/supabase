@@ -92,6 +92,7 @@ describe('calculateApiGatewayAggregate', () => {
       errorCount: 0,
       warningCount: 0,
       errorRate: 0,
+      successRate: 0,
     })
   })
 
@@ -106,6 +107,8 @@ describe('calculateApiGatewayAggregate', () => {
     expect(result.warningCount).toBe(16)
     // 4 errors / 100 total
     expect(result.errorRate).toBe(4)
+    // 100 - (16 warnings + 4 errors) / 100
+    expect(result.successRate).toBe(80)
   })
 
   it('ignores services that are not API Gateway products', () => {
